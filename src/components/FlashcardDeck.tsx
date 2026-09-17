@@ -108,9 +108,16 @@ export function FlashcardDeck({
         <div className="absolute left-5 hidden h-44 w-28 -rotate-6 rounded-xl border border-primary/25 bg-card/55 shadow-[var(--shadow-soft)] sm:block" />
         <div className="absolute right-5 hidden h-44 w-28 rotate-6 rounded-xl border border-primary/25 bg-card/55 shadow-[var(--shadow-soft)] sm:block" />
 
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onClick={() => setFlipped((f) => !f)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setFlipped((f) => !f);
+            }
+          }}
           className={cn(
             "relative z-10 flex aspect-[4/3] w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-primary/40 bg-card p-6 text-center text-card-foreground shadow-[var(--shadow-lift)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             flipped && "border-success/70",
@@ -150,7 +157,7 @@ export function FlashcardDeck({
               )}
             </>
           )}
-        </button>
+        </div>
       </div>
 
       {flipped && (
