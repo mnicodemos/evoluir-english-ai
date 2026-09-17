@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
+import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { speakEnglish } from "@/lib/speech";
@@ -224,8 +225,9 @@ function ListeningPage() {
   }, [index]);
 
 
-  // A new round of sentences is only unlocked when new lessons are created.
-  const lessonCount = lessons?.length ?? 0;
+  // A new round of sentences is unlocked every time the student starts a new lesson.
+  const { data: startedLessons } = useLessonRound();
+  const lessonCount = startedLessons ?? 0;
 
   const sentences = useMemo(() => {
     const fromLessons = lessonSentences(lessons ?? []);
