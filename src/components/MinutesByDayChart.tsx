@@ -11,6 +11,7 @@ import {
 } from "recharts";
 
 import { supabase } from "@/integrations/supabase/client";
+import { skillBucketOf } from "@/lib/studyDay";
 import { useUiLang } from "@/lib/uiLang";
 
 type Props = {
