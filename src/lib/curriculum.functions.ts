@@ -90,8 +90,8 @@ async function writeLesson(
           '"flashcards":[{"card_type":"listen|question","prompt":"front of card, uppercase English instruction or question","answer":"back of card, short English answer","listen_text":"English sentence to hear only on the answer side; empty for non-listen cards","word":"short label from the lesson","definition":"short English-only definition or explanation, no Portuguese","pronunciation":"simple phonetic hint","example":"natural English sentence from or based on this lesson","difficulty":"easy|medium|hard"}],' +
           '"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence"}]}. ' +
           "Give exactly 7 flashcards and 10 quiz questions. " +
-          "Exactly 4 flashcards must have card_type 'listen'. For these, the prompt must be a listening question or repeat instruction, the answer must reveal the sentence or phrase, and listen_text must contain that same English audio sentence. " +
-          "The other 3 flashcards must have card_type 'question' and should vary between grammar use, meaning, and a key expression from the lesson. " +
+          "Exactly 3 flashcards must have card_type 'listen'. For these, the prompt must be a listening question or repeat instruction, the answer must reveal the sentence or phrase, and listen_text must contain that same English audio sentence. " +
+          "The other 4 flashcards must have card_type 'question'. Randomly vary them between grammar use, meaning, key expressions, sentence completion, and real-life situations from the lesson, without repeating the same format. " +
           "Every flashcard must use content from THIS lesson transcript, and every flashcard field must be in English only - never Portuguese, never a translation. " +
           "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage). " +
           "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
@@ -138,7 +138,13 @@ async function writeLesson(
 
   if (error || !lesson) throw new Error(error?.message ?? "Could not save this lesson.");
 
-  const cards = (content.flashcards ?? []).slice(0, 7).filter((c) => c.word && (c.answer || c.definition || c.example));
+  const generatedCards = (content.flashcards ?? []).filter((c) => c.word && (c.answer || c.definition || c.example));
+  const listenCards = generatedCards.filter((card) => card.card_type === "listen").slice(0, 3);
+  const variedCards = generatedCards.filter((card) => card.card_type !== "listen").slice(0, 4);
+  const cards = [...listenCards, ...variedCards]
+    .map((card) => ({ card, random: Math.random() }))
+    .sort((a, b) => a.random - b.random)
+    .map(({ card }) => card);
   if (cards.length) {
     await supabase.from("flashcards").insert(
       cards.map((c, index) => ({
