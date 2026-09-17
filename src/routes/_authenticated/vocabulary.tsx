@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Mic, Search, Square, Volume2, X } from "lucide-react";
+import { Check, Loader2, Mic, RotateCcw, Search, Square, Volume2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -358,9 +358,15 @@ function Vocabulary() {
     <AppShell>
       <h1 className="text-3xl font-bold">Vocabulary Builder</h1>
       <p className="mt-2 text-muted-foreground">
-        Ten new words every day, chosen from the lessons in your learning path, with meaning, examples and a
+        Ten new words every time you start a new lesson, chosen from your learning path, with meaning, examples and a
         microphone to test your pronunciation.
       </p>
+      {(daily?.length ?? 0) > 0 && (
+        <Button variant="ghost" size="sm" className="mt-2 -ml-2" disabled={busy === "redo"} onClick={redoTodayWords}>
+          <RotateCcw className="mr-2 size-4" /> Redo today's words
+        </Button>
+      )}
+
 
       <label htmlFor="vocab-search" className="mt-6 block text-sm font-medium text-foreground">
         Search in English:
