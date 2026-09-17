@@ -188,8 +188,9 @@ function Vocabulary() {
         const audio = await stopVoiceRecording();
         const spoken = await transcribeAudio(audio);
         const score = Math.round(pronunciationScore(word.word, spoken) * 100);
+        // Show the result straight away; saving the practice happens in the background.
         if (profile) {
-          await logActivity({
+          void logActivity({
             userId: profile.id,
             type: "vocabulary",
             title: `Vocabulary practice — ${word.word}`,

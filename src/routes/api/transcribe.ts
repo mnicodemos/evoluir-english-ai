@@ -4,9 +4,29 @@ import { createFileRoute } from "@tanstack/react-router";
 const MAX_AUDIO_BYTES = 14 * 1024 * 1024;
 const GEMINI_TRANSCRIPTION_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash"] as const;
 
+/**
+ * Transcription only needs to echo what was said, so we turn off the model's
+ * "thinking" step and cap the answer. This is the main source of the delay
+ * students feel when their sentence or word is being checked.
+ */
+const FAST_CONFIG = {
+  temperature: 0,
+  maxOutputTokens: 256,
+  thinkingConfig: { thinkingBudget: 0 },
+};
+
 type GeminiTranscription = {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 };
+
+/** Reuse one client so the signing keys are fetched once, not on every recording. */
+let authClient: ReturnType<typeof createClient> | null = null;
+function getAuthClient(url: string, key: string) {
+  authClient ??= createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  return authClient;
+}
 
 export const Route = createFileRoute("/api/transcribe")({
   server: {
@@ -24,15 +44,18 @@ export const Route = createFileRoute("/api/transcribe")({
           return Response.json({ message: "Voice conversation is not configured yet." }, { status: 500 });
         }
 
-        const auth = createClient(supabaseUrl, publishableKey, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-        const { data, error } = await auth.auth.getClaims(token);
+        const auth = getAuthClient(supabaseUrl, publishableKey);
+        // Read the audio and validate the session at the same time instead of
+        // waiting for one and then the other.
+        const [claimsResult, form] = await Promise.all([
+          auth.auth.getClaims(token),
+          request.formData().catch(() => null),
+        ]);
+        const { data, error } = claimsResult;
         if (error || !data?.claims?.sub) {
           return Response.json({ message: "Please sign in again to use voice conversation." }, { status: 401 });
         }
 
-        const form = await request.formData().catch(() => null);
         const audio = form?.get("file");
         if (!(audio instanceof File) || audio.size < 2048) {
           return Response.json({ message: "That recording was empty. Please try again." }, { status: 400 });
@@ -48,8 +71,20 @@ export const Route = createFileRoute("/api/transcribe")({
         let result: GeminiTranscription | null = null;
         let failureStatus = 503;
 
-        for (const model of GEMINI_TRANSCRIPTION_MODELS) {
-          const response = await fetch(
+        const requestBody = (fast: boolean) =>
+          JSON.stringify({
+            contents: [{
+              role: "user",
+              parts: [
+                { text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks." },
+                { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
+              ],
+            }],
+            generationConfig: fast ? FAST_CONFIG : { temperature: 0, maxOutputTokens: 256 },
+          });
+
+        const send = (model: string, fast: boolean) =>
+          fetch(
             `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
             {
               method: "POST",
@@ -58,17 +93,14 @@ export const Route = createFileRoute("/api/transcribe")({
                 "X-Connection-Api-Key": connectionKey,
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({
-                contents: [{
-                  role: "user",
-                  parts: [
-                    { text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks." },
-                    { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
-                  ],
-                }],
-              }),
+              body: requestBody(fast),
             },
           );
+
+        for (const model of GEMINI_TRANSCRIPTION_MODELS) {
+          let response = await send(model, true);
+          // Older model versions reject the "no thinking" setting: retry plainly.
+          if (response.status === 400) response = await send(model, false);
 
           if (response.ok) {
             result = (await response.json()) as GeminiTranscription;
