@@ -177,31 +177,17 @@ function Dashboard() {
             <LevelCard level={profile.level} maxLevel={profile.max_level} />
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)] xl:items-start">
-            <div className="space-y-5">
-              <PathProgressCard />
-              <section>
-                <h2 className="text-lg font-semibold">Learning progress</h2>
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  {learningCards.map((c) => (
-                    <div key={c.label} className="card-soft p-4">
-                      <span className="text-xl">{c.emoji}</span>
-                      <p className="mt-1 text-xl font-bold">{c.value}</p>
-                      <p className="text-xs text-muted-foreground">{c.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
+          <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
+            <PathProgressCard />
 
-            <section>
+            <section className="min-w-0">
               <h2 className="text-lg font-semibold">Keep training</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {trainingCards.map((c) => (
                   <Link
                     key={`link-${c.to}`}
                     to={c.to}
-                    className={`card-soft group flex min-h-24 items-center gap-4 p-4 transition-shadow hover:shadow-[var(--shadow-lift)] ${c.className ?? ""}`}
+                    className={`card-soft group flex min-h-20 items-center gap-4 p-4 transition-shadow hover:shadow-[var(--shadow-lift)] ${c.className ?? ""}`}
                   >
                     <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
                       <c.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
@@ -215,14 +201,25 @@ function Dashboard() {
                 ))}
               </div>
             </section>
-          </div>
 
-          <section>
-            <h2 className="text-lg font-semibold">Performance</h2>
-            <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <section className="min-w-0">
+              <h2 className="text-lg font-semibold">Learning progress</h2>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                {learningCards.map((c) => (
+                  <div key={c.label} className="card-soft p-4">
+                    <span className="text-xl">{c.emoji}</span>
+                    <p className="mt-1 text-xl font-bold">{c.value}</p>
+                    <p className="text-xs text-muted-foreground">{c.label}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="flex min-w-0 flex-col">
+              <h2 className="text-lg font-semibold">Performance</h2>
               <Link
                 to={historyCard.to}
-                className={`card-soft group flex items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)] ${historyCard.className ?? ""}`}
+                className="card-soft group mt-3 flex min-h-24 flex-1 items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)]"
               >
                 <span className="grid size-11 place-items-center rounded-xl bg-secondary">
                   <historyCard.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
@@ -233,8 +230,8 @@ function Dashboard() {
                 </span>
                 <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
               </Link>
-            </div>
-          </section>
+            </section>
+          </div>
 
 
           {recent && recent.length > 0 && (
