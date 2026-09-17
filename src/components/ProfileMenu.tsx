@@ -83,7 +83,7 @@ export function ProfileMenu({ className }: { className?: string }) {
   useEffect(() => {
     if (!open) return;
     setName(profile?.name ?? "");
-    setPhone(profile?.phone ?? "");
+    setPhone(maskPhone(profile?.phone ?? ""));
     setBio(profile?.bio ?? "");
     setAvatarFile(null);
   }, [open, profile]);
