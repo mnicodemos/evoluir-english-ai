@@ -22,12 +22,18 @@ export function LessonQuiz({
     `lesson-quiz-answers:${lessonId}`,
     {},
   );
-  const [submitted, setSubmitted] = useState(false);
+  // Whether the quiz was already finished, so a completed lesson keeps showing
+  // the corrections instead of an empty quiz when the student comes back.
+  const [submitted, setSubmitted, clearSubmitted] = usePersistentState<boolean>(
+    `lesson-quiz-submitted:${lessonId}`,
+    false,
+  );
   const [saving, setSaving] = useState(false);
 
 
   const correct = questions.filter((q) => answers[q.id] === q.correct_answer).length;
   const score = questions.length ? Math.round((correct / questions.length) * 100) : 0;
+
 
   async function submit() {
     setSaving(true);
@@ -59,6 +65,7 @@ export function LessonQuiz({
 
   function retake() {
     clearAnswers();
+    clearSubmitted();
     setAnswers({});
     setSubmitted(false);
   }
@@ -73,16 +80,15 @@ export function LessonQuiz({
           <p className="mt-2 text-sm text-primary-foreground/80">
             {correct} of {questions.length} correct.{" "}
             {score >= PASS_SCORE
-              ? "Great job — you passed! Move on to the next lesson."
+              ? "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want."
               : `You need at least ${PASS_SCORE}% to pass. Review the explanations below and retake the quiz.`}
           </p>
-          {score < PASS_SCORE && (
-            <Button variant="secondary" className="mt-4" onClick={retake}>
-              Retake quiz
-            </Button>
-          )}
+          <Button variant="secondary" className="mt-4" onClick={retake}>
+            {score >= PASS_SCORE ? "Redo quiz" : "Retake quiz"}
+          </Button>
         </div>
       )}
+
 
       {questions.map((q, i) => {
         const chosen = answers[q.id];

@@ -86,16 +86,17 @@ export function FlashcardDeck({
       <div className="card-soft p-8 text-center">
         <p className="text-lg font-semibold">Review finished 🎉</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          The words you missed will come back sooner in your next review.
+          Everything you did is saved. You can go through the cards again whenever you like.
         </p>
         {cards.length > 0 && (
           <Button variant="outline" size="sm" className="mt-4" onClick={restart}>
-            Review again
+            {lang === "pt" ? "Refazer flashcards" : "Redo flashcards"}
           </Button>
         )}
       </div>
     );
   }
+
 
   const prompt = card.prompt?.trim() || card.word;
   const answerText = card.answer?.trim() || card.definition?.trim() || card.example?.trim() || card.word;
@@ -109,7 +110,13 @@ export function FlashcardDeck({
         <span className="text-xs text-muted-foreground">
           {index + 1}/{cards.length}
         </span>
+        {index > 0 && (
+          <Button variant="ghost" size="sm" className="text-xs" onClick={restart}>
+            <RotateCcw className="size-3" /> {lang === "pt" ? "Recomeçar" : "Start over"}
+          </Button>
+        )}
       </div>
+
 
       <div className="relative mx-auto flex min-h-72 w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-primary/30 bg-primary/10 p-5 shadow-[var(--shadow-soft)] sm:min-h-96 sm:p-8">
         {!flipped ? (
