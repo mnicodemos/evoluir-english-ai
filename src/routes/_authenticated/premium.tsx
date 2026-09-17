@@ -71,7 +71,7 @@ function Premium() {
           <header className="animate-rise">
             <p className="text-sm text-muted-foreground">Your plan</p>
             <h1 className="flex items-center gap-2 text-3xl font-bold">
-              <Crown className="size-7 text-[oklch(0.72_0.15_85)]" /> Premium
+              <Crown className="size-7 text-[oklch(0.78_0.18_82)]" /> Premium
             </h1>
           </header>
 

@@ -134,14 +134,14 @@ function Dashboard() {
               </h1>
               {profile.plan === "premium" ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[oklch(0.95_0.06_85)] px-3 py-1 text-xs font-semibold text-[oklch(0.45_0.12_75)]">
-                  <Crown className="size-3.5" /> Premium
+                  <Crown className="size-3.5 text-[oklch(0.78_0.18_82)]" /> Premium
                 </span>
               ) : (
                 <Link
                   to="/premium"
                   className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground/80 transition-colors hover:bg-accent"
                 >
-                  <Crown className="size-3.5" /> Go Premium
+                  <Crown className="size-3.5 text-[oklch(0.78_0.18_82)]" /> Go Premium
                 </Link>
               )}
             </div>
