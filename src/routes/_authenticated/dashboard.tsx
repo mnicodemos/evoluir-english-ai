@@ -102,8 +102,8 @@ function Dashboard() {
     { to: "/learning", label: "Learning Center", text: "Lessons, videos, flashcards and quizzes", icon: GraduationCap, className: "sm:col-span-2" },
     { to: "/coach", label: "AI Talking", text: "Speak and get a scored report", icon: MessageSquareText, className: undefined },
     { to: "/listening", label: "Listening Lab", text: "Train your ear with dictation drills", icon: Headphones, className: undefined },
-    { to: "/writing", label: "Writing", text: "Correct any text instantly", icon: PenLine, className: undefined },
-    { to: "/vocabulary", label: "Vocabulary", text: "Learn and review words", icon: BookOpen, className: undefined },
+    { to: "/writing", label: "Writing", text: "Correct any text instantly", icon: PenLine, className: "xl:h-full" },
+    { to: "/vocabulary", label: "Vocabulary", text: "Learn and review words", icon: BookOpen, className: "xl:h-full" },
   ] as const;
 
   const historyCard = { to: "/progress", label: "My history", text: "See how far you came", icon: LineChart, className: "sm:col-span-2" } as const;
@@ -184,7 +184,7 @@ function Dashboard() {
 
             <section className="min-w-0 xl:flex xl:flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_auto_1fr]">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_auto_minmax(7rem,1fr)]">
                 {trainingCards.map((c) => (
                   <Link
                     key={`link-${c.to}`}
@@ -217,11 +217,11 @@ function Dashboard() {
               </div>
             </section>
 
-            <section className="flex min-w-0 flex-col">
+            <section className="flex min-w-0 flex-col xl:grid xl:grid-rows-[auto_1fr_auto]">
               <h2 className="text-lg font-semibold">Performance</h2>
               <Link
                 to={historyCard.to}
-                className="card-soft group mt-3 flex min-h-24 flex-1 items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)]"
+                className="card-soft group mt-3 flex min-h-24 flex-1 items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)] xl:w-full"
               >
                 <span className="grid size-11 place-items-center rounded-xl bg-secondary">
                   <historyCard.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
@@ -232,7 +232,7 @@ function Dashboard() {
                 </span>
                 <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
               </Link>
-              <div className="card-soft mt-3 p-5">
+              <div className="card-soft mt-3 w-full p-5">
                 <WeeklyFrequency userId={profile.id} />
               </div>
             </section>
