@@ -204,9 +204,9 @@ function Dashboard() {
               </div>
             </section>
 
-            <section className="min-w-0">
+            <section className="grid min-w-0 gap-3 xl:grid-rows-[auto_1fr_1fr]">
               <h2 className="text-lg font-semibold">Learning progress</h2>
-              <div className="mt-3 grid grid-cols-2 gap-3 xl:grid-rows-2">
+              <div className="grid grid-cols-2 gap-3 xl:col-span-2 xl:row-span-2 xl:h-full xl:grid-rows-2">
                 {learningCards.map((c) => (
                   <div key={c.label} className="card-soft p-4 xl:h-full">
                     <span className="text-xl">{c.emoji}</span>
