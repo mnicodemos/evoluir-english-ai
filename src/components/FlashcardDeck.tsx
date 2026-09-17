@@ -13,14 +13,6 @@ const ratings = [
   { id: "easy", label: "Easy", className: "bg-[oklch(0.94_0.06_158)] text-[oklch(0.42_0.12_158)]" },
 ] as const;
 
-async function speak(word: string) {
-  try {
-    await speakEnglish(word);
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Could not play this pronunciation.");
-  }
-}
-
 
 /** Flip-card deck with Hard/Medium/Easy rating feeding the spaced-repetition schedule. */
 export function FlashcardDeck({
@@ -39,8 +31,21 @@ export function FlashcardDeck({
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [done, setDone] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const card = cards[index];
+
+  async function speak(word: string) {
+    if (isPlaying) return;
+    setIsPlaying(true);
+    try {
+      await speakEnglish(word);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not play this pronunciation.");
+    } finally {
+      setIsPlaying(false);
+    }
+  }
 
   async function rate(rating: "easy" | "medium" | "hard") {
     if (!card) return;
@@ -98,10 +103,12 @@ export function FlashcardDeck({
 
       <div className="flex items-center justify-center gap-2">
         <Button
-          variant="ghost"
+          variant={isPlaying ? "default" : "ghost"}
           size="sm"
           onClick={() => speak(card.word)}
+          disabled={isPlaying}
           aria-label="Listen to the pronunciation"
+          className={isPlaying ? "bg-success text-success-foreground hover:bg-success/90" : undefined}
         >
           <Volume2 className="size-4" /> Listen
         </Button>
