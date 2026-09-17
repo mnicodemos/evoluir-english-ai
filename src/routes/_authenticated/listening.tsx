@@ -22,6 +22,8 @@ export const Route = createFileRoute("/_authenticated/listening")({
       { name: "description", content: "Train your English listening with dictation drills for everyday, work and travel." },
       { property: "og:title", content: "Evoluir+ English AI · Listening Lab" },
       { property: "og:description", content: "Listen to natural English sentences and repeat them out loud." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ListeningPage,

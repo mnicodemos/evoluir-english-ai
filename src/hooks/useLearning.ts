@@ -30,6 +30,11 @@ export type Flashcard = {
   pronunciation: string;
   example: string;
   difficulty: string;
+  prompt: string | null;
+  answer: string | null;
+  card_type: string | null;
+  listen_text: string | null;
+  sort_order: number | null;
 };
 
 export type QuizQuestion = {
@@ -91,7 +96,7 @@ export function useLesson(lessonId: string) {
     queryFn: async () => {
       const [lesson, flashcards, quiz, mine] = await Promise.all([
         supabase.from("lessons").select("*").eq("id", lessonId).maybeSingle(),
-        supabase.from("flashcards").select("*").eq("lesson_id", lessonId).order("created_at"),
+        supabase.from("flashcards").select("*").eq("lesson_id", lessonId).order("sort_order").order("created_at"),
         supabase.from("quizzes").select("*").eq("lesson_id", lessonId).order("sort_order"),
         supabase
           .from("user_lessons")

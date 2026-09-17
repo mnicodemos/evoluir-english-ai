@@ -25,6 +25,8 @@ export const Route = createFileRoute("/_authenticated/learning/final-test")({
       },
       { property: "og:title", content: "Evoluir+ English AI · Final Test" },
       { property: "og:description", content: "30 questions to close your level and unlock the next one." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: FinalTestPage,

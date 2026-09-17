@@ -37,6 +37,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "description", content: "Your daily English plan, streak and skill scores in one place." },
       { property: "og:title", content: "Evoluir+ English AI · Dashboard" },
       { property: "og:description", content: "Your daily English plan, streak and skill scores." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
