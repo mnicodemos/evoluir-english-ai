@@ -11,3 +11,4 @@
   - [x] Ajustar layout para mobile e desktop
 - [x] Alterar placeholder do campo de busca para "Enter text or word..." com tradução
 - [x] Adicionar label acima do campo: "Search in English:"
+- [x] Ampliar e reorganizar todas as telas no desktop em formato paisagem

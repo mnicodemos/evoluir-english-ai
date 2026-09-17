@@ -29,7 +29,7 @@ function LearningCenter() {
 
   return (
     <AppShell>
-      <div className="space-y-7">
+      <div className="space-y-5 lg:space-y-6">
         <header className="animate-rise">
           <p className="text-sm text-muted-foreground">Learning Center</p>
           <h1 className="text-3xl font-bold">Your learning path</h1>
