@@ -182,9 +182,9 @@ function Dashboard() {
           <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
             <PathProgressCard />
 
-            <section className="min-w-0">
+            <section className="min-w-0 xl:flex xl:flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_auto_1fr]">
                 {trainingCards.map((c) => (
                   <Link
                     key={`link-${c.to}`}
