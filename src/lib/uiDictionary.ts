@@ -409,7 +409,6 @@ export const uiPt: Record<string, string> = {
     "Tudo o que você fez foi salvo. Você pode rever os cartões quando quiser.",
   "Redo flashcards": "Refazer flashcards",
   "Start over": "Recomeçar",
-  "Your course plan is downloading.": "O plano do seu curso está sendo baixado.",
   "Your study content is downloading.": "Seu conteúdo de estudo está sendo baixado.",
   "You finished every lesson. Take the Final Test to move up a level.":
     "Você concluiu todas as lições. Faça o Teste Final para avançar de nível.",
