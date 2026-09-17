@@ -184,7 +184,7 @@ function Dashboard() {
 
             <section className="min-w-0 xl:flex xl:flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_minmax(7rem,1fr)_minmax(7rem,1fr)]">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_7rem_7rem]">
                 {trainingCards.map((c) => (
                   <Link
                     key={`link-${c.to}`}
@@ -204,9 +204,9 @@ function Dashboard() {
               </div>
             </section>
 
-            <section className="grid min-w-0 gap-3 xl:grid-rows-[auto_1fr_1fr]">
+            <section className="grid min-w-0 gap-3 xl:grid-rows-[auto_7rem_7rem]">
               <h2 className="text-lg font-semibold">Learning progress</h2>
-              <div className="grid grid-cols-2 gap-3 xl:col-span-2 xl:row-span-2 xl:h-full xl:grid-rows-2">
+              <div className="grid grid-cols-2 gap-3 xl:col-span-2 xl:row-span-2 xl:h-full xl:grid-rows-[7rem_7rem]">
                 {learningCards.map((c) => (
                   <div key={c.label} className="card-soft p-4 xl:h-full">
                     <span className="text-xl">{c.emoji}</span>
@@ -217,11 +217,11 @@ function Dashboard() {
               </div>
             </section>
 
-            <section className="grid min-w-0 gap-3 xl:grid-rows-[auto_1fr_1fr]">
+            <section className="grid min-w-0 gap-3 xl:grid-rows-[auto_7rem_7rem]">
               <h2 className="text-lg font-semibold">Performance</h2>
               <Link
                 to={historyCard.to}
-                className="card-soft group flex min-h-24 h-full items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)] xl:w-full"
+                className="card-soft group flex h-full min-h-24 items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)] xl:w-full"
               >
                 <span className="grid size-11 place-items-center rounded-xl bg-secondary">
                   <historyCard.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
