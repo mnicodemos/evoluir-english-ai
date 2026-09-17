@@ -115,6 +115,26 @@ function LessonPage() {
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{lesson.objective}</p>
         </header>
 
+        {data.userLesson?.completed_at && (
+          <section className="card-soft flex flex-wrap items-center justify-between gap-3 border-success/40 bg-success/10 p-5">
+            <div>
+              <p className="text-sm font-semibold">Lesson completed</p>
+              <p className="text-xs text-muted-foreground">
+                Everything you did is saved. Want to practise again? Redo the flashcards or the quiz.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setActiveTab("flashcards")}>
+                <Layers className="size-4" /> Flashcards
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setActiveTab("quiz")}>
+                <ListChecks className="size-4" /> Quiz
+              </Button>
+            </div>
+          </section>
+        )}
+
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="video" className="gap-1.5">
