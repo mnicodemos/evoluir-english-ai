@@ -43,6 +43,10 @@ export const Route = createFileRoute("/api/speech")({
         const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!supabaseUrl || !publishableKey || !apiKey) {
+          const responseHeaders = new Headers();
+          if (upstream.status === 429) {
+            responseHeaders.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
+          }
           return Response.json(
             { message: "Audio is not configured yet." },
             { status: 500 },
@@ -120,9 +124,7 @@ export const Route = createFileRoute("/api/speech")({
             },
             {
               status: upstream.status,
-              headers: upstream.status === 429
-                ? { "Retry-After": upstream.headers.get("Retry-After") ?? "60" }
-                : undefined,
+              headers: responseHeaders,
             },
           );
         }
