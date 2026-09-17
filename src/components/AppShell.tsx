@@ -125,7 +125,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
           <ThemeToggle />
           <Button asChild variant="ghost" size="icon" aria-label={translate("Premium")}>
             <Link to="/premium">
-              <Crown className="size-4 text-[oklch(0.72_0.15_85)]" />
+              <Crown className="size-4 text-[oklch(0.78_0.18_82)]" />
             </Link>
           </Button>
           <Button variant="ghost" size="icon" onClick={signOut} aria-label={translate("Sign out")}>
