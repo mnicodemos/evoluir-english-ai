@@ -180,36 +180,52 @@ function Dashboard() {
             <LevelCard level={profile.level} maxLevel={profile.max_level} />
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
-            <PathProgressCard />
+          <div className="grid gap-5 xl:grid-cols-2 xl:grid-rows-2 xl:items-stretch">
+            <PathProgressCard className="h-full" />
 
-            <section className="min-w-0">
+            <section className="flex min-w-0 flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                {trainingCards.map((c) => (
-                  <Link
-                    key={`link-${c.to}`}
-                    to={c.to}
-                    className={`card-soft group flex min-h-20 items-center gap-4 p-4 transition-shadow hover:shadow-[var(--shadow-lift)] ${c.className ?? ""}`}
-                  >
-                    <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-                      <c.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-medium">{c.label}</span>
-                      <span className="block text-sm text-muted-foreground">{c.text}</span>
-                    </span>
-                    <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
-                  </Link>
-                ))}
+              <div className="mt-3 flex flex-1 flex-col gap-3">
+                <Link
+                  to={learningCenterCard.to}
+                  className="card-soft group flex shrink-0 min-h-20 items-center gap-4 p-4 transition-shadow hover:shadow-[var(--shadow-lift)]"
+                >
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
+                    <learningCenterCard.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">{learningCenterCard.label}</span>
+                    <span className="block text-sm text-muted-foreground">{learningCenterCard.text}</span>
+                  </span>
+                  <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                </Link>
+
+                <div className="grid flex-1 grid-cols-2 grid-rows-[1fr_2fr] gap-3">
+                  {trainingCards.map((c) => (
+                    <Link
+                      key={`link-${c.to}`}
+                      to={c.to}
+                      className="card-soft group flex h-full items-center gap-4 p-4 transition-shadow hover:shadow-[var(--shadow-lift)]"
+                    >
+                      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
+                        <c.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium">{c.label}</span>
+                        <span className="block text-sm text-muted-foreground">{c.text}</span>
+                      </span>
+                      <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  ))}
+                </div>
               </div>
             </section>
 
             <section className="min-w-0">
               <h2 className="text-lg font-semibold">Learning progress</h2>
-              <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className="mt-3 grid h-full grid-cols-2 gap-3">
                 {learningCards.map((c) => (
-                  <div key={c.label} className="card-soft p-4">
+                  <div key={c.label} className="card-soft flex flex-col justify-center p-4">
                     <span className="text-xl">{c.emoji}</span>
                     <p className="mt-1 text-xl font-bold">{c.value}</p>
                     <p className="text-xs text-muted-foreground">{c.label}</p>
