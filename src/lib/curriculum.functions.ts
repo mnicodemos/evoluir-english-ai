@@ -60,25 +60,6 @@ async function pickVideo(
   return findLessonVideo(`${plan.title} ${plan.level.toUpperCase()}`, plan.skill, used);
 }
 
-type GeneratedLesson = {
-  summary?: string;
-  transcript?: string;
-  transcript_pt?: string;
-  flashcards?: {
-    word?: string;
-    translation?: string;
-    definition?: string;
-    pronunciation?: string;
-    example?: string;
-    difficulty?: string;
-    prompt?: string;
-    answer?: string;
-    card_type?: string;
-    listen_text?: string;
-  }[];
-  quiz?: { question?: string; options?: string[]; correct_answer?: string; explanation?: string }[];
-};
-
 const quizItemSchema = z
   .object({
     question: z.string().trim().min(1).max(400),
@@ -192,7 +173,7 @@ async function writeLesson(
   if (!parsedContent.success) {
     throw new Error("The AI could not write this lesson. Please try again.");
   }
-  const content: GeneratedLesson = parsedContent.data;
+  const content = parsedContent.data;
 
   const video = await pickVideo(supabase, plan);
 

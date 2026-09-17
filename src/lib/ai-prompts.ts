@@ -1,6 +1,4 @@
-// Shared, client-safe prompt builders and parsers for every AI feature.
-// Used by the hybrid layer (local browser AI first, cloud Gemini as fallback)
-// and by the server functions that wrap the cloud gateway.
+// Shared, client-safe prompt builders and strict parsers for server-side AI features.
 
 import { findLevel } from "@/lib/level";
 import { z } from "zod";

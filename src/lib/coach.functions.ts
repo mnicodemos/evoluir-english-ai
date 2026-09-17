@@ -2,9 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  coachOpenerMessages,
+  coachReplyMessages,
+  conversationReportMessages,
+  parseConversationReport,
+  parseWritingFeedback,
+  writingCorrectionMessages,
+  type ConversationReport,
+  type WritingFeedback,
+} from "@/lib/ai-prompts";
 import { findLevel } from "@/lib/level";
 
-import { callGateway, parseJson } from "./ai-gateway.server";
+import { callGateway } from "./ai-gateway.server";
 
 const messageSchema = z.object({
   role: z.enum(["user", "assistant"]),
@@ -105,61 +115,20 @@ export const coachOpener = createServerFn({ method: "POST" })
     return { opener: text.trim() };
   });
 
-export type ConversationReport = {
-  fluency: number;
-  grammar: number;
-  vocabulary: number;
-  summary: string;
-  suggestions: string[];
-  common_errors: string[];
-  new_words: string[];
-};
-
 export const conversationReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z.object({ messages: z.array(messageSchema).min(1).max(60) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<ConversationReport> => {
-    const transcript = data.messages
-      .map((m) => `${m.role === "user" ? "Student" : "Teacher"}: ${m.content}`)
-      .join("\n");
-
     const raw = await callGateway(
-      [
-        {
-          role: "system",
-          content:
-            "You are a CELTA English examiner. Evaluate ONLY the student's English in the transcript. " +
-            'Reply with strict JSON: {"fluency":0-100,"grammar":0-100,"vocabulary":0-100,"summary":"2 sentences",' +
-            '"suggestions":["3 short improvement tips"],"common_errors":["up to 3 recurring mistakes"],"new_words":["up to 4 useful words or expressions the student should learn"]}',
-        },
-        { role: "user", content: transcript },
-      ],
+      conversationReportMessages(data.messages),
       true,
       { userId: context.userId, operation: "talking" },
     );
 
-    return parseJson<ConversationReport>(raw, {
-      fluency: 0,
-      grammar: 0,
-      vocabulary: 0,
-      summary: "We could not generate the report this time. Try another conversation.",
-      suggestions: [],
-      common_errors: [],
-      new_words: [],
-    });
+    return parseConversationReport(raw);
   });
-
-export type WritingFeedback = {
-  corrected: string;
-  natural: string;
-  explanations: string[];
-  suggestions: string[];
-  grammar: number;
-  vocabulary: number;
-  clarity: number;
-};
 
 export const correctWriting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -174,31 +143,10 @@ export const correctWriting = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<WritingFeedback> => {
     const raw = await callGateway(
-      [
-        {
-          role: "system",
-          content:
-            "You are a CELTA English writing teacher for Brazilian learners. " +
-            'Reply with strict JSON: {"corrected":"grammatically corrected version","natural":"how a native speaker would write it",' +
-            '"explanations":["short explanation of each important mistake, in simple English"],"suggestions":["2-4 tips to improve"],' +
-            '"grammar":0-100,"vocabulary":0-100,"clarity":0-100}',
-        },
-        {
-          role: "user",
-          content: `Task: ${data.prompt || "Free writing"}\nStudent level: ${data.level}\n\nStudent text:\n${data.text}`,
-        },
-      ],
+      writingCorrectionMessages(data.prompt, data.text, data.level),
       true,
       { userId: context.userId, operation: "writing_correction" },
     );
 
-    return parseJson<WritingFeedback>(raw, {
-      corrected: data.text,
-      natural: data.text,
-      explanations: ["We could not analyse this text. Please try again."],
-      suggestions: [],
-      grammar: 0,
-      vocabulary: 0,
-      clarity: 0,
-    });
+    return parseWritingFeedback(raw, data.text);
   });
