@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
-import { useTimeSpent } from "@/hooks/useTimeSpent";
+import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { speakEnglish } from "@/lib/speech";
 import { transcribeAudio } from "@/lib/transcribe";
 import { cancelVoiceRecording, startVoiceRecording, stopVoiceRecording } from "@/lib/voice-recorder";
@@ -196,6 +196,7 @@ function ListeningPage() {
   const { data: lessons } = useLessons();
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
+  useLogTimeOnExit({ timer: minutesSpent, profile, type: "listening_practice", title: "Listening practice" });
   const track = tracks[0]!;
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");

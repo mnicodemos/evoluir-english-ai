@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLearningPath, useOpenFinalTest } from "@/hooks/useCurriculum";
 import { completeLesson, useLesson } from "@/hooks/useLearning";
 import { logActivity, useProfile } from "@/hooks/useProfile";
-import { useTimeSpent } from "@/hooks/useTimeSpent";
+import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { FINAL_TEST_PASS, FINAL_TEST_QUESTIONS, nextLevel } from "@/lib/level";
 
 export const Route = createFileRoute("/_authenticated/learning/final-test")({
@@ -39,6 +39,7 @@ function FinalTestPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const minutesSpent = useTimeSpent();
+  useLogTimeOnExit({ timer: minutesSpent, profile, type: "final_test_practice", title: "Final test practice" });
 
   const [lessonId, setLessonId] = useState<string | null>(path.finalTest.lessonId);
   const [promoting, setPromoting] = useState(false);
