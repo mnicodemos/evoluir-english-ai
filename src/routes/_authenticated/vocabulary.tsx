@@ -193,7 +193,7 @@ function Vocabulary() {
             userId: profile.id,
             type: "vocabulary",
             title: `Vocabulary practice — ${word.word}`,
-            minutes: minutesSpent(0),
+            minutes: minutesSpent(1),
             score,
             scores: { reading: score },
             currentStreak: profile.streak_days,
