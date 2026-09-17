@@ -58,9 +58,11 @@ export function LessonQuiz({
   const PASS_SCORE = 70;
 
   function retake() {
+    clearAnswers();
     setAnswers({});
     setSubmitted(false);
   }
+
 
   return (
     <div className="space-y-5">
