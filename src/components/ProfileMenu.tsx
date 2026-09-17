@@ -47,6 +47,14 @@ function extensionFor(file: File) {
   return "jpg";
 }
 
+function maskPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length === 0) return "";
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+}
+
 function useAvatarUrl(path?: string | null) {
   return useQuery({
     queryKey: ["avatar-url", path],
@@ -75,7 +83,7 @@ export function ProfileMenu({ className }: { className?: string }) {
   useEffect(() => {
     if (!open) return;
     setName(profile?.name ?? "");
-    setPhone(profile?.phone ?? "");
+    setPhone(maskPhone(profile?.phone ?? ""));
     setBio(profile?.bio ?? "");
     setAvatarFile(null);
   }, [open, profile]);
@@ -219,8 +227,9 @@ export function ProfileMenu({ className }: { className?: string }) {
               id="profile-phone"
               type="tel"
               value={phone}
-              maxLength={30}
-              onChange={(event) => setPhone(event.target.value)}
+              placeholder="(99) 99999-9999"
+              maxLength={15}
+              onChange={(event) => setPhone(maskPhone(event.target.value))}
             />
           </div>
 
