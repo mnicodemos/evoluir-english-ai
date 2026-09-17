@@ -67,8 +67,8 @@ export function LessonVideo({
         </div>
         <div className="flex items-center gap-3">
           <Progress value={progress} className="h-2 flex-1" />
-          <Button size="sm" variant="secondary" onClick={() => onProgress(100)}>
-            I watched it
+          <Button size="sm" variant="secondary" onClick={() => onProgress(100)} disabled={progress >= 100}>
+            {progress >= 100 ? "Watched" : "I watched it"}
           </Button>
         </div>
       </div>
