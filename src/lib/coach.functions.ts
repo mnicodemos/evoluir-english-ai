@@ -3,8 +3,6 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  coachOpenerMessages,
-  coachReplyMessages,
   conversationReportMessages,
   parseConversationReport,
   parseWritingFeedback,
