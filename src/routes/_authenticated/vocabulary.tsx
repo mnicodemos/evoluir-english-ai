@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,16 +82,9 @@ function Vocabulary() {
     },
   });
 
-  // Counting the student's lessons: a new lesson unlocks a new set of ten words.
-  const { data: myLessons } = useQuery({
-    queryKey: ["my-lesson-count", profile?.id],
-    enabled: !!profile,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("lessons").select("id").eq("created_by", profile!.id);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  // Starting a new lesson unlocks a new set of ten words.
+  const { data: startedLessons } = useLessonRound();
+
 
   const { data: mine } = useQuery({
     queryKey: ["user-vocabulary", profile?.id],
