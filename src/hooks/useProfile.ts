@@ -20,6 +20,9 @@ export type Profile = {
   id: string;
   name: string;
   email: string | null;
+  phone: string | null;
+  bio: string | null;
+  avatar_path: string | null;
   level: string;
   max_level: string;
   goal: string;
