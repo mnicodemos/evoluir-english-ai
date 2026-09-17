@@ -108,56 +108,53 @@ export function FlashcardDeck({
         <div className="absolute left-5 hidden h-44 w-28 -rotate-6 rounded-xl border border-primary/25 bg-card/55 shadow-[var(--shadow-soft)] sm:block" />
         <div className="absolute right-5 hidden h-44 w-28 rotate-6 rounded-xl border border-primary/25 bg-card/55 shadow-[var(--shadow-soft)] sm:block" />
 
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setFlipped((f) => !f)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              setFlipped((f) => !f);
-            }
-          }}
-          className={cn(
-            "relative z-10 flex aspect-[4/3] w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-primary/40 bg-card p-6 text-center text-card-foreground shadow-[var(--shadow-lift)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-            flipped && "border-success/70",
-          )}
-        >
+        {!flipped ? (
+          <button
+            type="button"
+            onClick={() => setFlipped(true)}
+            className="relative z-10 flex aspect-[4/3] w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-primary/40 bg-card p-6 text-center text-card-foreground shadow-[var(--shadow-lift)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-1 text-[0.65rem] font-bold uppercase text-muted-foreground">
+              {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
+              {isListenCard ? "Listen card" : "Question card"}
+            </span>
+
+            <p className="max-w-xs text-xl font-black uppercase leading-tight sm:text-2xl">{prompt}</p>
+            <p className="text-xs font-medium uppercase text-muted-foreground">Tap to see the answer</p>
+          </button>
+        ) : (
+          <div
+            className={cn(
+              "relative z-10 flex aspect-[4/3] w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-success/70 bg-card p-6 text-center text-card-foreground shadow-[var(--shadow-lift)]",
+            )}
+          >
           <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-1 text-[0.65rem] font-bold uppercase text-muted-foreground">
             {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
             {isListenCard ? "Listen card" : "Question card"}
           </span>
 
-          {!flipped ? (
-            <>
-              <p className="max-w-xs text-xl font-black uppercase leading-tight sm:text-2xl">{prompt}</p>
-              <p className="text-xs font-medium uppercase text-muted-foreground">Tap to see the answer</p>
-            </>
-          ) : (
-            <>
-              <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl">{answerText}</p>
-              {card.example && card.example !== answerText && (
-                <p className="max-w-sm text-sm italic text-muted-foreground">“{card.example}”</p>
-              )}
-              {card.pronunciation && <p className="text-xs text-muted-foreground">{card.pronunciation}</p>}
-              {isListenCard && listenText && (
-                <Button
-                  variant={isPlaying ? "default" : "outline"}
-                  size="sm"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    void speak(listenText);
-                  }}
-                  disabled={isPlaying}
-                  aria-label="Listen to the answer"
-                  className={isPlaying ? "bg-success text-success-foreground hover:bg-success/90" : undefined}
-                >
-                  <Volume2 className="size-4" /> Listen
-                </Button>
-              )}
-            </>
+            <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl">{answerText}</p>
+            {card.example && card.example !== answerText && (
+              <p className="max-w-sm text-sm italic text-muted-foreground">“{card.example}”</p>
+            )}
+            {card.pronunciation && <p className="text-xs text-muted-foreground">{card.pronunciation}</p>}
+            {isListenCard && listenText && (
+              <Button
+                variant={isPlaying ? "default" : "outline"}
+                size="sm"
+                onClick={() => void speak(listenText)}
+                disabled={isPlaying}
+                aria-label="Listen to the answer"
+                className={isPlaying ? "bg-success text-success-foreground hover:bg-success/90" : undefined}
+              >
+                <Volume2 className="size-4" /> Listen
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={() => setFlipped(false)}>
+              See question
+            </Button>
+          </div>
           )}
-        </div>
       </div>
 
       {flipped && (
