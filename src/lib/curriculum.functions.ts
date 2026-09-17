@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 import {
   finalTestKey,
   findCurriculumLesson,
@@ -50,7 +52,7 @@ const SKILL_BRIEF: Record<string, string> = {
 
 /** Finds a captioned video (max 7 minutes) on the same topic as the lesson. */
 async function pickVideo(
-  supabase: { from: (t: string) => any },
+  supabase: SupabaseClient<Database>,
   plan: CurriculumLesson,
 ): Promise<LessonVideo> {
   const { data } = await supabase.from("lessons").select("video_url").not("video_url", "is", null);
@@ -135,7 +137,7 @@ function jsonValue(raw: string): unknown {
 }
 
 async function writeLesson(
-  supabase: { from: (t: string) => any },
+  supabase: SupabaseClient<Database>,
   userId: string,
   plan: CurriculumLesson,
 ): Promise<string> {
