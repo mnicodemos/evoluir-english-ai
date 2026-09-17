@@ -21,9 +21,10 @@ export async function callGateway(messages: Msg[], jsonMode = false): Promise<st
     const viaGemini = await callGemini(messages, jsonMode);
     if (viaGemini) return viaGemini;
   } catch (err) {
+    // Gemini being busy or down must never break the feature: keep going and let
+    // the Lovable AI gateway below answer instead.
     if (err instanceof AiError) throw err;
-    if (err instanceof Error) throw new AiError(503, err.message);
-    throw new AiError(503, "Google Gemini could not answer right now. Please try again in a moment.");
+    console.error("Gemini unavailable, using Lovable AI instead", err);
   }
 
   const res = await fetch(GATEWAY_URL, {
