@@ -177,13 +177,13 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     setSpeechVoice(next);
     stopSpeaking();
     if (mounted.current) setVoiceState("idle");
-    void playResponse("Hi! This is my voice. Let's practise English together.");
+    void playResponse("Hi! This is my voice. Let's practise English together.", next);
   }
 
-  async function playResponse(text: string) {
+  async function playResponse(text: string, selectedVoice: SpeechVoice = voice) {
     setVoiceState("speaking");
     try {
-      await speakEnglish(text);
+      await speakEnglish(text, selectedVoice);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "The response could not be played.");
     } finally {

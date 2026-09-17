@@ -91,9 +91,9 @@ function mergePcmChunks(chunks: Uint8Array[]): Float32Array {
 
 async function requestSpeech(
   value: string,
+  voice: SpeechVoice,
   onChunk?: (chunk: Uint8Array) => void,
 ): Promise<Float32Array> {
-  const voice = getSpeechVoice();
   if (Date.now() < aiSpeechUnavailableUntil) {
     throw new Error("AI audio is temporarily busy.");
   }
@@ -179,21 +179,34 @@ async function requestSpeech(
 }
 
 /** Free browser voice used whenever the audio service is unavailable. */
-async function speakWithBrowser(value: string): Promise<void> {
+async function speakWithBrowser(value: string, selectedVoice: SpeechVoice): Promise<void> {
   const synth = window.speechSynthesis;
   if (!synth) throw new Error("Audio playback is not supported by this browser.");
 
   synth.cancel();
   synth.resume();
-  const voices = synth.getVoices();
+  let voices = synth.getVoices();
+  if (voices.length === 0) {
+    await new Promise<void>((resolve) => {
+      const timeout = window.setTimeout(resolve, 500);
+      synth.addEventListener("voiceschanged", () => {
+        window.clearTimeout(timeout);
+        resolve();
+      }, { once: true });
+    });
+    voices = synth.getVoices();
+  }
 
   await new Promise<void>((resolve, reject) => {
     const utterance = new SpeechSynthesisUtterance(value);
     activeUtterance = utterance;
     utterance.lang = "en-US";
     utterance.rate = 0.95;
-    const english = voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
-    if (english) utterance.voice = english;
+    const englishVoices = voices.filter((candidate) => candidate.lang?.toLowerCase().startsWith("en"));
+    if (englishVoices.length > 0) {
+      const voiceIndex = VOICE_OPTIONS.findIndex((option) => option.id === selectedVoice);
+      utterance.voice = englishVoices[Math.max(0, voiceIndex) % englishVoices.length] ?? null;
+    }
 
     let settled = false;
     const finish = () => {
@@ -239,12 +252,12 @@ async function speakWithBrowser(value: string): Promise<void> {
  * Streams clear English pronunciation from the app's authenticated audio route,
  * falling back to the built-in browser voice when the service is unavailable.
  */
-export async function speakEnglish(text: string): Promise<void> {
+export async function speakEnglish(text: string, selectedVoice: SpeechVoice = getSpeechVoice()): Promise<void> {
   const value = text?.trim();
   if (!value || typeof window === "undefined") throw new Error("Choose a word to hear.");
 
   const AudioContextClass = window.AudioContext;
-  if (!AudioContextClass) return speakWithBrowser(value);
+  if (!AudioContextClass) return speakWithBrowser(value, selectedVoice);
   audioContext ??= new AudioContextClass({ sampleRate: 24000 });
   if (audioContext.state === "suspended") await audioContext.resume();
   const context = audioContext;
@@ -294,11 +307,11 @@ export async function speakEnglish(text: string): Promise<void> {
   };
 
   try {
-    samples = await requestSpeech(value, scheduleChunk);
+    samples = await requestSpeech(value, selectedVoice, scheduleChunk);
   } catch {
     if (requestId !== playRequest) return;
     if (streamed) return;
-    return speakWithBrowser(value);
+    return speakWithBrowser(value, selectedVoice);
   }
   if (requestId !== playRequest) return;
   if (context.state === "suspended") await context.resume();
