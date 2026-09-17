@@ -89,6 +89,132 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_limits: {
+        Row: {
+          cache_ttl_seconds: number
+          daily_limit: number
+          enabled: boolean
+          max_concurrent: number
+          min_interval_seconds: number
+          monthly_limit: number
+          operation: string
+          premium_daily_limit: number
+          premium_monthly_limit: number
+          updated_at: string
+        }
+        Insert: {
+          cache_ttl_seconds?: number
+          daily_limit: number
+          enabled?: boolean
+          max_concurrent?: number
+          min_interval_seconds?: number
+          monthly_limit: number
+          operation: string
+          premium_daily_limit: number
+          premium_monthly_limit: number
+          updated_at?: string
+        }
+        Update: {
+          cache_ttl_seconds?: number
+          daily_limit?: number
+          enabled?: boolean
+          max_concurrent?: number
+          min_interval_seconds?: number
+          monthly_limit?: number
+          operation?: string
+          premium_daily_limit?: number
+          premium_monthly_limit?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_response_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          hit_count: number
+          last_hit_at: string | null
+          model: string
+          operation: string
+          response_text: string
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at: string
+          hit_count?: number
+          last_hit_at?: string | null
+          model: string
+          operation: string
+          response_text: string
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          hit_count?: number
+          last_hit_at?: string | null
+          model?: string
+          operation?: string
+          response_text?: string
+        }
+        Relationships: []
+      }
+      ai_usage_events: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duration_ms: number | null
+          error_code: string | null
+          error_message: string | null
+          estimated_cost: number | null
+          id: string
+          input_tokens: number | null
+          model: string
+          operation: string
+          output_tokens: number | null
+          request_hash: string | null
+          status: string
+          success: boolean | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          estimated_cost?: number | null
+          id?: string
+          input_tokens?: number | null
+          model?: string
+          operation: string
+          output_tokens?: number | null
+          request_hash?: string | null
+          status?: string
+          success?: boolean | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          estimated_cost?: number | null
+          id?: string
+          input_tokens?: number | null
+          model?: string
+          operation?: string
+          output_tokens?: number | null
+          request_hash?: string | null
+          status?: string
+          success?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       flashcards: {
         Row: {
           answer: string | null
@@ -150,6 +276,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      learning_errors: {
+        Row: {
+          category: string
+          corrected_text: string
+          error_type: string
+          explanation: string
+          first_detected: string
+          frequency: number
+          id: string
+          last_detected: string
+          original_text: string
+          severity: string
+          skill: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          corrected_text: string
+          error_type: string
+          explanation?: string
+          first_detected?: string
+          frequency?: number
+          id?: string
+          last_detected?: string
+          original_text: string
+          severity?: string
+          skill: string
+          source?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          corrected_text?: string
+          error_type?: string
+          explanation?: string
+          first_detected?: string
+          frequency?: number
+          id?: string
+          last_detected?: string
+          original_text?: string
+          severity?: string
+          skill?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       learning_profile: {
         Row: {
@@ -642,7 +816,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      reserve_ai_usage: {
+        Args: {
+          p_daily_limit: number
+          p_max_concurrent: number
+          p_min_interval_seconds: number
+          p_model: string
+          p_monthly_limit: number
+          p_operation: string
+          p_premium_daily_limit: number
+          p_premium_monthly_limit: number
+          p_request_hash: string
+          p_user_id: string
+        }
+        Returns: {
+          allowed: boolean
+          event_id: string
+          reason: string
+          retry_after_seconds: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
