@@ -1,16 +1,23 @@
-# Resultado de vocabulário no padrão Reverso
+# Corrigir falhas de SEO
 
-## Objetivo
-Reorganizar a resposta da pesquisa para seguir a estrutura visual da referência, sem copiar a aparência do aplicativo externo.
+## Alterações no site
+- Remover do cabeçalho global os títulos, descrições e tags sociais duplicados, mantendo somente configurações realmente globais.
+- Adicionar URL canônica e URL social autorreferentes à página pública inicial.
+- Marcar login e toda a área autenticada como não indexáveis, pois são páginas pessoais e não devem aparecer na busca.
+- Criar `/sitemap.xml` com a página pública inicial e referenciá-lo em `robots.txt` usando o domínio oficial.
 
-## Alterações
-- Destacar a palavra pesquisada, pronúncia e botão de áudio no topo.
-- Exibir cada significado numerado, com classe gramatical e definição.
-- Agrupar as traduções em português dentro do significado correspondente.
-- Mostrar uma frase de exemplo em inglês logo abaixo de cada grupo.
-- Manter o link do Reverso Context como fonte e adaptar o conteúdo para celular e computador.
+## Google Search Console
+- Conectar uma conta Google Search Console ao projeto.
+- Solicitar a tag de verificação da propriedade `https://evoluirmaisenglishai.com/` e adicioná-la ao cabeçalho da página inicial.
+- Publicar as correções após a aprovação solicitada no chat.
+- Confirmar a tag no site publicado, verificar a propriedade e enviar o sitemap ao Google.
+
+## Verificação
+- Confirmar que o site compila sem erros.
+- Verificar no preview que `/sitemap.xml` contém apenas URLs públicas e que `robots.txt` aponta para ele.
+- Marcar como corrigidos somente os alertas totalmente resolvidos; a próxima varredura dará o veredito final.
 
 ## Detalhes técnicos
-- Ajustar o formato retornado pela busca para relacionar definição, traduções e exemplo.
-- Atualizar a resposta alternativa da IA para gerar o mesmo formato quando o Reverso bloquear a consulta.
-- Preservar compatibilidade com resultados já armazenados temporariamente no navegador.
+- O sitemap será gerado pela lista tipada de rotas do TanStack, com decisões explícitas de inclusão/exclusão.
+- A área autenticada será excluída como uma subárvore inteira; rotas de API, autenticação e ferramentas internas também serão excluídas.
+- Não será adicionado `lastmod` artificial, pois não há uma data editorial autoritativa por página.
