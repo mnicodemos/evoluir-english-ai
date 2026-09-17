@@ -9,7 +9,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { useLessons } from "@/hooks/useLearning";
+import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { parseWritingFeedback, writingCorrectionMessages, type WritingFeedback } from "@/lib/ai-prompts";
@@ -155,9 +155,9 @@ function Writing() {
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
   
-  const { data: lessons } = useLessons();
-  // A fresh set of tasks every day (and whenever new lessons are created).
-  const signature = `${todayKey()}-${lessons?.length ?? 0}`;
+  const { data: startedLessons } = useLessonRound();
+  // A fresh set of tasks every day, and every time the student starts a new lesson.
+  const signature = `${todayKey()}-${startedLessons ?? 0}`;
   const prompts = useMemo(() => roundPrompts(signature), [signature]);
   const [done, setDone] = useState<string[]>([]);
   const [prompt, setPrompt] = useState("");
@@ -178,6 +178,15 @@ function Writing() {
 
   function selectPrompt(p: string) {
     setPrompt(p);
+    setText("");
+    setResult(null);
+  }
+
+  /** Lets the student redo every task already checked today. */
+  function redoToday() {
+    setDone([]);
+    saveDone(signature, []);
+    setPrompt(prompts[0] ?? "");
     setText("");
     setResult(null);
   }
