@@ -19,6 +19,15 @@ type GeminiTranscription = {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 };
 
+/** Reuse one client so the signing keys are fetched once, not on every recording. */
+let authClient: ReturnType<typeof createClient> | null = null;
+function getAuthClient(url: string, key: string) {
+  authClient ??= createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  return authClient;
+}
+
 export const Route = createFileRoute("/api/transcribe")({
   server: {
     handlers: {
