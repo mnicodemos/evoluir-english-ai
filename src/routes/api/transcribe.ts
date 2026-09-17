@@ -35,15 +35,18 @@ export const Route = createFileRoute("/api/transcribe")({
           return Response.json({ message: "Voice conversation is not configured yet." }, { status: 500 });
         }
 
-        const auth = createClient(supabaseUrl, publishableKey, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-        const { data, error } = await auth.auth.getClaims(token);
+        const auth = getAuthClient(supabaseUrl, publishableKey);
+        // Read the audio and validate the session at the same time instead of
+        // waiting for one and then the other.
+        const [claimsResult, form] = await Promise.all([
+          auth.auth.getClaims(token),
+          request.formData().catch(() => null),
+        ]);
+        const { data, error } = claimsResult;
         if (error || !data?.claims?.sub) {
           return Response.json({ message: "Please sign in again to use voice conversation." }, { status: 401 });
         }
 
-        const form = await request.formData().catch(() => null);
         const audio = form?.get("file");
         if (!(audio instanceof File) || audio.size < 2048) {
           return Response.json({ message: "That recording was empty. Please try again." }, { status: 400 });
