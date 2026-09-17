@@ -86,16 +86,17 @@ export function FlashcardDeck({
       <div className="card-soft p-8 text-center">
         <p className="text-lg font-semibold">Review finished 🎉</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          The words you missed will come back sooner in your next review.
+          Everything you did is saved. You can go through the cards again whenever you like.
         </p>
         {cards.length > 0 && (
           <Button variant="outline" size="sm" className="mt-4" onClick={restart}>
-            Review again
+            {lang === "pt" ? "Refazer flashcards" : "Redo flashcards"}
           </Button>
         )}
       </div>
     );
   }
+
 
   const prompt = card.prompt?.trim() || card.word;
   const answerText = card.answer?.trim() || card.definition?.trim() || card.example?.trim() || card.word;
