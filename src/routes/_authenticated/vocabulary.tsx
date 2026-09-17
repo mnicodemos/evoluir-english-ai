@@ -101,8 +101,8 @@ function Vocabulary() {
     isLoading: dailyLoading,
     error: dailyError,
   } = useQuery({
-    // A new lesson means a new set of ten words.
-    queryKey: ["daily-words", profile?.id, studyToday(), myLessons?.length ?? 0],
+    // Starting a new lesson means a new set of ten words.
+    queryKey: ["daily-words", profile?.id, studyToday(), startedLessons ?? 0],
     enabled: !!profile,
     staleTime: 1000 * 60 * 30,
     retry: false,
