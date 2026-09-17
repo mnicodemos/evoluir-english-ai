@@ -298,9 +298,9 @@ export async function speakEnglish(text: string): Promise<void> {
   if (requestId !== playRequest) return;
   if (context.state === "suspended") await context.resume();
 
-  if (streamed && lastSource) {
+  const finalSource = lastSource;
+  if (streamed && finalSource) {
     await new Promise<void>((resolve) => {
-      const finalSource = lastSource;
       finalSource.onended = () => {
         activeSources.delete(finalSource);
         resolve();
