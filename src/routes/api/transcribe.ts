@@ -19,7 +19,7 @@ export const Route = createFileRoute("/api/transcribe")({
         const supabaseUrl = process.env["SUPABASE_URL"];
         const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
         const lovableKey = process.env["LOVABLE_API_KEY"];
-        const connectionKey = process.env["UDC_GOOGLE_GEMINI_KEY_API_KEY"];
+        const connectionKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
         if (!supabaseUrl || !publishableKey || !lovableKey || !connectionKey) {
           return Response.json({ message: "Voice conversation is not configured yet." }, { status: 500 });
         }
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/api/transcribe")({
 
         for (const model of GEMINI_TRANSCRIPTION_MODELS) {
           const response = await fetch(
-            `https://connector-gateway.lovable.dev/udc_google_gemini_key/v1beta/models/${model}:generateContent`,
+            `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
             {
               method: "POST",
               headers: {

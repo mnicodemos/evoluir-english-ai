@@ -65,7 +65,7 @@ export const Route = createFileRoute("/api/speech")({
           return Response.json({ message: "Choose a valid word to hear." }, { status: 400 });
         }
 
-        const geminiKey = process.env["UDC_GOOGLE_GEMINI_KEY_API_KEY"];
+        const geminiKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
 
 
         const voiceName = GEMINI_VOICES[parsed.data.voice] ?? "Kore";
@@ -123,7 +123,7 @@ export const Route = createFileRoute("/api/speech")({
         outer: for (const model of geminiKey ? GEMINI_TTS_MODELS : []) {
           for (let attempt = 0; attempt < 2; attempt += 1) {
             const res = await fetch(
-              `https://connector-gateway.lovable.dev/udc_google_gemini_key/v1beta/models/${model}:generateContent`,
+              `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
               {
                 method: "POST",
                 headers: {
