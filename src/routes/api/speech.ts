@@ -4,6 +4,7 @@ import { z } from "zod";
 
 const requestSchema = z.object({
   text: z.string().trim().min(1).max(500),
+  cacheable: z.boolean().default(false),
 });
 
 // The Lovable audio gateway needs workspace credits; this project has its own
@@ -12,15 +13,12 @@ const GEMINI_TTS_MODEL = "gemini-2.5-flash-preview-tts";
 
 const GEMINI_VOICE = "Kore";
 
-
 export const Route = createFileRoute("/api/speech")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         const authorization = request.headers.get("authorization");
-        const token = authorization?.startsWith("Bearer ")
-          ? authorization.slice(7)
-          : null;
+        const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
         if (!token) {
           return Response.json({ message: "Please sign in to use audio." }, { status: 401 });
         }
@@ -29,10 +27,7 @@ export const Route = createFileRoute("/api/speech")({
         const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!supabaseUrl || !publishableKey || !apiKey) {
-          return Response.json(
-            { message: "Audio is not configured yet." },
-            { status: 500 },
-          );
+          return Response.json({ message: "Audio is not configured yet." }, { status: 500 });
         }
 
         const auth = createClient(supabaseUrl, publishableKey, {
@@ -157,7 +152,10 @@ export const Route = createFileRoute("/api/speech")({
                   `data: ${JSON.stringify(
                     sentAudio
                       ? { type: "speech.audio.done" }
-                      : { type: "speech.audio.error", message: "The audio service returned no sound." },
+                      : {
+                          type: "speech.audio.error",
+                          message: "The audio service returned no sound.",
+                        },
                   )}\n\n`,
                 ),
               );
@@ -168,7 +166,10 @@ export const Route = createFileRoute("/api/speech")({
         return new Response(stream, {
           headers: {
             "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
+            "Cache-Control": parsed.data.cacheable
+              ? "public, max-age=31536000, immutable"
+              : "no-store",
+            Vary: "Authorization",
           },
         });
       },

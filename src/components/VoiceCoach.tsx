@@ -1,10 +1,24 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-import { Briefcase, Coffee, Headphones, Loader2, Mic, MicOff, Plane, Sparkles, Volume2 } from "lucide-react";
+import {
+  Briefcase,
+  Coffee,
+  Headphones,
+  Loader2,
+  Mic,
+  MicOff,
+  Plane,
+  Sparkles,
+  Volume2,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { Conversation, ConversationContent, ConversationScrollButton } from "@/components/ai-elements/conversation";
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
@@ -24,14 +38,36 @@ import {
 import { hybridChat } from "@/lib/local-ai";
 import { getLevelState } from "@/lib/level";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
-import { cancelVoiceRecording, startVoiceRecording, stopVoiceRecording } from "@/lib/voice-recorder";
+import { streamCoachReply } from "@/lib/coach-stream";
+import {
+  cancelVoiceRecording,
+  startVoiceRecording,
+  stopVoiceRecording,
+} from "@/lib/voice-recorder";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type VoiceState = "idle" | "recording" | "transcribing" | "thinking" | "speaking";
 
+function takeCompletePhrases(value: string) {
+  const phrases: string[] = [];
+  let rest = value;
+  const boundary = /[,;.!?](?:\s|$)/;
+  while (true) {
+    const match = boundary.exec(rest);
+    if (!match || match.index < 8) break;
+    const end = match.index + match[0].length;
+    phrases.push(rest.slice(0, end).trim());
+    rest = rest.slice(end);
+  }
+  return { phrases, rest };
+}
+
 const scenarios = [
   {
-    id: "everyday", label: "Everyday English", hint: "Family, friends, routine", icon: Coffee,
+    id: "everyday",
+    label: "Everyday English",
+    hint: "Family, friends, routine",
+    icon: Coffee,
     fallbackOpeners: [
       "Hi! Great to see you again. How was your day today?",
       "Hey! Imagine we're neighbours chatting over coffee. What did you do last weekend?",
@@ -42,7 +78,10 @@ const scenarios = [
     ],
   },
   {
-    id: "professional", label: "Professional English", hint: "Meetings, interviews, networking", icon: Briefcase,
+    id: "professional",
+    label: "Professional English",
+    hint: "Meetings, interviews, networking",
+    icon: Briefcase,
     fallbackOpeners: [
       "Welcome! Let's warm up for work situations. Can you tell me what you do and what a typical week looks like?",
       "Hi! Imagine I'm interviewing you for your dream job. Tell me a little about yourself.",
@@ -53,7 +92,10 @@ const scenarios = [
     ],
   },
   {
-    id: "travel", label: "Travel English", hint: "Airport, hotel, restaurant", icon: Plane,
+    id: "travel",
+    label: "Travel English",
+    hint: "Airport, hotel, restaurant",
+    icon: Plane,
     fallbackOpeners: [
       "Let's travel! You just landed and you're at the check-in desk of your hotel. What do you say to the receptionist?",
       "Ready for a trip? You're at the airport and your flight is delayed. What do you ask at the information desk?",
@@ -99,9 +141,13 @@ async function transcribe(audio: Blob): Promise<string> {
   if (!token) throw new Error("Please sign in again to use voice conversation.");
   const form = new FormData();
   form.append("file", audio, "recording.wav");
-  const response = await fetch("/api/transcribe", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: form });
+  const response = await fetch("/api/transcribe", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
   if (!response.ok || !response.body) {
-    const body = await response.json().catch(() => null) as { message?: string } | null;
+    const body = (await response.json().catch(() => null)) as { message?: string } | null;
     throw new Error(body?.message ?? `Transcription failed (${response.status}).`);
   }
 
@@ -111,7 +157,11 @@ async function transcribe(audio: Blob): Promise<string> {
     for (const line of event.split(/\r?\n/)) {
       if (!line.startsWith("data:")) continue;
       try {
-        const payload = JSON.parse(line.slice(5).trim()) as { type?: string; delta?: string; text?: string };
+        const payload = JSON.parse(line.slice(5).trim()) as {
+          type?: string;
+          delta?: string;
+          text?: string;
+        };
         if (payload.type === "transcript.text.delta") transcript += payload.delta ?? "";
         if (payload.type === "transcript.text.done" && payload.text) transcript = payload.text;
       } catch {
@@ -138,7 +188,12 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const { data: snapshot } = useStudySnapshot();
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
-  useLogTimeOnExit({ timer: minutesSpent, profile, type: "conversation_practice", title: "Speaking practice" });
+  useLogTimeOnExit({
+    timer: minutesSpent,
+    profile,
+    type: "conversation_practice",
+    title: "Speaking practice",
+  });
   const { data: overall } = useOverallAverage();
   // The conversation always follows the CEFR level the student actually reached.
   const cefrLevel = getLevelState(profile?.level).current.value;
@@ -149,10 +204,15 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const [finishing, setFinishing] = useState(false);
   const mounted = useRef(true);
   const topicOffset = useRef(0);
+  const speechQueue = useRef<Promise<void>>(Promise.resolve());
 
   useEffect(() => {
     mounted.current = true;
-    return () => { mounted.current = false; cancelVoiceRecording(); stopSpeaking(); };
+    return () => {
+      mounted.current = false;
+      cancelVoiceRecording();
+      stopSpeaking();
+    };
   }, []);
   useEffect(() => {
     if (!lessonTopic || scenario) return;
@@ -181,6 +241,18 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     }
   }
 
+  function queueSpeech(text: string) {
+    speechQueue.current = speechQueue.current
+      .then(async () => {
+        if (!mounted.current) return;
+        setVoiceState("speaking");
+        await speakEnglish(text, { cache: "memory" });
+      })
+      .catch((error: unknown) => {
+        toast.error(error instanceof Error ? error.message : "The response could not be played.");
+      });
+  }
+
   /** Starts a conversation with a subject picked by the AI. `offset` asks for another subject. */
   async function start(offset = 0) {
     const selected = scenarioOfTheDay(offset);
@@ -206,7 +278,9 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     } catch {
       const fresh = selected.fallbackOpeners.filter((line) => !used.includes(line));
       const pool = fresh.length ? fresh : selected.fallbackOpeners;
-      opener = pool[Math.floor(Math.random() * pool.length)] ?? "Hi! Let's chat in English. How are you today?";
+      opener =
+        pool[Math.floor(Math.random() * pool.length)] ??
+        "Hi! Let's chat in English. How are you today?";
     }
     rememberOpener(opener);
     if (!mounted.current) return;
@@ -237,7 +311,11 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       const next: ChatMessage[] = [...messages, { role: "user", content: text }];
       setMessages(next);
       setVoiceState("thinking");
-      const raw = await hybridChat(
+      let streamedReply = "";
+      let phraseBuffer = "";
+      const replyIndex = next.length;
+      setMessages([...next, { role: "assistant", content: "" }]);
+      const raw = await streamCoachReply(
         coachReplyMessages(
           scenario,
           cefrLevel,
@@ -245,14 +323,32 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
           buildStudyContext(snapshot),
           next.slice(-8),
         ),
+        (delta) => {
+          streamedReply += delta;
+          phraseBuffer += delta;
+          if (mounted.current) {
+            setMessages((current) =>
+              current.map((message, index) =>
+                index === replyIndex ? { ...message, content: streamedReply } : message,
+              ),
+            );
+          }
+          const split = takeCompletePhrases(phraseBuffer);
+          phraseBuffer = split.rest;
+          split.phrases.forEach(queueSpeech);
+        },
       );
       const reply = raw.trim();
+      if (phraseBuffer.trim()) queueSpeech(phraseBuffer.trim());
       const updated: ChatMessage[] = [...next, { role: "assistant", content: reply }];
       setMessages(updated);
-      await playResponse(reply);
+      await speechQueue.current;
+      if (mounted.current) setVoiceState("idle");
     } catch (error) {
       if (mounted.current) setVoiceState("idle");
-      toast.error(error instanceof Error ? error.message : "AI Talking could not hear or answer you.");
+      toast.error(
+        error instanceof Error ? error.message : "AI Talking could not hear or answer you.",
+      );
     }
   }
 
@@ -266,22 +362,37 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     setVoiceState("idle");
     setFinishing(true);
     try {
-      const result = parseConversationReport(await hybridChat(conversationReportMessages(messages), true));
+      const result = parseConversationReport(
+        await hybridChat(conversationReportMessages(messages), true),
+      );
       setReport(result);
       const average = Math.round((result.fluency + result.grammar + result.vocabulary) / 3);
       const scenarioLabel = scenarios.find((item) => item.id === scenario)?.label ?? "English";
       if (result.common_errors.length) {
-        const { data } = await supabase.from("learning_profile").select("common_errors").eq("user_id", profile.id).maybeSingle();
-        const merged = Array.from(new Set([...(data?.common_errors ?? []), ...result.common_errors])).slice(-12);
-        await supabase.from("learning_profile").upsert({ user_id: profile.id, common_errors: merged }, { onConflict: "user_id" });
+        const { data } = await supabase
+          .from("learning_profile")
+          .select("common_errors")
+          .eq("user_id", profile.id)
+          .maybeSingle();
+        const merged = Array.from(
+          new Set([...(data?.common_errors ?? []), ...result.common_errors]),
+        ).slice(-12);
+        await supabase
+          .from("learning_profile")
+          .upsert({ user_id: profile.id, common_errors: merged }, { onConflict: "user_id" });
       }
       const scored = result.fluency > 0 || result.grammar > 0 || result.vocabulary > 0;
-      if (!scored) toast.error("We could not score this session, so your Talking progress was not changed.");
+      if (!scored)
+        toast.error("We could not score this session, so your Talking progress was not changed.");
       await logActivity({
-        userId: profile.id, type: "conversation", title: `${scenarioLabel} speaking session`, minutes: minutesSpent(1),
+        userId: profile.id,
+        type: "conversation",
+        title: `${scenarioLabel} speaking session`,
+        minutes: minutesSpent(1),
         score: scored ? average : null,
         ...(scored ? { scores: { speaking: result.fluency } } : {}),
-        currentStreak: profile.streak_days, lastDate: profile.last_activity_date,
+        currentStreak: profile.streak_days,
+        lastDate: profile.last_activity_date,
       });
       queryClient.invalidateQueries();
     } catch (error) {
@@ -292,93 +403,212 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   }
 
   if (!scenario) {
-    return <>
-      <h1 className="text-3xl font-bold">AI Talking</h1>
-      <p className="mt-2 text-muted-foreground">Starting a new conversation… the AI is choosing today's subject.</p>
-      <div className="mt-7 flex items-center gap-2 text-muted-foreground"><Loader2 className="size-5 animate-spin" /> <Shimmer>Preparing your topic…</Shimmer></div>
-    </>;
+    return (
+      <>
+        <h1 className="text-3xl font-bold">AI Talking</h1>
+        <p className="mt-2 text-muted-foreground">
+          Starting a new conversation… the AI is choosing today's subject.
+        </p>
+        <div className="mt-7 flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="size-5 animate-spin" /> <Shimmer>Preparing your topic…</Shimmer>
+        </div>
+      </>
+    );
   }
-
 
   const userAnswers = messages.filter((message) => message.role === "user").length;
   const hasEnoughAnswers = userAnswers >= 3;
-  const isProcessingAnswer = voiceState === "recording" || voiceState === "transcribing" || voiceState === "thinking";
+  const isProcessingAnswer =
+    voiceState === "recording" || voiceState === "transcribing" || voiceState === "thinking";
   const canFinish = hasEnoughAnswers && !isProcessingAnswer && !finishing;
-  const statusText = voiceState === "recording" ? "Listening… tap again when you finish" : voiceState === "transcribing" ? "Understanding your English…" : voiceState === "thinking" ? "Preparing a reply…" : voiceState === "speaking" ? "AI Talking is speaking…" : "Tap the microphone and speak in English";
+  const statusText =
+    voiceState === "recording"
+      ? "Listening… tap again when you finish"
+      : voiceState === "transcribing"
+        ? "Understanding your English…"
+        : voiceState === "thinking"
+          ? "Preparing a reply…"
+          : voiceState === "speaking"
+            ? "AI Talking is speaking…"
+            : "Tap the microphone and speak in English";
 
-  const newTopic = () => { cancelVoiceRecording(); topicOffset.current += 1; void start(topicOffset.current); };
+  const newTopic = () => {
+    cancelVoiceRecording();
+    topicOffset.current += 1;
+    void start(topicOffset.current);
+  };
 
-  return <div className="space-y-5">
-    <div>
-      <div className="min-w-0 flex-1"><h1 className="text-2xl font-bold">AI Talking</h1><p className="max-w-full text-sm leading-snug text-muted-foreground">Voice conversation · the AI chooses today's subject</p></div>
-    </div>
-
-    {userAnswers === 0 && <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3 text-sm">
-      <span className="text-muted-foreground">Don't like today's topic?</span>
-      <Button size="sm" variant="outline" disabled={isProcessingAnswer} onClick={newTopic}>New topic</Button>
-    </div>}
-
-
-    <section className="card-soft flex h-[58vh] min-h-[430px] flex-col overflow-hidden">
-      <Conversation>
-        <ConversationContent className="gap-5 p-5">
-          {messages.map((message, index) => <Message key={`${message.role}-${index}`} from={message.role}>
-            <MessageContent className={message.role === "user" ? "bg-primary text-primary-foreground" : undefined}>
-              <MessageResponse>{message.content}</MessageResponse>
-            </MessageContent>
-          </Message>)}
-          {(voiceState === "transcribing" || voiceState === "thinking") && <Message from="assistant"><MessageContent><Shimmer>{voiceState === "transcribing" ? "Listening carefully…" : "Thinking…"}</Shimmer></MessageContent></Message>}
-        </ConversationContent>
-        <ConversationScrollButton />
-      </Conversation>
-
-      <div className="border-t border-border bg-background p-4 text-center">
-        <p className="mb-3 min-h-5 text-sm text-muted-foreground" aria-live="polite">{statusText}</p>
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            size="icon"
-            variant="outline"
-            aria-label="Replay the last AI response"
-            disabled={voiceState !== "idle" && voiceState !== "speaking" || !messages.some((message) => message.role === "assistant")}
-            onClick={() => { const last = [...messages].reverse().find((message) => message.role === "assistant"); if (last) void playResponse(last.content); }}
-            className={voiceState === "speaking" ? "bg-success text-success-foreground hover:bg-success/90" : ""}
-          >
-            <Volume2 />
-          </Button>
-
-
-          <Button size="icon" aria-label={voiceState === "recording" ? "Stop recording" : "Start recording"} onClick={toggleRecording} disabled={voiceState === "thinking" || voiceState === "transcribing"} className={`size-16 rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}>
-            {voiceState === "recording" ? <MicOff className="size-7" /> : voiceState === "thinking" || voiceState === "transcribing" ? <Loader2 className="size-7 animate-spin" /> : <Mic className="size-7" />}
-          </Button>
-          <span className="size-9" aria-hidden="true" />
+  return (
+    <div className="space-y-5">
+      <div>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl font-bold">AI Talking</h1>
+          <p className="max-w-full text-sm leading-snug text-muted-foreground">
+            Voice conversation · the AI chooses today's subject
+          </p>
         </div>
       </div>
-    </section>
 
-    <div className="space-y-1.5 text-center">
-      <Button className="w-full" size="lg" variant="outline" onClick={finish} disabled={!canFinish}>
-        {finishing ? <Loader2 className="animate-spin" /> : <Sparkles />} <span>Finish session and get my report</span>
-      </Button>
-      <p className="text-xs text-muted-foreground">
-        {hasEnoughAnswers ? (
-          <span className="text-success font-medium">Ready — get your personalized feedback.</span>
-        ) : (
-          <>
-            <span>Speak at least 3 answers to unlock your report</span>{" "}
-            <span>{`(${Math.min(userAnswers, 3)}/3).`}</span>
-          </>
-        )}
-      </p>
+      {userAnswers === 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3 text-sm">
+          <span className="text-muted-foreground">Don't like today's topic?</span>
+          <Button size="sm" variant="outline" disabled={isProcessingAnswer} onClick={newTopic}>
+            New topic
+          </Button>
+        </div>
+      )}
+
+      <section className="card-soft flex h-[58vh] min-h-[430px] flex-col overflow-hidden">
+        <Conversation>
+          <ConversationContent className="gap-5 p-5">
+            {messages.map((message, index) => (
+              <Message key={`${message.role}-${index}`} from={message.role}>
+                <MessageContent
+                  className={
+                    message.role === "user" ? "bg-primary text-primary-foreground" : undefined
+                  }
+                >
+                  <MessageResponse>{message.content}</MessageResponse>
+                </MessageContent>
+              </Message>
+            ))}
+            {voiceState === "transcribing" && (
+              <Message from="assistant">
+                <MessageContent>
+                  <Shimmer>Transcribing your answer…</Shimmer>
+                </MessageContent>
+              </Message>
+            )}
+            {voiceState === "thinking" && !messages.at(-1)?.content && (
+              <Message from="assistant">
+                <MessageContent>
+                  <Shimmer>Preparing the first sentence…</Shimmer>
+                </MessageContent>
+              </Message>
+            )}
+          </ConversationContent>
+          <ConversationScrollButton />
+        </Conversation>
+
+        <div className="border-t border-border bg-background p-4 text-center">
+          <p className="mb-3 min-h-5 text-sm text-muted-foreground" aria-live="polite">
+            {statusText}
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              size="icon"
+              variant="outline"
+              aria-label="Replay the last AI response"
+              disabled={
+                (voiceState !== "idle" && voiceState !== "speaking") ||
+                !messages.some((message) => message.role === "assistant")
+              }
+              onClick={() => {
+                const last = [...messages]
+                  .reverse()
+                  .find((message) => message.role === "assistant");
+                if (last) void playResponse(last.content);
+              }}
+              className={
+                voiceState === "speaking"
+                  ? "bg-success text-success-foreground hover:bg-success/90"
+                  : ""
+              }
+            >
+              <Volume2 />
+            </Button>
+
+            <Button
+              size="icon"
+              aria-label={voiceState === "recording" ? "Stop recording" : "Start recording"}
+              onClick={toggleRecording}
+              disabled={voiceState === "thinking" || voiceState === "transcribing"}
+              className={`size-16 rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}
+            >
+              {voiceState === "recording" ? (
+                <MicOff className="size-7" />
+              ) : voiceState === "thinking" || voiceState === "transcribing" ? (
+                <Loader2 className="size-7 animate-spin" />
+              ) : (
+                <Mic className="size-7" />
+              )}
+            </Button>
+            <span className="size-9" aria-hidden="true" />
+          </div>
+        </div>
+      </section>
+
+      <div className="space-y-1.5 text-center">
+        <Button
+          className="w-full"
+          size="lg"
+          variant="outline"
+          onClick={finish}
+          disabled={!canFinish}
+        >
+          {finishing ? <Loader2 className="animate-spin" /> : <Sparkles />}{" "}
+          <span>Finish session and get my report</span>
+        </Button>
+        <p className="text-xs text-muted-foreground">
+          {hasEnoughAnswers ? (
+            <span className="text-success font-medium">
+              Ready — get your personalized feedback.
+            </span>
+          ) : (
+            <>
+              <span>Speak at least 3 answers to unlock your report</span>{" "}
+              <span>{`(${Math.min(userAnswers, 3)}/3).`}</span>
+            </>
+          )}
+        </p>
+      </div>
+
+      {report && (
+        <section className="card-soft animate-rise p-6">
+          <h2 className="text-lg font-semibold">Talking report</h2>
+          <div className="mt-5 grid gap-5 sm:grid-cols-3">
+            {[
+              { label: "Fluency", value: report.fluency },
+              { label: "Grammar", value: report.grammar },
+              { label: "Vocabulary", value: report.vocabulary },
+            ].map((score) => (
+              <div key={score.label}>
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">{score.label}</span>
+                  <span className="text-muted-foreground">{score.value}</span>
+                </div>
+                <Progress value={score.value} className="mt-2 h-2" />
+              </div>
+            ))}
+          </div>
+          <p className="mt-5 text-sm text-muted-foreground">{report.summary}</p>
+          {report.suggestions.length > 0 && (
+            <>
+              <h3 className="mt-6 font-semibold">Improvement suggestions</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                {report.suggestions.map((suggestion) => (
+                  <li key={suggestion}>{suggestion}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {report.new_words.length > 0 && (
+            <>
+              <h3 className="mt-6 font-semibold">Words to learn</h3>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {report.new_words.map((word) => (
+                  <span
+                    key={word}
+                    className="rounded-full bg-accent px-3 py-1 text-sm text-accent-foreground"
+                  >
+                    {word}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+      )}
     </div>
-
-    {report && <section className="card-soft animate-rise p-6">
-      <h2 className="text-lg font-semibold">Talking report</h2>
-      <div className="mt-5 grid gap-5 sm:grid-cols-3">{[
-        { label: "Fluency", value: report.fluency }, { label: "Grammar", value: report.grammar }, { label: "Vocabulary", value: report.vocabulary },
-      ].map((score) => <div key={score.label}><div className="flex justify-between text-sm"><span className="font-medium">{score.label}</span><span className="text-muted-foreground">{score.value}</span></div><Progress value={score.value} className="mt-2 h-2" /></div>)}</div>
-      <p className="mt-5 text-sm text-muted-foreground">{report.summary}</p>
-      {report.suggestions.length > 0 && <><h3 className="mt-6 font-semibold">Improvement suggestions</h3><ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">{report.suggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}</ul></>}
-      {report.new_words.length > 0 && <><h3 className="mt-6 font-semibold">Words to learn</h3><div className="mt-2 flex flex-wrap gap-2">{report.new_words.map((word) => <span key={word} className="rounded-full bg-accent px-3 py-1 text-sm text-accent-foreground">{word}</span>)}</div></>}
-    </section>}
-  </div>;
+  );
 }

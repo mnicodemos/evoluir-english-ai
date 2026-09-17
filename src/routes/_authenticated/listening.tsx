@@ -13,15 +13,26 @@ import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { speakEnglish } from "@/lib/speech";
 import { transcribeAudio } from "@/lib/transcribe";
-import { cancelVoiceRecording, startVoiceRecording, stopVoiceRecording } from "@/lib/voice-recorder";
+import {
+  cancelVoiceRecording,
+  startVoiceRecording,
+  stopVoiceRecording,
+} from "@/lib/voice-recorder";
 
 export const Route = createFileRoute("/_authenticated/listening")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · Listening Lab" },
-      { name: "description", content: "Train your English listening with dictation drills for everyday, work and travel." },
+      {
+        name: "description",
+        content:
+          "Train your English listening with dictation drills for everyday, work and travel.",
+      },
       { property: "og:title", content: "Evoluir+ English AI · Listening Lab" },
-      { property: "og:description", content: "Listen to natural English sentences and repeat them out loud." },
+      {
+        property: "og:description",
+        content: "Listen to natural English sentences and repeat them out loud.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -44,7 +55,10 @@ function countWords(sentence: string) {
 function clampWords(sentence: string, max = MAX_WORDS) {
   const words = sentence.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
   if (words.length <= max) return sentence.trim();
-  const clipped = words.slice(0, max).join(" ").replace(/[,;:]$/, "");
+  const clipped = words
+    .slice(0, max)
+    .join(" ")
+    .replace(/[,;:]$/, "");
   return /[.!?]$/.test(clipped) ? clipped : `${clipped}.`;
 }
 
@@ -196,7 +210,12 @@ function ListeningPage() {
   const { data: lessons } = useLessons();
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
-  useLogTimeOnExit({ timer: minutesSpent, profile, type: "listening_practice", title: "Listening practice" });
+  useLogTimeOnExit({
+    timer: minutesSpent,
+    profile,
+    type: "listening_practice",
+    title: "Listening practice",
+  });
   const track = tracks[0]!;
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -227,14 +246,15 @@ function ListeningPage() {
     setBest(0);
   }, [index]);
 
-
   // A new round of sentences is unlocked every time the student starts a new lesson.
   const { data: startedLessons } = useLessonRound();
   const lessonCount = startedLessons ?? 0;
 
   const sentences = useMemo(() => {
     const fromLessons = lessonSentences(lessons ?? []);
-    const extra = (trackCategories[track.id] ?? []).flatMap((c) => (fromLessons.get(c) ?? []).map(clampWords));
+    const extra = (trackCategories[track.id] ?? []).flatMap((c) =>
+      (fromLessons.get(c) ?? []).map(clampWords),
+    );
     const pool = [...new Set([...extra, ...track.sentences.map(clampWords)])].filter(isDrillLength);
     const start = pool.length ? (lessonCount * SENTENCES_PER_TRACK) % pool.length : 0;
     const picked: string[] = [];
@@ -305,11 +325,11 @@ function ListeningPage() {
       if (slow) {
         const words = sentence.split(/\s+/).filter(Boolean);
         for (const word of words) {
-          await speakEnglish(word);
+          await speakEnglish(word, { cache: "persistent" });
           await new Promise((resolve) => setTimeout(resolve, 350));
         }
       } else {
-        await speakEnglish(sentence);
+        await speakEnglish(sentence, { cache: "persistent" });
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Audio is unavailable right now.");
@@ -317,10 +337,14 @@ function ListeningPage() {
       setPlaying(false);
       setCanReveal(true);
       // REVEAL is available for 5s after audio; only stays fixed on the third attempt.
-      window.setTimeout(() => setAttempts((a) => {
-        if (a < 3) setCanReveal(false);
-        return a;
-      }), 5000);
+      window.setTimeout(
+        () =>
+          setAttempts((a) => {
+            if (a < 3) setCanReveal(false);
+            return a;
+          }),
+        5000,
+      );
     }
   }
 
@@ -357,7 +381,9 @@ function ListeningPage() {
       if (nextAttempts >= 3) setCanReveal(true);
       recordAnswer(track.id, index);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "I couldn't hear that clearly. Please try again.");
+      toast.error(
+        error instanceof Error ? error.message : "I couldn't hear that clearly. Please try again.",
+      );
     } finally {
       setChecking(false);
     }
@@ -407,8 +433,8 @@ function ListeningPage() {
           <p className="text-sm text-muted-foreground">Listening Lab</p>
           <h1 className="text-2xl font-semibold">Train your ear with real English</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the activity — a new set
-            arrives every time you start a new lesson in the Learning Center.
+            Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
+            activity — a new set arrives every time you start a new lesson in the Learning Center.
           </p>
           <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
             <RotateCcw className="mr-2 size-4" /> Redo today's activity
@@ -449,7 +475,9 @@ function ListeningPage() {
                 <span> {average}%</span>
               </p>
             </div>
-            <Progress value={((index + (checked !== null ? 1 : 0)) / Math.max(1, sentences.length)) * 100} />
+            <Progress
+              value={((index + (checked !== null ? 1 : 0)) / Math.max(1, sentences.length)) * 100}
+            />
 
             <div className="flex flex-wrap gap-3">
               <Button onClick={() => play(false)} disabled={playing}>
@@ -535,7 +563,11 @@ function ListeningPage() {
                 ) : (
                   <Button onClick={startRepeat} disabled={checking || playing}>
                     <Mic className="mr-2 size-4" />{" "}
-                    {checking ? "Checking..." : checked !== null ? "Try again" : "Repeat the sentence"}
+                    {checking
+                      ? "Checking..."
+                      : checked !== null
+                        ? "Try again"
+                        : "Repeat the sentence"}
                   </Button>
                 )
               ) : (

@@ -20,6 +20,7 @@ import { Route as AuthenticatedPremiumRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedVocabularyRouteImport } from './routes/_authenticated/vocabulary'
 import { Route as AuthenticatedWritingRouteImport } from './routes/_authenticated/writing'
+import { Route as ApiCoachStreamRouteImport } from './routes/api/coach-stream'
 import { Route as ApiSpeechRouteImport } from './routes/api/speech'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authenticated/learning/index'
@@ -82,6 +83,11 @@ const AuthenticatedWritingRoute = AuthenticatedWritingRouteImport.update({
   path: '/writing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
+  id: '/api/coach-stream',
+  path: '/api/coach-stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSpeechRoute = ApiSpeechRouteImport.update({
   id: '/api/speech',
   path: '/api/speech',
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/progress': typeof AuthenticatedProgressRoute
   '/vocabulary': typeof AuthenticatedVocabularyRoute
   '/writing': typeof AuthenticatedWritingRoute
+  '/api/coach-stream': typeof ApiCoachStreamRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/progress': typeof AuthenticatedProgressRoute
   '/vocabulary': typeof AuthenticatedVocabularyRoute
   '/writing': typeof AuthenticatedWritingRoute
+  '/api/coach-stream': typeof ApiCoachStreamRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/vocabulary': typeof AuthenticatedVocabularyRoute
   '/_authenticated/writing': typeof AuthenticatedWritingRoute
+  '/api/coach-stream': typeof ApiCoachStreamRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/_authenticated/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/progress'
     | '/vocabulary'
     | '/writing'
+    | '/api/coach-stream'
     | '/api/speech'
     | '/api/transcribe'
     | '/learning/$lessonId'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/progress'
     | '/vocabulary'
     | '/writing'
+    | '/api/coach-stream'
     | '/api/speech'
     | '/api/transcribe'
     | '/learning/$lessonId'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/_authenticated/progress'
     | '/_authenticated/vocabulary'
     | '/_authenticated/writing'
+    | '/api/coach-stream'
     | '/api/speech'
     | '/api/transcribe'
     | '/_authenticated/learning/$lessonId'
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -330,6 +343,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/writing'
       preLoaderRoute: typeof AuthenticatedWritingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/coach-stream': {
+      id: '/api/coach-stream'
+      path: '/api/coach-stream'
+      fullPath: '/api/coach-stream'
+      preLoaderRoute: typeof ApiCoachStreamRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/speech': {
       id: '/api/speech'
@@ -420,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiCoachStreamRoute: ApiCoachStreamRoute,
   ApiSpeechRoute: ApiSpeechRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,

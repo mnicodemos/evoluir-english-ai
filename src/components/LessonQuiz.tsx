@@ -1,5 +1,6 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { saveQuizResult, type QuizQuestion } from "@/hooks/useLearning";
@@ -21,42 +22,52 @@ export function LessonQuiz({
   const { lang } = useUiLang();
   // Answers are kept locally so leaving the lesson does not lose them.
   const [answers, setAnswers, clearAnswers] = usePersistentState<Record<string, string>>(
-    `lesson-quiz-answers:${lessonId}`,
+    `lesson-quiz-answers:${userId ?? "guest"}:${lessonId}`,
     {},
   );
   // Whether the quiz was already finished, so a completed lesson keeps showing
   // the corrections instead of an empty quiz when the student comes back.
   const [submitted, setSubmitted, clearSubmitted] = usePersistentState<boolean>(
-    `lesson-quiz-submitted:${lessonId}`,
+    `lesson-quiz-submitted:${userId ?? "guest"}:${lessonId}`,
     false,
   );
   const [saving, setSaving] = useState(false);
-
+  const [saveFailed, setSaveFailed] = useState(false);
 
   const correct = questions.filter((q) => answers[q.id] === q.correct_answer).length;
   const score = questions.length ? Math.round((correct / questions.length) * 100) : 0;
 
-
   async function submit() {
     setSaving(true);
-    setSubmitted(true);
-    if (userId) {
-      await saveQuizResult({
-        userId,
-        lessonId,
-        score,
-        total: questions.length,
-        correct,
-        details: questions.map((q) => ({
-          question: q.question,
-          answer: answers[q.id] ?? "",
-          correct_answer: q.correct_answer,
-          is_correct: answers[q.id] === q.correct_answer,
-        })),
-      });
+    setSaveFailed(false);
+    try {
+      if (userId) {
+        await saveQuizResult({
+          userId,
+          lessonId,
+          score,
+          total: questions.length,
+          correct,
+          details: questions.map((q) => ({
+            question: q.question,
+            answer: answers[q.id] ?? "",
+            correct_answer: q.correct_answer,
+            is_correct: answers[q.id] === q.correct_answer,
+          })),
+        });
+      }
+      setSubmitted(true);
+      onFinished?.(score);
+    } catch (error) {
+      setSaveFailed(true);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Your answers are safe, but progress could not be saved. Try again.",
+      );
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    onFinished?.(score);
   }
 
   if (questions.length === 0) {
@@ -72,7 +83,6 @@ export function LessonQuiz({
     setSubmitted(false);
   }
 
-
   return (
     <div className="space-y-5">
       {submitted && (
@@ -80,7 +90,9 @@ export function LessonQuiz({
           <p className="text-sm text-primary-foreground/70">Your score</p>
           <p className="text-4xl font-bold">{score}%</p>
           <p className="mt-2 text-sm text-primary-foreground/80">
-            {lang === "pt" ? `${correct} de ${questions.length} corretas. ` : `${correct} of ${questions.length} correct. `}
+            {lang === "pt"
+              ? `${correct} de ${questions.length} corretas. `
+              : `${correct} of ${questions.length} correct. `}
             {score >= PASS_SCORE
               ? lang === "pt"
                 ? "Muito bem — você passou! Suas respostas foram salvas e você pode refazer o quiz quando quiser."
@@ -94,7 +106,6 @@ export function LessonQuiz({
           </Button>
         </div>
       )}
-
 
       {questions.map((q, i) => {
         const chosen = answers[q.id];
@@ -147,13 +158,20 @@ export function LessonQuiz({
       })}
 
       {!submitted && (
-        <Button
-          className="w-full"
-          disabled={Object.keys(answers).length < questions.length || saving}
-          onClick={submit}
-        >
-          Finish quiz
-        </Button>
+        <div className="space-y-2">
+          {saveFailed && (
+            <p className="text-center text-sm text-destructive" role="alert">
+              Your answers are saved on this device. Try saving again.
+            </p>
+          )}
+          <Button
+            className="w-full"
+            disabled={Object.keys(answers).length < questions.length || saving}
+            onClick={submit}
+          >
+            {saving ? "Saving…" : saveFailed ? "Try saving again" : "Finish quiz"}
+          </Button>
+        </div>
       )}
     </div>
   );
