@@ -255,8 +255,15 @@ function Writing() {
     <AppShell>
       <h1 className="text-3xl font-bold">Writing AI Corrector</h1>
       <p className="mt-2 text-muted-foreground">
-        One task for Everyday, Professional and Travel English. New tasks every day — nothing repeats.
+        One task for Everyday, Professional and Travel English. New tasks every day and every time you start a new
+        lesson — nothing repeats.
       </p>
+      {done.length > 0 && (
+        <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoToday}>
+          Redo today's tasks
+        </Button>
+      )}
+
 
       <div className="mt-7 grid gap-3 sm:grid-cols-3">
         {prompts.map((p, index) => {
