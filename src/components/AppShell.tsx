@@ -103,6 +103,22 @@ function AppShellContent({ children }: { children: ReactNode }) {
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label={translate("Premium")}
+                className="size-10 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                asChild
+              >
+                <Link to="/premium">
+                  <Crown className="size-5 text-[oklch(0.78_0.18_82)]" />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={8}>{translate("Premium")}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
                 aria-label={translate("Sign out")}
                 className="size-10 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 onClick={signOut}
