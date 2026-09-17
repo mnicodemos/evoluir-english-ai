@@ -9,9 +9,6 @@ const requestSchema = z.object({
     .default("alloy"),
 });
 
-const wait = (milliseconds: number) =>
-  new Promise((resolve) => setTimeout(resolve, milliseconds));
-
 // The Lovable audio gateway needs workspace credits; this project has its own
 // Google Gemini key connected, so speech is generated there instead.
 const GEMINI_TTS_MODELS = ["gemini-2.5-flash-preview-tts", "gemini-2.5-pro-preview-tts"] as const;
@@ -55,12 +52,16 @@ export const Route = createFileRoute("/api/speech")({
         const auth = createClient(supabaseUrl, publishableKey, {
           auth: { persistSession: false, autoRefreshToken: false },
         });
-        const { data, error } = await auth.auth.getClaims(token);
+        const [claimsResult, bodyResult] = await Promise.all([
+          auth.auth.getClaims(token),
+          request.json().catch(() => null),
+        ]);
+        const { data, error } = claimsResult;
         if (error || !data?.claims?.sub) {
           return Response.json({ message: "Please sign in again to use audio." }, { status: 401 });
         }
 
-        const parsed = requestSchema.safeParse(await request.json().catch(() => null));
+        const parsed = requestSchema.safeParse(bodyResult);
         if (!parsed.success) {
           return Response.json({ message: "Choose a valid word to hear." }, { status: 400 });
         }
@@ -88,58 +89,41 @@ export const Route = createFileRoute("/api/speech")({
           },
         });
 
-        let audioBase64 = "";
         let lastStatus = 502;
         let lastMessage = "Audio generation failed.";
 
-        // All AI audio runs on the project's own Google Gemini key.
-        outer: for (const model of GEMINI_TTS_MODELS) {
-          for (let attempt = 0; attempt < 2; attempt += 1) {
-            const res = await fetch(
-              `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
-              {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${apiKey}`,
-                  "X-Connection-Api-Key": geminiKey,
-                  "Content-Type": "application/json",
-                },
-                body,
+        let upstream: Response | null = null;
+        for (const model of GEMINI_TTS_MODELS) {
+          const res = await fetch(
+            `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:streamGenerateContent?alt=sse`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${apiKey}`,
+                "X-Connection-Api-Key": geminiKey,
+                "Content-Type": "application/json",
               },
-            );
+              body,
+            },
+          );
 
-            if (res.ok) {
-              const json = (await res.json()) as {
-                candidates?: Array<{
-                  content?: { parts?: Array<{ inlineData?: { data?: string } }> };
-                }>;
-              };
-              const data = (json.candidates?.[0]?.content?.parts ?? [])
-                .map((p) => p.inlineData?.data ?? "")
-                .join("");
-              if (data) {
-                audioBase64 = data;
-                break outer;
-              }
-              lastStatus = 502;
-              lastMessage = "The audio service returned no sound.";
-              break;
-            }
-
-            lastStatus = res.status;
-            const raw = await res.text().catch(() => "");
-            try {
-              const parsedBody = JSON.parse(raw) as { error?: { message?: string } };
-              lastMessage = parsedBody.error?.message ?? lastMessage;
-            } catch {
-              if (raw) lastMessage = raw.slice(0, 200);
-            }
-            if (res.status !== 429 && res.status < 500) break outer;
-            if (attempt === 0) await wait(600 + Math.random() * 300);
+          if (res.ok && res.body) {
+            upstream = res;
+            break;
           }
+
+          lastStatus = res.status;
+          const raw = await res.text().catch(() => "");
+          try {
+            const parsedBody = JSON.parse(raw) as { error?: { message?: string } };
+            lastMessage = parsedBody.error?.message ?? lastMessage;
+          } catch {
+            if (raw) lastMessage = raw.slice(0, 200);
+          }
+          if (res.status !== 429 && res.status < 500) break;
         }
 
-        if (!audioBase64) {
+        if (!upstream?.body) {
           return Response.json(
             {
               message:
@@ -151,25 +135,56 @@ export const Route = createFileRoute("/api/speech")({
           );
         }
 
-        // The client reads an SSE stream of PCM deltas, so wrap the audio in the
-        // same event shape the audio gateway used.
-        const stream = new ReadableStream<Uint8Array>({
-          start(controller) {
-            const encoder = new TextEncoder();
-            const chunkSize = 32_000;
-            for (let i = 0; i < audioBase64.length; i += chunkSize) {
-              const payload = JSON.stringify({
-                type: "speech.audio.delta",
-                audio: audioBase64.slice(i, i + chunkSize),
-              });
-              controller.enqueue(encoder.encode(`data: ${payload}\n\n`));
-            }
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: "speech.audio.done" })}\n\n`),
-            );
-            controller.close();
-          },
-        });
+        const decoder = new TextDecoder();
+        const encoder = new TextEncoder();
+        let pending = "";
+        let sentAudio = false;
+        const stream = upstream.body.pipeThrough(
+          new TransformStream<Uint8Array, Uint8Array>({
+            transform(chunk, controller) {
+              pending += decoder.decode(chunk, { stream: true });
+              const events = pending.split(/\r?\n\r?\n/);
+              pending = events.pop() ?? "";
+              for (const event of events) {
+                for (const line of event.split(/\r?\n/)) {
+                  if (!line.startsWith("data:")) continue;
+                  try {
+                    const payload = JSON.parse(line.slice(5).trim()) as {
+                      candidates?: Array<{
+                        content?: { parts?: Array<{ inlineData?: { data?: string } }> };
+                      }>;
+                    };
+                    for (const candidate of payload.candidates ?? []) {
+                      for (const part of candidate.content?.parts ?? []) {
+                        const audio = part.inlineData?.data;
+                        if (!audio) continue;
+                        sentAudio = true;
+                        controller.enqueue(
+                          encoder.encode(
+                            `data: ${JSON.stringify({ type: "speech.audio.delta", audio })}\n\n`,
+                          ),
+                        );
+                      }
+                    }
+                  } catch {
+                    // Ignore provider keep-alives and metadata-only events.
+                  }
+                }
+              }
+            },
+            flush(controller) {
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify(
+                    sentAudio
+                      ? { type: "speech.audio.done" }
+                      : { type: "speech.audio.error", message: "The audio service returned no sound." },
+                  )}\n\n`,
+                ),
+              );
+            },
+          }),
+        );
 
         return new Response(stream, {
           headers: {
