@@ -36,16 +36,6 @@ export function MinutesByDayChart({ userId, level }: Props) {
         day: "2-digit",
         month: "short",
       });
-      const bucketOf = (type: string) =>
-        type === "listening"
-          ? "Listening"
-          : type === "vocabulary"
-            ? "Reading"
-            : type === "conversation"
-              ? "Talking"
-              : type === "writing"
-                ? "Writing"
-                : null;
       type Buckets = { Listening: number; Reading: number; Talking: number; Writing: number };
       const empty = (): Buckets => ({ Listening: 0, Reading: 0, Talking: 0, Writing: 0 });
       const totals = new Map<string, Buckets>();
