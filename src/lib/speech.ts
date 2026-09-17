@@ -247,7 +247,6 @@ export async function speakEnglish(text: string): Promise<void> {
   let samples: Float32Array;
   let streamed = false;
   let playhead = context.currentTime + 0.05;
-  let lastSource: AudioBufferSourceNode | null = null;
   let pendingByte: number | null = null;
 
   const scheduleChunk = (incoming: Uint8Array) => {
@@ -284,7 +283,6 @@ export async function speakEnglish(text: string): Promise<void> {
     source.start(playhead);
     playhead += decoded.duration;
     activeSources.add(source);
-    lastSource = source;
     streamed = true;
   };
 
@@ -298,7 +296,8 @@ export async function speakEnglish(text: string): Promise<void> {
   if (requestId !== playRequest) return;
   if (context.state === "suspended") await context.resume();
 
-  const finalSource = lastSource;
+  const scheduledSources = Array.from(activeSources);
+  const finalSource = scheduledSources[scheduledSources.length - 1];
   if (streamed && finalSource) {
     await new Promise<void>((resolve) => {
       finalSource.onended = () => {
