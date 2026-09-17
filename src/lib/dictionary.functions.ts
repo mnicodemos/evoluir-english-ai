@@ -1,4 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callGateway, parseJson } from "./ai-gateway.server";
 
 export type DictionaryEntry = {
   found: boolean;
@@ -49,15 +53,6 @@ function parseReverso(html: string) {
   return { translations, pairs };
 }
 
-function parseJson<T>(raw: string, fallback: T): T {
-  try {
-    const cleaned = raw.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
-    return JSON.parse(cleaned) as T;
-  } catch {
-    return fallback;
-  }
-}
-
 /**
  * Looks a word up on context.reverso.net (English -> Portuguese) and returns the
  * translations plus bilingual example sentences. Reverso often blocks server
@@ -65,8 +60,9 @@ function parseJson<T>(raw: string, fallback: T): T {
  * the same Reverso Context format.
  */
 export const lookupWord = createServerFn({ method: "GET" })
-  .inputValidator((input: { term: string }) => ({ term: String(input.term ?? "").trim() }))
-  .handler(async ({ data }): Promise<DictionaryEntry> => {
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ term: z.string().trim().min(1).max(120) }).parse(input))
+  .handler(async ({ data, context }): Promise<DictionaryEntry> => {
     const term = data.term.replace(/\s+/g, " ").trim().toLowerCase();
     const sourceUrl = `https://context.reverso.net/translation/english-portuguese/${encodeURIComponent(term)}`;
     const empty: DictionaryEntry = {
@@ -102,8 +98,7 @@ export const lookupWord = createServerFn({ method: "GET" })
 
     // Build a structured entry that groups definitions, translations and examples.
     try {
-      const { callGemini } = await import("./gemini.server");
-      const raw = await callGemini(
+      const raw = await callGateway(
         [
           {
             role: "system",
@@ -120,8 +115,9 @@ export const lookupWord = createServerFn({ method: "GET" })
           },
         ],
         true,
+        { userId: context.userId, operation: "dictionary" },
       );
-      if (raw) {
+      {
         const parsed = parseJson<{
           meanings?: {
             partOfSpeech?: string;

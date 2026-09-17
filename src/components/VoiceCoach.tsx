@@ -35,7 +35,7 @@ import {
   parseConversationReport,
   type ConversationReport,
 } from "@/lib/ai-prompts";
-import { hybridChat } from "@/lib/local-ai";
+import { aiChat } from "@/lib/aiChat.functions";
 import { getLevelState } from "@/lib/level";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { streamCoachReply } from "@/lib/coach-stream";
@@ -264,15 +264,17 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     const used = loadUsedOpeners();
     let opener: string;
     try {
-      const text = await hybridChat(
-        coachOpenerMessages(
+      const text = await aiChat({ data: {
+        messages: coachOpenerMessages(
           selected.id,
           cefrLevel,
           profile?.goal ?? "conversation",
           buildStudyContext(snapshot),
           used,
         ),
-      );
+        jsonMode: false,
+        operation: "talking",
+      } });
       opener = text.trim();
       if (!opener) throw new Error("empty opener");
     } catch {
@@ -363,7 +365,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     setFinishing(true);
     try {
       const result = parseConversationReport(
-        await hybridChat(conversationReportMessages(messages), true),
+        await aiChat({ data: { messages: conversationReportMessages(messages), jsonMode: true, operation: "talking" } }),
       );
       setReport(result);
       const average = Math.round((result.fluency + result.grammar + result.vocabulary) / 3);

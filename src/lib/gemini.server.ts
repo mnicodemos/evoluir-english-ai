@@ -2,9 +2,20 @@ const GATEWAY_URL = "https://connector-gateway.lovable.dev/udc_marcelo_s_google_
 // Use the lighter model for short tutoring exchanges and keep the larger
 // model as a quota fallback. This avoids exhausting the smaller free quota
 // assigned to the larger model during normal speaking practice.
-const MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash"];
+export const GEMINI_TEXT_MODEL = "gemini-3.5-flash-lite";
+const MODELS = [GEMINI_TEXT_MODEL, "gemini-3.5-flash"];
 
 export type GeminiMessage = { role: "system" | "user" | "assistant"; content: string };
+
+export class GeminiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+    public retryAfter = 0,
+  ) {
+    super(message);
+  }
+}
 
 function requestBody(messages: GeminiMessage[], jsonMode = false) {
   const systemParts = messages
@@ -63,6 +74,7 @@ export async function callGemini(
   const body = requestBody(messages, jsonMode);
 
   let lastStatus = 503;
+  let retryAfter = 0;
   for (const model of MODELS) {
     const res = await fetch(`${GATEWAY_URL}/v1beta/models/${model}:generateContent`, {
       method: "POST",
@@ -76,6 +88,7 @@ export async function callGemini(
 
     if (!res.ok) {
       lastStatus = res.status;
+      retryAfter = Number(res.headers.get("Retry-After") ?? 0);
       const errorBody = await res.text();
       console.error(
         `Gemini request failed [${res.status}] on ${model}: ${errorBody.slice(0, 300)}`,
@@ -96,9 +109,11 @@ export async function callGemini(
     if (text) return text;
   }
 
-  throw new Error(
+  throw new GeminiError(
+    lastStatus,
     lastStatus === 429
       ? "Your Google Gemini limit is temporarily busy. Please try again in a moment."
       : "Google Gemini could not answer right now. Please try again in a moment.",
+    retryAfter,
   );
 }

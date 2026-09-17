@@ -1,4 +1,5 @@
 type Msg = { role: "system" | "user" | "assistant"; content: string };
+import type { AiOperation } from "./ai-usage.server";
 
 export class AiError extends Error {
   status: number;
@@ -12,19 +13,49 @@ export class AiError extends Error {
  * All AI usage runs on the workspace's own Google Gemini key.
  * There is no third-party fallback on purpose.
  */
-export async function callGateway(messages: Msg[], jsonMode = false): Promise<string> {
-  const { callGemini } = await import("./gemini.server");
+export async function callGateway(
+  messages: Msg[],
+  jsonMode = false,
+  usage?: { userId: string; operation: AiOperation },
+): Promise<string> {
+  const { callGemini, GEMINI_TEXT_MODEL, GeminiError } = await import("./gemini.server");
+  const usageTools = usage ? await import("./ai-usage.server") : null;
+  const requestHash = usageTools ? await usageTools.hashAiRequest({ messages, jsonMode }) : "";
+  const ttl = usage && usageTools ? await usageTools.operationCacheTtl(usage.operation) : 0;
+  const cached = ttl > 0 && usageTools ? await usageTools.readAiCache(requestHash) : null;
+  if (cached !== null) return cached;
+  const ticket = usage && usageTools
+    ? await usageTools.reserveAiUsage({ ...usage, model: GEMINI_TEXT_MODEL, requestHash })
+    : null;
   let text: string | null = null;
   try {
     text = await callGemini(messages, jsonMode);
   } catch (err) {
+    if (ticket && usageTools) {
+      await usageTools.finishAiUsage(ticket, {
+        success: false,
+        errorCode: err instanceof GeminiError ? `gemini_${err.status}` : "gemini_error",
+        errorMessage: err instanceof Error ? err.message : "Google Gemini failed",
+      });
+    }
     if (err instanceof AiError) throw err;
     const message = err instanceof Error ? err.message : "Google Gemini could not answer right now.";
-    throw new AiError(503, message);
+    throw new AiError(err instanceof GeminiError ? err.status : 503, message);
   }
 
   if (text === null) {
+    if (ticket && usageTools) await usageTools.finishAiUsage(ticket, { success: false, errorCode: "not_configured" });
     throw new AiError(500, "Your Google Gemini key is not connected yet.");
+  }
+  if (ticket && usageTools) await usageTools.finishAiUsage(ticket, { success: true });
+  if (usage && usageTools && ttl > 0) {
+    await usageTools.writeAiCache({
+      cacheKey: requestHash,
+      operation: usage.operation,
+      model: GEMINI_TEXT_MODEL,
+      responseText: text,
+      ttlSeconds: ttl,
+    });
   }
   return text;
 }
