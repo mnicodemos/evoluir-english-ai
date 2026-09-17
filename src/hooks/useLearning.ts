@@ -26,6 +26,7 @@ export type Flashcard = {
   lesson_id: string | null;
   word: string;
   translation: string;
+  definition: string;
   pronunciation: string;
   example: string;
   difficulty: string;

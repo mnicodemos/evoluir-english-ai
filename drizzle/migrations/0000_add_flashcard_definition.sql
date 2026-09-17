@@ -1,0 +1,1 @@
+ALTER TABLE public.flashcards ADD COLUMN IF NOT EXISTS definition TEXT NOT NULL DEFAULT '';

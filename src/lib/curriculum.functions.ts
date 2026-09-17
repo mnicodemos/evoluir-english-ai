@@ -65,7 +65,7 @@ type GeneratedLesson = {
   summary?: string;
   transcript?: string;
   transcript_pt?: string;
-  flashcards?: { word?: string; translation?: string; pronunciation?: string; example?: string; difficulty?: string }[];
+  flashcards?: { word?: string; translation?: string; definition?: string; pronunciation?: string; example?: string; difficulty?: string }[];
   quiz?: { question?: string; options?: string[]; correct_answer?: string; explanation?: string }[];
 };
 
@@ -88,9 +88,10 @@ async function writeLesson(
           'Reply with strict JSON: {"summary":"120-180 words explaining the language point with clear examples, in simple English",' +
           '"transcript":"a 450-600 word mini-lesson script in English, written in short paragraphs separated by blank lines",' +
           '"transcript_pt":"a faithful Brazilian Portuguese translation of the script, same paragraph structure",' +
-          '"flashcards":[{"word":"","translation":"Portuguese","pronunciation":"simple phonetic hint","example":"natural English sentence","difficulty":"easy|medium|hard"}],' +
+          '"flashcards":[{"word":"","definition":"short English-only definition of the word (max 18 words, no Portuguese)","pronunciation":"simple phonetic hint","example":"natural English sentence using the word","difficulty":"easy|medium|hard"}],' +
           '"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence"}]}. ' +
           "Give exactly 6 flashcards and 10 quiz questions. " +
+          "The flashcards must be words or expressions that actually appear in the transcript of THIS lesson, and every flashcard field must be in English only - never Portuguese, never a translation. " +
           "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage). " +
           "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
           "Each question must be self-contained: a sentence to complete or correct, or a direct grammar rule question.",
@@ -136,13 +137,14 @@ async function writeLesson(
 
   if (error || !lesson) throw new Error(error?.message ?? "Could not save this lesson.");
 
-  const cards = (content.flashcards ?? []).slice(0, 8).filter((c) => c.word && c.translation);
+  const cards = (content.flashcards ?? []).slice(0, 8).filter((c) => c.word && (c.definition || c.example));
   if (cards.length) {
     await supabase.from("flashcards").insert(
       cards.map((c) => ({
         lesson_id: lesson.id,
         word: String(c.word).slice(0, 120),
-        translation: String(c.translation).slice(0, 200),
+        translation: String(c.translation ?? "").slice(0, 200),
+        definition: String(c.definition ?? c.example ?? "").slice(0, 300),
         pronunciation: String(c.pronunciation ?? "").slice(0, 120),
         example: String(c.example ?? "").slice(0, 400),
         difficulty: ["easy", "medium", "hard"].includes(String(c.difficulty)) ? String(c.difficulty) : "medium",
