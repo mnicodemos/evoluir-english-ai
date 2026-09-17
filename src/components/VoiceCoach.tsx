@@ -9,7 +9,6 @@ import { Message, MessageContent, MessageResponse } from "@/components/ai-elemen
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { useOverallAverage } from "@/hooks/useVocabularyProgress";
@@ -24,7 +23,7 @@ import {
 } from "@/lib/ai-prompts";
 import { hybridChat } from "@/lib/local-ai";
 import { getLevelState } from "@/lib/level";
-import { getSpeechVoice, setSpeechVoice, speakEnglish, stopSpeaking, VOICE_OPTIONS, type SpeechVoice } from "@/lib/speech";
+import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { cancelVoiceRecording, startVoiceRecording, stopVoiceRecording } from "@/lib/voice-recorder";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -148,7 +147,6 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [report, setReport] = useState<ConversationReport | null>(null);
   const [finishing, setFinishing] = useState(false);
-  const [voice, setVoice] = useState<SpeechVoice>(() => getSpeechVoice());
   const mounted = useRef(true);
   const topicOffset = useRef(0);
 
@@ -172,18 +170,10 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     void start(0);
   }, [lessonTopic]);
 
-  function changeVoice(next: SpeechVoice) {
-    setVoice(next);
-    setSpeechVoice(next);
-    stopSpeaking();
-    if (mounted.current) setVoiceState("idle");
-    void playResponse("Hi! This is my voice. Let's practise English together.", next);
-  }
-
-  async function playResponse(text: string, selectedVoice: SpeechVoice = voice) {
+  async function playResponse(text: string) {
     setVoiceState("speaking");
     try {
-      await speakEnglish(text, selectedVoice);
+      await speakEnglish(text);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "The response could not be played.");
     } finally {
@@ -319,17 +309,8 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const newTopic = () => { cancelVoiceRecording(); topicOffset.current += 1; void start(topicOffset.current); };
 
   return <div className="space-y-5">
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
       <div className="min-w-0 flex-1"><h1 className="text-2xl font-bold">AI Talking</h1><p className="max-w-full text-sm leading-snug text-muted-foreground">Voice conversation · the AI chooses today's subject</p></div>
-      <div className="flex w-full items-center gap-2 sm:w-auto">
-        <span aria-hidden className="text-xl">🔊</span>
-        <Select value={voice} onValueChange={(value) => changeVoice(value as SpeechVoice)}>
-          <SelectTrigger aria-label="Choose the AI voice" className="h-10 min-w-0 flex-1 text-sm sm:w-[240px] sm:flex-none"><SelectValue placeholder="AI voice" /></SelectTrigger>
-          <SelectContent>
-            {VOICE_OPTIONS.map((option) => <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
     </div>
 
     {userAnswers === 0 && <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3 text-sm">

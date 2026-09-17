@@ -4,27 +4,13 @@ import { z } from "zod";
 
 const requestSchema = z.object({
   text: z.string().trim().min(1).max(500),
-  voice: z
-    .enum(["alloy", "ash", "coral", "echo", "fable", "nova", "onyx", "sage", "shimmer"])
-    .default("alloy"),
 });
 
 // The Lovable audio gateway needs workspace credits; this project has its own
 // Google Gemini key connected, so speech is generated there instead.
 const GEMINI_TTS_MODEL = "gemini-2.5-flash-preview-tts";
 
-// Map the app's voice picker onto Gemini's prebuilt voices.
-const GEMINI_VOICES: Record<string, string> = {
-  alloy: "Kore",
-  ash: "Charon",
-  coral: "Aoede",
-  echo: "Fenrir",
-  fable: "Puck",
-  nova: "Leda",
-  onyx: "Orus",
-  sage: "Callirrhoe",
-  shimmer: "Zephyr",
-};
+const GEMINI_VOICE = "Kore";
 
 
 export const Route = createFileRoute("/api/speech")({
@@ -71,7 +57,6 @@ export const Route = createFileRoute("/api/speech")({
           return Response.json({ message: "Audio is not configured yet." }, { status: 500 });
         }
 
-        const voiceName = GEMINI_VOICES[parsed.data.voice] ?? "Kore";
         const body = JSON.stringify({
           contents: [
             {
@@ -85,7 +70,7 @@ export const Route = createFileRoute("/api/speech")({
           ],
           generationConfig: {
             responseModalities: ["AUDIO"],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: GEMINI_VOICE } } },
           },
         });
 
