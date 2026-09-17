@@ -143,7 +143,7 @@ function LessonPage() {
               <ul className="grid gap-2 sm:grid-cols-2">
                 {data.flashcards.map((f) => (
                   <li key={f.id} className="rounded-lg bg-secondary/60 px-3 py-2 text-sm">
-                    <strong>{f.word}</strong> — {f.definition || f.example}
+                    <strong>{f.word}</strong> — {f.answer || f.definition || f.example}
                   </li>
                 ))}
               </ul>

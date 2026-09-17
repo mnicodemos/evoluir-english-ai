@@ -11,24 +11,12 @@ import {
 } from "@/lib/curriculum";
 
 import { callGateway, parseJson } from "./ai-gateway.server";
-import { callGemini } from "./gemini.server";
 import { findLessonVideo, type LessonVideo } from "./lessonVideo.server";
 
-/**
- * Lesson + quiz content generation runs on the workspace's own Google Gemini
- * key, falling back to the Lovable AI gateway if it is unavailable.
- */
 async function callContentAi(
   messages: { role: "system" | "user" | "assistant"; content: string }[],
   jsonMode = false,
 ): Promise<string> {
-  try {
-    const viaGemini = await callGemini(messages, jsonMode);
-    if (viaGemini) return viaGemini;
-  } catch (err) {
-    if ((err as { status?: number }).status === 429) throw err;
-    console.error("Gemini generation failed, falling back to Lovable AI", err);
-  }
   return callGateway(messages, jsonMode);
 }
 
@@ -65,7 +53,18 @@ type GeneratedLesson = {
   summary?: string;
   transcript?: string;
   transcript_pt?: string;
-  flashcards?: { word?: string; translation?: string; definition?: string; pronunciation?: string; example?: string; difficulty?: string }[];
+  flashcards?: {
+    word?: string;
+    translation?: string;
+    definition?: string;
+    pronunciation?: string;
+    example?: string;
+    difficulty?: string;
+    prompt?: string;
+    answer?: string;
+    card_type?: string;
+    listen_text?: string;
+  }[];
   quiz?: { question?: string; options?: string[]; correct_answer?: string; explanation?: string }[];
 };
 
@@ -88,10 +87,12 @@ async function writeLesson(
           'Reply with strict JSON: {"summary":"120-180 words explaining the language point with clear examples, in simple English",' +
           '"transcript":"a 450-600 word mini-lesson script in English, written in short paragraphs separated by blank lines",' +
           '"transcript_pt":"a faithful Brazilian Portuguese translation of the script, same paragraph structure",' +
-          '"flashcards":[{"word":"","definition":"short English-only definition of the word (max 18 words, no Portuguese)","pronunciation":"simple phonetic hint","example":"natural English sentence using the word","difficulty":"easy|medium|hard"}],' +
+          '"flashcards":[{"card_type":"listen|question","prompt":"front of card, uppercase English instruction or question","answer":"back of card, short English answer","listen_text":"English sentence to hear only on the answer side; empty for non-listen cards","word":"short label from the lesson","definition":"short English-only definition or explanation, no Portuguese","pronunciation":"simple phonetic hint","example":"natural English sentence from or based on this lesson","difficulty":"easy|medium|hard"}],' +
           '"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence"}]}. ' +
-          "Give exactly 6 flashcards and 10 quiz questions. " +
-          "The flashcards must be words or expressions that actually appear in the transcript of THIS lesson, and every flashcard field must be in English only - never Portuguese, never a translation. " +
+          "Give exactly 7 flashcards and 10 quiz questions. " +
+          "Exactly 4 flashcards must have card_type 'listen'. For these, the prompt must be a listening question or repeat instruction, the answer must reveal the sentence or phrase, and listen_text must contain that same English audio sentence. " +
+          "The other 3 flashcards must have card_type 'question' and should vary between grammar use, meaning, and a key expression from the lesson. " +
+          "Every flashcard must use content from THIS lesson transcript, and every flashcard field must be in English only - never Portuguese, never a translation. " +
           "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage). " +
           "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
           "Each question must be self-contained: a sentence to complete or correct, or a direct grammar rule question.",
@@ -137,16 +138,21 @@ async function writeLesson(
 
   if (error || !lesson) throw new Error(error?.message ?? "Could not save this lesson.");
 
-  const cards = (content.flashcards ?? []).slice(0, 8).filter((c) => c.word && (c.definition || c.example));
+  const cards = (content.flashcards ?? []).slice(0, 7).filter((c) => c.word && (c.answer || c.definition || c.example));
   if (cards.length) {
     await supabase.from("flashcards").insert(
-      cards.map((c) => ({
+      cards.map((c, index) => ({
         lesson_id: lesson.id,
         word: String(c.word).slice(0, 120),
         translation: String(c.translation ?? "").slice(0, 200),
         definition: String(c.definition ?? c.example ?? "").slice(0, 300),
         pronunciation: String(c.pronunciation ?? "").slice(0, 120),
         example: String(c.example ?? "").slice(0, 400),
+        prompt: String(c.prompt ?? c.word ?? "").slice(0, 240),
+        answer: String(c.answer ?? c.definition ?? c.example ?? "").slice(0, 500),
+        card_type: c.card_type === "listen" ? "listen" : "question",
+        listen_text: String(c.card_type === "listen" ? c.listen_text || c.answer || c.example || c.word || "" : "").slice(0, 500),
+        sort_order: index,
         difficulty: ["easy", "medium", "hard"].includes(String(c.difficulty)) ? String(c.difficulty) : "medium",
         created_by: userId,
       })),

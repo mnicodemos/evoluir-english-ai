@@ -33,7 +33,7 @@ function ReviewPage() {
   const { data: cards, isLoading } = useQuery({
     queryKey: ["all-flashcards"],
     queryFn: async (): Promise<Flashcard[]> => {
-      const { data } = await supabase.from("flashcards").select("*");
+      const { data } = await supabase.from("flashcards").select("*").order("sort_order").order("created_at");
       return (data ?? []) as Flashcard[];
     },
   });
