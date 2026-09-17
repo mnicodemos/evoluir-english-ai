@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import { countsAsStudyDay } from "@/lib/studyDay";
 import { studyToday } from "@/lib/today";
 
 /**
@@ -88,7 +89,7 @@ export async function logActivity(params: {
   // Read the freshest streak straight from the profile: the caller's copy can be
   // stale (cached query), which used to skip a day and undercount the streak.
   const lastDate = levelRow?.last_activity_date ?? params.lastDate;
-  if (lastDate !== today) {
+  if (countsAsStudyDay(params.type) && lastDate !== today) {
     const currentStreak = levelRow?.streak_days ?? params.currentStreak;
     const streak = lastDate === yesterday ? currentStreak + 1 : 1;
     await supabase
