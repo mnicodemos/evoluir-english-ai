@@ -36,7 +36,9 @@ export function setSpeechVoice(voice: SpeechVoice) {
 
 let audioContext: AudioContext | null = null;
 const activeSources = new Set<AudioBufferSourceNode>();
+let activeUtterance: SpeechSynthesisUtterance | null = null;
 let playRequest = 0;
+let aiSpeechUnavailableUntil = 0;
 
 const audioCache = new Map<string, Float32Array>();
 const pendingAudio = new Map<string, Promise<Float32Array>>();
@@ -63,6 +65,7 @@ function stopCurrentAudio() {
 export function stopSpeaking() {
   playRequest += 1;
   stopCurrentAudio();
+  activeUtterance = null;
   if (typeof window !== "undefined") window.speechSynthesis?.cancel();
 }
 
@@ -91,6 +94,9 @@ async function requestSpeech(
   onChunk?: (chunk: Uint8Array) => void,
 ): Promise<Float32Array> {
   const voice = getSpeechVoice();
+  if (Date.now() < aiSpeechUnavailableUntil) {
+    throw new Error("AI audio is temporarily busy.");
+  }
   const cacheKey = `${voice}:${value.toLocaleLowerCase("en-US")}`;
   const cached = audioCache.get(cacheKey);
   if (cached) return cached;
@@ -113,6 +119,13 @@ async function requestSpeech(
     });
     if (!response.ok || !response.body) {
       const body = await response.json().catch(() => null) as { message?: string } | null;
+      if (response.status === 429 || response.status >= 500) {
+        const retryAfter = Number(response.headers.get("Retry-After"));
+        const delayMs = Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter * 1000
+          : 60_000;
+        aiSpeechUnavailableUntil = Date.now() + delayMs;
+      }
       throw new Error(body?.message ?? `Audio failed (${response.status}).`);
     }
 
@@ -165,27 +178,18 @@ async function requestSpeech(
   }
 }
 
-/** Waits for the browser voice list, which loads asynchronously on most browsers. */
-function loadVoices(synth: SpeechSynthesis): Promise<SpeechSynthesisVoice[]> {
-  const ready = synth.getVoices();
-  if (ready.length) return Promise.resolve(ready);
-  return new Promise((resolve) => {
-    const done = () => resolve(synth.getVoices());
-    synth.addEventListener?.("voiceschanged", done, { once: true });
-    window.setTimeout(done, 1200);
-  });
-}
-
 /** Free browser voice used whenever the audio service is unavailable. */
 async function speakWithBrowser(value: string): Promise<void> {
   const synth = window.speechSynthesis;
   if (!synth) throw new Error("Audio playback is not supported by this browser.");
 
   synth.cancel();
-  const voices = await loadVoices(synth);
+  synth.resume();
+  const voices = synth.getVoices();
 
   await new Promise<void>((resolve, reject) => {
     const utterance = new SpeechSynthesisUtterance(value);
+    activeUtterance = utterance;
     utterance.lang = "en-US";
     utterance.rate = 0.95;
     const english = voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
@@ -195,6 +199,7 @@ async function speakWithBrowser(value: string): Promise<void> {
     const finish = () => {
       if (settled) return;
       settled = true;
+      activeUtterance = null;
       window.clearInterval(timer);
       resolve();
     };
@@ -209,6 +214,7 @@ async function speakWithBrowser(value: string): Promise<void> {
         return;
       }
       settled = true;
+      activeUtterance = null;
       window.clearInterval(timer);
       reject(new Error("Could not play this pronunciation."));
     };
@@ -222,6 +228,7 @@ async function speakWithBrowser(value: string): Promise<void> {
       synth.speak(utterance);
     } catch {
       settled = true;
+      activeUtterance = null;
       window.clearInterval(timer);
       reject(new Error("Could not play this pronunciation."));
     }
