@@ -7,6 +7,8 @@ import { Progress } from "@/components/ui/progress";
 import { reviewFlashcard, type Flashcard, type UserFlashcard } from "@/hooks/useLearning";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { speakEnglish } from "@/lib/speech";
+import { useUiLang } from "@/lib/uiLang";
+import { cn } from "@/lib/utils";
 
 /**
  * English-only flip-card deck for the lesson vocabulary. The student recalls the
@@ -31,6 +33,8 @@ export function FlashcardDeck({
   const [saved, setSaved, clearSaved] = usePersistentState(storageKey ?? null, { index: 0, done: false });
   const [flipped, setFlipped] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null);
+  const { lang } = useUiLang();
 
   const index = Math.min(saved.index, Math.max(0, cards.length - 1));
   const card = cards[index];
@@ -48,7 +52,8 @@ export function FlashcardDeck({
   }
 
   async function answer(correct: boolean) {
-    if (!card) return;
+    if (!card || feedback) return;
+    setFeedback(correct ? "correct" : "incorrect");
     if (userId) {
       await reviewFlashcard(
         userId,
@@ -58,7 +63,9 @@ export function FlashcardDeck({
       );
       onRated?.();
     }
+    await new Promise((resolve) => window.setTimeout(resolve, 500));
     setFlipped(false);
+    setFeedback(null);
     if (index + 1 >= cards.length) {
       setSaved({ index, done: true });
       onFinished?.();
@@ -71,6 +78,7 @@ export function FlashcardDeck({
     clearSaved();
     setSaved({ index: 0, done: false });
     setFlipped(false);
+    setFeedback(null);
   }
 
   if (saved.done || !card) {
@@ -120,18 +128,23 @@ export function FlashcardDeck({
           </button>
         ) : (
           <div
-            className="relative z-10 flex aspect-[4/3] w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-success-foreground/25 bg-success p-6 text-center text-success-foreground shadow-[var(--shadow-lift)]"
+            className={cn(
+              "relative z-10 flex aspect-[4/3] w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 bg-primary p-6 text-center text-primary-foreground shadow-[var(--shadow-lift)] transition-colors",
+              feedback === "correct" && "border-success",
+              feedback === "incorrect" && "border-destructive",
+              !feedback && "border-primary-foreground/25",
+            )}
           >
-          <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-success-foreground/15 px-2 py-1 text-[0.65rem] font-bold uppercase text-success-foreground">
+          <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-primary-foreground/15 px-2 py-1 text-[0.65rem] font-bold uppercase text-primary-foreground">
             {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
             {isListenCard ? "Listen card" : "Question card"}
           </span>
 
             <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl">{answerText}</p>
             {card.example && card.example !== answerText && (
-              <p className="max-w-sm text-sm italic text-success-foreground/80">“{card.example}”</p>
+              <p className="max-w-sm text-sm italic text-primary-foreground/80">“{card.example}”</p>
             )}
-            {card.pronunciation && <p className="text-xs text-success-foreground/75">{card.pronunciation}</p>}
+            {card.pronunciation && <p className="text-xs text-primary-foreground/75">{card.pronunciation}</p>}
             {isListenCard && listenText && (
               <Button
                 variant={isPlaying ? "default" : "outline"}
@@ -144,7 +157,7 @@ export function FlashcardDeck({
                 <Volume2 className="size-4" /> Listen
               </Button>
             )}
-            <Button variant="ghost" size="sm" onClick={() => setFlipped(false)}>
+            <Button variant="ghost" size="sm" onClick={() => setFlipped(false)} disabled={feedback !== null}>
               See question
             </Button>
           </div>
@@ -156,16 +169,18 @@ export function FlashcardDeck({
           <Button
             variant="default"
             onClick={() => answer(true)}
+            disabled={feedback !== null}
             className="flex items-center justify-center gap-2 rounded-lg bg-success px-3 py-3 text-sm font-semibold text-success-foreground transition-transform hover:scale-[1.02]"
           >
-            <Check className="size-4" /> Acerto
+            <Check className="size-4" /> {lang === "pt" ? "Acerto" : "Correct"}
           </Button>
           <Button
             variant="destructive"
             onClick={() => answer(false)}
+            disabled={feedback !== null}
             className="flex items-center justify-center gap-2 rounded-lg bg-destructive px-3 py-3 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.02]"
           >
-            <X className="size-4" /> Erro
+            <X className="size-4" /> {lang === "pt" ? "Erro" : "Incorrect"}
           </Button>
         </div>
       )}
