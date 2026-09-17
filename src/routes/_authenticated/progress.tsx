@@ -14,6 +14,15 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useVocabularyProgress } from "@/hooks/useVocabularyProgress";
 import { supabase } from "@/integrations/supabase/client";
 
+interface RecentActivity {
+  id: string;
+  title: string | null;
+  activity_type: string;
+  created_at: string;
+  duration_minutes: number;
+  score: number | null;
+}
+
 export const Route = createFileRoute("/_authenticated/progress")({
   head: () => ({
     meta: [
@@ -42,6 +51,20 @@ function ProgressPage() {
     queryFn: async () => {
       const { data } = await supabase.from("learning_profile").select("*").maybeSingle();
       return data;
+    },
+  });
+
+  const { data: recent } = useQuery({
+    queryKey: ["activities-recent", profile?.id, profile?.level],
+    enabled: !!profile,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("activities")
+        .select("id, title, activity_type, created_at, duration_minutes, score")
+        .eq("level", profile!.level)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return (data ?? []) as RecentActivity[];
     },
   });
 
@@ -131,6 +154,35 @@ function ProgressPage() {
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
             {learning.common_errors.map((e: string, i: number) => (
               <li key={i}>{e}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {recent && recent.length > 0 && (
+        <section className="card-soft mt-5 p-6">
+          <h2 className="text-lg font-semibold">{t("Recent activity")}</h2>
+          <ul className="mt-4 divide-y divide-border">
+            {recent.map((a) => (
+              <li key={a.id} className="flex items-center justify-between py-3 text-sm">
+                <span>
+                  <span className="block font-medium">
+                    {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
+                      <>
+                        <span>Lesson:</span> {(a.title as string).slice(8)}
+                      </>
+                    ) : (
+                      a.title || a.activity_type
+                    )}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {new Date(a.created_at).toLocaleDateString()} · {a.duration_minutes} min
+                  </span>
+                </span>
+                {a.score != null && (
+                  <span className="font-semibold text-[oklch(0.55_0.14_158)]">{a.score}%</span>
+                )}
+              </li>
             ))}
           </ul>
         </section>
