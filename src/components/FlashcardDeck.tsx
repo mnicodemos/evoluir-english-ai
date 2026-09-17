@@ -13,14 +13,6 @@ const ratings = [
   { id: "easy", label: "Easy", className: "bg-[oklch(0.94_0.06_158)] text-[oklch(0.42_0.12_158)]" },
 ] as const;
 
-async function speak(word: string) {
-  try {
-    await speakEnglish(word);
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Could not play this pronunciation.");
-  }
-}
-
 
 /** Flip-card deck with Hard/Medium/Easy rating feeding the spaced-repetition schedule. */
 export function FlashcardDeck({
