@@ -35,7 +35,7 @@ export function setSpeechVoice(voice: SpeechVoice) {
 }
 
 let audioContext: AudioContext | null = null;
-let activeSource: AudioBufferSourceNode | null = null;
+const activeSources = new Set<AudioBufferSourceNode>();
 let playRequest = 0;
 
 const audioCache = new Map<string, Float32Array>();
@@ -49,14 +49,14 @@ function decodeBase64(value: string): Uint8Array {
 }
 
 function stopCurrentAudio() {
-  if (activeSource) {
+  for (const source of activeSources) {
     try {
-      activeSource.stop();
+      source.stop();
     } catch {
       // A source that already finished cannot be stopped again.
     }
-    activeSource = null;
   }
+  activeSources.clear();
 }
 
 /** Interrupts anything currently being spoken so the user can talk instead. */
@@ -280,9 +280,10 @@ export async function speakEnglish(text: string): Promise<void> {
     source.connect(gain);
     gain.connect(context.destination);
     playhead = Math.max(playhead, context.currentTime + 0.02);
+    source.onended = () => activeSources.delete(source);
     source.start(playhead);
     playhead += decoded.duration;
-    activeSource = source;
+    activeSources.add(source);
     lastSource = source;
     streamed = true;
   };
@@ -301,7 +302,7 @@ export async function speakEnglish(text: string): Promise<void> {
     await new Promise<void>((resolve) => {
       const finalSource = lastSource;
       finalSource.onended = () => {
-        if (activeSource === finalSource) activeSource = null;
+        activeSources.delete(finalSource);
         resolve();
       };
     });
@@ -316,17 +317,17 @@ export async function speakEnglish(text: string): Promise<void> {
   source.buffer = decoded;
   source.connect(gain);
   gain.connect(context.destination);
-  activeSource = source;
+  activeSources.add(source);
 
   await new Promise<void>((resolve, reject) => {
     source.onended = () => {
-      if (activeSource === source) activeSource = null;
+      activeSources.delete(source);
       resolve();
     };
     try {
       source.start();
     } catch {
-      if (activeSource === source) activeSource = null;
+      activeSources.delete(source);
       reject(new Error("Audio could not start on this device. Please tap again."));
     }
   });
