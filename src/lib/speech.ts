@@ -1,54 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
 
-/** Voices available on the AI speech service. The user picks one; it persists per device. */
-export const VOICE_OPTIONS = [
-  { id: "alloy", label: "Alloy · neutral" },
-  { id: "ash", label: "Ash · calm male" },
-  { id: "coral", label: "Coral · warm female" },
-  { id: "echo", label: "Echo · deep male" },
-  { id: "fable", label: "Fable · storyteller" },
-  { id: "nova", label: "Nova · friendly female" },
-  { id: "onyx", label: "Onyx · strong male" },
-  { id: "sage", label: "Sage · relaxed female" },
-  { id: "shimmer", label: "Shimmer · bright female" },
-] as const;
-
-export type SpeechVoice = (typeof VOICE_OPTIONS)[number]["id"];
-const VOICE_STORAGE_KEY = "ai-speech-voice-v1";
-
-const BROWSER_VOICE_PROFILES: Record<SpeechVoice, {
-  pitch: number;
-  rate: number;
-  preferredNames: string[];
-}> = {
-  alloy: { pitch: 1, rate: 0.95, preferredNames: [] },
-  ash: { pitch: 0.82, rate: 0.9, preferredNames: ["daniel", "david", "james", "male"] },
-  coral: { pitch: 1.14, rate: 0.96, preferredNames: ["samantha", "victoria", "zira", "female"] },
-  echo: { pitch: 0.68, rate: 0.84, preferredNames: ["alex", "fred", "george", "male"] },
-  fable: { pitch: 1.05, rate: 0.82, preferredNames: ["arthur", "daniel", "narrator"] },
-  nova: { pitch: 1.2, rate: 1.04, preferredNames: ["ava", "samantha", "susan", "female"] },
-  onyx: { pitch: 0.72, rate: 0.98, preferredNames: ["aaron", "david", "tom", "male"] },
-  sage: { pitch: 0.96, rate: 0.86, preferredNames: ["karen", "moira", "serena", "female"] },
-  shimmer: { pitch: 1.3, rate: 1.02, preferredNames: ["tessa", "victoria", "zira", "female"] },
+const BROWSER_VOICE_PROFILE = {
+  pitch: 1,
+  rate: 0.95,
+  preferredNames: ["samantha", "victoria", "zira", "female"],
 };
-
-export function getSpeechVoice(): SpeechVoice {
-  try {
-    const stored = window.localStorage.getItem(VOICE_STORAGE_KEY);
-    if (VOICE_OPTIONS.some((option) => option.id === stored)) return stored as SpeechVoice;
-  } catch {
-    // Storage unavailable — fall through to the default voice.
-  }
-  return "alloy";
-}
-
-export function setSpeechVoice(voice: SpeechVoice) {
-  try {
-    window.localStorage.setItem(VOICE_STORAGE_KEY, voice);
-  } catch {
-    // Storage unavailable — the choice only lasts for this session.
-  }
-}
 
 let audioContext: AudioContext | null = null;
 const activeSources = new Set<AudioBufferSourceNode>();
@@ -107,13 +63,12 @@ function mergePcmChunks(chunks: Uint8Array[]): Float32Array {
 
 async function requestSpeech(
   value: string,
-  voice: SpeechVoice,
   onChunk?: (chunk: Uint8Array) => void,
 ): Promise<Float32Array> {
   if (Date.now() < aiSpeechUnavailableUntil) {
     throw new Error("AI audio is temporarily busy.");
   }
-  const cacheKey = `${voice}:${value.toLocaleLowerCase("en-US")}`;
+  const cacheKey = value.toLocaleLowerCase("en-US");
   const cached = audioCache.get(cacheKey);
   if (cached) return cached;
 
@@ -131,7 +86,7 @@ async function requestSpeech(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: value, voice }),
+      body: JSON.stringify({ text: value }),
     });
     if (!response.ok || !response.body) {
       const body = await response.json().catch(() => null) as { message?: string } | null;
@@ -195,7 +150,7 @@ async function requestSpeech(
 }
 
 /** Free browser voice used whenever the audio service is unavailable. */
-async function speakWithBrowser(value: string, selectedVoice: SpeechVoice): Promise<void> {
+async function speakWithBrowser(value: string): Promise<void> {
   const synth = window.speechSynthesis;
   if (!synth) throw new Error("Audio playback is not supported by this browser.");
 
@@ -215,7 +170,7 @@ async function speakWithBrowser(value: string, selectedVoice: SpeechVoice): Prom
 
   await new Promise<void>((resolve, reject) => {
     const utterance = new SpeechSynthesisUtterance(value);
-    const profile = BROWSER_VOICE_PROFILES[selectedVoice];
+    const profile = BROWSER_VOICE_PROFILE;
     activeUtterance = utterance;
     utterance.lang = "en-US";
     utterance.pitch = profile.pitch;
@@ -226,8 +181,7 @@ async function speakWithBrowser(value: string, selectedVoice: SpeechVoice): Prom
         const name = candidate.name.toLowerCase();
         return profile.preferredNames.some((preferredName) => name.includes(preferredName));
       });
-      const voiceIndex = VOICE_OPTIONS.findIndex((option) => option.id === selectedVoice);
-      utterance.voice = preferred ?? englishVoices[Math.max(0, voiceIndex) % englishVoices.length] ?? null;
+      utterance.voice = preferred ?? englishVoices[0] ?? null;
     }
 
     let settled = false;
@@ -274,12 +228,12 @@ async function speakWithBrowser(value: string, selectedVoice: SpeechVoice): Prom
  * Streams clear English pronunciation from the app's authenticated audio route,
  * falling back to the built-in browser voice when the service is unavailable.
  */
-export async function speakEnglish(text: string, selectedVoice: SpeechVoice = getSpeechVoice()): Promise<void> {
+export async function speakEnglish(text: string): Promise<void> {
   const value = text?.trim();
   if (!value || typeof window === "undefined") throw new Error("Choose a word to hear.");
 
   const AudioContextClass = window.AudioContext;
-  if (!AudioContextClass) return speakWithBrowser(value, selectedVoice);
+  if (!AudioContextClass) return speakWithBrowser(value);
   audioContext ??= new AudioContextClass({ sampleRate: 24000 });
   if (audioContext.state === "suspended") await audioContext.resume();
   const context = audioContext;
@@ -329,11 +283,11 @@ export async function speakEnglish(text: string, selectedVoice: SpeechVoice = ge
   };
 
   try {
-    samples = await requestSpeech(value, selectedVoice, scheduleChunk);
+    samples = await requestSpeech(value, scheduleChunk);
   } catch {
     if (requestId !== playRequest) return;
     if (streamed) return;
-    return speakWithBrowser(value, selectedVoice);
+    return speakWithBrowser(value);
   }
   if (requestId !== playRequest) return;
   if (context.state === "suspended") await context.resume();
