@@ -1,5 +1,5 @@
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/udc_google_gemini_key";
+const GATEWAY_URL = "https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key";
 // Use the lighter model for short tutoring exchanges and keep the larger
 // model as a quota fallback. This avoids exhausting the smaller free quota
 // assigned to the larger model during normal speaking practice.
@@ -15,7 +15,7 @@ type Msg = { role: "system" | "user" | "assistant"; content: string };
  */
 export async function callGemini(messages: Msg[], jsonMode = false): Promise<string | null> {
   const lovableKey = process.env["LOVABLE_API_KEY"];
-  const connectionKey = process.env["UDC_GOOGLE_GEMINI_KEY_API_KEY"];
+  const connectionKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
   if (!lovableKey || !connectionKey) return null;
 
   const systemParts = messages.filter((m) => m.role === "system").map((m) => m.content);
