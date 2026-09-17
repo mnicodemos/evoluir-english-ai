@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { logActivity } from "@/hooks/useProfile";
+
 const IDLE_MS = 60_000;
 
 export type TimeSpent = {
@@ -12,7 +14,10 @@ export type TimeSpent = {
   start: () => void;
   /** Stops counting — used when the activity ends. */
   stop: () => void;
+  /** Seconds measured but not reported yet (useful for debugging/display). */
+  pendingSeconds: () => number;
 };
+
 
 /**
  * Measures how long the student is actually *doing* an activity, not how long
@@ -73,15 +78,55 @@ export function useTimeSpent(options?: { manual?: boolean }): TimeSpent {
   return useMemo(() => {
     const read = ((min = 1) => {
       const total = activeMs.current + (startedAt.current !== null ? Date.now() - startedAt.current : 0);
-      const delta = total - reportedMs.current;
-      // Only whole minutes are reported; the leftover seconds stay for the next call,
-      // so several short actions never add up to more time than was really spent.
-      const minutes = Math.max(min, Math.floor(delta / 60000));
+      // Never below zero: a previous call may have rounded a few seconds up.
+      const delta = Math.max(0, total - reportedMs.current);
+      // Rounded to the nearest minute (30s+ counts as a minute) and the seconds
+      // already reported are stored, so nothing is counted twice or thrown away.
+      const minutes = Math.max(min, Math.round(delta / 60000));
       reportedMs.current += minutes * 60000;
       return minutes;
     }) as TimeSpent;
     read.start = resume;
     read.stop = flush;
+    read.pendingSeconds = () => {
+      const total = activeMs.current + (startedAt.current !== null ? Date.now() - startedAt.current : 0);
+      return Math.max(0, Math.round((total - reportedMs.current) / 1000));
+    };
     return read;
   }, [resume, flush]);
 }
+
+/**
+ * Stores the practice time that was not logged yet when the student leaves the
+ * screen, so every minute spent on an activity is recorded — even when the
+ * activity is abandoned halfway through.
+ */
+export function useLogTimeOnExit(params: {
+  timer: TimeSpent;
+  profile: { id: string; streak_days: number; last_activity_date: string | null } | null | undefined;
+  type: string;
+  title: string;
+}) {
+  const { timer } = params;
+  const latest = useRef(params);
+  latest.current = params;
+
+  useEffect(() => {
+    return () => {
+      timer.stop();
+      const { profile, type, title } = latest.current;
+      const minutes = timer(0);
+      if (minutes >= 1 && profile) {
+        void logActivity({
+          userId: profile.id,
+          type,
+          title,
+          minutes,
+          currentStreak: profile.streak_days,
+          lastDate: profile.last_activity_date,
+        });
+      }
+    };
+  }, [timer]);
+}
+
