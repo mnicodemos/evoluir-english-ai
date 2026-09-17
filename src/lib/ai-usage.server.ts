@@ -1,5 +1,3 @@
-import type { Json } from "@/integrations/supabase/types";
-
 export const AI_OPERATIONS = [
   "chat",
   "talking",
@@ -137,7 +135,7 @@ export async function writeAiCache(input: {
     model: input.model,
     response_text: input.responseText,
     expires_at: new Date(Date.now() + input.ttlSeconds * 1000).toISOString(),
-  } satisfies { cache_key: string; operation: string; model: string; response_text: string; expires_at: string } as Json);
+  });
 }
 
 export async function operationCacheTtl(operation: AiOperation): Promise<number> {

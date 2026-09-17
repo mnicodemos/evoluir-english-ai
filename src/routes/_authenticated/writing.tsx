@@ -13,7 +13,7 @@ import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { parseWritingFeedback, writingCorrectionMessages, type WritingFeedback } from "@/lib/ai-prompts";
-import { hybridChat } from "@/lib/local-ai";
+import { aiChat } from "@/lib/aiChat.functions";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
@@ -209,10 +209,11 @@ function Writing() {
     }
     setLoading(true);
     try {
-      const raw = await hybridChat(
-        writingCorrectionMessages(prompt, text.trim(), profile?.level ?? "intermediate"),
-        true,
-      );
+      const raw = await aiChat({ data: {
+        messages: writingCorrectionMessages(prompt, text.trim(), profile?.level ?? "intermediate"),
+        jsonMode: true,
+        operation: "writing_correction",
+      } });
       const feedback = parseWritingFeedback(raw, text.trim());
       setResult(feedback);
 

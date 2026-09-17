@@ -6,8 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callGateway } from "./ai-gateway.server";
 
 /**
- * Generic cloud fallback used by the hybrid AI layer (src/lib/local-ai.ts)
- * when the browser's built-in model is not available.
+ * Authenticated Gemini entry point for short conversational and writing tasks.
  */
 export const aiChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -24,10 +23,14 @@ export const aiChat = createServerFn({ method: "POST" })
           .min(1)
           .max(60),
         jsonMode: z.boolean().default(false),
+        operation: z.enum(["chat", "talking", "writing_correction"]).default("chat"),
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
-    const text = await callGateway(data.messages, data.jsonMode);
+  .handler(async ({ data, context }) => {
+    const text = await callGateway(data.messages, data.jsonMode, {
+      userId: context.userId,
+      operation: data.operation,
+    });
     return text.trim();
   });
