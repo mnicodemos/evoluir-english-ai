@@ -468,7 +468,13 @@ export function getCurriculum(level: string | null | undefined): CurriculumLesso
         objective,
         skill: isReview ? (lessonIndex === 2 ? "grammar" : "reading") : SKILL_ORDER[lessonIndex]!,
         category: unit.category,
-        reviewUnits: isReview ? (lessonIndex === 0 ? [1, 2] : [1, 2, 3, 4, 5]) : [],
+        reviewUnits: isReview
+          ? lessonIndex === 0
+            ? [1, 2]
+            : lessonIndex === 1
+              ? [3, 4, 5]
+              : [1, 2, 3, 4, 5]
+          : [],
         isReviewTest: isReview && lessonIndex === 2,
       });
       index += 1;

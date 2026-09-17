@@ -337,7 +337,7 @@ export const openFinalTest = createServerFn({ method: "POST" })
         transcript_pt: "",
         sort_order: 999,
         curriculum_key: key,
-        unit_number: 6,
+        unit_number: 7,
         position_in_unit: 1,
         skill: "grammar",
         created_by: userId,
