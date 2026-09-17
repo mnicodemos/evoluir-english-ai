@@ -252,6 +252,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_path: string | null
+          bio: string | null
           created_at: string
           daily_minutes: number
           email: string | null
@@ -262,6 +264,7 @@ export type Database = {
           max_level: string
           name: string
           onboarding_completed: boolean
+          phone: string | null
           plan: string
           plan_expires_at: string | null
           plan_interval: string | null
@@ -270,6 +273,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          avatar_path?: string | null
+          bio?: string | null
           created_at?: string
           daily_minutes?: number
           email?: string | null
@@ -280,6 +285,7 @@ export type Database = {
           max_level?: string
           name?: string
           onboarding_completed?: boolean
+          phone?: string | null
           plan?: string
           plan_expires_at?: string | null
           plan_interval?: string | null
@@ -288,6 +294,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          avatar_path?: string | null
+          bio?: string | null
           created_at?: string
           daily_minutes?: number
           email?: string | null
@@ -298,6 +306,7 @@ export type Database = {
           max_level?: string
           name?: string
           onboarding_completed?: boolean
+          phone?: string | null
           plan?: string
           plan_expires_at?: string | null
           plan_interval?: string | null

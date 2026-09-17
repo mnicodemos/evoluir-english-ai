@@ -15,6 +15,13 @@
       "when": 1789655688836,
       "tag": "0001_add_flashcard_prompt_listen_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789666264824,
+      "tag": "0002_add_profile_contact_avatar",
+      "breakpoints": true
     }
   ]
 }
