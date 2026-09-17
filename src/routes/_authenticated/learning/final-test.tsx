@@ -14,6 +14,8 @@ import { completeLesson, useLesson } from "@/hooks/useLearning";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { FINAL_TEST_PASS, FINAL_TEST_QUESTIONS, nextLevel } from "@/lib/level";
+import { useUiLang } from "@/lib/uiLang";
+import { uiPt } from "@/lib/uiDictionary";
 
 export const Route = createFileRoute("/_authenticated/learning/final-test")({
   head: () => ({
@@ -33,6 +35,8 @@ export const Route = createFileRoute("/_authenticated/learning/final-test")({
 });
 
 function FinalTestPage() {
+  const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
   const path = useLearningPath();
   const { data: profile } = useProfile();
   const openTest = useOpenFinalTest();
@@ -53,7 +57,7 @@ function FinalTestPage() {
       const result = await openTest.mutateAsync(path.level);
       setLessonId(result.lessonId);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not open the Final Test.");
+      toast.error(err instanceof Error ? err.message : t("Could not open the Final Test."));
     }
   };
 
@@ -72,14 +76,22 @@ function FinalTestPage() {
 
     if (score < FINAL_TEST_PASS) {
       queryClient.invalidateQueries({ queryKey: ["quiz-results"] });
-      toast.info(`You scored ${score}%. You need ${FINAL_TEST_PASS}% to move up — review and take the test again.`);
+      toast.info(
+        lang === "pt"
+          ? `Você fez ${score}%. É necessário ${FINAL_TEST_PASS}% para avançar — revise e refaça o teste.`
+          : `You scored ${score}%. You need ${FINAL_TEST_PASS}% to move up — review and take the test again.`,
+      );
       return;
     }
 
     await completeLesson(profile.id, id);
 
     if (!upcoming) {
-      toast.success(`You passed with ${score}%. You are at the top CEFR level!`);
+      toast.success(
+        lang === "pt"
+          ? `Você passou com ${score}%. Você está no nível máximo do CEFR!`
+          : `You passed with ${score}%. You are at the top CEFR level!`,
+      );
       queryClient.invalidateQueries();
       return;
     }
@@ -92,13 +104,13 @@ function FinalTestPage() {
         .eq("id", profile.id);
       if (error) throw error;
       queryClient.invalidateQueries();
-      toast.success(`You passed with ${score}%! Your level is now ${upcoming.label}.`, {
-        description: "A new course with 30 core lessons and an optional review unit was unlocked — everything you finished before is kept.",
+      toast.success(lang === "pt" ? `Você passou com ${score}%! Seu nível agora é ${upcoming.label}.` : `You passed with ${score}%! Your level is now ${upcoming.label}.`, {
+        description: t("A new course with 30 core lessons and an optional review unit was unlocked — everything you finished before is kept."),
         duration: 9000,
       });
       navigate({ to: "/learning" });
     } catch {
-      toast.error("Your test was saved, but the level change failed. Please try again.");
+      toast.error(t("Your test was saved, but the level change failed. Please try again."));
     } finally {
       setPromoting(false);
     }

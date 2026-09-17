@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { saveQuizResult, type QuizQuestion } from "@/hooks/useLearning";
 import { usePersistentState } from "@/hooks/usePersistentState";
+import { useUiLang } from "@/lib/uiLang";
 
 /** Multiple-choice / fill-in quiz with instant score, explanations and review advice. */
 export function LessonQuiz({
@@ -17,6 +18,7 @@ export function LessonQuiz({
   lessonId: string;
   onFinished?: (score: number) => void;
 }) {
+  const { lang } = useUiLang();
   // Answers are kept locally so leaving the lesson does not lose them.
   const [answers, setAnswers, clearAnswers] = usePersistentState<Record<string, string>>(
     `lesson-quiz-answers:${lessonId}`,
@@ -78,13 +80,17 @@ export function LessonQuiz({
           <p className="text-sm text-primary-foreground/70">Your score</p>
           <p className="text-4xl font-bold">{score}%</p>
           <p className="mt-2 text-sm text-primary-foreground/80">
-            {correct} of {questions.length} correct.{" "}
+            {lang === "pt" ? `${correct} de ${questions.length} corretas. ` : `${correct} of ${questions.length} correct. `}
             {score >= PASS_SCORE
-              ? "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want."
-              : `You need at least ${PASS_SCORE}% to pass. Review the explanations below and retake the quiz.`}
+              ? lang === "pt"
+                ? "Muito bem — você passou! Suas respostas foram salvas e você pode refazer o quiz quando quiser."
+                : "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want."
+              : lang === "pt"
+                ? `Você precisa de pelo menos ${PASS_SCORE}% para passar. Revise as explicações abaixo e refaça o quiz.`
+                : `You need at least ${PASS_SCORE}% to pass. Review the explanations below and retake the quiz.`}
           </p>
           <Button variant="secondary" className="mt-4" onClick={retake}>
-            {score >= PASS_SCORE ? "Redo quiz" : "Retake quiz"}
+            {lang === "pt" ? "Refazer o quiz" : score >= PASS_SCORE ? "Redo quiz" : "Retake quiz"}
           </Button>
         </div>
       )}

@@ -117,11 +117,61 @@ export const uiPt: Record<string, string> = {
   "Great job — you passed! Move on to the next lesson.":
     "Muito bem — você passou! Siga para a próxima lição.",
   "Retake quiz": "Refazer o quiz",
+  "Redo quiz": "Refazer o quiz",
+  "Question": "Questão",
+  "You need at least 70% to pass. Review the explanations below and retake the quiz.":
+    "Você precisa de pelo menos 70% para passar. Revise as explicações abaixo e refaça o quiz.",
+  "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want.":
+    "Muito bem — você passou! Suas respostas foram salvas e você pode refazer o quiz quando quiser.",
   "Score below 70%. Review the lesson and retake the quiz to complete it.":
     "Nota abaixo de 70%. Revise a lição e refaça o quiz para concluí-la.",
   "Lessons, videos, flashcards and quizzes": "Lições, vídeos, flashcards e quizzes",
   "Lessons, videos, flashcards and quizzes in one learning path.":
     "Lições, vídeos, flashcards e quizzes em uma única trilha.",
+  "A complete course for your level: 30 core lessons plus 3 optional review lessons, with video, summary, flashcards, quiz and guided practice. Each lesson unlocks when you finish the one before it.":
+    "Um curso completo para o seu nível: 30 lições principais e 3 lições opcionais de revisão, com vídeo, resumo, flashcards, quiz e prática guiada. Cada lição é liberada quando você conclui a anterior.",
+  Course: "Curso",
+  "33 lessons in 6 units, including an optional review unit with a 10-question test.":
+    "33 lições em 6 unidades, incluindo uma unidade opcional de revisão com um teste de 10 questões.",
+  "Optional review · does not block the Final Test":
+    "Revisão opcional · não bloqueia o Teste Final",
+  "Unit 6 — Review": "Unidade 6 — Revisão",
+  "Review I": "Revisão I",
+  "Review II": "Revisão II",
+  Test: "Teste",
+  "Your course plan is downloading.": "O plano do seu curso está sendo baixado.",
+  "Could not build the course PDF. Please try again.":
+    "Não foi possível criar o PDF do curso. Tente novamente.",
+  "Finish the previous lesson first to unlock this one.":
+    "Conclua primeiro a lição anterior para liberar esta.",
+  "Final Test": "Teste Final",
+  "30 questions. Score 70% or more to move up to the next level.":
+    "30 questões. Alcance 70% ou mais para avançar ao próximo nível.",
+  "Take the final test": "Fazer o teste final",
+  "Finish the 30 lessons in Units 1–5 to unlock":
+    "Conclua as 30 lições das Unidades 1–5 para liberar",
+  "Finish the 30 core lessons in Units 1–5 to unlock the Final Test. Unit 6 is optional.":
+    "Conclua as 30 lições principais das Unidades 1–5 para liberar o Teste Final. A Unidade 6 é opcional.",
+  "The AI will write your test now. Take it in one sitting.":
+    "A IA criará seu teste agora. Faça-o de uma só vez.",
+  "Start final test": "Iniciar teste final",
+  questions: "questões",
+  "questions.": "questões.",
+  Score: "Nota",
+  correct: "corretas",
+  "correct.": "corretas.",
+  "or more to move up to the next level.": "ou mais para avançar ao próximo nível.",
+  "Setting up your next level…": "Preparando seu próximo nível…",
+  "A new course with 30 core lessons and an optional review unit was unlocked — everything you finished before is kept.":
+    "Um novo curso com 30 lições principais e uma unidade opcional de revisão foi liberado — tudo o que você concluiu antes foi mantido.",
+  "Could not open the Final Test.": "Não foi possível abrir o Teste Final.",
+  "Your test was saved, but the level change failed. Please try again.":
+    "Seu teste foi salvo, mas não foi possível alterar o nível. Tente novamente.",
+  "Lesson completed": "Lição concluída",
+  "Everything you did is saved. Want to practise again? Redo the flashcards or the quiz.":
+    "Tudo o que você fez foi salvo. Quer praticar novamente? Refaça os flashcards ou o quiz.",
+  "Turn on the video subtitles (CC) to follow along while you watch.":
+    "Ative as legendas do vídeo (CC) para acompanhar enquanto assiste.",
   "Video, summary, flashcards and quiz in one English lesson.":
     "Vídeo, resumo, flashcards e quiz em uma lição de inglês.",
   "Spaced repetition review of your English flashcards.":
@@ -247,6 +297,7 @@ export const uiPt: Record<string, string> = {
   "Your league report is downloading.": "Seu relatório da liga está sendo baixado.",
   "Could not build your summary. Please try again.":
     "Não foi possível montar seu resumo. Tente novamente.",
+  "Could not play this audio.": "Não foi possível reproduzir este áudio.",
   "Something went wrong. Please try again.": "Algo deu errado. Tente novamente.",
   "Audio is unavailable right now.": "O áudio está indisponível no momento.",
   "See how far you came": "Veja o quanto você evoluiu",
@@ -360,6 +411,20 @@ export const uiPt: Record<string, string> = {
   "Mark this part as done": "Marcar esta parte como concluída",
   "Finish quiz": "Finalizar quiz",
   Listen: "Ouvir",
+  "Listen card": "Cartão de escuta",
+  "Question card": "Cartão de pergunta",
+  "Tap to see the answer": "Toque para ver a resposta",
+  "Listen to the answer": "Ouvir a resposta",
+  "See question": "Ver pergunta",
+  "Everything you did is saved. You can go through the cards again whenever you like.":
+    "Tudo o que você fez foi salvo. Você pode rever os cartões quando quiser.",
+  "Redo flashcards": "Refazer flashcards",
+  "Start over": "Recomeçar",
+  "Your study content is downloading.": "Seu conteúdo de estudo está sendo baixado.",
+  "You finished every lesson. Take the Final Test to move up a level.":
+    "Você concluiu todas as lições. Faça o Teste Final para avançar de nível.",
+  Lesson: "Lição",
+  completed: "concluída",
   "Your hardest cards were scheduled to come back sooner.":
     "Seus cards mais difíceis voltarão mais cedo.",
   "No cards yet — open a lesson to start building your deck.":
@@ -387,6 +452,13 @@ export const uiPt: Record<string, string> = {
   "Write your answer in English…": "Escreva sua resposta em inglês…",
   "New writing tasks arrive tomorrow, or when you create new lessons in the Learning Center.":
     "Novas tarefas de escrita chegam amanhã ou quando você criar novas lições no Centro de Aprendizado.",
+  "New writing tasks arrive tomorrow, or as soon as you start a new lesson in the Learning Center.":
+    "Novas tarefas de escrita chegam amanhã ou assim que você iniciar uma nova lição no Centro de Aprendizado.",
+  "This task is already checked.": "Esta tarefa já foi corrigida.",
+  "Want a better score? Redo it and submit a new version.":
+    "Quer uma nota melhor? Refaça a tarefa e envie uma nova versão.",
+  "Redo this task": "Refazer esta tarefa",
+  "Redo this task to improve your score": "Refazer esta tarefa para melhorar sua nota",
   "Family, friends, routine": "Família, amigos, rotina",
   "Meetings, emails, career": "Reuniões, e-mails, carreira",
   "Airport, hotel, restaurant": "Aeroporto, hotel, restaurante",
@@ -468,6 +540,12 @@ export const uiPt: Record<string, string> = {
   "and day 7 is today": "e o dia 7 é hoje",
   "Each line shows your score in %, and Overall is the average of the five skills.":
     "Cada linha mostra sua nota em %, e Geral é a média das cinco habilidades.",
+  "Ten new words every time you start a new lesson, chosen from your learning path, with meaning, examples and a microphone to test your pronunciation.":
+    "Dez palavras novas sempre que você iniciar uma nova lição, escolhidas da sua trilha, com significado, exemplos e microfone para testar sua pronúncia.",
+  "Redo today's words": "Refazer as palavras de hoje",
+  "Today's words are back — practise them again.":
+    "As palavras de hoje voltaram — pratique-as novamente.",
+  "Could not reset today's words": "Não foi possível restaurar as palavras de hoje",
 
   // Level labels
   "A1 Beginner": "A1 Iniciante",

@@ -20,6 +20,8 @@ import { pronunciationScore, transcribeAudio } from "@/lib/transcribe";
 import { cancelVoiceRecording, startVoiceRecording, stopVoiceRecording } from "@/lib/voice-recorder";
 import { lookupWord } from "@/lib/dictionary.functions";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
+import { useUiLang } from "@/lib/uiLang";
+import { uiPt } from "@/lib/uiDictionary";
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
@@ -62,7 +64,8 @@ function highlightWord(sentence: string, word: string) {
 }
 
 function Vocabulary() {
-
+  const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
   const { data: profile } = useProfile();
   const loadDailyWords = useServerFn(dailyWords);
   const searchDictionary = useServerFn(lookupWord);
@@ -156,9 +159,9 @@ function Vocabulary() {
         .in("word_id", ids);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
-      toast.success("Today's words are back — practise them again.");
+      toast.success(t("Today's words are back — practise them again."));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not reset today's words");
+      toast.error(err instanceof Error ? err.message : t("Could not reset today's words"));
     } finally {
       setBusy(null);
     }
