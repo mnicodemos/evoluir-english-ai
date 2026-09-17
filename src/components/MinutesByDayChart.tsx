@@ -41,7 +41,7 @@ export function MinutesByDayChart({ userId, level }: Props) {
       const empty = (): Buckets => ({ Listening: 0, Reading: 0, Talking: 0, Writing: 0 });
       const totals = new Map<string, Buckets>();
       for (const row of data ?? []) {
-        const bucket = bucketOf(row.activity_type) as keyof Buckets | null;
+        const bucket = skillBucketOf(row.activity_type) as keyof Buckets | null;
         if (!bucket) continue;
         const key = dayFmt.format(new Date(row.created_at));
         const entry = totals.get(key) ?? empty();
