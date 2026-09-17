@@ -147,12 +147,11 @@ export function FlashcardDeck({
             {card.pronunciation && <p className="text-xs text-primary-foreground/75">{card.pronunciation}</p>}
             {isListenCard && listenText && (
               <Button
-                variant={isPlaying ? "default" : "outline"}
                 size="sm"
                 onClick={() => void speak(listenText)}
                 disabled={isPlaying}
                 aria-label="Listen to the answer"
-                className={isPlaying ? "bg-success text-success-foreground hover:bg-success/90" : undefined}
+                className="border-2 border-primary-foreground/30 bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Volume2 className="size-4" /> Listen
               </Button>
