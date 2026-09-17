@@ -193,7 +193,7 @@ export function CurriculumPath() {
 }
 
 /** Dashboard card: course progress + skill scores. */
-export function PathProgressCard() {
+export function PathProgressCard({ className }: { className?: string }) {
   const path = useLearningPath();
   const { data: profile } = useProfile();
   const { data: mine } = useUserLessons();
