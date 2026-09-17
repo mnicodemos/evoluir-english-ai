@@ -33,7 +33,9 @@ function translate(label: string, lang: "en" | "pt") {
 function initials(name?: string | null, email?: string | null) {
   const source = (name?.trim() || email?.split("@")[0] || "User").trim();
   const parts = source.split(/\s+/).filter(Boolean);
-  const letters = parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : source.slice(0, 2);
+  const first = parts[0]?.[0] ?? "U";
+  const second = parts.length > 1 ? (parts[1]?.[0] ?? "") : source[1] ?? "";
+  const letters = `${first}${second}`;
   return letters.toUpperCase();
 }
 
