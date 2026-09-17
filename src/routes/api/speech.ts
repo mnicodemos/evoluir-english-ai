@@ -101,7 +101,7 @@ export const Route = createFileRoute("/api/speech")({
                 method: "POST",
                 headers: {
                   Authorization: `Bearer ${apiKey}`,
-                  "X-Connection-Api-Key": geminiKey ?? "",
+                  "X-Connection-Api-Key": geminiKey,
                   "Content-Type": "application/json",
                 },
                 body,
