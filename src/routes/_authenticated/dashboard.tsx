@@ -22,6 +22,8 @@ import { LevelCard } from "@/components/LevelCard";
 import { PathProgressCard } from "@/components/LearningPathCard";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { WeeklyFrequency } from "@/components/WeeklyFrequency";
+
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { supabase } from "@/integrations/supabase/client";
