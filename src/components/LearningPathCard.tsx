@@ -109,51 +109,53 @@ export function CurriculumPath() {
         </Button>
       </section>
 
-      {path.units.map((unit) => (
-        <section key={unit.unit} className="card-soft p-5" aria-label={unit.title}>
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="font-semibold">{unit.title}</h3>
-            <span className="text-xs text-muted-foreground">
-              {unit.completed}/{unit.lessons.length}
-            </span>
-          </div>
-          <ul className="mt-4 space-y-2">
-            {unit.lessons.map((lesson) => {
-              const busy = busyKey === lesson.key;
-              return (
-                <li key={lesson.key}>
-                  <button
-                    type="button"
-                    onClick={() => void start(lesson)}
-                    disabled={busy || open.isPending}
-                    aria-label={lesson.title}
-                    className={`flex w-full items-center gap-3 rounded-xl border border-border p-3 text-left transition-shadow hover:shadow-[var(--shadow-lift)] ${
-                      lesson.locked ? "opacity-60" : ""
-                    }`}
-                  >
-                    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-secondary text-xs font-semibold">
-                      {lesson.position}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">{lesson.title}</span>
-                      <span className="mt-1 block text-xs text-muted-foreground">{lesson.objective}</span>
-                    </span>
-                    {busy ? (
-                      <Loader2 className="size-4 shrink-0 animate-spin" />
-                    ) : lesson.completed ? (
-                      <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
-                    ) : lesson.locked ? (
-                      <Lock className="size-4 shrink-0 text-muted-foreground" />
-                    ) : (
-                      <Play className="size-4 shrink-0 text-[oklch(0.45_0.11_255)]" />
-                    )}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+      <div className="grid gap-5 xl:grid-cols-2 2xl:grid-cols-3">
+        {path.units.map((unit) => (
+          <section key={unit.unit} className="card-soft p-5" aria-label={unit.title}>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="font-semibold">{unit.title}</h3>
+              <span className="text-xs text-muted-foreground">
+                {unit.completed}/{unit.lessons.length}
+              </span>
+            </div>
+            <ul className="mt-4 space-y-2">
+              {unit.lessons.map((lesson) => {
+                const busy = busyKey === lesson.key;
+                return (
+                  <li key={lesson.key}>
+                    <button
+                      type="button"
+                      onClick={() => void start(lesson)}
+                      disabled={busy || open.isPending}
+                      aria-label={lesson.title}
+                      className={`flex w-full items-center gap-3 rounded-xl border border-border p-3 text-left transition-shadow hover:shadow-[var(--shadow-lift)] ${
+                        lesson.locked ? "opacity-60" : ""
+                      }`}
+                    >
+                      <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-secondary text-xs font-semibold">
+                        {lesson.position}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium">{lesson.title}</span>
+                        <span className="mt-1 block text-xs text-muted-foreground">{lesson.objective}</span>
+                      </span>
+                      {busy ? (
+                        <Loader2 className="size-4 shrink-0 animate-spin" />
+                      ) : lesson.completed ? (
+                        <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
+                      ) : lesson.locked ? (
+                        <Lock className="size-4 shrink-0 text-muted-foreground" />
+                      ) : (
+                        <Play className="size-4 shrink-0 text-[oklch(0.45_0.11_255)]" />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
+      </div>
 
       <section className="card-soft p-5" aria-label="Final Test">
         <div className="flex items-center gap-3">
