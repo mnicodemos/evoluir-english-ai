@@ -100,8 +100,8 @@ function Dashboard() {
 
   const trainingCards = [
     { to: "/learning", label: "Learning Center", text: "Lessons, videos, flashcards and quizzes", icon: GraduationCap, className: "sm:col-span-2" },
-    { to: "/coach", label: "AI Talking", text: "Speak and get a scored report", icon: MessageSquareText, className: undefined },
-    { to: "/listening", label: "Listening Lab", text: "Train your ear with dictation drills", icon: Headphones, className: undefined },
+    { to: "/coach", label: "AI Talking", text: "Speak and get a scored report", icon: MessageSquareText, className: "xl:h-full" },
+    { to: "/listening", label: "Listening Lab", text: "Train your ear with dictation drills", icon: Headphones, className: "xl:h-full" },
     { to: "/writing", label: "Writing", text: "Correct any text instantly", icon: PenLine, className: "xl:h-full" },
     { to: "/vocabulary", label: "Vocabulary", text: "Learn and review words", icon: BookOpen, className: "xl:h-full" },
   ] as const;
@@ -184,7 +184,7 @@ function Dashboard() {
 
             <section className="min-w-0 xl:flex xl:flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_auto_minmax(7rem,1fr)]">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_minmax(7rem,1fr)_minmax(7rem,1fr)]">
                 {trainingCards.map((c) => (
                   <Link
                     key={`link-${c.to}`}
