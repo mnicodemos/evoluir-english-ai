@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { completeLesson, saveVideoProgress, useLesson, useUserFlashcards } from "@/hooks/useLearning";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
-import { useTimeSpent } from "@/hooks/useTimeSpent";
+import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 
 
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
@@ -39,6 +39,7 @@ function LessonPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const minutesSpent = useTimeSpent();
+  useLogTimeOnExit({ timer: minutesSpent, profile, type: "lesson_practice", title: "Lesson practice" });
 
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   // Remember which tab the user was on so leaving mid-lesson brings them back.

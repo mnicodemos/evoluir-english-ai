@@ -11,7 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
-import { useTimeSpent } from "@/hooks/useTimeSpent";
+import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { parseWritingFeedback, writingCorrectionMessages, type WritingFeedback } from "@/lib/ai-prompts";
 import { hybridChat } from "@/lib/local-ai";
 
@@ -154,6 +154,7 @@ function Writing() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
+  useLogTimeOnExit({ timer: minutesSpent, profile, type: "writing_practice", title: "Writing practice" });
   
   const { data: startedLessons } = useLessonRound();
   // A fresh set of tasks every day, and every time the student starts a new lesson.

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { logActivity, useProfile } from "@/hooks/useProfile";
-import { useTimeSpent } from "@/hooks/useTimeSpent";
+import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { useOverallAverage } from "@/hooks/useVocabularyProgress";
 import { buildStudyContext, useStudySnapshot } from "@/hooks/useStudyContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -139,6 +139,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const { data: snapshot } = useStudySnapshot();
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
+  useLogTimeOnExit({ timer: minutesSpent, profile, type: "conversation_practice", title: "Speaking practice" });
   const { data: overall } = useOverallAverage();
   // The conversation always follows the CEFR level the student actually reached.
   const cefrLevel = getLevelState(profile?.level).current.value;
