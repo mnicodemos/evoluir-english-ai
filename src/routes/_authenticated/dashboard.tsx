@@ -98,12 +98,13 @@ function Dashboard() {
   });
 
 
+  const learningCenterCard = { to: "/learning", label: "Learning Center", text: "Lessons, videos, flashcards and quizzes", icon: GraduationCap } as const;
+
   const trainingCards = [
-    { to: "/learning", label: "Learning Center", text: "Lessons, videos, flashcards and quizzes", icon: GraduationCap, className: "sm:col-span-2" },
-    { to: "/coach", label: "AI Talking", text: "Speak and get a scored report", icon: MessageSquareText, className: undefined },
-    { to: "/listening", label: "Listening Lab", text: "Train your ear with dictation drills", icon: Headphones, className: undefined },
-    { to: "/writing", label: "Writing", text: "Correct any text instantly", icon: PenLine, className: undefined },
-    { to: "/vocabulary", label: "Vocabulary", text: "Learn and review words", icon: BookOpen, className: undefined },
+    { to: "/coach", label: "AI Talking", text: "Speak and get a scored report", icon: MessageSquareText },
+    { to: "/listening", label: "Listening Lab", text: "Train your ear with dictation drills", icon: Headphones },
+    { to: "/writing", label: "Writing", text: "Correct any text instantly", icon: PenLine },
+    { to: "/vocabulary", label: "Vocabulary", text: "Learn and review words", icon: BookOpen },
   ] as const;
 
   const historyCard = { to: "/progress", label: "My history", text: "See how far you came", icon: LineChart, className: "sm:col-span-2" } as const;
