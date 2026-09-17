@@ -99,12 +99,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         <div className="flex flex-col items-center gap-1">
           <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
           <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ProfileMenu className="hover:bg-sidebar-accent hover:text-sidebar-foreground" />
-            </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={8}>{translate("Profile")}</TooltipContent>
-          </Tooltip>
+          <ProfileMenu className="hover:bg-sidebar-accent hover:text-sidebar-foreground" />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
