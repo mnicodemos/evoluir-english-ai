@@ -1,6 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+
+import { authenticateApiRequest } from "@/lib/api-auth.server";
+import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
 
 const requestSchema = z.object({
   text: z.string().trim().min(1).max(500),
@@ -17,30 +19,18 @@ export const Route = createFileRoute("/api/speech")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const authorization = request.headers.get("authorization");
-        const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
-        if (!token) {
-          return Response.json({ message: "Please sign in to use audio." }, { status: 401 });
+        let userId: string;
+        try {
+          userId = await authenticateApiRequest(request);
+        } catch (error) {
+          return Response.json({ message: error instanceof Response && error.status === 401 ? "Please sign in again to use audio." : "Audio is not configured yet." }, { status: error instanceof Response ? error.status : 500 });
         }
-
-        const supabaseUrl = process.env["SUPABASE_URL"];
-        const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
         const apiKey = process.env["LOVABLE_API_KEY"];
-        if (!supabaseUrl || !publishableKey || !apiKey) {
+        if (!apiKey) {
           return Response.json({ message: "Audio is not configured yet." }, { status: 500 });
         }
 
-        const auth = createClient(supabaseUrl, publishableKey, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-        const [claimsResult, bodyResult] = await Promise.all([
-          auth.auth.getClaims(token),
-          request.json().catch(() => null),
-        ]);
-        const { data, error } = claimsResult;
-        if (error || !data?.claims?.sub) {
-          return Response.json({ message: "Please sign in again to use audio." }, { status: 401 });
-        }
+        const bodyResult = await request.json().catch(() => null);
 
         const parsed = requestSchema.safeParse(bodyResult);
         if (!parsed.success) {
@@ -50,6 +40,15 @@ export const Route = createFileRoute("/api/speech")({
         const geminiKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
         if (!geminiKey) {
           return Response.json({ message: "Audio is not configured yet." }, { status: 500 });
+        }
+
+        let ticket;
+        try {
+          ticket = await reserveAiUsage({ userId, operation: "tts", model: GEMINI_TTS_MODEL, requestHash: await hashAiRequest(parsed.data.text) });
+        } catch (error) {
+          const headers = new Headers();
+          if (error instanceof AiUsageError && error.retryAfter) headers.set("Retry-After", String(error.retryAfter));
+          return Response.json({ message: error instanceof Error ? error.message : "Audio is temporarily unavailable." }, { status: error instanceof AiUsageError ? error.status : 503, headers });
         }
 
         const body = JSON.stringify({
@@ -95,6 +94,7 @@ export const Route = createFileRoute("/api/speech")({
           if (upstream.status === 429) {
             responseHeaders.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
           }
+          await finishAiUsage(ticket, { success: false, errorCode: `gemini_${upstream.status}`, errorMessage: message });
           return Response.json(
             {
               message:
@@ -146,7 +146,7 @@ export const Route = createFileRoute("/api/speech")({
                 }
               }
             },
-            flush(controller) {
+            async flush(controller) {
               controller.enqueue(
                 encoder.encode(
                   `data: ${JSON.stringify(
@@ -159,6 +159,10 @@ export const Route = createFileRoute("/api/speech")({
                   )}\n\n`,
                 ),
               );
+              await finishAiUsage(ticket, {
+                success: sentAudio,
+                ...(sentAudio ? {} : { errorCode: "empty_audio", errorMessage: "The audio service returned no sound." }),
+              });
             },
           }),
         );

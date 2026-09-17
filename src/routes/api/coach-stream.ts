@@ -1,8 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { openGeminiStream } from "@/lib/gemini.server";
+import { authenticateApiRequest } from "@/lib/api-auth.server";
+import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
+import { GEMINI_TEXT_MODEL, openGeminiStream } from "@/lib/gemini.server";
 
 const requestSchema = z.object({
   messages: z
@@ -21,45 +22,20 @@ type GeminiEvent = {
   error?: { message?: string };
 };
 
-let authClient: ReturnType<typeof createClient> | null = null;
-
-function getAuthClient(url: string, key: string) {
-  authClient ??= createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  return authClient;
-}
-
 export const Route = createFileRoute("/api/coach-stream")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const authorization = request.headers.get("authorization");
-        const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
-        if (!token)
+        let userId: string;
+        try {
+          userId = await authenticateApiRequest(request);
+        } catch (error) {
           return Response.json(
-            { message: "Please sign in to use voice conversation." },
-            { status: 401 },
-          );
-
-        const url = process.env["SUPABASE_URL"];
-        const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-        if (!url || !key)
-          return Response.json(
-            { message: "Voice conversation is not configured yet." },
-            { status: 500 },
-          );
-
-        const [claimsResult, body] = await Promise.all([
-          getAuthClient(url, key).auth.getClaims(token),
-          request.json().catch(() => null),
-        ]);
-        if (claimsResult.error || !claimsResult.data?.claims?.sub) {
-          return Response.json(
-            { message: "Please sign in again to use voice conversation." },
-            { status: 401 },
+            { message: error instanceof Response && error.status === 401 ? "Please sign in again to use voice conversation." : "Voice conversation is not configured yet." },
+            { status: error instanceof Response ? error.status : 500 },
           );
         }
+        const body = await request.json().catch(() => null);
 
         const parsed = requestSchema.safeParse(body);
         if (!parsed.success)
@@ -67,6 +43,21 @@ export const Route = createFileRoute("/api/coach-stream")({
             { message: "The conversation request is invalid." },
             { status: 400 },
           );
+
+        let ticket;
+        try {
+          ticket = await reserveAiUsage({
+            userId,
+            operation: "talking",
+            model: GEMINI_TEXT_MODEL,
+            requestHash: await hashAiRequest(parsed.data),
+          });
+        } catch (error) {
+          const status = error instanceof AiUsageError ? error.status : 503;
+          const headers = new Headers();
+          if (error instanceof AiUsageError && error.retryAfter) headers.set("Retry-After", String(error.retryAfter));
+          return Response.json({ message: error instanceof Error ? error.message : "AI Talking is temporarily unavailable." }, { status, headers });
+        }
 
         const upstream = await openGeminiStream(parsed.data.messages);
         if (!upstream)
@@ -83,6 +74,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           const headers = new Headers();
           if (upstream.status === 429)
             headers.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
+          await finishAiUsage(ticket, { success: false, errorCode: `gemini_${upstream.status}`, errorMessage: message });
           return Response.json({ message }, { status: upstream.status, headers });
         }
 
@@ -125,7 +117,7 @@ export const Route = createFileRoute("/api/coach-stream")({
                 }
               }
             },
-            flush(controller) {
+            async flush(controller) {
               controller.enqueue(
                 encoder.encode(
                   `data: ${JSON.stringify(
@@ -138,6 +130,10 @@ export const Route = createFileRoute("/api/coach-stream")({
                   )}\n\n`,
                 ),
               );
+              await finishAiUsage(ticket, {
+                success: emittedText,
+                ...(emittedText ? {} : { errorCode: "empty_response", errorMessage: "Google Gemini returned an empty reply." }),
+              });
             },
           }),
         );
