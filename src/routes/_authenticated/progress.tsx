@@ -65,34 +65,38 @@ function ProgressPage() {
         <Skeleton className="mt-7 h-72 w-full" />
       ) : (
         <>
-          <section className="card-soft mt-7 p-6">
-            <h2 className="text-lg font-semibold">{t("Frequency")}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{t("The days you studied this month.")}</p>
-            <div className="mt-5">{profile && <FrequencyCalendar userId={profile.id} />}</div>
-          </section>
+          <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <section className="card-soft p-5">
+              <h2 className="text-lg font-semibold">{t("Frequency")}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t("The days you studied this month.")}</p>
+              <div className="mt-4">{profile && <FrequencyCalendar userId={profile.id} />}</div>
+            </section>
 
-          <section className="card-soft mt-6 p-6">
-            <h2 className="text-lg font-semibold">{t("Evolution")}</h2>
-            {profile && <EvolutionChart userId={profile.id} level={profile.level} />}
-            {profile && <MinutesByDayChart userId={profile.id} level={profile.level} />}
-          </section>
-
-          <section className="card-soft mt-6 p-6">
-            <h2 className="text-lg font-semibold">{t("Current level")}</h2>
-            <div className="mt-5 grid gap-5 sm:grid-cols-2">
-              {skills.map((s) => (
-                <div key={s.label}>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{t(s.label)}</span>
-                    <span className="text-muted-foreground">{s.value}%</span>
+            <section className="card-soft p-5">
+              <h2 className="text-lg font-semibold">{t("Current level")}</h2>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                {skills.map((s) => (
+                  <div key={s.label}>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">{t(s.label)}</span>
+                      <span className="text-muted-foreground">{s.value}%</span>
+                    </div>
+                    <Bar value={s.value} className="mt-2 h-2" />
                   </div>
-                  <Bar value={s.value} className="mt-2 h-2" />
-                </div>
-              ))}
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <section className="card-soft mt-5 p-5">
+            <h2 className="text-lg font-semibold">{t("Evolution")}</h2>
+            <div className="grid gap-5 xl:grid-cols-2">
+              {profile && <EvolutionChart userId={profile.id} level={profile.level} />}
+              {profile && <MinutesByDayChart userId={profile.id} level={profile.level} />}
             </div>
           </section>
 
-          <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
             <section className="card-soft p-6">
               <h2 className="flex items-center gap-2 font-semibold">
                 <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" /> {t("Strengths")}
@@ -122,7 +126,7 @@ function ProgressPage() {
       )}
 
       {learning?.common_errors && learning.common_errors.length > 0 && (
-        <section className="card-soft mt-6 p-6">
+        <section className="card-soft mt-5 p-5">
           <h2 className="text-lg font-semibold">{t("Frequent mistakes")}</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
             {learning.common_errors.map((e: string, i: number) => (
