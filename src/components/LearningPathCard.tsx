@@ -247,7 +247,7 @@ export function PathProgressCard({ className }: { className?: string }) {
   };
 
   return (
-    <section className="card-soft bg-card p-6 text-card-foreground" aria-labelledby="path-progress-heading">
+    <section className={`card-soft bg-card p-6 text-card-foreground ${className ?? ""}`} aria-labelledby="path-progress-heading">
       <h2 id="path-progress-heading" className="text-xl font-semibold">
         Your progress
       </h2>
