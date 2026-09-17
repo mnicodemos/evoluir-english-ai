@@ -16,6 +16,22 @@ export const VOICE_OPTIONS = [
 export type SpeechVoice = (typeof VOICE_OPTIONS)[number]["id"];
 const VOICE_STORAGE_KEY = "ai-speech-voice-v1";
 
+const BROWSER_VOICE_PROFILES: Record<SpeechVoice, {
+  pitch: number;
+  rate: number;
+  preferredNames: string[];
+}> = {
+  alloy: { pitch: 1, rate: 0.95, preferredNames: [] },
+  ash: { pitch: 0.82, rate: 0.9, preferredNames: ["daniel", "david", "james", "male"] },
+  coral: { pitch: 1.14, rate: 0.96, preferredNames: ["samantha", "victoria", "zira", "female"] },
+  echo: { pitch: 0.68, rate: 0.84, preferredNames: ["alex", "fred", "george", "male"] },
+  fable: { pitch: 1.05, rate: 0.82, preferredNames: ["arthur", "daniel", "narrator"] },
+  nova: { pitch: 1.2, rate: 1.04, preferredNames: ["ava", "samantha", "susan", "female"] },
+  onyx: { pitch: 0.72, rate: 0.98, preferredNames: ["aaron", "david", "tom", "male"] },
+  sage: { pitch: 0.96, rate: 0.86, preferredNames: ["karen", "moira", "serena", "female"] },
+  shimmer: { pitch: 1.3, rate: 1.02, preferredNames: ["tessa", "victoria", "zira", "female"] },
+};
+
 export function getSpeechVoice(): SpeechVoice {
   try {
     const stored = window.localStorage.getItem(VOICE_STORAGE_KEY);
@@ -199,13 +215,19 @@ async function speakWithBrowser(value: string, selectedVoice: SpeechVoice): Prom
 
   await new Promise<void>((resolve, reject) => {
     const utterance = new SpeechSynthesisUtterance(value);
+    const profile = BROWSER_VOICE_PROFILES[selectedVoice];
     activeUtterance = utterance;
     utterance.lang = "en-US";
-    utterance.rate = 0.95;
+    utterance.pitch = profile.pitch;
+    utterance.rate = profile.rate;
     const englishVoices = voices.filter((candidate) => candidate.lang?.toLowerCase().startsWith("en"));
     if (englishVoices.length > 0) {
+      const preferred = englishVoices.find((candidate) => {
+        const name = candidate.name.toLowerCase();
+        return profile.preferredNames.some((preferredName) => name.includes(preferredName));
+      });
       const voiceIndex = VOICE_OPTIONS.findIndex((option) => option.id === selectedVoice);
-      utterance.voice = englishVoices[Math.max(0, voiceIndex) % englishVoices.length] ?? null;
+      utterance.voice = preferred ?? englishVoices[Math.max(0, voiceIndex) % englishVoices.length] ?? null;
     }
 
     let settled = false;
