@@ -66,7 +66,9 @@ export const Route = createFileRoute("/api/speech")({
         }
 
         const geminiKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
-
+        if (!geminiKey) {
+          return Response.json({ message: "Audio is not configured yet." }, { status: 500 });
+        }
 
         const voiceName = GEMINI_VOICES[parsed.data.voice] ?? "Kore";
         const body = JSON.stringify({
@@ -90,37 +92,8 @@ export const Route = createFileRoute("/api/speech")({
         let lastStatus = 502;
         let lastMessage = "Audio generation failed.";
 
-        // Primary: the managed audio service, which streams natural speech and
-        // is not limited by the Google free-tier daily quota.
-        try {
-          const managed = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "google/gemini-3.1-flash-tts-preview",
-              contents: [{ role: "user", parts: [{ text: parsed.data.text }] }],
-              generationConfig: {
-                responseModalities: ["AUDIO"],
-                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
-              },
-              stream_format: "sse",
-            }),
-          });
-          if (managed.ok && managed.body) {
-            return new Response(managed.body, {
-              headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
-            });
-          }
-          lastStatus = managed.status;
-          lastMessage = "Audio generation failed.";
-        } catch {
-          // Fall through to the project's own Google key below.
-        }
-
-        outer: for (const model of geminiKey ? GEMINI_TTS_MODELS : []) {
+        // All AI audio runs on the project's own Google Gemini key.
+        outer: for (const model of GEMINI_TTS_MODELS) {
           for (let attempt = 0; attempt < 2; attempt += 1) {
             const res = await fetch(
               `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
@@ -128,7 +101,7 @@ export const Route = createFileRoute("/api/speech")({
                 method: "POST",
                 headers: {
                   Authorization: `Bearer ${apiKey}`,
-                  "X-Connection-Api-Key": geminiKey ?? "",
+                  "X-Connection-Api-Key": geminiKey,
                   "Content-Type": "application/json",
                 },
                 body,
