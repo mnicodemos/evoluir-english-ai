@@ -24,6 +24,7 @@ import {
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
 import { UiLangProvider, UiLangToggle, useUiLang } from "@/lib/uiLang";
@@ -98,22 +99,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         <div className="flex flex-col items-center gap-1">
           <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
           <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={translate("Premium")}
-                className="size-10 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                asChild
-              >
-                <Link to="/premium">
-                  <Crown className="size-5 text-[oklch(0.78_0.18_82)]" />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={8}>{translate("Premium")}</TooltipContent>
-          </Tooltip>
+          <ProfileMenu className="hover:bg-sidebar-accent hover:text-sidebar-foreground" />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -139,11 +125,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-1">
           <UiLangToggle />
           <ThemeToggle />
-          <Button asChild variant="ghost" size="icon" aria-label={translate("Premium")}>
-            <Link to="/premium">
-              <Crown className="size-4 text-[oklch(0.78_0.18_82)]" />
-            </Link>
-          </Button>
+          <ProfileMenu className="hover:bg-accent hover:text-foreground" />
           <Button variant="ghost" size="icon" onClick={signOut} aria-label={translate("Sign out")}>
             <LogOut className="size-4" />
           </Button>
