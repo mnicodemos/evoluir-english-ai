@@ -103,10 +103,12 @@ export function FlashcardDeck({
 
       <div className="flex items-center justify-center gap-2">
         <Button
-          variant="ghost"
+          variant={isPlaying ? "default" : "ghost"}
           size="sm"
           onClick={() => speak(card.word)}
+          disabled={isPlaying}
           aria-label="Listen to the pronunciation"
+          className={isPlaying ? "bg-success text-success-foreground hover:bg-success/90" : undefined}
         >
           <Volume2 className="size-4" /> Listen
         </Button>
