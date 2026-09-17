@@ -306,7 +306,7 @@ function Writing() {
             <CheckCircle2 className="mx-auto size-8 text-green-600" />
             <p className="mt-2 font-semibold">All 3 writing tasks completed!</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              New writing tasks arrive tomorrow, or when you create new lessons in the Learning Center.
+              New writing tasks arrive tomorrow, or as soon as you start a new lesson in the Learning Center.
             </p>
             <Button variant="outline" className="mt-4" onClick={redoPrompt}>
               Redo this task to improve your score
