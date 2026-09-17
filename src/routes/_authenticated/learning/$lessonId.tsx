@@ -107,7 +107,7 @@ function LessonPage() {
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{lesson.objective}</p>
         </header>
 
-        <Tabs defaultValue="video">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="video" className="gap-1.5">
               <Video className="size-4" /> <span className="hidden sm:inline">Video</span>
