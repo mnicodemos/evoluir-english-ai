@@ -91,6 +91,8 @@ export type Database = {
       }
       flashcards: {
         Row: {
+          answer: string | null
+          card_type: string | null
           created_at: string
           created_by: string | null
           definition: string
@@ -98,11 +100,16 @@ export type Database = {
           example: string
           id: string
           lesson_id: string | null
+          listen_text: string | null
+          prompt: string | null
           pronunciation: string
+          sort_order: number | null
           translation: string
           word: string
         }
         Insert: {
+          answer?: string | null
+          card_type?: string | null
           created_at?: string
           created_by?: string | null
           definition?: string
@@ -110,11 +117,16 @@ export type Database = {
           example?: string
           id?: string
           lesson_id?: string | null
+          listen_text?: string | null
+          prompt?: string | null
           pronunciation?: string
+          sort_order?: number | null
           translation: string
           word: string
         }
         Update: {
+          answer?: string | null
+          card_type?: string | null
           created_at?: string
           created_by?: string | null
           definition?: string
@@ -122,7 +134,10 @@ export type Database = {
           example?: string
           id?: string
           lesson_id?: string | null
+          listen_text?: string | null
+          prompt?: string | null
           pronunciation?: string
+          sort_order?: number | null
           translation?: string
           word?: string
         }
