@@ -91,7 +91,7 @@ async function writeLesson(
           '"flashcards":[{"word":"","definition":"short English-only definition of the word (max 18 words, no Portuguese)","pronunciation":"simple phonetic hint","example":"natural English sentence using the word","difficulty":"easy|medium|hard"}],' +
           '"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence"}]}. ' +
           "Give exactly 6 flashcards and 10 quiz questions. " +
-          "The flashcards must be words or expressions that actually appear in the transcript of THIS lesson, and every flashcard field must be in English only - never Portuguese, never a translation. " + +
+          "The flashcards must be words or expressions that actually appear in the transcript of THIS lesson, and every flashcard field must be in English only - never Portuguese, never a translation. " +
           "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage). " +
           "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
           "Each question must be self-contained: a sentence to complete or correct, or a direct grammar rule question.",
