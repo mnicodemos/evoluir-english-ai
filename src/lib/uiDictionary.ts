@@ -151,6 +151,10 @@ export const uiPt: Record<string, string> = {
   "The AI will write your test now. Take it in one sitting.":
     "A IA criará seu teste agora. Faça-o de uma só vez.",
   "Start final test": "Iniciar teste final",
+  questions: "questões",
+  "questions.": "questões.",
+  Score: "Nota",
+  "or more to move up to the next level.": "ou mais para avançar ao próximo nível.",
   "Setting up your next level…": "Preparando seu próximo nível…",
   "Lesson completed": "Lição concluída",
   "Everything you did is saved. Want to practise again? Redo the flashcards or the quiz.":
@@ -282,6 +286,7 @@ export const uiPt: Record<string, string> = {
   "Your league report is downloading.": "Seu relatório da liga está sendo baixado.",
   "Could not build your summary. Please try again.":
     "Não foi possível montar seu resumo. Tente novamente.",
+  "Could not play this audio.": "Não foi possível reproduzir este áudio.",
   "Something went wrong. Please try again.": "Algo deu errado. Tente novamente.",
   "Audio is unavailable right now.": "O áudio está indisponível no momento.",
   "See how far you came": "Veja o quanto você evoluiu",
@@ -404,6 +409,12 @@ export const uiPt: Record<string, string> = {
     "Tudo o que você fez foi salvo. Você pode rever os cartões quando quiser.",
   "Redo flashcards": "Refazer flashcards",
   "Start over": "Recomeçar",
+  "Your course plan is downloading.": "O plano do seu curso está sendo baixado.",
+  "Your study content is downloading.": "Seu conteúdo de estudo está sendo baixado.",
+  "You finished every lesson. Take the Final Test to move up a level.":
+    "Você concluiu todas as lições. Faça o Teste Final para avançar de nível.",
+  Lesson: "Lição",
+  completed: "concluída",
   "Your hardest cards were scheduled to come back sooner.":
     "Seus cards mais difíceis voltarão mais cedo.",
   "No cards yet — open a lesson to start building your deck.":
