@@ -4,6 +4,17 @@ import { createFileRoute } from "@tanstack/react-router";
 const MAX_AUDIO_BYTES = 14 * 1024 * 1024;
 const GEMINI_TRANSCRIPTION_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash"] as const;
 
+/**
+ * Transcription only needs to echo what was said, so we turn off the model's
+ * "thinking" step and cap the answer. This is the main source of the delay
+ * students feel when their sentence or word is being checked.
+ */
+const FAST_CONFIG = {
+  temperature: 0,
+  maxOutputTokens: 256,
+  thinkingConfig: { thinkingBudget: 0 },
+};
+
 type GeminiTranscription = {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 };
