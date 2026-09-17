@@ -100,8 +100,8 @@ function Dashboard() {
 
   const trainingCards = [
     { to: "/learning", label: "Learning Center", text: "Lessons, videos, flashcards and quizzes", icon: GraduationCap, className: "sm:col-span-2" },
-    { to: "/coach", label: "AI Talking", text: "Speak and get a scored report", icon: MessageSquareText, className: undefined },
-    { to: "/listening", label: "Listening Lab", text: "Train your ear with dictation drills", icon: Headphones, className: undefined },
+    { to: "/coach", label: "AI Talking", text: "Speak and get a scored report", icon: MessageSquareText, className: "xl:h-full" },
+    { to: "/listening", label: "Listening Lab", text: "Train your ear with dictation drills", icon: Headphones, className: "xl:h-full" },
     { to: "/writing", label: "Writing", text: "Correct any text instantly", icon: PenLine, className: "xl:h-full" },
     { to: "/vocabulary", label: "Vocabulary", text: "Learn and review words", icon: BookOpen, className: "xl:h-full" },
   ] as const;
