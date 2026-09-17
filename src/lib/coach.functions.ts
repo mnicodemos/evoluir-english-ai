@@ -119,11 +119,10 @@ export const conversationReport = createServerFn({ method: "POST" })
     z.object({ messages: z.array(messageSchema).min(1).max(60) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<ConversationReport> => {
-    const raw = await callGateway(
-      conversationReportMessages(data.messages),
-      true,
-      { userId: context.userId, operation: "talking" },
-    );
+    const raw = await callGateway(conversationReportMessages(data.messages), true, {
+      userId: context.userId,
+      operation: "talking",
+    });
 
     return parseConversationReport(raw);
   });
