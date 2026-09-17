@@ -59,9 +59,17 @@ export const Route = createFileRoute("/api/coach-stream")({
           return Response.json({ message: error instanceof Error ? error.message : "AI Talking is temporarily unavailable." }, { status, headers });
         }
 
-        const upstream = await openGeminiStream(parsed.data.messages);
-        if (!upstream)
+        let upstream: Response | null;
+        try {
+          upstream = await openGeminiStream(parsed.data.messages);
+        } catch (error) {
+          await finishAiUsage(ticket, { success: false, errorCode: "gemini_network", errorMessage: error instanceof Error ? error.message : "Network failure" });
+          return Response.json({ message: "Google Gemini could not answer right now." }, { status: 503 });
+        }
+        if (!upstream) {
+          await finishAiUsage(ticket, { success: false, errorCode: "not_configured", errorMessage: "Google Gemini is not connected yet." });
           return Response.json({ message: "Google Gemini is not connected yet." }, { status: 500 });
+        }
         if (!upstream.ok || !upstream.body) {
           const raw = await upstream.text().catch(() => "");
           let message = "Google Gemini could not answer right now.";

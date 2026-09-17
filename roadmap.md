@@ -16,3 +16,8 @@
 - [x] Reduzir latência do AI Talking com texto e áudio progressivos
 - [x] Persistir áudios estáticos de vocabulário e flashcards no navegador
 - [x] Renovar sessão e reenviar progresso uma vez sem perder respostas
+- [x] Fase 1 — proteger alterações de plano e remover concessão Premium por e-mail
+- [x] Fase 1 — aplicar limites configuráveis e auditoria a todas as operações de IA
+- [x] Fase 1 — centralizar AI Talking e Writing no Gemini autenticado do servidor
+- [x] Fase 1 — validar respostas estruturadas de relatórios, Writing, aulas e vocabulário
+- [x] Fase 1 — manter avatar privado com limite de 5 MB e preservar contratos de áudio

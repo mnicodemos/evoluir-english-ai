@@ -48,14 +48,14 @@ export const coachReply = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const text = await callGateway([
       {
         role: "system",
         content: coachSystemPrompt(data.scenario, data.level, data.goal, data.studyContext),
       },
       ...data.messages,
-    ]);
+    ], false, { userId: context.userId, operation: "talking" });
     return { reply: text.trim() };
   });
 
@@ -72,7 +72,7 @@ export const coachOpener = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const avoidList = data.avoid.length
       ? `\nOpenings already used with this student (do NOT repeat or paraphrase them — pick a different sub-topic and question):\n${data.avoid.map((line) => `- ${line}`).join("\n")}`
       : "";
@@ -92,7 +92,7 @@ export const coachOpener = createServerFn({ method: "POST" })
           .join("\n"),
       },
       { role: "user", content: "Start our conversation now." },
-    ]);
+    ], false, { userId: context.userId, operation: "talking" });
     return { opener: text.trim() };
   });
 
@@ -111,7 +111,7 @@ export const conversationReport = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z.object({ messages: z.array(messageSchema).min(1).max(60) }).parse(input),
   )
-  .handler(async ({ data }): Promise<ConversationReport> => {
+  .handler(async ({ data, context }): Promise<ConversationReport> => {
     const transcript = data.messages
       .map((m) => `${m.role === "user" ? "Student" : "Teacher"}: ${m.content}`)
       .join("\n");
@@ -128,6 +128,7 @@ export const conversationReport = createServerFn({ method: "POST" })
         { role: "user", content: transcript },
       ],
       true,
+      { userId: context.userId, operation: "talking" },
     );
 
     return parseJson<ConversationReport>(raw, {
@@ -162,7 +163,7 @@ export const correctWriting = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }): Promise<WritingFeedback> => {
+  .handler(async ({ data, context }): Promise<WritingFeedback> => {
     const raw = await callGateway(
       [
         {
@@ -179,6 +180,7 @@ export const correctWriting = createServerFn({ method: "POST" })
         },
       ],
       true,
+      { userId: context.userId, operation: "writing_correction" },
     );
 
     return parseJson<WritingFeedback>(raw, {
