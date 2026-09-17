@@ -227,8 +227,9 @@ export function ProfileMenu({ className }: { className?: string }) {
               id="profile-phone"
               type="tel"
               value={phone}
-              maxLength={30}
-              onChange={(event) => setPhone(event.target.value)}
+              placeholder="(99) 99999-9999"
+              maxLength={15}
+              onChange={(event) => setPhone(maskPhone(event.target.value))}
             />
           </div>
 
