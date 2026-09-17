@@ -33,8 +33,10 @@ export const Route = createFileRoute("/")({
           "Practice conversation, fix your writing and grow your vocabulary every day with an AI English coach.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://evoluirmaisenglishai.com/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://evoluirmaisenglishai.com/" }],
   }),
   component: Landing,
 });
