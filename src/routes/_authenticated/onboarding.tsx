@@ -19,6 +19,8 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
       { name: "description", content: "Tell AI Talking your level, goal and daily study time." },
       { property: "og:title", content: "Evoluir+ English AI · Set up your plan" },
       { property: "og:description", content: "Tell AI Talking your level, goal and daily study time." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Onboarding,

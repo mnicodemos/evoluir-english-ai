@@ -24,6 +24,8 @@ export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
       { name: "description", content: "Watch the video, review the flashcards and take the quiz of this lesson." },
       { property: "og:title", content: "Evoluir+ English AI · Lesson" },
       { property: "og:description", content: "Video, summary, flashcards and quiz in one English lesson." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LessonPage,

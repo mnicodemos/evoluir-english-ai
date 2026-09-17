@@ -15,6 +15,8 @@ export const Route = createFileRoute("/_authenticated/learning/")({
       },
       { property: "og:title", content: "Evoluir+ English AI · Learning Center" },
       { property: "og:description", content: "30 lessons in 5 units with videos, flashcards and quizzes." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LearningCenter,

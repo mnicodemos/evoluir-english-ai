@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/premium")({
       },
       { property: "og:title", content: "Evoluir+ English AI · Premium" },
       { property: "og:description", content: "Unlimited AI Talking, pronunciation and audio lessons." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Premium,

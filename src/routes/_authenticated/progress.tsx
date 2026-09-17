@@ -21,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/progress")({
       { name: "description", content: "Track your speaking, grammar, listening and vocabulary evolution." },
       { property: "og:title", content: "Evoluir+ English AI · My history" },
       { property: "og:description", content: "Track your English evolution week by week." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ProgressPage,

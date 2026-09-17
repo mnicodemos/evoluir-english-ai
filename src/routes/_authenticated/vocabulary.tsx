@@ -28,6 +28,8 @@ export const Route = createFileRoute("/_authenticated/vocabulary")({
       { name: "description", content: "Learn new English words every day and test your pronunciation out loud." },
       { property: "og:title", content: "Evoluir+ English AI · Vocabulary builder" },
       { property: "og:description", content: "Fresh English words every day, with pronunciation practice." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Vocabulary,
