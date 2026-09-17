@@ -37,6 +37,9 @@ function LessonPage() {
   const minutesSpent = useTimeSpent();
 
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
+  // Remember which tab the user was on so leaving mid-lesson brings them back.
+  const [activeTab, setActiveTab] = usePersistentState<string>(`lesson-tab:${lessonId}`, "video");
+
 
   const lesson = data?.lesson;
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
