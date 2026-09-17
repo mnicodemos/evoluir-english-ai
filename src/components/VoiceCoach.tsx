@@ -319,12 +319,12 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const newTopic = () => { cancelVoiceRecording(); topicOffset.current += 1; void start(topicOffset.current); };
 
   return <div className="space-y-5">
-    <div className="flex items-center justify-between gap-3">
-      <div><h1 className="text-2xl font-bold">AI Talking</h1><p className="text-sm text-muted-foreground">Voice conversation · the AI chooses today's subject</p></div>
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0 flex-1"><h1 className="text-2xl font-bold">AI Talking</h1><p className="max-w-full text-sm leading-snug text-muted-foreground">Voice conversation · the AI chooses today's subject</p></div>
+      <div className="flex w-full items-center gap-2 sm:w-auto">
         <span aria-hidden className="text-xl">🔊</span>
         <Select value={voice} onValueChange={(value) => changeVoice(value as SpeechVoice)}>
-          <SelectTrigger aria-label="Choose the AI voice" className="h-10 w-[240px] text-sm"><SelectValue placeholder="AI voice" /></SelectTrigger>
+          <SelectTrigger aria-label="Choose the AI voice" className="h-10 min-w-0 flex-1 text-sm sm:w-[240px] sm:flex-none"><SelectValue placeholder="AI voice" /></SelectTrigger>
           <SelectContent>
             {VOICE_OPTIONS.map((option) => <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>)}
           </SelectContent>
