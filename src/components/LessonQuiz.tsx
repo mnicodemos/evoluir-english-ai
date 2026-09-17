@@ -22,12 +22,18 @@ export function LessonQuiz({
     `lesson-quiz-answers:${lessonId}`,
     {},
   );
-  const [submitted, setSubmitted] = useState(false);
+  // Whether the quiz was already finished, so a completed lesson keeps showing
+  // the corrections instead of an empty quiz when the student comes back.
+  const [submitted, setSubmitted, clearSubmitted] = usePersistentState<boolean>(
+    `lesson-quiz-submitted:${lessonId}`,
+    false,
+  );
   const [saving, setSaving] = useState(false);
 
 
   const correct = questions.filter((q) => answers[q.id] === q.correct_answer).length;
   const score = questions.length ? Math.round((correct / questions.length) * 100) : 0;
+
 
   async function submit() {
     setSaving(true);
