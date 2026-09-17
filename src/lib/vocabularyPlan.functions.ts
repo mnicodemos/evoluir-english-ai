@@ -44,10 +44,10 @@ export const dailyWords = createServerFn({ method: "POST" })
 
     // A fresh set of ten words is created every time the student starts a new lesson.
     const { count } = await supabase
-      .from("lessons")
+      .from("user_lessons")
       .select("id", { count: "exact", head: true })
-      .eq("created_by", userId);
-    const batchKey = `lesson-${count ?? 0}`;
+      .eq("user_id", userId);
+    const batchKey = `started-${count ?? 0}`;
 
     const existing = await supabase
       .from("vocabulary")
