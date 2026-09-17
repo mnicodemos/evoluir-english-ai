@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { saveQuizResult, type QuizQuestion } from "@/hooks/useLearning";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 /** Multiple-choice / fill-in quiz with instant score, explanations and review advice. */
 export function LessonQuiz({
@@ -16,9 +17,14 @@ export function LessonQuiz({
   lessonId: string;
   onFinished?: (score: number) => void;
 }) {
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  // Answers are kept locally so leaving the lesson does not lose them.
+  const [answers, setAnswers, clearAnswers] = usePersistentState<Record<string, string>>(
+    `lesson-quiz-answers:${lessonId}`,
+    {},
+  );
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
+
 
   const correct = questions.filter((q) => answers[q.id] === q.correct_answer).length;
   const score = questions.length ? Math.round((correct / questions.length) * 100) : 0;
@@ -52,9 +58,11 @@ export function LessonQuiz({
   const PASS_SCORE = 70;
 
   function retake() {
+    clearAnswers();
     setAnswers({});
     setSubmitted(false);
   }
+
 
   return (
     <div className="space-y-5">
