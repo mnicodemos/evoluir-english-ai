@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { STUDY_DAY_ACTIVITY_TYPES } from "@/lib/studyDay";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -42,6 +43,8 @@ export function FrequencyCalendar({ userId }: Props) {
       const { data } = await supabase
         .from("activities")
         .select("created_at")
+        // Same rule as the streak: only lessons and AI Talking sessions mark a day.
+        .in("activity_type", [...STUDY_DAY_ACTIVITY_TYPES])
         .gte("created_at", monthStartLocal.toISOString())
         .lt("created_at", monthEndLocal.toISOString());
       const days = new Set<string>();
