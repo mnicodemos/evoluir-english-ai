@@ -182,6 +182,9 @@ async function writeLesson(
   const quiz = (content.quiz ?? [])
     .slice(0, 10)
     .filter((q) => q.question && Array.isArray(q.options) && q.options.length > 1 && q.correct_answer);
+  if (plan.isReviewTest && quiz.length !== 10) {
+    throw new Error("The AI could not write all 10 review questions. Please try again.");
+  }
   if (quiz.length) {
     await supabase.from("quizzes").insert(
       quiz.map((q, index) => ({
