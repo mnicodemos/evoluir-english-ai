@@ -135,6 +135,10 @@ export const uiPt: Record<string, string> = {
     "33 lições em 6 unidades, incluindo uma unidade opcional de revisão com um teste de 10 questões.",
   "Optional review · does not block the Final Test":
     "Revisão opcional · não bloqueia o Teste Final",
+  "Unit 6 — Review": "Unidade 6 — Revisão",
+  "Review I": "Revisão I",
+  "Review II": "Revisão II",
+  Test: "Teste",
   "Your course plan is downloading.": "O plano do seu curso está sendo baixado.",
   "Could not build the course PDF. Please try again.":
     "Não foi possível criar o PDF do curso. Tente novamente.",
@@ -154,8 +158,15 @@ export const uiPt: Record<string, string> = {
   questions: "questões",
   "questions.": "questões.",
   Score: "Nota",
+  correct: "corretas",
+  "correct.": "corretas.",
   "or more to move up to the next level.": "ou mais para avançar ao próximo nível.",
   "Setting up your next level…": "Preparando seu próximo nível…",
+  "A new course with 30 core lessons and an optional review unit was unlocked — everything you finished before is kept.":
+    "Um novo curso com 30 lições principais e uma unidade opcional de revisão foi liberado — tudo o que você concluiu antes foi mantido.",
+  "Could not open the Final Test.": "Não foi possível abrir o Teste Final.",
+  "Your test was saved, but the level change failed. Please try again.":
+    "Seu teste foi salvo, mas não foi possível alterar o nível. Tente novamente.",
   "Lesson completed": "Lição concluída",
   "Everything you did is saved. Want to practise again? Redo the flashcards or the quiz.":
     "Tudo o que você fez foi salvo. Quer praticar novamente? Refaça os flashcards ou o quiz.",
