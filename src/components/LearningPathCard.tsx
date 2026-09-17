@@ -193,7 +193,7 @@ export function CurriculumPath() {
 }
 
 /** Dashboard card: course progress + skill scores. */
-export function PathProgressCard() {
+export function PathProgressCard({ className }: { className?: string }) {
   const path = useLearningPath();
   const { data: profile } = useProfile();
   const { data: mine } = useUserLessons();
@@ -247,7 +247,7 @@ export function PathProgressCard() {
   };
 
   return (
-    <section className="card-soft bg-card p-6 text-card-foreground" aria-labelledby="path-progress-heading">
+    <section className={`card-soft bg-card p-6 text-card-foreground ${className ?? ""}`} aria-labelledby="path-progress-heading">
       <h2 id="path-progress-heading" className="text-xl font-semibold">
         Your progress
       </h2>
