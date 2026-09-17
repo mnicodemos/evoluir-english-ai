@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-import { callGateway, parseJson } from "./ai-gateway.server";
+import { callGateway } from "./ai-gateway.server";
 import { studyToday } from "./today";
 
 export type DailyWord = {
@@ -30,6 +30,27 @@ type AiWord = {
   lesson_title?: string;
   difficulty?: string;
 };
+
+const aiWordsSchema = z.object({
+  words: z.array(z.object({
+    word: z.string().trim().min(1).max(120),
+    translation: z.string().trim().min(1).max(200),
+    meaning: z.string().trim().min(1).max(400),
+    pronunciation: z.string().max(120),
+    example: z.string().trim().min(1).max(400),
+    lesson_title: z.string().max(240),
+    difficulty: z.enum(["easy", "medium", "hard"]),
+  }).strict()).min(1).max(10),
+}).strict();
+
+function parseWords(raw: string) {
+  try {
+    const value = JSON.parse(raw.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim()) as unknown;
+    return aiWordsSchema.safeParse(value);
+  } catch {
+    return aiWordsSchema.safeParse(null);
+  }
+}
 
 /**
  * Returns today's ten new words, built by the AI from the lessons in the student's path.
@@ -102,8 +123,9 @@ export const dailyWords = createServerFn({ method: "POST" })
       { userId, operation: "vocabulary_generation" },
     );
 
-    const parsed = parseJson<{ words?: AiWord[] }>(raw, {});
-    const fresh = (parsed.words ?? [])
+    const parsed = parseWords(raw);
+    if (!parsed.success) throw new Error("The AI returned an invalid vocabulary list. Please try again.");
+    const fresh = (parsed.data.words as AiWord[])
       .filter((w) => w.word && w.translation && !usedWords.has(String(w.word).toLowerCase()))
       .slice(0, missing);
 

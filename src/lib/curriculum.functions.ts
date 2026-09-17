@@ -11,7 +11,7 @@ import {
   type CurriculumLesson,
 } from "@/lib/curriculum";
 
-import { callGateway, parseJson } from "./ai-gateway.server";
+import { callGateway } from "./ai-gateway.server";
 import { findLessonVideo, type LessonVideo } from "./lessonVideo.server";
 
 async function callContentAi(
@@ -71,6 +71,45 @@ type GeneratedLesson = {
   quiz?: { question?: string; options?: string[]; correct_answer?: string; explanation?: string }[];
 };
 
+const quizItemSchema = z.object({
+  question: z.string().trim().min(1).max(400),
+  options: z.array(z.string().trim().min(1).max(240)).length(4),
+  correct_answer: z.string().trim().min(1).max(240),
+  explanation: z.string().trim().min(1).max(400),
+}).strict().refine((item) => item.options.includes(item.correct_answer), "Correct answer must match an option");
+
+const flashcardSchema = z.object({
+  word: z.string().trim().min(1).max(120),
+  translation: z.string().max(200).default(""),
+  definition: z.string().trim().min(1).max(300),
+  pronunciation: z.string().max(120).default(""),
+  example: z.string().trim().min(1).max(400),
+  difficulty: z.enum(["easy", "medium", "hard"]),
+  prompt: z.string().trim().min(1).max(240),
+  answer: z.string().trim().min(1).max(500),
+  card_type: z.enum(["listen", "question"]),
+  listen_text: z.string().max(500),
+}).strict();
+
+const generatedLessonSchema = z.object({
+  summary: z.string().trim().min(1).max(3000),
+  transcript: z.string().trim().min(1).max(15000),
+  transcript_pt: z.string().max(15000),
+  flashcards: z.array(flashcardSchema).length(7).refine(
+    (cards) => cards.filter((card) => card.card_type === "listen").length === 3,
+    "Exactly three listening cards are required",
+  ),
+  quiz: z.array(quizItemSchema).length(10),
+}).strict();
+
+function jsonValue(raw: string): unknown {
+  try {
+    return JSON.parse(raw.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim()) as unknown;
+  } catch {
+    return null;
+  }
+}
+
 async function writeLesson(
   supabase: { from: (t: string) => any },
   userId: string,
@@ -124,10 +163,11 @@ async function writeLesson(
     true,
   );
 
-  const content = parseJson<GeneratedLesson>(raw, {});
-  if (!content.summary || !content.transcript) {
+  const parsedContent = generatedLessonSchema.safeParse(jsonValue(raw));
+  if (!parsedContent.success) {
     throw new Error("The AI could not write this lesson. Please try again.");
   }
+  const content: GeneratedLesson = parsedContent.data;
 
   const video = await pickVideo(supabase, plan);
 
@@ -263,6 +303,7 @@ const FINAL_TEST_TOTAL = 30;
 type GeneratedTest = {
   quiz?: { question?: string; options?: string[]; correct_answer?: string; explanation?: string }[];
 };
+const generatedTestSchema = z.object({ quiz: z.array(quizItemSchema).length(FINAL_TEST_TOTAL) }).strict();
 
 /**
  * Opens the Final Test of the student's level. It only unlocks when all 30
@@ -328,7 +369,9 @@ export const openFinalTest = createServerFn({ method: "POST" })
       true,
     );
 
-    const content = parseJson<GeneratedTest>(raw, {});
+    const parsedContent = generatedTestSchema.safeParse(jsonValue(raw));
+    if (!parsedContent.success) throw new Error("The AI could not write the Final Test. Please try again.");
+    const content: GeneratedTest = parsedContent.data;
     const quiz = (content.quiz ?? [])
       .filter((q) => q.question && Array.isArray(q.options) && q.options.length > 1 && q.correct_answer)
       .slice(0, FINAL_TEST_TOTAL);
