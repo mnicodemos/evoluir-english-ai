@@ -184,7 +184,7 @@ function Dashboard() {
 
             <section className="min-w-0 xl:flex xl:flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_auto_minmax(7rem,1fr)]">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_minmax(7rem,1fr)_minmax(7rem,1fr)]">
                 {trainingCards.map((c) => (
                   <Link
                     key={`link-${c.to}`}
