@@ -11,7 +11,7 @@ const requestSchema = z.object({
 
 // The Lovable audio gateway needs workspace credits; this project has its own
 // Google Gemini key connected, so speech is generated there instead.
-const GEMINI_TTS_MODELS = ["gemini-2.5-flash-preview-tts", "gemini-2.5-pro-preview-tts"] as const;
+const GEMINI_TTS_MODEL = "gemini-2.5-flash-preview-tts";
 
 // Map the app's voice picker onto Gemini's prebuilt voices.
 const GEMINI_VOICES: Record<string, string> = {
@@ -89,49 +89,41 @@ export const Route = createFileRoute("/api/speech")({
           },
         });
 
-        let lastStatus = 502;
-        let lastMessage = "Audio generation failed.";
-
-        let upstream: Response | null = null;
-        for (const model of GEMINI_TTS_MODELS) {
-          const res = await fetch(
-            `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:streamGenerateContent?alt=sse`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${apiKey}`,
-                "X-Connection-Api-Key": geminiKey,
-                "Content-Type": "application/json",
-              },
-              body,
+        const upstream = await fetch(
+          `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${GEMINI_TTS_MODEL}:streamGenerateContent?alt=sse`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "X-Connection-Api-Key": geminiKey,
+              "Content-Type": "application/json",
             },
-          );
+            body,
+          },
+        );
 
-          if (res.ok && res.body) {
-            upstream = res;
-            break;
-          }
-
-          lastStatus = res.status;
-          const raw = await res.text().catch(() => "");
+        if (!upstream.ok || !upstream.body) {
+          const raw = await upstream.text().catch(() => "");
+          let message = "Audio generation failed.";
           try {
             const parsedBody = JSON.parse(raw) as { error?: { message?: string } };
-            lastMessage = parsedBody.error?.message ?? lastMessage;
+            message = parsedBody.error?.message ?? message;
           } catch {
-            if (raw) lastMessage = raw.slice(0, 200);
+            if (raw) message = raw.slice(0, 200);
           }
-          if (res.status !== 429 && res.status < 500) break;
-        }
-
-        if (!upstream?.body) {
           return Response.json(
             {
               message:
-                lastStatus === 429
+                upstream.status === 429
                   ? "Your Google audio limit is busy. Please try again in a moment."
-                  : lastMessage,
+                  : message,
             },
-            { status: lastStatus },
+            {
+              status: upstream.status,
+              headers: upstream.status === 429
+                ? { "Retry-After": upstream.headers.get("Retry-After") ?? "60" }
+                : undefined,
+            },
           );
         }
 
