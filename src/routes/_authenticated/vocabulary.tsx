@@ -17,7 +17,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
 import { pronunciationScore, transcribeAudio } from "@/lib/transcribe";
-import { cancelVoiceRecording, startVoiceRecording, stopVoiceRecording } from "@/lib/voice-recorder";
+import {
+  cancelVoiceRecording,
+  startVoiceRecording,
+  stopVoiceRecording,
+} from "@/lib/voice-recorder";
 import { lookupWord } from "@/lib/dictionary.functions";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { useUiLang } from "@/lib/uiLang";
@@ -27,9 +31,15 @@ export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · Vocabulary builder" },
-      { name: "description", content: "Learn new English words every day and test your pronunciation out loud." },
+      {
+        name: "description",
+        content: "Learn new English words every day and test your pronunciation out loud.",
+      },
       { property: "og:title", content: "Evoluir+ English AI · Vocabulary builder" },
-      { property: "og:description", content: "Fresh English words every day, with pronunciation practice." },
+      {
+        property: "og:description",
+        content: "Fresh English words every day, with pronunciation practice.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -65,7 +75,7 @@ function highlightWord(sentence: string, word: string) {
 
 function Vocabulary() {
   const { lang } = useUiLang();
-  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
+  const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data: profile } = useProfile();
   const loadDailyWords = useServerFn(dailyWords);
   const searchDictionary = useServerFn(lookupWord);
@@ -76,7 +86,6 @@ function Vocabulary() {
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   // Reading time only counts while the student is actually working on the words.
   const minutesSpent = useTimeSpent({ manual: true });
-
 
   const { data: words, isLoading } = useQuery({
     queryKey: ["vocabulary"],
@@ -89,7 +98,6 @@ function Vocabulary() {
 
   // Starting a new lesson unlocks a new set of ten words.
   const { data: startedLessons } = useLessonRound();
-
 
   const { data: mine } = useQuery({
     queryKey: ["user-vocabulary", profile?.id],
@@ -111,7 +119,8 @@ function Vocabulary() {
     enabled: !!profile,
     staleTime: 1000 * 60 * 30,
     retry: false,
-    queryFn: async () => (await loadDailyWords({ data: { level: profile?.level ?? "intermediate" } })) as Word[],
+    queryFn: async () =>
+      (await loadDailyWords({ data: { level: profile?.level ?? "intermediate" } })) as Word[],
   });
 
   const byWord = new Map((mine ?? []).map((m) => [m.word_id, m]));
@@ -171,7 +180,7 @@ function Vocabulary() {
     setPlayingKey(key);
     minutesSpent.start();
     try {
-      await speakEnglish(word);
+      await speakEnglish(word, { cache: "persistent" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not play this pronunciation.");
     } finally {
@@ -179,7 +188,6 @@ function Vocabulary() {
       minutesSpent.stop();
     }
   }
-
 
   async function togglePronunciation(word: Word) {
     if (checkingId) return;
@@ -228,7 +236,11 @@ function Vocabulary() {
       setRecordingId(null);
       minutesSpent.stop();
       cancelVoiceRecording();
-      toast.error(error instanceof Error ? error.message : "Microphone access is needed to test pronunciation.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Microphone access is needed to test pronunciation.",
+      );
     }
   }
 
@@ -285,13 +297,14 @@ function Vocabulary() {
     staleTime: 1000 * 60 * 60,
   });
 
-
   // Ten new words each day, written by the AI from the lessons in the learning path.
   const today = (daily ?? []).filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) < 75);
 
   function List({ items, showActions = true }: { items: Word[]; showActions?: boolean }) {
     if (items.length === 0)
-      return <p className="mt-6 text-sm text-muted-foreground">Nothing here yet — keep practicing.</p>;
+      return (
+        <p className="mt-6 text-sm text-muted-foreground">Nothing here yet — keep practicing.</p>
+      );
     return (
       <div className="mt-5 grid gap-4">
         {items.map((w) => {
@@ -313,17 +326,21 @@ function Vocabulary() {
                     size="icon"
                     onClick={() => speak(`daily-${w.id}`, w.word)}
                     aria-label="Listen"
-                    className={playingKey === `daily-${w.id}` ? "bg-success text-success-foreground hover:bg-success/90" : ""}
+                    className={
+                      playingKey === `daily-${w.id}`
+                        ? "bg-success text-success-foreground hover:bg-success/90"
+                        : ""
+                    }
                   >
                     <Volume2 className="size-4" />
                   </Button>
-
-
                 </div>
               </div>
               <p className="mt-3 text-sm">{w.meaning}</p>
               <p className="mt-1 text-sm text-muted-foreground">{w.pronunciation}</p>
-              <p className="mt-3 rounded-lg bg-secondary/70 px-3 py-2 text-sm italic">"{w.example}"</p>
+              <p className="mt-3 rounded-lg bg-secondary/70 px-3 py-2 text-sm italic">
+                "{w.example}"
+              </p>
               {showActions && (
                 <div className="mt-4 flex gap-2">
                   <Button
@@ -340,7 +357,9 @@ function Vocabulary() {
                     variant={isRecording ? "destructive" : "outline"}
                     disabled={isChecking || Boolean(checkingId)}
                     onClick={() => togglePronunciation(w)}
-                    aria-label={isRecording ? "Stop and check pronunciation" : "Test your pronunciation"}
+                    aria-label={
+                      isRecording ? "Stop and check pronunciation" : "Test your pronunciation"
+                    }
                     title={isRecording ? "Stop and check pronunciation" : "Test your pronunciation"}
                   >
                     {isChecking ? (
@@ -364,15 +383,20 @@ function Vocabulary() {
     <AppShell>
       <h1 className="text-3xl font-bold">Vocabulary Builder</h1>
       <p className="mt-2 text-muted-foreground">
-        Ten new words every time you start a new lesson, chosen from your learning path, with meaning, examples and a
-        microphone to test your pronunciation.
+        Ten new words every time you start a new lesson, chosen from your learning path, with
+        meaning, examples and a microphone to test your pronunciation.
       </p>
       {(daily?.length ?? 0) > 0 && (
-        <Button variant="ghost" size="sm" className="mt-2 -ml-2" disabled={busy === "redo"} onClick={redoTodayWords}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mt-2 -ml-2"
+          disabled={busy === "redo"}
+          onClick={redoTodayWords}
+        >
           <RotateCcw className="mr-2 size-4" /> Redo today's words
         </Button>
       )}
-
 
       <label htmlFor="vocab-search" className="mt-6 block text-sm font-medium text-foreground">
         Search in English:
@@ -420,12 +444,14 @@ function Vocabulary() {
                   size="icon"
                   onClick={() => speak(`dict-${entry.word}`, entry.word)}
                   aria-label="Listen"
-                  className={playingKey === `dict-${entry.word}` ? "bg-success text-success-foreground hover:bg-success/90" : ""}
+                  className={
+                    playingKey === `dict-${entry.word}`
+                      ? "bg-success text-success-foreground hover:bg-success/90"
+                      : ""
+                  }
                 >
                   <Volume2 className="size-5" />
                 </Button>
-
-
               </div>
 
               {(entry.ipaUs || entry.ipaUk) && (
@@ -485,7 +511,6 @@ function Vocabulary() {
             </article>
           )}
         </section>
-
       ) : isLoading ? (
         <div className="mt-7 space-y-4">
           <Skeleton className="h-40 w-full" />
@@ -511,7 +536,9 @@ function Vocabulary() {
               </div>
             ) : dailyError ? (
               <p className="mt-6 text-sm text-muted-foreground">
-                {dailyError instanceof Error ? dailyError.message : "Today's words are not ready yet."}
+                {dailyError instanceof Error
+                  ? dailyError.message
+                  : "Today's words are not ready yet."}
               </p>
             ) : (
               <List items={today} />

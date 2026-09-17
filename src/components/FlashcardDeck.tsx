@@ -31,12 +31,15 @@ export function FlashcardDeck({
   onFinished?: () => void;
   onRated?: () => void;
 }) {
-  const [saved, setSaved, clearSaved] = usePersistentState(storageKey ?? null, { index: 0, done: false });
+  const [saved, setSaved, clearSaved] = usePersistentState(storageKey ?? null, {
+    index: 0,
+    done: false,
+  });
   const [flipped, setFlipped] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null);
   const { lang } = useUiLang();
-  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
+  const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
 
   const index = Math.min(saved.index, Math.max(0, cards.length - 1));
   const card = cards[index];
@@ -45,7 +48,7 @@ export function FlashcardDeck({
     if (isPlaying) return;
     setIsPlaying(true);
     try {
-      await speakEnglish(text);
+      await speakEnglish(text, { cache: "persistent" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("Could not play this audio."));
     } finally {
@@ -57,13 +60,23 @@ export function FlashcardDeck({
     if (!card || feedback) return;
     setFeedback(correct ? "correct" : "incorrect");
     if (userId) {
-      await reviewFlashcard(
-        userId,
-        card.id,
-        correct ? "easy" : "hard",
-        states.find((s) => s.flashcard_id === card.id),
-      );
-      onRated?.();
+      try {
+        await reviewFlashcard(
+          userId,
+          card.id,
+          correct ? "easy" : "hard",
+          states.find((s) => s.flashcard_id === card.id),
+        );
+        onRated?.();
+      } catch (error) {
+        setFeedback(null);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : t("Your answer is safe, but progress could not be saved. Try again."),
+        );
+        return;
+      }
     }
     await new Promise((resolve) => window.setTimeout(resolve, 500));
     setFlipped(false);
@@ -99,10 +112,11 @@ export function FlashcardDeck({
     );
   }
 
-
   const prompt = card.prompt?.trim() || card.word;
-  const answerText = card.answer?.trim() || card.definition?.trim() || card.example?.trim() || card.word;
-  const listenText = card.listen_text?.trim() || (card.card_type === "listen" ? card.example?.trim() : "");
+  const answerText =
+    card.answer?.trim() || card.definition?.trim() || card.example?.trim() || card.word;
+  const listenText =
+    card.listen_text?.trim() || (card.card_type === "listen" ? card.example?.trim() : "");
   const isListenCard = card.card_type === "listen";
 
   return (
@@ -119,7 +133,6 @@ export function FlashcardDeck({
         )}
       </div>
 
-
       <div className="relative mx-auto flex min-h-72 w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-primary/30 bg-primary/10 p-5 shadow-[var(--shadow-soft)] sm:min-h-96 sm:p-8">
         {!flipped ? (
           <button
@@ -132,8 +145,12 @@ export function FlashcardDeck({
               {isListenCard ? "Listen card" : "Question card"}
             </span>
 
-            <p className="max-w-xs text-xl font-black uppercase leading-tight sm:text-2xl">{prompt}</p>
-            <p className="text-xs font-medium uppercase text-primary-foreground/75">Tap to see the answer</p>
+            <p className="max-w-xs text-xl font-black uppercase leading-tight sm:text-2xl">
+              {prompt}
+            </p>
+            <p className="text-xs font-medium uppercase text-primary-foreground/75">
+              Tap to see the answer
+            </p>
           </button>
         ) : (
           <div
@@ -144,16 +161,18 @@ export function FlashcardDeck({
               !feedback && "border-primary-foreground/25",
             )}
           >
-          <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-primary-foreground/15 px-2 py-1 text-[0.65rem] font-bold uppercase text-primary-foreground">
-            {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
-            {isListenCard ? "Listen card" : "Question card"}
-          </span>
+            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-primary-foreground/15 px-2 py-1 text-[0.65rem] font-bold uppercase text-primary-foreground">
+              {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
+              {isListenCard ? "Listen card" : "Question card"}
+            </span>
 
             <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl">{answerText}</p>
             {card.example && card.example !== answerText && (
               <p className="max-w-sm text-sm italic text-primary-foreground/80">“{card.example}”</p>
             )}
-            {card.pronunciation && <p className="text-xs text-primary-foreground/75">{card.pronunciation}</p>}
+            {card.pronunciation && (
+              <p className="text-xs text-primary-foreground/75">{card.pronunciation}</p>
+            )}
             {isListenCard && listenText && (
               <Button
                 size="sm"
@@ -165,11 +184,16 @@ export function FlashcardDeck({
                 <Volume2 className="size-4" /> Listen
               </Button>
             )}
-            <Button variant="ghost" size="sm" onClick={() => setFlipped(false)} disabled={feedback !== null}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setFlipped(false)}
+              disabled={feedback !== null}
+            >
               See question
             </Button>
           </div>
-          )}
+        )}
       </div>
 
       {flipped && (

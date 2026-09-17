@@ -6,6 +6,13 @@ const BROWSER_VOICE_PROFILE = {
   preferredNames: ["samantha", "victoria", "zira", "female"],
 };
 
+const SPEECH_CACHE_NAME = "evoluir-static-speech-v1";
+const SPEECH_FORMAT_VERSION = "pcm24-kore-095-v1";
+
+export type SpeechOptions = {
+  cache?: "memory" | "persistent";
+};
+
 let audioContext: AudioContext | null = null;
 const activeSources = new Set<AudioBufferSourceNode>();
 let activeUtterance: SpeechSynthesisUtterance | null = null;
@@ -14,6 +21,60 @@ let aiSpeechUnavailableUntil = 0;
 
 const audioCache = new Map<string, Float32Array>();
 const pendingAudio = new Map<string, Promise<Float32Array>>();
+
+function pcmBytesToSamples(pcm: Uint8Array): Float32Array {
+  const sampleCount = Math.floor(pcm.byteLength / 2);
+  const view = new DataView(pcm.buffer, pcm.byteOffset, sampleCount * 2);
+  const samples = new Float32Array(sampleCount);
+  for (let index = 0; index < sampleCount; index += 1) {
+    samples[index] = view.getInt16(index * 2, true) / 32768;
+  }
+  return samples;
+}
+
+async function speechCacheRequest(value: string) {
+  const input = new TextEncoder().encode(
+    `${SPEECH_FORMAT_VERSION}:${value.trim().toLocaleLowerCase("en-US")}`,
+  );
+  const digest = await crypto.subtle.digest("SHA-256", input);
+  const hash = Array.from(new Uint8Array(digest), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+  return new Request(`${window.location.origin}/__speech-cache__/${hash}`);
+}
+
+async function readPersistentSpeech(value: string): Promise<Float32Array | null> {
+  if (!("caches" in window) || !crypto.subtle) return null;
+  try {
+    const cache = await caches.open(SPEECH_CACHE_NAME);
+    const response = await cache.match(await speechCacheRequest(value));
+    return response ? pcmBytesToSamples(new Uint8Array(await response.arrayBuffer())) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writePersistentSpeech(value: string, chunks: Uint8Array[]) {
+  if (!("caches" in window) || !crypto.subtle) return;
+  try {
+    const blob = new Blob(
+      chunks.map((chunk) => chunk.slice()),
+      { type: "audio/L16;rate=24000;channels=1" },
+    );
+    const cache = await caches.open(SPEECH_CACHE_NAME);
+    await cache.put(
+      await speechCacheRequest(value),
+      new Response(blob, {
+        headers: {
+          "Content-Type": blob.type,
+          "Cache-Control": "public, max-age=31536000, immutable",
+        },
+      }),
+    );
+  } catch {
+    // Private browsing and storage quotas can disable Cache API writes.
+  }
+}
 
 function decodeBase64(value: string): Uint8Array {
   const binary = window.atob(value);
@@ -52,25 +113,29 @@ function mergePcmChunks(chunks: Uint8Array[]): Float32Array {
     offset += chunk.length;
   }
 
-  const sampleCount = Math.floor(pcm.byteLength / 2);
-  const view = new DataView(pcm.buffer, pcm.byteOffset, sampleCount * 2);
-  const samples = new Float32Array(sampleCount);
-  for (let index = 0; index < sampleCount; index += 1) {
-    samples[index] = view.getInt16(index * 2, true) / 32768;
-  }
-  return samples;
+  return pcmBytesToSamples(pcm);
 }
 
 async function requestSpeech(
   value: string,
   onChunk?: (chunk: Uint8Array) => void,
+  cacheMode: SpeechOptions["cache"] = "memory",
 ): Promise<Float32Array> {
-  if (Date.now() < aiSpeechUnavailableUntil) {
-    throw new Error("AI audio is temporarily busy.");
-  }
   const cacheKey = value.toLocaleLowerCase("en-US");
   const cached = audioCache.get(cacheKey);
   if (cached) return cached;
+
+  if (cacheMode === "persistent") {
+    const persisted = await readPersistentSpeech(value);
+    if (persisted) {
+      audioCache.set(cacheKey, persisted);
+      return persisted;
+    }
+  }
+
+  if (Date.now() < aiSpeechUnavailableUntil) {
+    throw new Error("AI audio is temporarily busy.");
+  }
 
   const existing = pendingAudio.get(cacheKey);
   if (existing) return existing;
@@ -86,15 +151,13 @@ async function requestSpeech(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: value }),
+      body: JSON.stringify({ text: value, cacheable: cacheMode === "persistent" }),
     });
     if (!response.ok || !response.body) {
-      const body = await response.json().catch(() => null) as { message?: string } | null;
+      const body = (await response.json().catch(() => null)) as { message?: string } | null;
       if (response.status === 429 || response.status >= 500) {
         const retryAfter = Number(response.headers.get("Retry-After"));
-        const delayMs = Number.isFinite(retryAfter) && retryAfter > 0
-          ? retryAfter * 1000
-          : 60_000;
+        const delayMs = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 60_000;
         aiSpeechUnavailableUntil = Date.now() + delayMs;
       }
       throw new Error(body?.message ?? `Audio failed (${response.status}).`);
@@ -117,7 +180,8 @@ async function requestSpeech(
             chunks.push(decoded);
             onChunk?.(decoded);
           }
-          if (payload.type === "speech.audio.error") streamError = payload.message ?? "Audio generation failed.";
+          if (payload.type === "speech.audio.error")
+            streamError = payload.message ?? "Audio generation failed.";
         } catch {
           // Ignore keep-alives and non-audio events.
         }
@@ -138,6 +202,7 @@ async function requestSpeech(
 
     const samples = mergePcmChunks(chunks);
     audioCache.set(cacheKey, samples);
+    if (cacheMode === "persistent") await writePersistentSpeech(value, chunks);
     return samples;
   })();
 
@@ -160,10 +225,14 @@ async function speakWithBrowser(value: string): Promise<void> {
   if (voices.length === 0) {
     await new Promise<void>((resolve) => {
       const timeout = window.setTimeout(resolve, 500);
-      synth.addEventListener("voiceschanged", () => {
-        window.clearTimeout(timeout);
-        resolve();
-      }, { once: true });
+      synth.addEventListener(
+        "voiceschanged",
+        () => {
+          window.clearTimeout(timeout);
+          resolve();
+        },
+        { once: true },
+      );
     });
     voices = synth.getVoices();
   }
@@ -175,7 +244,9 @@ async function speakWithBrowser(value: string): Promise<void> {
     utterance.lang = "en-US";
     utterance.pitch = profile.pitch;
     utterance.rate = profile.rate;
-    const englishVoices = voices.filter((candidate) => candidate.lang?.toLowerCase().startsWith("en"));
+    const englishVoices = voices.filter((candidate) =>
+      candidate.lang?.toLowerCase().startsWith("en"),
+    );
     if (englishVoices.length > 0) {
       const preferred = englishVoices.find((candidate) => {
         const name = candidate.name.toLowerCase();
@@ -228,7 +299,7 @@ async function speakWithBrowser(value: string): Promise<void> {
  * Streams clear English pronunciation from the app's authenticated audio route,
  * falling back to the built-in browser voice when the service is unavailable.
  */
-export async function speakEnglish(text: string): Promise<void> {
+export async function speakEnglish(text: string, options: SpeechOptions = {}): Promise<void> {
   const value = text?.trim();
   if (!value || typeof window === "undefined") throw new Error("Choose a word to hear.");
 
@@ -283,7 +354,7 @@ export async function speakEnglish(text: string): Promise<void> {
   };
 
   try {
-    samples = await requestSpeech(value, scheduleChunk);
+    samples = await requestSpeech(value, scheduleChunk, options.cache ?? "memory");
   } catch {
     if (requestId !== playRequest) return;
     if (streamed) return;
