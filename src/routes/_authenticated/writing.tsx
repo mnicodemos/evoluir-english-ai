@@ -9,7 +9,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { useLessons } from "@/hooks/useLearning";
+import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { parseWritingFeedback, writingCorrectionMessages, type WritingFeedback } from "@/lib/ai-prompts";
@@ -155,9 +155,9 @@ function Writing() {
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
   
-  const { data: lessons } = useLessons();
-  // A fresh set of tasks every day (and whenever new lessons are created).
-  const signature = `${todayKey()}-${lessons?.length ?? 0}`;
+  const { data: startedLessons } = useLessonRound();
+  // A fresh set of tasks every day, and every time the student starts a new lesson.
+  const signature = `${todayKey()}-${startedLessons ?? 0}`;
   const prompts = useMemo(() => roundPrompts(signature), [signature]);
   const [done, setDone] = useState<string[]>([]);
   const [prompt, setPrompt] = useState("");
@@ -178,6 +178,15 @@ function Writing() {
 
   function selectPrompt(p: string) {
     setPrompt(p);
+    setText("");
+    setResult(null);
+  }
+
+  /** Lets the student redo every task already checked today. */
+  function redoToday() {
+    setDone([]);
+    saveDone(signature, []);
+    setPrompt(prompts[0] ?? "");
     setText("");
     setResult(null);
   }
@@ -246,8 +255,15 @@ function Writing() {
     <AppShell>
       <h1 className="text-3xl font-bold">Writing AI Corrector</h1>
       <p className="mt-2 text-muted-foreground">
-        One task for Everyday, Professional and Travel English. New tasks every day — nothing repeats.
+        One task for Everyday, Professional and Travel English. New tasks every day and every time you start a new
+        lesson — nothing repeats.
       </p>
+      {done.length > 0 && (
+        <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoToday}>
+          Redo today's tasks
+        </Button>
+      )}
+
 
       <div className="mt-7 grid gap-3 sm:grid-cols-3">
         {prompts.map((p, index) => {
@@ -290,7 +306,7 @@ function Writing() {
             <CheckCircle2 className="mx-auto size-8 text-green-600" />
             <p className="mt-2 font-semibold">All 3 writing tasks completed!</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              New writing tasks arrive tomorrow, or when you create new lessons in the Learning Center.
+              New writing tasks arrive tomorrow, or as soon as you start a new lesson in the Learning Center.
             </p>
             <Button variant="outline" className="mt-4" onClick={redoPrompt}>
               Redo this task to improve your score

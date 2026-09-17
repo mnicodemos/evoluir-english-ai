@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Mic, Search, Square, Volume2, X } from "lucide-react";
+import { Check, Loader2, Mic, RotateCcw, Search, Square, Volume2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,16 +82,9 @@ function Vocabulary() {
     },
   });
 
-  // Counting the student's lessons: a new lesson unlocks a new set of ten words.
-  const { data: myLessons } = useQuery({
-    queryKey: ["my-lesson-count", profile?.id],
-    enabled: !!profile,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("lessons").select("id").eq("created_by", profile!.id);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  // Starting a new lesson unlocks a new set of ten words.
+  const { data: startedLessons } = useLessonRound();
+
 
   const { data: mine } = useQuery({
     queryKey: ["user-vocabulary", profile?.id],
@@ -107,8 +101,8 @@ function Vocabulary() {
     isLoading: dailyLoading,
     error: dailyError,
   } = useQuery({
-    // A new lesson means a new set of ten words.
-    queryKey: ["daily-words", profile?.id, studyToday(), myLessons?.length ?? 0],
+    // Starting a new lesson means a new set of ten words.
+    queryKey: ["daily-words", profile?.id, studyToday(), startedLessons ?? 0],
     enabled: !!profile,
     staleTime: 1000 * 60 * 30,
     retry: false,
@@ -142,6 +136,28 @@ function Vocabulary() {
       toast.error(err instanceof Error ? err.message : "Could not save this word");
     } finally {
       minutesSpent.stop();
+      setBusy(null);
+    }
+  }
+
+  /** Brings today's words back to the Today tab so the student can practise them again. */
+  async function redoTodayWords() {
+    if (!profile) return;
+    const ids = (daily ?? []).map((w) => w.id);
+    if (!ids.length) return;
+    setBusy("redo");
+    try {
+      const { error } = await supabase
+        .from("user_vocabulary")
+        .update({ mastery_level: 0 })
+        .eq("user_id", profile.id)
+        .in("word_id", ids);
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
+      toast.success("Today's words are back — practise them again.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not reset today's words");
+    } finally {
       setBusy(null);
     }
   }
@@ -342,9 +358,15 @@ function Vocabulary() {
     <AppShell>
       <h1 className="text-3xl font-bold">Vocabulary Builder</h1>
       <p className="mt-2 text-muted-foreground">
-        Ten new words every day, chosen from the lessons in your learning path, with meaning, examples and a
+        Ten new words every time you start a new lesson, chosen from your learning path, with meaning, examples and a
         microphone to test your pronunciation.
       </p>
+      {(daily?.length ?? 0) > 0 && (
+        <Button variant="ghost" size="sm" className="mt-2 -ml-2" disabled={busy === "redo"} onClick={redoTodayWords}>
+          <RotateCcw className="mr-2 size-4" /> Redo today's words
+        </Button>
+      )}
+
 
       <label htmlFor="vocab-search" className="mt-6 block text-sm font-medium text-foreground">
         Search in English:

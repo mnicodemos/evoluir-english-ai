@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
+import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { speakEnglish } from "@/lib/speech";
@@ -224,8 +225,9 @@ function ListeningPage() {
   }, [index]);
 
 
-  // A new round of sentences is only unlocked when new lessons are created.
-  const lessonCount = lessons?.length ?? 0;
+  // A new round of sentences is unlocked every time the student starts a new lesson.
+  const { data: startedLessons } = useLessonRound();
+  const lessonCount = startedLessons ?? 0;
 
   const sentences = useMemo(() => {
     const fromLessons = lessonSentences(lessons ?? []);
@@ -402,9 +404,12 @@ function ListeningPage() {
           <p className="text-sm text-muted-foreground">Listening Lab</p>
           <h1 className="text-2xl font-semibold">Train your ear with real English</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the activity and unlock
-            a new set when new lessons are created.
+            Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the activity — a new set
+            arrives every time you start a new lesson in the Learning Center.
           </p>
+          <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
+            <RotateCcw className="mr-2 size-4" /> Redo today's activity
+          </Button>
         </header>
 
         {trackDone ? (
@@ -420,7 +425,7 @@ function ListeningPage() {
               <CheckCircle2 className="mx-auto size-8 text-green-600" />
               <p className="mt-2 font-semibold">All 3 listening tasks completed!</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                New listening tasks arrive when you create new lessons in the Learning Center.
+                New listening tasks arrive as soon as you start a new lesson in the Learning Center.
               </p>
               <Button variant="outline" className="mt-4" onClick={redoActivity}>
                 <RotateCcw className="mr-2 size-4" /> Redo activity to improve your score
