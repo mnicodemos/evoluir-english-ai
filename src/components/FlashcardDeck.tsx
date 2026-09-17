@@ -31,8 +31,21 @@ export function FlashcardDeck({
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [done, setDone] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const card = cards[index];
+
+  async function speak(word: string) {
+    if (isPlaying) return;
+    setIsPlaying(true);
+    try {
+      await speakEnglish(word);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not play this pronunciation.");
+    } finally {
+      setIsPlaying(false);
+    }
+  }
 
   async function rate(rating: "easy" | "medium" | "hard") {
     if (!card) return;
