@@ -86,7 +86,10 @@ function mergePcmChunks(chunks: Uint8Array[]): Float32Array {
   return samples;
 }
 
-async function requestSpeech(value: string): Promise<Float32Array> {
+async function requestSpeech(
+  value: string,
+  onChunk?: (chunk: Uint8Array) => void,
+): Promise<Float32Array> {
   const voice = getSpeechVoice();
   const cacheKey = `${voice}:${value.toLocaleLowerCase("en-US")}`;
   const cached = audioCache.get(cacheKey);
@@ -115,14 +118,22 @@ async function requestSpeech(value: string): Promise<Float32Array> {
 
     let buffer = "";
     const chunks: Uint8Array[] = [];
+    let streamError = "";
     const consumeEvent = (event: string) => {
       for (const line of event.split(/\r?\n/)) {
         if (!line.startsWith("data:")) continue;
         try {
-          const payload = JSON.parse(line.slice(5).trim()) as { type?: string; audio?: string };
+          const payload = JSON.parse(line.slice(5).trim()) as {
+            type?: string;
+            audio?: string;
+            message?: string;
+          };
           if (payload.type === "speech.audio.delta" && payload.audio) {
-            chunks.push(decodeBase64(payload.audio));
+            const decoded = decodeBase64(payload.audio);
+            chunks.push(decoded);
+            onChunk?.(decoded);
           }
+          if (payload.type === "speech.audio.error") streamError = payload.message ?? "Audio generation failed.";
         } catch {
           // Ignore keep-alives and non-audio events.
         }
@@ -139,6 +150,7 @@ async function requestSpeech(value: string): Promise<Float32Array> {
       events.forEach(consumeEvent);
     }
     if (buffer.trim()) consumeEvent(buffer);
+    if (streamError) throw new Error(streamError);
 
     const samples = mergePcmChunks(chunks);
     audioCache.set(cacheKey, samples);
@@ -233,14 +245,68 @@ export async function speakEnglish(text: string): Promise<void> {
   stopCurrentAudio();
 
   let samples: Float32Array;
+  let streamed = false;
+  let playhead = context.currentTime + 0.05;
+  let lastSource: AudioBufferSourceNode | null = null;
+  let pendingByte: number | null = null;
+
+  const scheduleChunk = (incoming: Uint8Array) => {
+    if (requestId !== playRequest) return;
+    let bytes = incoming;
+    if (pendingByte !== null) {
+      const joined = new Uint8Array(incoming.length + 1);
+      joined[0] = pendingByte;
+      joined.set(incoming, 1);
+      bytes = joined;
+      pendingByte = null;
+    }
+    if (bytes.length % 2 !== 0) {
+      pendingByte = bytes[bytes.length - 1] ?? null;
+      bytes = bytes.slice(0, -1);
+    }
+    if (bytes.length === 0) return;
+
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const floats = new Float32Array(bytes.byteLength / 2);
+    for (let index = 0; index < floats.length; index += 1) {
+      floats[index] = view.getInt16(index * 2, true) / 32768;
+    }
+    const decoded = context.createBuffer(1, floats.length, 24000);
+    decoded.copyToChannel(floats, 0);
+    const source = context.createBufferSource();
+    const gain = context.createGain();
+    gain.gain.value = 1.15;
+    source.buffer = decoded;
+    source.connect(gain);
+    gain.connect(context.destination);
+    playhead = Math.max(playhead, context.currentTime + 0.02);
+    source.start(playhead);
+    playhead += decoded.duration;
+    activeSource = source;
+    lastSource = source;
+    streamed = true;
+  };
+
   try {
-    samples = await requestSpeech(value);
+    samples = await requestSpeech(value, scheduleChunk);
   } catch {
     if (requestId !== playRequest) return;
+    if (streamed) return;
     return speakWithBrowser(value);
   }
   if (requestId !== playRequest) return;
   if (context.state === "suspended") await context.resume();
+
+  if (streamed && lastSource) {
+    await new Promise<void>((resolve) => {
+      const finalSource = lastSource;
+      finalSource.onended = () => {
+        if (activeSource === finalSource) activeSource = null;
+        resolve();
+      };
+    });
+    return;
+  }
 
   const decoded = context.createBuffer(1, samples.length, 24000);
   decoded.getChannelData(0).set(samples);
