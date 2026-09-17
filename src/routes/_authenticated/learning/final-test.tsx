@@ -93,7 +93,7 @@ function FinalTestPage() {
       if (error) throw error;
       queryClient.invalidateQueries();
       toast.success(`You passed with ${score}%! Your level is now ${upcoming.label}.`, {
-        description: "A new course of 30 lessons was unlocked — everything you finished before is kept.",
+        description: "A new course with 30 core lessons and an optional review unit was unlocked — everything you finished before is kept.",
         duration: 9000,
       });
       navigate({ to: "/learning" });
@@ -127,7 +127,7 @@ function FinalTestPage() {
 
         {!path.finalTest.unlocked ? (
           <div className="card-soft p-6 text-sm text-muted-foreground">
-            <span>Finish all 30 lessons of this level to unlock the Final Test.</span>
+            <span>Finish the 30 core lessons in Units 1–5 to unlock the Final Test. Unit 6 is optional.</span>
           </div>
         ) : !id ? (
           <div className="card-soft space-y-4 p-6">

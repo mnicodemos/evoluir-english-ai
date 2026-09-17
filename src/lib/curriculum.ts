@@ -1,5 +1,6 @@
 /**
- * Fixed CEFR curriculum: every level has 5 units with 6 lessons each (30 lessons).
+ * Fixed CEFR curriculum: every level has 30 core lessons in 5 units, followed
+ * by an optional 3-lesson review unit.
  * The lessons rotate through the four skills the student needs to master the level:
  * listening, reading, talking and writing, plus vocabulary and grammar consolidation.
  * The content of each lesson is written by the AI the first time the student opens it.
@@ -9,8 +10,11 @@ export const SKILL_ORDER = ["listening", "reading", "talking", "writing", "vocab
 export type Skill = (typeof SKILL_ORDER)[number];
 
 export const LESSONS_PER_UNIT = 6;
-export const UNITS_PER_LEVEL = 5;
-export const LESSONS_PER_LEVEL = LESSONS_PER_UNIT * UNITS_PER_LEVEL;
+export const CORE_UNITS_PER_LEVEL = 5;
+export const CORE_LESSONS_PER_LEVEL = LESSONS_PER_UNIT * CORE_UNITS_PER_LEVEL;
+export const REVIEW_LESSONS_PER_LEVEL = 3;
+export const UNITS_PER_LEVEL = CORE_UNITS_PER_LEVEL + 1;
+export const LESSONS_PER_LEVEL = CORE_LESSONS_PER_LEVEL + REVIEW_LESSONS_PER_LEVEL;
 
 type UnitBlueprint = {
   title: string;
@@ -30,6 +34,8 @@ export type CurriculumLesson = {
   objective: string;
   skill: Skill;
   category: string;
+  reviewUnits: number[];
+  isReviewTest: boolean;
 };
 
 const CURRICULUM: Record<string, UnitBlueprint[]> = {
@@ -427,26 +433,51 @@ export function curriculumKey(level: string, unit: number, position: number) {
   return `${normalizeLevel(level)}-u${unit}-l${position}`;
 }
 
-/** All 30 lessons of a level, in study order. */
+function reviewUnit(coreUnits: UnitBlueprint[]): UnitBlueprint {
+  const unitName = (index: number) => coreUnits[index]?.title.replace(/^Unit \d+ — /, "") ?? `Unit ${index + 1}`;
+  return {
+    title: "Unit 6 — Review",
+    category: "review",
+    lessons: [
+      ["Review I", `Review and summarize Units 1 and 2: ${unitName(0)} and ${unitName(1)}.`],
+      ["Review II", `Review and summarize Units 3, 4 and 5: ${unitName(2)}, ${unitName(3)} and ${unitName(4)}.`],
+      ["Test", "Answer 10 questions reviewing the content studied across Units 1 to 5."],
+    ],
+  };
+}
+
+/** All 30 core lessons plus the 3 optional review activities, in study order. */
 export function getCurriculum(level: string | null | undefined): CurriculumLesson[] {
   const code = normalizeLevel(level);
-  const units = CURRICULUM[code]!;
+  const coreUnits = CURRICULUM[code]!;
+  const units = [...coreUnits, reviewUnit(coreUnits)];
   const out: CurriculumLesson[] = [];
+  let index = 0;
 
   units.forEach((unit, unitIndex) => {
     unit.lessons.forEach(([title, objective], lessonIndex) => {
+      const isReview = unitIndex === CORE_UNITS_PER_LEVEL;
       out.push({
         key: curriculumKey(code, unitIndex + 1, lessonIndex + 1),
         level: code,
         unit: unitIndex + 1,
         unitTitle: unit.title,
         position: lessonIndex + 1,
-        index: unitIndex * LESSONS_PER_UNIT + lessonIndex,
+        index,
         title,
         objective,
-        skill: SKILL_ORDER[lessonIndex]!,
+        skill: isReview ? (lessonIndex === 2 ? "grammar" : "reading") : SKILL_ORDER[lessonIndex]!,
         category: unit.category,
+        reviewUnits: isReview
+          ? lessonIndex === 0
+            ? [1, 2]
+            : lessonIndex === 1
+              ? [3, 4, 5]
+              : [1, 2, 3, 4, 5]
+          : [],
+        isReviewTest: isReview && lessonIndex === 2,
       });
+      index += 1;
     });
   });
 
@@ -467,6 +498,11 @@ export function getUnits(level: string | null | undefined) {
     title: lessons.find((l) => l.unit === i + 1)!.unitTitle,
     lessons: lessons.filter((l) => l.unit === i + 1),
   }));
+}
+
+/** The original Units 1-5, which alone determine Final Test availability. */
+export function getCoreCurriculum(level: string | null | undefined) {
+  return getCurriculum(level).filter((lesson) => lesson.unit <= CORE_UNITS_PER_LEVEL);
 }
 
 /** Key of the Final Test that closes a level (30 questions, 70% to move up). */

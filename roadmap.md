@@ -12,3 +12,4 @@
 - [x] Alterar placeholder do campo de busca para "Enter text or word..." com tradução
 - [x] Adicionar label acima do campo: "Search in English:"
 - [x] Ampliar e reorganizar todas as telas no desktop em formato paisagem
+- [x] Adicionar Unit 6 Review a todos os níveis, com Review I, Review II e teste opcional de 10 questões

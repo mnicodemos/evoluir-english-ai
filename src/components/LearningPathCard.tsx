@@ -20,7 +20,7 @@ function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Something went wrong. Please try again.";
 }
 
-/** The full 30-lesson path of the current level, split into 5 units. */
+/** The 30-lesson core path plus its optional 3-lesson review unit. */
 export function CurriculumPath() {
   const path = useLearningPath();
   const open = useOpenPathLesson();
@@ -82,7 +82,7 @@ export function CurriculumPath() {
               <span>{findLevel(path.level).label}</span>
             </h2>
             <p className="text-sm text-muted-foreground">
-              <span>30 lessons in 5 units covering talking, writing, reading and listening for this level.</span>
+              <span>33 lessons in 6 units, including an optional review unit with a 10-question test.</span>
             </p>
           </div>
           <p className="text-sm font-semibold">
@@ -113,7 +113,10 @@ export function CurriculumPath() {
         {path.units.map((unit) => (
           <section key={unit.unit} className="card-soft p-5" aria-label={unit.title}>
             <div className="flex items-center justify-between gap-3">
+            <div>
               <h3 className="font-semibold">{unit.title}</h3>
+              {unit.unit === 6 && <p className="text-xs text-muted-foreground">Optional review · does not block the Final Test</p>}
+            </div>
               <span className="text-xs text-muted-foreground">
                 {unit.completed}/{unit.lessons.length}
               </span>
@@ -183,7 +186,7 @@ export function CurriculumPath() {
             </>
           ) : (
             <>
-              <Lock className="size-4" /> <span>Finish all 30 lessons to unlock</span>
+              <Lock className="size-4" /> <span>Finish the 30 lessons in Units 1–5 to unlock</span>
             </>
           )}
         </Button>
