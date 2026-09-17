@@ -140,6 +140,28 @@ function Vocabulary() {
     }
   }
 
+  /** Brings today's words back to the Today tab so the student can practise them again. */
+  async function redoTodayWords() {
+    if (!profile) return;
+    const ids = (daily ?? []).map((w) => w.id);
+    if (!ids.length) return;
+    setBusy("redo");
+    try {
+      const { error } = await supabase
+        .from("user_vocabulary")
+        .update({ mastery_level: 0 })
+        .eq("user_id", profile.id)
+        .in("word_id", ids);
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
+      toast.success("Today's words are back — practise them again.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not reset today's words");
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function speak(key: string, word: string) {
     setPlayingKey(key);
     minutesSpent.start();
