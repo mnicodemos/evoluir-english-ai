@@ -8,6 +8,8 @@ import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserFlashcards, useUserLessons, type Flashcard } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
+import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
+
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/learning/review")({
@@ -28,9 +30,12 @@ function ReviewPage() {
   const { data: profile } = useProfile();
   const { data: states } = useUserFlashcards();
   const { data: userLessons } = useUserLessons();
+  const minutesSpent = useTimeSpent();
+  useLogTimeOnExit({ timer: minutesSpent, profile, type: "flashcards", title: "Flashcard review" });
 
   const queryClient = useQueryClient();
   const [round, setRound] = useState(0);
+
 
   const { data: cards, isLoading } = useQuery({
     queryKey: ["all-flashcards"],
