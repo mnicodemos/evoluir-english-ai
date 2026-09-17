@@ -97,6 +97,8 @@ export const uiPt: Record<string, string> = {
   "Your hardest words first": "Suas palavras mais difíceis primeiro",
   "Review finished 🎉": "Revisão concluída 🎉",
   "Tap to see the meaning": "Toque para ver o significado",
+  Correct: "Acerto",
+  Incorrect: "Erro",
   cards: "cartões",
   "Answered so far": "Respondidos até agora",
   "ready for smart review": "prontos para revisão inteligente",
