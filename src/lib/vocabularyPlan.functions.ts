@@ -99,6 +99,7 @@ export const dailyWords = createServerFn({ method: "POST" })
         },
       ],
       true,
+      { userId, operation: "vocabulary_generation" },
     );
 
     const parsed = parseJson<{ words?: AiWord[] }>(raw, {});

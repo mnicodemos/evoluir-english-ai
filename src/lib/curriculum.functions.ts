@@ -16,9 +16,11 @@ import { findLessonVideo, type LessonVideo } from "./lessonVideo.server";
 
 async function callContentAi(
   messages: { role: "system" | "user" | "assistant"; content: string }[],
+  userId: string,
+  operation: "lesson_generation" | "quiz_generation",
   jsonMode = false,
 ): Promise<string> {
-  return callGateway(messages, jsonMode);
+  return callGateway(messages, jsonMode, { userId, operation });
 }
 
 /** CEFR descriptors used to keep every generated lesson at the student's exact level. */
@@ -117,6 +119,8 @@ async function writeLesson(
         content: `Lesson title: ${plan.title}\nObjective: ${plan.objective}\nMain skill: ${plan.skill}\nCEFR level: ${plan.level.toUpperCase()}\nUnit: ${plan.unitTitle}${reviewScope ? `\nPrevious-unit course outline:\n${reviewScope}` : ""}`,
       },
     ],
+    userId,
+    "lesson_generation",
     true,
   );
 
@@ -319,6 +323,8 @@ export const openFinalTest = createServerFn({ method: "POST" })
         },
         { role: "user", content: `Write the ${FINAL_TEST_TOTAL}-question final test for level ${level.toUpperCase()}.` },
       ],
+      userId,
+      "quiz_generation",
       true,
     );
 

@@ -21,6 +21,9 @@ export async function callGateway(
   const { callGemini, GEMINI_TEXT_MODEL, GeminiError } = await import("./gemini.server");
   const usageTools = usage ? await import("./ai-usage.server") : null;
   const requestHash = usageTools ? await usageTools.hashAiRequest({ messages, jsonMode }) : "";
+  const ttl = usage && usageTools ? await usageTools.operationCacheTtl(usage.operation) : 0;
+  const cached = ttl > 0 && usageTools ? await usageTools.readAiCache(requestHash) : null;
+  if (cached !== null) return cached;
   const ticket = usage && usageTools
     ? await usageTools.reserveAiUsage({ ...usage, model: GEMINI_TEXT_MODEL, requestHash })
     : null;
@@ -45,6 +48,15 @@ export async function callGateway(
     throw new AiError(500, "Your Google Gemini key is not connected yet.");
   }
   if (ticket && usageTools) await usageTools.finishAiUsage(ticket, { success: true });
+  if (usage && usageTools && ttl > 0) {
+    await usageTools.writeAiCache({
+      cacheKey: requestHash,
+      operation: usage.operation,
+      model: GEMINI_TEXT_MODEL,
+      responseText: text,
+      ttlSeconds: ttl,
+    });
+  }
   return text;
 }
 
