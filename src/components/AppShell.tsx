@@ -125,10 +125,10 @@ function AppShellContent({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-1">
           <UiLangToggle />
           <ThemeToggle />
-          <ProfileMenu className="hover:bg-accent hover:text-foreground" />
           <Button variant="ghost" size="icon" onClick={signOut} aria-label={translate("Sign out")}>
             <LogOut className="size-4" />
           </Button>
+          <ProfileMenu className="hover:bg-accent hover:text-foreground" />
         </div>
       </header>
 
