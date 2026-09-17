@@ -22,6 +22,8 @@ import { LevelCard } from "@/components/LevelCard";
 import { PathProgressCard } from "@/components/LearningPathCard";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { WeeklyFrequency } from "@/components/WeeklyFrequency";
+
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -230,7 +232,11 @@ function Dashboard() {
                 </span>
                 <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
               </Link>
+              <div className="card-soft mt-3 p-5">
+                <WeeklyFrequency userId={profile.id} />
+              </div>
             </section>
+
           </div>
 
 
