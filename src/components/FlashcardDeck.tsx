@@ -110,7 +110,13 @@ export function FlashcardDeck({
         <span className="text-xs text-muted-foreground">
           {index + 1}/{cards.length}
         </span>
+        {index > 0 && (
+          <Button variant="ghost" size="sm" className="text-xs" onClick={restart}>
+            <RotateCcw className="size-3" /> {lang === "pt" ? "Recomeçar" : "Start over"}
+          </Button>
+        )}
       </div>
+
 
       <div className="relative mx-auto flex min-h-72 w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-primary/30 bg-primary/10 p-5 shadow-[var(--shadow-soft)] sm:min-h-96 sm:p-8">
         {!flipped ? (
