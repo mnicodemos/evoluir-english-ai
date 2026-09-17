@@ -5,6 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   finalTestKey,
   findCurriculumLesson,
+  getCoreCurriculum,
   getCurriculum,
   normalizeLevel,
   type CurriculumLesson,
@@ -74,6 +75,17 @@ async function writeLesson(
   plan: CurriculumLesson,
 ): Promise<string> {
   const descriptor = CEFR[plan.level] ?? CEFR["b1"]!;
+  const reviewScope = plan.reviewUnits.length
+    ? getCurriculum(plan.level)
+        .filter((lesson) => plan.reviewUnits.includes(lesson.unit) && lesson.unit <= 5)
+        .map((lesson) => `${lesson.unit}.${lesson.position} ${lesson.title}: ${lesson.objective}`)
+        .join("\n")
+    : "";
+  const reviewInstructions = plan.isReviewTest
+    ? "This is the optional Unit 6 review Test. Build its summary and all 10 quiz questions from the supplied Units 1-5 course outline. Cover all five units fairly. Do not introduce new material. The test does not determine CEFR promotion."
+    : plan.reviewUnits.length
+      ? `This is a consolidation lesson. Summarize and practise only Units ${plan.reviewUnits.join(" and ")} from the supplied course outline. Connect their main grammar, vocabulary and communication skills without introducing new material.`
+      : "";
 
   const raw = await callContentAi(
     [
@@ -83,6 +95,7 @@ async function writeLesson(
           `You are a CELTA English teacher writing lesson ${plan.position} of ${plan.unitTitle} in a structured ${plan.level.toUpperCase()} course for a Brazilian learner. ` +
           `${descriptor} ` +
           `${SKILL_BRIEF[plan.skill] ?? ""} ` +
+          `${reviewInstructions} ` +
           `Keep EVERY part of the lesson inside ${plan.level.toUpperCase()}: grammar, vocabulary, sentence length and idioms must match this level exactly. ` +
           'Reply with strict JSON: {"summary":"120-180 words explaining the language point with clear examples, in simple English",' +
           '"transcript":"a 450-600 word mini-lesson script in English, written in short paragraphs separated by blank lines",' +
@@ -94,14 +107,14 @@ async function writeLesson(
           "The other 4 flashcards must have card_type 'question'. Randomly vary them between grammar use, meaning, key expressions, sentence completion, and real-life situations from the lesson, without repeating the same format. " +
           "Every flashcard must use content from THIS lesson transcript, and every flashcard field must be in English only - never Portuguese, never a translation. " +
           "Every flashcard answer, definition and example must be SHORT: one brief sentence or phrase, maximum 15 words. " +
-          "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage). " +
+          `${plan.reviewUnits.length ? "Every quiz question must review content from the supplied previous-unit outline, with balanced grammar, vocabulary and usage." : "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage)."} ` +
           "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
           "Each question must be self-contained: a sentence to complete or correct, or a direct grammar rule question.",
 
       },
       {
         role: "user",
-        content: `Lesson title: ${plan.title}\nObjective: ${plan.objective}\nMain skill: ${plan.skill}\nCEFR level: ${plan.level.toUpperCase()}\nUnit: ${plan.unitTitle}`,
+        content: `Lesson title: ${plan.title}\nObjective: ${plan.objective}\nMain skill: ${plan.skill}\nCEFR level: ${plan.level.toUpperCase()}\nUnit: ${plan.unitTitle}${reviewScope ? `\nPrevious-unit course outline:\n${reviewScope}` : ""}`,
       },
     ],
     true,
@@ -265,8 +278,8 @@ export const openFinalTest = createServerFn({ method: "POST" })
       .maybeSingle();
     if (existing?.id) return { lessonId: existing.id as string };
 
-    // Every lesson of the level must be completed first.
-    const plan = getCurriculum(level);
+    // Only the 30 core lessons in Units 1-5 are required. Unit 6 is optional.
+    const plan = getCoreCurriculum(level);
     const { data: rows } = await supabase
       .from("lessons")
       .select("id, curriculum_key")

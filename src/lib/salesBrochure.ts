@@ -119,7 +119,7 @@ const COPY: Record<LandingLang, Brochure> = {
       {
         title: "The Evoluir+ method (5 layers)",
         intro:
-          "Every CEFR level (A1 to C2) has 30 lessons across 5 units. No random content: you follow a path built in the right order.",
+          "Every CEFR level (A1 to C2) has 30 core lessons across 5 units, plus an optional 3-lesson review unit. No random content: you follow a path built in the right order.",
         bullets: [
           "1. Input with purpose — a short video (up to 7 min) with captions, always on the lesson topic.",
           "2. Active comprehension — summary, objective and key vocabulary in English.",

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { useLessons, useUserLessons } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
-import { finalTestKey, getUnits, type CurriculumLesson } from "@/lib/curriculum";
+import { CORE_UNITS_PER_LEVEL, finalTestKey, getUnits, type CurriculumLesson } from "@/lib/curriculum";
 import { openCurriculumLesson, openFinalTest } from "@/lib/curriculum.functions";
 import { getLevelState } from "@/lib/level";
 
@@ -18,7 +18,7 @@ export type PathLesson = CurriculumLesson & {
 
 export type PathUnit = { unit: number; title: string; lessons: PathLesson[]; completed: number };
 
-/** The student's fixed 30-lesson path for the current CEFR level, with lock state. */
+/** The student's 30 core lessons and optional review unit, with lock state. */
 export function useLearningPath() {
   const { data: profile } = useProfile();
   const { data: lessons } = useLessons();
@@ -58,6 +58,7 @@ export function useLearningPath() {
 
     const all = units.flatMap((u) => u.lessons);
     const completed = all.filter((l) => l.completed).length;
+    const coreLessons = all.filter((lesson) => lesson.unit <= CORE_UNITS_PER_LEVEL);
     const testRow = byKey.get(finalTestKey(level));
     const testId = (testRow?.id as string | undefined) ?? null;
     const testState = stateOf(testId);
@@ -71,7 +72,7 @@ export function useLearningPath() {
       next: all.find((l) => !l.completed) ?? null,
       finalTest: {
         lessonId: testId,
-        unlocked: completed === all.length,
+        unlocked: coreLessons.every((lesson) => lesson.completed),
         passed: !!testState?.completed_at,
       },
     };

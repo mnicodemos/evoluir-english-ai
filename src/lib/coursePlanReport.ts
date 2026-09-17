@@ -87,12 +87,12 @@ export async function downloadCoursePlan(input: { name: string; level: string })
 
   wb.cover({
     title: "Full course content",
-    subtitle: "30 lessons in 5 units, grammar, vocabulary and reference material",
+    subtitle: "33 lessons in 6 units, including review, grammar, vocabulary and reference material",
     footnote: `Generated on ${new Date().toLocaleDateString()}`,
   });
 
   // How to use
-  wb.divider("How to use this workbook", `${units.length} units · 30 lessons · Final Test`);
+  wb.divider("How to use this workbook", `${units.length} units · 33 lessons · Final Test`);
   wb.para(
     "This workbook contains everything you will study at this level. Each unit opens with its own page, and each lesson brings the objective, the study summary, the script in English and Portuguese, the vocabulary entries and the grammar quiz.",
     { size: 10.5 },
@@ -107,6 +107,7 @@ export async function downloadCoursePlan(input: { name: string; level: string })
   wb.bullet("Study the vocabulary entries and say each example out loud.");
   wb.bullet("Answer the quiz: 70% or more completes the lesson and unlocks the next one.");
   wb.bullet("After lesson 30, take the Final Test (30 questions) to move up a level.");
+  wb.bullet("Unit 6 adds two reviews and an optional 10-question test; it does not block the Final Test.");
 
   // Units and lessons
   units.forEach((unit) => {
