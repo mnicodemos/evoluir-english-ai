@@ -13,6 +13,8 @@ import { downloadCoursePlan } from "@/lib/coursePlanReport";
 import { downloadDailyReport } from "@/lib/dailyReport";
 import { findLevel } from "@/lib/level";
 import { supabase } from "@/integrations/supabase/client";
+import { useUiLang } from "@/lib/uiLang";
+import { uiPt } from "@/lib/uiDictionary";
 
 
 
@@ -22,6 +24,8 @@ function errorMessage(error: unknown) {
 
 /** The 30-lesson core path plus its optional 3-lesson review unit. */
 export function CurriculumPath() {
+  const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
   const path = useLearningPath();
   const open = useOpenPathLesson();
   const navigate = useNavigate();
@@ -36,13 +40,13 @@ export function CurriculumPath() {
         name: profile?.name ?? "",
         level: path.level,
       });
-      if (saved) toast.success("Your course plan is downloading.");
+      if (saved) toast.success(t("Your course plan is downloading."));
       else
         toast.info(
-          "Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again.",
+          t("Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again."),
         );
     } catch {
-      toast.error("Could not build the course PDF. Please try again.");
+      toast.error(t("Could not build the course PDF. Please try again."));
     } finally {
       setPlanLoading(false);
     }
@@ -50,7 +54,7 @@ export function CurriculumPath() {
 
   const start = async (lesson: PathLesson) => {
     if (lesson.locked) {
-      toast.info("Finish the previous lesson first to unlock this one.");
+      toast.info(t("Finish the previous lesson first to unlock this one."));
       return;
     }
     if (lesson.lessonId) {
@@ -197,6 +201,8 @@ export function CurriculumPath() {
 
 /** Dashboard card: course progress + skill scores. */
 export function PathProgressCard() {
+  const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
   const path = useLearningPath();
   const { data: profile } = useProfile();
   const { data: mine } = useUserLessons();
@@ -237,13 +243,13 @@ export function PathProgressCard() {
         level: profile.level,
         lessonIds: studied.map((l) => l.lesson_id),
       });
-      if (saved) toast.success("Your study content is downloading.");
+      if (saved) toast.success(t("Your study content is downloading."));
       else
         toast.info(
-          "Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again.",
+          t("Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again."),
         );
     } catch {
-      toast.error("Could not build your summary. Please try again.");
+      toast.error(t("Could not build your summary. Please try again."));
     } finally {
       setDownloading(false);
     }

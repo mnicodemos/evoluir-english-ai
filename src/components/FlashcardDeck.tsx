@@ -8,6 +8,7 @@ import { reviewFlashcard, type Flashcard, type UserFlashcard } from "@/hooks/use
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { speakEnglish } from "@/lib/speech";
 import { useUiLang } from "@/lib/uiLang";
+import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
 
 /**
@@ -35,6 +36,7 @@ export function FlashcardDeck({
   const [isPlaying, setIsPlaying] = useState(false);
   const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null);
   const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
 
   const index = Math.min(saved.index, Math.max(0, cards.length - 1));
   const card = cards[index];
@@ -45,7 +47,7 @@ export function FlashcardDeck({
     try {
       await speakEnglish(text);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not play this audio.");
+      toast.error(error instanceof Error ? error.message : t("Could not play this audio."));
     } finally {
       setIsPlaying(false);
     }
