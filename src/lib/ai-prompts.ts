@@ -9,7 +9,10 @@ export type AiMsg = { role: "system" | "user" | "assistant"; content: string };
 
 function parseJson(raw: string): unknown {
   try {
-    const cleaned = raw.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+    const cleaned = raw
+      .replace(/^```(?:json)?/i, "")
+      .replace(/```$/, "")
+      .trim();
     return JSON.parse(cleaned) as unknown;
   } catch {
     return null;
@@ -65,7 +68,8 @@ export function coachOpenerMessages(
     studyContext ? `Student history:\n${studyContext.slice(0, 700)}` : "",
     `Write ONE opening message at ${cefr.cefr}: maximum 2 short sentences, about 25 words.`,
     "Greet in a few words and end with exactly ONE short, direct question the student can answer by speaking.",
-    "Vary the sub-topic every time. Reply with the opening message only, no quotes or labels." + avoidList,
+    "Vary the sub-topic every time. Reply with the opening message only, no quotes or labels." +
+      avoidList,
   ]
     .filter(Boolean)
     .join("\n");
@@ -86,17 +90,21 @@ export type ConversationReport = {
 };
 
 const score = z.number().finite().min(0).max(100);
-const conversationReportSchema = z.object({
-  fluency: score,
-  grammar: score,
-  vocabulary: score,
-  summary: z.string().trim().min(1).max(1000),
-  suggestions: z.array(z.string().trim().min(1).max(300)).max(6),
-  common_errors: z.array(z.string().trim().min(1).max(300)).max(6),
-  new_words: z.array(z.string().trim().min(1).max(120)).max(8),
-}).strict();
+const conversationReportSchema = z
+  .object({
+    fluency: score,
+    grammar: score,
+    vocabulary: score,
+    summary: z.string().trim().min(1).max(1000),
+    suggestions: z.array(z.string().trim().min(1).max(300)).max(6),
+    common_errors: z.array(z.string().trim().min(1).max(300)).max(6),
+    new_words: z.array(z.string().trim().min(1).max(120)).max(8),
+  })
+  .strict();
 
-export function conversationReportMessages(messages: { role: "user" | "assistant"; content: string }[]): AiMsg[] {
+export function conversationReportMessages(
+  messages: { role: "user" | "assistant"; content: string }[],
+): AiMsg[] {
   const transcript = messages
     .map((m) => `${m.role === "user" ? "Student" : "Teacher"}: ${m.content}`)
     .join("\n");
@@ -114,7 +122,8 @@ export function conversationReportMessages(messages: { role: "user" | "assistant
 
 export function parseConversationReport(raw: string): ConversationReport {
   const result = conversationReportSchema.safeParse(parseJson(raw));
-  if (!result.success) throw new Error("The AI returned an invalid conversation report. Please try again.");
+  if (!result.success)
+    throw new Error("The AI returned an invalid conversation report. Please try again.");
   return result.data;
 }
 
@@ -128,15 +137,17 @@ export type WritingFeedback = {
   clarity: number;
 };
 
-const writingFeedbackSchema = z.object({
-  corrected: z.string().trim().min(1).max(12000),
-  natural: z.string().trim().min(1).max(12000),
-  explanations: z.array(z.string().trim().min(1).max(500)).max(20),
-  suggestions: z.array(z.string().trim().min(1).max(500)).max(10),
-  grammar: score,
-  vocabulary: score,
-  clarity: score,
-}).strict();
+const writingFeedbackSchema = z
+  .object({
+    corrected: z.string().trim().min(1).max(12000),
+    natural: z.string().trim().min(1).max(12000),
+    explanations: z.array(z.string().trim().min(1).max(500)).max(20),
+    suggestions: z.array(z.string().trim().min(1).max(500)).max(10),
+    grammar: score,
+    vocabulary: score,
+    clarity: score,
+  })
+  .strict();
 
 export function writingCorrectionMessages(prompt: string, text: string, level: string): AiMsg[] {
   return [
@@ -158,7 +169,9 @@ export function writingCorrectionMessages(prompt: string, text: string, level: s
 export function parseWritingFeedback(raw: string, originalText: string): WritingFeedback {
   const result = writingFeedbackSchema.safeParse(parseJson(raw));
   if (!result.success || (!result.data.corrected && originalText)) {
-    throw new Error("The AI returned invalid writing feedback. Your text was preserved; please try again.");
+    throw new Error(
+      "The AI returned invalid writing feedback. Your text was preserved; please try again.",
+    );
   }
   return result.data;
 }

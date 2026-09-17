@@ -42,9 +42,11 @@ function parseReverso(html: string) {
   }
 
   const src: string[] = [];
-  for (const m of html.matchAll(/<div class="src ltr[^"]*">([\s\S]*?)<\/div>/g)) src.push(decode(m[1]!));
+  for (const m of html.matchAll(/<div class="src ltr[^"]*">([\s\S]*?)<\/div>/g))
+    src.push(decode(m[1]!));
   const trg: string[] = [];
-  for (const m of html.matchAll(/<div class="trg ltr[^"]*">([\s\S]*?)<\/div>/g)) trg.push(decode(m[1]!));
+  for (const m of html.matchAll(/<div class="trg ltr[^"]*">([\s\S]*?)<\/div>/g))
+    trg.push(decode(m[1]!));
 
   const pairs: { en: string; pt: string }[] = [];
   for (let i = 0; i < Math.min(src.length, trg.length); i += 1) {
@@ -61,7 +63,9 @@ function parseReverso(html: string) {
  */
 export const lookupWord = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ term: z.string().trim().min(1).max(120) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ term: z.string().trim().min(1).max(120) }).parse(input),
+  )
   .handler(async ({ data, context }): Promise<DictionaryEntry> => {
     const term = data.term.replace(/\s+/g, " ").trim().toLowerCase();
     const sourceUrl = `https://context.reverso.net/translation/english-portuguese/${encodeURIComponent(term)}`;

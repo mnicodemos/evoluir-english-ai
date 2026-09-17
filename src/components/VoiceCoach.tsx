@@ -264,17 +264,19 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     const used = loadUsedOpeners();
     let opener: string;
     try {
-      const text = await aiChat({ data: {
-        messages: coachOpenerMessages(
-          selected.id,
-          cefrLevel,
-          profile?.goal ?? "conversation",
-          buildStudyContext(snapshot),
-          used,
-        ),
-        jsonMode: false,
-        operation: "talking",
-      } });
+      const text = await aiChat({
+        data: {
+          messages: coachOpenerMessages(
+            selected.id,
+            cefrLevel,
+            profile?.goal ?? "conversation",
+            buildStudyContext(snapshot),
+            used,
+          ),
+          jsonMode: false,
+          operation: "talking",
+        },
+      });
       opener = text.trim();
       if (!opener) throw new Error("empty opener");
     } catch {
@@ -365,7 +367,13 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     setFinishing(true);
     try {
       const result = parseConversationReport(
-        await aiChat({ data: { messages: conversationReportMessages(messages), jsonMode: true, operation: "talking" } }),
+        await aiChat({
+          data: {
+            messages: conversationReportMessages(messages),
+            jsonMode: true,
+            operation: "talking",
+          },
+        }),
       );
       setReport(result);
       const average = Math.round((result.fluency + result.grammar + result.vocabulary) / 3);

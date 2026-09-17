@@ -29,22 +29,39 @@ export const Route = createFileRoute("/api/transcribe")({
         try {
           userId = await authenticateApiRequest(request);
         } catch (error) {
-          return Response.json({ message: error instanceof Response && error.status === 401 ? "Please sign in again to use voice conversation." : "Voice conversation is not configured yet." }, { status: error instanceof Response ? error.status : 500 });
+          return Response.json(
+            {
+              message:
+                error instanceof Response && error.status === 401
+                  ? "Please sign in again to use voice conversation."
+                  : "Voice conversation is not configured yet.",
+            },
+            { status: error instanceof Response ? error.status : 500 },
+          );
         }
         const lovableKey = process.env["LOVABLE_API_KEY"];
         const connectionKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
         if (!lovableKey || !connectionKey) {
-          return Response.json({ message: "Voice conversation is not configured yet." }, { status: 500 });
+          return Response.json(
+            { message: "Voice conversation is not configured yet." },
+            { status: 500 },
+          );
         }
 
         const form = await request.formData().catch(() => null);
 
         const audio = form?.get("file");
         if (!(audio instanceof File) || audio.size < 2048) {
-          return Response.json({ message: "That recording was empty. Please try again." }, { status: 400 });
+          return Response.json(
+            { message: "That recording was empty. Please try again." },
+            { status: 400 },
+          );
         }
         if (audio.size > MAX_AUDIO_BYTES) {
-          return Response.json({ message: "That recording is too long. Please record a shorter answer." }, { status: 413 });
+          return Response.json(
+            { message: "That recording is too long. Please record a shorter answer." },
+            { status: 413 },
+          );
         }
         if (audio.type !== "audio/wav") {
           return Response.json({ message: "This audio format is not supported." }, { status: 415 });
@@ -53,24 +70,45 @@ export const Route = createFileRoute("/api/transcribe")({
         const audioBase64 = Buffer.from(await audio.arrayBuffer()).toString("base64");
         let ticket;
         try {
-          ticket = await reserveAiUsage({ userId, operation: "transcription", model: GEMINI_TRANSCRIPTION_MODELS[0], requestHash: await hashAiRequest({ size: audio.size, sample: audioBase64.slice(0, 1024) }) });
+          ticket = await reserveAiUsage({
+            userId,
+            operation: "transcription",
+            model: GEMINI_TRANSCRIPTION_MODELS[0],
+            requestHash: await hashAiRequest({
+              size: audio.size,
+              sample: audioBase64.slice(0, 1024),
+            }),
+          });
         } catch (error) {
           const headers = new Headers();
-          if (error instanceof AiUsageError && error.retryAfter) headers.set("Retry-After", String(error.retryAfter));
-          return Response.json({ message: error instanceof Error ? error.message : "Voice transcription is temporarily unavailable." }, { status: error instanceof AiUsageError ? error.status : 503, headers });
+          if (error instanceof AiUsageError && error.retryAfter)
+            headers.set("Retry-After", String(error.retryAfter));
+          return Response.json(
+            {
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "Voice transcription is temporarily unavailable.",
+            },
+            { status: error instanceof AiUsageError ? error.status : 503, headers },
+          );
         }
         let result: GeminiTranscription | null = null;
         let failureStatus = 503;
 
         const requestBody = (fast: boolean) =>
           JSON.stringify({
-            contents: [{
-              role: "user",
-              parts: [
-                { text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks." },
-                { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
-              ],
-            }],
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks.",
+                  },
+                  { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
+                ],
+              },
+            ],
             generationConfig: fast ? FAST_CONFIG : { temperature: 0, maxOutputTokens: 256 },
           });
 
@@ -100,7 +138,9 @@ export const Route = createFileRoute("/api/transcribe")({
 
           failureStatus = response.status;
           const errorBody = await response.text().catch(() => "");
-          console.error(`Gemini transcription failed [${response.status}] on ${model}: ${errorBody.slice(0, 300)}`);
+          console.error(
+            `Gemini transcription failed [${response.status}] on ${model}: ${errorBody.slice(0, 300)}`,
+          );
 
           // Only a quota limit can be model-specific. Other failures should not
           // trigger another paid request with the same audio.
@@ -108,10 +148,15 @@ export const Route = createFileRoute("/api/transcribe")({
         }
 
         if (!result) {
-          const message = failureStatus === 429
-            ? "Your Google AI voice limit is busy right now. Please wait about a minute and try again."
-            : "I couldn't process that recording right now. Please try again in a moment.";
-          await finishAiUsage(ticket, { success: false, errorCode: `gemini_${failureStatus}`, errorMessage: message });
+          const message =
+            failureStatus === 429
+              ? "Your Google AI voice limit is busy right now. Please wait about a minute and try again."
+              : "I couldn't process that recording right now. Please try again in a moment.";
+          await finishAiUsage(ticket, {
+            success: false,
+            errorCode: `gemini_${failureStatus}`,
+            errorMessage: message,
+          });
           return Response.json({ message }, { status: failureStatus });
         }
 
@@ -120,8 +165,15 @@ export const Route = createFileRoute("/api/transcribe")({
           .join("")
           .trim();
         if (!transcript) {
-          await finishAiUsage(ticket, { success: false, errorCode: "empty_transcript", errorMessage: "No speech was recognized." });
-          return Response.json({ message: "I couldn't hear that clearly. Please try again." }, { status: 422 });
+          await finishAiUsage(ticket, {
+            success: false,
+            errorCode: "empty_transcript",
+            errorMessage: "No speech was recognized.",
+          });
+          return Response.json(
+            { message: "I couldn't hear that clearly. Please try again." },
+            { status: 422 },
+          );
         }
 
         await finishAiUsage(ticket, { success: true });

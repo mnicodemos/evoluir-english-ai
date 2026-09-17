@@ -24,9 +24,10 @@ export async function callGateway(
   const ttl = usage && usageTools ? await usageTools.operationCacheTtl(usage.operation) : 0;
   const cached = ttl > 0 && usageTools ? await usageTools.readAiCache(requestHash) : null;
   if (cached !== null) return cached;
-  const ticket = usage && usageTools
-    ? await usageTools.reserveAiUsage({ ...usage, model: GEMINI_TEXT_MODEL, requestHash })
-    : null;
+  const ticket =
+    usage && usageTools
+      ? await usageTools.reserveAiUsage({ ...usage, model: GEMINI_TEXT_MODEL, requestHash })
+      : null;
   let text: string | null = null;
   try {
     text = await callGemini(messages, jsonMode);
@@ -39,12 +40,14 @@ export async function callGateway(
       });
     }
     if (err instanceof AiError) throw err;
-    const message = err instanceof Error ? err.message : "Google Gemini could not answer right now.";
+    const message =
+      err instanceof Error ? err.message : "Google Gemini could not answer right now.";
     throw new AiError(err instanceof GeminiError ? err.status : 503, message);
   }
 
   if (text === null) {
-    if (ticket && usageTools) await usageTools.finishAiUsage(ticket, { success: false, errorCode: "not_configured" });
+    if (ticket && usageTools)
+      await usageTools.finishAiUsage(ticket, { success: false, errorCode: "not_configured" });
     throw new AiError(500, "Your Google Gemini key is not connected yet.");
   }
   if (ticket && usageTools) await usageTools.finishAiUsage(ticket, { success: true });
@@ -60,10 +63,12 @@ export async function callGateway(
   return text;
 }
 
-
 export function parseJson<T>(raw: string, fallback: T): T {
   try {
-    const cleaned = raw.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+    const cleaned = raw
+      .replace(/^```(?:json)?/i, "")
+      .replace(/```$/, "")
+      .trim();
     return JSON.parse(cleaned) as T;
   } catch {
     return fallback;

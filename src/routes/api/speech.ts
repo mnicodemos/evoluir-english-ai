@@ -23,7 +23,15 @@ export const Route = createFileRoute("/api/speech")({
         try {
           userId = await authenticateApiRequest(request);
         } catch (error) {
-          return Response.json({ message: error instanceof Response && error.status === 401 ? "Please sign in again to use audio." : "Audio is not configured yet." }, { status: error instanceof Response ? error.status : 500 });
+          return Response.json(
+            {
+              message:
+                error instanceof Response && error.status === 401
+                  ? "Please sign in again to use audio."
+                  : "Audio is not configured yet.",
+            },
+            { status: error instanceof Response ? error.status : 500 },
+          );
         }
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) {
@@ -44,11 +52,22 @@ export const Route = createFileRoute("/api/speech")({
 
         let ticket;
         try {
-          ticket = await reserveAiUsage({ userId, operation: "tts", model: GEMINI_TTS_MODEL, requestHash: await hashAiRequest(parsed.data.text) });
+          ticket = await reserveAiUsage({
+            userId,
+            operation: "tts",
+            model: GEMINI_TTS_MODEL,
+            requestHash: await hashAiRequest(parsed.data.text),
+          });
         } catch (error) {
           const headers = new Headers();
-          if (error instanceof AiUsageError && error.retryAfter) headers.set("Retry-After", String(error.retryAfter));
-          return Response.json({ message: error instanceof Error ? error.message : "Audio is temporarily unavailable." }, { status: error instanceof AiUsageError ? error.status : 503, headers });
+          if (error instanceof AiUsageError && error.retryAfter)
+            headers.set("Retry-After", String(error.retryAfter));
+          return Response.json(
+            {
+              message: error instanceof Error ? error.message : "Audio is temporarily unavailable.",
+            },
+            { status: error instanceof AiUsageError ? error.status : 503, headers },
+          );
         }
 
         const body = JSON.stringify({
@@ -94,7 +113,11 @@ export const Route = createFileRoute("/api/speech")({
           if (upstream.status === 429) {
             responseHeaders.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
           }
-          await finishAiUsage(ticket, { success: false, errorCode: `gemini_${upstream.status}`, errorMessage: message });
+          await finishAiUsage(ticket, {
+            success: false,
+            errorCode: `gemini_${upstream.status}`,
+            errorMessage: message,
+          });
           return Response.json(
             {
               message:
@@ -161,7 +184,12 @@ export const Route = createFileRoute("/api/speech")({
               );
               await finishAiUsage(ticket, {
                 success: sentAudio,
-                ...(sentAudio ? {} : { errorCode: "empty_audio", errorMessage: "The audio service returned no sound." }),
+                ...(sentAudio
+                  ? {}
+                  : {
+                      errorCode: "empty_audio",
+                      errorMessage: "The audio service returned no sound.",
+                    }),
               });
             },
           }),

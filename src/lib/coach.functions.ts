@@ -49,13 +49,17 @@ export const coachReply = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const text = await callGateway([
-      {
-        role: "system",
-        content: coachSystemPrompt(data.scenario, data.level, data.goal, data.studyContext),
-      },
-      ...data.messages,
-    ], false, { userId: context.userId, operation: "talking" });
+    const text = await callGateway(
+      [
+        {
+          role: "system",
+          content: coachSystemPrompt(data.scenario, data.level, data.goal, data.studyContext),
+        },
+        ...data.messages,
+      ],
+      false,
+      { userId: context.userId, operation: "talking" },
+    );
     return { reply: text.trim() };
   });
 
@@ -76,23 +80,28 @@ export const coachOpener = createServerFn({ method: "POST" })
     const avoidList = data.avoid.length
       ? `\nOpenings already used with this student (do NOT repeat or paraphrase them — pick a different sub-topic and question):\n${data.avoid.map((line) => `- ${line}`).join("\n")}`
       : "";
-    const text = await callGateway([
-      {
-        role: "system",
-        content: [
-          "You are a CELTA-certified English teacher.",
-          `Student level: ${findLevel(data.level).label}. ${findLevel(data.level).descriptor} Goal: "${data.goal}".`,
-          `Practice scenario — ${scenarioPrompts[data.scenario] ?? scenarioPrompts["everyday"]}`,
-          data.studyContext ? `Student history:\n${data.studyContext.slice(0, 700)}` : "",
-          `Write ONE opening message at ${findLevel(data.level).cefr}: maximum 2 short sentences, about 25 words.`,
-          "Greet in a few words and end with exactly ONE short, direct question the student can answer by speaking.",
-          "Vary the sub-topic every time. Reply with the opening message only, no quotes or labels." + avoidList,
-        ]
-          .filter(Boolean)
-          .join("\n"),
-      },
-      { role: "user", content: "Start our conversation now." },
-    ], false, { userId: context.userId, operation: "talking" });
+    const text = await callGateway(
+      [
+        {
+          role: "system",
+          content: [
+            "You are a CELTA-certified English teacher.",
+            `Student level: ${findLevel(data.level).label}. ${findLevel(data.level).descriptor} Goal: "${data.goal}".`,
+            `Practice scenario — ${scenarioPrompts[data.scenario] ?? scenarioPrompts["everyday"]}`,
+            data.studyContext ? `Student history:\n${data.studyContext.slice(0, 700)}` : "",
+            `Write ONE opening message at ${findLevel(data.level).cefr}: maximum 2 short sentences, about 25 words.`,
+            "Greet in a few words and end with exactly ONE short, direct question the student can answer by speaking.",
+            "Vary the sub-topic every time. Reply with the opening message only, no quotes or labels." +
+              avoidList,
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        },
+        { role: "user", content: "Start our conversation now." },
+      ],
+      false,
+      { userId: context.userId, operation: "talking" },
+    );
     return { opener: text.trim() };
   });
 

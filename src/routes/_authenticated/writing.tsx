@@ -12,16 +12,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
-import { parseWritingFeedback, writingCorrectionMessages, type WritingFeedback } from "@/lib/ai-prompts";
+import {
+  parseWritingFeedback,
+  writingCorrectionMessages,
+  type WritingFeedback,
+} from "@/lib/ai-prompts";
 import { aiChat } from "@/lib/aiChat.functions";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · Writing corrector" },
-      { name: "description", content: "Get your English text corrected, rewritten naturally and scored." },
+      {
+        name: "description",
+        content: "Get your English text corrected, rewritten naturally and scored.",
+      },
       { property: "og:title", content: "Evoluir+ English AI · Writing corrector" },
-      { property: "og:description", content: "Get your English text corrected and scored instantly." },
+      {
+        property: "og:description",
+        content: "Get your English text corrected and scored instantly.",
+      },
     ],
   }),
   component: Writing,
@@ -130,7 +140,9 @@ function roundPrompts(signature: string): string[] {
   let history = loadHistory();
   const pick = (pool: string[]) => {
     const fresh = pool.filter((p) => !history.includes(p));
-    return (fresh.length ? fresh : pool)[Math.floor(Math.random() * (fresh.length || pool.length))]!;
+    return (fresh.length ? fresh : pool)[
+      Math.floor(Math.random() * (fresh.length || pool.length))
+    ]!;
   };
   if (categories.every((c) => c.pool.every((p) => history.includes(p)))) {
     history = [];
@@ -154,8 +166,13 @@ function Writing() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
-  useLogTimeOnExit({ timer: minutesSpent, profile, type: "writing_practice", title: "Writing practice" });
-  
+  useLogTimeOnExit({
+    timer: minutesSpent,
+    profile,
+    type: "writing_practice",
+    title: "Writing practice",
+  });
+
   const { data: startedLessons } = useLessonRound();
   // A fresh set of tasks every day, and every time the student starts a new lesson.
   const signature = `${todayKey()}-${startedLessons ?? 0}`;
@@ -209,11 +226,17 @@ function Writing() {
     }
     setLoading(true);
     try {
-      const raw = await aiChat({ data: {
-        messages: writingCorrectionMessages(prompt, text.trim(), profile?.level ?? "intermediate"),
-        jsonMode: true,
-        operation: "writing_correction",
-      } });
+      const raw = await aiChat({
+        data: {
+          messages: writingCorrectionMessages(
+            prompt,
+            text.trim(),
+            profile?.level ?? "intermediate",
+          ),
+          jsonMode: true,
+          operation: "writing_correction",
+        },
+      });
       const feedback = parseWritingFeedback(raw, text.trim());
       setResult(feedback);
 
@@ -257,15 +280,14 @@ function Writing() {
     <AppShell>
       <h1 className="text-3xl font-bold">Writing AI Corrector</h1>
       <p className="mt-2 text-muted-foreground">
-        One task for Everyday, Professional and Travel English. New tasks every day and every time you start a new
-        lesson — nothing repeats.
+        One task for Everyday, Professional and Travel English. New tasks every day and every time
+        you start a new lesson — nothing repeats.
       </p>
       {done.length > 0 && (
         <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoToday}>
           Redo today's tasks
         </Button>
       )}
-
 
       <div className="mt-7 grid gap-3 sm:grid-cols-3">
         {prompts.map((p, index) => {
@@ -278,11 +300,19 @@ function Writing() {
               onClick={() => selectPrompt(p)}
               title={isDone ? "Checked — click to redo" : undefined}
               className={`card-soft flex h-full flex-col gap-1.5 p-4 text-left transition-colors ${
-                isDone ? "opacity-70 hover:bg-accent/50" : isActive ? "ring-2 ring-primary" : "hover:bg-accent/50"
+                isDone
+                  ? "opacity-70 hover:bg-accent/50"
+                  : isActive
+                    ? "ring-2 ring-primary"
+                    : "hover:bg-accent/50"
               }`}
             >
               <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {isDone ? <CheckCircle2 className="size-3.5 text-green-600" /> : <PenLine className="size-3.5" />}
+                {isDone ? (
+                  <CheckCircle2 className="size-3.5 text-green-600" />
+                ) : (
+                  <PenLine className="size-3.5" />
+                )}
                 {category.label}
               </span>
               <span className="text-sm font-medium">{p}</span>
@@ -296,9 +326,13 @@ function Writing() {
 
       <section className="card-soft mt-5 p-6">
         <div className="flex items-center justify-between gap-3">
-          <label className="text-sm font-medium">{allDone ? <span>Today's tasks</span> : prompt}</label>
+          <label className="text-sm font-medium">
+            {allDone ? <span>Today's tasks</span> : prompt}
+          </label>
           <span className="text-sm text-muted-foreground">
-            <span>{done.length}/{prompts.length} </span>
+            <span>
+              {done.length}/{prompts.length}{" "}
+            </span>
             <span>done</span>
           </span>
         </div>
@@ -308,7 +342,8 @@ function Writing() {
             <CheckCircle2 className="mx-auto size-8 text-green-600" />
             <p className="mt-2 font-semibold">All 3 writing tasks completed!</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              New writing tasks arrive tomorrow, or as soon as you start a new lesson in the Learning Center.
+              New writing tasks arrive tomorrow, or as soon as you start a new lesson in the
+              Learning Center.
             </p>
             <Button variant="outline" className="mt-4" onClick={redoPrompt}>
               Redo this task to improve your score
@@ -339,7 +374,11 @@ function Writing() {
                 {text.trim().split(/\s+/).filter(Boolean).length} words
               </span>
               <Button onClick={analyse} disabled={loading}>
-                {loading ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
+                {loading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Wand2 className="size-4" />
+                )}
                 Correct my text
               </Button>
             </div>

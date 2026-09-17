@@ -31,7 +31,12 @@ export const Route = createFileRoute("/api/coach-stream")({
           userId = await authenticateApiRequest(request);
         } catch (error) {
           return Response.json(
-            { message: error instanceof Response && error.status === 401 ? "Please sign in again to use voice conversation." : "Voice conversation is not configured yet." },
+            {
+              message:
+                error instanceof Response && error.status === 401
+                  ? "Please sign in again to use voice conversation."
+                  : "Voice conversation is not configured yet.",
+            },
             { status: error instanceof Response ? error.status : 500 },
           );
         }
@@ -55,19 +60,37 @@ export const Route = createFileRoute("/api/coach-stream")({
         } catch (error) {
           const status = error instanceof AiUsageError ? error.status : 503;
           const headers = new Headers();
-          if (error instanceof AiUsageError && error.retryAfter) headers.set("Retry-After", String(error.retryAfter));
-          return Response.json({ message: error instanceof Error ? error.message : "AI Talking is temporarily unavailable." }, { status, headers });
+          if (error instanceof AiUsageError && error.retryAfter)
+            headers.set("Retry-After", String(error.retryAfter));
+          return Response.json(
+            {
+              message:
+                error instanceof Error ? error.message : "AI Talking is temporarily unavailable.",
+            },
+            { status, headers },
+          );
         }
 
         let upstream: Response | null;
         try {
           upstream = await openGeminiStream(parsed.data.messages);
         } catch (error) {
-          await finishAiUsage(ticket, { success: false, errorCode: "gemini_network", errorMessage: error instanceof Error ? error.message : "Network failure" });
-          return Response.json({ message: "Google Gemini could not answer right now." }, { status: 503 });
+          await finishAiUsage(ticket, {
+            success: false,
+            errorCode: "gemini_network",
+            errorMessage: error instanceof Error ? error.message : "Network failure",
+          });
+          return Response.json(
+            { message: "Google Gemini could not answer right now." },
+            { status: 503 },
+          );
         }
         if (!upstream) {
-          await finishAiUsage(ticket, { success: false, errorCode: "not_configured", errorMessage: "Google Gemini is not connected yet." });
+          await finishAiUsage(ticket, {
+            success: false,
+            errorCode: "not_configured",
+            errorMessage: "Google Gemini is not connected yet.",
+          });
           return Response.json({ message: "Google Gemini is not connected yet." }, { status: 500 });
         }
         if (!upstream.ok || !upstream.body) {
@@ -82,7 +105,11 @@ export const Route = createFileRoute("/api/coach-stream")({
           const headers = new Headers();
           if (upstream.status === 429)
             headers.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
-          await finishAiUsage(ticket, { success: false, errorCode: `gemini_${upstream.status}`, errorMessage: message });
+          await finishAiUsage(ticket, {
+            success: false,
+            errorCode: `gemini_${upstream.status}`,
+            errorMessage: message,
+          });
           return Response.json({ message }, { status: upstream.status, headers });
         }
 
@@ -140,7 +167,12 @@ export const Route = createFileRoute("/api/coach-stream")({
               );
               await finishAiUsage(ticket, {
                 success: emittedText,
-                ...(emittedText ? {} : { errorCode: "empty_response", errorMessage: "Google Gemini returned an empty reply." }),
+                ...(emittedText
+                  ? {}
+                  : {
+                      errorCode: "empty_response",
+                      errorMessage: "Google Gemini returned an empty reply.",
+                    }),
               });
             },
           }),
