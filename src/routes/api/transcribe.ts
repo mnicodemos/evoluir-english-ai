@@ -62,8 +62,20 @@ export const Route = createFileRoute("/api/transcribe")({
         let result: GeminiTranscription | null = null;
         let failureStatus = 503;
 
-        for (const model of GEMINI_TRANSCRIPTION_MODELS) {
-          const response = await fetch(
+        const requestBody = (fast: boolean) =>
+          JSON.stringify({
+            contents: [{
+              role: "user",
+              parts: [
+                { text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks." },
+                { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
+              ],
+            }],
+            generationConfig: fast ? FAST_CONFIG : { temperature: 0, maxOutputTokens: 256 },
+          });
+
+        const send = (model: string, fast: boolean) =>
+          fetch(
             `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
             {
               method: "POST",
@@ -72,17 +84,14 @@ export const Route = createFileRoute("/api/transcribe")({
                 "X-Connection-Api-Key": connectionKey,
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({
-                contents: [{
-                  role: "user",
-                  parts: [
-                    { text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks." },
-                    { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
-                  ],
-                }],
-              }),
+              body: requestBody(fast),
             },
           );
+
+        for (const model of GEMINI_TRANSCRIPTION_MODELS) {
+          let response = await send(model, true);
+          // Older model versions reject the "no thinking" setting: retry plainly.
+          if (response.status === 400) response = await send(model, false);
 
           if (response.ok) {
             result = (await response.json()) as GeminiTranscription;
