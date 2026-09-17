@@ -65,6 +65,7 @@ export function LessonQuiz({
 
   function retake() {
     clearAnswers();
+    clearSubmitted();
     setAnswers({});
     setSubmitted(false);
   }
@@ -79,16 +80,15 @@ export function LessonQuiz({
           <p className="mt-2 text-sm text-primary-foreground/80">
             {correct} of {questions.length} correct.{" "}
             {score >= PASS_SCORE
-              ? "Great job — you passed! Move on to the next lesson."
+              ? "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want."
               : `You need at least ${PASS_SCORE}% to pass. Review the explanations below and retake the quiz.`}
           </p>
-          {score < PASS_SCORE && (
-            <Button variant="secondary" className="mt-4" onClick={retake}>
-              Retake quiz
-            </Button>
-          )}
+          <Button variant="secondary" className="mt-4" onClick={retake}>
+            {score >= PASS_SCORE ? "Redo quiz" : "Retake quiz"}
+          </Button>
         </div>
       )}
+
 
       {questions.map((q, i) => {
         const chosen = answers[q.id];
