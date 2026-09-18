@@ -8,6 +8,8 @@ import type { Database, Json } from "@/integrations/supabase/types";
 import { aggregateSkillEvidence } from "./aggregateSkill";
 import {
   type AssessmentEvidence,
+  evidenceSourceTypeSchema,
+  evaluatorSchema,
   pedagogicalSkillSchema,
   type PedagogicalSkill,
 } from "./contracts";
@@ -188,20 +190,16 @@ async function persistEvidenceAndResults(params: {
       id: row.id,
       skill: pedagogicalSkillSchema.parse(row.skill),
       subskill: row.subskill,
-      sourceType: row.source_type,
+      sourceType: evidenceSourceTypeSchema.parse(row.source_type),
       sourceId: row.source_id,
-      sourceItemId: row.source_item_id,
-      evidenceType: row.evidence_type,
-      polarity: row.polarity,
       itemCefr: row.item_cefr,
       rawScore: row.raw_score,
       sourceReliability: row.source_reliability,
       evidenceQuality: row.evidence_quality,
       sampleWeight: row.sample_weight,
-      evaluatedBy: row.evaluated_by,
+      evaluatedBy: evaluatorSchema.parse(row.evaluated_by),
       modelVersion: row.model_version,
       rubricVersion: row.rubric_version,
-      metadata: row.metadata,
     }));
     const result = aggregateSkillEvidence(skill as PedagogicalSkill, history);
     const resultId = await deterministicUuid(`pedagogy-result:${sessionId}:${skill}`);
