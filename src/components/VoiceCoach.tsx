@@ -23,7 +23,7 @@ import { Message, MessageContent, MessageResponse } from "@/components/ai-elemen
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { logActivity, useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { useOverallAverage } from "@/hooks/useVocabularyProgress";
 import { buildStudyContext, useStudySnapshot } from "@/hooks/useStudyContext";
@@ -31,8 +31,6 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   coachOpenerMessages,
   coachReplyMessages,
-  conversationReportMessages,
-  parseConversationReport,
   type ConversationReport,
 } from "@/lib/ai-prompts";
 import { aiChat } from "@/lib/aiChat.functions";
@@ -44,6 +42,8 @@ import {
   startVoiceRecording,
   stopVoiceRecording,
 } from "@/lib/voice-recorder";
+import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type VoiceState = "idle" | "recording" | "transcribing" | "thinking" | "speaking";
@@ -202,6 +202,8 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [report, setReport] = useState<ConversationReport | null>(null);
   const [finishing, setFinishing] = useState(false);
+  const talkingOperationKey = useRef(crypto.randomUUID());
+  const finishTalking = useServerFn(finishTalkingLegacy);
   const mounted = useRef(true);
   const topicOffset = useRef(0);
   const speechQueue = useRef<Promise<void>>(Promise.resolve());
@@ -366,44 +368,16 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     setVoiceState("idle");
     setFinishing(true);
     try {
-      const result = parseConversationReport(
-        await aiChat({
-          data: {
-            messages: conversationReportMessages(messages),
-            jsonMode: true,
-            operation: "talking",
-          },
-        }),
-      );
+      const result = await finishTalking({ data: {
+        operationKey: talkingOperationKey.current,
+        scenario: scenario as "everyday" | "professional" | "travel",
+        messages,
+        minutes: minutesSpent(1),
+      } });
       setReport(result);
-      const average = Math.round((result.fluency + result.grammar + result.vocabulary) / 3);
-      const scenarioLabel = scenarios.find((item) => item.id === scenario)?.label ?? "English";
-      if (result.common_errors.length) {
-        const { data } = await supabase
-          .from("learning_profile")
-          .select("common_errors")
-          .eq("user_id", profile.id)
-          .maybeSingle();
-        const merged = Array.from(
-          new Set([...(data?.common_errors ?? []), ...result.common_errors]),
-        ).slice(-12);
-        await supabase
-          .from("learning_profile")
-          .upsert({ user_id: profile.id, common_errors: merged }, { onConflict: "user_id" });
-      }
       const scored = result.fluency > 0 || result.grammar > 0 || result.vocabulary > 0;
       if (!scored)
         toast.error("We could not score this session, so your Talking progress was not changed.");
-      await logActivity({
-        userId: profile.id,
-        type: "conversation",
-        title: `${scenarioLabel} speaking session`,
-        minutes: minutesSpent(1),
-        score: scored ? average : null,
-        ...(scored ? { scores: { speaking: result.fluency } } : {}),
-        currentStreak: profile.streak_days,
-        lastDate: profile.last_activity_date,
-      });
       queryClient.invalidateQueries();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not generate your report.");

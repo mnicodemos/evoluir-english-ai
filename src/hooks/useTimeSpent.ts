@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useServerFn } from "@tanstack/react-start";
 
-import { logActivity } from "@/hooks/useProfile";
+import { logPracticeTelemetry } from "@/lib/legacyActivity.functions";
 
 const IDLE_MS = 60_000;
 
@@ -108,6 +109,8 @@ export function useLogTimeOnExit(params: {
   title: string;
 }) {
   const { timer } = params;
+  const logTelemetry = useServerFn(logPracticeTelemetry);
+  const operationKey = useRef(crypto.randomUUID());
   const latest = useRef(params);
   latest.current = params;
 
@@ -117,16 +120,13 @@ export function useLogTimeOnExit(params: {
       const { profile, type, title } = latest.current;
       const minutes = timer(0);
       if (minutes >= 1 && profile) {
-        void logActivity({
-          userId: profile.id,
-          type,
-          title,
+        void logTelemetry({ data: {
+          operationKey: operationKey.current,
+          activityType: type as "listening_practice" | "vocabulary_reading" | "conversation_practice" | "writing_practice" | "lesson_practice" | "final_test_practice",
           minutes,
-          currentStreak: profile.streak_days,
-          lastDate: profile.last_activity_date,
-        });
+        } });
       }
     };
-  }, [timer]);
+  }, [timer, logTelemetry]);
 }
 

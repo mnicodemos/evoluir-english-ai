@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, BookOpen, Layers, ListChecks, MessageSquareText, Video } from "lucide-react";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -12,9 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { completeLesson, saveVideoProgress, useLesson, useUserFlashcards } from "@/hooks/useLearning";
-import { logActivity, useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
+import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 
 
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
@@ -39,6 +41,7 @@ function LessonPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const minutesSpent = useTimeSpent();
+  const saveQuizLegacy = useServerFn(persistQuizLegacy);
   useLogTimeOnExit({ timer: minutesSpent, profile, type: "lesson_practice", title: "Lesson practice" });
 
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
@@ -57,7 +60,7 @@ function LessonPage() {
     queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
   }
 
-  async function finishLesson(score: number) {
+  async function finishLesson(score: number, attemptKey: string) {
     if (!profile) return;
     // A lesson only counts as completed with a quiz score of 70% or more.
     if (score < 70) {
@@ -67,15 +70,7 @@ function LessonPage() {
     await completeLesson(profile.id, lessonId);
     // Lessons do not feed the Your progress bars: each bar comes from its own
     // module (Listening Lab, Vocabulary, AI Talking, Writing AI Corrector).
-    await logActivity({
-      userId: profile.id,
-      type: "lesson",
-      title: `Lesson: ${lesson?.title ?? ""}`,
-      minutes: minutesSpent(1),
-      score,
-      currentStreak: profile.streak_days,
-      lastDate: profile.last_activity_date,
-    });
+    await saveQuizLegacy({ data: { attemptKey, activityType: "lesson", minutes: minutesSpent(1) } });
     queryClient.invalidateQueries({ queryKey: ["user-lessons"] });
     queryClient.invalidateQueries({ queryKey: ["quiz-results"] });
     queryClient.invalidateQueries({ queryKey: ["profile"] });

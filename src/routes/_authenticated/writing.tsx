@@ -11,10 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { useLessonRound } from "@/hooks/useLessonRound";
-import { logActivity, useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { type WritingFeedback } from "@/lib/ai-prompts";
 import { analyseAuthoritativeWriting } from "@/lib/pedagogy/dualWrite.functions";
+import { persistWritingLegacy } from "@/lib/legacyActivity.functions";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
@@ -181,6 +182,7 @@ function Writing() {
   const [result, setResult] = useState<WritingFeedback | null>(null);
   const operationKey = useRef<string | null>(null);
   const analyseWriting = useServerFn(analyseAuthoritativeWriting);
+  const saveLegacyWriting = useServerFn(persistWritingLegacy);
 
   useEffect(() => {
     const finished = loadDone(signature);
@@ -248,17 +250,7 @@ function Writing() {
       rememberAnswered(prompt);
 
       if (profile) {
-        const avg = Math.round((feedback.grammar + feedback.vocabulary + feedback.clarity) / 3);
-        await logActivity({
-          userId: profile.id,
-          type: "writing",
-          title: "Writing correction",
-          minutes: minutesSpent(1),
-          score: avg,
-          scores: { writing: avg },
-          currentStreak: profile.streak_days,
-          lastDate: profile.last_activity_date,
-        });
+        await saveLegacyWriting({ data: { operationKey: stableOperationKey, minutes: minutesSpent(1) } });
         queryClient.invalidateQueries();
       }
     } catch (err) {

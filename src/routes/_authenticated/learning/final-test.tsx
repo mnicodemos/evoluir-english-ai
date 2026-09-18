@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Loader2, Trophy } from "lucide-react";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -11,11 +12,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useLearningPath, useOpenFinalTest } from "@/hooks/useCurriculum";
 import { completeLesson, useLesson } from "@/hooks/useLearning";
-import { logActivity, useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { FINAL_TEST_PASS, FINAL_TEST_QUESTIONS, nextLevel } from "@/lib/level";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
+import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 
 export const Route = createFileRoute("/_authenticated/learning/final-test")({
   head: () => ({
@@ -43,6 +45,7 @@ function FinalTestPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const minutesSpent = useTimeSpent();
+  const saveQuizLegacy = useServerFn(persistQuizLegacy);
   useLogTimeOnExit({ timer: minutesSpent, profile, type: "final_test_practice", title: "Final test practice" });
 
   const [lessonId, setLessonId] = useState<string | null>(path.finalTest.lessonId);
@@ -61,18 +64,9 @@ function FinalTestPage() {
     }
   };
 
-  const finish = async (score: number) => {
+  const finish = async (score: number, attemptKey: string) => {
     if (!profile || !id) return;
-    await logActivity({
-      userId: profile.id,
-      type: "final_test",
-      title: `Final Test ${path.level.toUpperCase()}`,
-      minutes: minutesSpent(1),
-      score,
-      
-      currentStreak: profile.streak_days,
-      lastDate: profile.last_activity_date,
-    });
+    await saveQuizLegacy({ data: { attemptKey, activityType: "final_test", minutes: minutesSpent(1) } });
 
     if (score < FINAL_TEST_PASS) {
       queryClient.invalidateQueries({ queryKey: ["quiz-results"] });

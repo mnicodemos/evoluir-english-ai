@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { pronunciationSimilarity } from "@/lib/legacyScores";
 
 /** Sends a recorded WAV blob to the transcription endpoint and returns the recognized English text. */
 export async function transcribeAudio(audio: Blob): Promise<string> {
@@ -47,24 +48,7 @@ export async function transcribeAudio(audio: Blob): Promise<string> {
   return transcript.trim();
 }
 
-const normalize = (value: string) => value.toLowerCase().replace(/[^a-z\s]/g, "").trim();
-
 /** Rough similarity (0-1) between what the student said and the target word. */
 export function pronunciationScore(target: string, spoken: string): number {
-  const a = normalize(target);
-  const b = normalize(spoken);
-  if (!a || !b) return 0;
-  if (b === a || b.split(/\s+/).includes(a)) return 1;
-
-  const rows = a.length + 1;
-  const cols = b.length + 1;
-  const dist = Array.from({ length: rows }, (_, i) => [i, ...Array<number>(cols - 1).fill(0)]);
-  for (let j = 0; j < cols; j += 1) dist[0]![j] = j;
-  for (let i = 1; i < rows; i += 1) {
-    for (let j = 1; j < cols; j += 1) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      dist[i]![j] = Math.min(dist[i - 1]![j]! + 1, dist[i]![j - 1]! + 1, dist[i - 1]![j - 1]! + cost);
-    }
-  }
-  return Math.max(0, 1 - dist[rows - 1]![cols - 1]! / Math.max(a.length, b.length));
+  return pronunciationSimilarity(target, spoken);
 }
