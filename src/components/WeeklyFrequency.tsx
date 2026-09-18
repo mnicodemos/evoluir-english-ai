@@ -95,9 +95,7 @@ export function WeeklyFrequency({ userId }: Props) {
             );
           })}
         </div>
-        <p className="text-center text-[10px] font-medium leading-tight text-muted-foreground">
-          {aiGoalLabel}
-        </p>
+        <p className="text-center text-base font-medium">{aiGoalLabel}</p>
       </div>
     </div>
   );
