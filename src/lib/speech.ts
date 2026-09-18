@@ -220,8 +220,14 @@ async function requestSpeech(
   }
 }
 
+/** Keeps the playback speed inside a natural, intelligible range. */
+function clampRate(rate: number | undefined) {
+  if (!rate || !Number.isFinite(rate)) return 1;
+  return Math.min(1.2, Math.max(0.6, rate));
+}
+
 /** Free browser voice used whenever the audio service is unavailable. */
-async function speakWithBrowser(value: string): Promise<void> {
+async function speakWithBrowser(value: string, rate = 1): Promise<void> {
   const synth = window.speechSynthesis;
   if (!synth) throw new Error("Audio playback is not supported by this browser.");
 
