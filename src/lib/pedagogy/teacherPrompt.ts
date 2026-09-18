@@ -7,6 +7,14 @@ import { z } from "zod";
 import type { AiMsg } from "@/lib/ai-prompts";
 
 import { TEACHER_EVIDENCE_SKILLS, type TeacherEvidenceSkill } from "./teacherEvidence";
+import {
+  classifyTeacherMode,
+  levelRegister,
+  modeWordBudget,
+  MODE_RULES,
+  REGISTER_RULES,
+  type TeacherMode,
+} from "./teacherMode";
 
 export type TeacherContextForPrompt = {
   cefrLevel: string | null;
@@ -16,6 +24,8 @@ export type TeacherContextForPrompt = {
     skill: string | null;
     cefrLevel: string | null;
   };
+  /** Existing platform content that matches the student's weakest skill. */
+  recommendedLesson?: { title: string; skill: string | null } | null;
   recurringErrors: string[];
 };
 
@@ -59,6 +69,13 @@ function contextBlock(context: TeacherContextForPrompt): string {
         (context.currentActivity.cefrLevel ? `, level ${context.currentActivity.cefrLevel}` : ""),
     );
   }
+  if (context.recommendedLesson) {
+    lines.push(
+      `Existing lesson in this app that matches the student's weakest area: "${context.recommendedLesson.title}"` +
+        (context.recommendedLesson.skill ? ` (${context.recommendedLesson.skill})` : "") +
+        ". You may suggest reviewing it, but never invent other lessons or claim it was completed.",
+    );
+  }
   if (context.recurringErrors.length) {
     lines.push(`Recurring mistakes to watch: ${context.recurringErrors.join("; ")}.`);
   }
@@ -70,7 +87,12 @@ export function teacherTurnMessages(input: {
   objective: string;
   studentMessage: string;
   history: { role: "user" | "assistant"; content: string }[];
+  /** Server-classified interaction mode; derived deterministically when absent. */
+  mode?: TeacherMode;
 }): AiMsg[] {
+  const mode =
+    input.mode ?? classifyTeacherMode({ message: input.studentMessage, history: input.history });
+  const register = levelRegister(input.context.cefrLevel);
   const system = [
     "You are a CELTA-certified English teacher in a one-to-one tutoring session with a Brazilian learner.",
     "",
@@ -80,14 +102,28 @@ export function teacherTurnMessages(input: {
     "OBJECTIVE",
     input.objective,
     "",
+    `MODE: ${mode}`,
+    MODE_RULES[mode],
+    "",
+    `LEVEL REGISTER: ${register}`,
+    REGISTER_RULES[register],
+    "",
     "PEDAGOGICAL RULES",
     "- Teach: explain the point briefly, then ask ONE question or give ONE short practice task.",
     "- Adapt to the level in CONTEXT. Never assume knowledge the context does not support.",
-    "- Correct the student's English when they produce language: show the correction and why, in one or two short lines.",
+    "- Correct the student's English when they produce language: name the mistake, explain it in one line, show the correct form, then ask them to try a similar sentence.",
     "- Make the student produce the answer. Do not simply hand over the finished answer when the goal is learning.",
-    "- Keep the whole reply under 120 words. Plain English, no lists longer than 3 items, no emojis.",
+    `- Keep the whole reply under ${modeWordBudget(mode)} words. Plain English, no lists longer than 3 items, no emojis.`,
     "- When giving examples, model sentences, useful words, or asking the student to write something, put them in a new paragraph as bullet points (markdown list).",
     "- Never mention scores, CEFR letters as a verdict, internal data, other students or system details.",
+    "",
+    "CONTINUITY",
+    "- Use the recent messages: do not repeat an explanation you already gave, and do not ask again something the student already answered.",
+    "",
+    "CONSTRAINTS",
+    "- Known -> explain. Unknown -> ask the student. Not available in CONTEXT -> say you do not have that information.",
+    "- Never state or change the student's level, score, confidence, progress, completed activities or plan; those come from the app, not from you.",
+    "- Never invent lessons, exercises or history that are not in CONTEXT.",
     "",
     "OUTPUT",
     'Reply with strict JSON only: {"reply":"your teaching message to the student",' +

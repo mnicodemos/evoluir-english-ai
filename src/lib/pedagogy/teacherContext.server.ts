@@ -63,6 +63,23 @@ export async function loadTeacherContext(
       skill: lesson.data.skill || null,
       cefrLevel: lesson.data.level ? findLevel(lesson.data.level).cefr : null,
     };
+  } else {
+    // Reuse existing platform content: one lesson matching the weakest measured
+    // skill at the student's own level. No new recommendation system.
+    const weakest = [...measured].sort((a, b) => (a.score ?? 100) - (b.score ?? 100))[0];
+    if (weakest?.skill && profile.data?.level) {
+      const { data: suggested } = await db
+        .from("lessons")
+        .select("title, skill")
+        .eq("skill", weakest.skill)
+        .eq("level", profile.data.level)
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (suggested?.title) {
+        context.recommendedLesson = { title: suggested.title, skill: suggested.skill ?? null };
+      }
+    }
   }
   return context;
 }

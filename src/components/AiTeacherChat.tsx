@@ -32,6 +32,17 @@ const suggestions = [
   "Let's practice conversation",
 ];
 
+const quickActions = ["Practise this", "Explain another way"];
+
+const MODE_LABEL: Record<string, string> = {
+  EXPLAIN: "Explaining",
+  PRACTICE: "Practising",
+  CORRECT: "Correcting",
+  EXAMPLE: "Examples",
+  REVIEW: "Reviewing",
+  CONVERSATION: "Conversation",
+};
+
 const errorCopy: Record<string, string> = {
   offline: "You seem to be offline. Check your connection and try again.",
   quota: "You have reached your AI usage limit for now. Please try again later.",
@@ -50,6 +61,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
+  const [mode, setMode] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const session = useQuery({
@@ -80,6 +92,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
       }),
     onSuccess: (result) => {
       if (result.conversationId) setConversationId(result.conversationId);
+      setMode(result.mode ?? null);
       setMessages((prev) => [...prev, { role: "assistant", content: result.reply }]);
       void queryClient.invalidateQueries({ queryKey: ["teacher-session"] });
     },
@@ -143,6 +156,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             </Badge>
           )}
           {ctx.lessonTitle && <Badge variant="outline">{ctx.lessonTitle}</Badge>}
+          {mode && <Badge variant="outline">{t(MODE_LABEL[mode] ?? mode)}</Badge>}
         </div>
       )}
 
@@ -184,6 +198,16 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
                 </MessageContent>
               </Message>
             ))}
+
+            {messages.at(-1)?.role === "assistant" && !turn.isPending && (
+              <div className="flex flex-wrap gap-2">
+                {quickActions.map((action) => (
+                  <Button key={action} variant="outline" size="sm" onClick={() => send(action)}>
+                    {t(action)}
+                  </Button>
+                ))}
+              </div>
+            )}
 
             {turn.isPending && (
               <div aria-live="polite" className="text-sm">
