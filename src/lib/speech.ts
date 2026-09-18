@@ -356,12 +356,13 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
     const gain = context.createGain();
     gain.gain.value = 1.15;
     source.buffer = decoded;
+    source.playbackRate.value = rate;
     source.connect(gain);
     gain.connect(context.destination);
     playhead = Math.max(playhead, context.currentTime + 0.02);
     source.onended = () => activeSources.delete(source);
     source.start(playhead);
-    playhead += decoded.duration;
+    playhead += decoded.duration / rate;
     activeSources.add(source);
     streamed = true;
   };
