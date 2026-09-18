@@ -9,7 +9,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callGateway } from "@/lib/ai-gateway.server";
 import { deterministicUuid, persistTeacherEvidence } from "@/lib/pedagogy/dualWrite.functions";
-import { measuredCefr } from "@/lib/pedagogy/cefr";
+import { itemLevelFromStoredLevel } from "@/lib/pedagogy/cefr";
 import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
 import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
 import {
@@ -134,7 +134,7 @@ export const teacherTurn = createServerFn({ method: "POST" })
           score: decision.score,
           turnId,
           // Level of the interaction, taken from the server-owned context.
-          itemCefr: measuredCefr(pedagogicalContext.cefrLevel),
+          itemCefr: itemLevelFromStoredLevel(pedagogicalContext.cefrLevel),
         }),
       });
       evidencePersisted = result.ok && !result.duplicate;
