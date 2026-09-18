@@ -51,106 +51,60 @@ export function WeeklyFrequency({ userId }: Props) {
   });
 
   const allStudied = (studyDays?.size ?? 0) === 7;
+  const studiedCount = studyDays?.size ?? 0;
+  const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
 
   return (
-    <div className="flex h-full flex-col justify-center gap-2">
-      <div className="flex justify-center">
+    <div className="flex h-full flex-col justify-center gap-3">
+      <div className="flex items-center gap-3">
         <TrophyBadge active={allStudied} />
+        <div className="grid flex-1 grid-cols-7 place-items-center gap-1.5">
+          {weekKeys.map((key, i) => {
+            const studied = studyDays?.has(key) ?? false;
+            const isToday = key === todayKey;
+            return (
+              <div
+                key={key}
+                className={
+                  "flex flex-col items-center gap-1.5 rounded-lg border p-2 " +
+                  (studied ? "border-transparent bg-success/10" : "border-border bg-card") +
+                  (isToday ? " ring-1 ring-foreground/30" : "")
+                }
+              >
+                {studied ? (
+                  <span className="grid size-6 place-items-center rounded-full bg-success text-success-foreground">
+                    <Check className="size-3.5" strokeWidth={3} />
+                  </span>
+                ) : (
+                  <span className="size-6 rounded-full border-2 border-border" />
+                )}
+                <span className="text-[11px] text-muted-foreground">{labels[i]}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
-
-
-      <div className="grid flex-1 grid-cols-7 place-items-center gap-1.5">
-        {weekKeys.map((key, i) => {
-          const studied = studyDays?.has(key) ?? false;
-          const isToday = key === todayKey;
-          return (
-            <div
-              key={key}
-              className={
-                "flex flex-col items-center gap-1.5 rounded-lg border p-2 " +
-                (studied ? "border-transparent bg-success/10" : "border-border bg-card") +
-                (isToday ? " ring-1 ring-foreground/30" : "")
-              }
-            >
-              {studied ? (
-                <span className="grid size-6 place-items-center rounded-full bg-success text-success-foreground">
-                  <Check className="size-3.5" strokeWidth={3} />
-                </span>
-              ) : (
-                <span className="size-6 rounded-full border-2 border-border" />
-              )}
-              <span className="text-[11px] text-muted-foreground">{labels[i]}</span>
-            </div>
-          );
-        })}
-      </div>
+      <p className="text-center text-xs font-medium text-muted-foreground">
+        {goalLabel} {studiedCount} / 07 Days
+      </p>
     </div>
   );
 }
 
-function TrophyBadge({ active, size = 44 }: { active: boolean; size?: number }) {
-  const id = `trophy-grad-${active ? "gold" : "gray"}`;
-  const from = active ? "oklch(0.90 0.15 95)" : "oklch(0.80 0.01 250)";
-  const to = active ? "oklch(0.68 0.15 80)" : "oklch(0.60 0.02 240)";
-  const glow = active ? "oklch(0.85 0.16 90 / 0.6)" : "oklch(0.70 0.02 245 / 0.35)";
-  const iconColor = active ? "oklch(0.45 0.10 80)" : "oklch(0.55 0.01 250)";
-
+function TrophyBadge({ active }: { active: boolean }) {
   return (
     <span
-      className="relative grid shrink-0 place-items-center"
-      style={{ width: size, height: size }}
+      className={cn(
+        "relative grid size-14 shrink-0 place-items-center rounded-full shadow-lg transition-all duration-500",
+        active
+          ? "bg-gradient-to-br from-[oklch(0.90_0.15_95)] to-[oklch(0.68_0.15_80)] text-[oklch(0.45_0.10_80)] motion-safe:animate-pulse"
+          : "bg-gradient-to-br from-[oklch(0.80_0.01_250)] to-[oklch(0.60_0.02_240)] text-[oklch(0.55_0.01_250)]"
+      )}
       role="img"
       aria-label={active ? "7-day trophy unlocked" : "7-day trophy locked"}
       title={active ? "7-day trophy unlocked" : "7-day trophy locked"}
     >
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-full blur-md motion-safe:animate-[pulse_2.4s_ease-in-out_infinite]"
-        style={{ background: `radial-gradient(circle, ${glow} 0%, transparent 70%)` }}
-      />
-      <svg
-        viewBox="0 0 64 64"
-        width={size}
-        height={size}
-        className="relative motion-safe:animate-[league-float_3.6s_ease-in-out_infinite]"
-      >
-        <defs>
-          <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor={from} />
-            <stop offset="100%" stopColor={to} />
-          </linearGradient>
-          <clipPath id={`${id}-clip`}>
-            <path d="M32 4 54 18 54 46 32 60 10 46 10 18Z" />
-          </clipPath>
-        </defs>
-        <path d="M32 4 54 18 54 46 32 60 10 46 10 18Z" fill={`url(#${id})`} />
-        <path d="M32 4 54 18 32 30 10 18Z" fill="white" opacity="0.22" />
-        <path d="M32 30 54 18 54 46 32 60Z" fill="black" opacity="0.14" />
-        <g clipPath={`url(#${id}-clip)`}>
-          <rect
-            x="-40"
-            y="0"
-            width="24"
-            height="64"
-            fill="white"
-            opacity="0.35"
-            transform="skewX(-18)"
-            className="motion-safe:animate-[league-shine_3.2s_linear_infinite]"
-          />
-        </g>
-        <path
-          d="M32 4 54 18 54 46 32 60 10 46 10 18Z"
-          fill="none"
-          stroke="white"
-          strokeOpacity="0.5"
-          strokeWidth="1.5"
-        />
-        <foreignObject x="14" y="14" width="36" height="36" className="pointer-events-none">
-          <div className="grid h-full w-full place-items-center">
-            <Trophy className="size-5" style={{ color: iconColor }} strokeWidth={2.5} />
-          </div>
-        </foreignObject>
-      </svg>
+      <Trophy className="size-7" strokeWidth={2.5} />
     </span>
   );
 }
