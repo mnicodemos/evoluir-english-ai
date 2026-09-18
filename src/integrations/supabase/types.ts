@@ -1228,6 +1228,19 @@ export type Database = {
         }
         Returns: Json
       }
+      record_pedagogical_failure: {
+        Args: {
+          p_already_claimed?: boolean
+          p_error_code: string
+          p_error_message: string
+          p_idempotency_key: string
+          p_source_id: string
+          p_source_type: string
+          p_stage: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       reserve_ai_usage: {
         Args: {
           p_daily_limit: number
