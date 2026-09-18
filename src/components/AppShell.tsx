@@ -21,6 +21,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
 import { ProfileMenu } from "@/components/ProfileMenu";
+import { AiTeacherFloatButton } from "@/components/AiTeacherFloatButton";
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
@@ -190,13 +191,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         {location.pathname === "/dashboard" && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Link
-                to="/teacher"
-                aria-label={translate("AI Teacher")}
-                className="fixed bottom-[4.5rem] right-4 z-40 grid h-14 w-14 place-items-center rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-900/30 transition-transform duration-200 hover:scale-110 animate-pulse lg:bottom-8 lg:right-8"
-              >
-                <Sparkles className="size-7" aria-hidden="true" />
-              </Link>
+              <AiTeacherFloatButton />
             </TooltipTrigger>
             <TooltipContent side="left" sideOffset={8}>
               {translate("AI Teacher")}
