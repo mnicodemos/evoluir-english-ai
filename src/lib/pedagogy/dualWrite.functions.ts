@@ -8,8 +8,10 @@ import { parseWritingFeedback, writingCorrectionMessages } from "@/lib/ai-prompt
 import { expectedLengthLabel, writingLevelConfig } from "@/lib/writingLevels";
 import { callGateway } from "@/lib/ai-gateway.server";
 
+import { findLevel } from "@/lib/level";
+
 import { aggregateSkillEvidence } from "./aggregateSkill";
-import { measuredCefr } from "./cefr";
+import { measuredCefr, type MeasuredCefrLevel } from "./cefr";
 import {
   type AssessmentEvidence,
   evidenceSourceTypeSchema,
