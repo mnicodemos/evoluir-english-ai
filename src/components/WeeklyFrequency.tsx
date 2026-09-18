@@ -61,7 +61,7 @@ export function WeeklyFrequency({ userId }: Props) {
     <div className="flex h-full items-center gap-3">
       <div className="flex flex-col items-center gap-1.5">
         <TrophyBadge active={allStudied} lang={lang} />
-        <div className="flex w-14 flex-col items-center text-center text-[10px] font-medium leading-tight text-muted-foreground">
+        <div className="flex w-11 flex-col items-center text-center text-[10px] font-medium leading-tight text-muted-foreground">
           <span>{goalLabel}</span>
           <span>
             {studiedCount}/7 {daysLabel}
