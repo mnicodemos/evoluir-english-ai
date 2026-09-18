@@ -127,6 +127,9 @@ export function writingEvidence(
     sourceType: "writing" as const,
     evidenceType: "subscore" as const,
     polarity: "neutral" as const,
+    // The task was written for this level and the correction was judged against
+    // it (Phase 19), so the evidence carries the same level.
+    itemCefr: itemCefr ?? null,
     sourceReliability: 0.8,
     evidenceQuality: 0.85,
     sampleWeight: 1,
