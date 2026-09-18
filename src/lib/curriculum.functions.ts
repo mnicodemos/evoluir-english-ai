@@ -432,7 +432,7 @@ export const openFinalTest = createServerFn({ method: "POST" })
             `You are a CEFR examiner writing the final exam of a ${level.toUpperCase()} English course for a Brazilian learner. ` +
             `${descriptor} ` +
             `The exam checks the grammar the level requires: tenses, structures, word order, connectors and correct usage. ` +
-            `Reply with strict JSON: {"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence"}]}. ` +
+            `Reply with strict JSON: {"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence","pedagogical_skill":"grammar"}]}. ` +
             `Give exactly ${FINAL_TEST_TOTAL} questions, all different, ordered from easier to harder, all inside ${level.toUpperCase()}. ` +
             `Every question must be a self-contained grammar question (complete or correct a sentence, choose the right form). ` +
             `Never ask about a dialogue, a video, a story, a character or any listening/reading passage.`,
@@ -482,18 +482,10 @@ export const openFinalTest = createServerFn({ method: "POST" })
 
     if (error || !lesson) throw new Error(error?.message ?? "Could not open the Final Test.");
 
-    await supabase.from("quizzes").insert(
-      quiz.map((q, index) => ({
-        lesson_id: lesson.id,
-        question: String(q.question).slice(0, 400),
-        question_type: "multiple_choice",
-        options: q.options as string[],
-        correct_answer: String(q.correct_answer),
-        explanation: String(q.explanation ?? "").slice(0, 400),
-        sort_order: index,
-        created_by: userId,
-      })),
-    );
+    // The Final Test prompt constrains every item to grammar, so grammar is the
+    // structural default when the generated label is absent or unsupported.
+    await insertQuizQuestions(supabase, userId, lesson.id as string, quiz, "grammar");
+
 
     return { lessonId: lesson.id as string };
   });
