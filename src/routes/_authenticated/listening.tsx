@@ -243,14 +243,19 @@ function ListeningPage() {
   async function play(slow = false) {
     setPlaying(true);
     try {
-      if (slow) {
+      // Lower levels practise word by word; from B1 the sentence stays whole,
+      // just slower, so rhythm and intonation are preserved.
+      if (slow && config.slowMode === "word-by-word") {
         const words = sentence.split(/\s+/).filter(Boolean);
         for (const word of words) {
-          await speakEnglish(word, { cache: "persistent" });
+          await speakEnglish(word, { cache: "persistent", rate: config.rate });
           await new Promise((resolve) => setTimeout(resolve, 350));
         }
       } else {
-        await speakEnglish(sentence, { cache: "persistent" });
+        await speakEnglish(sentence, {
+          cache: "persistent",
+          rate: slow ? config.rate * 0.85 : config.rate,
+        });
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Audio is unavailable right now.");
