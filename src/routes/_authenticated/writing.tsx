@@ -71,27 +71,29 @@ function rememberAnswered(prompt: string) {
 }
 
 /**
- * One task per theme (Everyday, Professional, Travel), new every day.
- * Already answered tasks never come back until the whole pool is used.
+ * One task per theme (Everyday, Professional, Travel), taken from the pool of
+ * the student's CEFR level. Already answered tasks are skipped while fresh ones
+ * exist; when the whole level pool is used the history is cleared.
  */
-function roundPrompts(signature: string): string[] {
+function roundPrompts(
+  signature: string,
+  config: WritingLevelConfig,
+  rotation: number,
+): string[] {
   const key = `writing-prompts-round-${signature}`;
   const saved = readList(key);
   if (saved.length === TASKS_PER_ROUND) return saved;
 
   let history = loadHistory();
-  const pick = (pool: string[]) => {
-    const fresh = pool.filter((p) => !history.includes(p));
-    return (fresh.length ? fresh : pool)[
-      Math.floor(Math.random() * (fresh.length || pool.length))
-    ]!;
-  };
-  if (categories.every((c) => c.pool.every((p) => history.includes(p)))) {
+  const levelExhausted = WRITING_CATEGORIES.every(({ id }) =>
+    config.tasks[id].every((task) => history.includes(task)),
+  );
+  if (levelExhausted) {
     history = [];
     writeList(HISTORY_KEY, history);
   }
 
-  const picked = categories.map((c) => pick(c.pool));
+  const picked = pickWritingTasks({ config, history, rotation });
   writeList(key, picked);
   return picked;
 }
