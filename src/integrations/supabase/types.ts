@@ -654,11 +654,15 @@ export type Database = {
       pedagogical_dual_write_failures: {
         Row: {
           attempt_count: number
+          completed_at: string | null
           error_code: string
           first_failed_at: string
           id: string
           idempotency_key: string
+          last_error_message: string | null
           last_failed_at: string
+          next_retry_at: string | null
+          processing_started_at: string | null
           resolved_at: string | null
           source_id: string | null
           source_type: string
@@ -668,11 +672,15 @@ export type Database = {
         }
         Insert: {
           attempt_count?: number
+          completed_at?: string | null
           error_code: string
           first_failed_at?: string
           id?: string
           idempotency_key: string
+          last_error_message?: string | null
           last_failed_at?: string
+          next_retry_at?: string | null
+          processing_started_at?: string | null
           resolved_at?: string | null
           source_id?: string | null
           source_type: string
@@ -682,11 +690,15 @@ export type Database = {
         }
         Update: {
           attempt_count?: number
+          completed_at?: string | null
           error_code?: string
           first_failed_at?: string
           id?: string
           idempotency_key?: string
+          last_error_message?: string | null
           last_failed_at?: string
+          next_retry_at?: string | null
+          processing_started_at?: string | null
           resolved_at?: string | null
           source_id?: string | null
           source_type?: string
@@ -811,6 +823,7 @@ export type Database = {
       }
       quiz_results: {
         Row: {
+          attempt_key: string | null
           correct_count: number
           created_at: string
           details: Json
@@ -821,6 +834,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          attempt_key?: string | null
           correct_count?: number
           created_at?: string
           details?: Json
@@ -831,6 +845,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          attempt_key?: string | null
           correct_count?: number
           created_at?: string
           details?: Json
@@ -1189,6 +1204,19 @@ export type Database = {
       }
     }
     Functions: {
+      persist_pedagogical_bundle: {
+        Args: {
+          p_evidence: Json
+          p_idempotency_key: string
+          p_results: Json
+          p_rubric_version: string
+          p_session_id: string
+          p_source_id: string
+          p_source_type: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       reserve_ai_usage: {
         Args: {
           p_daily_limit: number
