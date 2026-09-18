@@ -21,7 +21,12 @@ export type Database = {
           duration_minutes: number
           id: string
           level: string | null
+          operation_key: string | null
+          operation_status: string | null
+          result: Json | null
           score: number | null
+          source_id: string | null
+          source_type: string | null
           title: string
           user_id: string
         }
@@ -31,7 +36,12 @@ export type Database = {
           duration_minutes?: number
           id?: string
           level?: string | null
+          operation_key?: string | null
+          operation_status?: string | null
+          result?: Json | null
           score?: number | null
+          source_id?: string | null
+          source_type?: string | null
           title?: string
           user_id: string
         }
@@ -41,7 +51,12 @@ export type Database = {
           duration_minutes?: number
           id?: string
           level?: string | null
+          operation_key?: string | null
+          operation_status?: string | null
+          result?: Json | null
           score?: number | null
+          source_id?: string | null
+          source_type?: string | null
           title?: string
           user_id?: string
         }
@@ -1214,6 +1229,21 @@ export type Database = {
           source_id: string
           source_type: string
         }[]
+      }
+      persist_authoritative_legacy_activity: {
+        Args: {
+          p_activity_type: string
+          p_duration_minutes: number
+          p_operation_key: string
+          p_result: Json
+          p_score: number
+          p_scores: Json
+          p_source_id: string
+          p_source_type: string
+          p_title: string
+          p_user_id: string
+        }
+        Returns: Json
       }
       persist_pedagogical_bundle: {
         Args: {
