@@ -192,7 +192,14 @@ describe("Authoritative source contracts", () => {
   it("calculates Quiz results exclusively from stored answer keys", () => {
     expect(
       gradeQuizAnswers(
-        [{ id: questionId, question: "Stored question", correct_answer: "server-key", sort_order: 1 }],
+        [
+          {
+            id: questionId,
+            question: "Stored question",
+            correct_answer: "server-key",
+            sort_order: 1,
+          },
+        ],
         [{ questionId, answer: "forged-answer" }],
       ),
     ).toMatchObject({ score: 0, correct: 0, details: [{ is_correct: false }] });

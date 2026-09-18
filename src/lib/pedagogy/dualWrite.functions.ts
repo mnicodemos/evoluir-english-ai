@@ -417,7 +417,9 @@ export const submitAuthoritativeQuiz = createServerFn({ method: "POST" })
       const submitted = new Map(data.answers.map((answer) => [answer.questionId, answer.answer]));
       if (
         details.length !== data.answers.length ||
-        details.some((detail) => !detail.question_id || submitted.get(detail.question_id) !== detail.answer)
+        details.some(
+          (detail) => !detail.question_id || submitted.get(detail.question_id) !== detail.answer,
+        )
       ) {
         throw new PedagogicalWriteError(
           "idempotency",
