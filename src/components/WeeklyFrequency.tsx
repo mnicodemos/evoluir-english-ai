@@ -53,11 +53,12 @@ export function WeeklyFrequency({ userId }: Props) {
   const allStudied = (studyDays?.size ?? 0) === 7;
   const studiedCount = studyDays?.size ?? 0;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
+  const daysLabel = lang === "pt" ? "dias" : "days";
 
   return (
     <div className="flex h-full flex-col justify-center gap-3">
       <div className="flex items-center gap-3">
-        <TrophyBadge active={allStudied} />
+        <TrophyBadge active={allStudied} lang={lang} />
 
 
         <div className="grid flex-1 grid-cols-7 place-items-center gap-1.5">
@@ -87,24 +88,27 @@ export function WeeklyFrequency({ userId }: Props) {
         </div>
       </div>
       <p className="text-center text-xs font-medium text-muted-foreground">
-        {goalLabel} {studiedCount} / 07 Days
+        {goalLabel} {studiedCount} / 7 {daysLabel}
       </p>
     </div>
   );
 }
 
-function TrophyBadge({ active }: { active: boolean }) {
+function TrophyBadge({ active, lang }: { active: boolean; lang: "pt" | "en" }) {
+  const unlockedText = lang === "pt" ? "Troféu de 7 dias desbloqueado" : "7-day trophy unlocked";
+  const lockedText = lang === "pt" ? "Troféu de 7 dias bloqueado" : "7-day trophy locked";
+
   return (
     <span
       className={cn(
-        "relative grid size-14 shrink-0 place-items-center rounded-full shadow-lg transition-all duration-500",
+        "relative grid size-14 shrink-0 place-items-center self-center rounded-full shadow-lg transition-all duration-500",
         active
           ? "bg-gradient-to-br from-[oklch(0.90_0.15_95)] to-[oklch(0.68_0.15_80)] text-[oklch(0.45_0.10_80)] motion-safe:animate-pulse"
           : "bg-gradient-to-br from-[oklch(0.80_0.01_250)] to-[oklch(0.60_0.02_240)] text-[oklch(0.55_0.01_250)]"
       )}
       role="img"
-      aria-label={active ? "7-day trophy unlocked" : "7-day trophy locked"}
-      title={active ? "7-day trophy unlocked" : "7-day trophy locked"}
+      aria-label={active ? unlockedText : lockedText}
+      title={active ? unlockedText : lockedText}
     >
       <Trophy className="size-7" strokeWidth={2.5} />
     </span>
