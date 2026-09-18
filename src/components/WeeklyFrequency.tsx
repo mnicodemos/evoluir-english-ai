@@ -54,8 +54,9 @@ export function WeeklyFrequency({ userId }: Props) {
   return (
     <div className="flex h-full flex-col justify-center gap-2">
       <div className="flex justify-center">
-        <TrophyBadge active={true} />
+        <TrophyBadge active={allStudied} />
       </div>
+
 
       <div className="grid flex-1 grid-cols-7 place-items-center gap-1.5">
         {weekKeys.map((key, i) => {
