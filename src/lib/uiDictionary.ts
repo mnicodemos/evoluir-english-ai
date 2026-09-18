@@ -248,6 +248,21 @@ export const uiPt: Record<string, string> = {
   REVEAL: "REVELAR",
   "Hide sentence": "Ocultar frase",
   "Play word by word": "Tocar palavra por palavra",
+  "Play slower": "Tocar mais devagar",
+  "Listening Practice": "Prática de Escuta",
+  Pronunciation: "Pronúncia",
+  "Basic sounds and very frequent words, one short sentence at a time.":
+    "Sons básicos e palavras muito frequentes, uma frase curta por vez.",
+  "Frequent words and simple past, repeated in short phrases.":
+    "Palavras frequentes e passado simples, repetidos em frases curtas.",
+  "Complete sentences with natural rhythm and clear word endings.":
+    "Frases completas com ritmo natural e finais de palavra claros.",
+  "Full sentences, sentence stress and connected speech.":
+    "Frases completas, acentuação da frase e fala conectada.",
+  "Fluency and accent reduction across longer, complex sentences.":
+    "Fluência e redução de sotaque em frases longas e complexas.",
+  "Natural delivery, subtle stress and near-native intonation.":
+    "Fala natural, acentuação sutil e entonação quase nativa.",
   "Type the sentence in English": "Digite a frase em inglês",
   "Type what you heard first.": "Digite primeiro o que você ouviu.",
   "Check answer": "Verificar resposta",
