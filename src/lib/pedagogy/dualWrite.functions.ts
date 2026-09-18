@@ -408,11 +408,15 @@ async function processWriting(
     sourceId: row.id,
     idempotencyKey: key,
     rubricVersion: WRITING_RUBRIC_VERSION,
-    evidence: writingEvidence({
-      grammar: row.grammar_score,
-      vocabulary: row.vocabulary_score,
-      clarity: row.clarity_score,
-    }),
+    evidence: writingEvidence(
+      {
+        grammar: row.grammar_score,
+        vocabulary: row.vocabulary_score,
+        clarity: row.clarity_score,
+      },
+      // The task and the correction rubric belong to the stored profile level.
+      await profileItemLevel(admin, userId),
+    ),
     ...(claimedAt ? { claimedAt } : {}),
   });
 }

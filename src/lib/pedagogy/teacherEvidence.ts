@@ -52,6 +52,8 @@ export function teacherEvidence(input: {
   skill: TeacherEvidenceSkill;
   score: number;
   turnId: string;
+  /** CEFR level of the interaction, resolved server-side from the profile. */
+  itemCefr?: MeasuredCefrLevel | null;
 }): AssessmentEvidence[] {
   return [
     {
