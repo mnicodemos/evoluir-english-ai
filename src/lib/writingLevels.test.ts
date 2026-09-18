@@ -20,7 +20,9 @@ describe("writing level configuration", () => {
   it("keeps the existing B2 tasks and maps legacy level names", () => {
     const b2 = writingLevelConfig("upper-intermediate");
     expect(b2.level).toBe("b2");
-    expect(b2.tasks.professional).toContain("Write an email asking a client to reschedule a meeting.");
+    expect(b2.tasks.professional).toContain(
+      "Write an email asking a client to reschedule a meeting.",
+    );
   });
 
   it("offers one task per theme for the level", () => {

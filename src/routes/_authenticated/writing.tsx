@@ -82,11 +82,7 @@ function rememberAnswered(prompt: string) {
  * the student's CEFR level. Already answered tasks are skipped while fresh ones
  * exist; when the whole level pool is used the history is cleared.
  */
-function roundPrompts(
-  signature: string,
-  config: WritingLevelConfig,
-  rotation: number,
-): string[] {
+function roundPrompts(signature: string, config: WritingLevelConfig, rotation: number): string[] {
   const key = `writing-prompts-round-${signature}`;
   const saved = readList(key);
   if (saved.length === TASKS_PER_ROUND) return saved;
@@ -329,8 +325,8 @@ function Writing() {
             />
             <div className="mt-4 flex items-center justify-between gap-3">
               <span className="text-sm text-muted-foreground">
-                {text.trim().split(/\s+/).filter(Boolean).length} words ·{" "}
-                <span>target</span> {expectedLengthLabel(config)}
+                {text.trim().split(/\s+/).filter(Boolean).length} words · <span>target</span>{" "}
+                {expectedLengthLabel(config)}
               </span>
               <Button onClick={analyse} disabled={loading}>
                 {loading ? (
