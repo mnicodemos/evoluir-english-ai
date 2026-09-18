@@ -22,7 +22,6 @@ import {
   writingSubmissionRecord,
   WRITING_RUBRIC_VERSION,
 } from "./dualWrite";
-import { auditedQuizSkill } from "./quizSkillCatalog";
 
 const quizInputSchema = z.object({ quizResultId: z.string().uuid() }).strict();
 const writingInputSchema = z
@@ -265,7 +264,7 @@ export const dualWriteQuizEvidence = createServerFn({ method: "POST" })
       );
       const evidence = details.flatMap((detail) => {
         if (!detail.question_id) return [];
-        const skill = skills.get(detail.question_id) ?? auditedQuizSkill(detail.question_id);
+        const skill = skills.get(detail.question_id);
         return skill
           ? [quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill })]
           : [];

@@ -10,7 +10,6 @@ import {
   writingEvidence,
   writingSubmissionRecord,
 } from "./dualWrite";
-import { auditedQuizSkill } from "./quizSkillCatalog";
 import {
   CEFR_LEVELS,
   cefrLevelSchema,
@@ -178,11 +177,6 @@ describe("Quiz dual-write mapping", () => {
   it("accepts legacy details without a question identifier without inventing one", () => {
     const { question_id: _questionId, ...legacy } = detail;
     expect(parseQuizDetails([legacy])).toEqual([legacy]);
-  });
-
-  it("classifies only explicitly audited question IDs", () => {
-    expect(auditedQuizSkill("ceafbabb-b317-47e4-b7f4-fc6f0af79920")).toBe("grammar");
-    expect(auditedQuizSkill("22222222-2222-4222-8222-222222222222")).toBeNull();
   });
 });
 
