@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import type { MeasuredCefrLevel } from "./cefr";
 import { type AssessmentEvidence, pedagogicalSkillSchema } from "./contracts";
 
 export const QUIZ_RUBRIC_VERSION = "quiz-observed-answer-v1";
@@ -112,7 +113,10 @@ export function classifyQuizEvidence(
   return { evidence, missingQuestionIds };
 }
 
-export function writingEvidence(scores: WritingSubscores): AssessmentEvidence[] {
+export function writingEvidence(
+  scores: WritingSubscores,
+  itemCefr?: MeasuredCefrLevel | null,
+): AssessmentEvidence[] {
   const subscores: Pick<AssessmentEvidence, "skill" | "subskill" | "rawScore">[] = [
     { skill: "grammar", subskill: "writing_grammar", rawScore: scores.grammar },
     { skill: "vocabulary", subskill: "writing_vocabulary", rawScore: scores.vocabulary },
