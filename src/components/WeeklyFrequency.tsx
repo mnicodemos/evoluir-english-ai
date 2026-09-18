@@ -57,7 +57,8 @@ export function WeeklyFrequency({ userId }: Props) {
   return (
     <div className="flex h-full flex-col justify-center gap-3">
       <div className="flex items-center gap-3">
-        <TrophyBadge active={allStudied} />
+        <TrophyBadge active={true} />
+
         <div className="grid flex-1 grid-cols-7 place-items-center gap-1.5">
           {weekKeys.map((key, i) => {
             const studied = studyDays?.has(key) ?? false;
