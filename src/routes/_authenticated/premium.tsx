@@ -59,7 +59,23 @@ const plans = [
 function Premium() {
   const { data: profile, isLoading } = useProfile();
   const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
+  const [starting, setStarting] = useState(false);
+  const startCheckout = useServerFn(createStripeCheckoutSession);
   const isPremium = profile?.plan === "premium";
+
+  async function goToCheckout() {
+    if (starting) return;
+    setStarting(true);
+    try {
+      const { url } = await startCheckout({ data: { interval: selected } });
+      window.location.href = url;
+    } catch {
+      setStarting(false);
+      toast.error("We could not open the secure checkout", {
+        description: "Please try again in a moment.",
+      });
+    }
+  }
 
   return (
     <AppShell>
@@ -156,19 +172,16 @@ function Premium() {
                 <Button
                   className="mt-7 w-full sm:w-auto"
                   size="lg"
-                  onClick={() =>
-                    toast.info("Checkout is opening soon", {
-                      description:
-                        selected === "yearly"
-                          ? "Yearly plan R$ 799,90 — secure payment will be available shortly."
-                          : "Monthly plan R$ 79,90 — secure payment will be available shortly.",
-                    })
-                  }
+                  disabled={starting}
+                  onClick={goToCheckout}
                 >
-                  Go Premium — {selected === "yearly" ? "R$ 799,90/year" : "R$ 79,90/month"}
+                  {starting && <Loader2 className="mr-2 size-4 animate-spin" />}
+                  {starting
+                    ? "Opening secure checkout…"
+                    : `Go Premium — ${selected === "yearly" ? "R$ 799,90/year" : "R$ 79,90/month"}`}
                 </Button>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Secure payment is being finalised. You will be able to pay by card or Pix.
+                  Secure payment is processed by Stripe. Your card details never reach Evoluir+.
                 </p>
               </section>
             </>
