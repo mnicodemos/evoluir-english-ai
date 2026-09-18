@@ -26,7 +26,7 @@ export const uiPt: Record<string, string> = {
   "Your session expired. Please sign in again.": "Sua sessão expirou. Entre novamente.",
   "The teacher is unavailable right now. Please try again.":
     "O professor está indisponível agora. Tente novamente.",
-  "Something went wrong. Please try again.": "Algo deu errado. Tente novamente.",
+  Dashboard: "Início",
   Learning: "Aprendizado",
   Listening: "Escuta",
   "AI Talking": "AI Talking",
