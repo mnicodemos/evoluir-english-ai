@@ -190,9 +190,7 @@ async function findOtherGrantingSubscription(
         current_period_end: row.current_period_end,
       }),
     )
-    .sort((a, b) =>
-      (b.current_period_end ?? "9999").localeCompare(a.current_period_end ?? "9999"),
-    );
+    .sort((a, b) => (b.current_period_end ?? "9999").localeCompare(a.current_period_end ?? "9999"));
 
   const best = candidates[0];
   return best ? { id: best.id, current_period_end: best.current_period_end } : null;
