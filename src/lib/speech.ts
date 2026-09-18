@@ -11,6 +11,12 @@ const SPEECH_FORMAT_VERSION = "pcm24-kore-095-v1";
 
 export type SpeechOptions = {
   cache?: "memory" | "persistent";
+  /**
+   * Playback speed applied to the generated audio (1 = natural speed).
+   * Used to slow the voice down for lower CEFR levels without changing the
+   * audio provider or the cached audio itself.
+   */
+  rate?: number;
 };
 
 let audioContext: AudioContext | null = null;
