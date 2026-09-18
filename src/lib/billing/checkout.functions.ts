@@ -45,9 +45,9 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
         .maybeSingle();
 
       const customer = await stripe.customers.create({
-        email: profile?.email ?? undefined,
-        name: profile?.name ?? undefined,
         metadata: { user_id: context.userId },
+        ...(profile?.email ? { email: profile.email } : {}),
+        ...(profile?.name ? { name: profile.name } : {}),
       });
       customerId = customer.id;
       await linkCustomer(context.userId, customerId);
