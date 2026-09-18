@@ -250,7 +250,6 @@ export const uiPt: Record<string, string> = {
   "Play word by word": "Tocar palavra por palavra",
   "Play slower": "Tocar mais devagar",
   "Listening Practice": "Prática de Escuta",
-  Pronunciation: "Pronúncia",
   "Basic sounds and very frequent words, one short sentence at a time.":
     "Sons básicos e palavras muito frequentes, uma frase curta por vez.",
   "Frequent words and simple past, repeated in short phrases.":
