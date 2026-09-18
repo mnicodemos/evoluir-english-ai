@@ -30,7 +30,6 @@ import {
   writingFeedbackFromRow,
 } from "./authoritativeSources";
 
-const quizInputSchema = z.object({ quizResultId: z.string().uuid() }).strict();
 const retryInputSchema = z.object({ limit: z.number().int().min(1).max(5).default(3) }).strict();
 
 type AdminClient = SupabaseClient<Database>;
@@ -107,44 +106,20 @@ async function recordFailure(
   sourceId: string | null,
   idempotencyKey: string,
   error: unknown,
+  alreadyClaimed = false,
 ) {
   const failure = classifyFailure(error);
-  const { data: existing } = await admin
-    .from("pedagogical_dual_write_failures")
-    .select("id, attempt_count")
-    .eq("user_id", userId)
-    .eq("idempotency_key", idempotencyKey)
-    .maybeSingle();
-  const attemptCount = (existing?.attempt_count ?? 0) + 1;
-  const delaySeconds = Math.min(3600, 15 * 2 ** Math.min(attemptCount - 1, 8));
-  const values = {
-    user_id: userId,
-    source_type: sourceType,
-    source_id: sourceId,
-    idempotency_key: idempotencyKey,
-    stage: failure.stage,
-    error_code: failure.code,
-    last_error_message: sanitizedMessage(error),
-    status: retryable(failure.code) && attemptCount < 5 ? "pending" : "failed",
-    attempt_count: attemptCount,
-    last_failed_at: new Date().toISOString(),
-    next_retry_at:
-      retryable(failure.code) && attemptCount < 5
-        ? new Date(Date.now() + delaySeconds * 1000).toISOString()
-        : null,
-    processing_started_at: null,
-    completed_at: null,
-    resolved_at: null,
-  } as const;
-  if (existing) {
-    await admin
-      .from("pedagogical_dual_write_failures")
-      .update(values)
-      .eq("id", existing.id)
-      .eq("user_id", userId);
-  } else {
-    await admin.from("pedagogical_dual_write_failures").insert(values);
-  }
+  const { error: recordError } = await admin.rpc("record_pedagogical_failure", {
+    p_user_id: userId,
+    p_source_type: sourceType,
+    p_source_id: sourceId ?? undefined,
+    p_idempotency_key: idempotencyKey,
+    p_stage: failure.stage,
+    p_error_code: failure.code,
+    p_error_message: sanitizedMessage(error),
+    p_already_claimed: alreadyClaimed,
+  });
+  if (recordError) console.error("Pedagogical failure record could not be persisted");
 }
 
 async function resolveFailure(admin: AdminClient, userId: string, idempotencyKey: string) {
@@ -463,15 +438,39 @@ export const submitAuthoritativeQuiz = createServerFn({ method: "POST" })
       correct_count: graded.correct,
       details: graded.details,
     });
-    if (insertError) {
-      if (insertError.code === "23505") {
+    if (insertError && insertError.code !== "23505") throw new Error("Quiz result could not be saved");
+    if (insertError?.code === "23505") {
+      const { data: concurrent } = await admin
+        .from("quiz_results")
+        .select("id, user_id, lesson_id, score, total_questions, correct_count, details")
+        .eq("id", data.attemptKey)
+        .maybeSingle();
+      const concurrentDetails = parseQuizDetails(concurrent?.details);
+      if (
+        !concurrent ||
+        concurrent.user_id !== context.userId ||
+        concurrent.lesson_id !== data.lessonId ||
+        concurrentDetails.length !== graded.details.length ||
+        concurrentDetails.some(
+          (detail, index) =>
+            detail.question_id !== graded.details[index]?.question_id ||
+            detail.answer !== graded.details[index]?.answer,
+        )
+      ) {
         throw new PedagogicalWriteError(
           "idempotency",
           "IDEMPOTENCY_CONFLICT",
-          "Quiz attempt was submitted concurrently",
+          "Quiz attempt was submitted concurrently with different answers",
         );
       }
-      throw new Error("Quiz result could not be saved");
+      await processQuizResultSafely(admin, context.userId, concurrent.id);
+      return {
+        resultId: concurrent.id,
+        score: concurrent.score,
+        total: concurrent.total_questions,
+        correct: concurrent.correct_count,
+        details: concurrentDetails,
+      };
     }
     await processQuizResultSafely(admin, context.userId, data.attemptKey);
     return { resultId: data.attemptKey, ...graded };
@@ -523,36 +522,32 @@ export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
       feedback,
     });
     const { error: insertError } = await admin.from("writing_submissions").insert(record);
-    if (insertError) {
-      if (insertError.code === "23505") {
+    if (insertError && insertError.code !== "23505") throw new Error("Writing result could not be saved");
+    if (insertError?.code === "23505") {
+      const { data: concurrent } = await admin
+        .from("writing_submissions")
+        .select(
+          "id, user_id, prompt, original_text, corrected_text, natural_text, explanations, suggestions, grammar_score, vocabulary_score, clarity_score",
+        )
+        .eq("id", submissionId)
+        .maybeSingle();
+      if (
+        !concurrent ||
+        concurrent.user_id !== context.userId ||
+        concurrent.prompt !== data.prompt ||
+        concurrent.original_text !== data.originalText
+      ) {
         throw new PedagogicalWriteError(
           "idempotency",
           "IDEMPOTENCY_CONFLICT",
-          "Writing operation was submitted concurrently",
+          "Writing operation was submitted concurrently with different content",
         );
       }
-      throw new Error("Writing result could not be saved");
+      await processWritingSafely(admin, context.userId, submissionId, key);
+      return { sourceId: submissionId, feedback: writingFeedbackFromRow(concurrent) };
     }
     await processWritingSafely(admin, context.userId, submissionId, key);
     return { sourceId: submissionId, feedback };
-  });
-
-export const dualWriteQuizEvidence = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => quizInputSchema.parse(input))
-  .handler(async ({ data, context }) => {
-    const admin = await loadAdmin();
-    const key = `quiz:${data.quizResultId}`;
-    void key;
-    return processQuizResultSafely(admin, context.userId, data.quizResultId);
-  });
-
-export const dualWriteWritingEvidence = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => authoritativeWritingInputSchema.parse(input))
-  .handler(async ({ data, context }) => {
-    const result = await analyseAuthoritativeWriting({ data });
-    return { ok: true, sourceId: result.sourceId, duplicate: false, evidenceCount: 0 };
   });
 
 export const retryPendingPedagogicalWrites = createServerFn({ method: "POST" })
@@ -598,6 +593,7 @@ export const retryPendingPedagogicalWrites = createServerFn({ method: "POST" })
           failure.source_id,
           failure.idempotency_key,
           error,
+          true,
         );
       }
     }
