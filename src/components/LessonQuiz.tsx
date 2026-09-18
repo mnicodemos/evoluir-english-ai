@@ -58,13 +58,9 @@ export function LessonQuiz({
             answers: questions.map((q) => ({ questionId: q.id, answer: answers[q.id] ?? "" })),
           },
         });
-        if (
-          saved.score !== score ||
-          saved.correct !== correct ||
-          saved.total !== questions.length
-        ) {
-          throw new Error("The saved quiz result did not match the displayed result");
-        }
+        setSubmitted(true);
+        onFinished?.(saved.score);
+        return;
       }
       setSubmitted(true);
       onFinished?.(score);

@@ -95,15 +95,11 @@ function classifyFailure(error: unknown): { stage: FailureStage; code: FailureCo
   return { stage: "evidence", code: "EVIDENCE_PERSIST_FAILED" };
 }
 
-function retryable(code: FailureCode) {
-  return !["AUTHORIZATION_FAILED", "VALIDATION_FAILED", "IDEMPOTENCY_CONFLICT"].includes(code);
-}
-
 async function recordFailure(
   admin: AdminClient,
   userId: string,
   sourceType: SourceType,
-  sourceId: string | null,
+  sourceId: string,
   idempotencyKey: string,
   error: unknown,
   alreadyClaimed = false,
@@ -112,7 +108,7 @@ async function recordFailure(
   const { error: recordError } = await admin.rpc("record_pedagogical_failure", {
     p_user_id: userId,
     p_source_type: sourceType,
-    p_source_id: sourceId ?? undefined,
+    p_source_id: sourceId,
     p_idempotency_key: idempotencyKey,
     p_stage: failure.stage,
     p_error_code: failure.code,
