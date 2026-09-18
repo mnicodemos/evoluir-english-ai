@@ -117,6 +117,7 @@ export function useLogTimeOnExit(params: {
   latest.current = params;
 
   useEffect(() => {
+    const currentOperationKey = operationKey.current;
     return () => {
       timer.stop();
       const { profile, type } = latest.current;
@@ -124,7 +125,7 @@ export function useLogTimeOnExit(params: {
       if (minutes >= 1 && profile) {
         void logTelemetry({
           data: {
-            operationKey: operationKey.current,
+            operationKey: currentOperationKey,
             activityType: type as
               | "listening_practice"
               | "vocabulary_reading"
