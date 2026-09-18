@@ -395,6 +395,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   const gain = context.createGain();
   gain.gain.value = 1.15;
   source.buffer = decoded;
+  source.playbackRate.value = rate;
   source.connect(gain);
   gain.connect(context.destination);
   activeSources.add(source);
