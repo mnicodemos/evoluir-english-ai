@@ -3,13 +3,9 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { isPlayableVideoUrl, youtubeVideoId } from "@/lib/lessonVideoDisplay";
 
 const speeds = [0.75, 1, 1.25, 1.5];
-
-function youtubeId(url: string) {
-  const match = url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{6,})/);
-  return match?.[1] ?? null;
-}
 
 /**
  * Responsive lesson player. Plays a direct video file with speed control and
@@ -34,15 +30,16 @@ export function LessonVideo({
     if (videoRef.current) videoRef.current.playbackRate = speed;
   }, [speed]);
 
-  if (!url) {
+  if (!url || !isPlayableVideoUrl(url)) {
     return (
       <div className="card-soft flex flex-col items-center gap-3 p-8 text-center">
         <span className="grid size-12 place-items-center rounded-full bg-secondary">
           <Play className="size-5" />
         </span>
         <p className="text-sm text-muted-foreground">
-          No video has been added to this lesson yet. Read the summary and transcript below, then continue to the
-          flashcards.
+          {url
+            ? "This video is unavailable right now. Read the summary below and continue the lesson."
+            : "No video has been added to this lesson yet. Read the summary and transcript below, then continue to the flashcards."}
         </p>
         <Button size="sm" variant="secondary" onClick={() => onProgress(100)}>
           Mark this part as done
@@ -52,7 +49,7 @@ export function LessonVideo({
     );
   }
 
-  const yt = youtubeId(url);
+  const yt = youtubeVideoId(url);
   if (yt) {
     return (
       <div className="space-y-3">
@@ -67,7 +64,12 @@ export function LessonVideo({
         </div>
         <div className="flex items-center gap-3">
           <Progress value={progress} className="h-2 flex-1" />
-          <Button size="sm" variant="secondary" onClick={() => onProgress(100)} disabled={progress >= 100}>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => onProgress(100)}
+            disabled={progress >= 100}
+          >
             {progress >= 100 ? "Watched" : "I watched it"}
           </Button>
         </div>
@@ -100,14 +102,25 @@ export function LessonVideo({
       >
         <source src={url} />
         {captions?.map((c) => (
-          <track key={c.label} kind="subtitles" label={c.label} src={c.src} srcLang={c.label.slice(0, 2)} />
+          <track
+            key={c.label}
+            kind="subtitles"
+            label={c.label}
+            src={c.src}
+            srcLang={c.label.slice(0, 2)}
+          />
         ))}
       </video>
 
       <div className="flex flex-wrap items-center gap-3">
         <Progress value={progress} className="h-2 min-w-32 flex-1" />
         <span className="text-xs text-muted-foreground">{Math.round(progress)}% watched</span>
-        <Button size="sm" variant="secondary" onClick={() => onProgress(100)} disabled={progress >= 100}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => onProgress(100)}
+          disabled={progress >= 100}
+        >
           {progress >= 100 ? "Watched" : "I watched it"}
         </Button>
         <div className="flex items-center gap-1">
@@ -117,7 +130,9 @@ export function LessonVideo({
               type="button"
               onClick={() => setSpeed(s)}
               className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
-                speed === s ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary"
+                speed === s
+                  ? "bg-secondary text-foreground"
+                  : "text-muted-foreground hover:bg-secondary"
               }`}
             >
               {s}x

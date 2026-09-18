@@ -22,6 +22,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
+import { formatVideoDuration, videoReviewPoints } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz } from "@/lib/quizCompletion";
 
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
@@ -65,6 +66,9 @@ function LessonPage() {
   const [activeTab, setActiveTab] = usePersistentState<string>(`lesson-tab:${lessonId}`, "video");
 
   const lesson = data?.lesson;
+  // Reinforcement copy comes from the lesson text that already exists.
+  const reviewPoints = videoReviewPoints(lesson?.summary);
+  const videoLength = formatVideoDuration(lesson?.video_duration_seconds);
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
 
   async function handleProgress(percent: number) {
@@ -179,10 +183,37 @@ function LessonPage() {
           </TabsList>
 
           <TabsContent value="video" className="mt-5 space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold">Video reinforcement</h2>
+              <p className="text-sm text-muted-foreground">
+                Watch this short explanation before you practise.
+                {videoLength ? ` About ${videoLength}.` : ""}
+              </p>
+            </div>
             <LessonVideo url={lesson.video_url} progress={progress} onProgress={handleProgress} />
             <p className="text-xs text-muted-foreground">
               Turn on the video subtitles (CC) to follow along while you watch.
             </p>
+
+            {reviewPoints.length > 0 && (
+              <section className="card-soft space-y-2 p-5">
+                <h3 className="text-sm font-semibold">What you just reviewed</h3>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                  {reviewPoints.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Button size="sm" onClick={() => setActiveTab("quiz")}>
+                <ListChecks className="size-4" /> Now practise
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setActiveTab("flashcards")}>
+                <Layers className="size-4" /> Review the flashcards
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="summary" className="mt-5">
