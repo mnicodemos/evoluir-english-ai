@@ -102,7 +102,7 @@ function TrophyBadge({ active, lang }: { active: boolean; lang: "pt" | "en" }) {
   return (
     <span
       className={cn(
-        "relative grid size-14 shrink-0 place-items-center self-center rounded-full shadow-lg transition-all duration-500",
+        "relative grid size-11 shrink-0 place-items-center self-center rounded-full shadow-lg transition-all duration-500",
         active
           ? "bg-gradient-to-br from-[oklch(0.90_0.15_95)] to-[oklch(0.68_0.15_80)] text-[oklch(0.45_0.10_80)] motion-safe:animate-pulse"
           : "bg-gradient-to-br from-[oklch(0.80_0.01_250)] to-[oklch(0.60_0.02_240)] text-[oklch(0.55_0.01_250)]"
@@ -111,7 +111,7 @@ function TrophyBadge({ active, lang }: { active: boolean; lang: "pt" | "en" }) {
       aria-label={active ? unlockedText : lockedText}
       title={active ? unlockedText : lockedText}
     >
-      <Trophy className="size-7" strokeWidth={2.5} />
+      <Trophy className="size-5" strokeWidth={2.5} />
     </span>
   );
 }
