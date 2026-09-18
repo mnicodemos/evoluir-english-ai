@@ -335,7 +335,12 @@ async function processQuiz(
       )
       .map((question) => [question.id, question.pedagogical_skill as "grammar" | "vocabulary"]),
   );
-  const classified = classifyQuizEvidence(details, skills);
+  // The item level comes from the lesson the quiz belongs to, server-side only.
+  const classified = classifyQuizEvidence(
+    details,
+    skills,
+    await lessonItemLevel(admin, result.lesson_id),
+  );
   const persisted = classified.evidence.length
     ? await persistEvidenceAndResults({
         admin,
