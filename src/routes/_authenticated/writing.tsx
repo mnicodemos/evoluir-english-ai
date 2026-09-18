@@ -35,64 +35,8 @@ export const Route = createFileRoute("/_authenticated/writing")({
   component: Writing,
 });
 
-type Category = "everyday" | "professional" | "travel";
-
-const categories: { id: Category; label: string; hint: string; pool: string[] }[] = [
-  {
-    id: "everyday",
-    label: "Everyday English",
-    hint: "Family, friends, routine",
-    pool: [
-      "Describe your daily routine from morning to night.",
-      "Tell a friend by message what you did last weekend.",
-      "Describe your home and your favourite room in it.",
-      "Write about a meal you love and how you prepare it.",
-      "Tell me about a person in your family you admire.",
-      "Describe your hometown to someone who has never visited it.",
-      "Write a short message inviting a friend to your birthday.",
-      "Tell me what you usually do to relax after a busy day.",
-      "Describe a hobby you started recently and why you like it.",
-      "Write about your plans for next weekend.",
-    ],
-  },
-  {
-    id: "professional",
-    label: "Professional English",
-    hint: "Meetings, emails, career",
-    pool: [
-      "Write an email asking a client to reschedule a meeting.",
-      "Describe your professional experience in a short paragraph.",
-      "Explain a project you are proud of and your role in it.",
-      "Write a status update about your current project for your team.",
-      "Write an email introducing yourself to a new international client.",
-      "Describe a difficult situation at work and how you solved it.",
-      "Write a short message asking your manager for a day off.",
-      "Explain why you would be a good fit for your dream job.",
-      "Write an email answering a client who is unhappy with a delay.",
-      "Describe how a typical work week looks for you.",
-    ],
-  },
-  {
-    id: "travel",
-    label: "Travel English",
-    hint: "Airport, hotel, restaurant",
-    pool: [
-      "Tell me about the last trip you took.",
-      "Write an email to a hotel asking about check-in time and breakfast.",
-      "Describe your dream destination and what you would do there.",
-      "Write a polite complaint about a room that was not clean.",
-      "Describe what happened when a flight of yours was delayed.",
-      "Write a short review of a restaurant you visited abroad.",
-      "Explain to a tourist how to get from the airport to your city centre.",
-      "Write a message asking a friend to travel with you next holiday.",
-      "Describe the food you tried on a trip and what you thought of it.",
-      "Write an email booking a tour for two people.",
-    ],
-  },
-];
-
 const HISTORY_KEY = "writing-history";
-const TASKS_PER_ROUND = categories.length;
+const TASKS_PER_ROUND = WRITING_CATEGORIES.length;
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
