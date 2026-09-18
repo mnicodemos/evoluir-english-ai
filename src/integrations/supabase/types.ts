@@ -14,21 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _phase6c_verification: {
-        Row: {
-          result: string | null
-          step: string | null
-        }
-        Insert: {
-          result?: string | null
-          step?: string | null
-        }
-        Update: {
-          result?: string | null
-          step?: string | null
-        }
-        Relationships: []
-      }
       activities: {
         Row: {
           activity_type: string

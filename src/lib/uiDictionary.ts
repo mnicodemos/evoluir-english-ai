@@ -3,7 +3,8 @@
 export const uiPt: Record<string, string> = {
   // Navigation / shell
   "AI Teacher": "AI Teacher",
-  "Practice English with your personal AI teacher": "Pratique inglês com seu professor de IA pessoal",
+  "Practice English with your personal AI teacher":
+    "Pratique inglês com seu professor de IA pessoal",
   "New conversation": "Nova conversa",
   "Your context": "Seu contexto",
   Level: "Nível",
@@ -50,7 +51,7 @@ export const uiPt: Record<string, string> = {
   "Download course": "Baixar curso",
   "Download your progress": "Baixar seu progresso",
   "Voice conversation": "Conversa por voz",
-  "Practice": "Praticar",
+  Practice: "Praticar",
   Hello: "Olá",
   "Welcome back": "Bem-vindo de volta",
   "Your daily English plan, streak and skill scores in one place.":
@@ -90,8 +91,7 @@ export const uiPt: Record<string, string> = {
   "Your starting level": "Seu nível inicial",
   "Everything was reset to zero so you start this level fresh.":
     "Tudo foi zerado para você começar este nível do zero.",
-  "Every session updates your learner profile.":
-    "Cada sessão atualiza seu perfil de aprendizado.",
+  "Every session updates your learner profile.": "Cada sessão atualiza seu perfil de aprendizado.",
   "Practice more to reveal your strengths.": "Pratique mais para revelar seus pontos fortes.",
   "Keep going to find your weak spots.": "Continue para descobrir seus pontos fracos.",
   "Frequent mistakes": "Erros frequentes",
@@ -142,7 +142,7 @@ export const uiPt: Record<string, string> = {
     "Muito bem — você passou! Siga para a próxima lição.",
   "Retake quiz": "Refazer o quiz",
   "Redo quiz": "Refazer o quiz",
-  "Question": "Questão",
+  Question: "Questão",
   "You need at least 70% to pass. Review the explanations below and retake the quiz.":
     "Você precisa de pelo menos 70% para passar. Revise as explicações abaixo e refaça o quiz.",
   "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want.":
@@ -278,7 +278,6 @@ export const uiPt: Record<string, string> = {
   "Source: context.reverso.net": "Fonte: context.reverso.net",
   ".": ".",
 
-
   // AI Talking
   "Voice conversation · the AI chooses today's subject":
     "Conversa por voz · a IA escolhe o assunto de hoje",
@@ -316,6 +315,32 @@ export const uiPt: Record<string, string> = {
   "Practice with AI Talking": "Praticar com o AI Talking",
   "Speak and get a scored report": "Fale e receba um relatório com nota",
 
+  // Subscription portal (Phase 7)
+  "My subscription": "Minha assinatura",
+  Plan: "Plano",
+  "Billing period": "Periodicidade",
+  Status: "Status",
+  Active: "Ativa",
+  Trial: "Teste",
+  Canceled: "Cancelada",
+  Inactive: "Inativa",
+  "Payment pending": "Pagamento pendente",
+  Refunded: "Reembolsada",
+  "Premium access": "Acesso Premium",
+  "Not active": "Não ativo",
+  "Manage subscription": "Gerenciar assinatura",
+  "Discover Premium": "Conhecer Premium",
+  "Changes and cancellations are handled by Stripe and applied here automatically.":
+    "Alterações e cancelamentos são feitos pelo Stripe e aplicados aqui automaticamente.",
+  "Your subscription was canceled and your Premium access stays available until the end of the period you already paid for.":
+    "Sua assinatura foi cancelada e seu acesso Premium continua disponível até o fim do período já pago.",
+  "Your last payment did not go through. Update your payment details to keep Premium.":
+    "Seu último pagamento não foi concluído. Atualize seus dados de pagamento para manter o Premium.",
+  "No billing account found yet": "Nenhuma assinatura encontrada ainda",
+  "Start a subscription to manage it here.": "Assine para gerenciar sua assinatura aqui.",
+  "We could not open your subscription management":
+    "Não foi possível abrir o gerenciamento da sua assinatura",
+
   // Reports / premium / misc
   "Your daily summary is downloading.": "Seu resumo diário está sendo baixado.",
   "Your league report is downloading.": "Seu relatório da liga está sendo baixado.",
@@ -340,7 +365,8 @@ export const uiPt: Record<string, string> = {
   "Profile updated": "Perfil atualizado",
   "Choose an image file.": "Escolha um arquivo de imagem.",
   "Choose a photo up to 5 MB.": "Escolha uma foto de até 5 MB.",
-  "Could not save your profile. Please try again.": "Não foi possível salvar seu perfil. Tente novamente.",
+  "Could not save your profile. Please try again.":
+    "Não foi possível salvar seu perfil. Tente novamente.",
   "Your plan": "Seu plano",
   Free: "Gratuito",
   Monthly: "Mensal",
@@ -367,8 +393,8 @@ export const uiPt: Record<string, string> = {
   "come back tomorrow,": "voltam amanhã,",
   "in a few days and": "em alguns dias e",
   "much later.": "bem mais tarde.",
-  "Step": "Etapa",
-  "of": "de",
+  Step: "Etapa",
+  of: "de",
   "correct answers": "respostas corretas",
   "Your lessons will start at this level and move up when you close the Diamond league with an overall average of 70% or more.":
     "Suas lições começarão neste nível e avançarão quando você fechar a liga Diamante com média geral de 70% ou mais.",
@@ -424,8 +450,7 @@ export const uiPt: Record<string, string> = {
     "As lições de hoje já foram criadas. Continue abaixo — novas opções chegam amanhã.",
   "You haven't started today's lessons yet. Choose one in Learning to begin.":
     "Você ainda não começou as lições de hoje. Escolha uma em Aprendizado para começar.",
-  "No new lessons right now. Create one above.":
-    "Nenhuma lição nova agora. Crie uma acima.",
+  "No new lessons right now. Create one above.": "Nenhuma lição nova agora. Crie uma acima.",
   "You haven't completed any lesson yet.": "Você ainda não concluiu nenhuma lição.",
   "Structured English lessons with videos, flashcards and quizzes for your daily practice.":
     "Lições de inglês estruturadas com vídeos, flashcards e quizzes para sua prática diária.",
@@ -464,10 +489,8 @@ export const uiPt: Record<string, string> = {
   "Sentence 1 of 1": "Frase 1 de 1",
   "Daily routines, small talk and casual plans.":
     "Rotinas diárias, conversas informais e planos casuais.",
-  "Meetings, emails and workplace conversations.":
-    "Reuniões, e-mails e conversas de trabalho.",
-  "Airports, hotels, restaurants and directions.":
-    "Aeroportos, hotéis, restaurantes e direções.",
+  "Meetings, emails and workplace conversations.": "Reuniões, e-mails e conversas de trabalho.",
+  "Airports, hotels, restaurants and directions.": "Aeroportos, hotéis, restaurantes e direções.",
   "Train your English listening with dictation drills for everyday, work and travel.":
     "Treine sua escuta em inglês com ditados do dia a dia, trabalho e viagens.",
 
@@ -551,9 +574,11 @@ export const uiPt: Record<string, string> = {
     "Cada barra é seu tempo de prática no dia, dividido por atividade.",
   "The days you studied this month.": "Os dias em que você estudou neste mês.",
   "Each line shows your score in %.": "Cada linha mostra sua nota em %.",
-  "Close the Diamond league with an overall average of": "Feche a liga Diamante com uma média geral de",
+  "Close the Diamond league with an overall average of":
+    "Feche a liga Diamante com uma média geral de",
   "or more and your lessons move up to": "ou mais e suas lições avançam para",
-  "Diamond league closed! Reach an overall average of": "Liga Diamante fechada! Alcance uma média geral de",
+  "Diamond league closed! Reach an overall average of":
+    "Liga Diamante fechada! Alcance uma média geral de",
   "to move up to": "para subir para",
   "Top CEFR level reached": "Nível máximo do CEFR alcançado",
   "lessons are created at": "as lições são criadas em",
@@ -580,11 +605,15 @@ export const uiPt: Record<string, string> = {
   "C2 Proficient": "C2 Proficiente",
 
   // Level hints
-  "Basic words, greetings and very short sentences": "Palavras básicas, saudações e frases bem curtas",
+  "Basic words, greetings and very short sentences":
+    "Palavras básicas, saudações e frases bem curtas",
   "Simple routines, past and future basics": "Rotinas simples, passado e futuro básicos",
-  "Everyday conversation and familiar work topics": "Conversa do dia a dia e assuntos de trabalho familiares",
-  "Fluent discussion, meetings and detailed opinions": "Discussão fluente, reuniões e opiniões detalhadas",
-  "Nuance, idioms and complex professional language": "Nuances, idiomas e linguagem profissional complexa",
+  "Everyday conversation and familiar work topics":
+    "Conversa do dia a dia e assuntos de trabalho familiares",
+  "Fluent discussion, meetings and detailed opinions":
+    "Discussão fluente, reuniões e opiniões detalhadas",
+  "Nuance, idioms and complex professional language":
+    "Nuances, idiomas e linguagem profissional complexa",
   "Near-native precision and style": "Precisão e estilo próximos ao nativo",
 
   // Common AI-generated feedback labels
