@@ -23,7 +23,10 @@ function entitlement(overrides: Partial<Entitlement> = {}): Entitlement {
 describe("subscriptionGrantsAccess", () => {
   it("grants access for active and trial inside the period", () => {
     expect(
-      subscriptionGrantsAccess({ status: "active", current_period_end: "2026-02-01T00:00:00Z" }, now),
+      subscriptionGrantsAccess(
+        { status: "active", current_period_end: "2026-02-01T00:00:00Z" },
+        now,
+      ),
     ).toBe(true);
     expect(subscriptionGrantsAccess({ status: "trial", current_period_end: null }, now)).toBe(true);
   });
@@ -36,16 +39,25 @@ describe("subscriptionGrantsAccess", () => {
 
   it("denies access once the paid period has ended", () => {
     expect(
-      subscriptionGrantsAccess({ status: "active", current_period_end: "2026-01-01T00:00:00Z" }, now),
+      subscriptionGrantsAccess(
+        { status: "active", current_period_end: "2026-01-01T00:00:00Z" },
+        now,
+      ),
     ).toBe(false);
   });
 });
 
 describe("entitlements", () => {
   it("treats revoked and expired entitlements as inactive", () => {
-    expect(entitlementIsActive(entitlement({ revoked_at: "2026-01-05T00:00:00Z" }), now)).toBe(false);
-    expect(entitlementIsActive(entitlement({ expires_at: "2026-01-05T00:00:00Z" }), now)).toBe(false);
-    expect(entitlementIsActive(entitlement({ expires_at: "2026-03-05T00:00:00Z" }), now)).toBe(true);
+    expect(entitlementIsActive(entitlement({ revoked_at: "2026-01-05T00:00:00Z" }), now)).toBe(
+      false,
+    );
+    expect(entitlementIsActive(entitlement({ expires_at: "2026-01-05T00:00:00Z" }), now)).toBe(
+      false,
+    );
+    expect(entitlementIsActive(entitlement({ expires_at: "2026-03-05T00:00:00Z" }), now)).toBe(
+      true,
+    );
   });
 
   it("lists only active features", () => {
