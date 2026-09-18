@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -39,9 +40,7 @@ const writingInputSchema = z
   })
   .strict();
 
-type AuthenticatedClient = {
-  from: (table: keyof Database["public"]["Tables"]) => any;
-};
+type AuthenticatedClient = SupabaseClient<Database>;
 
 async function deterministicUuid(value: string): Promise<string> {
   const bytes = new Uint8Array(
@@ -185,7 +184,7 @@ async function persistEvidenceAndResults(params: {
       .eq("skill", skill)
       .order("created_at", { ascending: true });
     if (error) throw error;
-    const history: AssessmentEvidence[] = (data ?? []).map((row: any) => ({
+    const history: AssessmentEvidence[] = (data ?? []).map((row) => ({
       id: row.id,
       skill: pedagogicalSkillSchema.parse(row.skill),
       subskill: row.subskill,

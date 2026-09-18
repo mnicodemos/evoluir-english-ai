@@ -66,7 +66,7 @@ export function writingEvidence(scores: WritingSubscores): AssessmentEvidence[] 
     evaluatedBy: "gemini" as const,
     modelVersion: PEDAGOGY_MODEL_VERSION,
     rubricVersion: WRITING_RUBRIC_VERSION,
-    metadata: { criterion: item.subskill },
+    metadata: { criterion: item.subskill ?? "unspecified" },
   }));
 }
 
