@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import { runProgressMutation } from "@/lib/auth-retry";
+import { dualWriteQuizEvidence } from "@/lib/pedagogy/dualWrite.functions";
 
 export type Lesson = {
   id: string;
@@ -260,16 +261,31 @@ export async function saveQuizResult(params: {
   score: number;
   total: number;
   correct: number;
-  details: { question: string; answer: string; correct_answer: string; is_correct: boolean }[];
+  details: {
+    question_id: string;
+    question: string;
+    answer: string;
+    correct_answer: string;
+    is_correct: boolean;
+  }[];
 }) {
-  await runProgressMutation(() =>
-    supabase.from("quiz_results").insert({
-      user_id: params.userId,
-      lesson_id: params.lessonId,
-      score: params.score,
-      total_questions: params.total,
-      correct_count: params.correct,
-      details: params.details,
-    }),
+  const { data } = await runProgressMutation(() =>
+    supabase
+      .from("quiz_results")
+      .insert({
+        user_id: params.userId,
+        lesson_id: params.lessonId,
+        score: params.score,
+        total_questions: params.total,
+        correct_count: params.correct,
+        details: params.details,
+      })
+      .select("id")
+      .single(),
   );
+  try {
+    await dualWriteQuizEvidence({ data: { quizResultId: data.id } });
+  } catch (error) {
+    console.warn("Quiz result was saved; pedagogical dual write will be retried later", error);
+  }
 }

@@ -49,6 +49,7 @@ export function LessonQuiz({
           total: questions.length,
           correct,
           details: questions.map((q) => ({
+            question_id: q.id,
             question: q.question,
             answer: answers[q.id] ?? "",
             correct_answer: q.correct_answer,
