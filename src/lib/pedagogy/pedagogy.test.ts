@@ -1,0 +1,138 @@
+import { describe, expect, it } from "vitest";
+
+import { aggregateSkillEvidence } from "./aggregateSkill";
+import { cefrForScore } from "./cefr";
+import { assertConfidence } from "./confidence";
+import {
+  CEFR_LEVELS,
+  cefrLevelSchema,
+  PEDAGOGICAL_SKILLS,
+  pedagogicalSkillSchema,
+  scoreSchema,
+  type AssessmentEvidence,
+  type PedagogicalSkill,
+} from "./contracts";
+
+const boundaries = [
+  [0, "A1"],
+  [29, "A1"],
+  [30, "A2"],
+  [44, "A2"],
+  [45, "B1"],
+  [59, "B1"],
+  [60, "B2"],
+  [74, "B2"],
+  [75, "C1"],
+  [89, "C1"],
+  [90, "C2"],
+  [100, "C2"],
+] as const;
+
+describe("CEFR rules", () => {
+  it.each(boundaries)("maps %i to %s", (score, cefr) => {
+    expect(cefrForScore(score)).toBe(cefr);
+  });
+
+  it.each([-1, 101, Number.NaN, Number.POSITIVE_INFINITY, null])(
+    "rejects invalid score %s",
+    (score) => {
+      expect(() => scoreSchema.parse(score)).toThrow();
+    },
+  );
+
+  it.each(CEFR_LEVELS)("accepts CEFR value %s", (cefr) => {
+    expect(cefrLevelSchema.parse(cefr)).toBe(cefr);
+  });
+
+  it.each(["a1", "A3", "unknown", ""])("rejects CEFR value %s", (cefr) => {
+    expect(cefrLevelSchema.safeParse(cefr).success).toBe(false);
+  });
+});
+
+describe("confidence", () => {
+  it.each([0, 0.5, 1])("accepts %s", (confidence) => {
+    expect(assertConfidence(confidence)).toBe(confidence);
+  });
+
+  it.each([-0.01, 1.01, Number.NaN, Number.POSITIVE_INFINITY])("rejects %s", (confidence) => {
+    expect(() => assertConfidence(confidence)).toThrow();
+  });
+});
+
+describe("pedagogical skills", () => {
+  it("defines exactly the seven skills", () => {
+    expect(PEDAGOGICAL_SKILLS).toHaveLength(7);
+    for (const skill of PEDAGOGICAL_SKILLS) expect(pedagogicalSkillSchema.parse(skill)).toBe(skill);
+  });
+});
+
+function evidence(skill: PedagogicalSkill, score: number, overrides = {}): AssessmentEvidence {
+  return {
+    skill,
+    sourceType: "quiz",
+    rawScore: score,
+    sourceReliability: 0.8,
+    evidenceQuality: 0.9,
+    sampleWeight: 1,
+    evaluatedBy: "deterministic",
+    rubricVersion: "rubric-v1",
+    ...overrides,
+  };
+}
+
+describe("skill aggregation", () => {
+  it("does not confuse missing evidence with A1", () => {
+    expect(aggregateSkillEvidence("reading", [])).toEqual({
+      skill: "reading",
+      score: null,
+      cefr: "insufficient_evidence",
+      confidence: null,
+      evidenceCount: 0,
+      ruleVersion: "cefr-score-v1",
+    });
+  });
+
+  it("requires the configured minimum evidence", () => {
+    const result = aggregateSkillEvidence("writing", [evidence("writing", 100)]);
+    expect(result.cefr).toBe("insufficient_evidence");
+    expect(result.score).toBeNull();
+  });
+
+  it("uses quality, reliability and sample weight in the score", () => {
+    const result = aggregateSkillEvidence("grammar", [
+      evidence("grammar", 100),
+      evidence("grammar", 0, { evidenceQuality: 0.5 }),
+    ]);
+    expect(result.score).toBe(64);
+    expect(result.cefr).toBe("B2");
+    expect(result.confidence).toBeGreaterThanOrEqual(0);
+    expect(result.confidence).toBeLessThanOrEqual(1);
+  });
+
+  it("ignores evidence for a different skill and invalid evidence", () => {
+    const result = aggregateSkillEvidence("listening", [
+      evidence("speaking", 80),
+      evidence("listening", 80, { evidenceQuality: 2 }),
+    ]);
+    expect(result.cefr).toBe("insufficient_evidence");
+    expect(result.evidenceCount).toBe(0);
+  });
+
+  it("is deterministic and does not mutate prior results", () => {
+    const first = aggregateSkillEvidence("vocabulary", [
+      evidence("vocabulary", 40),
+      evidence("vocabulary", 50),
+    ]);
+    const second = aggregateSkillEvidence("vocabulary", [
+      evidence("vocabulary", 90),
+      evidence("vocabulary", 100),
+    ]);
+    expect(first).toEqual(
+      aggregateSkillEvidence("vocabulary", [
+        evidence("vocabulary", 40),
+        evidence("vocabulary", 50),
+      ]),
+    );
+    expect(first).not.toEqual(second);
+  });
+});
