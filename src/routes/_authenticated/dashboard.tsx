@@ -18,6 +18,7 @@ import { getLeague, LeagueBadge } from "@/components/LeagueBadge";
 import { LeagueReportButton } from "@/components/LeagueReportButton";
 
 import { LevelCard } from "@/components/LevelCard";
+import { NextStepCard } from "@/components/NextStepCard";
 import { PathProgressCard } from "@/components/LearningPathCard";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -161,6 +162,8 @@ function Dashboard() {
 
             <LevelCard level={profile.level} maxLevel={profile.max_level} />
           </div>
+
+          <NextStepCard />
 
           <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
             <PathProgressCard />
