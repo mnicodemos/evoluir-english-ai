@@ -79,6 +79,8 @@ export function calibrateCefrToItemLevel(
  * Normalises a stored profile/lesson level (including legacy labels such as
  * "intermediate") to a CEFR item level.
  */
-export function itemLevelFromStoredLevel(level: string | null | undefined): MeasuredCefrLevel | null {
+export function itemLevelFromStoredLevel(
+  level: string | null | undefined,
+): MeasuredCefrLevel | null {
   return measuredCefr(findLevel(level).value.toUpperCase());
 }

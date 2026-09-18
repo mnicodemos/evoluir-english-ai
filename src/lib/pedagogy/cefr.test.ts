@@ -1,3 +1,6 @@
+import { describe, expect, it } from "vitest";
+
+import { calibrateCefrToItemLevel, itemLevelFromStoredLevel, measuredCefr } from "./cefr";
 
 describe("item-level calibration (phase 20)", () => {
   it("never reads a score above the level of the practised item", () => {
