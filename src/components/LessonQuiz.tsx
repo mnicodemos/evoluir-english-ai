@@ -1,10 +1,12 @@
 import { CheckCircle2, XCircle } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { saveQuizResult, type QuizQuestion } from "@/hooks/useLearning";
+import { type QuizQuestion } from "@/hooks/useLearning";
 import { usePersistentState } from "@/hooks/usePersistentState";
+import { submitAuthoritativeQuiz } from "@/lib/pedagogy/dualWrite.functions";
 import { useUiLang } from "@/lib/uiLang";
 
 /** Multiple-choice / fill-in quiz with instant score, explanations and review advice. */
@@ -37,6 +39,7 @@ export function LessonQuiz({
   );
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
+  const submitQuiz = useServerFn(submitAuthoritativeQuiz);
 
   const correct = questions.filter((q) => answers[q.id] === q.correct_answer).length;
   const score = questions.length ? Math.round((correct / questions.length) * 100) : 0;
@@ -48,21 +51,16 @@ export function LessonQuiz({
       if (userId) {
         const stableAttemptKey = attemptKey || crypto.randomUUID();
         if (!attemptKey) setAttemptKey(stableAttemptKey);
-        await saveQuizResult({
-          attemptKey: stableAttemptKey,
-          userId,
-          lessonId,
-          score,
-          total: questions.length,
-          correct,
-          details: questions.map((q) => ({
-            question_id: q.id,
-            question: q.question,
-            answer: answers[q.id] ?? "",
-            correct_answer: q.correct_answer,
-            is_correct: answers[q.id] === q.correct_answer,
-          })),
+        const saved = await submitQuiz({
+          data: {
+            attemptKey: stableAttemptKey,
+            lessonId,
+            answers: questions.map((q) => ({ questionId: q.id, answer: answers[q.id] ?? "" })),
+          },
         });
+        if (saved.score !== score || saved.correct !== correct || saved.total !== questions.length) {
+          throw new Error("The saved quiz result did not match the displayed result");
+        }
       }
       setSubmitted(true);
       onFinished?.(score);

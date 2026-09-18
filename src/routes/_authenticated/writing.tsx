@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 
 import { CheckCircle2, Loader2, PenLine, Wand2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -12,13 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { logActivity, useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
-import {
-  parseWritingFeedback,
-  writingCorrectionMessages,
-  type WritingFeedback,
-} from "@/lib/ai-prompts";
-import { aiChat } from "@/lib/aiChat.functions";
-import { dualWriteWritingEvidence } from "@/lib/pedagogy/dualWrite.functions";
+import { type WritingFeedback } from "@/lib/ai-prompts";
+import { analyseAuthoritativeWriting } from "@/lib/pedagogy/dualWrite.functions";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
@@ -184,6 +180,7 @@ function Writing() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WritingFeedback | null>(null);
   const operationKey = useRef<string | null>(null);
+  const analyseWriting = useServerFn(analyseAuthoritativeWriting);
 
   useEffect(() => {
     const finished = loadDone(signature);
@@ -234,18 +231,15 @@ function Writing() {
     const stableOperationKey = operationKey.current ?? crypto.randomUUID();
     operationKey.current = stableOperationKey;
     try {
-      const raw = await aiChat({
+      const authoritative = await analyseWriting({
         data: {
-          messages: writingCorrectionMessages(
-            prompt,
-            text.trim(),
-            profile?.level ?? "intermediate",
-          ),
-          jsonMode: true,
-          operation: "writing_correction",
+          operationKey: stableOperationKey,
+          prompt,
+          originalText: text.trim(),
+          level: profile?.level ?? "intermediate",
         },
       });
-      const feedback = parseWritingFeedback(raw, text.trim());
+      const feedback = authoritative.feedback;
       setResult(feedback);
 
       // Mark this task as answered — it is never offered again.
@@ -267,21 +261,6 @@ function Writing() {
           lastDate: profile.last_activity_date,
         });
         queryClient.invalidateQueries();
-      }
-      try {
-        await dualWriteWritingEvidence({
-          data: {
-            operationKey: stableOperationKey,
-            prompt,
-            originalText: text.trim(),
-            feedback,
-          },
-        });
-      } catch (error) {
-        console.warn(
-          "Writing result was saved; pedagogical dual write will be retried later",
-          error,
-        );
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not analyse your text");
