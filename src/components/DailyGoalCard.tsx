@@ -125,7 +125,7 @@ export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMin
         </Dialog>
       </div>
       <Progress value={percent} className="mt-4 h-2" />
-      <p className={`mt-2 text-xs ${done >= goalMinutes ? "text-success" : "text-muted-foreground"}`}>
+      <p className={`mt-2 text-xs ${done >= goalMinutes ? "text-success/80" : "text-muted-foreground"}`}>
         {done >= goalMinutes ? (
           "Goal reached today. Great work!"
         ) : (
