@@ -32,7 +32,9 @@ import { coachOpenerMessages, coachReplyMessages, type ConversationReport } from
 import { aiChat } from "@/lib/aiChat.functions";
 import { getLevelState } from "@/lib/level";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
+import { takeSpeechBlocks } from "@/lib/speechChunks";
 import { streamCoachReply } from "@/lib/coach-stream";
+
 import {
   cancelVoiceRecording,
   startVoiceRecording,
@@ -42,21 +44,8 @@ import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
-type VoiceState = "idle" | "recording" | "transcribing" | "thinking" | "speaking";
+type VoiceState = "idle" | "recording" | "sending" | "transcribing" | "thinking" | "speaking";
 
-function takeCompletePhrases(value: string) {
-  const phrases: string[] = [];
-  let rest = value;
-  const boundary = /[,;.!?](?:\s|$)/;
-  while (true) {
-    const match = boundary.exec(rest);
-    if (!match || match.index < 8) break;
-    const end = match.index + match[0].length;
-    phrases.push(rest.slice(0, end).trim());
-    rest = rest.slice(end);
-  }
-  return { phrases, rest };
-}
 
 const scenarios = [
   {
