@@ -65,7 +65,10 @@ export function parseQuizDetails(value: unknown): QuizDetail[] {
   return result.success ? result.data : [];
 }
 
-export function quizEvidence(detail: ClassifiedQuizDetail): AssessmentEvidence {
+export function quizEvidence(
+  detail: ClassifiedQuizDetail,
+  itemCefr?: MeasuredCefrLevel | null,
+): AssessmentEvidence {
   return {
     skill: pedagogicalSkillSchema.parse(detail.pedagogical_skill),
     sourceType: "quiz",
@@ -73,6 +76,9 @@ export function quizEvidence(detail: ClassifiedQuizDetail): AssessmentEvidence {
     evidenceType: "answer",
     polarity: detail.is_correct ? "positive" : "negative",
     rawScore: detail.is_correct ? 100 : 0,
+    // The level of the lesson the question belongs to, so a correct A1 answer is
+    // read as A1 evidence instead of level-free mastery.
+    itemCefr: itemCefr ?? null,
     sourceReliability: 1,
     evidenceQuality: 0.9,
     sampleWeight: 1,
@@ -85,6 +91,7 @@ export function quizEvidence(detail: ClassifiedQuizDetail): AssessmentEvidence {
 export function classifyQuizEvidence(
   details: QuizDetail[],
   skills: ReadonlyMap<string, "grammar" | "vocabulary">,
+  itemCefr?: MeasuredCefrLevel | null,
 ) {
   const evidence: AssessmentEvidence[] = [];
   const missingQuestionIds: string[] = [];
@@ -93,7 +100,10 @@ export function classifyQuizEvidence(
     const skill = skills.get(detail.question_id);
     if (skill) {
       evidence.push(
-        quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill }),
+        quizEvidence(
+          { ...detail, question_id: detail.question_id, pedagogical_skill: skill },
+          itemCefr,
+        ),
       );
     } else {
       missingQuestionIds.push(detail.question_id);
