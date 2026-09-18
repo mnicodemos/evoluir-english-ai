@@ -356,7 +356,7 @@ async function processQuiz(
     idempotencyKey: key,
     rubricVersion: QUIZ_RUBRIC_VERSION,
     evidence,
-    claimedAt,
+    ...(claimedAt ? { claimedAt } : {}),
   });
 }
 
@@ -392,7 +392,7 @@ async function processWriting(
       vocabulary: row.vocabulary_score,
       clarity: row.clarity_score,
     }),
-    claimedAt,
+    ...(claimedAt ? { claimedAt } : {}),
   });
 }
 
@@ -564,7 +564,7 @@ export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
     const { data: profile, error: profileError } = await admin
       .from("profiles")
       .select("level")
-      .eq("user_id", context.userId)
+      .eq("id", context.userId)
       .maybeSingle();
     if (profileError) throw new Error("Writing level could not be loaded");
     const raw = await callGateway(
