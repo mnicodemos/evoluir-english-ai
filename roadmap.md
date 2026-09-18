@@ -31,4 +31,4 @@
   - [x] Registrar evidências e snapshots por habilidade com tolerância a falhas
   - [x] Validar RLS, retries, não regressão e ausência de duplicações
 - [x] Fase 2H — proteger `quizzes.correct_answer` no banco e validar sem operações reais
-- [ ] Fase 2F-L2 — tornar activities/progress autoritativos no servidor sem operações reais
+- [x] Fase 2F-L2 — tornar activities/progress autoritativos no servidor sem operações reais

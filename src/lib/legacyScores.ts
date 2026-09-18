@@ -22,7 +22,10 @@ export function listeningAnswerScore(expected: string, answer: string) {
 }
 
 const normalizePronunciation = (value: string) =>
-  value.toLowerCase().replace(/[^a-z\s]/g, "").trim();
+  value
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, "")
+    .trim();
 
 /** Existing normalized Levenshtein rule, shared by client display and server authority. */
 export function pronunciationSimilarity(target: string, spoken: string): number {
@@ -33,7 +36,10 @@ export function pronunciationSimilarity(target: string, spoken: string): number 
 
   const rows = a.length + 1;
   const cols = b.length + 1;
-  const dist = Array.from({ length: rows }, (_, index) => [index, ...Array<number>(cols - 1).fill(0)]);
+  const dist = Array.from({ length: rows }, (_, index) => [
+    index,
+    ...Array<number>(cols - 1).fill(0),
+  ]);
   for (let column = 0; column < cols; column += 1) dist[0]![column] = column;
   for (let row = 1; row < rows; row += 1) {
     for (let column = 1; column < cols; column += 1) {

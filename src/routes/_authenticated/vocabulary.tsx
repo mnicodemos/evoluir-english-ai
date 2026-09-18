@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLessonRound } from "@/hooks/useLessonRound";
-import { logActivity, useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
@@ -26,6 +26,7 @@ import { lookupWord } from "@/lib/dictionary.functions";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
+import { logPracticeTelemetry, persistPronunciationLegacy } from "@/lib/legacyActivity.functions";
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
@@ -79,6 +80,8 @@ function Vocabulary() {
   const { data: profile } = useProfile();
   const loadDailyWords = useServerFn(dailyWords);
   const searchDictionary = useServerFn(lookupWord);
+  const savePronunciation = useServerFn(persistPronunciationLegacy);
+  const logTelemetry = useServerFn(logPracticeTelemetry);
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState<string | null>(null);
   const [recordingId, setRecordingId] = useState<string | null>(null);
@@ -198,20 +201,18 @@ function Vocabulary() {
       try {
         const audio = await stopVoiceRecording();
         const spoken = await transcribeAudio(audio);
-        const score = Math.round(pronunciationScore(word.word, spoken) * 100);
-        // Show the result straight away; saving the practice happens in the background.
-        if (profile) {
-          void logActivity({
-            userId: profile.id,
-            type: "vocabulary",
-            title: `Vocabulary practice — ${word.word}`,
+        const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
+        const authoritative = await savePronunciation({
+          data: {
+            operationKey: crypto.randomUUID(),
+            wordId: word.id,
+            transcript: spoken,
             minutes: minutesSpent(1),
-            score,
-            scores: { reading: score },
-            currentStreak: profile.streak_days,
-            lastDate: profile.last_activity_date,
-          });
-        }
+          },
+        });
+        const score = authoritative.score;
+        if (score !== previewScore)
+          console.warn("Pronunciation preview differed from the authoritative result");
         if (score >= 80) toast.success(`Great pronunciation — ${score}% match.`);
         else if (score >= 55) toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
         else toast.error(`I heard “${spoken}”. Listen again and try once more.`);
@@ -278,17 +279,16 @@ function Vocabulary() {
       const minutes = minutesSpent(0);
       const p = profileRef.current;
       if (minutes >= 1 && p) {
-        void logActivity({
-          userId: p.id,
-          type: "vocabulary",
-          title: "Vocabulary reading",
-          minutes,
-          currentStreak: p.streak_days,
-          lastDate: p.last_activity_date,
+        void logTelemetry({
+          data: {
+            operationKey: crypto.randomUUID(),
+            activityType: "vocabulary_reading",
+            minutes,
+          },
         });
       }
     };
-  }, [minutesSpent]);
+  }, [minutesSpent, logTelemetry]);
 
   const { data: entry, isFetching: searching } = useQuery({
     queryKey: ["dictionary-v2", q.toLowerCase()],

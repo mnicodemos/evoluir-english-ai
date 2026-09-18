@@ -25,7 +25,7 @@ export function LessonQuiz({
   questions: QuizQuestion[];
   userId?: string | undefined;
   lessonId: string;
-  onFinished?: (score: number) => void;
+  onFinished?: (score: number, attemptKey: string) => void;
 }) {
   const { lang } = useUiLang();
   // Answers are kept locally so leaving the lesson does not lose them.
@@ -87,7 +87,7 @@ export function LessonQuiz({
           ),
         });
         setSubmitted(true);
-        onFinished?.(saved.score);
+        onFinished?.(saved.score, stableAttemptKey);
         return;
       }
       throw new Error("Sign in to save and grade this quiz.");
