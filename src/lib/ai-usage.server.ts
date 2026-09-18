@@ -8,6 +8,7 @@ export const AI_OPERATIONS = [
   "vocabulary_generation",
   "writing_correction",
   "dictionary",
+  "teacher",
 ] as const;
 
 export type AiOperation = (typeof AI_OPERATIONS)[number];
