@@ -172,19 +172,16 @@ function ListeningPage() {
   const { data: startedLessons } = useLessonRound();
   const lessonCount = startedLessons ?? 0;
 
-  const sentences = useMemo(() => {
-    const fromLessons = lessonSentences(lessons ?? []);
-    const extra = (trackCategories[track.id] ?? []).flatMap((c) =>
-      (fromLessons.get(c) ?? []).map(clampWords),
-    );
-    const pool = [...new Set([...extra, ...track.sentences.map(clampWords)])].filter(isDrillLength);
-    const start = pool.length ? (lessonCount * SENTENCES_PER_TRACK) % pool.length : 0;
-    const picked: string[] = [];
-    for (let i = 0; i < Math.min(SENTENCES_PER_TRACK, pool.length); i += 1) {
-      picked.push(pool[(start + i) % pool.length]!);
-    }
-    return picked;
-  }, [lessons, lessonCount, track]);
+  const sentences = useMemo(
+    () =>
+      pickListeningSentences({
+        config,
+        lessonSentences: lessonSentencesForLevel(lessons ?? [], levelInfo.value, config),
+        rotation: lessonCount,
+        count: SENTENCES_PER_TRACK,
+      }),
+    [lessons, lessonCount, config, levelInfo.value],
+  );
 
   const sentence = sentences[index] ?? "";
   const isDone = completed[track.id] === lessonCount;
