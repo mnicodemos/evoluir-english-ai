@@ -91,8 +91,7 @@ export function teacherTurnMessages(input: {
   mode?: TeacherMode;
 }): AiMsg[] {
   const mode =
-    input.mode ??
-    classifyTeacherMode({ message: input.studentMessage, history: input.history });
+    input.mode ?? classifyTeacherMode({ message: input.studentMessage, history: input.history });
   const register = levelRegister(input.context.cefrLevel);
   const system = [
     "You are a CELTA-certified English teacher in a one-to-one tutoring session with a Brazilian learner.",

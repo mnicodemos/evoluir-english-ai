@@ -14,7 +14,8 @@ export type TeacherMode = (typeof TEACHER_MODES)[number];
 
 const EXPLAIN_RE =
   /\b(why|what is|what's|what are|how do|how does|explain|difference between|when do i|meaning of|grammar rule)\b|\b(por que|porque|o que (é|significa)|explica|explicar|qual a diferença|quando usar)\b/i;
-const EXAMPLE_RE = /\b(example|examples|for instance|show me|give me a sentence)\b|\b(exemplo|exemplos|me d[êe] (um|uma))\b/i;
+const EXAMPLE_RE =
+  /\b(example|examples|for instance|show me|give me a sentence)\b|\b(exemplo|exemplos|me d[êe] (um|uma))\b/i;
 const PRACTICE_RE =
   /\b(practi[cs]e|exercise|exercises|quiz me|test me|drill|let'?s practi[cs]e|train)\b|\b(praticar|pr[áa]tica|exerc[íi]cio|me teste|treinar)\b/i;
 const CORRECT_RE =

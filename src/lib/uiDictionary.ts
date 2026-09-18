@@ -16,7 +16,6 @@ export const uiPt: Record<string, string> = {
   Correcting: "Corrigindo",
   Examples: "Exemplos",
   Reviewing: "Revisando",
-  Conversation: "Conversa",
   "Hi! I'm your AI Teacher. What would you like to practice today?":
     "Olá! Sou seu professor de IA. O que você quer praticar hoje?",
   "Explain a grammar topic": "Explicar um tópico de gramática",

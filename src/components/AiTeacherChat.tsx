@@ -202,12 +202,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             {messages.at(-1)?.role === "assistant" && !turn.isPending && (
               <div className="flex flex-wrap gap-2">
                 {quickActions.map((action) => (
-                  <Button
-                    key={action}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => send(action)}
-                  >
+                  <Button key={action} variant="outline" size="sm" onClick={() => send(action)}>
                     {t(action)}
                   </Button>
                 ))}
