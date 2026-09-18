@@ -139,6 +139,14 @@ export const uiPt: Record<string, string> = {
   Video: "Vídeo",
   "Lesson video": "Vídeo da lição",
   "I watched it": "Já assisti",
+  "Video reinforcement": "Reforço em vídeo",
+  "Watch this short explanation before you practise.":
+    "Assista a uma explicação curta antes de praticar.",
+  "What you just reviewed": "O que você acabou de revisar",
+  "Now practise": "Agora pratique",
+  "Review the flashcards": "Revisar os flashcards",
+  "This video is unavailable right now. Read the summary below and continue the lesson.":
+    "Este vídeo está indisponível agora. Leia o resumo abaixo e continue a aula.",
   Watched: "Assistido",
   Flashcards: "Flashcards",
   Quiz: "Quiz",
