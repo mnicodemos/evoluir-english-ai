@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database, Json } from "@/integrations/supabase/types";
 import { parseWritingFeedback, writingCorrectionMessages } from "@/lib/ai-prompts";
+import { expectedLengthLabel, writingLevelConfig } from "@/lib/writingLevels";
 import { callGateway } from "@/lib/ai-gateway.server";
 
 import { aggregateSkillEvidence } from "./aggregateSkill";
