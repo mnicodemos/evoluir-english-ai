@@ -49,12 +49,17 @@ export const teacherTurn = createServerFn({ method: "POST" })
       lessonId: data.lessonId ?? null,
     });
 
+    // Mode is classified on the server from the student's own turn: the client
+    // cannot declare a mode, a level or a skill.
+    const mode = classifyTeacherMode({ message: data.message, history: data.history });
+
     const raw = await callGateway(
       teacherTurnMessages({
         context: pedagogicalContext,
         objective: data.objective,
         studentMessage: data.message,
         history: data.history,
+        mode,
       }),
       true,
       { userId, operation: "teacher" },
