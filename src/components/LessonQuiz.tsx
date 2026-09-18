@@ -36,7 +36,7 @@ export function LessonQuiz({
   // Whether the quiz was already finished, so a completed lesson keeps showing
   // the corrections instead of an empty quiz when the student comes back.
   const [submitted, setSubmitted, clearSubmitted] = usePersistentState<boolean>(
-    `lesson-quiz-submitted:${userId ?? "guest"}:${lessonId}`,
+    `lesson-quiz-submitted-v2:${userId ?? "guest"}:${lessonId}`,
     false,
   );
   const [attemptKey, setAttemptKey, clearAttemptKey] = usePersistentState<string>(
