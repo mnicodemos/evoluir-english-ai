@@ -1,0 +1,174 @@
+// Deterministic "next step" layer (Phase 10).
+// Pure functions over data the server already owns (current_skill_profile,
+// learning_profile.common_errors, activities recency, lessons). No LLM, no new
+// profile, no new score, no new CEFR, no new evidence.
+
+export type SkillSnapshot = {
+  skill: string;
+  score: number | null;
+  confidence: number | null;
+  cefrLevel: string;
+};
+
+export type NextStepReason =
+  | "recent_errors"
+  | "low_confidence"
+  | "lowest_score"
+  | "not_practised_recently"
+  | "not_measured_yet"
+  | "no_data";
+
+export type NextStepAction =
+  | "review_lesson"
+  | "practise_listening"
+  | "practise_writing"
+  | "practise_speaking"
+  | "practise_vocabulary"
+  | "talk_to_teacher";
+
+export type NextStepActivity = {
+  type: "lesson" | "listening" | "writing" | "speaking" | "vocabulary" | "teacher";
+  title: string;
+  /** Existing app route. Never invented. */
+  to: string;
+  params?: { lessonId: string };
+};
+
+export type NextStep = {
+  prioritySkill: string | null;
+  reason: NextStepReason;
+  action: NextStepAction;
+  activity: NextStepActivity;
+};
+
+export type NextStepInput = {
+  skills: SkillSnapshot[];
+  /** learning_profile.common_errors (most recent last). */
+  recurringErrors: string[];
+  /** Skills practised in the recent window, from existing activities rows. */
+  recentlyPractised: string[];
+  /** One existing, not-completed lesson per skill, already filtered by level. */
+  lessonBySkill: Record<string, { id: string; title: string } | undefined>;
+};
+
+/** Existing practice surfaces, used only as fallback when no lesson matches. */
+const FALLBACK_BY_SKILL: Record<string, { action: NextStepAction; activity: NextStepActivity }> = {
+  listening: {
+    action: "practise_listening",
+    activity: { type: "listening", title: "Listening Lab", to: "/listening" },
+  },
+  writing: {
+    action: "practise_writing",
+    activity: { type: "writing", title: "Writing", to: "/writing" },
+  },
+  speaking: {
+    action: "practise_speaking",
+    activity: { type: "speaking", title: "AI Talking", to: "/coach" },
+  },
+  pronunciation: {
+    action: "practise_speaking",
+    activity: { type: "speaking", title: "AI Talking", to: "/coach" },
+  },
+  vocabulary: {
+    action: "practise_vocabulary",
+    activity: { type: "vocabulary", title: "Vocabulary", to: "/vocabulary" },
+  },
+};
+
+const TEACHER_FALLBACK: { action: NextStepAction; activity: NextStepActivity } = {
+  action: "talk_to_teacher",
+  activity: { type: "teacher", title: "AI Teacher", to: "/teacher" },
+};
+
+/** True when a recurring error text mentions the skill. Simple and explainable. */
+function skillHasRecentError(skill: string, errors: string[]): boolean {
+  return errors.some((error) => error.toLowerCase().includes(skill.toLowerCase()));
+}
+
+function rank(skill: SkillSnapshot, input: NextStepInput): { weight: number; reason: NextStepReason } {
+  if (skillHasRecentError(skill.skill, input.recurringErrors))
+    return { weight: 0, reason: "recent_errors" };
+  if (skill.score === null) return { weight: 1, reason: "not_measured_yet" };
+  if (skill.confidence !== null && skill.confidence < 0.5)
+    return { weight: 2, reason: "low_confidence" };
+  if (!input.recentlyPractised.includes(skill.skill))
+    return { weight: 3, reason: "not_practised_recently" };
+  return { weight: 4, reason: "lowest_score" };
+}
+
+/**
+ * Picks one priority skill and one REAL activity. Ties break by lower score,
+ * then alphabetically, so the result is stable for the same data.
+ */
+export function buildNextStep(input: NextStepInput): NextStep {
+  const candidates = input.skills.filter((item) => item.skill);
+  if (candidates.length === 0) {
+    return {
+      prioritySkill: null,
+      reason: "no_data",
+      action: TEACHER_FALLBACK.action,
+      activity: TEACHER_FALLBACK.activity,
+    };
+  }
+
+  const ordered = candidates
+    .map((skill) => ({ skill, ...rank(skill, input) }))
+    .sort(
+      (a, b) =>
+        a.weight - b.weight ||
+        (a.skill.score ?? 0) - (b.skill.score ?? 0) ||
+        a.skill.skill.localeCompare(b.skill.skill),
+    );
+
+  const best = ordered[0]!;
+  const lesson = input.lessonBySkill[best.skill.skill];
+  if (lesson) {
+    return {
+      prioritySkill: best.skill.skill,
+      reason: best.reason,
+      action: "review_lesson",
+      activity: {
+        type: "lesson",
+        title: lesson.title,
+        to: "/learning/$lessonId",
+        params: { lessonId: lesson.id },
+      },
+    };
+  }
+  const fallback = FALLBACK_BY_SKILL[best.skill.skill] ?? TEACHER_FALLBACK;
+  return {
+    prioritySkill: best.skill.skill,
+    reason: best.reason,
+    action: fallback.action,
+    activity: fallback.activity,
+  };
+}
+
+/** Factual, positive copy. One entry per reason; nothing is invented. */
+export const NEXT_STEP_REASON_TEXT: Record<NextStepReason, string> = {
+  recent_errors: "Based on your recent mistakes in this area.",
+  low_confidence: "We still have little evidence about this skill.",
+  lowest_score: "This is your lowest skill score right now.",
+  not_practised_recently: "You have not practised this recently.",
+  not_measured_yet: "You have not practised this skill yet.",
+  no_data: "Start anywhere and we will personalise your next step.",
+};
+
+export const NEXT_STEP_ACTION_TEXT: Record<NextStepAction, string> = {
+  review_lesson: "Review lesson",
+  practise_listening: "Practise listening",
+  practise_writing: "Practise writing",
+  practise_speaking: "Practise speaking",
+  practise_vocabulary: "Practise vocabulary",
+  talk_to_teacher: "Talk to AI Teacher",
+};
+
+export const NEXT_STEP_SKILL_TEXT: Record<string, string> = {
+  grammar: "Grammar",
+  vocabulary: "Vocabulary",
+  reading: "Reading",
+  listening: "Listening",
+  writing: "Writing",
+  speaking: "Speaking",
+  pronunciation: "Pronunciation",
+};
