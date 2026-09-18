@@ -56,40 +56,39 @@ export function WeeklyFrequency({ userId }: Props) {
   const daysLabel = lang === "pt" ? "dias" : "days";
 
   return (
-    <div className="flex h-full flex-col justify-center gap-3">
-      <div className="flex items-center gap-3">
+    <div className="flex h-full items-center gap-3">
+      <div className="flex flex-col items-center gap-1.5">
         <TrophyBadge active={allStudied} lang={lang} />
-
-
-        <div className="grid flex-1 grid-cols-7 place-items-center gap-1.5">
-          {weekKeys.map((key, i) => {
-            const studied = studyDays?.has(key) ?? false;
-            const isToday = key === todayKey;
-            return (
-              <div
-                key={key}
-                className={
-                  "flex flex-col items-center gap-1.5 rounded-lg border p-2 " +
-                  (studied ? "border-transparent bg-success/10" : "border-border bg-card") +
-                  (isToday ? " ring-1 ring-foreground/30" : "")
-                }
-              >
-                {studied ? (
-                  <span className="grid size-6 place-items-center rounded-full bg-success text-success-foreground">
-                    <Check className="size-3.5" strokeWidth={3} />
-                  </span>
-                ) : (
-                  <span className="size-6 rounded-full border-2 border-border" />
-                )}
-                <span className="text-[11px] text-muted-foreground">{labels[i]}</span>
-              </div>
-            );
-          })}
-        </div>
+        <p className="w-14 text-center text-[10px] font-medium leading-tight text-muted-foreground">
+          {goalLabel} {studiedCount} / 7 {daysLabel}
+        </p>
       </div>
-      <p className="text-center text-xs font-medium text-muted-foreground">
-        {goalLabel} {studiedCount} / 7 {daysLabel}
-      </p>
+
+      <div className="grid flex-1 grid-cols-7 place-items-center gap-1">
+        {weekKeys.map((key, i) => {
+          const studied = studyDays?.has(key) ?? false;
+          const isToday = key === todayKey;
+          return (
+            <div
+              key={key}
+              className={
+                "flex flex-col items-center gap-1 rounded-lg border p-1.5 " +
+                (studied ? "border-transparent bg-success/10" : "border-border bg-card") +
+                (isToday ? " ring-1 ring-foreground/30" : "")
+              }
+            >
+              {studied ? (
+                <span className="grid size-5 place-items-center rounded-full bg-success text-success-foreground">
+                  <Check className="size-3" strokeWidth={3} />
+                </span>
+              ) : (
+                <span className="size-5 rounded-full border-2 border-border" />
+              )}
+              <span className="text-[10px] text-muted-foreground">{labels[i]}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
