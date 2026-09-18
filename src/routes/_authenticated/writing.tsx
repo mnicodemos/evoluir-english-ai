@@ -118,9 +118,15 @@ function Writing() {
   });
 
   const { data: startedLessons } = useLessonRound();
+  // The CEFR level comes from the stored profile — the student cannot pick it here.
+  const config = useMemo(() => writingLevelConfig(profile?.level), [profile?.level]);
+  const rotation = startedLessons ?? 0;
   // A fresh set of tasks every day, and every time the student starts a new lesson.
-  const signature = `${todayKey()}-${startedLessons ?? 0}`;
-  const prompts = useMemo(() => roundPrompts(signature), [signature]);
+  const signature = `${todayKey()}-${config.level}-${rotation}`;
+  const prompts = useMemo(
+    () => roundPrompts(signature, config, rotation),
+    [signature, config, rotation],
+  );
   const [done, setDone] = useState<string[]>([]);
   const [prompt, setPrompt] = useState("");
   const [text, setText] = useState("");
