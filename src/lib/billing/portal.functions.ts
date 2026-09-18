@@ -19,9 +19,7 @@ export const createStripePortalSession = createServerFn({ method: "POST" })
     const customerId = await getLinkedCustomerId(context.userId);
     if (!customerId) return { url: null };
 
-    const origin = new URL(
-      (await import("@tanstack/react-start/server")).getRequest().url,
-    ).origin;
+    const origin = new URL((await import("@tanstack/react-start/server")).getRequest().url).origin;
 
     const session = await getStripe().billingPortal.sessions.create({
       customer: customerId,

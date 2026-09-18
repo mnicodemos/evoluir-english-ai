@@ -222,7 +222,6 @@ function Premium() {
             )}
           </section>
 
-
           {isPremium ? (
             <section className="card-soft bg-primary p-6 text-primary-foreground">
               <span className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-medium">
