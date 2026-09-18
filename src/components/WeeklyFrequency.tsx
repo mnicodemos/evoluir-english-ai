@@ -54,40 +54,50 @@ export function WeeklyFrequency({ userId }: Props) {
   const studiedCount = studyDays?.size ?? 0;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
+  const aiGoalLabel =
+    lang === "pt" ? "Evoluir + English AI objetivo" : "Evoluir + English AI goal";
 
   return (
     <div className="flex h-full items-center gap-3">
       <div className="flex flex-col items-center gap-1.5">
         <TrophyBadge active={allStudied} lang={lang} />
-        <p className="w-14 text-center text-[10px] font-medium leading-tight text-muted-foreground">
-          {goalLabel} {studiedCount} / 7 {daysLabel}
-        </p>
+        <div className="flex w-14 flex-col items-center text-center text-[10px] font-medium leading-tight text-muted-foreground">
+          <span>{goalLabel}</span>
+          <span>
+            {studiedCount}/7 {daysLabel}
+          </span>
+        </div>
       </div>
 
-      <div className="grid flex-1 grid-cols-7 place-items-center gap-1">
-        {weekKeys.map((key, i) => {
-          const studied = studyDays?.has(key) ?? false;
-          const isToday = key === todayKey;
-          return (
-            <div
-              key={key}
-              className={
-                "flex flex-col items-center gap-1 rounded-lg border p-1.5 " +
-                (studied ? "border-transparent bg-success/10" : "border-border bg-card") +
-                (isToday ? " ring-1 ring-foreground/30" : "")
-              }
-            >
-              {studied ? (
-                <span className="grid size-5 place-items-center rounded-full bg-success text-success-foreground">
-                  <Check className="size-3" strokeWidth={3} />
-                </span>
-              ) : (
-                <span className="size-5 rounded-full border-2 border-border" />
-              )}
-              <span className="text-[10px] text-muted-foreground">{labels[i]}</span>
-            </div>
-          );
-        })}
+      <div className="flex flex-1 flex-col gap-1">
+        <div className="grid grid-cols-7 place-items-center gap-1">
+          {weekKeys.map((key, i) => {
+            const studied = studyDays?.has(key) ?? false;
+            const isToday = key === todayKey;
+            return (
+              <div
+                key={key}
+                className={
+                  "flex flex-col items-center gap-1 rounded-lg border p-1.5 " +
+                  (studied ? "border-transparent bg-success/10" : "border-border bg-card") +
+                  (isToday ? " ring-1 ring-foreground/30" : "")
+                }
+              >
+                {studied ? (
+                  <span className="grid size-5 place-items-center rounded-full bg-success text-success-foreground">
+                    <Check className="size-3" strokeWidth={3} />
+                  </span>
+                ) : (
+                  <span className="size-5 rounded-full border-2 border-border" />
+                )}
+                <span className="text-[10px] text-muted-foreground">{labels[i]}</span>
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-center text-[10px] font-medium leading-tight text-muted-foreground">
+          {aiGoalLabel}
+        </p>
       </div>
     </div>
   );
