@@ -7,6 +7,14 @@ import { z } from "zod";
 import type { AiMsg } from "@/lib/ai-prompts";
 
 import { TEACHER_EVIDENCE_SKILLS, type TeacherEvidenceSkill } from "./teacherEvidence";
+import {
+  classifyTeacherMode,
+  levelRegister,
+  modeWordBudget,
+  MODE_RULES,
+  REGISTER_RULES,
+  type TeacherMode,
+} from "./teacherMode";
 
 export type TeacherContextForPrompt = {
   cefrLevel: string | null;
@@ -16,6 +24,8 @@ export type TeacherContextForPrompt = {
     skill: string | null;
     cefrLevel: string | null;
   };
+  /** Existing platform content that matches the student's weakest skill. */
+  recommendedLesson?: { title: string; skill: string | null } | null;
   recurringErrors: string[];
 };
 
