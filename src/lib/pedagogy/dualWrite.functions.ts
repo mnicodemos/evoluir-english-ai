@@ -19,10 +19,6 @@ import {
   WRITING_RUBRIC_VERSION,
 } from "./dualWrite";
 
-type UserClient = Parameters<Parameters<typeof requireSupabaseAuth>[0]>[0] extends never
-  ? never
-  : unknown;
-
 const quizInputSchema = z.object({ quizResultId: z.string().uuid() }).strict();
 const writingInputSchema = z
   .object({

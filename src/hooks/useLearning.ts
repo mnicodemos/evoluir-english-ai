@@ -283,6 +283,7 @@ export async function saveQuizResult(params: {
       .select("id")
       .single(),
   );
+  if (!data) throw new Error("Quiz result was saved without a returned identifier");
   try {
     await dualWriteQuizEvidence({ data: { quizResultId: data.id } });
   } catch (error) {

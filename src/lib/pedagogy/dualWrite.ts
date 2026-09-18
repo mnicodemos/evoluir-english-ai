@@ -50,11 +50,12 @@ export function quizEvidence(detail: ClassifiedQuizDetail): AssessmentEvidence {
 }
 
 export function writingEvidence(scores: WritingSubscores): AssessmentEvidence[] {
-  return [
+  const subscores: Pick<AssessmentEvidence, "skill" | "subskill" | "rawScore">[] = [
     { skill: "grammar", subskill: "writing_grammar", rawScore: scores.grammar },
     { skill: "vocabulary", subskill: "writing_vocabulary", rawScore: scores.vocabulary },
     { skill: "writing", subskill: "clarity", rawScore: scores.clarity },
-  ].map((item) => ({
+  ];
+  return subscores.map((item) => ({
     ...item,
     sourceType: "writing" as const,
     evidenceType: "subscore" as const,
