@@ -100,18 +100,37 @@ const conversationReportSchema = z
   })
   .strict();
 
+/**
+ * Speaking rubric. `level` is the stored profile level, resolved on the server —
+ * never sent by the browser — so a beginner is never judged by advanced criteria.
+ */
 export function conversationReportMessages(
   messages: { role: "user" | "assistant"; content: string }[],
+  level?: string | null,
 ): AiMsg[] {
   const transcript = messages
     .map((m) => `${m.role === "user" ? "Student" : "Teacher"}: ${m.content}`)
     .join("\n");
+  const cefr = findLevel(level ?? "");
+  const levelContext = level
+    ? `\nStudent level: ${cefr.label}. ${cefr.descriptor}\n` +
+      `Judge the speaking against ${cefr.cefr} expectations only: do not demand language above this level, ` +
+      "and do not reward language below it. " +
+      (["a1", "a2"].includes(cefr.value)
+        ? "At this level prioritise getting the message across, basic sentence structure and high-frequency vocabulary; " +
+          "a small range of words is normal and is not an advanced failure."
+        : ["b1", "b2"].includes(cefr.value)
+          ? "At this level prioritise organisation, grammar accuracy, clarity and vocabulary range."
+          : "At this level prioritise precision, nuance, natural idiomatic range and sustained argument.") +
+      `\nKeep the summary and tips simple enough for a ${cefr.label} learner.`
+    : "";
   return [
     {
       role: "system",
       content:
-        "You are a CELTA English examiner. Evaluate ONLY the student's English in the transcript. " +
-        'Reply with strict JSON: {"fluency":0-100,"grammar":0-100,"vocabulary":0-100,"summary":"2 sentences",' +
+        "You are a CELTA English examiner. Evaluate ONLY the student's English in the transcript." +
+        levelContext +
+        '\nReply with strict JSON: {"fluency":0-100,"grammar":0-100,"vocabulary":0-100,"summary":"2 sentences",' +
         '"suggestions":["3 short improvement tips"],"common_errors":["up to 3 recurring mistakes"],"new_words":["up to 4 useful words or expressions the student should learn"]}',
     },
     { role: "user", content: transcript },

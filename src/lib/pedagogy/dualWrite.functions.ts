@@ -9,6 +9,7 @@ import { expectedLengthLabel, writingLevelConfig } from "@/lib/writingLevels";
 import { callGateway } from "@/lib/ai-gateway.server";
 
 import { aggregateSkillEvidence } from "./aggregateSkill";
+import { itemLevelFromStoredLevel, measuredCefr } from "./cefr";
 import {
   type AssessmentEvidence,
   evidenceSourceTypeSchema,
@@ -162,6 +163,17 @@ async function loadAdmin() {
   return supabaseAdmin as unknown as AdminClient;
 }
 
+async function lessonItemLevel(admin: AdminClient, lessonId: string | null) {
+  if (!lessonId) return null;
+  const { data } = await admin.from("lessons").select("level").eq("id", lessonId).maybeSingle();
+  return data?.level ? itemLevelFromStoredLevel(data.level) : null;
+}
+
+async function profileItemLevel(admin: AdminClient, userId: string) {
+  const { data } = await admin.from("profiles").select("level").eq("id", userId).maybeSingle();
+  return data?.level ? itemLevelFromStoredLevel(data.level) : null;
+}
+
 async function persistEvidenceAndResults(params: {
   admin: AdminClient;
   userId: string;
@@ -180,7 +192,7 @@ async function persistEvidenceAndResults(params: {
     const { data, error } = await admin
       .from("assessment_evidence")
       .select(
-        "id, skill, subskill, source_type, source_id, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, model_version, rubric_version",
+        "id, skill, subskill, source_type, source_id, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, model_version, rubric_version",
       )
       .eq("user_id", userId)
       .eq("skill", skill)
@@ -198,6 +210,7 @@ async function persistEvidenceAndResults(params: {
       subskill: row.subskill,
       sourceType: evidenceSourceTypeSchema.parse(row.source_type),
       sourceId: row.source_id,
+      itemCefr: measuredCefr(row.item_cefr),
       rawScore: row.raw_score,
       sourceReliability: row.source_reliability,
       evidenceQuality: row.evidence_quality,
@@ -293,7 +306,7 @@ async function processQuiz(
   const key = `quiz:${quizResultId}`;
   const { data: result, error } = await admin
     .from("quiz_results")
-    .select("id, user_id, details")
+    .select("id, user_id, lesson_id, details")
     .eq("id", quizResultId)
     .maybeSingle();
   if (error || !result || result.user_id !== userId) {
@@ -333,7 +346,12 @@ async function processQuiz(
       )
       .map((question) => [question.id, question.pedagogical_skill as "grammar" | "vocabulary"]),
   );
-  const classified = classifyQuizEvidence(details, skills);
+  // The item level comes from the lesson the quiz belongs to, server-side only.
+  const classified = classifyQuizEvidence(
+    details,
+    skills,
+    await lessonItemLevel(admin, result.lesson_id),
+  );
   const persisted = classified.evidence.length
     ? await persistEvidenceAndResults({
         admin,
@@ -383,11 +401,15 @@ async function processWriting(
     sourceId: row.id,
     idempotencyKey: key,
     rubricVersion: WRITING_RUBRIC_VERSION,
-    evidence: writingEvidence({
-      grammar: row.grammar_score,
-      vocabulary: row.vocabulary_score,
-      clarity: row.clarity_score,
-    }),
+    evidence: writingEvidence(
+      {
+        grammar: row.grammar_score,
+        vocabulary: row.vocabulary_score,
+        clarity: row.clarity_score,
+      },
+      // The task and the correction rubric belong to the stored profile level.
+      await profileItemLevel(admin, userId),
+    ),
     ...(claimedAt ? { claimedAt } : {}),
   });
 }

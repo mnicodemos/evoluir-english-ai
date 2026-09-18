@@ -102,7 +102,7 @@ describe("skill aggregation", () => {
       cefr: "insufficient_evidence",
       confidence: null,
       evidenceCount: 0,
-      ruleVersion: "cefr-score-v1",
+      ruleVersion: "cefr-score-v2",
     });
   });
 

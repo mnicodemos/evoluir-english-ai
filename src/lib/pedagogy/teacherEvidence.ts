@@ -1,6 +1,7 @@
 // Turns a SUGGESTED teacher assessment into pedagogical evidence, reusing the
 // existing evidence contract. The server decides whether anything is persisted.
 
+import type { MeasuredCefrLevel } from "./cefr";
 import type { AssessmentEvidence } from "./contracts";
 
 export const TEACHER_RUBRIC_VERSION = "teacher-interaction-v1";
@@ -52,6 +53,8 @@ export function teacherEvidence(input: {
   skill: TeacherEvidenceSkill;
   score: number;
   turnId: string;
+  /** CEFR level of the interaction, resolved server-side from the profile. */
+  itemCefr?: MeasuredCefrLevel | null;
 }): AssessmentEvidence[] {
   return [
     {
@@ -61,6 +64,7 @@ export function teacherEvidence(input: {
       sourceItemId: input.turnId,
       evidenceType: "subscore",
       polarity: input.score >= 70 ? "positive" : "negative",
+      itemCefr: input.itemCefr ?? null,
       rawScore: input.score,
       // A single conversational turn is weaker evidence than a graded quiz or a
       // full writing submission, so it carries less weight in the aggregation.

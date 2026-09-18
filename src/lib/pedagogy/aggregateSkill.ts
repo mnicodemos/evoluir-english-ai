@@ -1,4 +1,13 @@
-import { cefrForScore, INITIAL_CEFR_RULESET, type CefrRuleset } from "./cefr";
+import {
+  calibrateCefrToItemLevel,
+  cefrForScore,
+  cefrRank,
+  INITIAL_CEFR_RULESET,
+  MEASURED_CEFR_LEVELS,
+  measuredCefr,
+  type CefrRuleset,
+  type MeasuredCefrLevel,
+} from "./cefr";
 import {
   calculateConfidence,
   type ConfidenceConfig,
@@ -41,6 +50,26 @@ function isValidEvidence(evidence: AssessmentEvidence, skill: PedagogicalSkill) 
     Number.isFinite(evidence.sampleWeight) &&
     evidence.sampleWeight > 0
   );
+}
+
+/**
+ * The level of the content the evidence actually came from, weighted the same
+ * way the score is. Returns null when no evidence carries an item level, which
+ * keeps legacy evidence on the previous behaviour.
+ */
+function practisedLevel(
+  weightedEvidence: readonly { itemCefr?: string | null; effectiveWeight: number }[],
+): MeasuredCefrLevel | null {
+  const levelled = weightedEvidence.flatMap((item) => {
+    const level = measuredCefr(item.itemCefr);
+    return level && item.effectiveWeight > 0 ? [{ level, weight: item.effectiveWeight }] : [];
+  });
+  if (levelled.length === 0) return null;
+  const totalWeight = levelled.reduce((sum, item) => sum + item.weight, 0);
+  const index = Math.round(
+    levelled.reduce((sum, item) => sum + cefrRank(item.level) * item.weight, 0) / totalWeight,
+  );
+  return MEASURED_CEFR_LEVELS[Math.min(Math.max(index, 0), MEASURED_CEFR_LEVELS.length - 1)]!;
 }
 
 export function aggregateSkillEvidence(
@@ -91,7 +120,10 @@ export function aggregateSkillEvidence(
   return {
     skill: validSkill,
     score,
-    cefr: cefrForScore(score, config.ruleset),
+    cefr: calibrateCefrToItemLevel(
+      cefrForScore(score, config.ruleset),
+      practisedLevel(weightedEvidence),
+    ),
     confidence,
     evidenceCount: validEvidence.length,
     ruleVersion: config.ruleset.version,

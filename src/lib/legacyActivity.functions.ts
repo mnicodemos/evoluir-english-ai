@@ -241,10 +241,17 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
       .maybeSingle();
     if (existing?.result) return parseConversationReport(JSON.stringify(existing.result));
     const { callGateway } = await import("@/lib/ai-gateway.server");
-    const raw = await callGateway(conversationReportMessages(data.messages), true, {
-      userId: context.userId,
-      operation: "talking",
-    });
+    // The speaking rubric level comes from the stored profile, never from the browser.
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("level")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const raw = await callGateway(
+      conversationReportMessages(data.messages, profile?.level ?? null),
+      true,
+      { userId: context.userId, operation: "talking" },
+    );
     const report = parseConversationReport(raw);
     const score = Math.round((report.fluency + report.grammar + report.vocabulary) / 3);
     await persist({
