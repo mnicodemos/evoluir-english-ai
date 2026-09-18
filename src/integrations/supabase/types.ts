@@ -1204,6 +1204,17 @@ export type Database = {
       }
     }
     Functions: {
+      claim_pedagogical_retries: {
+        Args: { p_limit?: number; p_stale_seconds?: number; p_user_id: string }
+        Returns: {
+          attempt_count: number
+          claimed_at: string
+          id: string
+          idempotency_key: string
+          source_id: string
+          source_type: string
+        }[]
+      }
       persist_pedagogical_bundle: {
         Args: {
           p_evidence: Json
