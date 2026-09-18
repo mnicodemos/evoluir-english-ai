@@ -31,6 +31,7 @@ const nav = [
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/coach", label: "AI Talking", icon: MessageSquareText },
+  { to: "/teacher", label: "AI Teacher", icon: GraduationCap },
   { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/progress", label: "Progress", icon: LineChart },

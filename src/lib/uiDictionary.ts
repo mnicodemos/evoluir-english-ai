@@ -2,6 +2,30 @@
 // Lesson content, practice sentences and any AI generated text stay in English.
 export const uiPt: Record<string, string> = {
   // Navigation / shell
+  "AI Teacher": "AI Teacher",
+  "Practice English with your personal AI teacher": "Pratique inglês com seu professor de IA pessoal",
+  "New conversation": "Nova conversa",
+  "Your context": "Seu contexto",
+  Level: "Nível",
+  Focus: "Foco",
+  "Hi! I'm your AI Teacher. What would you like to practice today?":
+    "Olá! Sou seu professor de IA. O que você quer praticar hoje?",
+  "Explain a grammar topic": "Explicar um tópico de gramática",
+  "Practice vocabulary": "Praticar vocabulário",
+  "Correct my English": "Corrigir meu inglês",
+  "Let's practice conversation": "Vamos praticar conversação",
+  You: "Você",
+  "Teacher is thinking...": "O professor está pensando...",
+  "Type your message": "Digite sua mensagem",
+  "Type your message...": "Digite sua mensagem...",
+  "Send message": "Enviar mensagem",
+  "You seem to be offline. Check your connection and try again.":
+    "Parece que você está sem conexão. Verifique sua internet e tente novamente.",
+  "You have reached your AI usage limit for now. Please try again later.":
+    "Você atingiu o limite de uso da IA por agora. Tente novamente mais tarde.",
+  "Your session expired. Please sign in again.": "Sua sessão expirou. Entre novamente.",
+  "The teacher is unavailable right now. Please try again.":
+    "O professor está indisponível agora. Tente novamente.",
   Dashboard: "Início",
   Learning: "Aprendizado",
   Listening: "Escuta",

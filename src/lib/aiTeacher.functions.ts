@@ -135,3 +135,50 @@ export const teacherTurn = createServerFn({ method: "POST" })
       evidenceSkill: decision.assess ? decision.skill : null,
     };
   });
+
+// Read-only session bootstrap for the AI Teacher UI: the display context comes
+// from the server (never computed on the client) plus the student's latest
+// teacher conversation, read with the user's own RLS-scoped client.
+export const loadTeacherSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        lessonId: z.string().uuid().optional(),
+        conversationId: z.string().uuid().optional(),
+      })
+      .strict()
+      .parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const pedagogicalContext = await loadTeacherContext(context.userId, {
+      lessonId: data.lessonId ?? null,
+    });
+
+    let query = context.supabase
+      .from("ai_conversations")
+      .select("id, messages, updated_at")
+      .eq("scenario", "teacher")
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    if (data.conversationId) query = query.eq("id", data.conversationId);
+    const { data: rows } = await query;
+    const conversation = rows?.[0] ?? null;
+
+    const focus =
+      pedagogicalContext.currentActivity?.skill ??
+      [...pedagogicalContext.skills].sort((a, b) => (a.score ?? 100) - (b.score ?? 100))[0]
+        ?.skill ??
+      null;
+
+    return {
+      context: {
+        cefrLevel: pedagogicalContext.currentActivity?.cefrLevel ?? pedagogicalContext.cefrLevel,
+        focusSkill: focus,
+        lessonTitle: pedagogicalContext.currentActivity?.lessonTitle ?? null,
+      },
+      conversation: conversation
+        ? { id: conversation.id as string, messages: conversation.messages }
+        : null,
+    };
+  });
