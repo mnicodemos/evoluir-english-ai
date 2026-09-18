@@ -11,6 +11,7 @@ import {
   LogOut,
   MessageSquareText,
   PenLine,
+  Sparkles,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
