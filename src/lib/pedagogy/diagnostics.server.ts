@@ -15,7 +15,9 @@ export async function readPedagogicalDiagnostics(): Promise<PedagogicalDiagnosti
     supabaseAdmin
       .from("unresolved_pedagogical_failures")
       .select("failure_id", { count: "exact", head: true }),
-    supabaseAdmin.from("orphan_quiz_results").select("quiz_result_id", { count: "exact", head: true }),
+    supabaseAdmin
+      .from("orphan_quiz_results")
+      .select("quiz_result_id", { count: "exact", head: true }),
   ]);
 
   return {

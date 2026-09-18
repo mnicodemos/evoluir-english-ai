@@ -12,10 +12,7 @@ import {
   normalizeLevel,
   type CurriculumLesson,
 } from "@/lib/curriculum";
-import {
-  resolveQuizEvidenceSkill,
-  type QuizEvidenceSkill,
-} from "@/lib/pedagogy/quizSkill";
+import { resolveQuizEvidenceSkill, type QuizEvidenceSkill } from "@/lib/pedagogy/quizSkill";
 
 import { callGateway } from "./ai-gateway.server";
 import { findLessonVideo, type LessonVideo } from "./lessonVideo.server";
@@ -127,7 +124,6 @@ async function insertQuizQuestions(
     console.error("Missing pedagogical mapping could not be recorded for lesson", lessonId);
   }
 }
-
 
 const flashcardSchema = z
   .object({
@@ -311,7 +307,6 @@ async function writeLesson(
     );
   }
 
-
   return lesson.id as string;
 }
 
@@ -485,7 +480,6 @@ export const openFinalTest = createServerFn({ method: "POST" })
     // The Final Test prompt constrains every item to grammar, so grammar is the
     // structural default when the generated label is absent or unsupported.
     await insertQuizQuestions(supabase, userId, lesson.id as string, quiz, "grammar");
-
 
     return { lessonId: lesson.id as string };
   });
