@@ -1,3 +1,5 @@
+import { findLevel } from "@/lib/level";
+
 import { scoreSchema, type CefrLevel } from "./contracts";
 
 export type CefrBand = {
@@ -71,4 +73,12 @@ export function calibrateCefrToItemLevel(
 ): Exclude<CefrLevel, "insufficient_evidence"> {
   if (!itemLevel) return scoreCefr;
   return cefrRank(scoreCefr) > cefrRank(itemLevel) ? itemLevel : scoreCefr;
+}
+
+/**
+ * Normalises a stored profile/lesson level (including legacy labels such as
+ * "intermediate") to a CEFR item level.
+ */
+export function itemLevelFromStoredLevel(level: string | null | undefined): MeasuredCefrLevel | null {
+  return measuredCefr(findLevel(level).value.toUpperCase());
 }
