@@ -133,7 +133,10 @@ function ListeningPage() {
     type: "listening_practice",
     title: "Listening practice",
   });
-  const track = tracks[0]!;
+  const track = { id: LEGACY_TRACK_ID };
+  // The drills follow the CEFR level stored on the profile.
+  const levelInfo = findLevel(profile?.level);
+  const config = listeningLevelConfig(profile?.level);
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [checked, setChecked] = useState<number | null>(null);
