@@ -52,6 +52,26 @@ function isValidEvidence(evidence: AssessmentEvidence, skill: PedagogicalSkill) 
   );
 }
 
+/**
+ * The level of the content the evidence actually came from, weighted the same
+ * way the score is. Returns null when no evidence carries an item level, which
+ * keeps legacy evidence on the previous behaviour.
+ */
+function practisedLevel(
+  weightedEvidence: readonly { itemCefr?: string | null; effectiveWeight: number }[],
+): MeasuredCefrLevel | null {
+  const levelled = weightedEvidence.flatMap((item) => {
+    const level = measuredCefr(item.itemCefr);
+    return level && item.effectiveWeight > 0 ? [{ level, weight: item.effectiveWeight }] : [];
+  });
+  if (levelled.length === 0) return null;
+  const totalWeight = levelled.reduce((sum, item) => sum + item.weight, 0);
+  const index = Math.round(
+    levelled.reduce((sum, item) => sum + cefrRank(item.level) * item.weight, 0) / totalWeight,
+  );
+  return MEASURED_CEFR_LEVELS[Math.min(Math.max(index, 0), MEASURED_CEFR_LEVELS.length - 1)]!;
+}
+
 export function aggregateSkillEvidence(
   skill: PedagogicalSkill,
   evidence: readonly AssessmentEvidence[],
