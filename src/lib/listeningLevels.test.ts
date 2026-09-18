@@ -19,7 +19,9 @@ describe("listening level configuration", () => {
 
   it("keeps the current behaviour for B2 and legacy levels", () => {
     expect(listeningLevelConfig("upper-intermediate").level).toBe("b2");
-    expect(listeningLevelConfig(null).rate).toBe(1);
+    expect(listeningLevelConfig("b2").rate).toBe(1);
+    // Unknown levels keep the ladder default instead of failing.
+    expect(listeningLevelConfig(null).level).toBe("b1");
   });
 
   it("only keeps sentences inside the level range", () => {
