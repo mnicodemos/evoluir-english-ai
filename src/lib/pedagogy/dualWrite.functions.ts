@@ -131,7 +131,10 @@ async function persistEvidenceAndResults(params: {
     .eq("id", sessionId)
     .eq("user_id", userId)
     .maybeSingle();
-  if (existingSession?.status === "completed") return { duplicate: true, evidenceCount: 0 };
+  if (existingSession?.status === "completed") {
+    await resolveFailure(supabase, userId, idempotencyKey);
+    return { duplicate: true, evidenceCount: 0 };
+  }
   if (!existingSession) {
     const { error } = await supabase.from("assessment_sessions").insert({
       id: sessionId,

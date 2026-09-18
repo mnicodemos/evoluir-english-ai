@@ -4,6 +4,12 @@ import { aggregateSkillEvidence } from "./aggregateSkill";
 import { cefrForScore } from "./cefr";
 import { assertConfidence } from "./confidence";
 import {
+  parseQuizDetails,
+  quizEvidence,
+  toleratePedagogicalFailure,
+  writingEvidence,
+} from "./dualWrite";
+import {
   CEFR_LEVELS,
   cefrLevelSchema,
   PEDAGOGICAL_SKILLS,
@@ -134,5 +140,77 @@ describe("skill aggregation", () => {
       ]),
     );
     expect(first).not.toEqual(second);
+  });
+});
+
+describe("Quiz dual-write mapping", () => {
+  const detail = {
+    question_id: "11111111-1111-4111-8111-111111111111",
+    question: "Choose the correct form",
+    answer: "goes",
+    correct_answer: "goes",
+    is_correct: true,
+  };
+
+  it("preserves the source item and maps an explicitly classified correct answer", () => {
+    expect(quizEvidence({ ...detail, pedagogical_skill: "grammar" })).toMatchObject({
+      skill: "grammar",
+      sourceItemId: detail.question_id,
+      rawScore: 100,
+      polarity: "positive",
+    });
+  });
+
+  it("maps an explicitly classified incorrect vocabulary answer as negative", () => {
+    expect(
+      quizEvidence({ ...detail, is_correct: false, pedagogical_skill: "vocabulary" }),
+    ).toMatchObject({ skill: "vocabulary", rawScore: 0, polarity: "negative" });
+  });
+
+  it("does not invent a skill while parsing unclassified operational details", () => {
+    const [parsed] = parseQuizDetails([detail]);
+    expect(parsed).toEqual(detail);
+    expect(parsed).not.toHaveProperty("pedagogical_skill");
+  });
+
+  it("accepts legacy details without a question identifier without inventing one", () => {
+    const { question_id: _questionId, ...legacy } = detail;
+    expect(parseQuizDetails([legacy])).toEqual([legacy]);
+  });
+});
+
+describe("Writing dual-write mapping", () => {
+  const scores = { grammar: 82, vocabulary: 74, clarity: 91 };
+
+  it("preserves the three existing Gemini subscores", () => {
+    expect(writingEvidence(scores)).toEqual([
+      expect.objectContaining({ skill: "grammar", subskill: "writing_grammar", rawScore: 82 }),
+      expect.objectContaining({
+        skill: "vocabulary",
+        subskill: "writing_vocabulary",
+        rawScore: 74,
+      }),
+      expect.objectContaining({ skill: "writing", subskill: "clarity", rawScore: 91 }),
+    ]);
+  });
+
+  it("keeps clarity as a writing subskill rather than inventing an eighth skill", () => {
+    const clarity = writingEvidence(scores).find((item) => item.subskill === "clarity");
+    expect(clarity?.skill).toBe("writing");
+    expect(PEDAGOGICAL_SKILLS).toHaveLength(7);
+  });
+});
+
+describe("Dual-write resilience", () => {
+  it("absorbs pedagogical failures without failing the operational caller", async () => {
+    await expect(
+      toleratePedagogicalFailure(async () => {
+        throw new Error("pedagogy unavailable");
+      }),
+    ).resolves.toBeNull();
+  });
+
+  it("returns a successful pedagogical result unchanged", async () => {
+    await expect(toleratePedagogicalFailure(async () => "saved")).resolves.toBe("saved");
   });
 });
