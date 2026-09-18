@@ -29,8 +29,11 @@ export async function callGateway(
       ? await usageTools.reserveAiUsage({ ...usage, model: GEMINI_TEXT_MODEL, requestHash })
       : null;
   let text: string | null = null;
+  let usageTokens: { inputTokens?: number; outputTokens?: number } = {};
   try {
-    text = await callGemini(messages, jsonMode);
+    text = await callGemini(messages, jsonMode, (reported) => {
+      usageTokens = reported;
+    });
   } catch (err) {
     if (ticket && usageTools) {
       await usageTools.finishAiUsage(ticket, {
@@ -50,7 +53,9 @@ export async function callGateway(
       await usageTools.finishAiUsage(ticket, { success: false, errorCode: "not_configured" });
     throw new AiError(500, "Your Google Gemini key is not connected yet.");
   }
-  if (ticket && usageTools) await usageTools.finishAiUsage(ticket, { success: true });
+  if (ticket && usageTools)
+    await usageTools.finishAiUsage(ticket, { success: true, ...usageTokens });
+
   if (usage && usageTools && ttl > 0) {
     await usageTools.writeAiCache({
       cacheKey: requestHash,
