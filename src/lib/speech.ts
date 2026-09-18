@@ -372,7 +372,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   } catch {
     if (requestId !== playRequest) return;
     if (streamed) return;
-    return speakWithBrowser(value);
+    return speakWithBrowser(value, rate);
   }
   if (requestId !== playRequest) return;
   if (context.state === "suspended") await context.resume();
