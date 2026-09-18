@@ -2,9 +2,17 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  conversationReportMessages,
+  parseConversationReport,
+  parseWritingFeedback,
+  writingCorrectionMessages,
+  type ConversationReport,
+  type WritingFeedback,
+} from "@/lib/ai-prompts";
 import { findLevel } from "@/lib/level";
 
-import { callGateway, parseJson } from "./ai-gateway.server";
+import { callGateway } from "./ai-gateway.server";
 
 const messageSchema = z.object({
   role: z.enum(["user", "assistant"]),
@@ -48,14 +56,18 @@ export const coachReply = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
-    const text = await callGateway([
-      {
-        role: "system",
-        content: coachSystemPrompt(data.scenario, data.level, data.goal, data.studyContext),
-      },
-      ...data.messages,
-    ]);
+  .handler(async ({ data, context }) => {
+    const text = await callGateway(
+      [
+        {
+          role: "system",
+          content: coachSystemPrompt(data.scenario, data.level, data.goal, data.studyContext),
+        },
+        ...data.messages,
+      ],
+      false,
+      { userId: context.userId, operation: "talking" },
+    );
     return { reply: text.trim() };
   });
 
@@ -72,84 +84,48 @@ export const coachOpener = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const avoidList = data.avoid.length
       ? `\nOpenings already used with this student (do NOT repeat or paraphrase them — pick a different sub-topic and question):\n${data.avoid.map((line) => `- ${line}`).join("\n")}`
       : "";
-    const text = await callGateway([
-      {
-        role: "system",
-        content: [
-          "You are a CELTA-certified English teacher.",
-          `Student level: ${findLevel(data.level).label}. ${findLevel(data.level).descriptor} Goal: "${data.goal}".`,
-          `Practice scenario — ${scenarioPrompts[data.scenario] ?? scenarioPrompts["everyday"]}`,
-          data.studyContext ? `Student history:\n${data.studyContext.slice(0, 700)}` : "",
-          `Write ONE opening message at ${findLevel(data.level).cefr}: maximum 2 short sentences, about 25 words.`,
-          "Greet in a few words and end with exactly ONE short, direct question the student can answer by speaking.",
-          "Vary the sub-topic every time. Reply with the opening message only, no quotes or labels." + avoidList,
-        ]
-          .filter(Boolean)
-          .join("\n"),
-      },
-      { role: "user", content: "Start our conversation now." },
-    ]);
+    const text = await callGateway(
+      [
+        {
+          role: "system",
+          content: [
+            "You are a CELTA-certified English teacher.",
+            `Student level: ${findLevel(data.level).label}. ${findLevel(data.level).descriptor} Goal: "${data.goal}".`,
+            `Practice scenario — ${scenarioPrompts[data.scenario] ?? scenarioPrompts["everyday"]}`,
+            data.studyContext ? `Student history:\n${data.studyContext.slice(0, 700)}` : "",
+            `Write ONE opening message at ${findLevel(data.level).cefr}: maximum 2 short sentences, about 25 words.`,
+            "Greet in a few words and end with exactly ONE short, direct question the student can answer by speaking.",
+            "Vary the sub-topic every time. Reply with the opening message only, no quotes or labels." +
+              avoidList,
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        },
+        { role: "user", content: "Start our conversation now." },
+      ],
+      false,
+      { userId: context.userId, operation: "talking" },
+    );
     return { opener: text.trim() };
   });
-
-export type ConversationReport = {
-  fluency: number;
-  grammar: number;
-  vocabulary: number;
-  summary: string;
-  suggestions: string[];
-  common_errors: string[];
-  new_words: string[];
-};
 
 export const conversationReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z.object({ messages: z.array(messageSchema).min(1).max(60) }).parse(input),
   )
-  .handler(async ({ data }): Promise<ConversationReport> => {
-    const transcript = data.messages
-      .map((m) => `${m.role === "user" ? "Student" : "Teacher"}: ${m.content}`)
-      .join("\n");
-
-    const raw = await callGateway(
-      [
-        {
-          role: "system",
-          content:
-            "You are a CELTA English examiner. Evaluate ONLY the student's English in the transcript. " +
-            'Reply with strict JSON: {"fluency":0-100,"grammar":0-100,"vocabulary":0-100,"summary":"2 sentences",' +
-            '"suggestions":["3 short improvement tips"],"common_errors":["up to 3 recurring mistakes"],"new_words":["up to 4 useful words or expressions the student should learn"]}',
-        },
-        { role: "user", content: transcript },
-      ],
-      true,
-    );
-
-    return parseJson<ConversationReport>(raw, {
-      fluency: 0,
-      grammar: 0,
-      vocabulary: 0,
-      summary: "We could not generate the report this time. Try another conversation.",
-      suggestions: [],
-      common_errors: [],
-      new_words: [],
+  .handler(async ({ data, context }): Promise<ConversationReport> => {
+    const raw = await callGateway(conversationReportMessages(data.messages), true, {
+      userId: context.userId,
+      operation: "talking",
     });
-  });
 
-export type WritingFeedback = {
-  corrected: string;
-  natural: string;
-  explanations: string[];
-  suggestions: string[];
-  grammar: number;
-  vocabulary: number;
-  clarity: number;
-};
+    return parseConversationReport(raw);
+  });
 
 export const correctWriting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -162,32 +138,12 @@ export const correctWriting = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }): Promise<WritingFeedback> => {
+  .handler(async ({ data, context }): Promise<WritingFeedback> => {
     const raw = await callGateway(
-      [
-        {
-          role: "system",
-          content:
-            "You are a CELTA English writing teacher for Brazilian learners. " +
-            'Reply with strict JSON: {"corrected":"grammatically corrected version","natural":"how a native speaker would write it",' +
-            '"explanations":["short explanation of each important mistake, in simple English"],"suggestions":["2-4 tips to improve"],' +
-            '"grammar":0-100,"vocabulary":0-100,"clarity":0-100}',
-        },
-        {
-          role: "user",
-          content: `Task: ${data.prompt || "Free writing"}\nStudent level: ${data.level}\n\nStudent text:\n${data.text}`,
-        },
-      ],
+      writingCorrectionMessages(data.prompt, data.text, data.level),
       true,
+      { userId: context.userId, operation: "writing_correction" },
     );
 
-    return parseJson<WritingFeedback>(raw, {
-      corrected: data.text,
-      natural: data.text,
-      explanations: ["We could not analyse this text. Please try again."],
-      suggestions: [],
-      grammar: 0,
-      vocabulary: 0,
-      clarity: 0,
-    });
+    return parseWritingFeedback(raw, data.text);
   });

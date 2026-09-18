@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-import { callGateway, parseJson } from "./ai-gateway.server";
+import { callGateway } from "./ai-gateway.server";
 import { studyToday } from "./today";
 
 export type DailyWord = {
@@ -18,7 +18,8 @@ export type DailyWord = {
   lesson_id: string | null;
 };
 
-const SELECT = "id, word, translation, meaning, pronunciation, example, category, difficulty, lesson_id";
+const SELECT =
+  "id, word, translation, meaning, pronunciation, example, category, difficulty, lesson_id";
 const DAILY_COUNT = 10;
 
 type AiWord = {
@@ -31,13 +32,50 @@ type AiWord = {
   difficulty?: string;
 };
 
+const aiWordsSchema = z
+  .object({
+    words: z
+      .array(
+        z
+          .object({
+            word: z.string().trim().min(1).max(120),
+            translation: z.string().trim().min(1).max(200),
+            meaning: z.string().trim().min(1).max(400),
+            pronunciation: z.string().max(120),
+            example: z.string().trim().min(1).max(400),
+            lesson_title: z.string().max(240),
+            difficulty: z.enum(["easy", "medium", "hard"]),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(10),
+  })
+  .strict();
+
+function parseWords(raw: string) {
+  try {
+    const value = JSON.parse(
+      raw
+        .replace(/^```(?:json)?/i, "")
+        .replace(/```$/, "")
+        .trim(),
+    ) as unknown;
+    return aiWordsSchema.safeParse(value);
+  } catch {
+    return aiWordsSchema.safeParse(null);
+  }
+}
+
 /**
  * Returns today's ten new words, built by the AI from the lessons in the student's path.
  * Words already offered today are reused, and words the student has already seen are never repeated.
  */
 export const dailyWords = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ level: z.string().default("intermediate") }).parse(input ?? {}))
+  .inputValidator((input: unknown) =>
+    z.object({ level: z.string().default("intermediate") }).parse(input ?? {}),
+  )
   .handler(async ({ data, context }): Promise<DailyWord[]> => {
     const { supabase, userId } = context;
     const today = studyToday();
@@ -68,10 +106,17 @@ export const dailyWords = createServerFn({ method: "POST" })
       .like("curriculum_key", `${data.level}-%`)
       .order("sort_order")
       .limit(30);
-    const lessonList = (lessons ?? []) as { id: string; title: string; category: string; objective: string }[];
+    const lessonList = (lessons ?? []) as {
+      id: string;
+      title: string;
+      category: string;
+      objective: string;
+    }[];
 
     const { data: known } = await supabase.from("vocabulary").select("word").limit(1000);
-    const usedWords = new Set(((known ?? []) as { word: string }[]).map((w) => w.word.toLowerCase()));
+    const usedWords = new Set(
+      ((known ?? []) as { word: string }[]).map((w) => w.word.toLowerCase()),
+    );
 
     const missing = DAILY_COUNT - todays.length;
     const raw = await callGateway(
@@ -102,8 +147,10 @@ export const dailyWords = createServerFn({ method: "POST" })
       { userId, operation: "vocabulary_generation" },
     );
 
-    const parsed = parseJson<{ words?: AiWord[] }>(raw, {});
-    const fresh = (parsed.words ?? [])
+    const parsed = parseWords(raw);
+    if (!parsed.success)
+      throw new Error("The AI returned an invalid vocabulary list. Please try again.");
+    const fresh = (parsed.data.words as AiWord[])
       .filter((w) => w.word && w.translation && !usedWords.has(String(w.word).toLowerCase()))
       .slice(0, missing);
 
@@ -125,7 +172,9 @@ export const dailyWords = createServerFn({ method: "POST" })
             pronunciation: String(w.pronunciation ?? "").slice(0, 120),
             example: String(w.example ?? "").slice(0, 400),
             category: lesson?.category ?? "general",
-            difficulty: ["easy", "medium", "hard"].includes(String(w.difficulty)) ? String(w.difficulty) : "medium",
+            difficulty: ["easy", "medium", "hard"].includes(String(w.difficulty))
+              ? String(w.difficulty)
+              : "medium",
             lesson_id: lesson?.id ?? null,
             level: data.level,
             created_by: userId,

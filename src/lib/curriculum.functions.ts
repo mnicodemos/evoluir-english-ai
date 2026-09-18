@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 import {
   finalTestKey,
   findCurriculumLesson,
@@ -11,7 +13,7 @@ import {
   type CurriculumLesson,
 } from "@/lib/curriculum";
 
-import { callGateway, parseJson } from "./ai-gateway.server";
+import { callGateway } from "./ai-gateway.server";
 import { findLessonVideo, type LessonVideo } from "./lessonVideo.server";
 
 async function callContentAi(
@@ -34,17 +36,23 @@ const CEFR: Record<string, string> = {
 };
 
 const SKILL_BRIEF: Record<string, string> = {
-  listening: "Focus on listening: the script must sound like natural spoken English with a short dialogue the student can shadow.",
-  reading: "Focus on reading: the script must include a short text plus guidance on how to read it for gist and detail.",
-  talking: "Focus on speaking: give model sentences, useful phrases and prompts the student can say out loud.",
-  writing: "Focus on writing: give a model text, a simple structure and sentence patterns the student can copy.",
-  vocabulary: "Focus on vocabulary: teach a clear word set with meaning, collocation and natural examples.",
-  grammar: "Focus on grammar: explain the form, the meaning, the common Brazilian-learner mistake and how to fix it.",
+  listening:
+    "Focus on listening: the script must sound like natural spoken English with a short dialogue the student can shadow.",
+  reading:
+    "Focus on reading: the script must include a short text plus guidance on how to read it for gist and detail.",
+  talking:
+    "Focus on speaking: give model sentences, useful phrases and prompts the student can say out loud.",
+  writing:
+    "Focus on writing: give a model text, a simple structure and sentence patterns the student can copy.",
+  vocabulary:
+    "Focus on vocabulary: teach a clear word set with meaning, collocation and natural examples.",
+  grammar:
+    "Focus on grammar: explain the form, the meaning, the common Brazilian-learner mistake and how to fix it.",
 };
 
 /** Finds a captioned video (max 7 minutes) on the same topic as the lesson. */
 async function pickVideo(
-  supabase: { from: (t: string) => any },
+  supabase: SupabaseClient<Database>,
   plan: CurriculumLesson,
 ): Promise<LessonVideo> {
   const { data } = await supabase.from("lessons").select("video_url").not("video_url", "is", null);
@@ -52,27 +60,65 @@ async function pickVideo(
   return findLessonVideo(`${plan.title} ${plan.level.toUpperCase()}`, plan.skill, used);
 }
 
-type GeneratedLesson = {
-  summary?: string;
-  transcript?: string;
-  transcript_pt?: string;
-  flashcards?: {
-    word?: string;
-    translation?: string;
-    definition?: string;
-    pronunciation?: string;
-    example?: string;
-    difficulty?: string;
-    prompt?: string;
-    answer?: string;
-    card_type?: string;
-    listen_text?: string;
-  }[];
-  quiz?: { question?: string; options?: string[]; correct_answer?: string; explanation?: string }[];
-};
+const quizItemSchema = z
+  .object({
+    question: z.string().trim().min(1).max(400),
+    options: z.array(z.string().trim().min(1).max(240)).length(4),
+    correct_answer: z.string().trim().min(1).max(240),
+    explanation: z.string().trim().min(1).max(400),
+  })
+  .strict()
+  .refine(
+    (item) => item.options.includes(item.correct_answer),
+    "Correct answer must match an option",
+  );
+
+const flashcardSchema = z
+  .object({
+    word: z.string().trim().min(1).max(120),
+    translation: z.string().max(200).default(""),
+    definition: z.string().trim().min(1).max(300),
+    pronunciation: z.string().max(120).default(""),
+    example: z.string().trim().min(1).max(400),
+    difficulty: z.enum(["easy", "medium", "hard"]),
+    prompt: z.string().trim().min(1).max(240),
+    answer: z.string().trim().min(1).max(500),
+    card_type: z.enum(["listen", "question"]),
+    listen_text: z.string().max(500),
+  })
+  .strict();
+
+const generatedLessonSchema = z
+  .object({
+    summary: z.string().trim().min(1).max(3000),
+    transcript: z.string().trim().min(1).max(15000),
+    transcript_pt: z.string().max(15000),
+    flashcards: z
+      .array(flashcardSchema)
+      .length(7)
+      .refine(
+        (cards) => cards.filter((card) => card.card_type === "listen").length === 3,
+        "Exactly three listening cards are required",
+      ),
+    quiz: z.array(quizItemSchema).length(10),
+  })
+  .strict();
+
+function jsonValue(raw: string): unknown {
+  try {
+    return JSON.parse(
+      raw
+        .replace(/^```(?:json)?/i, "")
+        .replace(/```$/, "")
+        .trim(),
+    ) as unknown;
+  } catch {
+    return null;
+  }
+}
 
 async function writeLesson(
-  supabase: { from: (t: string) => any },
+  supabase: SupabaseClient<Database>,
   userId: string,
   plan: CurriculumLesson,
 ): Promise<string> {
@@ -112,7 +158,6 @@ async function writeLesson(
           `${plan.reviewUnits.length ? "Every quiz question must review content from the supplied previous-unit outline, with balanced grammar, vocabulary and usage." : "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage)."} ` +
           "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
           "Each question must be self-contained: a sentence to complete or correct, or a direct grammar rule question.",
-
       },
       {
         role: "user",
@@ -124,10 +169,11 @@ async function writeLesson(
     true,
   );
 
-  const content = parseJson<GeneratedLesson>(raw, {});
-  if (!content.summary || !content.transcript) {
+  const parsedContent = generatedLessonSchema.safeParse(jsonValue(raw));
+  if (!parsedContent.success) {
     throw new Error("The AI could not write this lesson. Please try again.");
   }
+  const content = parsedContent.data;
 
   const video = await pickVideo(supabase, plan);
 
@@ -156,7 +202,9 @@ async function writeLesson(
 
   if (error || !lesson) throw new Error(error?.message ?? "Could not save this lesson.");
 
-  const generatedCards = (content.flashcards ?? []).filter((c) => c.word && (c.answer || c.definition || c.example));
+  const generatedCards = (content.flashcards ?? []).filter(
+    (c) => c.word && (c.answer || c.definition || c.example),
+  );
   const listenCards = generatedCards.filter((card) => card.card_type === "listen").slice(0, 3);
   const variedCards = generatedCards.filter((card) => card.card_type !== "listen").slice(0, 4);
   const cards = [...listenCards, ...variedCards]
@@ -175,9 +223,13 @@ async function writeLesson(
         prompt: String(c.prompt ?? c.word ?? "").slice(0, 240),
         answer: String(c.answer ?? c.definition ?? c.example ?? "").slice(0, 500),
         card_type: c.card_type === "listen" ? "listen" : "question",
-        listen_text: String(c.card_type === "listen" ? c.listen_text || c.answer || c.example || c.word || "" : "").slice(0, 500),
+        listen_text: String(
+          c.card_type === "listen" ? c.listen_text || c.answer || c.example || c.word || "" : "",
+        ).slice(0, 500),
         sort_order: index,
-        difficulty: ["easy", "medium", "hard"].includes(String(c.difficulty)) ? String(c.difficulty) : "medium",
+        difficulty: ["easy", "medium", "hard"].includes(String(c.difficulty))
+          ? String(c.difficulty)
+          : "medium",
         created_by: userId,
       })),
     );
@@ -185,7 +237,9 @@ async function writeLesson(
 
   const quiz = (content.quiz ?? [])
     .slice(0, 10)
-    .filter((q) => q.question && Array.isArray(q.options) && q.options.length > 1 && q.correct_answer);
+    .filter(
+      (q) => q.question && Array.isArray(q.options) && q.options.length > 1 && q.correct_answer,
+    );
   if (plan.isReviewTest && quiz.length !== 10) {
     throw new Error("The AI could not write all 10 review questions. Please try again.");
   }
@@ -263,6 +317,9 @@ const FINAL_TEST_TOTAL = 30;
 type GeneratedTest = {
   quiz?: { question?: string; options?: string[]; correct_answer?: string; explanation?: string }[];
 };
+const generatedTestSchema = z
+  .object({ quiz: z.array(quizItemSchema).length(FINAL_TEST_TOTAL) })
+  .strict();
 
 /**
  * Opens the Final Test of the student's level. It only unlocks when all 30
@@ -291,7 +348,10 @@ export const openFinalTest = createServerFn({ method: "POST" })
       .from("lessons")
       .select("id, curriculum_key")
       .eq("created_by", userId)
-      .in("curriculum_key", plan.map((l) => l.key));
+      .in(
+        "curriculum_key",
+        plan.map((l) => l.key),
+      );
     const lessonIds = ((rows ?? []) as { id: string }[]).map((r) => r.id);
 
     let done = 0;
@@ -301,7 +361,9 @@ export const openFinalTest = createServerFn({ method: "POST" })
         .select("lesson_id, completed_at")
         .eq("user_id", userId)
         .in("lesson_id", lessonIds);
-      done = ((states ?? []) as { completed_at: string | null }[]).filter((s) => s.completed_at).length;
+      done = ((states ?? []) as { completed_at: string | null }[]).filter(
+        (s) => s.completed_at,
+      ).length;
     }
     if (done < plan.length) {
       throw new Error("Finish all 30 lessons of this level to unlock the Final Test.");
@@ -321,18 +383,27 @@ export const openFinalTest = createServerFn({ method: "POST" })
             `Every question must be a self-contained grammar question (complete or correct a sentence, choose the right form). ` +
             `Never ask about a dialogue, a video, a story, a character or any listening/reading passage.`,
         },
-        { role: "user", content: `Write the ${FINAL_TEST_TOTAL}-question final test for level ${level.toUpperCase()}.` },
+        {
+          role: "user",
+          content: `Write the ${FINAL_TEST_TOTAL}-question final test for level ${level.toUpperCase()}.`,
+        },
       ],
       userId,
       "quiz_generation",
       true,
     );
 
-    const content = parseJson<GeneratedTest>(raw, {});
+    const parsedContent = generatedTestSchema.safeParse(jsonValue(raw));
+    if (!parsedContent.success)
+      throw new Error("The AI could not write the Final Test. Please try again.");
+    const content: GeneratedTest = parsedContent.data;
     const quiz = (content.quiz ?? [])
-      .filter((q) => q.question && Array.isArray(q.options) && q.options.length > 1 && q.correct_answer)
+      .filter(
+        (q) => q.question && Array.isArray(q.options) && q.options.length > 1 && q.correct_answer,
+      )
       .slice(0, FINAL_TEST_TOTAL);
-    if (quiz.length < 10) throw new Error("The AI could not write the Final Test. Please try again.");
+    if (quiz.length < 10)
+      throw new Error("The AI could not write the Final Test. Please try again.");
 
     const { data: lesson, error } = await supabase
       .from("lessons")
