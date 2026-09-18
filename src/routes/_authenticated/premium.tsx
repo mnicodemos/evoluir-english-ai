@@ -1,6 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Crown, Loader2, Sparkles } from "lucide-react";
+import { Check, Crown, ExternalLink, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
 import { createStripeCheckoutSession } from "@/lib/billing/checkout.functions";
+import { getMyAccess } from "@/lib/billing/entitlements.functions";
+import { createStripePortalSession } from "@/lib/billing/portal.functions";
+import { buildSubscriptionView } from "@/lib/billing/subscriptionView";
 
 export const Route = createFileRoute("/_authenticated/premium")({
   head: () => ({
