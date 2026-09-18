@@ -39,3 +39,36 @@ export function cefrForScore(
   if (!band) throw new RangeError(`No CEFR band configured for score ${validScore}`);
   return band.level;
 }
+
+/** Measurable CEFR levels, from lowest to highest. */
+export const MEASURED_CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
+
+export type MeasuredCefrLevel = (typeof MEASURED_CEFR_LEVELS)[number];
+
+export function measuredCefr(value: unknown): MeasuredCefrLevel | null {
+  const found = MEASURED_CEFR_LEVELS.find(
+    (level) => typeof value === "string" && level === value.trim().toUpperCase(),
+  );
+  return found ?? null;
+}
+
+export function cefrRank(level: MeasuredCefrLevel): number {
+  return MEASURED_CEFR_LEVELS.indexOf(level);
+}
+
+/**
+ * Pedagogical calibration, NOT a new score: a student can only demonstrate the
+ * level of the content they actually practised. A perfect run of A1 items is
+ * A1 mastery, never C2. Scoring below the practised level is kept as it is,
+ * because that is a real signal of difficulty at that level.
+ *
+ * With no item level recorded (legacy evidence) the raw band is returned
+ * unchanged, so existing results are never rewritten by guesswork.
+ */
+export function calibrateCefrToItemLevel(
+  scoreCefr: Exclude<CefrLevel, "insufficient_evidence">,
+  itemLevel: MeasuredCefrLevel | null,
+): Exclude<CefrLevel, "insufficient_evidence"> {
+  if (!itemLevel) return scoreCefr;
+  return cefrRank(scoreCefr) > cefrRank(itemLevel) ? itemLevel : scoreCefr;
+}
