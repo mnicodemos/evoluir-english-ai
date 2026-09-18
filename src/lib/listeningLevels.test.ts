@@ -27,9 +27,9 @@ describe("listening level configuration", () => {
   it("only keeps sentences inside the level range", () => {
     const a1 = listeningLevelConfig("a1");
     expect(a1.sentences.every((sentence) => fitsLevel(sentence, a1))).toBe(true);
-    expect(fitsLevel("Despite considerable investment the initiative has not delivered yet.", a1)).toBe(
-      false,
-    );
+    expect(
+      fitsLevel("Despite considerable investment the initiative has not delivered yet.", a1),
+    ).toBe(false);
   });
 
   it("extracts lesson sentences that match the level", () => {
