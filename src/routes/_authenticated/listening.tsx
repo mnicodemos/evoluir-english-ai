@@ -12,6 +12,13 @@ import { useLessons, type Lesson } from "@/hooks/useLearning";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
+import { findLevel } from "@/lib/level";
+import {
+  listeningLevelConfig,
+  pickListeningSentences,
+  sentencesFromText,
+  type ListeningLevelConfig,
+} from "@/lib/listeningLevels";
 import { speakEnglish } from "@/lib/speech";
 import { transcribeAudio } from "@/lib/transcribe";
 import {
