@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { CheckCircle2, Download, Loader2, Lock, Play, Sparkles, Trophy } from "lucide-react";
+import { BookOpen, CheckCircle2, Download, Loader2, Lock, Play, Trophy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
