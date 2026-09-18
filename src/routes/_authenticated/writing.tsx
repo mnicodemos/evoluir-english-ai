@@ -18,6 +18,7 @@ import {
   type WritingFeedback,
 } from "@/lib/ai-prompts";
 import { aiChat } from "@/lib/aiChat.functions";
+import { dualWriteWritingEvidence } from "@/lib/pedagogy/dualWrite.functions";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
@@ -259,6 +260,21 @@ function Writing() {
           lastDate: profile.last_activity_date,
         });
         queryClient.invalidateQueries();
+      }
+      try {
+        await dualWriteWritingEvidence({
+          data: {
+            idempotencyKey: crypto.randomUUID(),
+            prompt,
+            originalText: text.trim(),
+            feedback,
+          },
+        });
+      } catch (error) {
+        console.warn(
+          "Writing result was saved; pedagogical dual write will be retried later",
+          error,
+        );
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not analyse your text");

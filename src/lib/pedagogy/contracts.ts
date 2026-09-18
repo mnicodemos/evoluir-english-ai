@@ -28,6 +28,8 @@ export const EVIDENCE_SOURCE_TYPES = [
 ] as const;
 
 export const EVALUATORS = ["deterministic", "gemini", "hybrid"] as const;
+export const EVIDENCE_TYPES = ["answer", "subscore"] as const;
+export const EVIDENCE_POLARITIES = ["positive", "negative", "neutral"] as const;
 export const LEARNING_ERROR_SEVERITIES = ["low", "medium", "high"] as const;
 
 export const pedagogicalSkillSchema = z.enum(PEDAGOGICAL_SKILLS);
@@ -36,6 +38,8 @@ export const assessmentTypeSchema = z.enum(ASSESSMENT_TYPES);
 export const assessmentStatusSchema = z.enum(ASSESSMENT_STATUSES);
 export const evidenceSourceTypeSchema = z.enum(EVIDENCE_SOURCE_TYPES);
 export const evaluatorSchema = z.enum(EVALUATORS);
+export const evidenceTypeSchema = z.enum(EVIDENCE_TYPES);
+export const evidencePolaritySchema = z.enum(EVIDENCE_POLARITIES);
 export const learningErrorSeveritySchema = z.enum(LEARNING_ERROR_SEVERITIES);
 export const scoreSchema = z.number().finite().min(0).max(100);
 export const confidenceSchema = z.number().finite().min(0).max(1);
@@ -46,6 +50,8 @@ export type AssessmentType = z.infer<typeof assessmentTypeSchema>;
 export type AssessmentStatus = z.infer<typeof assessmentStatusSchema>;
 export type EvidenceSourceType = z.infer<typeof evidenceSourceTypeSchema>;
 export type EvaluatedBy = z.infer<typeof evaluatorSchema>;
+export type EvidenceType = z.infer<typeof evidenceTypeSchema>;
+export type EvidencePolarity = z.infer<typeof evidencePolaritySchema>;
 export type LearningErrorSeverity = z.infer<typeof learningErrorSeveritySchema>;
 
 export type AssessmentEvidence = {
@@ -54,6 +60,9 @@ export type AssessmentEvidence = {
   subskill?: string | null;
   sourceType: EvidenceSourceType;
   sourceId?: string | null;
+  sourceItemId?: string | null;
+  evidenceType?: EvidenceType | null;
+  polarity?: EvidencePolarity | null;
   itemCefr?: Exclude<CefrLevel, "insufficient_evidence"> | null;
   rawScore: number;
   sourceReliability: number;
@@ -62,6 +71,7 @@ export type AssessmentEvidence = {
   evaluatedBy: EvaluatedBy;
   modelVersion?: string | null;
   rubricVersion: string;
+  metadata?: Record<string, string | number | boolean | null>;
 };
 
 export type SkillAssessmentResult = {

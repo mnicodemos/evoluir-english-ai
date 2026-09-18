@@ -221,14 +221,18 @@ export type Database = {
           created_at: string
           evaluated_by: string
           evidence_quality: number
+          evidence_type: string | null
           id: string
           item_cefr: string | null
+          metadata: Json
           model_version: string | null
+          polarity: string | null
           raw_score: number
           rubric_version: string
           sample_weight: number
           skill: string
           source_id: string | null
+          source_item_id: string | null
           source_reliability: number
           source_type: string
           subskill: string | null
@@ -239,14 +243,18 @@ export type Database = {
           created_at?: string
           evaluated_by: string
           evidence_quality: number
+          evidence_type?: string | null
           id?: string
           item_cefr?: string | null
+          metadata?: Json
           model_version?: string | null
+          polarity?: string | null
           raw_score: number
           rubric_version: string
           sample_weight?: number
           skill: string
           source_id?: string | null
+          source_item_id?: string | null
           source_reliability: number
           source_type: string
           subskill?: string | null
@@ -257,14 +265,18 @@ export type Database = {
           created_at?: string
           evaluated_by?: string
           evidence_quality?: number
+          evidence_type?: string | null
           id?: string
           item_cefr?: string | null
+          metadata?: Json
           model_version?: string | null
+          polarity?: string | null
           raw_score?: number
           rubric_version?: string
           sample_weight?: number
           skill?: string
           source_id?: string | null
+          source_item_id?: string | null
           source_reliability?: number
           source_type?: string
           subskill?: string | null
@@ -293,11 +305,14 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          idempotency_key: string | null
           overall_cefr: string | null
           overall_confidence: number | null
           overall_score: number | null
           rubric_version: string
           ruleset_version: string
+          source_id: string | null
+          source_type: string | null
           started_at: string
           status: string
           updated_at: string
@@ -308,11 +323,14 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          idempotency_key?: string | null
           overall_cefr?: string | null
           overall_confidence?: number | null
           overall_score?: number | null
           rubric_version: string
           ruleset_version: string
+          source_id?: string | null
+          source_type?: string | null
           started_at?: string
           status?: string
           updated_at?: string
@@ -323,11 +341,14 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          idempotency_key?: string | null
           overall_cefr?: string | null
           overall_confidence?: number | null
           overall_score?: number | null
           rubric_version?: string
           ruleset_version?: string
+          source_id?: string | null
+          source_type?: string | null
           started_at?: string
           status?: string
           updated_at?: string
@@ -630,6 +651,59 @@ export type Database = {
         }
         Relationships: []
       }
+      pedagogical_dual_write_failures: {
+        Row: {
+          attempt_count: number
+          error_code: string
+          first_failed_at: string
+          id: string
+          idempotency_key: string
+          last_failed_at: string
+          resolved_at: string | null
+          source_id: string | null
+          source_type: string
+          stage: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          attempt_count?: number
+          error_code: string
+          first_failed_at?: string
+          id?: string
+          idempotency_key: string
+          last_failed_at?: string
+          resolved_at?: string | null
+          source_id?: string | null
+          source_type: string
+          stage: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          attempt_count?: number
+          error_code?: string
+          first_failed_at?: string
+          id?: string
+          idempotency_key?: string
+          last_failed_at?: string
+          resolved_at?: string | null
+          source_id?: string | null
+          source_type?: string
+          stage?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedagogical_dual_write_failures_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_path: string | null
@@ -785,6 +859,7 @@ export type Database = {
           id: string
           lesson_id: string
           options: Json
+          pedagogical_skill: string | null
           question: string
           question_type: string
           sort_order: number
@@ -797,6 +872,7 @@ export type Database = {
           id?: string
           lesson_id: string
           options?: Json
+          pedagogical_skill?: string | null
           question: string
           question_type?: string
           sort_order?: number
@@ -809,6 +885,7 @@ export type Database = {
           id?: string
           lesson_id?: string
           options?: Json
+          pedagogical_skill?: string | null
           question?: string
           question_type?: string
           sort_order?: number
@@ -1013,6 +1090,68 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      writing_submissions: {
+        Row: {
+          clarity_score: number
+          corrected_text: string
+          created_at: string
+          explanations: Json
+          grammar_score: number
+          id: string
+          idempotency_key: string
+          model_version: string
+          natural_text: string
+          original_text: string
+          prompt: string
+          rubric_version: string
+          suggestions: Json
+          user_id: string
+          vocabulary_score: number
+        }
+        Insert: {
+          clarity_score: number
+          corrected_text: string
+          created_at?: string
+          explanations?: Json
+          grammar_score: number
+          id?: string
+          idempotency_key: string
+          model_version: string
+          natural_text: string
+          original_text: string
+          prompt: string
+          rubric_version: string
+          suggestions?: Json
+          user_id: string
+          vocabulary_score: number
+        }
+        Update: {
+          clarity_score?: number
+          corrected_text?: string
+          created_at?: string
+          explanations?: Json
+          grammar_score?: number
+          id?: string
+          idempotency_key?: string
+          model_version?: string
+          natural_text?: string
+          original_text?: string
+          prompt?: string
+          rubric_version?: string
+          suggestions?: Json
+          user_id?: string
+          vocabulary_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "writing_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

@@ -50,6 +50,13 @@
       "when": 1789690989646,
       "tag": "0006_protect_assessment_session_history",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789691466817,
+      "tag": "0007_add_pedagogical_dual_write_bridge",
+      "breakpoints": true
     }
   ]
 }
