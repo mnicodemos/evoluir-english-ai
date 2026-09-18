@@ -127,7 +127,12 @@ describe("skill aggregation", () => {
       evidence("vocabulary", 90),
       evidence("vocabulary", 100),
     ]);
-    expect(first).toEqual(aggregateSkillEvidence("vocabulary", [evidence("vocabulary", 40), evidence("vocabulary", 50)]));
+    expect(first).toEqual(
+      aggregateSkillEvidence("vocabulary", [
+        evidence("vocabulary", 40),
+        evidence("vocabulary", 50),
+      ]),
+    );
     expect(first).not.toEqual(second);
   });
 });

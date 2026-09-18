@@ -10,15 +10,7 @@ export const PEDAGOGICAL_SKILLS = [
   "pronunciation",
 ] as const;
 
-export const CEFR_LEVELS = [
-  "A1",
-  "A2",
-  "B1",
-  "B2",
-  "C1",
-  "C2",
-  "insufficient_evidence",
-] as const;
+export const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2", "insufficient_evidence"] as const;
 
 export const ASSESSMENT_TYPES = ["placement", "diagnostic", "progress_check", "final"] as const;
 export const ASSESSMENT_STATUSES = ["started", "completed", "abandoned", "invalidated"] as const;

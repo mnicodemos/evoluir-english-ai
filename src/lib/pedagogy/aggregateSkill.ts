@@ -1,5 +1,9 @@
 import { cefrForScore, INITIAL_CEFR_RULESET, type CefrRuleset } from "./cefr";
-import { calculateConfidence, type ConfidenceConfig, INITIAL_CONFIDENCE_CONFIG } from "./confidence";
+import {
+  calculateConfidence,
+  type ConfidenceConfig,
+  INITIAL_CONFIDENCE_CONFIG,
+} from "./confidence";
 import {
   confidenceSchema,
   evidenceSourceTypeSchema,
@@ -50,7 +54,10 @@ export function aggregateSkillEvidence(
     ...item,
     effectiveWeight: item.sampleWeight * item.evidenceQuality * item.sourceReliability,
   }));
-  const totalEffectiveWeight = weightedEvidence.reduce((sum, item) => sum + item.effectiveWeight, 0);
+  const totalEffectiveWeight = weightedEvidence.reduce(
+    (sum, item) => sum + item.effectiveWeight,
+    0,
+  );
 
   if (
     validEvidence.length < config.minimumEvidenceCount ||

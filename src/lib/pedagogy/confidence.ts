@@ -29,9 +29,14 @@ export function assertConfidence(value: number): number {
   return confidenceSchema.parse(value);
 }
 
-function weightedMean(values: readonly ConfidenceEvidence[], key: "evidenceQuality" | "sourceReliability") {
+function weightedMean(
+  values: readonly ConfidenceEvidence[],
+  key: "evidenceQuality" | "sourceReliability",
+) {
   const totalWeight = values.reduce((sum, evidence) => sum + evidence.sampleWeight, 0);
-  return values.reduce((sum, evidence) => sum + evidence[key] * evidence.sampleWeight, 0) / totalWeight;
+  return (
+    values.reduce((sum, evidence) => sum + evidence[key] * evidence.sampleWeight, 0) / totalWeight
+  );
 }
 
 export function calculateConfidence(
