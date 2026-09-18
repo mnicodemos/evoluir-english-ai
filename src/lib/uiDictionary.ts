@@ -279,6 +279,23 @@ export const uiPt: Record<string, string> = {
 
   // Writing
   "Writing AI Corrector": "Corretor de Escrita com IA",
+  "Writing Practice": "Prática de Escrita",
+  target: "alvo",
+  words: "palavras",
+  "One task for Everyday, Professional and Travel English, at your level. New tasks every day and every time you start a new lesson — nothing repeats.":
+    "Uma tarefa de inglês do dia a dia, profissional e de viagem, no seu nível. Novas tarefas todos os dias e sempre que você começa uma nova aula — nada se repete.",
+  "Simple sentences about you, your routine and your family.":
+    "Frases simples sobre você, sua rotina e sua família.",
+  "Common situations, simple past and simple plans.":
+    "Situações comuns, passado simples e planos simples.",
+  "Opinions, short narratives and simple work situations.":
+    "Opiniões, narrativas curtas e situações simples de trabalho.",
+  "Developed answers with clear structure and varied language.":
+    "Respostas desenvolvidas com estrutura clara e linguagem variada.",
+  "Argumentation, analysis and professional or academic writing.":
+    "Argumentação, análise e escrita profissional ou acadêmica.",
+  "Sophisticated, critical writing with nuance and advanced register.":
+    "Escrita sofisticada e crítica, com nuance e registro avançado.",
   "Today's tasks": "Tarefas de hoje",
   "All 3 writing tasks completed!": "Todas as 3 tarefas de escrita concluídas!",
   "Already checked": "Já corrigido",
