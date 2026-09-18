@@ -27,6 +27,39 @@ export type WritingSubscores = {
   clarity: number;
 };
 
+export type WritingFeedbackSnapshot = WritingSubscores & {
+  corrected: string;
+  natural: string;
+  explanations: string[];
+  suggestions: string[];
+};
+
+export function writingSubmissionRecord(input: {
+  id: string;
+  userId: string;
+  idempotencyKey: string;
+  prompt: string;
+  originalText: string;
+  feedback: WritingFeedbackSnapshot;
+}) {
+  return {
+    id: input.id,
+    user_id: input.userId,
+    idempotency_key: input.idempotencyKey,
+    prompt: input.prompt,
+    original_text: input.originalText,
+    corrected_text: input.feedback.corrected,
+    natural_text: input.feedback.natural,
+    explanations: input.feedback.explanations,
+    suggestions: input.feedback.suggestions,
+    grammar_score: input.feedback.grammar,
+    vocabulary_score: input.feedback.vocabulary,
+    clarity_score: input.feedback.clarity,
+    model_version: PEDAGOGY_MODEL_VERSION,
+    rubric_version: WRITING_RUBRIC_VERSION,
+  };
+}
+
 export function parseQuizDetails(value: unknown): QuizDetail[] {
   const result = z.array(quizDetailSchema).safeParse(value);
   return result.success ? result.data : [];

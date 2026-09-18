@@ -8,7 +8,9 @@ import {
   quizEvidence,
   toleratePedagogicalFailure,
   writingEvidence,
+  writingSubmissionRecord,
 } from "./dualWrite";
+import { auditedQuizSkill } from "./quizSkillCatalog";
 import {
   CEFR_LEVELS,
   cefrLevelSchema,
@@ -177,6 +179,11 @@ describe("Quiz dual-write mapping", () => {
     const { question_id: _questionId, ...legacy } = detail;
     expect(parseQuizDetails([legacy])).toEqual([legacy]);
   });
+
+  it("classifies only explicitly audited question IDs", () => {
+    expect(auditedQuizSkill("ceafbabb-b317-47e4-b7f4-fc6f0af79920")).toBe("grammar");
+    expect(auditedQuizSkill("22222222-2222-4222-8222-222222222222")).toBeNull();
+  });
 });
 
 describe("Writing dual-write mapping", () => {
@@ -198,6 +205,33 @@ describe("Writing dual-write mapping", () => {
     const clarity = writingEvidence(scores).find((item) => item.subskill === "clarity");
     expect(clarity?.skill).toBe("writing");
     expect(PEDAGOGICAL_SKILLS).toHaveLength(7);
+  });
+
+  it("preserves original text and the complete existing evaluation in its source record", () => {
+    const record = writingSubmissionRecord({
+      id: "11111111-1111-4111-8111-111111111111",
+      userId: "22222222-2222-4222-8222-222222222222",
+      idempotencyKey: "writing:33333333-3333-4333-8333-333333333333",
+      prompt: "Describe your week.",
+      originalText: "My untouched original text.",
+      feedback: {
+        ...scores,
+        corrected: "My corrected text.",
+        natural: "My more natural text.",
+        explanations: ["Existing explanation"],
+        suggestions: ["Existing suggestion"],
+      },
+    });
+    expect(record.original_text).toBe("My untouched original text.");
+    expect(record).toMatchObject({
+      corrected_text: "My corrected text.",
+      natural_text: "My more natural text.",
+      explanations: ["Existing explanation"],
+      suggestions: ["Existing suggestion"],
+      grammar_score: 82,
+      vocabulary_score: 74,
+      clarity_score: 91,
+    });
   });
 });
 

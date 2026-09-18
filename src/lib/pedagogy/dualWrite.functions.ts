@@ -19,8 +19,10 @@ import {
   quizEvidence,
   QUIZ_RUBRIC_VERSION,
   writingEvidence,
+  writingSubmissionRecord,
   WRITING_RUBRIC_VERSION,
 } from "./dualWrite";
+import { auditedQuizSkill } from "./quizSkillCatalog";
 
 const quizInputSchema = z.object({ quizResultId: z.string().uuid() }).strict();
 const writingInputSchema = z
@@ -263,7 +265,7 @@ export const dualWriteQuizEvidence = createServerFn({ method: "POST" })
       );
       const evidence = details.flatMap((detail) => {
         if (!detail.question_id) return [];
-        const skill = skills.get(detail.question_id);
+        const skill = skills.get(detail.question_id) ?? auditedQuizSkill(detail.question_id);
         return skill
           ? [quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill })]
           : [];
@@ -301,22 +303,16 @@ export const dualWriteWritingEvidence = createServerFn({ method: "POST" })
     const key = `writing:${data.idempotencyKey}`;
     const submissionId = await deterministicUuid(`writing-submission:${context.userId}:${key}`);
     try {
-      const { error } = await context.supabase.from("writing_submissions").insert({
-        id: submissionId,
-        user_id: context.userId,
-        idempotency_key: key,
-        prompt: data.prompt,
-        original_text: data.originalText,
-        corrected_text: data.feedback.corrected,
-        natural_text: data.feedback.natural,
-        explanations: data.feedback.explanations,
-        suggestions: data.feedback.suggestions,
-        grammar_score: data.feedback.grammar,
-        vocabulary_score: data.feedback.vocabulary,
-        clarity_score: data.feedback.clarity,
-        model_version: PEDAGOGY_MODEL_VERSION,
-        rubric_version: WRITING_RUBRIC_VERSION,
-      });
+      const { error } = await context.supabase.from("writing_submissions").insert(
+        writingSubmissionRecord({
+          id: submissionId,
+          userId: context.userId,
+          idempotencyKey: key,
+          prompt: data.prompt,
+          originalText: data.originalText,
+          feedback: data.feedback,
+        }),
+      );
       if (error && error.code !== "23505") throw error;
       const persisted = await persistEvidenceAndResults({
         supabase: context.supabase as unknown as AuthenticatedClient,
