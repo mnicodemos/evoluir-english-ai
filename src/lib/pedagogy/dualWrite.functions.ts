@@ -195,7 +195,6 @@ async function persistEvidenceAndResults(params: {
       subskill: row.subskill,
       sourceType: evidenceSourceTypeSchema.parse(row.source_type),
       sourceId: row.source_id,
-      itemCefr: row.item_cefr,
       rawScore: row.raw_score,
       sourceReliability: row.source_reliability,
       evidenceQuality: row.evidence_quality,
