@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json } from "@/integrations/supabase/types";
 import { conversationReportMessages, parseConversationReport } from "@/lib/ai-prompts";
 import {
   listeningLegacyInputSchema,
@@ -55,13 +56,13 @@ async function persist(params: {
     p_user_id: params.userId,
     p_source_type: params.sourceType,
     p_operation_key: params.operationKey,
-    p_source_id: params.sourceId ?? null,
+    p_source_id: (params.sourceId ?? null) as unknown as string,
     p_activity_type: params.activityType,
     p_title: params.title,
     p_duration_minutes: params.minutes,
-    p_score: params.score ?? null,
-    p_scores: params.scores ?? {},
-    p_result: params.result ?? {},
+    p_score: (params.score ?? null) as unknown as number,
+    p_scores: (params.scores ?? {}) as Json,
+    p_result: (params.result ?? {}) as Json,
   });
   if (error) throw new Error(error.code === "P0001" ? "IDEMPOTENCY_CONFLICT" : "Progress could not be saved");
   return data;
@@ -154,7 +155,7 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
     const admin = await adminClient();
     const { data: existing } = await admin.from("activities").select("result, score")
       .eq("user_id", context.userId).eq("source_type", "talking").eq("operation_key", data.operationKey).maybeSingle();
-    if (existing?.result) return existing.result;
+    if (existing?.result) return parseConversationReport(JSON.stringify(existing.result));
     const { callGateway } = await import("@/lib/ai-gateway.server");
     const raw = await callGateway(conversationReportMessages(data.messages), true, { userId: context.userId, operation: "talking" });
     const report = parseConversationReport(raw);
