@@ -7,6 +7,7 @@ import { getLevelReference } from "@/lib/levelReference";
 import { savePdf } from "@/lib/pdfDownload";
 import { ACCENT, INK, MUTED, loadLogo, shorten } from "@/lib/pdfTheme";
 import { createWorkbook } from "@/lib/pdfWorkbook";
+import { QUIZ_PUBLIC_FIELDS } from "@/lib/quizPublicFields";
 
 type LessonRow = {
   id: string;
@@ -26,10 +27,11 @@ type FlashcardRow = {
 };
 
 type QuizRow = {
+  id: string;
   lesson_id: string;
   question: string;
+  question_type: string;
   options: unknown;
-  correct_answer: string;
   explanation: string | null;
   sort_order: number | null;
 };
@@ -63,7 +65,7 @@ export async function downloadCoursePlan(input: { name: string; level: string })
     lessonIds.length
       ? supabase
           .from("quizzes")
-          .select("lesson_id, question, options, correct_answer, explanation, sort_order")
+          .select(QUIZ_PUBLIC_FIELDS)
           .in("lesson_id", lessonIds)
           .order("sort_order", { ascending: true })
       : Promise.resolve({ data: [] }),
@@ -162,13 +164,11 @@ export async function downloadCoursePlan(input: { name: string; level: string })
           wb.para(`${index + 1}. ${q.question}`, { size: 10, bold: true, color: [INK.r, INK.g, INK.b], gap: 2 });
           const options = Array.isArray(q.options) ? (q.options as string[]) : [];
           for (const opt of options) {
-            const isCorrect = opt === q.correct_answer;
-            wb.para(`• ${opt}${isCorrect ? "  (correct answer)" : ""}`, {
+            wb.para(`• ${opt}`, {
               size: 9.5,
               gap: 1,
               indent: 18,
-              color: isCorrect ? ([22, 122, 71] as [number, number, number]) : ([58, 63, 74] as [number, number, number]),
-              bold: isCorrect,
+              color: [58, 63, 74],
             });
           }
           if (q.explanation) wb.para(`Why: ${q.explanation}`, { size: 9, indent: 18, color: MUTED_RGB });
