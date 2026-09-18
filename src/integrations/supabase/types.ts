@@ -1228,6 +1228,19 @@ export type Database = {
         }
         Returns: Json
       }
+      record_claimed_pedagogical_failure: {
+        Args: {
+          p_claimed_at: string
+          p_error_code: string
+          p_error_message: string
+          p_idempotency_key: string
+          p_source_id: string
+          p_source_type: string
+          p_stage: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       record_pedagogical_failure: {
         Args: {
           p_already_claimed?: boolean
@@ -1260,6 +1273,14 @@ export type Database = {
           reason: string
           retry_after_seconds: number
         }[]
+      }
+      resolve_claimed_pedagogical_failure: {
+        Args: {
+          p_claimed_at: string
+          p_idempotency_key: string
+          p_user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

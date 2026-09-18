@@ -85,6 +85,13 @@
       "when": 1789693997128,
       "tag": "0011_make_pedagogical_retry_attempts_atomic",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789694109640,
+      "tag": "0012_guard_reclaimed_retry_ownership",
+      "breakpoints": true
     }
   ]
 }
