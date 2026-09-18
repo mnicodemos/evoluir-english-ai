@@ -11,6 +11,7 @@ import {
   LogOut,
   MessageSquareText,
   PenLine,
+  Sparkles,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
@@ -185,6 +186,21 @@ function AppShellContent({ children }: { children: ReactNode }) {
             </Tooltip>
           ))}
         </nav>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              to="/teacher"
+              aria-label={translate("AI Teacher")}
+              className="fixed bottom-[4.5rem] right-4 z-40 grid h-14 w-14 place-items-center rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-900/30 transition-transform duration-200 hover:scale-110 animate-pulse lg:bottom-8 lg:right-8"
+            >
+              <Sparkles className="size-7" aria-hidden="true" />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="left" sideOffset={8}>
+            {translate("AI Teacher")}
+          </TooltipContent>
+        </Tooltip>
       </div>
     </TooltipProvider>
   );
