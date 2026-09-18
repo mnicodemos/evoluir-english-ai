@@ -22,7 +22,7 @@
 - [x] Fase 1 — validar respostas estruturadas de relatórios, Writing, aulas e vocabulário
 - [x] Fase 1 — manter avatar privado com limite de 5 MB e preservar contratos de áudio
 - [ ] Fase 2 — criar fundação pedagógica versionada e isolada, sem conectar ao frontend
-  - [ ] Criar sessões, evidências, resultados por habilidade e projeção atual
-  - [ ] Centralizar contratos e implementar regras CEFR, agregação e confidence
-  - [ ] Preparar referências opcionais em learning_errors
+  - [x] Criar sessões, evidências, resultados por habilidade e projeção atual
+  - [x] Centralizar contratos e implementar regras CEFR, agregação e confidence
+  - [x] Preparar referências opcionais em learning_errors
   - [ ] Validar regras, isolamento, histórico e compatibilidade do sistema atual

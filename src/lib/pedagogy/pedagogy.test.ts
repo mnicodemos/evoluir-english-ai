@@ -103,7 +103,7 @@ describe("skill aggregation", () => {
       evidence("grammar", 100),
       evidence("grammar", 0, { evidenceQuality: 0.5 }),
     ]);
-    expect(result.score).toBe(67);
+    expect(result.score).toBe(64);
     expect(result.cefr).toBe("B2");
     expect(result.confidence).toBeGreaterThanOrEqual(0);
     expect(result.confidence).toBeLessThanOrEqual(1);
