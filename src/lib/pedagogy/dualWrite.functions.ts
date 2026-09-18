@@ -438,7 +438,8 @@ export const submitAuthoritativeQuiz = createServerFn({ method: "POST" })
       correct_count: graded.correct,
       details: graded.details,
     });
-    if (insertError && insertError.code !== "23505") throw new Error("Quiz result could not be saved");
+    if (insertError && insertError.code !== "23505")
+      throw new Error("Quiz result could not be saved");
     if (insertError?.code === "23505") {
       const { data: concurrent } = await admin
         .from("quiz_results")
@@ -522,7 +523,8 @@ export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
       feedback,
     });
     const { error: insertError } = await admin.from("writing_submissions").insert(record);
-    if (insertError && insertError.code !== "23505") throw new Error("Writing result could not be saved");
+    if (insertError && insertError.code !== "23505")
+      throw new Error("Writing result could not be saved");
     if (insertError?.code === "23505") {
       const { data: concurrent } = await admin
         .from("writing_submissions")
