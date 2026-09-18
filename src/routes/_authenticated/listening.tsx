@@ -43,98 +43,19 @@ export const Route = createFileRoute("/_authenticated/listening")({
   component: ListeningPage,
 });
 
-type Track = { id: string; label: string; description: string; sentences: string[] };
-
-/** Each track presents one sentence per round. */
+/** Each round presents one sentence at a time. */
 const SENTENCES_PER_TRACK = 3;
-/** Pronunciation drills use short sentences: 5 to 7 words. */
-const MIN_WORDS = 5;
-const MAX_WORDS = 7;
+/** Kept for the existing evidence records, which store one track id. */
+const LEGACY_TRACK_ID = "everyday" as const;
 
-function countWords(sentence: string) {
-  return sentence.replace(/\s+/g, " ").trim().split(" ").filter(Boolean).length;
+/** Sentences taken from the lessons of the student's own level. */
+function lessonSentencesForLevel(lessons: Lesson[], level: string, config: ListeningLevelConfig) {
+  return lessons
+    .filter((lesson) => findLevel(lesson.level).value === level)
+    .flatMap((lesson) =>
+      sentencesFromText(`${lesson.summary ?? ""} ${lesson.transcript ?? ""}`, config),
+    );
 }
-
-function clampWords(sentence: string, max = MAX_WORDS) {
-  const words = sentence.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
-  if (words.length <= max) return sentence.trim();
-  const clipped = words
-    .slice(0, max)
-    .join(" ")
-    .replace(/[,;:]$/, "");
-  return /[.!?]$/.test(clipped) ? clipped : `${clipped}.`;
-}
-
-/** Keeps only drills with 5 to 7 words. */
-function isDrillLength(sentence: string) {
-  const total = countWords(sentence);
-  return total >= MIN_WORDS && total <= MAX_WORDS;
-}
-
-const tracks: Track[] = [
-  {
-    id: "everyday",
-    label: "Everyday English",
-    description: "Daily routines, small talk and casual plans.",
-    sentences: [
-      "I get up early every morning.",
-      "Let's grab a coffee after work.",
-      "She lives near the train station.",
-      "I forgot my keys at home.",
-      "We are having dinner outside tonight.",
-      "It looks like rain this afternoon.",
-    ],
-  },
-  {
-    id: "professional",
-    label: "Professional English",
-    description: "Meetings, emails and workplace conversations.",
-    sentences: [
-      "Could you send me the report?",
-      "We must call the client today.",
-      "The deadline moved to next month.",
-      "Let's schedule a quick call tomorrow.",
-      "I need support with this presentation.",
-      "The team delivered the first version.",
-    ],
-  },
-  {
-    id: "travel",
-    label: "Travel English",
-    description: "Airports, hotels, restaurants and directions.",
-    sentences: [
-      "Where is the gate for Lisbon?",
-      "I have a reservation for tonight.",
-      "How do I reach the station?",
-      "Is breakfast included in the price?",
-      "A table for two, please.",
-      "My luggage did not arrive today.",
-    ],
-  },
-];
-
-/** Sentences taken from the lessons the student already has, so listening follows the course. */
-function lessonSentences(lessons: Lesson[]) {
-  const byCategory = new Map<string, string[]>();
-  for (const lesson of lessons) {
-    const text = `${lesson.summary ?? ""} ${lesson.transcript ?? ""}`;
-    const parts = text
-      .replace(/\s+/g, " ")
-      .split(/(?<=[.!?])\s+/)
-      .map((s) => clampWords(s.trim()))
-      .filter((s) => isDrillLength(s) && /^[A-Za-z]/.test(s));
-    const key = (lesson.category || "general").toLowerCase();
-    byCategory.set(key, [...(byCategory.get(key) ?? []), ...parts]);
-  }
-  return byCategory;
-}
-
-// Grammar lessons never feed the tracks — sentences must match each track's theme.
-const trackCategories: Record<string, string[]> = {
-  everyday: ["everyday", "conversation", "vocabulary", "general", "speaking", "listening"],
-  professional: ["professional", "business", "work", "writing"],
-  travel: ["travel"],
-};
 
 function normalize(value: string) {
   return value
