@@ -147,7 +147,26 @@ const writingFeedbackSchema = z
   })
   .strict();
 
-export function writingCorrectionMessages(prompt: string, text: string, level: string): AiMsg[] {
+/** CEFR context for the correction. Resolved on the server, never sent by the browser. */
+export type WritingLevelGuidance = {
+  label: string;
+  expectedLength: string;
+  focus: string;
+  priorities: string[];
+};
+
+export function writingCorrectionMessages(
+  prompt: string,
+  text: string,
+  level: string,
+  guidance?: WritingLevelGuidance,
+): AiMsg[] {
+  const levelContext = guidance
+    ? `CEFR level: ${guidance.label}\nTask goal: ${guidance.focus}\nExpected length: ${guidance.expectedLength}\n` +
+      `Correction priorities for this level, in order: ${guidance.priorities.join("; ")}.\n` +
+      `Judge the text against ${guidance.label} expectations only — do not demand language above this level, ` +
+      `and do not reward language below it. Keep explanations simple enough for a ${guidance.label} learner.`
+    : `Student level: ${level}`;
   return [
     {
       role: "system",
@@ -159,7 +178,7 @@ export function writingCorrectionMessages(prompt: string, text: string, level: s
     },
     {
       role: "user",
-      content: `Task: ${prompt || "Free writing"}\nStudent level: ${level}\n\nStudent text:\n${text}`,
+      content: `Task: ${prompt || "Free writing"}\n${levelContext}\n\nStudent text:\n${text}`,
     },
   ];
 }
