@@ -59,6 +59,23 @@ export async function openGeminiStream(messages: GeminiMessage[]): Promise<Respo
   });
 }
 
+export type GeminiUsage = { inputTokens?: number; outputTokens?: number };
+
+/**
+ * Reads the token counts Gemini already returns in `usageMetadata`. Nothing is
+ * estimated: a field that the provider omits stays undefined.
+ */
+export function extractGeminiUsage(payload: unknown): GeminiUsage {
+  const meta = (payload as { usageMetadata?: Record<string, unknown> } | null)?.usageMetadata;
+  if (!meta) return {};
+  const input = meta["promptTokenCount"];
+  const output = meta["candidatesTokenCount"];
+  return {
+    ...(typeof input === "number" && Number.isFinite(input) ? { inputTokens: input } : {}),
+    ...(typeof output === "number" && Number.isFinite(output) ? { outputTokens: output } : {}),
+  };
+}
+
 /**
  * Calls Google Gemini through the connector gateway using the workspace's own
  * Gemini key. Used for the heavy content generation (lessons + quizzes).
@@ -68,10 +85,12 @@ export async function openGeminiStream(messages: GeminiMessage[]): Promise<Respo
 export async function callGemini(
   messages: GeminiMessage[],
   jsonMode = false,
+  onUsage?: (usage: GeminiUsage) => void,
 ): Promise<string | null> {
   const credentials = connectorCredentials();
   if (!credentials) return null;
   const body = requestBody(messages, jsonMode);
+
 
   let lastStatus = 503;
   let retryAfter = 0;
@@ -106,7 +125,11 @@ export async function callGemini(
       .map((p) => p.text ?? "")
       .join("")
       .trim();
-    if (text) return text;
+    if (text) {
+      onUsage?.(extractGeminiUsage(data));
+      return text;
+    }
+
   }
 
   throw new GeminiError(
