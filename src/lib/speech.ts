@@ -315,8 +315,9 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   const value = text?.trim();
   if (!value || typeof window === "undefined") throw new Error("Choose a word to hear.");
 
+  const rate = clampRate(options.rate);
   const AudioContextClass = window.AudioContext;
-  if (!AudioContextClass) return speakWithBrowser(value);
+  if (!AudioContextClass) return speakWithBrowser(value, rate);
   audioContext ??= new AudioContextClass({ sampleRate: 24000 });
   if (audioContext.state === "suspended") await audioContext.resume();
   const context = audioContext;
