@@ -366,11 +366,19 @@ function ListeningPage() {
     <AppShell>
       <div className="space-y-6">
         <header>
-          <p className="text-sm text-muted-foreground">Listening Lab</p>
+          <p className="text-sm text-muted-foreground">
+            <span>Listening Practice</span>
+            <span> • {config.label}</span>
+          </p>
           <h1 className="text-2xl font-semibold">Train your ear with real English</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
             activity — a new set arrives every time you start a new lesson in the Learning Center.
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            <span>Pronunciation</span>
+            <span> • {config.label} — </span>
+            <span>{config.focus}</span>
           </p>
           <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
             <RotateCcw className="mr-2 size-4" /> Redo today's activity
