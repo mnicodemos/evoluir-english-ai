@@ -319,8 +319,6 @@ export const uiPt: Record<string, string> = {
   "My subscription": "Minha assinatura",
   Plan: "Plano",
   "Billing period": "Periodicidade",
-  Monthly: "Mensal",
-  Yearly: "Anual",
   Status: "Status",
   Active: "Ativa",
   Trial: "Teste",
