@@ -16,7 +16,9 @@ describe("extractGeminiUsage", () => {
 
   it("never invents a value from a non-numeric field", () => {
     expect(
-      extractGeminiUsage({ usageMetadata: { promptTokenCount: "120", candidatesTokenCount: null } }),
+      extractGeminiUsage({
+        usageMetadata: { promptTokenCount: "120", candidatesTokenCount: null },
+      }),
     ).toEqual({});
   });
 });

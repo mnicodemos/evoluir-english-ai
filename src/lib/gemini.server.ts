@@ -91,7 +91,6 @@ export async function callGemini(
   if (!credentials) return null;
   const body = requestBody(messages, jsonMode);
 
-
   let lastStatus = 503;
   let retryAfter = 0;
   for (const model of MODELS) {
@@ -129,7 +128,6 @@ export async function callGemini(
       onUsage?.(extractGeminiUsage(data));
       return text;
     }
-
   }
 
   throw new GeminiError(
