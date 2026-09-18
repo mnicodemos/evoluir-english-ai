@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Crown, Sparkles } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Check, Crown, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -7,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
+import { createStripeCheckoutSession } from "@/lib/billing/checkout.functions";
 
 export const Route = createFileRoute("/_authenticated/premium")({
   head: () => ({

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedBillingSuccessRouteImport } from './routes/_authenticated/billing-success'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedListeningRouteImport } from './routes/_authenticated/listening'
@@ -45,6 +46,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedBillingSuccessRoute =
+  AuthenticatedBillingSuccessRouteImport.update({
+    id: '/billing-success',
+    path: '/billing-success',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
   id: '/coach',
   path: '/coach',
@@ -144,6 +151,7 @@ const LovableEmailTransactionalPreviewRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/listening': typeof AuthenticatedListeningRoute
@@ -166,6 +174,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/listening': typeof AuthenticatedListeningRoute
@@ -190,6 +199,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/listening': typeof AuthenticatedListeningRoute
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/billing-success'
     | '/coach'
     | '/dashboard'
     | '/listening'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/billing-success'
     | '/coach'
     | '/dashboard'
     | '/listening'
@@ -259,6 +271,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/billing-success'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
     | '/_authenticated/listening'
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/billing-success': {
+      id: '/_authenticated/billing-success'
+      path: '/billing-success'
+      fullPath: '/billing-success'
+      preLoaderRoute: typeof AuthenticatedBillingSuccessRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/coach': {
       id: '/_authenticated/coach'
@@ -443,6 +463,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBillingSuccessRoute: typeof AuthenticatedBillingSuccessRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedListeningRoute: typeof AuthenticatedListeningRoute
@@ -459,6 +480,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBillingSuccessRoute: AuthenticatedBillingSuccessRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedListeningRoute: AuthenticatedListeningRoute,
