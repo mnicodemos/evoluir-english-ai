@@ -24,6 +24,7 @@ import {
   authoritativeWritingInputSchema,
   gradeQuizAnswers,
 } from "./authoritativeSources";
+import { QUIZ_PUBLIC_FIELDS } from "../quizPublicFields";
 
 const boundaries = [
   [0, "A1"],
@@ -202,7 +203,18 @@ describe("Authoritative source contracts", () => {
         ],
         [{ questionId, answer: "forged-answer" }],
       ),
-    ).toMatchObject({ score: 0, correct: 0, details: [{ is_correct: false }] });
+    ).toMatchObject({
+      score: 0,
+      correct: 0,
+      details: [{ correct_answer: "server-key", is_correct: false }],
+    });
+  });
+
+  it("keeps the answer key out of the public Quiz projection", () => {
+    expect(QUIZ_PUBLIC_FIELDS.split(", ")).not.toContain("correct_answer");
+    expect(QUIZ_PUBLIC_FIELDS.split(", ")).toEqual(
+      expect.arrayContaining(["id", "lesson_id", "question", "options", "explanation"]),
+    );
   });
 
   it("rejects client-declared Quiz scores and correctness", () => {

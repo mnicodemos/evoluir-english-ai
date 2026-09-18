@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import { runProgressMutation } from "@/lib/auth-retry";
+import { QUIZ_PUBLIC_FIELDS } from "@/lib/quizPublicFields";
 
 export type Lesson = {
   id: string;
@@ -104,7 +105,7 @@ export function useLesson(lessonId: string) {
           .order("created_at"),
         supabase
           .from("quizzes")
-          .select("id, lesson_id, question, question_type, options, explanation, sort_order")
+          .select(QUIZ_PUBLIC_FIELDS)
           .eq("lesson_id", lessonId)
           .order("sort_order"),
         supabase

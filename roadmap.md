@@ -30,4 +30,4 @@
   - [x] Tornar Quiz e Writing rastreáveis e idempotentes sem alterar os resultados atuais
   - [x] Registrar evidências e snapshots por habilidade com tolerância a falhas
   - [x] Validar RLS, retries, não regressão e ausência de duplicações
-- [ ] Fase 2H — proteger `quizzes.correct_answer` no banco e validar sem operações reais
+- [x] Fase 2H — proteger `quizzes.correct_answer` no banco e validar sem operações reais
