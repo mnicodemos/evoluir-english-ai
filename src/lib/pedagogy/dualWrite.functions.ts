@@ -200,7 +200,11 @@ async function persistEvidenceAndResults(params: {
       .eq("skill", skill)
       .order("created_at", { ascending: true });
     if (error) {
-      throw new PedagogicalWriteError("aggregation", "AGGREGATION_FAILED", "Could not load evidence history");
+      throw new PedagogicalWriteError(
+        "aggregation",
+        "AGGREGATION_FAILED",
+        "Could not load evidence history",
+      );
     }
     const history: AssessmentEvidence[] = (data ?? []).map((row) => ({
       id: row.id,
@@ -223,7 +227,11 @@ async function persistEvidenceAndResults(params: {
         ...params.evidence.filter((item) => item.skill === skill),
       ]);
     } catch {
-      throw new PedagogicalWriteError("cefr_calculation", "CEFR_CALCULATION_FAILED", "Could not calculate the pedagogical result");
+      throw new PedagogicalWriteError(
+        "cefr_calculation",
+        "CEFR_CALCULATION_FAILED",
+        "Could not calculate the pedagogical result",
+      );
     }
     results.push({
       id: await deterministicUuid(`pedagogy-result:${sessionId}:${skill}`),
@@ -268,7 +276,11 @@ async function persistEvidenceAndResults(params: {
   });
   if (error) {
     const classified = classifyFailure(error);
-    throw new PedagogicalWriteError(classified.stage, classified.code, "Atomic pedagogical persistence failed");
+    throw new PedagogicalWriteError(
+      classified.stage,
+      classified.code,
+      "Atomic pedagogical persistence failed",
+    );
   }
   await resolveFailure(admin, userId, idempotencyKey);
   const payload = data && typeof data === "object" && !Array.isArray(data) ? data : {};
@@ -286,7 +298,11 @@ async function processQuiz(admin: AdminClient, userId: string, quizResultId: str
     .eq("id", quizResultId)
     .maybeSingle();
   if (error || !result || result.user_id !== userId) {
-    throw new PedagogicalWriteError("authorization", "AUTHORIZATION_FAILED", "Quiz source is unavailable");
+    throw new PedagogicalWriteError(
+      "authorization",
+      "AUTHORIZATION_FAILED",
+      "Quiz source is unavailable",
+    );
   }
   const details = parseQuizDetails(result.details);
   const ids = details.flatMap((detail) => (detail.question_id ? [detail.question_id] : []));
@@ -295,16 +311,26 @@ async function processQuiz(admin: AdminClient, userId: string, quizResultId: str
     .from("quizzes")
     .select("id, pedagogical_skill")
     .in("id", ids);
-  if (questionError) throw new PedagogicalWriteError("source", "VALIDATION_FAILED", "Quiz questions are unavailable");
+  if (questionError)
+    throw new PedagogicalWriteError(
+      "source",
+      "VALIDATION_FAILED",
+      "Quiz questions are unavailable",
+    );
   const skills = new Map(
     (questions ?? [])
-      .filter((question) => question.pedagogical_skill === "grammar" || question.pedagogical_skill === "vocabulary")
+      .filter(
+        (question) =>
+          question.pedagogical_skill === "grammar" || question.pedagogical_skill === "vocabulary",
+      )
       .map((question) => [question.id, question.pedagogical_skill as "grammar" | "vocabulary"]),
   );
   const evidence = details.flatMap((detail) => {
     if (!detail.question_id) return [];
     const skill = skills.get(detail.question_id);
-    return skill ? [quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill })] : [];
+    return skill
+      ? [quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill })]
+      : [];
   });
   if (evidence.length === 0) return { duplicate: false, evidenceCount: 0 };
   return persistEvidenceAndResults({
@@ -318,7 +344,12 @@ async function processQuiz(admin: AdminClient, userId: string, quizResultId: str
   });
 }
 
-async function processWriting(admin: AdminClient, userId: string, submissionId: string, key: string) {
+async function processWriting(
+  admin: AdminClient,
+  userId: string,
+  submissionId: string,
+  key: string,
+) {
   const { data: row, error } = await admin
     .from("writing_submissions")
     .select("id, user_id, grammar_score, vocabulary_score, clarity_score")
@@ -326,7 +357,11 @@ async function processWriting(admin: AdminClient, userId: string, submissionId: 
     .eq("idempotency_key", key)
     .maybeSingle();
   if (error || !row || row.user_id !== userId) {
-    throw new PedagogicalWriteError("authorization", "AUTHORIZATION_FAILED", "Writing source is unavailable");
+    throw new PedagogicalWriteError(
+      "authorization",
+      "AUTHORIZATION_FAILED",
+      "Writing source is unavailable",
+    );
   }
   return persistEvidenceAndResults({
     admin,
@@ -379,12 +414,23 @@ export const dualWriteWritingEvidence = createServerFn({ method: "POST" })
         .select("original_text, prompt")
         .eq("id", submissionId)
         .maybeSingle();
-      if (existing && (existing.original_text !== record.original_text || existing.prompt !== record.prompt)) {
-        throw new PedagogicalWriteError("idempotency", "IDEMPOTENCY_CONFLICT", "Writing operation identity was reused");
+      if (
+        existing &&
+        (existing.original_text !== record.original_text || existing.prompt !== record.prompt)
+      ) {
+        throw new PedagogicalWriteError(
+          "idempotency",
+          "IDEMPOTENCY_CONFLICT",
+          "Writing operation identity was reused",
+        );
       }
       const { error } = await admin.from("writing_submissions").insert(record);
       if (error && error.code !== "23505") {
-        throw new PedagogicalWriteError("source", "VALIDATION_FAILED", "Writing source could not be persisted");
+        throw new PedagogicalWriteError(
+          "source",
+          "VALIDATION_FAILED",
+          "Writing source could not be persisted",
+        );
       }
       return {
         ok: true,
@@ -414,7 +460,11 @@ export const retryPendingPedagogicalWrites = createServerFn({ method: "POST" })
       .limit(data.limit);
     let completed = 0;
     for (const failure of failures ?? []) {
-      if (!failure.source_id || (failure.source_type !== "quiz" && failure.source_type !== "writing")) continue;
+      if (
+        !failure.source_id ||
+        (failure.source_type !== "quiz" && failure.source_type !== "writing")
+      )
+        continue;
       await admin
         .from("pedagogical_dual_write_failures")
         .update({ status: "retrying", processing_started_at: now })
