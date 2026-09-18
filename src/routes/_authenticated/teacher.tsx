@@ -17,7 +17,8 @@ export const Route = createFileRoute("/_authenticated/teacher")({
       { property: "og:title", content: "Evoluir+ English AI · AI Teacher" },
       {
         property: "og:description",
-        content: "Ask questions, practise sentences and get pedagogical feedback from your AI teacher.",
+        content:
+          "Ask questions, practise sentences and get pedagogical feedback from your AI teacher.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

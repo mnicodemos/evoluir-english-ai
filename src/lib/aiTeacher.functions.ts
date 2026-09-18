@@ -167,7 +167,8 @@ export const loadTeacherSession = createServerFn({ method: "POST" })
 
     const focus =
       pedagogicalContext.currentActivity?.skill ??
-      [...pedagogicalContext.skills].sort((a, b) => (a.score ?? 100) - (b.score ?? 100))[0]?.skill ??
+      [...pedagogicalContext.skills].sort((a, b) => (a.score ?? 100) - (b.score ?? 100))[0]
+        ?.skill ??
       null;
 
     return {

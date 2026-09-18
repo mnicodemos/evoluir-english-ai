@@ -154,9 +154,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
                 <Message from="assistant">
                   <MessageContent>
                     <MessageResponse>
-                      {t(
-                        "Hi! I'm your AI Teacher. What would you like to practice today?",
-                      )}
+                      {t("Hi! I'm your AI Teacher. What would you like to practice today?")}
                     </MessageResponse>
                   </MessageContent>
                 </Message>
