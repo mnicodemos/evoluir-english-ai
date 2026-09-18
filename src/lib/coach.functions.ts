@@ -119,10 +119,18 @@ export const conversationReport = createServerFn({ method: "POST" })
     z.object({ messages: z.array(messageSchema).min(1).max(60) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<ConversationReport> => {
-    const raw = await callGateway(conversationReportMessages(data.messages), true, {
-      userId: context.userId,
-      operation: "talking",
-    });
+    // Rubric level read on the server from the profile, never from the client.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("level")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const raw = await callGateway(
+      conversationReportMessages(data.messages, profile?.level ?? null),
+      true,
+      { userId: context.userId, operation: "talking" },
+    );
 
     return parseConversationReport(raw);
   });
