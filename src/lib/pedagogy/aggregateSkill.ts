@@ -120,7 +120,10 @@ export function aggregateSkillEvidence(
   return {
     skill: validSkill,
     score,
-    cefr: cefrForScore(score, config.ruleset),
+    cefr: calibrateCefrToItemLevel(
+      cefrForScore(score, config.ruleset),
+      practisedLevel(weightedEvidence),
+    ),
     confidence,
     evidenceCount: validEvidence.length,
     ruleVersion: config.ruleset.version,
