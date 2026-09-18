@@ -16,6 +16,13 @@ import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { type WritingFeedback } from "@/lib/ai-prompts";
 import { analyseAuthoritativeWriting } from "@/lib/pedagogy/dualWrite.functions";
 import { persistWritingLegacy } from "@/lib/legacyActivity.functions";
+import {
+  expectedLengthLabel,
+  pickWritingTasks,
+  WRITING_CATEGORIES,
+  writingLevelConfig,
+  type WritingLevelConfig,
+} from "@/lib/writingLevels";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
@@ -35,64 +42,8 @@ export const Route = createFileRoute("/_authenticated/writing")({
   component: Writing,
 });
 
-type Category = "everyday" | "professional" | "travel";
-
-const categories: { id: Category; label: string; hint: string; pool: string[] }[] = [
-  {
-    id: "everyday",
-    label: "Everyday English",
-    hint: "Family, friends, routine",
-    pool: [
-      "Describe your daily routine from morning to night.",
-      "Tell a friend by message what you did last weekend.",
-      "Describe your home and your favourite room in it.",
-      "Write about a meal you love and how you prepare it.",
-      "Tell me about a person in your family you admire.",
-      "Describe your hometown to someone who has never visited it.",
-      "Write a short message inviting a friend to your birthday.",
-      "Tell me what you usually do to relax after a busy day.",
-      "Describe a hobby you started recently and why you like it.",
-      "Write about your plans for next weekend.",
-    ],
-  },
-  {
-    id: "professional",
-    label: "Professional English",
-    hint: "Meetings, emails, career",
-    pool: [
-      "Write an email asking a client to reschedule a meeting.",
-      "Describe your professional experience in a short paragraph.",
-      "Explain a project you are proud of and your role in it.",
-      "Write a status update about your current project for your team.",
-      "Write an email introducing yourself to a new international client.",
-      "Describe a difficult situation at work and how you solved it.",
-      "Write a short message asking your manager for a day off.",
-      "Explain why you would be a good fit for your dream job.",
-      "Write an email answering a client who is unhappy with a delay.",
-      "Describe how a typical work week looks for you.",
-    ],
-  },
-  {
-    id: "travel",
-    label: "Travel English",
-    hint: "Airport, hotel, restaurant",
-    pool: [
-      "Tell me about the last trip you took.",
-      "Write an email to a hotel asking about check-in time and breakfast.",
-      "Describe your dream destination and what you would do there.",
-      "Write a polite complaint about a room that was not clean.",
-      "Describe what happened when a flight of yours was delayed.",
-      "Write a short review of a restaurant you visited abroad.",
-      "Explain to a tourist how to get from the airport to your city centre.",
-      "Write a message asking a friend to travel with you next holiday.",
-      "Describe the food you tried on a trip and what you thought of it.",
-      "Write an email booking a tour for two people.",
-    ],
-  },
-];
-
 const HISTORY_KEY = "writing-history";
-const TASKS_PER_ROUND = categories.length;
+const TASKS_PER_ROUND = WRITING_CATEGORIES.length;
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -127,27 +78,25 @@ function rememberAnswered(prompt: string) {
 }
 
 /**
- * One task per theme (Everyday, Professional, Travel), new every day.
- * Already answered tasks never come back until the whole pool is used.
+ * One task per theme (Everyday, Professional, Travel), taken from the pool of
+ * the student's CEFR level. Already answered tasks are skipped while fresh ones
+ * exist; when the whole level pool is used the history is cleared.
  */
-function roundPrompts(signature: string): string[] {
+function roundPrompts(signature: string, config: WritingLevelConfig, rotation: number): string[] {
   const key = `writing-prompts-round-${signature}`;
   const saved = readList(key);
   if (saved.length === TASKS_PER_ROUND) return saved;
 
   let history = loadHistory();
-  const pick = (pool: string[]) => {
-    const fresh = pool.filter((p) => !history.includes(p));
-    return (fresh.length ? fresh : pool)[
-      Math.floor(Math.random() * (fresh.length || pool.length))
-    ]!;
-  };
-  if (categories.every((c) => c.pool.every((p) => history.includes(p)))) {
+  const levelExhausted = WRITING_CATEGORIES.every(({ id }) =>
+    config.tasks[id].every((task) => history.includes(task)),
+  );
+  if (levelExhausted) {
     history = [];
     writeList(HISTORY_KEY, history);
   }
 
-  const picked = categories.map((c) => pick(c.pool));
+  const picked = pickWritingTasks({ config, history, rotation });
   writeList(key, picked);
   return picked;
 }
@@ -172,9 +121,15 @@ function Writing() {
   });
 
   const { data: startedLessons } = useLessonRound();
+  // The CEFR level comes from the stored profile — the student cannot pick it here.
+  const config = useMemo(() => writingLevelConfig(profile?.level), [profile?.level]);
+  const rotation = startedLessons ?? 0;
   // A fresh set of tasks every day, and every time the student starts a new lesson.
-  const signature = `${todayKey()}-${startedLessons ?? 0}`;
-  const prompts = useMemo(() => roundPrompts(signature), [signature]);
+  const signature = `${todayKey()}-${config.level}-${rotation}`;
+  const prompts = useMemo(
+    () => roundPrompts(signature, config, rotation),
+    [signature, config, rotation],
+  );
   const [done, setDone] = useState<string[]>([]);
   const [prompt, setPrompt] = useState("");
   const [text, setText] = useState("");
@@ -275,9 +230,12 @@ function Writing() {
   return (
     <AppShell>
       <h1 className="text-3xl font-bold">Writing AI Corrector</h1>
+      <p className="mt-1 text-sm font-medium text-muted-foreground">
+        Writing Practice • {config.label} — {config.focus}
+      </p>
       <p className="mt-2 text-muted-foreground">
-        One task for Everyday, Professional and Travel English. New tasks every day and every time
-        you start a new lesson — nothing repeats.
+        One task for Everyday, Professional and Travel English, at your level. New tasks every day
+        and every time you start a new lesson — nothing repeats.
       </p>
       {done.length > 0 && (
         <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoToday}>
@@ -287,7 +245,7 @@ function Writing() {
 
       <div className="mt-7 grid gap-3 sm:grid-cols-3">
         {prompts.map((p, index) => {
-          const category = categories[index]!;
+          const category = WRITING_CATEGORIES[index]!;
           const isDone = done.includes(p);
           const isActive = prompt === p;
           return (
@@ -367,7 +325,8 @@ function Writing() {
             />
             <div className="mt-4 flex items-center justify-between gap-3">
               <span className="text-sm text-muted-foreground">
-                {text.trim().split(/\s+/).filter(Boolean).length} words
+                {text.trim().split(/\s+/).filter(Boolean).length} words · <span>target</span>{" "}
+                {expectedLengthLabel(config)}
               </span>
               <Button onClick={analyse} disabled={loading}>
                 {loading ? (
