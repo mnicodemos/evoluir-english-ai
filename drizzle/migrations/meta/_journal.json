@@ -127,6 +127,20 @@
       "when": 1789729250174,
       "tag": "0017_add_pedagogical_diagnostic_views",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1789729974250,
+      "tag": "0018_teacher_pedagogical_source",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1789730016310,
+      "tag": "0019_teacher_ai_usage_operation",
+      "breakpoints": true
     }
   ]
 }

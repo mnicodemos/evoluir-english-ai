@@ -25,6 +25,7 @@ export const EVIDENCE_SOURCE_TYPES = [
   "vocabulary",
   "reading",
   "final_test",
+  "teacher",
 ] as const;
 
 export const EVALUATORS = ["deterministic", "gemini", "hybrid"] as const;

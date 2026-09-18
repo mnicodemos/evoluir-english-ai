@@ -33,7 +33,7 @@ import {
 const retryInputSchema = z.object({ limit: z.number().int().min(1).max(5).default(3) }).strict();
 
 type AdminClient = SupabaseClient<Database>;
-type SourceType = "quiz" | "writing";
+type SourceType = "quiz" | "writing" | "teacher";
 type FailureStage =
   | "source"
   | "authorization"
@@ -413,6 +413,39 @@ async function processWritingSafely(
   } catch (error) {
     await recordFailure(admin, userId, "writing", submissionId, key, error);
     console.error("Writing pedagogical dual write failed", classifyFailure(error).code);
+    return { ok: false, duplicate: false, evidenceCount: 0 };
+  }
+}
+
+/**
+ * Persists AI Teacher evidence through the SAME pedagogical pipeline used by Quiz
+ * and Writing (session -> evidence -> skill result -> aggregation). A failure here
+ * never invalidates the answer the student already received: it is recorded as an
+ * observable, non-retryable pedagogical failure (a conversational turn cannot be
+ * replayed from persisted state).
+ */
+export async function persistTeacherEvidence(params: {
+  userId: string;
+  turnId: string;
+  rubricVersion: string;
+  evidence: AssessmentEvidence[];
+}) {
+  const admin = await loadAdmin();
+  const key = `teacher:${params.turnId}`;
+  try {
+    const result = await persistEvidenceAndResults({
+      admin,
+      userId: params.userId,
+      sourceType: "teacher",
+      sourceId: params.turnId,
+      idempotencyKey: key,
+      rubricVersion: params.rubricVersion,
+      evidence: params.evidence,
+    });
+    return { ok: true, ...result };
+  } catch (error) {
+    await recordFailure(admin, params.userId, "teacher", params.turnId, key, error);
+    console.error("Teacher pedagogical write failed", classifyFailure(error).code);
     return { ok: false, duplicate: false, evidenceCount: 0 };
   }
 }
