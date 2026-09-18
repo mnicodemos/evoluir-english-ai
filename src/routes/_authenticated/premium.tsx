@@ -69,12 +69,31 @@ const plans = [
   },
 ];
 
+const STATUS_LABEL: Record<string, string> = {
+  active: "Active",
+  trial: "Trial",
+  canceled: "Canceled",
+  expired: "Inactive",
+  payment_failed: "Payment pending",
+  refunded: "Refunded",
+};
+
 function Premium() {
   const { data: profile, isLoading } = useProfile();
+  const fetchAccess = useServerFn(getMyAccess);
+  const { data: access } = useQuery({
+    queryKey: ["my-access"],
+    queryFn: () => fetchAccess(),
+  });
   const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
   const [starting, setStarting] = useState(false);
+  const [opening, setOpening] = useState(false);
   const startCheckout = useServerFn(createStripeCheckoutSession);
-  const isPremium = profile?.plan === "premium";
+  const openPortal = useServerFn(createStripePortalSession);
+
+  // Server/database authority: Premium comes from valid entitlements only.
+  const view = access ? buildSubscriptionView(access) : null;
+  const isPremium = view ? view.plan === "premium" : profile?.plan === "premium";
 
   async function goToCheckout() {
     if (starting) return;
@@ -85,6 +104,27 @@ function Premium() {
     } catch {
       setStarting(false);
       toast.error("We could not open the secure checkout", {
+        description: "Please try again in a moment.",
+      });
+    }
+  }
+
+  async function goToPortal() {
+    if (opening) return;
+    setOpening(true);
+    try {
+      const { url } = await openPortal({ data: undefined });
+      if (!url) {
+        setOpening(false);
+        toast.error("No billing account found yet", {
+          description: "Start a subscription to manage it here.",
+        });
+        return;
+      }
+      window.location.href = url;
+    } catch {
+      setOpening(false);
+      toast.error("We could not open your subscription management", {
         description: "Please try again in a moment.",
       });
     }
@@ -105,6 +145,83 @@ function Premium() {
               <Crown className="size-7 text-[oklch(0.78_0.18_82)]" /> Premium
             </h1>
           </header>
+
+          <section className="card-soft p-6">
+            <h2 className="text-lg font-semibold">My subscription</h2>
+            {!view ? (
+              <Skeleton className="mt-4 h-24 w-full" />
+            ) : (
+              <>
+                <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+                  <div>
+                    <dt className="text-muted-foreground">Plan</dt>
+                    <dd className="font-medium">{view.plan === "premium" ? "Premium" : "Free"}</dd>
+                  </div>
+                  {view.interval && (
+                    <div>
+                      <dt className="text-muted-foreground">Billing period</dt>
+                      <dd className="font-medium">
+                        {view.interval === "monthly" ? "Monthly" : "Yearly"}
+                      </dd>
+                    </div>
+                  )}
+                  {view.status && (
+                    <div>
+                      <dt className="text-muted-foreground">Status</dt>
+                      <dd className="font-medium">{STATUS_LABEL[view.status] ?? "Inactive"}</dd>
+                    </div>
+                  )}
+                  <div>
+                    <dt className="text-muted-foreground">Premium access</dt>
+                    <dd className="font-medium">
+                      {view.plan === "premium"
+                        ? view.accessUntil
+                          ? `Active until ${new Date(view.accessUntil).toLocaleDateString()}`
+                          : "Active"
+                        : "Not active"}
+                    </dd>
+                  </div>
+                </dl>
+
+                {view.canceledButActive && (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Your subscription was canceled and your Premium access stays available until the
+                    end of the period you already paid for.
+                  </p>
+                )}
+                {view.status === "payment_failed" && (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Your last payment did not go through. Update your payment details to keep
+                    Premium.
+                  </p>
+                )}
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {view.canManage ? (
+                    <Button variant="outline" disabled={opening} onClick={goToPortal}>
+                      {opening ? (
+                        <Loader2 className="mr-2 size-4 animate-spin" />
+                      ) : (
+                        <ExternalLink className="mr-2 size-4" />
+                      )}
+                      Manage subscription
+                    </Button>
+                  ) : (
+                    view.plan === "free" && (
+                      <Button variant="outline" onClick={goToCheckout} disabled={starting}>
+                        {starting && <Loader2 className="mr-2 size-4 animate-spin" />}
+                        Discover Premium
+                      </Button>
+                    )
+                  )}
+                </div>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Changes and cancellations are handled by Stripe and applied here automatically.
+                </p>
+              </>
+            )}
+          </section>
+
 
           {isPremium ? (
             <section className="card-soft bg-primary p-6 text-primary-foreground">
