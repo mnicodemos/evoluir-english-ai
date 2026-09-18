@@ -232,7 +232,7 @@ async function persistEvidenceAndResults(params: {
 
 export const dualWriteQuizEvidence = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => quizInputSchema.parse(input))
+  .validator((input: unknown) => quizInputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const key = `quiz:${data.quizResultId}`;
     try {
@@ -296,7 +296,7 @@ export const dualWriteQuizEvidence = createServerFn({ method: "POST" })
 
 export const dualWriteWritingEvidence = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => writingInputSchema.parse(input))
+  .validator((input: unknown) => writingInputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const key = `writing:${data.idempotencyKey}`;
     const submissionId = await deterministicUuid(`writing-submission:${context.userId}:${key}`);
