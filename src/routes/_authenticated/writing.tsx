@@ -16,6 +16,13 @@ import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { type WritingFeedback } from "@/lib/ai-prompts";
 import { analyseAuthoritativeWriting } from "@/lib/pedagogy/dualWrite.functions";
 import { persistWritingLegacy } from "@/lib/legacyActivity.functions";
+import {
+  expectedLengthLabel,
+  pickWritingTasks,
+  WRITING_CATEGORIES,
+  writingLevelConfig,
+  type WritingLevelConfig,
+} from "@/lib/writingLevels";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
