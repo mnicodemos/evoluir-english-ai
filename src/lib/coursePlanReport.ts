@@ -85,7 +85,11 @@ export async function downloadCoursePlan(input: { name: string; level: string })
   }
 
   const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const wb = createWorkbook(doc, logo, { brand: BRAND, levelLabel: level.label, docTitle: "Course workbook" });
+  const wb = createWorkbook(doc, logo, {
+    brand: BRAND,
+    levelLabel: level.label,
+    docTitle: "Course workbook",
+  });
 
   wb.cover({
     title: "Full course content",
@@ -105,15 +109,22 @@ export async function downloadCoursePlan(input: { name: string; level: string })
   );
   wb.label("Study routine");
   wb.bullet("Watch the lesson video with the subtitles (CC) turned on.");
-  wb.bullet("Read the script aloud once, then read the Portuguese version to check your understanding.");
+  wb.bullet(
+    "Read the script aloud once, then read the Portuguese version to check your understanding.",
+  );
   wb.bullet("Study the vocabulary entries and say each example out loud.");
   wb.bullet("Answer the quiz: 70% or more completes the lesson and unlocks the next one.");
   wb.bullet("After lesson 30, take the Final Test (30 questions) to move up a level.");
-  wb.bullet("Unit 6 adds two reviews and an optional 10-question test; it does not block the Final Test.");
+  wb.bullet(
+    "Unit 6 adds two reviews and an optional 10-question test; it does not block the Final Test.",
+  );
 
   // Units and lessons
   units.forEach((unit) => {
-    wb.divider(`Unit ${String(unit.unit).padStart(2, "0")}: ${unit.title}`, `${unit.lessons.length} lessons`);
+    wb.divider(
+      `Unit ${String(unit.unit).padStart(2, "0")}: ${unit.title}`,
+      `${unit.lessons.length} lessons`,
+    );
 
     for (const lesson of unit.lessons) {
       const row = lessonByKey.get(lesson.key);
@@ -153,7 +164,11 @@ export async function downloadCoursePlan(input: { name: string; level: string })
       if (cards.length) {
         wb.label("Vocabulary");
         cards.forEach((card, index) => {
-          wb.entry(index + 1, card.word, `${card.translation}${card.pronunciation ? ` (${card.pronunciation})` : ""}`);
+          wb.entry(
+            index + 1,
+            card.word,
+            `${card.translation}${card.pronunciation ? ` (${card.pronunciation})` : ""}`,
+          );
           if (card.example) wb.example(card.example);
         });
       }
@@ -161,7 +176,12 @@ export async function downloadCoursePlan(input: { name: string; level: string })
       if (quiz.length) {
         wb.label("Grammar quiz");
         quiz.forEach((q, index) => {
-          wb.para(`${index + 1}. ${q.question}`, { size: 10, bold: true, color: [INK.r, INK.g, INK.b], gap: 2 });
+          wb.para(`${index + 1}. ${q.question}`, {
+            size: 10,
+            bold: true,
+            color: [INK.r, INK.g, INK.b],
+            gap: 2,
+          });
           const options = Array.isArray(q.options) ? (q.options as string[]) : [];
           for (const opt of options) {
             wb.para(`• ${opt}`, {
@@ -171,7 +191,8 @@ export async function downloadCoursePlan(input: { name: string; level: string })
               color: [58, 63, 74],
             });
           }
-          if (q.explanation) wb.para(`Why: ${q.explanation}`, { size: 9, indent: 18, color: MUTED_RGB });
+          if (q.explanation)
+            wb.para(`Why: ${q.explanation}`, { size: 9, indent: 18, color: MUTED_RGB });
         });
       }
 
@@ -243,7 +264,9 @@ export async function downloadCoursePlan(input: { name: string; level: string })
     { size: 10.5 },
   );
   wb.label("How to prepare");
-  wb.bullet("Review the grammar part of this workbook and rewrite each structure in your own words.");
+  wb.bullet(
+    "Review the grammar part of this workbook and rewrite each structure in your own words.",
+  );
   wb.bullet("Redo the quizzes of the lessons where you scored below 90%.");
   wb.bullet("Read the texts aloud and rewrite the writing model with your own information.");
   doc.setTextColor(ACCENT.r, ACCENT.g, ACCENT.b);
