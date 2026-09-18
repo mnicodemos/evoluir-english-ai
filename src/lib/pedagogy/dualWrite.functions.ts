@@ -595,8 +595,16 @@ export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
       .eq("id", context.userId)
       .maybeSingle();
     if (profileError) throw new Error("Writing level could not be loaded");
+    // The CEFR context for the correction is resolved from the stored profile,
+    // never from anything the browser sent.
+    const writingConfig = writingLevelConfig(profile?.level ?? null);
     const raw = await callGateway(
-      writingCorrectionMessages(data.prompt, data.originalText, profile?.level ?? "intermediate"),
+      writingCorrectionMessages(data.prompt, data.originalText, profile?.level ?? "intermediate", {
+        label: writingConfig.label,
+        expectedLength: expectedLengthLabel(writingConfig),
+        focus: writingConfig.focus,
+        priorities: writingConfig.priorities,
+      }),
       true,
       { userId: context.userId, operation: "writing_correction" },
     );
