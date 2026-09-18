@@ -25,8 +25,9 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
             signature,
             getWebhookSecret(),
             undefined,
-            (stripe as unknown as { createSubtleCryptoProvider?: () => unknown })
-              .createSubtleCryptoProvider?.() as never,
+            (
+              stripe as unknown as { createSubtleCryptoProvider?: () => unknown }
+            ).createSubtleCryptoProvider?.() as never,
           );
         } catch (error) {
           console.error("[stripe] invalid webhook signature", (error as Error).message);
@@ -82,9 +83,8 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
 });
 
 async function handleEvent(stripe: Stripe, event: Stripe.Event): Promise<boolean> {
-  const { syncSubscription, resolveUserId, linkCustomer } = await import(
-    "@/lib/billing/stripeSync.server"
-  );
+  const { syncSubscription, resolveUserId, linkCustomer } =
+    await import("@/lib/billing/stripeSync.server");
 
   switch (event.type) {
     case "checkout.session.completed": {

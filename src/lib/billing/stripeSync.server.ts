@@ -53,8 +53,7 @@ type StripeSubscriptionLike = Stripe.Subscription & {
 
 function periodFromSubscription(subscription: StripeSubscriptionLike) {
   const item = subscription.items?.data?.[0] as
-    | { current_period_start?: number | null; current_period_end?: number | null }
-    | undefined;
+    { current_period_start?: number | null; current_period_end?: number | null } | undefined;
   return {
     start: secondsToIso(subscription.current_period_start ?? item?.current_period_start ?? null),
     end: secondsToIso(subscription.current_period_end ?? item?.current_period_end ?? null),
@@ -76,7 +75,9 @@ export async function syncSubscription(
     (await resolveUserId({
       metadataUserId: subscription.metadata?.["user_id"] ?? null,
       customerId: customerId ?? null,
-    })) ?? fallbackUserId ?? null;
+    })) ??
+    fallbackUserId ??
+    null;
 
   const status = mapStripeStatus(subscription.status);
   if (!userId) return { userId: null, status };

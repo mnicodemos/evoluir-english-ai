@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { parseCheckoutInput } from "./checkout.functions";
-import { PRICE_ENV_BY_INTERVAL, mapStripeStatus, resolvePriceId, secondsToIso } from "./stripeMapping";
+import {
+  PRICE_ENV_BY_INTERVAL,
+  mapStripeStatus,
+  resolvePriceId,
+  secondsToIso,
+} from "./stripeMapping";
 import { subscriptionGrantsAccess } from "./contracts";
 
 const env = {

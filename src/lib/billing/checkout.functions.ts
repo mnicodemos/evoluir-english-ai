@@ -9,9 +9,7 @@ import { BILLING_INTERVALS, resolvePriceId } from "./stripeMapping";
  * Strict input: the client may only name an allowed plan interval. Any attempt
  * to send a price, amount, currency, plan or premium flag is rejected.
  */
-export const checkoutInputSchema = z
-  .object({ interval: z.enum(BILLING_INTERVALS) })
-  .strict();
+export const checkoutInputSchema = z.object({ interval: z.enum(BILLING_INTERVALS) }).strict();
 
 export function parseCheckoutInput(input: unknown) {
   return checkoutInputSchema.parse(input);
@@ -32,7 +30,10 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
     const { getStripe } = await import("./stripe.server");
     const { getLinkedCustomerId, linkCustomer } = await import("./stripeSync.server");
 
-    const priceId = resolvePriceId(data.interval, process.env as Record<string, string | undefined>);
+    const priceId = resolvePriceId(
+      data.interval,
+      process.env as Record<string, string | undefined>,
+    );
     const stripe = getStripe();
     const origin = resolveOrigin();
 
