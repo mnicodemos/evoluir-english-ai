@@ -51,6 +51,15 @@ export type NextStepInput = {
   lessonBySkill: Record<string, { id: string; title: string } | undefined>;
 };
 
+/**
+ * The lesson catalogue labels spoken lessons 'talking'; the skill profile calls
+ * the same skill 'speaking'. Map the catalogue label onto the profile label so
+ * a real lesson can be matched instead of falling back.
+ */
+export function lessonSkillToProfileSkill(lessonSkill: string): string {
+  return lessonSkill === "talking" ? "speaking" : lessonSkill;
+}
+
 /** Existing practice surfaces, used only as fallback when no lesson matches. */
 const FALLBACK_BY_SKILL: Record<string, { action: NextStepAction; activity: NextStepActivity }> = {
   listening: {
