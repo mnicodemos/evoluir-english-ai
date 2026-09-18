@@ -162,6 +162,13 @@
       "when": 1789758645416,
       "tag": "0022_ai_limits_premium_from_entitlements",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1789761052960,
+      "tag": "0023_phase11_content_enrichment",
+      "breakpoints": true
     }
   ]
 }

@@ -6,7 +6,12 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-import { buildNextStep, type NextStep, type SkillSnapshot } from "./nextStep";
+import {
+  buildNextStep,
+  lessonSkillToProfileSkill,
+  type NextStep,
+  type SkillSnapshot,
+} from "./nextStep";
 
 const RECENT_DAYS = 7;
 
@@ -60,8 +65,8 @@ export const loadNextStep = createServerFn({ method: "POST" })
     const lessonBySkill: Record<string, { id: string; title: string } | undefined> = {};
     for (const lesson of lessons ?? []) {
       if (!lesson.skill || doneLessons.has(lesson.id)) continue;
-      if (!lessonBySkill[lesson.skill])
-        lessonBySkill[lesson.skill] = { id: lesson.id, title: lesson.title };
+      const skill = lessonSkillToProfileSkill(lesson.skill);
+      if (!lessonBySkill[skill]) lessonBySkill[skill] = { id: lesson.id, title: lesson.title };
     }
 
     return buildNextStep({

@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { buildNextStep, NEXT_STEP_REASON_TEXT, type NextStepInput } from "./nextStep";
+import {
+  buildNextStep,
+  lessonSkillToProfileSkill,
+  NEXT_STEP_REASON_TEXT,
+  type NextStepInput,
+} from "./nextStep";
 
 const base: NextStepInput = {
   skills: [],
@@ -136,5 +141,26 @@ describe("next step copy", () => {
       expect(text.length).toBeGreaterThan(10);
       expect(text).not.toMatch(/bad|weak|poor|terrible/i);
     }
+  });
+});
+
+describe("lesson catalogue skill labels", () => {
+  it("treats a 'talking' lesson as the speaking skill", () => {
+    expect(lessonSkillToProfileSkill("talking")).toBe("speaking");
+    expect(lessonSkillToProfileSkill("grammar")).toBe("grammar");
+    expect(lessonSkillToProfileSkill("pronunciation")).toBe("pronunciation");
+  });
+
+  it("uses a spoken lesson for the speaking skill once the label is mapped", () => {
+    const step = buildNextStep({
+      skills: [{ skill: "speaking", score: 40, confidence: 0.9, cefrLevel: "B2" }],
+      recurringErrors: [],
+      recentlyPractised: ["speaking"],
+      lessonBySkill: {
+        [lessonSkillToProfileSkill("talking")]: { id: "lesson-5", title: "Presenting Your Ideas" },
+      },
+    });
+    expect(step.action).toBe("review_lesson");
+    expect(step.activity.params).toEqual({ lessonId: "lesson-5" });
   });
 });
