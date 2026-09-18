@@ -295,7 +295,7 @@ async function processQuiz(
   const key = `quiz:${quizResultId}`;
   const { data: result, error } = await admin
     .from("quiz_results")
-    .select("id, user_id, details")
+    .select("id, user_id, lesson_id, details")
     .eq("id", quizResultId)
     .maybeSingle();
   if (error || !result || result.user_id !== userId) {
