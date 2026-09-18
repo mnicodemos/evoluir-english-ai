@@ -220,7 +220,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   async function playResponse(text: string) {
     setVoiceState("speaking");
     try {
-      await speakEnglish(text);
+      await speakEnglish(text, { cache: "persistent" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "The response could not be played.");
     } finally {
@@ -233,12 +233,14 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       .then(async () => {
         if (!mounted.current) return;
         setVoiceState("speaking");
-        await speakEnglish(text, { cache: "memory" });
+        // Persistent cache: the same sentence is never generated twice, even after a reload.
+        await speakEnglish(text, { cache: "persistent" });
       })
       .catch((error: unknown) => {
         toast.error(error instanceof Error ? error.message : "The response could not be played.");
       });
   }
+
 
   /** Starts a conversation with a subject picked by the AI. `offset` asks for another subject. */
   async function start(offset = 0) {
