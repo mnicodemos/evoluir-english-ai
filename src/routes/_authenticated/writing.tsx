@@ -271,7 +271,10 @@ function Writing() {
           },
         });
       } catch (error) {
-        console.warn("Writing result was saved; pedagogical dual write will be retried later", error);
+        console.warn(
+          "Writing result was saved; pedagogical dual write will be retried later",
+          error,
+        );
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not analyse your text");

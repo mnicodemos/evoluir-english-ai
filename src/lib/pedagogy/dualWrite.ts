@@ -69,11 +69,16 @@ export function writingEvidence(scores: WritingSubscores): AssessmentEvidence[] 
   }));
 }
 
-export async function toleratePedagogicalFailure<T>(operation: () => Promise<T>): Promise<T | null> {
+export async function toleratePedagogicalFailure<T>(
+  operation: () => Promise<T>,
+): Promise<T | null> {
   try {
     return await operation();
   } catch (error) {
-    console.warn("Pedagogical dual write failed", error instanceof Error ? error.message : "unknown");
+    console.warn(
+      "Pedagogical dual write failed",
+      error instanceof Error ? error.message : "unknown",
+    );
     return null;
   }
 }

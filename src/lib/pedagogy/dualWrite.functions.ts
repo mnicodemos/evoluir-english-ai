@@ -5,7 +5,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database, Json } from "@/integrations/supabase/types";
 
 import { aggregateSkillEvidence } from "./aggregateSkill";
-import { type AssessmentEvidence, pedagogicalSkillSchema, type PedagogicalSkill } from "./contracts";
+import {
+  type AssessmentEvidence,
+  pedagogicalSkillSchema,
+  type PedagogicalSkill,
+} from "./contracts";
 import {
   parseQuizDetails,
   PEDAGOGY_MODEL_VERSION,
@@ -44,7 +48,9 @@ type AuthenticatedClient = {
 };
 
 async function deterministicUuid(value: string): Promise<string> {
-  const bytes = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)));
+  const bytes = new Uint8Array(
+    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)),
+  );
   bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x50;
   bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
   const hex = Array.from(bytes.slice(0, 16), (byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -98,7 +104,11 @@ async function recordFailure(
   });
 }
 
-async function resolveFailure(supabase: AuthenticatedClient, userId: string, idempotencyKey: string) {
+async function resolveFailure(
+  supabase: AuthenticatedClient,
+  userId: string,
+  idempotencyKey: string,
+) {
   await supabase
     .from("pedagogical_dual_write_failures")
     .update({ status: "resolved", resolved_at: new Date().toISOString() })
@@ -249,13 +259,19 @@ export const dualWriteQuizEvidence = createServerFn({ method: "POST" })
       if (questionError) throw questionError;
       const skills = new Map(
         (questions ?? [])
-          .filter((question) => question.pedagogical_skill === "grammar" || question.pedagogical_skill === "vocabulary")
+          .filter(
+            (question) =>
+              question.pedagogical_skill === "grammar" ||
+              question.pedagogical_skill === "vocabulary",
+          )
           .map((question) => [question.id, question.pedagogical_skill as "grammar" | "vocabulary"]),
       );
       const evidence = details.flatMap((detail) => {
         if (!detail.question_id) return [];
         const skill = skills.get(detail.question_id);
-        return skill ? [quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill })] : [];
+        return skill
+          ? [quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill })]
+          : [];
       });
       if (evidence.length === 0) return { ok: true, duplicate: false, evidenceCount: 0 };
       const persisted = await persistEvidenceAndResults({
