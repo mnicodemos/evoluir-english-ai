@@ -428,7 +428,8 @@ function ListeningPage() {
                 <Volume2 className="mr-2 size-4" /> {playing ? "Playing..." : "Play sentence"}
               </Button>
               <Button variant="outline" onClick={() => play(true)} disabled={playing}>
-                <RotateCcw className="mr-2 size-4" /> Play word by word
+                <RotateCcw className="mr-2 size-4" />{" "}
+                {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
               </Button>
             </div>
 
