@@ -82,9 +82,9 @@ function AppShellContent({ children }: { children: ReactNode }) {
           <Link
             to="/dashboard"
             aria-label={translate("Dashboard")}
-            className="grid size-10 place-items-center rounded-lg hover:bg-sidebar-accent"
+            className="grid size-14 place-items-center rounded-lg hover:bg-sidebar-accent"
           >
-            <Logo className="size-8" />
+            <Logo className="size-14" />
           </Link>
 
           <nav className="mt-8 flex flex-1 flex-col gap-1">
