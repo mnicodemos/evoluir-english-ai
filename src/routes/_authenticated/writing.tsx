@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { CheckCircle2, Loader2, PenLine, Wand2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -183,6 +183,7 @@ function Writing() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WritingFeedback | null>(null);
+  const operationKey = useRef<string | null>(null);
 
   useEffect(() => {
     const finished = loadDone(signature);
@@ -190,6 +191,7 @@ function Writing() {
     setPrompt(prompts.find((p) => !finished.includes(p)) ?? prompts[0] ?? "");
     setText("");
     setResult(null);
+    operationKey.current = null;
   }, [signature, prompts]);
 
   const currentDone = done.includes(prompt);
@@ -199,6 +201,7 @@ function Writing() {
     setPrompt(p);
     setText("");
     setResult(null);
+    operationKey.current = null;
   }
 
   /** Lets the student redo every task already checked today. */
@@ -208,6 +211,7 @@ function Writing() {
     setPrompt(prompts[0] ?? "");
     setText("");
     setResult(null);
+    operationKey.current = null;
   }
 
   /** Lets the student redo an already checked task to improve the score. */
@@ -217,6 +221,7 @@ function Writing() {
     saveDone(signature, nextDone);
     setText("");
     setResult(null);
+    operationKey.current = null;
   }
 
   async function analyse() {
@@ -226,6 +231,8 @@ function Writing() {
       return;
     }
     setLoading(true);
+    const stableOperationKey = operationKey.current ?? crypto.randomUUID();
+    operationKey.current = stableOperationKey;
     try {
       const raw = await aiChat({
         data: {
@@ -264,7 +271,7 @@ function Writing() {
       try {
         await dualWriteWritingEvidence({
           data: {
-            idempotencyKey: crypto.randomUUID(),
+            operationKey: stableOperationKey,
             prompt,
             originalText: text.trim(),
             feedback,
@@ -289,6 +296,7 @@ function Writing() {
       setPrompt(remaining[0]!);
       setText("");
       setResult(null);
+      operationKey.current = null;
     }
   }
 

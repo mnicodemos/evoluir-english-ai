@@ -256,6 +256,7 @@ export async function reviewFlashcard(
 }
 
 export async function saveQuizResult(params: {
+  attemptKey: string;
   userId: string;
   lessonId: string;
   score: number;
@@ -269,23 +270,41 @@ export async function saveQuizResult(params: {
     is_correct: boolean;
   }[];
 }) {
-  const { data } = await runProgressMutation(() =>
-    supabase
-      .from("quiz_results")
-      .insert({
-        user_id: params.userId,
-        lesson_id: params.lessonId,
-        score: params.score,
-        total_questions: params.total,
-        correct_count: params.correct,
-        details: params.details,
-      })
-      .select("id")
-      .single(),
-  );
-  if (!data) throw new Error("Quiz result was saved without a returned identifier");
+  let resultId = params.attemptKey;
   try {
-    await dualWriteQuizEvidence({ data: { quizResultId: data.id } });
+    const { data } = await runProgressMutation(() =>
+      supabase
+        .from("quiz_results")
+        .insert({
+          id: params.attemptKey,
+          attempt_key: params.attemptKey,
+          user_id: params.userId,
+          lesson_id: params.lessonId,
+          score: params.score,
+          total_questions: params.total,
+          correct_count: params.correct,
+          details: params.details,
+        })
+        .select("id")
+        .single(),
+    );
+    if (!data) throw new Error("Quiz result was saved without a returned identifier");
+    resultId = data.id;
+  } catch (error) {
+    const duplicate =
+      typeof error === "object" && error !== null && "code" in error && error.code === "23505";
+    if (!duplicate) throw error;
+    const { data, error: lookupError } = await supabase
+      .from("quiz_results")
+      .select("id")
+      .eq("id", params.attemptKey)
+      .eq("user_id", params.userId)
+      .maybeSingle();
+    if (lookupError || !data) throw lookupError ?? new Error("Quiz attempt could not be recovered");
+    resultId = data.id;
+  }
+  try {
+    await dualWriteQuizEvidence({ data: { quizResultId: resultId } });
   } catch (error) {
     console.warn("Quiz result was saved; pedagogical dual write will be retried later", error);
   }

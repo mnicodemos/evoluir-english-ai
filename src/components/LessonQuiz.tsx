@@ -31,6 +31,10 @@ export function LessonQuiz({
     `lesson-quiz-submitted:${userId ?? "guest"}:${lessonId}`,
     false,
   );
+  const [attemptKey, setAttemptKey, clearAttemptKey] = usePersistentState<string>(
+    `lesson-quiz-attempt:${userId ?? "guest"}:${lessonId}`,
+    "",
+  );
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
 
@@ -42,7 +46,10 @@ export function LessonQuiz({
     setSaveFailed(false);
     try {
       if (userId) {
+        const stableAttemptKey = attemptKey || crypto.randomUUID();
+        if (!attemptKey) setAttemptKey(stableAttemptKey);
         await saveQuizResult({
+          attemptKey: stableAttemptKey,
           userId,
           lessonId,
           score,
@@ -80,8 +87,10 @@ export function LessonQuiz({
   function retake() {
     clearAnswers();
     clearSubmitted();
+    clearAttemptKey();
     setAnswers({});
     setSubmitted(false);
+    setAttemptKey("");
   }
 
   return (

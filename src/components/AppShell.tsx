@@ -27,6 +27,7 @@ import { Footer } from "@/components/Footer";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
+import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
 import { UiLangProvider, UiLangToggle, useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 
@@ -62,6 +63,13 @@ function AppShellContent({ children }: { children: ReactNode }) {
   useEffect(() => {
     stopSpeaking();
   }, [location.pathname]);
+
+  useEffect(() => {
+    const retryKey = "pedagogical-retry-checked";
+    if (window.sessionStorage.getItem(retryKey)) return;
+    window.sessionStorage.setItem(retryKey, "1");
+    void retryPendingPedagogicalWrites({ data: { limit: 3 } }).catch(() => undefined);
+  }, []);
 
   async function signOut() {
     await queryClient.cancelQueries();
