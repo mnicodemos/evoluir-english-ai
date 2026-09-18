@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Check } from "lucide-react";
+import { Check, Trophy } from "lucide-react";
+
 
 import { supabase } from "@/integrations/supabase/client";
 import { STUDY_DAY_ACTIVITY_TYPES } from "@/lib/studyDay";
