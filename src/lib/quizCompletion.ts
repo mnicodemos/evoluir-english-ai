@@ -5,10 +5,7 @@ export type QuizCompletionDependencies = {
   completeLesson: () => Promise<void>;
 };
 
-export async function finalizeLessonQuiz(
-  score: number,
-  dependencies: QuizCompletionDependencies,
-) {
+export async function finalizeLessonQuiz(score: number, dependencies: QuizCompletionDependencies) {
   await dependencies.persistLegacy();
   const passed = score >= LESSON_QUIZ_PASS_SCORE;
   if (passed) await dependencies.completeLesson();
