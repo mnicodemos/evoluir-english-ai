@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedBillingSuccessRouteImport } from './routes/_authenticated/billing-success'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedListeningRouteImport } from './routes/_authenticated/listening'
@@ -28,6 +29,7 @@ import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedLearningLessonIdRouteImport } from './routes/_authenticated/learning/$lessonId'
 import { Route as AuthenticatedLearningFinalTestRouteImport } from './routes/_authenticated/learning/final-test'
 import { Route as AuthenticatedLearningReviewRouteImport } from './routes/_authenticated/learning/review'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
@@ -44,6 +46,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedBillingSuccessRoute =
+  AuthenticatedBillingSuccessRouteImport.update({
+    id: '/billing-success',
+    path: '/billing-success',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
   id: '/coach',
   path: '/coach',
@@ -128,6 +136,11 @@ const AuthenticatedLearningReviewRoute =
     path: '/learning/review',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe/webhook',
+  path: '/api/public/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -138,6 +151,7 @@ const LovableEmailTransactionalPreviewRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/listening': typeof AuthenticatedListeningRoute
@@ -154,11 +168,13 @@ export interface FileRoutesByFullPath {
   '/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/learning/review': typeof AuthenticatedLearningReviewRoute
   '/learning/': typeof AuthenticatedLearningIndexRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/listening': typeof AuthenticatedListeningRoute
@@ -175,6 +191,7 @@ export interface FileRoutesByTo {
   '/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/learning/review': typeof AuthenticatedLearningReviewRoute
   '/learning': typeof AuthenticatedLearningIndexRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
@@ -182,6 +199,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/listening': typeof AuthenticatedListeningRoute
@@ -198,6 +216,7 @@ export interface FileRoutesById {
   '/_authenticated/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/_authenticated/learning/review': typeof AuthenticatedLearningReviewRoute
   '/_authenticated/learning/': typeof AuthenticatedLearningIndexRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
@@ -205,6 +224,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/billing-success'
     | '/coach'
     | '/dashboard'
     | '/listening'
@@ -221,11 +241,13 @@ export interface FileRouteTypes {
     | '/learning/final-test'
     | '/learning/review'
     | '/learning/'
+    | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/billing-success'
     | '/coach'
     | '/dashboard'
     | '/listening'
@@ -242,12 +264,14 @@ export interface FileRouteTypes {
     | '/learning/final-test'
     | '/learning/review'
     | '/learning'
+    | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/billing-success'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
     | '/_authenticated/listening'
@@ -264,6 +288,7 @@ export interface FileRouteTypes {
     | '/_authenticated/learning/final-test'
     | '/_authenticated/learning/review'
     | '/_authenticated/learning/'
+    | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
@@ -274,6 +299,7 @@ export interface RootRouteChildren {
   ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
@@ -299,6 +325,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/billing-success': {
+      id: '/_authenticated/billing-success'
+      path: '/billing-success'
+      fullPath: '/billing-success'
+      preLoaderRoute: typeof AuthenticatedBillingSuccessRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/coach': {
       id: '/_authenticated/coach'
@@ -412,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearningReviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/stripe/webhook': {
+      id: '/api/public/stripe/webhook'
+      path: '/api/public/stripe/webhook'
+      fullPath: '/api/public/stripe/webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -423,6 +463,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBillingSuccessRoute: typeof AuthenticatedBillingSuccessRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedListeningRoute: typeof AuthenticatedListeningRoute
@@ -439,6 +480,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBillingSuccessRoute: AuthenticatedBillingSuccessRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedListeningRoute: AuthenticatedListeningRoute,
@@ -464,6 +506,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCoachStreamRoute: ApiCoachStreamRoute,
   ApiSpeechRoute: ApiSpeechRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport

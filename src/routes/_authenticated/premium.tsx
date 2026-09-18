@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Crown, Sparkles } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Check, Crown, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -7,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
+import { createStripeCheckoutSession } from "@/lib/billing/checkout.functions";
 
 export const Route = createFileRoute("/_authenticated/premium")({
   head: () => ({
@@ -14,10 +16,14 @@ export const Route = createFileRoute("/_authenticated/premium")({
       { title: "Evoluir+ English AI · Premium" },
       {
         name: "description",
-        content: "Unlock unlimited AI Talking, pronunciation and audio lessons with Evoluir+ English AI Premium.",
+        content:
+          "Unlock unlimited AI Talking, pronunciation and audio lessons with Evoluir+ English AI Premium.",
       },
       { property: "og:title", content: "Evoluir+ English AI · Premium" },
-      { property: "og:description", content: "Unlimited AI Talking, pronunciation and audio lessons." },
+      {
+        property: "og:description",
+        content: "Unlimited AI Talking, pronunciation and audio lessons.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -34,7 +40,12 @@ const premiumPerks = [
   "Priority support",
 ];
 
-const freePerks = ["3 AI Talking sessions per day", "3 writing corrections per day", "Vocabulary builder", "Basic progress"];
+const freePerks = [
+  "3 AI Talking sessions per day",
+  "3 writing corrections per day",
+  "Vocabulary builder",
+  "Basic progress",
+];
 
 const plans = [
   {
@@ -57,7 +68,23 @@ const plans = [
 function Premium() {
   const { data: profile, isLoading } = useProfile();
   const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
+  const [starting, setStarting] = useState(false);
+  const startCheckout = useServerFn(createStripeCheckoutSession);
   const isPremium = profile?.plan === "premium";
+
+  async function goToCheckout() {
+    if (starting) return;
+    setStarting(true);
+    try {
+      const { url } = await startCheckout({ data: { interval: selected } });
+      window.location.href = url;
+    } catch {
+      setStarting(false);
+      toast.error("We could not open the secure checkout", {
+        description: "Please try again in a moment.",
+      });
+    }
+  }
 
   return (
     <AppShell>
@@ -84,7 +111,9 @@ function Premium() {
                 You have full access, {profile.name || "student"}.
               </h2>
               <p className="mt-2 text-sm text-primary-foreground/75">
-                {profile.plan_interval === "monthly" ? "Monthly plan — R$ 79,90/month" : "Yearly plan — R$ 799,90/year"}
+                {profile.plan_interval === "monthly"
+                  ? "Monthly plan — R$ 79,90/month"
+                  : "Yearly plan — R$ 799,90/year"}
                 {profile.plan_expires_at
                   ? ` · renews on ${new Date(profile.plan_expires_at).toLocaleDateString()}`
                   : ""}
@@ -119,7 +148,9 @@ function Premium() {
                     </div>
                     <p className="mt-3 text-3xl font-bold">
                       {p.price}
-                      <span className="text-base font-medium text-muted-foreground">{p.period}</span>
+                      <span className="text-base font-medium text-muted-foreground">
+                        {p.period}
+                      </span>
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">{p.note}</p>
                   </button>
@@ -154,19 +185,16 @@ function Premium() {
                 <Button
                   className="mt-7 w-full sm:w-auto"
                   size="lg"
-                  onClick={() =>
-                    toast.info("Checkout is opening soon", {
-                      description:
-                        selected === "yearly"
-                          ? "Yearly plan R$ 799,90 — secure payment will be available shortly."
-                          : "Monthly plan R$ 79,90 — secure payment will be available shortly.",
-                    })
-                  }
+                  disabled={starting}
+                  onClick={goToCheckout}
                 >
-                  Go Premium — {selected === "yearly" ? "R$ 799,90/year" : "R$ 79,90/month"}
+                  {starting && <Loader2 className="mr-2 size-4 animate-spin" />}
+                  {starting
+                    ? "Opening secure checkout…"
+                    : `Go Premium — ${selected === "yearly" ? "R$ 799,90/year" : "R$ 79,90/month"}`}
                 </Button>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Secure payment is being finalised. You will be able to pay by card or Pix.
+                  Secure payment is processed by Stripe. Your card details never reach Evoluir+.
                 </p>
               </section>
             </>
