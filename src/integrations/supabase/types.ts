@@ -215,6 +215,191 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_evidence: {
+        Row: {
+          assessment_session_id: string
+          created_at: string
+          evaluated_by: string
+          evidence_quality: number
+          id: string
+          item_cefr: string | null
+          model_version: string | null
+          raw_score: number
+          rubric_version: string
+          sample_weight: number
+          skill: string
+          source_id: string | null
+          source_reliability: number
+          source_type: string
+          subskill: string | null
+          user_id: string
+        }
+        Insert: {
+          assessment_session_id: string
+          created_at?: string
+          evaluated_by: string
+          evidence_quality: number
+          id?: string
+          item_cefr?: string | null
+          model_version?: string | null
+          raw_score: number
+          rubric_version: string
+          sample_weight?: number
+          skill: string
+          source_id?: string | null
+          source_reliability: number
+          source_type: string
+          subskill?: string | null
+          user_id: string
+        }
+        Update: {
+          assessment_session_id?: string
+          created_at?: string
+          evaluated_by?: string
+          evidence_quality?: number
+          id?: string
+          item_cefr?: string | null
+          model_version?: string | null
+          raw_score?: number
+          rubric_version?: string
+          sample_weight?: number
+          skill?: string
+          source_id?: string | null
+          source_reliability?: number
+          source_type?: string
+          subskill?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_evidence_session_owner_fkey"
+            columns: ["assessment_session_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_sessions"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "assessment_evidence_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessment_sessions: {
+        Row: {
+          assessment_type: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          overall_cefr: string | null
+          overall_confidence: number | null
+          overall_score: number | null
+          rubric_version: string
+          ruleset_version: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assessment_type: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          overall_cefr?: string | null
+          overall_confidence?: number | null
+          overall_score?: number | null
+          rubric_version: string
+          ruleset_version: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assessment_type?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          overall_cefr?: string | null
+          overall_confidence?: number | null
+          overall_score?: number | null
+          rubric_version?: string
+          ruleset_version?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessment_skill_results: {
+        Row: {
+          assessed_at: string
+          assessment_session_id: string
+          cefr_level: string
+          confidence_score: number | null
+          created_at: string
+          evidence_count: number
+          id: string
+          rule_version: string
+          score: number | null
+          skill: string
+          user_id: string
+        }
+        Insert: {
+          assessed_at?: string
+          assessment_session_id: string
+          cefr_level: string
+          confidence_score?: number | null
+          created_at?: string
+          evidence_count?: number
+          id?: string
+          rule_version: string
+          score?: number | null
+          skill: string
+          user_id: string
+        }
+        Update: {
+          assessed_at?: string
+          assessment_session_id?: string
+          cefr_level?: string
+          confidence_score?: number | null
+          created_at?: string
+          evidence_count?: number
+          id?: string
+          rule_version?: string
+          score?: number | null
+          skill?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_skill_results_session_owner_fkey"
+            columns: ["assessment_session_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_sessions"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "assessment_skill_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flashcards: {
         Row: {
           answer: string | null
@@ -279,6 +464,8 @@ export type Database = {
       }
       learning_errors: {
         Row: {
+          assessment_evidence_id: string | null
+          assessment_session_id: string | null
           category: string
           corrected_text: string
           error_type: string
@@ -294,6 +481,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assessment_evidence_id?: string | null
+          assessment_session_id?: string | null
           category: string
           corrected_text: string
           error_type: string
@@ -309,6 +498,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assessment_evidence_id?: string | null
+          assessment_session_id?: string | null
           category?: string
           corrected_text?: string
           error_type?: string
@@ -323,7 +514,22 @@ export type Database = {
           source?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "learning_errors_assessment_evidence_owner_fkey"
+            columns: ["assessment_evidence_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_evidence"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "learning_errors_assessment_session_owner_fkey"
+            columns: ["assessment_session_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_sessions"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
       }
       learning_profile: {
         Row: {
@@ -813,7 +1019,35 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      current_skill_profile: {
+        Row: {
+          assessed_at: string | null
+          assessment_session_id: string | null
+          cefr_level: string | null
+          confidence_score: number | null
+          evidence_count: number | null
+          rule_version: string | null
+          score: number | null
+          skill: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_skill_results_session_owner_fkey"
+            columns: ["assessment_session_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_sessions"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "assessment_skill_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       reserve_ai_usage: {
