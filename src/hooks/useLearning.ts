@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import { runProgressMutation } from "@/lib/auth-retry";
-import { dualWriteQuizEvidence } from "@/lib/pedagogy/dualWrite.functions";
 
 export type Lesson = {
   id: string;
@@ -45,7 +44,6 @@ export type QuizQuestion = {
   question: string;
   question_type: string;
   options: string[];
-  correct_answer: string;
   explanation: string;
   sort_order: number;
 };
@@ -104,7 +102,11 @@ export function useLesson(lessonId: string) {
           .eq("lesson_id", lessonId)
           .order("sort_order")
           .order("created_at"),
-        supabase.from("quizzes").select("*").eq("lesson_id", lessonId).order("sort_order"),
+        supabase
+          .from("quizzes")
+          .select("id, lesson_id, question, question_type, options, explanation, sort_order")
+          .eq("lesson_id", lessonId)
+          .order("sort_order"),
         supabase
           .from("user_lessons")
           .select("lesson_id, video_progress, progress, completed_at")
@@ -253,59 +255,4 @@ export async function reviewFlashcard(
       { onConflict: "user_id,flashcard_id" },
     ),
   );
-}
-
-export async function saveQuizResult(params: {
-  attemptKey: string;
-  userId: string;
-  lessonId: string;
-  score: number;
-  total: number;
-  correct: number;
-  details: {
-    question_id: string;
-    question: string;
-    answer: string;
-    correct_answer: string;
-    is_correct: boolean;
-  }[];
-}) {
-  let resultId = params.attemptKey;
-  try {
-    const { data } = await runProgressMutation(() =>
-      supabase
-        .from("quiz_results")
-        .insert({
-          id: params.attemptKey,
-          attempt_key: params.attemptKey,
-          user_id: params.userId,
-          lesson_id: params.lessonId,
-          score: params.score,
-          total_questions: params.total,
-          correct_count: params.correct,
-          details: params.details,
-        })
-        .select("id")
-        .single(),
-    );
-    if (!data) throw new Error("Quiz result was saved without a returned identifier");
-    resultId = data.id;
-  } catch (error) {
-    const duplicate =
-      typeof error === "object" && error !== null && "code" in error && error.code === "23505";
-    if (!duplicate) throw error;
-    const { data, error: lookupError } = await supabase
-      .from("quiz_results")
-      .select("id")
-      .eq("id", params.attemptKey)
-      .eq("user_id", params.userId)
-      .maybeSingle();
-    if (lookupError || !data) throw lookupError ?? new Error("Quiz attempt could not be recovered");
-    resultId = data.id;
-  }
-  try {
-    await dualWriteQuizEvidence({ data: { quizResultId: resultId } });
-  } catch (error) {
-    console.warn("Quiz result was saved; pedagogical dual write will be retried later", error);
-  }
 }

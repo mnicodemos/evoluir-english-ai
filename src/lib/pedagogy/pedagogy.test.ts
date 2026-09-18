@@ -19,6 +19,11 @@ import {
   type AssessmentEvidence,
   type PedagogicalSkill,
 } from "./contracts";
+import {
+  authoritativeQuizInputSchema,
+  authoritativeWritingInputSchema,
+  gradeQuizAnswers,
+} from "./authoritativeSources";
 
 const boundaries = [
   [0, "A1"],
@@ -177,6 +182,66 @@ describe("Quiz dual-write mapping", () => {
   it("accepts legacy details without a question identifier without inventing one", () => {
     const { question_id: _questionId, ...legacy } = detail;
     expect(parseQuizDetails([legacy])).toEqual([legacy]);
+  });
+});
+
+describe("Authoritative source contracts", () => {
+  const questionId = "11111111-1111-4111-8111-111111111111";
+  const operationKey = "33333333-3333-4333-8333-333333333333";
+
+  it("calculates Quiz results exclusively from stored answer keys", () => {
+    expect(
+      gradeQuizAnswers(
+        [
+          {
+            id: questionId,
+            question: "Stored question",
+            correct_answer: "server-key",
+            sort_order: 1,
+          },
+        ],
+        [{ questionId, answer: "forged-answer" }],
+      ),
+    ).toMatchObject({ score: 0, correct: 0, details: [{ is_correct: false }] });
+  });
+
+  it("rejects client-declared Quiz scores and correctness", () => {
+    expect(
+      authoritativeQuizInputSchema.safeParse({
+        attemptKey: operationKey,
+        lessonId: "22222222-2222-4222-8222-222222222222",
+        answers: [{ questionId, answer: "server-key" }],
+        score: 100,
+        correct: 1,
+        is_correct: true,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects client-declared Writing evaluation fields", () => {
+    expect(
+      authoritativeWritingInputSchema.safeParse({
+        operationKey,
+        prompt: "Describe your week.",
+        originalText: "This is my original writing text.",
+        grammar: 100,
+        vocabulary: 100,
+        clarity: 100,
+        corrected: "Forged correction",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("keeps retry identities valid while rejecting duplicate Quiz answers", () => {
+    expect(() =>
+      gradeQuizAnswers(
+        [{ id: questionId, question: "Stored question", correct_answer: "yes", sort_order: 1 }],
+        [
+          { questionId, answer: "yes" },
+          { questionId, answer: "yes" },
+        ],
+      ),
+    ).toThrow("Duplicate quiz answer");
   });
 });
 

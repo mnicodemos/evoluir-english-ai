@@ -1,11 +1,19 @@
 import { CheckCircle2, XCircle } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { saveQuizResult, type QuizQuestion } from "@/hooks/useLearning";
+import { type QuizQuestion } from "@/hooks/useLearning";
 import { usePersistentState } from "@/hooks/usePersistentState";
+import { submitAuthoritativeQuiz } from "@/lib/pedagogy/dualWrite.functions";
 import { useUiLang } from "@/lib/uiLang";
+
+type SubmittedDetail = {
+  question_id: string;
+  correct_answer: string;
+  is_correct: boolean;
+};
 
 /** Multiple-choice / fill-in quiz with instant score, explanations and review advice. */
 export function LessonQuiz({
@@ -28,18 +36,25 @@ export function LessonQuiz({
   // Whether the quiz was already finished, so a completed lesson keeps showing
   // the corrections instead of an empty quiz when the student comes back.
   const [submitted, setSubmitted, clearSubmitted] = usePersistentState<boolean>(
-    `lesson-quiz-submitted:${userId ?? "guest"}:${lessonId}`,
+    `lesson-quiz-submitted-v2:${userId ?? "guest"}:${lessonId}`,
     false,
   );
   const [attemptKey, setAttemptKey, clearAttemptKey] = usePersistentState<string>(
     `lesson-quiz-attempt:${userId ?? "guest"}:${lessonId}`,
     "",
   );
+  const [submittedResult, setSubmittedResult, clearSubmittedResult] = usePersistentState<{
+    score: number;
+    correct: number;
+    total: number;
+    details: SubmittedDetail[];
+  } | null>(`lesson-quiz-result:${userId ?? "guest"}:${lessonId}`, null);
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
+  const submitQuiz = useServerFn(submitAuthoritativeQuiz);
 
-  const correct = questions.filter((q) => answers[q.id] === q.correct_answer).length;
-  const score = questions.length ? Math.round((correct / questions.length) * 100) : 0;
+  const correct = submittedResult?.correct ?? 0;
+  const score = submittedResult?.score ?? 0;
 
   async function submit() {
     setSaving(true);
@@ -48,24 +63,19 @@ export function LessonQuiz({
       if (userId) {
         const stableAttemptKey = attemptKey || crypto.randomUUID();
         if (!attemptKey) setAttemptKey(stableAttemptKey);
-        await saveQuizResult({
-          attemptKey: stableAttemptKey,
-          userId,
-          lessonId,
-          score,
-          total: questions.length,
-          correct,
-          details: questions.map((q) => ({
-            question_id: q.id,
-            question: q.question,
-            answer: answers[q.id] ?? "",
-            correct_answer: q.correct_answer,
-            is_correct: answers[q.id] === q.correct_answer,
-          })),
+        const saved = await submitQuiz({
+          data: {
+            attemptKey: stableAttemptKey,
+            lessonId,
+            answers: questions.map((q) => ({ questionId: q.id, answer: answers[q.id] ?? "" })),
+          },
         });
+        setSubmittedResult(saved);
+        setSubmitted(true);
+        onFinished?.(saved.score);
+        return;
       }
-      setSubmitted(true);
-      onFinished?.(score);
+      throw new Error("Sign in to save and grade this quiz.");
     } catch (error) {
       setSaveFailed(true);
       toast.error(
@@ -88,9 +98,11 @@ export function LessonQuiz({
     clearAnswers();
     clearSubmitted();
     clearAttemptKey();
+    clearSubmittedResult();
     setAnswers({});
     setSubmitted(false);
     setAttemptKey("");
+    setSubmittedResult(null);
   }
 
   return (
@@ -119,7 +131,8 @@ export function LessonQuiz({
 
       {questions.map((q, i) => {
         const chosen = answers[q.id];
-        const isCorrect = chosen === q.correct_answer;
+        const detail = submittedResult?.details.find((item) => item.question_id === q.id);
+        const isCorrect = detail?.is_correct === true;
         return (
           <div key={q.id} className="card-soft p-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -131,7 +144,7 @@ export function LessonQuiz({
                 const selected = chosen === opt;
                 let style = "border-border hover:bg-secondary";
                 let textColor = "";
-                if (submitted && opt === q.correct_answer) {
+                if (submitted && opt === detail?.correct_answer) {
                   style = "border-success bg-success/10";
                   textColor = "text-success";
                 } else if (submitted && selected) {

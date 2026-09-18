@@ -4,6 +4,8 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database, Json } from "@/integrations/supabase/types";
+import { parseWritingFeedback, writingCorrectionMessages } from "@/lib/ai-prompts";
+import { callGateway } from "@/lib/ai-gateway.server";
 
 import { aggregateSkillEvidence } from "./aggregateSkill";
 import {
@@ -21,26 +23,13 @@ import {
   writingSubmissionRecord,
   WRITING_RUBRIC_VERSION,
 } from "./dualWrite";
+import {
+  authoritativeQuizInputSchema,
+  authoritativeWritingInputSchema,
+  gradeQuizAnswers,
+  writingFeedbackFromRow,
+} from "./authoritativeSources";
 
-const quizInputSchema = z.object({ quizResultId: z.string().uuid() }).strict();
-const writingInputSchema = z
-  .object({
-    operationKey: z.string().uuid(),
-    prompt: z.string().max(2000),
-    originalText: z.string().trim().min(1).max(12000),
-    feedback: z
-      .object({
-        corrected: z.string().min(1).max(12000),
-        natural: z.string().min(1).max(12000),
-        explanations: z.array(z.string().min(1).max(500)).max(20),
-        suggestions: z.array(z.string().min(1).max(500)).max(10),
-        grammar: z.number().finite().min(0).max(100),
-        vocabulary: z.number().finite().min(0).max(100),
-        clarity: z.number().finite().min(0).max(100),
-      })
-      .strict(),
-  })
-  .strict();
 const retryInputSchema = z.object({ limit: z.number().int().min(1).max(5).default(3) }).strict();
 
 type AdminClient = SupabaseClient<Database>;
@@ -106,55 +95,27 @@ function classifyFailure(error: unknown): { stage: FailureStage; code: FailureCo
   return { stage: "evidence", code: "EVIDENCE_PERSIST_FAILED" };
 }
 
-function retryable(code: FailureCode) {
-  return !["AUTHORIZATION_FAILED", "VALIDATION_FAILED", "IDEMPOTENCY_CONFLICT"].includes(code);
-}
-
 async function recordFailure(
   admin: AdminClient,
   userId: string,
   sourceType: SourceType,
-  sourceId: string | null,
+  sourceId: string,
   idempotencyKey: string,
   error: unknown,
+  alreadyClaimed = false,
 ) {
   const failure = classifyFailure(error);
-  const { data: existing } = await admin
-    .from("pedagogical_dual_write_failures")
-    .select("id, attempt_count")
-    .eq("user_id", userId)
-    .eq("idempotency_key", idempotencyKey)
-    .maybeSingle();
-  const attemptCount = (existing?.attempt_count ?? 0) + 1;
-  const delaySeconds = Math.min(3600, 15 * 2 ** Math.min(attemptCount - 1, 8));
-  const values = {
-    user_id: userId,
-    source_type: sourceType,
-    source_id: sourceId,
-    idempotency_key: idempotencyKey,
-    stage: failure.stage,
-    error_code: failure.code,
-    last_error_message: sanitizedMessage(error),
-    status: retryable(failure.code) && attemptCount < 5 ? "pending" : "failed",
-    attempt_count: attemptCount,
-    last_failed_at: new Date().toISOString(),
-    next_retry_at:
-      retryable(failure.code) && attemptCount < 5
-        ? new Date(Date.now() + delaySeconds * 1000).toISOString()
-        : null,
-    processing_started_at: null,
-    completed_at: null,
-    resolved_at: null,
-  } as const;
-  if (existing) {
-    await admin
-      .from("pedagogical_dual_write_failures")
-      .update(values)
-      .eq("id", existing.id)
-      .eq("user_id", userId);
-  } else {
-    await admin.from("pedagogical_dual_write_failures").insert(values);
-  }
+  const { error: recordError } = await admin.rpc("record_pedagogical_failure", {
+    p_user_id: userId,
+    p_source_type: sourceType,
+    p_source_id: sourceId,
+    p_idempotency_key: idempotencyKey,
+    p_stage: failure.stage,
+    p_error_code: failure.code,
+    p_error_message: sanitizedMessage(error),
+    p_already_claimed: alreadyClaimed,
+  });
+  if (recordError) console.error("Pedagogical failure record could not be persisted");
 }
 
 async function resolveFailure(admin: AdminClient, userId: string, idempotencyKey: string) {
@@ -172,6 +133,29 @@ async function resolveFailure(admin: AdminClient, userId: string, idempotencyKey
     .eq("idempotency_key", idempotencyKey);
 }
 
+async function recordClaimedFailure(
+  admin: AdminClient,
+  userId: string,
+  sourceType: SourceType,
+  sourceId: string,
+  idempotencyKey: string,
+  claimedAt: string,
+  error: unknown,
+) {
+  const failure = classifyFailure(error);
+  const { error: recordError } = await admin.rpc("record_claimed_pedagogical_failure", {
+    p_user_id: userId,
+    p_source_type: sourceType,
+    p_source_id: sourceId,
+    p_idempotency_key: idempotencyKey,
+    p_stage: failure.stage,
+    p_error_code: failure.code,
+    p_error_message: sanitizedMessage(error),
+    p_claimed_at: claimedAt,
+  });
+  if (recordError) console.error("Claimed pedagogical failure could not be persisted");
+}
+
 async function loadAdmin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin as unknown as AdminClient;
@@ -185,6 +169,7 @@ async function persistEvidenceAndResults(params: {
   idempotencyKey: string;
   rubricVersion: string;
   evidence: AssessmentEvidence[];
+  claimedAt?: string;
 }) {
   const { admin, userId, sourceType, sourceId, idempotencyKey, rubricVersion } = params;
   const sessionId = await deterministicUuid(`pedagogy-session:${userId}:${idempotencyKey}`);
@@ -282,7 +267,15 @@ async function persistEvidenceAndResults(params: {
       "Atomic pedagogical persistence failed",
     );
   }
-  await resolveFailure(admin, userId, idempotencyKey);
+  if (params.claimedAt) {
+    await admin.rpc("resolve_claimed_pedagogical_failure", {
+      p_user_id: userId,
+      p_idempotency_key: idempotencyKey,
+      p_claimed_at: params.claimedAt,
+    });
+  } else {
+    await resolveFailure(admin, userId, idempotencyKey);
+  }
   const payload = data && typeof data === "object" && !Array.isArray(data) ? data : {};
   return {
     duplicate: payload["duplicate"] === true,
@@ -290,7 +283,12 @@ async function persistEvidenceAndResults(params: {
   };
 }
 
-async function processQuiz(admin: AdminClient, userId: string, quizResultId: string) {
+async function processQuiz(
+  admin: AdminClient,
+  userId: string,
+  quizResultId: string,
+  claimedAt?: string,
+) {
   const key = `quiz:${quizResultId}`;
   const { data: result, error } = await admin
     .from("quiz_results")
@@ -341,6 +339,7 @@ async function processQuiz(admin: AdminClient, userId: string, quizResultId: str
     idempotencyKey: key,
     rubricVersion: QUIZ_RUBRIC_VERSION,
     evidence,
+    claimedAt,
   });
 }
 
@@ -349,6 +348,7 @@ async function processWriting(
   userId: string,
   submissionId: string,
   key: string,
+  claimedAt?: string,
 ) {
   const { data: row, error } = await admin
     .from("writing_submissions")
@@ -375,48 +375,164 @@ async function processWriting(
       vocabulary: row.vocabulary_score,
       clarity: row.clarity_score,
     }),
+    claimedAt,
   });
 }
 
-export const dualWriteQuizEvidence = createServerFn({ method: "POST" })
+async function processQuizResultSafely(admin: AdminClient, userId: string, quizResultId: string) {
+  const key = `quiz:${quizResultId}`;
+  try {
+    return { ok: true, ...(await processQuiz(admin, userId, quizResultId)) };
+  } catch (error) {
+    await recordFailure(admin, userId, "quiz", quizResultId, key, error);
+    console.error("Quiz pedagogical dual write failed", classifyFailure(error).code);
+    return { ok: false, duplicate: false, evidenceCount: 0 };
+  }
+}
+
+async function processWritingSafely(
+  admin: AdminClient,
+  userId: string,
+  submissionId: string,
+  key: string,
+) {
+  try {
+    return { ok: true, ...(await processWriting(admin, userId, submissionId, key)) };
+  } catch (error) {
+    await recordFailure(admin, userId, "writing", submissionId, key, error);
+    console.error("Writing pedagogical dual write failed", classifyFailure(error).code);
+    return { ok: false, duplicate: false, evidenceCount: 0 };
+  }
+}
+
+export const submitAuthoritativeQuiz = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => quizInputSchema.parse(input))
+  .inputValidator((input: unknown) => authoritativeQuizInputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const admin = await loadAdmin();
-    const key = `quiz:${data.quizResultId}`;
-    try {
-      return { ok: true, ...(await processQuiz(admin, context.userId, data.quizResultId)) };
-    } catch (error) {
-      await recordFailure(admin, context.userId, "quiz", data.quizResultId, key, error);
-      console.error("Quiz pedagogical dual write failed", classifyFailure(error).code);
-      return { ok: false, duplicate: false, evidenceCount: 0 };
+    const { data: existing, error: existingError } = await admin
+      .from("quiz_results")
+      .select("id, user_id, lesson_id, score, total_questions, correct_count, details")
+      .eq("id", data.attemptKey)
+      .maybeSingle();
+    if (existingError) throw new Error("Quiz attempt could not be checked");
+    if (existing) {
+      if (existing.user_id !== context.userId || existing.lesson_id !== data.lessonId) {
+        throw new PedagogicalWriteError(
+          "idempotency",
+          "IDEMPOTENCY_CONFLICT",
+          "Quiz attempt identity was reused",
+        );
+      }
+      const details = parseQuizDetails(existing.details);
+      const submitted = new Map(data.answers.map((answer) => [answer.questionId, answer.answer]));
+      if (
+        details.length !== data.answers.length ||
+        details.some(
+          (detail) => !detail.question_id || submitted.get(detail.question_id) !== detail.answer,
+        )
+      ) {
+        throw new PedagogicalWriteError(
+          "idempotency",
+          "IDEMPOTENCY_CONFLICT",
+          "Quiz attempt identity was reused with different answers",
+        );
+      }
+      await processQuizResultSafely(admin, context.userId, existing.id);
+      return {
+        resultId: existing.id,
+        score: existing.score,
+        total: existing.total_questions,
+        correct: existing.correct_count,
+        details,
+      };
     }
+
+    const { data: questions, error: questionError } = await admin
+      .from("quizzes")
+      .select("id, question, correct_answer, sort_order")
+      .eq("lesson_id", data.lessonId)
+      .order("sort_order");
+    if (questionError) throw new Error("Quiz questions are unavailable");
+    let graded;
+    try {
+      graded = gradeQuizAnswers(questions ?? [], data.answers);
+    } catch (error) {
+      throw new PedagogicalWriteError(
+        "validation",
+        "VALIDATION_FAILED",
+        error instanceof Error ? error.message : "Quiz answers are invalid",
+      );
+    }
+    const { error: insertError } = await admin.from("quiz_results").insert({
+      id: data.attemptKey,
+      attempt_key: data.attemptKey,
+      user_id: context.userId,
+      lesson_id: data.lessonId,
+      score: graded.score,
+      total_questions: graded.total,
+      correct_count: graded.correct,
+      details: graded.details,
+    });
+    if (insertError && insertError.code !== "23505")
+      throw new Error("Quiz result could not be saved");
+    if (insertError?.code === "23505") {
+      const { data: concurrent } = await admin
+        .from("quiz_results")
+        .select("id, user_id, lesson_id, score, total_questions, correct_count, details")
+        .eq("id", data.attemptKey)
+        .maybeSingle();
+      const concurrentDetails = parseQuizDetails(concurrent?.details);
+      if (
+        !concurrent ||
+        concurrent.user_id !== context.userId ||
+        concurrent.lesson_id !== data.lessonId ||
+        concurrentDetails.length !== graded.details.length ||
+        concurrentDetails.some(
+          (detail, index) =>
+            detail.question_id !== graded.details[index]?.question_id ||
+            detail.answer !== graded.details[index]?.answer,
+        )
+      ) {
+        throw new PedagogicalWriteError(
+          "idempotency",
+          "IDEMPOTENCY_CONFLICT",
+          "Quiz attempt was submitted concurrently with different answers",
+        );
+      }
+      await processQuizResultSafely(admin, context.userId, concurrent.id);
+      return {
+        resultId: concurrent.id,
+        score: concurrent.score,
+        total: concurrent.total_questions,
+        correct: concurrent.correct_count,
+        details: concurrentDetails,
+      };
+    }
+    await processQuizResultSafely(admin, context.userId, data.attemptKey);
+    return { resultId: data.attemptKey, ...graded };
   });
 
-export const dualWriteWritingEvidence = createServerFn({ method: "POST" })
+export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => writingInputSchema.parse(input))
+  .inputValidator((input: unknown) => authoritativeWritingInputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const admin = await loadAdmin();
     const key = `writing:${data.operationKey}`;
     const submissionId = await deterministicUuid(`writing-submission:${context.userId}:${key}`);
-    try {
-      const record = writingSubmissionRecord({
-        id: submissionId,
-        userId: context.userId,
-        idempotencyKey: key,
-        prompt: data.prompt,
-        originalText: data.originalText,
-        feedback: data.feedback,
-      });
-      const { data: existing } = await admin
-        .from("writing_submissions")
-        .select("original_text, prompt")
-        .eq("id", submissionId)
-        .maybeSingle();
+    const { data: existing, error: existingError } = await admin
+      .from("writing_submissions")
+      .select(
+        "id, user_id, prompt, original_text, corrected_text, natural_text, explanations, suggestions, grammar_score, vocabulary_score, clarity_score",
+      )
+      .eq("id", submissionId)
+      .maybeSingle();
+    if (existingError) throw new Error("Writing operation could not be checked");
+    if (existing) {
       if (
-        existing &&
-        (existing.original_text !== record.original_text || existing.prompt !== record.prompt)
+        existing.user_id !== context.userId ||
+        existing.prompt !== data.prompt ||
+        existing.original_text !== data.originalText
       ) {
         throw new PedagogicalWriteError(
           "idempotency",
@@ -424,24 +540,58 @@ export const dualWriteWritingEvidence = createServerFn({ method: "POST" })
           "Writing operation identity was reused",
         );
       }
-      const { error } = await admin.from("writing_submissions").insert(record);
-      if (error && error.code !== "23505") {
+      await processWritingSafely(admin, context.userId, submissionId, key);
+      return { sourceId: submissionId, feedback: writingFeedbackFromRow(existing) };
+    }
+
+    const { data: profile, error: profileError } = await admin
+      .from("profiles")
+      .select("level")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (profileError) throw new Error("Writing level could not be loaded");
+    const raw = await callGateway(
+      writingCorrectionMessages(data.prompt, data.originalText, profile?.level ?? "intermediate"),
+      true,
+      { userId: context.userId, operation: "writing_correction" },
+    );
+    const feedback = parseWritingFeedback(raw, data.originalText);
+    const record = writingSubmissionRecord({
+      id: submissionId,
+      userId: context.userId,
+      idempotencyKey: key,
+      prompt: data.prompt,
+      originalText: data.originalText,
+      feedback,
+    });
+    const { error: insertError } = await admin.from("writing_submissions").insert(record);
+    if (insertError && insertError.code !== "23505")
+      throw new Error("Writing result could not be saved");
+    if (insertError?.code === "23505") {
+      const { data: concurrent } = await admin
+        .from("writing_submissions")
+        .select(
+          "id, user_id, prompt, original_text, corrected_text, natural_text, explanations, suggestions, grammar_score, vocabulary_score, clarity_score",
+        )
+        .eq("id", submissionId)
+        .maybeSingle();
+      if (
+        !concurrent ||
+        concurrent.user_id !== context.userId ||
+        concurrent.prompt !== data.prompt ||
+        concurrent.original_text !== data.originalText
+      ) {
         throw new PedagogicalWriteError(
-          "source",
-          "VALIDATION_FAILED",
-          "Writing source could not be persisted",
+          "idempotency",
+          "IDEMPOTENCY_CONFLICT",
+          "Writing operation was submitted concurrently with different content",
         );
       }
-      return {
-        ok: true,
-        sourceId: submissionId,
-        ...(await processWriting(admin, context.userId, submissionId, key)),
-      };
-    } catch (error) {
-      await recordFailure(admin, context.userId, "writing", submissionId, key, error);
-      console.error("Writing pedagogical dual write failed", classifyFailure(error).code);
-      return { ok: false, sourceId: submissionId, duplicate: false, evidenceCount: 0 };
+      await processWritingSafely(admin, context.userId, submissionId, key);
+      return { sourceId: submissionId, feedback: writingFeedbackFromRow(concurrent) };
     }
+    await processWritingSafely(admin, context.userId, submissionId, key);
+    return { sourceId: submissionId, feedback };
   });
 
 export const retryPendingPedagogicalWrites = createServerFn({ method: "POST" })
@@ -449,15 +599,12 @@ export const retryPendingPedagogicalWrites = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => retryInputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const admin = await loadAdmin();
-    const now = new Date().toISOString();
-    const { data: failures } = await admin
-      .from("pedagogical_dual_write_failures")
-      .select("id, source_type, source_id, idempotency_key")
-      .eq("user_id", context.userId)
-      .in("status", ["pending", "failed"])
-      .or(`next_retry_at.is.null,next_retry_at.lte.${now}`)
-      .order("last_failed_at", { ascending: true })
-      .limit(data.limit);
+    const { data: failures, error: claimError } = await admin.rpc("claim_pedagogical_retries", {
+      p_user_id: context.userId,
+      p_limit: data.limit,
+      p_stale_seconds: 300,
+    });
+    if (claimError) throw new Error("Pedagogical retries could not be claimed");
     let completed = 0;
     for (const failure of failures ?? []) {
       if (
@@ -465,25 +612,37 @@ export const retryPendingPedagogicalWrites = createServerFn({ method: "POST" })
         (failure.source_type !== "quiz" && failure.source_type !== "writing")
       )
         continue;
-      await admin
+      const { data: claimed } = await admin
         .from("pedagogical_dual_write_failures")
-        .update({ status: "retrying", processing_started_at: now })
+        .update({ status: "retrying" })
         .eq("id", failure.id)
-        .eq("user_id", context.userId);
+        .eq("user_id", context.userId)
+        .eq("status", "processing")
+        .eq("processing_started_at", failure.claimed_at)
+        .select("id")
+        .maybeSingle();
+      if (!claimed) continue;
       try {
         if (failure.source_type === "quiz") {
-          await processQuiz(admin, context.userId, failure.source_id);
+          await processQuiz(admin, context.userId, failure.source_id, failure.claimed_at);
         } else {
-          await processWriting(admin, context.userId, failure.source_id, failure.idempotency_key);
+          await processWriting(
+            admin,
+            context.userId,
+            failure.source_id,
+            failure.idempotency_key,
+            failure.claimed_at,
+          );
         }
         completed += 1;
       } catch (error) {
-        await recordFailure(
+        await recordClaimedFailure(
           admin,
           context.userId,
           failure.source_type,
           failure.source_id,
           failure.idempotency_key,
+          failure.claimed_at,
           error,
         );
       }

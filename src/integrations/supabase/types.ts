@@ -1204,6 +1204,17 @@ export type Database = {
       }
     }
     Functions: {
+      claim_pedagogical_retries: {
+        Args: { p_limit?: number; p_stale_seconds?: number; p_user_id: string }
+        Returns: {
+          attempt_count: number
+          claimed_at: string
+          id: string
+          idempotency_key: string
+          source_id: string
+          source_type: string
+        }[]
+      }
       persist_pedagogical_bundle: {
         Args: {
           p_evidence: Json
@@ -1216,6 +1227,32 @@ export type Database = {
           p_user_id: string
         }
         Returns: Json
+      }
+      record_claimed_pedagogical_failure: {
+        Args: {
+          p_claimed_at: string
+          p_error_code: string
+          p_error_message: string
+          p_idempotency_key: string
+          p_source_id: string
+          p_source_type: string
+          p_stage: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      record_pedagogical_failure: {
+        Args: {
+          p_already_claimed?: boolean
+          p_error_code: string
+          p_error_message: string
+          p_idempotency_key: string
+          p_source_id: string
+          p_source_type: string
+          p_stage: string
+          p_user_id: string
+        }
+        Returns: undefined
       }
       reserve_ai_usage: {
         Args: {
@@ -1236,6 +1273,14 @@ export type Database = {
           reason: string
           retry_after_seconds: number
         }[]
+      }
+      resolve_claimed_pedagogical_failure: {
+        Args: {
+          p_claimed_at: string
+          p_idempotency_key: string
+          p_user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
