@@ -69,34 +69,34 @@ export function WeeklyFrequency({ userId }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-1">
-        <div className="grid grid-cols-7 place-items-center gap-1">
-          {weekKeys.map((key, i) => {
-            const studied = studyDays?.has(key) ?? false;
-            const isToday = key === todayKey;
-            return (
-              <div
-                key={key}
-                className={
-                  "flex flex-col items-center gap-1 rounded-lg border p-1.5 " +
-                  (studied ? "border-transparent bg-success/10" : "border-border bg-card") +
-                  (isToday ? " ring-1 ring-foreground/30" : "")
-                }
-              >
-                {studied ? (
-                  <span className="grid size-5 place-items-center rounded-full bg-success text-success-foreground">
-                    <Check className="size-3" strokeWidth={3} />
-                  </span>
-                ) : (
-                  <span className="size-5 rounded-full border-2 border-border" />
-                )}
-                <span className="text-[10px] text-muted-foreground">{labels[i]}</span>
-              </div>
-            );
-          })}
-        </div>
-        <div className="rounded-lg border border-border bg-card p-2 text-center">
-          <p className="text-base font-medium">{aiGoalLabel}</p>
+      <div className="flex flex-1 items-center">
+        <div className="flex w-full flex-col gap-2 rounded-lg border border-border bg-card p-2.5">
+          <div className="grid grid-cols-7 place-items-center gap-1">
+            {weekKeys.map((key, i) => {
+              const studied = studyDays?.has(key) ?? false;
+              const isToday = key === todayKey;
+              return (
+                <div
+                  key={key}
+                  className={
+                    "flex flex-col items-center gap-1 rounded-lg border p-1.5 " +
+                    (studied ? "border-transparent bg-success/10" : "border-border bg-card") +
+                    (isToday ? " ring-1 ring-foreground/30" : "")
+                  }
+                >
+                  {studied ? (
+                    <span className="grid size-5 place-items-center rounded-full bg-success text-success-foreground">
+                      <Check className="size-3" strokeWidth={3} />
+                    </span>
+                  ) : (
+                    <span className="size-5 rounded-full border-2 border-border" />
+                  )}
+                  <span className="text-[10px] text-muted-foreground">{labels[i]}</span>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-center text-base font-medium">{aiGoalLabel}</p>
         </div>
       </div>
     </div>
