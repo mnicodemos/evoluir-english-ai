@@ -203,7 +203,7 @@ export function pickListeningSentences(options: {
     ),
   ];
   if (pool.length === 0) return [];
-  const start = ((rotation * count) % pool.length + pool.length) % pool.length;
+  const start = (((rotation * count) % pool.length) + pool.length) % pool.length;
   const picked: string[] = [];
   for (let index = 0; index < Math.min(count, pool.length); index += 1) {
     picked.push(pool[(start + index) % pool.length]!);
