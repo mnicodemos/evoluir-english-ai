@@ -54,8 +54,6 @@ export function WeeklyFrequency({ userId }: Props) {
   const studiedCount = studyDays?.size ?? 0;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
-  const aiGoalLabel =
-    lang === "pt" ? "Evoluir + English AI objetivo" : "Evoluir + English AI goal";
 
   return (
     <div className="flex h-full items-center gap-3">
@@ -88,7 +86,6 @@ export function WeeklyFrequency({ userId }: Props) {
               );
             })}
           </div>
-          <p className="hidden text-center text-base font-medium lg:block">{aiGoalLabel}</p>
         </div>
       </div>
     </div>
