@@ -10,6 +10,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callGateway } from "@/lib/ai-gateway.server";
 import { deterministicUuid, persistTeacherEvidence } from "@/lib/pedagogy/dualWrite.functions";
 import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
+import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
 import {
   teacherEvidence,
   teacherEvidenceDecision,
@@ -134,6 +135,7 @@ export const teacherTurn = createServerFn({ method: "POST" })
 
     return {
       conversationId,
+      mode,
       reply: turn.reply,
       correction: turn.observedError,
       evidencePersisted,
