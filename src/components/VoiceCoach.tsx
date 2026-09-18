@@ -401,18 +401,24 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const userAnswers = messages.filter((message) => message.role === "user").length;
   const hasEnoughAnswers = userAnswers >= 3;
   const isProcessingAnswer =
-    voiceState === "recording" || voiceState === "transcribing" || voiceState === "thinking";
+    voiceState === "recording" ||
+    voiceState === "sending" ||
+    voiceState === "transcribing" ||
+    voiceState === "thinking";
   const canFinish = hasEnoughAnswers && !isProcessingAnswer && !finishing;
   const statusText =
     voiceState === "recording"
       ? "Listening… tap again when you finish"
-      : voiceState === "transcribing"
-        ? "Understanding your English…"
-        : voiceState === "thinking"
-          ? "Preparing a reply…"
-          : voiceState === "speaking"
-            ? "AI Talking is speaking…"
-            : "Tap the microphone and speak in English";
+      : voiceState === "sending"
+        ? "Sending your recording…"
+        : voiceState === "transcribing"
+          ? "Understanding your English…"
+          : voiceState === "thinking"
+            ? "Preparing a reply…"
+            : voiceState === "speaking"
+              ? "AI Talking is speaking…"
+              : "Tap the microphone and speak in English";
+
 
   const newTopic = () => {
     cancelVoiceRecording();
