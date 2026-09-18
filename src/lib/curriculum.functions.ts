@@ -205,7 +205,7 @@ async function writeLesson(
           '"transcript":"a 450-600 word mini-lesson script in English, written in short paragraphs separated by blank lines",' +
           '"transcript_pt":"a faithful Brazilian Portuguese translation of the script, same paragraph structure",' +
           '"flashcards":[{"card_type":"listen|question","prompt":"front of card, uppercase English instruction or question","answer":"back of card, short English answer","listen_text":"English sentence to hear only on the answer side; empty for non-listen cards","word":"short label from the lesson","definition":"short English-only definition or explanation, no Portuguese","pronunciation":"simple phonetic hint","example":"natural English sentence from or based on this lesson","difficulty":"easy|medium|hard"}],' +
-          '"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence"}]}. ' +
+          '"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence","pedagogical_skill":"grammar or vocabulary - grammar when the item tests form, structure, tense or word order; vocabulary when it tests word choice, collocation, linking expressions or register"}]}. ' +
           "Give exactly 7 flashcards and 10 quiz questions. " +
           "Exactly 3 flashcards must have card_type 'listen'. For these, the prompt must be a listening question or repeat instruction, the answer must reveal the sentence or phrase, and listen_text must contain that same English audio sentence. " +
           "The other 4 flashcards must have card_type 'question'. Randomly vary them between grammar use, meaning, key expressions, sentence completion, and real-life situations from the lesson, without repeating the same format. " +
@@ -300,19 +300,17 @@ async function writeLesson(
     throw new Error("The AI could not write all 10 review questions. Please try again.");
   }
   if (quiz.length) {
-    await supabase.from("quizzes").insert(
-      quiz.map((q, index) => ({
-        lesson_id: lesson.id,
-        question: String(q.question).slice(0, 400),
-        question_type: "multiple_choice",
-        options: q.options as string[],
-        correct_answer: String(q.correct_answer),
-        explanation: String(q.explanation ?? "").slice(0, 400),
-        sort_order: index,
-        created_by: userId,
-      })),
+    // Non-review lesson quizzes are constrained by the prompt to the lesson's
+    // grammar point, so grammar is a structural default rather than a guess.
+    await insertQuizQuestions(
+      supabase,
+      userId,
+      lesson.id as string,
+      quiz,
+      plan.reviewUnits.length || plan.isReviewTest ? null : "grammar",
     );
   }
+
 
   return lesson.id as string;
 }
