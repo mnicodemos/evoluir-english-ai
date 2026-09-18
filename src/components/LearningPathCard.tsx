@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { CheckCircle2, Download, Loader2, Lock, Play, Sparkles, Trophy } from "lucide-react";
+import { BookOpen, CheckCircle2, Download, Loader2, Lock, Play, Trophy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -76,8 +76,8 @@ export function CurriculumPath() {
     <div className="space-y-5">
       <section className="card-soft p-6" aria-labelledby="path-heading">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-accent">
-            <Sparkles className="size-5 text-accent-foreground" />
+          <span className="grid size-12 place-items-center rounded-xl bg-[oklch(0.96_0.05_75)]">
+            <BookOpen className="size-6 text-[oklch(0.62_0.16_50)]" />
           </span>
           <div className="flex-1">
             <h2 id="path-heading" className="text-lg font-semibold">
