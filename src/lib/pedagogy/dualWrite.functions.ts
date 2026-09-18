@@ -133,6 +133,29 @@ async function resolveFailure(admin: AdminClient, userId: string, idempotencyKey
     .eq("idempotency_key", idempotencyKey);
 }
 
+async function recordClaimedFailure(
+  admin: AdminClient,
+  userId: string,
+  sourceType: SourceType,
+  sourceId: string,
+  idempotencyKey: string,
+  claimedAt: string,
+  error: unknown,
+) {
+  const failure = classifyFailure(error);
+  const { error: recordError } = await admin.rpc("record_claimed_pedagogical_failure", {
+    p_user_id: userId,
+    p_source_type: sourceType,
+    p_source_id: sourceId,
+    p_idempotency_key: idempotencyKey,
+    p_stage: failure.stage,
+    p_error_code: failure.code,
+    p_error_message: sanitizedMessage(error),
+    p_claimed_at: claimedAt,
+  });
+  if (recordError) console.error("Claimed pedagogical failure could not be persisted");
+}
+
 async function loadAdmin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin as unknown as AdminClient;
@@ -582,16 +605,21 @@ export const retryPendingPedagogicalWrites = createServerFn({ method: "POST" })
         } else {
           await processWriting(admin, context.userId, failure.source_id, failure.idempotency_key);
         }
+        await admin.rpc("resolve_claimed_pedagogical_failure", {
+          p_user_id: context.userId,
+          p_idempotency_key: failure.idempotency_key,
+          p_claimed_at: failure.claimed_at,
+        });
         completed += 1;
       } catch (error) {
-        await recordFailure(
+        await recordClaimedFailure(
           admin,
           context.userId,
           failure.source_type,
           failure.source_id,
           failure.idempotency_key,
+          failure.claimed_at,
           error,
-          true,
         );
       }
     }
