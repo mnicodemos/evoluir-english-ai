@@ -19,7 +19,6 @@ export type TimeSpent = {
   pendingSeconds: () => number;
 };
 
-
 /**
  * Measures how long the student is actually *doing* an activity, not how long
  * the screen is open. Time while the tab is hidden never counts.
@@ -78,7 +77,8 @@ export function useTimeSpent(options?: { manual?: boolean }): TimeSpent {
 
   return useMemo(() => {
     const read = ((min = 1) => {
-      const total = activeMs.current + (startedAt.current !== null ? Date.now() - startedAt.current : 0);
+      const total =
+        activeMs.current + (startedAt.current !== null ? Date.now() - startedAt.current : 0);
       // Never below zero: a previous call may have rounded a few seconds up.
       const delta = Math.max(0, total - reportedMs.current);
       // Rounded to the nearest minute (30s+ counts as a minute) and the seconds
@@ -90,7 +90,8 @@ export function useTimeSpent(options?: { manual?: boolean }): TimeSpent {
     read.start = resume;
     read.stop = flush;
     read.pendingSeconds = () => {
-      const total = activeMs.current + (startedAt.current !== null ? Date.now() - startedAt.current : 0);
+      const total =
+        activeMs.current + (startedAt.current !== null ? Date.now() - startedAt.current : 0);
       return Math.max(0, Math.round((total - reportedMs.current) / 1000));
     };
     return read;
@@ -104,7 +105,8 @@ export function useTimeSpent(options?: { manual?: boolean }): TimeSpent {
  */
 export function useLogTimeOnExit(params: {
   timer: TimeSpent;
-  profile: { id: string; streak_days: number; last_activity_date: string | null } | null | undefined;
+  profile:
+    { id: string; streak_days: number; last_activity_date: string | null } | null | undefined;
   type: string;
   title: string;
 }) {
@@ -117,16 +119,23 @@ export function useLogTimeOnExit(params: {
   useEffect(() => {
     return () => {
       timer.stop();
-      const { profile, type, title } = latest.current;
+      const { profile, type } = latest.current;
       const minutes = timer(0);
       if (minutes >= 1 && profile) {
-        void logTelemetry({ data: {
-          operationKey: operationKey.current,
-          activityType: type as "listening_practice" | "vocabulary_reading" | "conversation_practice" | "writing_practice" | "lesson_practice" | "final_test_practice",
-          minutes,
-        } });
+        void logTelemetry({
+          data: {
+            operationKey: operationKey.current,
+            activityType: type as
+              | "listening_practice"
+              | "vocabulary_reading"
+              | "conversation_practice"
+              | "writing_practice"
+              | "lesson_practice"
+              | "final_test_practice",
+            minutes,
+          },
+        });
       }
     };
   }, [timer, logTelemetry]);
 }
-

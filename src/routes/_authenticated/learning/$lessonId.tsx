@@ -12,20 +12,30 @@ import { LessonVideo } from "@/components/LessonVideo";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { completeLesson, saveVideoProgress, useLesson, useUserFlashcards } from "@/hooks/useLearning";
+import {
+  completeLesson,
+  saveVideoProgress,
+  useLesson,
+  useUserFlashcards,
+} from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 
-
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · Lesson" },
-      { name: "description", content: "Watch the video, review the flashcards and take the quiz of this lesson." },
+      {
+        name: "description",
+        content: "Watch the video, review the flashcards and take the quiz of this lesson.",
+      },
       { property: "og:title", content: "Evoluir+ English AI · Lesson" },
-      { property: "og:description", content: "Video, summary, flashcards and quiz in one English lesson." },
+      {
+        property: "og:description",
+        content: "Video, summary, flashcards and quiz in one English lesson.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -42,12 +52,16 @@ function LessonPage() {
   const navigate = useNavigate();
   const minutesSpent = useTimeSpent();
   const saveQuizLegacy = useServerFn(persistQuizLegacy);
-  useLogTimeOnExit({ timer: minutesSpent, profile, type: "lesson_practice", title: "Lesson practice" });
+  useLogTimeOnExit({
+    timer: minutesSpent,
+    profile,
+    type: "lesson_practice",
+    title: "Lesson practice",
+  });
 
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   // Remember which tab the user was on so leaving mid-lesson brings them back.
   const [activeTab, setActiveTab] = usePersistentState<string>(`lesson-tab:${lessonId}`, "video");
-
 
   const lesson = data?.lesson;
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
@@ -70,7 +84,9 @@ function LessonPage() {
     await completeLesson(profile.id, lessonId);
     // Lessons do not feed the Your progress bars: each bar comes from its own
     // module (Listening Lab, Vocabulary, AI Talking, Writing AI Corrector).
-    await saveQuizLegacy({ data: { attemptKey, activityType: "lesson", minutes: minutesSpent(1) } });
+    await saveQuizLegacy({
+      data: { attemptKey, activityType: "lesson", minutes: minutesSpent(1) },
+    });
     queryClient.invalidateQueries({ queryKey: ["user-lessons"] });
     queryClient.invalidateQueries({ queryKey: ["quiz-results"] });
     queryClient.invalidateQueries({ queryKey: ["profile"] });
@@ -97,14 +113,21 @@ function LessonPage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <Link to="/learning" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/learning"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="size-4" /> Learning Center
         </Link>
 
         <header className="animate-rise">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-            <span className="rounded-full bg-secondary px-2.5 py-1 capitalize text-foreground/70">{lesson.category}</span>
-            <span className="rounded-full bg-secondary px-2.5 py-1 capitalize text-foreground/70">{lesson.level}</span>
+            <span className="rounded-full bg-secondary px-2.5 py-1 capitalize text-foreground/70">
+              {lesson.category}
+            </span>
+            <span className="rounded-full bg-secondary px-2.5 py-1 capitalize text-foreground/70">
+              {lesson.level}
+            </span>
           </div>
           <h1 className="mt-3 text-3xl font-bold">{lesson.title}</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{lesson.objective}</p>
@@ -115,7 +138,8 @@ function LessonPage() {
             <div>
               <p className="text-sm font-semibold">Lesson completed</p>
               <p className="text-xs text-muted-foreground">
-                Everything you did is saved. Want to practise again? Redo the flashcards or the quiz.
+                Everything you did is saved. Want to practise again? Redo the flashcards or the
+                quiz.
               </p>
             </div>
             <div className="flex gap-2">
@@ -128,7 +152,6 @@ function LessonPage() {
             </div>
           </section>
         )}
-
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
@@ -197,7 +220,9 @@ function LessonPage() {
 
         <section className="card-soft bg-primary p-6 text-primary-foreground">
           <p className="text-sm text-primary-foreground/75">Practice with AI Talking</p>
-          <h2 className="mt-1 text-xl font-semibold">Use what you just learned in a real conversation</h2>
+          <h2 className="mt-1 text-xl font-semibold">
+            Use what you just learned in a real conversation
+          </h2>
           <Button
             variant="secondary"
             className="mt-4"

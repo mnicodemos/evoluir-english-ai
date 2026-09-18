@@ -250,7 +250,9 @@ function Writing() {
       rememberAnswered(prompt);
 
       if (profile) {
-        await saveLegacyWriting({ data: { operationKey: stableOperationKey, minutes: minutesSpent(1) } });
+        await saveLegacyWriting({
+          data: { operationKey: stableOperationKey, minutes: minutesSpent(1) },
+        });
         queryClient.invalidateQueries();
       }
     } catch (err) {

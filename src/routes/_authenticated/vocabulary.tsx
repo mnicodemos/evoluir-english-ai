@@ -202,11 +202,17 @@ function Vocabulary() {
         const audio = await stopVoiceRecording();
         const spoken = await transcribeAudio(audio);
         const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
-        const authoritative = await savePronunciation({ data: {
-          operationKey: crypto.randomUUID(), wordId: word.id, transcript: spoken, minutes: minutesSpent(1),
-        } });
+        const authoritative = await savePronunciation({
+          data: {
+            operationKey: crypto.randomUUID(),
+            wordId: word.id,
+            transcript: spoken,
+            minutes: minutesSpent(1),
+          },
+        });
         const score = authoritative.score;
-        if (score !== previewScore) console.warn("Pronunciation preview differed from the authoritative result");
+        if (score !== previewScore)
+          console.warn("Pronunciation preview differed from the authoritative result");
         if (score >= 80) toast.success(`Great pronunciation — ${score}% match.`);
         else if (score >= 55) toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
         else toast.error(`I heard “${spoken}”. Listen again and try once more.`);
@@ -273,9 +279,13 @@ function Vocabulary() {
       const minutes = minutesSpent(0);
       const p = profileRef.current;
       if (minutes >= 1 && p) {
-        void logTelemetry({ data: {
-          operationKey: crypto.randomUUID(), activityType: "vocabulary_reading", minutes,
-        } });
+        void logTelemetry({
+          data: {
+            operationKey: crypto.randomUUID(),
+            activityType: "vocabulary_reading",
+            minutes,
+          },
+        });
       }
     };
   }, [minutesSpent, logTelemetry]);

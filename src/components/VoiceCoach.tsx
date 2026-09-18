@@ -28,11 +28,7 @@ import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { useOverallAverage } from "@/hooks/useVocabularyProgress";
 import { buildStudyContext, useStudySnapshot } from "@/hooks/useStudyContext";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  coachOpenerMessages,
-  coachReplyMessages,
-  type ConversationReport,
-} from "@/lib/ai-prompts";
+import { coachOpenerMessages, coachReplyMessages, type ConversationReport } from "@/lib/ai-prompts";
 import { aiChat } from "@/lib/aiChat.functions";
 import { getLevelState } from "@/lib/level";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
@@ -368,12 +364,14 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     setVoiceState("idle");
     setFinishing(true);
     try {
-      const result = await finishTalking({ data: {
-        operationKey: talkingOperationKey.current,
-        scenario: scenario as "everyday" | "professional" | "travel",
-        messages,
-        minutes: minutesSpent(1),
-      } });
+      const result = await finishTalking({
+        data: {
+          operationKey: talkingOperationKey.current,
+          scenario: scenario as "everyday" | "professional" | "travel",
+          messages,
+          minutes: minutesSpent(1),
+        },
+      });
       setReport(result);
       const scored = result.fluency > 0 || result.grammar > 0 || result.vocabulary > 0;
       if (!scored)

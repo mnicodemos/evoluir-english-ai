@@ -25,7 +25,11 @@ export async function transcribeAudio(audio: Blob): Promise<string> {
     for (const line of event.split(/\r?\n/)) {
       if (!line.startsWith("data:")) continue;
       try {
-        const payload = JSON.parse(line.slice(5).trim()) as { type?: string; delta?: string; text?: string };
+        const payload = JSON.parse(line.slice(5).trim()) as {
+          type?: string;
+          delta?: string;
+          text?: string;
+        };
         if (payload.type === "transcript.text.delta") transcript += payload.delta ?? "";
         if (payload.type === "transcript.text.done" && payload.text) transcript = payload.text;
       } catch {

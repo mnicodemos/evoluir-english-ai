@@ -403,16 +403,18 @@ function ListeningPage() {
     setProgress(nextProgress);
     writeProgress(nextProgress);
     if (profile) {
-      const saved = await saveListening({ data: {
-        operationKey: operationKey.current,
-        trackId: track.id as "everyday" | "professional" | "travel",
-        round: lessonCount,
-        minutes: minutesSpent(1),
-        evidence: sentences.map((expected, sentenceIndex) => ({
-          expected,
-          transcripts: transcripts[sentenceIndex] ?? [],
-        })),
-      } });
+      const saved = await saveListening({
+        data: {
+          operationKey: operationKey.current,
+          trackId: track.id as "everyday" | "professional" | "travel",
+          round: lessonCount,
+          minutes: minutesSpent(1),
+          evidence: sentences.map((expected, sentenceIndex) => ({
+            expected,
+            transcripts: transcripts[sentenceIndex] ?? [],
+          })),
+        },
+      });
       const result = saved as { score?: number };
       const final = result.score ?? average;
       queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
