@@ -510,16 +510,23 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
               size="icon"
               aria-label={voiceState === "recording" ? "Stop recording" : "Start recording"}
               onClick={toggleRecording}
-              disabled={voiceState === "thinking" || voiceState === "transcribing"}
+              disabled={
+                voiceState === "thinking" ||
+                voiceState === "sending" ||
+                voiceState === "transcribing"
+              }
               className={`size-16 rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}
             >
               {voiceState === "recording" ? (
                 <MicOff className="size-7" />
-              ) : voiceState === "thinking" || voiceState === "transcribing" ? (
+              ) : voiceState === "thinking" ||
+                voiceState === "sending" ||
+                voiceState === "transcribing" ? (
                 <Loader2 className="size-7 animate-spin" />
               ) : (
                 <Mic className="size-7" />
               )}
+
             </Button>
             <span className="size-9" aria-hidden="true" />
           </div>
