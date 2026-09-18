@@ -33,3 +33,4 @@
 - [x] Fase 2H — proteger `quizzes.correct_answer` no banco e validar sem operações reais
 - [x] Fase 2F-L2 — tornar activities/progress autoritativos no servidor sem operações reais
 - [x] Fase 2F-R.3 — separar persistência/aprovação e observar mapeamentos pedagógicos ausentes
+- [x] Fase 6A — auditoria de monetização e fundação provider-agnostic (subscriptions, entitlements, contratos)
