@@ -166,17 +166,17 @@ function AppShellContent({ children }: { children: ReactNode }) {
           <Footer lang={lang} containerClassName="max-w-[1440px] px-4 sm:px-6 lg:px-8 xl:px-10" />
         </div>
 
-        <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-7 place-items-center border-t border-border bg-background/95 backdrop-blur py-3 lg:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-8 place-items-center border-t border-border bg-background/95 backdrop-blur py-2 lg:hidden">
           {nav.map((item) => (
             <Tooltip key={item.to}>
               <TooltipTrigger asChild>
                 <Link
                   to={item.to}
                   aria-label={translate(item.label)}
-                  className="grid size-10 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="grid size-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                   activeProps={{ className: "bg-accent text-foreground" }}
                 >
-                  <item.icon className="size-6" />
+                  <item.icon className="size-5" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="top" sideOffset={8}>
