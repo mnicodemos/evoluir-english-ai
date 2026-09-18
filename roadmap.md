@@ -25,4 +25,4 @@
   - [x] Criar sessões, evidências, resultados por habilidade e projeção atual
   - [x] Centralizar contratos e implementar regras CEFR, agregação e confidence
   - [x] Preparar referências opcionais em learning_errors
-  - [ ] Validar regras, isolamento, histórico e compatibilidade do sistema atual
+  - [x] Validar regras, isolamento, histórico e compatibilidade do sistema atual
