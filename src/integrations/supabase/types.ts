@@ -1204,6 +1204,19 @@ export type Database = {
       }
     }
     Functions: {
+      persist_pedagogical_bundle: {
+        Args: {
+          p_evidence: Json
+          p_idempotency_key: string
+          p_results: Json
+          p_rubric_version: string
+          p_session_id: string
+          p_source_id: string
+          p_source_type: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       reserve_ai_usage: {
         Args: {
           p_daily_limit: number

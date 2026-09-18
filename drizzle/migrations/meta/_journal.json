@@ -64,6 +64,13 @@
       "when": 1789692714172,
       "tag": "0008_harden_pedagogical_dual_write",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789692794147,
+      "tag": "0009_add_atomic_pedagogical_bundle",
+      "breakpoints": true
     }
   ]
 }
