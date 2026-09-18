@@ -27,9 +27,10 @@ function wordCount(text: string) {
  * actually produced enough English AND the suggested skill/score are valid.
  * Questions, greetings and short reactions never generate evidence.
  */
-export function teacherEvidenceDecision(candidate: TeacherAssessmentCandidate):
-  | { assess: false; reason: string }
-  | { assess: true; skill: TeacherEvidenceSkill; score: number } {
+export function teacherEvidenceDecision(
+  candidate: TeacherAssessmentCandidate,
+):
+  { assess: false; reason: string } | { assess: true; skill: TeacherEvidenceSkill; score: number } {
   if (!candidate.assessable) return { assess: false, reason: "not_a_production" };
   const skill = TEACHER_EVIDENCE_SKILLS.find((item) => item === candidate.focusSkill);
   if (!skill) return { assess: false, reason: "invalid_skill" };

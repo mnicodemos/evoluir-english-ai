@@ -117,7 +117,8 @@ export function parseTeacherTurn(raw: string): TeacherTurn {
     value = null;
   }
   const parsed = teacherTurnSchema.safeParse(value);
-  if (!parsed.success) throw new Error("The AI teacher returned an invalid answer. Please try again.");
+  if (!parsed.success)
+    throw new Error("The AI teacher returned an invalid answer. Please try again.");
   return {
     reply: parsed.data.reply,
     assessable: parsed.data.assessable,
