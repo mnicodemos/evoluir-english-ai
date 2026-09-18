@@ -255,7 +255,7 @@ async function speakWithBrowser(value: string, rate = 1): Promise<void> {
     activeUtterance = utterance;
     utterance.lang = "en-US";
     utterance.pitch = profile.pitch;
-    utterance.rate = profile.rate;
+    utterance.rate = profile.rate * clampRate(rate);
     const englishVoices = voices.filter((candidate) =>
       candidate.lang?.toLowerCase().startsWith("en"),
     );
