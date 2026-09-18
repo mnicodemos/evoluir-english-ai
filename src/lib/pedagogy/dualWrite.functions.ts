@@ -163,6 +163,22 @@ async function loadAdmin() {
   return supabaseAdmin as unknown as AdminClient;
 }
 
+/** Normalises a stored level (including legacy labels) to a CEFR item level. */
+function itemLevelFor(level: string | null | undefined): MeasuredCefrLevel | null {
+  return measuredCefr(findLevel(level).value.toUpperCase());
+}
+
+async function lessonItemLevel(admin: AdminClient, lessonId: string | null) {
+  if (!lessonId) return null;
+  const { data } = await admin.from("lessons").select("level").eq("id", lessonId).maybeSingle();
+  return data?.level ? itemLevelFor(data.level) : null;
+}
+
+async function profileItemLevel(admin: AdminClient, userId: string) {
+  const { data } = await admin.from("profiles").select("level").eq("id", userId).maybeSingle();
+  return data?.level ? itemLevelFor(data.level) : null;
+}
+
 async function persistEvidenceAndResults(params: {
   admin: AdminClient;
   userId: string;
