@@ -178,7 +178,6 @@ describe("Quiz dual-write mapping", () => {
     const { question_id: _questionId, ...legacy } = detail;
     expect(parseQuizDetails([legacy])).toEqual([legacy]);
   });
-
 });
 
 describe("Writing dual-write mapping", () => {
