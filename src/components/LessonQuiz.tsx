@@ -70,7 +70,22 @@ export function LessonQuiz({
             answers: questions.map((q) => ({ questionId: q.id, answer: answers[q.id] ?? "" })),
           },
         });
-        setSubmittedResult(saved);
+        setSubmittedResult({
+          score: saved.score,
+          correct: saved.correct,
+          total: saved.total,
+          details: saved.details.flatMap((detail) =>
+            detail.question_id
+              ? [
+                  {
+                    question_id: detail.question_id,
+                    correct_answer: detail.correct_answer,
+                    is_correct: detail.is_correct,
+                  },
+                ]
+              : [],
+          ),
+        });
         setSubmitted(true);
         onFinished?.(saved.score);
         return;

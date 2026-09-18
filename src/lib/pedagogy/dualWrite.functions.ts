@@ -102,7 +102,6 @@ async function recordFailure(
   sourceId: string,
   idempotencyKey: string,
   error: unknown,
-  alreadyClaimed = false,
 ) {
   const failure = classifyFailure(error);
   const { error: recordError } = await admin.rpc("record_pedagogical_failure", {
@@ -113,7 +112,7 @@ async function recordFailure(
     p_stage: failure.stage,
     p_error_code: failure.code,
     p_error_message: sanitizedMessage(error),
-    p_already_claimed: alreadyClaimed,
+    p_already_claimed: false,
   });
   if (recordError) console.error("Pedagogical failure record could not be persisted");
 }
@@ -304,7 +303,16 @@ async function processQuiz(
   }
   const details = parseQuizDetails(result.details);
   const ids = details.flatMap((detail) => (detail.question_id ? [detail.question_id] : []));
-  if (ids.length === 0) return { duplicate: false, evidenceCount: 0 };
+  if (ids.length === 0) {
+    if (claimedAt) {
+      await admin.rpc("resolve_claimed_pedagogical_failure", {
+        p_user_id: userId,
+        p_idempotency_key: key,
+        p_claimed_at: claimedAt,
+      });
+    }
+    return { duplicate: false, evidenceCount: 0 };
+  }
   const { data: questions, error: questionError } = await admin
     .from("quizzes")
     .select("id, pedagogical_skill")
@@ -330,7 +338,16 @@ async function processQuiz(
       ? [quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill })]
       : [];
   });
-  if (evidence.length === 0) return { duplicate: false, evidenceCount: 0 };
+  if (evidence.length === 0) {
+    if (claimedAt) {
+      await admin.rpc("resolve_claimed_pedagogical_failure", {
+        p_user_id: userId,
+        p_idempotency_key: key,
+        p_claimed_at: claimedAt,
+      });
+    }
+    return { duplicate: false, evidenceCount: 0 };
+  }
   return persistEvidenceAndResults({
     admin,
     userId,
@@ -339,7 +356,7 @@ async function processQuiz(
     idempotencyKey: key,
     rubricVersion: QUIZ_RUBRIC_VERSION,
     evidence,
-    claimedAt,
+    ...(claimedAt ? { claimedAt } : {}),
   });
 }
 
@@ -375,7 +392,7 @@ async function processWriting(
       vocabulary: row.vocabulary_score,
       clarity: row.clarity_score,
     }),
-    claimedAt,
+    ...(claimedAt ? { claimedAt } : {}),
   });
 }
 
@@ -547,7 +564,7 @@ export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
     const { data: profile, error: profileError } = await admin
       .from("profiles")
       .select("level")
-      .eq("user_id", context.userId)
+      .eq("id", context.userId)
       .maybeSingle();
     if (profileError) throw new Error("Writing level could not be loaded");
     const raw = await callGateway(
