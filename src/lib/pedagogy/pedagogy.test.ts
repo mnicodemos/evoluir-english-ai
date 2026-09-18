@@ -203,7 +203,11 @@ describe("Authoritative source contracts", () => {
         ],
         [{ questionId, answer: "forged-answer" }],
       ),
-    ).toMatchObject({ score: 0, correct: 0, details: [{ is_correct: false }] });
+    ).toMatchObject({
+      score: 0,
+      correct: 0,
+      details: [{ correct_answer: "server-key", is_correct: false }],
+    });
   });
 
   it("keeps the answer key out of the public Quiz projection", () => {
