@@ -152,10 +152,46 @@ export async function reconcileEntitlements(input: {
     return;
   }
 
+  // A user may hold more than one subscription. Only revoke when no other
+  // subscription of theirs still grants access.
+  const other = await findOtherGrantingSubscription(input.userId, input.subscriptionId);
+  if (other) {
+    await reconcileEntitlements({
+      userId: input.userId,
+      subscriptionId: other.id,
+      grantsAccess: true,
+      expiresAt: other.current_period_end,
+    });
+    return;
+  }
+
   await supabaseAdmin
     .from("entitlements")
     .update({ revoked_at: now })
     .eq("user_id", input.userId)
     .eq("plan", "premium")
     .is("revoked_at", null);
+}
+
+async function findOtherGrantingSubscription(
+  userId: string,
+  excludeSubscriptionId: string | null,
+): Promise<{ id: string; current_period_end: string | null } | null> {
+  const { data } = await supabaseAdmin
+    .from("subscriptions")
+    .select("id, status, current_period_end")
+    .eq("user_id", userId);
+
+  const candidates = (data ?? [])
+    .filter((row) => row.id !== excludeSubscriptionId)
+    .filter((row) =>
+      subscriptionGrantsAccess({
+        status: row.status as never,
+        current_period_end: row.current_period_end,
+      }),
+    )
+    .sort((a, b) => (b.current_period_end ?? "9999").localeCompare(a.current_period_end ?? "9999"));
+
+  const best = candidates[0];
+  return best ? { id: best.id, current_period_end: best.current_period_end } : null;
 }
