@@ -8,10 +8,8 @@ import { parseWritingFeedback, writingCorrectionMessages } from "@/lib/ai-prompt
 import { expectedLengthLabel, writingLevelConfig } from "@/lib/writingLevels";
 import { callGateway } from "@/lib/ai-gateway.server";
 
-import { findLevel } from "@/lib/level";
-
 import { aggregateSkillEvidence } from "./aggregateSkill";
-import { measuredCefr, type MeasuredCefrLevel } from "./cefr";
+import { itemLevelFromStoredLevel, measuredCefr } from "./cefr";
 import {
   type AssessmentEvidence,
   evidenceSourceTypeSchema,
@@ -168,12 +166,12 @@ async function loadAdmin() {
 async function lessonItemLevel(admin: AdminClient, lessonId: string | null) {
   if (!lessonId) return null;
   const { data } = await admin.from("lessons").select("level").eq("id", lessonId).maybeSingle();
-  return data?.level ? itemLevelFor(data.level) : null;
+  return data?.level ? itemLevelFromStoredLevel(data.level) : null;
 }
 
 async function profileItemLevel(admin: AdminClient, userId: string) {
   const { data } = await admin.from("profiles").select("level").eq("id", userId).maybeSingle();
-  return data?.level ? itemLevelFor(data.level) : null;
+  return data?.level ? itemLevelFromStoredLevel(data.level) : null;
 }
 
 async function persistEvidenceAndResults(params: {
