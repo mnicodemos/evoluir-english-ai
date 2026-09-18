@@ -169,6 +169,7 @@ async function persistEvidenceAndResults(params: {
   idempotencyKey: string;
   rubricVersion: string;
   evidence: AssessmentEvidence[];
+  claimedAt?: string;
 }) {
   const { admin, userId, sourceType, sourceId, idempotencyKey, rubricVersion } = params;
   const sessionId = await deterministicUuid(`pedagogy-session:${userId}:${idempotencyKey}`);
@@ -266,7 +267,15 @@ async function persistEvidenceAndResults(params: {
       "Atomic pedagogical persistence failed",
     );
   }
-  await resolveFailure(admin, userId, idempotencyKey);
+  if (params.claimedAt) {
+    await admin.rpc("resolve_claimed_pedagogical_failure", {
+      p_user_id: userId,
+      p_idempotency_key: idempotencyKey,
+      p_claimed_at: params.claimedAt,
+    });
+  } else {
+    await resolveFailure(admin, userId, idempotencyKey);
+  }
   const payload = data && typeof data === "object" && !Array.isArray(data) ? data : {};
   return {
     duplicate: payload["duplicate"] === true,
@@ -274,7 +283,12 @@ async function persistEvidenceAndResults(params: {
   };
 }
 
-async function processQuiz(admin: AdminClient, userId: string, quizResultId: string) {
+async function processQuiz(
+  admin: AdminClient,
+  userId: string,
+  quizResultId: string,
+  claimedAt?: string,
+) {
   const key = `quiz:${quizResultId}`;
   const { data: result, error } = await admin
     .from("quiz_results")
@@ -325,6 +339,7 @@ async function processQuiz(admin: AdminClient, userId: string, quizResultId: str
     idempotencyKey: key,
     rubricVersion: QUIZ_RUBRIC_VERSION,
     evidence,
+    claimedAt,
   });
 }
 
@@ -333,6 +348,7 @@ async function processWriting(
   userId: string,
   submissionId: string,
   key: string,
+  claimedAt?: string,
 ) {
   const { data: row, error } = await admin
     .from("writing_submissions")
@@ -359,6 +375,7 @@ async function processWriting(
       vocabulary: row.vocabulary_score,
       clarity: row.clarity_score,
     }),
+    claimedAt,
   });
 }
 
@@ -601,15 +618,16 @@ export const retryPendingPedagogicalWrites = createServerFn({ method: "POST" })
       if (!claimed) continue;
       try {
         if (failure.source_type === "quiz") {
-          await processQuiz(admin, context.userId, failure.source_id);
+          await processQuiz(admin, context.userId, failure.source_id, failure.claimed_at);
         } else {
-          await processWriting(admin, context.userId, failure.source_id, failure.idempotency_key);
+          await processWriting(
+            admin,
+            context.userId,
+            failure.source_id,
+            failure.idempotency_key,
+            failure.claimed_at,
+          );
         }
-        await admin.rpc("resolve_claimed_pedagogical_failure", {
-          p_user_id: context.userId,
-          p_idempotency_key: failure.idempotency_key,
-          p_claimed_at: failure.claimed_at,
-        });
         completed += 1;
       } catch (error) {
         await recordClaimedFailure(
