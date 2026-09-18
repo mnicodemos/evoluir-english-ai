@@ -9,6 +9,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callGateway } from "@/lib/ai-gateway.server";
 import { deterministicUuid, persistTeacherEvidence } from "@/lib/pedagogy/dualWrite.functions";
+import { measuredCefr } from "@/lib/pedagogy/cefr";
 import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
 import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
 import {
@@ -128,7 +129,13 @@ export const teacherTurn = createServerFn({ method: "POST" })
         userId,
         turnId,
         rubricVersion: TEACHER_RUBRIC_VERSION,
-        evidence: teacherEvidence({ skill: decision.skill, score: decision.score, turnId }),
+        evidence: teacherEvidence({
+          skill: decision.skill,
+          score: decision.score,
+          turnId,
+          // Level of the interaction, taken from the server-owned context.
+          itemCefr: measuredCefr(pedagogicalContext.cefrLevel),
+        }),
       });
       evidencePersisted = result.ok && !result.duplicate;
     }
