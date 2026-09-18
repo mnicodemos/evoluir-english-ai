@@ -46,7 +46,6 @@ import { useServerFn } from "@tanstack/react-start";
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type VoiceState = "idle" | "recording" | "sending" | "transcribing" | "thinking" | "speaking";
 
-
 const scenarios = [
   {
     id: "everyday",
@@ -241,7 +240,6 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       });
   }
 
-
   /** Starts a conversation with a subject picked by the AI. `offset` asks for another subject. */
   async function start(offset = 0) {
     const selected = scenarioOfTheDay(offset);
@@ -419,7 +417,6 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
               ? "AI Talking is speaking…"
               : "Tap the microphone and speak in English";
 
-
   const newTopic = () => {
     cancelVoiceRecording();
     topicOffset.current += 1;
@@ -526,7 +523,6 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
               ) : (
                 <Mic className="size-7" />
               )}
-
             </Button>
             <span className="size-9" aria-hidden="true" />
           </div>

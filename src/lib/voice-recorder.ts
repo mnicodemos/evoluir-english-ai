@@ -52,14 +52,14 @@ function encodeWav(chunks: Float32Array[], sourceRate: number): Blob {
   }
   const source = trimSilence(merged, sourceRate);
 
-
   const targetRate = 16000;
   const ratio = sourceRate / targetRate;
   const sampleLength = Math.max(1, Math.floor(source.length / ratio));
   const wav = new ArrayBuffer(44 + sampleLength * 2);
   const view = new DataView(wav);
   const write = (offset: number, text: string) => {
-    for (let index = 0; index < text.length; index += 1) view.setUint8(offset + index, text.charCodeAt(index));
+    for (let index = 0; index < text.length; index += 1)
+      view.setUint8(offset + index, text.charCodeAt(index));
   };
 
   write(0, "RIFF");
@@ -91,7 +91,8 @@ function encodeWav(chunks: Float32Array[], sourceRate: number): Blob {
 export async function startVoiceRecording(): Promise<void> {
   // Drop any recording left over from an interrupted session so the mic never stays locked.
   if (activeRecording) cancelVoiceRecording();
-  if (!navigator.mediaDevices?.getUserMedia) throw new Error("Microphone recording is not supported by this browser.");
+  if (!navigator.mediaDevices?.getUserMedia)
+    throw new Error("Microphone recording is not supported by this browser.");
 
   let stream: MediaStream;
   try {
@@ -124,7 +125,16 @@ export async function startVoiceRecording(): Promise<void> {
   gain.connect(compressor);
   compressor.connect(processor);
   processor.connect(context.destination);
-  activeRecording = { context, input, gain, compressor, processor, stream, chunks, sampleRate: context.sampleRate };
+  activeRecording = {
+    context,
+    input,
+    gain,
+    compressor,
+    processor,
+    stream,
+    chunks,
+    sampleRate: context.sampleRate,
+  };
 }
 
 export async function stopVoiceRecording(): Promise<Blob> {

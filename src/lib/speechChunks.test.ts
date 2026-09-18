@@ -22,7 +22,6 @@ describe("takeSpeechBlocks", () => {
     );
   });
 
-
   it("never emits empty blocks", () => {
     const { blocks } = takeSpeechBlocks(" ,,,,, ", 2);
     expect(blocks.every((block) => block.length > 0)).toBe(true);
