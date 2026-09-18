@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { GraduationCap, Plus, Send } from "lucide-react";
+import { Plus, Send, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -115,7 +115,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <GraduationCap className="size-5" aria-hidden="true" />
+            <Sparkles className="size-5" aria-hidden="true" />
           </span>
           <div>
             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
