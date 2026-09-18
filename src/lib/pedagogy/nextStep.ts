@@ -85,7 +85,10 @@ function skillHasRecentError(skill: string, errors: string[]): boolean {
   return errors.some((error) => error.toLowerCase().includes(skill.toLowerCase()));
 }
 
-function rank(skill: SkillSnapshot, input: NextStepInput): { weight: number; reason: NextStepReason } {
+function rank(
+  skill: SkillSnapshot,
+  input: NextStepInput,
+): { weight: number; reason: NextStepReason } {
   if (skillHasRecentError(skill.skill, input.recurringErrors))
     return { weight: 0, reason: "recent_errors" };
   if (skill.score === null) return { weight: 1, reason: "not_measured_yet" };

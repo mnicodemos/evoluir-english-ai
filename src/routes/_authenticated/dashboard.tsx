@@ -29,13 +29,14 @@ import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { getLevelState } from "@/lib/level";
 import { useUiLang } from "@/lib/uiLang";
 
-
-
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · Dashboard" },
-      { name: "description", content: "Your daily English plan, streak and skill scores in one place." },
+      {
+        name: "description",
+        content: "Your daily English plan, streak and skill scores in one place.",
+      },
       { property: "og:title", content: "Evoluir+ English AI · Dashboard" },
       { property: "og:description", content: "Your daily English plan, streak and skill scores." },
       { property: "og:type", content: "website" },
@@ -50,14 +51,29 @@ function NextLeagueStatus({ streakDays }: { streakDays: number }) {
   const league = getLeague(streakDays);
 
   if (league.nextIn === 0) {
-    return <p className="mt-1 text-xs font-semibold text-foreground/80">{lang === "pt" ? "Liga máxima alcançada" : "Top league reached"}</p>;
+    return (
+      <p className="mt-1 text-xs font-semibold text-foreground/80">
+        {lang === "pt" ? "Liga máxima alcançada" : "Top league reached"}
+      </p>
+    );
   }
 
   const nextLeagueInfo = getLeague(streakDays + league.nextIn);
   const nextLeague = nextLeagueInfo.name;
-  const translatedLeague = lang === "pt"
-    ? ({ Silver: "Prata", Gold: "Ouro", Sapphire: "Safira", Ruby: "Rubi", Emerald: "Esmeralda", Amethyst: "Ametista", Pearl: "Pérola", Obsidian: "Obsidiana", Diamond: "Diamante" }[nextLeague] ?? nextLeague)
-    : nextLeague;
+  const translatedLeague =
+    lang === "pt"
+      ? ({
+          Silver: "Prata",
+          Gold: "Ouro",
+          Sapphire: "Safira",
+          Ruby: "Rubi",
+          Emerald: "Esmeralda",
+          Amethyst: "Ametista",
+          Pearl: "Pérola",
+          Obsidian: "Obsidiana",
+          Diamond: "Diamante",
+        }[nextLeague] ?? nextLeague)
+      : nextLeague;
 
   return (
     <p
@@ -71,7 +87,6 @@ function NextLeagueStatus({ streakDays }: { streakDays: number }) {
   );
 }
 
-
 function Dashboard() {
   const { data: profile, isLoading } = useProfile();
   const navigate = useNavigate();
@@ -83,17 +98,50 @@ function Dashboard() {
   }, [profile, navigate]);
 
   const trainingCards = [
-    { to: "/learning", label: "Learning Center", text: "Lessons, videos, flashcards and quizzes", icon: GraduationCap, className: "sm:col-span-2" },
-    { to: "/coach", label: "AI Talking", text: "Speak and get a scored report", icon: MessageSquareText, className: "xl:h-full" },
-    { to: "/listening", label: "Listening Lab", text: "Train your ear with dictation drills", icon: Headphones, className: "xl:h-full" },
-    { to: "/writing", label: "Writing", text: "Correct any text instantly", icon: PenLine, className: "xl:h-full" },
-    { to: "/vocabulary", label: "Vocabulary", text: "Learn and review words", icon: BookOpen, className: "xl:h-full" },
+    {
+      to: "/learning",
+      label: "Learning Center",
+      text: "Lessons, videos, flashcards and quizzes",
+      icon: GraduationCap,
+      className: "sm:col-span-2",
+    },
+    {
+      to: "/coach",
+      label: "AI Talking",
+      text: "Speak and get a scored report",
+      icon: MessageSquareText,
+      className: "xl:h-full",
+    },
+    {
+      to: "/listening",
+      label: "Listening Lab",
+      text: "Train your ear with dictation drills",
+      icon: Headphones,
+      className: "xl:h-full",
+    },
+    {
+      to: "/writing",
+      label: "Writing",
+      text: "Correct any text instantly",
+      icon: PenLine,
+      className: "xl:h-full",
+    },
+    {
+      to: "/vocabulary",
+      label: "Vocabulary",
+      text: "Learn and review words",
+      icon: BookOpen,
+      className: "xl:h-full",
+    },
   ] as const;
 
-  const historyCard = { to: "/progress", label: "My history", text: "See how far you came", icon: LineChart, className: "sm:col-span-2" } as const;
-
-
-
+  const historyCard = {
+    to: "/progress",
+    label: "My history",
+    text: "See how far you came",
+    icon: LineChart,
+    className: "sm:col-span-2",
+  } as const;
 
   const learningCards = [
     { emoji: "📚", label: "Lessons completed", value: `${snapshot?.lessonsCompleted ?? 0}` },
@@ -140,7 +188,9 @@ function Dashboard() {
                   <Calendar className="size-6 text-[oklch(0.45_0.12_175)]" />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="whitespace-nowrap text-lg font-bold sm:text-base md:text-lg">{streakDays} days</p>
+                  <p className="whitespace-nowrap text-lg font-bold sm:text-base md:text-lg">
+                    {streakDays} days
+                  </p>
                   <p className="text-base text-muted-foreground sm:text-sm">Study streak</p>
                   <NextLeagueStatus streakDays={streakDays} />
                 </div>
@@ -156,7 +206,6 @@ function Dashboard() {
                 streakDays={streakDays}
               />
             </div>
-
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} />
 
@@ -222,7 +271,6 @@ function Dashboard() {
                 <WeeklyFrequency userId={profile.id} />
               </div>
             </section>
-
           </div>
         </div>
       )}

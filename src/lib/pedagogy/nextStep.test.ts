@@ -91,7 +91,9 @@ describe("next step content", () => {
     const step = buildNextStep({
       ...base,
       skills: [skill("listening", 40)],
-      lessonBySkill: { listening: { id: "11111111-1111-1111-1111-111111111111", title: "Airport talk" } },
+      lessonBySkill: {
+        listening: { id: "11111111-1111-1111-1111-111111111111", title: "Airport talk" },
+      },
     });
     expect(step.action).toBe("review_lesson");
     expect(step.activity).toEqual({
