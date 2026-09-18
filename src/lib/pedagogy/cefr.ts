@@ -14,7 +14,9 @@ export type CefrRuleset = {
 
 /** Technical starting rules only; these are not an official CEFR certification equivalence. */
 export const INITIAL_CEFR_RULESET: CefrRuleset = {
-  version: "cefr-score-v1",
+  // v2 keeps the same bands and adds the item-level calibration below, so the
+  // rule version recorded with every skill result stays traceable.
+  version: "cefr-score-v2",
   certificationEquivalence: false,
   bands: [
     { level: "A1", minimumScore: 0, maximumScore: 29 },
