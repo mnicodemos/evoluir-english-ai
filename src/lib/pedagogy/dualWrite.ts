@@ -82,6 +82,26 @@ export function quizEvidence(detail: ClassifiedQuizDetail): AssessmentEvidence {
   };
 }
 
+export function classifyQuizEvidence(
+  details: QuizDetail[],
+  skills: ReadonlyMap<string, "grammar" | "vocabulary">,
+) {
+  const evidence: AssessmentEvidence[] = [];
+  const missingQuestionIds: string[] = [];
+  for (const detail of details) {
+    if (!detail.question_id) continue;
+    const skill = skills.get(detail.question_id);
+    if (skill) {
+      evidence.push(
+        quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill }),
+      );
+    } else {
+      missingQuestionIds.push(detail.question_id);
+    }
+  }
+  return { evidence, missingQuestionIds };
+}
+
 export function writingEvidence(scores: WritingSubscores): AssessmentEvidence[] {
   const subscores: Pick<AssessmentEvidence, "skill" | "subskill" | "rawScore">[] = [
     { skill: "grammar", subskill: "writing_grammar", rawScore: scores.grammar },

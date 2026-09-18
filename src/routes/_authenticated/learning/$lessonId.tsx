@@ -22,6 +22,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
+import { finalizeLessonQuiz } from "@/lib/quizCompletion";
 
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
   head: () => ({
@@ -76,17 +77,25 @@ function LessonPage() {
 
   async function finishLesson(score: number, attemptKey: string) {
     if (!profile) return;
+    const result = await finalizeLessonQuiz(score, {
+      persistLegacy: async () => {
+        // Lessons do not feed the Your progress bars: each bar comes from its own
+        // module (Listening Lab, Vocabulary, AI Talking, Writing AI Corrector).
+        await saveQuizLegacy({
+          data: { attemptKey, activityType: "lesson", minutes: minutesSpent(1) },
+        });
+      },
+      completeLesson: async () => completeLesson(profile.id, lessonId),
+    });
     // A lesson only counts as completed with a quiz score of 70% or more.
-    if (score < 70) {
+    if (!result.passed) {
+      queryClient.invalidateQueries({ queryKey: ["quiz-results"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
+      queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
       toast.info("Score below 70%. Review the lesson and retake the quiz to complete it.");
       return;
     }
-    await completeLesson(profile.id, lessonId);
-    // Lessons do not feed the Your progress bars: each bar comes from its own
-    // module (Listening Lab, Vocabulary, AI Talking, Writing AI Corrector).
-    await saveQuizLegacy({
-      data: { attemptKey, activityType: "lesson", minutes: minutesSpent(1) },
-    });
     queryClient.invalidateQueries({ queryKey: ["user-lessons"] });
     queryClient.invalidateQueries({ queryKey: ["quiz-results"] });
     queryClient.invalidateQueries({ queryKey: ["profile"] });
