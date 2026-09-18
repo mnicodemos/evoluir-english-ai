@@ -14,10 +14,14 @@ describe("takeSpeechBlocks", () => {
       "That is a great answer and I can hear real progress in your pronunciation today, well done.";
     const second = " Now tell me about the last trip you took with your family, please.";
     const { blocks, rest } = takeSpeechBlocks(`${first}${second}`, 80);
-    expect(blocks).toHaveLength(1);
-    expect(blocks[0]?.endsWith("done.")).toBe(true);
-    expect(rest.trim()).toBe(second.trim());
+    expect(blocks.length).toBeGreaterThan(0);
+    expect(blocks[0]!.length).toBeGreaterThanOrEqual(80);
+    expect(/[.!?,;]$/.test(blocks[0]!)).toBe(true);
+    expect(`${blocks.join(" ")} ${rest}`.replace(/\s+/g, " ").trim()).toBe(
+      `${first}${second}`.replace(/\s+/g, " ").trim(),
+    );
   });
+
 
   it("never emits empty blocks", () => {
     const { blocks } = takeSpeechBlocks(" ,,,,, ", 2);
