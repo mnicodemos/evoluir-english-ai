@@ -282,7 +282,13 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   }
 
   async function toggleRecording() {
-    if (!scenario || voiceState === "thinking" || voiceState === "transcribing") return;
+    if (
+      !scenario ||
+      voiceState === "thinking" ||
+      voiceState === "sending" ||
+      voiceState === "transcribing"
+    )
+      return;
     if (voiceState === "speaking") {
       stopSpeaking();
       setVoiceState("idle");
@@ -297,9 +303,10 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       return;
     }
 
-    setVoiceState("transcribing");
+    setVoiceState("sending");
     try {
       const audio = await stopVoiceRecording();
+      if (mounted.current) setVoiceState("transcribing");
       const text = await transcribe(audio);
       const next: ChatMessage[] = [...messages, { role: "user", content: text }];
       setMessages(next);
@@ -326,13 +333,15 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
               ),
             );
           }
-          const split = takeCompletePhrases(phraseBuffer);
+          // Short phrases are merged into one audio request; long replies still split.
+          const split = takeSpeechBlocks(phraseBuffer);
           phraseBuffer = split.rest;
-          split.phrases.forEach(queueSpeech);
+          split.blocks.forEach(queueSpeech);
         },
       );
       const reply = raw.trim();
       if (phraseBuffer.trim()) queueSpeech(phraseBuffer.trim());
+
       const updated: ChatMessage[] = [...next, { role: "assistant", content: reply }];
       setMessages(updated);
       await speechQueue.current;
