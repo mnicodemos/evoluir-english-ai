@@ -4,6 +4,7 @@ import { aggregateSkillEvidence } from "./aggregateSkill";
 import { cefrForScore } from "./cefr";
 import { assertConfidence } from "./confidence";
 import {
+  classifyQuizEvidence,
   parseQuizDetails,
   quizEvidence,
   toleratePedagogicalFailure,
@@ -183,6 +184,26 @@ describe("Quiz dual-write mapping", () => {
   it("accepts legacy details without a question identifier without inventing one", () => {
     const { question_id: _questionId, ...legacy } = detail;
     expect(parseQuizDetails([legacy])).toEqual([legacy]);
+  });
+
+  it("creates evidence only for explicitly mapped questions", () => {
+    const missingId = "22222222-2222-4222-8222-222222222222";
+    const result = classifyQuizEvidence(
+      [detail, { ...detail, question_id: missingId }],
+      new Map([[detail.question_id, "grammar"]] as const),
+    );
+    expect(result.evidence).toHaveLength(1);
+    expect(result.evidence[0]).toMatchObject({
+      skill: "grammar",
+      sourceItemId: detail.question_id,
+    });
+    expect(result.missingQuestionIds).toEqual([missingId]);
+  });
+
+  it("reports an unmapped question without inventing evidence", () => {
+    const result = classifyQuizEvidence([detail], new Map());
+    expect(result.evidence).toEqual([]);
+    expect(result.missingQuestionIds).toEqual([detail.question_id]);
   });
 });
 

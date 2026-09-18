@@ -16,8 +16,8 @@ import {
   type PedagogicalSkill,
 } from "./contracts";
 import {
+  classifyQuizEvidence,
   parseQuizDetails,
-  quizEvidence,
   QUIZ_RUBRIC_VERSION,
   writingEvidence,
   writingSubmissionRecord,
@@ -46,6 +46,7 @@ type FailureStage =
   | "finalization"
   | "idempotency";
 type FailureCode =
+  | "MISSING_PEDAGOGICAL_MAPPING"
   | "SESSION_CREATION_FAILED"
   | "EVIDENCE_PERSIST_FAILED"
   | "AGGREGATION_FAILED"
@@ -331,33 +332,27 @@ async function processQuiz(
       )
       .map((question) => [question.id, question.pedagogical_skill as "grammar" | "vocabulary"]),
   );
-  const evidence = details.flatMap((detail) => {
-    if (!detail.question_id) return [];
-    const skill = skills.get(detail.question_id);
-    return skill
-      ? [quizEvidence({ ...detail, question_id: detail.question_id, pedagogical_skill: skill })]
-      : [];
-  });
-  if (evidence.length === 0) {
-    if (claimedAt) {
-      await admin.rpc("resolve_claimed_pedagogical_failure", {
-        p_user_id: userId,
-        p_idempotency_key: key,
-        p_claimed_at: claimedAt,
-      });
-    }
-    return { duplicate: false, evidenceCount: 0 };
+  const classified = classifyQuizEvidence(details, skills);
+  const persisted = classified.evidence.length
+    ? await persistEvidenceAndResults({
+        admin,
+        userId,
+        sourceType: "quiz",
+        sourceId: result.id,
+        idempotencyKey: key,
+        rubricVersion: QUIZ_RUBRIC_VERSION,
+        evidence: classified.evidence,
+        ...(claimedAt ? { claimedAt } : {}),
+      })
+    : { duplicate: false, evidenceCount: 0 };
+  if (classified.missingQuestionIds.length > 0) {
+    throw new PedagogicalWriteError(
+      "source",
+      "MISSING_PEDAGOGICAL_MAPPING",
+      `${classified.missingQuestionIds.length} Quiz question(s) lack a valid pedagogical mapping`,
+    );
   }
-  return persistEvidenceAndResults({
-    admin,
-    userId,
-    sourceType: "quiz",
-    sourceId: result.id,
-    idempotencyKey: key,
-    rubricVersion: QUIZ_RUBRIC_VERSION,
-    evidence,
-    ...(claimedAt ? { claimedAt } : {}),
-  });
+  return persisted;
 }
 
 async function processWriting(
