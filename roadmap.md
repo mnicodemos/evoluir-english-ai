@@ -26,3 +26,7 @@
   - [x] Centralizar contratos e implementar regras CEFR, agregação e confidence
   - [x] Preparar referências opcionais em learning_errors
   - [x] Validar regras, isolamento, histórico e compatibilidade do sistema atual
+- [ ] Fase 2C — conectar Quiz e Writing à fundação pedagógica por Dual Write
+  - [ ] Tornar Quiz e Writing rastreáveis e idempotentes sem alterar os resultados atuais
+  - [ ] Registrar evidências e snapshots por habilidade com tolerância a falhas
+  - [ ] Validar RLS, retries, não regressão e ausência de duplicações
