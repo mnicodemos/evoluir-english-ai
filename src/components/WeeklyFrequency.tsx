@@ -69,7 +69,7 @@ export function WeeklyFrequency({ userId }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col gap-1">
         <div className="grid grid-cols-7 place-items-center gap-1">
           {weekKeys.map((key, i) => {
             const studied = studyDays?.has(key) ?? false;
@@ -94,12 +94,10 @@ export function WeeklyFrequency({ userId }: Props) {
               </div>
             );
           })}
-          <div className="col-span-7 rounded-lg border border-border bg-card px-2 py-1 text-center">
-            <span className="text-[10px] font-medium leading-tight text-muted-foreground">
-              {aiGoalLabel}
-            </span>
-          </div>
         </div>
+        <p className="text-center text-[10px] font-medium leading-tight text-muted-foreground">
+          {aiGoalLabel}
+        </p>
       </div>
     </div>
   );
