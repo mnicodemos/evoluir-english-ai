@@ -224,7 +224,6 @@ describe("Authoritative source contracts", () => {
         operationKey,
         prompt: "Describe your week.",
         originalText: "This is my original writing text.",
-        level: "b1",
         grammar: 100,
         vocabulary: 100,
         clarity: 100,

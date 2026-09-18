@@ -22,7 +22,6 @@ export const authoritativeWritingInputSchema = z
     operationKey: z.string().uuid(),
     prompt: z.string().max(2000),
     originalText: z.string().trim().min(1).max(12000),
-    level: z.string().min(1).max(40),
   })
   .strict();
 

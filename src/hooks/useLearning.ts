@@ -44,7 +44,6 @@ export type QuizQuestion = {
   question: string;
   question_type: string;
   options: string[];
-  correct_answer: string;
   explanation: string;
   sort_order: number;
 };
@@ -103,7 +102,11 @@ export function useLesson(lessonId: string) {
           .eq("lesson_id", lessonId)
           .order("sort_order")
           .order("created_at"),
-        supabase.from("quizzes").select("*").eq("lesson_id", lessonId).order("sort_order"),
+        supabase
+          .from("quizzes")
+          .select("id, lesson_id, question, question_type, options, explanation, sort_order")
+          .eq("lesson_id", lessonId)
+          .order("sort_order"),
         supabase
           .from("user_lessons")
           .select("lesson_id, video_progress, progress, completed_at")

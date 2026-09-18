@@ -544,8 +544,14 @@ export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
       return { sourceId: submissionId, feedback: writingFeedbackFromRow(existing) };
     }
 
+    const { data: profile, error: profileError } = await admin
+      .from("profiles")
+      .select("level")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (profileError) throw new Error("Writing level could not be loaded");
     const raw = await callGateway(
-      writingCorrectionMessages(data.prompt, data.originalText, data.level),
+      writingCorrectionMessages(data.prompt, data.originalText, profile?.level ?? "intermediate"),
       true,
       { userId: context.userId, operation: "writing_correction" },
     );

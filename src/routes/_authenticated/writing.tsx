@@ -236,7 +236,6 @@ function Writing() {
           operationKey: stableOperationKey,
           prompt,
           originalText: text.trim(),
-          level: profile?.level ?? "intermediate",
         },
       });
       const feedback = authoritative.feedback;

@@ -9,6 +9,12 @@ import { usePersistentState } from "@/hooks/usePersistentState";
 import { submitAuthoritativeQuiz } from "@/lib/pedagogy/dualWrite.functions";
 import { useUiLang } from "@/lib/uiLang";
 
+type SubmittedDetail = {
+  question_id: string;
+  correct_answer: string;
+  is_correct: boolean;
+};
+
 /** Multiple-choice / fill-in quiz with instant score, explanations and review advice. */
 export function LessonQuiz({
   questions,
@@ -37,12 +43,18 @@ export function LessonQuiz({
     `lesson-quiz-attempt:${userId ?? "guest"}:${lessonId}`,
     "",
   );
+  const [submittedResult, setSubmittedResult, clearSubmittedResult] = usePersistentState<{
+    score: number;
+    correct: number;
+    total: number;
+    details: SubmittedDetail[];
+  } | null>(`lesson-quiz-result:${userId ?? "guest"}:${lessonId}`, null);
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const submitQuiz = useServerFn(submitAuthoritativeQuiz);
 
-  const correct = questions.filter((q) => answers[q.id] === q.correct_answer).length;
-  const score = questions.length ? Math.round((correct / questions.length) * 100) : 0;
+  const correct = submittedResult?.correct ?? 0;
+  const score = submittedResult?.score ?? 0;
 
   async function submit() {
     setSaving(true);
@@ -58,12 +70,12 @@ export function LessonQuiz({
             answers: questions.map((q) => ({ questionId: q.id, answer: answers[q.id] ?? "" })),
           },
         });
+        setSubmittedResult(saved);
         setSubmitted(true);
         onFinished?.(saved.score);
         return;
       }
-      setSubmitted(true);
-      onFinished?.(score);
+      throw new Error("Sign in to save and grade this quiz.");
     } catch (error) {
       setSaveFailed(true);
       toast.error(
@@ -86,9 +98,11 @@ export function LessonQuiz({
     clearAnswers();
     clearSubmitted();
     clearAttemptKey();
+    clearSubmittedResult();
     setAnswers({});
     setSubmitted(false);
     setAttemptKey("");
+    setSubmittedResult(null);
   }
 
   return (
@@ -117,7 +131,8 @@ export function LessonQuiz({
 
       {questions.map((q, i) => {
         const chosen = answers[q.id];
-        const isCorrect = chosen === q.correct_answer;
+        const detail = submittedResult?.details.find((item) => item.question_id === q.id);
+        const isCorrect = detail?.is_correct === true;
         return (
           <div key={q.id} className="card-soft p-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -129,7 +144,7 @@ export function LessonQuiz({
                 const selected = chosen === opt;
                 let style = "border-border hover:bg-secondary";
                 let textColor = "";
-                if (submitted && opt === q.correct_answer) {
+                if (submitted && opt === detail?.correct_answer) {
                   style = "border-success bg-success/10";
                   textColor = "text-success";
                 } else if (submitted && selected) {
