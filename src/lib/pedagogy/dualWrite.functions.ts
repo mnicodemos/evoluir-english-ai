@@ -9,6 +9,7 @@ import { expectedLengthLabel, writingLevelConfig } from "@/lib/writingLevels";
 import { callGateway } from "@/lib/ai-gateway.server";
 
 import { aggregateSkillEvidence } from "./aggregateSkill";
+import { measuredCefr } from "./cefr";
 import {
   type AssessmentEvidence,
   evidenceSourceTypeSchema,
@@ -180,7 +181,7 @@ async function persistEvidenceAndResults(params: {
     const { data, error } = await admin
       .from("assessment_evidence")
       .select(
-        "id, skill, subskill, source_type, source_id, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, model_version, rubric_version",
+        "id, skill, subskill, source_type, source_id, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, model_version, rubric_version",
       )
       .eq("user_id", userId)
       .eq("skill", skill)
@@ -198,6 +199,7 @@ async function persistEvidenceAndResults(params: {
       subskill: row.subskill,
       sourceType: evidenceSourceTypeSchema.parse(row.source_type),
       sourceId: row.source_id,
+      itemCefr: measuredCefr(row.item_cefr),
       rawScore: row.raw_score,
       sourceReliability: row.source_reliability,
       evidenceQuality: row.evidence_quality,
