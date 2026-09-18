@@ -12,6 +12,10 @@ import {
   normalizeLevel,
   type CurriculumLesson,
 } from "@/lib/curriculum";
+import {
+  resolveQuizEvidenceSkill,
+  type QuizEvidenceSkill,
+} from "@/lib/pedagogy/quizSkill";
 
 import { callGateway } from "./ai-gateway.server";
 import { findLessonVideo, type LessonVideo } from "./lessonVideo.server";
@@ -66,12 +70,64 @@ const quizItemSchema = z
     options: z.array(z.string().trim().min(1).max(240)).length(4),
     correct_answer: z.string().trim().min(1).max(240),
     explanation: z.string().trim().min(1).max(400),
+    pedagogical_skill: z.string().trim().max(40).optional(),
   })
   .strict()
   .refine(
     (item) => item.options.includes(item.correct_answer),
     "Correct answer must match an option",
   );
+
+type GeneratedQuizItem = z.infer<typeof quizItemSchema>;
+
+/**
+ * Persists generated quiz questions with a server-validated pedagogical skill.
+ * The label produced during generation is only accepted when it is one of the
+ * skills the evidence pipeline already supports. When it cannot be resolved the
+ * failure is recorded through the existing observability mechanism instead of
+ * assigning an arbitrary skill.
+ */
+async function insertQuizQuestions(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string,
+  quiz: GeneratedQuizItem[],
+  structuralDefault: QuizEvidenceSkill | null,
+) {
+  const rows = quiz.map((q, index) => ({
+    lesson_id: lessonId,
+    question: String(q.question).slice(0, 400),
+    question_type: "multiple_choice",
+    options: q.options as string[],
+    correct_answer: String(q.correct_answer),
+    explanation: String(q.explanation ?? "").slice(0, 400),
+    sort_order: index,
+    created_by: userId,
+    pedagogical_skill: resolveQuizEvidenceSkill(q.pedagogical_skill, structuralDefault),
+  }));
+
+  await supabase.from("quizzes").insert(rows);
+
+  const unmapped = rows.filter((row) => row.pedagogical_skill === null).length;
+  if (unmapped === 0) return;
+
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.rpc("record_pedagogical_failure", {
+      p_user_id: userId,
+      p_source_type: "quiz",
+      p_source_id: lessonId,
+      p_idempotency_key: `quiz_generation:${lessonId}`,
+      p_stage: "source",
+      p_error_code: "MISSING_PEDAGOGICAL_MAPPING",
+      p_error_message: `${unmapped} generated Quiz question(s) lack a valid pedagogical mapping`,
+      p_already_claimed: false,
+    });
+  } catch {
+    console.error("Missing pedagogical mapping could not be recorded for lesson", lessonId);
+  }
+}
+
 
 const flashcardSchema = z
   .object({
