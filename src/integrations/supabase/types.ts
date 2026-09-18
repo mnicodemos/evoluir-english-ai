@@ -1217,6 +1217,83 @@ export type Database = {
           },
         ]
       }
+      orphan_quiz_results: {
+        Row: {
+          assessment_session_id: string | null
+          assessment_session_status: string | null
+          attempt_key: string | null
+          created_at: string | null
+          lesson_id: string | null
+          orphan_reason: string | null
+          quiz_result_id: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_results_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      unresolved_pedagogical_failures: {
+        Row: {
+          attempt_count: number | null
+          created_at: string | null
+          error_code: string | null
+          failure_id: string | null
+          idempotency_key: string | null
+          last_error_message: string | null
+          next_retry_at: string | null
+          source_id: string | null
+          source_type: string | null
+          stage: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attempt_count?: number | null
+          created_at?: string | null
+          error_code?: string | null
+          failure_id?: string | null
+          idempotency_key?: string | null
+          last_error_message?: string | null
+          next_retry_at?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          stage?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attempt_count?: number | null
+          created_at?: string | null
+          error_code?: string | null
+          failure_id?: string | null
+          idempotency_key?: string | null
+          last_error_message?: string | null
+          next_retry_at?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          stage?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedagogical_dual_write_failures_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       claim_pedagogical_retries: {

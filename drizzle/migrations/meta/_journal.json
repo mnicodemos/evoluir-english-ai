@@ -120,6 +120,13 @@
       "when": 1789697446691,
       "tag": "0016_observe_missing_quiz_pedagogical_mapping",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1789729250174,
+      "tag": "0017_add_pedagogical_diagnostic_views",
+      "breakpoints": true
     }
   ]
 }
