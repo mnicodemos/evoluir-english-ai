@@ -32,7 +32,9 @@ import { coachOpenerMessages, coachReplyMessages, type ConversationReport } from
 import { aiChat } from "@/lib/aiChat.functions";
 import { getLevelState } from "@/lib/level";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
+import { takeSpeechBlocks } from "@/lib/speechChunks";
 import { streamCoachReply } from "@/lib/coach-stream";
+
 import {
   cancelVoiceRecording,
   startVoiceRecording,
@@ -42,21 +44,7 @@ import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
-type VoiceState = "idle" | "recording" | "transcribing" | "thinking" | "speaking";
-
-function takeCompletePhrases(value: string) {
-  const phrases: string[] = [];
-  let rest = value;
-  const boundary = /[,;.!?](?:\s|$)/;
-  while (true) {
-    const match = boundary.exec(rest);
-    if (!match || match.index < 8) break;
-    const end = match.index + match[0].length;
-    phrases.push(rest.slice(0, end).trim());
-    rest = rest.slice(end);
-  }
-  return { phrases, rest };
-}
+type VoiceState = "idle" | "recording" | "sending" | "transcribing" | "thinking" | "speaking";
 
 const scenarios = [
   {
@@ -231,7 +219,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   async function playResponse(text: string) {
     setVoiceState("speaking");
     try {
-      await speakEnglish(text);
+      await speakEnglish(text, { cache: "persistent" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "The response could not be played.");
     } finally {
@@ -244,7 +232,8 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       .then(async () => {
         if (!mounted.current) return;
         setVoiceState("speaking");
-        await speakEnglish(text, { cache: "memory" });
+        // Persistent cache: the same sentence is never generated twice, even after a reload.
+        await speakEnglish(text, { cache: "persistent" });
       })
       .catch((error: unknown) => {
         toast.error(error instanceof Error ? error.message : "The response could not be played.");
@@ -291,7 +280,13 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   }
 
   async function toggleRecording() {
-    if (!scenario || voiceState === "thinking" || voiceState === "transcribing") return;
+    if (
+      !scenario ||
+      voiceState === "thinking" ||
+      voiceState === "sending" ||
+      voiceState === "transcribing"
+    )
+      return;
     if (voiceState === "speaking") {
       stopSpeaking();
       setVoiceState("idle");
@@ -306,9 +301,10 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       return;
     }
 
-    setVoiceState("transcribing");
+    setVoiceState("sending");
     try {
       const audio = await stopVoiceRecording();
+      if (mounted.current) setVoiceState("transcribing");
       const text = await transcribe(audio);
       const next: ChatMessage[] = [...messages, { role: "user", content: text }];
       setMessages(next);
@@ -335,13 +331,15 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
               ),
             );
           }
-          const split = takeCompletePhrases(phraseBuffer);
+          // Short phrases are merged into one audio request; long replies still split.
+          const split = takeSpeechBlocks(phraseBuffer);
           phraseBuffer = split.rest;
-          split.phrases.forEach(queueSpeech);
+          split.blocks.forEach(queueSpeech);
         },
       );
       const reply = raw.trim();
       if (phraseBuffer.trim()) queueSpeech(phraseBuffer.trim());
+
       const updated: ChatMessage[] = [...next, { role: "assistant", content: reply }];
       setMessages(updated);
       await speechQueue.current;
@@ -401,18 +399,23 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const userAnswers = messages.filter((message) => message.role === "user").length;
   const hasEnoughAnswers = userAnswers >= 3;
   const isProcessingAnswer =
-    voiceState === "recording" || voiceState === "transcribing" || voiceState === "thinking";
+    voiceState === "recording" ||
+    voiceState === "sending" ||
+    voiceState === "transcribing" ||
+    voiceState === "thinking";
   const canFinish = hasEnoughAnswers && !isProcessingAnswer && !finishing;
   const statusText =
     voiceState === "recording"
       ? "Listening… tap again when you finish"
-      : voiceState === "transcribing"
-        ? "Understanding your English…"
-        : voiceState === "thinking"
-          ? "Preparing a reply…"
-          : voiceState === "speaking"
-            ? "AI Talking is speaking…"
-            : "Tap the microphone and speak in English";
+      : voiceState === "sending"
+        ? "Sending your recording…"
+        : voiceState === "transcribing"
+          ? "Understanding your English…"
+          : voiceState === "thinking"
+            ? "Preparing a reply…"
+            : voiceState === "speaking"
+              ? "AI Talking is speaking…"
+              : "Tap the microphone and speak in English";
 
   const newTopic = () => {
     cancelVoiceRecording();
@@ -504,12 +507,18 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
               size="icon"
               aria-label={voiceState === "recording" ? "Stop recording" : "Start recording"}
               onClick={toggleRecording}
-              disabled={voiceState === "thinking" || voiceState === "transcribing"}
+              disabled={
+                voiceState === "thinking" ||
+                voiceState === "sending" ||
+                voiceState === "transcribing"
+              }
               className={`size-16 rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}
             >
               {voiceState === "recording" ? (
                 <MicOff className="size-7" />
-              ) : voiceState === "thinking" || voiceState === "transcribing" ? (
+              ) : voiceState === "thinking" ||
+                voiceState === "sending" ||
+                voiceState === "transcribing" ? (
                 <Loader2 className="size-7 animate-spin" />
               ) : (
                 <Mic className="size-7" />

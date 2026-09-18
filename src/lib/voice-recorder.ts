@@ -11,14 +11,46 @@ type ActiveRecording = {
 
 let activeRecording: ActiveRecording | null = null;
 
+/**
+ * Cuts the silence before and after the speech so only the spoken part is
+ * uploaded. A short margin is kept on both sides so no word is clipped, which
+ * protects transcription quality.
+ */
+export function trimSilence(source: Float32Array, sampleRate: number): Float32Array {
+  const window = Math.max(128, Math.floor(sampleRate * 0.02));
+  const margin = Math.floor(sampleRate * 0.15);
+  const threshold = 0.012;
+
+  let first = -1;
+  let last = -1;
+  for (let start = 0; start < source.length; start += window) {
+    const end = Math.min(source.length, start + window);
+    let sum = 0;
+    for (let index = start; index < end; index += 1) {
+      const value = source[index] ?? 0;
+      sum += value * value;
+    }
+    if (Math.sqrt(sum / Math.max(1, end - start)) >= threshold) {
+      if (first < 0) first = start;
+      last = end;
+    }
+  }
+  if (first < 0 || last <= first) return source;
+
+  const from = Math.max(0, first - margin);
+  const to = Math.min(source.length, last + margin);
+  return source.subarray(from, to);
+}
+
 function encodeWav(chunks: Float32Array[], sourceRate: number): Blob {
   const sourceLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-  const source = new Float32Array(sourceLength);
+  const merged = new Float32Array(sourceLength);
   let sourceOffset = 0;
   for (const chunk of chunks) {
-    source.set(chunk, sourceOffset);
+    merged.set(chunk, sourceOffset);
     sourceOffset += chunk.length;
   }
+  const source = trimSilence(merged, sourceRate);
 
   const targetRate = 16000;
   const ratio = sourceRate / targetRate;
@@ -26,7 +58,8 @@ function encodeWav(chunks: Float32Array[], sourceRate: number): Blob {
   const wav = new ArrayBuffer(44 + sampleLength * 2);
   const view = new DataView(wav);
   const write = (offset: number, text: string) => {
-    for (let index = 0; index < text.length; index += 1) view.setUint8(offset + index, text.charCodeAt(index));
+    for (let index = 0; index < text.length; index += 1)
+      view.setUint8(offset + index, text.charCodeAt(index));
   };
 
   write(0, "RIFF");
@@ -58,7 +91,8 @@ function encodeWav(chunks: Float32Array[], sourceRate: number): Blob {
 export async function startVoiceRecording(): Promise<void> {
   // Drop any recording left over from an interrupted session so the mic never stays locked.
   if (activeRecording) cancelVoiceRecording();
-  if (!navigator.mediaDevices?.getUserMedia) throw new Error("Microphone recording is not supported by this browser.");
+  if (!navigator.mediaDevices?.getUserMedia)
+    throw new Error("Microphone recording is not supported by this browser.");
 
   let stream: MediaStream;
   try {
@@ -91,7 +125,16 @@ export async function startVoiceRecording(): Promise<void> {
   gain.connect(compressor);
   compressor.connect(processor);
   processor.connect(context.destination);
-  activeRecording = { context, input, gain, compressor, processor, stream, chunks, sampleRate: context.sampleRate };
+  activeRecording = {
+    context,
+    input,
+    gain,
+    compressor,
+    processor,
+    stream,
+    chunks,
+    sampleRate: context.sampleRate,
+  };
 }
 
 export async function stopVoiceRecording(): Promise<Blob> {
