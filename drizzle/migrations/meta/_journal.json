@@ -99,6 +99,13 @@
       "when": 1789695153777,
       "tag": "0013_protect_quiz_answer_key",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1789696389156,
+      "tag": "0014_secure_legacy_activity_progress",
+      "breakpoints": true
     }
   ]
 }
