@@ -242,7 +242,7 @@ function Writing() {
 
       <div className="mt-7 grid gap-3 sm:grid-cols-3">
         {prompts.map((p, index) => {
-          const category = categories[index]!;
+          const category = WRITING_CATEGORIES[index]!;
           const isDone = done.includes(p);
           const isActive = prompt === p;
           return (
