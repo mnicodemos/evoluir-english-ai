@@ -135,8 +135,8 @@ function Dashboard() {
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="card-soft flex flex-col justify-center p-5">
               <div className="flex items-center gap-4">
-                <span className="grid size-12 place-items-center rounded-xl bg-[oklch(0.96_0.05_75)]">
-                  <Calendar className="size-6 text-[oklch(0.62_0.16_50)]" />
+                <span className="grid size-12 place-items-center rounded-xl bg-[oklch(0.92_0.05_175)]">
+                  <Calendar className="size-6 text-[oklch(0.45_0.12_175)]" />
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="whitespace-nowrap text-lg font-bold sm:text-base md:text-lg">{streakDays} days</p>
