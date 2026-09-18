@@ -3,7 +3,6 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { conversationReportMessages, parseConversationReport } from "@/lib/ai-prompts";
-import { callGateway } from "@/lib/ai-gateway.server";
 import {
   listeningLegacyInputSchema,
   pronunciationLegacyInputSchema,
@@ -12,7 +11,14 @@ import {
   telemetryInputSchema,
 } from "@/lib/legacyActivity.schemas";
 import { listeningAnswerScore, pronunciationSimilarity } from "@/lib/legacyScores";
-import { deterministicUuid } from "@/lib/pedagogy/dualWrite.functions";
+
+async function deterministicUuid(value: string): Promise<string> {
+  const bytes = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)));
+  bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x50;
+  bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
+  const hex = Array.from(bytes.slice(0, 16), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
 
 const writingLegacyInputSchema = z.object({
   operationKey: z.string().uuid(),
@@ -149,6 +155,7 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
     const { data: existing } = await admin.from("activities").select("result, score")
       .eq("user_id", context.userId).eq("source_type", "talking").eq("operation_key", data.operationKey).maybeSingle();
     if (existing?.result) return existing.result;
+    const { callGateway } = await import("@/lib/ai-gateway.server");
     const raw = await callGateway(conversationReportMessages(data.messages), true, { userId: context.userId, operation: "talking" });
     const report = parseConversationReport(raw);
     const score = Math.round((report.fluency + report.grammar + report.vocabulary) / 3);

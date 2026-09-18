@@ -1,7 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Check, CheckCircle2, Headphones, Mic, RotateCcw, Square, Volume2, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
 import { useLessonRound } from "@/hooks/useLessonRound";
-import { logActivity, useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { speakEnglish } from "@/lib/speech";
 import { transcribeAudio } from "@/lib/transcribe";
@@ -18,6 +19,8 @@ import {
   startVoiceRecording,
   stopVoiceRecording,
 } from "@/lib/voice-recorder";
+import { persistListeningLegacy } from "@/lib/legacyActivity.functions";
+import { listeningAnswerScore } from "@/lib/legacyScores";
 
 export const Route = createFileRoute("/_authenticated/listening")({
   head: () => ({
@@ -141,21 +144,6 @@ function normalize(value: string) {
     .filter(Boolean);
 }
 
-function scoreAnswer(expected: string, answer: string) {
-  const target = normalize(expected);
-  const given = normalize(answer);
-  const pool = [...given];
-  let hits = 0;
-  for (const word of target) {
-    const index = pool.indexOf(word);
-    if (index >= 0) {
-      hits += 1;
-      pool.splice(index, 1);
-    }
-  }
-  return target.length ? Math.round((hits / target.length) * 100) : 0;
-}
-
 /** Marks which words of the sentence the student actually repeated. */
 function wordMatches(expected: string, spoken: string) {
   const pool = normalize(spoken);
@@ -209,6 +197,7 @@ function ListeningPage() {
   const { data: profile } = useProfile();
   const { data: lessons } = useLessons();
   const queryClient = useQueryClient();
+  const saveListening = useServerFn(persistListeningLegacy);
   const minutesSpent = useTimeSpent();
   useLogTimeOnExit({
     timer: minutesSpent,
@@ -221,6 +210,8 @@ function ListeningPage() {
   const [answer, setAnswer] = useState("");
   const [checked, setChecked] = useState<number | null>(null);
   const [scores, setScores] = useState<number[]>([]);
+  const [transcripts, setTranscripts] = useState<string[][]>([]);
+  const operationKey = useRef(crypto.randomUUID());
   // Up to 3 attempts per sentence; the best score is kept. Below 70% forces a retry.
   const [attempts, setAttempts] = useState(0);
   const [best, setBest] = useState(0);
@@ -302,6 +293,8 @@ function ListeningPage() {
     setAnswer("");
     setChecked(null);
     setScores([]);
+    setTranscripts([]);
+    operationKey.current = crypto.randomUUID();
     setAttempts(0);
     setBest(0);
   }
@@ -366,7 +359,7 @@ function ListeningPage() {
       const blob = await stopVoiceRecording();
       const spoken = await transcribeAudio(blob);
       setAnswer(spoken);
-      const value = scoreAnswer(sentence, spoken);
+      const value = listeningAnswerScore(sentence, spoken);
       setChecked(value);
       const nextAttempts = attempts + 1;
       setAttempts(nextAttempts);
@@ -375,6 +368,11 @@ function ListeningPage() {
       setScores((prev) => {
         const copy = [...prev];
         copy[index] = Math.max(copy[index] ?? 0, value);
+        return copy;
+      });
+      setTranscripts((prev) => {
+        const copy = prev.map((items) => [...items]);
+        copy[index] = [...(copy[index] ?? []), spoken];
         return copy;
       });
       // After the third attempt, REVEAL stays available for the rest of the sentence.
@@ -405,17 +403,18 @@ function ListeningPage() {
     setProgress(nextProgress);
     writeProgress(nextProgress);
     if (profile) {
-      const final = Math.round([...scores].reduce((a, b) => a + b, 0) / Math.max(1, scores.length));
-      await logActivity({
-        userId: profile.id,
-        type: "listening",
-        title: `Listening Lab: ${track.label}`,
+      const saved = await saveListening({ data: {
+        operationKey: operationKey.current,
+        trackId: track.id as "everyday" | "professional" | "travel",
+        round: lessonCount,
         minutes: minutesSpent(1),
-        score: final,
-        scores: { listening: final },
-        currentStreak: profile.streak_days,
-        lastDate: profile.last_activity_date,
-      });
+        evidence: sentences.map((expected, sentenceIndex) => ({
+          expected,
+          transcripts: transcripts[sentenceIndex] ?? [],
+        })),
+      } });
+      const result = saved as { score?: number };
+      const final = result.score ?? average;
       queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast.success(`Listening session saved with ${final}%`);
@@ -424,6 +423,8 @@ function ListeningPage() {
     setAnswer("");
     setChecked(null);
     setScores([]);
+    setTranscripts([]);
+    operationKey.current = crypto.randomUUID();
   }
 
   return (
