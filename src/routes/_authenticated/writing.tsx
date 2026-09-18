@@ -322,7 +322,8 @@ function Writing() {
             />
             <div className="mt-4 flex items-center justify-between gap-3">
               <span className="text-sm text-muted-foreground">
-                {text.trim().split(/\s+/).filter(Boolean).length} words
+                {text.trim().split(/\s+/).filter(Boolean).length} words ·{" "}
+                <span>target</span> {expectedLengthLabel(config)}
               </span>
               <Button onClick={analyse} disabled={loading}>
                 {loading ? (
