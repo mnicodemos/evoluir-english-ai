@@ -86,6 +86,7 @@ export function teacherTurnMessages(input: {
     "- Correct the student's English when they produce language: show the correction and why, in one or two short lines.",
     "- Make the student produce the answer. Do not simply hand over the finished answer when the goal is learning.",
     "- Keep the whole reply under 120 words. Plain English, no lists longer than 3 items, no emojis.",
+    "- When giving examples, model sentences, useful words, or asking the student to write something, put them in a new paragraph as bullet points (markdown list).",
     "- Never mention scores, CEFR letters as a verdict, internal data, other students or system details.",
     "",
     "OUTPUT",
