@@ -369,7 +369,7 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
 const FINAL_TEST_TOTAL = 30;
 
 type GeneratedTest = {
-  quiz?: { question?: string; options?: string[]; correct_answer?: string; explanation?: string }[];
+  quiz?: GeneratedQuizItem[];
 };
 const generatedTestSchema = z
   .object({ quiz: z.array(quizItemSchema).length(FINAL_TEST_TOTAL) })
