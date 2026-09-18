@@ -12,6 +12,13 @@ import { useLessons, type Lesson } from "@/hooks/useLearning";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
+import { findLevel } from "@/lib/level";
+import {
+  listeningLevelConfig,
+  pickListeningSentences,
+  sentencesFromText,
+  type ListeningLevelConfig,
+} from "@/lib/listeningLevels";
 import { speakEnglish } from "@/lib/speech";
 import { transcribeAudio } from "@/lib/transcribe";
 import {
@@ -43,98 +50,19 @@ export const Route = createFileRoute("/_authenticated/listening")({
   component: ListeningPage,
 });
 
-type Track = { id: string; label: string; description: string; sentences: string[] };
-
-/** Each track presents one sentence per round. */
+/** Each round presents one sentence at a time. */
 const SENTENCES_PER_TRACK = 3;
-/** Pronunciation drills use short sentences: 5 to 7 words. */
-const MIN_WORDS = 5;
-const MAX_WORDS = 7;
+/** Kept for the existing evidence records, which store one track id. */
+const LEGACY_TRACK_ID = "everyday" as const;
 
-function countWords(sentence: string) {
-  return sentence.replace(/\s+/g, " ").trim().split(" ").filter(Boolean).length;
+/** Sentences taken from the lessons of the student's own level. */
+function lessonSentencesForLevel(lessons: Lesson[], level: string, config: ListeningLevelConfig) {
+  return lessons
+    .filter((lesson) => findLevel(lesson.level).value === level)
+    .flatMap((lesson) =>
+      sentencesFromText(`${lesson.summary ?? ""} ${lesson.transcript ?? ""}`, config),
+    );
 }
-
-function clampWords(sentence: string, max = MAX_WORDS) {
-  const words = sentence.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
-  if (words.length <= max) return sentence.trim();
-  const clipped = words
-    .slice(0, max)
-    .join(" ")
-    .replace(/[,;:]$/, "");
-  return /[.!?]$/.test(clipped) ? clipped : `${clipped}.`;
-}
-
-/** Keeps only drills with 5 to 7 words. */
-function isDrillLength(sentence: string) {
-  const total = countWords(sentence);
-  return total >= MIN_WORDS && total <= MAX_WORDS;
-}
-
-const tracks: Track[] = [
-  {
-    id: "everyday",
-    label: "Everyday English",
-    description: "Daily routines, small talk and casual plans.",
-    sentences: [
-      "I get up early every morning.",
-      "Let's grab a coffee after work.",
-      "She lives near the train station.",
-      "I forgot my keys at home.",
-      "We are having dinner outside tonight.",
-      "It looks like rain this afternoon.",
-    ],
-  },
-  {
-    id: "professional",
-    label: "Professional English",
-    description: "Meetings, emails and workplace conversations.",
-    sentences: [
-      "Could you send me the report?",
-      "We must call the client today.",
-      "The deadline moved to next month.",
-      "Let's schedule a quick call tomorrow.",
-      "I need support with this presentation.",
-      "The team delivered the first version.",
-    ],
-  },
-  {
-    id: "travel",
-    label: "Travel English",
-    description: "Airports, hotels, restaurants and directions.",
-    sentences: [
-      "Where is the gate for Lisbon?",
-      "I have a reservation for tonight.",
-      "How do I reach the station?",
-      "Is breakfast included in the price?",
-      "A table for two, please.",
-      "My luggage did not arrive today.",
-    ],
-  },
-];
-
-/** Sentences taken from the lessons the student already has, so listening follows the course. */
-function lessonSentences(lessons: Lesson[]) {
-  const byCategory = new Map<string, string[]>();
-  for (const lesson of lessons) {
-    const text = `${lesson.summary ?? ""} ${lesson.transcript ?? ""}`;
-    const parts = text
-      .replace(/\s+/g, " ")
-      .split(/(?<=[.!?])\s+/)
-      .map((s) => clampWords(s.trim()))
-      .filter((s) => isDrillLength(s) && /^[A-Za-z]/.test(s));
-    const key = (lesson.category || "general").toLowerCase();
-    byCategory.set(key, [...(byCategory.get(key) ?? []), ...parts]);
-  }
-  return byCategory;
-}
-
-// Grammar lessons never feed the tracks — sentences must match each track's theme.
-const trackCategories: Record<string, string[]> = {
-  everyday: ["everyday", "conversation", "vocabulary", "general", "speaking", "listening"],
-  professional: ["professional", "business", "work", "writing"],
-  travel: ["travel"],
-};
 
 function normalize(value: string) {
   return value
@@ -205,7 +133,10 @@ function ListeningPage() {
     type: "listening_practice",
     title: "Listening practice",
   });
-  const track = tracks[0]!;
+  const track = { id: LEGACY_TRACK_ID };
+  // The drills follow the CEFR level stored on the profile.
+  const levelInfo = findLevel(profile?.level);
+  const config = listeningLevelConfig(profile?.level);
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [checked, setChecked] = useState<number | null>(null);
@@ -241,19 +172,16 @@ function ListeningPage() {
   const { data: startedLessons } = useLessonRound();
   const lessonCount = startedLessons ?? 0;
 
-  const sentences = useMemo(() => {
-    const fromLessons = lessonSentences(lessons ?? []);
-    const extra = (trackCategories[track.id] ?? []).flatMap((c) =>
-      (fromLessons.get(c) ?? []).map(clampWords),
-    );
-    const pool = [...new Set([...extra, ...track.sentences.map(clampWords)])].filter(isDrillLength);
-    const start = pool.length ? (lessonCount * SENTENCES_PER_TRACK) % pool.length : 0;
-    const picked: string[] = [];
-    for (let i = 0; i < Math.min(SENTENCES_PER_TRACK, pool.length); i += 1) {
-      picked.push(pool[(start + i) % pool.length]!);
-    }
-    return picked;
-  }, [lessons, lessonCount, track]);
+  const sentences = useMemo(
+    () =>
+      pickListeningSentences({
+        config,
+        lessonSentences: lessonSentencesForLevel(lessons ?? [], levelInfo.value, config),
+        rotation: lessonCount,
+        count: SENTENCES_PER_TRACK,
+      }),
+    [lessons, lessonCount, config, levelInfo.value],
+  );
 
   const sentence = sentences[index] ?? "";
   const isDone = completed[track.id] === lessonCount;
@@ -315,14 +243,19 @@ function ListeningPage() {
   async function play(slow = false) {
     setPlaying(true);
     try {
-      if (slow) {
+      // Lower levels practise word by word; from B1 the sentence stays whole,
+      // just slower, so rhythm and intonation are preserved.
+      if (slow && config.slowMode === "word-by-word") {
         const words = sentence.split(/\s+/).filter(Boolean);
         for (const word of words) {
-          await speakEnglish(word, { cache: "persistent" });
+          await speakEnglish(word, { cache: "persistent", rate: config.rate });
           await new Promise((resolve) => setTimeout(resolve, 350));
         }
       } else {
-        await speakEnglish(sentence, { cache: "persistent" });
+        await speakEnglish(sentence, {
+          cache: "persistent",
+          rate: slow ? config.rate * 0.85 : config.rate,
+        });
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Audio is unavailable right now.");
@@ -433,11 +366,19 @@ function ListeningPage() {
     <AppShell>
       <div className="space-y-6">
         <header>
-          <p className="text-sm text-muted-foreground">Listening Lab</p>
+          <p className="text-sm text-muted-foreground">
+            <span>Listening Practice</span>
+            <span> • {config.label}</span>
+          </p>
           <h1 className="text-2xl font-semibold">Train your ear with real English</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
             activity — a new set arrives every time you start a new lesson in the Learning Center.
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            <span>Pronunciation</span>
+            <span> • {config.label} — </span>
+            <span>{config.focus}</span>
           </p>
           <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
             <RotateCcw className="mr-2 size-4" /> Redo today's activity
@@ -487,7 +428,8 @@ function ListeningPage() {
                 <Volume2 className="mr-2 size-4" /> {playing ? "Playing..." : "Play sentence"}
               </Button>
               <Button variant="outline" onClick={() => play(true)} disabled={playing}>
-                <RotateCcw className="mr-2 size-4" /> Play word by word
+                <RotateCcw className="mr-2 size-4" />{" "}
+                {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
               </Button>
             </div>
 

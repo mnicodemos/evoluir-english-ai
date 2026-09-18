@@ -11,6 +11,12 @@ const SPEECH_FORMAT_VERSION = "pcm24-kore-095-v1";
 
 export type SpeechOptions = {
   cache?: "memory" | "persistent";
+  /**
+   * Playback speed applied to the generated audio (1 = natural speed).
+   * Used to slow the voice down for lower CEFR levels without changing the
+   * audio provider or the cached audio itself.
+   */
+  rate?: number;
 };
 
 let audioContext: AudioContext | null = null;
@@ -214,8 +220,14 @@ async function requestSpeech(
   }
 }
 
+/** Keeps the playback speed inside a natural, intelligible range. */
+function clampRate(rate: number | undefined) {
+  if (!rate || !Number.isFinite(rate)) return 1;
+  return Math.min(1.2, Math.max(0.6, rate));
+}
+
 /** Free browser voice used whenever the audio service is unavailable. */
-async function speakWithBrowser(value: string): Promise<void> {
+async function speakWithBrowser(value: string, rate = 1): Promise<void> {
   const synth = window.speechSynthesis;
   if (!synth) throw new Error("Audio playback is not supported by this browser.");
 
@@ -243,7 +255,7 @@ async function speakWithBrowser(value: string): Promise<void> {
     activeUtterance = utterance;
     utterance.lang = "en-US";
     utterance.pitch = profile.pitch;
-    utterance.rate = profile.rate;
+    utterance.rate = profile.rate * clampRate(rate);
     const englishVoices = voices.filter((candidate) =>
       candidate.lang?.toLowerCase().startsWith("en"),
     );
@@ -303,8 +315,9 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   const value = text?.trim();
   if (!value || typeof window === "undefined") throw new Error("Choose a word to hear.");
 
+  const rate = clampRate(options.rate);
   const AudioContextClass = window.AudioContext;
-  if (!AudioContextClass) return speakWithBrowser(value);
+  if (!AudioContextClass) return speakWithBrowser(value, rate);
   audioContext ??= new AudioContextClass({ sampleRate: 24000 });
   if (audioContext.state === "suspended") await audioContext.resume();
   const context = audioContext;
@@ -343,12 +356,13 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
     const gain = context.createGain();
     gain.gain.value = 1.15;
     source.buffer = decoded;
+    source.playbackRate.value = rate;
     source.connect(gain);
     gain.connect(context.destination);
     playhead = Math.max(playhead, context.currentTime + 0.02);
     source.onended = () => activeSources.delete(source);
     source.start(playhead);
-    playhead += decoded.duration;
+    playhead += decoded.duration / rate;
     activeSources.add(source);
     streamed = true;
   };
@@ -358,7 +372,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   } catch {
     if (requestId !== playRequest) return;
     if (streamed) return;
-    return speakWithBrowser(value);
+    return speakWithBrowser(value, rate);
   }
   if (requestId !== playRequest) return;
   if (context.state === "suspended") await context.resume();
@@ -381,6 +395,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   const gain = context.createGain();
   gain.gain.value = 1.15;
   source.buffer = decoded;
+  source.playbackRate.value = rate;
   source.connect(gain);
   gain.connect(context.destination);
   activeSources.add(source);
