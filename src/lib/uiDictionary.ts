@@ -687,4 +687,28 @@ export const uiPt: Record<string, string> = {
     "Dependência excessiva de respostas fragmentadas em vez de frases completas",
   "Using social formulas inappropriately in response to open-ended questions":
     "Uso inapropriado de fórmulas sociais em resposta a perguntas abertas",
+
+  // Auth / login page
+  "Your English teacher is waiting for you.": "Seu professor de inglês está esperando por você.",
+  "Conversation, writing and vocabulary practice with feedback in seconds.":
+    "Pratique conversação, escrita e vocabulário com feedback em segundos.",
+  "Back to home": "Voltar ao início",
+  "Check your email": "Verifique seu e-mail",
+  "We sent a confirmation link to": "Enviamos um link de confirmação para",
+  "Click it to activate your account, then come back and sign in.":
+    "Clique nele para ativar sua conta, depois volte e entre.",
+  "Back to sign in": "Voltar para entrar",
+  "Create your account": "Crie sua conta",
+  "Two minutes to set up your personal learning plan.":
+    "Dois minutos para configurar seu plano de aprendizado pessoal.",
+  "Sign in to continue your streak.": "Entre para continuar sua sequência.",
+  Email: "E-mail",
+  Password: "Senha",
+  "Hide password": "Ocultar senha",
+  "Show password": "Mostrar senha",
+  "Sign in": "Entrar",
+  "Start my evolution": "Começar minha evolução",
+  "Already have an account?": "Já tem uma conta?",
+  "New here?": "Novo por aqui?",
+  "Create an account": "Criar uma conta",
 };
