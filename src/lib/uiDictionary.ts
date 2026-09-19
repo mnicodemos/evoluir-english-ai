@@ -702,8 +702,8 @@ export const uiPt: Record<string, string> = {
   "Two minutes to set up your personal learning plan.":
     "Dois minutos para configurar seu plano de aprendizado pessoal.",
   "Sign in to continue your streak.": "Entre para continuar sua sequência.",
-  "Email": "E-mail",
-  "Password": "Senha",
+  Email: "E-mail",
+  Password: "Senha",
   "Hide password": "Ocultar senha",
   "Show password": "Mostrar senha",
   "Sign in": "Entrar",
