@@ -17,10 +17,10 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Sign in" },
-      { name: "description", content: "Sign in or create your Evoluir+ English AI account." },
-      { property: "og:title", content: "Evoluir+ English AI · Sign in" },
-      { property: "og:description", content: "Sign in or create your Evoluir+ English AI account." },
+      { title: "Evoluir+ English AI · Entrar" },
+      { name: "description", content: "Entre ou crie sua conta na Evoluir+ English AI." },
+      { property: "og:title", content: "Evoluir+ English AI · Entrar" },
+      { property: "og:description", content: "Entre ou crie sua conta na Evoluir+ English AI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex, nofollow" },
