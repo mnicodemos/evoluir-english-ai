@@ -42,11 +42,7 @@ const nav = [
 const sidebarNav = [...nav, { to: "/premium", label: "Premium", icon: Crown }] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
-  return (
-    <UiLangProvider>
-      <AppShellContent>{children}</AppShellContent>
-    </UiLangProvider>
-  );
+  return <AppShellContent>{children}</AppShellContent>;
 }
 
 function AppShellContent({ children }: { children: ReactNode }) {
