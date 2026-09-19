@@ -8,7 +8,7 @@ const UI_LANG_KEY = "evoluir-ui-lang";
 
 type Ctx = { lang: UiLang; setLang: (lang: UiLang) => void };
 
-const UiLangContext = createContext<Ctx>({ lang: "en", setLang: () => {} });
+const UiLangContext = createContext<Ctx>({ lang: "pt", setLang: () => {} });
 
 export function useUiLang() {
   return useContext(UiLangContext);
@@ -22,7 +22,7 @@ const ATTRS = ["placeholder", "aria-label", "title"] as const;
  * so they always stay in English.
  */
 export function UiLangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<UiLang>("en");
+  const [lang, setLangState] = useState<UiLang>("pt");
   const rootRef = useRef<HTMLDivElement>(null);
   const originals = useRef(new WeakMap<Node, string>());
   const attrOriginals = useRef(new WeakMap<Element, Record<string, string>>());
