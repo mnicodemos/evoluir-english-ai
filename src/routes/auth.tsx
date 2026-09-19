@@ -113,12 +113,15 @@ function AuthPage() {
             <span className="font-display font-semibold">Evoluir+ English AI</span>
           </Link>
 
-          <Link
-            to="/"
-            className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <span aria-hidden="true">←</span> Back to home
-          </Link>
+          <div className="mb-6 flex items-center justify-between">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <span aria-hidden="true">←</span> Back to home
+            </Link>
+            <UiLangToggle />
+          </div>
 
           {sent ? (
             <div className="card-soft p-7 text-center">
