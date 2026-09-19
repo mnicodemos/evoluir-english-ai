@@ -46,7 +46,7 @@ const featureIcons = [MessageSquareText, PenLine, BookOpen];
 const stepNumbers = ["01", "02", "03", "04"];
 
 function Landing() {
-  const [lang, setLang] = useState<LandingLang>("en");
+  const [lang, setLang] = useState<LandingLang>("pt");
   const t = landingCopy[lang];
 
   // The landing page is always shown in the dark theme.
