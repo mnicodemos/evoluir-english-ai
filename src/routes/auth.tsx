@@ -221,7 +221,7 @@ function AuthPage() {
         </div>
       </div>
       </div>
-      <Footer leftAligned />
+      <Footer leftAligned lang={lang} />
     </div>
 
 
