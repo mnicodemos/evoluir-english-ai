@@ -25,7 +25,7 @@ import { AiTeacherFloatButton } from "@/components/AiTeacherFloatButton";
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
-import { UiLangProvider, UiLangToggle, useUiLang } from "@/lib/uiLang";
+import { UiLangToggle, useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 
 const nav = [
