@@ -8,14 +8,16 @@ import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
 
-type Props = { userId: string };
+type Props = { userId: string; daysPerWeek?: number };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
 const LABELS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const LABELS_PT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
-/** Weekly frequency strip: one tile per weekday of the current week. */
-export function WeeklyFrequency({ userId }: Props) {
+/** Weekly frequency strip: one tile per weekday of the current week.
+ *  The trophy uses the student's configured weekly frequency, falling back to 7. */
+export function WeeklyFrequency({ userId, daysPerWeek }: Props) {
+  const weeklyGoal = daysPerWeek ?? 7;
   const { lang } = useUiLang();
   const labels = lang === "pt" ? LABELS_PT : LABELS_EN;
   const todayKey = dayFmt.format(new Date());
@@ -50,7 +52,7 @@ export function WeeklyFrequency({ userId }: Props) {
     },
   });
 
-  const allStudied = (studyDays?.size ?? 0) === 7;
+  const allStudied = (studyDays?.size ?? 0) >= weeklyGoal;
   const studiedCount = studyDays?.size ?? 0;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
@@ -58,11 +60,11 @@ export function WeeklyFrequency({ userId }: Props) {
   return (
     <div className="flex h-full items-center gap-3">
       <div className="flex flex-col items-center gap-1.5">
-        <TrophyBadge active={allStudied} lang={lang} />
+        <TrophyBadge active={allStudied} lang={lang} days={weeklyGoal} />
         <div className="flex w-11 flex-col items-center text-center text-[10px] font-medium leading-tight text-muted-foreground">
           <span>{goalLabel}</span>
           <span>
-            {studiedCount}/7 {daysLabel}
+            {studiedCount}/{weeklyGoal} {daysLabel}
           </span>
         </div>
       </div>
@@ -92,9 +94,11 @@ export function WeeklyFrequency({ userId }: Props) {
   );
 }
 
-function TrophyBadge({ active, lang }: { active: boolean; lang: "pt" | "en" }) {
-  const unlockedText = lang === "pt" ? "Troféu de 7 dias desbloqueado" : "7-day trophy unlocked";
-  const lockedText = lang === "pt" ? "Troféu de 7 dias bloqueado" : "7-day trophy locked";
+function TrophyBadge({ active, lang, days }: { active: boolean; lang: "pt" | "en"; days: number }) {
+  const unlockedText =
+    lang === "pt" ? `Troféu de ${days} dias desbloqueado` : `${days}-day trophy unlocked`;
+  const lockedText =
+    lang === "pt" ? `Troféu de ${days} dias bloqueado` : `${days}-day trophy locked`;
 
   return (
     <span

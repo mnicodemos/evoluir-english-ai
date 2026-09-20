@@ -268,7 +268,7 @@ function Dashboard() {
                 <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
               </Link>
               <div className="card-soft h-full w-full p-5">
-                <WeeklyFrequency userId={profile.id} />
+                <WeeklyFrequency userId={profile.id} daysPerWeek={profile.study_days_per_week ?? 7} />
               </div>
             </section>
           </div>
