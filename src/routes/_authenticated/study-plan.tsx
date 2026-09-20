@@ -64,7 +64,7 @@ function StudyPlanPage() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["study-plan", profile?.id],
     queryFn: () => loadStudyPlan(),
     enabled: !!profile?.id,
