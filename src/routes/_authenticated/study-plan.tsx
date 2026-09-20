@@ -114,18 +114,13 @@ function StudyPlanPage() {
   // "Previous plan → Updated plan": the plan shown before the recalculation is
   // kept in memory only, so nothing new is stored.
   const [previous, setPrevious] = useState<StudyPlanDay[] | null>(null);
-  const [updating, setUpdating] = useState(false);
 
-  const recalculate = async () => {
+  const recalculate = () => {
     if (!plan) return;
     setPrevious(plan.days);
-    setUpdating(true);
-    try {
-      await queryClient.invalidateQueries({ queryKey: ["study-plan"] });
-      toast.success("Plan updated with your recent progress");
-    } finally {
-      setUpdating(false);
-    }
+    void queryClient
+      .invalidateQueries({ queryKey: ["study-plan"] })
+      .then(() => toast.success("Plan updated with your recent progress"));
   };
 
   const changed =
