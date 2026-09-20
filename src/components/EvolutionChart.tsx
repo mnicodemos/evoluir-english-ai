@@ -20,7 +20,6 @@ type Props = {
   level?: string;
 };
 
-
 type ProgressRow = {
   id: string;
   user_id: string;
@@ -116,8 +115,7 @@ export function EvolutionChart({ userId }: Props) {
       <p className="mt-1 text-sm text-muted-foreground">
         <span>{t("Last 7 days:")}</span> <span>{t("day 1 is")}</span>{" "}
         <span>{chartData[0]?.name}</span> <span>{t("and day 7 is today")}</span>{" "}
-        <span>({chartData[6]?.name})</span>.{" "}
-        <span>{t("Each line shows your score in %.")}</span>
+        <span>({chartData[6]?.name})</span>. <span>{t("Each line shows your score in %.")}</span>
       </p>
       <div className="mt-5 h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
@@ -166,4 +164,3 @@ export function EvolutionChart({ userId }: Props) {
     </>
   );
 }
-
