@@ -130,6 +130,15 @@ describe("next step content", () => {
     });
   });
 
+  it("uses the current profile level in the contextual insight", () => {
+    const step = buildNextStep({
+      ...base,
+      currentLevel: "b2",
+      skills: [skill("grammar", 72)],
+    });
+    expect(step.insight?.cefrLevel).toBe("b2");
+  });
+
   it("never uses a lesson from another skill", () => {
     const step = buildNextStep({
       ...base,

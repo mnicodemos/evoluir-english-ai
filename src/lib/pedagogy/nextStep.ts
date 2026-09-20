@@ -50,6 +50,8 @@ export type NextStep = {
 
 export type NextStepInput = {
   skills: SkillSnapshot[];
+  /** Current CEFR level from the existing user profile. */
+  currentLevel?: string | null;
   /** learning_profile.common_errors (most recent last). */
   recurringErrors: string[];
   /** Skills practised in the recent window, from existing activities rows. */
@@ -142,7 +144,8 @@ export function buildNextStep(input: NextStepInput): NextStep {
   const best = ordered[0]!;
   const insight = {
     cefrLevel:
-      best.skill.cefrLevel === "insufficient_evidence" ? null : best.skill.cefrLevel,
+      input.currentLevel ??
+      (best.skill.cefrLevel === "insufficient_evidence" ? null : best.skill.cefrLevel),
     confidence: best.skill.confidence,
     hasEvidence: best.skill.score !== null || best.skill.confidence !== null,
     recentlyPractised: input.recentlyPractised.includes(best.skill.skill),

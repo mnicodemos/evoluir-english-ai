@@ -9,6 +9,7 @@ import {
   NEXT_STEP_SKILL_TEXT,
 } from "@/lib/pedagogy/nextStep";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
+import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -45,7 +46,7 @@ export function NextStepCard() {
     data.insight?.confidence === null || data.insight?.confidence === undefined
       ? null
       : Math.round(data.insight.confidence * 100);
-  const cefrLevel = data.insight?.cefrLevel?.toUpperCase() ?? null;
+  const cefrLevel = data.insight?.cefrLevel ? findLevel(data.insight.cefrLevel).label : null;
   const progressionReason = data.insight?.recentlyPractised
     ? t("Builds on your recent practice")
     : t("Adds recent evidence to your progress");
