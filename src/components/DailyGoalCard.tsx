@@ -31,7 +31,7 @@ export function useMinutesToday(userId?: string) {
       const { data, error } = await supabase
         .from("activities")
         .select("duration_minutes, activity_type")
-        .eq("user_id", userId)
+        .eq("user_id", userId!)
         .in("activity_type", [...LEARNING_ACTIVITY_TYPES])
         .gte("created_at", start.toISOString());
       if (error) throw error;
