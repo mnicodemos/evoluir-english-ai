@@ -202,10 +202,10 @@ function StudyPlanPage() {
             <Button
               variant="outline"
               className="min-h-11 w-full sm:w-auto"
-              disabled={updating || !plan}
-              onClick={() => void recalculate()}
+              disabled={isFetching || !plan}
+              onClick={recalculate}
             >
-              {updating ? (
+              {isFetching ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <RefreshCw className="size-4" />
