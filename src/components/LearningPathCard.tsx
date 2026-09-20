@@ -113,11 +113,11 @@ export function CurriculumPath() {
         </Button>
       </section>
 
-      <div className="grid gap-5 xl:grid-cols-2 2xl:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
         {path.units.map((unit) => (
           <section key={unit.unit} className="card-soft p-5" aria-label={unit.title}>
-            <div className="flex items-center justify-between gap-3">
-            <div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+            <div className="min-w-0">
               <h3 className="font-semibold">{unit.title}</h3>
               {unit.unit === 6 && <p className="text-xs text-muted-foreground">Optional review · does not block the Final Test</p>}
             </div>

@@ -125,12 +125,12 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Sparkles className="size-5" aria-hidden="true" />
           </span>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
             <p className="text-sm text-muted-foreground">
               {t("Practice English with your personal AI teacher")}
@@ -160,7 +160,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
         </div>
       )}
 
-      <Card className="flex h-[60vh] min-h-[360px] flex-col overflow-hidden p-0 sm:h-[62vh]">
+      <Card className="flex h-[min(60dvh,38rem)] min-h-[20rem] flex-col overflow-hidden p-0 sm:h-[min(62dvh,42rem)] sm:min-h-[22.5rem]">
         <Conversation className="flex-1">
           <ConversationContent className="gap-6 p-4">
             {messages.length === 0 && (
@@ -243,13 +243,16 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             placeholder={t("Type your message...")}
             disabled={turn.isPending}
             onChange={(event) => setInput(event.target.value)}
+            onFocus={(event) => {
+              window.setTimeout(() => event.currentTarget.scrollIntoView({ block: "center" }), 150);
+            }}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
                 send(input);
               }
             }}
-            className="min-h-[52px] resize-none"
+            className="min-h-[52px] scroll-mb-32 resize-none"
           />
           <Button
             type="submit"

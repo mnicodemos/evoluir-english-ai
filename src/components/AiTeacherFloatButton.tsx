@@ -16,7 +16,7 @@ export function AiTeacherFloatButton({ className }: { className?: string }) {
       to="/teacher"
       aria-label="AI Teacher"
       className={cn(
-        "fixed bottom-[4.5rem] right-4 z-40 grid size-14 place-items-center rounded-full transition-transform duration-200 hover:scale-110 lg:bottom-8 lg:right-8",
+        "fixed bottom-[calc(8rem+env(safe-area-inset-bottom))] right-4 z-40 grid size-14 place-items-center rounded-full transition-transform duration-200 hover:scale-110 sm:bottom-[calc(5rem+env(safe-area-inset-bottom))] lg:bottom-8 lg:right-8",
         className
       )}
       style={{

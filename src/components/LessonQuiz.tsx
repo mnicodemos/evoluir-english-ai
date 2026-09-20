@@ -149,7 +149,7 @@ export function LessonQuiz({
         const detail = submittedResult?.details.find((item) => item.question_id === q.id);
         const isCorrect = detail?.is_correct === true;
         return (
-          <div key={q.id} className="card-soft p-5">
+          <div key={q.id} className="card-soft break-words p-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Question {i + 1}
             </p>
@@ -174,7 +174,7 @@ export function LessonQuiz({
                     type="button"
                     disabled={submitted}
                     onClick={() => setAnswers((a) => ({ ...a, [q.id]: opt }))}
-                    className={`rounded-lg border px-4 py-2.5 text-left text-sm font-medium transition-colors ${style} ${textColor}`}
+                    className={`min-h-11 rounded-lg border px-4 py-3 text-left text-sm font-medium transition-colors ${style} ${textColor}`}
                   >
                     {opt}
                   </button>

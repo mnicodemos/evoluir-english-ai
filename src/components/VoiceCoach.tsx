@@ -443,7 +443,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
         </div>
       )}
 
-      <section className="card-soft flex h-[58vh] min-h-[430px] flex-col overflow-hidden">
+      <section className="card-soft flex h-[min(58dvh,38rem)] min-h-[22rem] flex-col overflow-hidden sm:min-h-[26.875rem]">
         <Conversation>
           <ConversationContent className="gap-5 p-5">
             {messages.map((message, index) => (
@@ -494,11 +494,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
                   .find((message) => message.role === "assistant");
                 if (last) void playResponse(last.content);
               }}
-              className={
-                voiceState === "speaking"
-                  ? "bg-success text-success-foreground hover:bg-success/90"
-                  : ""
-              }
+              className={voiceState === "speaking" ? "bg-success text-success-foreground hover:bg-success/90" : ""}
             >
               <Volume2 />
             </Button>
