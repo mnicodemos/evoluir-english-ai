@@ -11,13 +11,15 @@ import {
 } from "recharts";
 
 import { supabase } from "@/integrations/supabase/client";
+import { buildSkillHistory, type SkillResultRow } from "@/lib/skillHistory";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 
 type Props = {
   userId: string;
-  level: string;
+  level?: string;
 };
+
 
 type ProgressRow = {
   id: string;
