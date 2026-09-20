@@ -62,7 +62,7 @@ export function LessonVideo({
             allowFullScreen
           />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Progress value={progress} className="h-2 flex-1" />
           <Button
             size="sm"
@@ -129,7 +129,7 @@ export function LessonVideo({
               key={s}
               type="button"
               onClick={() => setSpeed(s)}
-              className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+              className={`min-h-11 min-w-11 rounded-md px-2 py-1 text-xs font-medium transition-colors sm:min-h-8 sm:min-w-0 ${
                 speed === s
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:bg-secondary"

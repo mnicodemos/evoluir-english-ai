@@ -164,9 +164,9 @@ function ProgressPage() {
           <h2 className="text-lg font-semibold">{t("Recent activity")}</h2>
           <ul className="mt-4 divide-y divide-border">
             {recent.map((a) => (
-              <li key={a.id} className="flex items-center justify-between py-3 text-sm">
-                <span>
-                  <span className="block font-medium">
+              <li key={a.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 text-sm">
+                <span className="min-w-0">
+                  <span className="block break-words font-medium">
                     {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
                       <>
                         <span>Lesson:</span> {(a.title as string).slice(8)}
@@ -180,7 +180,7 @@ function ProgressPage() {
                   </span>
                 </span>
                 {a.score != null && (
-                  <span className="font-semibold text-[oklch(0.55_0.14_158)]">{a.score}%</span>
+                  <span className="shrink-0 font-semibold text-[oklch(0.55_0.14_158)]">{a.score}%</span>
                 )}
               </li>
             ))}

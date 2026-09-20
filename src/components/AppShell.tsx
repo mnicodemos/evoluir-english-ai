@@ -74,7 +74,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="min-h-screen bg-background pb-20 lg:pb-0 lg:pl-20">
+      <div className="min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0 lg:pl-20">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-20 flex-col items-center bg-sidebar py-5 text-sidebar-foreground lg:flex">
           <Link
             to="/dashboard"
@@ -127,12 +127,12 @@ function AppShellContent({ children }: { children: ReactNode }) {
           </div>
         </aside>
 
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background/85 px-4 backdrop-blur lg:hidden">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <Logo className="size-[1.3rem]" />
-            <span className="font-display text-sm font-semibold">Evoluir+ English AI</span>
+        <header className="sticky top-0 z-20 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/85 px-3 backdrop-blur sm:px-4 lg:hidden">
+          <Link to="/dashboard" className="flex min-w-0 items-center gap-2">
+            <Logo className="size-[1.3rem] shrink-0" />
+            <span className="truncate font-display text-sm font-semibold">Evoluir+ English AI</span>
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
             <UiLangToggle />
             <ThemeToggle />
             <Button
@@ -160,18 +160,18 @@ function AppShellContent({ children }: { children: ReactNode }) {
           {children}
         </main>
 
-        <div className="mb-20 lg:mb-0">
+        <div className="mb-0">
           <Footer lang={lang} containerClassName="max-w-[1440px] px-4 sm:px-6 lg:px-8 xl:px-10" />
         </div>
 
-        <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-9 place-items-center border-t border-border bg-background/95 px-1 py-2 backdrop-blur lg:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 place-items-center border-t border-border bg-background/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur sm:grid-cols-9 lg:hidden">
           {sidebarNav.map((item) => (
             <Tooltip key={item.to}>
               <TooltipTrigger asChild>
                 <Link
                   to={item.to}
                   aria-label={translate(item.label)}
-                  className="grid size-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="grid size-11 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:size-10"
                   activeProps={{ className: "bg-accent text-foreground" }}
                 >
                   <item.icon className="size-5" />

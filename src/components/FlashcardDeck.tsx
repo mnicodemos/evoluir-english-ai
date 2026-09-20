@@ -121,7 +121,7 @@ export function FlashcardDeck({
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Progress value={(index / cards.length) * 100} className="h-2 flex-1" />
         <span className="text-xs text-muted-foreground">
           {index + 1}/{cards.length}
@@ -138,7 +138,7 @@ export function FlashcardDeck({
           <button
             type="button"
             onClick={() => setFlipped(true)}
-            className="relative z-10 flex aspect-[4/3] w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-primary-foreground/25 bg-primary p-6 text-center text-primary-foreground shadow-[var(--shadow-lift)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="relative z-10 flex min-h-72 w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-primary-foreground/25 bg-primary p-6 text-center text-primary-foreground shadow-[var(--shadow-lift)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:aspect-[4/3] sm:min-h-0"
           >
             <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-primary-foreground/15 px-2 py-1 text-[0.65rem] font-bold uppercase text-primary-foreground">
               {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
@@ -155,7 +155,7 @@ export function FlashcardDeck({
         ) : (
           <div
             className={cn(
-              "relative z-10 flex aspect-[4/3] w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 bg-primary p-6 text-center text-primary-foreground shadow-[var(--shadow-lift)] transition-colors",
+              "relative z-10 flex min-h-72 w-full max-w-md flex-col items-center justify-center gap-4 overflow-y-auto rounded-xl border-4 bg-primary p-6 text-center text-primary-foreground shadow-[var(--shadow-lift)] transition-colors sm:aspect-[4/3] sm:min-h-0",
               feedback === "correct" && "border-success",
               feedback === "incorrect" && "border-destructive",
               !feedback && "border-primary-foreground/25",

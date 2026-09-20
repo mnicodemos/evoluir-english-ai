@@ -87,7 +87,7 @@ function AuthPage() {
   }
 
   return (
-    <div className="dark flex min-h-screen flex-col bg-background text-foreground">
+    <div className="dark flex min-h-dvh flex-col bg-background text-foreground">
       <div className="grid flex-1 lg:grid-cols-2">
         <div className="relative hidden flex-col bg-secondary p-12 lg:flex">
           <Link to="/" className="flex items-center gap-2 text-foreground">
@@ -104,14 +104,14 @@ function AuthPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-center px-5 py-14">
+        <div className="flex items-center justify-center px-5 py-8 sm:py-14">
           <div className="w-full max-w-sm">
             <Link to="/" className="mb-8 flex items-center gap-2 lg:hidden">
               <Logo className="size-[1.2rem]" />
               <span className="font-display font-semibold">Evoluir+ English AI</span>
             </Link>
 
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <Link
                 to="/"
                 className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -158,6 +158,7 @@ function AuthPage() {
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                       className="scroll-mt-20"
                         placeholder="Marcelo"
                         required
                       />
@@ -170,6 +171,7 @@ function AuthPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                     className="scroll-mt-20"
                       placeholder="you@company.com"
                       required
                     />
@@ -185,13 +187,13 @@ function AuthPage() {
                         placeholder="••••••••"
                         minLength={6}
                         required
-                        className="pr-10"
+                        className="scroll-mt-20 pr-12"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
                         aria-label={showPassword ? "Hide password" : "Show password"}
-                        className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground transition-colors hover:text-foreground"
+                        className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>

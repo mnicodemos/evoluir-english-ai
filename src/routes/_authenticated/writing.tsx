@@ -278,9 +278,9 @@ function Writing() {
         })}
       </div>
 
-      <section className="card-soft mt-5 p-6">
-        <div className="flex items-center justify-between gap-3">
-          <label className="text-sm font-medium">
+      <section className="card-soft mt-5 p-4 sm:p-6">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <label className="min-w-0 break-words text-sm font-medium">
             {allDone ? <span>Today's tasks</span> : prompt}
           </label>
           <span className="text-sm text-muted-foreground">
@@ -319,16 +319,19 @@ function Writing() {
             <Textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
+              onFocus={(event) => {
+                window.setTimeout(() => event.currentTarget.scrollIntoView({ block: "center" }), 150);
+              }}
               rows={9}
               placeholder="Write your answer in English…"
-              className="mt-5"
+              className="mt-5 min-h-52 scroll-mb-40 text-base"
             />
-            <div className="mt-4 flex items-center justify-between gap-3">
+            <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm text-muted-foreground">
                 {text.trim().split(/\s+/).filter(Boolean).length} words · <span>target</span>{" "}
                 {expectedLengthLabel(config)}
               </span>
-              <Button onClick={analyse} disabled={loading}>
+              <Button className="w-full sm:w-auto" onClick={analyse} disabled={loading}>
                 {loading ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (

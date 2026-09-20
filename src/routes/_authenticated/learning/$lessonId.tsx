@@ -155,7 +155,7 @@ function LessonPage() {
                 quiz.
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" onClick={() => setActiveTab("flashcards")}>
                 <Layers className="size-4" /> Flashcards
               </Button>
@@ -168,16 +168,16 @@ function LessonPage() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="video" className="gap-1.5">
+            <TabsTrigger value="video" aria-label="Video" className="gap-1.5">
               <Video className="size-4" /> <span className="hidden sm:inline">Video</span>
             </TabsTrigger>
-            <TabsTrigger value="summary" className="gap-1.5">
+            <TabsTrigger value="summary" aria-label="Summary" className="gap-1.5">
               <BookOpen className="size-4" /> <span className="hidden sm:inline">Summary</span>
             </TabsTrigger>
-            <TabsTrigger value="flashcards" className="gap-1.5">
+            <TabsTrigger value="flashcards" aria-label="Flashcards" className="gap-1.5">
               <Layers className="size-4" /> <span className="hidden sm:inline">Flashcards</span>
             </TabsTrigger>
-            <TabsTrigger value="quiz" className="gap-1.5">
+            <TabsTrigger value="quiz" aria-label="Quiz" className="gap-1.5">
               <ListChecks className="size-4" /> <span className="hidden sm:inline">Quiz</span>
             </TabsTrigger>
           </TabsList>

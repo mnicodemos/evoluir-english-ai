@@ -312,8 +312,8 @@ function Vocabulary() {
           const isChecking = checkingId === w.id;
           return (
             <article key={w.id} className="card-soft p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1 break-words">
                   <h3 className="text-lg font-semibold">{w.word}</h3>
                   <p className="text-sm text-muted-foreground">{w.translation}</p>
                 </div>
@@ -417,7 +417,7 @@ function Vocabulary() {
             type="button"
             onClick={() => setQuery("")}
             aria-label="Clear search"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-muted-foreground hover:text-foreground"
           >
             <X className="size-4" />
           </button>
