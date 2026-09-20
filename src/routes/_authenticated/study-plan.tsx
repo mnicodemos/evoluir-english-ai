@@ -254,6 +254,73 @@ function StudyPlanPage() {
               )}
             </section>
 
+            <section className="card-soft p-5">
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <Sparkles className="size-5 text-primary" />
+                Why this plan?
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">Based on your progress:</p>
+              <ul className="mt-3 space-y-2">
+                {plan.reasons.map((reason) => (
+                  <li
+                    key={`${reason.code}-${reason.skill ?? ""}`}
+                    className="flex items-start gap-2 text-sm"
+                  >
+                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <span className="break-words">{planReasonText(reason)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {changed && previous && (
+              <section className="card-soft p-5">
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <RefreshCw className="size-5 text-primary" />
+                  Previous plan → Updated plan
+                </h2>
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Previous plan
+                    </p>
+                    <ul className="mt-2 space-y-2">
+                      {previous.map((day) => (
+                        <li
+                          key={`prev-${day.day}`}
+                          className="rounded-lg border border-border p-3 text-sm"
+                        >
+                          <span className="font-medium">{day.day}</span> ·{" "}
+                          {SKILL_LABELS[day.skill] ?? day.skill}
+                          <p className="text-muted-foreground break-words">{day.title}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="flex items-center gap-1 text-xs uppercase tracking-wide text-primary">
+                      <ArrowRight className="size-3.5" />
+                      Updated plan
+                    </p>
+                    <ul className="mt-2 space-y-2">
+                      {plan.days.map((day) => (
+                        <li
+                          key={`next-${day.day}`}
+                          className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm"
+                        >
+                          <span className="font-medium">{day.day}</span> ·{" "}
+                          {SKILL_LABELS[day.skill] ?? day.skill}
+                          <p className="text-muted-foreground break-words">{day.title}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            )}
+
+
+
             <section className="space-y-3">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <CalendarCheck className="size-5 text-primary" />
