@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
+import { countsAsLearningMinutes, LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
 
 const presets = [10, 15, 20, 30, 45, 60];
 
@@ -29,10 +30,15 @@ export function useMinutesToday(userId?: string) {
       start.setHours(0, 0, 0, 0);
       const { data, error } = await supabase
         .from("activities")
-        .select("duration_minutes")
+        .select("duration_minutes, activity_type")
+        .eq("user_id", userId)
+        .in("activity_type", [...LEARNING_ACTIVITY_TYPES])
         .gte("created_at", start.toISOString());
       if (error) throw error;
-      return (data ?? []).reduce((sum, a) => sum + (a.duration_minutes ?? 0), 0);
+      return (data ?? []).reduce(
+        (sum, a) => sum + (countsAsLearningMinutes(a.activity_type) ? (a.duration_minutes ?? 0) : 0),
+        0,
+      );
     },
   });
 }
