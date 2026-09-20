@@ -10,6 +10,25 @@ export function countsAsStudyDay(activityType: string) {
 }
 
 /**
+ * Activity types that represent completed learning outcomes. The daily goal card
+ * only counts these, excluding residual timer/navigation records such as the
+ * "*_practice" telemetry rows written while a session is still open.
+ */
+export const LEARNING_ACTIVITY_TYPES = [
+  "lesson",
+  "final_test",
+  "conversation",
+  "listening",
+  "writing",
+  "vocabulary",
+  "flashcards",
+] as const;
+
+export function countsAsLearningMinutes(activityType: string) {
+  return (LEARNING_ACTIVITY_TYPES as readonly string[]).includes(activityType);
+}
+
+/**
  * Every activity type the app records, mapped to the skill bucket used by the
  * charts. Practice time (including abandoned sessions) is counted exactly once,
  * so the chart totals always match the minutes stored for the day.

@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
+import { countsAsLearningMinutes, LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
 
 const presets = [10, 15, 20, 30, 45, 60];
 
@@ -29,10 +30,16 @@ export function useMinutesToday(userId?: string) {
       start.setHours(0, 0, 0, 0);
       const { data, error } = await supabase
         .from("activities")
-        .select("duration_minutes")
+        .select("duration_minutes, activity_type")
+        .eq("user_id", userId!)
+        .in("activity_type", [...LEARNING_ACTIVITY_TYPES])
         .gte("created_at", start.toISOString());
       if (error) throw error;
-      return (data ?? []).reduce((sum, a) => sum + (a.duration_minutes ?? 0), 0);
+      return (data ?? []).reduce(
+        (sum, a) =>
+          sum + (countsAsLearningMinutes(a.activity_type) ? (a.duration_minutes ?? 0) : 0),
+        0,
+      );
     },
   });
 }
@@ -49,7 +56,10 @@ export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMin
 
   const save = useMutation({
     mutationFn: async (minutes: number) => {
-      const { error } = await supabase.from("profiles").update({ daily_minutes: minutes }).eq("id", userId);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ daily_minutes: minutes })
+        .eq("id", userId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -88,7 +98,9 @@ export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMin
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Daily goal</DialogTitle>
-              <DialogDescription>How many minutes of English do you want to practise each day?</DialogDescription>
+              <DialogDescription>
+                How many minutes of English do you want to practise each day?
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
@@ -125,13 +137,14 @@ export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMin
         </Dialog>
       </div>
       <Progress value={percent} className="mt-4 h-2" />
-      <p className={`mt-2 text-xs ${done >= goalMinutes ? "text-success/80" : "text-muted-foreground"}`}>
+      <p
+        className={`mt-2 text-xs ${done >= goalMinutes ? "text-success/80" : "text-muted-foreground"}`}
+      >
         {done >= goalMinutes ? (
           "Goal reached today. Great work!"
         ) : (
           <>
-            <span>{goalMinutes - done}</span>{" "}
-            <span>minutes left today</span>{" "}
+            <span>{goalMinutes - done}</span> <span>minutes left today</span>{" "}
             <span>({percent}%)</span>
           </>
         )}
