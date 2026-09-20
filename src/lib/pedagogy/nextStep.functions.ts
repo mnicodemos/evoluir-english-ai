@@ -71,6 +71,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
 
     return buildNextStep({
       skills: snapshots,
+      currentLevel: level,
       recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
       recentlyPractised: [
         ...new Set((recent.data ?? []).map((row) => row.activity_type).filter(Boolean)),
