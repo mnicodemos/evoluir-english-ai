@@ -166,7 +166,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
           <Footer lang={lang} containerClassName="max-w-[1440px] px-4 sm:px-6 lg:px-8 xl:px-10" />
         </div>
 
-        <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 place-items-center border-t border-border bg-background/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur sm:grid-cols-9 lg:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 place-items-center border-t border-border bg-background/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur sm:grid-cols-10 lg:hidden">
           {sidebarNav.map((item) => (
             <Tooltip key={item.to}>
               <TooltipTrigger asChild>
