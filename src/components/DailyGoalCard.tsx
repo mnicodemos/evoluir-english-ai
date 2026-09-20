@@ -47,52 +47,6 @@ export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMin
           </p>
           <p className="text-base text-muted-foreground sm:text-sm">Your daily goal</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Change your daily goal">
-              <Pencil className="size-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Daily goal</DialogTitle>
-              <DialogDescription>
-                How many minutes of English do you want to practise each day?
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {presets.map((p) => (
-                  <Button
-                    key={p}
-                    type="button"
-                    variant={Number(value) === p ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setValue(String(p))}
-                  >
-                    {p} min
-                  </Button>
-                ))}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="daily-goal">Custom (5–240 minutes)</Label>
-                <Input
-                  id="daily-goal"
-                  type="number"
-                  min={5}
-                  max={240}
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button onClick={() => save.mutate(minutes)} disabled={!valid || save.isPending}>
-                {save.isPending ? "Saving..." : "Save goal"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
       <Progress value={percent} className="mt-4 h-2" />
       <p
