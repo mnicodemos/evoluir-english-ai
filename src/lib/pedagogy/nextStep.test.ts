@@ -120,7 +120,9 @@ describe("next step content", () => {
   it("exposes missing evidence without inventing a value", () => {
     const step = buildNextStep({
       ...base,
-      skills: [{ skill: "writing", score: null, confidence: null, cefrLevel: "insufficient_evidence" }],
+      skills: [
+        { skill: "writing", score: null, confidence: null, cefrLevel: "insufficient_evidence" },
+      ],
     });
     expect(step.insight).toEqual({
       cefrLevel: null,

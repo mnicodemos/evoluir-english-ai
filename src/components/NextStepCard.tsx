@@ -61,9 +61,7 @@ export function NextStepCard() {
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-semibold">{t("Your next step")}</h2>
             <p className="mt-0.5 font-medium">{skillLabel}</p>
-            <p className="text-sm text-muted-foreground">
-              {t(NEXT_STEP_REASON_TEXT[data.reason])}
-            </p>
+            <p className="text-sm text-muted-foreground">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
             <p className="mt-2 text-sm">
               {t("How to practise")}: <span className="font-medium">{data.activity.title}</span>
             </p>
