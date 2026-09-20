@@ -52,7 +52,7 @@ export function WeeklyFrequency({ userId, daysPerWeek }: Props) {
     },
   });
 
-  const allStudied = (studyDays?.size ?? 0) === 7;
+  const allStudied = (studyDays?.size ?? 0) >= weeklyGoal;
   const studiedCount = studyDays?.size ?? 0;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
@@ -60,11 +60,11 @@ export function WeeklyFrequency({ userId, daysPerWeek }: Props) {
   return (
     <div className="flex h-full items-center gap-3">
       <div className="flex flex-col items-center gap-1.5">
-        <TrophyBadge active={allStudied} lang={lang} />
+        <TrophyBadge active={allStudied} lang={lang} days={weeklyGoal} />
         <div className="flex w-11 flex-col items-center text-center text-[10px] font-medium leading-tight text-muted-foreground">
           <span>{goalLabel}</span>
           <span>
-            {studiedCount}/7 {daysLabel}
+            {studiedCount}/{weeklyGoal} {daysLabel}
           </span>
         </div>
       </div>
