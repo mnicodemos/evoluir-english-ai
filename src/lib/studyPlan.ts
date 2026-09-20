@@ -74,6 +74,28 @@ export type PlanLesson = {
   completed: boolean;
 };
 
+/**
+ * Existing skill evidence, read as-is from the current skill profile. Nothing is
+ * recomputed here: no CEFR change, no new score, no new evidence.
+ */
+export type PlanSkillNeed = {
+  skill: string;
+  score: number | null;
+  confidence: number | null;
+  recentlyPractised: boolean;
+};
+
+export type PlanReasonCode =
+  | "needs_more_practice"
+  | "requires_recent_practice"
+  | "not_measured_yet"
+  | "low_confidence"
+  | "matches_level"
+  | "follows_goal"
+  | "no_evidence_yet";
+
+export type PlanReason = { code: PlanReasonCode; skill?: string };
+
 export type StudyPlanInput = {
   goal: string;
   dailyMinutes: number;
@@ -82,6 +104,8 @@ export type StudyPlanInput = {
   level: string | null;
   lessons: PlanLesson[];
   minutesThisWeek: number;
+  /** Existing skill evidence used only to order the non-focus days. */
+  needs?: PlanSkillNeed[];
 };
 
 export type StudyPlanDay = {
@@ -101,15 +125,55 @@ export type StudyPlan = {
   completedCount: number;
   totalCount: number;
   progressPercent: number;
+  /** "Why this plan?" — factual reasons derived from the data above. */
+  reasons: PlanReason[];
 };
 
 export function lessonSkillOf(planSkill: string) {
   return planSkill === "speaking" ? "talking" : planSkill;
 }
 
+/**
+ * Need weight per skill, mirroring the wording already used by the app: no
+ * measurement first, then low confidence, then no recent practice, then the
+ * lowest score. Lower weight = higher need.
+ */
+export function needWeight(need: PlanSkillNeed): number {
+  if (need.score === null) return 0;
+  if (need.confidence !== null && need.confidence < 0.5) return 1;
+  if (!need.recentlyPractised) return 2;
+  return 3;
+}
+
+function needReason(need: PlanSkillNeed): PlanReasonCode {
+  if (need.score === null) return "not_measured_yet";
+  if (need.confidence !== null && need.confidence < 0.5) return "low_confidence";
+  if (!need.recentlyPractised) return "requires_recent_practice";
+  return "needs_more_practice";
+}
+
+/** Goal skills reordered by existing evidence. The goal set itself never changes. */
+function orderByNeed(goalSkills: readonly string[], needs: PlanSkillNeed[]): string[] {
+  if (needs.length === 0) return [...goalSkills];
+  const bySkill = new Map(needs.map((need) => [need.skill, need]));
+  return [...goalSkills]
+    .map((skill, index) => ({ skill, index, need: bySkill.get(skill) ?? null }))
+    .sort((a, b) => {
+      const wa = a.need ? needWeight(a.need) : 2.5;
+      const wb = b.need ? needWeight(b.need) : 2.5;
+      return wa - wb || (a.need?.score ?? 0) - (b.need?.score ?? 0) || a.index - b.index;
+    })
+    .map((entry) => entry.skill);
+}
+
 /** Skill sequence: the focus area every other day, goal skills in between. */
-export function skillSequence(goal: string, focus: StudyFocus, slots: number): string[] {
-  const goalSkills = SKILLS_BY_GOAL[goal] ?? SKILLS_BY_GOAL["conversation"]!;
+export function skillSequence(
+  goal: string,
+  focus: StudyFocus,
+  slots: number,
+  needs: PlanSkillNeed[] = [],
+): string[] {
+  const goalSkills = orderByNeed(SKILLS_BY_GOAL[goal] ?? SKILLS_BY_GOAL["conversation"]!, needs);
   if (focus === "balanced") {
     return Array.from({ length: slots }, (_, i) => goalSkills[i % goalSkills.length]!);
   }
@@ -126,9 +190,30 @@ export function skillSequence(goal: string, focus: StudyFocus, slots: number): s
   return sequence;
 }
 
+function buildReasons(
+  input: StudyPlanInput,
+  items: StudyPlanDay[],
+  needs: PlanSkillNeed[],
+): PlanReason[] {
+  const reasons: PlanReason[] = [];
+  const planned = new Set(items.map((item) => item.skill));
+  const ranked = [...needs]
+    .filter((need) => planned.has(need.skill))
+    .sort((a, b) => needWeight(a) - needWeight(b) || (a.score ?? 0) - (b.score ?? 0));
+
+  for (const need of ranked.slice(0, 2)) {
+    reasons.push({ code: needReason(need), skill: need.skill });
+  }
+  if (ranked.length === 0) reasons.push({ code: "no_evidence_yet" });
+  if (items.some((item) => item.lessonId)) reasons.push({ code: "matches_level" });
+  reasons.push({ code: "follows_goal" });
+  return reasons;
+}
+
 export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
   const days = DAYS_BY_FREQUENCY[input.daysPerWeek] ?? DAYS_BY_FREQUENCY[3]!;
-  const skills = skillSequence(input.goal, input.focus, days.length);
+  const needs = input.needs ?? [];
+  const skills = skillSequence(input.goal, input.focus, days.length, needs);
   const used = new Set<string>();
 
   const items: StudyPlanDay[] = days.map((day, i) => {
@@ -160,5 +245,6 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
     completedCount,
     totalCount: items.length,
     progressPercent: items.length ? Math.round((completedCount / items.length) * 100) : 0,
+    reasons: buildReasons(input, items, needs),
   };
 }
