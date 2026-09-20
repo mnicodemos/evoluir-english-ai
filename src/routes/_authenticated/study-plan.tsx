@@ -1,6 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarCheck, Check, Clock, Loader2, Target } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarCheck,
+  Check,
+  Clock,
+  Loader2,
+  RefreshCw,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,11 +21,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { findLevel } from "@/lib/level";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import {
+  planReasonText,
   STUDY_PLAN_DAYS_PER_WEEK,
   STUDY_PLAN_FOCUS_AREAS,
   STUDY_PLAN_GOALS,
   STUDY_PLAN_MINUTES,
   type StudyFocus,
+  type StudyPlanDay,
 } from "@/lib/studyPlan";
 
 export const Route = createFileRoute("/_authenticated/study-plan")({
