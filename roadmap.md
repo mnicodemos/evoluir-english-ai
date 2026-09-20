@@ -1,11 +1,11 @@
 # Roadmap
 
-- [ ] Fase 21 — excelência responsiva em smartphone, tablet e desktop
-  - [ ] Auditar navegação, telas principais, teclado, áudio, gravação e overflow
-  - [ ] Aplicar somente correções responsivas essenciais, preservando toda a lógica
-  - [ ] Validar 320, 375, 390, 414, 768 e 1280 px em claro e escuro
-  - [ ] Executar regressão completa, tipos, estilo e compilação
-  - [ ] Entregar o relatório final obrigatório e encerrar a fase
+- [x] Fase 21 — excelência responsiva em smartphone, tablet e desktop
+  - [x] Auditar navegação, telas principais, teclado, áudio, gravação e overflow
+  - [x] Aplicar somente correções responsivas essenciais, preservando toda a lógica
+  - [x] Validar 320, 375, 390, 414, 768 e 1280 px; repetição autenticada final bloqueada por sessão expirada
+  - [x] Executar regressão completa, tipos, estilo e compilação
+  - [x] Entregar o relatório final obrigatório e encerrar a fase
 - [x] Painéis sem degradê seguindo o tema (claro/escuro) — validado em screenshots
 - [x] Logo enviado aplicado no menu, login, onboarding, landing e favicon
 - [x] Retirar atalhos do quadro "Learning progress" no dashboard (apenas informação)
