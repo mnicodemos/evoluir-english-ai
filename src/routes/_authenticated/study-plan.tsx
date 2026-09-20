@@ -111,6 +111,38 @@ function StudyPlanPage() {
   const plan = data?.plan;
   const levelLabel = data?.preferences.level ? findLevel(data.preferences.level).label : null;
 
+  // "Previous plan → Updated plan": the plan shown before the recalculation is
+  // kept in memory only, so nothing new is stored.
+  const [previous, setPrevious] = useState<StudyPlanDay[] | null>(null);
+  const [updating, setUpdating] = useState(false);
+
+  const recalculate = async () => {
+    if (!plan) return;
+    setPrevious(plan.days);
+    setUpdating(true);
+    try {
+      await queryClient.invalidateQueries({ queryKey: ["study-plan"] });
+      toast.success("Plan updated with your recent progress");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const changed =
+    !!previous &&
+    !!plan &&
+    (previous.length !== plan.days.length ||
+      previous.some((day, i) => {
+        const current = plan.days[i];
+        return (
+          !current ||
+          day.day !== current.day ||
+          day.skill !== current.skill ||
+          day.title !== current.title ||
+          day.completed !== current.completed
+        );
+      }));
+
   return (
     <AppShell>
       <div className="space-y-5 lg:space-y-6">
