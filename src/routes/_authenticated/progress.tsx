@@ -27,7 +27,10 @@ export const Route = createFileRoute("/_authenticated/progress")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · My history" },
-      { name: "description", content: "Track your speaking, grammar, listening and vocabulary evolution." },
+      {
+        name: "description",
+        content: "Track your speaking, grammar, listening and vocabulary evolution.",
+      },
       { property: "og:title", content: "Evoluir+ English AI · My history" },
       { property: "og:description", content: "Track your English evolution week by week." },
       { property: "og:type", content: "website" },
@@ -40,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/progress")({
 function ProgressPage() {
   const { data: profile } = useProfile();
   const { lang } = useUiLang();
-  const t = (s: string) => (lang === "pt" ? (uiPt as Record<string, string>)[s] ?? s : s);
+  const t = (s: string) => (lang === "pt" ? ((uiPt as Record<string, string>)[s] ?? s) : s);
   const { data: vocabProgress } = useVocabularyProgress();
 
   const { data: history, isLoading } = useProgressHistory(profile?.id, profile?.level);
@@ -91,7 +94,9 @@ function ProgressPage() {
           <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto_auto]">
             <section className="card-soft p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
               <h2 className="text-lg font-semibold">{t("Frequency")}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{t("The days you studied this month.")}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t("The days you studied this month.")}
+              </p>
               <div className="mt-4">{profile && <FrequencyCalendar userId={profile.id} />}</div>
             </section>
 
@@ -125,7 +130,11 @@ function ProgressPage() {
                 </h2>
                 <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
                   {strengths.length ? (
-                    strengths.map((s) => <li key={s.label}>{t(s.label)} — {s.value}%</li>)
+                    strengths.map((s) => (
+                      <li key={s.label}>
+                        {t(s.label)} — {s.value}%
+                      </li>
+                    ))
                   ) : (
                     <li>{t("Practice more to reveal your strengths.")}</li>
                   )}
@@ -137,7 +146,11 @@ function ProgressPage() {
                 </h2>
                 <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
                   {gaps.length ? (
-                    gaps.map((s) => <li key={s.label}>{t(s.label)} — {s.value}%</li>)
+                    gaps.map((s) => (
+                      <li key={s.label}>
+                        {t(s.label)} — {s.value}%
+                      </li>
+                    ))
                   ) : (
                     <li>{t("Keep going to find your weak spots.")}</li>
                   )}
@@ -164,7 +177,10 @@ function ProgressPage() {
           <h2 className="text-lg font-semibold">{t("Recent activity")}</h2>
           <ul className="mt-4 divide-y divide-border">
             {recent.map((a) => (
-              <li key={a.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 text-sm">
+              <li
+                key={a.id}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 text-sm"
+              >
                 <span className="min-w-0">
                   <span className="block break-words font-medium">
                     {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
@@ -180,7 +196,9 @@ function ProgressPage() {
                   </span>
                 </span>
                 {a.score != null && (
-                  <span className="shrink-0 font-semibold text-[oklch(0.55_0.14_158)]">{a.score}%</span>
+                  <span className="shrink-0 font-semibold text-[oklch(0.55_0.14_158)]">
+                    {a.score}%
+                  </span>
                 )}
               </li>
             ))}

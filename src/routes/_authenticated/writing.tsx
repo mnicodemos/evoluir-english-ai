@@ -320,7 +320,10 @@ function Writing() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               onFocus={(event) => {
-                window.setTimeout(() => event.currentTarget.scrollIntoView({ block: "center" }), 150);
+                window.setTimeout(
+                  () => event.currentTarget.scrollIntoView({ block: "center" }),
+                  150,
+                );
               }}
               rows={9}
               placeholder="Write your answer in English…"

@@ -16,8 +16,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 
-
-
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Something went wrong. Please try again.";
 }
@@ -25,7 +23,7 @@ function errorMessage(error: unknown) {
 /** The 30-lesson core path plus its optional 3-lesson review unit. */
 export function CurriculumPath() {
   const { lang } = useUiLang();
-  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
+  const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const path = useLearningPath();
   const open = useOpenPathLesson();
   const navigate = useNavigate();
@@ -43,7 +41,9 @@ export function CurriculumPath() {
       if (saved) toast.success(t("Your course plan is downloading."));
       else
         toast.info(
-          t("Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again."),
+          t(
+            "Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again.",
+          ),
         );
     } catch {
       toast.error(t("Could not build the course PDF. Please try again."));
@@ -86,7 +86,9 @@ export function CurriculumPath() {
               <span>{findLevel(path.level).label}</span>
             </h2>
             <p className="text-sm text-muted-foreground">
-              <span>33 lessons in 6 units, including an optional review unit with a 10-question test.</span>
+              <span>
+                33 lessons in 6 units, including an optional review unit with a 10-question test.
+              </span>
             </p>
           </div>
           <p className="text-sm font-semibold">
@@ -96,7 +98,9 @@ export function CurriculumPath() {
         <div className="mt-4">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">Completed</span>
-            <span className="text-muted-foreground">{Math.round((path.completed / path.total) * 100)}%</span>
+            <span className="text-muted-foreground">
+              {Math.round((path.completed / path.total) * 100)}%
+            </span>
           </div>
           <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-2 h-2" />
         </div>
@@ -108,7 +112,11 @@ export function CurriculumPath() {
           onClick={() => void downloadPlan()}
           disabled={planLoading}
         >
-          {planLoading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+          {planLoading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Download className="size-4" />
+          )}
           Download course
         </Button>
       </section>
@@ -117,10 +125,14 @@ export function CurriculumPath() {
         {path.units.map((unit) => (
           <section key={unit.unit} className="card-soft p-5" aria-label={unit.title}>
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-            <div className="min-w-0">
-              <h3 className="font-semibold">{unit.title}</h3>
-              {unit.unit === 6 && <p className="text-xs text-muted-foreground">Optional review · does not block the Final Test</p>}
-            </div>
+              <div className="min-w-0">
+                <h3 className="font-semibold">{unit.title}</h3>
+                {unit.unit === 6 && (
+                  <p className="text-xs text-muted-foreground">
+                    Optional review · does not block the Final Test
+                  </p>
+                )}
+              </div>
               <span className="text-xs text-muted-foreground">
                 {unit.completed}/{unit.lessons.length}
               </span>
@@ -144,7 +156,9 @@ export function CurriculumPath() {
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-medium">{lesson.title}</span>
-                        <span className="mt-1 block text-xs text-muted-foreground">{lesson.objective}</span>
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {lesson.objective}
+                        </span>
                       </span>
                       {busy ? (
                         <Loader2 className="size-4 shrink-0 animate-spin" />
@@ -177,7 +191,9 @@ export function CurriculumPath() {
               <span>30 questions. Score 70% or more to move up to the next level.</span>
             </p>
           </div>
-          {path.finalTest.passed && <CheckCircle2 className="size-5 shrink-0 text-[oklch(0.55_0.15_150)]" />}
+          {path.finalTest.passed && (
+            <CheckCircle2 className="size-5 shrink-0 text-[oklch(0.55_0.15_150)]" />
+          )}
         </div>
         <Button
           className="mt-4 w-full"
@@ -202,7 +218,7 @@ export function CurriculumPath() {
 /** Dashboard card: course progress + skill scores. */
 export function PathProgressCard() {
   const { lang } = useUiLang();
-  const t = (text: string) => (lang === "pt" ? uiPt[text] ?? text : text);
+  const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const path = useLearningPath();
   const { data: profile } = useProfile();
   const { data: mine } = useUserLessons();
@@ -210,7 +226,9 @@ export function PathProgressCard() {
 
   // Only the lessons of the level the student is on now.
   const levelLessonIds = new Set(path.lessons.map((l) => l.lessonId).filter(Boolean) as string[]);
-  const studied = (mine ?? []).filter((l) => Boolean(l.completed_at) && levelLessonIds.has(l.lesson_id));
+  const studied = (mine ?? []).filter(
+    (l) => Boolean(l.completed_at) && levelLessonIds.has(l.lesson_id),
+  );
 
   const { data: latest } = useQuery({
     queryKey: ["progress-latest", profile?.id, profile?.level],
@@ -246,7 +264,9 @@ export function PathProgressCard() {
       if (saved) toast.success(t("Your study content is downloading."));
       else
         toast.info(
-          t("Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again."),
+          t(
+            "Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again.",
+          ),
         );
     } catch {
       toast.error(t("Could not build your summary. Please try again."));
@@ -256,7 +276,10 @@ export function PathProgressCard() {
   };
 
   return (
-    <section className="card-soft bg-card p-6 text-card-foreground" aria-labelledby="path-progress-heading">
+    <section
+      className="card-soft bg-card p-6 text-card-foreground"
+      aria-labelledby="path-progress-heading"
+    >
       <h2 id="path-progress-heading" className="text-xl font-semibold">
         Your progress
       </h2>
@@ -280,13 +303,14 @@ export function PathProgressCard() {
       <div className="mt-4">
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium">Completed</span>
-          <span className="text-muted-foreground">{Math.round((path.completed / path.total) * 100)}%</span>
+          <span className="text-muted-foreground">
+            {Math.round((path.completed / path.total) * 100)}%
+          </span>
         </div>
         <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-2 h-2" />
       </div>
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
-
         {skills.map((s) => (
           <div key={s.label}>
             <div className="flex items-center justify-between text-sm">
@@ -305,8 +329,18 @@ export function PathProgressCard() {
       )}
 
       {studied.length > 0 && (
-        <Button variant="outline" size="sm" className="mt-5" onClick={() => void download()} disabled={downloading}>
-          {downloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-5"
+          onClick={() => void download()}
+          disabled={downloading}
+        >
+          {downloading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Download className="size-4" />
+          )}
           Download your progress
         </Button>
       )}

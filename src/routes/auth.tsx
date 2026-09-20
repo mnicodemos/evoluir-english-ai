@@ -158,7 +158,7 @@ function AuthPage() {
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                       className="scroll-mt-20"
+                        className="scroll-mt-20"
                         placeholder="Marcelo"
                         required
                       />
@@ -171,7 +171,7 @@ function AuthPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                     className="scroll-mt-20"
+                      className="scroll-mt-20"
                       placeholder="you@company.com"
                       required
                     />
