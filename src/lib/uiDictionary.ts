@@ -77,7 +77,6 @@ export const uiPt: Record<string, string> = {
   "Main goal": "Objetivo principal",
   "Improve conversation": "Melhorar a conversação",
   "English for work": "Inglês para o trabalho",
-  "Travel English": "Inglês para viagens",
   "Interview preparation": "Preparação para entrevista",
   "Reach a CEFR level": "Alcançar um nível CEFR",
   "Daily time": "Tempo diário",
@@ -86,13 +85,11 @@ export const uiPt: Record<string, string> = {
   Balanced: "Equilibrado",
   "Save my plan": "Salvar meu plano",
   "Study plan updated": "Plano de estudo atualizado",
-  "Could not save your plan": "Não foi possível salvar seu plano",
   "Weekly progress": "Progresso semanal",
   "Completed activities": "Atividades concluídas",
   "Minutes studied": "Minutos estudados",
   "Your level:": "Seu nível:",
   "Week 1": "Semana 1",
-  Completed: "Concluído",
   "Start activity": "Começar atividade",
   "The plan reuses your existing lessons and practice areas. When no lesson of that skill is available for your level, we point you to the matching practice area.":
     "O plano reutiliza suas aulas e áreas de prática existentes. Quando não há aula dessa habilidade no seu nível, indicamos a área de prática correspondente.",
@@ -103,9 +100,6 @@ export const uiPt: Record<string, string> = {
   Friday: "Sexta-feira",
   Saturday: "Sábado",
   Sunday: "Domingo",
-  Grammar: "Gramática",
-  Speaking: "Fala",
-  Reading: "Leitura",
   "No assessed history yet. Complete an activity to start your evolution chart.":
     "Ainda não há histórico avaliado. Conclua uma atividade para iniciar seu gráfico de evolução.",
 
