@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   BookOpen,
+  CalendarCheck,
   Crown,
   GraduationCap,
   Headphones,
@@ -30,6 +31,7 @@ import { uiPt } from "@/lib/uiDictionary";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/study-plan", label: "My Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/coach", label: "AI Talking", icon: MessageSquareText },

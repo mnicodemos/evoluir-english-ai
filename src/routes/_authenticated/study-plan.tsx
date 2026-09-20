@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/study-plan")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: StudyPlanPage;
+  component: StudyPlanPage,
 });
 
 const SKILL_LABELS: Record<string, string> = {
@@ -216,12 +216,22 @@ function StudyPlanPage() {
                       )}
                     </div>
                     <p className="mt-3 font-medium break-words">{day.title}</p>
-                    <Link
-                      to={day.to}
-                      className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
-                    >
-                      Start activity
-                    </Link>
+                    {day.lessonId ? (
+                      <Link
+                        to="/learning/$lessonId"
+                        params={{ lessonId: day.lessonId }}
+                        className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                      >
+                        Start activity
+                      </Link>
+                    ) : (
+                      <Link
+                        to={day.to as "/listening"}
+                        className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                      >
+                        Start activity
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
