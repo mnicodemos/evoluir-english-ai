@@ -494,7 +494,11 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
                   .find((message) => message.role === "assistant");
                 if (last) void playResponse(last.content);
               }}
-              className={voiceState === "speaking" ? "bg-success text-success-foreground hover:bg-success/90" : ""}
+              className={
+                voiceState === "speaking"
+                  ? "bg-success text-success-foreground hover:bg-success/90"
+                  : ""
+              }
             >
               <Volume2 />
             </Button>

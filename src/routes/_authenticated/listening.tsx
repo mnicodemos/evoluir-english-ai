@@ -439,7 +439,7 @@ function ListeningPage() {
                   <button
                     type="button"
                     onClick={() => setRevealed(true)}
-              className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-success underline-offset-4 hover:underline"
+                    className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-success underline-offset-4 hover:underline"
                   >
                     REVEAL
                   </button>
@@ -489,8 +489,12 @@ function ListeningPage() {
                     </span>
                   ))}
                 </p>
-                <p className="mt-2 break-words text-muted-foreground">Correct sentence: {sentence}</p>
-                {answer && <p className="mt-1 break-words text-muted-foreground">You said: {answer}</p>}
+                <p className="mt-2 break-words text-muted-foreground">
+                  Correct sentence: {sentence}
+                </p>
+                {answer && (
+                  <p className="mt-1 break-words text-muted-foreground">You said: {answer}</p>
+                )}
                 <p className="mt-2 text-muted-foreground">
                   Attempt {attempts} of 3 · Best result: {best}%
                   {!passed && checked < 70 && " · You need at least 70% — try again."}
