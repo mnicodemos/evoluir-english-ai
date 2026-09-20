@@ -5,8 +5,6 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { countsAsLearningMinutes, LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
 
-const presets = [10, 15, 20, 30, 45, 60];
-
 export function useMinutesToday(userId?: string) {
   return useQuery({
     queryKey: ["minutes-today", userId],
