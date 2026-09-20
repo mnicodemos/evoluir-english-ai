@@ -805,6 +805,8 @@ export type Database = {
           plan_interval: string | null
           plan_started_at: string | null
           streak_days: number
+          study_days_per_week: number | null
+          study_focus: string | null
           updated_at: string
         }
         Insert: {
@@ -826,6 +828,8 @@ export type Database = {
           plan_interval?: string | null
           plan_started_at?: string | null
           streak_days?: number
+          study_days_per_week?: number | null
+          study_focus?: string | null
           updated_at?: string
         }
         Update: {
@@ -847,6 +851,8 @@ export type Database = {
           plan_interval?: string | null
           plan_started_at?: string | null
           streak_days?: number
+          study_days_per_week?: number | null
+          study_focus?: string | null
           updated_at?: string
         }
         Relationships: []

@@ -19,6 +19,7 @@ import { Route as AuthenticatedListeningRouteImport } from './routes/_authentica
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPremiumRouteImport } from './routes/_authenticated/premium'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
+import { Route as AuthenticatedStudyPlanRouteImport } from './routes/_authenticated/study-plan'
 import { Route as AuthenticatedTeacherRouteImport } from './routes/_authenticated/teacher'
 import { Route as AuthenticatedVocabularyRouteImport } from './routes/_authenticated/vocabulary'
 import { Route as AuthenticatedWritingRouteImport } from './routes/_authenticated/writing'
@@ -80,6 +81,11 @@ const AuthenticatedPremiumRoute = AuthenticatedPremiumRouteImport.update({
 const AuthenticatedProgressRoute = AuthenticatedProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStudyPlanRoute = AuthenticatedStudyPlanRouteImport.update({
+  id: '/study-plan',
+  path: '/study-plan',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTeacherRoute = AuthenticatedTeacherRouteImport.update({
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/premium': typeof AuthenticatedPremiumRoute
   '/progress': typeof AuthenticatedProgressRoute
+  '/study-plan': typeof AuthenticatedStudyPlanRoute
   '/teacher': typeof AuthenticatedTeacherRoute
   '/vocabulary': typeof AuthenticatedVocabularyRoute
   '/writing': typeof AuthenticatedWritingRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/premium': typeof AuthenticatedPremiumRoute
   '/progress': typeof AuthenticatedProgressRoute
+  '/study-plan': typeof AuthenticatedStudyPlanRoute
   '/teacher': typeof AuthenticatedTeacherRoute
   '/vocabulary': typeof AuthenticatedVocabularyRoute
   '/writing': typeof AuthenticatedWritingRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/premium': typeof AuthenticatedPremiumRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
+  '/_authenticated/study-plan': typeof AuthenticatedStudyPlanRoute
   '/_authenticated/teacher': typeof AuthenticatedTeacherRoute
   '/_authenticated/vocabulary': typeof AuthenticatedVocabularyRoute
   '/_authenticated/writing': typeof AuthenticatedWritingRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/premium'
     | '/progress'
+    | '/study-plan'
     | '/teacher'
     | '/vocabulary'
     | '/writing'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/premium'
     | '/progress'
+    | '/study-plan'
     | '/teacher'
     | '/vocabulary'
     | '/writing'
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/premium'
     | '/_authenticated/progress'
+    | '/_authenticated/study-plan'
     | '/_authenticated/teacher'
     | '/_authenticated/vocabulary'
     | '/_authenticated/writing'
@@ -375,6 +387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgressRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/study-plan': {
+      id: '/_authenticated/study-plan'
+      path: '/study-plan'
+      fullPath: '/study-plan'
+      preLoaderRoute: typeof AuthenticatedStudyPlanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/teacher': {
       id: '/_authenticated/teacher'
       path: '/teacher'
@@ -470,6 +489,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPremiumRoute: typeof AuthenticatedPremiumRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
+  AuthenticatedStudyPlanRoute: typeof AuthenticatedStudyPlanRoute
   AuthenticatedTeacherRoute: typeof AuthenticatedTeacherRoute
   AuthenticatedVocabularyRoute: typeof AuthenticatedVocabularyRoute
   AuthenticatedWritingRoute: typeof AuthenticatedWritingRoute
@@ -487,6 +507,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPremiumRoute: AuthenticatedPremiumRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
+  AuthenticatedStudyPlanRoute: AuthenticatedStudyPlanRoute,
   AuthenticatedTeacherRoute: AuthenticatedTeacherRoute,
   AuthenticatedVocabularyRoute: AuthenticatedVocabularyRoute,
   AuthenticatedWritingRoute: AuthenticatedWritingRoute,

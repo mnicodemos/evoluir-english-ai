@@ -169,6 +169,13 @@
       "when": 1789761052960,
       "tag": "0023_phase11_content_enrichment",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1789923450226,
+      "tag": "0024_add_study_plan_preferences_to_profiles",
+      "breakpoints": true
     }
   ]
 }
