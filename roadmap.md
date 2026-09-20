@@ -41,3 +41,4 @@
 - [x] Fase 2F-R.3 — separar persistência/aprovação e observar mapeamentos pedagógicos ausentes
 - [x] Fase 6A — auditoria de monetização e fundação provider-agnostic (subscriptions, entitlements, contratos)
 - [x] Fase 22A — Plano de Estudo Personalizado (MVP): preferências no perfil, plano semanal com aulas existentes e acompanhamento
+- [x] Fase 22B+C — Plano adaptativo (ordem por evidência existente), "Why this plan?" e "Update my plan" com comparação Previous → Updated

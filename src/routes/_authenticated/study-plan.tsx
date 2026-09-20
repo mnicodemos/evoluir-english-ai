@@ -1,6 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarCheck, Check, Clock, Loader2, Target } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarCheck,
+  Check,
+  Clock,
+  Loader2,
+  RefreshCw,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,11 +21,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { findLevel } from "@/lib/level";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import {
+  planReasonText,
   STUDY_PLAN_DAYS_PER_WEEK,
   STUDY_PLAN_FOCUS_AREAS,
   STUDY_PLAN_GOALS,
   STUDY_PLAN_MINUTES,
   type StudyFocus,
+  type StudyPlanDay,
 } from "@/lib/studyPlan";
 
 export const Route = createFileRoute("/_authenticated/study-plan")({
@@ -53,7 +64,7 @@ function StudyPlanPage() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["study-plan", profile?.id],
     queryFn: () => loadStudyPlan(),
     enabled: !!profile?.id,
@@ -99,6 +110,33 @@ function StudyPlanPage() {
 
   const plan = data?.plan;
   const levelLabel = data?.preferences.level ? findLevel(data.preferences.level).label : null;
+
+  // "Previous plan → Updated plan": the plan shown before the recalculation is
+  // kept in memory only, so nothing new is stored.
+  const [previous, setPrevious] = useState<StudyPlanDay[] | null>(null);
+
+  const recalculate = () => {
+    if (!plan) return;
+    setPrevious(plan.days);
+    void queryClient
+      .invalidateQueries({ queryKey: ["study-plan"] })
+      .then(() => toast.success("Plan updated with your recent progress"));
+  };
+
+  const changed =
+    !!previous &&
+    !!plan &&
+    (previous.length !== plan.days.length ||
+      previous.some((day, i) => {
+        const current = plan.days[i];
+        return (
+          !current ||
+          day.day !== current.day ||
+          day.skill !== current.skill ||
+          day.title !== current.title ||
+          day.completed !== current.completed
+        );
+      }));
 
   return (
     <AppShell>
@@ -149,14 +187,32 @@ function StudyPlanPage() {
             onChange={(v) => setFocus(v as StudyFocus)}
           />
 
-          <Button
-            className="min-h-11 w-full sm:w-auto"
-            disabled={save.isPending}
-            onClick={() => save.mutate()}
-          >
-            {save.isPending && <Loader2 className="size-4 animate-spin" />}
-            Save my plan
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              className="min-h-11 w-full sm:w-auto"
+              disabled={save.isPending}
+              onClick={() => {
+                if (plan) setPrevious(plan.days);
+                save.mutate();
+              }}
+            >
+              {save.isPending && <Loader2 className="size-4 animate-spin" />}
+              Save my plan
+            </Button>
+            <Button
+              variant="outline"
+              className="min-h-11 w-full sm:w-auto"
+              disabled={isFetching || !plan}
+              onClick={recalculate}
+            >
+              {isFetching ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <RefreshCw className="size-4" />
+              )}
+              Update my plan
+            </Button>
+          </div>
         </section>
 
         {isLoading || !plan ? (
@@ -192,6 +248,71 @@ function StudyPlanPage() {
                 <p className="mt-3 text-sm text-muted-foreground">Your level: {levelLabel}</p>
               )}
             </section>
+
+            <section className="card-soft p-5">
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <Sparkles className="size-5 text-primary" />
+                Why this plan?
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">Based on your progress:</p>
+              <ul className="mt-3 space-y-2">
+                {plan.reasons.map((reason) => (
+                  <li
+                    key={`${reason.code}-${reason.skill ?? ""}`}
+                    className="flex items-start gap-2 text-sm"
+                  >
+                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <span className="break-words">{planReasonText(reason)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {changed && previous && (
+              <section className="card-soft p-5">
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <RefreshCw className="size-5 text-primary" />
+                  Previous plan → Updated plan
+                </h2>
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Previous plan
+                    </p>
+                    <ul className="mt-2 space-y-2">
+                      {previous.map((day) => (
+                        <li
+                          key={`prev-${day.day}`}
+                          className="rounded-lg border border-border p-3 text-sm"
+                        >
+                          <span className="font-medium">{day.day}</span> ·{" "}
+                          {SKILL_LABELS[day.skill] ?? day.skill}
+                          <p className="text-muted-foreground break-words">{day.title}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="flex items-center gap-1 text-xs uppercase tracking-wide text-primary">
+                      <ArrowRight className="size-3.5" />
+                      Updated plan
+                    </p>
+                    <ul className="mt-2 space-y-2">
+                      {plan.days.map((day) => (
+                        <li
+                          key={`next-${day.day}`}
+                          className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm"
+                        >
+                          <span className="font-medium">{day.day}</span> ·{" "}
+                          {SKILL_LABELS[day.skill] ?? day.skill}
+                          <p className="text-muted-foreground break-words">{day.title}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            )}
 
             <section className="space-y-3">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
