@@ -94,9 +94,11 @@ export function WeeklyFrequency({ userId, daysPerWeek }: Props) {
   );
 }
 
-function TrophyBadge({ active, lang }: { active: boolean; lang: "pt" | "en" }) {
-  const unlockedText = lang === "pt" ? "Troféu de 7 dias desbloqueado" : "7-day trophy unlocked";
-  const lockedText = lang === "pt" ? "Troféu de 7 dias bloqueado" : "7-day trophy locked";
+function TrophyBadge({ active, lang, days }: { active: boolean; lang: "pt" | "en"; days: number }) {
+  const unlockedText =
+    lang === "pt" ? `Troféu de ${days} dias desbloqueado` : `${days}-day trophy unlocked`;
+  const lockedText =
+    lang === "pt" ? `Troféu de ${days} dias bloqueado` : `${days}-day trophy locked`;
 
   return (
     <span
