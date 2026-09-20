@@ -31,33 +31,7 @@ export function useMinutesToday(userId?: string) {
 }
 
 export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMinutes: number }) {
-  const queryClient = useQueryClient();
   const { data: done = 0 } = useMinutesToday(userId);
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(String(goalMinutes));
-
-  useEffect(() => {
-    if (open) setValue(String(goalMinutes));
-  }, [open, goalMinutes]);
-
-  const save = useMutation({
-    mutationFn: async (minutes: number) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ daily_minutes: minutes })
-        .eq("id", userId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-      setOpen(false);
-      toast.success("Daily goal updated");
-    },
-    onError: () => toast.error("Could not update your goal. Please try again."),
-  });
-
-  const minutes = Number(value);
-  const valid = Number.isFinite(minutes) && minutes >= 5 && minutes <= 240;
   const percent = goalMinutes > 0 ? Math.min(100, Math.round((done / goalMinutes) * 100)) : 0;
 
   return (
