@@ -35,6 +35,12 @@ describe("next step priority", () => {
     });
     expect(step.prioritySkill).toBe("grammar");
     expect(step.reason).toBe("recent_errors");
+    expect(step.insight).toEqual({
+      cefrLevel: "B1",
+      confidence: 0.8,
+      hasEvidence: true,
+      recentlyPractised: true,
+    });
   });
 
   it("falls back to low confidence, then to not practised, then to lowest score", () => {
@@ -106,6 +112,21 @@ describe("next step content", () => {
       title: "Airport talk",
       to: "/learning/$lessonId",
       params: { lessonId: "11111111-1111-1111-1111-111111111111" },
+    });
+    expect(step.insight?.cefrLevel).toBe("B1");
+    expect(step.insight?.confidence).toBe(0.8);
+  });
+
+  it("exposes missing evidence without inventing a value", () => {
+    const step = buildNextStep({
+      ...base,
+      skills: [{ skill: "writing", score: null, confidence: null, cefrLevel: "insufficient_evidence" }],
+    });
+    expect(step.insight).toEqual({
+      cefrLevel: null,
+      confidence: null,
+      hasEvidence: false,
+      recentlyPractised: false,
     });
   });
 

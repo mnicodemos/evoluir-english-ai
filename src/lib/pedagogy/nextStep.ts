@@ -39,6 +39,13 @@ export type NextStep = {
   reason: NextStepReason;
   action: NextStepAction;
   activity: NextStepActivity;
+  /** Existing evidence for the chosen skill, exposed for contextual display only. */
+  insight?: {
+    cefrLevel: string | null;
+    confidence: number | null;
+    hasEvidence: boolean;
+    recentlyPractised: boolean;
+  };
 };
 
 export type NextStepInput = {
@@ -133,12 +140,20 @@ export function buildNextStep(input: NextStepInput): NextStep {
     );
 
   const best = ordered[0]!;
+  const insight = {
+    cefrLevel:
+      best.skill.cefrLevel === "insufficient_evidence" ? null : best.skill.cefrLevel,
+    confidence: best.skill.confidence,
+    hasEvidence: best.skill.score !== null || best.skill.confidence !== null,
+    recentlyPractised: input.recentlyPractised.includes(best.skill.skill),
+  };
   const lesson = input.lessonBySkill[best.skill.skill];
   if (lesson) {
     return {
       prioritySkill: best.skill.skill,
       reason: best.reason,
       action: "review_lesson",
+      insight,
       activity: {
         type: "lesson",
         title: lesson.title,
@@ -152,6 +167,7 @@ export function buildNextStep(input: NextStepInput): NextStep {
     prioritySkill: best.skill.skill,
     reason: best.reason,
     action: fallback.action,
+    insight,
     activity: fallback.activity,
   };
 }
