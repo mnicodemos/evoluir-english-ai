@@ -67,6 +67,9 @@ export const uiPt: Record<string, string> = {
   Dashboard: "Início",
   Learning: "Aprendizado",
   Listening: "Escuta",
+  "No assessed history yet. Complete an activity to start your evolution chart.":
+    "Ainda não há histórico avaliado. Conclua uma atividade para iniciar seu gráfico de evolução.",
+
   "AI Talking": "AI Talking",
   Writing: "Escrita",
   Vocabulary: "Vocabulário",
