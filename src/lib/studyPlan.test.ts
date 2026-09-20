@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildStudyPlan,
-  skillSequence,
-  type PlanLesson,
-  type StudyPlanInput,
-} from "./studyPlan";
+import { buildStudyPlan, skillSequence, type PlanLesson, type StudyPlanInput } from "./studyPlan";
 
 const lessons: PlanLesson[] = [
   { id: "l1", title: "Listening to a Debate", skill: "listening", level: "b2", completed: true },
@@ -62,7 +57,11 @@ describe("studyPlan", () => {
 
   it("falls back to existing practice surfaces when no lesson matches", () => {
     const plan = buildStudyPlan(input({ lessons: [], focus: "listening", daysPerWeek: 2 }));
-    expect(plan.days[0]).toMatchObject({ title: "Listening Lab", to: "/listening", lessonId: null });
+    expect(plan.days[0]).toMatchObject({
+      title: "Listening Lab",
+      to: "/listening",
+      lessonId: null,
+    });
   });
 
   it("tracks weekly progress from completed lessons and effective minutes", () => {

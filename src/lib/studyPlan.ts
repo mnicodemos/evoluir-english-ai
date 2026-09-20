@@ -159,8 +159,6 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
     minutesThisWeek: input.minutesThisWeek,
     completedCount,
     totalCount: items.length,
-    progressPercent: items.length
-      ? Math.round((completedCount / items.length) * 100)
-      : 0,
+    progressPercent: items.length ? Math.round((completedCount / items.length) * 100) : 0,
   };
 }

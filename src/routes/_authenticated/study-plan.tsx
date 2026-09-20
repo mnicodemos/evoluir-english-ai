@@ -107,8 +107,8 @@ function StudyPlanPage() {
           <p className="text-sm text-muted-foreground">My Study Plan</p>
           <h1 className="text-3xl font-bold">Your weekly study plan</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Choose your goal, your available time and your focus area. Your plan uses the lessons and
-            practice already available for your level.
+            Choose your goal, your available time and your focus area. Your plan uses the lessons
+            and practice already available for your level.
           </p>
         </header>
 

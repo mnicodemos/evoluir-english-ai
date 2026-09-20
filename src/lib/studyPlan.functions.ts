@@ -8,12 +8,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 
-import {
-  buildStudyPlan,
-  type PlanLesson,
-  type StudyFocus,
-  type StudyPlan,
-} from "./studyPlan";
+import { buildStudyPlan, type PlanLesson, type StudyFocus, type StudyPlan } from "./studyPlan";
 
 /** Monday 00:00 of the current week, in Brazil time, as an ISO timestamp. */
 function weekStartIso(now = new Date()): string {
