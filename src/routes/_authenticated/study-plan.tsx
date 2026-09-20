@@ -192,14 +192,32 @@ function StudyPlanPage() {
             onChange={(v) => setFocus(v as StudyFocus)}
           />
 
-          <Button
-            className="min-h-11 w-full sm:w-auto"
-            disabled={save.isPending}
-            onClick={() => save.mutate()}
-          >
-            {save.isPending && <Loader2 className="size-4 animate-spin" />}
-            Save my plan
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              className="min-h-11 w-full sm:w-auto"
+              disabled={save.isPending}
+              onClick={() => {
+                if (plan) setPrevious(plan.days);
+                save.mutate();
+              }}
+            >
+              {save.isPending && <Loader2 className="size-4 animate-spin" />}
+              Save my plan
+            </Button>
+            <Button
+              variant="outline"
+              className="min-h-11 w-full sm:w-auto"
+              disabled={updating || !plan}
+              onClick={() => void recalculate()}
+            >
+              {updating ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <RefreshCw className="size-4" />
+              )}
+              Update my plan
+            </Button>
+          </div>
         </section>
 
         {isLoading || !plan ? (
