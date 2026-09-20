@@ -8,14 +8,16 @@ import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
 
-type Props = { userId: string };
+type Props = { userId: string; daysPerWeek?: number };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
 const LABELS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const LABELS_PT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
-/** Weekly frequency strip: one tile per weekday of the current week. */
-export function WeeklyFrequency({ userId }: Props) {
+/** Weekly frequency strip: one tile per weekday of the current week.
+ *  The trophy uses the student's configured weekly frequency, falling back to 7. */
+export function WeeklyFrequency({ userId, daysPerWeek }: Props) {
+  const weeklyGoal = daysPerWeek ?? 7;
   const { lang } = useUiLang();
   const labels = lang === "pt" ? LABELS_PT : LABELS_EN;
   const todayKey = dayFmt.format(new Date());
