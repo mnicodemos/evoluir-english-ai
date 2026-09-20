@@ -248,3 +248,34 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
     reasons: buildReasons(input, items, needs),
   };
 }
+
+const REASON_SKILL_LABELS: Record<string, string> = {
+  grammar: "Grammar",
+  listening: "Listening",
+  speaking: "Speaking",
+  vocabulary: "Vocabulary",
+  writing: "Writing",
+  reading: "Reading",
+  pronunciation: "Pronunciation",
+};
+
+/** Factual "Why this plan?" lines. Nothing invented, no AI call. */
+export function planReasonText(reason: PlanReason): string {
+  const skill = reason.skill ? (REASON_SKILL_LABELS[reason.skill] ?? reason.skill) : "";
+  switch (reason.code) {
+    case "needs_more_practice":
+      return `${skill} needs more practice`;
+    case "requires_recent_practice":
+      return `${skill} requires recent practice`;
+    case "not_measured_yet":
+      return `${skill} has not been measured yet`;
+    case "low_confidence":
+      return `${skill} still has little evidence`;
+    case "matches_level":
+      return "Activities match your level";
+    case "follows_goal":
+      return "Your main goal stays the priority";
+    case "no_evidence_yet":
+      return "Complete an activity to personalise your plan further";
+  }
+}
