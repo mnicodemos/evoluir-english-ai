@@ -319,8 +319,6 @@ function StudyPlanPage() {
               </section>
             )}
 
-
-
             <section className="space-y-3">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <CalendarCheck className="size-5 text-primary" />
