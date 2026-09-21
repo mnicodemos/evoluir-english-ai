@@ -1,4 +1,4 @@
-import { Instagram, X } from "lucide-react";
+import { Instagram } from "lucide-react";
 
 import {
   Tooltip,
