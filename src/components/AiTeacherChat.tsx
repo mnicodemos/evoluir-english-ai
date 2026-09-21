@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Send, Sparkles } from "lucide-react";
+import { GraduationCap, Plus, Send, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -41,7 +41,10 @@ const MODE_LABEL: Record<string, string> = {
   EXAMPLE: "Examples",
   REVIEW: "Reviewing",
   CONVERSATION: "Conversation",
+  COACH: "Coach session",
 };
+
+const COACH_START_MESSAGE = "Start a guided study session with me.";
 
 const errorCopy: Record<string, string> = {
   offline: "You seem to be offline. Check your connection and try again.",
@@ -62,6 +65,13 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
   const [mode, setMode] = useState<string | null>(null);
+  const [coachActive, setCoachActive] = useState(false);
+  const [coachState, setCoachState] = useState<{
+    stage: string;
+    turn: number;
+    maxTurns: number;
+    finished: boolean;
+  } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const session = useQuery({
@@ -81,18 +91,25 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   }, [session.data, started]);
 
   const turn = useMutation({
-    mutationFn: async (message: string) =>
+    mutationFn: async (vars: {
+      message: string;
+      coach: boolean;
+      history: ReturnType<typeof buildTeacherHistory>;
+    }) =>
       teacherTurn({
         data: {
-          message,
+          message: vars.message,
           ...(conversationId ? { conversationId } : {}),
           ...(lessonId ? { lessonId } : {}),
-          history: buildTeacherHistory(messages),
+          history: vars.history,
+          ...(vars.coach ? { coach: true } : {}),
         },
       }),
     onSuccess: (result) => {
       if (result.conversationId) setConversationId(result.conversationId);
       setMode(result.mode ?? null);
+      setCoachState(result.coach ?? null);
+      if (result.coach?.finished) setCoachActive(false);
       setMessages((prev) => [...prev, { role: "assistant", content: result.reply }]);
       void queryClient.invalidateQueries({ queryKey: ["teacher-session"] });
     },
@@ -102,14 +119,25 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     },
   });
 
-  function send(raw: string) {
+  function send(raw: string, options?: { coach?: boolean; resetHistory?: boolean }) {
     const { ok, value } = validateTeacherMessage(raw);
     if (!ok || turn.isPending) return;
     setError(null);
     setStarted(true);
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: value }]);
-    turn.mutate(value);
+    const history = options?.resetHistory ? [] : buildTeacherHistory(messages);
+    setMessages((prev) =>
+      options?.resetHistory ? [{ role: "user", content: value }] : [...prev, { role: "user", content: value }],
+    );
+    turn.mutate({ message: value, coach: options?.coach ?? coachActive, history });
+  }
+
+  function startCoachSession() {
+    if (turn.isPending) return;
+    setConversationId(undefined);
+    setCoachActive(true);
+    setCoachState(null);
+    send(COACH_START_MESSAGE, { coach: true, resetHistory: true });
   }
 
   function newConversation() {
@@ -118,6 +146,8 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     setInput("");
     setError(null);
     setStarted(true);
+    setCoachActive(false);
+    setCoachState(null);
     inputRef.current?.focus();
   }
 
@@ -137,26 +167,44 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             </p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={newConversation}>
-          <Plus className="size-4" aria-hidden="true" />
-          {t("New conversation")}
-        </Button>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={startCoachSession}
+            disabled={turn.isPending}
+          >
+            <GraduationCap className="size-4" aria-hidden="true" />
+            {t("Start coach session")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={newConversation}>
+            <Plus className="size-4" aria-hidden="true" />
+            {t("New conversation")}
+          </Button>
+        </div>
       </header>
 
-      {(ctx?.cefrLevel || ctx?.focusSkill || ctx?.lessonTitle) && (
+      {(ctx?.cefrLevel || ctx?.focusSkill || ctx?.lessonTitle || coachState) && (
         <div className="flex flex-wrap items-center gap-2" aria-label={t("Your context")}>
-          {ctx.cefrLevel && (
+          {ctx?.cefrLevel && (
             <Badge variant="secondary">
               {t("Level")}: {ctx.cefrLevel}
             </Badge>
           )}
-          {ctx.focusSkill && (
+          {ctx?.focusSkill && (
             <Badge variant="secondary">
               {t("Focus")}: {ctx.focusSkill}
             </Badge>
           )}
-          {ctx.lessonTitle && <Badge variant="outline">{ctx.lessonTitle}</Badge>}
+          {ctx?.lessonTitle && <Badge variant="outline">{ctx.lessonTitle}</Badge>}
           {mode && <Badge variant="outline">{t(MODE_LABEL[mode] ?? mode)}</Badge>}
+          {coachState && (
+            <Badge variant="outline">
+              {coachState.finished
+                ? t("Session complete")
+                : `${t("Coach step")} ${coachState.turn}/${coachState.maxTurns}`}
+            </Badge>
+          )}
         </div>
       )}
 

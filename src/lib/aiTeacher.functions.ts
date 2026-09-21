@@ -13,6 +13,14 @@ import { itemLevelFromStoredLevel } from "@/lib/pedagogy/cefr";
 import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
 import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
 import {
+  coachBlock,
+  coachFocus,
+  coachStage,
+  coachStudentTurns,
+  COACH_MAX_TURNS,
+  type CoachStage,
+} from "@/lib/pedagogy/coachSession";
+import {
   teacherEvidence,
   teacherEvidenceDecision,
   TEACHER_RUBRIC_VERSION,
@@ -34,6 +42,9 @@ const teacherTurnInputSchema = z
     objective: z.string().trim().min(1).max(200).default("Help the student improve their English."),
     message: z.string().trim().min(1).max(2000),
     history: z.array(historyMessageSchema).max(20).default([]),
+    // The student may only ask for a guided session. Focus, level, stage and
+    // any assessment stay server-side.
+    coach: z.boolean().optional(),
   })
   .strict();
 
@@ -52,8 +63,23 @@ export const teacherTurn = createServerFn({ method: "POST" })
     });
 
     // Mode is classified on the server from the student's own turn: the client
-    // cannot declare a mode, a level or a skill.
-    const mode = classifyTeacherMode({ message: data.message, history: data.history });
+    // cannot declare a mode, a level or a skill. The only client intent allowed
+    // is "I want a guided session" (coach).
+    const mode = data.coach
+      ? "COACH"
+      : classifyTeacherMode({ message: data.message, history: data.history });
+
+    // Coach session state is derived server-side: stage from the conversation
+    // shape, focus from the existing next-step priority logic.
+    let coach: { stage: CoachStage; focusSkill: string | null; turns: number } | null = null;
+    let coachPromptBlock: string | undefined;
+    if (mode === "COACH") {
+      const turns = coachStudentTurns(data.history);
+      const stage = coachStage(turns);
+      const focus = coachFocus(pedagogicalContext);
+      coach = { stage, focusSkill: focus.skill, turns };
+      coachPromptBlock = coachBlock(focus, stage, turns);
+    }
 
     const raw = await callGateway(
       teacherTurnMessages({
@@ -62,6 +88,7 @@ export const teacherTurn = createServerFn({ method: "POST" })
         studentMessage: data.message,
         history: data.history,
         mode,
+        ...(coachPromptBlock ? { coachBlock: coachPromptBlock } : {}),
       }),
       true,
       { userId, operation: "teacher" },
@@ -147,6 +174,15 @@ export const teacherTurn = createServerFn({ method: "POST" })
       correction: turn.observedError,
       evidencePersisted,
       evidenceSkill: decision.assess ? decision.skill : null,
+      coach: coach
+        ? {
+            stage: coach.stage,
+            focusSkill: coach.focusSkill,
+            turn: coach.turns,
+            maxTurns: COACH_MAX_TURNS,
+            finished: coach.stage === "SUMMARY",
+          }
+        : null,
     };
   });
 

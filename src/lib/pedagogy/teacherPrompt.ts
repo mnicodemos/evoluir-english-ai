@@ -89,6 +89,8 @@ export function teacherTurnMessages(input: {
   history: { role: "user" | "assistant"; content: string }[];
   /** Server-classified interaction mode; derived deterministically when absent. */
   mode?: TeacherMode;
+  /** Server-built coach session block (coach mode only). */
+  coachBlock?: string;
 }): AiMsg[] {
   const mode =
     input.mode ?? classifyTeacherMode({ message: input.studentMessage, history: input.history });
@@ -105,6 +107,7 @@ export function teacherTurnMessages(input: {
     `MODE: ${mode}`,
     MODE_RULES[mode],
     "",
+    ...(input.coachBlock ? [input.coachBlock, ""] : []),
     `LEVEL REGISTER: ${register}`,
     REGISTER_RULES[register],
     "",

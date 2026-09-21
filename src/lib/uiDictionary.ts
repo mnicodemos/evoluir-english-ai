@@ -6,6 +6,10 @@ export const uiPt: Record<string, string> = {
   "Practice English with your personal AI teacher":
     "Pratique inglês com seu professor de IA pessoal",
   "New conversation": "Nova conversa",
+  "Start coach session": "Iniciar sessão guiada",
+  "Coach session": "Sessão guiada",
+  "Coach step": "Etapa",
+  "Session complete": "Sessão concluída",
   "Your context": "Seu contexto",
   Level: "Nível",
   Focus: "Foco",
