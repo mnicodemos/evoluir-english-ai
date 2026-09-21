@@ -91,18 +91,25 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   }, [session.data, started]);
 
   const turn = useMutation({
-    mutationFn: async (message: string) =>
+    mutationFn: async (vars: {
+      message: string;
+      coach: boolean;
+      history: ReturnType<typeof buildTeacherHistory>;
+    }) =>
       teacherTurn({
         data: {
-          message,
+          message: vars.message,
           ...(conversationId ? { conversationId } : {}),
           ...(lessonId ? { lessonId } : {}),
-          history: buildTeacherHistory(messages),
+          history: vars.history,
+          ...(vars.coach ? { coach: true } : {}),
         },
       }),
     onSuccess: (result) => {
       if (result.conversationId) setConversationId(result.conversationId);
       setMode(result.mode ?? null);
+      setCoachState(result.coach ?? null);
+      if (result.coach?.finished) setCoachActive(false);
       setMessages((prev) => [...prev, { role: "assistant", content: result.reply }]);
       void queryClient.invalidateQueries({ queryKey: ["teacher-session"] });
     },
@@ -112,14 +119,25 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     },
   });
 
-  function send(raw: string) {
+  function send(raw: string, options?: { coach?: boolean; resetHistory?: boolean }) {
     const { ok, value } = validateTeacherMessage(raw);
     if (!ok || turn.isPending) return;
     setError(null);
     setStarted(true);
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: value }]);
-    turn.mutate(value);
+    const history = options?.resetHistory ? [] : buildTeacherHistory(messages);
+    setMessages((prev) =>
+      options?.resetHistory ? [{ role: "user", content: value }] : [...prev, { role: "user", content: value }],
+    );
+    turn.mutate({ message: value, coach: options?.coach ?? coachActive, history });
+  }
+
+  function startCoachSession() {
+    if (turn.isPending) return;
+    setConversationId(undefined);
+    setCoachActive(true);
+    setCoachState(null);
+    send(COACH_START_MESSAGE, { coach: true, resetHistory: true });
   }
 
   function newConversation() {
@@ -128,6 +146,8 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     setInput("");
     setError(null);
     setStarted(true);
+    setCoachActive(false);
+    setCoachState(null);
     inputRef.current?.focus();
   }
 
