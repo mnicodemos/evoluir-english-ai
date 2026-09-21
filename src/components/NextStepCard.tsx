@@ -129,14 +129,23 @@ export function NextStepCard() {
                   <span>{t("No evidence at your current CEFR level yet")}</span>
                 </li>
               )}
-              <li className="flex items-start gap-2">
-                <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                <span>{progressionReason}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                <span>{t("Supports your progression")}</span>
-              </li>
+              {hasCurrentLevelEvidence ? (
+                <>
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                    <span>{progressionReason}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                    <span>{t("Supports your progression")}</span>
+                  </li>
+                </>
+              ) : (
+                <li className="flex items-start gap-2">
+                  <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                  <span>{t("Complete an activity to build evidence at this level")}</span>
+                </li>
+              )}
             </ul>
           </div>
         </aside>
