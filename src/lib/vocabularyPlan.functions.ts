@@ -80,12 +80,14 @@ export const dailyWords = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const today = studyToday();
 
-    // A fresh set of ten words is created every time the student starts a new lesson.
+    // A fresh set of ten words is unlocked by each COMPLETED lesson, so retaking a
+    // lesson reuses the same batch instead of creating a duplicate one.
     const { count } = await supabase
       .from("user_lessons")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", userId);
-    const batchKey = `started-${count ?? 0}`;
+      .eq("user_id", userId)
+      .not("completed_at", "is", null);
+    const batchKey = lessonBatchKey(count ?? 0);
 
     const existing = await supabase
       .from("vocabulary")
@@ -96,6 +98,7 @@ export const dailyWords = createServerFn({ method: "POST" })
 
     const todays = (existing.data ?? []) as DailyWord[];
     if (todays.length >= DAILY_COUNT) return todays.slice(0, DAILY_COUNT);
+
 
     // Words must come only from this level's lessons, so a mastered word never counts
     // toward another level when the student changes level.
