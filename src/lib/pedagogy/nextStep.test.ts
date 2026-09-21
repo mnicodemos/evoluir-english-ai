@@ -183,6 +183,76 @@ describe("next step content", () => {
   });
 });
 
+describe("insight is scoped to the selected level", () => {
+  const b1 = { skill: "vocabulary", score: 62, confidence: 0.8, cefrLevel: "B1" };
+  const b2 = { skill: "grammar", score: 88, confidence: 0.77, cefrLevel: "B2" };
+
+  it("uses only B1 evidence when B1 is selected", () => {
+    const step = buildNextStep({ ...base, currentLevel: "B1", skills: [b1, b2] });
+    expect(step.prioritySkill).toBe("vocabulary");
+    expect(step.insight?.cefrLevel).toBe("B1");
+    expect(step.insight?.hasEvidence).toBe(true);
+    expect(step.insight?.strongestSkill).toBeNull();
+  });
+
+  it("does not fill a B2 insight with B1 evidence", () => {
+    const step = buildNextStep({ ...base, currentLevel: "B2", skills: [b1] });
+    expect(step.insight?.hasEvidence).toBe(false);
+    expect(step.insight?.situation).toBe("no_evidence_at_level");
+    expect(step.insight?.score).toBeNull();
+  });
+
+  it("returns to the B1 context after B1 -> B2 -> B1 without changing the input", () => {
+    const input = { ...base, skills: [b1, b2] };
+    const first = buildNextStep({ ...input, currentLevel: "B1" });
+    buildNextStep({ ...input, currentLevel: "B2" });
+    const back = buildNextStep({ ...input, currentLevel: "B1" });
+    expect(back).toEqual(first);
+    expect(input.skills).toEqual([b1, b2]);
+  });
+
+  it("names the stronger skill at the same level", () => {
+    const step = buildNextStep({
+      ...base,
+      currentLevel: "B2",
+      skills: [
+        { skill: "vocabulary", score: 55, confidence: 0.7, cefrLevel: "B2" },
+        { skill: "grammar", score: 88, confidence: 0.8, cefrLevel: "B2" },
+      ],
+      recentlyPractised: ["vocabulary", "grammar"],
+    });
+    expect(step.prioritySkill).toBe("vocabulary");
+    expect(step.insight?.situation).toBe("strong_elsewhere");
+    expect(step.insight?.strongestSkill).toBe("grammar");
+  });
+
+  it("reacts to new evidence at the selected level", () => {
+    const before = buildNextStep({
+      ...base,
+      currentLevel: "B2",
+      skills: [{ skill: "writing", score: null, confidence: null, cefrLevel: "B2" }],
+    });
+    const after = buildNextStep({
+      ...base,
+      currentLevel: "B2",
+      skills: [{ skill: "writing", score: 79, confidence: 0.6, cefrLevel: "B2" }],
+      recentlyPractised: ["writing"],
+    });
+    expect(before.insight?.situation).toBe("no_evidence_at_level");
+    expect(after.insight?.situation).toBe("needs_practice");
+    expect(after.insight?.score).toBe(79);
+  });
+
+  it("keeps confidence internal and never exposes a display percentage", () => {
+    const step = buildNextStep({ ...base, currentLevel: "B2", skills: [b2] });
+    expect(step.insight?.confidence).toBe(0.77);
+    expect(Object.keys(step.insight ?? {})).not.toContain("confidencePercent");
+    for (const text of Object.values(NEXT_STEP_SITUATION_TEXT)) {
+      expect(text).not.toMatch(/confidence|%/i);
+    }
+  });
+});
+
 describe("next step copy", () => {
   it("has factual, non-negative copy for every reason", () => {
     for (const text of Object.values(NEXT_STEP_REASON_TEXT)) {
