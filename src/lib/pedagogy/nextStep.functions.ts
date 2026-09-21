@@ -28,6 +28,16 @@ export const loadNextStep = createServerFn({ method: "POST" })
         .from("current_skill_profile")
         .select("skill, score, cefr_level, confidence_score")
         .eq("user_id", userId),
+      // Full per-level history (completed sessions only). Nothing is ever
+      // deleted: each CEFR level keeps its own evidence, so when the student
+      // returns to a level that already has results, those results are shown
+      // again instead of being borrowed from another level.
+      supabaseAdmin
+        .from("assessment_skill_results")
+        .select("skill, score, cefr_level, confidence_score, assessed_at, assessment_sessions!inner(status)")
+        .eq("user_id", userId)
+        .eq("assessment_sessions.status", "completed")
+        .order("assessed_at", { ascending: false }),
       supabaseAdmin
         .from("learning_profile")
         .select("common_errors")
