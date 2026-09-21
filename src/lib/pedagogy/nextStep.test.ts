@@ -132,9 +132,12 @@ describe("next step content", () => {
     expect(step.insight).toEqual({
       cefrLevel: null,
       confidence: null,
+      score: null,
       hasEvidence: false,
       matchesCurrentLevel: true,
       recentlyPractised: false,
+      situation: "no_evidence_at_level",
+      strongestSkill: null,
     });
   });
 
