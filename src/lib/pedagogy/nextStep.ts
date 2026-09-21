@@ -172,14 +172,40 @@ export function buildNextStep(input: NextStepInput): NextStep {
     !currentLevel ||
     (best.skill.cefrLevel !== "insufficient_evidence" &&
       best.skill.cefrLevel.toUpperCase() === currentLevel);
+  const hasEvidence = best.skill.score !== null || best.skill.confidence !== null;
+  const recentlyPractised = input.recentlyPractised.includes(best.skill.skill);
+  // Strongest OTHER skill with its own evidence at the selected level.
+  const strongest = candidates
+    .filter(
+      (item) =>
+        item.skill !== best.skill.skill &&
+        item.score !== null &&
+        item.cefrLevel !== "insufficient_evidence",
+    )
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.skill.localeCompare(b.skill))[0];
+  const strongestSkill =
+    strongest && (strongest.score ?? 0) >= 70 && (strongest.score ?? 0) > (best.skill.score ?? 0)
+      ? strongest.skill
+      : null;
+  const situation: NextStepSituation =
+    !hasEvidence || !matchesCurrentLevel
+      ? "no_evidence_at_level"
+      : strongestSkill
+        ? "strong_elsewhere"
+        : !recentlyPractised
+          ? "not_practised"
+          : "needs_practice";
   const insight = {
     cefrLevel:
       input.currentLevel ??
       (best.skill.cefrLevel === "insufficient_evidence" ? null : best.skill.cefrLevel),
     confidence: best.skill.confidence,
-    hasEvidence: best.skill.score !== null || best.skill.confidence !== null,
+    score: best.skill.score,
+    hasEvidence,
     matchesCurrentLevel,
-    recentlyPractised: input.recentlyPractised.includes(best.skill.skill),
+    recentlyPractised,
+    situation,
+    strongestSkill,
   };
   const lesson = input.lessonBySkill[best.skill.skill];
   if (lesson) {
