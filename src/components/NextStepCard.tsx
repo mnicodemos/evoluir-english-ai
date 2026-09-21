@@ -101,37 +101,39 @@ export function NextStepCard() {
             <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
               <Sparkles className="size-5 text-primary" aria-hidden="true" />
             </span>
-            <h3 className="text-lg font-semibold">{t("AI Learning Insight")}</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg font-semibold">{t("AI Learning Insight")}</h3>
+
+              <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">
+                {t("Your next focus")}
+              </p>
+              <p className="mt-1 font-medium">
+                {skillLabel}
+                {cefrLevel ? ` — ${cefrLevel}` : ""}
+              </p>
+
+              <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
+                {t("What is happening")}
+              </p>
+              <p className="mt-1 text-sm">{situationText}</p>
+
+              <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
+                {t("Why this matters now")}
+              </p>
+              <p className="mt-1 text-sm">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
+
+              <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
+                {t("Next step")}
+              </p>
+              <p className="mt-1 flex items-start gap-2 text-sm">
+                <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                <span>
+                  {actionText}
+                  {data.activity.title ? `: ${data.activity.title}` : ""}
+                </span>
+              </p>
+            </div>
           </div>
-
-          <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">
-            {t("Your next focus")}
-          </p>
-          <p className="mt-1 font-medium">
-            {skillLabel}
-            {cefrLevel ? ` — ${cefrLevel}` : ""}
-          </p>
-
-          <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
-            {t("What is happening")}
-          </p>
-          <p className="mt-1 text-sm">{situationText}</p>
-
-          <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
-            {t("Why this matters now")}
-          </p>
-          <p className="mt-1 text-sm">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
-
-          <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
-            {t("Next step")}
-          </p>
-          <p className="mt-1 flex items-start gap-2 text-sm">
-            <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-            <span>
-              {actionText}
-              {data.activity.title ? `: ${data.activity.title}` : ""}
-            </span>
-          </p>
         </aside>
       </div>
     </section>
