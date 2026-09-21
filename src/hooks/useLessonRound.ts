@@ -12,11 +12,15 @@ export function useLessonRound() {
     queryKey: ["lesson-round"],
     refetchOnMount: "always",
     queryFn: async (): Promise<number> => {
+      // Completed lessons, matching the vocabulary batch rule: retaking a lesson
+      // does not open a new round.
       const { count, error } = await supabase
         .from("user_lessons")
-        .select("id", { count: "exact", head: true });
+        .select("id", { count: "exact", head: true })
+        .not("completed_at", "is", null);
       if (error) throw error;
       return count ?? 0;
     },
+
   });
 }
