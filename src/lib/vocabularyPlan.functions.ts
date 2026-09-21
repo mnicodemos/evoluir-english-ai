@@ -166,16 +166,17 @@ export const dailyWords = createServerFn({ method: "POST" })
     }
 
     const exclude = new Set(usedWords);
+    const first = await askAi(exclude);
     // Saving fewer than ten words is fine; the batch is never padded with existing words.
-    let fresh = selectNewWords(await askAi(exclude), exclude, missing);
+    let fresh = selectNewWords(first, usedWords, missing);
 
-    // The model sometimes repeats known words: one retry with those words added to the
+    // The model sometimes repeats known words: one retry with those repeats added to the
     // exclusion list, instead of failing the whole batch.
     if (!fresh.length) {
-      const second = await askAi(exclude);
-      for (const w of second) exclude.add(String(w.word ?? "").trim().toLowerCase());
-      fresh = selectNewWords(second, usedWords, missing);
+      for (const w of first) exclude.add(String(w.word ?? "").trim().toLowerCase());
+      fresh = selectNewWords(await askAi(exclude), usedWords, missing);
     }
+
 
     if (!fresh.length) {
       if (todays.length) return todays;
