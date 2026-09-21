@@ -1,4 +1,4 @@
-import { Instagram } from "lucide-react";
+import { Instagram, Mail } from "lucide-react";
 
 import {
   Tooltip,
@@ -112,6 +112,13 @@ export function Footer({
                 </Tooltip>
               ))}
             </div>
+            <a
+              href="mailto:evoluirmaisoficial@hotmail.com"
+              className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-[#A1A1AA] dark:hover:text-white"
+            >
+              <Mail className="size-4" aria-hidden="true" />
+              <span>evoluirmaisoficial@hotmail.com</span>
+            </a>
             </TooltipProvider>
           </div>
 
