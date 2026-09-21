@@ -46,16 +46,19 @@ export function NextStepCard() {
   const skillLabel = data.prioritySkill
     ? t(NEXT_STEP_SKILL_TEXT[data.prioritySkill] ?? data.prioritySkill)
     : t("Free practice");
-  const confidence =
-    data.insight?.confidence === null || data.insight?.confidence === undefined
-      ? null
-      : Math.round(data.insight.confidence * 100);
-  const cefrLevel = data.insight?.cefrLevel ? findLevel(data.insight.cefrLevel).label : null;
-  const progressionReason = data.insight?.recentlyPractised
-    ? t("Builds on your recent practice")
-    : t("Adds recent evidence to your progress");
-  const hasCurrentLevelEvidence =
-    data.insight?.hasEvidence === true && data.insight.matchesCurrentLevel;
+  const cefrLevel = data.insight?.cefrLevel ? findLevel(data.insight.cefrLevel).cefr : null;
+  const strongestLabel = data.insight?.strongestSkill
+    ? t(NEXT_STEP_SKILL_TEXT[data.insight.strongestSkill] ?? data.insight.strongestSkill)
+    : null;
+  // Deterministic copy: the template comes from the pedagogy layer and is
+  // filled only with values the server already provided for this level.
+  const situation = data.insight?.situation ?? "no_data";
+  const situationText = t(NEXT_STEP_SITUATION_TEXT[situation])
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"))
+    .replaceAll("{strongest}", strongestLabel ?? skillLabel);
+  const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
+
 
   return (
     <section className="card-soft p-5" aria-label={t("Your next step")}>
