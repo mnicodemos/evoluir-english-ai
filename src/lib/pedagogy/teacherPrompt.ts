@@ -107,6 +107,7 @@ export function teacherTurnMessages(input: {
     `MODE: ${mode}`,
     MODE_RULES[mode],
     "",
+    ...(input.coachBlock ? [input.coachBlock, ""] : []),
     `LEVEL REGISTER: ${register}`,
     REGISTER_RULES[register],
     "",
