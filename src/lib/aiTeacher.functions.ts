@@ -174,6 +174,15 @@ export const teacherTurn = createServerFn({ method: "POST" })
       correction: turn.observedError,
       evidencePersisted,
       evidenceSkill: decision.assess ? decision.skill : null,
+      coach: coach
+        ? {
+            stage: coach.stage,
+            focusSkill: coach.focusSkill,
+            turn: coach.turns,
+            maxTurns: COACH_MAX_TURNS,
+            finished: coach.stage === "SUMMARY",
+          }
+        : null,
     };
   });
 
