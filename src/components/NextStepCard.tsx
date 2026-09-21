@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { useProfile } from "@/hooks/useProfile";
 import {
   NEXT_STEP_ACTION_TEXT,
   NEXT_STEP_REASON_TEXT,
