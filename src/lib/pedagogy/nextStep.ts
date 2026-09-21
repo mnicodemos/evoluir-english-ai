@@ -34,6 +34,17 @@ export type NextStepActivity = {
   params?: { lessonId: string };
 };
 
+/**
+ * Deterministic situation of the chosen skill AT THE SELECTED LEVEL.
+ * Drives the student-facing copy; no invented data, no LLM.
+ */
+export type NextStepSituation =
+  | "no_data"
+  | "no_evidence_at_level"
+  | "strong_elsewhere"
+  | "not_practised"
+  | "needs_practice";
+
 export type NextStep = {
   prioritySkill: string | null;
   reason: NextStepReason;
@@ -42,10 +53,15 @@ export type NextStep = {
   /** Existing evidence for the chosen skill, exposed for contextual display only. */
   insight?: {
     cefrLevel: string | null;
+    /** Internal index only. Never displayed to the student. */
     confidence: number | null;
+    score: number | null;
     hasEvidence: boolean;
     matchesCurrentLevel: boolean;
     recentlyPractised: boolean;
+    situation: NextStepSituation;
+    /** Best-performing other skill with evidence at the same level, if any. */
+    strongestSkill: string | null;
   };
 };
 
