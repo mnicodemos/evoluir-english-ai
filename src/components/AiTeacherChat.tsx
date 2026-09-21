@@ -41,7 +41,10 @@ const MODE_LABEL: Record<string, string> = {
   EXAMPLE: "Examples",
   REVIEW: "Reviewing",
   CONVERSATION: "Conversation",
+  COACH: "Coach session",
 };
+
+const COACH_START_MESSAGE = "Start a guided study session with me.";
 
 const errorCopy: Record<string, string> = {
   offline: "You seem to be offline. Check your connection and try again.",
@@ -62,6 +65,13 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
   const [mode, setMode] = useState<string | null>(null);
+  const [coachActive, setCoachActive] = useState(false);
+  const [coachState, setCoachState] = useState<{
+    stage: string;
+    turn: number;
+    maxTurns: number;
+    finished: boolean;
+  } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const session = useQuery({
