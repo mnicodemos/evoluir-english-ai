@@ -251,6 +251,20 @@ export const NEXT_STEP_ACTION_TEXT: Record<NextStepAction, string> = {
   talk_to_teacher: "Talk to AI Teacher",
 };
 
+/**
+ * Templates for the student-facing "what is happening" line. Placeholders are
+ * filled with real values only: {skill}, {level}, {strongest}.
+ */
+export const NEXT_STEP_SITUATION_TEXT: Record<NextStepSituation, string> = {
+  no_data: "We do not have your learning data yet.",
+  no_evidence_at_level:
+    "We are still building your {skill} assessment at {level}. Do a {skill} activity at this level to create new evidence.",
+  strong_elsewhere:
+    "You are already doing well in {strongest}. Right now {skill} is what needs more practice at {level}.",
+  not_practised: "You have not practised {skill} at {level} recently.",
+  needs_practice: "Among your {level} results, {skill} is the skill that needs the most attention.",
+};
+
 export const NEXT_STEP_SKILL_TEXT: Record<string, string> = {
   grammar: "Grammar",
   vocabulary: "Vocabulary",
