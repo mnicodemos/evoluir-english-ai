@@ -116,12 +116,18 @@ export const dailyWords = createServerFn({ method: "POST" })
       objective: string;
     }[];
 
-    const { data: known } = await supabase.from("vocabulary").select("word").limit(1000);
-    const usedWords = new Set(
-      ((known ?? []) as { word: string }[]).map((w) => w.word.toLowerCase()),
-    );
+    // Duplicate check is scoped to THIS student at this level: global sample words and
+    // other students' words must not block a word that is new for this learner.
+    const { data: known } = await supabase
+      .from("vocabulary")
+      .select("word")
+      .eq("created_by", userId)
+      .eq("level", data.level)
+      .limit(1000);
+    const usedWords = ownedWordSet((known ?? []) as { word: string }[]);
 
     const missing = DAILY_COUNT - todays.length;
+
     const raw = await callGateway(
       [
         {
