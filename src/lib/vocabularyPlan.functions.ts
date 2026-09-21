@@ -159,9 +159,9 @@ export const dailyWords = createServerFn({ method: "POST" })
     const parsed = parseWords(raw);
     if (!parsed.success)
       throw new Error("The AI returned an invalid vocabulary list. Please try again.");
-    const fresh = (parsed.data.words as AiWord[])
-      .filter((w) => w.word && w.translation && !usedWords.has(String(w.word).toLowerCase()))
-      .slice(0, missing);
+    // Saving fewer than ten words is fine; the batch is never padded with existing words.
+    const fresh = selectNewWords(parsed.data.words as AiWord[], usedWords, missing);
+
 
     if (!fresh.length) {
       if (todays.length) return todays;
