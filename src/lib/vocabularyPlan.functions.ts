@@ -5,6 +5,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { callGateway } from "./ai-gateway.server";
 import { studyToday } from "./today";
+import { lessonBatchKey, ownedWordSet, selectNewWords } from "./vocabularyBatch";
+
 
 export type DailyWord = {
   id: string;
