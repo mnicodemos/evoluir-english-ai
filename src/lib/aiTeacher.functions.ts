@@ -13,6 +13,14 @@ import { itemLevelFromStoredLevel } from "@/lib/pedagogy/cefr";
 import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
 import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
 import {
+  coachBlock,
+  coachFocus,
+  coachStage,
+  coachStudentTurns,
+  COACH_MAX_TURNS,
+  type CoachStage,
+} from "@/lib/pedagogy/coachSession";
+import {
   teacherEvidence,
   teacherEvidenceDecision,
   TEACHER_RUBRIC_VERSION,
