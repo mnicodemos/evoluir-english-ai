@@ -59,7 +59,8 @@ export const loadNextStep = createServerFn({ method: "POST" })
     // ordered by assessed_at DESC, so the first match per skill wins.
     const level = profile.data?.level ?? null;
     const current = level?.toUpperCase() ?? null;
-    const atLevelBySkill = new Map<string, (typeof history.data)[number]>();
+    type HistoryRow = NonNullable<typeof history.data>[number];
+    const atLevelBySkill = new Map<string, HistoryRow>();
     for (const row of history.data ?? []) {
       if (!row.skill || !row.cefr_level) continue;
       if (current && row.cefr_level.toUpperCase() !== current) continue;
@@ -86,7 +87,6 @@ export const loadNextStep = createServerFn({ method: "POST" })
     // Existing lessons that match a skill at the student's own level and are
     // not completed yet. No new content, no ranking.
     const doneLessons = new Set((completed.data ?? []).map((row) => row.lesson_id));
-    const level = profile.data?.level ?? null;
     let query = supabaseAdmin.from("lessons").select("id, title, skill, level, sort_order");
     if (level) query = query.eq("level", level);
     const { data: lessons } = await query.order("sort_order", { ascending: true });
