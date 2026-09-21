@@ -100,57 +100,35 @@ export function NextStepCard() {
             <Sparkles className="size-4 text-primary" aria-hidden="true" />
             <h3 className="font-semibold">{t("AI Learning Insight")}</h3>
           </div>
+
           <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">
-            {t("Why now?")}
+            {t("Your next focus")}
+          </p>
+          <p className="mt-1 font-medium">
+            {skillLabel}
+            {cefrLevel ? ` — ${cefrLevel}` : ""}
+          </p>
+
+          <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
+            {t("What is happening")}
+          </p>
+          <p className="mt-1 text-sm">{situationText}</p>
+
+          <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
+            {t("Why this matters now")}
           </p>
           <p className="mt-1 text-sm">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
 
-          <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <dt className="text-xs text-muted-foreground">{t("Current level")}</dt>
-              <dd className="mt-0.5 font-medium">{cefrLevel ?? t("Not available yet")}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-muted-foreground">{t("Confidence")}</dt>
-              <dd className="mt-0.5 font-medium">
-                {confidence === null ? t("Building evidence") : `${confidence}%`}
-              </dd>
-            </div>
-          </dl>
-
-          <div className="mt-4">
-            <p className="text-xs text-muted-foreground">{t("Recommended because")}</p>
-            <ul className="mt-2 space-y-2 text-sm">
-              {hasCurrentLevelEvidence ? (
-                <li className="flex items-start gap-2">
-                  <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                  <span>{t("Matches your CEFR level")}</span>
-                </li>
-              ) : (
-                <li className="flex items-start gap-2">
-                  <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                  <span>{t("No evidence at your current CEFR level yet")}</span>
-                </li>
-              )}
-              {hasCurrentLevelEvidence ? (
-                <>
-                  <li className="flex items-start gap-2">
-                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                    <span>{progressionReason}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                    <span>{t("Supports your progression")}</span>
-                  </li>
-                </>
-              ) : (
-                <li className="flex items-start gap-2">
-                  <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                  <span>{t("Complete an activity to build evidence at this level")}</span>
-                </li>
-              )}
-            </ul>
-          </div>
+          <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
+            {t("Next step")}
+          </p>
+          <p className="mt-1 flex items-start gap-2 text-sm">
+            <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+            <span>
+              {actionText}
+              {data.activity.title ? `: ${data.activity.title}` : ""}
+            </span>
+          </p>
         </aside>
       </div>
     </section>
