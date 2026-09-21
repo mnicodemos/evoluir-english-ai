@@ -7,6 +7,7 @@ import { useProfile } from "@/hooks/useProfile";
 import {
   NEXT_STEP_ACTION_TEXT,
   NEXT_STEP_REASON_TEXT,
+  NEXT_STEP_SITUATION_TEXT,
   NEXT_STEP_SKILL_TEXT,
 } from "@/lib/pedagogy/nextStep";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
