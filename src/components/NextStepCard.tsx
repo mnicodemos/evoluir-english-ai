@@ -97,9 +97,11 @@ export function NextStepCard() {
         </div>
 
         <aside className="min-w-0 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-          <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-primary" aria-hidden="true" />
-            <h3 className="font-semibold">{t("AI Learning Insight")}</h3>
+          <div className="flex items-start gap-4">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
+              <Sparkles className="size-5 text-primary" aria-hidden="true" />
+            </span>
+            <h3 className="text-lg font-semibold">{t("AI Learning Insight")}</h3>
           </div>
 
           <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">
