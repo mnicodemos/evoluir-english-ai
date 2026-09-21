@@ -39,6 +39,7 @@ describe("next step priority", () => {
       cefrLevel: "B1",
       confidence: 0.8,
       hasEvidence: true,
+      matchesCurrentLevel: true,
       recentlyPractised: true,
     });
   });
@@ -128,17 +129,32 @@ describe("next step content", () => {
       cefrLevel: null,
       confidence: null,
       hasEvidence: false,
+      matchesCurrentLevel: true,
       recentlyPractised: false,
     });
   });
 
-  it("uses the current profile level in the contextual insight", () => {
+  it("does not reuse confidence from a previous CEFR level", () => {
     const step = buildNextStep({
       ...base,
       currentLevel: "b2",
       skills: [skill("grammar", 72)],
     });
     expect(step.insight?.cefrLevel).toBe("b2");
+    expect(step.insight?.confidence).toBeNull();
+    expect(step.insight?.hasEvidence).toBe(false);
+    expect(step.insight?.matchesCurrentLevel).toBe(false);
+  });
+
+  it("keeps current confidence when the CEFR level has not changed", () => {
+    const step = buildNextStep({
+      ...base,
+      currentLevel: "B1",
+      skills: [skill("grammar", 72)],
+    });
+    expect(step.insight?.confidence).toBe(0.8);
+    expect(step.insight?.hasEvidence).toBe(true);
+    expect(step.insight?.matchesCurrentLevel).toBe(true);
   });
 
   it("never uses a lesson from another skill", () => {
