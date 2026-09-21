@@ -22,12 +22,22 @@ export const loadNextStep = createServerFn({ method: "POST" })
     const userId = context.userId;
     const since = new Date(Date.now() - RECENT_DAYS * 86_400_000).toISOString();
 
-    const [profile, skills, learning, recent, completed] = await Promise.all([
+    const [profile, skills, history, learning, recent, completed] = await Promise.all([
       supabaseAdmin.from("profiles").select("level").eq("id", userId).maybeSingle(),
       supabaseAdmin
         .from("current_skill_profile")
         .select("skill, score, cefr_level, confidence_score")
         .eq("user_id", userId),
+      // Full per-level history (completed sessions only). Nothing is ever
+      // deleted: each CEFR level keeps its own evidence, so when the student
+      // returns to a level that already has results, those results are shown
+      // again instead of being borrowed from another level.
+      supabaseAdmin
+        .from("assessment_skill_results")
+        .select("skill, score, cefr_level, confidence_score, assessed_at, assessment_sessions!inner(status)")
+        .eq("user_id", userId)
+        .eq("assessment_sessions.status", "completed")
+        .order("assessed_at", { ascending: false }),
       supabaseAdmin
         .from("learning_profile")
         .select("common_errors")
@@ -45,19 +55,38 @@ export const loadNextStep = createServerFn({ method: "POST" })
         .not("completed_at", "is", null),
     ]);
 
+    // Latest completed result per skill AT THE CURRENT LEVEL. Rows are
+    // ordered by assessed_at DESC, so the first match per skill wins.
+    const level = profile.data?.level ?? null;
+    const current = level?.toUpperCase() ?? null;
+    type HistoryRow = NonNullable<typeof history.data>[number];
+    const atLevelBySkill = new Map<string, HistoryRow>();
+    for (const row of history.data ?? []) {
+      if (!row.skill || !row.cefr_level) continue;
+      if (current && row.cefr_level.toUpperCase() !== current) continue;
+      if (!atLevelBySkill.has(row.skill)) atLevelBySkill.set(row.skill, row);
+    }
+
     const snapshots: SkillSnapshot[] = (skills.data ?? [])
       .filter((row) => row.skill)
-      .map((row) => ({
-        skill: row.skill as string,
-        score: row.score === null ? null : Number(row.score),
-        confidence: row.confidence_score === null ? null : Number(row.confidence_score),
-        cefrLevel: row.cefr_level ?? "insufficient_evidence",
-      }));
+      .map((row) => {
+        // Prefer the skill's own evidence at the current level; only when the
+        // level has no evidence of its own do we fall back to the latest
+        // snapshot, which buildNextStep flags as cross-level (not replicated).
+        const own = atLevelBySkill.get(row.skill as string);
+        const source = own ?? row;
+        return {
+          skill: row.skill as string,
+          score: source.score === null ? null : Number(source.score),
+          confidence:
+            source.confidence_score === null ? null : Number(source.confidence_score),
+          cefrLevel: source.cefr_level ?? "insufficient_evidence",
+        };
+      });
 
     // Existing lessons that match a skill at the student's own level and are
     // not completed yet. No new content, no ranking.
     const doneLessons = new Set((completed.data ?? []).map((row) => row.lesson_id));
-    const level = profile.data?.level ?? null;
     let query = supabaseAdmin.from("lessons").select("id, title, skill, level, sort_order");
     if (level) query = query.eq("level", level);
     const { data: lessons } = await query.order("sort_order", { ascending: true });
