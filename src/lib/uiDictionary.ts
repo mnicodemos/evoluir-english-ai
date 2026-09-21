@@ -18,6 +18,20 @@ export const uiPt: Record<string, string> = {
   "Free practice": "Prática livre",
   "AI Learning Insight": "Insight de aprendizado com IA",
   "Why now?": "Por que agora?",
+  "Your next focus": "Seu próximo foco",
+  "What is happening": "O que está acontecendo",
+  "Why this matters now": "Por que isso importa agora",
+  "Next step": "Próximo passo",
+  "your current level": "seu nível atual",
+  "We do not have your learning data yet.": "Ainda não temos seus dados de aprendizagem.",
+  "We are still building your {skill} assessment at {level}. Do a {skill} activity at this level to create new evidence.":
+    "Ainda estamos construindo sua avaliação de {skill} no {level}. Faça uma atividade de {skill} neste nível para gerar novas evidências.",
+  "You are already doing well in {strongest}. Right now {skill} is what needs more practice at {level}.":
+    "Você já apresenta bom desempenho em {strongest}. Neste momento, {skill} precisa de mais prática no {level}.",
+  "You have not practised {skill} at {level} recently.":
+    "Você não praticou {skill} no {level} recentemente.",
+  "Among your {level} results, {skill} is the skill that needs the most attention.":
+    "Entre seus resultados de {level}, {skill} é a habilidade que precisa de mais atenção.",
   Confidence: "Confiança",
   "Not available yet": "Ainda não disponível",
   "Building evidence": "Construindo evidências",

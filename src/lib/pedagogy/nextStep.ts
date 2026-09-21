@@ -34,6 +34,17 @@ export type NextStepActivity = {
   params?: { lessonId: string };
 };
 
+/**
+ * Deterministic situation of the chosen skill AT THE SELECTED LEVEL.
+ * Drives the student-facing copy; no invented data, no LLM.
+ */
+export type NextStepSituation =
+  | "no_data"
+  | "no_evidence_at_level"
+  | "strong_elsewhere"
+  | "not_practised"
+  | "needs_practice";
+
 export type NextStep = {
   prioritySkill: string | null;
   reason: NextStepReason;
@@ -42,10 +53,15 @@ export type NextStep = {
   /** Existing evidence for the chosen skill, exposed for contextual display only. */
   insight?: {
     cefrLevel: string | null;
+    /** Internal index only. Never displayed to the student. */
     confidence: number | null;
+    score: number | null;
     hasEvidence: boolean;
     matchesCurrentLevel: boolean;
     recentlyPractised: boolean;
+    situation: NextStepSituation;
+    /** Best-performing other skill with evidence at the same level, if any. */
+    strongestSkill: string | null;
   };
 };
 
@@ -156,14 +172,40 @@ export function buildNextStep(input: NextStepInput): NextStep {
     !currentLevel ||
     (best.skill.cefrLevel !== "insufficient_evidence" &&
       best.skill.cefrLevel.toUpperCase() === currentLevel);
+  const hasEvidence = best.skill.score !== null || best.skill.confidence !== null;
+  const recentlyPractised = input.recentlyPractised.includes(best.skill.skill);
+  // Strongest OTHER skill with its own evidence at the selected level.
+  const strongest = candidates
+    .filter(
+      (item) =>
+        item.skill !== best.skill.skill &&
+        item.score !== null &&
+        item.cefrLevel !== "insufficient_evidence",
+    )
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.skill.localeCompare(b.skill))[0];
+  const strongestSkill =
+    strongest && (strongest.score ?? 0) >= 70 && (strongest.score ?? 0) > (best.skill.score ?? 0)
+      ? strongest.skill
+      : null;
+  const situation: NextStepSituation =
+    !hasEvidence || !matchesCurrentLevel
+      ? "no_evidence_at_level"
+      : strongestSkill
+        ? "strong_elsewhere"
+        : !recentlyPractised
+          ? "not_practised"
+          : "needs_practice";
   const insight = {
     cefrLevel:
       input.currentLevel ??
       (best.skill.cefrLevel === "insufficient_evidence" ? null : best.skill.cefrLevel),
     confidence: best.skill.confidence,
-    hasEvidence: best.skill.score !== null || best.skill.confidence !== null,
+    score: best.skill.score,
+    hasEvidence,
     matchesCurrentLevel,
-    recentlyPractised: input.recentlyPractised.includes(best.skill.skill),
+    recentlyPractised,
+    situation,
+    strongestSkill,
   };
   const lesson = input.lessonBySkill[best.skill.skill];
   if (lesson) {
@@ -207,6 +249,20 @@ export const NEXT_STEP_ACTION_TEXT: Record<NextStepAction, string> = {
   practise_speaking: "Practise speaking",
   practise_vocabulary: "Practise vocabulary",
   talk_to_teacher: "Talk to AI Teacher",
+};
+
+/**
+ * Templates for the student-facing "what is happening" line. Placeholders are
+ * filled with real values only: {skill}, {level}, {strongest}.
+ */
+export const NEXT_STEP_SITUATION_TEXT: Record<NextStepSituation, string> = {
+  no_data: "We do not have your learning data yet.",
+  no_evidence_at_level:
+    "We are still building your {skill} assessment at {level}. Do a {skill} activity at this level to create new evidence.",
+  strong_elsewhere:
+    "You are already doing well in {strongest}. Right now {skill} is what needs more practice at {level}.",
+  not_practised: "You have not practised {skill} at {level} recently.",
+  needs_practice: "Among your {level} results, {skill} is the skill that needs the most attention.",
 };
 
 export const NEXT_STEP_SKILL_TEXT: Record<string, string> = {
