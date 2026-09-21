@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Send, Sparkles } from "lucide-react";
+import { GraduationCap, Plus, Send, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -167,26 +167,44 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             </p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={newConversation}>
-          <Plus className="size-4" aria-hidden="true" />
-          {t("New conversation")}
-        </Button>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={startCoachSession}
+            disabled={turn.isPending}
+          >
+            <GraduationCap className="size-4" aria-hidden="true" />
+            {t("Start coach session")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={newConversation}>
+            <Plus className="size-4" aria-hidden="true" />
+            {t("New conversation")}
+          </Button>
+        </div>
       </header>
 
-      {(ctx?.cefrLevel || ctx?.focusSkill || ctx?.lessonTitle) && (
+      {(ctx?.cefrLevel || ctx?.focusSkill || ctx?.lessonTitle || coachState) && (
         <div className="flex flex-wrap items-center gap-2" aria-label={t("Your context")}>
-          {ctx.cefrLevel && (
+          {ctx?.cefrLevel && (
             <Badge variant="secondary">
               {t("Level")}: {ctx.cefrLevel}
             </Badge>
           )}
-          {ctx.focusSkill && (
+          {ctx?.focusSkill && (
             <Badge variant="secondary">
               {t("Focus")}: {ctx.focusSkill}
             </Badge>
           )}
-          {ctx.lessonTitle && <Badge variant="outline">{ctx.lessonTitle}</Badge>}
+          {ctx?.lessonTitle && <Badge variant="outline">{ctx.lessonTitle}</Badge>}
           {mode && <Badge variant="outline">{t(MODE_LABEL[mode] ?? mode)}</Badge>}
+          {coachState && (
+            <Badge variant="outline">
+              {coachState.finished
+                ? t("Session complete")
+                : `${t("Coach step")} ${coachState.turn}/${coachState.maxTurns}`}
+            </Badge>
+          )}
         </div>
       )}
 
