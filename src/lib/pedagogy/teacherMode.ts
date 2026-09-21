@@ -9,6 +9,9 @@ export const TEACHER_MODES = [
   "EXAMPLE",
   "REVIEW",
   "CONVERSATION",
+  // Guided study session (Phase 23B). Never inferred from the message: it is
+  // only used when the student explicitly starts a coach session.
+  "COACH",
 ] as const;
 export type TeacherMode = (typeof TEACHER_MODES)[number];
 
