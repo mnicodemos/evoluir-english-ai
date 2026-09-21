@@ -27,10 +27,19 @@ function ThreadsIcon({ className = "size-5" }: { className?: string }) {
   );
 }
 
+function XIcon({ className = "size-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.672l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
 const socialLinks = [
-  { label: "Instagram", href: "https://instagram.com/evoluirmaisoficial", icon: Instagram },
-  { label: "TikTok", href: "https://tiktok.com/@evoluirmaisoficial", icon: TikTokIcon },
-  { label: "Threads", href: "https://threads.net/@evoluirmaisoficial", icon: ThreadsIcon },
+  { label: "Instagram", href: "https://instagram.com/evoluirmaisenglishai", icon: Instagram },
+  { label: "TikTok", href: "https://tiktok.com/@evoluirmaisenglishai", icon: TikTokIcon },
+  { label: "Threads", href: "https://threads.net/@evoluirmaisenglishai", icon: ThreadsIcon },
+  { label: "X", href: "https://x.com/evoluirmaisai", icon: XIcon },
 ];
 
 
