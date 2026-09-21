@@ -89,11 +89,14 @@ export const MODE_RULES: Record<TeacherMode, string> = {
     "Recap only what the context supports, in a few lines, then offer one quick check. Never invent past activity or progress.",
   CONVERSATION:
     "Keep a natural conversation going with one follow-up question; correct only mistakes that matter.",
+  COACH:
+    "Lead a guided study session: set the focus, give one challenge, give objective feedback on what the student produced, then the next step. Follow the COACH SESSION block.",
 };
 
 /** Short modes stay short; complex asks may go deeper. */
 export function modeWordBudget(mode: TeacherMode): number {
   if (mode === "EXPLAIN" || mode === "REVIEW") return 140;
   if (mode === "CONVERSATION") return 90;
+  if (mode === "COACH") return 130;
   return 110;
 }
