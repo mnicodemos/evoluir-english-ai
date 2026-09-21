@@ -161,6 +161,7 @@ export const dailyWords = createServerFn({ method: "POST" })
     const parsed = parseWords(raw);
     if (!parsed.success)
       throw new Error("The AI returned an invalid vocabulary list. Please try again.");
+    console.log("VOCABDBG owned=", usedWords.size, "ai=", parsed.data.words.map((x)=>x.word).join(","));
     // Saving fewer than ten words is fine; the batch is never padded with existing words.
     const fresh = selectNewWords(parsed.data.words as AiWord[], usedWords, missing);
 
