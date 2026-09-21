@@ -91,7 +91,7 @@ export function Footer({
           <div className="space-y-5">
             <div className="flex items-center gap-2.5">
               <Logo className="size-8 shrink-0" />
-              <span className="font-display text-lg font-semibold text-foreground dark:text-white">Evoluir+</span>
+              <span className="font-display text-lg font-semibold text-foreground dark:text-white">Evoluir+ English AI</span>
             </div>
             <TooltipProvider delayDuration={200}>
             <div className="flex items-center gap-3">
