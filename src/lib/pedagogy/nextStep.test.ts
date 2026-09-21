@@ -196,10 +196,17 @@ describe("insight is scoped to the selected level", () => {
 
   it("uses only B1 evidence when B1 is selected", () => {
     const step = buildNextStep({ ...base, currentLevel: "B1", skills: [b1, b2] });
-    expect(step.prioritySkill).toBe("vocabulary");
+    // grammar only has B2 evidence, so at B1 it counts as not measured yet and
+    // its B2 score is never shown.
+    expect(step.prioritySkill).toBe("grammar");
     expect(step.insight?.cefrLevel).toBe("B1");
-    expect(step.insight?.hasEvidence).toBe(true);
-    expect(step.insight?.strongestSkill).toBeNull();
+    expect(step.insight?.score).toBeNull();
+    expect(step.insight?.situation).toBe("no_evidence_at_level");
+
+    const onlyB1 = buildNextStep({ ...base, currentLevel: "B1", skills: [b1] });
+    expect(onlyB1.prioritySkill).toBe("vocabulary");
+    expect(onlyB1.insight?.hasEvidence).toBe(true);
+    expect(onlyB1.insight?.score).toBe(62);
   });
 
   it("does not fill a B2 insight with B1 evidence", () => {
