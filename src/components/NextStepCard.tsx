@@ -21,8 +21,11 @@ export function NextStepCard() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
+  // Key the cache by the current CEFR level: when the level changes, the
+  // previous level's insight (confidence, reasons) is never reused.
+  const { data: profile } = useProfile();
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["next-step"],
+    queryKey: ["next-step", profile?.level ?? null],
     queryFn: () => loadNextStep({ data: undefined }),
     staleTime: 60 * 1000,
   });

@@ -61,13 +61,16 @@ function Landing() {
   }, []);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(LANDING_LANG_KEY);
+    const saved =
+      window.localStorage.getItem(LANDING_LANG_KEY) ?? window.localStorage.getItem(UI_LANG_KEY);
     if (saved === "pt" || saved === "en") setLang(saved);
   }, []);
 
   function switchLang(next: LandingLang) {
     setLang(next);
     window.localStorage.setItem(LANDING_LANG_KEY, next);
+    // Keep the app UI language (login and signed-in pages) in sync.
+    window.localStorage.setItem(UI_LANG_KEY, next);
   }
 
   return (
