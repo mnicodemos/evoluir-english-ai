@@ -105,6 +105,11 @@ function LessonPage() {
     queryClient.invalidateQueries({ queryKey: ["profile"] });
     queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
     queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
+    // A completed lesson unlocks a new vocabulary batch: refresh it right away.
+    queryClient.invalidateQueries({ queryKey: ["lesson-round"] });
+    queryClient.invalidateQueries({ queryKey: ["daily-words"] });
+    queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
+
     toast.success(`Lesson completed with ${score}%`);
   }
 

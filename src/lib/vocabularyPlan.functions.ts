@@ -5,6 +5,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { callGateway } from "./ai-gateway.server";
 import { studyToday } from "./today";
+import { lessonBatchKey, ownedWordSet, selectNewWords } from "./vocabularyBatch";
+
 
 export type DailyWord = {
   id: string;
@@ -80,12 +82,14 @@ export const dailyWords = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const today = studyToday();
 
-    // A fresh set of ten words is created every time the student starts a new lesson.
+    // A fresh set of ten words is unlocked by each COMPLETED lesson, so retaking a
+    // lesson reuses the same batch instead of creating a duplicate one.
     const { count } = await supabase
       .from("user_lessons")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", userId);
-    const batchKey = `started-${count ?? 0}`;
+      .eq("user_id", userId)
+      .not("completed_at", "is", null);
+    const batchKey = lessonBatchKey(count ?? 0);
 
     const existing = await supabase
       .from("vocabulary")
@@ -96,6 +100,7 @@ export const dailyWords = createServerFn({ method: "POST" })
 
     const todays = (existing.data ?? []) as DailyWord[];
     if (todays.length >= DAILY_COUNT) return todays.slice(0, DAILY_COUNT);
+
 
     // Words must come only from this level's lessons, so a mastered word never counts
     // toward another level when the student changes level.
@@ -113,51 +118,71 @@ export const dailyWords = createServerFn({ method: "POST" })
       objective: string;
     }[];
 
-    const { data: known } = await supabase.from("vocabulary").select("word").limit(1000);
-    const usedWords = new Set(
-      ((known ?? []) as { word: string }[]).map((w) => w.word.toLowerCase()),
-    );
+    // Duplicate check is scoped to THIS student at this level: global sample words and
+    // other students' words must not block a word that is new for this learner.
+    const { data: known } = await supabase
+      .from("vocabulary")
+      .select("word")
+      .eq("created_by", userId)
+      .eq("level", data.level)
+      .limit(1000);
+    const usedWords = ownedWordSet((known ?? []) as { word: string }[]);
 
     const missing = DAILY_COUNT - todays.length;
-    const raw = await callGateway(
-      [
-        {
-          role: "system",
-          content:
-            "You are a CELTA English teacher choosing daily vocabulary for a Brazilian learner. " +
-            `Pick exactly ${missing} useful English words or short expressions that come from the lessons listed by the user. ` +
-            'Reply with strict JSON: {"words":[{"word":"","translation":"Brazilian Portuguese","meaning":"short definition in simple English",' +
-            '"pronunciation":"simple phonetic hint","example":"natural English sentence using the word",' +
-            '"lesson_title":"the exact lesson title this word comes from","difficulty":"easy|medium|hard"}]}',
-        },
-        {
-          role: "user",
-          content: [
-            `Student level: ${data.level}.`,
-            lessonList.length
-              ? `Lessons in the learning path:\n${lessonList.map((l) => `- ${l.title} (${l.category}): ${l.objective}`).join("\n")}`
-              : "No lessons yet — choose everyday communication words.",
-            usedWords.size ? `Do NOT use these words again: ${[...usedWords].join(", ")}.` : "",
-          ]
-            .filter(Boolean)
-            .join("\n\n"),
-        },
-      ],
-      true,
-      { userId, operation: "vocabulary_generation" },
-    );
 
-    const parsed = parseWords(raw);
-    if (!parsed.success)
-      throw new Error("The AI returned an invalid vocabulary list. Please try again.");
-    const fresh = (parsed.data.words as AiWord[])
-      .filter((w) => w.word && w.translation && !usedWords.has(String(w.word).toLowerCase()))
-      .slice(0, missing);
+    async function askAi(exclude: Set<string>) {
+      const raw = await callGateway(
+        [
+          {
+            role: "system",
+            content:
+              "You are a CELTA English teacher choosing daily vocabulary for a Brazilian learner. " +
+              `Pick exactly ${missing} useful English words or short expressions that come from the lessons listed by the user. ` +
+              "Never pick a word the user lists as already known. " +
+              'Reply with strict JSON: {"words":[{"word":"","translation":"Brazilian Portuguese","meaning":"short definition in simple English",' +
+              '"pronunciation":"simple phonetic hint","example":"natural English sentence using the word",' +
+              '"lesson_title":"the exact lesson title this word comes from","difficulty":"easy|medium|hard"}]}',
+          },
+          {
+            role: "user",
+            content: [
+              `Student level: ${data.level}.`,
+              lessonList.length
+                ? `Lessons in the learning path:\n${lessonList.map((l) => `- ${l.title} (${l.category}): ${l.objective}`).join("\n")}`
+                : "No lessons yet — choose everyday communication words.",
+              exclude.size ? `Already known — do NOT use these words: ${[...exclude].join(", ")}.` : "",
+            ]
+              .filter(Boolean)
+              .join("\n\n"),
+          },
+        ],
+        true,
+        { userId, operation: "vocabulary_generation" },
+      );
+      const parsed = parseWords(raw);
+      if (!parsed.success)
+        throw new Error("The AI returned an invalid vocabulary list. Please try again.");
+      return parsed.data.words as AiWord[];
+    }
+
+    const exclude = new Set(usedWords);
+    const first = await askAi(exclude);
+    // Saving fewer than ten words is fine; the batch is never padded with existing words.
+    let fresh = selectNewWords(first, usedWords, missing);
+
+    // The model sometimes repeats known words: one retry with those repeats added to the
+    // exclusion list, instead of failing the whole batch.
+    if (!fresh.length) {
+      for (const w of first) exclude.add(String(w.word ?? "").trim().toLowerCase());
+      fresh = selectNewWords(await askAi(exclude), usedWords, missing);
+    }
+
 
     if (!fresh.length) {
       if (todays.length) return todays;
       throw new Error("The AI could not pick today's words. Please try again in a moment.");
     }
+
 
     const byTitle = new Map(lessonList.map((l) => [l.title.toLowerCase(), l]));
     const { data: inserted, error } = await supabase
