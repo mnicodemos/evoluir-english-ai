@@ -39,9 +39,12 @@ describe("next step priority", () => {
     expect(step.insight).toEqual({
       cefrLevel: "B1",
       confidence: 0.8,
+      score: 80,
       hasEvidence: true,
       matchesCurrentLevel: true,
       recentlyPractised: true,
+      situation: "needs_practice",
+      strongestSkill: null,
     });
   });
 
