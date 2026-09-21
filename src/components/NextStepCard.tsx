@@ -54,6 +54,8 @@ export function NextStepCard() {
   const progressionReason = data.insight?.recentlyPractised
     ? t("Builds on your recent practice")
     : t("Adds recent evidence to your progress");
+  const hasCurrentLevelEvidence =
+    data.insight?.hasEvidence === true && data.insight.matchesCurrentLevel;
 
   return (
     <section className="card-soft p-5" aria-label={t("Your next step")}>
@@ -116,12 +118,17 @@ export function NextStepCard() {
           <div className="mt-4">
             <p className="text-xs text-muted-foreground">{t("Recommended because")}</p>
             <ul className="mt-2 space-y-2 text-sm">
-              {cefrLevel ? (
+              {hasCurrentLevelEvidence ? (
                 <li className="flex items-start gap-2">
                   <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
                   <span>{t("Matches your CEFR level")}</span>
                 </li>
-              ) : null}
+              ) : (
+                <li className="flex items-start gap-2">
+                  <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                  <span>{t("No evidence at your current CEFR level yet")}</span>
+                </li>
+              )}
               <li className="flex items-start gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
                 <span>{progressionReason}</span>

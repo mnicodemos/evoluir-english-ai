@@ -19,6 +19,8 @@ export const uiPt: Record<string, string> = {
   "Building evidence": "Construindo evidências",
   "Recommended because": "Recomendado porque",
   "Matches your CEFR level": "Corresponde ao seu nível CEFR",
+  "No evidence at your current CEFR level yet":
+    "Ainda não há evidências no seu nível CEFR atual",
   "Builds on your recent practice": "Aproveita sua prática recente",
   "Adds recent evidence to your progress": "Adiciona evidências recentes à sua evolução",
   "Supports your progression": "Apoia sua progressão",

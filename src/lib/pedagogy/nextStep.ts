@@ -44,6 +44,7 @@ export type NextStep = {
     cefrLevel: string | null;
     confidence: number | null;
     hasEvidence: boolean;
+    matchesCurrentLevel: boolean;
     recentlyPractised: boolean;
   };
 };
@@ -122,7 +123,16 @@ function rank(
  * then alphabetically, so the result is stable for the same data.
  */
 export function buildNextStep(input: NextStepInput): NextStep {
-  const candidates = input.skills.filter((item) => item.skill);
+  const currentLevel = input.currentLevel?.toUpperCase() ?? null;
+  const candidates = input.skills
+    .filter((item) => item.skill)
+    .map((item) => {
+      const evidenceLevel = item.cefrLevel.toUpperCase();
+      const matchesCurrentLevel = !currentLevel || evidenceLevel === currentLevel;
+      return matchesCurrentLevel
+        ? item
+        : { ...item, score: null, confidence: null, cefrLevel: "insufficient_evidence" };
+    });
   if (candidates.length === 0) {
     return {
       prioritySkill: null,
@@ -142,12 +152,17 @@ export function buildNextStep(input: NextStepInput): NextStep {
     );
 
   const best = ordered[0]!;
+  const matchesCurrentLevel =
+    !currentLevel ||
+    (best.skill.cefrLevel !== "insufficient_evidence" &&
+      best.skill.cefrLevel.toUpperCase() === currentLevel);
   const insight = {
     cefrLevel:
       input.currentLevel ??
       (best.skill.cefrLevel === "insufficient_evidence" ? null : best.skill.cefrLevel),
     confidence: best.skill.confidence,
     hasEvidence: best.skill.score !== null || best.skill.confidence !== null,
+    matchesCurrentLevel,
     recentlyPractised: input.recentlyPractised.includes(best.skill.skill),
   };
   const lesson = input.lessonBySkill[best.skill.skill];

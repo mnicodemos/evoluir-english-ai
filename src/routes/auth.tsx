@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { UiLangToggle, useUiLang } from "@/lib/uiLang";
+import { uiPt } from "@/lib/uiDictionary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,7 @@ function AuthPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -96,10 +98,10 @@ function AuthPage() {
           </Link>
           <div className="flex flex-1 flex-col justify-center">
             <h2 className="max-w-sm text-3xl font-bold text-foreground">
-              Your English teacher is waiting for you.
+              {t("Your English teacher is waiting for you.")}
             </h2>
             <p className="mt-4 max-w-sm text-muted-foreground">
-              Conversation, writing and vocabulary practice with feedback in seconds.
+              {t("Conversation, writing and vocabulary practice with feedback in seconds.")}
             </p>
           </div>
         </div>
@@ -116,17 +118,17 @@ function AuthPage() {
                 to="/"
                 className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
-                <span aria-hidden="true">←</span> Back to home
+                <span aria-hidden="true">←</span> {t("Back to home")}
               </Link>
               <UiLangToggle />
             </div>
 
             {sent ? (
               <div className="card-soft p-7 text-center">
-                <h1 className="text-xl font-semibold">Check your email</h1>
+                <h1 className="text-xl font-semibold">{t("Check your email")}</h1>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  We sent a confirmation link to <strong>{email}</strong>. Click it to activate your
-                  account, then come back and sign in.
+                  {t("We sent a confirmation link to")} <strong>{email}</strong>.{" "}
+                  {t("Click it to activate your account, then come back and sign in.")}
                 </p>
                 <Button
                   variant="outline"
@@ -136,24 +138,24 @@ function AuthPage() {
                     setMode("signin");
                   }}
                 >
-                  Back to sign in
+                  {t("Back to sign in")}
                 </Button>
               </div>
             ) : (
               <>
                 <h1 className="text-2xl font-bold">
-                  {mode === "signup" ? "Create your account" : "Welcome back"}
+                  {t(mode === "signup" ? "Create your account" : "Welcome back")}
                 </h1>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {mode === "signup"
-                    ? "Two minutes to set up your personal learning plan."
-                    : "Sign in to continue your streak."}
+                    ? t("Two minutes to set up your personal learning plan.")
+                    : t("Sign in to continue your streak.")}
                 </p>
 
                 <form onSubmit={onSubmit} className="mt-7 space-y-4">
                   {mode === "signup" && (
                     <div className="space-y-2">
-                      <Label htmlFor="name">Your name</Label>
+                      <Label htmlFor="name">{t("Your name")}</Label>
                       <Input
                         id="name"
                         value={name}
@@ -165,7 +167,7 @@ function AuthPage() {
                     </div>
                   )}
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t("Email")}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -177,7 +179,7 @@ function AuthPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t("Password")}</Label>
                     <div className="relative">
                       <Input
                         id="password"
@@ -192,7 +194,7 @@ function AuthPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
-                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        aria-label={t(showPassword ? "Hide password" : "Show password")}
                         className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -201,18 +203,18 @@ function AuthPage() {
                   </div>
                   <Button type="submit" className="w-full" size="lg" disabled={loading}>
                     {loading && <Loader2 className="size-4 animate-spin" />}
-                    {mode === "signup" ? "Start my evolution" : "Sign in"}
+                    {t(mode === "signup" ? "Start my evolution" : "Sign in")}
                   </Button>
                 </form>
 
                 <p className="mt-6 text-center text-sm text-muted-foreground">
-                  {mode === "signup" ? "Already have an account?" : "New here?"}{" "}
+                  {t(mode === "signup" ? "Already have an account?" : "New here?")}{" "}
                   <button
                     type="button"
                     className="font-medium text-foreground underline underline-offset-4"
                     onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
                   >
-                    {mode === "signup" ? "Sign in" : "Create an account"}
+                    {t(mode === "signup" ? "Sign in" : "Create an account")}
                   </button>
                 </p>
               </>
