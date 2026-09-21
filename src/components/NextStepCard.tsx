@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { useProfile } from "@/hooks/useProfile";
 import {
   NEXT_STEP_ACTION_TEXT,
   NEXT_STEP_REASON_TEXT,
@@ -21,8 +22,11 @@ export function NextStepCard() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
+  // Key the cache by the current CEFR level: when the level changes, the
+  // previous level's insight (confidence, reasons) is never reused.
+  const { data: profile } = useProfile();
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["next-step"],
+    queryKey: ["next-step", profile?.level ?? null],
     queryFn: () => loadNextStep({ data: undefined }),
     staleTime: 60 * 1000,
   });

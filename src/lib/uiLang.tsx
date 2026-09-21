@@ -4,7 +4,7 @@ import { uiPt } from "@/lib/uiDictionary";
 
 export type UiLang = "en" | "pt";
 
-const UI_LANG_KEY = "evoluir-ui-lang";
+export const UI_LANG_KEY = "evoluir-ui-lang";
 
 type Ctx = { lang: UiLang; setLang: (lang: UiLang) => void };
 

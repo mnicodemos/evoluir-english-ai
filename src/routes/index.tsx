@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Logo";
 import { LANDING_LANG_KEY, landingCopy, type LandingLang } from "@/lib/landingCopy";
+import { UI_LANG_KEY } from "@/lib/uiLang";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -60,13 +61,16 @@ function Landing() {
   }, []);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(LANDING_LANG_KEY);
+    const saved =
+      window.localStorage.getItem(LANDING_LANG_KEY) ?? window.localStorage.getItem(UI_LANG_KEY);
     if (saved === "pt" || saved === "en") setLang(saved);
   }, []);
 
   function switchLang(next: LandingLang) {
     setLang(next);
     window.localStorage.setItem(LANDING_LANG_KEY, next);
+    // Keep the app UI language (login and signed-in pages) in sync.
+    window.localStorage.setItem(UI_LANG_KEY, next);
   }
 
   return (
