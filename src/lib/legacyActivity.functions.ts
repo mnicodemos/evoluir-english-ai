@@ -12,6 +12,21 @@ import {
   telemetryInputSchema,
 } from "@/lib/legacyActivity.schemas";
 import { listeningAnswerScore, pronunciationSimilarity } from "@/lib/legacyScores";
+import {
+  activityItemLevel,
+  persistActivityEvidence,
+} from "@/lib/pedagogy/dualWrite.functions";
+import {
+  LISTENING_RUBRIC_VERSION,
+  PRONUNCIATION_RUBRIC_VERSION,
+  SPEAKING_RUBRIC_VERSION,
+  listeningEvidence,
+  pronunciationEvidence,
+  speakingEvidence,
+  speakingEvidenceDecision,
+} from "@/lib/pedagogy/activityEvidence";
+import { toleratePedagogicalFailure as tolerateEvidence } from "@/lib/pedagogy/dualWrite";
+
 
 async function deterministicUuid(value: string): Promise<string> {
   const bytes = new Uint8Array(
