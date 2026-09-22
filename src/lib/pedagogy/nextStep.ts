@@ -3,6 +3,8 @@
 // learning_profile.common_errors, activities recency, lessons). No LLM, no new
 // profile, no new score, no new CEFR, no new evidence.
 
+import type { SkillQuest } from "./skillQuest";
+
 export type SkillSnapshot = {
   skill: string;
   score: number | null;
@@ -50,6 +52,12 @@ export type NextStep = {
   reason: NextStepReason;
   action: NextStepAction;
   activity: NextStepActivity;
+  /**
+   * Phase 29: priority Skill Quest, derived server-side from the existing
+   * Invisible Gaps. Absent when no valid gap has an executable activity.
+   */
+  quest?: SkillQuest | null;
+
   /** Existing evidence for the chosen skill, exposed for contextual display only. */
   insight?: {
     cefrLevel: string | null;
