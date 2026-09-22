@@ -208,8 +208,10 @@ export const Route = createFileRoute("/api/speech")({
               // leaving the record open.
               await settle(sentAudio, sentAudio ? undefined : "cancelled", "Playback was stopped");
             },
-          }),
-        );
+        };
+        const stream = upstream.body.pipeThrough(new TransformStream(transformer));
+
+
 
 
         return new Response(stream, {
