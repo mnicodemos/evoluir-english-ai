@@ -176,6 +176,13 @@
       "when": 1789923450226,
       "tag": "0024_add_study_plan_preferences_to_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1790081474926,
+      "tag": "0025_widen_pedagogical_source_types",
+      "breakpoints": true
     }
   ]
 }
