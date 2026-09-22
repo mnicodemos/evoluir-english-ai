@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Compass, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
 import {
@@ -61,6 +62,7 @@ export function NextStepCard() {
     .replaceAll("{level}", cefrLevel ?? t("your current level"))
     .replaceAll("{strongest}", strongestLabel ?? skillLabel);
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
+  const quickWin = data.quickWin;
 
 
   return (
@@ -95,6 +97,50 @@ export function NextStepCard() {
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
             )}
+
+            {quickWin ? (
+              <div className="mt-5 border-t border-border pt-4">
+                <div className="flex items-center gap-3">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary">
+                    <Zap className="size-4 text-primary" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase text-muted-foreground">
+                      {t("Quick Win")}
+                    </p>
+                    <h3 className="font-semibold leading-snug">{t(quickWin.title)}</h3>
+                  </div>
+                </div>
+
+                <ul className="mt-3 grid gap-2 text-sm">
+                  {quickWin.steps.map((step) => (
+                    <li key={`${step.label}-${step.text}`} className="flex min-w-0 items-start gap-2">
+                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                      <span className="min-w-0">
+                        <span className="font-medium">{t(step.label)}</span>
+                        <span className="text-muted-foreground"> — {t(step.text)}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                {quickWin.activity.params ? (
+                  <Button asChild variant="secondary" size="sm" className="mt-4 h-10 rounded-xl px-3">
+                    <Link to="/learning/$lessonId" params={quickWin.activity.params}>
+                      {t(quickWin.cta)}
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button asChild variant="secondary" size="sm" className="mt-4 h-10 rounded-xl px-3">
+                    <Link to={quickWin.activity.to}>
+                      {t(quickWin.cta)}
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            ) : null}
           </div>
         </div>
 
