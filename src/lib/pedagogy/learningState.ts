@@ -134,7 +134,6 @@ export function evidenceStage(
     case "speaking":
     case "teacher":
     case "final_test":
-    case "teacher_note" as never:
       return evidence.rawScore >= config.spontaneousScore &&
         (evidence.sourceType === "speaking" || evidence.sourceType === "teacher")
         ? "SPONTANEOUS_USE"
