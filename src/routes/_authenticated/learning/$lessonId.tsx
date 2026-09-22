@@ -1,6 +1,15 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, BookOpen, Layers, ListChecks, MessageSquareText, Video } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  CheckCircle2,
+  Circle,
+  Layers,
+  ListChecks,
+  MessageSquareText,
+  Video,
+} from "lucide-react";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -22,8 +31,12 @@ import { useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
+import { lessonChecklist } from "@/lib/lessonChecklist";
+import { buildLessonGuide } from "@/lib/lessonGuide";
 import { formatVideoDuration, videoReviewPoints } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz } from "@/lib/quizCompletion";
+import { uiPt } from "@/lib/uiDictionary";
+import { useUiLang } from "@/lib/uiLang";
 
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
   head: () => ({
@@ -47,6 +60,8 @@ export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
 
 function LessonPage() {
   const { lessonId } = Route.useParams();
+  const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data, isLoading } = useLesson(lessonId);
   const { data: profile } = useProfile();
   const { data: cardStates } = useUserFlashcards();
@@ -70,6 +85,30 @@ function LessonPage() {
   const reviewPoints = videoReviewPoints(lesson?.summary);
   const videoLength = formatVideoDuration(lesson?.video_duration_seconds);
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
+
+  // The Learning Guide is built from lesson content already stored — no AI call.
+  const guide = buildLessonGuide(
+    {
+      title: lesson?.title ?? "",
+      objective: lesson?.objective ?? "",
+      summary: lesson?.summary ?? "",
+      skill: lesson?.skill,
+      level: lesson?.level,
+    },
+    data?.flashcards ?? [],
+  );
+
+  const cardIds = new Set((data?.flashcards ?? []).map((card) => card.id));
+  const reviewedCards = (cardStates ?? []).filter(
+    (state) => cardIds.has(state.flashcard_id) && state.times_reviewed > 0,
+  ).length;
+  const checklist = lessonChecklist({
+    hasVideo: !!lesson?.video_url,
+    videoWatched: progress >= 100,
+    cardsTotal: data?.flashcards.length ?? 0,
+    cardsReviewed: reviewedCards,
+    quizPassed: !!data?.userLesson?.completed_at,
+  });
 
   async function handleProgress(percent: number) {
     setVideoProgress(percent);
@@ -171,6 +210,41 @@ function LessonPage() {
           </section>
         )}
 
+        {!data.userLesson?.completed_at && (
+          <section className="card-soft space-y-3 p-5" aria-label={t("Lesson checklist")}>
+            <p className="text-sm font-semibold">
+              {lang === "pt" ? "O que falta nesta lição" : "What is left in this lesson"}
+            </p>
+            <ul className="space-y-2">
+              {checklist.items.map((item) => (
+                <li key={item.id} className="flex items-center gap-2 text-sm">
+                  {item.done ? (
+                    <CheckCircle2
+                      className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <Circle className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  )}
+                  <span className={item.done ? "text-muted-foreground line-through" : ""}>
+                    {t(item.label)}
+                  </span>
+                  <span className="sr-only">
+                    {item.done ? t("done") : t("still to do")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {checklist.onlyVideoPending && (
+              <p className="text-xs text-muted-foreground">
+                {lang === "pt"
+                  ? 'Você já fez o resto — só falta tocar em "Eu assisti" no vídeo.'
+                  : 'You did everything else — only the "I watched it" button on the video is left.'}
+              </p>
+            )}
+          </section>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="video" aria-label="Video" className="gap-1.5">
@@ -222,17 +296,31 @@ function LessonPage() {
           </TabsContent>
 
           <TabsContent value="summary" className="mt-5">
-            <div className="card-soft space-y-4 p-6">
-              <h2 className="text-lg font-semibold">Lesson summary</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">{lesson.summary}</p>
-              <h3 className="pt-2 text-sm font-semibold">Key vocabulary</h3>
-              <ul className="grid gap-2 sm:grid-cols-2">
-                {data.flashcards.map((f) => (
-                  <li key={f.id} className="rounded-lg bg-secondary/60 px-3 py-2 text-sm">
-                    <strong>{f.word}</strong> — {f.answer || f.definition || f.example}
-                  </li>
-                ))}
-              </ul>
+            <div className="card-soft space-y-5 p-6">
+              <div>
+                <h2 className="text-lg font-semibold">
+                  {lang === "pt" ? "Guia de Aprendizagem" : "Learning Guide"}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {lang === "pt"
+                    ? "Tudo o que você precisa desta lição, direto ao ponto."
+                    : "Everything you need from this lesson, straight to the point."}
+                </p>
+              </div>
+              {guide.map((section) => (
+                <section key={section.id} className="space-y-2">
+                  <h3 className="text-sm font-semibold">
+                    <span aria-hidden="true">{section.emoji}</span> {t(section.title)}
+                  </h3>
+                  <ul className="grid gap-2 sm:grid-cols-2">
+                    {section.items.map((item) => (
+                      <li key={item} className="rounded-lg bg-secondary/60 px-3 py-2 text-sm">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
             </div>
           </TabsContent>
 

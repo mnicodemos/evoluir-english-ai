@@ -30,6 +30,7 @@ import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedLearningLessonIdRouteImport } from './routes/_authenticated/learning/$lessonId'
 import { Route as AuthenticatedLearningFinalTestRouteImport } from './routes/_authenticated/learning/final-test'
 import { Route as AuthenticatedLearningReviewRouteImport } from './routes/_authenticated/learning/review'
+import { Route as AuthenticatedLearningUnitTestRouteImport } from './routes/_authenticated/learning/unit-test'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
@@ -142,6 +143,12 @@ const AuthenticatedLearningReviewRoute =
     path: '/learning/review',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLearningUnitTestRoute =
+  AuthenticatedLearningUnitTestRouteImport.update({
+    id: '/learning/unit-test',
+    path: '/learning/unit-test',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe/webhook',
   path: '/api/public/stripe/webhook',
@@ -174,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
   '/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/learning/review': typeof AuthenticatedLearningReviewRoute
+  '/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
   '/learning/': typeof AuthenticatedLearningIndexRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -198,6 +206,7 @@ export interface FileRoutesByTo {
   '/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
   '/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/learning/review': typeof AuthenticatedLearningReviewRoute
+  '/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
   '/learning': typeof AuthenticatedLearningIndexRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -224,6 +233,7 @@ export interface FileRoutesById {
   '/_authenticated/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
   '/_authenticated/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/_authenticated/learning/review': typeof AuthenticatedLearningReviewRoute
+  '/_authenticated/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
   '/_authenticated/learning/': typeof AuthenticatedLearningIndexRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/learning/$lessonId'
     | '/learning/final-test'
     | '/learning/review'
+    | '/learning/unit-test'
     | '/learning/'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/learning/$lessonId'
     | '/learning/final-test'
     | '/learning/review'
+    | '/learning/unit-test'
     | '/learning'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
@@ -299,6 +311,7 @@ export interface FileRouteTypes {
     | '/_authenticated/learning/$lessonId'
     | '/_authenticated/learning/final-test'
     | '/_authenticated/learning/review'
+    | '/_authenticated/learning/unit-test'
     | '/_authenticated/learning/'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
@@ -464,6 +477,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearningReviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/learning/unit-test': {
+      id: '/_authenticated/learning/unit-test'
+      path: '/learning/unit-test'
+      fullPath: '/learning/unit-test'
+      preLoaderRoute: typeof AuthenticatedLearningUnitTestRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/stripe/webhook': {
       id: '/api/public/stripe/webhook'
       path: '/api/public/stripe/webhook'
@@ -496,6 +516,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLearningLessonIdRoute: typeof AuthenticatedLearningLessonIdRoute
   AuthenticatedLearningFinalTestRoute: typeof AuthenticatedLearningFinalTestRoute
   AuthenticatedLearningReviewRoute: typeof AuthenticatedLearningReviewRoute
+  AuthenticatedLearningUnitTestRoute: typeof AuthenticatedLearningUnitTestRoute
   AuthenticatedLearningIndexRoute: typeof AuthenticatedLearningIndexRoute
 }
 
@@ -514,6 +535,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLearningLessonIdRoute: AuthenticatedLearningLessonIdRoute,
   AuthenticatedLearningFinalTestRoute: AuthenticatedLearningFinalTestRoute,
   AuthenticatedLearningReviewRoute: AuthenticatedLearningReviewRoute,
+  AuthenticatedLearningUnitTestRoute: AuthenticatedLearningUnitTestRoute,
   AuthenticatedLearningIndexRoute: AuthenticatedLearningIndexRoute,
 }
 

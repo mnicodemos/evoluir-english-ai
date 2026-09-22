@@ -514,3 +514,18 @@ export function finalTestKey(level: string | null | undefined) {
 export function isFinalTestKey(key: string) {
   return key.endsWith("-final");
 }
+
+/** Key of the Final Test that closes one unit (integrates the 6 lessons of the unit). */
+export function unitTestKey(level: string | null | undefined, unit: number) {
+  return `${normalizeLevel(level)}-u${unit}-test`;
+}
+
+/** True when the key belongs to a unit Final Test. */
+export function isUnitTestKey(key: string) {
+  return /-u\d+-test$/.test(key);
+}
+
+/** The lessons of one unit, in study order. */
+export function getUnitLessons(level: string | null | undefined, unit: number) {
+  return getCurriculum(level).filter((lesson) => lesson.unit === unit);
+}

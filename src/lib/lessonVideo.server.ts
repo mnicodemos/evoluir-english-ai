@@ -103,19 +103,39 @@ async function searchYoutube(query: string): Promise<{ id: string; seconds: numb
   return found.filter((v) => (seen.has(v.id) ? false : seen.add(v.id)));
 }
 
+/** A lesson video is easiest to follow between 2½ and 6 minutes. */
+const IDEAL_SECONDS = 300;
+
+/** Closest to the ideal teaching length wins, so 20-second clips never do. */
+function bestByLength(results: { id: string; seconds: number }[]) {
+  return [...results].sort(
+    (a, b) => Math.abs(a.seconds - IDEAL_SECONDS) - Math.abs(b.seconds - IDEAL_SECONDS),
+  );
+}
+
 /**
  * Returns a captioned video matching the lesson topic, preferring one that is
- * not already used by another lesson of this student.
+ * not already used by another lesson of this student. The queries describe the
+ * lesson itself — topic, objective, skill and CEFR level — instead of relying on
+ * the title alone, and the candidate closest to a teaching length is chosen.
  */
 export async function findLessonVideo(
   topic: string,
   skill: string,
   used: Set<string>,
+  options: { objective?: string; level?: string } = {},
 ): Promise<LessonVideo> {
-  const queries = [`${topic} english lesson`, `${skill} english lesson ${topic}`];
+  const level = options.level ? options.level.toUpperCase() : "";
+  const objective = (options.objective ?? "").split(/[.,;]/)[0]?.trim() ?? "";
+  const queries = [
+    `${topic} english lesson ${level}`.trim(),
+    objective ? `learn english ${objective} lesson` : "",
+    `${skill} english lesson ${topic}`,
+  ].filter(Boolean);
+
   for (const query of queries) {
     try {
-      const results = await searchYoutube(query);
+      const results = bestByLength(await searchYoutube(query));
       const fresh = results.find((v) => !used.has(`https://www.youtube.com/watch?v=${v.id}`));
       const pick = fresh ?? results[0];
       if (pick) return { url: `https://www.youtube.com/watch?v=${pick.id}`, seconds: pick.seconds };
