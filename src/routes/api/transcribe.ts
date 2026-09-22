@@ -93,96 +93,132 @@ export const Route = createFileRoute("/api/transcribe")({
             { status: error instanceof AiUsageError ? error.status : 503, headers },
           );
         }
-        let result: GeminiTranscription | null = null;
-        let failureStatus = 503;
+        // From here on the usage record is open: every exit path must close it,
+        // otherwise the "one request at a time" guard stays locked.
+        let settled = false;
+        const settle = async (result: {
+          success: boolean;
+          errorCode?: string;
+          errorMessage?: string;
+        }) => {
+          if (settled) return;
+          settled = true;
+          await finishAiUsage(ticket, result);
+        };
 
-        const requestBody = (fast: boolean) =>
-          JSON.stringify({
-            contents: [
+        try {
+          let result: GeminiTranscription | null = null;
+          let failureStatus = 503;
+
+          const requestBody = (fast: boolean) =>
+            JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [
+                    {
+                      text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks.",
+                    },
+                    { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
+                  ],
+                },
+              ],
+              generationConfig: fast ? FAST_CONFIG : { temperature: 0, maxOutputTokens: 256 },
+            });
+
+          const send = (model: string, fast: boolean) =>
+            fetch(
+              `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
               {
-                role: "user",
-                parts: [
-                  {
-                    text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks.",
-                  },
-                  { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
-                ],
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${lovableKey}`,
+                  "X-Connection-Api-Key": connectionKey,
+                  "Content-Type": "application/json",
+                },
+                body: requestBody(fast),
+                signal: request.signal,
               },
-            ],
-            generationConfig: fast ? FAST_CONFIG : { temperature: 0, maxOutputTokens: 256 },
-          });
+            );
 
-        const send = (model: string, fast: boolean) =>
-          fetch(
-            `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${lovableKey}`,
-                "X-Connection-Api-Key": connectionKey,
-                "Content-Type": "application/json",
-              },
-              body: requestBody(fast),
-            },
-          );
+          for (const model of GEMINI_TRANSCRIPTION_MODELS) {
+            let response = await send(model, true);
+            // Older model versions reject the "no thinking" setting: retry plainly.
+            if (response.status === 400) response = await send(model, false);
 
-        for (const model of GEMINI_TRANSCRIPTION_MODELS) {
-          let response = await send(model, true);
-          // Older model versions reject the "no thinking" setting: retry plainly.
-          if (response.status === 400) response = await send(model, false);
+            if (response.ok) {
+              result = (await response.json()) as GeminiTranscription;
+              break;
+            }
 
-          if (response.ok) {
-            result = (await response.json()) as GeminiTranscription;
-            break;
+            failureStatus = response.status;
+            const errorBody = await response.text().catch(() => "");
+            console.error(
+              `Gemini transcription failed [${response.status}] on ${model}: ${errorBody.slice(0, 300)}`,
+            );
+
+            // Only a quota limit can be model-specific. Other failures should not
+            // trigger another paid request with the same audio.
+            if (response.status !== 429) break;
           }
 
-          failureStatus = response.status;
-          const errorBody = await response.text().catch(() => "");
-          console.error(
-            `Gemini transcription failed [${response.status}] on ${model}: ${errorBody.slice(0, 300)}`,
-          );
+          if (!result) {
+            const message =
+              failureStatus === 429
+                ? "Your Google AI voice limit is busy right now. Please wait about a minute and try again."
+                : "I couldn't process that recording right now. Please try again in a moment.";
+            await settle({
+              success: false,
+              errorCode: `gemini_${failureStatus}`,
+              errorMessage: message,
+            });
+            return Response.json({ message }, { status: failureStatus });
+          }
 
-          // Only a quota limit can be model-specific. Other failures should not
-          // trigger another paid request with the same audio.
-          if (response.status !== 429) break;
-        }
+          const transcript = (result.candidates?.[0]?.content?.parts ?? [])
+            .map((part) => part.text ?? "")
+            .join("")
+            .trim();
+          if (!transcript) {
+            await settle({
+              success: false,
+              errorCode: "empty_transcript",
+              errorMessage: "No speech was recognized.",
+            });
+            return Response.json(
+              { message: "I couldn't hear that clearly. Please try again." },
+              { status: 422 },
+            );
+          }
 
-        if (!result) {
-          const message =
-            failureStatus === 429
-              ? "Your Google AI voice limit is busy right now. Please wait about a minute and try again."
-              : "I couldn't process that recording right now. Please try again in a moment.";
-          await finishAiUsage(ticket, {
-            success: false,
-            errorCode: `gemini_${failureStatus}`,
-            errorMessage: message,
+          await settle({ success: true });
+
+          const streamEvent = `data: ${JSON.stringify({ type: "transcript.text.done", text: transcript })}\n\n`;
+          return new Response(streamEvent, {
+            headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
           });
-          return Response.json({ message }, { status: failureStatus });
-        }
-
-        const transcript = (result.candidates?.[0]?.content?.parts ?? [])
-          .map((part) => part.text ?? "")
-          .join("")
-          .trim();
-        if (!transcript) {
-          await finishAiUsage(ticket, {
+        } catch (error) {
+          const aborted = error instanceof Error && error.name === "AbortError";
+          await settle({
             success: false,
-            errorCode: "empty_transcript",
-            errorMessage: "No speech was recognized.",
+            errorCode: aborted ? "cancelled" : "transcription_failed",
+            errorMessage: error instanceof Error ? error.message : "Transcription failed",
           });
+          if (aborted) return new Response(null, { status: 499 });
           return Response.json(
-            { message: "I couldn't hear that clearly. Please try again." },
-            { status: 422 },
+            { message: "I couldn't process that recording right now. Please try again." },
+            { status: 503 },
           );
+        } finally {
+          // Safety net: a path that returned without settling still closes here.
+          await settle({
+            success: false,
+            errorCode: "incomplete",
+            errorMessage: "Request ended without a result",
+          });
         }
-
-        await finishAiUsage(ticket, { success: true });
-
-        const streamEvent = `data: ${JSON.stringify({ type: "transcript.text.done", text: transcript })}\n\n`;
-        return new Response(streamEvent, {
-          headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
-        });
       },
+
     },
   },
 });
