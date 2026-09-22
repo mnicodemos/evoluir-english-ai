@@ -14,12 +14,10 @@ import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
 import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
 import {
   coachBlock,
-  coachFocus,
-  coachStage,
-  coachStudentTurns,
-  COACH_MAX_TURNS,
+  coachPlan,
   type CoachStage,
 } from "@/lib/pedagogy/coachSession";
+
 import {
   teacherEvidence,
   teacherEvidenceDecision,
