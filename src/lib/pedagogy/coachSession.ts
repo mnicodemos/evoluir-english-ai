@@ -8,7 +8,9 @@
 
 import { buildNextStep, type NextStepReason } from "./nextStep";
 import { levelRegister, type LevelRegister } from "./teacherMode";
+import type { TeacherTaskType } from "./teacherEvidence";
 import type { TeacherContextForPrompt } from "./teacherPrompt";
+
 
 export const COACH_STAGES = [
   "START",
