@@ -47,13 +47,20 @@ export const INITIAL_LEARNING_STATE_CONFIG: LearningStateConfig = {
 
 export type LearningStateResult = {
   skill: PedagogicalSkill | null;
+  /** Main stage demonstrated. Maintenance never replaces it. */
   state: LearningState;
   /** Distinct, valid evidence considered. */
   evidenceCount: number;
   /** Evidence that actually sustained the reported stage or a higher one. */
   sustainingCount: number;
+  /**
+   * Durability: the same stage was demonstrated again after a real interval.
+   * It is an attribute of the stage above, not a stage of its own.
+   */
+  maintenance: boolean;
   ruleVersion: string;
 };
+
 
 const STAGE_RANK: Record<(typeof LEARNING_STATES)[number], number> = {
   EXPOSURE: 0,
