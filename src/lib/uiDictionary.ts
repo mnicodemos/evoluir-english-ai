@@ -10,6 +10,11 @@ export const uiPt: Record<string, string> = {
   "Coach session": "Sessão guiada",
   "Coach step": "Etapa",
   "Session complete": "Sessão concluída",
+  "Training session": "Treino guiado",
+  Situation: "Situação",
+  "Answer in English as you would in real life. I will adapt the challenge.":
+    "Responda em inglês como responderia na vida real. Vou adaptar o desafio.",
+
   "Your context": "Seu contexto",
   Level: "Nível",
   Focus: "Foco",
