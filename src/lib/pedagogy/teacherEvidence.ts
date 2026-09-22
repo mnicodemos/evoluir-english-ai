@@ -56,6 +56,15 @@ export function teacherEvidenceDecision(
  */
 export type TeacherTaskType = "production" | "spontaneous_use";
 
+/**
+ * Free conversation is the student using English on their own; every other mode
+ * (correction, practice, examples) is a task the teacher set.
+ */
+export function teacherTaskType(mode: string): TeacherTaskType {
+  return mode === "CONVERSATION" ? "spontaneous_use" : "production";
+}
+
+
 export function teacherEvidence(input: {
   skill: TeacherEvidenceSkill;
   score: number;
