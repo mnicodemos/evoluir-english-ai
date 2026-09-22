@@ -200,14 +200,21 @@ function Vocabulary() {
   }
 
   async function togglePronunciation(word: Word) {
-    if (checkingId) return;
+    if (pronunciationGate.current.isBusy()) {
+      toast(t("The check is already running."));
+      return;
+    }
 
     if (recordingId === word.id) {
+      const attempt = pronunciationGate.current.begin();
+      if (attempt === null) return;
+      const controller = new AbortController();
+      pronunciationAbort.current = controller;
       setRecordingId(null);
       setCheckingId(word.id);
       try {
         const audio = await stopVoiceRecording();
-        const spoken = await transcribeAudio(audio);
+        const spoken = await transcribeAudio(audio, controller.signal);
         const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
         const authoritative = await savePronunciation({
           data: {
@@ -217,6 +224,8 @@ function Vocabulary() {
             minutes: minutesSpent(1),
           },
         });
+        // A late answer from an older attempt must never change the screen.
+        if (!pronunciationGate.current.isCurrent(attempt)) return;
         const score = authoritative.score;
         if (score !== previewScore)
           console.warn("Pronunciation preview differed from the authoritative result");
@@ -224,9 +233,16 @@ function Vocabulary() {
         else if (score >= 55) toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
         else toast.error(`I heard “${spoken}”. Listen again and try once more.`);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Could not check that pronunciation.");
+        const cancelled = error instanceof Error && error.name === "AbortError";
+        if (!cancelled && pronunciationGate.current.isCurrent(attempt))
+          toast.error(
+            error instanceof Error ? error.message : "Could not check that pronunciation.",
+          );
       } finally {
+        // Success, error, cancel: the attempt always ends and frees the button.
+        if (pronunciationAbort.current === controller) pronunciationAbort.current = null;
         minutesSpent.stop();
+        pronunciationGate.current.end(attempt);
         setCheckingId(null);
       }
       return;
@@ -251,6 +267,7 @@ function Vocabulary() {
       );
     }
   }
+
 
   const all = words ?? [];
   const learned = all.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75);
