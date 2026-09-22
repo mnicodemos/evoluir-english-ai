@@ -104,7 +104,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       if (!lessonBySkill[skill]) lessonBySkill[skill] = { id: lesson.id, title: lesson.title };
     }
 
-    return buildNextStep({
+    const step = buildNextStep({
       skills: snapshots,
       currentLevel: level,
       recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
@@ -113,4 +113,40 @@ export const loadNextStep = createServerFn({ method: "POST" })
       ] as string[],
       lessonBySkill,
     });
+
+    // Phase 29: the priority Skill Quest, derived from the existing evidence
+    // through the existing Invisible Gaps. Read-only, deterministic, no AI.
+    const { data: evidenceRows } = await supabaseAdmin
+      .from("assessment_evidence")
+      .select(
+        "id, skill, subskill, source_type, source_id, source_item_id, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, rubric_version, metadata, created_at",
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(EVIDENCE_LIMIT);
+
+    const evidence: AssessmentEvidence[] = (evidenceRows ?? []).map((row) => ({
+      id: row.id,
+      skill: row.skill as PedagogicalSkill,
+      subskill: row.subskill,
+      sourceType: row.source_type as AssessmentEvidence["sourceType"],
+      sourceId: row.source_id,
+      sourceItemId: row.source_item_id,
+      rawScore: Number(row.raw_score),
+      sourceReliability: Number(row.source_reliability),
+      evidenceQuality: Number(row.evidence_quality),
+      sampleWeight: Number(row.sample_weight),
+      evaluatedBy: row.evaluated_by as AssessmentEvidence["evaluatedBy"],
+      rubricVersion: row.rubric_version,
+      metadata: (row.metadata ?? {}) as AssessmentEvidence["metadata"],
+      createdAt: row.created_at,
+    }));
+
+    const quest = selectPrioritySkillQuest({
+      gaps: deriveInvisibleGaps({ evidence }),
+      lessonBySkill,
+    });
+
+    return { ...step, quest };
   });
+
