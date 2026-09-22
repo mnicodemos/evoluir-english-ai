@@ -42,3 +42,4 @@
 - [x] Fase 6A — auditoria de monetização e fundação provider-agnostic (subscriptions, entitlements, contratos)
 - [x] Fase 22A — Plano de Estudo Personalizado (MVP): preferências no perfil, plano semanal com aulas existentes e acompanhamento
 - [x] Fase 22B+C — Plano adaptativo (ordem por evidência existente), "Why this plan?" e "Update my plan" com comparação Previous → Updated
+- [x] Ajuste visual — telas autenticadas em largura total no desktop, preservando leitura e responsividade
