@@ -8,6 +8,7 @@
 
 import { buildNextStep, type NextStepReason } from "./nextStep";
 import { levelRegister, type LevelRegister } from "./teacherMode";
+import type { TeacherTaskType } from "./teacherEvidence";
 import type { TeacherContextForPrompt } from "./teacherPrompt";
 
 export const COACH_STAGES = [
@@ -53,10 +54,7 @@ export function productionSignal(message: string): number {
  * of the focus skill (server data). Strong, sustained production unlocks a more
  * complex situation; weak production lowers the load and adds support.
  */
-export function coachTier(input: {
-  productions: string[];
-  focusScore?: number | null;
-}): CoachTier {
+export function coachTier(input: { productions: string[]; focusScore?: number | null }): CoachTier {
   const real = input.productions.filter((message) => message.trim().length > 0);
   if (real.length === 0) return "STANDARD";
   const signals = real.map(productionSignal);
@@ -252,6 +250,15 @@ export const COACH_EVIDENCE_MIN_WORDS = 8;
  */
 export function coachEvidenceRound(studentTurns: number): number {
   return Math.max(1, Math.ceil(Math.max(Math.trunc(studentTurns) - 1, 1) / 3));
+}
+
+/**
+ * Task type of a coach turn, from the stage the session is already in. RETRY is
+ * where the session asks an open follow-up the student answers on their own, so
+ * it reads as spontaneous use; every other stage is guided production.
+ */
+export function coachTaskType(stage: CoachStage): TeacherTaskType {
+  return stage === "RETRY" ? "spontaneous_use" : "production";
 }
 
 /**

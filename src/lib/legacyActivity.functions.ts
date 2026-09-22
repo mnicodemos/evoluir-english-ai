@@ -12,10 +12,7 @@ import {
   telemetryInputSchema,
 } from "@/lib/legacyActivity.schemas";
 import { listeningAnswerScore, pronunciationSimilarity } from "@/lib/legacyScores";
-import {
-  activityItemLevel,
-  persistActivityEvidence,
-} from "@/lib/pedagogy/dualWrite.functions";
+import { activityItemLevel, persistActivityEvidence } from "@/lib/pedagogy/dualWrite.functions";
 import {
   LISTENING_RUBRIC_VERSION,
   PRONUNCIATION_RUBRIC_VERSION,
@@ -24,9 +21,9 @@ import {
   pronunciationEvidence,
   speakingEvidence,
   speakingEvidenceDecision,
+  speakingTaskType,
 } from "@/lib/pedagogy/activityEvidence";
 import { toleratePedagogicalFailure as tolerateEvidence } from "@/lib/pedagogy/dualWrite";
-
 
 async function deterministicUuid(value: string): Promise<string> {
   const bytes = new Uint8Array(
@@ -231,7 +228,6 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
     return saved;
   });
 
-
 export const persistPronunciationLegacy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => pronunciationLegacyInputSchema.parse(input))
@@ -273,7 +269,6 @@ export const persistPronunciationLegacy = createServerFn({ method: "POST" })
       }),
     );
     return { score, saved };
-
   });
 
 export const finishTalkingLegacy = createServerFn({ method: "POST" })
@@ -316,11 +311,10 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
     });
     // Phase 26: the speaking report the session already produced becomes
     // evidence, but only when the student really spoke in this conversation.
-    const speakingGate = speakingEvidenceDecision({
-      studentMessages: data.messages
-        .filter((message) => message.role === "user")
-        .map((message) => message.content),
-    });
+    const studentMessages = data.messages
+      .filter((message) => message.role === "user")
+      .map((message) => message.content);
+    const speakingGate = speakingEvidenceDecision({ studentMessages });
     if (speakingGate.assess) {
       await tolerateEvidence(async () =>
         persistActivityEvidence({
@@ -328,7 +322,13 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
           sourceType: "speaking",
           operationKey: data.operationKey,
           rubricVersion: SPEAKING_RUBRIC_VERSION,
-          evidence: speakingEvidence(report, await activityItemLevel(context.userId)),
+          evidence: speakingEvidence(
+            report,
+            await activityItemLevel(context.userId),
+            // Phase 27B: labels the session as guided production or spontaneous
+            // use from the student's own turns. Score and report are untouched.
+            speakingTaskType(studentMessages),
+          ),
         }),
       );
     }

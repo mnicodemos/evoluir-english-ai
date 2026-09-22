@@ -68,16 +68,35 @@ export function speakingEvidenceDecision(input: {
   return { assess: true };
 }
 
+/** Task type of a speaking session, from the student's own turns in it. */
+export type SpeakingTaskType = "production" | "spontaneous_use";
+
+/**
+ * A speaking session is spontaneous use when the student sustained the
+ * conversation with their own longer turns, not just answered the minimum. It is
+ * never inferred from the score.
+ */
+export function speakingTaskType(studentMessages: readonly string[]): SpeakingTaskType {
+  const sustained = studentMessages.filter(
+    (message) => message.trim().split(/\s+/).filter(Boolean).length >= 8,
+  );
+  return sustained.length >= 5 ? "spontaneous_use" : "production";
+}
+
 export function speakingEvidence(
   report: SpeakingReport,
   itemCefr?: MeasuredCefrLevel | null,
+  taskType: SpeakingTaskType = "production",
 ): AssessmentEvidence[] {
-  const subscores: { skill: "speaking" | "grammar" | "vocabulary"; subskill: string; raw: number }[] =
-    [
-      { skill: "speaking", subskill: "fluency", raw: report.fluency },
-      { skill: "grammar", subskill: "speaking_grammar", raw: report.grammar },
-      { skill: "vocabulary", subskill: "speaking_vocabulary", raw: report.vocabulary },
-    ];
+  const subscores: {
+    skill: "speaking" | "grammar" | "vocabulary";
+    subskill: string;
+    raw: number;
+  }[] = [
+    { skill: "speaking", subskill: "fluency", raw: report.fluency },
+    { skill: "grammar", subskill: "speaking_grammar", raw: report.grammar },
+    { skill: "vocabulary", subskill: "speaking_vocabulary", raw: report.vocabulary },
+  ];
   return subscores
     .filter((item) => Number.isFinite(item.raw))
     .map((item) => ({
@@ -95,7 +114,7 @@ export function speakingEvidence(
       evaluatedBy: "gemini" as const,
       modelVersion: SPEAKING_MODEL_VERSION,
       rubricVersion: SPEAKING_RUBRIC_VERSION,
-      metadata: { criterion: item.subskill },
+      metadata: { criterion: item.subskill, taskType },
     }));
 }
 

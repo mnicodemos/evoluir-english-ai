@@ -47,11 +47,17 @@ export const INITIAL_LEARNING_STATE_CONFIG: LearningStateConfig = {
 
 export type LearningStateResult = {
   skill: PedagogicalSkill | null;
+  /** Main stage demonstrated. Maintenance never replaces it. */
   state: LearningState;
   /** Distinct, valid evidence considered. */
   evidenceCount: number;
   /** Evidence that actually sustained the reported stage or a higher one. */
   sustainingCount: number;
+  /**
+   * Durability: the same stage was demonstrated again after a real interval.
+   * It is an attribute of the stage above, not a stage of its own.
+   */
+  maintenance: boolean;
   ruleVersion: string;
 };
 
@@ -103,21 +109,44 @@ function truthy(value: unknown) {
   return value === true || value === "true";
 }
 
+type Stage = (typeof LEARNING_STATES)[number];
+
 /**
- * The highest stage a single result can possibly demonstrate, by where it came
- * from — never by how high the score is.
+ * Task types the evidence metadata may declare explicitly. Anything else (or
+ * nothing at all, as in older evidence) falls back to the source rules below.
  */
-export function evidenceStage(
-  evidence: AssessmentEvidence,
-  config: LearningStateConfig = INITIAL_LEARNING_STATE_CONFIG,
-): (typeof LEARNING_STATES)[number] {
+const TASK_TYPE_STAGE: Record<string, Stage> = {
+  recognition: "RECOGNITION",
+  application: "APPLICATION",
+  production: "PRODUCTION",
+  spontaneous_use: "SPONTANEOUS_USE",
+};
+
+/**
+ * Highest stage each source of evidence can demonstrate at all. Metadata may
+ * refine a stage inside this limit, never above it: a comprehension item never
+ * becomes production because a producer labelled it so.
+ */
+const SOURCE_CEILING: Record<AssessmentEvidence["sourceType"], Stage> = {
+  quiz: "APPLICATION",
+  listening: "RECOGNITION",
+  reading: "RECOGNITION",
+  vocabulary: "RECOGNITION",
+  placement: "RECOGNITION",
+  writing: "PRODUCTION",
+  pronunciation: "PRODUCTION",
+  final_test: "PRODUCTION",
+  speaking: "SPONTANEOUS_USE",
+  teacher: "SPONTANEOUS_USE",
+};
+
+/** Behaviour for evidence that carries no explicit task type (Phase 27A). */
+function sourceStage(evidence: AssessmentEvidence, config: LearningStateConfig): Stage {
   const meta = evidence.metadata ?? {};
   switch (evidence.sourceType) {
     case "quiz":
       // Applying a structure only counts when the item itself says so.
-      return truthy(meta["application"]) || meta["taskType"] === "application"
-        ? "APPLICATION"
-        : "RECOGNITION";
+      return truthy(meta["application"]) ? "APPLICATION" : "RECOGNITION";
     case "listening":
     case "reading":
     case "vocabulary":
@@ -125,22 +154,36 @@ export function evidenceStage(
       // Comprehension and recall of given items: recognition, never production.
       return "RECOGNITION";
     case "writing":
-      return truthy(meta["freeProduction"]) || meta["taskType"] === "production"
-        ? "PRODUCTION"
-        : "APPLICATION";
+      return truthy(meta["freeProduction"]) ? "PRODUCTION" : "APPLICATION";
     case "pronunciation":
       // Guaranteed upstream to exist only for a real recorded attempt.
       return "PRODUCTION";
     case "speaking":
     case "teacher":
+      return evidence.rawScore >= config.spontaneousScore ? "SPONTANEOUS_USE" : "PRODUCTION";
     case "final_test":
-      return evidence.rawScore >= config.spontaneousScore &&
-        (evidence.sourceType === "speaking" || evidence.sourceType === "teacher")
-        ? "SPONTANEOUS_USE"
-        : "PRODUCTION";
+      return "PRODUCTION";
     default:
       return "EXPOSURE";
   }
+}
+
+/**
+ * The highest stage a single result can possibly demonstrate: the task type the
+ * evidence declares, capped by what its source can demonstrate — never by how
+ * high the score is. Evidence without a declared task type keeps the previous
+ * source-based reading, so existing rows are unaffected.
+ */
+export function evidenceStage(
+  evidence: AssessmentEvidence,
+  config: LearningStateConfig = INITIAL_LEARNING_STATE_CONFIG,
+): Stage {
+  const declaredRaw = evidence.metadata?.["taskType"];
+  const declared =
+    typeof declaredRaw === "string" ? TASK_TYPE_STAGE[declaredRaw.trim().toLowerCase()] : undefined;
+  const ceiling = SOURCE_CEILING[evidence.sourceType] ?? "EXPOSURE";
+  if (!declared) return sourceStage(evidence, config);
+  return STAGE_RANK[declared] <= STAGE_RANK[ceiling] ? declared : ceiling;
 }
 
 function dayKey(value: string | null | undefined) {
@@ -172,6 +215,7 @@ export function deriveLearningState(
       state: "INSUFFICIENT_EVIDENCE",
       evidenceCount: 0,
       sustainingCount: 0,
+      maintenance: false,
       ruleVersion: LEARNING_STATE_RULE_VERSION,
     };
   }
@@ -182,13 +226,11 @@ export function deriveLearningState(
     .filter((item) => item.rawScore >= config.sustainingScore)
     .map((item) => ({ stage: evidenceStage(item, config), evidence: item }));
 
-  let stage: (typeof LEARNING_STATES)[number] = "EXPOSURE";
+  let stage: Stage = "EXPOSURE";
   let sustainingCount = 0;
   for (const candidate of [...LEARNING_STATES].reverse()) {
     if (candidate === "MAINTENANCE") continue;
-    const matching = sustaining.filter(
-      (item) => STAGE_RANK[item.stage] >= STAGE_RANK[candidate],
-    );
+    const matching = sustaining.filter((item) => STAGE_RANK[item.stage] >= STAGE_RANK[candidate]);
     if (matching.length >= config.minimumEvidenceForStage) {
       stage = candidate;
       sustainingCount = matching.length;
@@ -196,25 +238,30 @@ export function deriveLearningState(
     }
   }
 
-  let state: LearningState = stage;
-  if (STAGE_RANK[stage] >= STAGE_RANK.APPLICATION) {
-    // Maintenance = still demonstrated after a real interval, from the
-    // timestamps evidence already carries. An immediate repeat does not count.
-    const days = sustaining
-      .filter((item) => STAGE_RANK[item.stage] >= STAGE_RANK[stage])
-      .map((item) => dayKey(item.evidence.createdAt))
-      .filter((day): day is number => day !== null);
-    if (days.length >= 2) {
-      const span = Math.max(...days) - Math.min(...days);
-      if (span >= config.maintenanceIntervalDays) state = "MAINTENANCE";
-    }
+  // Maintenance = the SAME stage still demonstrated after a real interval, read
+  // from the timestamps evidence already carries. It describes durability, so it
+  // is reported alongside the stage and never replaces it. Two results from the
+  // same day (one session) are not continuity.
+  let maintenance = false;
+  if (STAGE_RANK[stage] >= STAGE_RANK.RECOGNITION) {
+    const days = [
+      ...new Set(
+        sustaining
+          .filter((item) => STAGE_RANK[item.stage] >= STAGE_RANK[stage])
+          .map((item) => dayKey(item.evidence.createdAt))
+          .filter((day): day is number => day !== null),
+      ),
+    ];
+    maintenance =
+      days.length >= 2 && Math.max(...days) - Math.min(...days) >= config.maintenanceIntervalDays;
   }
 
   return {
     skill,
-    state,
+    state: stage,
     evidenceCount: valid.length,
     sustainingCount,
+    maintenance,
     ruleVersion: LEARNING_STATE_RULE_VERSION,
   };
 }

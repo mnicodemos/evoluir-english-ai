@@ -17,16 +17,18 @@ import {
   coachEvidenceDecision,
   coachEvidenceRound,
   coachPlan,
+  coachTaskType,
   COACH_RUBRIC_VERSION,
   type CoachStage,
 } from "@/lib/pedagogy/coachSession";
 
-
 import {
   teacherEvidence,
   teacherEvidenceDecision,
+  teacherTaskType,
   TEACHER_RUBRIC_VERSION,
 } from "@/lib/pedagogy/teacherEvidence";
+
 import { parseTeacherTurn, teacherTurnMessages } from "@/lib/pedagogy/teacherPrompt";
 
 const historyMessageSchema = z.object({
@@ -95,7 +97,6 @@ export const teacherTurn = createServerFn({ method: "POST" })
       };
       coachPromptBlock = coachBlock(plan);
     }
-
 
     const raw = await callGateway(
       teacherTurnMessages({
@@ -187,14 +188,14 @@ export const teacherTurn = createServerFn({ method: "POST" })
           turnId,
           // Level of the interaction, taken from the server-owned context.
           itemCefr: itemLevelFromStoredLevel(pedagogicalContext.cefrLevel),
-          ...(coach
-            ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION }
-            : {}),
+          // What kind of task this turn was, from the mode/stage already derived
+          // server-side. It only labels the evidence; no score changes.
+          taskType: coach ? coachTaskType(coach.stage) : teacherTaskType(mode),
+          ...(coach ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION } : {}),
         }),
       });
       evidencePersisted = result.ok && !result.duplicate;
     }
-
 
     return {
       conversationId,
@@ -213,7 +214,6 @@ export const teacherTurn = createServerFn({ method: "POST" })
             finished: coach.finished,
           }
         : null,
-
     };
   });
 

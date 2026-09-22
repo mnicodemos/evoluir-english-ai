@@ -49,6 +49,21 @@ export function teacherEvidenceDecision(
   return { assess: true, skill, score: candidate.suggestedScore };
 }
 
+/**
+ * What kind of task the turn was, decided by the server from the mode/stage it
+ * already computed. Guided production is production; an open follow-up the
+ * student answers on their own is spontaneous use.
+ */
+export type TeacherTaskType = "production" | "spontaneous_use";
+
+/**
+ * Free conversation is the student using English on their own; every other mode
+ * (correction, practice, examples) is a task the teacher set.
+ */
+export function teacherTaskType(mode: string): TeacherTaskType {
+  return mode === "CONVERSATION" ? "spontaneous_use" : "production";
+}
+
 export function teacherEvidence(input: {
   skill: TeacherEvidenceSkill;
   score: number;
@@ -58,6 +73,7 @@ export function teacherEvidence(input: {
   /** Coach sessions reuse this model with their own subskill/rubric label. */
   subskill?: string;
   rubricVersion?: string;
+  taskType?: TeacherTaskType;
 }): AssessmentEvidence[] {
   const subskill = input.subskill ?? "teacher_interaction";
   return [
@@ -78,8 +94,10 @@ export function teacherEvidence(input: {
       evaluatedBy: "gemini",
       modelVersion: TEACHER_MODEL_VERSION,
       rubricVersion: input.rubricVersion ?? TEACHER_RUBRIC_VERSION,
-      metadata: { criterion: subskill },
+      metadata: {
+        criterion: subskill,
+        ...(input.taskType ? { taskType: input.taskType } : {}),
+      },
     },
   ];
 }
-
