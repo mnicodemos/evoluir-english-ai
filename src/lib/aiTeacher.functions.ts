@@ -191,10 +191,12 @@ export const teacherTurn = createServerFn({ method: "POST" })
             stage: coach.stage,
             focusSkill: coach.focusSkill,
             turn: coach.turns,
-            maxTurns: COACH_MAX_TURNS,
-            finished: coach.stage === "SUMMARY",
+            maxTurns: coach.plannedTurns,
+            scenario: coach.scenario,
+            finished: coach.finished,
           }
         : null,
+
     };
   });
 
