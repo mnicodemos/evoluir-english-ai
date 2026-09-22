@@ -781,6 +781,8 @@ export const uiPt: Record<string, string> = {
   "Today's words are back — practise them again.":
     "As palavras de hoje voltaram — pratique-as novamente.",
   "Could not reset today's words": "Não foi possível restaurar as palavras de hoje",
+  "The check is already running.": "A análise já está em andamento.",
+
 
   // Level labels
   "A1 Beginner": "A1 Iniciante",

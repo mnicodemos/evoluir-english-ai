@@ -136,64 +136,79 @@ export const Route = createFileRoute("/api/speech")({
         const encoder = new TextEncoder();
         let pending = "";
         let sentAudio = false;
-        const stream = upstream.body.pipeThrough(
-          new TransformStream<Uint8Array, Uint8Array>({
-            transform(chunk, controller) {
-              pending += decoder.decode(chunk, { stream: true });
-              const events = pending.split(/\r?\n\r?\n/);
-              pending = events.pop() ?? "";
-              for (const event of events) {
-                for (const line of event.split(/\r?\n/)) {
-                  if (!line.startsWith("data:")) continue;
-                  try {
-                    const payload = JSON.parse(line.slice(5).trim()) as {
-                      candidates?: Array<{
-                        content?: { parts?: Array<{ inlineData?: { data?: string } }> };
-                      }>;
-                    };
-                    for (const candidate of payload.candidates ?? []) {
-                      for (const part of candidate.content?.parts ?? []) {
-                        const audio = part.inlineData?.data;
-                        if (!audio) continue;
-                        sentAudio = true;
-                        controller.enqueue(
-                          encoder.encode(
-                            `data: ${JSON.stringify({ type: "speech.audio.delta", audio })}\n\n`,
-                          ),
-                        );
-                      }
+        let settled = false;
+        // Closing the usage record exactly once keeps the "one request at a
+        // time" guard from staying locked when the listener stops the audio.
+        const settle = async (success: boolean, errorCode?: string, errorMessage?: string) => {
+          if (settled) return;
+          settled = true;
+          await finishAiUsage(ticket, {
+            success,
+            ...(errorCode ? { errorCode, errorMessage: errorMessage ?? errorCode } : {}),
+          });
+        };
+        // `cancel` runs when the listener stops the audio; it is part of the
+        // stream spec but missing from the bundled DOM types.
+        const transformer: Transformer<Uint8Array, Uint8Array> & {
+          cancel?: () => Promise<void>;
+        } = {
+          transform(chunk, controller) {
+            pending += decoder.decode(chunk, { stream: true });
+            const events = pending.split(/\r?\n\r?\n/);
+            pending = events.pop() ?? "";
+            for (const event of events) {
+              for (const line of event.split(/\r?\n/)) {
+                if (!line.startsWith("data:")) continue;
+                try {
+                  const payload = JSON.parse(line.slice(5).trim()) as {
+                    candidates?: Array<{
+                      content?: { parts?: Array<{ inlineData?: { data?: string } }> };
+                    }>;
+                  };
+                  for (const candidate of payload.candidates ?? []) {
+                    for (const part of candidate.content?.parts ?? []) {
+                      const audio = part.inlineData?.data;
+                      if (!audio) continue;
+                      sentAudio = true;
+                      controller.enqueue(
+                        encoder.encode(
+                          `data: ${JSON.stringify({ type: "speech.audio.delta", audio })}\n\n`,
+                        ),
+                      );
                     }
-                  } catch {
-                    // Ignore provider keep-alives and metadata-only events.
                   }
+                } catch {
+                  // Ignore provider keep-alives and metadata-only events.
                 }
               }
-            },
-            async flush(controller) {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify(
-                    sentAudio
-                      ? { type: "speech.audio.done" }
-                      : {
-                          type: "speech.audio.error",
-                          message: "The audio service returned no sound.",
-                        },
-                  )}\n\n`,
-                ),
-              );
-              await finishAiUsage(ticket, {
-                success: sentAudio,
-                ...(sentAudio
-                  ? {}
-                  : {
-                      errorCode: "empty_audio",
-                      errorMessage: "The audio service returned no sound.",
-                    }),
-              });
-            },
-          }),
-        );
+            }
+          },
+          async flush(controller) {
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify(
+                  sentAudio
+                    ? { type: "speech.audio.done" }
+                    : {
+                        type: "speech.audio.error",
+                        message: "The audio service returned no sound.",
+                      },
+                )}\n\n`,
+              ),
+            );
+            await settle(
+              sentAudio,
+              sentAudio ? undefined : "empty_audio",
+              sentAudio ? undefined : "The audio service returned no sound.",
+            );
+          },
+          async cancel() {
+            // The listener stopped the audio: end the attempt instead of
+            // leaving the record open.
+            await settle(sentAudio, sentAudio ? undefined : "cancelled", "Playback was stopped");
+          },
+        };
+        const stream = upstream.body.pipeThrough(new TransformStream(transformer));
 
         return new Response(stream, {
           headers: {

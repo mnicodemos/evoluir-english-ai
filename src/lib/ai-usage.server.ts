@@ -39,13 +39,49 @@ export async function hashAiRequest(value: unknown): Promise<string> {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+/**
+ * A request can end without closing its own record (network drop, the student
+ * leaving the page, an unexpected provider error). Those records used to keep
+ * the "one request at a time" guard locked, so the next attempt was refused
+ * with "another AI request is already running". Any record older than this is
+ * treated as abandoned and closed on the next attempt — no timer, no polling.
+ */
+export const ABANDONED_USAGE_SECONDS = 90;
+
+export function isAbandonedUsage(createdAt: string, now = Date.now()): boolean {
+  const started = Date.parse(createdAt);
+  if (!Number.isFinite(started)) return false;
+  return now - started >= ABANDONED_USAGE_SECONDS * 1000;
+}
+
+/** Closes this user's abandoned records for one operation so the guard is free. */
+async function releaseAbandonedAiUsage(userId: string, operation: AiOperation) {
+  const db = await admin();
+  const cutoff = new Date(Date.now() - ABANDONED_USAGE_SECONDS * 1000).toISOString();
+  await db
+    .from("ai_usage_events")
+    .update({
+      status: "error",
+      success: false,
+      error_code: "abandoned",
+      error_message: "Request ended without completing",
+      completed_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId)
+    .eq("operation", operation)
+    .eq("status", "pending")
+    .lt("created_at", cutoff);
+}
+
 export async function reserveAiUsage(input: {
   userId: string;
   operation: AiOperation;
   model: string;
   requestHash?: string;
 }): Promise<UsageTicket> {
+  await releaseAbandonedAiUsage(input.userId, input.operation);
   const db = await admin();
+
   const { data: limit, error: limitError } = await db
     .from("ai_limits")
     .select(

@@ -15,6 +15,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { markVocabularyBatchSeen, vocabularySignature } from "@/lib/activityIndicators";
+import { createAttemptGate } from "@/lib/attemptGate";
+
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
 import { pronunciationScore, transcribeAudio } from "@/lib/transcribe";
@@ -88,8 +90,12 @@ function Vocabulary() {
   const [recordingId, setRecordingId] = useState<string | null>(null);
   const [checkingId, setCheckingId] = useState<string | null>(null);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
+  // One pronunciation check at a time; every attempt ends and frees the button.
+  const pronunciationGate = useRef(createAttemptGate());
+  const pronunciationAbort = useRef<AbortController | null>(null);
   // Reading time only counts while the student is actually working on the words.
   const minutesSpent = useTimeSpent({ manual: true });
+
 
   const { data: words, isLoading } = useQuery({
     queryKey: ["vocabulary"],
@@ -200,14 +206,21 @@ function Vocabulary() {
   }
 
   async function togglePronunciation(word: Word) {
-    if (checkingId) return;
+    if (pronunciationGate.current.isBusy()) {
+      toast(t("The check is already running."));
+      return;
+    }
 
     if (recordingId === word.id) {
+      const attempt = pronunciationGate.current.begin();
+      if (attempt === null) return;
+      const controller = new AbortController();
+      pronunciationAbort.current = controller;
       setRecordingId(null);
       setCheckingId(word.id);
       try {
         const audio = await stopVoiceRecording();
-        const spoken = await transcribeAudio(audio);
+        const spoken = await transcribeAudio(audio, controller.signal);
         const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
         const authoritative = await savePronunciation({
           data: {
@@ -217,6 +230,8 @@ function Vocabulary() {
             minutes: minutesSpent(1),
           },
         });
+        // A late answer from an older attempt must never change the screen.
+        if (!pronunciationGate.current.isCurrent(attempt)) return;
         const score = authoritative.score;
         if (score !== previewScore)
           console.warn("Pronunciation preview differed from the authoritative result");
@@ -224,9 +239,16 @@ function Vocabulary() {
         else if (score >= 55) toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
         else toast.error(`I heard “${spoken}”. Listen again and try once more.`);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Could not check that pronunciation.");
+        const cancelled = error instanceof Error && error.name === "AbortError";
+        if (!cancelled && pronunciationGate.current.isCurrent(attempt))
+          toast.error(
+            error instanceof Error ? error.message : "Could not check that pronunciation.",
+          );
       } finally {
+        // Success, error, cancel: the attempt always ends and frees the button.
+        if (pronunciationAbort.current === controller) pronunciationAbort.current = null;
         minutesSpent.stop();
+        pronunciationGate.current.end(attempt);
         setCheckingId(null);
       }
       return;
@@ -251,6 +273,7 @@ function Vocabulary() {
       );
     }
   }
+
 
   const all = words ?? [];
   const learned = all.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75);
@@ -281,8 +304,16 @@ function Vocabulary() {
   const profileRef = useRef(profile);
   profileRef.current = profile;
   useEffect(() => {
+    const gate = pronunciationGate.current;
+    const abortRef = pronunciationAbort;
     return () => {
+      // Leaving the page cancels an open check and releases the microphone.
+      abortRef.current?.abort();
+      abortRef.current = null;
+      gate.reset();
+      cancelVoiceRecording();
       minutesSpent.stop();
+
       const minutes = minutesSpent(0);
       const p = profileRef.current;
       if (minutes >= 1 && p) {
