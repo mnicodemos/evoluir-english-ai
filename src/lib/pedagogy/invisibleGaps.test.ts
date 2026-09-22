@@ -150,9 +150,9 @@ describe("invisible gaps (Phase 28)", () => {
     expect(second).toEqual(first);
     expect(JSON.stringify(items)).toBe(snapshot);
     // Unmeasured skills come first, then structural gaps.
-    expect(first.map((item) => item.priority)).toEqual([...first.map((item) => item.priority)].sort(
-      (a, b) => a - b,
-    ));
+    expect(first.map((item) => item.priority)).toEqual(
+      [...first.map((item) => item.priority)].sort((a, b) => a - b),
+    );
   });
 
   it("leaves the existing learning state untouched", () => {
