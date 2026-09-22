@@ -51,7 +51,7 @@ const aiWordsSchema = z
           .strict(),
       )
       .min(1)
-      .max(10),
+      .max(20),
   })
   .strict();
 
@@ -129,6 +129,9 @@ export const dailyWords = createServerFn({ method: "POST" })
     const usedWords = ownedWordSet((known ?? []) as { word: string }[]);
 
     const missing = DAILY_COUNT - todays.length;
+    // The model often repeats words the student already owns, so it is asked for
+    // spare candidates: the extras absorb the repeats and the batch still fills.
+    const askCount = Math.min(missing + 6, 20);
 
     async function askAi(exclude: Set<string>) {
       const raw = await callGateway(
@@ -137,7 +140,7 @@ export const dailyWords = createServerFn({ method: "POST" })
             role: "system",
             content:
               "You are a CELTA English teacher choosing daily vocabulary for a Brazilian learner. " +
-              `Pick exactly ${missing} useful English words or short expressions that come from the lessons listed by the user. ` +
+              `Pick exactly ${askCount} useful English words or short expressions that come from the lessons listed by the user. ` +
               "Never pick a word the user lists as already known. " +
               'Reply with strict JSON: {"words":[{"word":"","translation":"Brazilian Portuguese","meaning":"short definition in simple English",' +
               '"pronunciation":"simple phonetic hint","example":"natural English sentence using the word",' +
@@ -171,10 +174,16 @@ export const dailyWords = createServerFn({ method: "POST" })
     let fresh = selectNewWords(first, usedWords, missing);
 
     // The model sometimes repeats known words: one retry with those repeats added to the
-    // exclusion list, instead of failing the whole batch.
+    // exclusion list, instead of failing the whole batch. The pause respects the usage
+    // limiter, which would otherwise reject a second call fired immediately.
     if (!fresh.length) {
       for (const w of first) exclude.add(String(w.word ?? "").trim().toLowerCase());
-      fresh = selectNewWords(await askAi(exclude), usedWords, missing);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 6_000));
+        fresh = selectNewWords(await askAi(exclude), usedWords, missing);
+      } catch {
+        fresh = [];
+      }
     }
 
 
