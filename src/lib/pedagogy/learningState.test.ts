@@ -214,3 +214,173 @@ describe("deriveLearningStates", () => {
     expect(after.cefr).toBe("B1");
   });
 });
+
+// Phase 27B — explicit task-type metadata and maintenance as durability.
+describe("learning state evolution (27B)", () => {
+  const at = (day: string, item: string, meta?: AssessmentEvidence["metadata"]) =>
+    evidence({
+      sourceItemId: item,
+      createdAt: day,
+      ...(meta ? { metadata: meta } : {}),
+    });
+
+  it("reads a standard quiz as recognition and an application quiz as application", () => {
+    expect(deriveLearningState([at("2026-09-01", "1"), at("2026-09-01", "2")]).state).toBe(
+      "RECOGNITION",
+    );
+    const applied = deriveLearningState([
+      at("2026-09-01", "1", { taskType: "application" }),
+      at("2026-09-01", "2", { taskType: "application" }),
+    ]);
+    expect(applied.state).toBe("APPLICATION");
+  });
+
+  it("never lets metadata push a source above what it can demonstrate", () => {
+    const listeningClaim = evidence({
+      skill: "listening",
+      sourceType: "listening",
+      metadata: { taskType: "spontaneous_use" },
+    });
+    expect(evidenceStage(listeningClaim)).toBe("RECOGNITION");
+    const quizClaim = evidence({ metadata: { taskType: "production" } });
+    expect(evidenceStage(quizClaim)).toBe("APPLICATION");
+  });
+
+  it("separates teacher production from spontaneous use by task type", () => {
+    const turn = (item: string, taskType: string) =>
+      evidence({
+        sourceType: "teacher",
+        evaluatedBy: "gemini",
+        rawScore: 82,
+        sourceItemId: item,
+        metadata: { taskType },
+      });
+    expect(deriveLearningState([turn("a", "production"), turn("b", "production")]).state).toBe(
+      "PRODUCTION",
+    );
+    expect(
+      deriveLearningState([turn("a", "spontaneous_use"), turn("b", "spontaneous_use")]).state,
+    ).toBe("SPONTANEOUS_USE");
+  });
+
+  it("labels teacher and coach turns from the mode and stage already derived", () => {
+    expect(teacherTaskType("CONVERSATION")).toBe("spontaneous_use");
+    expect(teacherTaskType("CORRECT")).toBe("production");
+    expect(coachTaskType("RETRY")).toBe("spontaneous_use");
+    expect(coachTaskType("CHALLENGE")).toBe("production");
+    const [piece] = teacherEvidence({
+      skill: "grammar",
+      score: 80,
+      turnId: "t1",
+      taskType: "spontaneous_use",
+    });
+    expect(piece?.metadata?.["taskType"]).toBe("spontaneous_use");
+    expect(evidenceStage(piece!)).toBe("SPONTANEOUS_USE");
+  });
+
+  it("labels a speaking session from the student's own turns", () => {
+    const short = ["I go to work", "yes I like it", "it was fine", "maybe tomorrow"];
+    expect(speakingTaskType(short)).toBe("production");
+    const sustained = Array.from(
+      { length: 5 },
+      () => "I usually travel for work because my team is spread across three cities",
+    );
+    expect(speakingTaskType(sustained)).toBe("spontaneous_use");
+    const [speaking] = speakingEvidence(
+      { fluency: 80, grammar: 80, vocabulary: 80 },
+      null,
+      "spontaneous_use",
+    );
+    expect(evidenceStage(speaking!)).toBe("SPONTANEOUS_USE");
+  });
+
+  it("keeps a real pronunciation recording at production", () => {
+    const attempts = [
+      ...pronunciationEvidence({ wordId: "w1", transcript: "schedule", score: 90 }),
+      ...pronunciationEvidence({ wordId: "w2", transcript: "thorough", score: 80 }),
+    ];
+    expect(deriveLearningState(attempts).state).toBe("PRODUCTION");
+  });
+
+  it("preserves the stage when maintenance is demonstrated", () => {
+    const stageCases: { meta: AssessmentEvidence["metadata"]; state: string }[] = [
+      { meta: { taskType: "recognition" }, state: "RECOGNITION" },
+      { meta: { taskType: "application" }, state: "APPLICATION" },
+    ];
+    for (const item of stageCases) {
+      const result = deriveLearningState([
+        at("2026-09-01T10:00:00Z", "a", item.meta),
+        at("2026-09-20T10:00:00Z", "b", item.meta),
+      ]);
+      expect(result.state).toBe(item.state);
+      expect(result.maintenance).toBe(true);
+    }
+    const spontaneous = (item: string, day: string) =>
+      evidence({
+        sourceType: "teacher",
+        evaluatedBy: "gemini",
+        rawScore: 85,
+        sourceItemId: item,
+        createdAt: day,
+        metadata: { taskType: "spontaneous_use" },
+      });
+    const result = deriveLearningState([
+      spontaneous("a", "2026-09-01T10:00:00Z"),
+      spontaneous("b", "2026-09-25T10:00:00Z"),
+    ]);
+    expect(result.state).toBe("SPONTANEOUS_USE");
+    expect(result.maintenance).toBe(true);
+  });
+
+  it("never reports maintenance without later, sufficient evidence", () => {
+    // One result only: no stage, no maintenance.
+    expect(deriveLearningState([at("2026-09-01T10:00:00Z", "a")]).maintenance).toBe(false);
+    // Two results inside the same day are one session, not continuity.
+    expect(
+      deriveLearningState([at("2026-09-01T10:00:00Z", "a"), at("2026-09-01T18:00:00Z", "b")])
+        .maintenance,
+    ).toBe(false);
+    // A second result too soon after the first is not continuity either.
+    expect(
+      deriveLearningState([at("2026-09-01T10:00:00Z", "a"), at("2026-09-03T10:00:00Z", "b")])
+        .maintenance,
+    ).toBe(false);
+    // Weak performance: no stage is sustained, so nothing to maintain.
+    expect(
+      deriveLearningState([
+        evidence({ rawScore: 20, sourceItemId: "a", createdAt: "2026-09-01T10:00:00Z" }),
+        evidence({ rawScore: 25, sourceItemId: "b", createdAt: "2026-09-25T10:00:00Z" }),
+      ]).maintenance,
+    ).toBe(false);
+    expect(deriveLearningState([]).maintenance).toBe(false);
+  });
+
+  it("keeps working for older evidence and unknown metadata", () => {
+    // No metadata at all: the previous source-based reading is preserved.
+    expect(deriveLearningState([at("2026-09-01", "a"), at("2026-09-01", "b")]).state).toBe(
+      "RECOGNITION",
+    );
+    const legacyWriting = (item: string) =>
+      evidence({ skill: "writing", sourceType: "writing", sourceItemId: item });
+    expect(deriveLearningState([legacyWriting("a"), legacyWriting("b")]).state).toBe("APPLICATION");
+    // Unknown or malformed task types are ignored, never fatal.
+    const unknown = (item: string) =>
+      evidence({ sourceItemId: item, metadata: { taskType: "wizardry" } });
+    expect(deriveLearningState([unknown("a"), unknown("b")]).state).toBe("RECOGNITION");
+    const numeric = (item: string) => evidence({ sourceItemId: item, metadata: { taskType: 7 } });
+    expect(deriveLearningState([numeric("a"), numeric("b")]).state).toBe("RECOGNITION");
+  });
+
+  it("stays a pure function of its input", () => {
+    const items = [
+      at("2026-09-01T10:00:00Z", "a", { taskType: "application" }),
+      at("2026-09-20T10:00:00Z", "b", { taskType: "application" }),
+    ];
+    const snapshot = JSON.stringify(items);
+    const first = deriveLearningState(items);
+    const second = deriveLearningState(items);
+    expect(second).toEqual(first);
+    // No AI, no database, no writes: the input is untouched.
+    expect(JSON.stringify(items)).toBe(snapshot);
+  });
+});
