@@ -473,7 +473,47 @@ export async function persistTeacherEvidence(params: {
   }
 }
 
+/**
+ * Phase 26: the SAME pipeline for the other activities that already produce a
+ * server-derived result (Listening Lab, Speaking session, Pronunciation). A
+ * failure is recorded and never breaks the activity the student just finished.
+ */
+export async function persistActivityEvidence(params: {
+  userId: string;
+  sourceType: "listening" | "speaking" | "pronunciation";
+  operationKey: string;
+  evidence: AssessmentEvidence[];
+  rubricVersion: string;
+}) {
+  if (params.evidence.length === 0) return { ok: true, duplicate: false, evidenceCount: 0 };
+  const admin = await loadAdmin();
+  const key = `${params.sourceType}:${params.operationKey}`;
+  const sourceId = await deterministicUuid(`activity-source:${params.userId}:${key}`);
+  try {
+    const result = await persistEvidenceAndResults({
+      admin,
+      userId: params.userId,
+      sourceType: params.sourceType,
+      sourceId,
+      idempotencyKey: key,
+      rubricVersion: params.rubricVersion,
+      evidence: params.evidence,
+    });
+    return { ok: true, ...result };
+  } catch (error) {
+    await recordFailure(admin, params.userId, params.sourceType, sourceId, key, error);
+    console.error("Activity pedagogical write failed", classifyFailure(error).code);
+    return { ok: false, duplicate: false, evidenceCount: 0 };
+  }
+}
+
+/** Server-owned CEFR level of the student, reused for activities without one. */
+export async function activityItemLevel(userId: string) {
+  return profileItemLevel(await loadAdmin(), userId);
+}
+
 export const submitAuthoritativeQuiz = createServerFn({ method: "POST" })
+
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => authoritativeQuizInputSchema.parse(input))
   .handler(async ({ data, context }) => {
