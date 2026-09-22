@@ -70,8 +70,10 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     stage: string;
     turn: number;
     maxTurns: number;
+    scenario?: string;
     finished: boolean;
   } | null>(null);
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const session = useQuery({
