@@ -144,11 +144,15 @@ export const Route = createFileRoute("/api/speech")({
           settled = true;
           await finishAiUsage(ticket, {
             success,
-            ...(errorCode ? { errorCode, errorMessage } : {}),
+            ...(errorCode ? { errorCode, errorMessage: errorMessage ?? errorCode } : {}),
           });
         };
-        const stream = upstream.body.pipeThrough(
-          new TransformStream<Uint8Array, Uint8Array>({
+        // `cancel` runs when the listener stops the audio; it is part of the
+        // stream spec but missing from the bundled DOM types.
+        const transformer: Transformer<Uint8Array, Uint8Array> & {
+          cancel?: () => Promise<void>;
+        } = {
+
             transform(chunk, controller) {
               pending += decoder.decode(chunk, { stream: true });
               const events = pending.split(/\r?\n\r?\n/);
