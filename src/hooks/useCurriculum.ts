@@ -4,8 +4,14 @@ import { useMemo } from "react";
 
 import { useLessons, useUserLessons } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
-import { CORE_UNITS_PER_LEVEL, finalTestKey, getUnits, type CurriculumLesson } from "@/lib/curriculum";
-import { openCurriculumLesson, openFinalTest } from "@/lib/curriculum.functions";
+import {
+  CORE_UNITS_PER_LEVEL,
+  finalTestKey,
+  getUnits,
+  unitTestKey,
+  type CurriculumLesson,
+} from "@/lib/curriculum";
+import { openCurriculumLesson, openFinalTest, openUnitTest } from "@/lib/curriculum.functions";
 import { getLevelState } from "@/lib/level";
 
 export type PathLesson = CurriculumLesson & {
@@ -17,6 +23,13 @@ export type PathLesson = CurriculumLesson & {
 };
 
 export type PathUnit = { unit: number; title: string; lessons: PathLesson[]; completed: number };
+
+export type UnitTestState = {
+  unit: number;
+  lessonId: string | null;
+  unlocked: boolean;
+  passed: boolean;
+};
 
 /** The student's 30 core lessons and optional review unit, with lock state. */
 export function useLearningPath() {
@@ -63,6 +76,21 @@ export function useLearningPath() {
     const testId = (testRow?.id as string | undefined) ?? null;
     const testState = stateOf(testId);
 
+    // One integrated Final Test per core unit, unlocked once its lessons are done.
+    const unitTests: UnitTestState[] = units
+      .filter((unit) => unit.unit <= CORE_UNITS_PER_LEVEL)
+      .map((unit) => {
+        const row = byKey.get(unitTestKey(level, unit.unit));
+        const id = (row?.id as string | undefined) ?? null;
+        const state = stateOf(id);
+        return {
+          unit: unit.unit,
+          lessonId: id,
+          unlocked: unit.lessons.length > 0 && unit.lessons.every((lesson) => lesson.completed),
+          passed: !!state?.completed_at,
+        };
+      });
+
     return {
       level,
       units,
@@ -70,6 +98,7 @@ export function useLearningPath() {
       completed,
       total: all.length,
       next: all.find((l) => !l.completed) ?? null,
+      unitTests,
       finalTest: {
         lessonId: testId,
         unlocked: coreLessons.every((lesson) => lesson.completed),
@@ -101,6 +130,19 @@ export function useOpenFinalTest() {
 
   return useMutation({
     mutationFn: async (level: string) => open({ data: { level } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lessons"] });
+    },
+  });
+}
+
+/** Opens the integrated Final Test of one unit, writing it the first time. */
+export function useOpenUnitTest() {
+  const open = useServerFn(openUnitTest);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { level: string; unit: number }) => open({ data: input }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["lessons"] });
     },

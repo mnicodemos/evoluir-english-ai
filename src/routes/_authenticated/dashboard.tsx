@@ -24,6 +24,7 @@ import { PathProgressCard } from "@/components/LearningPathCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
+import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { getLevelState } from "@/lib/level";
@@ -91,6 +92,7 @@ function Dashboard() {
   const { data: profile, isLoading } = useProfile();
   const navigate = useNavigate();
   const { data: snapshot } = useStudySnapshot();
+  const indicators = useActivityIndicators();
   const streakDays = profile ? effectiveStreak(profile) : 0;
 
   useEffect(() => {
@@ -220,22 +222,39 @@ function Dashboard() {
             <section className="min-w-0 xl:flex xl:flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_7rem_7rem]">
-                {trainingCards.map((c) => (
-                  <Link
-                    key={`link-${c.to}`}
-                    to={c.to}
-                    className={`card-soft group flex min-h-20 items-center gap-4 p-4 transition-shadow hover:shadow-[var(--shadow-lift)] ${c.className ?? ""}`}
-                  >
-                    <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-                      <c.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-medium">{c.label}</span>
-                      <span className="block text-sm text-muted-foreground">{c.text}</span>
-                    </span>
-                    <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
-                  </Link>
-                ))}
+                {trainingCards.map((c) => {
+                  const hasNew = Boolean(
+                    (indicators as Record<string, boolean>)[c.to.replace("/", "")],
+                  );
+                  return (
+                    <Link
+                      key={`link-${c.to}`}
+                      to={c.to}
+                      className={`card-soft group relative flex min-h-20 items-center gap-4 p-4 transition-shadow hover:shadow-[var(--shadow-lift)] ${c.className ?? ""}`}
+                    >
+                      {hasNew && (
+                        <span className="absolute right-2 top-2 flex items-center gap-1">
+                          <span
+                            aria-hidden="true"
+                            className="size-2.5 rounded-full bg-[oklch(0.62_0.16_150)]"
+                          />
+                          <span className="sr-only">New activity available</span>
+                        </span>
+                      )}
+                      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
+                        <c.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium">{c.label}</span>
+                        <span className="block text-sm text-muted-foreground">
+                          {c.text}
+                          {hasNew ? " · New" : ""}
+                        </span>
+                      </span>
+                      <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  );
+                })}
               </div>
             </section>
 

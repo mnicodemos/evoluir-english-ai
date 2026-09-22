@@ -14,6 +14,7 @@ import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
+import { markVocabularyBatchSeen, vocabularySignature } from "@/lib/activityIndicators";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
 import { pronunciationScore, transcribeAudio } from "@/lib/transcribe";
@@ -127,6 +128,12 @@ function Vocabulary() {
   });
 
   const byWord = new Map((mine ?? []).map((m) => [m.word_id, m]));
+
+  // Opening this page consumes the batch, so the dashboard dot goes away.
+  useEffect(() => {
+    if (!profile) return;
+    markVocabularyBatchSeen(vocabularySignature(studyToday(), startedLessons ?? 0));
+  }, [profile, startedLessons]);
 
   async function markKnown(wordId: string) {
     if (!profile) return;

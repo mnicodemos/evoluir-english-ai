@@ -174,6 +174,47 @@ export function CurriculumPath() {
                 );
               })}
             </ul>
+            {(() => {
+              const test = path.unitTests.find((item) => item.unit === unit.unit);
+              if (!test) return null;
+              return (
+                <Button
+                  variant={test.passed ? "outline" : "default"}
+                  size="sm"
+                  className="mt-4 w-full"
+                  disabled={!test.unlocked}
+                  onClick={() =>
+                    navigate({ to: "/learning/unit-test", search: { unit: unit.unit } })
+                  }
+                >
+                  {test.unlocked ? (
+                    <>
+                      {test.passed ? (
+                        <CheckCircle2 className="size-4" />
+                      ) : (
+                        <Trophy className="size-4" />
+                      )}
+                      <span>
+                        {test.passed
+                          ? t("Unit test passed")
+                          : lang === "pt"
+                            ? "Teste Final da Unidade"
+                            : "Unit Final Test"}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="size-4" />
+                      <span>
+                        {lang === "pt"
+                          ? "Conclua as 6 lições para liberar"
+                          : "Finish the 6 lessons to unlock"}
+                      </span>
+                    </>
+                  )}
+                </Button>
+              );
+            })()}
           </section>
         ))}
       </div>
