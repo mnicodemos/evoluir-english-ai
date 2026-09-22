@@ -149,7 +149,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10">
+        <main className="w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10">
           {showBackButton && (
             <Link
               to="/dashboard"
@@ -163,7 +163,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         </main>
 
         <div className="mb-0">
-          <Footer lang={lang} containerClassName="max-w-[1440px] px-4 sm:px-6 lg:px-8 xl:px-10" />
+          <Footer lang={lang} containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10" />
         </div>
 
         <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 place-items-center border-t border-border bg-background/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur sm:grid-cols-10 lg:hidden">
