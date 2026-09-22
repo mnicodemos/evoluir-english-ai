@@ -11,6 +11,8 @@ import {
   NEXT_STEP_SKILL_TEXT,
 } from "@/lib/pedagogy/nextStep";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
+import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
+
 import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -132,7 +134,38 @@ export function NextStepCard() {
                   {data.activity.title ? `: ${data.activity.title}` : ""}
                 </span>
               </p>
+
+              {data.quest ? (
+                <div className="mt-5 border-t border-border pt-4">
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">
+                    {t("Next challenge")}
+                  </p>
+                  <p className="mt-1 font-medium">
+                    {t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)}
+                  </p>
+                  <p className="mt-1 text-sm">{t(SKILL_QUEST_ACTION_TEXT[data.quest.action])}</p>
+                  {data.quest.resource.params ? (
+                    <Link
+                      to="/learning/$lessonId"
+                      params={data.quest.resource.params}
+                      className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                    >
+                      {t("Practise now")}
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </Link>
+                  ) : (
+                    <Link
+                      to={data.quest.resource.to}
+                      className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                    >
+                      {t("Practise now")}
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </Link>
+                  )}
+                </div>
+              ) : null}
             </div>
+
           </div>
         </aside>
       </div>

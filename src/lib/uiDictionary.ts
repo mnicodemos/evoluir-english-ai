@@ -20,6 +20,17 @@ export const uiPt: Record<string, string> = {
   Focus: "Foco",
   "Your next step": "Seu próximo passo",
   "How to practise": "Como praticar",
+  "Next challenge": "Próximo desafio",
+  "Practise now": "Praticar agora",
+  "Do a first activity so we can measure this skill":
+    "Faça uma primeira atividade para medirmos esta habilidade",
+  "Do one more activity in this skill": "Faça mais uma atividade nesta habilidade",
+  "Take the next step in this skill": "Avance para o próximo passo nesta habilidade",
+  "Produce your own language in this skill": "Produza suas próprias frases nesta habilidade",
+  "Use this skill in a free conversation": "Use esta habilidade em uma conversa livre",
+  "Show this skill again to keep it solid":
+    "Mostre esta habilidade novamente para mantê-la firme",
+
   "Free practice": "Prática livre",
   "AI Learning Insight": "Insight de aprendizado com IA",
   "Why now?": "Por que agora?",
