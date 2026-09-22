@@ -24,6 +24,8 @@ import {
   pronunciationEvidence,
   speakingEvidence,
   speakingEvidenceDecision,
+  speakingTaskType,
+
 } from "@/lib/pedagogy/activityEvidence";
 import { toleratePedagogicalFailure as tolerateEvidence } from "@/lib/pedagogy/dualWrite";
 
