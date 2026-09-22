@@ -6,14 +6,20 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+import type { AssessmentEvidence, PedagogicalSkill } from "./contracts";
+import { deriveInvisibleGaps } from "./invisibleGaps";
 import {
   buildNextStep,
   lessonSkillToProfileSkill,
   type NextStep,
   type SkillSnapshot,
 } from "./nextStep";
+import { selectPrioritySkillQuest } from "./skillQuest";
 
 const RECENT_DAYS = 7;
+/** Existing evidence rows considered for the Skill Quest. Read-only. */
+const EVIDENCE_LIMIT = 400;
+
 
 export const loadNextStep = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
