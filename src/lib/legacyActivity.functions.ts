@@ -187,7 +187,7 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
       Math.max(...item.transcripts.map((text) => listeningAnswerScore(item.expected, text))),
     );
     const score = Math.round(itemScores.reduce((sum, value) => sum + value, 0) / itemScores.length);
-    return persist({
+    const saved = await persist({
       userId: context.userId,
       sourceType: "listening",
       operationKey: data.operationKey,
@@ -198,7 +198,24 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
       scores: { listening: score },
       result: { round: data.round, itemScores },
     });
+    // Phase 26: the same measured answers also feed the existing evidence
+    // pipeline. A pedagogical failure never breaks the finished activity.
+    await tolerateEvidence(async () =>
+      persistActivityEvidence({
+        userId: context.userId,
+        sourceType: "listening",
+        operationKey: data.operationKey,
+        rubricVersion: LISTENING_RUBRIC_VERSION,
+        evidence: listeningEvidence({
+          itemScores,
+          round: data.round,
+          itemCefr: await activityItemLevel(context.userId),
+        }),
+      }),
+    );
+    return saved;
   });
+
 
 export const persistPronunciationLegacy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
