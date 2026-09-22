@@ -138,7 +138,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       sampleWeight: Number(row.sample_weight),
       evaluatedBy: row.evaluated_by as AssessmentEvidence["evaluatedBy"],
       rubricVersion: row.rubric_version,
-      metadata: (row.metadata ?? {}) as AssessmentEvidence["metadata"],
+      metadata: (row.metadata ?? {}) as NonNullable<AssessmentEvidence["metadata"]>,
       createdAt: row.created_at,
     }));
 
