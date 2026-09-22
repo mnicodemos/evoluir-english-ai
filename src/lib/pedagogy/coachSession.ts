@@ -238,7 +238,43 @@ export function coachPlan(
   };
 }
 
+/** Rubric of the coach session evidence. Reuses the teacher evidence model. */
+export const COACH_RUBRIC_VERSION = "coach-session-v1";
+
+/** Minimum real production for a coach turn to sustain evidence. */
+export const COACH_EVIDENCE_MIN_PRODUCTION = 0.34;
+export const COACH_EVIDENCE_MIN_WORDS = 8;
+
+/**
+ * Round of the coach session (1-based). Evidence is keyed by round, never by
+ * message, so a retry inside the same round refines the session instead of
+ * adding a second, duplicated piece of evidence.
+ */
+export function coachEvidenceRound(studentTurns: number): number {
+  return Math.max(1, Math.ceil(Math.max(Math.trunc(studentTurns) - 1, 1) / 3));
+}
+
+/**
+ * Deterministic gate for coach evidence: only a turn where the student really
+ * produced English inside the session can be evidence. Opening the session,
+ * asking for a session and short reactions never count as demonstrated skill.
+ */
+export function coachEvidenceDecision(input: {
+  stage: CoachStage;
+  studentMessage: string;
+}): { assess: true } | { assess: false; reason: string } {
+  if (input.stage === "START") return { assess: false, reason: "session_start" };
+  const text = (input.studentMessage ?? "").trim();
+  const words = text.split(/\s+/).filter(Boolean).length;
+  if (words < COACH_EVIDENCE_MIN_WORDS) return { assess: false, reason: "too_short" };
+  if (productionSignal(text) < COACH_EVIDENCE_MIN_PRODUCTION) {
+    return { assess: false, reason: "insufficient_production" };
+  }
+  return { assess: true };
+}
+
 /** Prompt block appended for coach mode only. Factual, server-owned data. */
+
 export function coachBlock(plan: CoachPlan): string {
   const { focus, stage, tier, turns, plannedTurns, scenario } = plan;
   return [
