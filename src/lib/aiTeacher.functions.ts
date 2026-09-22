@@ -17,16 +17,20 @@ import {
   coachEvidenceDecision,
   coachEvidenceRound,
   coachPlan,
+  coachTaskType,
   COACH_RUBRIC_VERSION,
   type CoachStage,
 } from "@/lib/pedagogy/coachSession";
 
 
+
 import {
   teacherEvidence,
   teacherEvidenceDecision,
+  teacherTaskType,
   TEACHER_RUBRIC_VERSION,
 } from "@/lib/pedagogy/teacherEvidence";
+
 import { parseTeacherTurn, teacherTurnMessages } from "@/lib/pedagogy/teacherPrompt";
 
 const historyMessageSchema = z.object({
