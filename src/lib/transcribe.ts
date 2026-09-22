@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pronunciationSimilarity } from "@/lib/legacyScores";
 
 /** Sends a recorded WAV blob to the transcription endpoint and returns the recognized English text. */
-export async function transcribeAudio(audio: Blob): Promise<string> {
+export async function transcribeAudio(audio: Blob, signal?: AbortSignal): Promise<string> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   if (!token) throw new Error("Please sign in again to use the microphone.");
@@ -13,7 +13,9 @@ export async function transcribeAudio(audio: Blob): Promise<string> {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: form,
+    ...(signal ? { signal } : {}),
   });
+
   if (!response.ok || !response.body) {
     const body = (await response.json().catch(() => null)) as { message?: string } | null;
     throw new Error(body?.message ?? `Transcription failed (${response.status}).`);
