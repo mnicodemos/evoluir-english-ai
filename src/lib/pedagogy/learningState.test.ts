@@ -138,10 +138,16 @@ describe("deriveLearningState", () => {
         .filter((piece) => piece.skill === "speaking")
         .map((piece) => ({ ...piece, sourceItemId: item, createdAt: day }));
     const sameDay = [...speak("2026-09-01T10:00:00Z", "a"), ...speak("2026-09-01T11:00:00Z", "b")];
-    expect(deriveLearningState(sameDay).state).not.toBe("MAINTENANCE");
+    const sameSession = deriveLearningState(sameDay);
+    expect(sameSession.maintenance).toBe(false);
+    expect(sameSession.state).toBe("PRODUCTION");
     const spaced = [...speak("2026-09-01T10:00:00Z", "a"), ...speak("2026-09-20T10:00:00Z", "b")];
-    expect(deriveLearningState(spaced).state).toBe("MAINTENANCE");
+    const result = deriveLearningState(spaced);
+    // Maintenance is durability of the stage, so the stage itself is preserved.
+    expect(result.state).toBe("PRODUCTION");
+    expect(result.maintenance).toBe(true);
   });
+
 
   it("counts a duplicated result once", () => {
     const one = evidence({ id: "11111111-1111-4111-8111-111111111111" });
