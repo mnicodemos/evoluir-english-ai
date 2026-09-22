@@ -35,7 +35,7 @@ import {
 const retryInputSchema = z.object({ limit: z.number().int().min(1).max(5).default(3) }).strict();
 
 type AdminClient = SupabaseClient<Database>;
-type SourceType = "quiz" | "writing" | "teacher";
+type SourceType = "quiz" | "writing" | "teacher" | "listening" | "speaking" | "pronunciation";
 type FailureStage =
   | "source"
   | "authorization"
