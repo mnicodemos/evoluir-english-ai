@@ -12,6 +12,21 @@ import {
   telemetryInputSchema,
 } from "@/lib/legacyActivity.schemas";
 import { listeningAnswerScore, pronunciationSimilarity } from "@/lib/legacyScores";
+import {
+  activityItemLevel,
+  persistActivityEvidence,
+} from "@/lib/pedagogy/dualWrite.functions";
+import {
+  LISTENING_RUBRIC_VERSION,
+  PRONUNCIATION_RUBRIC_VERSION,
+  SPEAKING_RUBRIC_VERSION,
+  listeningEvidence,
+  pronunciationEvidence,
+  speakingEvidence,
+  speakingEvidenceDecision,
+} from "@/lib/pedagogy/activityEvidence";
+import { toleratePedagogicalFailure as tolerateEvidence } from "@/lib/pedagogy/dualWrite";
+
 
 async function deterministicUuid(value: string): Promise<string> {
   const bytes = new Uint8Array(
@@ -187,7 +202,7 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
       Math.max(...item.transcripts.map((text) => listeningAnswerScore(item.expected, text))),
     );
     const score = Math.round(itemScores.reduce((sum, value) => sum + value, 0) / itemScores.length);
-    return persist({
+    const saved = await persist({
       userId: context.userId,
       sourceType: "listening",
       operationKey: data.operationKey,
@@ -198,7 +213,24 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
       scores: { listening: score },
       result: { round: data.round, itemScores },
     });
+    // Phase 26: the same measured answers also feed the existing evidence
+    // pipeline. A pedagogical failure never breaks the finished activity.
+    await tolerateEvidence(async () =>
+      persistActivityEvidence({
+        userId: context.userId,
+        sourceType: "listening",
+        operationKey: data.operationKey,
+        rubricVersion: LISTENING_RUBRIC_VERSION,
+        evidence: listeningEvidence({
+          itemScores,
+          round: data.round,
+          itemCefr: await activityItemLevel(context.userId),
+        }),
+      }),
+    );
+    return saved;
   });
+
 
 export const persistPronunciationLegacy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -224,7 +256,24 @@ export const persistPronunciationLegacy = createServerFn({ method: "POST" })
       scores: { reading: score },
       result: { transcript: data.transcript },
     });
+    // Phase 26: a recorded attempt is a real pronunciation result; simply seeing
+    // the word never becomes evidence (empty transcript -> no evidence).
+    await tolerateEvidence(async () =>
+      persistActivityEvidence({
+        userId: context.userId,
+        sourceType: "pronunciation",
+        operationKey: data.operationKey,
+        rubricVersion: PRONUNCIATION_RUBRIC_VERSION,
+        evidence: pronunciationEvidence({
+          wordId: word.id,
+          transcript: data.transcript,
+          score,
+          itemCefr: await activityItemLevel(context.userId),
+        }),
+      }),
+    );
     return { score, saved };
+
   });
 
 export const finishTalkingLegacy = createServerFn({ method: "POST" })
@@ -265,6 +314,25 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
       scores: { speaking: report.fluency },
       result: report,
     });
+    // Phase 26: the speaking report the session already produced becomes
+    // evidence, but only when the student really spoke in this conversation.
+    const speakingGate = speakingEvidenceDecision({
+      studentMessages: data.messages
+        .filter((message) => message.role === "user")
+        .map((message) => message.content),
+    });
+    if (speakingGate.assess) {
+      await tolerateEvidence(async () =>
+        persistActivityEvidence({
+          userId: context.userId,
+          sourceType: "speaking",
+          operationKey: data.operationKey,
+          rubricVersion: SPEAKING_RUBRIC_VERSION,
+          evidence: speakingEvidence(report, await activityItemLevel(context.userId)),
+        }),
+      );
+    }
+
     if (report.common_errors.length) {
       const { data: current } = await admin
         .from("learning_profile")
