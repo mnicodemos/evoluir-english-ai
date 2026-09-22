@@ -316,11 +316,10 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
     });
     // Phase 26: the speaking report the session already produced becomes
     // evidence, but only when the student really spoke in this conversation.
-    const speakingGate = speakingEvidenceDecision({
-      studentMessages: data.messages
-        .filter((message) => message.role === "user")
-        .map((message) => message.content),
-    });
+    const studentMessages = data.messages
+      .filter((message) => message.role === "user")
+      .map((message) => message.content);
+    const speakingGate = speakingEvidenceDecision({ studentMessages });
     if (speakingGate.assess) {
       await tolerateEvidence(async () =>
         persistActivityEvidence({
@@ -328,10 +327,17 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
           sourceType: "speaking",
           operationKey: data.operationKey,
           rubricVersion: SPEAKING_RUBRIC_VERSION,
-          evidence: speakingEvidence(report, await activityItemLevel(context.userId)),
+          evidence: speakingEvidence(
+            report,
+            await activityItemLevel(context.userId),
+            // Phase 27B: labels the session as guided production or spontaneous
+            // use from the student's own turns. Score and report are untouched.
+            speakingTaskType(studentMessages),
+          ),
         }),
       );
     }
+
 
     if (report.common_errors.length) {
       const { data: current } = await admin
