@@ -29,11 +29,26 @@ export type NextStepAction =
   | "talk_to_teacher";
 
 export type NextStepActivity = {
-  type: "lesson" | "listening" | "writing" | "speaking" | "vocabulary" | "teacher";
+  type: "lesson" | "learning" | "listening" | "writing" | "speaking" | "vocabulary" | "teacher";
   title: string;
   /** Existing app route. Never invented. */
   to: string;
   params?: { lessonId: string };
+};
+
+export type NextStepQuickWinStep = {
+  label: string;
+  text: string;
+};
+
+export type NextStepQuickWin = {
+  /** Same focus selected by the existing next-step priority. */
+  skill: string;
+  title: string;
+  steps: readonly [NextStepQuickWinStep, NextStepQuickWinStep, NextStepQuickWinStep];
+  cta: string;
+  /** Existing app surface opened by the shortcut. */
+  activity: NextStepActivity;
 };
 
 /**
@@ -52,6 +67,8 @@ export type NextStep = {
   reason: NextStepReason;
   action: NextStepAction;
   activity: NextStepActivity;
+  /** Compact presentation shortcut derived from the same priority skill. */
+  quickWin?: NextStepQuickWin | null;
   /**
    * Phase 29: priority Skill Quest, derived server-side from the existing
    * Invisible Gaps. Absent when no valid gap has an executable activity.
@@ -123,6 +140,102 @@ const TEACHER_FALLBACK: { action: NextStepAction; activity: NextStepActivity } =
   activity: { type: "teacher", title: "AI Teacher", to: "/teacher" },
 };
 
+const LEARNING_CENTER: NextStepActivity = {
+  type: "learning",
+  title: "Learning Center",
+  to: "/learning",
+};
+
+const QUICK_WIN_COPY: Record<
+  string,
+  Omit<NextStepQuickWin, "skill" | "activity">
+> = {
+  vocabulary: {
+    title: "Strengthen your vocabulary",
+    cta: "Practice vocabulary",
+    steps: [
+      { label: "Review", text: "5 words you recently missed" },
+      { label: "Use", text: "Create 2 sentences with them" },
+      { label: "Recall", text: "Try to remember them without looking" },
+    ],
+  },
+  grammar: {
+    title: "Strengthen your grammar",
+    cta: "Practice grammar",
+    steps: [
+      { label: "Notice", text: "Review the structure in context" },
+      { label: "Build", text: "Create 3 short sentences" },
+      { label: "Check", text: "Read them aloud once" },
+    ],
+  },
+  writing: {
+    title: "Strengthen your writing",
+    cta: "Practice writing",
+    steps: [
+      { label: "Plan it", text: "Choose one simple idea" },
+      { label: "Write", text: "Produce a short paragraph" },
+      { label: "Improve", text: "Review the correction carefully" },
+    ],
+  },
+  speaking: {
+    title: "Strengthen your speaking",
+    cta: "Practice speaking",
+    steps: [
+      { label: "Prepare", text: "Think of one short answer" },
+      { label: "Speak", text: "Record it naturally" },
+      { label: "Adjust", text: "Use the feedback in a new attempt" },
+    ],
+  },
+  pronunciation: {
+    title: "Strengthen your pronunciation",
+    cta: "Practice speaking",
+    steps: [
+      { label: "Listen first", text: "Focus on the target sounds" },
+      { label: "Repeat", text: "Say the sentence naturally" },
+      { label: "Record", text: "Check your pronunciation once" },
+    ],
+  },
+  listening: {
+    title: "Strengthen your listening",
+    cta: "Practice listening",
+    steps: [
+      { label: "Listen first", text: "Catch the main idea first" },
+      { label: "Answer", text: "Respond without replaying too much" },
+      { label: "Confirm", text: "Check the words you missed" },
+    ],
+  },
+  reading: {
+    title: "Strengthen your reading",
+    cta: "Practice reading",
+    steps: [
+      { label: "Skim", text: "Find the main idea quickly" },
+      { label: "Scan", text: "Look for two key details" },
+      { label: "Explain", text: "Summarise it in one sentence" },
+    ],
+  },
+};
+
+function quickWinActivity(skill: string, selectedActivity: NextStepActivity): NextStepActivity | null {
+  if (skill === "vocabulary") return FALLBACK_BY_SKILL["vocabulary"]?.activity ?? null;
+  if (skill === "listening") return FALLBACK_BY_SKILL["listening"]?.activity ?? null;
+  if (skill === "writing") return FALLBACK_BY_SKILL["writing"]?.activity ?? null;
+  if (skill === "speaking" || skill === "pronunciation") return FALLBACK_BY_SKILL["speaking"]?.activity ?? null;
+  if (skill === "grammar") return selectedActivity.type === "lesson" ? selectedActivity : TEACHER_FALLBACK.activity;
+  if (skill === "reading") return selectedActivity.type === "lesson" ? selectedActivity : LEARNING_CENTER;
+  return null;
+}
+
+export function buildQuickWin(
+  prioritySkill: string | null,
+  selectedActivity: NextStepActivity,
+): NextStepQuickWin | null {
+  if (!prioritySkill) return null;
+  const copy = QUICK_WIN_COPY[prioritySkill];
+  const activity = quickWinActivity(prioritySkill, selectedActivity);
+  if (!copy || !activity) return null;
+  return { skill: prioritySkill, ...copy, activity };
+}
+
 /** True when a recurring error text mentions the skill. Simple and explainable. */
 function skillHasRecentError(skill: string, errors: string[]): boolean {
   return errors.some((error) => error.toLowerCase().includes(skill.toLowerCase()));
@@ -163,6 +276,7 @@ export function buildNextStep(input: NextStepInput): NextStep {
       reason: "no_data",
       action: TEACHER_FALLBACK.action,
       activity: TEACHER_FALLBACK.activity,
+      quickWin: null,
     };
   }
 
@@ -217,17 +331,19 @@ export function buildNextStep(input: NextStepInput): NextStep {
   };
   const lesson = input.lessonBySkill[best.skill.skill];
   if (lesson) {
+    const activity: NextStepActivity = {
+      type: "lesson",
+      title: lesson.title,
+      to: "/learning/$lessonId",
+      params: { lessonId: lesson.id },
+    };
     return {
       prioritySkill: best.skill.skill,
       reason: best.reason,
       action: "review_lesson",
       insight,
-      activity: {
-        type: "lesson",
-        title: lesson.title,
-        to: "/learning/$lessonId",
-        params: { lessonId: lesson.id },
-      },
+      activity,
+      quickWin: buildQuickWin(best.skill.skill, activity),
     };
   }
   const fallback = FALLBACK_BY_SKILL[best.skill.skill] ?? TEACHER_FALLBACK;
@@ -237,6 +353,7 @@ export function buildNextStep(input: NextStepInput): NextStep {
     action: fallback.action,
     insight,
     activity: fallback.activity,
+    quickWin: buildQuickWin(best.skill.skill, fallback.activity),
   };
 }
 

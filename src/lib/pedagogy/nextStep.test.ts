@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildQuickWin,
   buildNextStep,
   lessonSkillToProfileSkill,
   NEXT_STEP_REASON_TEXT,
@@ -187,6 +188,74 @@ describe("next step content", () => {
     );
     // grammar and reading have no dedicated surface: the teacher is the real fallback.
     expect(buildNextStep({ ...base, skills: [skill("grammar", 30)] }).activity.to).toBe("/teacher");
+  });
+});
+
+describe("quick win", () => {
+  it("uses vocabulary focus without keeping vocabulary fixed for every student", () => {
+    const step = buildNextStep({ ...base, skills: [skill("vocabulary", 30)] });
+    expect(step.quickWin).toMatchObject({
+      skill: "vocabulary",
+      title: "Strengthen your vocabulary",
+      cta: "Practice vocabulary",
+      activity: { to: "/vocabulary" },
+    });
+  });
+
+  it("changes the shortcut for grammar, speaking, writing, listening and reading", () => {
+    expect(buildNextStep({ ...base, skills: [skill("grammar", 30)] }).quickWin).toMatchObject({
+      skill: "grammar",
+      cta: "Practice grammar",
+      activity: { to: "/teacher" },
+    });
+    expect(buildNextStep({ ...base, skills: [skill("speaking", 30)] }).quickWin).toMatchObject({
+      skill: "speaking",
+      cta: "Practice speaking",
+      activity: { to: "/coach" },
+    });
+    expect(buildNextStep({ ...base, skills: [skill("writing", 30)] }).quickWin).toMatchObject({
+      skill: "writing",
+      cta: "Practice writing",
+      activity: { to: "/writing" },
+    });
+    expect(buildNextStep({ ...base, skills: [skill("listening", 30)] }).quickWin).toMatchObject({
+      skill: "listening",
+      cta: "Practice listening",
+      activity: { to: "/listening" },
+    });
+    expect(buildNextStep({ ...base, skills: [skill("reading", 30)] }).quickWin).toMatchObject({
+      skill: "reading",
+      cta: "Practice reading",
+      activity: { to: "/learning" },
+    });
+  });
+
+  it("uses an existing lesson for grammar and reading when one is already selected", () => {
+    const grammar = buildNextStep({
+      ...base,
+      skills: [skill("grammar", 30)],
+      lessonBySkill: { grammar: { id: "lesson-grammar", title: "Past habits" } },
+    });
+    const reading = buildNextStep({
+      ...base,
+      skills: [skill("reading", 30)],
+      lessonBySkill: { reading: { id: "lesson-reading", title: "A work email" } },
+    });
+    expect(grammar.quickWin?.activity).toMatchObject({
+      to: "/learning/$lessonId",
+      params: { lessonId: "lesson-grammar" },
+    });
+    expect(reading.quickWin?.activity).toMatchObject({
+      to: "/learning/$lessonId",
+      params: { lessonId: "lesson-reading" },
+    });
+  });
+
+  it("returns no quick win when there is no suitable micropractice", () => {
+    expect(buildNextStep(base).quickWin).toBeNull();
+    expect(
+      buildQuickWin("unknown-skill", { type: "teacher", title: "AI Teacher", to: "/teacher" }),
+    ).toBeNull();
   });
 });
 
