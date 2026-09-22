@@ -255,6 +255,16 @@ export function coachEvidenceRound(studentTurns: number): number {
 }
 
 /**
+ * Task type of a coach turn, from the stage the session is already in. RETRY is
+ * where the session asks an open follow-up the student answers on their own, so
+ * it reads as spontaneous use; every other stage is guided production.
+ */
+export function coachTaskType(stage: CoachStage): TeacherTaskType {
+  return stage === "RETRY" ? "spontaneous_use" : "production";
+}
+
+
+/**
  * Deterministic gate for coach evidence: only a turn where the student really
  * produced English inside the session can be evidence. Opening the session,
  * asking for a session and short reactions never count as demonstrated skill.
