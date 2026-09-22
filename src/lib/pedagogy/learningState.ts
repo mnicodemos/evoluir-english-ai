@@ -110,21 +110,44 @@ function truthy(value: unknown) {
   return value === true || value === "true";
 }
 
+type Stage = (typeof LEARNING_STATES)[number];
+
 /**
- * The highest stage a single result can possibly demonstrate, by where it came
- * from — never by how high the score is.
+ * Task types the evidence metadata may declare explicitly. Anything else (or
+ * nothing at all, as in older evidence) falls back to the source rules below.
  */
-export function evidenceStage(
-  evidence: AssessmentEvidence,
-  config: LearningStateConfig = INITIAL_LEARNING_STATE_CONFIG,
-): (typeof LEARNING_STATES)[number] {
+const TASK_TYPE_STAGE: Record<string, Stage> = {
+  recognition: "RECOGNITION",
+  application: "APPLICATION",
+  production: "PRODUCTION",
+  spontaneous_use: "SPONTANEOUS_USE",
+};
+
+/**
+ * Highest stage each source of evidence can demonstrate at all. Metadata may
+ * refine a stage inside this limit, never above it: a comprehension item never
+ * becomes production because a producer labelled it so.
+ */
+const SOURCE_CEILING: Record<AssessmentEvidence["sourceType"], Stage> = {
+  quiz: "APPLICATION",
+  listening: "RECOGNITION",
+  reading: "RECOGNITION",
+  vocabulary: "RECOGNITION",
+  placement: "RECOGNITION",
+  writing: "PRODUCTION",
+  pronunciation: "PRODUCTION",
+  final_test: "PRODUCTION",
+  speaking: "SPONTANEOUS_USE",
+  teacher: "SPONTANEOUS_USE",
+};
+
+/** Behaviour for evidence that carries no explicit task type (Phase 27A). */
+function sourceStage(evidence: AssessmentEvidence, config: LearningStateConfig): Stage {
   const meta = evidence.metadata ?? {};
   switch (evidence.sourceType) {
     case "quiz":
       // Applying a structure only counts when the item itself says so.
-      return truthy(meta["application"]) || meta["taskType"] === "application"
-        ? "APPLICATION"
-        : "RECOGNITION";
+      return truthy(meta["application"]) ? "APPLICATION" : "RECOGNITION";
     case "listening":
     case "reading":
     case "vocabulary":
@@ -132,23 +155,38 @@ export function evidenceStage(
       // Comprehension and recall of given items: recognition, never production.
       return "RECOGNITION";
     case "writing":
-      return truthy(meta["freeProduction"]) || meta["taskType"] === "production"
-        ? "PRODUCTION"
-        : "APPLICATION";
+      return truthy(meta["freeProduction"]) ? "PRODUCTION" : "APPLICATION";
     case "pronunciation":
       // Guaranteed upstream to exist only for a real recorded attempt.
       return "PRODUCTION";
     case "speaking":
     case "teacher":
+      return evidence.rawScore >= config.spontaneousScore ? "SPONTANEOUS_USE" : "PRODUCTION";
     case "final_test":
-      return evidence.rawScore >= config.spontaneousScore &&
-        (evidence.sourceType === "speaking" || evidence.sourceType === "teacher")
-        ? "SPONTANEOUS_USE"
-        : "PRODUCTION";
+      return "PRODUCTION";
     default:
       return "EXPOSURE";
   }
 }
+
+/**
+ * The highest stage a single result can possibly demonstrate: the task type the
+ * evidence declares, capped by what its source can demonstrate — never by how
+ * high the score is. Evidence without a declared task type keeps the previous
+ * source-based reading, so existing rows are unaffected.
+ */
+export function evidenceStage(
+  evidence: AssessmentEvidence,
+  config: LearningStateConfig = INITIAL_LEARNING_STATE_CONFIG,
+): Stage {
+  const declaredRaw = evidence.metadata?.["taskType"];
+  const declared =
+    typeof declaredRaw === "string" ? TASK_TYPE_STAGE[declaredRaw.trim().toLowerCase()] : undefined;
+  const ceiling = SOURCE_CEILING[evidence.sourceType] ?? "EXPOSURE";
+  if (!declared) return sourceStage(evidence, config);
+  return STAGE_RANK[declared] <= STAGE_RANK[ceiling] ? declared : ceiling;
+}
+
 
 function dayKey(value: string | null | undefined) {
   if (!value) return null;
