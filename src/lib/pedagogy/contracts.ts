@@ -73,6 +73,8 @@ export type AssessmentEvidence = {
   modelVersion?: string | null;
   rubricVersion: string;
   metadata?: Record<string, string | number | boolean | null>;
+  /** Existing assessment_evidence.created_at, when the row was read back. */
+  createdAt?: string | null;
 };
 
 export type SkillAssessmentResult = {

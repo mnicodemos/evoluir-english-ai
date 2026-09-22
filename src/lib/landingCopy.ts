@@ -72,7 +72,8 @@ export const landingCopy = {
     goPremium: "Go Premium",
     footer: {
       connectionLinks: ["About the project", "Frequently asked questions", "Contact & Partnerships"],
-      tagline: "Tomorrow's transformation starts now and depends only on you.",
+      tagline: "Seu inglês não segue um curso. Ele evolui com você.",
+      taglineLine2: "Aprenda. Pratique. Produza. Evolua.",
       newsletterTitle: "MORE INFORMATION",
       newsletterText: "Get more information about the course and the methodology we apply.",
       emailPlaceholder: "your@email.com",
@@ -153,7 +154,8 @@ export const landingCopy = {
     goPremium: "Quero o Premium",
     footer: {
       connectionLinks: ["Sobre o Projeto", "Perguntas Frequentes", "Contato & Parcerias"],
-      tagline: "A transformação do amanhã começa agora e só depende de você.",
+      tagline: "Seu inglês não segue um curso. Ele evolui com você.",
+      taglineLine2: "Aprenda. Pratique. Produza. Evolua.",
       newsletterTitle: "MAIS INFORMAÇÕES",
       newsletterText: "Receba mais informações sobre o curso e a metodologia que aplicamos.",
       emailPlaceholder: "seu@email.com",
