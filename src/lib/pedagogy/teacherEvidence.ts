@@ -55,11 +55,15 @@ export function teacherEvidence(input: {
   turnId: string;
   /** CEFR level of the interaction, resolved server-side from the profile. */
   itemCefr?: MeasuredCefrLevel | null;
+  /** Coach sessions reuse this model with their own subskill/rubric label. */
+  subskill?: string;
+  rubricVersion?: string;
 }): AssessmentEvidence[] {
+  const subskill = input.subskill ?? "teacher_interaction";
   return [
     {
       skill: input.skill,
-      subskill: "teacher_interaction",
+      subskill,
       sourceType: "teacher",
       sourceItemId: input.turnId,
       evidenceType: "subscore",
@@ -73,8 +77,9 @@ export function teacherEvidence(input: {
       sampleWeight: 0.5,
       evaluatedBy: "gemini",
       modelVersion: TEACHER_MODEL_VERSION,
-      rubricVersion: TEACHER_RUBRIC_VERSION,
-      metadata: { criterion: "teacher_interaction" },
+      rubricVersion: input.rubricVersion ?? TEACHER_RUBRIC_VERSION,
+      metadata: { criterion: subskill },
     },
   ];
 }
+
