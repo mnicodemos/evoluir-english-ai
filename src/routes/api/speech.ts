@@ -136,6 +136,17 @@ export const Route = createFileRoute("/api/speech")({
         const encoder = new TextEncoder();
         let pending = "";
         let sentAudio = false;
+        let settled = false;
+        // Closing the usage record exactly once keeps the "one request at a
+        // time" guard from staying locked when the listener stops the audio.
+        const settle = async (success: boolean, errorCode?: string, errorMessage?: string) => {
+          if (settled) return;
+          settled = true;
+          await finishAiUsage(ticket, {
+            success,
+            ...(errorCode ? { errorCode, errorMessage } : {}),
+          });
+        };
         const stream = upstream.body.pipeThrough(
           new TransformStream<Uint8Array, Uint8Array>({
             transform(chunk, controller) {
@@ -182,18 +193,20 @@ export const Route = createFileRoute("/api/speech")({
                   )}\n\n`,
                 ),
               );
-              await finishAiUsage(ticket, {
-                success: sentAudio,
-                ...(sentAudio
-                  ? {}
-                  : {
-                      errorCode: "empty_audio",
-                      errorMessage: "The audio service returned no sound.",
-                    }),
-              });
+              await settle(
+                sentAudio,
+                sentAudio ? undefined : "empty_audio",
+                sentAudio ? undefined : "The audio service returned no sound.",
+              );
+            },
+            async cancel() {
+              // The listener stopped the audio: end the attempt instead of
+              // leaving the record open.
+              await settle(sentAudio, sentAudio ? undefined : "cancelled", "Playback was stopped");
             },
           }),
         );
+
 
         return new Response(stream, {
           headers: {
