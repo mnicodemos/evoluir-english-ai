@@ -314,6 +314,25 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
       scores: { speaking: report.fluency },
       result: report,
     });
+    // Phase 26: the speaking report the session already produced becomes
+    // evidence, but only when the student really spoke in this conversation.
+    const speakingGate = speakingEvidenceDecision({
+      studentMessages: data.messages
+        .filter((message) => message.role === "user")
+        .map((message) => message.content),
+    });
+    if (speakingGate.assess) {
+      await tolerateEvidence(async () =>
+        persistActivityEvidence({
+          userId: context.userId,
+          sourceType: "speaking",
+          operationKey: data.operationKey,
+          rubricVersion: SPEAKING_RUBRIC_VERSION,
+          evidence: speakingEvidence(report, await activityItemLevel(context.userId)),
+        }),
+      );
+    }
+
     if (report.common_errors.length) {
       const { data: current } = await admin
         .from("learning_profile")
