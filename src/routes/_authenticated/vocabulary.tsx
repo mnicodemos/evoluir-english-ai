@@ -15,6 +15,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { markVocabularyBatchSeen, vocabularySignature } from "@/lib/activityIndicators";
+import { createAttemptGate } from "@/lib/attemptGate";
+
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
 import { pronunciationScore, transcribeAudio } from "@/lib/transcribe";
@@ -88,8 +90,12 @@ function Vocabulary() {
   const [recordingId, setRecordingId] = useState<string | null>(null);
   const [checkingId, setCheckingId] = useState<string | null>(null);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
+  // One pronunciation check at a time; every attempt ends and frees the button.
+  const pronunciationGate = useRef(createAttemptGate());
+  const pronunciationAbort = useRef<AbortController | null>(null);
   // Reading time only counts while the student is actually working on the words.
   const minutesSpent = useTimeSpent({ manual: true });
+
 
   const { data: words, isLoading } = useQuery({
     queryKey: ["vocabulary"],
