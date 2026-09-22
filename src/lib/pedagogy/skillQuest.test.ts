@@ -104,13 +104,15 @@ describe("skill quest (Phase 29)", () => {
   });
 
   it("returns no quest when no existing surface can address the gap", () => {
-    // Reading has no production surface today; nothing is invented.
+    // Reading has no dedicated surface today; nothing is invented.
     expect(deriveSkillQuest(gap({ skill: "reading" }))).toBeNull();
-    // Pronunciation cannot be demonstrated beyond production either.
     expect(
-      deriveSkillQuest(gap({ skill: "pronunciation", type: "SPONTANEOUS_USE_GAP", currentState: "PRODUCTION", expectedState: "SPONTANEOUS_USE", reason: "spontaneous_use_not_demonstrated", priority: 4 })),
+      deriveSkillQuest(
+        gap({ skill: "reading", type: "UNMEASURED", reason: "no_valid_evidence", priority: 0 }),
+      ),
     ).toBeNull();
   });
+
 
   it("keeps the existing pedagogical priority and picks the most urgent quest", () => {
     const gaps = [
