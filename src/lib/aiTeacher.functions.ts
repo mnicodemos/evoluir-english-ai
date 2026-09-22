@@ -191,10 +191,14 @@ export const teacherTurn = createServerFn({ method: "POST" })
           turnId,
           // Level of the interaction, taken from the server-owned context.
           itemCefr: itemLevelFromStoredLevel(pedagogicalContext.cefrLevel),
+          // What kind of task this turn was, from the mode/stage already derived
+          // server-side. It only labels the evidence; no score changes.
+          taskType: coach ? coachTaskType(coach.stage) : teacherTaskType(mode),
           ...(coach
             ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION }
             : {}),
         }),
+
       });
       evidencePersisted = result.ok && !result.duplicate;
     }
