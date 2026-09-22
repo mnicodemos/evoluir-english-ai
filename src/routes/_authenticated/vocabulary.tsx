@@ -304,8 +304,16 @@ function Vocabulary() {
   const profileRef = useRef(profile);
   profileRef.current = profile;
   useEffect(() => {
+    const gate = pronunciationGate.current;
+    const abortRef = pronunciationAbort;
     return () => {
+      // Leaving the page cancels an open check and releases the microphone.
+      abortRef.current?.abort();
+      abortRef.current = null;
+      gate.reset();
+      cancelVoiceRecording();
       minutesSpent.stop();
+
       const minutes = minutesSpent(0);
       const p = profileRef.current;
       if (minutes >= 1 && p) {
