@@ -70,8 +70,10 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     stage: string;
     turn: number;
     maxTurns: number;
+    scenario?: string;
     finished: boolean;
   } | null>(null);
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const session = useQuery({
@@ -207,6 +209,21 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
           )}
         </div>
       )}
+
+      {coachState && !coachState.finished && (
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
+          <p className="font-medium text-primary">{t("Training session")}</p>
+          {coachState.scenario && (
+            <p className="text-muted-foreground">
+              {t("Situation")}: {coachState.scenario}
+            </p>
+          )}
+          <p className="text-muted-foreground">
+            {t("Answer in English as you would in real life. I will adapt the challenge.")}
+          </p>
+        </div>
+      )}
+
 
       <Card className="flex h-[min(60dvh,38rem)] min-h-[20rem] flex-col overflow-hidden p-0 sm:h-[min(62dvh,42rem)] sm:min-h-[22.5rem]">
         <Conversation className="flex-1">

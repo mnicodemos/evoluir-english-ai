@@ -14,12 +14,10 @@ import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
 import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
 import {
   coachBlock,
-  coachFocus,
-  coachStage,
-  coachStudentTurns,
-  COACH_MAX_TURNS,
+  coachPlan,
   type CoachStage,
 } from "@/lib/pedagogy/coachSession";
+
 import {
   teacherEvidence,
   teacherEvidenceDecision,
@@ -70,16 +68,30 @@ export const teacherTurn = createServerFn({ method: "POST" })
       : classifyTeacherMode({ message: data.message, history: data.history });
 
     // Coach session state is derived server-side: stage from the conversation
-    // shape, focus from the existing next-step priority logic.
-    let coach: { stage: CoachStage; focusSkill: string | null; turns: number } | null = null;
+    // shape, focus from the existing next-step priority logic, difficulty tier
+    // from the student's own production. The client never sends any of this.
+    let coach: {
+      stage: CoachStage;
+      focusSkill: string | null;
+      turns: number;
+      plannedTurns: number;
+      scenario: string;
+      finished: boolean;
+    } | null = null;
     let coachPromptBlock: string | undefined;
     if (mode === "COACH") {
-      const turns = coachStudentTurns(data.history);
-      const stage = coachStage(turns);
-      const focus = coachFocus(pedagogicalContext);
-      coach = { stage, focusSkill: focus.skill, turns };
-      coachPromptBlock = coachBlock(focus, stage, turns);
+      const plan = coachPlan(pedagogicalContext, data.history, data.message);
+      coach = {
+        stage: plan.stage,
+        focusSkill: plan.focus.skill,
+        turns: plan.turns,
+        plannedTurns: plan.plannedTurns,
+        scenario: plan.scenario,
+        finished: plan.finished,
+      };
+      coachPromptBlock = coachBlock(plan);
     }
+
 
     const raw = await callGateway(
       teacherTurnMessages({
@@ -179,10 +191,12 @@ export const teacherTurn = createServerFn({ method: "POST" })
             stage: coach.stage,
             focusSkill: coach.focusSkill,
             turn: coach.turns,
-            maxTurns: COACH_MAX_TURNS,
-            finished: coach.stage === "SUMMARY",
+            maxTurns: coach.plannedTurns,
+            scenario: coach.scenario,
+            finished: coach.finished,
           }
         : null,
+
     };
   });
 
