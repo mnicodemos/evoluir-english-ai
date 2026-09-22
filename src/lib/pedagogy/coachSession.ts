@@ -11,7 +11,6 @@ import { levelRegister, type LevelRegister } from "./teacherMode";
 import type { TeacherTaskType } from "./teacherEvidence";
 import type { TeacherContextForPrompt } from "./teacherPrompt";
 
-
 export const COACH_STAGES = [
   "START",
   "CHALLENGE",
@@ -55,10 +54,7 @@ export function productionSignal(message: string): number {
  * of the focus skill (server data). Strong, sustained production unlocks a more
  * complex situation; weak production lowers the load and adds support.
  */
-export function coachTier(input: {
-  productions: string[];
-  focusScore?: number | null;
-}): CoachTier {
+export function coachTier(input: { productions: string[]; focusScore?: number | null }): CoachTier {
   const real = input.productions.filter((message) => message.trim().length > 0);
   if (real.length === 0) return "STANDARD";
   const signals = real.map(productionSignal);
@@ -264,7 +260,6 @@ export function coachEvidenceRound(studentTurns: number): number {
 export function coachTaskType(stage: CoachStage): TeacherTaskType {
   return stage === "RETRY" ? "spontaneous_use" : "production";
 }
-
 
 /**
  * Deterministic gate for coach evidence: only a turn where the student really

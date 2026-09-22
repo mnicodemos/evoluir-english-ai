@@ -61,7 +61,6 @@ export type LearningStateResult = {
   ruleVersion: string;
 };
 
-
 const STAGE_RANK: Record<(typeof LEARNING_STATES)[number], number> = {
   EXPOSURE: 0,
   RECOGNITION: 1,
@@ -187,7 +186,6 @@ export function evidenceStage(
   return STAGE_RANK[declared] <= STAGE_RANK[ceiling] ? declared : ceiling;
 }
 
-
 function dayKey(value: string | null | undefined) {
   if (!value) return null;
   const time = Date.parse(value);
@@ -255,8 +253,7 @@ export function deriveLearningState(
       ),
     ];
     maintenance =
-      days.length >= 2 &&
-      Math.max(...days) - Math.min(...days) >= config.maintenanceIntervalDays;
+      days.length >= 2 && Math.max(...days) - Math.min(...days) >= config.maintenanceIntervalDays;
   }
 
   return {
@@ -268,7 +265,6 @@ export function deriveLearningState(
     ruleVersion: LEARNING_STATE_RULE_VERSION,
   };
 }
-
 
 /** Learning state per skill, derived from a mixed evidence list. */
 export function deriveLearningStates(

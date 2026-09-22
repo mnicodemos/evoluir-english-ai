@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import { aggregateSkillEvidence } from "./aggregateSkill";
-import { listeningEvidence, pronunciationEvidence, speakingEvidence } from "./activityEvidence";
+import {
+  listeningEvidence,
+  pronunciationEvidence,
+  speakingEvidence,
+  speakingTaskType,
+} from "./activityEvidence";
+import { coachTaskType } from "./coachSession";
 import type { AssessmentEvidence } from "./contracts";
+import { teacherEvidence, teacherTaskType } from "./teacherEvidence";
 import {
   deriveLearningState,
   deriveLearningStates,
@@ -10,6 +17,7 @@ import {
   learningStateRank,
   LEARNING_STATE_RULE_VERSION,
 } from "./learningState";
+
 
 function evidence(overrides: Partial<AssessmentEvidence> = {}): AssessmentEvidence {
   return {

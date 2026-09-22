@@ -64,7 +64,6 @@ export function teacherTaskType(mode: string): TeacherTaskType {
   return mode === "CONVERSATION" ? "spontaneous_use" : "production";
 }
 
-
 export function teacherEvidence(input: {
   skill: TeacherEvidenceSkill;
   score: number;
@@ -102,5 +101,3 @@ export function teacherEvidence(input: {
     },
   ];
 }
-
-

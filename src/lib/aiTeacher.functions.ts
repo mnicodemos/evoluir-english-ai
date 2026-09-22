@@ -22,8 +22,6 @@ import {
   type CoachStage,
 } from "@/lib/pedagogy/coachSession";
 
-
-
 import {
   teacherEvidence,
   teacherEvidenceDecision,
@@ -99,7 +97,6 @@ export const teacherTurn = createServerFn({ method: "POST" })
       };
       coachPromptBlock = coachBlock(plan);
     }
-
 
     const raw = await callGateway(
       teacherTurnMessages({
@@ -194,15 +191,11 @@ export const teacherTurn = createServerFn({ method: "POST" })
           // What kind of task this turn was, from the mode/stage already derived
           // server-side. It only labels the evidence; no score changes.
           taskType: coach ? coachTaskType(coach.stage) : teacherTaskType(mode),
-          ...(coach
-            ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION }
-            : {}),
+          ...(coach ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION } : {}),
         }),
-
       });
       evidencePersisted = result.ok && !result.duplicate;
     }
-
 
     return {
       conversationId,
@@ -221,7 +214,6 @@ export const teacherTurn = createServerFn({ method: "POST" })
             finished: coach.finished,
           }
         : null,
-
     };
   });
 

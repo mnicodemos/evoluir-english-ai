@@ -12,10 +12,7 @@ import {
   telemetryInputSchema,
 } from "@/lib/legacyActivity.schemas";
 import { listeningAnswerScore, pronunciationSimilarity } from "@/lib/legacyScores";
-import {
-  activityItemLevel,
-  persistActivityEvidence,
-} from "@/lib/pedagogy/dualWrite.functions";
+import { activityItemLevel, persistActivityEvidence } from "@/lib/pedagogy/dualWrite.functions";
 import {
   LISTENING_RUBRIC_VERSION,
   PRONUNCIATION_RUBRIC_VERSION,
@@ -25,10 +22,8 @@ import {
   speakingEvidence,
   speakingEvidenceDecision,
   speakingTaskType,
-
 } from "@/lib/pedagogy/activityEvidence";
 import { toleratePedagogicalFailure as tolerateEvidence } from "@/lib/pedagogy/dualWrite";
-
 
 async function deterministicUuid(value: string): Promise<string> {
   const bytes = new Uint8Array(
@@ -233,7 +228,6 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
     return saved;
   });
 
-
 export const persistPronunciationLegacy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => pronunciationLegacyInputSchema.parse(input))
@@ -275,7 +269,6 @@ export const persistPronunciationLegacy = createServerFn({ method: "POST" })
       }),
     );
     return { score, saved };
-
   });
 
 export const finishTalkingLegacy = createServerFn({ method: "POST" })
@@ -339,7 +332,6 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
         }),
       );
     }
-
 
     if (report.common_errors.length) {
       const { data: current } = await admin

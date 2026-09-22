@@ -88,12 +88,15 @@ export function speakingEvidence(
   itemCefr?: MeasuredCefrLevel | null,
   taskType: SpeakingTaskType = "production",
 ): AssessmentEvidence[] {
-  const subscores: { skill: "speaking" | "grammar" | "vocabulary"; subskill: string; raw: number }[] =
-    [
-      { skill: "speaking", subskill: "fluency", raw: report.fluency },
-      { skill: "grammar", subskill: "speaking_grammar", raw: report.grammar },
-      { skill: "vocabulary", subskill: "speaking_vocabulary", raw: report.vocabulary },
-    ];
+  const subscores: {
+    skill: "speaking" | "grammar" | "vocabulary";
+    subskill: string;
+    raw: number;
+  }[] = [
+    { skill: "speaking", subskill: "fluency", raw: report.fluency },
+    { skill: "grammar", subskill: "speaking_grammar", raw: report.grammar },
+    { skill: "vocabulary", subskill: "speaking_vocabulary", raw: report.vocabulary },
+  ];
   return subscores
     .filter((item) => Number.isFinite(item.raw))
     .map((item) => ({
@@ -114,7 +117,6 @@ export function speakingEvidence(
       metadata: { criterion: item.subskill, taskType },
     }));
 }
-
 
 /**
  * Pronunciation evidence requires a real attempt: seeing or hearing a word is
