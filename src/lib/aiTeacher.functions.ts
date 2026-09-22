@@ -14,9 +14,13 @@ import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
 import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
 import {
   coachBlock,
+  coachEvidenceDecision,
+  coachEvidenceRound,
   coachPlan,
+  COACH_RUBRIC_VERSION,
   type CoachStage,
 } from "@/lib/pedagogy/coachSession";
+
 
 import {
   teacherEvidence,
