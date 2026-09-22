@@ -217,6 +217,7 @@ export function deriveLearningState(
       state: "INSUFFICIENT_EVIDENCE",
       evidenceCount: 0,
       sustainingCount: 0,
+      maintenance: false,
       ruleVersion: LEARNING_STATE_RULE_VERSION,
     };
   }
@@ -227,13 +228,11 @@ export function deriveLearningState(
     .filter((item) => item.rawScore >= config.sustainingScore)
     .map((item) => ({ stage: evidenceStage(item, config), evidence: item }));
 
-  let stage: (typeof LEARNING_STATES)[number] = "EXPOSURE";
+  let stage: Stage = "EXPOSURE";
   let sustainingCount = 0;
   for (const candidate of [...LEARNING_STATES].reverse()) {
     if (candidate === "MAINTENANCE") continue;
-    const matching = sustaining.filter(
-      (item) => STAGE_RANK[item.stage] >= STAGE_RANK[candidate],
-    );
+    const matching = sustaining.filter((item) => STAGE_RANK[item.stage] >= STAGE_RANK[candidate]);
     if (matching.length >= config.minimumEvidenceForStage) {
       stage = candidate;
       sustainingCount = matching.length;
@@ -241,28 +240,35 @@ export function deriveLearningState(
     }
   }
 
-  let state: LearningState = stage;
-  if (STAGE_RANK[stage] >= STAGE_RANK.APPLICATION) {
-    // Maintenance = still demonstrated after a real interval, from the
-    // timestamps evidence already carries. An immediate repeat does not count.
-    const days = sustaining
-      .filter((item) => STAGE_RANK[item.stage] >= STAGE_RANK[stage])
-      .map((item) => dayKey(item.evidence.createdAt))
-      .filter((day): day is number => day !== null);
-    if (days.length >= 2) {
-      const span = Math.max(...days) - Math.min(...days);
-      if (span >= config.maintenanceIntervalDays) state = "MAINTENANCE";
-    }
+  // Maintenance = the SAME stage still demonstrated after a real interval, read
+  // from the timestamps evidence already carries. It describes durability, so it
+  // is reported alongside the stage and never replaces it. Two results from the
+  // same day (one session) are not continuity.
+  let maintenance = false;
+  if (STAGE_RANK[stage] >= STAGE_RANK.RECOGNITION) {
+    const days = [
+      ...new Set(
+        sustaining
+          .filter((item) => STAGE_RANK[item.stage] >= STAGE_RANK[stage])
+          .map((item) => dayKey(item.evidence.createdAt))
+          .filter((day): day is number => day !== null),
+      ),
+    ];
+    maintenance =
+      days.length >= 2 &&
+      Math.max(...days) - Math.min(...days) >= config.maintenanceIntervalDays;
   }
 
   return {
     skill,
-    state,
+    state: stage,
     evidenceCount: valid.length,
     sustainingCount,
+    maintenance,
     ruleVersion: LEARNING_STATE_RULE_VERSION,
   };
 }
+
 
 /** Learning state per skill, derived from a mixed evidence list. */
 export function deriveLearningStates(
