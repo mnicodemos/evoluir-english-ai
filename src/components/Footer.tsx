@@ -93,6 +93,11 @@ export function Footer({
               <Logo className="size-8 shrink-0" />
               <span className="font-display text-lg font-semibold text-foreground dark:text-white">Evoluir+ English AI</span>
             </div>
+            <p className="max-w-[320px] text-sm font-semibold italic leading-snug text-foreground dark:text-white sm:max-w-none sm:text-base sm:leading-relaxed">
+              {t.tagline}
+              <br />
+              {t.taglineLine2}
+            </p>
             <TooltipProvider delayDuration={200}>
             <div className="flex items-center gap-3">
               {socialLinks.map((social) => (
@@ -122,10 +127,6 @@ export function Footer({
             </TooltipProvider>
           </div>
 
-          {/* Tagline */}
-          <p className="max-w-[320px] text-sm font-semibold italic leading-snug text-foreground dark:text-white sm:max-w-none sm:text-lg sm:leading-relaxed">
-            “{t.tagline}”
-          </p>
         </div>
       </div>
 
