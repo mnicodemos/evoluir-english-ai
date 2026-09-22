@@ -128,9 +128,8 @@ describe("invisible gaps (Phase 28)", () => {
     // Enough evidence for the existing aggregation, but nothing sustained: that
     // is a visible low score, not an invisible gap.
     const weak = pair("grammar", "quiz", null, { score: 30 });
-    const gap = gapFor("grammar", weak);
-    expect(gap?.type).not.toBe("PRODUCTION_GAP");
-    expect(gap?.type).toBe("INSUFFICIENT_EVIDENCE");
+    // No gap at all: the weak result is visible through the score itself.
+    expect(gapFor("grammar", weak)).toBeUndefined();
   });
 
   it("ignores invalid evidence instead of inventing a gap from it", () => {
