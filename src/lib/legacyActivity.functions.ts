@@ -256,7 +256,24 @@ export const persistPronunciationLegacy = createServerFn({ method: "POST" })
       scores: { reading: score },
       result: { transcript: data.transcript },
     });
+    // Phase 26: a recorded attempt is a real pronunciation result; simply seeing
+    // the word never becomes evidence (empty transcript -> no evidence).
+    await tolerateEvidence(async () =>
+      persistActivityEvidence({
+        userId: context.userId,
+        sourceType: "pronunciation",
+        operationKey: data.operationKey,
+        rubricVersion: PRONUNCIATION_RUBRIC_VERSION,
+        evidence: pronunciationEvidence({
+          wordId: word.id,
+          transcript: data.transcript,
+          score,
+          itemCefr: await activityItemLevel(context.userId),
+        }),
+      }),
+    );
     return { score, saved };
+
   });
 
 export const finishTalkingLegacy = createServerFn({ method: "POST" })
