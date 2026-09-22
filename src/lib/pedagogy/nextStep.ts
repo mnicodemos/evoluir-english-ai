@@ -172,7 +172,7 @@ const QUICK_WIN_COPY: Record<
     title: "Strengthen your writing",
     cta: "Practice writing",
     steps: [
-      { label: "Plan", text: "Choose one simple idea" },
+      { label: "Plan it", text: "Choose one simple idea" },
       { label: "Write", text: "Produce a short paragraph" },
       { label: "Improve", text: "Review the correction carefully" },
     ],
@@ -190,7 +190,7 @@ const QUICK_WIN_COPY: Record<
     title: "Strengthen your pronunciation",
     cta: "Practice speaking",
     steps: [
-      { label: "Listen", text: "Focus on the target sounds" },
+      { label: "Listen first", text: "Focus on the target sounds" },
       { label: "Repeat", text: "Say the sentence naturally" },
       { label: "Record", text: "Check your pronunciation once" },
     ],
@@ -199,7 +199,7 @@ const QUICK_WIN_COPY: Record<
     title: "Strengthen your listening",
     cta: "Practice listening",
     steps: [
-      { label: "Listen", text: "Catch the main idea first" },
+      { label: "Listen first", text: "Catch the main idea first" },
       { label: "Answer", text: "Respond without replaying too much" },
       { label: "Confirm", text: "Check the words you missed" },
     ],
@@ -216,10 +216,10 @@ const QUICK_WIN_COPY: Record<
 };
 
 function quickWinActivity(skill: string, selectedActivity: NextStepActivity): NextStepActivity | null {
-  if (skill === "vocabulary") return FALLBACK_BY_SKILL.vocabulary.activity;
-  if (skill === "listening") return FALLBACK_BY_SKILL.listening.activity;
-  if (skill === "writing") return FALLBACK_BY_SKILL.writing.activity;
-  if (skill === "speaking" || skill === "pronunciation") return FALLBACK_BY_SKILL.speaking.activity;
+  if (skill === "vocabulary") return FALLBACK_BY_SKILL["vocabulary"]?.activity ?? null;
+  if (skill === "listening") return FALLBACK_BY_SKILL["listening"]?.activity ?? null;
+  if (skill === "writing") return FALLBACK_BY_SKILL["writing"]?.activity ?? null;
+  if (skill === "speaking" || skill === "pronunciation") return FALLBACK_BY_SKILL["speaking"]?.activity ?? null;
   if (skill === "grammar") return selectedActivity.type === "lesson" ? selectedActivity : TEACHER_FALLBACK.activity;
   if (skill === "reading") return selectedActivity.type === "lesson" ? selectedActivity : LEARNING_CENTER;
   return null;
