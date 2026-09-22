@@ -163,25 +163,38 @@ export const teacherTurn = createServerFn({ method: "POST" })
       suggestedScore: turn.suggestedScore,
       studentMessage: data.message,
     });
+    // Coach mode adds a second, deterministic gate: only a turn with real
+    // production inside the session counts, and the evidence is keyed by session
+    // round, so a retry refines the round instead of duplicating evidence.
+    const coachGate = coach
+      ? coachEvidenceDecision({ stage: coach.stage, studentMessage: data.message })
+      : null;
+    const assess = decision.assess && (!coach || coachGate?.assess === true);
     let evidencePersisted = false;
-    if (decision.assess && conversationId) {
-      const turnId = await deterministicUuid(
-        `teacher-turn:${userId}:${conversationId}:${data.message}`,
-      );
+    if (decision.assess && assess && conversationId) {
+      const turnId = coach
+        ? await deterministicUuid(
+            `coach-round:${userId}:${conversationId}:${decision.skill}:${coachEvidenceRound(coach.turns)}`,
+          )
+        : await deterministicUuid(`teacher-turn:${userId}:${conversationId}:${data.message}`);
       const result = await persistTeacherEvidence({
         userId,
         turnId,
-        rubricVersion: TEACHER_RUBRIC_VERSION,
+        rubricVersion: coach ? COACH_RUBRIC_VERSION : TEACHER_RUBRIC_VERSION,
         evidence: teacherEvidence({
           skill: decision.skill,
           score: decision.score,
           turnId,
           // Level of the interaction, taken from the server-owned context.
           itemCefr: itemLevelFromStoredLevel(pedagogicalContext.cefrLevel),
+          ...(coach
+            ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION }
+            : {}),
         }),
       });
       evidencePersisted = result.ok && !result.duplicate;
     }
+
 
     return {
       conversationId,
