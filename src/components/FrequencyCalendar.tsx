@@ -75,7 +75,6 @@ export function FrequencyCalendar({ userId }: Props) {
         <Button
           variant="ghost"
           size="icon"
-          className="size-7"
           onClick={() => setMonthOffset((v) => v - 1)}
           aria-label="Previous month"
         >
@@ -85,7 +84,6 @@ export function FrequencyCalendar({ userId }: Props) {
         <Button
           variant="ghost"
           size="icon"
-          className="size-7"
           onClick={() => setMonthOffset((v) => v + 1)}
           aria-label="Next month"
         >

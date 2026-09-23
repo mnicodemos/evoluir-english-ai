@@ -150,7 +150,7 @@ export function UiLangToggle({ className }: { className?: string }) {
       onClick={() => setLang(lang === "en" ? "pt" : "en")}
       aria-label={lang === "en" ? "Mudar idioma para português" : "Switch language to English"}
       className={
-        "inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:min-h-8 sm:min-w-8 " +
+        "inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground transition-colors hover:bg-accent hover:text-foreground lg:min-h-10 lg:min-w-10 " +
         (className ?? "")
       }
     >
