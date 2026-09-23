@@ -32,7 +32,6 @@ export const uiPt: Record<string, string> = {
     "Você já conseguiu usar uma habilidade em diferentes situações.",
   "What deserves attention now": "O que merece atenção agora",
   "Your next move": "Seu próximo movimento",
-  Continue: "Continuar",
   "Your journey is starting. Keep practising to gather more evidence.":
     "Sua jornada está começando. Continue praticando para reunir mais evidências.",
   "What your practice already shows": "O que a sua prática já demonstra",

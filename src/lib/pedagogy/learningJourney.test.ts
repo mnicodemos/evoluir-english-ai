@@ -138,7 +138,7 @@ describe("learning journey (Phase 35)", () => {
             params: { lessonId: "l1" },
             ceiling: "PRODUCTION",
           },
-        } as NextStep["quest"],
+        } as NonNullable<NextStep["quest"]>,
       }),
     });
     expect(journey.nextMove).toEqual({
