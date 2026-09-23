@@ -200,7 +200,6 @@ function LessonPage() {
               ? t("Let's practise {skill} in a new context.").replace("{skill}", lessonSkill)
               : t("Let's practise this skill in a new context.")
           }
-          description={t("Start with the lesson and follow the steps already prepared for you.")}
           imageSize="lesson"
           contrast="inverse"
           className="card-soft bg-primary p-4 sm:p-5"

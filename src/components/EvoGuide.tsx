@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 type EvoGuideProps = {
   title: string;
-  description: string;
+  description?: string;
   children?: ReactNode;
   className?: string;
   imageSize?: "default" | "dashboard" | "diagnosis" | "diagnosisIntro" | "lesson";
@@ -71,14 +71,16 @@ export function EvoGuide({
         >
           {title}
         </h2>
-        <p
-          className={cn(
-            "mt-1 text-sm",
-            contrast === "inverse" ? "text-primary-foreground/75" : "text-muted-foreground",
-          )}
-        >
-          {description}
-        </p>
+        {description ? (
+          <p
+            className={cn(
+              "mt-1 text-sm",
+              contrast === "inverse" ? "text-primary-foreground/75" : "text-muted-foreground",
+            )}
+          >
+            {description}
+          </p>
+        ) : null}
         {children ? <div className="mt-3">{children}</div> : null}
       </div>
     </div>

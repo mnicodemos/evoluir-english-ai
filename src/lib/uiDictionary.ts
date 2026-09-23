@@ -361,8 +361,6 @@ export const uiPt: Record<string, string> = {
     "Vamos praticar {skill} em um novo contexto.",
   "Let's practise this skill in a new context.":
     "Vamos praticar esta habilidade em um novo contexto.",
-  "Start with the lesson and follow the steps already prepared for you.":
-    "Comece pela aula e siga as etapas já preparadas para você.",
   "Your learning path": "Sua trilha de aprendizado",
   "Today's lessons": "Lições de hoje",
   "New options": "Novas opções",
