@@ -244,9 +244,7 @@ function LessonPage() {
                   <span className={item.done ? "text-muted-foreground line-through" : ""}>
                     {t(item.label)}
                   </span>
-                  <span className="sr-only">
-                    {item.done ? t("done") : t("still to do")}
-                  </span>
+                  <span className="sr-only">{item.done ? t("done") : t("still to do")}</span>
                 </li>
               ))}
             </ul>
