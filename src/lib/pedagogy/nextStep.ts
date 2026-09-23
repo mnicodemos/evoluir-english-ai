@@ -56,11 +56,7 @@ export type NextStepQuickWin = {
  * Drives the student-facing copy; no invented data, no LLM.
  */
 export type NextStepSituation =
-  | "no_data"
-  | "no_evidence_at_level"
-  | "strong_elsewhere"
-  | "not_practised"
-  | "needs_practice";
+  "no_data" | "no_evidence_at_level" | "strong_elsewhere" | "not_practised" | "needs_practice";
 
 export type NextStep = {
   prioritySkill: string | null;
@@ -107,8 +103,7 @@ export type NextStepInput = {
    * yields to a skill with the same kind of need that has not transferred yet.
    */
   transferredSkills?: readonly string[];
-}
-
+};
 
 /**
  * The lesson catalogue labels spoken lessons 'talking'; the skill profile calls
@@ -154,10 +149,7 @@ const LEARNING_CENTER: NextStepActivity = {
   to: "/learning",
 };
 
-const QUICK_WIN_COPY: Record<
-  string,
-  Omit<NextStepQuickWin, "skill" | "activity">
-> = {
+const QUICK_WIN_COPY: Record<string, Omit<NextStepQuickWin, "skill" | "activity">> = {
   vocabulary: {
     title: "Strengthen your vocabulary",
     cta: "Practice vocabulary",
@@ -230,15 +222,21 @@ const SMART_REVIEW: NextStepActivity = {
   to: "/learning/review",
 };
 
-function quickWinActivity(skill: string, selectedActivity: NextStepActivity): NextStepActivity | null {
+function quickWinActivity(
+  skill: string,
+  selectedActivity: NextStepActivity,
+): NextStepActivity | null {
   // Vocabulary: the main action opens the daily words, so the Quick Win uses the
   // existing spaced-repetition review instead of repeating the same activity.
   if (skill === "vocabulary") return SMART_REVIEW;
   if (skill === "listening") return FALLBACK_BY_SKILL["listening"]?.activity ?? null;
   if (skill === "writing") return FALLBACK_BY_SKILL["writing"]?.activity ?? null;
-  if (skill === "speaking" || skill === "pronunciation") return FALLBACK_BY_SKILL["speaking"]?.activity ?? null;
-  if (skill === "grammar") return selectedActivity.type === "lesson" ? selectedActivity : TEACHER_FALLBACK.activity;
-  if (skill === "reading") return selectedActivity.type === "lesson" ? selectedActivity : LEARNING_CENTER;
+  if (skill === "speaking" || skill === "pronunciation")
+    return FALLBACK_BY_SKILL["speaking"]?.activity ?? null;
+  if (skill === "grammar")
+    return selectedActivity.type === "lesson" ? selectedActivity : TEACHER_FALLBACK.activity;
+  if (skill === "reading")
+    return selectedActivity.type === "lesson" ? selectedActivity : LEARNING_CENTER;
   return null;
 }
 
@@ -312,7 +310,6 @@ export function buildNextStep(input: NextStepInput): NextStep {
         (a.skill.score ?? 0) - (b.skill.score ?? 0) ||
         a.skill.skill.localeCompare(b.skill.skill),
     );
-
 
   const best = ordered[0]!;
   const matchesCurrentLevel =

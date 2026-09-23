@@ -194,11 +194,14 @@ export const teacherTurn = createServerFn({ method: "POST" })
           // Phase 30: the real-life context of this production, kept in the
           // existing metadata so transfer can be read deterministically later.
           ...(coach
-            ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION, context: coach.scenario }
+            ? {
+                subskill: "coach_session",
+                rubricVersion: COACH_RUBRIC_VERSION,
+                context: coach.scenario,
+              }
             : pedagogicalContext.currentActivity?.lessonTitle
               ? { context: pedagogicalContext.currentActivity.lessonTitle }
               : {}),
-
         }),
       });
       evidencePersisted = result.ok && !result.duplicate;

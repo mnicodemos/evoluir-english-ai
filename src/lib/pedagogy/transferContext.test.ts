@@ -40,9 +40,9 @@ describe("evidenceContextKey", () => {
   });
 
   it("falls back to the session/activity and then the round already recorded", () => {
-    expect(
-      evidenceContextKey(coachTurn("x", { metadata: {}, sourceId: "session-1" })),
-    ).toBe("source:teacher:session-1");
+    expect(evidenceContextKey(coachTurn("x", { metadata: {}, sourceId: "session-1" }))).toBe(
+      "source:teacher:session-1",
+    );
     expect(
       evidenceContextKey(coachTurn("x", { metadata: { round: 3 }, sourceType: "listening" })),
     ).toBe("round:listening:3");
