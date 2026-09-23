@@ -357,6 +357,9 @@ export const uiPt: Record<string, string> = {
 
   // Learning center
   "Learning Center": "Centro de Aprendizado",
+  "Let's practise {skill} in a new context.": "Vamos praticar {skill} em um novo contexto.",
+  "Let's practise this skill in a new context.":
+    "Vamos praticar esta habilidade em um novo contexto.",
   "Your learning path": "Sua trilha de aprendizado",
   "Today's lessons": "Lições de hoje",
   "New options": "Novas opções",
