@@ -205,19 +205,14 @@ function category(
   // the top just because time passed, and more contexts are never a target.
   if (loop.consolidation === "TRANSFERRED") return null;
 
-  // Production in one context only: a different context is worth practising.
-  if (loop.consolidation === "CONTEXTUAL") {
-    if (!facts.recentlyPractised || (facts.days !== null && facts.days >= RELEVANT_DAYS))
-      return "CONTEXT_REVIEW";
-    // Practised right now in its single context: nothing to recover yet.
-    return null;
-  }
+  // Production in a single context so far. Time is only an auxiliary signal:
+  // when a relevant while has passed it is simply worth revisiting; otherwise a
+  // DIFFERENT context is the useful practice, and practising it right now means
+  // there is nothing to recover yet.
+  if (facts.recentlyPractised) return null;
+  if (facts.days !== null && facts.days >= RELEVANT_DAYS) return "DECAY_REVIEW";
+  return "CONTEXT_REVIEW";
 
-  // Time is only an auxiliary signal, and only where a real need remains.
-  if (facts.days !== null && facts.days >= RELEVANT_DAYS && !facts.recentlyPractised)
-    return "DECAY_REVIEW";
-
-  return null;
 }
 
 /** Capability the review should ask for, given the label. */
