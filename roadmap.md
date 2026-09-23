@@ -73,3 +73,8 @@
 - [x] Fase 22B+C — Plano adaptativo (ordem por evidência existente), "Why this plan?" e "Update my plan" com comparação Previous → Updated
 - [x] Ajuste visual — telas autenticadas em largura total no desktop, preservando leitura e responsividade
 - [x] Dashboard — diferenciar as três ações, padronizar botões e ampliar Study Streak no desktop
+
+- [x] Fase — Vocabulary performance (a)+(b) e botão "✓ That's OK"
+  - Palavras salvas carregam sem IA; geração em segundo plano; falha memorizada por lote, com "Tentar novamente" manual
+- [ ] Pendente: investigar por que o lote completed-16 não está persistindo as palavras geradas (fase futura)
+- [ ] Pendente: latência da validação de pronúncia (2,4–45 s, provedor de IA)
