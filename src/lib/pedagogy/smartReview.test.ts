@@ -322,6 +322,25 @@ describe("deriveSmartReview", () => {
     expect(selectPrioritySkillQuest({ gaps })).toEqual(before);
   });
 
+  it("reports no candidate when every skill is either transferred or just practised", () => {
+    const result = deriveSmartReview(
+      input({
+        evidence: [
+          production("grammar", "a work meeting", 3),
+          production("grammar", "a job interview", 2),
+          production("speaking", "a trip", 1),
+          production("speaking", "a trip", 0),
+        ],
+        skills: [
+          { skill: "grammar", score: 80, confidence: 0.9, cefrLevel: "B1" },
+          { skill: "speaking", score: 78, confidence: 0.8, cefrLevel: "B1" },
+        ],
+        recentlyPractised: ["speaking"],
+      }),
+    );
+    expect(result).toEqual([]);
+  });
+
   it("selects only a review an existing surface can host", () => {
     // Reading has no dedicated surface today, so it never becomes the review.
     const result = selectSmartReview(input({ evidence: [quiz("reading", 3), quiz("reading", 2)] }));
