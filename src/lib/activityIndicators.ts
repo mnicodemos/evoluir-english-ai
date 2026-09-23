@@ -48,9 +48,9 @@ export function vocabularyHasNewActivity(input: {
 /**
  * Whether an existing Dashboard destination still has an available action.
  * Only state that means the round was actually done is used: Listening keeps a
- * completed round and Writing keeps its corrected tasks. Vocabulary only keeps
- * a "batch opened" mark, and opening an activity is not doing it, so it never
- * hides a recommendation. Lessons and open-ended practice stay available.
+ * completed round and Writing keeps its corrected tasks. Vocabulary is judged by
+ * real reviews, and opening an activity is not doing it, so it never hides a
+ * recommendation. Lessons and open-ended practice stay available.
  */
 export function dashboardActionAvailable(
   destination: string,
@@ -100,9 +100,4 @@ export function writeText(key: string, value: string) {
   } catch {
     /* storage unavailable */
   }
-}
-
-/** Called when the student opens Vocabulary: the batch stops being "new". */
-export function markVocabularyBatchSeen(signature: string) {
-  if (signature) writeText(VOCABULARY_SEEN_KEY, signature);
 }
