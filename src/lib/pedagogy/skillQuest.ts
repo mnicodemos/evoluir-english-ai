@@ -51,7 +51,6 @@ export type SkillQuest = {
   ruleVersion: string;
 };
 
-
 const LESSON_CEILING: LearningState = "APPLICATION";
 
 /** Existing surfaces, with the capability each one can really demonstrate. */
@@ -112,9 +111,7 @@ function requirement(
       return { target: "RECOGNITION", action: "add_evidence" };
     case "STAGE_GAP":
       // Only with a deterministic expectation supplied upstream (Phase 28).
-      return gap.expectedState
-        ? { target: gap.expectedState, action: "reach_next_stage" }
-        : null;
+      return gap.expectedState ? { target: gap.expectedState, action: "reach_next_stage" } : null;
     case "PRODUCTION_GAP":
       return { target: "PRODUCTION", action: "produce_language" };
     case "SPONTANEOUS_USE_GAP":
@@ -138,7 +135,6 @@ export type SkillQuestInput = {
   /** Phase 31: skills whose transfer the existing layer already demonstrated. */
   transferredSkills?: readonly string[];
 };
-
 
 function lessonResource(
   skill: PedagogicalSkill,
@@ -182,8 +178,7 @@ export function deriveSkillQuest(
   // skill has not been used across contexts yet, practising it in another
   // context is appropriate. A transferred skill never gets a forced variation.
   const alreadyTransferred = (input.transferredSkills ?? []).includes(gap.skill);
-  const varyContext =
-    !alreadyTransferred && target >= learningStateRank("PRODUCTION");
+  const varyContext = !alreadyTransferred && target >= learningStateRank("PRODUCTION");
 
   return {
     skill: gap.skill,
@@ -197,7 +192,6 @@ export function deriveSkillQuest(
     priority: gap.priority,
     ruleVersion: SKILL_QUEST_RULE_VERSION,
   };
-
 }
 
 /**

@@ -7,7 +7,11 @@
 // decides transfer, no new table, column, route or activity is involved. The
 // context itself travels in the metadata JSONB the evidence contract already has.
 
-import { pedagogicalSkillSchema, type AssessmentEvidence, type PedagogicalSkill } from "./contracts";
+import {
+  pedagogicalSkillSchema,
+  type AssessmentEvidence,
+  type PedagogicalSkill,
+} from "./contracts";
 import {
   evidenceStage,
   INITIAL_LEARNING_STATE_CONFIG,
@@ -103,7 +107,9 @@ export function deriveTransferContext(
   stateConfig: LearningStateConfig = INITIAL_LEARNING_STATE_CONFIG,
 ): TransferContextResult {
   const skills = new Set(
-    evidence.filter((item) => pedagogicalSkillSchema.safeParse(item.skill).success).map((i) => i.skill),
+    evidence
+      .filter((item) => pedagogicalSkillSchema.safeParse(item.skill).success)
+      .map((i) => i.skill),
   );
   const skill = skills.size === 1 ? ([...skills][0] as PedagogicalSkill) : null;
 

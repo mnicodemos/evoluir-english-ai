@@ -115,7 +115,10 @@ describe("deriveSkillLoopState", () => {
         evidenceType: "answer",
         metadata: { context, application: true },
       });
-    const loop = deriveSkillLoopState([quiz("unit 1", "2026-09-20T10:00:00.000Z"), quiz("unit 2", "2026-09-21T10:00:00.000Z")]);
+    const loop = deriveSkillLoopState([
+      quiz("unit 1", "2026-09-20T10:00:00.000Z"),
+      quiz("unit 2", "2026-09-21T10:00:00.000Z"),
+    ]);
     expect(loop.consolidation).toBe("NOT_CONSOLIDATED");
   });
 
@@ -144,10 +147,12 @@ describe("deriveSkillLoopState", () => {
     expect(states.grammar?.consolidation).toBe("TRANSFERRED");
     expect(states.writing?.consolidation).toBe("CONTEXTUAL");
     expect(states.vocabulary?.consolidation).toBe("NOT_CONSOLIDATED");
-    expect(transferredSkills([
-      production("work", "2026-09-20T10:00:00.000Z"),
-      production("travel", "2026-09-22T10:00:00.000Z"),
-    ])).toEqual(["grammar"]);
+    expect(
+      transferredSkills([
+        production("work", "2026-09-20T10:00:00.000Z"),
+        production("travel", "2026-09-22T10:00:00.000Z"),
+      ]),
+    ).toEqual(["grammar"]);
     expect(contextualSkills([production("work", "2026-09-20T10:00:00.000Z")])).toEqual(["grammar"]);
   });
 });

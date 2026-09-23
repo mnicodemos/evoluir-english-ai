@@ -17,11 +17,9 @@ import {
 } from "./nextStep";
 import { selectPrioritySkillQuest } from "./skillQuest";
 
-
 const RECENT_DAYS = 7;
 /** Existing evidence rows considered for the Skill Quest. Read-only. */
 const EVIDENCE_LIMIT = 400;
-
 
 export const loadNextStep = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -42,7 +40,9 @@ export const loadNextStep = createServerFn({ method: "POST" })
       // again instead of being borrowed from another level.
       supabaseAdmin
         .from("assessment_skill_results")
-        .select("skill, score, cefr_level, confidence_score, assessed_at, assessment_sessions!inner(status)")
+        .select(
+          "skill, score, cefr_level, confidence_score, assessed_at, assessment_sessions!inner(status)",
+        )
         .eq("user_id", userId)
         .eq("assessment_sessions.status", "completed")
         .order("assessed_at", { ascending: false }),
@@ -86,8 +86,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
         return {
           skill: row.skill as string,
           score: source.score === null ? null : Number(source.score),
-          confidence:
-            source.confidence_score === null ? null : Number(source.confidence_score),
+          confidence: source.confidence_score === null ? null : Number(source.confidence_score),
           cefrLevel: source.cefr_level ?? "insufficient_evidence",
         };
       });
@@ -155,7 +154,5 @@ export const loadNextStep = createServerFn({ method: "POST" })
       transferredSkills: transferred,
     });
 
-
     return { ...step, quest };
   });
-
