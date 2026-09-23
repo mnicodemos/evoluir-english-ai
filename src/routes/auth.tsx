@@ -43,6 +43,8 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [forgot, setForgot] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -64,6 +66,15 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
+      if (forgot) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setResetSent(true);
+        setSent(true);
+        return;
+      }
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -127,14 +138,24 @@ function AuthPage() {
               <div className="card-soft p-7 text-center">
                 <h1 className="text-xl font-semibold">{t("Check your email")}</h1>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  {t("We sent a confirmation link to")} <strong>{email}</strong>.{" "}
-                  {t("Click it to activate your account, then come back and sign in.")}
+                  {resetSent ? (
+                    <>
+                      {t("We sent a password reset link to")} <strong>{email}</strong>.
+                    </>
+                  ) : (
+                    <>
+                      {t("We sent a confirmation link to")} <strong>{email}</strong>.{" "}
+                      {t("Click it to activate your account, then come back and sign in.")}
+                    </>
+                  )}
                 </p>
                 <Button
                   variant="outline"
                   className="mt-6 w-full"
                   onClick={() => {
                     setSent(false);
+                    setResetSent(false);
+                    setForgot(false);
                     setMode("signin");
                   }}
                 >
@@ -144,16 +165,24 @@ function AuthPage() {
             ) : (
               <>
                 <h1 className="text-2xl font-bold">
-                  {t(mode === "signup" ? "Create your account" : "Welcome back")}
+                  {t(
+                    forgot
+                      ? "Reset your password"
+                      : mode === "signup"
+                        ? "Create your account"
+                        : "Welcome back",
+                  )}
                 </h1>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {mode === "signup"
-                    ? t("Two minutes to set up your personal learning plan.")
-                    : t("Sign in to continue your streak.")}
+                  {forgot
+                    ? t("Enter your email and we'll send you a link to create a new password.")
+                    : mode === "signup"
+                      ? t("Two minutes to set up your personal learning plan.")
+                      : t("Sign in to continue your streak.")}
                 </p>
 
                 <form onSubmit={onSubmit} className="mt-7 space-y-4">
-                  {mode === "signup" && (
+                  {mode === "signup" && !forgot && (
                     <div className="space-y-2">
                       <Label htmlFor="name">{t("Your name")}</Label>
                       <Input
@@ -178,34 +207,56 @@ function AuthPage() {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">{t("Password")}</Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        minLength={6}
-                        required
-                        className="scroll-mt-20 pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((v) => !v)}
-                        aria-label={t(showPassword ? "Hide password" : "Show password")}
-                        className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                      </button>
+                  {!forgot && (
+                    <div className="space-y-2">
+                      <Label htmlFor="password">{t("Password")}</Label>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••"
+                          minLength={6}
+                          required
+                          className="scroll-mt-20 pr-12"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          aria-label={t(showPassword ? "Hide password" : "Show password")}
+                          className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="size-4" />
+                          ) : (
+                            <Eye className="size-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <Button type="submit" className="w-full" size="lg" disabled={loading}>
                     {loading && <Loader2 className="size-4 animate-spin" />}
-                    {t(mode === "signup" ? "Start my evolution" : "Sign in")}
+                    {t(
+                      forgot
+                        ? "Send reset link"
+                        : mode === "signup"
+                          ? "Start my evolution"
+                          : "Sign in",
+                    )}
                   </Button>
                 </form>
+
+                <p className="mt-4 text-center text-sm">
+                  <button
+                    type="button"
+                    className="font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                    onClick={() => setForgot((v) => !v)}
+                  >
+                    {t(forgot ? "Back to sign in" : "Forgot my password")}
+                  </button>
+                </p>
 
                 <p className="mt-6 text-center text-sm text-muted-foreground">
                   {t(mode === "signup" ? "Already have an account?" : "New here?")}{" "}
