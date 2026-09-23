@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles } from "lucide-react";
 
+import { EvoGuide } from "@/components/EvoGuide";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
 import { NEXT_STEP_SKILL_TEXT } from "@/lib/pedagogy/nextStep";
@@ -59,7 +60,16 @@ export function ProofOfProgressCard() {
 
   return (
     <section className="card-soft mt-5 p-5" aria-labelledby="proof-of-progress-title">
-      <div className="flex min-w-0 items-start gap-4">
+      <EvoGuide
+        title={
+          data.highlights.length > 0
+            ? t("We already have evidence of development in your skills.")
+            : t("We are still building evidence about your evolution.")
+        }
+        imageSize="lesson"
+      />
+
+      <div className="mt-5 flex min-w-0 items-start gap-4 border-t border-border pt-5">
         <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
           <Sparkles className="size-5 text-[oklch(0.55_0.14_158)]" aria-hidden="true" />
         </span>

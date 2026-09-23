@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Fase — EVO no Progress / evidências de evolução
+  - [x] Reutilizar o guia e o PNG oficial somente no contexto real já retornado pelo Proof of Progress
+  - [x] Diferenciar evidência válida de evidência insuficiente sem criar cálculo, indicador ou consulta
+  - [x] Preservar estados, evidências, CEFR, histórico, gráficos e toda a lógica pedagógica
 - [x] Fase — EVO no Smart Review
   - [x] Reutilizar o guia e o PNG oficial somente quando houver recomendação válida
   - [x] Preservar habilidade, motivo, ordem, ação, estados e toda a lógica pedagógica
