@@ -21,7 +21,10 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
       { title: "Evoluir+ English AI · Set up your plan" },
       { name: "description", content: "Tell AI Talking your level, goal and daily study time." },
       { property: "og:title", content: "Evoluir+ English AI · Set up your plan" },
-      { property: "og:description", content: "Tell AI Talking your level, goal and daily study time." },
+      {
+        property: "og:description",
+        content: "Tell AI Talking your level, goal and daily study time.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -36,8 +39,6 @@ const goals = [
   { value: "interview", label: "Interview", hint: "Land a job at a global company" },
   { value: "certification", label: "Certification", hint: "TOEFL, IELTS and similar" },
 ];
-
-
 
 const times = [10, 20, 30];
 
@@ -94,12 +95,19 @@ function Onboarding() {
         <div className="space-y-5">
           <EvoGuide
             title={t("Hi. I'm EVO.")}
-            description={t("I'll help you understand where you are in English and find a good starting point.")}
+            description={t(
+              "I'll help you understand where you are in English and find a good starting point.",
+            )}
             className="card-soft p-4"
           />
           <div className="space-y-2">
             <Label htmlFor="name">{t("Your name")}</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Marcelo" />
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Marcelo"
+            />
           </div>
         </div>
       ),
@@ -107,14 +115,17 @@ function Onboarding() {
     },
     {
       title: "What is your main goal?",
-      body: (
-        <Options options={goals} value={goal} onChange={setGoal} />
-      ),
+      body: <Options options={goals} value={goal} onChange={setGoal} />,
       canContinue: true,
     },
     {
       title: "Placement test",
-      body: <PlacementTest answers={answers} onAnswer={(id, value) => setAnswers((a) => ({ ...a, [id]: value }))} />,
+      body: (
+        <PlacementTest
+          answers={answers}
+          onAnswer={(id, value) => setAnswers((a) => ({ ...a, [id]: value }))}
+        />
+      ),
       canContinue: answeredAll,
     },
     {
@@ -145,10 +156,16 @@ function Onboarding() {
             ))}
           </div>
           <p className="text-sm text-muted-foreground">
-            Your lessons will start at this level and move up when you close the Diamond league with an overall
-            average of 70% or more.
+            Your lessons will start at this level and move up when you close the Diamond league with
+            an overall average of 70% or more.
           </p>
-          <Button variant="outline" onClick={() => { setAnswers({}); setStep(2); }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setAnswers({});
+              setStep(2);
+            }}
+          >
             Retake the test
           </Button>
         </div>
@@ -174,7 +191,6 @@ function Onboarding() {
 
   const current = steps[step]!;
 
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-5 py-10">
@@ -187,7 +203,7 @@ function Onboarding() {
           {steps.map((_, i) => (
             <span
               key={i}
-            className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-primary" : "bg-muted"}`}
+              className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-primary" : "bg-muted"}`}
             />
           ))}
         </div>
@@ -233,8 +249,8 @@ function PlacementTest({
   return (
     <div className="space-y-5">
       <p className="text-sm text-muted-foreground">
-        Answer all {PLACEMENT_QUESTIONS.length} questions. They get harder as you go — it is normal not to know
-        the last ones.
+        Answer all {PLACEMENT_QUESTIONS.length} questions. They get harder as you go — it is normal
+        not to know the last ones.
       </p>
       {PLACEMENT_QUESTIONS.map((q, index) => (
         <fieldset key={q.id} className="card-soft p-4">
@@ -263,7 +279,6 @@ function PlacementTest({
     </div>
   );
 }
-
 
 function Options({
   options,

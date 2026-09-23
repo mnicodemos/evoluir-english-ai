@@ -828,8 +828,7 @@ export const uiPt: Record<string, string> = {
   "Hi. I'm EVO.": "Oi. Eu sou a EVO.",
   "I'll help you understand where you are in English and find a good starting point.":
     "Vou ajudar você a entender seu momento no inglês e encontrar um bom ponto de partida.",
-  "Now we have a clearer view of where you are.":
-    "Agora temos uma visão melhor do seu momento.",
+  "Now we have a clearer view of where you are.": "Agora temos uma visão melhor do seu momento.",
   "Let's turn this result into your next step.":
     "Vamos transformar esse resultado no seu próximo passo.",
   "Placement test": "Teste de nivelamento",

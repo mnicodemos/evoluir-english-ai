@@ -75,7 +75,6 @@ export function NextStepCard() {
     ? dashboardActionAvailable(data.quest.resource.to, activityIndicators)
     : false;
 
-
   return (
     <section className="card-soft p-5" aria-label={t("Your next step")}>
       <EvoGuide
@@ -108,7 +107,9 @@ export function NextStepCard() {
             <div className="min-w-0 flex-1">
               <h2 className="text-lg font-semibold">{t("Your next step")}</h2>
               <p className="mt-0.5 font-medium">{skillLabel}</p>
-              <p className="text-sm text-muted-foreground">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
+              <p className="text-sm text-muted-foreground">
+                {t(NEXT_STEP_REASON_TEXT[data.reason])}
+              </p>
               <p className="mt-2 text-sm">
                 {t("How to practise")}: <span className="font-medium">{data.activity.title}</span>
               </p>
@@ -152,14 +153,20 @@ export function NextStepCard() {
                       <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
                       <span className="min-w-0">
                         <span className="font-medium">{t("Recall")}</span>
-                        <span className="text-muted-foreground"> — {t("Remember before revealing")}</span>
+                        <span className="text-muted-foreground">
+                          {" "}
+                          — {t("Remember before revealing")}
+                        </span>
                       </span>
                     </li>
                     <li className="flex min-w-0 items-start gap-2">
                       <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
                       <span className="min-w-0">
                         <span className="font-medium">{t("Track")}</span>
-                        <span className="text-muted-foreground"> — {t("Mark Error or Correct")}</span>
+                        <span className="text-muted-foreground">
+                          {" "}
+                          — {t("Mark Error or Correct")}
+                        </span>
                       </span>
                     </li>
                   </ul>
@@ -249,7 +256,6 @@ export function NextStepCard() {
                 </div>
               ) : null}
             </div>
-
           </div>
         </aside>
       </div>
