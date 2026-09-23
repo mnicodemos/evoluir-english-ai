@@ -17,8 +17,15 @@ describe("splitForFirstAudio", () => {
     expect(splitForFirstAudio("resilient")).toEqual(["resilient"]);
   });
 
-  it("starts a medium answer with a shorter opening block", () => {
-    const blocks = splitForFirstAudio(MEDIUM);
+  it("keeps a medium answer with no natural pause as one request", () => {
+    // Cutting mid-clause would break the voice, so a single long clause stays whole.
+    expect(splitForFirstAudio(MEDIUM)).toEqual([MEDIUM]);
+  });
+
+  it("starts a medium answer that has natural pauses with a shorter opening block", () => {
+    const blocks = splitForFirstAudio(
+      "Well done, that was a very clear answer. Now tell me about the last trip you took with your family, and describe what you enjoyed the most about it.",
+    );
     expect(blocks.length).toBeGreaterThan(1);
     expect(blocks[0]!.length).toBeLessThanOrEqual(FIRST_BLOCK_MAX_CHARS);
   });
