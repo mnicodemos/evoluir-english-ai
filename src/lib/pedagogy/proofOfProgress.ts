@@ -254,7 +254,7 @@ export function deriveProofOfProgress(
     currentLevel: input.currentLevel ?? null,
     levelChange: officialLevelChange(input.levelHistory ?? []),
     highlights: highlights.slice(0, limit),
-    keepPractising: keepPractising.sort((a, b) => a.skill?.localeCompare?.(b) ?? a.localeCompare(b)),
+    keepPractising: keepPractising.sort((a, b) => a.localeCompare(b)),
     ruleVersion: PROOF_OF_PROGRESS_RULE_VERSION,
   };
 }
