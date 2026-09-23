@@ -134,11 +134,10 @@ function Vocabulary() {
 
   const byWord = new Map((mine ?? []).map((m) => [m.word_id, m]));
 
-  // Opening this page consumes the batch, so the dashboard dot goes away.
-  useEffect(() => {
-    if (!profile) return;
-    markVocabularyBatchSeen(vocabularySignature(studyToday(), startedLessons ?? 0));
-  }, [profile, startedLessons]);
+  // Opening this page is not doing the practice: the dashboard dot is driven by
+  // real reviews (user_vocabulary), so nothing is marked here.
+
+
 
   async function markKnown(wordId: string) {
     if (!profile) return;
@@ -161,6 +160,7 @@ function Vocabulary() {
       await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
       await queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
       await queryClient.invalidateQueries({ queryKey: ["vocabulary-progress"] });
+      await queryClient.invalidateQueries({ queryKey: ["vocabulary-last-review"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save this word");
     } finally {
