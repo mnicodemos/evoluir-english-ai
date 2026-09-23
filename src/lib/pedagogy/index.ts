@@ -4,7 +4,9 @@ export * from "./confidence";
 export * from "./contracts";
 export * from "./dualWrite";
 export * from "./invisibleGaps";
+export * from "./learningLoop";
 export * from "./learningState";
+
 export * from "./skillQuest";
 export * from "./transferContext";
 
