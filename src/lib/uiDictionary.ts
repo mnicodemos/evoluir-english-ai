@@ -901,4 +901,23 @@ export const uiPt: Record<string, string> = {
   "Already have an account?": "Já tem uma conta?",
   "New here?": "Novo por aqui?",
   "Create an account": "Criar uma conta",
+
+  // Admin panel
+  "Admin panel": "Painel administrativo",
+  "Registered users": "Usuários cadastrados",
+  Loading: "Carregando",
+  "Could not load the users right now.": "Não foi possível carregar os usuários agora.",
+
+  // Password recovery
+  "Forgot my password": "Esqueci minha senha",
+  "Reset your password": "Redefinir sua senha",
+  "Enter your email and we'll send you a link to create a new password.":
+    "Informe seu e-mail e enviaremos um link para criar uma nova senha.",
+  "Send reset link": "Enviar link",
+  "We sent a password reset link to": "Enviamos um link de redefinição de senha para",
+  "Create a new password": "Criar uma nova senha",
+  "Choose a new password to finish signing in.":
+    "Escolha uma nova senha para concluir o acesso.",
+  "Save new password": "Salvar nova senha",
+  "Password updated": "Senha atualizada",
 };
