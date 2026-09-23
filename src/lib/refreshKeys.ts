@@ -45,10 +45,7 @@ export const LEVEL_REFRESH_KEYS = [
   ["minutes-by-day"],
 ] as const;
 
-function invalidateAll(
-  queryClient: QueryClient,
-  keys: ReadonlyArray<ReadonlyArray<string>>,
-) {
+function invalidateAll(queryClient: QueryClient, keys: ReadonlyArray<ReadonlyArray<string>>) {
   return Promise.all(
     keys.map((queryKey) => queryClient.invalidateQueries({ queryKey: [...queryKey] })),
   );

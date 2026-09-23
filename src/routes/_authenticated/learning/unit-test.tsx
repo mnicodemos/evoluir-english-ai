@@ -153,7 +153,12 @@ function UnitTestPage() {
         ) : !data ? (
           <Skeleton className="h-64 w-full" />
         ) : (
-          <LessonQuiz questions={data.quiz} userId={profile?.id} lessonId={id} onFinished={finish} />
+          <LessonQuiz
+            questions={data.quiz}
+            userId={profile?.id}
+            lessonId={id}
+            onFinished={finish}
+          />
         )}
       </div>
     </AppShell>
