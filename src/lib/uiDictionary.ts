@@ -36,6 +36,10 @@ export const uiPt: Record<string, string> = {
   "Your journey is starting. Keep practising to gather more evidence.":
     "Sua jornada está começando. Continue praticando para reunir mais evidências.",
   "What your practice already shows": "O que a sua prática já demonstra",
+  "We already have evidence of development in your skills.":
+    "Já temos evidências de desenvolvimento nas suas habilidades.",
+  "We are still building evidence about your evolution.":
+    "Ainda estamos construindo evidências sobre sua evolução.",
   "Level officially updated": "Nível atualizado oficialmente",
   "You transferred": "Você conseguiu transferir",
   "You consolidated": "Você consolidou",
