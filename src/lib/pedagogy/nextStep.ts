@@ -215,8 +215,17 @@ const QUICK_WIN_COPY: Record<
   },
 };
 
+/** Existing smart-review surface: the complementary micro-practice for words. */
+const SMART_REVIEW: NextStepActivity = {
+  type: "learning",
+  title: "Smart review",
+  to: "/learning/review",
+};
+
 function quickWinActivity(skill: string, selectedActivity: NextStepActivity): NextStepActivity | null {
-  if (skill === "vocabulary") return FALLBACK_BY_SKILL["vocabulary"]?.activity ?? null;
+  // Vocabulary: the main action opens the daily words, so the Quick Win uses the
+  // existing spaced-repetition review instead of repeating the same activity.
+  if (skill === "vocabulary") return SMART_REVIEW;
   if (skill === "listening") return FALLBACK_BY_SKILL["listening"]?.activity ?? null;
   if (skill === "writing") return FALLBACK_BY_SKILL["writing"]?.activity ?? null;
   if (skill === "speaking" || skill === "pronunciation") return FALLBACK_BY_SKILL["speaking"]?.activity ?? null;
