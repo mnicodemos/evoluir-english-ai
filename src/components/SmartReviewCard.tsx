@@ -91,10 +91,7 @@ export function SmartReviewCard() {
                     </Button>
                   ) : (
                     <Button asChild variant="outline" className="mt-3 w-full sm:w-auto">
-                      <Link
-                        to={item.resource.to}
-                        aria-label={`${t("Review now")}: ${skillLabel}`}
-                      >
+                      <Link to={item.resource.to} aria-label={`${t("Review now")}: ${skillLabel}`}>
                         {t("Review now")}
                         <ArrowRight aria-hidden="true" />
                       </Link>
