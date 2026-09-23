@@ -190,8 +190,8 @@ export const uiPt: Record<string, string> = {
   Correcting: "Corrigindo",
   Examples: "Exemplos",
   Reviewing: "Revisando",
-  "Hi! I'm your AI Teacher. What would you like to practice today?":
-    "Olá! Sou seu professor de IA. O que você quer praticar hoje?",
+  "Hi! I'm EVO. I'm here to help you practise and develop your English.":
+    "Oi! Eu sou a EVO. Estou aqui para ajudar você a praticar e desenvolver seu inglês.",
   "Explain a grammar topic": "Explicar um tópico de gramática",
   "Practice vocabulary": "Praticar vocabulário",
   "Correct my English": "Corrigir meu inglês",
