@@ -8,7 +8,8 @@ type EvoGuideProps = {
   description: string;
   children?: ReactNode;
   className?: string;
-  imageSize?: "default" | "dashboard" | "diagnosis" | "diagnosisIntro";
+  imageSize?: "default" | "dashboard" | "diagnosis" | "diagnosisIntro" | "lesson";
+  contrast?: "default" | "inverse";
 };
 
 export function EvoGuide({
@@ -17,6 +18,7 @@ export function EvoGuide({
   children,
   className,
   imageSize = "default",
+  contrast = "default",
 }: EvoGuideProps) {
   return (
     <div
@@ -27,6 +29,8 @@ export function EvoGuide({
         (imageSize === "diagnosis" || imageSize === "diagnosisIntro") &&
           "grid-cols-1 justify-items-center gap-4 text-center sm:grid-cols-[minmax(0,1fr)_8rem] sm:gap-6 sm:text-left",
         imageSize === "diagnosisIntro" && "sm:grid-cols-[minmax(0,1fr)_7rem]",
+        imageSize === "lesson" &&
+          "grid-cols-[5.5rem_minmax(0,1fr)] gap-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-5",
         className,
       )}
     >
@@ -51,9 +55,30 @@ export function EvoGuide({
           (imageSize === "diagnosis" || imageSize === "diagnosisIntro") && "sm:order-1",
         )}
       >
-        <p className="text-xs font-semibold uppercase text-primary">EVO</p>
-        <h2 className="mt-1 text-base font-semibold text-card-foreground sm:text-lg">{title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+        <p
+          className={cn(
+            "text-xs font-semibold uppercase",
+            contrast === "inverse" ? "text-primary-foreground/75" : "text-primary",
+          )}
+        >
+          EVO
+        </p>
+        <h2
+          className={cn(
+            "mt-1 text-base font-semibold sm:text-lg",
+            contrast === "inverse" ? "text-primary-foreground" : "text-card-foreground",
+          )}
+        >
+          {title}
+        </h2>
+        <p
+          className={cn(
+            "mt-1 text-sm",
+            contrast === "inverse" ? "text-primary-foreground/75" : "text-muted-foreground",
+          )}
+        >
+          {description}
+        </p>
         {children ? <div className="mt-3">{children}</div> : null}
       </div>
     </div>

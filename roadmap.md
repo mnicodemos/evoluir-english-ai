@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Fase — EVO na abertura da aula
+  - [x] Reutilizar o guia e o PNG oficial com mensagem determinística baseada na habilidade da aula
+  - [x] Preservar conteúdo, exercícios, CTAs, avaliação, scoring, CEFR e persistência
+  - [x] Validar presença única e responsividade de 320 a 1440 px
 - [x] Ajuste final — EVO compacta somente na abertura do diagnóstico
   - [x] Reduzir a imagem em aproximadamente 10–15% e aproximar discretamente o campo de nome
   - [x] Preservar resultado, Dashboard, Landing, PNG oficial e toda a lógica

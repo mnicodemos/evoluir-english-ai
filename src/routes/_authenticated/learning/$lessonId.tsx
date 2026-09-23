@@ -15,6 +15,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { EvoGuide } from "@/components/EvoGuide";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { LessonQuiz } from "@/components/LessonQuiz";
 import { LessonVideo } from "@/components/LessonVideo";
@@ -85,6 +86,9 @@ function LessonPage() {
   const reviewPoints = videoReviewPoints(lesson?.summary);
   const videoLength = formatVideoDuration(lesson?.video_duration_seconds);
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
+  const lessonSkill = lesson?.skill
+    ? t(lesson.skill.charAt(0).toUpperCase() + lesson.skill.slice(1))
+    : null;
 
   // The Learning Guide is built from lesson content already stored — no AI call.
   const guide = buildLessonGuide(
@@ -189,6 +193,18 @@ function LessonPage() {
           <h1 className="mt-3 text-3xl font-bold">{lesson.title}</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{lesson.objective}</p>
         </header>
+
+        <EvoGuide
+          title={
+            lessonSkill
+              ? t("Let's practise {skill} in a new context.").replace("{skill}", lessonSkill)
+              : t("Let's practise this skill in a new context.")
+          }
+          description={t("Start with the lesson and follow the steps already prepared for you.")}
+          imageSize="lesson"
+          contrast="inverse"
+          className="card-soft bg-primary p-4 sm:p-5"
+        />
 
         {data.userLesson?.completed_at && (
           <section className="card-soft flex flex-wrap items-center justify-between gap-3 border-success/40 bg-success/10 p-5">
