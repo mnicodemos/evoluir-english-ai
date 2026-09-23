@@ -117,19 +117,62 @@ function Vocabulary() {
     },
   });
 
-  const {
-    data: daily,
-    isLoading: dailyLoading,
-    error: dailyError,
-  } = useQuery({
-    // Starting a new lesson means a new set of ten words.
-    queryKey: ["daily-words", profile?.id, studyToday(), startedLessons ?? 0],
-    enabled: !!profile,
+  // Starting a new lesson means a new set of ten words.
+  const dailyKey = ["daily-words", profile?.id, studyToday(), startedLessons ?? 0] as const;
+  const roundReady = !!profile && startedLessons !== undefined;
+
+  // 1) Words already saved for this batch: a plain read, shown right away.
+  const { data: saved, isLoading: savedLoading } = useQuery({
+    queryKey: [...dailyKey, "saved"],
+    enabled: roundReady,
     staleTime: 1000 * 60 * 30,
     retry: false,
     queryFn: async () =>
-      (await loadDailyWords({ data: { level: profile?.level ?? "intermediate" } })) as Word[],
+      (await loadDailyWords({
+        data: { level: profile?.level ?? "intermediate", generate: false },
+      })) as Word[],
   });
+
+  // 2) Missing words are generated in the background. A failed attempt is
+  // remembered for this batch so reopening or refreshing the page does not
+  // start a new generation by itself; the student can retry on purpose.
+  const failKey = profile ? `vocab-gen-failed:${profile.id}:${startedLessons ?? 0}` : null;
+  const [genBlocked, setGenBlocked] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!failKey) return;
+    setGenBlocked(window.localStorage.getItem(failKey) === "1");
+  }, [failKey]);
+  const needsGeneration = roundReady && !!saved && saved.length < 10 && genBlocked === false;
+  const {
+    data: generated,
+    isFetching: generating,
+    error: genError,
+  } = useQuery({
+    queryKey: [...dailyKey, "generate"],
+    enabled: needsGeneration,
+    staleTime: 1000 * 60 * 30,
+    retry: false,
+    refetchOnMount: false,
+    queryFn: async () => {
+      try {
+        return (await loadDailyWords({
+          data: { level: profile?.level ?? "intermediate" },
+        })) as Word[];
+      } catch (error) {
+        if (failKey) window.localStorage.setItem(failKey, "1");
+        setGenBlocked(true);
+        throw error;
+      }
+    },
+  });
+  function retryGeneration() {
+    if (failKey) window.localStorage.removeItem(failKey);
+    queryClient.removeQueries({ queryKey: [...dailyKey, "generate"] });
+    setGenBlocked(false);
+  }
+  const daily = generated && generated.length >= (saved?.length ?? 0) ? generated : saved;
+  const dailyLoading = savedLoading || !roundReady;
+  const genFailed = genBlocked === true || !!genError;
 
   const byWord = new Map((mine ?? []).map((m) => [m.word_id, m]));
 
@@ -570,14 +613,26 @@ function Vocabulary() {
                 <Skeleton className="h-40 w-full" />
                 <Skeleton className="h-40 w-full" />
               </div>
-            ) : dailyError ? (
-              <p className="mt-6 text-sm text-muted-foreground">
-                {dailyError instanceof Error
-                  ? dailyError.message
-                  : "Today's words are not ready yet."}
-              </p>
             ) : (
-              <List items={today} />
+              <>
+                {generating ? (
+                  <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="size-4 animate-spin" /> {t("Preparing new words…")}
+                  </p>
+                ) : genFailed && (daily?.length ?? 0) < 10 ? (
+                  <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                    <span>
+                      {genError instanceof Error
+                        ? genError.message
+                        : t("Today's words are not ready yet.")}
+                    </span>
+                    <Button variant="outline" size="sm" onClick={retryGeneration}>
+                      <RotateCcw className="size-4" /> {t("Try again")}
+                    </Button>
+                  </div>
+                ) : null}
+                {today.length > 0 || !generating ? <List items={today} /> : null}
+              </>
             )}
           </TabsContent>
           <TabsContent value="learned">

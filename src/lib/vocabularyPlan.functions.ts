@@ -7,7 +7,6 @@ import { callGateway } from "./ai-gateway.server";
 import { studyToday } from "./today";
 import { lessonBatchKey, ownedWordSet, selectNewWords } from "./vocabularyBatch";
 
-
 export type DailyWord = {
   id: string;
   word: string;
@@ -76,7 +75,13 @@ function parseWords(raw: string) {
 export const dailyWords = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ level: z.string().default("intermediate") }).parse(input ?? {}),
+    z
+      .object({
+        level: z.string().default("intermediate"),
+        // false = only read the words already saved for this batch (no AI call).
+        generate: z.boolean().default(true),
+      })
+      .parse(input ?? {}),
   )
   .handler(async ({ data, context }): Promise<DailyWord[]> => {
     const { supabase, userId } = context;
@@ -100,7 +105,7 @@ export const dailyWords = createServerFn({ method: "POST" })
 
     const todays = (existing.data ?? []) as DailyWord[];
     if (todays.length >= DAILY_COUNT) return todays.slice(0, DAILY_COUNT);
-
+    if (!data.generate) return todays;
 
     // Words must come only from this level's lessons, so a mastered word never counts
     // toward another level when the student changes level.
@@ -153,7 +158,9 @@ export const dailyWords = createServerFn({ method: "POST" })
               lessonList.length
                 ? `Lessons in the learning path:\n${lessonList.map((l) => `- ${l.title} (${l.category}): ${l.objective}`).join("\n")}`
                 : "No lessons yet — choose everyday communication words.",
-              exclude.size ? `Already known — do NOT use these words: ${[...exclude].join(", ")}.` : "",
+              exclude.size
+                ? `Already known — do NOT use these words: ${[...exclude].join(", ")}.`
+                : "",
             ]
               .filter(Boolean)
               .join("\n\n"),
@@ -177,7 +184,12 @@ export const dailyWords = createServerFn({ method: "POST" })
     // exclusion list, instead of failing the whole batch. The pause respects the usage
     // limiter, which would otherwise reject a second call fired immediately.
     if (!fresh.length) {
-      for (const w of first) exclude.add(String(w.word ?? "").trim().toLowerCase());
+      for (const w of first)
+        exclude.add(
+          String(w.word ?? "")
+            .trim()
+            .toLowerCase(),
+        );
       try {
         await new Promise((resolve) => setTimeout(resolve, 6_000));
         fresh = selectNewWords(await askAi(exclude), usedWords, missing);
@@ -186,12 +198,10 @@ export const dailyWords = createServerFn({ method: "POST" })
       }
     }
 
-
     if (!fresh.length) {
       if (todays.length) return todays;
       throw new Error("The AI could not pick today's words. Please try again in a moment.");
     }
-
 
     const byTitle = new Map(lessonList.map((l) => [l.title.toLowerCase(), l]));
     const { data: inserted, error } = await supabase
