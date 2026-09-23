@@ -20,6 +20,21 @@ export const uiPt: Record<string, string> = {
   Focus: "Foco",
   "Your next step": "Seu próximo passo",
   "How to practise": "Como praticar",
+
+  // Smart review (dashboard)
+  "Smart review": "Revisão inteligente",
+  "Worth recovering now": "O que vale recuperar agora",
+  "Review now": "Revisar agora",
+  "Let's reinforce a point that was tricky recently.":
+    "Vamos reforçar um ponto que apresentou dificuldade recentemente.",
+  "Reviewing this is worth it to feel more confident.":
+    "Vale revisar este conteúdo para ganhar mais segurança.",
+  "Let's reinforce this skill before moving ahead.":
+    "Vamos reforçar esta habilidade antes de seguir adiante.",
+  "It has been a while since your last practice. A quick review can help.":
+    "Faz algum tempo desde a última prática. Uma revisão rápida pode ajudar.",
+  "You have practised this skill. Now let's use it in another context.":
+    "Você já praticou esta habilidade. Agora vamos usá-la em outro contexto.",
   "Quick Win": "Ganho rápido",
   "Strengthen your vocabulary": "Fortaleça seu vocabulário",
   "Strengthen your grammar": "Fortaleça sua gramática",

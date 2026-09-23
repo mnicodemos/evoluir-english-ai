@@ -7,6 +7,7 @@ export * from "./invisibleGaps";
 export * from "./learningLoop";
 export * from "./learningState";
 export * from "./smartReview";
+export * from "./smartReviewUx";
 
 export * from "./skillQuest";
 export * from "./transferContext";
