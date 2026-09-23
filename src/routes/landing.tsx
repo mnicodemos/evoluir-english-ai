@@ -268,14 +268,14 @@ function CommercialLanding() {
 
         <section className="overflow-hidden bg-secondary/40 py-20 sm:py-28">
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-             <div className="relative mx-auto aspect-[339/452] w-full max-w-[400px] overflow-hidden rounded-lg">
+            <div className="relative mx-auto aspect-[339/452] w-full max-w-[400px] overflow-hidden rounded-lg">
               <img
-                 src={evoBust.url}
+                src={evoBust.url}
                 alt="EVO apresentando orientações personalizadas de aprendizagem"
-                 width={339}
-                 height={452}
+                width={339}
+                height={452}
                 loading="lazy"
-                 className="h-full w-full object-cover object-center"
+                className="h-full w-full object-cover object-center"
               />
             </div>
             <div>
@@ -285,13 +285,13 @@ function CommercialLanding() {
               </p>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {evoMessages.map((message, index) => (
-                   <div key={message} className="card-soft p-5 text-primary-foreground">
+                  <div key={message} className="card-soft p-5 text-primary-foreground">
                     <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase text-success">
                       <Logo className="size-5" /> EVO {String(index + 1).padStart(2, "0")}
                     </div>
-                     <p className="text-sm font-medium leading-relaxed text-primary-foreground">
-                       “{message}”
-                     </p>
+                    <p className="text-sm font-medium leading-relaxed text-primary-foreground">
+                      “{message}”
+                    </p>
                   </div>
                 ))}
               </div>
@@ -308,16 +308,16 @@ function CommercialLanding() {
                 em vez de simplesmente contar quantas atividades você realizou.
               </p>
             </div>
-             <div
-               className="card-soft p-5 text-primary-foreground sm:p-8"
-               aria-label="Caminho da evidência até a evolução"
-             >
+            <div
+              className="card-soft p-5 text-primary-foreground sm:p-8"
+              aria-label="Caminho da evidência até a evolução"
+            >
               {["Evidência", "Prática", "Contexto", "Evolução"].map((item, index, array) => (
                 <div key={item}>
                   <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary/60 p-4">
-                     <span className="font-display font-semibold text-primary-foreground">
-                       {item}
-                     </span>
+                    <span className="font-display font-semibold text-primary-foreground">
+                      {item}
+                    </span>
                     {index === array.length - 1 ? (
                       <Sparkles className="size-5 text-success" aria-hidden="true" />
                     ) : (
@@ -344,12 +344,12 @@ function CommercialLanding() {
             />
             <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {skills.map(([Icon, label]) => (
-                 <div
-                   key={label}
-                   className="card-soft flex min-h-32 flex-col justify-between p-5 text-primary-foreground"
-                 >
+                <div
+                  key={label}
+                  className="card-soft flex min-h-32 flex-col justify-between p-5 text-primary-foreground"
+                >
                   <Icon className="size-6 text-success" aria-hidden="true" />
-                   <h3 className="mt-8 text-sm font-semibold text-primary-foreground">
+                  <h3 className="mt-8 text-sm font-semibold text-primary-foreground">
                     {[...label].map((letter, index) => (
                       <span key={`${letter}-${index}`} aria-hidden="true">
                         {letter}
@@ -372,14 +372,12 @@ function CommercialLanding() {
               </p>
             </div>
             <div
-               className="card-soft overflow-hidden text-primary-foreground"
+              className="card-soft overflow-hidden text-primary-foreground"
               aria-label="Exemplo visual da área de evolução, sem dados pessoais"
             >
               <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-7">
                 <div>
-                   <p className="text-xs font-semibold uppercase text-muted">
-                    Minha evolução
-                  </p>
+                  <p className="text-xs font-semibold uppercase text-muted">Minha evolução</p>
                   <p className="mt-1 font-display font-semibold">Evidências da sua jornada</p>
                 </div>
                 <span className="grid size-10 place-items-center rounded-full bg-accent text-accent-foreground">
@@ -394,14 +392,12 @@ function CommercialLanding() {
                   "Seu próximo passo",
                 ].map((label) => (
                   <div key={label} className="rounded-lg border border-border bg-secondary/60 p-4">
-                     <p className="text-xs font-semibold text-muted">{label}</p>
+                    <p className="text-xs font-semibold text-muted">{label}</p>
                     <div className="mt-5 flex items-center gap-2 text-success" aria-hidden="true">
                       <CheckCircle2 className="size-5" />
                       <span className="h-px flex-1 bg-border" />
                     </div>
-                     <p className="mt-4 text-xs text-muted">
-                      Baseado na sua própria prática.
-                    </p>
+                    <p className="mt-4 text-xs text-muted">Baseado na sua própria prática.</p>
                   </div>
                 ))}
               </div>
@@ -414,16 +410,16 @@ function CommercialLanding() {
             <SectionHeading title="Para quem quer evoluir de verdade no inglês." />
             <div className="mt-12 grid gap-4 sm:grid-cols-2">
               {audiences.map(([Icon, title, text]) => (
-                 <article
-                   key={title}
-                   className="card-soft flex gap-4 p-5 text-primary-foreground sm:p-6"
-                 >
+                <article
+                  key={title}
+                  className="card-soft flex gap-4 p-5 text-primary-foreground sm:p-6"
+                >
                   <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
                   <div>
-                     <h3 className="text-sm font-bold text-primary-foreground">{title}</h3>
-                     <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
+                    <h3 className="text-sm font-bold text-primary-foreground">{title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
                   </div>
                 </article>
               ))}
