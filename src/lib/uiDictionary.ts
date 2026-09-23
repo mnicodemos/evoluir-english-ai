@@ -21,7 +21,27 @@ export const uiPt: Record<string, string> = {
   "Your next step": "Seu próximo passo",
   "How to practise": "Como praticar",
 
+  // Proof of progress (history)
+  "Your evolution": "Sua evolução",
+  "What your practice already shows": "O que a sua prática já demonstra",
+  "Level officially updated": "Nível atualizado oficialmente",
+  "You transferred": "Você conseguiu transferir",
+  "You consolidated": "Você consolidou",
+  "You evolved in": "Você evoluiu em",
+  "Keep practising": "Continue praticando",
+  "You have already used this skill in more than one context.":
+    "Você já usou esta habilidade em mais de um contexto.",
+  "You moved from early practice to a higher stage in this skill.":
+    "Você passou da prática inicial para um estágio mais avançado nesta habilidade.",
+  "Your results in this skill improved since the previous measurement.":
+    "Seus resultados nesta habilidade melhoraram em relação à medição anterior.",
+  "This skill had little evidence before and now has real evidence.":
+    "Esta habilidade tinha pouca evidência antes e agora possui evidência real.",
+  "We are still gathering evidence for this skill.":
+    "Ainda estamos reunindo evidências desta habilidade.",
+
   // Smart review (dashboard)
+
   "Worth recovering now": "O que vale recuperar agora",
   "Review now": "Revisar agora",
   "Let's reinforce a point that was tricky recently.":

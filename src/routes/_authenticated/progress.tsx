@@ -6,6 +6,8 @@ import { AppShell } from "@/components/AppShell";
 import { EvolutionChart, useProgressHistory } from "@/components/EvolutionChart";
 import { FrequencyCalendar } from "@/components/FrequencyCalendar";
 import { MinutesByDayChart } from "@/components/MinutesByDayChart";
+import { ProofOfProgressCard } from "@/components/ProofOfProgressCard";
+
 import { Progress as Bar } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
