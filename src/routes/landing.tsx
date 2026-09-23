@@ -93,12 +93,12 @@ const evoMessages = [
 ];
 
 const skills = [
-  [Ear, ["Listen", "ing"]],
-  [MessageCircleMore, ["Speak", "ing"]],
-  [PenLine, ["Writ", "ing"]],
-  [BookOpenText, ["Vocabu", "lary"]],
-  [Volume2, ["Pronunci", "ation"]],
-  [Languages, ["Read", "ing"]],
+  [Ear, "Listening"],
+  [MessageCircleMore, "Speaking"],
+  [PenLine, "Writing"],
+  [BookOpenText, "Vocabulary"],
+  [Volume2, "Pronunciation"],
+  [Languages, "Reading"],
 ] as const;
 
 const audiences = [
@@ -336,13 +336,15 @@ function CommercialLanding() {
             <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {skills.map(([Icon, label]) => (
                 <div
-                  key={label.join("")}
+                  key={label}
                   className="card-soft flex min-h-32 flex-col justify-between p-5"
                 >
                   <Icon className="size-6 text-success" aria-hidden="true" />
-                  <h3 className="mt-8 text-sm font-semibold">
-                    {label.map((part) => (
-                      <span key={part}>{part}</span>
+                  <h3 className="mt-8 text-sm font-semibold" aria-label={label}>
+                    {[...label].map((letter, index) => (
+                      <span key={`${letter}-${index}`} aria-hidden="true">
+                        {letter}
+                      </span>
                     ))}
                   </h3>
                 </div>
@@ -381,17 +383,12 @@ function CommercialLanding() {
                   "Você consolidou",
                   "Continue praticando",
                   "Seu próximo passo",
-                ].map((label, index) => (
+                ].map((label) => (
                   <div key={label} className="rounded-lg border border-border bg-secondary/60 p-4">
                     <p className="text-xs font-semibold text-muted-foreground">{label}</p>
-                    <div className="mt-5 flex items-end gap-2" aria-hidden="true">
-                      {[42, 68, 54, 82, 66].map((height, barIndex) => (
-                        <span
-                          key={barIndex}
-                          className={`w-full rounded-sm ${barIndex === index ? "bg-warning" : "bg-success/60"}`}
-                          style={{ height: `${height / 2}px` }}
-                        />
-                      ))}
+                    <div className="mt-5 flex items-center gap-2 text-success" aria-hidden="true">
+                      <CheckCircle2 className="size-5" />
+                      <span className="h-px flex-1 bg-border" />
                     </div>
                     <p className="mt-4 text-xs text-muted-foreground">
                       Baseado na sua própria prática.
