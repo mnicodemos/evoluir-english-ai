@@ -72,7 +72,7 @@ export function splitForFirstAudio(
   const text = value.trim();
   if (!text) return [];
   // Short answers are already fast: one request keeps the voice seamless.
-  if (text.length <= firstMax + 40) return [text];
+  if (text.length <= firstMax) return [text];
 
   const blocks: string[] = [];
   let rest = text;
