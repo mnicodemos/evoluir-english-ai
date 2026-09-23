@@ -368,9 +368,10 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
       const { data: prevLesson } = await supabase
         .from("lessons")
         .select("id")
-        .eq("created_by", userId)
         .eq("curriculum_key", previous.key)
+        .limit(1)
         .maybeSingle();
+
 
       const prevId = prevLesson?.id as string | undefined;
       const done = prevId
@@ -427,11 +428,11 @@ export const openFinalTest = createServerFn({ method: "POST" })
     const { data: rows } = await supabase
       .from("lessons")
       .select("id, curriculum_key")
-      .eq("created_by", userId)
       .in(
         "curriculum_key",
         plan.map((l) => l.key),
       );
+
     const lessonIds = ((rows ?? []) as { id: string }[]).map((r) => r.id);
 
     let done = 0;
@@ -542,14 +543,16 @@ export const openUnitTest = createServerFn({ method: "POST" })
     const unitPlan = getUnitLessons(level, data.unit);
     if (!unitPlan.length) throw new Error("This unit is not part of your learning path.");
 
+    // The lesson rows of the unit are the same ones the Learning Center reads:
+    // some are shared rows (no author), so ownership must not be required here.
     const { data: rows } = await supabase
       .from("lessons")
       .select("id, curriculum_key")
-      .eq("created_by", userId)
       .in(
         "curriculum_key",
         unitPlan.map((lesson) => lesson.key),
       );
+
     const unitLessonIds = ((rows ?? []) as { id: string }[]).map((row) => row.id);
 
     let completed = 0;
