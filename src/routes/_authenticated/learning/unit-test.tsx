@@ -18,6 +18,7 @@ import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 import { LESSON_QUIZ_PASS_SCORE } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { refreshAfterActivity } from "@/lib/refreshKeys";
 
 const searchSchema = z.object({ unit: z.coerce.number().int().min(1).max(5).catch(1) });
 
@@ -91,7 +92,7 @@ function UnitTestPage() {
     }
 
     await completeLesson(profile.id, id);
-    queryClient.invalidateQueries();
+    await refreshAfterActivity(queryClient);
     toast.success(
       lang === "pt"
         ? `Unidade ${unit} concluída com ${score}%!`

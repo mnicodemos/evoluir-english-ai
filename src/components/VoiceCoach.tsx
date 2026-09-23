@@ -25,7 +25,6 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
-import { useOverallAverage } from "@/hooks/useVocabularyProgress";
 import { buildStudyContext, useStudySnapshot } from "@/hooks/useStudyContext";
 import { supabase } from "@/integrations/supabase/client";
 import { coachOpenerMessages, coachReplyMessages, type ConversationReport } from "@/lib/ai-prompts";
@@ -42,6 +41,7 @@ import {
 } from "@/lib/voice-recorder";
 import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { refreshAfterActivity } from "@/lib/refreshKeys";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type VoiceState = "idle" | "recording" | "sending" | "transcribing" | "thinking" | "speaking";
@@ -178,7 +178,6 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     type: "conversation_practice",
     title: "Speaking practice",
   });
-  const { data: overall } = useOverallAverage();
   // The conversation always follows the CEFR level the student actually reached.
   const cefrLevel = getLevelState(profile?.level).current.value;
   const [scenario, setScenario] = useState<string | null>(null);
@@ -374,7 +373,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       const scored = result.fluency > 0 || result.grammar > 0 || result.vocabulary > 0;
       if (!scored)
         toast.error("We could not score this session, so your Talking progress was not changed.");
-      queryClient.invalidateQueries();
+      await refreshAfterActivity(queryClient);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not generate your report.");
     } finally {

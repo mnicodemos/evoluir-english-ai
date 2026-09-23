@@ -18,6 +18,7 @@ import { FINAL_TEST_PASS, FINAL_TEST_QUESTIONS, nextLevel } from "@/lib/level";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
+import { refreshAfterActivity, refreshAfterLevelChange } from "@/lib/refreshKeys";
 
 export const Route = createFileRoute("/_authenticated/learning/final-test")({
   head: () => ({
@@ -97,7 +98,7 @@ function FinalTestPage() {
           ? `Você passou com ${score}%. Você está no nível máximo do CEFR!`
           : `You passed with ${score}%. You are at the top CEFR level!`,
       );
-      queryClient.invalidateQueries();
+      await refreshAfterActivity(queryClient);
       return;
     }
 
@@ -108,7 +109,7 @@ function FinalTestPage() {
         .update({ level: upcoming.value, max_level: upcoming.value })
         .eq("id", profile.id);
       if (error) throw error;
-      queryClient.invalidateQueries();
+      await refreshAfterLevelChange(queryClient);
       toast.success(
         lang === "pt"
           ? `Você passou com ${score}%! Seu nível agora é ${upcoming.label}.`

@@ -17,6 +17,7 @@ import { type WritingFeedback } from "@/lib/ai-prompts";
 import { analyseAuthoritativeWriting } from "@/lib/pedagogy/dualWrite.functions";
 import { persistWritingLegacy } from "@/lib/legacyActivity.functions";
 import {
+import { refreshAfterActivity } from "@/lib/refreshKeys";
   expectedLengthLabel,
   pickWritingTasks,
   WRITING_CATEGORIES,
@@ -208,7 +209,7 @@ function Writing() {
         await saveLegacyWriting({
           data: { operationKey: stableOperationKey, minutes: minutesSpent(1) },
         });
-        queryClient.invalidateQueries();
+        await refreshAfterActivity(queryClient);
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not analyse your text");
