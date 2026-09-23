@@ -100,7 +100,15 @@ export type NextStepInput = {
   recentlyPractised: string[];
   /** One existing, not-completed lesson per skill, already filtered by level. */
   lessonBySkill: Record<string, { id: string; title: string } | undefined>;
-};
+  /**
+   * Phase 31: skills whose transfer is already demonstrated (Phase 30), passed
+   * as a plain list. It is not a score and never changes score, CEFR or
+   * confidence: inside the SAME priority weight, a transferred skill simply
+   * yields to a skill with the same kind of need that has not transferred yet.
+   */
+  transferredSkills?: readonly string[];
+}
+
 
 /**
  * The lesson catalogue labels spoken lessons 'talking'; the skill profile calls
@@ -289,14 +297,22 @@ export function buildNextStep(input: NextStepInput): NextStep {
     };
   }
 
+  const transferred = new Set(input.transferredSkills ?? []);
   const ordered = candidates
-    .map((skill) => ({ skill, ...rank(skill, input) }))
+    .map((skill) => ({
+      skill,
+      ...rank(skill, input),
+      transferred: transferred.has(skill.skill) ? 1 : 0,
+    }))
     .sort(
       (a, b) =>
         a.weight - b.weight ||
+        // Same kind of need: the skill already used across contexts goes last.
+        a.transferred - b.transferred ||
         (a.skill.score ?? 0) - (b.skill.score ?? 0) ||
         a.skill.skill.localeCompare(b.skill.skill),
     );
+
 
   const best = ordered[0]!;
   const matchesCurrentLevel =

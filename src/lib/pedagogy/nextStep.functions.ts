@@ -8,6 +8,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import type { AssessmentEvidence, PedagogicalSkill } from "./contracts";
 import { deriveInvisibleGaps } from "./invisibleGaps";
+import { transferredSkills } from "./learningLoop";
 import {
   buildNextStep,
   lessonSkillToProfileSkill,
@@ -15,6 +16,7 @@ import {
   type SkillSnapshot,
 } from "./nextStep";
 import { selectPrioritySkillQuest } from "./skillQuest";
+
 
 const RECENT_DAYS = 7;
 /** Existing evidence rows considered for the Skill Quest. Read-only. */
@@ -104,18 +106,8 @@ export const loadNextStep = createServerFn({ method: "POST" })
       if (!lessonBySkill[skill]) lessonBySkill[skill] = { id: lesson.id, title: lesson.title };
     }
 
-    const step = buildNextStep({
-      skills: snapshots,
-      currentLevel: level,
-      recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
-      recentlyPractised: [
-        ...new Set((recent.data ?? []).map((row) => row.activity_type).filter(Boolean)),
-      ] as string[],
-      lessonBySkill,
-    });
-
-    // Phase 29: the priority Skill Quest, derived from the existing evidence
-    // through the existing Invisible Gaps. Read-only, deterministic, no AI.
+    // Phase 29/30/31: existing evidence rows, read once and reused by the
+    // Invisible Gaps, the Skill Quest and the Transfer Context reading.
     const { data: evidenceRows } = await supabaseAdmin
       .from("assessment_evidence")
       .select(
@@ -142,10 +134,27 @@ export const loadNextStep = createServerFn({ method: "POST" })
       createdAt: row.created_at,
     }));
 
+    // Phase 31: the only signal the loop hands over — a plain list of skills
+    // whose transfer the existing Phase 30 layer already demonstrated.
+    const transferred = transferredSkills(evidence);
+
+    const step = buildNextStep({
+      skills: snapshots,
+      currentLevel: level,
+      recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
+      recentlyPractised: [
+        ...new Set((recent.data ?? []).map((row) => row.activity_type).filter(Boolean)),
+      ] as string[],
+      lessonBySkill,
+      transferredSkills: transferred,
+    });
+
     const quest = selectPrioritySkillQuest({
       gaps: deriveInvisibleGaps({ evidence }),
       lessonBySkill,
+      transferredSkills: transferred,
     });
+
 
     return { ...step, quest };
   });
