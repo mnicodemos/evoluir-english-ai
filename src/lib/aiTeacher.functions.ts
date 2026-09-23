@@ -191,7 +191,14 @@ export const teacherTurn = createServerFn({ method: "POST" })
           // What kind of task this turn was, from the mode/stage already derived
           // server-side. It only labels the evidence; no score changes.
           taskType: coach ? coachTaskType(coach.stage) : teacherTaskType(mode),
-          ...(coach ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION } : {}),
+          // Phase 30: the real-life context of this production, kept in the
+          // existing metadata so transfer can be read deterministically later.
+          ...(coach
+            ? { subskill: "coach_session", rubricVersion: COACH_RUBRIC_VERSION, context: coach.scenario }
+            : pedagogicalContext.currentActivity?.lessonTitle
+              ? { context: pedagogicalContext.currentActivity.lessonTitle }
+              : {}),
+
         }),
       });
       evidencePersisted = result.ok && !result.duplicate;

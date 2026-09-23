@@ -74,8 +74,14 @@ export function teacherEvidence(input: {
   subskill?: string;
   rubricVersion?: string;
   taskType?: TeacherTaskType;
+  /**
+   * Real-life context the production happened in (Phase 30). Stored in the
+   * existing metadata JSONB only; it changes no score, weight or rubric.
+   */
+  context?: string | null;
 }): AssessmentEvidence[] {
   const subskill = input.subskill ?? "teacher_interaction";
+  const context = input.context?.trim();
   return [
     {
       skill: input.skill,
@@ -97,7 +103,9 @@ export function teacherEvidence(input: {
       metadata: {
         criterion: subskill,
         ...(input.taskType ? { taskType: input.taskType } : {}),
+        ...(context ? { context } : {}),
       },
     },
   ];
 }
+
