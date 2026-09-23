@@ -14,7 +14,6 @@ import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
-import { markVocabularyBatchSeen, vocabularySignature } from "@/lib/activityIndicators";
 import { createAttemptGate } from "@/lib/attemptGate";
 
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
