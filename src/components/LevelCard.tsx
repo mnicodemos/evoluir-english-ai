@@ -49,7 +49,7 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
           <GraduationCap className="size-6 text-[oklch(0.45_0.12_240)]" />
         </span>
         <div className="flex-1 min-w-0">
-          <p className="whitespace-nowrap text-lg font-bold sm:text-base md:text-lg">{current.label}</p>
+          <p className="truncate text-lg font-bold sm:text-base md:text-lg">{current.label}</p>
           <p className="text-base text-muted-foreground sm:text-xs">
             <span>Your English level</span>
             <span> · </span>
