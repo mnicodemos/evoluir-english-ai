@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { splitForFirstAudio } from "@/lib/speechChunks";
 
 const BROWSER_VOICE_PROFILE = {
   pitch: 1,
@@ -24,6 +25,9 @@ const activeSources = new Set<AudioBufferSourceNode>();
 let activeUtterance: SpeechSynthesisUtterance | null = null;
 let playRequest = 0;
 let aiSpeechUnavailableUntil = 0;
+
+/** Live audio requests, so stopping the voice also stops generating it. */
+const abortControllers = new Set<AbortController>();
 
 const audioCache = new Map<string, Float32Array>();
 const pendingAudio = new Map<string, Promise<Float32Array>>();
@@ -104,6 +108,8 @@ function stopCurrentAudio() {
 export function stopSpeaking() {
   playRequest += 1;
   stopCurrentAudio();
+  for (const controller of abortControllers) controller.abort();
+  abortControllers.clear();
   activeUtterance = null;
   if (typeof window !== "undefined") window.speechSynthesis?.cancel();
 }
@@ -126,6 +132,7 @@ async function requestSpeech(
   value: string,
   onChunk?: (chunk: Uint8Array) => void,
   cacheMode: SpeechOptions["cache"] = "memory",
+  signal?: AbortSignal,
 ): Promise<Float32Array> {
   const cacheKey = value.toLocaleLowerCase("en-US");
   const cached = audioCache.get(cacheKey);
@@ -158,6 +165,7 @@ async function requestSpeech(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ text: value, cacheable: cacheMode === "persistent" }),
+      ...(signal ? { signal } : {}),
     });
     if (!response.ok || !response.body) {
       const body = (await response.json().catch(() => null)) as { message?: string } | null;
@@ -421,4 +429,3 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
     abortControllers.delete(controller);
   }
 }
-
