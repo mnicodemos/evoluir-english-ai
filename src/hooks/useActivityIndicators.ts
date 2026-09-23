@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
+import { fetchUserVocabularyMastery } from "@/hooks/useUserVocabularyMastery";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LISTENING_COMPLETION_KEY,
@@ -35,6 +36,7 @@ function todayKey() {
  * the Vocabulary page uses) and `user_vocabulary` mastery.
  */
 function useVocabularyBatchProgress(round: number, userId: string | undefined) {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["vocabulary-batch-progress", userId, round],
     enabled: !!userId,
@@ -45,12 +47,11 @@ function useVocabularyBatchProgress(round: number, userId: string | undefined) {
           .select("id")
           .eq("created_by", userId!)
           .eq("batch_key", lessonBatchKey(round)),
-        supabase.from("user_vocabulary").select("word_id, mastery_level"),
+        fetchUserVocabularyMastery(queryClient),
       ]);
       if (batch.error) throw batch.error;
-      if (mine.error) throw mine.error;
       const masteryByWordId: Record<string, number> = {};
-      for (const row of mine.data ?? []) masteryByWordId[row.word_id] = row.mastery_level ?? 0;
+      for (const row of mine) masteryByWordId[row.word_id] = row.mastery_level ?? 0;
       return { batchWordIds: (batch.data ?? []).map((w) => w.id), masteryByWordId };
     },
   });

@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useProfile } from "@/hooks/useProfile";
+import { fetchUserVocabularyMastery } from "@/hooks/useUserVocabularyMastery";
 import { supabase } from "@/integrations/supabase/client";
 
 export type StudySnapshot = {
@@ -17,6 +18,7 @@ export type StudySnapshot = {
 /** Aggregates lessons, videos, flashcards and quizzes for the current level — used by the dashboard and AI Talking. */
 export function useStudySnapshot() {
   const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
 
   return useQuery({
     queryKey: ["study-snapshot", profile?.id, profile?.level],
@@ -31,10 +33,10 @@ export function useStudySnapshot() {
       const lessonIds = new Set(lessons.map((l) => l.id));
       const lessonTitle = new Map(lessons.map((l) => [l.id, l.title]));
 
-      const [userLessons, userCards, userWords, results, lp, levelCards, levelWords] = await Promise.all([
+      const [userLessons, userCards, masteredWords, results, lp, levelCards, levelWords] = await Promise.all([
         supabase.from("user_lessons").select("lesson_id, video_progress, video_completed_at, completed_at"),
         supabase.from("user_flashcards").select("flashcard_id, mastery_level, last_rating, times_reviewed"),
-        supabase.from("user_vocabulary").select("word_id, mastery_level"),
+        fetchUserVocabularyMastery(queryClient),
         supabase.from("quiz_results").select("lesson_id, score").order("created_at", { ascending: false }).limit(30),
         supabase.from("learning_profile").select("common_errors").maybeSingle(),
         lessons.length
@@ -84,7 +86,7 @@ export function useStudySnapshot() {
         videosWatched: myLessons.filter((l) => l.video_completed_at || l.video_progress >= 99).length,
         vocabularyMastered:
           masteredCardIds.size +
-          (userWords.data ?? []).filter((w) => levelWordIds.has(w.word_id) && w.mastery_level >= 70).length,
+          masteredWords.filter((w) => levelWordIds.has(w.word_id) && w.mastery_level >= 70).length,
         quizAverage,
         weakWords,
         weakLessons,

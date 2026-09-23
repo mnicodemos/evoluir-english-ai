@@ -1,26 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-
-import { supabase } from "@/integrations/supabase/client";
+import { useUserLessons } from "@/hooks/useLearning";
 
 /**
- * How many lessons the student has already started (any progress row in user_lessons).
- * Listening Lab, Writing and Vocabulary use this number as their "round": every time the
- * student starts a new lesson, a fresh set of activities is generated.
+ * How many lessons the student has already completed. Listening Lab, Writing and
+ * Vocabulary use this number as their "round". It is derived from the same
+ * ["user-lessons"] dataset the rest of the app already loads — retaking a lesson
+ * does not open a new round.
  */
 export function useLessonRound() {
-  return useQuery({
-    queryKey: ["lesson-round"],
-    refetchOnMount: "always",
-    queryFn: async (): Promise<number> => {
-      // Completed lessons, matching the vocabulary batch rule: retaking a lesson
-      // does not open a new round.
-      const { count, error } = await supabase
-        .from("user_lessons")
-        .select("id", { count: "exact", head: true })
-        .not("completed_at", "is", null);
-      if (error) throw error;
-      return count ?? 0;
-    },
-
-  });
+  const { data, isLoading, error } = useUserLessons();
+  return {
+    data: data ? data.filter((row) => row.completed_at).length : undefined,
+    isLoading,
+    error,
+  };
 }
