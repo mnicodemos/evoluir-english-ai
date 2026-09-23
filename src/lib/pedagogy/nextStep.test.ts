@@ -202,6 +202,23 @@ describe("quick win", () => {
     });
   });
 
+  it("keeps the main action and quick practice as separate existing activities", () => {
+    const step = buildNextStep({
+      ...base,
+      skills: [skill("vocabulary", 30)],
+      lessonBySkill: { vocabulary: { id: "vocabulary-lesson", title: "Words in context" } },
+    });
+    expect(step.activity).toMatchObject({
+      to: "/learning/$lessonId",
+      params: { lessonId: "vocabulary-lesson" },
+    });
+    expect(step.quickWin?.activity).toEqual({
+      type: "vocabulary",
+      title: "Vocabulary",
+      to: "/vocabulary",
+    });
+  });
+
   it("changes the shortcut for grammar, speaking, writing, listening and reading", () => {
     expect(buildNextStep({ ...base, skills: [skill("grammar", 30)] }).quickWin).toMatchObject({
       skill: "grammar",

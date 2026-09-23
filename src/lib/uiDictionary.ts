@@ -76,6 +76,9 @@ export const uiPt: Record<string, string> = {
   "Practice reading": "Praticar leitura",
   "Next challenge": "Próximo desafio",
   "Practise now": "Praticar agora",
+  "Practice now": "Praticar agora",
+  "Quick practice": "Prática rápida",
+  "Take the challenge": "Aceitar o desafio",
   "Do a first activity so we can measure this skill":
     "Faça uma primeira atividade para medirmos esta habilidade",
   "Do one more activity in this skill": "Faça mais uma atividade nesta habilidade",
