@@ -219,7 +219,7 @@ function CommercialLanding() {
                       className="mt-0.5 size-5 shrink-0 text-warning"
                       aria-hidden="true"
                     />
-                    <p className="leading-relaxed text-card-foreground">{problem}</p>
+                    <p className="leading-relaxed text-primary-foreground">{problem}</p>
                   </div>
                 ))}
               </div>
@@ -240,8 +240,8 @@ function CommercialLanding() {
                   <span className="grid size-11 place-items-center rounded-lg bg-accent text-accent-foreground">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
-                  <h3 className="mt-5 text-sm font-bold text-foreground">{title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p>
+                  <h3 className="mt-5 text-sm font-bold text-primary-foreground">{title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted">{text}</p>
                 </article>
               ))}
             </div>
