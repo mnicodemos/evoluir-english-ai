@@ -248,7 +248,12 @@ describe("deriveSmartReview", () => {
 
   it("never treats a quiz as contextual production", () => {
     const result = deriveSmartReview(
-      input({ evidence: [quiz("grammar", 3, { metadata: { context: "unit 1" } }), quiz("grammar", 2, { metadata: { context: "unit 2" } })] }),
+      input({
+        evidence: [
+          quiz("grammar", 3, { metadata: { context: "unit 1" } }),
+          quiz("grammar", 2, { metadata: { context: "unit 2" } }),
+        ],
+      }),
     );
     expect(result[0]).toMatchObject({
       category: "UNCONSOLIDATED_REVIEW",
@@ -271,7 +276,12 @@ describe("deriveSmartReview", () => {
 
   it("is deterministic and idempotent for the same input", () => {
     const data = input({
-      evidence: [quiz("grammar", 3), quiz("grammar", 2), quiz("listening", 4), quiz("listening", 3)],
+      evidence: [
+        quiz("grammar", 3),
+        quiz("grammar", 2),
+        quiz("listening", 4),
+        quiz("listening", 3),
+      ],
     });
     expect(deriveSmartReview(data)).toEqual(deriveSmartReview(data));
   });
@@ -279,7 +289,12 @@ describe("deriveSmartReview", () => {
   it("breaks ties stably by skill name", () => {
     const result = deriveSmartReview(
       input({
-        evidence: [quiz("listening", 3), quiz("listening", 2), quiz("grammar", 3), quiz("grammar", 2)],
+        evidence: [
+          quiz("listening", 3),
+          quiz("listening", 2),
+          quiz("grammar", 3),
+          quiz("grammar", 2),
+        ],
       }),
     );
     expect(result.map((item) => item.skill)).toEqual(["grammar", "listening"]);

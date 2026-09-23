@@ -6,6 +6,7 @@ export * from "./dualWrite";
 export * from "./invisibleGaps";
 export * from "./learningLoop";
 export * from "./learningState";
+export * from "./smartReview";
 
 export * from "./skillQuest";
 export * from "./transferContext";

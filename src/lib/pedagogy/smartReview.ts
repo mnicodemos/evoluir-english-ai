@@ -23,10 +23,7 @@ import {
   type LearningStateConfig,
 } from "./learningState";
 import type { SkillSnapshot } from "./nextStep";
-import {
-  resolveSkillQuestResource,
-  type SkillQuestResource,
-} from "./skillQuest";
+import { resolveSkillQuestResource, type SkillQuestResource } from "./skillQuest";
 import { INITIAL_TRANSFER_CONTEXT_CONFIG, type TransferContextConfig } from "./transferContext";
 
 export const SMART_REVIEW_RULE_VERSION = "smart-review-v1";
@@ -212,7 +209,6 @@ function category(
   if (facts.recentlyPractised) return null;
   if (facts.days !== null && facts.days >= RELEVANT_DAYS) return "DECAY_REVIEW";
   return "CONTEXT_REVIEW";
-
 }
 
 /** Capability the review should ask for, given the label. */

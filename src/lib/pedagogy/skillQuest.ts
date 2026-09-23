@@ -189,7 +189,6 @@ export function deriveSkillQuest(
   const resource = resolveSkillQuestResource(gap.skill, need.target, input);
   if (!resource) return null;
 
-
   // Phase 31: when the quest already asks for production (or above) and this
   // skill has not been used across contexts yet, practising it in another
   // context is appropriate. A transferred skill never gets a forced variation.
