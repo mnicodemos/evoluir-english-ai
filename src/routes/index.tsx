@@ -315,9 +315,7 @@ function CommercialLanding() {
               {["Evidência", "Prática", "Contexto", "Evolução"].map((item, index, array) => (
                 <div key={item}>
                   <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary/60 p-4">
-                    <span className="font-display font-semibold text-card-foreground">
-                      {item}
-                    </span>
+                    <span className="font-display font-semibold text-card-foreground">{item}</span>
                     {index === array.length - 1 ? (
                       <Sparkles className="size-5 text-success" aria-hidden="true" />
                     ) : (
@@ -377,7 +375,9 @@ function CommercialLanding() {
             >
               <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-7">
                 <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">Minha evolução</p>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">
+                    Minha evolução
+                  </p>
                   <p className="mt-1 font-display font-semibold">Evidências da sua jornada</p>
                 </div>
                 <span className="grid size-10 place-items-center rounded-full bg-accent text-accent-foreground">
