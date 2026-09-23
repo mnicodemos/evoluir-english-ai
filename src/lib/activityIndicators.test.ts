@@ -15,9 +15,13 @@ describe("Dashboard recommended actions", () => {
     expect(dashboardActionAvailable("/writing", available)).toBe(false);
   });
 
-  it("keeps Vocabulary available: opening the batch is not doing the practice", () => {
-    expect(dashboardActionAvailable("/vocabulary", available)).toBe(true);
+  it("hides Vocabulary when the current batch has nothing left to practise", () => {
+    expect(dashboardActionAvailable("/vocabulary", available)).toBe(false);
+    expect(
+      dashboardActionAvailable("/vocabulary", { ...available, vocabulary: true }),
+    ).toBe(true);
   });
+
 
   it("does not block lessons or open-ended practice surfaces", () => {
     expect(dashboardActionAvailable("/learning/$lessonId", available)).toBe(true);

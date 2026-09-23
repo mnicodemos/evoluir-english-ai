@@ -58,9 +58,10 @@ export function vocabularyHasNewActivity(input: {
 /**
  * Whether an existing Dashboard destination still has an available action.
  * Only state that means the round was actually done is used: Listening keeps a
- * completed round and Writing keeps its corrected tasks. Vocabulary is judged by
- * real reviews, and opening an activity is not doing it, so it never hides a
- * recommendation. Lessons and open-ended practice stay available.
+ * completed round, Writing keeps its corrected tasks and Vocabulary keeps the
+ * mastery of the current batch — so a recommendation is never shown for a
+ * surface whose round has nothing left to practise. Opening a page is not doing
+ * it. Lessons and open-ended practice stay available.
  */
 export function dashboardActionAvailable(
   destination: string,
@@ -68,8 +69,10 @@ export function dashboardActionAvailable(
 ) {
   if (destination === "/listening") return indicators.listening;
   if (destination === "/writing") return indicators.writing;
+  if (destination === "/vocabulary") return indicators.vocabulary;
   return true;
 }
+
 
 
 function storage(): Storage | null {
