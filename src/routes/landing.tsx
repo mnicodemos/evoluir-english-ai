@@ -335,12 +335,9 @@ function CommercialLanding() {
             />
             <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {skills.map(([Icon, label]) => (
-                <div
-                  key={label}
-                  className="card-soft flex min-h-32 flex-col justify-between p-5"
-                >
+                <div key={label} className="card-soft flex min-h-32 flex-col justify-between p-5">
                   <Icon className="size-6 text-success" aria-hidden="true" />
-                  <h3 className="mt-8 text-sm font-semibold" aria-label={label}>
+                  <h3 className="mt-8 text-sm font-semibold">
                     {[...label].map((letter, index) => (
                       <span key={`${letter}-${index}`} aria-hidden="true">
                         {letter}
