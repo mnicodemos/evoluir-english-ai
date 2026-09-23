@@ -98,8 +98,8 @@ function Onboarding() {
             description={t(
               "I'll help you understand where you are in English and find a good starting point.",
             )}
-            imageSize="diagnosis"
-            className="card-soft p-4"
+            imageSize="diagnosisIntro"
+            className="card-soft px-4 py-3"
           />
           <div className="space-y-2">
             <Label htmlFor="name">{t("Your name")}</Label>
