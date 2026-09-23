@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import evoBust from "@/assets/evo-bust.png.asset.json";
+import evoGuideOfficial from "@/assets/evo-guide-official.png.asset.json";
 import { cn } from "@/lib/utils";
 
 type EvoGuideProps = {
@@ -14,17 +14,17 @@ export function EvoGuide({ title, description, children, className }: EvoGuidePr
   return (
     <div
       className={cn(
-        "grid min-w-0 grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[5.5rem_minmax(0,1fr)] sm:gap-4",
+        "grid min-w-0 grid-cols-[4.25rem_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[5.25rem_minmax(0,1fr)] sm:gap-4",
         className,
       )}
     >
-      <div className="aspect-[339/452] w-full overflow-hidden rounded-lg bg-secondary">
+      <div className="aspect-[1273/1236] w-full">
         <img
-          src={evoBust.url}
+          src={evoGuideOfficial.url}
           alt="EVO, sua companheira de evolução em inglês"
-          width={339}
-          height={452}
-          className="h-full w-full object-cover object-center"
+          width={1273}
+          height={1236}
+          className="h-full w-full object-contain object-center"
         />
       </div>
       <div className="min-w-0">
