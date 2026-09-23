@@ -22,7 +22,6 @@ export const uiPt: Record<string, string> = {
   "How to practise": "Como praticar",
 
   // Smart review (dashboard)
-  "Smart review": "Revisão inteligente",
   "Worth recovering now": "O que vale recuperar agora",
   "Review now": "Revisar agora",
   "Let's reinforce a point that was tricky recently.":
