@@ -30,19 +30,29 @@ export function writingHasNewActivity(input: {
   return input.prompts.some((prompt) => !input.done.includes(prompt));
 }
 
+/** Words a full vocabulary batch offers per round. */
+export const VOCABULARY_BATCH_SIZE = 10;
+/** A word counts as done with the same mastery threshold the Vocabulary page uses. */
+export const VOCABULARY_MASTERED = 75;
+
 /**
- * Vocabulary is new until the student actually reviews a word in the current
- * study day. Only the existing completion state (user_vocabulary
- * last_reviewed_at) is used: merely opening the page changes nothing.
+ * Vocabulary is new while the current round's batch still has a word the student
+ * has not mastered, or while the batch is not complete yet (a new round unlocks
+ * more words). Only the existing completion state (user_vocabulary mastery) is
+ * used: merely opening the page changes nothing.
  */
 export function vocabularyHasNewActivity(input: {
-  day: string;
-  lastReviewedAt: string | null | undefined;
+  batchWordIds: string[];
+  masteryByWordId: Record<string, number>;
+  batchSize?: number;
 }) {
-  if (!input.day) return false;
-  if (!input.lastReviewedAt) return true;
-  return input.lastReviewedAt.slice(0, 10) !== input.day;
+  const size = input.batchSize ?? VOCABULARY_BATCH_SIZE;
+  if (input.batchWordIds.length < size) return true;
+  return input.batchWordIds.some(
+    (id) => (input.masteryByWordId[id] ?? 0) < VOCABULARY_MASTERED,
+  );
 }
+
 
 
 /**
