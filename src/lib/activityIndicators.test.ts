@@ -1,11 +1,28 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  dashboardActionAvailable,
   listeningHasNewActivity,
   vocabularyHasNewActivity,
   vocabularySignature,
   writingHasNewActivity,
 } from "@/lib/activityIndicators";
+
+describe("Dashboard recommended actions", () => {
+  const available = { listening: true, writing: false, vocabulary: false };
+
+  it("uses the completion state already owned by Listening, Writing and Vocabulary", () => {
+    expect(dashboardActionAvailable("/listening", available)).toBe(true);
+    expect(dashboardActionAvailable("/writing", available)).toBe(false);
+    expect(dashboardActionAvailable("/vocabulary", available)).toBe(false);
+  });
+
+  it("does not block lessons or open-ended practice surfaces", () => {
+    expect(dashboardActionAvailable("/learning/$lessonId", available)).toBe(true);
+    expect(dashboardActionAvailable("/coach", available)).toBe(true);
+    expect(dashboardActionAvailable("/teacher", available)).toBe(true);
+  });
+});
 
 describe("Listening Lab indicator", () => {
   it("shows nothing when the current round was completed", () => {

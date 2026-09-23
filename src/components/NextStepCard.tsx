@@ -4,7 +4,9 @@ import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
+import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import {
   NEXT_STEP_ACTION_TEXT,
   NEXT_STEP_REASON_TEXT,
@@ -29,6 +31,7 @@ export function NextStepCard() {
   // Key the cache by the current CEFR level: when the level changes, the
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
+  const activityIndicators = useActivityIndicators();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
     queryFn: () => loadNextStep({ data: undefined }),
@@ -63,6 +66,13 @@ export function NextStepCard() {
     .replaceAll("{strongest}", strongestLabel ?? skillLabel);
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   const quickWin = data.quickWin;
+  const mainAvailable = dashboardActionAvailable(data.activity.to, activityIndicators);
+  const quickWinAvailable = quickWin
+    ? dashboardActionAvailable(quickWin.activity.to, activityIndicators)
+    : false;
+  const challengeAvailable = data.quest
+    ? dashboardActionAvailable(data.quest.resource.to, activityIndicators)
+    : false;
 
 
   return (
@@ -79,7 +89,7 @@ export function NextStepCard() {
             <p className="mt-2 text-sm">
               {t("How to practise")}: <span className="font-medium">{data.activity.title}</span>
             </p>
-            {data.activity.params ? (
+            {!mainAvailable ? null : data.activity.params ? (
               <Button asChild className="mt-3">
                 <Link to="/learning/$lessonId" params={data.activity.params}>
                   {t("Practice now")}
@@ -121,7 +131,7 @@ export function NextStepCard() {
                   ))}
                 </ul>
 
-                {quickWin.activity.params ? (
+                {!quickWinAvailable ? null : quickWin.activity.params ? (
                   <Button asChild className="mt-4">
                     <Link to="/learning/$lessonId" params={quickWin.activity.params}>
                       {t("Quick practice")}
@@ -187,7 +197,7 @@ export function NextStepCard() {
                     {t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)}
                   </p>
                   <p className="mt-1 text-sm">{t(SKILL_QUEST_ACTION_TEXT[data.quest.action])}</p>
-                  {data.quest.resource.params ? (
+                  {!challengeAvailable ? null : data.quest.resource.params ? (
                     <Button asChild className="mt-3">
                       <Link to="/learning/$lessonId" params={data.quest.resource.params}>
                         {t("Take the challenge")}
