@@ -18,7 +18,6 @@ import {
   LEARNING_STATE_RULE_VERSION,
 } from "./learningState";
 
-
 function evidence(overrides: Partial<AssessmentEvidence> = {}): AssessmentEvidence {
   return {
     skill: "grammar",
@@ -155,7 +154,6 @@ describe("deriveLearningState", () => {
     expect(result.state).toBe("PRODUCTION");
     expect(result.maintenance).toBe(true);
   });
-
 
   it("counts a duplicated result once", () => {
     const one = evidence({ id: "11111111-1111-4111-8111-111111111111" });

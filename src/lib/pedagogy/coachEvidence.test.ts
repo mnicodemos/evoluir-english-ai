@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  COACH_RUBRIC_VERSION,
-  coachEvidenceDecision,
-  coachEvidenceRound,
-} from "./coachSession";
+import { COACH_RUBRIC_VERSION, coachEvidenceDecision, coachEvidenceRound } from "./coachSession";
 import { teacherEvidence, teacherEvidenceDecision } from "./teacherEvidence";
 
 const production =

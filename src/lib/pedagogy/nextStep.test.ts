@@ -221,7 +221,6 @@ describe("quick win", () => {
     });
   });
 
-
   it("changes the shortcut for grammar, speaking, writing, listening and reading", () => {
     expect(buildNextStep({ ...base, skills: [skill("grammar", 30)] }).quickWin).toMatchObject({
       skill: "grammar",
