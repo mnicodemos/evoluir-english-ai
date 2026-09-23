@@ -89,10 +89,12 @@ describe("proof of progress", () => {
           quiz("writing", 19),
           production("writing", "work", 0, {
             sourceType: "writing",
+            sourceItemId: "task-1",
             metadata: { freeProduction: true },
           }),
           production("writing", "work", 0, {
             sourceType: "writing",
+            sourceItemId: "task-2",
             metadata: { freeProduction: true },
           }),
         ],
@@ -111,7 +113,7 @@ describe("proof of progress", () => {
       }),
     );
     const speaking = result.highlights.find((h) => h.skill === "speaking");
-    expect(speaking?.currentState).toBe("SPONTANEOUS_USE");
+    expect(speaking?.currentState).toBe("PRODUCTION");
     expect(speaking?.consolidation).toBe("CONTEXTUAL");
   });
 
