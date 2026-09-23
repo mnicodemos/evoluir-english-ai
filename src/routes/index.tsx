@@ -1,37 +1,45 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+  ArrowDown,
   ArrowRight,
-  BookOpen,
-  Check,
-  
-  LineChart,
-  MessageSquareText,
+  BookOpenText,
+  BriefcaseBusiness,
+  CheckCircle2,
+  Compass,
+  Ear,
+  GraduationCap,
+  Languages,
+  MessageCircleMore,
+  Mic2,
   PenLine,
+  RouteIcon,
   Sparkles,
   Target,
+  TrendingUp,
+  Users,
+  Volume2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import evoImage from "@/assets/evo-landing.webp";
+import evoBust from "@/assets/evo-bust.png.asset.json";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Logo";
-import { LANDING_LANG_KEY, landingCopy, type LandingLang } from "@/lib/landingCopy";
-import { UI_LANG_KEY } from "@/lib/uiLang";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Your personal AI English teacher" },
+      { title: "Evoluir+ English AI | Seu inglês evolui com você" },
       {
         name: "description",
         content:
-          "Practice conversation, fix your writing and grow your vocabulary every day with a CELTA-style AI English coach built for Brazilian professionals.",
+          "Aprenda, pratique e acompanhe sua evolução em inglês com uma jornada personalizada pelo Evoluir+ English AI.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Your personal AI English teacher" },
+      { property: "og:title", content: "Evoluir+ English AI | Seu inglês evolui com você" },
       {
         property: "og:description",
         content:
-          "Practice conversation, fix your writing and grow your vocabulary every day with an AI English coach.",
+          "Aprenda, pratique e acompanhe sua evolução em inglês com uma jornada personalizada pelo Evoluir+ English AI.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://evoluirmaisenglishai.com/" },
@@ -39,199 +47,406 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://evoluirmaisenglishai.com/" }],
   }),
-  component: Landing,
+  component: CommercialLanding,
 });
 
-const benefitIcons = [MessageSquareText, PenLine, BookOpen, LineChart];
-const featureIcons = [MessageSquareText, PenLine, BookOpen];
-const stepNumbers = ["01", "02", "03", "04"];
+const problems = [
+  "Você estuda, mas não sabe o que priorizar.",
+  "Você aprende conteúdo, mas nem sempre consegue usá-lo em situações reais.",
+  "Você pratica, mas nem sempre consegue perceber sua evolução.",
+];
 
-function Landing() {
-  const [lang, setLang] = useState<LandingLang>("pt");
-  const t = landingCopy[lang];
+const pillars = [
+  {
+    icon: Compass,
+    title: "DIAGNÓSTICO",
+    text: "Entenda suas habilidades e pontos que precisam de atenção.",
+  },
+  {
+    icon: RouteIcon,
+    title: "PLANO PERSONALIZADO",
+    text: "Tenha uma jornada orientada para seu objetivo.",
+  },
+  {
+    icon: Target,
+    title: "PRÁTICA",
+    text: "Aprenda e pratique dentro da mesma experiência.",
+  },
+  {
+    icon: TrendingUp,
+    title: "EVOLUÇÃO",
+    text: "Acompanhe evidências da sua evolução.",
+  },
+];
 
-  // The landing page is always shown in the dark theme.
-  useEffect(() => {
-    const root = document.documentElement;
-    const wasDark = root.classList.contains("dark");
-    root.classList.add("dark");
-    return () => {
-      if (!wasDark) root.classList.remove("dark");
-    };
-  }, []);
+const journey = [
+  ["01", "DESCUBRA", "Entenda seu nível e suas necessidades."],
+  ["02", "APRENDA", "Estude conteúdos adequados ao seu momento."],
+  ["03", "PRATIQUE", "Use o inglês em diferentes situações."],
+  ["04", "EVOLUA", "Receba orientação sobre o que faz sentido trabalhar a seguir."],
+] as const;
 
-  useEffect(() => {
-    const saved =
-      window.localStorage.getItem(LANDING_LANG_KEY) ?? window.localStorage.getItem(UI_LANG_KEY);
-    if (saved === "pt" || saved === "en") setLang(saved);
-  }, []);
+const evoMessages = [
+  "Encontrei seu próximo passo.",
+  "Vamos reforçar essa habilidade?",
+  "Você já demonstrou evolução aqui.",
+  "Agora vamos usar essa habilidade em outro contexto.",
+];
 
-  function switchLang(next: LandingLang) {
-    setLang(next);
-    window.localStorage.setItem(LANDING_LANG_KEY, next);
-    // Keep the app UI language (login and signed-in pages) in sync.
-    window.localStorage.setItem(UI_LANG_KEY, next);
-  }
+const skills = [
+  [Ear, "Listening"],
+  [MessageCircleMore, "Speaking"],
+  [PenLine, "Writing"],
+  [BookOpenText, "Vocabulary"],
+  [Volume2, "Pronunciation"],
+  [Languages, "Reading"],
+] as const;
 
+const audiences = [
+  [BriefcaseBusiness, "PROFISSIONAIS", "Para quem precisa usar inglês no trabalho."],
+  [
+    GraduationCap,
+    "ESTUDANTES",
+    "Para quem quer desenvolver suas habilidades de forma estruturada.",
+  ],
+  [
+    Users,
+    "QUEM JÁ ESTUDOU INGLÊS",
+    "Para quem sente que estuda há anos, mas ainda não evolui como gostaria.",
+  ],
+  [Mic2, "QUEM QUER PRATICAR", "Para quem quer transformar conhecimento em uso real."],
+] as const;
+
+function SectionHeading({ eyebrow, title }: { eyebrow?: string; title: string }) {
   return (
-    <div className="dark min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
-          <div className="flex items-center gap-2">
-            <Logo className="size-[1.8rem] shrink-0 self-center" />
-            <span className="font-display text-base font-semibold">Evoluir+ English AI</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => switchLang(lang === "en" ? "pt" : "en")}
-              aria-label={lang === "en" ? "Mudar idioma para português" : "Switch language to English"}
-              className="rounded-lg border border-border px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              {lang === "en" ? "EN" : "PT"}
-            </button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/auth">{t.signIn}</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link to="/auth" search={{ mode: "signup" }}>
-                {t.startFree}
-              </Link>
-            </Button>
-          </div>
+    <div className="max-w-3xl">
+      {eyebrow ? <p className="mb-4 text-xs font-bold uppercase text-success">{eyebrow}</p> : null}
+      <h2 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl lg:text-5xl">
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+function CommercialLanding() {
+  return (
+    <div className="dark min-h-screen overflow-x-clip bg-background text-foreground">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+          <Link
+            to="/"
+            aria-label="Evoluir+ English AI — início"
+            className="flex min-w-0 items-center gap-2.5"
+          >
+            <Logo className="size-8 shrink-0" />
+            <span className="truncate font-display text-sm font-semibold sm:text-base">
+              Evoluir+ English AI
+            </span>
+          </Link>
+          <Button asChild size="sm" className="shrink-0">
+            <Link to="/auth" search={{ mode: "signup" }}>
+              Começar <ArrowRight aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
       </header>
 
-      <section className="relative overflow-hidden surface-hero">
-        <div className="mx-auto max-w-6xl px-5 py-20 text-center sm:py-28">
-          <span className="animate-rise inline-flex items-center gap-2 rounded-full border border-foreground/15 bg-foreground/5 px-4 py-1.5 text-xs font-medium text-foreground/90">
-            <Sparkles className="size-3.5" /> {t.badge}
-          </span>
-          <h1 className="animate-rise mx-auto mt-6 max-w-3xl text-4xl font-bold leading-tight text-foreground sm:text-6xl">
-            {t.heroTitleA}
-            <span className="text-gradient-growth">{t.heroTitleB}</span>
-          </h1>
-          <p className="animate-rise mx-auto mt-5 max-w-xl text-base text-foreground/70 sm:text-lg">{t.heroText}</p>
-          <div className="animate-rise mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link to="/auth" search={{ mode: "signup" }}>
-                {t.ctaPrimary} <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="w-full border-foreground/20 bg-foreground/5 text-foreground hover:bg-foreground/10 hover:text-foreground sm:w-auto"
+      <main>
+        <section className="relative min-h-[calc(100svh-4rem)] overflow-hidden border-b border-border/70">
+          <div className="absolute inset-0 surface-hero opacity-45" aria-hidden="true" />
+          <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-7xl items-center gap-6 px-4 pb-0 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pt-10">
+            <div className="z-10 max-w-3xl pb-12 lg:pb-20">
+              <p className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-success">
+                <Sparkles className="size-4" aria-hidden="true" /> Uma jornada feita para você
+              </p>
+              <h1 className="text-4xl font-bold leading-[1.08] sm:text-6xl lg:text-7xl">
+                Seu inglês não segue um curso.
+                <span className="mt-2 block text-gradient-growth">Ele evolui com você.</span>
+              </h1>
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-xl">
+                Descubra o que você realmente precisa melhorar, pratique de forma personalizada e
+                acompanhe sua evolução em inglês.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button asChild size="lg" className="min-h-12 w-full sm:w-auto">
+                  <Link to="/auth" search={{ mode: "signup" }}>
+                    DESCUBRA SEU PRÓXIMO PASSO <ArrowRight aria-hidden="true" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="min-h-12 w-full bg-background/40 sm:w-auto"
+                >
+                  <a href="#como-funciona">
+                    CONHEÇA O EVOLUIR+ <ArrowDown aria-hidden="true" />
+                  </a>
+                </Button>
+              </div>
+            </div>
+
+            <div className="relative mx-auto flex h-[390px] w-full max-w-[540px] items-end justify-center sm:h-[540px] lg:h-[680px] lg:self-end">
+              <div
+                className="absolute bottom-[13%] left-1/2 h-[18%] w-[62%] -translate-x-1/2 rounded-full bg-success/10 blur-3xl"
+                aria-hidden="true"
+              />
+              <div className="relative h-full w-full">
+                <img
+                  src={evoImage}
+                  alt="EVO, a companheira inteligente da sua evolução em inglês"
+                  width={848}
+                  height={1264}
+                  fetchPriority="high"
+                  className="absolute inset-0 h-full w-full object-contain object-bottom drop-shadow-2xl"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-border/70 py-20 sm:py-28">
+          <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+            <SectionHeading title="Você já estudou inglês. Mas será que seu estudo está fazendo você evoluir?" />
+            <div>
+              <div className="space-y-4">
+                {problems.map((problem) => (
+                  <div
+                    key={problem}
+                    className="card-soft flex items-start gap-4 p-5 text-primary-foreground sm:p-6"
+                  >
+                    <CheckCircle2
+                      className="mt-0.5 size-5 shrink-0 text-warning"
+                      aria-hidden="true"
+                    />
+                    <p className="leading-relaxed text-primary-foreground">{problem}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-8 border-l-2 border-success pl-5 text-xl font-semibold leading-relaxed sm:text-2xl">
+                O problema nem sempre é falta de estudo.
+                <span className="block text-success">Pode ser falta de direção.</span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-secondary/40 py-20 sm:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading eyebrow="O diferencial" title="Não é apenas sobre estudar inglês." />
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {pillars.map(({ icon: Icon, title, text }) => (
+                <article key={title} className="card-soft p-6">
+                  <span className="grid size-11 place-items-center rounded-lg bg-accent text-accent-foreground">
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                  <h3 className="mt-5 text-sm font-bold text-primary-foreground">{title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted">{text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="como-funciona"
+          className="scroll-mt-20 border-y border-border/70 py-20 sm:py-28"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading eyebrow="Como funciona" title="Uma jornada que evolui com você." />
+            <ol className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {journey.map(([number, title, text]) => (
+                <li key={number} className="relative border-t border-border pt-6">
+                  <span className="font-display text-3xl font-bold text-success">{number}</span>
+                  <h3 className="mt-5 text-sm font-bold">{title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="overflow-hidden bg-secondary/40 py-20 sm:py-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
+            <div className="relative mx-auto aspect-[339/452] w-full max-w-[400px] overflow-hidden rounded-lg">
+              <img
+                src={evoBust.url}
+                alt="EVO apresentando orientações personalizadas de aprendizagem"
+                width={339}
+                height={452}
+                loading="lazy"
+                className="h-full w-full object-cover object-center"
+              />
+            </div>
+            <div>
+              <SectionHeading eyebrow="Sua companheira de evolução" title="Conheça a EVO." />
+              <p className="mt-5 text-lg text-muted-foreground">
+                Sua companheira inteligente de evolução em inglês.
+              </p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {evoMessages.map((message, index) => (
+                  <div key={message} className="card-soft p-5 text-primary-foreground">
+                    <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase text-success">
+                      <Logo className="size-5" /> EVO {String(index + 1).padStart(2, "0")}
+                    </div>
+                    <p className="text-sm font-medium leading-relaxed text-primary-foreground">
+                      “{message}”
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-y border-border/70 py-20 sm:py-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+            <div>
+              <SectionHeading title="Aprender inglês é mais do que acertar exercícios." />
+              <p className="mt-6 max-w-xl leading-relaxed text-muted-foreground">
+                O Evoluir+ considera sua jornada de aprendizagem para orientar os próximos passos,
+                em vez de simplesmente contar quantas atividades você realizou.
+              </p>
+            </div>
+            <div
+              className="card-soft p-5 text-primary-foreground sm:p-8"
+              aria-label="Caminho da evidência até a evolução"
             >
-              <Link to="/auth">{t.ctaSecondary}</Link>
-            </Button>
+              {["Evidência", "Prática", "Contexto", "Evolução"].map((item, index, array) => (
+                <div key={item}>
+                  <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary/60 p-4">
+                    <span className="font-display font-semibold text-primary-foreground">
+                      {item}
+                    </span>
+                    {index === array.length - 1 ? (
+                      <Sparkles className="size-5 text-success" aria-hidden="true" />
+                    ) : (
+                      <span className="size-2 rounded-full bg-warning" aria-hidden="true" />
+                    )}
+                  </div>
+                  {index < array.length - 1 ? (
+                    <ArrowDown
+                      className="mx-auto my-2 size-5 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-foreground/60">
-            {t.trust.map((i) => (
-              <span key={i} className="inline-flex items-center gap-1.5">
-                <Check className="size-4 text-success" /> {i}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-20">
-        <h2 className="text-center text-3xl font-bold sm:text-4xl">{t.whyTitle}</h2>
-        <p className="mx-auto mt-3 max-w-lg text-center text-foreground">{t.whyText}</p>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2">
-          {t.benefits.map((b, i) => {
-            const Icon = benefitIcons[i] ?? MessageSquareText;
-            return (
-              <div key={b.title} className="card-soft p-6 transition-shadow hover:shadow-[var(--shadow-lift)]">
-                <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground">
-                  <Icon className="size-5" />
+        <section className="py-20 sm:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading
+              eyebrow="Habilidades"
+              title="Uma experiência. Diferentes habilidades."
+            />
+            <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+              {skills.map(([Icon, label]) => (
+                <div
+                  key={label}
+                  className="card-soft flex min-h-32 flex-col justify-between p-5 text-primary-foreground"
+                >
+                  <Icon className="size-6 text-success" aria-hidden="true" />
+                  <h3 className="mt-8 text-sm font-semibold text-primary-foreground">
+                    {[...label].map((letter, index) => (
+                      <span key={`${letter}-${index}`} aria-hidden="true">
+                        {letter}
+                      </span>
+                    ))}
+                  </h3>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-secondary/40 py-20 sm:py-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
+            <div>
+              <SectionHeading eyebrow="Seu progresso" title="Veja sua evolução ganhar forma." />
+              <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
+                Visualize o que você já conquistou, onde está agora e qual caminho faz sentido
+                seguir.
+              </p>
+            </div>
+            <div
+              className="card-soft overflow-hidden text-primary-foreground"
+              aria-label="Exemplo visual da área de evolução, sem dados pessoais"
+            >
+              <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-7">
+                <div>
+                  <p className="text-xs font-semibold uppercase text-muted">Minha evolução</p>
+                  <p className="mt-1 font-display font-semibold">Evidências da sua jornada</p>
+                </div>
+                <span className="grid size-10 place-items-center rounded-full bg-accent text-accent-foreground">
+                  <TrendingUp className="size-5" aria-hidden="true" />
                 </span>
-                <h3 className="mt-4 text-lg font-semibold text-foreground">{b.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.text}</p>
               </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="bg-secondary/60 py-20">
-        <div className="mx-auto max-w-6xl px-5">
-          <h2 className="text-center text-3xl font-bold sm:text-4xl">{t.howTitle}</h2>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {t.steps.map((s, i) => (
-              <div key={s.title} className="card-soft p-6">
-                <span className="font-display text-2xl font-bold text-gradient-growth">{stepNumbers[i]}</span>
-                <h3 className="mt-3 font-semibold text-foreground">{s.title}</h3>
-                <p className="mt-2 text-sm text-foreground/80">{s.text}</p>
+              <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-7">
+                {[
+                  "Você evoluiu em",
+                  "Você consolidou",
+                  "Continue praticando",
+                  "Seu próximo passo",
+                ].map((label) => (
+                  <div key={label} className="rounded-lg border border-border bg-secondary/60 p-4">
+                    <p className="text-xs font-semibold text-muted">{label}</p>
+                    <div className="mt-5 flex items-center gap-2 text-success" aria-hidden="true">
+                      <CheckCircle2 className="size-5" />
+                      <span className="h-px flex-1 bg-border" />
+                    </div>
+                    <p className="mt-4 text-xs text-muted">Baseado na sua própria prática.</p>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-20">
-        <h2 className="text-center text-3xl font-bold sm:text-4xl">{t.insideTitle}</h2>
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {t.features.map((f, i) => {
-            const Icon = featureIcons[i] ?? MessageSquareText;
-            return (
-              <div key={f.title} className="card-soft p-6">
-                <Icon className="size-6 text-[oklch(0.6_0.14_158)]" />
-                <h3 className="mt-4 font-semibold text-foreground">{f.title}</h3>
-                <p className="mt-2 text-sm text-foreground/80">{f.text}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 pb-20">
-        <h2 className="text-center text-3xl font-bold sm:text-4xl">{t.plansTitle}</h2>
-        <p className="mx-auto mt-3 max-w-md text-center text-foreground">{t.plansText}</p>
-        <div className="mx-auto mt-10 grid max-w-3xl gap-5 sm:grid-cols-2">
-          <div className="card-soft p-7">
-            <h3 className="font-semibold text-foreground">{t.free}</h3>
-            <p className="mt-1 text-3xl font-bold text-foreground">R$ 0</p>
-            <ul className="mt-5 space-y-2 text-sm text-foreground/80">
-              {t.freeItems.map((i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <Check className="size-4 text-[oklch(0.6_0.14_158)]" /> {i}
-                </li>
+        <section className="border-y border-border/70 py-20 sm:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading title="Para quem quer evoluir de verdade no inglês." />
+            <div className="mt-12 grid gap-4 sm:grid-cols-2">
+              {audiences.map(([Icon, title, text]) => (
+                <article
+                  key={title}
+                  className="card-soft flex gap-4 p-5 text-primary-foreground sm:p-6"
+                >
+                  <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-bold text-primary-foreground">{title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
+                  </div>
+                </article>
               ))}
-            </ul>
-            <Button asChild className="mt-6 w-full">
-              <Link to="/auth" search={{ mode: "signup" }}>
-                {t.ctaPrimary}
-              </Link>
-            </Button>
+            </div>
           </div>
-          <div className="card-soft border-2 border-[oklch(0.6_0.14_158)] p-7">
-            <h3 className="flex items-center gap-2 font-semibold text-foreground">
-              {t.premium} <Target className="size-4" />
-            </h3>
-            <p className="mt-1 text-3xl font-bold text-foreground">
-              R$ 79,90<span className="text-base font-medium text-foreground">{t.perMonth}</span>
+        </section>
+
+        <section className="relative overflow-hidden py-24 sm:py-32">
+          <div className="absolute inset-0 surface-hero opacity-50" aria-hidden="true" />
+          <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
+            <Logo className="mx-auto size-12" />
+            <h2 className="mt-7 text-3xl font-bold leading-tight sm:text-5xl">
+              Descubra qual é o seu próximo passo.
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl leading-relaxed text-muted-foreground sm:text-lg">
+              Comece sua jornada e descubra como o Evoluir+ pode orientar seu aprendizado de inglês.
             </p>
-            <p className="mt-1 text-sm text-foreground/80">{t.yearly}</p>
-            <ul className="mt-5 space-y-2 text-sm text-foreground/80">
-              {t.premiumItems.map((i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <Sparkles className="size-4 text-[oklch(0.6_0.14_158)]" /> {i}
-                </li>
-              ))}
-            </ul>
-            <Button asChild variant="outline" className="mt-6 w-full">
+            <Button asChild size="lg" className="mt-8 min-h-12 w-full sm:w-auto">
               <Link to="/auth" search={{ mode: "signup" }}>
-                {t.goPremium}
+                COMEÇAR AGORA <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      <Footer lang={lang} />
+      <Footer lang="pt" />
     </div>
   );
 }
