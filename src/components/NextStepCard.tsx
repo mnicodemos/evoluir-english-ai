@@ -78,75 +78,89 @@ export function NextStepCard() {
   return (
     <section className="card-soft p-5" aria-label={t("Your next step")}>
       <div className="grid gap-5 lg:grid-cols-2 lg:gap-0">
-        <div className="flex min-w-0 items-start gap-4 lg:pr-6">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-            <Compass className="size-5 text-[oklch(0.45_0.11_255)]" aria-hidden="true" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-semibold">{t("Your next step")}</h2>
-            <p className="mt-0.5 font-medium">{skillLabel}</p>
-            <p className="text-sm text-muted-foreground">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
-            <p className="mt-2 text-sm">
-              {t("How to practise")}: <span className="font-medium">{data.activity.title}</span>
-            </p>
-            {!mainAvailable ? null : data.activity.params ? (
-              <Button asChild className="mt-3">
-                <Link to="/learning/$lessonId" params={data.activity.params}>
-                  {t("Practice now")}
-                  <ArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild className="mt-3">
-                <Link to={data.activity.to}>
-                  {t("Practice now")}
-                  <ArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-            )}
+        <div className="space-y-4 lg:pr-6">
+          <div className="flex min-w-0 items-start gap-4">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
+              <Compass className="size-5 text-[oklch(0.45_0.11_255)]" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-semibold">{t("Your next step")}</h2>
+              <p className="mt-0.5 font-medium">{skillLabel}</p>
+              <p className="text-sm text-muted-foreground">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
+              <p className="mt-2 text-sm">
+                {t("How to practise")}: <span className="font-medium">{data.activity.title}</span>
+              </p>
+              {!mainAvailable ? null : data.activity.params ? (
+                <Button asChild className="mt-3">
+                  <Link to="/learning/$lessonId" params={data.activity.params}>
+                    {t("Practice now")}
+                    <ArrowRight aria-hidden="true" />
+                  </Link>
+                </Button>
+              ) : (
+                <Button asChild className="mt-3">
+                  <Link to={data.activity.to}>
+                    {t("Practice now")}
+                    <ArrowRight aria-hidden="true" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
 
-            {quickWin ? (
-              <div className="mt-4 border-t border-border pt-3">
-                <div className="flex min-w-0 items-start gap-4">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-                    <Zap className="size-5 text-primary" aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-lg font-semibold">{t("Quick Win")}</h2>
-                    <p className="mt-0.5 font-medium">{t(quickWin.title)}</p>
+          {quickWin ? (
+            <div className="border-t border-border pt-3">
+              <div className="flex min-w-0 items-start gap-4">
+                <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
+                  <Zap className="size-5 text-primary" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-lg font-semibold">{t("Quick Win")}</h2>
+                  <p className="mt-0.5 font-medium">{t(quickWin.title)}</p>
 
-                    <ul className="mt-2 grid gap-1 text-sm">
-                      {quickWin.steps.map((step) => (
-                        <li key={`${step.label}-${step.text}`} className="flex min-w-0 items-start gap-2">
-                          <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                          <span className="min-w-0">
-                            <span className="font-medium">{t(step.label)}</span>
-                            <span className="text-muted-foreground"> — {t(step.text)}</span>
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                  <ul className="mt-2 grid gap-1 text-sm">
+                    <li className="flex min-w-0 items-start gap-2">
+                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                      <span className="min-w-0">
+                        <span className="font-medium">{t("Review")}</span>
+                        <span className="text-muted-foreground"> — {t("5 missed words")}</span>
+                      </span>
+                    </li>
+                    <li className="flex min-w-0 items-start gap-2">
+                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                      <span className="min-w-0">
+                        <span className="font-medium">{t("Recall")}</span>
+                        <span className="text-muted-foreground"> — {t("Remember before revealing")}</span>
+                      </span>
+                    </li>
+                    <li className="flex min-w-0 items-start gap-2">
+                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                      <span className="min-w-0">
+                        <span className="font-medium">{t("Track")}</span>
+                        <span className="text-muted-foreground"> — {t("Mark Error or Correct")}</span>
+                      </span>
+                    </li>
+                  </ul>
 
-                    {!quickWinAvailable ? null : quickWin.activity.params ? (
-                      <Button asChild className="mt-3">
-                        <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-                          {t("Quick practice")}
-                          <ArrowRight aria-hidden="true" />
-                        </Link>
-                      </Button>
-                    ) : (
-                      <Button asChild className="mt-3">
-                        <Link to={quickWin.activity.to}>
-                          {t("Quick practice")}
-                          <ArrowRight aria-hidden="true" />
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
+                  {!quickWinAvailable ? null : quickWin.activity.params ? (
+                    <Button asChild className="mt-3">
+                      <Link to="/learning/$lessonId" params={quickWin.activity.params}>
+                        {t("Quick practice")}
+                        <ArrowRight aria-hidden="true" />
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button asChild className="mt-3">
+                      <Link to={quickWin.activity.to}>
+                        {t("Quick practice")}
+                        <ArrowRight aria-hidden="true" />
+                      </Link>
+                    </Button>
+                  )}
                 </div>
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
 
         <aside className="min-w-0 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
