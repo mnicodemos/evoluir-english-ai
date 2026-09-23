@@ -22,6 +22,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
 import { ProfileMenu } from "@/components/ProfileMenu";
+import { AdminPanelButton } from "@/components/AdminPanelButton";
 import { AiTeacherFloatButton } from "@/components/AiTeacherFloatButton";
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
@@ -107,6 +108,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="flex flex-col items-center gap-1">
+            <AdminPanelButton className="size-10 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
             <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
             <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
             <Tooltip>
@@ -135,6 +137,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
             <span className="truncate font-display text-sm font-semibold">Evoluir+ English AI</span>
           </Link>
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+            <AdminPanelButton />
             <UiLangToggle />
             <ThemeToggle />
             <Button
