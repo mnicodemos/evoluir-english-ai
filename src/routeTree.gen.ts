@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LandingRouteImport } from './routes/landing'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedBillingSuccessRouteImport } from './routes/_authenticated/billing-success'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
@@ -47,6 +48,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandingRoute = LandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -170,6 +176,7 @@ const LovableEmailTransactionalPreviewRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/landing': typeof LandingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/landing': typeof LandingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/landing': typeof LandingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/landing'
     | '/reset-password'
     | '/billing-success'
     | '/coach'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/landing'
     | '/reset-password'
     | '/billing-success'
     | '/coach'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/landing'
     | '/reset-password'
     | '/_authenticated/billing-success'
     | '/_authenticated/coach'
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LandingRoute: typeof LandingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/landing': {
+      id: '/landing'
+      path: '/landing'
+      fullPath: '/landing'
+      preLoaderRoute: typeof LandingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -566,6 +586,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  LandingRoute: LandingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiCoachStreamRoute: ApiCoachStreamRoute,
   ApiSpeechRoute: ApiSpeechRoute,
