@@ -381,13 +381,12 @@ function Vocabulary() {
               {showActions && (
                 <div className="mt-4 flex gap-2">
                   <Button
-                    size="icon"
                     disabled={busy === w.id}
                     onClick={() => markKnown(w.id)}
                     aria-label="I know this word"
                     title="I know this word"
                   >
-                    <Check className="size-4" />
+                    <Check className="size-4" /> That's OK
                   </Button>
                   <Button
                     size="icon"
