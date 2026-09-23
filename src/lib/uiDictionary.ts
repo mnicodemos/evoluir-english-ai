@@ -20,7 +20,6 @@ export const uiPt: Record<string, string> = {
   Focus: "Foco",
   "Your next step": "Seu próximo passo",
   "Your next step is here.": "Seu próximo passo está aqui.",
-  Continue: "Continuar",
   "How to practise": "Como praticar",
 
   // Proof of progress (history)
