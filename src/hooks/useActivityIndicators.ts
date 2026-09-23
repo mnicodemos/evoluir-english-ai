@@ -29,22 +29,28 @@ function todayKey() {
 }
 
 /**
- * Last time the student actually reviewed a vocabulary word. Read from the
- * existing user_vocabulary state; nothing new is stored.
+ * The current vocabulary batch and how much of it the student has mastered.
+ * Both come from existing state: the batch rows in `vocabulary` (same batch key
+ * the Vocabulary page uses) and `user_vocabulary` mastery.
  */
-function useLastVocabularyReview() {
+function useVocabularyBatchProgress(round: number, userId: string | undefined) {
   return useQuery({
-    queryKey: ["vocabulary-last-review"],
-    queryFn: async (): Promise<string | null> => {
-      const { data, error } = await supabase
-        .from("user_vocabulary")
-        .select("last_reviewed_at")
-        .not("last_reviewed_at", "is", null)
-        .order("last_reviewed_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data?.last_reviewed_at ?? null;
+    queryKey: ["vocabulary-batch-progress", userId, round],
+    enabled: !!userId,
+    queryFn: async () => {
+      const [batch, mine] = await Promise.all([
+        supabase
+          .from("vocabulary")
+          .select("id")
+          .eq("created_by", userId!)
+          .eq("batch_key", lessonBatchKey(round)),
+        supabase.from("user_vocabulary").select("word_id, mastery_level"),
+      ]);
+      if (batch.error) throw batch.error;
+      if (mine.error) throw mine.error;
+      const masteryByWordId: Record<string, number> = {};
+      for (const row of mine.data ?? []) masteryByWordId[row.word_id] = row.mastery_level ?? 0;
+      return { batchWordIds: (batch.data ?? []).map((w) => w.id), masteryByWordId };
     },
   });
 }
@@ -56,8 +62,8 @@ function useLastVocabularyReview() {
 export function useActivityIndicators(): ActivityIndicators {
   const { data: profile } = useProfile();
   const { data: lessonRound } = useLessonRound();
-  const { data: lastVocabularyReview } = useLastVocabularyReview();
   const round = lessonRound ?? 0;
+  const { data: vocabularyBatch } = useVocabularyBatchProgress(round, profile?.id);
   const [indicators, setIndicators] = useState<ActivityIndicators>({
     listening: false,
     writing: false,
@@ -80,12 +86,12 @@ export function useActivityIndicators(): ActivityIndicators {
         done: readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []),
         tasksPerRound: WRITING_CATEGORIES.length,
       }),
-      vocabulary: vocabularyHasNewActivity({
-        day: studyToday(),
-        lastReviewedAt: lastVocabularyReview,
-      }),
+      vocabulary: vocabularyBatch
+        ? vocabularyHasNewActivity(vocabularyBatch)
+        : false,
     });
-  }, [profile, round, lastVocabularyReview]);
+  }, [profile, round, vocabularyBatch]);
+
 
   return indicators;
 }
