@@ -53,10 +53,7 @@ export function SmartReviewCard() {
 
   return (
     <section className="card-soft p-5" aria-labelledby="smart-review-title">
-      <EvoGuide
-        title={t("This is a good skill to reinforce now.")}
-        imageSize="lesson"
-      />
+      <EvoGuide title={t("This is a good skill to reinforce now.")} imageSize="lesson" />
 
       <div className="mt-5 flex min-w-0 items-start gap-4 border-t border-border pt-5">
         <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
