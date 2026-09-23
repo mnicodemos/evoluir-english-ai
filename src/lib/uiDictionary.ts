@@ -568,6 +568,7 @@ export const uiPt: Record<string, string> = {
   "Could not play this pronunciation.": "Não foi possível reproduzir esta pronúncia.",
   "Could not save this word": "Não foi possível salvar esta palavra",
   "Today's words are not ready yet.": "As palavras de hoje ainda não estão prontas.",
+  "Preparing new words…": "Preparando novas palavras…",
   "Fresh English words every day, with pronunciation practice.":
     "Novas palavras em inglês todo dia, com prática de pronúncia.",
   "Learn new English words every day and test your pronunciation out loud.":
