@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { splitForFirstAudio } from "@/lib/speechChunks";
 
 const BROWSER_VOICE_PROFILE = {
   pitch: 1,
@@ -24,6 +25,9 @@ const activeSources = new Set<AudioBufferSourceNode>();
 let activeUtterance: SpeechSynthesisUtterance | null = null;
 let playRequest = 0;
 let aiSpeechUnavailableUntil = 0;
+
+/** Live audio requests, so stopping the voice also stops generating it. */
+const abortControllers = new Set<AbortController>();
 
 const audioCache = new Map<string, Float32Array>();
 const pendingAudio = new Map<string, Promise<Float32Array>>();
@@ -104,6 +108,8 @@ function stopCurrentAudio() {
 export function stopSpeaking() {
   playRequest += 1;
   stopCurrentAudio();
+  for (const controller of abortControllers) controller.abort();
+  abortControllers.clear();
   activeUtterance = null;
   if (typeof window !== "undefined") window.speechSynthesis?.cancel();
 }
@@ -126,6 +132,7 @@ async function requestSpeech(
   value: string,
   onChunk?: (chunk: Uint8Array) => void,
   cacheMode: SpeechOptions["cache"] = "memory",
+  signal?: AbortSignal,
 ): Promise<Float32Array> {
   const cacheKey = value.toLocaleLowerCase("en-US");
   const cached = audioCache.get(cacheKey);
@@ -158,6 +165,7 @@ async function requestSpeech(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ text: value, cacheable: cacheMode === "persistent" }),
+      ...(signal ? { signal } : {}),
     });
     if (!response.ok || !response.body) {
       const body = (await response.json().catch(() => null)) as { message?: string } | null;
@@ -310,6 +318,10 @@ async function speakWithBrowser(value: string, rate = 1): Promise<void> {
 /**
  * Streams clear English pronunciation from the app's authenticated audio route,
  * falling back to the built-in browser voice when the service is unavailable.
+ *
+ * A long answer is spoken in order, block by block: the short opening block is
+ * played as soon as it is ready while the next block is already being prepared,
+ * so the student stops waiting for the whole answer to be generated.
  */
 export async function speakEnglish(text: string, options: SpeechOptions = {}): Promise<void> {
   const value = text?.trim();
@@ -323,11 +335,35 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   const context = audioContext;
   const requestId = ++playRequest;
   stopCurrentAudio();
+  const controller = new AbortController();
+  abortControllers.add(controller);
 
-  let samples: Float32Array;
-  let streamed = false;
+  const cacheMode = options.cache ?? "memory";
+  const blocks = splitForFirstAudio(value);
   let playhead = context.currentTime + 0.05;
   let pendingByte: number | null = null;
+  let scheduledAny = false;
+  let lastSource: AudioBufferSourceNode | undefined;
+
+  const scheduleSamples = (floats: Float32Array) => {
+    if (requestId !== playRequest || floats.length === 0) return;
+    const decoded = context.createBuffer(1, floats.length, 24000);
+    decoded.getChannelData(0).set(floats);
+    const source = context.createBufferSource();
+    const gain = context.createGain();
+    gain.gain.value = 1.15;
+    source.buffer = decoded;
+    source.playbackRate.value = rate;
+    source.connect(gain);
+    gain.connect(context.destination);
+    playhead = Math.max(playhead, context.currentTime + 0.02);
+    source.onended = () => activeSources.delete(source);
+    source.start(playhead);
+    playhead += decoded.duration / rate;
+    activeSources.add(source);
+    scheduledAny = true;
+    lastSource = source;
+  };
 
   const scheduleChunk = (incoming: Uint8Array) => {
     if (requestId !== playRequest) return;
@@ -344,72 +380,52 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
       bytes = bytes.slice(0, -1);
     }
     if (bytes.length === 0) return;
-
-    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    const floats = new Float32Array(bytes.byteLength / 2);
-    for (let index = 0; index < floats.length; index += 1) {
-      floats[index] = view.getInt16(index * 2, true) / 32768;
-    }
-    const decoded = context.createBuffer(1, floats.length, 24000);
-    decoded.copyToChannel(floats, 0);
-    const source = context.createBufferSource();
-    const gain = context.createGain();
-    gain.gain.value = 1.15;
-    source.buffer = decoded;
-    source.playbackRate.value = rate;
-    source.connect(gain);
-    gain.connect(context.destination);
-    playhead = Math.max(playhead, context.currentTime + 0.02);
-    source.onended = () => activeSources.delete(source);
-    source.start(playhead);
-    playhead += decoded.duration / rate;
-    activeSources.add(source);
-    streamed = true;
+    scheduleSamples(pcmBytesToSamples(bytes));
   };
 
   try {
-    samples = await requestSpeech(value, scheduleChunk, options.cache ?? "memory");
-  } catch {
-    if (requestId !== playRequest) return;
-    if (streamed) return;
-    return speakWithBrowser(value, rate);
-  }
-  if (requestId !== playRequest) return;
-  if (context.state === "suspended") await context.resume();
+    let prefetched: Promise<Float32Array> | null = null;
+    for (let index = 0; index < blocks.length; index += 1) {
+      const block = blocks[index]!;
+      let streamedThisBlock = false;
+      const onChunk = (chunk: Uint8Array) => {
+        streamedThisBlock = true;
+        scheduleChunk(chunk);
+      };
+      let samples: Float32Array;
+      try {
+        samples = prefetched
+          ? await prefetched
+          : await requestSpeech(block, onChunk, cacheMode, controller.signal);
+      } catch (error) {
+        if (requestId !== playRequest) return;
+        if (scheduledAny) break;
+        if (controller.signal.aborted) return;
+        void error;
+        return speakWithBrowser(value, rate);
+      }
+      if (requestId !== playRequest) return;
+      // Prepare the next block while this one is already playing.
+      const next = blocks[index + 1];
+      prefetched = next
+        ? requestSpeech(next, undefined, cacheMode, controller.signal).catch(() => {
+            throw new Error("The rest of the answer could not be played.");
+          })
+        : null;
+      if (!streamedThisBlock) scheduleSamples(samples);
+    }
 
-  const scheduledSources = Array.from(activeSources);
-  const finalSource = scheduledSources[scheduledSources.length - 1];
-  if (streamed && finalSource) {
+    if (requestId !== playRequest) return;
+    if (context.state === "suspended") await context.resume();
+    const finalSource: AudioBufferSourceNode | undefined = lastSource;
+    if (!finalSource) throw new Error("Audio could not start on this device. Please tap again.");
     await new Promise<void>((resolve) => {
       finalSource.onended = () => {
         activeSources.delete(finalSource);
         resolve();
       };
     });
-    return;
+  } finally {
+    abortControllers.delete(controller);
   }
-
-  const decoded = context.createBuffer(1, samples.length, 24000);
-  decoded.getChannelData(0).set(samples);
-  const source = context.createBufferSource();
-  const gain = context.createGain();
-  gain.gain.value = 1.15;
-  source.buffer = decoded;
-  source.playbackRate.value = rate;
-  source.connect(gain);
-  gain.connect(context.destination);
-  activeSources.add(source);
-
-  await new Promise<void>((resolve, reject) => {
-    source.onended = () => {
-      activeSources.delete(source);
-      resolve();
-    };
-    try {
-      source.start();
-    } catch {
-      activeSources.delete(source);
-      reject(new Error("Audio could not start on this device. Please tap again."));
-    }
-  });
 }
