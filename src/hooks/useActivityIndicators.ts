@@ -18,7 +18,6 @@ import {
 import { lessonBatchKey } from "@/lib/vocabularyBatch";
 import { WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
 
-
 export type ActivityIndicators = {
   listening: boolean;
   writing: boolean;
@@ -88,12 +87,9 @@ export function useActivityIndicators(): ActivityIndicators {
         done: readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []),
         tasksPerRound: WRITING_CATEGORIES.length,
       }),
-      vocabulary: vocabularyBatch
-        ? vocabularyHasNewActivity(vocabularyBatch)
-        : false,
+      vocabulary: vocabularyBatch ? vocabularyHasNewActivity(vocabularyBatch) : false,
     });
   }, [profile, round, vocabularyBatch]);
-
 
   return indicators;
 }

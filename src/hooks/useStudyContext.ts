@@ -33,17 +33,32 @@ export function useStudySnapshot() {
       const lessonIds = new Set(lessons.map((l) => l.id));
       const lessonTitle = new Map(lessons.map((l) => [l.id, l.title]));
 
-      const [userLessons, userCards, masteredWords, results, lp, levelCards, levelWords] = await Promise.all([
-        supabase.from("user_lessons").select("lesson_id, video_progress, video_completed_at, completed_at"),
-        supabase.from("user_flashcards").select("flashcard_id, mastery_level, last_rating, times_reviewed"),
-        fetchUserVocabularyMastery(queryClient),
-        supabase.from("quiz_results").select("lesson_id, score").order("created_at", { ascending: false }).limit(30),
-        supabase.from("learning_profile").select("common_errors").maybeSingle(),
-        lessons.length
-          ? supabase.from("flashcards").select("id, word").in("lesson_id", lessons.map((l) => l.id))
-          : Promise.resolve({ data: [] }),
-        supabase.from("vocabulary").select("id, level, lesson_id"),
-      ]);
+      const [userLessons, userCards, masteredWords, results, lp, levelCards, levelWords] =
+        await Promise.all([
+          supabase
+            .from("user_lessons")
+            .select("lesson_id, video_progress, video_completed_at, completed_at"),
+          supabase
+            .from("user_flashcards")
+            .select("flashcard_id, mastery_level, last_rating, times_reviewed"),
+          fetchUserVocabularyMastery(queryClient),
+          supabase
+            .from("quiz_results")
+            .select("lesson_id, score")
+            .order("created_at", { ascending: false })
+            .limit(30),
+          supabase.from("learning_profile").select("common_errors").maybeSingle(),
+          lessons.length
+            ? supabase
+                .from("flashcards")
+                .select("id, word")
+                .in(
+                  "lesson_id",
+                  lessons.map((l) => l.id),
+                )
+            : Promise.resolve({ data: [] }),
+          supabase.from("vocabulary").select("id, level, lesson_id"),
+        ]);
 
       const levelCardIds = new Set((levelCards.data ?? []).map((c) => c.id));
       // A word belongs to this level when it is tagged with the level. Words without a tag
@@ -56,15 +71,25 @@ export function useStudySnapshot() {
       );
 
       // Only cards the student actually answered and mastered count (restricted to this level's lessons).
-      const cardsRows = (userCards.data ?? []).filter((card) => levelCardIds.has(card.flashcard_id));
-      const masteredCardIds = new Set(
-        cardsRows.filter((card) => card.times_reviewed > 0 && card.mastery_level >= 70).map((card) => card.flashcard_id),
+      const cardsRows = (userCards.data ?? []).filter((card) =>
+        levelCardIds.has(card.flashcard_id),
       );
-      const weakIds = cardsRows.filter((c) => c.mastery_level < 50 || c.last_rating === "hard").map((c) => c.flashcard_id);
+      const masteredCardIds = new Set(
+        cardsRows
+          .filter((card) => card.times_reviewed > 0 && card.mastery_level >= 70)
+          .map((card) => card.flashcard_id),
+      );
+      const weakIds = cardsRows
+        .filter((c) => c.mastery_level < 50 || c.last_rating === "hard")
+        .map((c) => c.flashcard_id);
       const cardWord = new Map((levelCards.data ?? []).map((c) => [c.id, c.word]));
-      const weakWords = Array.from(new Set(weakIds.map((id) => cardWord.get(id) ?? "").filter(Boolean))).slice(0, 8);
+      const weakWords = Array.from(
+        new Set(weakIds.map((id) => cardWord.get(id) ?? "").filter(Boolean)),
+      ).slice(0, 8);
 
-      const quizRows = (results.data ?? []).filter((r) => r.lesson_id && lessonIds.has(r.lesson_id));
+      const quizRows = (results.data ?? []).filter(
+        (r) => r.lesson_id && lessonIds.has(r.lesson_id),
+      );
       const quizAverage = quizRows.length
         ? Math.round(quizRows.reduce((sum, r) => sum + r.score, 0) / quizRows.length)
         : 0;
@@ -83,7 +108,8 @@ export function useStudySnapshot() {
       return {
         lessonsCompleted: myLessons.filter((l) => l.completed_at).length,
         lessonsTotal: lessons.length,
-        videosWatched: myLessons.filter((l) => l.video_completed_at || l.video_progress >= 99).length,
+        videosWatched: myLessons.filter((l) => l.video_completed_at || l.video_progress >= 99)
+          .length,
         vocabularyMastered:
           masteredCardIds.size +
           masteredWords.filter((w) => levelWordIds.has(w.word_id) && w.mastery_level >= 70).length,
@@ -103,8 +129,10 @@ export function buildStudyContext(s?: StudySnapshot | null) {
     `Lessons completed: ${s.lessonsCompleted}/${s.lessonsTotal}. Videos watched: ${s.videosWatched}.`,
     `Average quiz score: ${s.quizAverage}%. Words mastered: ${s.vocabularyMastered}.`,
   ];
-  if (s.weakLessons.length) lines.push(`Lessons with a low quiz score: ${s.weakLessons.join(", ")}.`);
-  if (s.weakWords.length) lines.push(`Words the student finds difficult: ${s.weakWords.join(", ")}.`);
+  if (s.weakLessons.length)
+    lines.push(`Lessons with a low quiz score: ${s.weakLessons.join(", ")}.`);
+  if (s.weakWords.length)
+    lines.push(`Words the student finds difficult: ${s.weakWords.join(", ")}.`);
   if (s.commonErrors.length) lines.push(`Recurring mistakes: ${s.commonErrors.join("; ")}.`);
   return lines.join("\n");
 }

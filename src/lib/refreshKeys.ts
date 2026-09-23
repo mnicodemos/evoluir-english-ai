@@ -11,6 +11,7 @@ export const ACTIVITY_REFRESH_KEYS = [
   ["study-snapshot"],
   ["next-step"],
   ["proof-of-progress"],
+  ["user-vocabulary-mastery"],
   ["quiz-results"],
   ["user-lessons"],
   ["lesson-round"],
@@ -41,6 +42,7 @@ export const LEVEL_REFRESH_KEYS = [
   ["daily-words"],
   ["vocabulary-progress"],
   ["vocabulary-batch-progress"],
+  ["user-vocabulary-mastery"],
   ["study-plan"],
   ["minutes-by-day"],
 ] as const;

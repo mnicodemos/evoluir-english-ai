@@ -16,7 +16,9 @@ export function fetchUserVocabularyMastery(queryClient: QueryClient): Promise<Wo
     queryKey: [...USER_VOCABULARY_MASTERY_KEY],
     staleTime: 30_000,
     queryFn: async (): Promise<WordMastery[]> => {
-      const { data, error } = await supabase.from("user_vocabulary").select("word_id, mastery_level");
+      const { data, error } = await supabase
+        .from("user_vocabulary")
+        .select("word_id, mastery_level");
       if (error) throw error;
       return (data ?? []).map((row) => ({
         word_id: row.word_id,
