@@ -160,14 +160,14 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
 
   return (
     <div className="flex w-full max-w-none flex-col gap-4">
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:justify-between">
+      <header className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
           <p className="text-sm text-muted-foreground">
             {t("Practice English with your personal AI teacher")}
           </p>
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <Button
             variant="secondary"
             size="sm"
