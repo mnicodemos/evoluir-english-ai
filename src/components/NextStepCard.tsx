@@ -80,22 +80,19 @@ export function NextStepCard() {
               {t("How to practise")}: <span className="font-medium">{data.activity.title}</span>
             </p>
             {data.activity.params ? (
-              <Link
-                to="/learning/$lessonId"
-                params={data.activity.params}
-                className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
-              >
-                {t(NEXT_STEP_ACTION_TEXT[data.action])}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
+              <Button asChild className="mt-3">
+                <Link to="/learning/$lessonId" params={data.activity.params}>
+                  {t("Practice now")}
+                  <ArrowRight aria-hidden="true" />
+                </Link>
+              </Button>
             ) : (
-              <Link
-                to={data.activity.to}
-                className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
-              >
-                {t(NEXT_STEP_ACTION_TEXT[data.action])}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
+              <Button asChild className="mt-3">
+                <Link to={data.activity.to}>
+                  {t("Practice now")}
+                  <ArrowRight aria-hidden="true" />
+                </Link>
+              </Button>
             )}
 
             {quickWin ? (
@@ -125,17 +122,17 @@ export function NextStepCard() {
                 </ul>
 
                 {quickWin.activity.params ? (
-                  <Button asChild variant="secondary" size="sm" className="mt-4 h-10 rounded-xl px-3">
+                  <Button asChild className="mt-4">
                     <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-                      {t(quickWin.cta)}
-                      <ArrowRight className="size-4" aria-hidden="true" />
+                      {t("Quick practice")}
+                      <ArrowRight aria-hidden="true" />
                     </Link>
                   </Button>
                 ) : (
-                  <Button asChild variant="secondary" size="sm" className="mt-4 h-10 rounded-xl px-3">
+                  <Button asChild className="mt-4">
                     <Link to={quickWin.activity.to}>
-                      {t(quickWin.cta)}
-                      <ArrowRight className="size-4" aria-hidden="true" />
+                      {t("Quick practice")}
+                      <ArrowRight aria-hidden="true" />
                     </Link>
                   </Button>
                 )}
@@ -191,22 +188,19 @@ export function NextStepCard() {
                   </p>
                   <p className="mt-1 text-sm">{t(SKILL_QUEST_ACTION_TEXT[data.quest.action])}</p>
                   {data.quest.resource.params ? (
-                    <Link
-                      to="/learning/$lessonId"
-                      params={data.quest.resource.params}
-                      className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
-                    >
-                      {t("Practise now")}
-                      <ArrowRight className="size-4" aria-hidden="true" />
-                    </Link>
+                    <Button asChild className="mt-3">
+                      <Link to="/learning/$lessonId" params={data.quest.resource.params}>
+                        {t("Take the challenge")}
+                        <ArrowRight aria-hidden="true" />
+                      </Link>
+                    </Button>
                   ) : (
-                    <Link
-                      to={data.quest.resource.to}
-                      className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
-                    >
-                      {t("Practise now")}
-                      <ArrowRight className="size-4" aria-hidden="true" />
-                    </Link>
+                    <Button asChild className="mt-3">
+                      <Link to={data.quest.resource.to}>
+                        {t("Take the challenge")}
+                        <ArrowRight aria-hidden="true" />
+                      </Link>
+                    </Button>
                   )}
                 </div>
               ) : null}
