@@ -93,12 +93,12 @@ const evoMessages = [
 ];
 
 const skills = [
-  [Ear, "Listening"],
-  [MessageCircleMore, "Speaking"],
-  [PenLine, "Writing"],
-  [BookOpenText, "Vocabulary"],
-  [Volume2, "Pronunciation"],
-  [Languages, "Reading"],
+  [Ear, ["Listen", "ing"]],
+  [MessageCircleMore, ["Speak", "ing"]],
+  [PenLine, ["Writ", "ing"]],
+  [BookOpenText, ["Vocabu", "lary"]],
+  [Volume2, ["Pronunci", "ation"]],
+  [Languages, ["Read", "ing"]],
 ] as const;
 
 const audiences = [
@@ -335,9 +335,16 @@ function CommercialLanding() {
             />
             <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {skills.map(([Icon, label]) => (
-                <div key={label} className="card-soft flex min-h-32 flex-col justify-between p-5">
+                <div
+                  key={label.join("")}
+                  className="card-soft flex min-h-32 flex-col justify-between p-5"
+                >
                   <Icon className="size-6 text-success" aria-hidden="true" />
-                  <h3 className="mt-8 text-sm font-semibold">{label}</h3>
+                  <h3 className="mt-8 text-sm font-semibold">
+                    {label.map((part) => (
+                      <span key={part}>{part}</span>
+                    ))}
+                  </h3>
                 </div>
               ))}
             </div>
