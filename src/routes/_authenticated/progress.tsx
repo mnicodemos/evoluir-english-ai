@@ -88,8 +88,10 @@ function ProgressPage() {
   return (
     <AppShell>
       <h1 className="text-3xl font-bold">{t("My history")}</h1>
+      <ProofOfProgressCard />
 
       {isLoading ? (
+
         <Skeleton className="mt-7 h-72 w-full" />
       ) : (
         <>
