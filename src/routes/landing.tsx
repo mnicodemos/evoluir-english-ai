@@ -20,7 +20,7 @@ import {
   Volume2,
 } from "lucide-react";
 
-import evoImage from "@/assets/evo-landing.png";
+import evoImage from "@/assets/evo-landing.webp";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
