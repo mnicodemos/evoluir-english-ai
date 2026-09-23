@@ -343,12 +343,12 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   let playhead = context.currentTime + 0.05;
   let pendingByte: number | null = null;
   let scheduledAny = false;
-  let lastSource: AudioBufferSourceNode | null = null;
+  let lastSource: AudioBufferSourceNode | undefined;
 
   const scheduleSamples = (floats: Float32Array) => {
     if (requestId !== playRequest || floats.length === 0) return;
     const decoded = context.createBuffer(1, floats.length, 24000);
-    decoded.copyToChannel(floats, 0);
+    decoded.getChannelData(0).set(floats);
     const source = context.createBufferSource();
     const gain = context.createGain();
     gain.gain.value = 1.15;
@@ -417,7 +417,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
 
     if (requestId !== playRequest) return;
     if (context.state === "suspended") await context.resume();
-    const finalSource = lastSource;
+    const finalSource: AudioBufferSourceNode | undefined = lastSource;
     if (!finalSource) throw new Error("Audio could not start on this device. Please tap again.");
     await new Promise<void>((resolve) => {
       finalSource.onended = () => {
