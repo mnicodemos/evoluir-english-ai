@@ -16,8 +16,8 @@ import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { type WritingFeedback } from "@/lib/ai-prompts";
 import { analyseAuthoritativeWriting } from "@/lib/pedagogy/dualWrite.functions";
 import { persistWritingLegacy } from "@/lib/legacyActivity.functions";
-import {
 import { refreshAfterActivity } from "@/lib/refreshKeys";
+import {
   expectedLengthLabel,
   pickWritingTasks,
   WRITING_CATEGORIES,
