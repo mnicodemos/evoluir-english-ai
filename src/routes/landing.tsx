@@ -103,17 +103,23 @@ const skills = [
 
 const audiences = [
   [BriefcaseBusiness, "PROFISSIONAIS", "Para quem precisa usar inglês no trabalho."],
-  [GraduationCap, "ESTUDANTES", "Para quem quer desenvolver suas habilidades de forma estruturada."],
-  [Users, "QUEM JÁ ESTUDOU INGLÊS", "Para quem sente que estuda há anos, mas ainda não evolui como gostaria."],
+  [
+    GraduationCap,
+    "ESTUDANTES",
+    "Para quem quer desenvolver suas habilidades de forma estruturada.",
+  ],
+  [
+    Users,
+    "QUEM JÁ ESTUDOU INGLÊS",
+    "Para quem sente que estuda há anos, mas ainda não evolui como gostaria.",
+  ],
   [Mic2, "QUEM QUER PRATICAR", "Para quem quer transformar conhecimento em uso real."],
 ] as const;
 
 function SectionHeading({ eyebrow, title }: { eyebrow?: string; title: string }) {
   return (
     <div className="max-w-3xl">
-      {eyebrow ? (
-        <p className="mb-4 text-xs font-bold uppercase text-success">{eyebrow}</p>
-      ) : null}
+      {eyebrow ? <p className="mb-4 text-xs font-bold uppercase text-success">{eyebrow}</p> : null}
       <h2 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl lg:text-5xl">
         {title}
       </h2>
@@ -126,9 +132,15 @@ function CommercialLanding() {
     <div className="dark min-h-screen overflow-x-clip bg-background text-foreground">
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-          <Link to="/landing" aria-label="Evoluir+ English AI — início" className="flex min-w-0 items-center gap-2.5">
+          <Link
+            to="/landing"
+            aria-label="Evoluir+ English AI — início"
+            className="flex min-w-0 items-center gap-2.5"
+          >
             <Logo className="size-8 shrink-0" />
-            <span className="truncate font-display text-sm font-semibold sm:text-base">Evoluir+ English AI</span>
+            <span className="truncate font-display text-sm font-semibold sm:text-base">
+              Evoluir+ English AI
+            </span>
           </Link>
           <Button asChild size="sm" className="shrink-0">
             <Link to="/auth" search={{ mode: "signup" }}>
@@ -151,7 +163,8 @@ function CommercialLanding() {
                 <span className="mt-2 block text-gradient-growth">Ele evolui com você.</span>
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-xl">
-                Descubra o que você realmente precisa melhorar, pratique de forma personalizada e acompanhe sua evolução em inglês.
+                Descubra o que você realmente precisa melhorar, pratique de forma personalizada e
+                acompanhe sua evolução em inglês.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="min-h-12 w-full sm:w-auto">
@@ -159,7 +172,12 @@ function CommercialLanding() {
                     DESCUBRA SEU PRÓXIMO PASSO <ArrowRight aria-hidden="true" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="min-h-12 w-full bg-background/40 sm:w-auto">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="min-h-12 w-full bg-background/40 sm:w-auto"
+                >
                   <a href="#como-funciona">
                     CONHEÇA O EVOLUIR+ <ArrowDown aria-hidden="true" />
                   </a>
@@ -168,7 +186,10 @@ function CommercialLanding() {
             </div>
 
             <div className="relative mx-auto flex h-[390px] w-full max-w-[540px] items-end justify-center sm:h-[540px] lg:h-[680px] lg:self-end">
-              <div className="absolute bottom-[13%] left-1/2 h-[18%] w-[62%] -translate-x-1/2 rounded-full bg-success/10 blur-3xl" aria-hidden="true" />
+              <div
+                className="absolute bottom-[13%] left-1/2 h-[18%] w-[62%] -translate-x-1/2 rounded-full bg-success/10 blur-3xl"
+                aria-hidden="true"
+              />
               <div className="relative h-full w-full">
                 <img
                   src={evoImage}
@@ -191,7 +212,10 @@ function CommercialLanding() {
               <div className="space-y-4">
                 {problems.map((problem) => (
                   <div key={problem} className="card-soft flex items-start gap-4 p-5 sm:p-6">
-                    <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-warning" aria-hidden="true" />
+                    <CheckCircle2
+                      className="mt-0.5 size-5 shrink-0 text-warning"
+                      aria-hidden="true"
+                    />
                     <p className="leading-relaxed text-card-foreground">{problem}</p>
                   </div>
                 ))}
@@ -221,7 +245,10 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section id="como-funciona" className="scroll-mt-20 border-y border-border/70 py-20 sm:py-28">
+        <section
+          id="como-funciona"
+          className="scroll-mt-20 border-y border-border/70 py-20 sm:py-28"
+        >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHeading eyebrow="Como funciona" title="Uma jornada que evolui com você." />
             <ol className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -251,7 +278,9 @@ function CommercialLanding() {
             </div>
             <div>
               <SectionHeading eyebrow="Sua companheira de evolução" title="Conheça a EVO." />
-              <p className="mt-5 text-lg text-muted-foreground">Sua companheira inteligente de evolução em inglês.</p>
+              <p className="mt-5 text-lg text-muted-foreground">
+                Sua companheira inteligente de evolução em inglês.
+              </p>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {evoMessages.map((message, index) => (
                   <div key={message} className="card-soft p-5">
@@ -271,7 +300,8 @@ function CommercialLanding() {
             <div>
               <SectionHeading title="Aprender inglês é mais do que acertar exercícios." />
               <p className="mt-6 max-w-xl leading-relaxed text-muted-foreground">
-                O Evoluir+ considera sua jornada de aprendizagem para orientar os próximos passos, em vez de simplesmente contar quantas atividades você realizou.
+                O Evoluir+ considera sua jornada de aprendizagem para orientar os próximos passos,
+                em vez de simplesmente contar quantas atividades você realizou.
               </p>
             </div>
             <div className="card-soft p-5 sm:p-8" aria-label="Caminho da evidência até a evolução">
@@ -279,9 +309,18 @@ function CommercialLanding() {
                 <div key={item}>
                   <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary/60 p-4">
                     <span className="font-display font-semibold">{item}</span>
-                    {index === array.length - 1 ? <Sparkles className="size-5 text-success" aria-hidden="true" /> : <span className="size-2 rounded-full bg-warning" aria-hidden="true" />}
+                    {index === array.length - 1 ? (
+                      <Sparkles className="size-5 text-success" aria-hidden="true" />
+                    ) : (
+                      <span className="size-2 rounded-full bg-warning" aria-hidden="true" />
+                    )}
                   </div>
-                  {index < array.length - 1 ? <ArrowDown className="mx-auto my-2 size-5 text-muted-foreground" aria-hidden="true" /> : null}
+                  {index < array.length - 1 ? (
+                    <ArrowDown
+                      className="mx-auto my-2 size-5 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -290,7 +329,10 @@ function CommercialLanding() {
 
         <section className="py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading eyebrow="Habilidades" title="Uma experiência. Diferentes habilidades." />
+            <SectionHeading
+              eyebrow="Habilidades"
+              title="Uma experiência. Diferentes habilidades."
+            />
             <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {skills.map(([Icon, label]) => (
                 <div key={label} className="card-soft flex min-h-32 flex-col justify-between p-5">
@@ -307,13 +349,19 @@ function CommercialLanding() {
             <div>
               <SectionHeading eyebrow="Seu progresso" title="Veja sua evolução ganhar forma." />
               <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
-                Visualize o que você já conquistou, onde está agora e qual caminho faz sentido seguir.
+                Visualize o que você já conquistou, onde está agora e qual caminho faz sentido
+                seguir.
               </p>
             </div>
-            <div className="card-soft overflow-hidden" aria-label="Exemplo visual da área de evolução, sem dados pessoais">
+            <div
+              className="card-soft overflow-hidden"
+              aria-label="Exemplo visual da área de evolução, sem dados pessoais"
+            >
               <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-7">
                 <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">Minha evolução</p>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">
+                    Minha evolução
+                  </p>
                   <p className="mt-1 font-display font-semibold">Evidências da sua jornada</p>
                 </div>
                 <span className="grid size-10 place-items-center rounded-full bg-accent text-accent-foreground">
@@ -321,15 +369,26 @@ function CommercialLanding() {
                 </span>
               </div>
               <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-7">
-                {["Você evoluiu em", "Você consolidou", "Continue praticando", "Seu próximo passo"].map((label, index) => (
+                {[
+                  "Você evoluiu em",
+                  "Você consolidou",
+                  "Continue praticando",
+                  "Seu próximo passo",
+                ].map((label, index) => (
                   <div key={label} className="rounded-lg border border-border bg-secondary/60 p-4">
                     <p className="text-xs font-semibold text-muted-foreground">{label}</p>
                     <div className="mt-5 flex items-end gap-2" aria-hidden="true">
                       {[42, 68, 54, 82, 66].map((height, barIndex) => (
-                        <span key={barIndex} className={`w-full rounded-sm ${barIndex === index ? "bg-warning" : "bg-success/60"}`} style={{ height: `${height / 2}px` }} />
+                        <span
+                          key={barIndex}
+                          className={`w-full rounded-sm ${barIndex === index ? "bg-warning" : "bg-success/60"}`}
+                          style={{ height: `${height / 2}px` }}
+                        />
                       ))}
                     </div>
-                    <p className="mt-4 text-xs text-muted-foreground">Baseado na sua própria prática.</p>
+                    <p className="mt-4 text-xs text-muted-foreground">
+                      Baseado na sua própria prática.
+                    </p>
                   </div>
                 ))}
               </div>
@@ -360,7 +419,9 @@ function CommercialLanding() {
           <div className="absolute inset-0 surface-hero opacity-50" aria-hidden="true" />
           <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
             <Logo className="mx-auto size-12" />
-            <h2 className="mt-7 text-3xl font-bold leading-tight sm:text-5xl">Descubra qual é o seu próximo passo.</h2>
+            <h2 className="mt-7 text-3xl font-bold leading-tight sm:text-5xl">
+              Descubra qual é o seu próximo passo.
+            </h2>
             <p className="mx-auto mt-5 max-w-2xl leading-relaxed text-muted-foreground sm:text-lg">
               Comece sua jornada e descubra como o Evoluir+ pode orientar seu aprendizado de inglês.
             </p>
