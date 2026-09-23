@@ -6,11 +6,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { EvoGuide } from "@/components/EvoGuide";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { PLACEMENT_QUESTIONS, scorePlacement } from "@/lib/placementTest";
+import { uiPt } from "@/lib/uiDictionary";
+import { useUiLang } from "@/lib/uiLang";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -39,6 +42,8 @@ const goals = [
 const times = [10, 20, 30];
 
 function Onboarding() {
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const { data: profile } = useProfile();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -86,9 +91,16 @@ function Onboarding() {
     {
       title: "What should we call you?",
       body: (
-        <div className="space-y-2">
-          <Label htmlFor="name">Your name</Label>
-          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Marcelo" />
+        <div className="space-y-5">
+          <EvoGuide
+            title={t("Hi. I'm EVO.")}
+            description={t("I'll help you understand where you are in English and find a good starting point.")}
+            className="card-soft p-4"
+          />
+          <div className="space-y-2">
+            <Label htmlFor="name">{t("Your name")}</Label>
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Marcelo" />
+          </div>
         </div>
       ),
       canContinue: true,
@@ -109,6 +121,11 @@ function Onboarding() {
       title: "Your CEFR level",
       body: (
         <div className="space-y-4">
+          <EvoGuide
+            title={t("Now we have a clearer view of where you are.")}
+            description={t("Let's turn this result into your next step.")}
+            className="card-soft p-4"
+          />
           <div className="card-soft p-5">
             <p className="text-sm text-muted-foreground">Your starting level</p>
             <p className="mt-1 text-2xl font-bold">{result.level.label}</p>

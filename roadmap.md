@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Fase EVO 1 — presença funcional no próximo passo e diagnóstico
+  - [x] Reutilizar o busto oficial da EVO sem alterar a landing
+  - [x] Manter recomendação, diagnóstico e resultado sob as regras existentes
+  - [x] Validar contraste, acessibilidade e responsividade
 - [x] Nova landing comercial pública em `/landing`
   - [x] Criar experiência estática com EVO e identidade visual existente
   - [x] Validar CTAs, SEO, acessibilidade e responsividade de 320 a 1440 px
