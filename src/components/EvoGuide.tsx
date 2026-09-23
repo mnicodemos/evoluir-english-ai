@@ -26,8 +26,7 @@ export function EvoGuide({
           "grid-cols-[5.1rem_minmax(0,1fr)] sm:grid-cols-[6.3rem_minmax(0,1fr)]",
         (imageSize === "diagnosis" || imageSize === "diagnosisIntro") &&
           "grid-cols-1 justify-items-center gap-4 text-center sm:grid-cols-[minmax(0,1fr)_8rem] sm:gap-6 sm:text-left",
-        imageSize === "diagnosisIntro" &&
-          "sm:grid-cols-[minmax(0,1fr)_7rem]",
+        imageSize === "diagnosisIntro" && "sm:grid-cols-[minmax(0,1fr)_7rem]",
         className,
       )}
     >
