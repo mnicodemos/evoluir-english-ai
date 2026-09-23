@@ -46,7 +46,7 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
   };
 
   return (
-    <div className="card-soft flex h-full flex-col justify-center p-4">
+    <div className="card-soft flex h-full min-w-0 flex-col justify-center p-4">
       <div className="flex items-center gap-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[oklch(0.92_0.05_240)]">
           <GraduationCap className="size-6 text-[oklch(0.45_0.12_240)]" />

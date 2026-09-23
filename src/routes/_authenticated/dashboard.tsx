@@ -181,8 +181,8 @@ function Dashboard() {
             </div>
           </header>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="card-soft flex flex-col justify-center p-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="card-soft flex min-w-0 flex-col justify-center p-5">
               <div className="flex items-center gap-4">
                 <span className="grid size-12 place-items-center rounded-xl bg-[oklch(0.92_0.05_175)]">
                   <Calendar className="size-6 text-[oklch(0.45_0.12_175)]" />
