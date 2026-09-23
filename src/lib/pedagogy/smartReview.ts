@@ -305,6 +305,3 @@ export const SMART_REVIEW_CATEGORY_TEXT: Record<SmartReviewCategory, string> = {
   CONTEXT_REVIEW: "Worth reviewing: try this skill in a different situation.",
   DECAY_REVIEW: "Worth reviewing: it has been a while since you practised this.",
 };
-
-/** Kept for callers that need the stage ordering alongside a candidate. */
-export { learningStateRank };
