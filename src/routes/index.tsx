@@ -213,13 +213,13 @@ function CommercialLanding() {
                 {problems.map((problem) => (
                   <div
                     key={problem}
-                    className="card-soft flex items-start gap-4 p-5 text-primary-foreground sm:p-6"
+                    className="card-soft flex items-start gap-4 p-5 text-card-foreground sm:p-6"
                   >
                     <CheckCircle2
                       className="mt-0.5 size-5 shrink-0 text-warning"
                       aria-hidden="true"
                     />
-                    <p className="leading-relaxed text-primary-foreground">{problem}</p>
+                    <p className="leading-relaxed text-card-foreground">{problem}</p>
                   </div>
                 ))}
               </div>
@@ -240,8 +240,8 @@ function CommercialLanding() {
                   <span className="grid size-11 place-items-center rounded-lg bg-accent text-accent-foreground">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
-                  <h3 className="mt-5 text-sm font-bold text-primary-foreground">{title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted">{text}</p>
+                  <h3 className="mt-5 text-sm font-bold text-card-foreground">{title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p>
                 </article>
               ))}
             </div>
@@ -285,11 +285,11 @@ function CommercialLanding() {
               </p>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {evoMessages.map((message, index) => (
-                  <div key={message} className="card-soft p-5 text-primary-foreground">
+                  <div key={message} className="card-soft p-5 text-card-foreground">
                     <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase text-success">
                       <Logo className="size-5" /> EVO {String(index + 1).padStart(2, "0")}
                     </div>
-                    <p className="text-sm font-medium leading-relaxed text-primary-foreground">
+                    <p className="text-sm font-medium leading-relaxed text-card-foreground">
                       “{message}”
                     </p>
                   </div>
@@ -309,13 +309,13 @@ function CommercialLanding() {
               </p>
             </div>
             <div
-              className="card-soft p-5 text-primary-foreground sm:p-8"
+              className="card-soft p-5 text-card-foreground sm:p-8"
               aria-label="Caminho da evidência até a evolução"
             >
               {["Evidência", "Prática", "Contexto", "Evolução"].map((item, index, array) => (
                 <div key={item}>
                   <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary/60 p-4">
-                    <span className="font-display font-semibold text-primary-foreground">
+                    <span className="font-display font-semibold text-card-foreground">
                       {item}
                     </span>
                     {index === array.length - 1 ? (
@@ -346,10 +346,10 @@ function CommercialLanding() {
               {skills.map(([Icon, label]) => (
                 <div
                   key={label}
-                  className="card-soft flex min-h-32 flex-col justify-between p-5 text-primary-foreground"
+                  className="card-soft flex min-h-32 flex-col justify-between p-5 text-card-foreground"
                 >
                   <Icon className="size-6 text-success" aria-hidden="true" />
-                  <h3 className="mt-8 text-sm font-semibold text-primary-foreground">
+                  <h3 className="mt-8 text-sm font-semibold text-card-foreground">
                     {[...label].map((letter, index) => (
                       <span key={`${letter}-${index}`} aria-hidden="true">
                         {letter}
@@ -372,12 +372,12 @@ function CommercialLanding() {
               </p>
             </div>
             <div
-              className="card-soft overflow-hidden text-primary-foreground"
+              className="card-soft overflow-hidden text-card-foreground"
               aria-label="Exemplo visual da área de evolução, sem dados pessoais"
             >
               <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-7">
                 <div>
-                  <p className="text-xs font-semibold uppercase text-muted">Minha evolução</p>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">Minha evolução</p>
                   <p className="mt-1 font-display font-semibold">Evidências da sua jornada</p>
                 </div>
                 <span className="grid size-10 place-items-center rounded-full bg-accent text-accent-foreground">
@@ -392,12 +392,14 @@ function CommercialLanding() {
                   "Seu próximo passo",
                 ].map((label) => (
                   <div key={label} className="rounded-lg border border-border bg-secondary/60 p-4">
-                    <p className="text-xs font-semibold text-muted">{label}</p>
+                    <p className="text-xs font-semibold text-card-foreground">{label}</p>
                     <div className="mt-5 flex items-center gap-2 text-success" aria-hidden="true">
                       <CheckCircle2 className="size-5" />
                       <span className="h-px flex-1 bg-border" />
                     </div>
-                    <p className="mt-4 text-xs text-muted">Baseado na sua própria prática.</p>
+                    <p className="mt-4 text-xs text-muted-foreground">
+                      Baseado na sua própria prática.
+                    </p>
                   </div>
                 ))}
               </div>
@@ -412,14 +414,14 @@ function CommercialLanding() {
               {audiences.map(([Icon, title, text]) => (
                 <article
                   key={title}
-                  className="card-soft flex gap-4 p-5 text-primary-foreground sm:p-6"
+                  className="card-soft flex gap-4 p-5 text-card-foreground sm:p-6"
                 >
                   <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
                   <div>
-                    <h3 className="text-sm font-bold text-primary-foreground">{title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
+                    <h3 className="text-sm font-bold text-card-foreground">{title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p>
                   </div>
                 </article>
               ))}
