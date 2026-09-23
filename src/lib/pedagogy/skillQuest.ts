@@ -152,6 +152,28 @@ function lessonResource(
 }
 
 /**
+ * The existing surface able to demonstrate `target` for this skill, or null when
+ * none can. Shared by the Skill Quest and the Smart Review selection so both
+ * layers always point at the same real, available activities.
+ */
+export function resolveSkillQuestResource(
+  skill: PedagogicalSkill,
+  target: LearningState,
+  input: SkillQuestInput = { gaps: [] },
+): SkillQuestResource | null {
+  const rank = learningStateRank(target);
+  if (rank < 0) return null;
+  const lesson = lessonResource(skill, input);
+  // A lesson is the closest existing content, but only for capabilities it can
+  // really demonstrate; production and spontaneous use need a real producer.
+  const candidates = [
+    ...(lesson && learningStateRank(lesson.ceiling) >= rank ? [lesson] : []),
+    ...RESOURCES_BY_SKILL[skill],
+  ];
+  return candidates.find((item) => learningStateRank(item.ceiling) >= rank) ?? null;
+}
+
+/**
  * The quest for one gap, or null when no existing surface can demonstrate the
  * required capability. A quest never points at something that does not exist.
  */
@@ -164,15 +186,9 @@ export function deriveSkillQuest(
   const target = learningStateRank(need.target);
   if (target < 0) return null;
 
-  const lesson = lessonResource(gap.skill, input);
-  // A lesson is the closest existing content, but only for capabilities it can
-  // really demonstrate; production and spontaneous use need a real producer.
-  const candidates = [
-    ...(lesson && learningStateRank(lesson.ceiling) >= target ? [lesson] : []),
-    ...RESOURCES_BY_SKILL[gap.skill],
-  ];
-  const resource = candidates.find((item) => learningStateRank(item.ceiling) >= target);
+  const resource = resolveSkillQuestResource(gap.skill, need.target, input);
   if (!resource) return null;
+
 
   // Phase 31: when the quest already asks for production (or above) and this
   // skill has not been used across contexts yet, practising it in another
