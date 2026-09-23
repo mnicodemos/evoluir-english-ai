@@ -4,7 +4,6 @@ import {
   dashboardActionAvailable,
   listeningHasNewActivity,
   vocabularyHasNewActivity,
-  vocabularySignature,
   writingHasNewActivity,
 } from "@/lib/activityIndicators";
 
@@ -63,30 +62,29 @@ describe("Writing indicator", () => {
 });
 
 describe("Vocabulary indicator", () => {
-  it("shows the dot for a batch the student has not opened", () => {
+  it("shows the dot when the student never reviewed a word", () => {
+    expect(vocabularyHasNewActivity({ day: "2026-09-22", lastReviewedAt: null })).toBe(true);
+  });
+
+  it("keeps the dot when the last real review was on a previous day", () => {
     expect(
       vocabularyHasNewActivity({
-        signature: vocabularySignature("2026-09-22", 8),
-        seenSignature: vocabularySignature("2026-09-22", 7),
+        day: "2026-09-23",
+        lastReviewedAt: "2026-09-22T18:00:00.000Z",
       }),
     ).toBe(true);
   });
 
-  it("disappears once the batch was opened", () => {
-    const signature = vocabularySignature("2026-09-22", 8);
-    expect(vocabularyHasNewActivity({ signature, seenSignature: signature })).toBe(false);
-  });
-
-  it("shows the dot on a new day", () => {
+  it("disappears only after a real review on this day", () => {
     expect(
       vocabularyHasNewActivity({
-        signature: vocabularySignature("2026-09-23", 8),
-        seenSignature: vocabularySignature("2026-09-22", 8),
+        day: "2026-09-22",
+        lastReviewedAt: "2026-09-22T09:12:00.000Z",
       }),
-    ).toBe(true);
+    ).toBe(false);
   });
 
-  it("does not show a dot without a signature", () => {
-    expect(vocabularyHasNewActivity({ signature: "", seenSignature: null })).toBe(false);
+  it("does not show a dot without a study day", () => {
+    expect(vocabularyHasNewActivity({ day: "", lastReviewedAt: null })).toBe(false);
   });
 });

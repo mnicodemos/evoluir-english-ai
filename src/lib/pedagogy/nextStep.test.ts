@@ -198,8 +198,10 @@ describe("quick win", () => {
       skill: "vocabulary",
       title: "Strengthen your vocabulary",
       cta: "Practice vocabulary",
-      activity: { to: "/vocabulary" },
+      activity: { to: "/learning/review" },
     });
+    // The main action stays on the daily words; the quick win is a different activity.
+    expect(step.activity.to).toBe("/vocabulary");
   });
 
   it("keeps the main action and quick practice as separate existing activities", () => {
@@ -213,11 +215,12 @@ describe("quick win", () => {
       params: { lessonId: "vocabulary-lesson" },
     });
     expect(step.quickWin?.activity).toEqual({
-      type: "vocabulary",
-      title: "Vocabulary",
-      to: "/vocabulary",
+      type: "learning",
+      title: "Smart review",
+      to: "/learning/review",
     });
   });
+
 
   it("changes the shortcut for grammar, speaking, writing, listening and reading", () => {
     expect(buildNextStep({ ...base, skills: [skill("grammar", 30)] }).quickWin).toMatchObject({
