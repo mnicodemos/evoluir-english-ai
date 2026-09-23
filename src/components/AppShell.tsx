@@ -132,7 +132,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         </aside>
 
         <header className="sticky top-0 z-20 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/85 px-3 backdrop-blur sm:px-4 lg:hidden">
-          <Link to="/dashboard" className="flex min-w-0 items-center gap-2">
+          <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
             <Logo className="size-[1.3rem] shrink-0" />
             <span className="truncate font-display text-sm font-semibold">Evoluir+ English AI</span>
           </Link>
@@ -156,17 +156,20 @@ function AppShellContent({ children }: { children: ReactNode }) {
           {showBackButton && (
             <Link
               to="/dashboard"
-              className="mb-4 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-card-foreground transition-colors hover:bg-accent"
+              className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-card-foreground transition-colors hover:bg-accent"
             >
               <ArrowLeft className="size-4" />
-              Back to Dashboard
+              {translate("Back to Dashboard")}
             </Link>
           )}
           {children}
         </main>
 
         <div className="mb-0">
-          <Footer lang={lang} containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10" />
+          <Footer
+            lang={lang}
+            containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10"
+          />
         </div>
 
         <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 place-items-center border-t border-border bg-background/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur sm:grid-cols-10 lg:hidden">

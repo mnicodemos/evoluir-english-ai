@@ -29,7 +29,10 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
       if (!user) throw new Error("not authenticated");
-      const { error } = await supabase.from("profiles").update({ level: target.value }).eq("id", user.id);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ level: target.value })
+        .eq("id", user.id);
       if (error) throw error;
       await queryClient.invalidateQueries();
       toast.success(`Level changed to ${target.label}.`, {
@@ -43,13 +46,13 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
   };
 
   return (
-    <div className="card-soft flex h-full flex-col justify-center p-4">
+    <div className="card-soft flex h-full min-w-0 flex-col justify-center p-4">
       <div className="flex items-center gap-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[oklch(0.92_0.05_240)]">
           <GraduationCap className="size-6 text-[oklch(0.45_0.12_240)]" />
         </span>
         <div className="flex-1 min-w-0">
-          <p className="whitespace-nowrap text-lg font-bold sm:text-base md:text-lg">{current.label}</p>
+          <p className="truncate text-lg font-bold sm:text-base md:text-lg">{current.label}</p>
           <p className="text-base text-muted-foreground sm:text-xs">
             <span>Your English level</span>
             <span> · </span>
@@ -77,13 +80,14 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
                     : `Change to ${l.label}`
               }
               className={cn(
-                "flex h-10 w-full items-center justify-center gap-1 rounded-lg border px-1 text-xs font-semibold transition sm:text-sm",
+                "flex h-10 w-full min-w-0 items-center justify-center gap-1 rounded-lg border px-1 text-xs font-semibold transition sm:text-sm",
                 active && "border-transparent bg-success text-success-foreground",
-                conquered && "border-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                conquered &&
+                  "border-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
                 locked && "cursor-not-allowed border-border/50 text-muted-foreground/50",
               )}
             >
-              {locked && <Lock className="size-3.5" />}
+              {locked && <Lock className="size-3.5 shrink-0" />}
               {l.value.toUpperCase()}
             </button>
           );

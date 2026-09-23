@@ -129,7 +129,9 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     setInput("");
     const history = options?.resetHistory ? [] : buildTeacherHistory(messages);
     setMessages((prev) =>
-      options?.resetHistory ? [{ role: "user", content: value }] : [...prev, { role: "user", content: value }],
+      options?.resetHistory
+        ? [{ role: "user", content: value }]
+        : [...prev, { role: "user", content: value }],
     );
     turn.mutate({ message: value, coach: options?.coach ?? coachActive, history });
   }
@@ -223,7 +225,6 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
           </p>
         </div>
       )}
-
 
       <Card className="flex h-[min(60dvh,38rem)] min-h-[20rem] flex-col overflow-hidden p-0 sm:h-[min(62dvh,42rem)] sm:min-h-[22.5rem]">
         <Conversation className="flex-1">
@@ -322,6 +323,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
           <Button
             type="submit"
             size="icon"
+            className="shrink-0"
             aria-label={t("Send message")}
             disabled={turn.isPending || !validateTeacherMessage(input).ok}
           >

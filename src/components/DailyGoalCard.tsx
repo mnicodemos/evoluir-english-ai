@@ -33,13 +33,13 @@ export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMin
   const percent = goalMinutes > 0 ? Math.min(100, Math.round((done / goalMinutes) * 100)) : 0;
 
   return (
-    <div className="card-soft flex flex-col justify-center p-5">
+    <div className="card-soft flex min-w-0 flex-col justify-center p-5">
       <div className="flex items-center gap-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[oklch(0.95_0.06_25)]">
           <Hourglass className="size-6 text-[oklch(0.55_0.18_25)]" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="whitespace-nowrap text-lg font-bold sm:text-base md:text-lg">
+          <p className="truncate text-lg font-bold sm:text-base md:text-lg">
             {done}{" "}
             <span className="text-xs font-medium text-muted-foreground sm:text-sm md:text-base">
               / {goalMinutes} <span className="inline">minutes</span>

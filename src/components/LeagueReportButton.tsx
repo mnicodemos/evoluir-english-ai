@@ -43,7 +43,7 @@ export function LeagueReportButton({
     <Button
       variant="outline"
       size="sm"
-      className="mt-3 w-full text-xs"
+      className="mt-3 h-auto min-h-10 w-full whitespace-normal py-2 text-center text-xs leading-tight"
       onClick={handleClick}
       disabled={loading}
     >
