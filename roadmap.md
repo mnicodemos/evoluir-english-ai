@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Fase EVO 2 — EVO no diagnóstico e resultado
+  - [x] Reutilizar o PNG oficial transparente e adaptar somente a composição responsiva
+  - [x] Preservar Dashboard, Landing, CTA, diagnóstico, CEFR e persistência
 - [x] Ajuste cirúrgico — ampliar a EVO do próximo passo no Dashboard em aproximadamente 20%
   - [x] Manter o PNG transparente oficial e preservar Diagnóstico, Landing e lógica
   - [x] Validar 320, 375, 390, 414, 768, 1280 e 1440 px
