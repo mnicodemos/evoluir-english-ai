@@ -8,13 +8,22 @@ type EvoGuideProps = {
   description: string;
   children?: ReactNode;
   className?: string;
+  imageSize?: "default" | "dashboard";
 };
 
-export function EvoGuide({ title, description, children, className }: EvoGuideProps) {
+export function EvoGuide({
+  title,
+  description,
+  children,
+  className,
+  imageSize = "default",
+}: EvoGuideProps) {
   return (
     <div
       className={cn(
         "grid min-w-0 grid-cols-[4.25rem_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[5.25rem_minmax(0,1fr)] sm:gap-4",
+        imageSize === "dashboard" &&
+          "grid-cols-[5.1rem_minmax(0,1fr)] sm:grid-cols-[6.3rem_minmax(0,1fr)]",
         className,
       )}
     >

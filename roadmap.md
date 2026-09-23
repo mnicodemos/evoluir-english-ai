@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Ajuste cirúrgico — ampliar a EVO do próximo passo no Dashboard em aproximadamente 20%
+  - [x] Manter o PNG transparente oficial e preservar Diagnóstico, Landing e lógica
+  - [x] Validar 320, 375, 390, 414, 768, 1280 e 1440 px
 - [x] Fase EVO 1 — presença funcional no próximo passo e diagnóstico
   - [x] Reutilizar o busto oficial da EVO sem alterar a landing
   - [x] Manter recomendação, diagnóstico e resultado sob as regras existentes
