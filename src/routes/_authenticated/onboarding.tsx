@@ -98,6 +98,7 @@ function Onboarding() {
             description={t(
               "I'll help you understand where you are in English and find a good starting point.",
             )}
+            imageSize="diagnosis"
             className="card-soft p-4"
           />
           <div className="space-y-2">
@@ -135,6 +136,7 @@ function Onboarding() {
           <EvoGuide
             title={t("Now we have a clearer view of where you are.")}
             description={t("Let's turn this result into your next step.")}
+            imageSize="diagnosis"
             className="card-soft p-4"
           />
           <div className="card-soft p-5">
