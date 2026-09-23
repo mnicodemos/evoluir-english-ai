@@ -40,10 +40,17 @@ export type SkillQuest = {
   targetState: LearningState;
   action: SkillQuestAction;
   resource: SkillQuestResource;
+  /**
+   * Phase 31: practising this skill in ANOTHER context is appropriate, because
+   * the existing transfer layer (Phase 30) has not seen it used across contexts
+   * yet. It is a boolean signal, never a count, a target or a score.
+   */
+  varyContext?: boolean;
   /** Deterministic order, taken from the gap itself. */
   priority: number;
   ruleVersion: string;
 };
+
 
 const LESSON_CEILING: LearningState = "APPLICATION";
 
@@ -128,7 +135,10 @@ export type SkillQuestInput = {
    * step already resolves it. Optional: without it, lessons are simply not used.
    */
   lessonBySkill?: Record<string, { id: string; title: string } | undefined>;
+  /** Phase 31: skills whose transfer the existing layer already demonstrated. */
+  transferredSkills?: readonly string[];
 };
+
 
 function lessonResource(
   skill: PedagogicalSkill,
