@@ -20,6 +20,7 @@ import { LeagueReportButton } from "@/components/LeagueReportButton";
 import { LevelCard } from "@/components/LevelCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { PathProgressCard } from "@/components/LearningPathCard";
+import { SmartReviewCard } from "@/components/SmartReviewCard";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
@@ -215,6 +216,8 @@ function Dashboard() {
           </div>
 
           <NextStepCard />
+
+          <SmartReviewCard />
 
           <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
             <PathProgressCard />
