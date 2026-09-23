@@ -88,17 +88,16 @@ export function buildLearningJourney(input: LearningJourneyInput): LearningJourn
   // The next move reuses the existing resolution: the priority Skill Quest when
   // one exists, otherwise the next step's own activity. Nothing new is resolved.
   const quest = step?.quest ?? null;
-  const nextMove =
-    quest?.resource
-      ? quest.resource.params
-        ? {
-            skill: quest.skill,
-            title: quest.resource.title,
-            to: quest.resource.to,
-            params: quest.resource.params,
-          }
-        : { skill: quest.skill, title: quest.resource.title, to: quest.resource.to }
-      : moveFromActivity(step?.prioritySkill ?? null, step?.activity);
+  const nextMove = quest?.resource
+    ? quest.resource.params
+      ? {
+          skill: quest.skill,
+          title: quest.resource.title,
+          to: quest.resource.to,
+          params: quest.resource.params,
+        }
+      : { skill: quest.skill, title: quest.resource.title, to: quest.resource.to }
+    : moveFromActivity(step?.prioritySkill ?? null, step?.activity);
 
   const currentLevel = proof?.currentLevel ?? input.currentLevel ?? null;
 

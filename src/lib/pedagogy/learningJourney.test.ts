@@ -178,9 +178,7 @@ describe("learning journey (Phase 35)", () => {
       }),
     });
     expect(journey.evidenceSkills).toEqual(["speaking", "grammar", "writing"]);
-    expect(journey.evidenceSkills.length).toBeLessThanOrEqual(
-      LEARNING_JOURNEY_MAX_EVIDENCE_SKILLS,
-    );
+    expect(journey.evidenceSkills.length).toBeLessThanOrEqual(LEARNING_JOURNEY_MAX_EVIDENCE_SKILLS);
   });
 
   it("13. exposes only presentable, stackable fields (no internal metrics)", () => {
