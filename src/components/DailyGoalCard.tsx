@@ -39,7 +39,7 @@ export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMin
           <Hourglass className="size-6 text-[oklch(0.55_0.18_25)]" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="whitespace-nowrap text-lg font-bold sm:text-base md:text-lg">
+          <p className="truncate text-lg font-bold sm:text-base md:text-lg">
             {done}{" "}
             <span className="text-xs font-medium text-muted-foreground sm:text-sm md:text-base">
               / {goalMinutes} <span className="inline">minutes</span>

@@ -78,10 +78,7 @@ function NextLeagueStatus({ streakDays }: { streakDays: number }) {
       : nextLeague;
 
   return (
-    <p
-      className="mt-1 whitespace-nowrap text-xs font-semibold"
-      style={{ color: nextLeagueInfo.to }}
-    >
+    <p className="mt-1 text-xs font-semibold" style={{ color: nextLeagueInfo.to }}>
       {lang === "pt"
         ? `${translatedLeague} em ${league.nextIn} ${league.nextIn === 1 ? "dia" : "dias"}`
         : `${translatedLeague} in ${league.nextIn} ${league.nextIn === 1 ? "day" : "days"}`}
@@ -191,7 +188,7 @@ function Dashboard() {
                   <Calendar className="size-6 text-[oklch(0.45_0.12_175)]" />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="whitespace-nowrap text-lg font-bold sm:text-base md:text-lg lg:text-3xl">
+                  <p className="truncate text-lg font-bold sm:text-base md:text-lg lg:text-3xl">
                     {streakDays} days
                   </p>
                   <p className="text-base text-muted-foreground sm:text-sm">Study streak</p>
