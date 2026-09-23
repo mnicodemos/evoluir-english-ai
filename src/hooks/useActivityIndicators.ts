@@ -14,8 +14,9 @@ import {
   WRITING_HISTORY_ROUND_PREFIX,
   writingHasNewActivity,
 } from "@/lib/activityIndicators";
-import { studyToday } from "@/lib/today";
+import { lessonBatchKey } from "@/lib/vocabularyBatch";
 import { WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
+
 
 export type ActivityIndicators = {
   listening: boolean;
