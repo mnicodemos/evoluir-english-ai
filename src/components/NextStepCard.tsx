@@ -80,6 +80,7 @@ export function NextStepCard() {
       <EvoGuide
         title={t("Your next step is here.")}
         description={data.activity.title}
+        imageSize="dashboard"
         className="mb-5 border-b border-border pb-5"
       >
         {!mainAvailable ? null : data.activity.params ? (
