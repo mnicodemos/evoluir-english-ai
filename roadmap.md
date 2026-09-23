@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Ajuste final — EVO compacta somente na abertura do diagnóstico
+  - [x] Reduzir a imagem em aproximadamente 10–15% e aproximar discretamente o campo de nome
+  - [x] Preservar resultado, Dashboard, Landing, PNG oficial e toda a lógica
 - [x] Fase EVO 2 — EVO no diagnóstico e resultado
   - [x] Reutilizar o PNG oficial transparente e adaptar somente a composição responsiva
   - [x] Preservar Dashboard, Landing, CTA, diagnóstico, CEFR e persistência
