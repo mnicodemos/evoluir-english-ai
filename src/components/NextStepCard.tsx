@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { EvoGuide } from "@/components/EvoGuide";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
@@ -74,9 +75,29 @@ export function NextStepCard() {
     ? dashboardActionAvailable(data.quest.resource.to, activityIndicators)
     : false;
 
-
   return (
     <section className="card-soft p-5" aria-label={t("Your next step")}>
+      <EvoGuide
+        title={t("Your next step is here.")}
+        description={data.activity.title}
+        className="mb-5 border-b border-border pb-5"
+      >
+        {!mainAvailable ? null : data.activity.params ? (
+          <Button asChild size="sm">
+            <Link to="/learning/$lessonId" params={data.activity.params}>
+              {t("Continue")}
+              <ArrowRight aria-hidden="true" />
+            </Link>
+          </Button>
+        ) : (
+          <Button asChild size="sm">
+            <Link to={data.activity.to}>
+              {t("Continue")}
+              <ArrowRight aria-hidden="true" />
+            </Link>
+          </Button>
+        )}
+      </EvoGuide>
       <div className="grid gap-5 lg:grid-cols-2 lg:gap-0">
         <div className="space-y-4 lg:pr-6">
           <div className="flex min-w-0 items-start gap-4">
@@ -86,7 +107,9 @@ export function NextStepCard() {
             <div className="min-w-0 flex-1">
               <h2 className="text-lg font-semibold">{t("Your next step")}</h2>
               <p className="mt-0.5 font-medium">{skillLabel}</p>
-              <p className="text-sm text-muted-foreground">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
+              <p className="text-sm text-muted-foreground">
+                {t(NEXT_STEP_REASON_TEXT[data.reason])}
+              </p>
               <p className="mt-2 text-sm">
                 {t("How to practise")}: <span className="font-medium">{data.activity.title}</span>
               </p>
@@ -130,14 +153,20 @@ export function NextStepCard() {
                       <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
                       <span className="min-w-0">
                         <span className="font-medium">{t("Recall")}</span>
-                        <span className="text-muted-foreground"> — {t("Remember before revealing")}</span>
+                        <span className="text-muted-foreground">
+                          {" "}
+                          — {t("Remember before revealing")}
+                        </span>
                       </span>
                     </li>
                     <li className="flex min-w-0 items-start gap-2">
                       <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
                       <span className="min-w-0">
                         <span className="font-medium">{t("Track")}</span>
-                        <span className="text-muted-foreground"> — {t("Mark Error or Correct")}</span>
+                        <span className="text-muted-foreground">
+                          {" "}
+                          — {t("Mark Error or Correct")}
+                        </span>
                       </span>
                     </li>
                   </ul>
@@ -227,7 +256,6 @@ export function NextStepCard() {
                 </div>
               ) : null}
             </div>
-
           </div>
         </aside>
       </div>
