@@ -23,6 +23,17 @@ export const uiPt: Record<string, string> = {
 
   // Proof of progress (history)
   "Your evolution": "Sua evolução",
+  "Your journey": "Sua jornada",
+  "Where you are and where you are heading": "Onde você está e para onde está avançando",
+  "Where you are": "Onde você está",
+  "Your current level": "Seu nível atual",
+  "Skills with relevant evidence": "Habilidades com evidência relevante",
+  "You have already used a skill in different situations.":
+    "Você já conseguiu usar uma habilidade em diferentes situações.",
+  "What deserves attention now": "O que merece atenção agora",
+  "Your next move": "Seu próximo movimento",
+  "Your journey is starting. Keep practising to gather more evidence.":
+    "Sua jornada está começando. Continue praticando para reunir mais evidências.",
   "What your practice already shows": "O que a sua prática já demonstra",
   "Level officially updated": "Nível atualizado oficialmente",
   "You transferred": "Você conseguiu transferir",
