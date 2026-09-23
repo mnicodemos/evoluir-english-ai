@@ -194,12 +194,11 @@ function CommercialLanding() {
                 <img
                   src={evoImage}
                   alt="EVO, a companheira inteligente da sua evolução em inglês"
-                  width={1024}
-                  height={1400}
+                  width={848}
+                  height={1264}
                   fetchPriority="high"
                   className="absolute inset-0 h-full w-full object-contain object-bottom drop-shadow-2xl"
                 />
-                <Logo className="absolute left-[56.5%] top-[22.3%] size-[5.7%] min-h-5 min-w-5 shadow-lg" />
               </div>
             </div>
           </div>
@@ -269,12 +268,11 @@ function CommercialLanding() {
               <img
                 src={evoImage}
                 alt="EVO apresentando orientações personalizadas de aprendizagem"
-                width={1024}
-                height={1400}
+                width={848}
+                height={1264}
                 loading="lazy"
                 className="h-full w-full object-contain object-bottom"
               />
-              <Logo className="absolute left-[56.5%] top-[22.3%] size-[5.7%] min-h-5 min-w-5 shadow-lg" />
             </div>
             <div>
               <SectionHeading eyebrow="Sua companheira de evolução" title="Conheça a EVO." />
