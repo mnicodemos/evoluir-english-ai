@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Fase — EVO no Smart Review
+  - [x] Reutilizar o guia e o PNG oficial somente quando houver recomendação válida
+  - [x] Preservar habilidade, motivo, ordem, ação, estados e toda a lógica pedagógica
+  - [x] Validar presença única e responsividade de 320 a 1440 px
 - [x] Fase — EVO na abertura da aula
   - [x] Reutilizar o guia e o PNG oficial com mensagem determinística baseada na habilidade da aula
   - [x] Preservar conteúdo, exercícios, CTAs, avaliação, scoring, CEFR e persistência

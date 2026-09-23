@@ -55,6 +55,7 @@ export const uiPt: Record<string, string> = {
   // Smart review (dashboard)
 
   "Worth recovering now": "O que vale recuperar agora",
+  "This is a good skill to reinforce now.": "Essa é uma boa habilidade para reforçar agora.",
   "Review now": "Revisar agora",
   "Let's reinforce a point that was tricky recently.":
     "Vamos reforçar um ponto que apresentou dificuldade recentemente.",
