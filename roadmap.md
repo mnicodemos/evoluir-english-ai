@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Nova landing comercial pública em `/landing`
+  - [x] Criar experiência estática com EVO e identidade visual existente
+  - [x] Validar CTAs, SEO, acessibilidade e responsividade de 320 a 1440 px
+  - [x] Confirmar que `/` e todas as funcionalidades existentes permanecem inalteradas
 - [x] Fase 21 — excelência responsiva em smartphone, tablet e desktop
   - [x] Auditar navegação, telas principais, teclado, áudio, gravação e overflow
   - [x] Aplicar somente correções responsivas essenciais, preservando toda a lógica
