@@ -69,6 +69,8 @@ export type UserFlashcard = {
 export function useLessons() {
   return useQuery({
     queryKey: ["lessons"],
+    // Lesson catalogue: content only changes when a lesson is written.
+    staleTime: 30 * 60_000,
     queryFn: async (): Promise<Lesson[]> => {
       const { data, error } = await supabase.from("lessons").select("*").order("sort_order");
       if (error) throw error;
@@ -131,6 +133,7 @@ export function useLesson(lessonId: string) {
 export function useAllFlashcards() {
   return useQuery({
     queryKey: ["all-flashcards"],
+    staleTime: 30 * 60_000,
     queryFn: async (): Promise<Flashcard[]> => {
       const { data, error } = await supabase.from("flashcards").select("*");
       if (error) throw error;

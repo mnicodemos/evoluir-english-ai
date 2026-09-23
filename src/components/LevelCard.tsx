@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LEVELS, findLevel } from "@/lib/level";
 import { cn } from "@/lib/utils";
+import { refreshAfterLevelChange } from "@/lib/refreshKeys";
 
 /**
  * Shows the student's CEFR level. The student can switch to the current level
@@ -34,7 +35,7 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
         .update({ level: target.value })
         .eq("id", user.id);
       if (error) throw error;
-      await queryClient.invalidateQueries();
+      await refreshAfterLevelChange(queryClient);
       toast.success(`Level changed to ${target.label}.`, {
         description: "Your progress in every level is kept.",
       });

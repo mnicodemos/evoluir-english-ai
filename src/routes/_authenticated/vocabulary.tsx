@@ -95,7 +95,6 @@ function Vocabulary() {
   // Reading time only counts while the student is actually working on the words.
   const minutesSpent = useTimeSpent({ manual: true });
 
-
   const { data: words, isLoading } = useQuery({
     queryKey: ["vocabulary"],
     queryFn: async () => {
@@ -137,8 +136,6 @@ function Vocabulary() {
   // Opening this page is not doing the practice: the dashboard dot is driven by
   // real reviews (user_vocabulary), so nothing is marked here.
 
-
-
   async function markKnown(wordId: string) {
     if (!profile) return;
     setBusy(wordId);
@@ -158,6 +155,7 @@ function Vocabulary() {
       );
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
+      await queryClient.invalidateQueries({ queryKey: ["user-vocabulary-mastery"] });
       await queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
       await queryClient.invalidateQueries({ queryKey: ["vocabulary-progress"] });
       await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
@@ -183,6 +181,7 @@ function Vocabulary() {
         .in("word_id", ids);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
+      await queryClient.invalidateQueries({ queryKey: ["user-vocabulary-mastery"] });
       await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
 
       toast.success(t("Today's words are back — practise them again."));
@@ -274,7 +273,6 @@ function Vocabulary() {
       );
     }
   }
-
 
   const all = words ?? [];
   const learned = all.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75);
