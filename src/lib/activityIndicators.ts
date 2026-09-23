@@ -43,6 +43,21 @@ export function vocabularySignature(day: string, round: number) {
   return `${day}-${round}`;
 }
 
+/**
+ * Whether an existing Dashboard destination still has an available action.
+ * Only the three surfaces that already expose completion state are gated;
+ * lessons are pre-filtered server-side and open-ended practice stays available.
+ */
+export function dashboardActionAvailable(
+  destination: string,
+  indicators: { listening: boolean; writing: boolean; vocabulary: boolean },
+) {
+  if (destination === "/listening") return indicators.listening;
+  if (destination === "/writing") return indicators.writing;
+  if (destination === "/vocabulary") return indicators.vocabulary;
+  return true;
+}
+
 function storage(): Storage | null {
   if (typeof window === "undefined") return null;
   try {
