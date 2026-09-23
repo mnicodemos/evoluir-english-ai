@@ -106,46 +106,44 @@ export function NextStepCard() {
             )}
 
             {quickWin ? (
-              <div className="mt-5 border-t border-border pt-4">
-                <div className="flex items-center gap-3">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary">
-                    <Zap className="size-4 text-primary" aria-hidden="true" />
+              <div className="mt-4 border-t border-border pt-3">
+                <div className="flex min-w-0 items-start gap-4">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
+                    <Zap className="size-5 text-primary" aria-hidden="true" />
                   </span>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase text-muted-foreground">
-                      {t("Quick Win")}
-                    </p>
-                    <h3 className="font-semibold leading-snug">{t(quickWin.title)}</h3>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-lg font-semibold">{t("Quick Win")}</h2>
+                    <p className="mt-0.5 font-medium">{t(quickWin.title)}</p>
+
+                    <ul className="mt-2 grid gap-1 text-sm">
+                      {quickWin.steps.map((step) => (
+                        <li key={`${step.label}-${step.text}`} className="flex min-w-0 items-start gap-2">
+                          <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                          <span className="min-w-0">
+                            <span className="font-medium">{t(step.label)}</span>
+                            <span className="text-muted-foreground"> — {t(step.text)}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {!quickWinAvailable ? null : quickWin.activity.params ? (
+                      <Button asChild className="mt-3">
+                        <Link to="/learning/$lessonId" params={quickWin.activity.params}>
+                          {t("Quick practice")}
+                          <ArrowRight aria-hidden="true" />
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button asChild className="mt-3">
+                        <Link to={quickWin.activity.to}>
+                          {t("Quick practice")}
+                          <ArrowRight aria-hidden="true" />
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
-
-                <ul className="mt-3 grid gap-2 text-sm">
-                  {quickWin.steps.map((step) => (
-                    <li key={`${step.label}-${step.text}`} className="flex min-w-0 items-start gap-2">
-                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                      <span className="min-w-0">
-                        <span className="font-medium">{t(step.label)}</span>
-                        <span className="text-muted-foreground"> — {t(step.text)}</span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                {!quickWinAvailable ? null : quickWin.activity.params ? (
-                  <Button asChild className="mt-4">
-                    <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-                      {t("Quick practice")}
-                      <ArrowRight aria-hidden="true" />
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button asChild className="mt-4">
-                    <Link to={quickWin.activity.to}>
-                      {t("Quick practice")}
-                      <ArrowRight aria-hidden="true" />
-                    </Link>
-                  </Button>
-                )}
               </div>
             ) : null}
           </div>
