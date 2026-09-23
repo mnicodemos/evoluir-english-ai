@@ -228,9 +228,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             {messages.length === 0 && (
               <div className="flex flex-col gap-4">
                 <EvoGuide
-                  title={t(
-                    "Hi! I'm EVO. I'm here to help you practise and develop your English.",
-                  )}
+                  title={t("Hi! I'm EVO. I'm here to help you practise and develop your English.")}
                   imageSize="lesson"
                 />
                 <div className="flex flex-wrap gap-2">
