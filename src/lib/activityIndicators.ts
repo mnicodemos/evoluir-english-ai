@@ -45,8 +45,10 @@ export function vocabularySignature(day: string, round: number) {
 
 /**
  * Whether an existing Dashboard destination still has an available action.
- * Only the three surfaces that already expose completion state are gated;
- * lessons are pre-filtered server-side and open-ended practice stays available.
+ * Only state that means the round was actually done is used: Listening keeps a
+ * completed round and Writing keeps its corrected tasks. Vocabulary only keeps
+ * a "batch opened" mark, and opening an activity is not doing it, so it never
+ * hides a recommendation. Lessons and open-ended practice stay available.
  */
 export function dashboardActionAvailable(
   destination: string,
@@ -54,9 +56,9 @@ export function dashboardActionAvailable(
 ) {
   if (destination === "/listening") return indicators.listening;
   if (destination === "/writing") return indicators.writing;
-  if (destination === "/vocabulary") return indicators.vocabulary;
   return true;
 }
+
 
 function storage(): Storage | null {
   if (typeof window === "undefined") return null;
