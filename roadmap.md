@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Fase final — EVO no AI Teacher e encerramento da integração planejada
+  - [x] Reutilizar o EvoGuide e o PNG oficial uma única vez no contexto inicial
+  - [x] Preservar integralmente conversa, histórico, IA, quotas, evidências e persistência
+  - [x] Exigir nova fase aprovada para futuras utilizações funcionais ou pedagógicas da EVO
 - [x] Fase — EVO no Progress / evidências de evolução
   - [x] Reutilizar o guia e o PNG oficial somente no contexto real já retornado pelo Proof of Progress
   - [x] Diferenciar evidência válida de evidência insuficiente sem criar cálculo, indicador ou consulta

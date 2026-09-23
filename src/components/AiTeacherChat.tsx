@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { GraduationCap, Plus, Send, Sparkles } from "lucide-react";
+import { GraduationCap, Plus, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -9,6 +9,7 @@ import {
 } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import { EvoGuide } from "@/components/EvoGuide";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -159,19 +160,14 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
 
   return (
     <div className="flex w-full max-w-none flex-col gap-4">
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:justify-between">
-        <div className="flex min-w-0 items-start gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Sparkles className="size-5" aria-hidden="true" />
-          </span>
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
-            <p className="text-sm text-muted-foreground">
-              {t("Practice English with your personal AI teacher")}
-            </p>
-          </div>
+      <header className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
+          <p className="text-sm text-muted-foreground">
+            {t("Practice English with your personal AI teacher")}
+          </p>
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <Button
             variant="secondary"
             size="sm"
@@ -231,13 +227,10 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
           <ConversationContent className="gap-6 p-4">
             {messages.length === 0 && (
               <div className="flex flex-col gap-4">
-                <Message from="assistant">
-                  <MessageContent>
-                    <MessageResponse>
-                      {t("Hi! I'm your AI Teacher. What would you like to practice today?")}
-                    </MessageResponse>
-                  </MessageContent>
-                </Message>
+                <EvoGuide
+                  title={t("Hi! I'm EVO. I'm here to help you practise and develop your English.")}
+                  imageSize="lesson"
+                />
                 <div className="flex flex-wrap gap-2">
                   {suggestions.map((suggestion) => (
                     <Button
