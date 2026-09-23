@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  FIRST_BLOCK_MAX_CHARS,
-  MAX_SPEECH_BLOCKS,
-  splitForFirstAudio,
-} from "@/lib/speechChunks";
+import { FIRST_BLOCK_MAX_CHARS, MAX_SPEECH_BLOCKS, splitForFirstAudio } from "@/lib/speechChunks";
 
 const SHORT = "Good morning, how are you today?";
 const MEDIUM =
