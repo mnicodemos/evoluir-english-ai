@@ -62,29 +62,38 @@ describe("Writing indicator", () => {
 });
 
 describe("Vocabulary indicator", () => {
-  it("shows the dot when the student never reviewed a word", () => {
-    expect(vocabularyHasNewActivity({ day: "2026-09-22", lastReviewedAt: null })).toBe(true);
+  const ids = ["w1", "w2", "w3"];
+
+  it("shows the dot while the round's batch is not complete yet", () => {
+    expect(
+      vocabularyHasNewActivity({ batchWordIds: ["w1"], masteryByWordId: { w1: 100 }, batchSize: 3 }),
+    ).toBe(true);
   });
 
-  it("keeps the dot when the last real review was on a previous day", () => {
+  it("keeps the dot while a word of the batch is still not mastered", () => {
     expect(
       vocabularyHasNewActivity({
-        day: "2026-09-23",
-        lastReviewedAt: "2026-09-22T18:00:00.000Z",
+        batchWordIds: ids,
+        masteryByWordId: { w1: 100, w2: 100 },
+        batchSize: 3,
       }),
     ).toBe(true);
   });
 
-  it("disappears only after a real review on this day", () => {
+  it("disappears once every word of the round is mastered", () => {
     expect(
       vocabularyHasNewActivity({
-        day: "2026-09-22",
-        lastReviewedAt: "2026-09-22T09:12:00.000Z",
+        batchWordIds: ids,
+        masteryByWordId: { w1: 100, w2: 80, w3: 75 },
+        batchSize: 3,
       }),
     ).toBe(false);
   });
 
-  it("does not show a dot without a study day", () => {
-    expect(vocabularyHasNewActivity({ day: "", lastReviewedAt: null })).toBe(false);
+  it("comes back when a new round has no words yet", () => {
+    expect(
+      vocabularyHasNewActivity({ batchWordIds: [], masteryByWordId: {}, batchSize: 3 }),
+    ).toBe(true);
   });
 });
+
