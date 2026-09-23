@@ -178,6 +178,13 @@ export function deriveSkillQuest(
   const resource = candidates.find((item) => learningStateRank(item.ceiling) >= target);
   if (!resource) return null;
 
+  // Phase 31: when the quest already asks for production (or above) and this
+  // skill has not been used across contexts yet, practising it in another
+  // context is appropriate. A transferred skill never gets a forced variation.
+  const alreadyTransferred = (input.transferredSkills ?? []).includes(gap.skill);
+  const varyContext =
+    !alreadyTransferred && target >= learningStateRank("PRODUCTION");
+
   return {
     skill: gap.skill,
     gapType: gap.type,
@@ -186,9 +193,11 @@ export function deriveSkillQuest(
     targetState: need.target,
     action: need.action,
     resource,
+    varyContext,
     priority: gap.priority,
     ruleVersion: SKILL_QUEST_RULE_VERSION,
   };
+
 }
 
 /**
