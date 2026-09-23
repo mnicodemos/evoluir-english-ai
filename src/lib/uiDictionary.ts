@@ -20,6 +20,20 @@ export const uiPt: Record<string, string> = {
   Focus: "Foco",
   "Your next step": "Seu próximo passo",
   "How to practise": "Como praticar",
+
+  // Smart review (dashboard)
+  "Worth recovering now": "O que vale recuperar agora",
+  "Review now": "Revisar agora",
+  "Let's reinforce a point that was tricky recently.":
+    "Vamos reforçar um ponto que apresentou dificuldade recentemente.",
+  "Reviewing this is worth it to feel more confident.":
+    "Vale revisar este conteúdo para ganhar mais segurança.",
+  "Let's reinforce this skill before moving ahead.":
+    "Vamos reforçar esta habilidade antes de seguir adiante.",
+  "It has been a while since your last practice. A quick review can help.":
+    "Faz algum tempo desde a última prática. Uma revisão rápida pode ajudar.",
+  "You have practised this skill. Now let's use it in another context.":
+    "Você já praticou esta habilidade. Agora vamos usá-la em outro contexto.",
   "Quick Win": "Ganho rápido",
   "Strengthen your vocabulary": "Fortaleça seu vocabulário",
   "Strengthen your grammar": "Fortaleça sua gramática",
@@ -85,8 +99,7 @@ export const uiPt: Record<string, string> = {
   "Take the next step in this skill": "Avance para o próximo passo nesta habilidade",
   "Produce your own language in this skill": "Produza suas próprias frases nesta habilidade",
   "Use this skill in a free conversation": "Use esta habilidade em uma conversa livre",
-  "Show this skill again to keep it solid":
-    "Mostre esta habilidade novamente para mantê-la firme",
+  "Show this skill again to keep it solid": "Mostre esta habilidade novamente para mantê-la firme",
 
   "Free practice": "Prática livre",
   "AI Learning Insight": "Insight de aprendizado com IA",
@@ -110,8 +123,7 @@ export const uiPt: Record<string, string> = {
   "Building evidence": "Construindo evidências",
   "Recommended because": "Recomendado porque",
   "Matches your CEFR level": "Corresponde ao seu nível CEFR",
-  "No evidence at your current CEFR level yet":
-    "Ainda não há evidências no seu nível CEFR atual",
+  "No evidence at your current CEFR level yet": "Ainda não há evidências no seu nível CEFR atual",
   "Complete an activity to build evidence at this level":
     "Conclua uma atividade para gerar evidências neste nível",
   "Builds on your recent practice": "Aproveita sua prática recente",
@@ -851,7 +863,6 @@ export const uiPt: Record<string, string> = {
   "Could not reset today's words": "Não foi possível restaurar as palavras de hoje",
   "The check is already running.": "A análise já está em andamento.",
 
-
   // Level labels
   "A1 Beginner": "A1 Iniciante",
   "A2 Elementary": "A2 Elementar",
@@ -916,8 +927,7 @@ export const uiPt: Record<string, string> = {
   "Send reset link": "Enviar link",
   "We sent a password reset link to": "Enviamos um link de redefinição de senha para",
   "Create a new password": "Criar uma nova senha",
-  "Choose a new password to finish signing in.":
-    "Escolha uma nova senha para concluir o acesso.",
+  "Choose a new password to finish signing in.": "Escolha uma nova senha para concluir o acesso.",
   "Save new password": "Salvar nova senha",
   "Password updated": "Senha atualizada",
 };

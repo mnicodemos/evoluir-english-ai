@@ -20,6 +20,7 @@ import { LeagueReportButton } from "@/components/LeagueReportButton";
 import { LevelCard } from "@/components/LevelCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { PathProgressCard } from "@/components/LearningPathCard";
+import { SmartReviewCard } from "@/components/SmartReviewCard";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
@@ -216,6 +217,8 @@ function Dashboard() {
 
           <NextStepCard />
 
+          <SmartReviewCard />
+
           <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
             <PathProgressCard />
 
@@ -287,7 +290,10 @@ function Dashboard() {
                 <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
               </Link>
               <div className="card-soft h-full w-full p-5">
-                <WeeklyFrequency userId={profile.id} daysPerWeek={profile.study_days_per_week ?? 7} />
+                <WeeklyFrequency
+                  userId={profile.id}
+                  daysPerWeek={profile.study_days_per_week ?? 7}
+                />
               </div>
             </section>
           </div>

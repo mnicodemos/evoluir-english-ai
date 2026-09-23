@@ -16,6 +16,7 @@ import {
   type SkillSnapshot,
 } from "./nextStep";
 import { selectPrioritySkillQuest } from "./skillQuest";
+import { buildSmartReviewList } from "./smartReviewUx";
 
 const RECENT_DAYS = 7;
 /** Existing evidence rows considered for the Skill Quest. Read-only. */
@@ -154,5 +155,25 @@ export const loadNextStep = createServerFn({ method: "POST" })
       transferredSkills: transferred,
     });
 
-    return { ...step, quest };
+    // Phase 33: the review recommendations, decided here on the server from the
+    // very same rows already read above (no extra query, no per-skill lookup).
+    // The skill already shown by "Your next step" and by the challenge is left
+    // out so the dashboard never repeats the same card twice.
+    const reviews = buildSmartReviewList(
+      {
+        evidence,
+        skills: snapshots,
+        currentLevel: level,
+        recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
+        recentlyPractised: [
+          ...new Set((recent.data ?? []).map((row) => row.activity_type).filter(Boolean)),
+        ] as string[],
+        lessonBySkill,
+      },
+      {
+        excludeSkills: [step.prioritySkill, quest?.skill].filter(Boolean) as string[],
+      },
+    );
+
+    return { ...step, quest, reviews };
   });

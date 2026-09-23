@@ -4,6 +4,7 @@
 // profile, no new score, no new CEFR, no new evidence.
 
 import type { SkillQuest } from "./skillQuest";
+import type { SmartReviewItem } from "./smartReviewUx";
 
 export type SkillSnapshot = {
   skill: string;
@@ -70,6 +71,11 @@ export type NextStep = {
    * Invisible Gaps. Absent when no valid gap has an executable activity.
    */
   quest?: SkillQuest | null;
+  /**
+   * Phase 33: at most three review recommendations, already selected and
+   * ordered server-side by the Phase 32 engine. Presentation only.
+   */
+  reviews?: SmartReviewItem[];
 
   /** Existing evidence for the chosen skill, exposed for contextual display only. */
   insight?: {
