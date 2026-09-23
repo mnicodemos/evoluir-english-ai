@@ -11,10 +11,13 @@ import {
 describe("Dashboard recommended actions", () => {
   const available = { listening: true, writing: false, vocabulary: false };
 
-  it("uses the completion state already owned by Listening, Writing and Vocabulary", () => {
+  it("uses the completion state Listening and Writing already own", () => {
     expect(dashboardActionAvailable("/listening", available)).toBe(true);
     expect(dashboardActionAvailable("/writing", available)).toBe(false);
-    expect(dashboardActionAvailable("/vocabulary", available)).toBe(false);
+  });
+
+  it("keeps Vocabulary available: opening the batch is not doing the practice", () => {
+    expect(dashboardActionAvailable("/vocabulary", available)).toBe(true);
   });
 
   it("does not block lessons or open-ended practice surfaces", () => {
@@ -23,6 +26,7 @@ describe("Dashboard recommended actions", () => {
     expect(dashboardActionAvailable("/teacher", available)).toBe(true);
   });
 });
+
 
 describe("Listening Lab indicator", () => {
   it("shows nothing when the current round was completed", () => {
