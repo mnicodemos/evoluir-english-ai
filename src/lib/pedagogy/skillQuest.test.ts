@@ -36,7 +36,13 @@ const EXISTING_ROUTES = new Set([
 describe("skill quest (Phase 29)", () => {
   it("turns an unmeasured skill into a measuring activity", () => {
     const quest = deriveSkillQuest(
-      gap({ skill: "listening", type: "UNMEASURED", currentState: "INSUFFICIENT_EVIDENCE", reason: "no_valid_evidence", priority: 0 }),
+      gap({
+        skill: "listening",
+        type: "UNMEASURED",
+        currentState: "INSUFFICIENT_EVIDENCE",
+        reason: "no_valid_evidence",
+        priority: 0,
+      }),
     );
     expect(quest?.action).toBe("measure_skill");
     expect(quest?.resource.to).toBe("/listening");
@@ -45,7 +51,12 @@ describe("skill quest (Phase 29)", () => {
 
   it("turns insufficient evidence into an evidence-collecting activity", () => {
     const quest = deriveSkillQuest(
-      gap({ skill: "vocabulary", type: "INSUFFICIENT_EVIDENCE", reason: "evidence_below_minimum", priority: 1 }),
+      gap({
+        skill: "vocabulary",
+        type: "INSUFFICIENT_EVIDENCE",
+        reason: "evidence_below_minimum",
+        priority: 1,
+      }),
     );
     expect(quest?.action).toBe("add_evidence");
     expect(quest?.resource.to).toBe("/vocabulary");
@@ -63,7 +74,14 @@ describe("skill quest (Phase 29)", () => {
 
   it("requires a spontaneous-use surface for a spontaneous use gap", () => {
     const quest = deriveSkillQuest(
-      gap({ skill: "speaking", type: "SPONTANEOUS_USE_GAP", currentState: "PRODUCTION", expectedState: "SPONTANEOUS_USE", reason: "spontaneous_use_not_demonstrated", priority: 4 }),
+      gap({
+        skill: "speaking",
+        type: "SPONTANEOUS_USE_GAP",
+        currentState: "PRODUCTION",
+        expectedState: "SPONTANEOUS_USE",
+        reason: "spontaneous_use_not_demonstrated",
+        priority: 4,
+      }),
     );
     expect(quest?.targetState).toBe("SPONTANEOUS_USE");
     expect(quest?.resource.ceiling).toBe("SPONTANEOUS_USE");
@@ -94,11 +112,23 @@ describe("skill quest (Phase 29)", () => {
 
   it("creates a stage quest only when a valid expectation exists", () => {
     const withExpectation = deriveSkillQuest(
-      gap({ skill: "writing", type: "STAGE_GAP", expectedState: "PRODUCTION", reason: "stage_below_expected", priority: 2 }),
+      gap({
+        skill: "writing",
+        type: "STAGE_GAP",
+        expectedState: "PRODUCTION",
+        reason: "stage_below_expected",
+        priority: 2,
+      }),
     );
     expect(withExpectation?.action).toBe("reach_next_stage");
     const without = deriveSkillQuest(
-      gap({ skill: "writing", type: "STAGE_GAP", expectedState: null, reason: "stage_below_expected", priority: 2 }),
+      gap({
+        skill: "writing",
+        type: "STAGE_GAP",
+        expectedState: null,
+        reason: "stage_below_expected",
+        priority: 2,
+      }),
     );
     expect(without).toBeNull();
   });
@@ -112,7 +142,6 @@ describe("skill quest (Phase 29)", () => {
       ),
     ).toBeNull();
   });
-
 
   it("keeps the existing pedagogical priority and picks the most urgent quest", () => {
     const gaps = [
@@ -133,9 +162,13 @@ describe("skill quest (Phase 29)", () => {
 
   it("always points at a route that really exists", () => {
     const gaps = deriveInvisibleGaps({ evidence: [] });
-    for (const quest of deriveSkillQuests({ gaps, lessonBySkill: { grammar: { id: "l1", title: "Unit 1" } } })) {
+    for (const quest of deriveSkillQuests({
+      gaps,
+      lessonBySkill: { grammar: { id: "l1", title: "Unit 1" } },
+    })) {
       expect(EXISTING_ROUTES.has(quest.resource.to)).toBe(true);
-      if (quest.resource.to === "/learning/$lessonId") expect(quest.resource.params?.lessonId).toBeTruthy();
+      if (quest.resource.to === "/learning/$lessonId")
+        expect(quest.resource.params?.lessonId).toBeTruthy();
     }
   });
 });

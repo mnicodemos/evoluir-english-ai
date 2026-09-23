@@ -513,7 +513,6 @@ export async function activityItemLevel(userId: string) {
 }
 
 export const submitAuthoritativeQuiz = createServerFn({ method: "POST" })
-
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => authoritativeQuizInputSchema.parse(input))
   .handler(async ({ data, context }) => {

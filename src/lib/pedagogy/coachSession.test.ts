@@ -132,7 +132,14 @@ describe("session difficulty adaptation", () => {
 
   it("asks for support and a new attempt at the easy tier", () => {
     const block = coachBlock(
-      coachPlan(base, [{ role: "user", content: "Start a session" }, { role: "assistant", content: "..." }], weak),
+      coachPlan(
+        base,
+        [
+          { role: "user", content: "Start a session" },
+          { role: "assistant", content: "..." },
+        ],
+        weak,
+      ),
     );
     expect(block).toContain("hint");
     expect(block).toContain("FEEDBACK PRIORITY");
@@ -147,7 +154,14 @@ describe("session difficulty adaptation", () => {
 describe("feedback, retry and follow-up rules", () => {
   it("asks for a new production right after a correction", () => {
     const block = coachBlock(
-      coachPlan(base, [{ role: "user", content: "Start" }, { role: "assistant", content: "..." }], strong),
+      coachPlan(
+        base,
+        [
+          { role: "user", content: "Start" },
+          { role: "assistant", content: "..." },
+        ],
+        strong,
+      ),
     );
     expect(block).toContain("use the corrected structure again");
   });

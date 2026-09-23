@@ -261,7 +261,7 @@ export function deriveSmartReview(
       varyContext: loop?.consolidation === "CONTEXTUAL",
       resource: resolveSkillQuestResource(skill, target, {
         gaps: [],
-        lessonBySkill: input.lessonBySkill,
+        ...(input.lessonBySkill ? { lessonBySkill: input.lessonBySkill } : {}),
       }),
       priority: CATEGORY_PRIORITY[label],
       ruleVersion: SMART_REVIEW_RULE_VERSION,
