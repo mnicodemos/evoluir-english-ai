@@ -87,7 +87,10 @@ describe("proof of progress", () => {
         evidence: [
           quiz("writing", 20),
           quiz("writing", 19),
-          production("writing", "work", 0, { sourceType: "writing", metadata: { freeProduction: true } }),
+          production("writing", "work", 0, {
+            sourceType: "writing",
+            metadata: { freeProduction: true },
+          }),
           production("writing", "work", 0, {
             sourceType: "writing",
             metadata: { freeProduction: true },
@@ -103,7 +106,9 @@ describe("proof of progress", () => {
 
   it("4. recognises valid production as the current stage", () => {
     const result = deriveProofOfProgress(
-      input({ evidence: [production("speaking", "travel", 3), production("speaking", "travel", 0)] }),
+      input({
+        evidence: [production("speaking", "travel", 3), production("speaking", "travel", 0)],
+      }),
     );
     const speaking = result.highlights.find((h) => h.skill === "speaking");
     expect(speaking?.currentState).toBe("SPONTANEOUS_USE");
@@ -213,8 +218,9 @@ describe("proof of progress", () => {
   });
 
   it("14. caps the highlights", () => {
-    const evidence = (["grammar", "vocabulary", "reading", "listening", "writing", "speaking"] as const)
-      .flatMap((skill) => [production(skill, "work", 5), production(skill, "travel", 0)]);
+    const evidence = (
+      ["grammar", "vocabulary", "reading", "listening", "writing", "speaking"] as const
+    ).flatMap((skill) => [production(skill, "work", 5), production(skill, "travel", 0)]);
     const result = deriveProofOfProgress(input({ evidence }));
     expect(result.highlights.length).toBeLessThanOrEqual(PROOF_OF_PROGRESS_MAX_HIGHLIGHTS);
     expect(deriveProofOfProgress(input({ evidence, limit: 3 })).highlights).toHaveLength(3);

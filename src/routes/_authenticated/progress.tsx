@@ -91,7 +91,6 @@ function ProgressPage() {
       <ProofOfProgressCard />
 
       {isLoading ? (
-
         <Skeleton className="mt-7 h-72 w-full" />
       ) : (
         <>

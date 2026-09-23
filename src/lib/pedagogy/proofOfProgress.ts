@@ -159,7 +159,10 @@ function resultsAtLevel(
   return (input.skillHistory ?? [])
     .filter((row) => row.skill === skill)
     .filter((row) => !current || (row.cefrLevel ?? "").toUpperCase() === current)
-    .map((row) => ({ score: row.score === null ? null : Number(row.score), at: time(row.assessedAt) }))
+    .map((row) => ({
+      score: row.score === null ? null : Number(row.score),
+      at: time(row.assessedAt),
+    }))
     .filter((row): row is { score: number; at: number } => row.score !== null && row.at !== null)
     .sort((a, b) => a.at - b.at);
 }
@@ -170,7 +173,9 @@ export function officialLevelChange(
 ): { from: string; to: string } | null {
   const points = history
     .map((row) => ({ level: (row.level ?? "").toUpperCase(), at: time(row.at) }))
-    .filter((row): row is { level: string; at: number } => VALID_LEVELS.has(row.level) && row.at !== null)
+    .filter(
+      (row): row is { level: string; at: number } => VALID_LEVELS.has(row.level) && row.at !== null,
+    )
     .sort((a, b) => a.at - b.at);
   if (points.length < 2) return null;
   const from = points[0]!.level;
@@ -203,18 +208,20 @@ export function deriveProofOfProgress(
 
     const loop = deriveSkillLoopState(items, config.learningState, config.transfer);
     const earlier = previousEvidence(items);
-    const previousState = earlier
-      ? deriveLearningState(earlier, config.learningState).state
-      : null;
+    const previousState = earlier ? deriveLearningState(earlier, config.learningState).state : null;
     const currentState = loop.learningState.state;
 
     const improved =
-      results.length >= 2 && results[results.length - 1]!.score > results[results.length - 2]!.score;
+      results.length >= 2 &&
+      results[results.length - 1]!.score > results[results.length - 2]!.score;
 
     let kind: ProofOfProgressKind | null = null;
     if (loop.transfer.transferred) {
       kind = "TRANSFER";
-    } else if (previousState !== null && learningStateRank(currentState) > learningStateRank(previousState)) {
+    } else if (
+      previousState !== null &&
+      learningStateRank(currentState) > learningStateRank(previousState)
+    ) {
       kind = "CONSOLIDATION";
     } else if (improved) {
       kind = "OBSERVABLE_GROWTH";
