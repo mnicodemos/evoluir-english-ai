@@ -183,6 +183,8 @@ function Vocabulary() {
         .in("word_id", ids);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
+      await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
+
       toast.success(t("Today's words are back — practise them again."));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("Could not reset today's words"));
