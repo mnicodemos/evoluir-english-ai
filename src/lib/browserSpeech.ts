@@ -29,10 +29,14 @@ function ctor(): RecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
-export function startBrowserRecognition(): void {
+export function browserRecognitionAvailable(): boolean {
+  return ctor() !== null;
+}
+
+export function startBrowserRecognition(): boolean {
   cancelBrowserRecognition();
   const Ctor = ctor();
-  if (!Ctor) return;
+  if (!Ctor) return false;
   try {
     const recognition = new Ctor();
     recognition.lang = "en-US";
@@ -52,8 +56,10 @@ export function startBrowserRecognition(): void {
     recognition.onerror = () => finish();
     recognition.start();
     active = state;
+    return true;
   } catch {
     active = null;
+    return false;
   }
 }
 

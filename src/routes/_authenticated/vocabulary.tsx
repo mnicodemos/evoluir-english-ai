@@ -97,6 +97,7 @@ function Vocabulary() {
   // One pronunciation check at a time; every attempt ends and frees the button.
   const pronunciationGate = useRef(createAttemptGate());
   const pronunciationAbort = useRef<AbortController | null>(null);
+  const usingBrowserSpeech = useRef(false);
   // Reading time only counts while the student is actually working on the words.
   const minutesSpent = useTimeSpent({ manual: true });
 
@@ -267,9 +268,16 @@ function Vocabulary() {
       setRecordingId(null);
       setCheckingId(word.id);
       try {
-        const [audio, heard] = await Promise.all([stopVoiceRecording(), stopBrowserRecognition()]);
-        // Browser recognition first (instant, no credits); AI only as fallback.
-        const spoken = heard ?? (await transcribeAudio(audio, controller.signal));
+        // Browser recognition (instant, no credits). The AI transcription is
+        // used only when this browser cannot recognise speech on its own.
+        let spoken: string;
+        if (usingBrowserSpeech.current) {
+          const heard = await stopBrowserRecognition();
+          if (!heard) throw new Error(t("I couldn't hear that clearly. Please try again."));
+          spoken = heard;
+        } else {
+          spoken = await transcribeAudio(await stopVoiceRecording(), controller.signal);
+        }
         const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
         const authoritative = await savePronunciation({
           data: {
@@ -311,8 +319,8 @@ function Vocabulary() {
 
     try {
       stopSpeaking();
-      await startVoiceRecording();
-      startBrowserRecognition();
+      usingBrowserSpeech.current = startBrowserRecognition();
+      if (!usingBrowserSpeech.current) await startVoiceRecording();
       minutesSpent.start();
       setRecordingId(word.id);
     } catch (error) {
