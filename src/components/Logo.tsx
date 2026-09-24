@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/logo-evo-green.png.asset.json";
+import logoAsset from "@/assets/evoluir-logo-official.png.asset.json";
 
 export function Logo({
   className = "size-7",

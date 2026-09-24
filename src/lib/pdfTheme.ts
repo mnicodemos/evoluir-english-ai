@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 
-import logoAsset from "@/assets/logo-evo-green.png.asset.json";
+import logoAsset from "@/assets/evoluir-logo-official.png.asset.json";
 
 export const INK = { r: 20, g: 24, b: 33 };
 export const MUTED = { r: 100, g: 106, b: 118 };
