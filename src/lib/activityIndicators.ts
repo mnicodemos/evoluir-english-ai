@@ -50,17 +50,12 @@ export function vocabularyHasNewActivity(input: {
   batchSize?: number;
 }) {
   if (input.batchWordIds.length === 0) return false;
-  return input.batchWordIds.some(
-    (id) => (input.masteryByWordId[id] ?? 0) < VOCABULARY_MASTERED,
-  );
+  return input.batchWordIds.some((id) => (input.masteryByWordId[id] ?? 0) < VOCABULARY_MASTERED);
 }
 
 /** Loading and failed reads never advertise vocabulary as available. */
 export function vocabularyIndicatorVisible(input: {
-  batch:
-    | { batchWordIds: string[]; masteryByWordId: Record<string, number> }
-    | null
-    | undefined;
+  batch: { batchWordIds: string[]; masteryByWordId: Record<string, number> } | null | undefined;
   isLoading: boolean;
   isError: boolean;
   generationFailed?: boolean;
@@ -68,8 +63,6 @@ export function vocabularyIndicatorVisible(input: {
   if (input.isLoading || input.isError || input.generationFailed || !input.batch) return false;
   return vocabularyHasNewActivity(input.batch);
 }
-
-
 
 /**
  * Whether an existing Dashboard destination still has an available action.
@@ -88,8 +81,6 @@ export function dashboardActionAvailable(
   if (destination === "/vocabulary") return indicators.vocabulary;
   return true;
 }
-
-
 
 function storage(): Storage | null {
   if (typeof window === "undefined") return null;

@@ -99,8 +99,7 @@ export function useActivityIndicators(): ActivityIndicators {
         batch: vocabularyBatch,
         isLoading: vocabularyLoading || vocabularyFetching,
         isError: vocabularyError,
-        generationFailed:
-          readText(vocabularyGenerationFailureKey(profile.id, round)) === "1",
+        generationFailed: readText(vocabularyGenerationFailureKey(profile.id, round)) === "1",
       }),
     });
   }, [profile, round, vocabularyBatch, vocabularyError, vocabularyFetching, vocabularyLoading]);

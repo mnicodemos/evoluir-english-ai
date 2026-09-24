@@ -18,11 +18,8 @@ describe("Dashboard recommended actions", () => {
 
   it("hides Vocabulary when the current batch has nothing left to practise", () => {
     expect(dashboardActionAvailable("/vocabulary", available)).toBe(false);
-    expect(
-      dashboardActionAvailable("/vocabulary", { ...available, vocabulary: true }),
-    ).toBe(true);
+    expect(dashboardActionAvailable("/vocabulary", { ...available, vocabulary: true })).toBe(true);
   });
-
 
   it("does not block lessons or open-ended practice surfaces", () => {
     expect(dashboardActionAvailable("/learning/$lessonId", available)).toBe(true);
@@ -30,7 +27,6 @@ describe("Dashboard recommended actions", () => {
     expect(dashboardActionAvailable("/teacher", available)).toBe(true);
   });
 });
-
 
 describe("Listening Lab indicator", () => {
   it("shows nothing when the current round was completed", () => {
@@ -56,9 +52,9 @@ describe("Writing indicator", () => {
   });
 
   it("shows the dot when a task is still open", () => {
-    expect(
-      writingHasNewActivity({ prompts: ["a", "b", "c"], done: ["a"], tasksPerRound }),
-    ).toBe(true);
+    expect(writingHasNewActivity({ prompts: ["a", "b", "c"], done: ["a"], tasksPerRound })).toBe(
+      true,
+    );
   });
 
   it("shows the dot when the round was never opened", () => {
@@ -96,9 +92,9 @@ describe("Vocabulary indicator", () => {
   });
 
   it("stays hidden when the saved batch is empty", () => {
-    expect(
-      vocabularyHasNewActivity({ batchWordIds: [], masteryByWordId: {}, batchSize: 3 }),
-    ).toBe(false);
+    expect(vocabularyHasNewActivity({ batchWordIds: [], masteryByWordId: {}, batchSize: 3 })).toBe(
+      false,
+    );
   });
 
   it("stays hidden while saved words are loading", () => {
@@ -124,4 +120,3 @@ describe("Vocabulary indicator", () => {
     ).toBe(false);
   });
 });
-

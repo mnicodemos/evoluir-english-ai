@@ -143,9 +143,7 @@ function Vocabulary() {
   // 2) Missing words are generated in the background. A failed attempt is
   // remembered for this batch so reopening or refreshing the page does not
   // start a new generation by itself; the student can retry on purpose.
-  const failKey = profile
-    ? vocabularyGenerationFailureKey(profile.id, startedLessons ?? 0)
-    : null;
+  const failKey = profile ? vocabularyGenerationFailureKey(profile.id, startedLessons ?? 0) : null;
   const [genBlocked, setGenBlocked] = useState<boolean | null>(null);
   useEffect(() => {
     if (!failKey) return;
