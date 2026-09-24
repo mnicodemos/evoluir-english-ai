@@ -21,6 +21,28 @@ type GeminiTranscription = {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 };
 
+const MAX_TRANSCRIPTION_ATTEMPTS = 3;
+
+function retryDelay(response: Response, attempt: number) {
+  const retryAfter = Number(response.headers.get("Retry-After"));
+  if (Number.isFinite(retryAfter) && retryAfter > 0) return Math.min(retryAfter * 1000, 5000);
+  return Math.min(750 * 2 ** attempt + Math.random() * 250, 3000);
+}
+
+async function waitForRetry(milliseconds: number, signal: AbortSignal) {
+  await new Promise<void>((resolve, reject) => {
+    const timeout = setTimeout(resolve, milliseconds);
+    signal.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timeout);
+        reject(new DOMException("The transcription was cancelled.", "AbortError"));
+      },
+      { once: true },
+    );
+  });
+}
+
 export const Route = createFileRoute("/api/transcribe")({
   server: {
     handlers: {
@@ -142,31 +164,41 @@ export const Route = createFileRoute("/api/transcribe")({
             );
 
           for (const model of GEMINI_TRANSCRIPTION_MODELS) {
-            let response = await send(model, true);
-            // Older model versions reject the "no thinking" setting: retry plainly.
-            if (response.status === 400) response = await send(model, false);
+            for (let attempt = 0; attempt < MAX_TRANSCRIPTION_ATTEMPTS; attempt += 1) {
+              let response = await send(model, true);
+              // A 400 here can mean this model version does not accept thinkingConfig.
+              // Repair that request once by removing only the unsupported setting.
+              if (response.status === 400) response = await send(model, false);
 
-            if (response.ok) {
-              result = (await response.json()) as GeminiTranscription;
-              break;
+              if (response.ok) {
+                result = (await response.json()) as GeminiTranscription;
+                break;
+              }
+
+              failureStatus = response.status;
+              const errorBody = await response.text().catch(() => "");
+              console.error(
+                `Gemini transcription failed [${response.status}] on ${model} (attempt ${attempt + 1}/${MAX_TRANSCRIPTION_ATTEMPTS}): ${errorBody.slice(0, 300)}`,
+              );
+
+              const retryable = response.status === 429 || response.status >= 500;
+              if (!retryable || attempt === MAX_TRANSCRIPTION_ATTEMPTS - 1) break;
+              await waitForRetry(retryDelay(response, attempt), request.signal);
             }
 
-            failureStatus = response.status;
-            const errorBody = await response.text().catch(() => "");
-            console.error(
-              `Gemini transcription failed [${response.status}] on ${model}: ${errorBody.slice(0, 300)}`,
-            );
-
-            // Only a quota limit can be model-specific. Other failures should not
-            // trigger another paid request with the same audio.
-            if (response.status !== 429) break;
+            if (result) break;
+            // Preserve the existing quota-only fallback. Transient 5xx failures
+            // are retried on the requested model and do not switch models.
+            if (failureStatus !== 429) break;
           }
 
           if (!result) {
             const message =
               failureStatus === 429
                 ? "Your Google AI voice limit is busy right now. Please wait about a minute and try again."
-                : "I couldn't process that recording right now. Please try again in a moment.";
+                : failureStatus >= 500
+                  ? "Voice processing is temporarily busy. Please wait a moment and try again."
+                  : "I couldn't process that recording right now. Please try again in a moment.";
             await settle({
               success: false,
               errorCode: `gemini_${failureStatus}`,
