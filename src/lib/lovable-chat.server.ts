@@ -108,7 +108,10 @@ export async function callLovableTalking(
   if (!res.ok || !res.body) {
     const raw = await res.text().catch(() => "");
     console.error(`Lovable AI talking failed [${res.status}]: ${raw.slice(0, 300)}`);
-    throw new LovableChatError(res.status, "AI Talking could not answer right now. Please try again.");
+    throw new LovableChatError(
+      res.status,
+      "AI Talking could not answer right now. Please try again.",
+    );
   }
   const reader = res.body.getReader();
   const decoder = new TextDecoder();

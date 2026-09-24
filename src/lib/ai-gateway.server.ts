@@ -19,9 +19,11 @@ export async function callGateway(
   usage?: { userId: string; operation: AiOperation },
   signal?: AbortSignal,
 ): Promise<string> {
-  const { callGemini, GEMINI_TEXT_MODEL: geminiModel, GeminiError } = await import(
-    "./gemini.server"
-  );
+  const {
+    callGemini,
+    GEMINI_TEXT_MODEL: geminiModel,
+    GeminiError,
+  } = await import("./gemini.server");
   // AI Talking conversation text (first sentence + replies) runs on the
   // standard Lovable AI service; the JSON report and every other feature keep
   // their current provider.
