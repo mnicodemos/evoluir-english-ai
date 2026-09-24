@@ -71,6 +71,34 @@ async function sendWithDeadline(
   }
 }
 
+const LOVABLE_TRANSCRIPTION_MODEL = "google/gemini-3.5-transcribe";
+
+/** Returns the transcript, or null so the existing fallback flow can take over. */
+async function transcribeWithLovable(
+  audio: File,
+  lovableKey: string,
+  requestSignal: AbortSignal,
+): Promise<string | null> {
+  const form = new FormData();
+  form.append("model", LOVABLE_TRANSCRIPTION_MODEL);
+  form.append("file", audio, audio.name || "recording.wav");
+  form.append("response_format", "json");
+  form.append("language", "en");
+  const response = await sendWithDeadline(
+    "https://ai.gateway.lovable.dev/v1/audio/transcriptions",
+    { method: "POST", headers: { Authorization: `Bearer ${lovableKey}` }, body: form },
+    requestSignal,
+  );
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    console.error(`Lovable transcription failed [${response.status}]: ${body.slice(0, 300)}`);
+    return null;
+  }
+  const data = (await response.json().catch(() => null)) as { text?: string } | null;
+  const text = data?.text?.trim();
+  return text ? text : null;
+}
+
 export const Route = createFileRoute("/api/transcribe")({
   server: {
     handlers: {
@@ -157,6 +185,18 @@ export const Route = createFileRoute("/api/transcribe")({
         };
 
         try {
+          // Primary: Lovable AI dedicated transcription service. The previous
+          // personal-key Gemini flow below stays as a fallback until approved
+          // for removal.
+          const primary = await transcribeWithLovable(audio, lovableKey, request.signal);
+          if (primary) {
+            await settle({ success: true });
+            return new Response(
+              `data: ${JSON.stringify({ type: "transcript.text.done", text: primary })}\n\n`,
+              { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" } },
+            );
+          }
+
           let result: GeminiTranscription | null = null;
           let failureStatus = 503;
 
