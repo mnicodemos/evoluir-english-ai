@@ -1,6 +1,12 @@
 import logoAsset from "@/assets/logo-evo-green.png.asset.json";
 
-export function Logo({ className = "size-7", invert = false }: { className?: string; invert?: boolean }) {
+export function Logo({
+  className = "size-7",
+  invert = false,
+}: {
+  className?: string;
+  invert?: boolean;
+}) {
   return (
     <span
       className={`inline-flex items-center justify-center overflow-hidden rounded-full bg-white ${className}`}
