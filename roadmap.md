@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Corrigir a captura rápida no Vocabulary e no Listening Lab sem compartilhar o microfone
 - [x] Corrigir falha imediata da validação de fala no Vocabulary com gravação de segurança
 - [x] Aplicar o verde oficial ao “+” nos cabeçalhos compartilhados dos PDFs
 - [x] Reorganizar os quadros inferiores — mover Learning progress e Performance para as posições verdes

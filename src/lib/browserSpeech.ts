@@ -10,7 +10,7 @@ type Recognition = {
   maxAlternatives: number;
   onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
   onend: (() => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
   start: () => void;
   stop: () => void;
   abort: () => void;
@@ -18,7 +18,12 @@ type Recognition = {
 
 type RecognitionCtor = new () => Recognition;
 
-let active: { recognition: Recognition; text: string; done: Promise<void> } | null = null;
+let active: {
+  recognition: Recognition;
+  text: string;
+  error: string | null;
+  done: Promise<void>;
+} | null = null;
 
 function ctor(): RecognitionCtor | null {
   if (typeof window === "undefined") return null;
@@ -40,14 +45,14 @@ export function startBrowserRecognition(): boolean {
   try {
     const recognition = new Ctor();
     recognition.lang = "en-US";
-    // This check expects one word. One-shot final results are more reliable on
-    // mobile Chrome than a continuous/interim session that is manually stopped.
-    recognition.interimResults = false;
-    recognition.continuous = false;
+    // Keep the session alive while the student speaks. On mobile Chrome a
+    // one-shot session can close during the pause between tapping and speaking.
+    recognition.interimResults = true;
+    recognition.continuous = true;
     recognition.maxAlternatives = 1;
     let finish: () => void = () => {};
     const done = new Promise<void>((resolve) => (finish = resolve));
-    const state = { recognition, text: "", done };
+    const state: NonNullable<typeof active> = { recognition, text: "", error: null, done };
     recognition.onresult = (event) => {
       state.text = Array.from(event.results)
         .map((r) => r[0]?.transcript ?? "")
@@ -55,7 +60,10 @@ export function startBrowserRecognition(): boolean {
         .trim();
     };
     recognition.onend = () => finish();
-    recognition.onerror = () => finish();
+    recognition.onerror = (event) => {
+      state.error = event.error ?? "recognition_failed";
+      finish();
+    };
     recognition.start();
     active = state;
     return true;
@@ -66,7 +74,7 @@ export function startBrowserRecognition(): boolean {
 }
 
 /** Stops listening and returns the transcript, or null if none was heard. */
-export async function stopBrowserRecognition(timeoutMs = 1200): Promise<string | null> {
+export async function stopBrowserRecognition(timeoutMs = 2500): Promise<string | null> {
   const state = active;
   active = null;
   if (!state) return null;
@@ -76,7 +84,7 @@ export async function stopBrowserRecognition(timeoutMs = 1200): Promise<string |
     /* already stopped */
   }
   await Promise.race([state.done, new Promise((r) => setTimeout(r, timeoutMs))]);
-  return state.text || null;
+  return state.error ? null : state.text || null;
 }
 
 export function cancelBrowserRecognition(): void {
