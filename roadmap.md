@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Ajuste visual do Dashboard — remover conteúdos destacados e alinhar a reflexão diária
 - [x] Correção localizada do Dashboard — reflexão diária e momentum nas faixas superiores
   - [x] Preservar integralmente Next Step, Quick Win, AI Learning Insight, Progress Snapshot e Smart Review
   - [x] Reutilizar somente PNG oficial, perfil e streak já carregados, sem novas consultas ou IA

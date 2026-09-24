@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { EvoGuide } from "@/components/EvoGuide";
 import { getDailyReflection, getGreeting } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -27,16 +26,15 @@ export function EvoDailyReflection({ userId, name }: EvoDailyReflectionProps) {
 
   return (
     <aside className="hidden min-w-0 border-l border-border pl-5 lg:block">
-      <EvoGuide
-        title={`${greetingIcon} ${greeting}${displayName ? `, ${displayName}` : ""}`}
-        description={`“${reflection.thought[copy]}”`}
-        imageSize="dashboard"
-      >
-        <p className="text-xs font-semibold uppercase text-muted-foreground">
-          {t("Daily reflection")}
-        </p>
-        <p className="mt-1 text-sm text-card-foreground">{reflection.reflection[copy]}</p>
-      </EvoGuide>
+      <p className="text-xs font-semibold uppercase text-muted-foreground">EVO</p>
+      <p className="mt-1 font-semibold text-card-foreground">
+        {`${greetingIcon} ${greeting}${displayName ? `, ${displayName}` : ""}`}
+      </p>
+      <p className="mt-1 text-sm text-muted-foreground">“{reflection.thought[copy]}”</p>
+      <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">
+        {t("Daily reflection")}
+      </p>
+      <p className="mt-1 text-sm text-card-foreground">{reflection.reflection[copy]}</p>
     </aside>
   );
 }
