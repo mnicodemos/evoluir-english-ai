@@ -52,7 +52,7 @@ export function startBrowserRecognition(): boolean {
     recognition.maxAlternatives = 1;
     let finish: () => void = () => {};
     const done = new Promise<void>((resolve) => (finish = resolve));
-    const state = { recognition, text: "", error: null, done };
+    const state: NonNullable<typeof active> = { recognition, text: "", error: null, done };
     recognition.onresult = (event) => {
       state.text = Array.from(event.results)
         .map((r) => r[0]?.transcript ?? "")
