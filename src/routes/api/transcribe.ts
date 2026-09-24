@@ -21,7 +21,11 @@ type GeminiTranscription = {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 };
 
-const MAX_TRANSCRIPTION_ATTEMPTS = 3;
+// One spaced retry is enough for a brief provider interruption. More attempts
+// kept the Listening Lab on "Checking..." for 40+ seconds without improving
+// the recording itself.
+const MAX_TRANSCRIPTION_ATTEMPTS = 2;
+const TRANSCRIPTION_ATTEMPT_TIMEOUT_MS = 15_000;
 
 function retryDelay(response: Response, attempt: number) {
   const retryAfter = Number(response.headers.get("Retry-After"));
@@ -41,6 +45,30 @@ async function waitForRetry(milliseconds: number, signal: AbortSignal) {
       { once: true },
     );
   });
+}
+
+async function sendWithDeadline(
+  url: string,
+  init: Omit<RequestInit, "signal">,
+  requestSignal: AbortSignal,
+): Promise<Response> {
+  const controller = new AbortController();
+  const abortFromRequest = () => controller.abort();
+  const timeout = setTimeout(() => controller.abort(), TRANSCRIPTION_ATTEMPT_TIMEOUT_MS);
+  requestSignal.addEventListener("abort", abortFromRequest, { once: true });
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (requestSignal.aborted) throw error;
+    if (controller.signal.aborted) {
+      return Response.json({ message: "Transcription attempt timed out." }, { status: 504 });
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+    requestSignal.removeEventListener("abort", abortFromRequest);
+  }
 }
 
 export const Route = createFileRoute("/api/transcribe")({
@@ -149,7 +177,7 @@ export const Route = createFileRoute("/api/transcribe")({
             });
 
           const send = (model: string, fast: boolean) =>
-            fetch(
+            sendWithDeadline(
               `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${model}:generateContent`,
               {
                 method: "POST",
@@ -159,8 +187,8 @@ export const Route = createFileRoute("/api/transcribe")({
                   "Content-Type": "application/json",
                 },
                 body: requestBody(fast),
-                signal: request.signal,
               },
+              request.signal,
             );
 
           for (const model of GEMINI_TRANSCRIPTION_MODELS) {
