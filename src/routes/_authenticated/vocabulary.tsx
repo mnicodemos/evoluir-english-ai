@@ -274,8 +274,9 @@ function Vocabulary() {
         let spoken: string;
         if (usingBrowserSpeech.current) {
           const heard = await stopBrowserRecognition();
-          const recording = await stopVoiceRecording();
-          spoken = heard ?? (await transcribeAudio(recording, controller.signal));
+          if (!heard)
+            throw new Error(t("I couldn't hear that clearly. Please try again."));
+          spoken = heard;
         } else {
           spoken = await transcribeAudio(await stopVoiceRecording(), controller.signal);
         }
@@ -321,9 +322,9 @@ function Vocabulary() {
     try {
       stopSpeaking();
       usingBrowserSpeech.current = startBrowserRecognition();
-      // Always retain the same WAV safety recording used before the browser
-      // recognition optimization. It is uploaded only if no transcript arrives.
-      await startVoiceRecording();
+      // Mobile Chrome cannot reliably share the microphone between its native
+      // recognizer and the WAV recorder. Use exactly one capture path.
+      if (!usingBrowserSpeech.current) await startVoiceRecording();
       minutesSpent.start();
       setRecordingId(word.id);
     } catch (error) {
