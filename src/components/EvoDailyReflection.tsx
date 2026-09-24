@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Sparkle } from "lucide-react";
+import { TreePine } from "lucide-react";
 
 import { getDailyReflection, getGreeting } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
@@ -27,7 +27,7 @@ export function EvoDailyReflection({ userId, name }: EvoDailyReflectionProps) {
   return (
     <aside className="hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex">
       <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-        <Sparkle className="size-5 text-primary" aria-hidden="true" />
+        <TreePine className="size-5 text-brand-green" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-card-foreground">
