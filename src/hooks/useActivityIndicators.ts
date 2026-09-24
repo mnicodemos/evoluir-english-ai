@@ -12,7 +12,6 @@ import {
   readJson,
   readText,
   vocabularyGenerationFailureKey,
-  vocabularyHasNewActivity,
   vocabularyIndicatorVisible,
   WRITING_DONE_ROUND_PREFIX,
   WRITING_HISTORY_ROUND_PREFIX,
