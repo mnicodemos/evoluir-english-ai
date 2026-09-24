@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Fase UX 11.1 — EVO Daily Reflection e My Progress Snapshot
+  - [x] Reutilizar a recomendação, o perfil e as evidências já carregadas, sem novas consultas
+  - [x] Adicionar reflexão diária determinística e snapshot responsivo aos cards existentes
+  - [x] Preservar integralmente pedagogia, rotas, autenticação, banco e IA
 - [x] Padronização global da identidade visual Evoluir+
   - [x] Consolidar o símbolo oficial enviado no componente compartilhado e nos PDFs
   - [x] Manter a EVO no PNG oficial transparente e nos pontos já aprovados
