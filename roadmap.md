@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Alinhar as divisórias do Next Step e padronizar o ícone da reflexão diária
 - [x] Ajuste visual do Dashboard — remover conteúdos destacados e alinhar a reflexão diária
 - [x] Correção localizada do Dashboard — reflexão diária e momentum nas faixas superiores
   - [x] Preservar integralmente Next Step, Quick Win, AI Learning Insight, Progress Snapshot e Smart Review
