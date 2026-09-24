@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Reorganizar os quadros inferiores — mover Learning progress e Performance para as posições verdes
 - [x] Reorganizar o Dashboard conforme as marcações — mover Your progress para dentro do Smart Review
 - [x] Alinhar a divisória do Your Momentum com a divisória superior
 - [x] Substituir o ícone da saudação por uma árvore no verde oficial

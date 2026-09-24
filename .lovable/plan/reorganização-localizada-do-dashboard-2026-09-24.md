@@ -1,17 +1,16 @@
 # Reorganização localizada do Dashboard
 
-## Alterações
-- Mover o conteúdo completo de **Your progress** da posição amarela para a área verde, à direita de **Smart review**.
-- Dividir a parte inferior do quadro Smart Review em duas colunas no desktop, inserindo a divisória vertical indicada em azul.
-- Remover a separação horizontal indicada em vermelho na área direita.
-- Remover o quadro antigo de **Your progress** da posição amarela, sem duplicar dados ou conteúdo.
-- No celular, manter os conteúdos empilhados e legíveis, sem cortes ou sobreposição.
+## Alteração
+- Mover o quadro completo **Learning progress** da posição azul para a posição verde superior esquerda.
+- Mover o quadro completo **Performance** da posição azul para a posição verde inferior esquerda.
+- Manter **Keep training** na coluna direita, ocupando a altura correspondente aos dois quadros reposicionados.
+- Preservar o conteúdo, os dados, os títulos, os cartões internos e todas as demais áreas do Dashboard.
 
-## Preservação
-- Não alterar textos, dados, cálculos, recomendações, lógica pedagógica, rotas, autenticação ou banco.
-- Reutilizar o componente existente de progresso; somente adaptar sua apresentação quando estiver dentro do Smart Review.
-- Manter EVO, Your Momentum e todos os demais blocos nas posições atuais.
+## Responsividade e validação
+- No desktop, aplicar explicitamente as posições indicadas, sem depender do preenchimento automático da grade.
+- No celular e tablet, manter os quadros empilhados, legíveis e sem cortes.
+- Validar em 320, 375, 390, 414, 768, 1280 e 1440 px, além de testes, TypeScript, lint, formatação e build.
 
-## Validação
-- Conferir o Dashboard em 320, 375, 390, 414, 768, 1280 e 1440 px.
-- Validar compilação, TypeScript, lint e formatação.
+## Limites
+- Somente apresentação visual: sem mudanças em lógica, dados, banco, rotas, autenticação, IA ou pedagogia.
+- Reutilizar integralmente os quadros existentes, sem duplicar ou recriar conteúdo.
