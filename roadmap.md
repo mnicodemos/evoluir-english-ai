@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Padronização global da identidade visual Evoluir+
+  - [x] Consolidar o símbolo oficial enviado no componente compartilhado e nos PDFs
+  - [x] Manter a EVO no PNG oficial transparente e nos pontos já aprovados
+  - [x] Padronizar favicon, ícones mobile e “+” no verde oficial sem alterar layout ou lógica
 - [x] Padronização global da marca — “+” e círculo superior no verde da EVO
   - [x] Atualizar a origem compartilhada do símbolo sem alterar desenho, tamanho ou posição
   - [x] Aplicar o mesmo verde somente ao “+” nas seis assinaturas visuais oficiais
