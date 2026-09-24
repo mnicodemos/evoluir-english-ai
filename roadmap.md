@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Corrigir o ícone da saudação para o símbolo único de quatro pontas
 - [x] Alinhar as divisórias do Next Step e padronizar o ícone da reflexão diária
 - [x] Ajuste visual do Dashboard — remover conteúdos destacados e alinhar a reflexão diária
 - [x] Correção localizada do Dashboard — reflexão diária e momentum nas faixas superiores
