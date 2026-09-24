@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AdminPanelButton } from "@/components/AdminPanelButton";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -245,7 +246,8 @@ export function ProfileMenu({ className }: { className?: string }) {
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-row items-center justify-between sm:justify-between">
+          <AdminPanelButton showLabel className="mr-auto" />
           <Button onClick={() => save.mutate()} disabled={save.isPending}>
             {save.isPending && <Loader2 className="size-4 animate-spin" />}
             {save.isPending ? translate("Saving...", lang) : translate("Save profile", lang)}
