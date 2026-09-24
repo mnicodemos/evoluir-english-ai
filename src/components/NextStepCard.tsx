@@ -242,7 +242,9 @@ export function NextStepCard() {
         </aside>
 
         <ProgressSnapshot
-          currentLevel={profile ? findLevel(profile.level).value.toUpperCase() : t("Not available yet")}
+          currentLevel={
+            profile ? findLevel(profile.level).value.toUpperCase() : t("Not available yet")
+          }
           strongestSkill={strongestLabel}
           focusNext={skillLabel}
           recentlyPractised={data.insight?.recentlyPractised ?? false}
