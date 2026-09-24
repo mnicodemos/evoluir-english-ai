@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Restaurar a gravação completa no Listening Lab e manter captura rápida somente no Vocabulary
 - [x] Corrigir a captura rápida no Vocabulary e no Listening Lab sem compartilhar o microfone
 - [x] Corrigir falha imediata da validação de fala no Vocabulary com gravação de segurança
 - [x] Aplicar o verde oficial ao “+” nos cabeçalhos compartilhados dos PDFs
