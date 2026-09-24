@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 
-import { ACCENT, DARK, INK, MUTED } from "@/lib/pdfTheme";
+import { ACCENT, DARK, INK, MUTED, drawBrandName } from "@/lib/pdfTheme";
 
 const BODY: [number, number, number] = [58, 63, 74];
 
@@ -90,8 +90,11 @@ export function createWorkbook(
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(13);
-      doc.setTextColor(190, 196, 206);
-      doc.text(opts.brand, pageW / 2, pageH * 0.38 + 26, { align: "center" });
+      drawBrandName(doc, opts.brand, pageW / 2, pageH * 0.38 + 26, {
+        r: 190,
+        g: 196,
+        b: 206,
+      });
 
       doc.setFillColor(ACCENT.r, ACCENT.g, ACCENT.b);
       doc.rect(margin, pageH * 0.48, contentW, 4, "F");

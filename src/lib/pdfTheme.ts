@@ -6,6 +6,37 @@ export const INK = { r: 20, g: 24, b: 33 };
 export const MUTED = { r: 100, g: 106, b: 118 };
 export const ACCENT = { r: 34, g: 168, b: 116 };
 export const DARK = { r: 15, g: 19, b: 28 };
+export const BRAND_GREEN = { r: 0, g: 245, b: 206 };
+
+/** Draws a centred brand name while keeping only the Evoluir+ symbol in the official green. */
+export function drawBrandName(
+  doc: jsPDF,
+  text: string,
+  centerX: number,
+  y: number,
+  color: { r: number; g: number; b: number },
+) {
+  const plusIndex = text.indexOf("+");
+  if (plusIndex < 0) {
+    doc.setTextColor(color.r, color.g, color.b);
+    doc.text(text, centerX, y, { align: "center" });
+    return;
+  }
+
+  const before = text.slice(0, plusIndex);
+  const after = text.slice(plusIndex + 1);
+  const beforeWidth = doc.getTextWidth(before);
+  const plusWidth = doc.getTextWidth("+");
+  const totalWidth = beforeWidth + plusWidth + doc.getTextWidth(after);
+  const left = centerX - totalWidth / 2;
+
+  doc.setTextColor(color.r, color.g, color.b);
+  doc.text(before, left, y);
+  doc.setTextColor(BRAND_GREEN.r, BRAND_GREEN.g, BRAND_GREEN.b);
+  doc.text("+", left + beforeWidth, y);
+  doc.setTextColor(color.r, color.g, color.b);
+  doc.text(after, left + beforeWidth + plusWidth, y);
+}
 
 /** Loads the app logo as a data URL so jsPDF can embed it. */
 export async function loadLogo(): Promise<string | null> {
@@ -130,9 +161,8 @@ export function drawCover(
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(26);
-  doc.setTextColor(255, 255, 255);
   for (const line of doc.splitTextToSize(opts.title, maxW) as string[]) {
-    doc.text(line, centerX, y, { align: "center" });
+    drawBrandName(doc, line, centerX, y, { r: 255, g: 255, b: 255 });
     y += 32;
   }
 
