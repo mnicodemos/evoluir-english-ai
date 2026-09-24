@@ -2,32 +2,74 @@ import { studyToday } from "@/lib/today";
 
 export const DAILY_REFLECTIONS = [
   {
-    thought: "Small consistent actions create meaningful progress.",
-    reflection: "Keep building your English journey one step at a time.",
+    thought: {
+      en: "Great things are built by small actions.",
+      pt: "Grandes conquistas são construídas por pequenas ações.",
+    },
+    reflection: {
+      en: "Keep building your consistency.",
+      pt: "Continue construindo sua consistência.",
+    },
   },
   {
-    thought: "Progress grows when practice becomes part of your day.",
-    reflection: "Every focused minute brings confident English closer.",
+    thought: {
+      en: "Direct your energy toward what you can practise today.",
+      pt: "Direcione sua energia para o que você pode praticar hoje.",
+    },
+    reflection: {
+      en: "Let today's effort be enough for today.",
+      pt: "Permita que o esforço de hoje seja suficiente por hoje.",
+    },
   },
   {
-    thought: "Confidence is built through small moments of real practice.",
-    reflection: "Use what you know today and let fluency grow naturally.",
+    thought: {
+      en: "Progress begins when intention becomes action.",
+      pt: "O progresso começa quando a intenção se transforma em ação.",
+    },
+    reflection: {
+      en: "Take the next useful step with attention.",
+      pt: "Dê o próximo passo útil com atenção.",
+    },
   },
   {
-    thought: "The words you practise today become tomorrow's confidence.",
-    reflection: "Stay curious, keep showing up and trust your progress.",
+    thought: {
+      en: "Patience gives steady practice time to become strength.",
+      pt: "A paciência dá tempo para a prática constante se tornar força.",
+    },
+    reflection: {
+      en: "Respect your pace and remain present.",
+      pt: "Respeite seu ritmo e permaneça presente.",
+    },
   },
   {
-    thought: "Meaningful learning happens one clear step at a time.",
-    reflection: "Focus on today's practice and your journey will keep moving.",
+    thought: {
+      en: "What you repeat with purpose shapes what you become.",
+      pt: "O que você repete com propósito molda quem você se torna.",
+    },
+    reflection: {
+      en: "Choose one meaningful practice and do it well.",
+      pt: "Escolha uma prática significativa e faça-a bem.",
+    },
   },
   {
-    thought: "Your consistency matters more than a perfect study session.",
-    reflection: "Keep your rhythm and give yourself room to improve.",
+    thought: {
+      en: "A calm mind learns more clearly than a hurried one.",
+      pt: "Uma mente serena aprende com mais clareza do que uma mente apressada.",
+    },
+    reflection: {
+      en: "Practise with calm attention, not pressure.",
+      pt: "Pratique com atenção serena, não com pressão.",
+    },
   },
   {
-    thought: "Every attempt helps your English become more natural.",
-    reflection: "Practise with purpose today and notice how far you have come.",
+    thought: {
+      en: "Each new attempt is evidence that you are moving forward.",
+      pt: "Cada nova tentativa é uma evidência de que você está avançando.",
+    },
+    reflection: {
+      en: "Value the practice, not only the result.",
+      pt: "Valorize a prática, não apenas o resultado.",
+    },
   },
 ] as const;
 

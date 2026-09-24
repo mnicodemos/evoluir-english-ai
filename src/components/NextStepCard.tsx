@@ -4,6 +4,7 @@ import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
+import { EvoGuide } from "@/components/EvoGuide";
 import { ProgressSnapshot } from "@/components/ProgressSnapshot";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
@@ -78,7 +79,12 @@ export function NextStepCard() {
 
   return (
     <section className="card-soft p-5" aria-label={t("Your next step")}>
-      <div className="grid gap-5 lg:grid-cols-2 lg:gap-x-0 lg:gap-y-6">
+      <div className="grid min-w-0 lg:grid-cols-2 lg:gap-5">
+        <EvoGuide title={t("Your next step is here.")} imageSize="lesson" />
+        <EvoDailyReflection userId={profile?.id ?? "student"} name={profile?.name ?? ""} />
+      </div>
+
+      <div className="mt-5 grid gap-5 border-t border-border pt-5 lg:grid-cols-2 lg:gap-x-0 lg:gap-y-6">
         <div className="space-y-4 lg:pr-6">
           <div className="flex min-w-0 items-start gap-4">
             <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
@@ -171,8 +177,6 @@ export function NextStepCard() {
             </div>
           ) : null}
         </div>
-
-        <EvoDailyReflection userId={profile?.id ?? "student"} name={profile?.name ?? ""} />
 
         <aside className="min-w-0 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <div className="flex items-start gap-4">

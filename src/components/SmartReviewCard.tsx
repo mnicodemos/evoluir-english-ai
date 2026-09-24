@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, RotateCcw } from "lucide-react";
 
 import { EvoGuide } from "@/components/EvoGuide";
+import { LearningMomentum } from "@/components/LearningMomentum";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
@@ -20,7 +21,7 @@ import { useUiLang } from "@/lib/uiLang";
  * server-side; this section only presents it, and it renders nothing when there
  * is no valid recommendation.
  */
-export function SmartReviewCard() {
+export function SmartReviewCard({ streakDays }: { streakDays: number }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
@@ -53,7 +54,10 @@ export function SmartReviewCard() {
 
   return (
     <section className="card-soft p-5" aria-labelledby="smart-review-title">
-      <EvoGuide title={t("This is a good skill to reinforce now.")} imageSize="lesson" />
+      <div className="grid min-w-0 lg:grid-cols-2 lg:gap-5">
+        <EvoGuide title={t("This is a good skill to reinforce now.")} imageSize="lesson" />
+        <LearningMomentum streakDays={streakDays} />
+      </div>
 
       <div className="mt-5 flex min-w-0 items-start gap-4 border-t border-border pt-5">
         <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">

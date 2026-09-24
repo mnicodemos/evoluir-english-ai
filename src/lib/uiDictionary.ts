@@ -61,6 +61,8 @@ export const uiPt: Record<string, string> = {
   "Learning Momentum": "Ritmo de aprendizagem",
   Consistent: "Consistente",
   "Building momentum": "Construindo ritmo",
+  "Your Momentum": "Seu ritmo",
+  "Keep building your consistency.": "Continue construindo sua consistência.",
 
   // Proof of progress (history)
   "Your evolution": "Sua evolução",

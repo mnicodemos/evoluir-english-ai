@@ -214,7 +214,7 @@ function Dashboard() {
 
           <NextStepCard />
 
-          <SmartReviewCard />
+          <SmartReviewCard streakDays={streakDays} />
 
           <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
             <PathProgressCard />

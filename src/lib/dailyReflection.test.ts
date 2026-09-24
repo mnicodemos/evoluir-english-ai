@@ -22,4 +22,12 @@ describe("daily reflection", () => {
     expect(getGreeting(14)).toBe("Good afternoon");
     expect(getGreeting(21)).toBe("Good evening");
   });
+
+  it("provides matching English and Portuguese copy without generating content", () => {
+    const reflection = getDailyReflection("student-1", new Date("2026-09-24T12:00:00-03:00"));
+    expect(reflection.thought.en).toBeTruthy();
+    expect(reflection.thought.pt).toBeTruthy();
+    expect(reflection.reflection.en).toBeTruthy();
+    expect(reflection.reflection.pt).toBeTruthy();
+  });
 });
