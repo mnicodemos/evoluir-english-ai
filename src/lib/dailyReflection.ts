@@ -39,7 +39,9 @@ function stableHash(value: string): number {
 
 export function getDailyReflection(userId: string, date: Date = new Date()) {
   const key = `${userId}:${studyToday(date)}`;
-  return DAILY_REFLECTIONS[stableHash(key) % DAILY_REFLECTIONS.length];
+  const reflection = DAILY_REFLECTIONS[stableHash(key) % DAILY_REFLECTIONS.length];
+  if (!reflection) throw new Error("Daily reflection collection is empty");
+  return reflection;
 }
 
 export function getGreeting(hour: number): "Good morning" | "Good afternoon" | "Good evening" {
