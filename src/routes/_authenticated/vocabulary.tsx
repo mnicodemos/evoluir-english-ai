@@ -20,6 +20,11 @@ import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
 import { pronunciationScore, transcribeAudio } from "@/lib/transcribe";
 import {
+  cancelBrowserRecognition,
+  startBrowserRecognition,
+  stopBrowserRecognition,
+} from "@/lib/browserSpeech";
+import {
   cancelVoiceRecording,
   startVoiceRecording,
   stopVoiceRecording,
@@ -262,8 +267,12 @@ function Vocabulary() {
       setRecordingId(null);
       setCheckingId(word.id);
       try {
-        const audio = await stopVoiceRecording();
-        const spoken = await transcribeAudio(audio, controller.signal);
+        const [audio, heard] = await Promise.all([
+          stopVoiceRecording(),
+          stopBrowserRecognition(),
+        ]);
+        // Browser recognition first (instant, no credits); AI only as fallback.
+        const spoken = heard ?? (await transcribeAudio(audio, controller.signal));
         const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
         const authoritative = await savePronunciation({
           data: {
@@ -298,17 +307,22 @@ function Vocabulary() {
     }
 
     // Another card was left recording: release it before starting a new one.
-    if (recordingId) cancelVoiceRecording();
+    if (recordingId) {
+      cancelVoiceRecording();
+      cancelBrowserRecognition();
+    }
 
     try {
       stopSpeaking();
       await startVoiceRecording();
+      startBrowserRecognition();
       minutesSpent.start();
       setRecordingId(word.id);
     } catch (error) {
       setRecordingId(null);
       minutesSpent.stop();
       cancelVoiceRecording();
+      cancelBrowserRecognition();
       toast.error(
         error instanceof Error
           ? error.message
