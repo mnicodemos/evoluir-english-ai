@@ -15,6 +15,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { createAttemptGate } from "@/lib/attemptGate";
+import { vocabularyGenerationFailureKey } from "@/lib/activityIndicators";
 
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
@@ -142,7 +143,7 @@ function Vocabulary() {
   // 2) Missing words are generated in the background. A failed attempt is
   // remembered for this batch so reopening or refreshing the page does not
   // start a new generation by itself; the student can retry on purpose.
-  const failKey = profile ? `vocab-gen-failed:${profile.id}:${startedLessons ?? 0}` : null;
+  const failKey = profile ? vocabularyGenerationFailureKey(profile.id, startedLessons ?? 0) : null;
   const [genBlocked, setGenBlocked] = useState<boolean | null>(null);
   useEffect(() => {
     if (!failKey) return;
@@ -644,17 +645,19 @@ function Vocabulary() {
                   </p>
                 ) : genFailed && (daily?.length ?? 0) < 10 ? (
                   <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    <span>
-                      {genError instanceof Error
-                        ? genError.message
-                        : t("Today's words are not ready yet.")}
-                    </span>
+                    <span>{t("No new words available right now. Please try again later.")}</span>
                     <Button variant="outline" size="sm" onClick={retryGeneration}>
                       <RotateCcw className="size-4" /> {t("Try again")}
                     </Button>
                   </div>
                 ) : null}
-                {today.length > 0 || !generating ? <List items={today} /> : null}
+                {today.length > 0 ? (
+                  <List items={today} />
+                ) : !generating && !genFailed ? (
+                  <p className="mt-6 text-sm text-muted-foreground">
+                    {t("No new words available right now. Please try again later.")}
+                  </p>
+                ) : null}
               </>
             )}
           </TabsContent>

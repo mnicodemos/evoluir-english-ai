@@ -10,7 +10,9 @@ import {
   LISTENING_TRACK_ID,
   listeningHasNewActivity,
   readJson,
-  vocabularyHasNewActivity,
+  readText,
+  vocabularyGenerationFailureKey,
+  vocabularyIndicatorVisible,
   WRITING_DONE_ROUND_PREFIX,
   WRITING_HISTORY_ROUND_PREFIX,
   writingHasNewActivity,
@@ -40,11 +42,12 @@ function useVocabularyBatchProgress(round: number, userId: string | undefined) {
     queryKey: ["vocabulary-batch-progress", userId, round],
     enabled: !!userId,
     queryFn: async () => {
+      if (!userId) return { batchWordIds: [], masteryByWordId: {} };
       const [batch, mine] = await Promise.all([
         supabase
           .from("vocabulary")
           .select("id")
-          .eq("created_by", userId!)
+          .eq("created_by", userId)
           .eq("batch_key", lessonBatchKey(round)),
         fetchUserVocabularyMastery(queryClient),
       ]);
@@ -64,7 +67,12 @@ export function useActivityIndicators(): ActivityIndicators {
   const { data: profile } = useProfile();
   const { data: lessonRound } = useLessonRound();
   const round = lessonRound ?? 0;
-  const { data: vocabularyBatch } = useVocabularyBatchProgress(round, profile?.id);
+  const {
+    data: vocabularyBatch,
+    isPending: vocabularyLoading,
+    isFetching: vocabularyFetching,
+    isError: vocabularyError,
+  } = useVocabularyBatchProgress(round, profile?.id);
   const [indicators, setIndicators] = useState<ActivityIndicators>({
     listening: false,
     writing: false,
@@ -87,9 +95,14 @@ export function useActivityIndicators(): ActivityIndicators {
         done: readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []),
         tasksPerRound: WRITING_CATEGORIES.length,
       }),
-      vocabulary: vocabularyBatch ? vocabularyHasNewActivity(vocabularyBatch) : false,
+      vocabulary: vocabularyIndicatorVisible({
+        batch: vocabularyBatch,
+        isLoading: vocabularyLoading || vocabularyFetching,
+        isError: vocabularyError,
+        generationFailed: readText(vocabularyGenerationFailureKey(profile.id, round)) === "1",
+      }),
     });
-  }, [profile, round, vocabularyBatch]);
+  }, [profile, round, vocabularyBatch, vocabularyError, vocabularyFetching, vocabularyLoading]);
 
   return indicators;
 }

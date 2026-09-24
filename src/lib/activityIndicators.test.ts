@@ -4,6 +4,7 @@ import {
   dashboardActionAvailable,
   listeningHasNewActivity,
   vocabularyHasNewActivity,
+  vocabularyIndicatorVisible,
   writingHasNewActivity,
 } from "@/lib/activityIndicators";
 
@@ -17,11 +18,8 @@ describe("Dashboard recommended actions", () => {
 
   it("hides Vocabulary when the current batch has nothing left to practise", () => {
     expect(dashboardActionAvailable("/vocabulary", available)).toBe(false);
-    expect(
-      dashboardActionAvailable("/vocabulary", { ...available, vocabulary: true }),
-    ).toBe(true);
+    expect(dashboardActionAvailable("/vocabulary", { ...available, vocabulary: true })).toBe(true);
   });
-
 
   it("does not block lessons or open-ended practice surfaces", () => {
     expect(dashboardActionAvailable("/learning/$lessonId", available)).toBe(true);
@@ -29,7 +27,6 @@ describe("Dashboard recommended actions", () => {
     expect(dashboardActionAvailable("/teacher", available)).toBe(true);
   });
 });
-
 
 describe("Listening Lab indicator", () => {
   it("shows nothing when the current round was completed", () => {
@@ -55,9 +52,9 @@ describe("Writing indicator", () => {
   });
 
   it("shows the dot when a task is still open", () => {
-    expect(
-      writingHasNewActivity({ prompts: ["a", "b", "c"], done: ["a"], tasksPerRound }),
-    ).toBe(true);
+    expect(writingHasNewActivity({ prompts: ["a", "b", "c"], done: ["a"], tasksPerRound })).toBe(
+      true,
+    );
   });
 
   it("shows the dot when the round was never opened", () => {
@@ -68,9 +65,9 @@ describe("Writing indicator", () => {
 describe("Vocabulary indicator", () => {
   const ids = ["w1", "w2", "w3"];
 
-  it("shows the dot while the round's batch is not complete yet", () => {
+  it("shows the dot when a saved word is ready to practise", () => {
     expect(
-      vocabularyHasNewActivity({ batchWordIds: ["w1"], masteryByWordId: { w1: 100 }, batchSize: 3 }),
+      vocabularyHasNewActivity({ batchWordIds: ["w1"], masteryByWordId: {}, batchSize: 3 }),
     ).toBe(true);
   });
 
@@ -94,10 +91,32 @@ describe("Vocabulary indicator", () => {
     ).toBe(false);
   });
 
-  it("comes back when a new round has no words yet", () => {
+  it("stays hidden when the saved batch is empty", () => {
+    expect(vocabularyHasNewActivity({ batchWordIds: [], masteryByWordId: {}, batchSize: 3 })).toBe(
+      false,
+    );
+  });
+
+  it("stays hidden while saved words are loading", () => {
     expect(
-      vocabularyHasNewActivity({ batchWordIds: [], masteryByWordId: {}, batchSize: 3 }),
-    ).toBe(true);
+      vocabularyIndicatorVisible({
+        batch: { batchWordIds: ["w1"], masteryByWordId: {} },
+        isLoading: true,
+        isError: false,
+      }),
+    ).toBe(false);
+  });
+
+  it("stays hidden after a saved-word read or generation error", () => {
+    const batch = { batchWordIds: ["w1"], masteryByWordId: {} };
+    expect(vocabularyIndicatorVisible({ batch, isLoading: false, isError: true })).toBe(false);
+    expect(
+      vocabularyIndicatorVisible({
+        batch,
+        isLoading: false,
+        isError: false,
+        generationFailed: true,
+      }),
+    ).toBe(false);
   });
 });
-

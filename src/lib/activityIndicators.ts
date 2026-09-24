@@ -11,6 +11,11 @@ export const LISTENING_COMPLETION_KEY = "listening-lab-completed-v1";
 export const LISTENING_TRACK_ID = "everyday";
 export const WRITING_HISTORY_ROUND_PREFIX = "writing-prompts-round-";
 export const WRITING_DONE_ROUND_PREFIX = "writing-done-round-";
+export const VOCABULARY_GENERATION_FAILED_PREFIX = "vocab-gen-failed:";
+
+export function vocabularyGenerationFailureKey(userId: string, round: number) {
+  return `${VOCABULARY_GENERATION_FAILED_PREFIX}${userId}:${round}`;
+}
 
 /** The Listening round is new until it is completed for this lesson count. */
 export function listeningHasNewActivity(input: {
@@ -36,24 +41,28 @@ export const VOCABULARY_BATCH_SIZE = 10;
 export const VOCABULARY_MASTERED = 75;
 
 /**
- * Vocabulary is new while the current round's batch still has a word the student
- * has not mastered, or while the batch is not complete yet (a new round unlocks
- * more words). Only the existing completion state (user_vocabulary mastery) is
- * used: merely opening the page changes nothing.
+ * Vocabulary is new only when the current round has at least one saved word that
+ * the student has not mastered. An empty batch is not an available activity.
  */
 export function vocabularyHasNewActivity(input: {
   batchWordIds: string[];
   masteryByWordId: Record<string, number>;
   batchSize?: number;
 }) {
-  const size = input.batchSize ?? VOCABULARY_BATCH_SIZE;
-  if (input.batchWordIds.length < size) return true;
-  return input.batchWordIds.some(
-    (id) => (input.masteryByWordId[id] ?? 0) < VOCABULARY_MASTERED,
-  );
+  if (input.batchWordIds.length === 0) return false;
+  return input.batchWordIds.some((id) => (input.masteryByWordId[id] ?? 0) < VOCABULARY_MASTERED);
 }
 
-
+/** Loading and failed reads never advertise vocabulary as available. */
+export function vocabularyIndicatorVisible(input: {
+  batch: { batchWordIds: string[]; masteryByWordId: Record<string, number> } | null | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  generationFailed?: boolean;
+}) {
+  if (input.isLoading || input.isError || input.generationFailed || !input.batch) return false;
+  return vocabularyHasNewActivity(input.batch);
+}
 
 /**
  * Whether an existing Dashboard destination still has an available action.
@@ -72,8 +81,6 @@ export function dashboardActionAvailable(
   if (destination === "/vocabulary") return indicators.vocabulary;
   return true;
 }
-
-
 
 function storage(): Storage | null {
   if (typeof window === "undefined") return null;
