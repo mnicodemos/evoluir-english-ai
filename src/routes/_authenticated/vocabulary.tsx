@@ -268,13 +268,14 @@ function Vocabulary() {
       setRecordingId(null);
       setCheckingId(word.id);
       try {
-        // Browser recognition (instant, no credits). The AI transcription is
-        // used only when this browser cannot recognise speech on its own.
+        // Browser recognition is instant and normally avoids an AI call. The
+        // local recording remains available as a safety net when mobile Chrome
+        // ends recognition without returning a transcript.
         let spoken: string;
         if (usingBrowserSpeech.current) {
           const heard = await stopBrowserRecognition();
-          if (!heard) throw new Error(t("I couldn't hear that clearly. Please try again."));
-          spoken = heard;
+          const recording = await stopVoiceRecording();
+          spoken = heard ?? (await transcribeAudio(recording, controller.signal));
         } else {
           spoken = await transcribeAudio(await stopVoiceRecording(), controller.signal);
         }
@@ -320,7 +321,9 @@ function Vocabulary() {
     try {
       stopSpeaking();
       usingBrowserSpeech.current = startBrowserRecognition();
-      if (!usingBrowserSpeech.current) await startVoiceRecording();
+      // Always retain the same WAV safety recording used before the browser
+      // recognition optimization. It is uploaded only if no transcript arrives.
+      await startVoiceRecording();
       minutesSpent.start();
       setRecordingId(word.id);
     } catch (error) {
