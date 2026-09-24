@@ -17,6 +17,7 @@ export async function callGateway(
   messages: Msg[],
   jsonMode = false,
   usage?: { userId: string; operation: AiOperation },
+  signal?: AbortSignal,
 ): Promise<string> {
   const { callGemini, GEMINI_TEXT_MODEL, GeminiError } = await import("./gemini.server");
   const usageTools = usage ? await import("./ai-usage.server") : null;
@@ -31,18 +32,29 @@ export async function callGateway(
   let text: string | null = null;
   let usageTokens: { inputTokens?: number; outputTokens?: number } = {};
   try {
-    text = await callGemini(messages, jsonMode, (reported) => {
-      usageTokens = reported;
-    });
+    text = await callGemini(
+      messages,
+      jsonMode,
+      (reported) => {
+        usageTokens = reported;
+      },
+      signal,
+    );
   } catch (err) {
     if (ticket && usageTools) {
       await usageTools.finishAiUsage(ticket, {
         success: false,
-        errorCode: err instanceof GeminiError ? `gemini_${err.status}` : "gemini_error",
+        errorCode: signal?.aborted
+          ? "timeout"
+          : err instanceof GeminiError
+            ? `gemini_${err.status}`
+            : "gemini_error",
         errorMessage: err instanceof Error ? err.message : "Google Gemini failed",
       });
     }
     if (err instanceof AiError) throw err;
+    if (signal?.aborted)
+      throw new AiError(504, "Voice processing is taking longer than expected. Please try again.");
     const message =
       err instanceof Error ? err.message : "Google Gemini could not answer right now.";
     throw new AiError(err instanceof GeminiError ? err.status : 503, message);

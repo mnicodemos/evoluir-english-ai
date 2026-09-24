@@ -110,3 +110,4 @@
   - Palavras salvas carregam sem IA; geração em segundo plano; falha memorizada por lote, com "Tentar novamente" manual
 - [ ] Pendente: investigar por que o lote completed-16 não está persistindo as palavras geradas (fase futura)
 - [ ] Pendente: latência da validação de pronúncia (2,4–45 s, provedor de IA)
+- [x] AI Talking: limite de 20 s (primeira resposta) e 15 s (entre trechos), cancelamento real e liberação imediata da vaga

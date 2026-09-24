@@ -32,7 +32,7 @@ import { aiChat } from "@/lib/aiChat.functions";
 import { getLevelState } from "@/lib/level";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { takeSpeechBlocks } from "@/lib/speechChunks";
-import { streamCoachReply } from "@/lib/coach-stream";
+import { COACH_TIMEOUT_MESSAGE, streamCoachReply } from "@/lib/coach-stream";
 
 import {
   cancelVoiceRecording,
@@ -190,11 +190,14 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   const mounted = useRef(true);
   const topicOffset = useRef(0);
   const speechQueue = useRef<Promise<void>>(Promise.resolve());
+  const replyAbort = useRef<AbortController | null>(null);
 
   useEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
+      // Leaving the screen really cancels the reply so the AI slot is freed.
+      replyAbort.current?.abort();
       cancelVoiceRecording();
       stopSpeaking();
     };
@@ -249,28 +252,45 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     setVoiceState("thinking");
     const used = loadUsedOpeners();
     let opener: string;
+    let openerTimer: ReturnType<typeof setTimeout> | undefined;
     try {
-      const text = await aiChat({
-        data: {
-          messages: coachOpenerMessages(
-            selected.id,
-            cefrLevel,
-            profile?.goal ?? "conversation",
-            buildStudyContext(snapshot),
-            used,
-          ),
-          jsonMode: false,
-          operation: "talking",
-        },
+      // The server aborts Gemini after 20 s; this guard only frees the screen
+      // if the answer never comes back at all.
+      const deadline = new Promise<never>((_, reject) => {
+        openerTimer = setTimeout(() => reject(new Error("opener_timeout")), 22_000);
       });
+      const text = await Promise.race([
+        aiChat({
+          data: {
+            messages: coachOpenerMessages(
+              selected.id,
+              cefrLevel,
+              profile?.goal ?? "conversation",
+              buildStudyContext(snapshot),
+              used,
+            ),
+            jsonMode: false,
+            operation: "talking",
+          },
+        }),
+        deadline,
+      ]);
       opener = text.trim();
       if (!opener) throw new Error("empty opener");
-    } catch {
+    } catch (error) {
+      if (
+        mounted.current &&
+        error instanceof Error &&
+        (error.message === "opener_timeout" || error.message === COACH_TIMEOUT_MESSAGE)
+      )
+        toast.error(COACH_TIMEOUT_MESSAGE);
       const fresh = selected.fallbackOpeners.filter((line) => !used.includes(line));
       const pool = fresh.length ? fresh : selected.fallbackOpeners;
       opener =
         pool[Math.floor(Math.random() * pool.length)] ??
         "Hi! Let's chat in English. How are you today?";
+    } finally {
+      clearTimeout(openerTimer);
     }
     rememberOpener(opener);
     if (!mounted.current) return;
@@ -312,6 +332,9 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       let phraseBuffer = "";
       const replyIndex = next.length;
       setMessages([...next, { role: "assistant", content: "" }]);
+      replyAbort.current?.abort();
+      const abort = new AbortController();
+      replyAbort.current = abort;
       const raw = await streamCoachReply(
         coachReplyMessages(
           scenario,
@@ -335,6 +358,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
           phraseBuffer = split.rest;
           split.blocks.forEach(queueSpeech);
         },
+        abort.signal,
       );
       const reply = raw.trim();
       if (phraseBuffer.trim()) queueSpeech(phraseBuffer.trim());
@@ -344,7 +368,14 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       await speechQueue.current;
       if (mounted.current) setVoiceState("idle");
     } catch (error) {
-      if (mounted.current) setVoiceState("idle");
+      if (!mounted.current) return;
+      setVoiceState("idle");
+      // Drop the empty placeholder left by a reply that never arrived.
+      setMessages((current) =>
+        current.at(-1)?.role === "assistant" && !current.at(-1)?.content
+          ? current.slice(0, -1)
+          : current,
+      );
       toast.error(
         error instanceof Error ? error.message : "AI Talking could not hear or answer you.",
       );

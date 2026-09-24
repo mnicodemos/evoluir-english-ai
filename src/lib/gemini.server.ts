@@ -45,7 +45,10 @@ function connectorCredentials() {
   return lovableKey && connectionKey ? { lovableKey, connectionKey } : null;
 }
 
-export async function openGeminiStream(messages: GeminiMessage[]): Promise<Response | null> {
+export async function openGeminiStream(
+  messages: GeminiMessage[],
+  signal?: AbortSignal,
+): Promise<Response | null> {
   const credentials = connectorCredentials();
   if (!credentials) return null;
   return fetch(`${GATEWAY_URL}/v1beta/models/${MODELS[0]}:streamGenerateContent?alt=sse`, {
@@ -56,6 +59,7 @@ export async function openGeminiStream(messages: GeminiMessage[]): Promise<Respo
       "Content-Type": "application/json",
     },
     body: requestBody(messages),
+    ...(signal ? { signal } : {}),
   });
 }
 
@@ -86,6 +90,7 @@ export async function callGemini(
   messages: GeminiMessage[],
   jsonMode = false,
   onUsage?: (usage: GeminiUsage) => void,
+  signal?: AbortSignal,
 ): Promise<string | null> {
   const credentials = connectorCredentials();
   if (!credentials) return null;
@@ -102,6 +107,7 @@ export async function callGemini(
         "Content-Type": "application/json",
       },
       body,
+      ...(signal ? { signal } : {}),
     });
 
     if (!res.ok) {
