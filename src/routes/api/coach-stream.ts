@@ -73,7 +73,8 @@ export const Route = createFileRoute("/api/coach-stream")({
 
         const FIRST_CHUNK_MS = 20_000;
         const BETWEEN_CHUNKS_MS = 15_000;
-        const TIMEOUT_MESSAGE = "Voice processing is taking longer than expected. Please try again.";
+        const TIMEOUT_MESSAGE =
+          "Voice processing is taking longer than expected. Please try again.";
         const upstreamAbort = new AbortController();
         let timedOut = false;
         let timer: ReturnType<typeof setTimeout> | undefined;
