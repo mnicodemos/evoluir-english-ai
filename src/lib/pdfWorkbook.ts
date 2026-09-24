@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 
-import { ACCENT, DARK, INK, MUTED } from "@/lib/pdfTheme";
+import { ACCENT, DARK, INK, MUTED, drawBrandName } from "@/lib/pdfTheme";
 
 const BODY: [number, number, number] = [58, 63, 74];
 
@@ -90,8 +90,11 @@ export function createWorkbook(
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(13);
-      doc.setTextColor(190, 196, 206);
-      doc.text(opts.brand, pageW / 2, pageH * 0.38 + 26, { align: "center" });
+      drawBrandName(doc, opts.brand, pageW / 2, pageH * 0.38 + 26, {
+        r: 190,
+        g: 196,
+        b: 206,
+      });
 
       doc.setFillColor(ACCENT.r, ACCENT.g, ACCENT.b);
       doc.rect(margin, pageH * 0.48, contentW, 4, "F");
@@ -207,7 +210,13 @@ export function createWorkbook(
 
     para(
       text: string,
-      o?: { size?: number; bold?: boolean; color?: [number, number, number]; gap?: number; indent?: number },
+      o?: {
+        size?: number;
+        bold?: boolean;
+        color?: [number, number, number];
+        gap?: number;
+        indent?: number;
+      },
     ) {
       const size = o?.size ?? 10;
       const indent = o?.indent ?? 0;
@@ -317,7 +326,12 @@ export function createWorkbook(
       doc.setFontSize(opts?.header ? 8.5 : 9.5);
       cells.forEach((cell, i) => {
         if (opts?.header) doc.setTextColor(MUTED.r, MUTED.g, MUTED.b);
-        else doc.setTextColor(i === 3 ? MUTED.r : INK.r, i === 3 ? MUTED.g : INK.g, i === 3 ? MUTED.b : INK.b);
+        else
+          doc.setTextColor(
+            i === 3 ? MUTED.r : INK.r,
+            i === 3 ? MUTED.g : INK.g,
+            i === 3 ? MUTED.b : INK.b,
+          );
         doc.text(opts?.header ? cell.toUpperCase() : cell, xs[i] ?? margin, y);
       });
       y += opts?.header ? 15 : 13;
