@@ -216,7 +216,7 @@ function Dashboard() {
           <SmartReviewCard streakDays={streakDays} />
 
           <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
-            <section className="min-w-0 xl:flex xl:flex-col">
+            <section className="min-w-0 xl:col-start-2 xl:flex xl:flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_7rem_7rem]">
                 {trainingCards.map((c) => {
