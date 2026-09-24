@@ -1,7 +1,7 @@
 // Browser speech recognition for single-word pronunciation checks.
 // Runs alongside the WAV recorder; when it yields a transcript the AI
 // transcription is skipped (instant, no credits). Otherwise the caller falls
-// back to the existing Gemini transcription with the recorded audio.
+// back to the existing transcription with the recorded audio.
 
 type Recognition = {
   lang: string;
@@ -40,8 +40,10 @@ export function startBrowserRecognition(): boolean {
   try {
     const recognition = new Ctor();
     recognition.lang = "en-US";
-    recognition.interimResults = true;
-    recognition.continuous = true;
+    // This check expects one word. One-shot final results are more reliable on
+    // mobile Chrome than a continuous/interim session that is manually stopped.
+    recognition.interimResults = false;
+    recognition.continuous = false;
     recognition.maxAlternatives = 1;
     let finish: () => void = () => {};
     const done = new Promise<void>((resolve) => (finish = resolve));

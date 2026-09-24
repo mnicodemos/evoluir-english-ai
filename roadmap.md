@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Corrigir falha imediata da validação de fala no Vocabulary com gravação de segurança
 - [x] Aplicar o verde oficial ao “+” nos cabeçalhos compartilhados dos PDFs
 - [x] Reorganizar os quadros inferiores — mover Learning progress e Performance para as posições verdes
 - [x] Reorganizar o Dashboard conforme as marcações — mover Your progress para dentro do Smart Review
