@@ -3,7 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { EvoGuide } from "@/components/EvoGuide";
+import { EvoDailyReflection } from "@/components/EvoDailyReflection";
+import { ProgressSnapshot } from "@/components/ProgressSnapshot";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
@@ -77,29 +78,7 @@ export function NextStepCard() {
 
   return (
     <section className="card-soft p-5" aria-label={t("Your next step")}>
-      <EvoGuide
-        title={t("Your next step is here.")}
-        description={data.activity.title}
-        imageSize="dashboard"
-        className="mb-5 border-b border-border pb-5"
-      >
-        {!mainAvailable ? null : data.activity.params ? (
-          <Button asChild size="sm">
-            <Link to="/learning/$lessonId" params={data.activity.params}>
-              {t("Continue")}
-              <ArrowRight aria-hidden="true" />
-            </Link>
-          </Button>
-        ) : (
-          <Button asChild size="sm">
-            <Link to={data.activity.to}>
-              {t("Continue")}
-              <ArrowRight aria-hidden="true" />
-            </Link>
-          </Button>
-        )}
-      </EvoGuide>
-      <div className="grid gap-5 lg:grid-cols-2 lg:gap-0">
+      <div className="grid gap-5 lg:grid-cols-2 lg:gap-x-0 lg:gap-y-6">
         <div className="space-y-4 lg:pr-6">
           <div className="flex min-w-0 items-start gap-4">
             <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
@@ -193,6 +172,8 @@ export function NextStepCard() {
           ) : null}
         </div>
 
+        <EvoDailyReflection userId={profile?.id ?? "student"} name={profile?.name ?? ""} />
+
         <aside className="min-w-0 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <div className="flex items-start gap-4">
             <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
@@ -259,6 +240,13 @@ export function NextStepCard() {
             </div>
           </div>
         </aside>
+
+        <ProgressSnapshot
+          currentLevel={profile ? findLevel(profile.level).value.toUpperCase() : t("Not available yet")}
+          strongestSkill={strongestLabel}
+          focusNext={skillLabel}
+          recentlyPractised={data.insight?.recentlyPractised ?? false}
+        />
       </div>
     </section>
   );

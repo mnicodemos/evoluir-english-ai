@@ -21,6 +21,46 @@ export const uiPt: Record<string, string> = {
   "Your next step": "Seu próximo passo",
   "Your next step is here.": "Seu próximo passo está aqui.",
   "How to practise": "Como praticar",
+  "EVO Daily Reflection": "Reflexão diária da EVO",
+  "Daily reflection": "Reflexão do dia",
+  "Good morning": "Bom dia",
+  "Good afternoon": "Boa tarde",
+  "Good evening": "Boa noite",
+  "Small consistent actions create meaningful progress.":
+    "Pequenas ações consistentes geram um progresso significativo.",
+  "Keep building your English journey one step at a time.":
+    "Continue construindo sua jornada no inglês, um passo de cada vez.",
+  "Progress grows when practice becomes part of your day.":
+    "O progresso cresce quando a prática se torna parte do seu dia.",
+  "Every focused minute brings confident English closer.":
+    "Cada minuto de foco aproxima você de um inglês mais confiante.",
+  "Confidence is built through small moments of real practice.":
+    "A confiança é construída em pequenos momentos de prática real.",
+  "Use what you know today and let fluency grow naturally.":
+    "Use o que você sabe hoje e deixe a fluência crescer naturalmente.",
+  "The words you practise today become tomorrow's confidence.":
+    "As palavras que você pratica hoje se transformam na confiança de amanhã.",
+  "Stay curious, keep showing up and trust your progress.":
+    "Mantenha a curiosidade, continue presente e confie no seu progresso.",
+  "Meaningful learning happens one clear step at a time.":
+    "O aprendizado significativo acontece um passo claro de cada vez.",
+  "Focus on today's practice and your journey will keep moving.":
+    "Concentre-se na prática de hoje e sua jornada continuará avançando.",
+  "Your consistency matters more than a perfect study session.":
+    "Sua consistência importa mais do que uma sessão de estudos perfeita.",
+  "Keep your rhythm and give yourself room to improve.":
+    "Mantenha seu ritmo e dê a si mesmo espaço para evoluir.",
+  "Every attempt helps your English become more natural.":
+    "Cada tentativa ajuda seu inglês a se tornar mais natural.",
+  "Practise with purpose today and notice how far you have come.":
+    "Pratique com propósito hoje e perceba o quanto você já avançou.",
+  "My Progress Snapshot": "Resumo do meu progresso",
+  "Current Level": "Nível atual",
+  "Strongest Skill": "Habilidade mais forte",
+  "Focus Next": "Próximo foco",
+  "Learning Momentum": "Ritmo de aprendizagem",
+  Consistent: "Consistente",
+  "Building momentum": "Construindo ritmo",
 
   // Proof of progress (history)
   "Your evolution": "Sua evolução",
