@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Reorganizar o Dashboard conforme as marcações — mover Your progress para dentro do Smart Review
 - [x] Alinhar a divisória do Your Momentum com a divisória superior
 - [x] Substituir o ícone da saudação por uma árvore no verde oficial
 - [x] Corrigir o ícone da saudação para o símbolo único de quatro pontas

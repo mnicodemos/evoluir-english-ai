@@ -257,7 +257,7 @@ export function CurriculumPath() {
 }
 
 /** Dashboard card: course progress + skill scores. */
-export function PathProgressCard() {
+export function PathProgressCard({ embedded = false }: { embedded?: boolean }) {
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const path = useLearningPath();
@@ -316,11 +316,8 @@ export function PathProgressCard() {
     }
   };
 
-  return (
-    <section
-      className="card-soft bg-card p-6 text-card-foreground"
-      aria-labelledby="path-progress-heading"
-    >
+  const content = (
+    <>
       <h2 id="path-progress-heading" className="text-xl font-semibold">
         Your progress
       </h2>
@@ -385,6 +382,23 @@ export function PathProgressCard() {
           Download your progress
         </Button>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <section className="min-w-0" aria-labelledby="path-progress-heading">
+        {content}
+      </section>
+    );
+  }
+
+  return (
+    <section
+      className="card-soft bg-card p-6 text-card-foreground"
+      aria-labelledby="path-progress-heading"
+    >
+      {content}
     </section>
   );
 }
