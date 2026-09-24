@@ -12,14 +12,15 @@ export const BRAND_GREEN = { r: 0, g: 245, b: 206 };
 export function drawBrandName(
   doc: jsPDF,
   text: string,
-  centerX: number,
+  x: number,
   y: number,
   color: { r: number; g: number; b: number },
+  align: "center" | "left" = "center",
 ) {
   const plusIndex = text.indexOf("+");
   if (plusIndex < 0) {
     doc.setTextColor(color.r, color.g, color.b);
-    doc.text(text, centerX, y, { align: "center" });
+    doc.text(text, x, y, { align });
     return;
   }
 
@@ -28,7 +29,7 @@ export function drawBrandName(
   const beforeWidth = doc.getTextWidth(before);
   const plusWidth = doc.getTextWidth("+");
   const totalWidth = beforeWidth + plusWidth + doc.getTextWidth(after);
-  const left = centerX - totalWidth / 2;
+  const left = align === "center" ? x - totalWidth / 2 : x;
 
   doc.setTextColor(color.r, color.g, color.b);
   doc.text(before, left, y);
@@ -102,7 +103,7 @@ export function drawHeader(
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(17);
-  doc.text(opts.title, textX, 48);
+  drawBrandName(doc, opts.title, textX, 48, { r: 255, g: 255, b: 255 }, "left");
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
   doc.setTextColor(190, 196, 206);
