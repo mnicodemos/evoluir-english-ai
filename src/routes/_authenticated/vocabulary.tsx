@@ -267,10 +267,7 @@ function Vocabulary() {
       setRecordingId(null);
       setCheckingId(word.id);
       try {
-        const [audio, heard] = await Promise.all([
-          stopVoiceRecording(),
-          stopBrowserRecognition(),
-        ]);
+        const [audio, heard] = await Promise.all([stopVoiceRecording(), stopBrowserRecognition()]);
         // Browser recognition first (instant, no credits); AI only as fallback.
         const spoken = heard ?? (await transcribeAudio(audio, controller.signal));
         const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
@@ -368,6 +365,7 @@ function Vocabulary() {
       abortRef.current = null;
       gate.reset();
       cancelVoiceRecording();
+      cancelBrowserRecognition();
       minutesSpent.stop();
 
       const minutes = minutesSpent(0);
