@@ -16,8 +16,6 @@ import { AppShell } from "@/components/AppShell";
 import { DailyGoalCard } from "@/components/DailyGoalCard";
 import { getLeague, LeagueBadge } from "@/components/LeagueBadge";
 
-
-
 import { LevelCard } from "@/components/LevelCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
