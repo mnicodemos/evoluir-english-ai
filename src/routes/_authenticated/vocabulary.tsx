@@ -274,8 +274,7 @@ function Vocabulary() {
         let spoken: string;
         if (usingBrowserSpeech.current) {
           const heard = await stopBrowserRecognition();
-          if (!heard)
-            throw new Error(t("I couldn't hear that clearly. Please try again."));
+          if (!heard) throw new Error(t("I couldn't hear that clearly. Please try again."));
           spoken = heard;
         } else {
           spoken = await transcribeAudio(await stopVoiceRecording(), controller.signal);
