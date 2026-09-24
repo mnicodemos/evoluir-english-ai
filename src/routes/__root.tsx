@@ -93,6 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Evoluir+ English AI" },
+      { name: "theme-color", content: "#000000" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -103,8 +104,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.png?v=5", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=5" },
-      { rel: "manifest", href: "/site.webmanifest?v=5" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=6" },
+      { rel: "manifest", href: "/site.webmanifest?v=6" },
     ],
   }),
   shellComponent: RootShell,
