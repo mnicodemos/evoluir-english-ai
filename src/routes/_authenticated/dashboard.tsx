@@ -215,8 +215,8 @@ function Dashboard() {
 
           <SmartReviewCard streakDays={streakDays} />
 
-          <div className="grid gap-5 xl:grid-cols-2 xl:items-stretch">
-            <section className="min-w-0 xl:col-start-2 xl:flex xl:flex-col">
+          <div className="grid gap-5 xl:grid-cols-2 xl:grid-rows-2 xl:items-stretch">
+            <section className="min-w-0 xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:flex xl:flex-col">
               <h2 className="text-lg font-semibold">Keep training</h2>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_7rem_7rem]">
                 {trainingCards.map((c) => {
@@ -255,9 +255,9 @@ function Dashboard() {
               </div>
             </section>
 
-            <section className="grid min-w-0 gap-3 xl:grid-rows-[auto_7rem_7rem]">
+            <section className="grid min-w-0 gap-3 xl:col-start-1 xl:row-start-1 xl:grid-rows-[auto_1fr]">
               <h2 className="text-lg font-semibold">Learning progress</h2>
-              <div className="grid grid-cols-2 gap-3 xl:col-span-2 xl:row-span-2 xl:h-full xl:grid-rows-[7rem_7rem]">
+              <div className="grid grid-cols-2 gap-3 xl:h-full xl:grid-cols-4">
                 {learningCards.map((c) => (
                   <div key={c.label} className="card-soft p-4 xl:h-full">
                     <span className="text-xl">{c.emoji}</span>
@@ -268,11 +268,11 @@ function Dashboard() {
               </div>
             </section>
 
-            <section className="grid min-w-0 gap-3 xl:grid-rows-[auto_7rem_7rem]">
+            <section className="grid min-w-0 gap-3 xl:col-start-1 xl:row-start-2 xl:grid-cols-2 xl:grid-rows-[auto_1fr]">
               <h2 className="text-lg font-semibold">Performance</h2>
               <Link
                 to={historyCard.to}
-                className="card-soft group flex h-full min-h-24 items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)] xl:w-full"
+                className="card-soft group flex h-full min-h-24 items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)] xl:col-start-1 xl:row-start-2 xl:w-full"
               >
                 <span className="grid size-11 place-items-center rounded-xl bg-secondary">
                   <historyCard.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
@@ -283,7 +283,7 @@ function Dashboard() {
                 </span>
                 <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
               </Link>
-              <div className="card-soft h-full w-full p-5">
+              <div className="card-soft h-full w-full p-5 xl:col-start-2 xl:row-start-2">
                 <WeeklyFrequency
                   userId={profile.id}
                   daysPerWeek={profile.study_days_per_week ?? 7}
