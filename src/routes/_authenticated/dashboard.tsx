@@ -187,7 +187,7 @@ function Dashboard() {
                   <Calendar className="size-6 text-[oklch(0.45_0.12_175)]" />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="truncate text-lg font-bold sm:text-base md:text-lg lg:text-3xl">
+                  <p className="truncate text-lg font-bold sm:text-base md:text-lg lg:text-2xl">
                     {streakDays} days
                   </p>
                   <p className="text-base text-muted-foreground sm:text-sm">Study streak</p>
