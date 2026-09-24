@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Loader2 } from "lucide-react";
+import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -198,7 +199,7 @@ function Onboarding() {
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-5 py-10">
         <div className="flex items-center gap-2">
           <Logo className="size-[1.8rem] shrink-0 self-center" />
-          <span className="font-display font-semibold">Evoluir+ English AI</span>
+          <BrandName />
         </div>
 
         <div className="mt-8 flex gap-1.5">

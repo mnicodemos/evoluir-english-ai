@@ -7,6 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Logo } from "@/components/Logo";
+import { BrandName } from "@/components/BrandName";
 import { cn } from "@/lib/utils";
 import { landingCopy, type LandingLang } from "@/lib/landingCopy";
 
@@ -91,7 +92,7 @@ export function Footer({
           <div className="space-y-5">
             <div className="flex items-center gap-2.5">
               <Logo className="size-8 shrink-0" />
-              <span className="font-display text-lg font-semibold text-foreground dark:text-white">Evoluir+ English AI</span>
+              <BrandName className="text-lg text-foreground dark:text-white" />
             </div>
             <p className="max-w-[320px] text-sm font-semibold italic leading-snug text-foreground dark:text-white sm:max-w-none sm:text-base sm:leading-relaxed">
               {t.tagline}

@@ -23,6 +23,7 @@ import {
 import evoImage from "@/assets/evo-landing.webp";
 import evoBust from "@/assets/evo-bust.png.asset.json";
 import { Footer } from "@/components/Footer";
+import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 
@@ -139,9 +140,7 @@ function CommercialLanding() {
             className="flex min-w-0 items-center gap-2.5"
           >
             <Logo className="size-8 shrink-0" />
-            <span className="truncate font-display text-sm font-semibold sm:text-base">
-              Evoluir+ English AI
-            </span>
+            <BrandName className="truncate text-sm sm:text-base" />
           </Link>
           <Button asChild size="sm" className="shrink-0">
             <Link to="/auth" search={{ mode: "signup" }}>

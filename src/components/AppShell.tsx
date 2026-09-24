@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
+import { BrandName } from "@/components/BrandName";
 import { Footer } from "@/components/Footer";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { AdminPanelButton } from "@/components/AdminPanelButton";
@@ -134,7 +135,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-20 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/85 px-3 backdrop-blur sm:px-4 lg:hidden">
           <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
             <Logo className="size-[1.3rem] shrink-0" />
-            <span className="truncate font-display text-sm font-semibold">Evoluir+ English AI</span>
+            <BrandName className="truncate text-sm" />
           </Link>
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
             <AdminPanelButton />

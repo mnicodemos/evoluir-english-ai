@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/logo.png.asset.json";
+import logoAsset from "@/assets/logo-evo-green.png.asset.json";
 
 export function Logo({ className = "size-7", invert = false }: { className?: string; invert?: boolean }) {
   return (

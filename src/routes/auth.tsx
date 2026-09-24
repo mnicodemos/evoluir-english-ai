@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { BrandName } from "@/components/BrandName";
 import { Footer } from "@/components/Footer";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -105,7 +106,7 @@ function AuthPage() {
         <div className="relative hidden flex-col bg-secondary p-12 lg:flex">
           <Link to="/" className="flex items-center gap-2 text-foreground">
             <Logo className="size-[1.2rem]" />
-            <span className="font-display font-semibold">Evoluir+ English AI</span>
+            <BrandName />
           </Link>
           <div className="flex flex-1 flex-col justify-center">
             <h2 className="max-w-sm text-3xl font-bold text-foreground">
@@ -121,7 +122,7 @@ function AuthPage() {
           <div className="w-full max-w-sm">
             <Link to="/" className="mb-8 flex items-center gap-2 lg:hidden">
               <Logo className="size-[1.2rem]" />
-              <span className="font-display font-semibold">Evoluir+ English AI</span>
+              <BrandName />
             </Link>
 
             <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">

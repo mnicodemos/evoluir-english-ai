@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Padronização global da marca — “+” e círculo superior no verde da EVO
+  - [x] Atualizar a origem compartilhada do símbolo sem alterar desenho, tamanho ou posição
+  - [x] Aplicar o mesmo verde somente ao “+” nas seis assinaturas visuais oficiais
+  - [x] Preservar integralmente EVO, textos, rotas, layout e comportamento
 - [x] Fase final — EVO no AI Teacher e encerramento da integração planejada
   - [x] Reutilizar o EvoGuide e o PNG oficial uma única vez no contexto inicial
   - [x] Preservar integralmente conversa, histórico, IA, quotas, evidências e persistência
