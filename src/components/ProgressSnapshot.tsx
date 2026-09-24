@@ -34,7 +34,7 @@ export function ProgressSnapshot({
   ];
 
   return (
-    <aside className="min-w-0 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+    <aside className="min-w-0 border-t border-border pt-5 lg:col-start-2 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
       <h3 className="text-lg font-semibold">{t("My Progress Snapshot")}</h3>
       <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         {items.map((item) => (

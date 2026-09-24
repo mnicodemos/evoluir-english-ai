@@ -62,8 +62,6 @@ export const uiPt: Record<string, string> = {
   Consistent: "Consistente",
   "Building momentum": "Construindo ritmo",
   "Your Momentum": "Seu ritmo",
-  "day learning streak": "dia seguido de estudo",
-  "day learning streaks": "dias seguidos de estudo",
   "Keep building your consistency.": "Continue construindo sua consistência.",
 
   // Proof of progress (history)

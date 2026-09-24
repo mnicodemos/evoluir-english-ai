@@ -16,7 +16,9 @@ export function LearningMomentum({ streakDays }: { streakDays: number }) {
         <p className="font-semibold">{t("Your Momentum")}</p>
         {streakDays > 0 ? (
           <p className="mt-1 text-sm text-muted-foreground">
-            {streakDays} {t(streakDays === 1 ? "day learning streak" : "day learning streaks")}
+            {lang === "pt"
+              ? `${streakDays} ${streakDays === 1 ? "dia seguido de estudo" : "dias seguidos de estudo"}`
+              : `${streakDays} day learning streak`}
           </p>
         ) : (
           <p className="mt-1 text-sm text-muted-foreground">
