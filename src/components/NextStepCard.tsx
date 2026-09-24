@@ -243,7 +243,6 @@ export function NextStepCard() {
             </div>
           </div>
         </aside>
-
       </div>
     </section>
   );
