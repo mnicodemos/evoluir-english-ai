@@ -104,10 +104,6 @@ function AuthPage() {
     <div className="dark flex min-h-dvh flex-col bg-background text-foreground">
       <div className="grid flex-1 lg:grid-cols-2">
         <div className="relative hidden flex-col bg-secondary p-12 lg:flex">
-          <Link to="/" className="flex items-center gap-2 text-foreground">
-            <Logo className="size-[1.2rem]" />
-            <BrandName />
-          </Link>
           <div className="flex flex-1 flex-col justify-center">
             <h2 className="max-w-sm text-3xl font-bold text-foreground">
               {t("Your English teacher is waiting for you.")}
