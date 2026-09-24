@@ -35,7 +35,7 @@ function initials(name?: string | null, email?: string | null) {
   const source = (name?.trim() || email?.split("@")[0] || "User").trim();
   const parts = source.split(/\s+/).filter(Boolean);
   const first = parts[0]?.[0] ?? "U";
-  const second = parts.length > 1 ? (parts[1]?.[0] ?? "") : source[1] ?? "";
+  const second = parts.length > 1 ? (parts[1]?.[0] ?? "") : (source[1] ?? "");
   const letters = `${first}${second}`;
   return letters.toUpperCase();
 }
@@ -63,7 +63,9 @@ function useAvatarUrl(path?: string | null) {
     staleTime: 45 * 60 * 1000,
     queryFn: async () => {
       if (!path) return null;
-      const { data, error } = await supabase.storage.from(AVATAR_BUCKET).createSignedUrl(path, 60 * 60);
+      const { data, error } = await supabase.storage
+        .from(AVATAR_BUCKET)
+        .createSignedUrl(path, 60 * 60);
       if (error) throw error;
       return data.signedUrl;
     },
@@ -126,11 +128,13 @@ export function ProfileMenu({ className }: { className?: string }) {
       let avatarPath = profile?.avatar_path ?? null;
       if (avatarFile) {
         const path = `${user.id}/profile-${Date.now()}.${extensionFor(avatarFile)}`;
-        const { error: uploadError } = await supabase.storage.from(AVATAR_BUCKET).upload(path, avatarFile, {
-          cacheControl: "3600",
-          contentType: avatarFile.type,
-          upsert: true,
-        });
+        const { error: uploadError } = await supabase.storage
+          .from(AVATAR_BUCKET)
+          .upload(path, avatarFile, {
+            cacheControl: "3600",
+            contentType: avatarFile.type,
+            upsert: true,
+          });
         if (uploadError) throw uploadError;
         avatarPath = path;
       }
@@ -181,7 +185,9 @@ export function ProfileMenu({ className }: { className?: string }) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{translate("Profile", lang)}</DialogTitle>
-          <DialogDescription>{translate("Update your photo and personal details.", lang)}</DialogDescription>
+          <DialogDescription>
+            {translate("Update your photo and personal details.", lang)}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5">
