@@ -19,7 +19,15 @@ export async function callGateway(
   usage?: { userId: string; operation: AiOperation },
   signal?: AbortSignal,
 ): Promise<string> {
-  const { callGemini, GEMINI_TEXT_MODEL, GeminiError } = await import("./gemini.server");
+  const { callGemini, GEMINI_TEXT_MODEL: geminiModel, GeminiError } = await import(
+    "./gemini.server"
+  );
+  // AI Talking conversation text (first sentence + replies) runs on the
+  // standard Lovable AI service; the JSON report and every other feature keep
+  // their current provider.
+  const useLovable = usage?.operation === "talking" && !jsonMode;
+  const lovable = useLovable ? await import("./lovable-chat.server") : null;
+  const GEMINI_TEXT_MODEL = lovable ? lovable.LOVABLE_TALKING_MODEL : geminiModel;
   const usageTools = usage ? await import("./ai-usage.server") : null;
   const requestHash = usageTools ? await usageTools.hashAiRequest({ messages, jsonMode }) : "";
   const ttl = usage && usageTools ? await usageTools.operationCacheTtl(usage.operation) : 0;
@@ -31,15 +39,13 @@ export async function callGateway(
       : null;
   let text: string | null = null;
   let usageTokens: { inputTokens?: number; outputTokens?: number } = {};
+  const onUsage = (reported: { inputTokens?: number; outputTokens?: number }) => {
+    usageTokens = reported;
+  };
   try {
-    text = await callGemini(
-      messages,
-      jsonMode,
-      (reported) => {
-        usageTokens = reported;
-      },
-      signal,
-    );
+    text = lovable
+      ? await lovable.callLovableTalking(messages, onUsage, signal)
+      : await callGemini(messages, jsonMode, onUsage, signal);
   } catch (err) {
     if (ticket && usageTools) {
       await usageTools.finishAiUsage(ticket, {
@@ -48,7 +54,9 @@ export async function callGateway(
           ? "timeout"
           : err instanceof GeminiError
             ? `gemini_${err.status}`
-            : "gemini_error",
+            : lovable && err instanceof lovable.LovableChatError
+              ? `lovable_${err.status}`
+              : "gemini_error",
         errorMessage: err instanceof Error ? err.message : "Google Gemini failed",
       });
     }
@@ -57,7 +65,11 @@ export async function callGateway(
       throw new AiError(504, "Voice processing is taking longer than expected. Please try again.");
     const message =
       err instanceof Error ? err.message : "Google Gemini could not answer right now.";
-    throw new AiError(err instanceof GeminiError ? err.status : 503, message);
+    const status =
+      err instanceof GeminiError || (lovable && err instanceof lovable.LovableChatError)
+        ? (err as { status: number }).status
+        : 503;
+    throw new AiError(status, message);
   }
 
   if (text === null) {
