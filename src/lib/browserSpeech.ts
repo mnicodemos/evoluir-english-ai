@@ -1,7 +1,6 @@
 // Browser speech recognition for single-word pronunciation checks.
-// Runs alongside the WAV recorder; when it yields a transcript the AI
-// transcription is skipped (instant, no credits). Otherwise the caller falls
-// back to the existing transcription with the recorded audio.
+// Kept to short Vocabulary attempts because mobile browser support is limited
+// and longer Listening Lab sentences need the complete WAV recording.
 
 type Recognition = {
   lang: string;
@@ -84,7 +83,9 @@ export async function stopBrowserRecognition(timeoutMs = 2500): Promise<string |
     /* already stopped */
   }
   await Promise.race([state.done, new Promise((r) => setTimeout(r, timeoutMs))]);
-  return state.error ? null : state.text || null;
+  // Chrome can report an end error after already delivering a usable interim
+  // result. Preserve what was heard instead of discarding valid speech.
+  return state.text || null;
 }
 
 export function cancelBrowserRecognition(): void {

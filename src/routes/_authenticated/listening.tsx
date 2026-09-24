@@ -14,11 +14,6 @@ import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { findLevel } from "@/lib/level";
 import {
-  cancelBrowserRecognition,
-  startBrowserRecognition,
-  stopBrowserRecognition,
-} from "@/lib/browserSpeech";
-import {
   listeningLevelConfig,
   pickListeningSentences,
   sentencesFromText,
@@ -157,17 +152,13 @@ function ListeningPage() {
   const [revealed, setRevealed] = useState(false);
   const [recording, setRecording] = useState(false);
   const [checking, setChecking] = useState(false);
-  const usingBrowserSpeech = useRef(false);
   const [completed, setCompleted] = useState<CompletionMap>({});
   const [progress, setProgress] = useState<ProgressMap>({});
 
   useEffect(() => {
     setCompleted(readCompletion());
     setProgress(readProgress());
-    return () => {
-      cancelVoiceRecording();
-      cancelBrowserRecognition();
-    };
+    return () => cancelVoiceRecording();
   }, []);
 
   useEffect(() => {
@@ -286,12 +277,10 @@ function ListeningPage() {
   /** Starts recording the student repeating the sentence. */
   async function startRepeat() {
     try {
-      usingBrowserSpeech.current = startBrowserRecognition();
-      if (!usingBrowserSpeech.current) await startVoiceRecording();
+      await startVoiceRecording();
       setRecording(true);
     } catch (error) {
       cancelVoiceRecording();
-      cancelBrowserRecognition();
       toast.error(error instanceof Error ? error.message : "Microphone is unavailable right now.");
     }
   }
@@ -301,9 +290,7 @@ function ListeningPage() {
     setRecording(false);
     setChecking(true);
     try {
-      const spoken = usingBrowserSpeech.current
-        ? await stopBrowserRecognition()
-        : await transcribeAudio(await stopVoiceRecording());
+      const spoken = await transcribeAudio(await stopVoiceRecording());
       if (!spoken) throw new Error("I couldn't hear that clearly. Please try again.");
       setAnswer(spoken);
       const value = listeningAnswerScore(sentence, spoken);
