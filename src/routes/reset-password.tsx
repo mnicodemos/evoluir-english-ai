@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Footer } from "@/components/Footer";
+import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,7 +70,7 @@ function ResetPasswordPage() {
           <div className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
               <Logo className="size-[1.2rem]" />
-              <span className="font-display font-semibold">Evoluir+ English AI</span>
+              <BrandName />
             </Link>
             <UiLangToggle />
           </div>
