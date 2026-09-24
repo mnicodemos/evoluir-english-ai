@@ -112,3 +112,4 @@
 - [ ] Pendente: latência da validação de pronúncia (2,4–45 s, provedor de IA)
 - [x] AI Talking: limite de 20 s (primeira resposta) e 15 s (entre trechos), cancelamento real e liberação imediata da vaga
 - [x] Mover o acesso ao painel administrativo para dentro da janela de perfil
+- [x] Sincronizar o indicador do Vocabulary com palavras realmente salvas e estados de erro
