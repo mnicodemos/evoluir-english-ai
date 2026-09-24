@@ -110,7 +110,16 @@ export function drawCover(
       const scale = Math.min((boxD - 30) / image.width, (boxD - 30) / image.height);
       const imageW = image.width * scale;
       const imageH = image.height * scale;
-      doc.addImage(logo, "PNG", centerX - imageW / 2, y - imageH / 2, imageW, imageH, undefined, "FAST");
+      doc.addImage(
+        logo,
+        "PNG",
+        centerX - imageW / 2,
+        y - imageH / 2,
+        imageW,
+        imageH,
+        undefined,
+        "FAST",
+      );
     } catch {
       /* logo is decorative */
     }
