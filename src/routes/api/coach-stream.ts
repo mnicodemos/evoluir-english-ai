@@ -3,7 +3,11 @@ import { z } from "zod";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
 import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
-import { GEMINI_TEXT_MODEL, openGeminiStream } from "@/lib/gemini.server";
+import {
+  LOVABLE_TALKING_MODEL,
+  openLovableTalkingStream,
+  parseLovableEvent,
+} from "@/lib/lovable-chat.server";
 
 const requestSchema = z.object({
   messages: z
@@ -16,11 +20,6 @@ const requestSchema = z.object({
     .min(1)
     .max(60),
 });
-
-type GeminiEvent = {
-  candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-  error?: { message?: string };
-};
 
 export const Route = createFileRoute("/api/coach-stream")({
   server: {
@@ -54,7 +53,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           ticket = await reserveAiUsage({
             userId,
             operation: "talking",
-            model: GEMINI_TEXT_MODEL,
+            model: LOVABLE_TALKING_MODEL,
             requestHash: await hashAiRequest(parsed.data),
           });
         } catch (error) {
@@ -106,35 +105,36 @@ export const Route = createFileRoute("/api/coach-stream")({
         arm(FIRST_CHUNK_MS);
         let upstream: Response | null;
         try {
-          upstream = await openGeminiStream(parsed.data.messages, upstreamAbort.signal);
+          upstream = await openLovableTalkingStream(parsed.data.messages, upstreamAbort.signal);
         } catch (error) {
           await settle(
             false,
-            timedOut ? "timeout" : "gemini_network",
+            timedOut ? "timeout" : "lovable_network",
             error instanceof Error ? error.message : "Network failure",
           );
           return Response.json(
-            { message: timedOut ? TIMEOUT_MESSAGE : "Google Gemini could not answer right now." },
+            { message: timedOut ? TIMEOUT_MESSAGE : "AI Talking could not answer right now." },
             { status: timedOut ? 504 : 503 },
           );
         }
         if (!upstream) {
-          await settle(false, "not_configured", "Google Gemini is not connected yet.");
-          return Response.json({ message: "Google Gemini is not connected yet." }, { status: 500 });
+          await settle(false, "not_configured", "LOVABLE_API_KEY missing");
+          return Response.json(
+            { message: "AI Talking is temporarily unavailable." },
+            { status: 500 },
+          );
         }
         if (!upstream.ok || !upstream.body) {
           const raw = await upstream.text().catch(() => "");
-          let message = "Google Gemini could not answer right now.";
-          try {
-            const payload = JSON.parse(raw) as { error?: { message?: string } };
-            message = payload.error?.message ?? message;
-          } catch {
-            if (raw) message = raw.slice(0, 240);
-          }
+          console.error(`Lovable AI talking failed [${upstream.status}]: ${raw.slice(0, 300)}`);
+          const message =
+            upstream.status === 402
+              ? "AI credits are exhausted. Please try again later."
+              : "AI Talking could not answer right now. Please try again.";
           const headers = new Headers();
           if (upstream.status === 429)
             headers.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
-          await settle(false, `gemini_${upstream.status}`, message);
+          await settle(false, `lovable_${upstream.status}`, raw.slice(0, 240) || message);
           return Response.json({ message }, { status: upstream.status, headers });
         }
 
@@ -149,23 +149,16 @@ export const Route = createFileRoute("/api/coach-stream")({
           controller: ReadableStreamDefaultController<Uint8Array>,
           event: string,
         ) => {
-          for (const line of event.split(/\r?\n/)) {
-            if (!line.startsWith("data:")) continue;
-            try {
-              const payload = JSON.parse(line.slice(5).trim()) as GeminiEvent;
-              const delta = (payload.candidates?.[0]?.content?.parts ?? [])
-                .map((part) => part.text ?? "")
-                .join("");
-              if (delta) {
-                emittedText = true;
-                send(controller, { type: "coach.text.delta", delta });
-              }
-              if (payload.error?.message)
-                send(controller, { type: "coach.text.error", message: payload.error.message });
-            } catch {
-              // Ignore provider keep-alives.
-            }
+          const parsedEvent = parseLovableEvent(event);
+          if (parsedEvent.delta) {
+            emittedText = true;
+            send(controller, { type: "coach.text.delta", delta: parsedEvent.delta });
           }
+          if (parsedEvent.error)
+            send(controller, {
+              type: "coach.text.error",
+              message: "AI Talking could not finish the reply.",
+            });
         };
 
         const stream = new ReadableStream<Uint8Array>({
@@ -186,12 +179,12 @@ export const Route = createFileRoute("/api/coach-stream")({
                 controller,
                 emittedText
                   ? { type: "coach.text.done" }
-                  : { type: "coach.text.error", message: "Google Gemini returned an empty reply." },
+                  : { type: "coach.text.error", message: "AI Talking returned an empty reply." },
               );
               await settle(
                 emittedText,
                 emittedText ? undefined : "empty_response",
-                emittedText ? undefined : "Google Gemini returned an empty reply.",
+                emittedText ? undefined : "AI Talking returned an empty reply.",
               );
               controller.close();
             } catch (error) {
