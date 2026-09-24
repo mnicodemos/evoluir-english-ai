@@ -54,8 +54,10 @@ export function SmartReviewCard({ streakDays }: { streakDays: number }) {
 
   return (
     <section className="card-soft p-5" aria-labelledby="smart-review-title">
-      <div className="grid min-w-0 lg:grid-cols-2 lg:gap-5">
-        <EvoGuide title={t("This is a good skill to reinforce now.")} imageSize="lesson" />
+      <div className="grid min-w-0 lg:grid-cols-2 lg:gap-x-0">
+        <div className="lg:pr-5">
+          <EvoGuide title={t("This is a good skill to reinforce now.")} imageSize="lesson" />
+        </div>
         <LearningMomentum streakDays={streakDays} />
       </div>
 
