@@ -5,7 +5,6 @@ import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { EvoGuide } from "@/components/EvoGuide";
-import { ProgressSnapshot } from "@/components/ProgressSnapshot";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
@@ -84,7 +83,7 @@ export function NextStepCard() {
         <EvoDailyReflection userId={profile?.id ?? "student"} name={profile?.name ?? ""} />
       </div>
 
-      <div className="mt-5 grid gap-5 border-t border-border pt-5 lg:grid-cols-2 lg:gap-x-0 lg:gap-y-6">
+      <div className="mt-5 grid gap-5 border-t border-border pt-5 lg:grid-cols-2 lg:gap-x-0">
         <div className="space-y-4 lg:pr-6">
           <div className="flex min-w-0 items-start gap-4">
             <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
@@ -245,14 +244,6 @@ export function NextStepCard() {
           </div>
         </aside>
 
-        <ProgressSnapshot
-          currentLevel={
-            profile ? findLevel(profile.level).value.toUpperCase() : t("Not available yet")
-          }
-          strongestSkill={strongestLabel}
-          focusNext={skillLabel}
-          recentlyPractised={data.insight?.recentlyPractised ?? false}
-        />
       </div>
     </section>
   );
