@@ -19,7 +19,13 @@ import { isAdminUser, listRegisteredUsers } from "@/lib/admin.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
-export function AdminPanelButton({ className }: { className?: string }) {
+export function AdminPanelButton({
+  className,
+  showLabel = false,
+}: {
+  className?: string;
+  showLabel?: boolean;
+}) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [open, setOpen] = useState(false);
@@ -48,11 +54,12 @@ export function AdminPanelButton({ className }: { className?: string }) {
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
+          size={showLabel ? "sm" : "icon"}
           aria-label={t("Admin panel")}
           className={className}
         >
           <Settings className="size-5" />
+          {showLabel && <span>{t("Admin panel")}</span>}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
