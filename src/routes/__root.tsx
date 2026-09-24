@@ -119,7 +119,6 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
         <script
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
