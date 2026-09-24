@@ -54,8 +54,11 @@ export function isAbandonedUsage(createdAt: string, now = Date.now()): boolean {
   return now - started >= ABANDONED_USAGE_SECONDS * 1000;
 }
 
-/** Closes this user's abandoned records for one operation so the guard is free. */
-async function releaseAbandonedAiUsage(userId: string, operation: AiOperation) {
+/**
+ * Closes every abandoned record (any user, any operation) older than the
+ * limit, so nothing stays "running" indefinitely in the usage queue.
+ */
+async function releaseAbandonedAiUsage(_userId: string, _operation: AiOperation) {
   const db = await admin();
   const cutoff = new Date(Date.now() - ABANDONED_USAGE_SECONDS * 1000).toISOString();
   await db
@@ -67,8 +70,6 @@ async function releaseAbandonedAiUsage(userId: string, operation: AiOperation) {
       error_message: "Request ended without completing",
       completed_at: new Date().toISOString(),
     })
-    .eq("user_id", userId)
-    .eq("operation", operation)
     .eq("status", "pending")
     .lt("created_at", cutoff);
 }
