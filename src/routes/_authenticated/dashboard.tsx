@@ -15,7 +15,6 @@ import { useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DailyGoalCard } from "@/components/DailyGoalCard";
 import { getLeague, LeagueBadge } from "@/components/LeagueBadge";
-import { LeagueReportButton } from "@/components/LeagueReportButton";
 
 import { LevelCard } from "@/components/LevelCard";
 import { NextStepCard } from "@/components/NextStepCard";
@@ -198,12 +197,6 @@ function Dashboard() {
                   label={getLevelState(profile.level).current.value.toUpperCase()}
                 />
               </div>
-              <LeagueReportButton
-                userId={profile.id}
-                name={profile.name}
-                level={profile.level}
-                streakDays={streakDays}
-              />
             </div>
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} />
