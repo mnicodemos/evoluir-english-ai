@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Correção localizada do Dashboard — reflexão diária e momentum nas faixas superiores
+  - [x] Preservar integralmente Next Step, Quick Win, AI Learning Insight, Progress Snapshot e Smart Review
+  - [x] Reutilizar somente PNG oficial, perfil e streak já carregados, sem novas consultas ou IA
 - [x] Fase UX 11.1 — EVO Daily Reflection e My Progress Snapshot
   - [x] Reutilizar a recomendação, o perfil e as evidências já carregadas, sem novas consultas
   - [x] Adicionar reflexão diária determinística e snapshot responsivo aos cards existentes
