@@ -80,12 +80,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative min-w-0 overflow-hidden rounded-lg border border-brand-green/30 bg-sidebar text-sidebar-foreground shadow-[var(--shadow-soft)]"
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-brand-green/30 bg-sidebar text-sidebar-foreground shadow-[var(--shadow-soft)]"
         aria-label={t("Your next step")}
       >
-        <div className="grid min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[19.5rem_minmax(0,1fr)_minmax(11rem,0.62fr)]">
+        <div className="grid h-full min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[22rem_minmax(0,1fr)_minmax(12rem,0.62fr)]">
           <div
-            className="relative min-h-[18rem] overflow-hidden self-stretch sm:min-h-[13.5rem] lg:min-h-[10.5rem]"
+            className="relative min-h-[18rem] overflow-hidden self-stretch sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
             <img
@@ -97,7 +97,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             />
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-center px-3 py-3 sm:px-4 xl:px-5">
+          <div className="relative z-10 flex min-w-0 flex-col justify-center px-3 py-3 sm:px-4 xl:px-6 xl:py-4">
             <p className="text-[11px] font-bold uppercase text-brand-green">
               EVO · {t("Your AI Learning Coach")}
             </p>

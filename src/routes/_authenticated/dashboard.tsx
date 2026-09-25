@@ -96,7 +96,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-2.5 xl:gap-2">
+        <div className="dashboard-one-screen grid gap-2.5 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4.5rem_5.25rem_minmax(13.5rem,1.35fr)_minmax(12rem,1fr)_minmax(6.5rem,0.55fr)] xl:gap-2.5">
           <header className="animate-rise min-w-0 xl:h-[4.5rem]">
             <EvoDailyReflection
               userId={profile.id}
@@ -130,12 +130,12 @@ function Dashboard() {
             />
           </div>
 
-          <div className="order-1 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
-            <section className="min-w-0 lg:col-span-9">
+          <div className="order-1 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">
+            <section className="min-w-0 lg:col-span-9 xl:h-full">
               <NextStepCard compact />
             </section>
             <section
-              className="card-soft min-w-0 p-3 lg:col-span-3"
+              className="card-soft min-w-0 p-3 lg:col-span-3 xl:h-full xl:p-4"
               aria-labelledby="today-progress-title"
             >
               <div className="flex items-center gap-2">
@@ -147,8 +147,8 @@ function Dashboard() {
                 </h2>
                 <ChevronRight className="ml-auto size-4 text-muted-foreground" aria-hidden="true" />
               </div>
-              <div className="mt-3 grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:grid-cols-[6rem_minmax(0,1fr)]">
-                <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:mx-0">
+              <div className="mt-3 grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:h-[calc(100%-2rem)] xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
+                <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:size-28 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
                     viewBox="0 0 96 96"
@@ -206,14 +206,14 @@ function Dashboard() {
             </section>
           </div>
 
-          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
-            <div className="min-w-0 lg:col-span-5">
+          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">
+            <div className="min-w-0 lg:col-span-5 xl:h-full">
               <PathProgressCard compact />
             </div>
-            <div className="min-w-0 lg:col-span-4">
+            <div className="min-w-0 lg:col-span-4 xl:h-full">
               <SmartReviewCard streakDays={streakDays} compact />
             </div>
-            <div className="min-w-0 lg:col-span-3">
+            <div className="min-w-0 lg:col-span-3 xl:h-full">
               <WeeklyFrequency
                 userId={profile.id}
                 daysPerWeek={profile.study_days_per_week ?? 7}
@@ -223,7 +223,7 @@ function Dashboard() {
           </div>
 
           <section
-            className="order-3 card-soft min-w-0 p-3 lg:order-none xl:p-2"
+            className="order-3 card-soft min-w-0 p-3 lg:order-none xl:flex xl:min-h-0 xl:flex-col xl:p-4"
             aria-labelledby="quick-access-title"
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
@@ -237,7 +237,7 @@ function Dashboard() {
               </div>
               <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-6 xl:gap-3">
               {quickAccess.map((item) => {
                 const hasNew = Boolean(
                   (indicators as Record<string, boolean>)[item.to.replace("/", "")],
@@ -246,15 +246,15 @@ function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="dashboard-quick-link group relative grid min-h-12 min-w-0 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border px-2 py-2 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5"
+                    className="dashboard-quick-link group relative grid min-h-12 min-w-0 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border px-2 py-2 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:grid-cols-[2.5rem_minmax(0,1fr)_auto] xl:px-3"
                   >
                     {hasNew && (
                       <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
                         <span className="sr-only">{t("New activity available")}</span>
                       </span>
                     )}
-                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-background/45">
-                      <item.icon className="size-4 text-foreground" />
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-background/45 xl:size-10">
+                      <item.icon className="size-4 text-foreground xl:size-5" />
                     </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
                     <ArrowRight className="size-3.5 text-foreground/65" aria-hidden="true" />
