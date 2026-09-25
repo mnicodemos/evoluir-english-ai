@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Redesign visual do Dashboard como One Screen, preservando integralmente dados, lógica e rotas
+- [x] Redesign visual do Dashboard como One Screen, preservando integralmente dados, lógica e rotas
 - [x] Limitar a espera da validação de fala e evitar repetição automática excessiva
 - [x] Tratar indisponibilidade temporária da transcrição com repetição limitada no mesmo modelo
 - [x] Restaurar a gravação completa no Listening Lab e manter captura rápida somente no Vocabulary
