@@ -89,7 +89,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_7rem] gap-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-5 xl:grid-cols-[13rem_minmax(0,1fr)_minmax(13rem,0.62fr)]">
           <div
-            className="relative order-2 -my-3 -mr-4 min-h-[9rem] sm:order-none sm:-my-4 sm:mr-0 sm:-ml-4"
+            className="relative order-2 -mt-3 -mr-4 min-h-[9rem] sm:order-none sm:-my-4 sm:mr-0 sm:-ml-4"
             aria-hidden="true"
           >
             <img
@@ -175,7 +175,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 min-w-0 rounded-lg border border-brand-green/30 bg-sidebar-accent/45 p-3 sm:col-span-2 xl:col-span-1 xl:self-center">
+          <aside className="relative z-10 order-3 col-span-2 min-w-0 rounded-lg border border-brand-green/30 bg-sidebar-accent/45 p-3 sm:order-none xl:col-span-1 xl:self-center">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
