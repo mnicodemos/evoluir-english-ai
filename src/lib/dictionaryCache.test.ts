@@ -39,7 +39,12 @@ const { dictionaryCacheKey, meaningsFromRaw } = await import("./dictionary.funct
 
 const msgs = [{ role: "user" as const, content: "Word: hello" }];
 const run = (userId: string, key: string, checked: boolean) =>
-  callGateway(msgs, true, { userId, operation: "dictionary", cacheKey: key, cacheChecked: checked });
+  callGateway(msgs, true, {
+    userId,
+    operation: "dictionary",
+    cacheKey: key,
+    cacheChecked: checked,
+  });
 
 beforeEach(() => {
   store.clear();

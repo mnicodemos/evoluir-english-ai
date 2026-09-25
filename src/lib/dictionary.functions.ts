@@ -117,7 +117,14 @@ export const lookupWord = createServerFn({ method: "GET" })
     if (cachedRaw !== null) {
       const cachedMeanings = meaningsFromRaw(cachedRaw);
       if (cachedMeanings.length > 0)
-        return { found: true, word: term, ipaUs: null, ipaUk: null, meanings: cachedMeanings, sourceUrl };
+        return {
+          found: true,
+          word: term,
+          ipaUs: null,
+          ipaUk: null,
+          meanings: cachedMeanings,
+          sourceUrl,
+        };
     }
 
     let translations: string[] = [];
