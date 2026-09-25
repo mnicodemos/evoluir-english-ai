@@ -117,7 +117,9 @@ export function aggregateCostPerformance(
 
   const comparisons = [...groups.entries()]
     .map(([key, groupRows]) => {
-      const [operation, model] = key.split("\u0000");
+      const separator = key.indexOf("\u0000");
+      const operation = key.slice(0, separator);
+      const model = key.slice(separator + 1);
       const durations = groupRows
         .map((row) => row.duration_ms)
         .filter((value): value is number => typeof value === "number");
