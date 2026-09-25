@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getDailyReflection, getGreeting } from "./dailyReflection";
+import { getDailyReflection, getGreeting, getGreetingTone } from "./dailyReflection";
 
 describe("daily reflection", () => {
   it("keeps the same reflection for the same user and study day", () => {
@@ -21,6 +21,15 @@ describe("daily reflection", () => {
     expect(getGreeting(8)).toBe("Good morning");
     expect(getGreeting(14)).toBe("Good afternoon");
     expect(getGreeting(21)).toBe("Good evening");
+  });
+
+  it("selects the tree tone from the same greeting periods", () => {
+    expect(getGreetingTone(0)).toBe("morning");
+    expect(getGreetingTone(11)).toBe("morning");
+    expect(getGreetingTone(12)).toBe("afternoon");
+    expect(getGreetingTone(17)).toBe("afternoon");
+    expect(getGreetingTone(18)).toBe("evening");
+    expect(getGreetingTone(23)).toBe("evening");
   });
 
   it("provides matching English and Portuguese copy without generating content", () => {

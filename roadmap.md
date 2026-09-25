@@ -113,3 +113,4 @@
 - [x] AI Talking: limite de 20 s (primeira resposta) e 15 s (entre trechos), cancelamento real e liberação imediata da vaga
 - [x] Mover o acesso ao painel administrativo para dentro da janela de perfil
 - [x] Sincronizar o indicador do Vocabulary com palavras realmente salvas e estados de erro
+- [x] Variar a cor da árvore da saudação por período do dia
