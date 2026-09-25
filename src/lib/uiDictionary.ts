@@ -1007,6 +1007,9 @@ export const uiPt: Record<string, string> = {
   // Admin panel
   "Admin panel": "Painel administrativo",
   "Registered users": "Usuários cadastrados",
+  Users: "Usuários",
+  "AI Usage": "Consumo IA",
+  "Cost & Performance": "Custo & Performance",
   Loading: "Carregando",
   "Could not load the users right now.": "Não foi possível carregar os usuários agora.",
 

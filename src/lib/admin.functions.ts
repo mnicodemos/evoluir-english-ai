@@ -90,6 +90,11 @@ function sumOrNull(values: Array<number | null>): number | null {
     : null;
 }
 
+function sumMeasured(values: Array<number | null>): number | null {
+  const measured = values.filter((value): value is number => typeof value === "number");
+  return measured.length ? measured.reduce((sum, value) => sum + value, 0) : null;
+}
+
 export function aggregateCostPerformance(
   rows: BenchmarkUsageRow[],
   cacheRows: BenchmarkCacheRow[],
@@ -116,8 +121,8 @@ export function aggregateCostPerformance(
       const durations = groupRows
         .map((row) => row.duration_ms)
         .filter((value): value is number => typeof value === "number");
-      const inputTokens = sumOrNull(groupRows.map((row) => row.input_tokens));
-      const outputTokens = sumOrNull(groupRows.map((row) => row.output_tokens));
+      const inputTokens = sumMeasured(groupRows.map((row) => row.input_tokens));
+      const outputTokens = sumMeasured(groupRows.map((row) => row.output_tokens));
       const estimatedCost = sumOrNull(groupRows.map((row) => row.estimated_cost));
       const cache = cacheByGroup.get(key) ?? { hits: 0, activeEntries: 0 };
       const costPerCall = estimatedCost === null ? null : estimatedCost / groupRows.length;
