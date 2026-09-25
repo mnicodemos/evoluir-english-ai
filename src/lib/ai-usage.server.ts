@@ -127,6 +127,10 @@ export async function reserveAiUsage(input: {
     );
 
   const { data, error } = await db.rpc("reserve_ai_usage", {
+    // Sent only when configured; NULL/absent = no global limit (previous behavior).
+    ...(limit.global_max_concurrent != null
+      ? { p_global_max_concurrent: limit.global_max_concurrent }
+      : {}),
     p_user_id: input.userId,
     p_operation: input.operation,
     p_model: input.model,
@@ -137,7 +141,6 @@ export async function reserveAiUsage(input: {
     p_premium_monthly_limit: limit.premium_monthly_limit,
     p_min_interval_seconds: limit.min_interval_seconds,
     p_max_concurrent: limit.max_concurrent,
-    p_global_max_concurrent: limit.global_max_concurrent ?? undefined,
   });
   const reservation = data?.[0];
   if (error || !reservation)
