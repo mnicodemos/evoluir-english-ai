@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, RotateCcw } from "lucide-react";
+
+import reviewListening from "@/assets/review-listening.jpg.asset.json";
+import reviewWriting from "@/assets/review-writing.jpg.asset.json";
 
 import { EvoGuide } from "@/components/EvoGuide";
 import { LearningMomentum } from "@/components/LearningMomentum";
@@ -66,28 +69,30 @@ export function SmartReviewCard({
   if (compact) {
     return (
       <section className="card-soft h-full min-w-0 p-3" aria-labelledby="smart-review-title">
-        <div className="flex items-center gap-2">
-          <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-accent">
-            <RotateCcw className="size-4 text-accent-foreground" aria-hidden="true" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 id="smart-review-title" className="text-sm font-semibold">
-              {t("Keep improving")}
-            </h2>
-            <p className="text-xs text-muted-foreground">{t("Worth recovering now")}</p>
-          </div>
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
+          <BookOpen className="size-5 text-dashboard-cyan" aria-hidden="true" />
+          <h2 id="smart-review-title" className="text-sm font-semibold">
+            {t("Keep improving")}
+          </h2>
+          <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <ul className="mt-2 grid gap-2">
-          {items.slice(0, 2).map((item) => {
+        <ul className="mt-3 grid gap-2">
+          {items.slice(0, 2).map((item, index) => {
             const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
             return (
               <li
                 key={item.skill}
-                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-t border-border pt-2 first:border-t-0 first:pt-0"
+                className="grid min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/45 pr-2"
               >
+                <img
+                  src={(index === 0 ? reviewWriting : reviewListening).url}
+                  alt=""
+                  className="h-[4.25rem] w-16 object-cover"
+                />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{skillLabel}</p>
-                  <p className="line-clamp-1 text-xs text-muted-foreground">
+                  <p className="text-[10px] text-muted-foreground">{skillLabel}</p>
+                  <p className="truncate text-sm font-semibold">{t(item.resource.title)}</p>
+                  <p className="line-clamp-2 text-[10px] leading-tight text-muted-foreground">
                     {t(SMART_REVIEW_REASON_TEXT[item.category])}
                   </p>
                 </div>
@@ -98,11 +103,11 @@ export function SmartReviewCard({
                       params={item.resource.params}
                       aria-label={`${t("Review now")}: ${skillLabel}`}
                     >
-                      {t("Review now")}
+                      {t("Review")}
                     </Link>
                   ) : (
                     <Link to={item.resource.to} aria-label={`${t("Review now")}: ${skillLabel}`}>
-                      {t("Review now")}
+                      {t("Review")}
                     </Link>
                   )}
                 </Button>

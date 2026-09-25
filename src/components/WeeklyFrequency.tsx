@@ -76,7 +76,9 @@ export function WeeklyFrequency({
           <p className="truncate text-base font-bold">
             {studiedCount} / {weeklyGoal} {daysLabel}
           </p>
-          <p className="text-xs text-muted-foreground">{lang === "pt" ? "Esta semana" : "This week"}</p>
+          <p className="text-xs text-muted-foreground">
+            {lang === "pt" ? "Esta semana" : "This week"}
+          </p>
         </div>
       </div>
     );
@@ -98,13 +100,36 @@ export function WeeklyFrequency({
         </div>
         <div className="mt-2 grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3">
           <div className="relative grid size-[5.5rem] place-items-center text-brand-green">
-            <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 80 80" aria-hidden="true">
-              <circle cx="40" cy="40" r={radius} fill="none" stroke="var(--secondary)" strokeWidth="8" />
-              <circle cx="40" cy="40" r={radius} fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={circumference * (1 - progress)} />
+            <svg
+              className="absolute inset-0 size-full -rotate-90"
+              viewBox="0 0 80 80"
+              aria-hidden="true"
+            >
+              <circle
+                cx="40"
+                cy="40"
+                r={radius}
+                fill="none"
+                stroke="var(--secondary)"
+                strokeWidth="8"
+              />
+              <circle
+                cx="40"
+                cy="40"
+                r={radius}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={circumference * (1 - progress)}
+              />
             </svg>
             <span className="relative text-center text-lg font-bold leading-none text-foreground">
               {studiedCount}/{weeklyGoal}
-              <span className="mt-1 block text-[9px] font-medium text-muted-foreground">{daysLabel}</span>
+              <span className="mt-1 block text-[9px] font-medium text-muted-foreground">
+                {daysLabel}
+              </span>
             </span>
           </div>
           <div>
@@ -113,8 +138,12 @@ export function WeeklyFrequency({
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {allStudied
-                ? lang === "pt" ? "Ótima consistência!" : "Great consistency!"
-                : lang === "pt" ? "Continue construindo seu ritmo." : "Keep building your rhythm."}
+                ? lang === "pt"
+                  ? "Ótima consistência!"
+                  : "Great consistency!"
+                : lang === "pt"
+                  ? "Continue construindo seu ritmo."
+                  : "Keep building your rhythm."}
             </p>
           </div>
         </div>
