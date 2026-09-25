@@ -50,6 +50,39 @@ export const Route = createFileRoute("/api/speech")({
           return Response.json({ message: "Audio is not configured yet." }, { status: 500 });
         }
 
+        const prompt = `Say clearly and naturally in English for a Brazilian learner: ${parsed.data.text}`;
+        // Shared cache only for audio the client already marks as reusable.
+        const cacheKey = parsed.data.cacheable
+          ? await ttsCacheKey({
+              text: parsed.data.text,
+              voice: GEMINI_VOICE,
+              model: GEMINI_TTS_MODEL,
+              prompt: TTS_PROMPT_PREFIX,
+            })
+          : null;
+        if (cacheKey) {
+          const startedAt = Date.now();
+          const cached = await readTtsCache(cacheKey);
+          if (cached) {
+            // Cache HIT: no provider call and no AI usage reservation.
+            console.log(`[tts-cache] hit ${cacheKey.slice(0, 12)} ${Date.now() - startedAt}ms`);
+            const encoder = new TextEncoder();
+            const events =
+              cached
+                .map((audio) => `data: ${JSON.stringify({ type: "speech.audio.delta", audio })}\n\n`)
+                .join("") + `data: ${JSON.stringify({ type: "speech.audio.done" })}\n\n`;
+            return new Response(encoder.encode(events), {
+              headers: {
+                "Content-Type": "text/event-stream",
+                "Cache-Control": "public, max-age=31536000, immutable",
+                Vary: "Authorization",
+                "X-TTS-Cache": "hit",
+              },
+            });
+          }
+          console.log(`[tts-cache] miss ${cacheKey.slice(0, 12)}`);
+        }
+
         let ticket;
         try {
           ticket = await reserveAiUsage({
@@ -74,11 +107,7 @@ export const Route = createFileRoute("/api/speech")({
           contents: [
             {
               role: "user",
-              parts: [
-                {
-                  text: `Say clearly and naturally in English for a Brazilian learner: ${parsed.data.text}`,
-                },
-              ],
+              parts: [{ text: prompt }],
             },
           ],
           generationConfig: {
