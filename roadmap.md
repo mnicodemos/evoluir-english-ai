@@ -122,3 +122,5 @@
   - [x] Preservar integralmente usuários e o módulo atual de consumo
   - [x] Adicionar benchmark somente com dados confiáveis existentes e N/D para lacunas
   - [x] Validar proteção administrativa, desktop e mobile sem alterar operações, limites ou banco
+
+- [ ] Fase 6A — benchmark controlado Lovable AI × Google, somente medição
