@@ -93,7 +93,7 @@ function AppShellContent({
       <div
         className={cn(
           "min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0",
-          dashboardLayout ? "lg:pl-52" : "lg:pl-20",
+          dashboardLayout ? "dark lg:pl-52" : "lg:pl-20",
         )}
       >
         <aside

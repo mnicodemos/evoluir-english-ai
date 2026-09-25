@@ -139,7 +139,7 @@ function Dashboard() {
         </div>
       ) : (
         <div className="dashboard-one-screen grid gap-3 xl:gap-2">
-          <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center">
+          <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center xl:h-[4.5rem]">
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">{t("Welcome back")}</p>
               <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-wrap">
@@ -172,7 +172,7 @@ function Dashboard() {
             </div>
           </header>
 
-          <div className="order-5 grid min-w-0 gap-3 sm:grid-cols-2 lg:order-none lg:grid-cols-4">
+          <div className="order-5 grid min-w-0 gap-3 sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[5.5rem]">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
             <div className="card-soft flex min-w-0 flex-col justify-center p-3">
@@ -193,7 +193,7 @@ function Dashboard() {
             </div>
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
-            <div className="card-soft min-w-0 p-3">
+            <div className="card-soft min-w-0 p-3 xl:p-2">
               <WeeklyFrequency
                 userId={profile.id}
                 daysPerWeek={profile.study_days_per_week ?? 7}
@@ -202,19 +202,18 @@ function Dashboard() {
             </div>
           </div>
 
-          <section className="order-1 lg:order-none">
-            <NextStepCard compact />
-          </section>
-
-          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
+          <div className="order-1 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
+            <section className="min-w-0 lg:col-span-9">
+              <NextStepCard compact />
+            </section>
             <section
-              className="card-soft min-w-0 p-3 lg:col-span-4"
+              className="card-soft min-w-0 p-3 lg:col-span-3"
               aria-labelledby="today-progress-title"
             >
               <h2 id="today-progress-title" className="text-sm font-semibold">
                 {t("Today's Progress")}
               </h2>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1 xl:grid-cols-2">
                 {learningCards.map((card) => (
                   <div key={card.label} className="min-w-0 rounded-md bg-secondary p-2 text-center">
                     <span className="text-base" aria-hidden="true">
@@ -228,10 +227,13 @@ function Dashboard() {
                 ))}
               </div>
             </section>
-            <div className="min-w-0 lg:col-span-4">
+          </div>
+
+          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-2">
+            <div className="min-w-0">
               <PathProgressCard compact />
             </div>
-            <div className="min-w-0 lg:col-span-4">
+            <div className="min-w-0">
               <SmartReviewCard streakDays={streakDays} compact />
             </div>
           </div>
