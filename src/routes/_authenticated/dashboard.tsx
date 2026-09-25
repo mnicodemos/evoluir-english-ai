@@ -1,10 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
+  BarChart3,
   BookOpen,
-  Calendar,
   CalendarCheck,
+  CheckCircle2,
   Crown,
+  Flame,
   GraduationCap,
   Headphones,
   MessageSquareText,
@@ -15,10 +17,8 @@ import {
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
-import { DailyGoalCard } from "@/components/DailyGoalCard";
+import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
-import { getLeague, LeagueBadge } from "@/components/LeagueBadge";
-
 import { LevelCard } from "@/components/LevelCard";
 import { PathProgressCard } from "@/components/LearningPathCard";
 import { NextStepCard } from "@/components/NextStepCard";
@@ -30,7 +30,6 @@ import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
-import { getLevelState } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -51,44 +50,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
 
-function NextLeagueStatus({ streakDays }: { streakDays: number }) {
-  const { lang } = useUiLang();
-  const league = getLeague(streakDays);
-
-  if (league.nextIn === 0) {
-    return (
-      <p className="mt-1 text-xs font-semibold text-foreground/80">
-        {lang === "pt" ? "Liga máxima alcançada" : "Top league reached"}
-      </p>
-    );
-  }
-
-  const nextLeagueInfo = getLeague(streakDays + league.nextIn);
-  const nextLeague = nextLeagueInfo.name;
-  const translatedLeague =
-    lang === "pt"
-      ? ({
-          Silver: "Prata",
-          Gold: "Ouro",
-          Sapphire: "Safira",
-          Ruby: "Rubi",
-          Emerald: "Esmeralda",
-          Amethyst: "Ametista",
-          Pearl: "Pérola",
-          Obsidian: "Obsidiana",
-          Diamond: "Diamante",
-        }[nextLeague] ?? nextLeague)
-      : nextLeague;
-
-  return (
-    <p className="mt-1 text-xs font-semibold" style={{ color: nextLeagueInfo.to }}>
-      {lang === "pt"
-        ? `${translatedLeague} em ${league.nextIn} ${league.nextIn === 1 ? "dia" : "dias"}`
-        : `${translatedLeague} in ${league.nextIn} ${league.nextIn === 1 ? "day" : "days"}`}
-    </p>
-  );
-}
-
 function Dashboard() {
   const { data: profile, isLoading } = useProfile();
   const navigate = useNavigate();
@@ -97,6 +58,7 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const streakDays = profile ? effectiveStreak(profile) : 0;
+  const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
@@ -169,34 +131,23 @@ function Dashboard() {
             </div>
           </header>
 
-          <div className="order-5 grid min-w-0 gap-3 sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[5.5rem]">
+          <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[5.25rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
-            <div className="card-soft flex min-w-0 flex-col justify-center p-3">
+            <div className="flex min-w-0 flex-col justify-center px-3 py-2">
               <div className="flex items-center gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-success/15">
-                  <Calendar className="size-4 text-success" />
+                <span className="grid size-9 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
+                  <Flame className="size-5 text-dashboard-coral" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-base font-bold">{streakDays} days</p>
                   <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
-                  <NextLeagueStatus streakDays={streakDays} />
                 </div>
-                <LeagueBadge
-                  streakDays={streakDays}
-                  label={getLevelState(profile.level).current.value.toUpperCase()}
-                />
               </div>
             </div>
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
-            <div className="card-soft min-w-0 p-3 xl:p-2">
-              <WeeklyFrequency
-                userId={profile.id}
-                daysPerWeek={profile.study_days_per_week ?? 7}
-                compact
-              />
-            </div>
+            <WeeklyFrequency userId={profile.id} daysPerWeek={profile.study_days_per_week ?? 7} presentation="summary" />
           </div>
 
           <div className="order-1 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
@@ -207,34 +158,49 @@ function Dashboard() {
               className="card-soft min-w-0 p-3 lg:col-span-3"
               aria-labelledby="today-progress-title"
             >
-              <h2 id="today-progress-title" className="text-sm font-semibold">
-                {t("Today's Progress")}
-              </h2>
-              <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1 xl:grid-cols-2">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="size-4 text-dashboard-cyan" />
+                <h2 id="today-progress-title" className="text-sm font-semibold">
+                  {t("Today's Progress")}
+                </h2>
+              </div>
+              <div className="mt-3 grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:grid-cols-[6rem_minmax(0,1fr)]">
+                <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:mx-0">
+                  <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 96 96" aria-hidden="true">
+                    <circle cx="48" cy="48" r="39" fill="none" stroke="var(--secondary)" strokeWidth="10" />
+                    <circle cx="48" cy="48" r="39" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeDasharray={2 * Math.PI * 39} strokeDashoffset={2 * Math.PI * 39 * (1 - Math.min(1, minutesToday / Math.max(profile.daily_minutes, 1)))} />
+                  </svg>
+                  <span className="relative text-center text-xl font-bold leading-none text-foreground">
+                    {minutesToday}
+                    <span className="mt-1 block text-[10px] font-medium text-muted-foreground">min</span>
+                  </span>
+                </div>
+                <div className="grid gap-2">
                 {learningCards.map((card) => (
                   <div
                     key={card.label}
-                    className="dashboard-tile min-w-0 rounded-md border p-2 text-center"
+                    className="grid min-w-0 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-2"
                   >
-                    <span className="text-base" aria-hidden="true">
-                      {card.emoji}
-                    </span>
-                    <p className="text-sm font-bold">{card.value}</p>
+                    <CheckCircle2 className="size-5 text-brand-green" aria-hidden="true" />
                     <p className="line-clamp-2 text-[10px] text-muted-foreground">
-                      {t(card.label)}
+                      <span className="font-bold text-foreground">{card.value}</span> {t(card.label)}
                     </p>
                   </div>
                 ))}
+                </div>
               </div>
             </section>
           </div>
 
-          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-2">
-            <div className="min-w-0">
+          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
+            <div className="min-w-0 lg:col-span-5">
               <PathProgressCard compact />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 lg:col-span-4">
               <SmartReviewCard streakDays={streakDays} compact />
+            </div>
+            <div className="min-w-0 lg:col-span-3">
+              <WeeklyFrequency userId={profile.id} daysPerWeek={profile.study_days_per_week ?? 7} presentation="dashboard-panel" />
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { GraduationCap, Lock } from "lucide-react";
+import { ChartNoAxesColumnIncreasing, GraduationCap, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -57,18 +57,22 @@ export function LevelCard({
   return (
     <div
       className={cn(
-        "card-soft flex h-full min-w-0 flex-col justify-center",
-        compact ? "p-3" : "p-4",
+        "flex h-full min-w-0 flex-col justify-center",
+        compact ? "px-3 py-2" : "card-soft p-4",
       )}
     >
       <div className="flex items-center gap-4">
         <span
           className={cn(
-            "grid shrink-0 place-items-center rounded-xl bg-accent",
+            "grid shrink-0 place-items-center rounded-md bg-dashboard-cyan/10",
             compact ? "size-9" : "size-12",
           )}
         >
-          <GraduationCap className={cn("text-accent-foreground", compact ? "size-4" : "size-6")} />
+          {compact ? (
+            <ChartNoAxesColumnIncreasing className="size-5 text-dashboard-cyan" />
+          ) : (
+            <GraduationCap className="size-6 text-accent-foreground" />
+          )}
         </span>
         <div className="flex-1 min-w-0">
           <p
@@ -80,14 +84,20 @@ export function LevelCard({
             {current.label}
           </p>
           <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-base sm:text-xs")}>
-            <span>Your English level</span>
-            <span> · </span>
-            <span>{current.cefr}</span>
+            {compact ? (
+              <span>{current.cefr}</span>
+            ) : (
+              <>
+                <span>Your English level</span>
+                <span> · </span>
+                <span>{current.cefr}</span>
+              </>
+            )}
           </p>
         </div>
       </div>
 
-      <div className={cn("grid grid-cols-6", compact ? "mt-2 gap-1" : "mt-3 gap-2")}>
+      <div className={cn("grid grid-cols-6", compact ? "mt-1.5 gap-1" : "mt-3 gap-2")}>
         {LEVELS.map((l, i) => {
           const locked = i > highestIndex;
           const active = i === currentIndex;

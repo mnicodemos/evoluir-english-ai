@@ -7,7 +7,12 @@ import { STUDY_DAY_ACTIVITY_TYPES } from "@/lib/studyDay";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
-type Props = { userId: string; daysPerWeek?: number; compact?: boolean };
+type Props = {
+  userId: string;
+  daysPerWeek?: number;
+  compact?: boolean;
+  presentation?: "default" | "summary" | "dashboard-panel";
+};
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
 const LABELS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -15,7 +20,12 @@ const LABELS_PT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 /** Weekly frequency strip: one tile per weekday of the current week.
  *  The trophy uses the student's configured weekly frequency, falling back to 7. */
-export function WeeklyFrequency({ userId, daysPerWeek, compact = false }: Props) {
+export function WeeklyFrequency({
+  userId,
+  daysPerWeek,
+  compact = false,
+  presentation = "default",
+}: Props) {
   const weeklyGoal = daysPerWeek ?? 7;
   const { lang } = useUiLang();
   const labels = lang === "pt" ? LABELS_PT : LABELS_EN;
@@ -55,6 +65,79 @@ export function WeeklyFrequency({ userId, daysPerWeek, compact = false }: Props)
   const studiedCount = studyDays?.size ?? 0;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
+
+  if (presentation === "summary") {
+    return (
+      <div className="flex h-full min-w-0 items-center gap-3 px-3 py-2">
+        <span className="grid size-9 shrink-0 place-items-center rounded-md bg-warning/10">
+          <Trophy className="size-5 text-warning" strokeWidth={2.5} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-base font-bold">
+            {studiedCount} / {weeklyGoal} {daysLabel}
+          </p>
+          <p className="text-xs text-muted-foreground">{lang === "pt" ? "Esta semana" : "This week"}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (presentation === "dashboard-panel") {
+    const radius = 34;
+    const circumference = 2 * Math.PI * radius;
+    const progress = weeklyGoal > 0 ? Math.min(1, studiedCount / weeklyGoal) : 0;
+    return (
+      <section className="card-soft h-full min-w-0 p-3" aria-labelledby="weekly-rhythm-title">
+        <div className="flex items-center gap-2">
+          <span className="grid size-8 place-items-center rounded-md bg-dashboard-cyan/10">
+            <Trophy className="size-4 text-dashboard-cyan" />
+          </span>
+          <h2 id="weekly-rhythm-title" className="text-sm font-semibold">
+            {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
+          </h2>
+        </div>
+        <div className="mt-2 grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3">
+          <div className="relative grid size-[5.5rem] place-items-center text-brand-green">
+            <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 80 80" aria-hidden="true">
+              <circle cx="40" cy="40" r={radius} fill="none" stroke="var(--secondary)" strokeWidth="8" />
+              <circle cx="40" cy="40" r={radius} fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={circumference * (1 - progress)} />
+            </svg>
+            <span className="relative text-center text-lg font-bold leading-none text-foreground">
+              {studiedCount}/{weeklyGoal}
+              <span className="mt-1 block text-[9px] font-medium text-muted-foreground">{daysLabel}</span>
+            </span>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">
+              {studiedCount} {lang === "pt" ? "dias ativos esta semana" : "days active this week"}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {allStudied
+                ? lang === "pt" ? "Ótima consistência!" : "Great consistency!"
+                : lang === "pt" ? "Continue construindo seu ritmo." : "Keep building your rhythm."}
+            </p>
+          </div>
+        </div>
+        <div className="mt-2 grid grid-cols-7 gap-1">
+          {weekKeys.map((key, i) => {
+            const studied = studyDays?.has(key) ?? false;
+            return (
+              <div key={key} className="grid justify-items-center gap-1">
+                <span className="text-[9px] text-muted-foreground">{labels[i]}</span>
+                {studied ? (
+                  <span className="grid size-5 place-items-center rounded-full bg-brand-green text-primary-foreground">
+                    <Check className="size-3" strokeWidth={3} />
+                  </span>
+                ) : (
+                  <span className="size-5 rounded-full border border-dashed border-muted-foreground" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div className={cn("flex h-full items-center", compact ? "gap-2" : "gap-3")}>
