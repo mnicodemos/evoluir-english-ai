@@ -118,8 +118,6 @@ function Dashboard() {
     },
     { to: "/writing", label: "Writing", icon: PenLine },
     { to: "/teacher", label: "AI Teacher", icon: Sparkles },
-    { to: "/study-plan", label: "My Study Plan", icon: CalendarCheck },
-    { to: "/progress", label: "Progress", icon: LineChart },
   ] as const;
 
   const learningCards = [
@@ -147,7 +145,7 @@ function Dashboard() {
                   {t("Hello")}, {profile.name || t("student")}
                 </h1>
                 <div className="flex shrink-0 items-center gap-2">
-                  <WandSparkles className="size-5 shrink-0 text-success" aria-hidden="true" />
+                  <WandSparkles className="size-5 shrink-0 text-brand-green" aria-hidden="true" />
                   {profile.plan === "premium" ? (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold text-warning-foreground">
                       <Crown className="size-3.5 text-warning" /> Premium
@@ -248,7 +246,7 @@ function Dashboard() {
               </h2>
               <ArrowRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-8">
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
               {quickAccess.map((item) => {
                 const hasNew = Boolean(
                   (indicators as Record<string, boolean>)[item.to.replace("/", "")],
@@ -257,7 +255,7 @@ function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className={`group relative min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-border bg-background px-2 py-2 transition-colors hover:bg-accent ${item.to === "/study-plan" ? "hidden lg:grid" : "grid"}`}
+                    className="group relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-border bg-background px-2 py-2 transition-colors hover:bg-accent"
                   >
                     {hasNew && (
                       <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
