@@ -6,14 +6,12 @@ import {
   BookOpen,
   CalendarCheck,
   CheckCircle2,
-  Crown,
   Flame,
   GraduationCap,
   Headphones,
   MessageSquareText,
   PenLine,
   Sparkles,
-  WandSparkles,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -99,37 +97,12 @@ function Dashboard() {
         </div>
       ) : (
         <div className="dashboard-one-screen grid gap-2.5 xl:gap-2">
-          <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center xl:h-[4.5rem]">
-            <div className="min-w-0">
-              <p className="text-xs font-medium text-muted-foreground">{t("Welcome back")}</p>
-              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-wrap">
-                <h1 className="min-w-0 truncate text-2xl font-bold 2xl:text-3xl">
-                  {t("Hello")}, {profile.name || t("student")}
-                </h1>
-                <div className="flex shrink-0 items-center gap-2">
-                  <WandSparkles className="size-5 shrink-0 text-brand-green" aria-hidden="true" />
-                  {profile.plan === "premium" ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-warning px-2 py-1 text-xs font-bold text-warning-foreground shadow-sm">
-                      <Crown className="size-3.5 text-warning" /> Premium
-                    </span>
-                  ) : (
-                    <Link
-                      to="/premium"
-                      className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground/80 transition-colors hover:bg-accent"
-                    >
-                      <Crown className="size-3.5 text-warning" /> {t("Go Premium")}
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="card-soft hidden min-w-0 p-3 lg:block">
-              <EvoDailyReflection
-                userId={profile.id}
-                name={profile.name}
-                placement="dashboard-header"
-              />
-            </div>
+          <header className="animate-rise min-w-0 xl:h-[4.5rem]">
+            <EvoDailyReflection
+              userId={profile.id}
+              name={profile.name}
+              placement="dashboard-header"
+            />
           </header>
 
           <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[5.25rem] [&>*+*]:border-border sm:[&>*+*]:border-l">

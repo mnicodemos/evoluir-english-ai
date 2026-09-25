@@ -45,6 +45,22 @@ const nav = [
 
 const sidebarNav = [...nav, { to: "/premium", label: "Premium", icon: Crown }] as const;
 
+const dashboardSidebarNav = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
+  { to: "/learning", label: "Lessons", icon: GraduationCap },
+  { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
+  { to: "/listening", label: "Listening", icon: Headphones },
+  { to: "/coach", label: "Speaking", icon: MessageSquareText },
+  { to: "/writing", label: "Writing", icon: PenLine },
+  { to: "/teacher", label: "AI Teacher", icon: Sparkles },
+] as const;
+
+const dashboardAccountNav = [
+  { to: "/progress", label: "My Progress", icon: LineChart },
+  { to: "/premium", label: "My Subscription", icon: Crown },
+] as const;
+
 export function AppShell({
   children,
   dashboardLayout = false,
@@ -93,13 +109,13 @@ function AppShellContent({
       <div
         className={cn(
           "min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0",
-          dashboardLayout ? "dashboard-shell dark lg:pl-52" : "lg:pl-20",
+          dashboardLayout ? "dashboard-shell dark lg:pl-44" : "lg:pl-20",
         )}
       >
         <aside
           className={cn(
             "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-sidebar-border bg-sidebar py-5 text-sidebar-foreground lg:flex",
-            dashboardLayout ? "w-52 items-stretch px-3" : "w-20 items-center",
+            dashboardLayout ? "w-44 items-stretch px-3 pt-3 pb-4" : "w-20 items-center",
           )}
         >
           <Link
@@ -108,14 +124,14 @@ function AppShellContent({
             className={cn(
               "rounded-lg hover:bg-sidebar-accent",
               dashboardLayout
-                ? "flex h-12 min-w-0 items-center gap-2.5 px-2"
+                ? "flex h-14 min-w-0 items-center gap-2 px-1"
                 : "grid size-11 place-items-center",
             )}
           >
-            <Logo className={dashboardLayout ? "size-10 shrink-0" : "size-11"} />
+            <Logo className={dashboardLayout ? "size-9 shrink-0" : "size-11"} />
             {dashboardLayout && (
               <span className="min-w-0 whitespace-nowrap leading-none">
-                <span className="block font-display text-base font-semibold">
+                <span className="block font-display text-[15px] font-semibold">
                   Evoluir<span className="text-brand-green">+</span>
                 </span>
                 <span className="mt-1 block text-[10px] font-semibold uppercase text-sidebar-foreground/70">
@@ -125,8 +141,8 @@ function AppShellContent({
             )}
           </Link>
 
-          <nav className={cn("flex flex-1 flex-col gap-1", dashboardLayout ? "mt-6" : "mt-8")}>
-            {sidebarNav.map((item) => (
+          <nav className={cn("flex flex-1 flex-col gap-1", dashboardLayout ? "mt-4" : "mt-8")}>
+            {(dashboardLayout ? dashboardSidebarNav : sidebarNav).map((item) => (
               <Tooltip key={item.to}>
                 <TooltipTrigger asChild>
                   <Link
@@ -135,7 +151,7 @@ function AppShellContent({
                     className={cn(
                       "rounded-lg text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground",
                       dashboardLayout
-                        ? "grid h-10 grid-cols-[2rem_minmax(0,1fr)] items-center px-2 text-sm font-medium"
+                        ? "grid h-10 grid-cols-[2rem_minmax(0,1fr)] items-center px-2 text-xs font-medium"
                         : "grid size-10 place-items-center",
                     )}
                     activeProps={{
@@ -156,30 +172,59 @@ function AppShellContent({
                 )}
               </Tooltip>
             ))}
+            {dashboardLayout && (
+              <>
+                <div className="my-2 border-t border-sidebar-border" />
+                {dashboardAccountNav.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    aria-label={translate(item.label)}
+                    className="grid h-10 grid-cols-[2rem_minmax(0,1fr)] items-center rounded-lg px-2 text-xs font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    activeProps={{
+                      className:
+                        "border border-brand-green/35 bg-sidebar-accent text-brand-green shadow-[inset_3px_0_0_var(--brand-green)]",
+                    }}
+                  >
+                    <item.icon className="size-5" />
+                    <span className="truncate text-left">{translate(item.label)}</span>
+                  </Link>
+                ))}
+              </>
+            )}
           </nav>
 
           <div
             className={cn("flex gap-1", dashboardLayout ? "items-center" : "flex-col items-center")}
           >
-            <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
-            <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={translate("Sign out")}
-                  className="size-10 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  onClick={signOut}
-                >
-                  <LogOut className="size-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={8}>
-                {translate("Sign out")}
-              </TooltipContent>
-            </Tooltip>
-            <ProfileMenu className="hover:bg-sidebar-accent hover:text-sidebar-foreground" />
+            {!dashboardLayout && (
+              <>
+                <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
+                <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
+              </>
+            )}
+            {!dashboardLayout && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={translate("Sign out")}
+                    className="size-10 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    onClick={signOut}
+                  >
+                    <LogOut className="size-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8}>
+                  {translate("Sign out")}
+                </TooltipContent>
+              </Tooltip>
+            )}
+            <ProfileMenu
+              presentation={dashboardLayout ? "dashboard-sidebar" : "icon"}
+              className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
+            />
           </div>
         </aside>
 
