@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { TreePine } from "lucide-react";
 
-import { getDailyReflection, getGreeting } from "@/lib/dailyReflection";
+import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -21,13 +21,19 @@ export function EvoDailyReflection({ userId, name }: EvoDailyReflectionProps) {
 
   const reflection = getDailyReflection(userId, now ?? new Date(0));
   const greeting = now ? t(getGreeting(now.getHours())) : t("Hello");
+  const greetingTone = now ? getGreetingTone(now.getHours()) : "afternoon";
+  const treeToneClass = {
+    morning: "text-greeting-morning",
+    afternoon: "text-greeting-afternoon",
+    evening: "text-greeting-evening",
+  }[greetingTone];
   const displayName = name.trim().split(/\s+/)[0];
   const copy = lang === "pt" ? "pt" : "en";
 
   return (
     <aside className="hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex">
       <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-        <TreePine className="size-5 text-brand-green" aria-hidden="true" />
+        <TreePine className={`size-5 ${treeToneClass}`} aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-card-foreground">

@@ -91,3 +91,9 @@ export function getGreeting(hour: number): "Good morning" | "Good afternoon" | "
   if (hour < 18) return "Good afternoon";
   return "Good evening";
 }
+
+export function getGreetingTone(hour: number): "morning" | "afternoon" | "evening" {
+  if (hour < 12) return "morning";
+  if (hour < 18) return "afternoon";
+  return "evening";
+}
