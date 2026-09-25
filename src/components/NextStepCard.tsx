@@ -83,7 +83,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         aria-label={t("Your next step")}
       >
         <div className="grid h-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-[9rem_minmax(0,1fr)] xl:grid-cols-[11rem_minmax(0,1fr)_minmax(12rem,0.72fr)]">
-          <div className="relative hidden min-h-0 sm:block">
+          <div className="absolute right-3 top-3 h-28 w-24 opacity-35 sm:relative sm:right-auto sm:top-auto sm:h-auto sm:w-auto sm:opacity-100">
             <EvoGuide
               title={t("Your focus is here. Get started now!")}
               imageSize="lesson"
@@ -92,7 +92,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             />
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-center xl:px-2">
+          <div className="relative z-10 flex min-w-0 flex-col justify-center pr-20 sm:pr-0 xl:px-2">
             <p className="text-[11px] font-bold uppercase text-brand-green">
               EVO · {t("Your AI Learning Coach")}
             </p>
@@ -151,7 +151,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 min-w-0 rounded-lg border border-brand-green/30 bg-sidebar-accent/45 p-3 xl:self-center">
+          <aside className="relative z-10 min-w-0 rounded-lg border border-brand-green/30 bg-sidebar-accent/45 p-3 sm:col-span-2 xl:col-span-1 xl:self-center">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>

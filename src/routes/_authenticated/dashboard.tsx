@@ -11,6 +11,7 @@ import {
   MessageSquareText,
   PenLine,
   Sparkles,
+  WandSparkles,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -137,14 +138,15 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-3 lg:min-h-[calc(100vh-1.5rem)] lg:grid-rows-[auto_auto_minmax(19rem,1fr)_auto_auto]">
+        <div className="dashboard-one-screen grid gap-3 lg:min-h-[calc(100vh-3rem)] lg:grid-rows-[auto_auto_minmax(15rem,1fr)_auto_auto] xl:min-h-[calc(100vh-1.5rem)]">
           <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center">
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">{t("Welcome back")}</p>
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <h1 className="min-w-0 break-words text-2xl font-bold 2xl:text-3xl">
-                  {t("Hello")}, {profile.name || t("student")} 👋
+                  {t("Hello")}, {profile.name || t("student")}
                 </h1>
+                <WandSparkles className="size-5 shrink-0 text-success" aria-hidden="true" />
               {profile.plan === "premium" ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold text-warning-foreground">
                   <Crown className="size-3.5 text-warning" /> Premium
