@@ -166,7 +166,7 @@ function Dashboard() {
             </div>
           </header>
 
-          <div className="order-2 grid min-w-0 gap-3 sm:grid-cols-2 lg:order-none lg:grid-cols-4">
+          <div className="order-1 grid min-w-0 gap-3 sm:grid-cols-2 lg:order-none lg:grid-cols-4">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
             <div className="card-soft flex min-w-0 flex-col justify-center p-3">
@@ -194,7 +194,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <section className="order-1 min-h-[19rem] lg:order-none">
+          <section className="order-2 min-h-[19rem] lg:order-none lg:min-h-[15rem] [@media(min-height:850px)]:lg:min-h-[19rem]">
             <NextStepCard compact />
           </section>
 
