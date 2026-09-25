@@ -80,7 +80,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative min-w-0 overflow-hidden rounded-xl border border-brand-green/25 bg-sidebar px-4 py-3 text-sidebar-foreground shadow-[var(--shadow-soft)]"
+        className="dashboard-focus relative min-w-0 overflow-hidden rounded-xl border border-brand-green/25 bg-sidebar px-4 py-3 text-sidebar-foreground shadow-[var(--shadow-soft)] xl:py-2"
         aria-label={t("Your next step")}
       >
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_7.5rem] gap-3 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-4 xl:grid-cols-[14rem_minmax(0,1fr)_minmax(13rem,0.62fr)]">

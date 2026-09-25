@@ -203,7 +203,7 @@ function AppShellContent({
         <main
           className={cn(
             "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
-            dashboardLayout && "xl:px-5 xl:py-3",
+            dashboardLayout && "xl:px-5 xl:py-2",
           )}
         >
           {showBackButton && (
