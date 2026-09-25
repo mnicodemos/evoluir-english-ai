@@ -138,14 +138,20 @@ export const dailyWords = createServerFn({ method: "POST" })
     // spare candidates: the extras absorb the repeats and the batch still fills.
     const askCount = Math.min(missing + 6, 20);
 
-    async function askAi(exclude: Set<string>) {
+    // When the literal lesson words are exhausted (the model keeps returning words the
+    // student already owns), the retry widens the source to the lessons' topics and
+    // situations at the same level, so a completed lesson always unlocks new words.
+    async function askAi(exclude: Set<string>, widen = false) {
+      const source = widen
+        ? `Pick exactly 20 useful English words or short expressions for the topics and situations of the lessons listed by the user, at the student's level. Prefer less obvious, level-appropriate vocabulary: collocations, phrasal verbs and expressions are welcome. `
+        : `Pick exactly ${askCount} useful English words or short expressions that come from the lessons listed by the user. `;
       const raw = await callGateway(
         [
           {
             role: "system",
             content:
               "You are a CELTA English teacher choosing daily vocabulary for a Brazilian learner. " +
-              `Pick exactly ${askCount} useful English words or short expressions that come from the lessons listed by the user. ` +
+              source +
               "Never pick a word the user lists as already known. " +
               'Reply with strict JSON: {"words":[{"word":"","translation":"Brazilian Portuguese","meaning":"short definition in simple English",' +
               '"pronunciation":"simple phonetic hint","example":"natural English sentence using the word",' +
