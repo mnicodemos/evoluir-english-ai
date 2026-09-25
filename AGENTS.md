@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Dashboard-only density and navigation styling must use opt-in presentation props on existing components, preserving their shared data and behavior.

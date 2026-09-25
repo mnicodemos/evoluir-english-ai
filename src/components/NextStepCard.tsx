@@ -26,7 +26,7 @@ import { useUiLang } from "@/lib/uiLang";
  * Adaptive next step. Everything shown here is decided server-side from the
  * student's own pedagogical data; the card only presents it.
  */
-export function NextStepCard() {
+export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
@@ -42,7 +42,7 @@ export function NextStepCard() {
 
   if (isLoading) {
     return (
-      <section className="card-soft p-5">
+      <section className={compact ? "card-soft h-full p-4" : "card-soft p-5"}>
         <Skeleton className="h-5 w-40" />
         <Skeleton className="mt-3 h-4 w-64" />
         <Skeleton className="mt-4 h-9 w-40" />
@@ -75,6 +75,112 @@ export function NextStepCard() {
   const challengeAvailable = data.quest
     ? dashboardActionAvailable(data.quest.resource.to, activityIndicators)
     : false;
+
+  if (compact) {
+    return (
+      <section
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-sidebar-border bg-sidebar p-4 text-sidebar-foreground shadow-[var(--shadow-soft)]"
+        aria-label={t("Your next step")}
+      >
+        <div className="grid h-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-[9rem_minmax(0,1fr)] xl:grid-cols-[11rem_minmax(0,1fr)_minmax(12rem,0.72fr)]">
+          <div className="relative hidden min-h-0 sm:block">
+            <EvoGuide
+              title={t("Your focus is here. Get started now!")}
+              imageSize="lesson"
+              contrast="inverse"
+              className="h-full grid-cols-1 content-end [&>div:first-child]:absolute [&>div:first-child]:inset-0 [&>div:first-child]:w-full [&>div:first-child]:opacity-95 [&>div:last-child]:sr-only"
+            />
+          </div>
+
+          <div className="relative z-10 flex min-w-0 flex-col justify-center xl:px-2">
+            <p className="text-[11px] font-bold uppercase text-brand-green">
+              EVO · {t("Your AI Learning Coach")}
+            </p>
+            <p className="mt-2 text-sm font-semibold text-sidebar-foreground/75">{t("Today's focus")}</p>
+            <h2 className="mt-1 break-words text-2xl font-bold text-sidebar-foreground xl:text-3xl">
+              {skillLabel}
+            </h2>
+            <p className="mt-2 line-clamp-2 text-sm text-sidebar-foreground/70">
+              {t(NEXT_STEP_REASON_TEXT[data.reason])}
+            </p>
+            <p className="mt-2 line-clamp-1 text-sm text-sidebar-foreground/85">
+              {t("How to practise")}: <span className="font-semibold">{data.activity.title}</span>
+            </p>
+            {mainAvailable && (
+              <Button asChild className="mt-4 w-fit bg-brand-green text-sidebar hover:bg-brand-green/90">
+                {data.activity.params ? (
+                  <Link to="/learning/$lessonId" params={data.activity.params}>
+                    {t("Practice now")} <ArrowRight aria-hidden="true" />
+                  </Link>
+                ) : (
+                  <Link to={data.activity.to}>
+                    {t("Practice now")} <ArrowRight aria-hidden="true" />
+                  </Link>
+                )}
+              </Button>
+            )}
+            {(quickWinAvailable || challengeAvailable) && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {quickWin && quickWinAvailable && (
+                  <Button asChild variant="ghost" size="sm" className="text-sidebar-foreground hover:bg-sidebar-accent">
+                    {quickWin.activity.params ? (
+                      <Link to="/learning/$lessonId" params={quickWin.activity.params}>
+                        <Zap /> {t("Quick Win")}
+                      </Link>
+                    ) : (
+                      <Link to={quickWin.activity.to}>
+                        <Zap /> {t("Quick Win")}
+                      </Link>
+                    )}
+                  </Button>
+                )}
+                {data.quest && challengeAvailable && (
+                  <Button asChild variant="ghost" size="sm" className="text-sidebar-foreground hover:bg-sidebar-accent">
+                    {data.quest.resource.params ? (
+                      <Link to="/learning/$lessonId" params={data.quest.resource.params}>
+                        <Sparkles /> {t("Take the challenge")}
+                      </Link>
+                    ) : (
+                      <Link to={data.quest.resource.to}>
+                        <Sparkles /> {t("Take the challenge")}
+                      </Link>
+                    )}
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+
+          <aside className="relative z-10 min-w-0 rounded-lg border border-brand-green/30 bg-sidebar-accent/45 p-3 xl:self-center">
+            <div className="flex items-center gap-2">
+              <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
+              <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
+            </div>
+            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80">
+              {cefrLevel && (
+                <li className="flex items-start gap-2">
+                  <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                  <span>{cefrLevel} · {skillLabel}</span>
+                </li>
+              )}
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span>{situationText}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span>{t(NEXT_STEP_REASON_TEXT[data.reason])}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span>{actionText}</span>
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="card-soft p-5" aria-label={t("Your next step")}>

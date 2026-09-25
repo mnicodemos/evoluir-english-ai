@@ -29,6 +29,7 @@ import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
 import { UiLangToggle, useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
+import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -44,11 +45,23 @@ const nav = [
 
 const sidebarNav = [...nav, { to: "/premium", label: "Premium", icon: Crown }] as const;
 
-export function AppShell({ children }: { children: ReactNode }) {
-  return <AppShellContent>{children}</AppShellContent>;
+export function AppShell({
+  children,
+  dashboardLayout = false,
+}: {
+  children: ReactNode;
+  dashboardLayout?: boolean;
+}) {
+  return <AppShellContent dashboardLayout={dashboardLayout}>{children}</AppShellContent>;
 }
 
-function AppShellContent({ children }: { children: ReactNode }) {
+function AppShellContent({
+  children,
+  dashboardLayout,
+}: {
+  children: ReactNode;
+  dashboardLayout: boolean;
+}) {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -77,37 +90,61 @@ function AppShellContent({ children }: { children: ReactNode }) {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0 lg:pl-20">
-        <aside className="fixed inset-y-0 left-0 z-30 hidden w-20 flex-col items-center bg-sidebar py-5 text-sidebar-foreground lg:flex">
+      <div
+        className={cn(
+          "min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0",
+          dashboardLayout ? "lg:pl-52" : "lg:pl-20",
+        )}
+      >
+        <aside
+          className={cn(
+            "fixed inset-y-0 left-0 z-30 hidden flex-col bg-sidebar py-5 text-sidebar-foreground lg:flex",
+            dashboardLayout ? "w-52 items-stretch px-3" : "w-20 items-center",
+          )}
+        >
           <Link
             to="/dashboard"
             aria-label={translate("Dashboard")}
-            className="grid size-11 place-items-center rounded-lg hover:bg-sidebar-accent"
+            className={cn(
+              "rounded-lg hover:bg-sidebar-accent",
+              dashboardLayout
+                ? "flex h-12 min-w-0 items-center gap-2.5 px-2"
+                : "grid size-11 place-items-center",
+            )}
           >
-            <Logo className="size-11" />
+            <Logo className={dashboardLayout ? "size-10 shrink-0" : "size-11"} />
+            {dashboardLayout && <BrandName className="min-w-0 text-sm" />}
           </Link>
 
-          <nav className="mt-8 flex flex-1 flex-col gap-1">
+          <nav className={cn("flex flex-1 flex-col gap-1", dashboardLayout ? "mt-6" : "mt-8")}>
             {sidebarNav.map((item) => (
               <Tooltip key={item.to}>
                 <TooltipTrigger asChild>
                   <Link
                     to={item.to}
                     aria-label={translate(item.label)}
-                    className="grid size-10 place-items-center rounded-lg text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    className={cn(
+                      "rounded-lg text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                      dashboardLayout
+                        ? "grid h-10 grid-cols-[2rem_minmax(0,1fr)] items-center px-2 text-sm font-medium"
+                        : "grid size-10 place-items-center",
+                    )}
                     activeProps={{ className: "bg-sidebar-accent text-sidebar-foreground" }}
                   >
                     <item.icon className="size-5" />
+                    {dashboardLayout && <span className="truncate text-left">{translate(item.label)}</span>}
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={8}>
-                  {translate(item.label)}
-                </TooltipContent>
+                {!dashboardLayout && (
+                  <TooltipContent side="right" sideOffset={8}>
+                    {translate(item.label)}
+                  </TooltipContent>
+                )}
               </Tooltip>
             ))}
           </nav>
 
-          <div className="flex flex-col items-center gap-1">
+          <div className={cn("flex gap-1", dashboardLayout ? "items-center" : "flex-col items-center")}>
             <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
             <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
             <Tooltip>
@@ -150,7 +187,12 @@ function AppShellContent({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10">
+        <main
+          className={cn(
+            "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
+            dashboardLayout && "xl:px-5 xl:py-3",
+          )}
+        >
           {showBackButton && (
             <Link
               to="/dashboard"
@@ -163,7 +205,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
           {children}
         </main>
 
-        <div className="mb-0">
+        <div className={cn("mb-0", dashboardLayout && "lg:hidden")}>
           <Footer
             lang={lang}
             containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10"

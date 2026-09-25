@@ -4,6 +4,7 @@ import { Hourglass } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { countsAsLearningMinutes, LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
+import { cn } from "@/lib/utils";
 
 export function useMinutesToday(userId?: string) {
   return useQuery({
@@ -28,29 +29,37 @@ export function useMinutesToday(userId?: string) {
   });
 }
 
-export function DailyGoalCard({ userId, goalMinutes }: { userId: string; goalMinutes: number }) {
+export function DailyGoalCard({
+  userId,
+  goalMinutes,
+  compact = false,
+}: {
+  userId: string;
+  goalMinutes: number;
+  compact?: boolean;
+}) {
   const { data: done = 0 } = useMinutesToday(userId);
   const percent = goalMinutes > 0 ? Math.min(100, Math.round((done / goalMinutes) * 100)) : 0;
 
   return (
-    <div className="card-soft flex min-w-0 flex-col justify-center p-5">
+    <div className={cn("card-soft flex min-w-0 flex-col justify-center", compact ? "p-3" : "p-5")}>
       <div className="flex items-center gap-4">
-        <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[oklch(0.95_0.06_25)]">
-          <Hourglass className="size-6 text-[oklch(0.55_0.18_25)]" />
+        <span className={cn("grid shrink-0 place-items-center rounded-xl bg-warning/15", compact ? "size-9" : "size-12")}>
+          <Hourglass className={cn("text-warning", compact ? "size-4" : "size-6")} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-lg font-bold sm:text-base md:text-lg">
+          <p className={cn("truncate font-bold", compact ? "text-base" : "text-lg sm:text-base md:text-lg")}>
             {done}{" "}
             <span className="text-xs font-medium text-muted-foreground sm:text-sm md:text-base">
               / {goalMinutes} <span className="inline">minutes</span>
             </span>
           </p>
-          <p className="text-base text-muted-foreground sm:text-sm">Your daily goal</p>
+          <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-base sm:text-sm")}>Your daily goal</p>
         </div>
       </div>
-      <Progress value={percent} className="mt-4 h-2" />
+      <Progress value={percent} className={cn("h-2", compact ? "mt-2" : "mt-4")} />
       <p
-        className={`mt-2 text-xs ${done >= goalMinutes ? "text-success/80" : "text-muted-foreground"}`}
+        className={cn("mt-2 text-xs", compact && "hidden 2xl:block", done >= goalMinutes ? "text-success/80" : "text-muted-foreground")}
       >
         {done >= goalMinutes ? (
           "Goal reached today. Great work!"
