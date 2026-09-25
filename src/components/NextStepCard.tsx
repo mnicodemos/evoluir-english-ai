@@ -89,7 +89,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_7rem] gap-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-5 xl:grid-cols-[13rem_minmax(0,1fr)_minmax(13rem,0.62fr)]">
           <div
-            className="relative order-2 -mt-3 -mr-4 min-h-[9rem] sm:order-none sm:-my-4 sm:mr-0 sm:-ml-4"
+            className="relative order-2 -mr-4 h-44 self-start sm:h-auto sm:self-stretch min-h-[9rem] sm:order-none sm:-my-4 sm:mr-0 sm:-ml-4"
             aria-hidden="true"
           >
             <img
