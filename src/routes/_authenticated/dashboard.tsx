@@ -3,8 +3,6 @@ import {
   ArrowRight,
   BarChart3,
   BookOpen,
-  Brain,
-  Calendar,
   CalendarCheck,
   CheckCircle2,
   Crown,
@@ -13,7 +11,6 @@ import {
   Headphones,
   MessageSquareText,
   PenLine,
-  Play,
   Sparkles,
   WandSparkles,
 } from "lucide-react";
@@ -22,8 +19,6 @@ import { useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
-import { getLeague, LeagueBadge } from "@/components/LeagueBadge";
-
 import { LevelCard } from "@/components/LevelCard";
 import { PathProgressCard } from "@/components/LearningPathCard";
 import { NextStepCard } from "@/components/NextStepCard";
@@ -35,7 +30,6 @@ import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
-import { getLevelState } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -55,44 +49,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   }),
   component: Dashboard,
 });
-
-function NextLeagueStatus({ streakDays }: { streakDays: number }) {
-  const { lang } = useUiLang();
-  const league = getLeague(streakDays);
-
-  if (league.nextIn === 0) {
-    return (
-      <p className="mt-1 text-xs font-semibold text-foreground/80">
-        {lang === "pt" ? "Liga máxima alcançada" : "Top league reached"}
-      </p>
-    );
-  }
-
-  const nextLeagueInfo = getLeague(streakDays + league.nextIn);
-  const nextLeague = nextLeagueInfo.name;
-  const translatedLeague =
-    lang === "pt"
-      ? ({
-          Silver: "Prata",
-          Gold: "Ouro",
-          Sapphire: "Safira",
-          Ruby: "Rubi",
-          Emerald: "Esmeralda",
-          Amethyst: "Ametista",
-          Pearl: "Pérola",
-          Obsidian: "Obsidiana",
-          Diamond: "Diamante",
-        }[nextLeague] ?? nextLeague)
-      : nextLeague;
-
-  return (
-    <p className="mt-1 text-xs font-semibold" style={{ color: nextLeagueInfo.to }}>
-      {lang === "pt"
-        ? `${translatedLeague} em ${league.nextIn} ${league.nextIn === 1 ? "dia" : "dias"}`
-        : `${translatedLeague} in ${league.nextIn} ${league.nextIn === 1 ? "day" : "days"}`}
-    </p>
-  );
-}
 
 function Dashboard() {
   const { data: profile, isLoading } = useProfile();
