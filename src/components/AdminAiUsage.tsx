@@ -59,8 +59,8 @@ export function AdminAiUsage() {
         <>
           <p className="mb-2 text-sm text-muted-foreground">
             Total AI calls ({q.data.days}d): <strong>{q.data.totalCalls}</strong>
-            {q.data.truncated ? " (first 10,000)" : ""} · Cost: not determinable (no reliable
-            price data) · First chunk: {ND} (not recorded)
+            {q.data.truncated ? " (first 10,000)" : ""} · Cost: not determinable (no reliable price
+            data) · First chunk: {ND} (not recorded)
           </p>
           <div className="max-h-[50vh] overflow-auto">
             <table className="w-full min-w-[900px] text-left text-xs">

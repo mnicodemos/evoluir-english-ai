@@ -78,7 +78,9 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
     const since = new Date(Date.now() - data.days * 86_400_000).toISOString();
     const { data: rows, error } = await supabaseAdmin
       .from("ai_usage_events")
-      .select("operation, model, success, status, duration_ms, input_tokens, output_tokens, error_code")
+      .select(
+        "operation, model, success, status, duration_ms, input_tokens, output_tokens, error_code",
+      )
       .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(10000);
