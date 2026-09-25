@@ -106,6 +106,7 @@
 - [x] Fase 22B+C — Plano adaptativo (ordem por evidência existente), "Why this plan?" e "Update my plan" com comparação Previous → Updated
 - [x] Ajuste visual — telas autenticadas em largura total no desktop, preservando leitura e responsividade
 - [x] Dashboard — diferenciar as três ações, padronizar botões e ampliar Study Streak no desktop
+- [x] Ajuste final do Dashboard — aplicar a nova EVO anexada, fixar a marca em duas linhas e validar 1280×800/mobile
 
 - [x] Fase — Vocabulary performance (a)+(b) e botão "✓ That's OK"
   - Palavras salvas carregam sem IA; geração em segundo plano; falha memorizada por lote, com "Tentar novamente" manual

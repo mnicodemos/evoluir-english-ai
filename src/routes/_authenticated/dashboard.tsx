@@ -138,7 +138,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-3">
+        <div className="dashboard-one-screen grid gap-3 xl:gap-2">
           <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center">
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">{t("Welcome back")}</p>
@@ -237,7 +237,7 @@ function Dashboard() {
           </div>
 
           <section
-            className="order-3 card-soft min-w-0 p-3 lg:order-none"
+            className="order-3 card-soft min-w-0 p-3 lg:order-none xl:p-2"
             aria-labelledby="quick-access-title"
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
