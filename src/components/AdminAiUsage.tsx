@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { getAiUsageSummary } from "@/lib/admin.functions";
 
 const ND = "N/D";
-const fmtMs = (v: number | null) => (v === null ? ND : `${(v / 1000).toFixed(1)} s`);
+const fmtMs = (v: number | null | undefined) => (v == null ? ND : `${(v / 1000).toFixed(1)} s`);
 const fmtN = (v: number | null) => (v === null ? ND : v.toLocaleString());
 
 export function AdminAiUsage() {
