@@ -85,6 +85,12 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(10000);
     if (error) throw error;
+    const { data: limitRows } = await supabaseAdmin
+      .from("ai_limits")
+      .select("operation, global_max_concurrent");
+    const globalLimit = new Map(
+      (limitRows ?? []).map((l) => [l.operation, l.global_max_concurrent] as const),
+    );
 
     type Agg = {
       operation: string;
@@ -169,6 +175,7 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
           outputTokens: a.withTokens ? a.outputTokens : null,
           models,
           providers: [...new Set(models.map(providerOf))],
+          globalMaxConcurrent: globalLimit.get(a.operation) ?? null,
           streaming: facts?.streaming ?? null,
           path: facts?.path ?? null,
         };
