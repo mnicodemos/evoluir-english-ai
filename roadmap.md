@@ -119,6 +119,6 @@
 
 - [x] Fase 3B — Ativação do Dictionary Knowledge Cache concluída: TTL 315360000 aplicado (apenas dictionary), HIT real confirmado, pronúncia intocada, 449 testes OK.
 - [x] Admin Panel — organizar Usuários, Consumo IA e Custo & Performance em abas independentes
-  - [ ] Preservar integralmente usuários e o módulo atual de consumo
-  - [ ] Adicionar benchmark somente com dados confiáveis existentes e N/D para lacunas
-  - [ ] Validar proteção administrativa, desktop e mobile sem alterar operações, limites ou banco
+  - [x] Preservar integralmente usuários e o módulo atual de consumo
+  - [x] Adicionar benchmark somente com dados confiáveis existentes e N/D para lacunas
+  - [x] Validar proteção administrativa, desktop e mobile sem alterar operações, limites ou banco
