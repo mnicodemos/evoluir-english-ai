@@ -110,15 +110,18 @@ function Dashboard() {
           <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[5.25rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
-              <div className="flex min-w-0 items-center gap-3 px-3 py-2">
-                <span className="grid size-11 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
-                  <Flame className="size-7 fill-dashboard-coral text-dashboard-coral" strokeWidth={1.8} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-bold">{streakDays} days</p>
-                  <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
-                </div>
-                <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+            <div className="flex min-w-0 items-center gap-3 px-3 py-2">
+              <span className="grid size-11 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
+                <Flame
+                  className="size-7 fill-dashboard-coral text-dashboard-coral"
+                  strokeWidth={1.8}
+                />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-base font-bold">{streakDays} days</p>
+                <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
+              </div>
+              <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
             </div>
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
