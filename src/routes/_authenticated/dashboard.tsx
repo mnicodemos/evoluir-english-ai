@@ -7,7 +7,6 @@ import {
   Crown,
   GraduationCap,
   Headphones,
-  LineChart,
   MessageSquareText,
   PenLine,
   Sparkles,
