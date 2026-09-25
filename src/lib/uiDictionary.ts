@@ -256,6 +256,7 @@ export const uiPt: Record<string, string> = {
 
   // My Study Plan
   "My Study Plan": "Meu plano de estudo",
+  "Study Plan": "Plano de estudo",
   "Your weekly study plan": "Seu plano de estudo semanal",
   "Choose your goal, your available time and your focus area. Your plan uses the lessons and practice already available for your level.":
     "Escolha seu objetivo, seu tempo disponível e sua área de foco. Seu plano usa as aulas e práticas já disponíveis para o seu nível.",

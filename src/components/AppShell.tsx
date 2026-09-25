@@ -33,7 +33,7 @@ import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/study-plan", label: "My Study Plan", icon: CalendarCheck },
+  { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/coach", label: "AI Talking", icon: MessageSquareText },
