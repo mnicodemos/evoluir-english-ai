@@ -69,7 +69,12 @@ describe("single ai_limits read", () => {
       reserveAiUsage({ userId: "u", operation: "tts", model: "m", limit: row }),
     ).rejects.toMatchObject({ status: 429, code: "daily_limit" });
     await expect(
-      reserveAiUsage({ userId: "u", operation: "tts", model: "m", limit: { ...row, enabled: false } }),
+      reserveAiUsage({
+        userId: "u",
+        operation: "tts",
+        model: "m",
+        limit: { ...row, enabled: false },
+      }),
     ).rejects.toMatchObject({ code: "operation_disabled" });
     limitRow = null;
     await expect(
