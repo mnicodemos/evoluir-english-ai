@@ -8,7 +8,7 @@ import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
 
-type Props = { userId: string; daysPerWeek?: number };
+type Props = { userId: string; daysPerWeek?: number; compact?: boolean };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
 const LABELS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -16,7 +16,7 @@ const LABELS_PT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 /** Weekly frequency strip: one tile per weekday of the current week.
  *  The trophy uses the student's configured weekly frequency, falling back to 7. */
-export function WeeklyFrequency({ userId, daysPerWeek }: Props) {
+export function WeeklyFrequency({ userId, daysPerWeek, compact = false }: Props) {
   const weeklyGoal = daysPerWeek ?? 7;
   const { lang } = useUiLang();
   const labels = lang === "pt" ? LABELS_PT : LABELS_EN;
@@ -58,9 +58,9 @@ export function WeeklyFrequency({ userId, daysPerWeek }: Props) {
   const daysLabel = lang === "pt" ? "dias" : "days";
 
   return (
-    <div className="flex h-full items-center gap-3">
+    <div className={cn("flex h-full items-center", compact ? "gap-2" : "gap-3")}>
       <div className="flex flex-col items-center gap-1.5">
-        <TrophyBadge active={allStudied} lang={lang} days={weeklyGoal} />
+        <TrophyBadge active={allStudied} lang={lang} days={weeklyGoal} compact={compact} />
         <div className="flex w-11 flex-col items-center text-center text-[10px] font-medium leading-tight text-muted-foreground">
           <span>{goalLabel}</span>
           <span>
@@ -94,7 +94,7 @@ export function WeeklyFrequency({ userId, daysPerWeek }: Props) {
   );
 }
 
-function TrophyBadge({ active, lang, days }: { active: boolean; lang: "pt" | "en"; days: number }) {
+function TrophyBadge({ active, lang, days, compact }: { active: boolean; lang: "pt" | "en"; days: number; compact: boolean }) {
   const unlockedText =
     lang === "pt" ? `Troféu de ${days} dias desbloqueado` : `${days}-day trophy unlocked`;
   const lockedText =
@@ -103,7 +103,8 @@ function TrophyBadge({ active, lang, days }: { active: boolean; lang: "pt" | "en
   return (
     <span
       className={cn(
-        "relative grid size-11 shrink-0 place-items-center self-center rounded-full shadow-lg transition-all duration-500",
+        "relative grid shrink-0 place-items-center self-center rounded-full shadow-lg transition-all duration-500",
+        compact ? "size-9" : "size-11",
         active
           ? "bg-gradient-to-br from-[oklch(0.90_0.15_95)] to-[oklch(0.68_0.15_80)] text-[oklch(0.45_0.10_80)] motion-safe:animate-pulse"
           : "bg-gradient-to-br from-[oklch(0.80_0.01_250)] to-[oklch(0.60_0.02_240)] text-[oklch(0.55_0.01_250)]"
@@ -112,7 +113,7 @@ function TrophyBadge({ active, lang, days }: { active: boolean; lang: "pt" | "en
       aria-label={active ? unlockedText : lockedText}
       title={active ? unlockedText : lockedText}
     >
-      <Trophy className="size-5" strokeWidth={2.5} />
+      <Trophy className={compact ? "size-4" : "size-5"} strokeWidth={2.5} />
     </span>
   );
 }

@@ -14,7 +14,15 @@ import { refreshAfterLevelChange } from "@/lib/refreshKeys";
  * Switching levels never erases progress: each level's course state is kept
  * (lessons are keyed per level), so coming back shows everything as left.
  */
-export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: string | null }) {
+export function LevelCard({
+  level,
+  maxLevel,
+  compact = false,
+}: {
+  level: string;
+  maxLevel?: string | null;
+  compact?: boolean;
+}) {
   const queryClient = useQueryClient();
   const [changing, setChanging] = useState(false);
   const current = findLevel(level);
@@ -47,14 +55,14 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
   };
 
   return (
-    <div className="card-soft flex h-full min-w-0 flex-col justify-center p-4">
+    <div className={cn("card-soft flex h-full min-w-0 flex-col justify-center", compact ? "p-3" : "p-4")}>
       <div className="flex items-center gap-4">
-        <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[oklch(0.92_0.05_240)]">
-          <GraduationCap className="size-6 text-[oklch(0.45_0.12_240)]" />
+        <span className={cn("grid shrink-0 place-items-center rounded-xl bg-accent", compact ? "size-9" : "size-12")}>
+          <GraduationCap className={cn("text-accent-foreground", compact ? "size-4" : "size-6")} />
         </span>
         <div className="flex-1 min-w-0">
-          <p className="truncate text-lg font-bold sm:text-base md:text-lg">{current.label}</p>
-          <p className="text-base text-muted-foreground sm:text-xs">
+          <p className={cn("truncate font-bold", compact ? "text-sm" : "text-lg sm:text-base md:text-lg")}>{current.label}</p>
+          <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-base sm:text-xs")}>
             <span>Your English level</span>
             <span> · </span>
             <span>{current.cefr}</span>
@@ -62,7 +70,7 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-6 gap-2">
+      <div className={cn("grid grid-cols-6", compact ? "mt-2 gap-1" : "mt-3 gap-2")}>
         {LEVELS.map((l, i) => {
           const locked = i > highestIndex;
           const active = i === currentIndex;
@@ -81,7 +89,8 @@ export function LevelCard({ level, maxLevel }: { level: string; maxLevel?: strin
                     : `Change to ${l.label}`
               }
               className={cn(
-                "flex h-10 w-full min-w-0 items-center justify-center gap-1 rounded-lg border px-1 text-xs font-semibold transition sm:text-sm",
+                "flex w-full min-w-0 items-center justify-center gap-1 rounded-lg border px-1 text-xs font-semibold transition sm:text-sm",
+                compact ? "h-6" : "h-10",
                 active && "border-transparent bg-success text-success-foreground",
                 conquered &&
                   "border-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
