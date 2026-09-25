@@ -105,7 +105,8 @@ export function AdminCostPerformance() {
           <p className="mt-3 text-xs text-muted-foreground">
             Observado: chamadas, tokens, latência, erros e HITs cumulativos do cache. Calculado:
             totais e médias. Estimado: custo e projeções somente quando todos os registros possuem
-            custo. First token, first chunk, retries, fallback e cache MISS: N/D.
+            custo. Provider: derivado do identificador do modelo registrado. First token, first
+            chunk, retries, fallback e cache MISS: N/D.
           </p>
           {query.data.truncated && (
             <p className="mt-1 text-xs text-muted-foreground">

@@ -118,7 +118,7 @@
 - [x] Gerar o novo lote do Vocabulary ao concluir uma lição e atualizar o ponto verde do Dashboard
 
 - [x] Fase 3B — Ativação do Dictionary Knowledge Cache concluída: TTL 315360000 aplicado (apenas dictionary), HIT real confirmado, pronúncia intocada, 449 testes OK.
-- [ ] Admin Panel — organizar Usuários, Consumo IA e Custo & Performance em abas independentes
+- [x] Admin Panel — organizar Usuários, Consumo IA e Custo & Performance em abas independentes
   - [ ] Preservar integralmente usuários e o módulo atual de consumo
   - [ ] Adicionar benchmark somente com dados confiáveis existentes e N/D para lacunas
   - [ ] Validar proteção administrativa, desktop e mobile sem alterar operações, limites ou banco
