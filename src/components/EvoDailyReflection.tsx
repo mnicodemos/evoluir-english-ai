@@ -51,12 +51,17 @@ export function EvoDailyReflection({
             <Sun className="size-5 text-warning" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-1 text-xs text-muted-foreground">“{reflection.thought[copy]}”</p>
+            <p className="line-clamp-1 text-xs text-muted-foreground">
+              “{reflection.thought[copy]}”
+            </p>
             <p className="mt-0.5 truncate text-[10px] text-muted-foreground/70">
               {reflection.reflection[copy]}
             </p>
           </div>
-          <div className="flex shrink-0 items-center gap-2 text-muted-foreground" aria-hidden="true">
+          <div
+            className="flex shrink-0 items-center gap-2 text-muted-foreground"
+            aria-hidden="true"
+          >
             <Share2 className="size-3.5" />
             <Target className="size-3.5" />
             <MoreVertical className="size-3.5" />
@@ -82,20 +87,10 @@ export function EvoDailyReflection({
           {`${greeting}${displayName ? `, ${displayName}` : ""}`}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">“{reflection.thought[copy]}”</p>
-        <p
-          className={
-            "mt-3 text-xs font-semibold uppercase text-muted-foreground"
-          }
-        >
+        <p className={"mt-3 text-xs font-semibold uppercase text-muted-foreground"}>
           {t("Daily reflection")}
         </p>
-        <p
-          className={
-            "mt-1 text-sm text-card-foreground"
-          }
-        >
-          {reflection.reflection[copy]}
-        </p>
+        <p className={"mt-1 text-sm text-card-foreground"}>{reflection.reflection[copy]}</p>
       </div>
     </aside>
   );

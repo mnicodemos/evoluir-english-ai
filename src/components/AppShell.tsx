@@ -195,10 +195,7 @@ function AppShellContent({
           </nav>
 
           <div
-            className={cn(
-              "flex gap-1",
-              dashboardLayout ? "items-center" : "flex-col items-center",
-            )}
+            className={cn("flex gap-1", dashboardLayout ? "items-center" : "flex-col items-center")}
           >
             {!dashboardLayout && (
               <>
@@ -206,22 +203,24 @@ function AppShellContent({
                 <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
               </>
             )}
-            {!dashboardLayout && <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={translate("Sign out")}
-                  className="size-10 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  onClick={signOut}
-                >
-                  <LogOut className="size-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={8}>
-                {translate("Sign out")}
-              </TooltipContent>
-            </Tooltip>}
+            {!dashboardLayout && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={translate("Sign out")}
+                    className="size-10 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    onClick={signOut}
+                  >
+                    <LogOut className="size-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8}>
+                  {translate("Sign out")}
+                </TooltipContent>
+              </Tooltip>
+            )}
             <ProfileMenu
               presentation={dashboardLayout ? "dashboard-sidebar" : "icon"}
               className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
