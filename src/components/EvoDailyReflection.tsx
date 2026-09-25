@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MoreVertical, Share2, Sun, Target, TreePine } from "lucide-react";
+import { Hand, MoreVertical, Share2, Sun, Target, TreePine } from "lucide-react";
 
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
@@ -39,8 +39,11 @@ export function EvoDailyReflection({
     return (
       <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.68fr)] lg:items-center">
         <div className="min-w-0">
-          <h1 className="truncate text-2xl font-bold text-foreground 2xl:text-3xl">
-            {greeting}, {displayName}! <span aria-hidden="true">👋</span>
+          <h1 className="flex min-w-0 items-center gap-2 text-2xl font-bold text-foreground 2xl:text-3xl">
+            <span className="truncate">
+              {greeting}, {displayName}!
+            </span>
+            <Hand className="size-5 shrink-0 text-warning" aria-hidden="true" />
           </h1>
           <p className="mt-1 truncate text-sm text-muted-foreground">
             {t("Great to have you back. Let's keep building your fluency.")}
