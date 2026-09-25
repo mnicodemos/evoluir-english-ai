@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Settings } from "lucide-react";
 import { useState } from "react";
 
+import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -62,7 +63,7 @@ export function AdminPanelButton({
           {showLabel && <span>{t("Admin panel")}</span>}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("Admin panel")}</DialogTitle>
           <DialogDescription>
@@ -100,6 +101,7 @@ export function AdminPanelButton({
             </table>
           </div>
         )}
+        <AdminAiUsage />
       </DialogContent>
     </Dialog>
   );

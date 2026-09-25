@@ -85,6 +85,8 @@ export const Route = createFileRoute("/api/coach-stream")({
           }, ms);
         };
         let settled = false;
+        // Token usage reported by the final "response.completed" event (observability only).
+        let usage: { inputTokens?: number; outputTokens?: number } | undefined;
         // Closes the usage record exactly once so the one-request-at-a-time
         // guard is released immediately, never waiting for the 90 s sweep.
         const settle = async (success: boolean, errorCode?: string, errorMessage?: string) => {
@@ -93,6 +95,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           settled = true;
           await finishAiUsage(ticket, {
             success,
+            ...(usage ?? {}),
             ...(errorCode ? { errorCode, errorMessage: errorMessage ?? errorCode } : {}),
           });
         };
@@ -150,6 +153,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           event: string,
         ) => {
           const parsedEvent = parseLovableEvent(event);
+          if (parsedEvent.usage) usage = parsedEvent.usage;
           if (parsedEvent.delta) {
             emittedText = true;
             send(controller, { type: "coach.text.delta", delta: parsedEvent.delta });
