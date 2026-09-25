@@ -132,7 +132,9 @@ function AppShellContent({
                     activeProps={{ className: "bg-sidebar-accent text-sidebar-foreground" }}
                   >
                     <item.icon className="size-5" />
-                    {dashboardLayout && <span className="truncate text-left">{translate(item.label)}</span>}
+                    {dashboardLayout && (
+                      <span className="truncate text-left">{translate(item.label)}</span>
+                    )}
                   </Link>
                 </TooltipTrigger>
                 {!dashboardLayout && (
@@ -144,7 +146,9 @@ function AppShellContent({
             ))}
           </nav>
 
-          <div className={cn("flex gap-1", dashboardLayout ? "items-center" : "flex-col items-center")}>
+          <div
+            className={cn("flex gap-1", dashboardLayout ? "items-center" : "flex-col items-center")}
+          >
             <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
             <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
             <Tooltip>

@@ -44,7 +44,11 @@ export function SmartReviewCard({
 
   if (isLoading) {
     return (
-      <section className={compact ? "card-soft h-full p-4" : "card-soft p-5"} aria-busy="true" aria-label={t("Smart review")}>
+      <section
+        className={compact ? "card-soft h-full p-4" : "card-soft p-5"}
+        aria-busy="true"
+        aria-label={t("Smart review")}
+      >
         <Skeleton className="h-5 w-40" />
         <Skeleton className="mt-3 h-4 w-64" />
       </section>
@@ -67,7 +71,9 @@ export function SmartReviewCard({
             <RotateCcw className="size-4 text-accent-foreground" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 id="smart-review-title" className="text-sm font-semibold">{t("Keep improving")}</h2>
+            <h2 id="smart-review-title" className="text-sm font-semibold">
+              {t("Keep improving")}
+            </h2>
             <p className="text-xs text-muted-foreground">{t("Worth recovering now")}</p>
           </div>
         </div>
@@ -75,14 +81,23 @@ export function SmartReviewCard({
           {items.slice(0, 2).map((item) => {
             const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
             return (
-              <li key={item.skill} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-t border-border pt-2 first:border-t-0 first:pt-0">
+              <li
+                key={item.skill}
+                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-t border-border pt-2 first:border-t-0 first:pt-0"
+              >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{skillLabel}</p>
-                  <p className="line-clamp-1 text-xs text-muted-foreground">{t(SMART_REVIEW_REASON_TEXT[item.category])}</p>
+                  <p className="line-clamp-1 text-xs text-muted-foreground">
+                    {t(SMART_REVIEW_REASON_TEXT[item.category])}
+                  </p>
                 </div>
                 <Button asChild variant="outline" size="sm">
                   {item.resource.params ? (
-                    <Link to="/learning/$lessonId" params={item.resource.params} aria-label={`${t("Review now")}: ${skillLabel}`}>
+                    <Link
+                      to="/learning/$lessonId"
+                      params={item.resource.params}
+                      aria-label={`${t("Review now")}: ${skillLabel}`}
+                    >
                       {t("Review now")}
                     </Link>
                   ) : (

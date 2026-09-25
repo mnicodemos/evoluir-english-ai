@@ -37,11 +37,13 @@ export function EvoDailyReflection({
 
   return (
     <aside
-      className={placement === "mobile-card"
-        ? "card-soft flex min-w-0 items-start gap-4 p-4 lg:hidden"
-        : placement === "dashboard-header"
-          ? "flex min-w-0 items-center gap-3"
-          : "hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex"}
+      className={
+        placement === "mobile-card"
+          ? "card-soft flex min-w-0 items-start gap-4 p-4 lg:hidden"
+          : placement === "dashboard-header"
+            ? "flex min-w-0 items-center gap-3"
+            : "hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex"
+      }
     >
       <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
         <TreePine className={`size-5 ${treeToneClass}`} aria-hidden="true" />
@@ -51,10 +53,22 @@ export function EvoDailyReflection({
           {`${greeting}${displayName ? `, ${displayName}` : ""}`}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">“{reflection.thought[copy]}”</p>
-        <p className={placement === "dashboard-header" ? "sr-only" : "mt-3 text-xs font-semibold uppercase text-muted-foreground"}>
+        <p
+          className={
+            placement === "dashboard-header"
+              ? "sr-only"
+              : "mt-3 text-xs font-semibold uppercase text-muted-foreground"
+          }
+        >
           {t("Daily reflection")}
         </p>
-        <p className={placement === "dashboard-header" ? "hidden" : "mt-1 text-sm text-card-foreground"}>{reflection.reflection[copy]}</p>
+        <p
+          className={
+            placement === "dashboard-header" ? "hidden" : "mt-1 text-sm text-card-foreground"
+          }
+        >
+          {reflection.reflection[copy]}
+        </p>
       </div>
     </aside>
   );
