@@ -114,3 +114,4 @@
 - [x] Mover o acesso ao painel administrativo para dentro da janela de perfil
 - [x] Sincronizar o indicador do Vocabulary com palavras realmente salvas e estados de erro
 - [x] Variar a cor da árvore da saudação por período do dia
+- [x] Exibir a saudação e a reflexão diária no espaço superior do Dashboard mobile

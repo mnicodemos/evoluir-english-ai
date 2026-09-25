@@ -14,6 +14,7 @@ import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { DailyGoalCard } from "@/components/DailyGoalCard";
+import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { getLeague, LeagueBadge } from "@/components/LeagueBadge";
 
 import { LevelCard } from "@/components/LevelCard";
@@ -202,6 +203,8 @@ function Dashboard() {
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} />
 
             <LevelCard level={profile.level} maxLevel={profile.max_level} />
+
+            <EvoDailyReflection userId={profile.id} name={profile.name} placement="mobile-card" />
           </div>
 
           <NextStepCard />
