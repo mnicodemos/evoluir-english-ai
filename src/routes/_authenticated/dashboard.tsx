@@ -118,7 +118,6 @@ function Dashboard() {
     },
     { to: "/writing", label: "Writing", icon: PenLine },
     { to: "/teacher", label: "AI Teacher", icon: Sparkles },
-    { to: "/study-plan", label: "My Study Plan", icon: CalendarCheck },
     { to: "/progress", label: "Progress", icon: LineChart },
   ] as const;
 
@@ -142,23 +141,25 @@ function Dashboard() {
           <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center">
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">{t("Welcome back")}</p>
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <h1 className="min-w-0 break-words text-2xl font-bold 2xl:text-3xl">
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-wrap">
+                <h1 className="min-w-0 truncate text-2xl font-bold 2xl:text-3xl">
                   {t("Hello")}, {profile.name || t("student")}
                 </h1>
-                <WandSparkles className="size-5 shrink-0 text-success" aria-hidden="true" />
-                {profile.plan === "premium" ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold text-warning-foreground">
-                    <Crown className="size-3.5 text-warning" /> Premium
-                  </span>
-                ) : (
-                  <Link
-                    to="/premium"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground/80 transition-colors hover:bg-accent"
-                  >
-                    <Crown className="size-3.5 text-warning" /> {t("Go Premium")}
-                  </Link>
-                )}
+                <div className="flex shrink-0 items-center gap-2">
+                  <WandSparkles className="size-5 shrink-0 text-success" aria-hidden="true" />
+                  {profile.plan === "premium" ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold text-warning-foreground">
+                      <Crown className="size-3.5 text-warning" /> Premium
+                    </span>
+                  ) : (
+                    <Link
+                      to="/premium"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground/80 transition-colors hover:bg-accent"
+                    >
+                      <Crown className="size-3.5 text-warning" /> {t("Go Premium")}
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
             <div className="card-soft hidden min-w-0 p-3 lg:block">
@@ -170,7 +171,7 @@ function Dashboard() {
             </div>
           </header>
 
-          <div className="order-1 grid min-w-0 gap-3 sm:grid-cols-2 lg:order-none lg:grid-cols-4">
+          <div className="order-5 grid min-w-0 gap-3 sm:grid-cols-2 lg:order-none lg:grid-cols-4">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
             <div className="card-soft flex min-w-0 flex-col justify-center p-3">
@@ -200,11 +201,11 @@ function Dashboard() {
             </div>
           </div>
 
-          <section className="order-2 min-h-[19rem] lg:order-none lg:min-h-[15rem] [@media(min-height:850px)]:lg:min-h-[19rem]">
+          <section className="order-1 min-h-[19rem] lg:order-none lg:min-h-[15rem] [@media(min-height:850px)]:lg:min-h-[19rem]">
             <NextStepCard compact />
           </section>
 
-          <div className="order-3 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
+          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
             <section
               className="card-soft min-w-0 p-3 lg:col-span-4"
               aria-labelledby="today-progress-title"
@@ -212,7 +213,7 @@ function Dashboard() {
               <h2 id="today-progress-title" className="text-sm font-semibold">
                 {t("Today's Progress")}
               </h2>
-              <div className="mt-3 grid grid-cols-4 gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {learningCards.map((card) => (
                   <div key={card.label} className="min-w-0 rounded-md bg-secondary p-2 text-center">
                     <span className="text-base" aria-hidden="true">
@@ -235,7 +236,7 @@ function Dashboard() {
           </div>
 
           <section
-            className="order-4 card-soft min-w-0 p-3 lg:order-none"
+            className="order-3 card-soft min-w-0 p-3 lg:order-none"
             aria-labelledby="quick-access-title"
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
@@ -270,7 +271,18 @@ function Dashboard() {
             </div>
           </section>
 
-          <div className="order-5 lg:hidden">
+          <Link
+            to="/study-plan"
+            className="order-4 grid min-h-14 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-border bg-card px-3 py-2 text-card-foreground shadow-[var(--shadow-soft)] transition-colors hover:bg-accent lg:hidden"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-secondary">
+              <CalendarCheck className="size-5 text-primary" aria-hidden="true" />
+            </span>
+            <span className="min-w-0 truncate text-sm font-semibold">{t("My Study Plan")}</span>
+            <ArrowRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          </Link>
+
+          <div className="order-6 lg:hidden">
             <EvoDailyReflection userId={profile.id} name={profile.name} placement="mobile-card" />
           </div>
         </div>
