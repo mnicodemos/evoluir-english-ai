@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import evoGuideOfficial from "@/assets/evo-guide-official.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
