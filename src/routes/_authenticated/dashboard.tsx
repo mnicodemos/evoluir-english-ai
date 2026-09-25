@@ -3,12 +3,14 @@ import {
   ArrowRight,
   BookOpen,
   Calendar,
+  CalendarCheck,
   Crown,
   GraduationCap,
   Headphones,
   LineChart,
   MessageSquareText,
   PenLine,
+  Sparkles,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -18,6 +20,7 @@ import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { getLeague, LeagueBadge } from "@/components/LeagueBadge";
 
 import { LevelCard } from "@/components/LevelCard";
+import { PathProgressCard } from "@/components/LearningPathCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
 
@@ -28,6 +31,7 @@ import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { getLevelState } from "@/lib/level";
+import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -89,6 +93,8 @@ function Dashboard() {
   const { data: profile, isLoading } = useProfile();
   const navigate = useNavigate();
   const { data: snapshot } = useStudySnapshot();
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const streakDays = profile ? effectiveStreak(profile) : 0;
 
@@ -96,51 +102,24 @@ function Dashboard() {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
   }, [profile, navigate]);
 
-  const trainingCards = [
+  const quickAccess = [
     {
       to: "/learning",
       label: "Learning Center",
-      text: "Lessons, videos, flashcards and quizzes",
       icon: GraduationCap,
-      className: "sm:col-span-2",
     },
+    { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
+    { to: "/listening", label: "Listening", icon: Headphones },
     {
       to: "/coach",
       label: "AI Talking",
-      text: "Speak and get a scored report",
       icon: MessageSquareText,
-      className: "xl:h-full",
     },
-    {
-      to: "/listening",
-      label: "Listening Lab",
-      text: "Train your ear with dictation drills",
-      icon: Headphones,
-      className: "xl:h-full",
-    },
-    {
-      to: "/writing",
-      label: "Writing",
-      text: "Correct any text instantly",
-      icon: PenLine,
-      className: "xl:h-full",
-    },
-    {
-      to: "/vocabulary",
-      label: "Vocabulary",
-      text: "Learn and review words",
-      icon: BookOpen,
-      className: "xl:h-full",
-    },
+    { to: "/writing", label: "Writing", icon: PenLine },
+    { to: "/teacher", label: "AI Teacher", icon: Sparkles },
+    { to: "/study-plan", label: "My Study Plan", icon: CalendarCheck },
+    { to: "/progress", label: "Progress", icon: LineChart },
   ] as const;
-
-  const historyCard = {
-    to: "/progress",
-    label: "My history",
-    text: "See how far you came",
-    icon: LineChart,
-    className: "sm:col-span-2",
-  } as const;
 
   const learningCards = [
     { emoji: "📚", label: "Lessons completed", value: `${snapshot?.lessonsCompleted ?? 0}` },
@@ -150,7 +129,7 @@ function Dashboard() {
   ];
 
   return (
-    <AppShell>
+    <AppShell dashboardLayout>
       {isLoading || !profile ? (
         <div className="space-y-4">
           <Skeleton className="h-10 w-56" />
@@ -158,39 +137,46 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="space-y-5 lg:space-y-6">
-          <header className="animate-rise">
-            <p className="text-sm text-muted-foreground">Welcome back</p>
-            <div className="flex min-w-0 flex-wrap items-center gap-3">
-              <h1 className="min-w-0 break-words text-3xl font-bold">
-                <span>Hello</span>, {profile.name || "student"} 👋
-              </h1>
+        <div className="dashboard-one-screen grid gap-3 lg:min-h-[calc(100vh-1.5rem)] lg:grid-rows-[auto_auto_minmax(19rem,1fr)_auto_auto]">
+          <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center">
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-muted-foreground">{t("Welcome back")}</p>
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <h1 className="min-w-0 break-words text-2xl font-bold 2xl:text-3xl">
+                  {t("Hello")}, {profile.name || t("student")} 👋
+                </h1>
               {profile.plan === "premium" ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[oklch(0.95_0.06_85)] px-3 py-1 text-xs font-semibold text-[oklch(0.45_0.12_75)]">
-                  <Crown className="size-3.5 text-[oklch(0.78_0.18_82)]" /> Premium
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold text-warning-foreground">
+                  <Crown className="size-3.5 text-warning" /> Premium
                 </span>
               ) : (
                 <Link
                   to="/premium"
                   className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground/80 transition-colors hover:bg-accent"
                 >
-                  <Crown className="size-3.5 text-[oklch(0.78_0.18_82)]" /> Go Premium
+                   <Crown className="size-3.5 text-warning" /> {t("Go Premium")}
                 </Link>
               )}
+              </div>
+            </div>
+            <div className="card-soft hidden min-w-0 p-3 lg:block">
+              <EvoDailyReflection userId={profile.id} name={profile.name} placement="dashboard-header" />
             </div>
           </header>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="card-soft flex min-w-0 flex-col justify-center p-5">
-              <div className="flex items-center gap-4">
-                <span className="grid size-12 place-items-center rounded-xl bg-[oklch(0.92_0.05_175)]">
-                  <Calendar className="size-6 text-[oklch(0.45_0.12_175)]" />
+          <div className="order-2 grid min-w-0 gap-3 sm:grid-cols-2 lg:order-none lg:grid-cols-4">
+            <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
+
+            <div className="card-soft flex min-w-0 flex-col justify-center p-3">
+              <div className="flex items-center gap-3">
+                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-success/15">
+                  <Calendar className="size-4 text-success" />
                 </span>
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-lg font-bold sm:text-base md:text-lg lg:text-2xl">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-base font-bold">
                     {streakDays} days
                   </p>
-                  <p className="text-base text-muted-foreground sm:text-sm">Study streak</p>
+                  <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
                   <NextLeagueStatus streakDays={streakDays} />
                 </div>
                 <LeagueBadge
@@ -200,92 +186,54 @@ function Dashboard() {
               </div>
             </div>
 
-            <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} />
-
-            <LevelCard level={profile.level} maxLevel={profile.max_level} />
-
-            <EvoDailyReflection userId={profile.id} name={profile.name} placement="mobile-card" />
+            <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
+            <div className="card-soft min-w-0 p-3">
+              <WeeklyFrequency userId={profile.id} daysPerWeek={profile.study_days_per_week ?? 7} compact />
+            </div>
           </div>
 
-          <NextStepCard />
+          <section className="order-1 min-h-[19rem] lg:order-none">
+            <NextStepCard compact />
+          </section>
 
-          <SmartReviewCard streakDays={streakDays} />
-
-          <div className="grid gap-5 xl:grid-cols-2 xl:grid-rows-2 xl:items-stretch">
-            <section className="min-w-0 xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:flex xl:flex-col">
-              <h2 className="text-lg font-semibold">Keep training</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-rows-[auto_7rem_7rem]">
-                {trainingCards.map((c) => {
-                  const hasNew = Boolean(
-                    (indicators as Record<string, boolean>)[c.to.replace("/", "")],
-                  );
-                  return (
-                    <Link
-                      key={`link-${c.to}`}
-                      to={c.to}
-                      className={`card-soft group relative flex min-h-20 items-center gap-4 p-4 transition-shadow hover:shadow-[var(--shadow-lift)] ${c.className ?? ""}`}
-                    >
-                      {hasNew && (
-                        <span className="absolute right-2 top-2 flex items-center gap-1">
-                          <span
-                            aria-hidden="true"
-                            className="size-2.5 rounded-full bg-[oklch(0.62_0.16_150)]"
-                          />
-                          <span className="sr-only">New activity available</span>
-                        </span>
-                      )}
-                      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-                        <c.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-medium">{c.label}</span>
-                        <span className="block text-sm text-muted-foreground">
-                          {c.text}
-                          {hasNew ? " · New" : ""}
-                        </span>
-                      </span>
-                      <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section className="grid min-w-0 gap-3 xl:col-start-1 xl:row-start-1 xl:grid-rows-[auto_1fr]">
-              <h2 className="text-lg font-semibold">Learning progress</h2>
-              <div className="grid grid-cols-2 gap-3 xl:h-full xl:grid-cols-4">
-                {learningCards.map((c) => (
-                  <div key={c.label} className="card-soft p-4 xl:h-full">
-                    <span className="text-xl">{c.emoji}</span>
-                    <p className="mt-1 text-xl font-bold">{c.value}</p>
-                    <p className="text-xs text-muted-foreground">{c.label}</p>
+          <div className="order-3 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
+            <section className="card-soft min-w-0 p-3 lg:col-span-4" aria-labelledby="today-progress-title">
+              <h2 id="today-progress-title" className="text-sm font-semibold">{t("Today's Progress")}</h2>
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                {learningCards.map((card) => (
+                  <div key={card.label} className="min-w-0 rounded-md bg-secondary p-2 text-center">
+                    <span className="text-base" aria-hidden="true">{card.emoji}</span>
+                    <p className="text-sm font-bold">{card.value}</p>
+                    <p className="line-clamp-2 text-[10px] text-muted-foreground">{t(card.label)}</p>
                   </div>
                 ))}
               </div>
             </section>
+            <div className="min-w-0 lg:col-span-4"><PathProgressCard compact /></div>
+            <div className="min-w-0 lg:col-span-4"><SmartReviewCard streakDays={streakDays} compact /></div>
+          </div>
 
-            <section className="grid min-w-0 gap-3 xl:col-start-1 xl:row-start-2 xl:grid-cols-2 xl:grid-rows-[auto_1fr]">
-              <h2 className="text-lg font-semibold">Performance</h2>
-              <Link
-                to={historyCard.to}
-                className="card-soft group flex h-full min-h-24 items-center gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)] xl:col-start-1 xl:row-start-2 xl:w-full"
-              >
-                <span className="grid size-11 place-items-center rounded-xl bg-secondary">
-                  <historyCard.icon className="size-5 text-[oklch(0.45_0.11_255)]" />
-                </span>
-                <span className="flex-1">
-                  <span className="block font-medium">{historyCard.label}</span>
-                  <span className="block text-sm text-muted-foreground">{historyCard.text}</span>
-                </span>
-                <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
-              </Link>
-              <div className="card-soft h-full w-full p-5 xl:col-start-2 xl:row-start-2">
-                <WeeklyFrequency
-                  userId={profile.id}
-                  daysPerWeek={profile.study_days_per_week ?? 7}
-                />
-              </div>
-            </section>
+          <section className="order-4 card-soft min-w-0 p-3 lg:order-none" aria-labelledby="quick-access-title">
+            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <h2 id="quick-access-title" className="text-sm font-semibold">{t("Quick Access")}</h2>
+              <ArrowRight className="size-4 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-8">
+              {quickAccess.map((item) => {
+                const hasNew = Boolean((indicators as Record<string, boolean>)[item.to.replace("/", "")]);
+                return (
+                  <Link key={item.to} to={item.to} className="group relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-border bg-background px-2 py-2 transition-colors hover:bg-accent">
+                    {hasNew && <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success"><span className="sr-only">{t("New activity available")}</span></span>}
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-secondary"><item.icon className="size-4 text-primary" /></span>
+                    <span className="truncate text-xs font-medium">{t(item.label)}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+
+          <div className="order-5 lg:hidden">
+            <EvoDailyReflection userId={profile.id} name={profile.name} placement="mobile-card" />
           </div>
         </div>
       )}
