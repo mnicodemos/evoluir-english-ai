@@ -28,16 +28,19 @@ import {
   useLesson,
   useUserFlashcards,
 } from "@/hooks/useLearning";
+import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
+import { vocabularyGenerationFailureKey } from "@/lib/activityIndicators";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
 import { formatVideoDuration, videoReviewPoints } from "@/lib/lessonVideoDisplay";
-import { finalizeLessonQuiz } from "@/lib/quizCompletion";
+import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { dailyWords } from "@/lib/vocabularyPlan.functions";
 
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
   head: () => ({
@@ -65,11 +68,13 @@ function LessonPage() {
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data, isLoading } = useLesson(lessonId);
   const { data: profile } = useProfile();
+  const { data: lessonRound } = useLessonRound();
   const { data: cardStates } = useUserFlashcards();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const minutesSpent = useTimeSpent();
   const saveQuizLegacy = useServerFn(persistQuizLegacy);
+  const generateVocabulary = useServerFn(dailyWords);
   useLogTimeOnExit({
     timer: minutesSpent,
     profile,
@@ -124,6 +129,7 @@ function LessonPage() {
 
   async function finishLesson(score: number, attemptKey: string) {
     if (!profile) return;
+    const wasAlreadyCompleted = !!data?.userLesson?.completed_at;
     const result = await finalizeLessonQuiz(score, {
       persistLegacy: async () => {
         // Lessons do not feed the Your progress bars: each bar comes from its own
@@ -152,8 +158,28 @@ function LessonPage() {
     queryClient.invalidateQueries({ queryKey: ["lesson-round"] });
     queryClient.invalidateQueries({ queryKey: ["daily-words"] });
     queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
+    queryClient.invalidateQueries({ queryKey: ["lesson", lessonId] });
 
     toast.success(`Lesson completed with ${score}%`);
+
+    // Only a newly completed lesson unlocks a batch. Generate it now so the
+    // Dashboard can advertise saved words before Vocabulary is ever opened.
+    if (lessonCompletionUnlocksVocabulary({ passed: result.passed, wasAlreadyCompleted })) {
+      const unlockedRound = lessonRound === undefined ? null : lessonRound + 1;
+      const failureKey =
+        unlockedRound === null ? null : vocabularyGenerationFailureKey(profile.id, unlockedRound);
+      try {
+        const words = await generateVocabulary({ data: { level: profile.level } });
+        if (failureKey) window.localStorage.removeItem(failureKey);
+        if (words.length > 0) {
+          await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
+        }
+      } catch {
+        if (failureKey) window.localStorage.setItem(failureKey, "1");
+        // Lesson completion remains authoritative. Vocabulary keeps its existing
+        // manual retry path when generation is temporarily unavailable.
+      }
+    }
   }
 
   if (isLoading || !lesson) {

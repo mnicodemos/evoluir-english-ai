@@ -115,3 +115,4 @@
 - [x] Sincronizar o indicador do Vocabulary com palavras realmente salvas e estados de erro
 - [x] Variar a cor da árvore da saudação por período do dia
 - [x] Exibir a saudação e a reflexão diária no espaço superior do Dashboard mobile
+- [x] Gerar o novo lote do Vocabulary ao concluir uma lição e atualizar o ponto verde do Dashboard

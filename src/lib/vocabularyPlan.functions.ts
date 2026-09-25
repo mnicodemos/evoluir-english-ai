@@ -198,7 +198,7 @@ export const dailyWords = createServerFn({ method: "POST" })
         );
       try {
         await new Promise((resolve) => setTimeout(resolve, 6_000));
-        fresh = selectNewWords(await askAi(exclude), usedWords, missing);
+        fresh = selectNewWords(await askAi(exclude, true), usedWords, missing);
       } catch {
         fresh = [];
       }

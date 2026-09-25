@@ -5,6 +5,14 @@ export type QuizCompletionDependencies = {
   completeLesson: () => Promise<void>;
 };
 
+/** A vocabulary batch is unlocked once, when a lesson first changes to completed. */
+export function lessonCompletionUnlocksVocabulary(input: {
+  passed: boolean;
+  wasAlreadyCompleted: boolean;
+}) {
+  return input.passed && !input.wasAlreadyCompleted;
+}
+
 export async function finalizeLessonQuiz(score: number, dependencies: QuizCompletionDependencies) {
   await dependencies.persistLegacy();
   const passed = score >= LESSON_QUIZ_PASS_SCORE;
