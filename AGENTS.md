@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Dashboard-only density and navigation styling must use opt-in presentation props on existing components, preserving their shared data and behavior.
+- The Dashboard Today's Focus must use `evo-dashboard-approved.png`, derived from the user-approved attachment; other EVO placements remain unchanged.

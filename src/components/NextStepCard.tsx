@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import evoGuideOfficial from "@/assets/evo-guide-official.png.asset.json";
+import evoDashboardApproved from "@/assets/evo-dashboard-approved.png";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
@@ -80,24 +80,20 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative min-w-0 overflow-hidden rounded-xl border border-brand-green/25 bg-sidebar px-4 py-3 text-sidebar-foreground shadow-[var(--shadow-soft)] sm:py-4"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse at 18% 60%, color-mix(in oklab, var(--brand-green) 22%, transparent), transparent 60%)",
-        }}
+        className="dashboard-focus relative min-w-0 overflow-hidden rounded-xl border border-brand-green/25 bg-sidebar px-4 py-3 text-sidebar-foreground shadow-[var(--shadow-soft)]"
         aria-label={t("Your next step")}
       >
-        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_7rem] gap-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-5 xl:grid-cols-[13rem_minmax(0,1fr)_minmax(13rem,0.62fr)]">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_7.5rem] gap-3 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-4 xl:grid-cols-[14rem_minmax(0,1fr)_minmax(13rem,0.62fr)]">
           <div
-            className="relative order-2 -mr-4 h-44 self-start sm:h-auto sm:self-stretch min-h-[9rem] sm:order-none sm:-my-4 sm:mr-0 sm:-ml-4"
+            className="relative order-2 -mr-4 h-44 self-end sm:order-none sm:-my-3 sm:mr-0 sm:-ml-4 sm:h-auto sm:min-h-[13rem] sm:self-stretch"
             aria-hidden="true"
           >
             <img
-              src={evoGuideOfficial.url}
+              src={evoDashboardApproved}
               alt=""
-              width={1273}
-              height={1236}
-              className="absolute inset-x-0 bottom-0 h-full w-full object-contain object-bottom drop-shadow-[0_8px_24px_color-mix(in_oklab,var(--brand-green)_35%,transparent)]"
+              width={1043}
+              height={838}
+              className="absolute inset-x-0 bottom-0 h-full w-full object-contain object-bottom"
             />
           </div>
 

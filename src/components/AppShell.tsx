@@ -113,7 +113,16 @@ function AppShellContent({
             )}
           >
             <Logo className={dashboardLayout ? "size-10 shrink-0" : "size-11"} />
-            {dashboardLayout && <BrandName className="min-w-0 text-sm" />}
+            {dashboardLayout && (
+              <span className="min-w-0 whitespace-nowrap leading-none">
+                <span className="block font-display text-base font-semibold">
+                  Evoluir<span className="text-brand-green">+</span>
+                </span>
+                <span className="mt-1 block text-[10px] font-semibold uppercase text-sidebar-foreground/70">
+                  English AI
+                </span>
+              </span>
+            )}
           </Link>
 
           <nav className={cn("flex flex-1 flex-col gap-1", dashboardLayout ? "mt-6" : "mt-8")}>
