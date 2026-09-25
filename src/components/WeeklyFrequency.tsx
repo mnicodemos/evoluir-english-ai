@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Check, Trophy } from "lucide-react";
+import { CalendarDays, Check, ChevronRight, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,8 +69,8 @@ export function WeeklyFrequency({
   if (presentation === "summary") {
     return (
       <div className="flex h-full min-w-0 items-center gap-3 px-3 py-2">
-        <span className="grid size-9 shrink-0 place-items-center rounded-md bg-warning/10">
-          <Trophy className="size-5 text-warning" strokeWidth={2.5} />
+        <span className="grid size-11 shrink-0 place-items-center rounded-md bg-warning/10">
+          <Trophy className="size-7 fill-warning text-warning" strokeWidth={2} />
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-bold">
@@ -80,6 +80,7 @@ export function WeeklyFrequency({
             {lang === "pt" ? "Esta semana" : "This week"}
           </p>
         </div>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
       </div>
     );
   }
@@ -92,7 +93,7 @@ export function WeeklyFrequency({
       <section className="card-soft h-full min-w-0 p-3" aria-labelledby="weekly-rhythm-title">
         <div className="flex items-center gap-2">
           <span className="grid size-8 place-items-center rounded-md bg-dashboard-cyan/10">
-            <Trophy className="size-4 text-dashboard-cyan" />
+            <CalendarDays className="size-4 text-dashboard-cyan" />
           </span>
           <h2 id="weekly-rhythm-title" className="text-sm font-semibold">
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}

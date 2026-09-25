@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Hourglass } from "lucide-react";
+import { Check, CircleDotDashed, Hourglass } from "lucide-react";
 
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,14 +48,18 @@ export function DailyGoalCard({
         compact ? "px-3 py-2" : "card-soft p-5",
       )}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <span
           className={cn(
             "grid shrink-0 place-items-center rounded-md bg-success/10",
-            compact ? "size-9" : "size-12",
+            compact ? "size-11" : "size-12",
           )}
         >
-          <Hourglass className={cn(compact ? "size-5 text-success" : "size-6 text-warning")} />
+          {compact ? (
+            <CircleDotDashed className="size-7 text-brand-green" strokeWidth={3} />
+          ) : (
+            <Hourglass className="size-6 text-warning" />
+          )}
         </span>
         <div className="min-w-0 flex-1">
           <p
@@ -73,6 +77,11 @@ export function DailyGoalCard({
             Your daily goal
           </p>
         </div>
+        {compact && done >= goalMinutes && (
+          <span className="grid size-5 shrink-0 place-items-center rounded-full bg-brand-green text-primary-foreground">
+            <Check className="size-3" strokeWidth={3} />
+          </span>
+        )}
       </div>
       <Progress
         value={percent}

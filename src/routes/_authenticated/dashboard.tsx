@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
-  BarChart3,
   Bolt,
   BookOpen,
   CalendarCheck,
-  CheckCircle2,
+  Check,
+  ChevronRight,
   Flame,
   GraduationCap,
   Headphones,
@@ -108,16 +108,18 @@ function Dashboard() {
           <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[5.25rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
-            <div className="flex min-w-0 flex-col justify-center px-3 py-2">
-              <div className="flex items-center gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
-                  <Flame className="size-5 text-dashboard-coral" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-bold">{streakDays} days</p>
-                  <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
-                </div>
+            <div className="flex min-w-0 items-center gap-3 px-3 py-2">
+              <span className="grid size-11 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
+                <Flame
+                  className="size-7 fill-dashboard-coral text-dashboard-coral"
+                  strokeWidth={1.8}
+                />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-base font-bold">{streakDays} days</p>
+                <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
               </div>
+              <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
             </div>
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
@@ -137,10 +139,13 @@ function Dashboard() {
               aria-labelledby="today-progress-title"
             >
               <div className="flex items-center gap-2">
-                <BarChart3 className="size-4 text-dashboard-cyan" />
+                <span className="grid size-6 place-items-center rounded-sm border border-dashboard-cyan text-dashboard-cyan">
+                  <Flame className="size-4" />
+                </span>
                 <h2 id="today-progress-title" className="text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
+                <ChevronRight className="ml-auto size-4 text-muted-foreground" aria-hidden="true" />
               </div>
               <div className="mt-3 grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:grid-cols-[6rem_minmax(0,1fr)]">
                 <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:mx-0">
@@ -187,7 +192,9 @@ function Dashboard() {
                       key={card.label}
                       className="grid min-w-0 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-2"
                     >
-                      <CheckCircle2 className="size-5 text-brand-green" aria-hidden="true" />
+                      <span className="grid size-5 place-items-center rounded-full bg-brand-green text-primary-foreground">
+                        <Check className="size-3" strokeWidth={3} aria-hidden="true" />
+                      </span>
                       <p className="line-clamp-2 text-[10px] text-muted-foreground">
                         <span className="font-bold text-foreground">{card.value}</span>{" "}
                         {t(card.label)}
@@ -221,12 +228,14 @@ function Dashboard() {
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="flex items-center gap-2">
-                <Bolt className="size-5 fill-warning text-warning" aria-hidden="true" />
+                <span className="grid size-7 place-items-center rounded-sm bg-warning text-warning-foreground">
+                  <Bolt className="size-5 fill-warning-foreground" aria-hidden="true" />
+                </span>
                 <h2 id="quick-access-title" className="text-sm font-semibold">
                   {t("Quick Access")}
                 </h2>
               </div>
-              <ArrowRight className="size-4 text-muted-foreground" aria-hidden="true" />
+              <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
               {quickAccess.map((item) => {
