@@ -148,7 +148,11 @@ function Dashboard() {
             </div>
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
-            <WeeklyFrequency userId={profile.id} daysPerWeek={profile.study_days_per_week ?? 7} presentation="summary" />
+            <WeeklyFrequency
+              userId={profile.id}
+              daysPerWeek={profile.study_days_per_week ?? 7}
+              presentation="summary"
+            />
           </div>
 
           <div className="order-1 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
@@ -167,27 +171,56 @@ function Dashboard() {
               </div>
               <div className="mt-3 grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:grid-cols-[6rem_minmax(0,1fr)]">
                 <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:mx-0">
-                  <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 96 96" aria-hidden="true">
-                    <circle cx="48" cy="48" r="39" fill="none" stroke="var(--secondary)" strokeWidth="10" />
-                    <circle cx="48" cy="48" r="39" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeDasharray={2 * Math.PI * 39} strokeDashoffset={2 * Math.PI * 39 * (1 - Math.min(1, minutesToday / Math.max(profile.daily_minutes, 1)))} />
+                  <svg
+                    className="absolute inset-0 size-full -rotate-90"
+                    viewBox="0 0 96 96"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="48"
+                      cy="48"
+                      r="39"
+                      fill="none"
+                      stroke="var(--secondary)"
+                      strokeWidth="10"
+                    />
+                    <circle
+                      cx="48"
+                      cy="48"
+                      r="39"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="10"
+                      strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 39}
+                      strokeDashoffset={
+                        2 *
+                        Math.PI *
+                        39 *
+                        (1 - Math.min(1, minutesToday / Math.max(profile.daily_minutes, 1)))
+                      }
+                    />
                   </svg>
                   <span className="relative text-center text-xl font-bold leading-none text-foreground">
                     {minutesToday}
-                    <span className="mt-1 block text-[10px] font-medium text-muted-foreground">min</span>
+                    <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
+                      min
+                    </span>
                   </span>
                 </div>
                 <div className="grid gap-2">
-                {learningCards.map((card) => (
-                  <div
-                    key={card.label}
-                    className="grid min-w-0 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-2"
-                  >
-                    <CheckCircle2 className="size-5 text-brand-green" aria-hidden="true" />
-                    <p className="line-clamp-2 text-[10px] text-muted-foreground">
-                      <span className="font-bold text-foreground">{card.value}</span> {t(card.label)}
-                    </p>
-                  </div>
-                ))}
+                  {learningCards.map((card) => (
+                    <div
+                      key={card.label}
+                      className="grid min-w-0 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-2"
+                    >
+                      <CheckCircle2 className="size-5 text-brand-green" aria-hidden="true" />
+                      <p className="line-clamp-2 text-[10px] text-muted-foreground">
+                        <span className="font-bold text-foreground">{card.value}</span>{" "}
+                        {t(card.label)}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </section>
@@ -201,7 +234,11 @@ function Dashboard() {
               <SmartReviewCard streakDays={streakDays} compact />
             </div>
             <div className="min-w-0 lg:col-span-3">
-              <WeeklyFrequency userId={profile.id} daysPerWeek={profile.study_days_per_week ?? 7} presentation="dashboard-panel" />
+              <WeeklyFrequency
+                userId={profile.id}
+                daysPerWeek={profile.study_days_per_week ?? 7}
+                presentation="dashboard-panel"
+              />
             </div>
           </div>
 
