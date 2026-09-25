@@ -83,6 +83,8 @@ export type AiLimitRow = {
   max_concurrent: number;
   enabled: boolean;
   cache_ttl_seconds: number;
+  /** NULL = no global limit (default for every operation). */
+  global_max_concurrent: number | null;
 };
 
 /** Single read of the operation's ai_limits row (limits + cache TTL). Null on failure. */
@@ -91,7 +93,7 @@ export async function loadAiLimit(operation: AiOperation): Promise<AiLimitRow | 
   const { data, error } = await db
     .from("ai_limits")
     .select(
-      "daily_limit, monthly_limit, premium_daily_limit, premium_monthly_limit, min_interval_seconds, max_concurrent, enabled, cache_ttl_seconds",
+      "daily_limit, monthly_limit, premium_daily_limit, premium_monthly_limit, min_interval_seconds, max_concurrent, enabled, cache_ttl_seconds, global_max_concurrent",
     )
     .eq("operation", operation)
     .maybeSingle();
@@ -135,6 +137,7 @@ export async function reserveAiUsage(input: {
     p_premium_monthly_limit: limit.premium_monthly_limit,
     p_min_interval_seconds: limit.min_interval_seconds,
     p_max_concurrent: limit.max_concurrent,
+    p_global_max_concurrent: limit.global_max_concurrent ?? undefined,
   });
   const reservation = data?.[0];
   if (error || !reservation)
@@ -149,6 +152,7 @@ export async function reserveAiUsage(input: {
       monthly_limit: "You reached this month's AI limit.",
       concurrent_limit: "Another AI request is already running. Please wait a moment.",
       rate_limit: "Please wait a moment before trying again.",
+      global_concurrency_limit: "O serviço está ocupado no momento. Tente novamente em instantes.",
     };
     throw new AiUsageError(
       429,
