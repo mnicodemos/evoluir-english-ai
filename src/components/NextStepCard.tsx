@@ -85,7 +85,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         <div className="grid min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[18rem_minmax(0,1fr)_minmax(11rem,0.62fr)]">
           <div
-            className="relative min-h-[18rem] overflow-hidden self-stretch sm:min-h-[13.5rem]"
+            className="relative min-h-[18rem] overflow-hidden self-stretch sm:min-h-[13.5rem] lg:min-h-[10.5rem]"
             aria-hidden="true"
           >
             <img
@@ -171,12 +171,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/30 bg-sidebar-accent/45 p-3 xl:col-span-1 xl:m-4 xl:ml-0 xl:self-center">
+          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/30 bg-sidebar-accent/45 p-3 xl:col-span-1 xl:m-2 xl:ml-0 xl:self-center">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
             </div>
-            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80">
+            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2 xl:gap-1">
               {cefrLevel && (
                 <li className="flex items-start gap-2">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
