@@ -13,3 +13,4 @@
 
 - Dashboard-only density and navigation styling must use opt-in presentation props on existing components, preserving their shared data and behavior.
 - The Dashboard Today's Focus must use the complete, unedited `Evo_novo_Dashboard.jpg` attachment through its CDN pointer; never remove its background, and keep it left of the text on mobile. Other EVO placements remain unchanged.
+- Dashboard visual tokens and dark surfaces stay scoped under `dashboard-shell`; this preserves the shared light/dark presentation of every other authenticated page.

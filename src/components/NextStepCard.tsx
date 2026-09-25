@@ -80,7 +80,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative min-w-0 overflow-hidden rounded-lg border border-brand-green/25 bg-sidebar text-sidebar-foreground shadow-[var(--shadow-soft)]"
+        className="dashboard-focus relative min-w-0 overflow-hidden rounded-lg border border-brand-green/30 bg-sidebar text-sidebar-foreground shadow-[var(--shadow-soft)]"
         aria-label={t("Your next step")}
       >
         <div className="grid min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[18rem_minmax(0,1fr)_minmax(11rem,0.62fr)]">
@@ -171,7 +171,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/30 bg-sidebar-accent/45 p-3 xl:col-span-1 xl:m-2 xl:ml-0 xl:self-center">
+          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 xl:col-span-1 xl:m-2 xl:ml-0 xl:self-center">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>

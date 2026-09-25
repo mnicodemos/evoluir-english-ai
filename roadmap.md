@@ -108,6 +108,7 @@
 - [x] Dashboard — diferenciar as três ações, padronizar botões e ampliar Study Streak no desktop
 - [x] Ajuste final do Dashboard — aplicar a nova EVO anexada, fixar a marca em duas linhas e validar 1280×800/mobile
 - [x] Correção visual do Dashboard — usar a EVO anexada completa, fundo escuro e composição fiel à referência em desktop/mobile
+- [x] Fidelidade visual do Dashboard — aplicar a paleta, superfícies, sombras, contadores e atalhos do Dashboard-2.jpg sem alterar comportamento
 
 - [x] Fase — Vocabulary performance (a)+(b) e botão "✓ That's OK"
   - Palavras salvas carregam sem IA; geração em segundo plano; falha memorizada por lote, com "Tentar novamente" manual
