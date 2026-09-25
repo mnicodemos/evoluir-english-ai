@@ -164,9 +164,7 @@ export function aggregateCostPerformance(
         avgMs: durations.length
           ? Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length)
           : null,
-        totalDurationMs: durations.length
-          ? durations.reduce((sum, value) => sum + value, 0)
-          : null,
+        totalDurationMs: durations.length ? durations.reduce((sum, value) => sum + value, 0) : null,
         medianMs: percentile(durations, 0.5),
         p95Ms: percentile(durations, 0.95),
         errors: groupRows.filter((row) => row.success === false).length,

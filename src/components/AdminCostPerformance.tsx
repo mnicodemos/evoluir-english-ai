@@ -26,7 +26,7 @@ export function AdminCostPerformance() {
     retry: false,
     staleTime: Infinity,
   });
-  const rows = query.data?.comparisons ?? [];
+  const rows = useMemo(() => query.data?.comparisons ?? [], [query.data?.comparisons]);
   const operationOptions = useMemo(
     () => [...new Map(rows.map((row) => [row.operation, row.label])).entries()],
     [rows],
@@ -83,7 +83,9 @@ export function AdminCostPerformance() {
           >
             <option value="all">Todas</option>
             {operationOptions.map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
+              <option key={value} value={value}>
+                {label}
+              </option>
             ))}
           </select>
         </label>
@@ -97,7 +99,11 @@ export function AdminCostPerformance() {
             <option value="all">Todos</option>
             {providerModelOptions.map((value) => {
               const [provider, model] = value.split("\u0000");
-              return <option key={value} value={value}>{provider} · {model}</option>;
+              return (
+                <option key={value} value={value}>
+                  {provider} · {model}
+                </option>
+              );
             })}
           </select>
         </label>

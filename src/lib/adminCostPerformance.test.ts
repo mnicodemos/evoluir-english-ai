@@ -51,7 +51,7 @@ describe("aggregateCostPerformance", () => {
       totalTokens: 15,
       tokenCoverage: 1,
       cacheHits: 4,
-      cacheMisses: null,
+      cacheMisses: 2,
       firstChunkMs: null,
       retries: null,
       medianMs: null,
@@ -100,16 +100,18 @@ describe("aggregateCostPerformance", () => {
 
   it("does not falsely attribute the historical transcription provider", () => {
     const result = aggregateCostPerformance(
-      [{
-        operation: "transcription",
-        model: "gemini-3.5-flash-lite",
-        success: true,
-        duration_ms: 500,
-        input_tokens: null,
-        output_tokens: null,
-        estimated_cost: null,
-        error_code: null,
-      }],
+      [
+        {
+          operation: "transcription",
+          model: "gemini-3.5-flash-lite",
+          success: true,
+          duration_ms: 500,
+          input_tokens: null,
+          output_tokens: null,
+          estimated_cost: null,
+          error_code: null,
+        },
+      ],
       [],
     );
     expect(result.comparisons[0]?.provider).toBe("N/D — provider não registrado");
