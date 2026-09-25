@@ -42,15 +42,20 @@ export function DailyGoalCard({
   const percent = goalMinutes > 0 ? Math.min(100, Math.round((done / goalMinutes) * 100)) : 0;
 
   return (
-    <div className={cn("card-soft flex min-w-0 flex-col justify-center", compact ? "p-3" : "p-5")}>
+    <div
+      className={cn(
+        "flex min-w-0 flex-col justify-center",
+        compact ? "px-3 py-2" : "card-soft p-5",
+      )}
+    >
       <div className="flex items-center gap-4">
         <span
           className={cn(
-            "grid shrink-0 place-items-center rounded-xl bg-warning/15",
+            "grid shrink-0 place-items-center rounded-md bg-success/10",
             compact ? "size-9" : "size-12",
           )}
         >
-          <Hourglass className={cn("text-warning", compact ? "size-4" : "size-6")} />
+          <Hourglass className={cn(compact ? "size-5 text-success" : "size-6 text-warning")} />
         </span>
         <div className="min-w-0 flex-1">
           <p
@@ -69,7 +74,10 @@ export function DailyGoalCard({
           </p>
         </div>
       </div>
-      <Progress value={percent} className={cn("h-2", compact ? "mt-2" : "mt-4")} />
+      <Progress
+        value={percent}
+        className={cn("h-2", compact ? "mt-1.5 [&>div]:bg-brand-green" : "mt-4")}
+      />
       <p
         className={cn(
           "mt-2 text-xs",
