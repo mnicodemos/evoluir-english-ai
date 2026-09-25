@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Camera, Loader2, UserRound } from "lucide-react";
+import { Camera, Loader2, Settings, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
 
@@ -72,7 +72,13 @@ function useAvatarUrl(path?: string | null) {
   });
 }
 
-export function ProfileMenu({ className }: { className?: string }) {
+export function ProfileMenu({
+  className,
+  presentation = "icon",
+}: {
+  className?: string;
+  presentation?: "icon" | "dashboard-sidebar";
+}) {
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
   const { data: profile } = useProfile();
@@ -170,16 +176,34 @@ export function ProfileMenu({ className }: { className?: string }) {
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
+          size={presentation === "dashboard-sidebar" ? "default" : "icon"}
           aria-label={translate("Edit profile", lang)}
-          className={cn("size-10 rounded-lg p-0 text-sidebar-foreground/70", className)}
+          className={cn(
+            presentation === "dashboard-sidebar"
+              ? "h-auto w-full justify-start gap-2 rounded-none border-t border-sidebar-border px-1 pt-3 pb-0 text-sidebar-foreground hover:bg-transparent"
+              : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
+            className,
+          )}
         >
-          <Avatar className="size-8 border border-border bg-muted">
+          <Avatar className="size-8 shrink-0 border border-border bg-muted">
             <AvatarImage src={photo} alt={displayName} className="object-cover" />
             <AvatarFallback className="bg-accent text-[11px] font-bold text-accent-foreground">
               {profile ? initials(profile.name, profile.email) : <UserRound className="size-4" />}
             </AvatarFallback>
           </Avatar>
+          {presentation === "dashboard-sidebar" && (
+            <>
+              <span className="min-w-0 flex-1 text-left">
+                <span className="block truncate text-xs font-semibold text-sidebar-foreground">
+                  {displayName.split(/\s+/)[0]}
+                </span>
+                <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
+                  {profile?.plan === "premium" ? "Premium" : translate("Profile", lang)}
+                </span>
+              </span>
+              <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
+            </>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
