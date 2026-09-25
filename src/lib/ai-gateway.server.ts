@@ -16,7 +16,14 @@ export class AiError extends Error {
 export async function callGateway(
   messages: Msg[],
   jsonMode = false,
-  usage?: { userId: string; operation: AiOperation },
+  usage?: {
+    userId: string;
+    operation: AiOperation;
+    /** Stable, user-independent cache key (default: hash of the messages). */
+    cacheKey?: string;
+    /** The caller already looked this key up and missed; skip the second read. */
+    cacheChecked?: boolean;
+  },
   signal?: AbortSignal,
 ): Promise<string> {
   const {
@@ -32,10 +39,12 @@ export async function callGateway(
   const GEMINI_TEXT_MODEL = lovable ? lovable.LOVABLE_TALKING_MODEL : geminiModel;
   const usageTools = usage ? await import("./ai-usage.server") : null;
   const requestHash = usageTools ? await usageTools.hashAiRequest({ messages, jsonMode }) : "";
+  const cacheKey = usage?.cacheKey ?? requestHash;
   // One ai_limits read per call: TTL comes from it and reserveAiUsage reuses it.
   const limitRow = usage && usageTools ? await usageTools.loadAiLimit(usage.operation) : null;
   const ttl = limitRow?.cache_ttl_seconds ?? 0;
-  const cached = ttl > 0 && usageTools ? await usageTools.readAiCache(requestHash) : null;
+  const cached =
+    ttl > 0 && usageTools && !usage?.cacheChecked ? await usageTools.readAiCache(cacheKey) : null;
   if (cached !== null) return cached;
   const ticket =
     usage && usageTools
@@ -91,7 +100,7 @@ export async function callGateway(
 
   if (usage && usageTools && ttl > 0) {
     await usageTools.writeAiCache({
-      cacheKey: requestHash,
+      cacheKey,
       operation: usage.operation,
       model: GEMINI_TEXT_MODEL,
       responseText: text,

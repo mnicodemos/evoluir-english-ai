@@ -19,6 +19,37 @@ export type DictionaryEntry = {
   sourceUrl: string;
 };
 
+type RawMeaning = {
+  partOfSpeech?: string;
+  context?: string;
+  definition?: string;
+  translations?: string[];
+  example?: { en?: string; pt?: string } | null;
+};
+
+/** Turns the model's JSON into meanings (same rules for fresh and cached answers). */
+export function meaningsFromRaw(raw: string): DictionaryEntry["meanings"] {
+  const parsed = parseJson<{ meanings?: RawMeaning[] }>(raw, {});
+  return (parsed.meanings ?? [])
+    .filter((m) => m.definition || (m.translations && m.translations.length > 0))
+    .slice(0, 5)
+    .map((m) => ({
+      partOfSpeech: m.partOfSpeech ?? null,
+      context: m.context ?? null,
+      definition: String(m.definition ?? ""),
+      translations: (m.translations ?? []).filter(Boolean).slice(0, 6),
+      example:
+        m.example && m.example.en && m.example.pt
+          ? { en: String(m.example.en), pt: String(m.example.pt) }
+          : null,
+    }));
+}
+
+/** Shared (not per-user) cache key: the normalized term only, versioned. */
+export function dictionaryCacheKey(term: string): string {
+  return `dictionary:v1:${term.replace(/\s+/g, " ").trim().toLowerCase()}`;
+}
+
 function decode(text: string) {
   return text
     .replace(/<!--\s*-->/g, "")
@@ -79,6 +110,16 @@ export const lookupWord = createServerFn({ method: "GET" })
     };
     if (term.length < 2) return empty;
 
+    // Shared cache first: a HIT skips the Reverso fetch, the AI call and the usage reservation.
+    const cacheKey = dictionaryCacheKey(term);
+    const { readAiCache } = await import("./ai-usage.server");
+    const cachedRaw = await readAiCache(cacheKey);
+    if (cachedRaw !== null) {
+      const cachedMeanings = meaningsFromRaw(cachedRaw);
+      if (cachedMeanings.length > 0)
+        return { found: true, word: term, ipaUs: null, ipaUk: null, meanings: cachedMeanings, sourceUrl };
+    }
+
     let translations: string[] = [];
     let pairs: { en: string; pt: string }[] = [];
 
@@ -119,31 +160,10 @@ export const lookupWord = createServerFn({ method: "GET" })
           },
         ],
         true,
-        { userId: context.userId, operation: "dictionary" },
+        { userId: context.userId, operation: "dictionary", cacheKey, cacheChecked: true },
       );
       {
-        const parsed = parseJson<{
-          meanings?: {
-            partOfSpeech?: string;
-            context?: string;
-            definition?: string;
-            translations?: string[];
-            example?: { en?: string; pt?: string } | null;
-          }[];
-        }>(raw, {});
-        const meanings = (parsed.meanings ?? [])
-          .filter((m) => m.definition || (m.translations && m.translations.length > 0))
-          .slice(0, 5)
-          .map((m) => ({
-            partOfSpeech: m.partOfSpeech ?? null,
-            context: m.context ?? null,
-            definition: String(m.definition ?? ""),
-            translations: (m.translations ?? []).filter(Boolean).slice(0, 6),
-            example:
-              m.example && m.example.en && m.example.pt
-                ? { en: String(m.example.en), pt: String(m.example.pt) }
-                : null,
-          }));
+        const meanings = meaningsFromRaw(raw);
         if (meanings.length > 0) {
           return { found: true, word: term, ipaUs: null, ipaUk: null, meanings, sourceUrl };
         }
