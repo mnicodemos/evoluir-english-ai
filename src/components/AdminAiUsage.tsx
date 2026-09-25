@@ -78,6 +78,7 @@ export function AdminAiUsage() {
                   <th className="pr-2">Max</th>
                   <th className="pr-2">Tokens in</th>
                   <th className="pr-2">Tokens out</th>
+                  <th className="pr-2">Global limit</th>
                   <th className="pr-2">Streaming</th>
                   <th className="pr-2">Provider / path</th>
                   <th>Top errors</th>
@@ -108,6 +109,7 @@ export function AdminAiUsage() {
                       )}
                     </td>
                     <td className="pr-2">{fmtN(o.outputTokens)}</td>
+                    <td className="pr-2">{o.globalMaxConcurrent ?? "Sem limite"}</td>
                     <td className="pr-2">{o.streaming ?? ND}</td>
                     <td className="pr-2">
                       {o.path ?? ND}

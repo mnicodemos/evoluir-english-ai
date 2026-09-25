@@ -183,6 +183,13 @@
       "when": 1790081474926,
       "tag": "0025_widen_pedagogical_source_types",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1790337309517,
+      "tag": "0026_ai_limits_global_max_concurrent",
+      "breakpoints": true
     }
   ]
 }

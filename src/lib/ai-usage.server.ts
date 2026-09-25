@@ -83,6 +83,8 @@ export type AiLimitRow = {
   max_concurrent: number;
   enabled: boolean;
   cache_ttl_seconds: number;
+  /** NULL = no global limit (default for every operation). */
+  global_max_concurrent: number | null;
 };
 
 /** Single read of the operation's ai_limits row (limits + cache TTL). Null on failure. */
@@ -91,7 +93,7 @@ export async function loadAiLimit(operation: AiOperation): Promise<AiLimitRow | 
   const { data, error } = await db
     .from("ai_limits")
     .select(
-      "daily_limit, monthly_limit, premium_daily_limit, premium_monthly_limit, min_interval_seconds, max_concurrent, enabled, cache_ttl_seconds",
+      "daily_limit, monthly_limit, premium_daily_limit, premium_monthly_limit, min_interval_seconds, max_concurrent, enabled, cache_ttl_seconds, global_max_concurrent",
     )
     .eq("operation", operation)
     .maybeSingle();
@@ -125,6 +127,10 @@ export async function reserveAiUsage(input: {
     );
 
   const { data, error } = await db.rpc("reserve_ai_usage", {
+    // Sent only when configured; NULL/absent = no global limit (previous behavior).
+    ...(limit.global_max_concurrent != null
+      ? { p_global_max_concurrent: limit.global_max_concurrent }
+      : {}),
     p_user_id: input.userId,
     p_operation: input.operation,
     p_model: input.model,
@@ -149,6 +155,7 @@ export async function reserveAiUsage(input: {
       monthly_limit: "You reached this month's AI limit.",
       concurrent_limit: "Another AI request is already running. Please wait a moment.",
       rate_limit: "Please wait a moment before trying again.",
+      global_concurrency_limit: "O serviço está ocupado no momento. Tente novamente em instantes.",
     };
     throw new AiUsageError(
       429,
