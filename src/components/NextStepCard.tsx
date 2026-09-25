@@ -80,7 +80,7 @@ export function NextStepCard() {
     <section className="card-soft p-5" aria-label={t("Your next step")}>
       <div className="grid min-w-0 lg:grid-cols-2 lg:gap-x-0">
         <div className="lg:pr-6">
-          <EvoGuide title={t("Your next step is here.")} imageSize="lesson" />
+          <EvoGuide title={t("Your focus is here. Get started now!")} imageSize="lesson" />
         </div>
         <EvoDailyReflection userId={profile?.id ?? "student"} name={profile?.name ?? ""} />
       </div>

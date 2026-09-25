@@ -19,7 +19,7 @@ export const uiPt: Record<string, string> = {
   Level: "Nível",
   Focus: "Foco",
   "Your next step": "Seu próximo passo",
-  "Your next step is here.": "Seu próximo passo está aqui.",
+  "Your focus is here. Get started now!": "Seu foco está aqui. Comece agora!",
   "How to practise": "Como praticar",
   "EVO Daily Reflection": "Reflexão diária da EVO",
   "Daily reflection": "Reflexão do dia",
