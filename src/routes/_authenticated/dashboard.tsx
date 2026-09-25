@@ -147,22 +147,26 @@ function Dashboard() {
                   {t("Hello")}, {profile.name || t("student")}
                 </h1>
                 <WandSparkles className="size-5 shrink-0 text-success" aria-hidden="true" />
-              {profile.plan === "premium" ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold text-warning-foreground">
-                  <Crown className="size-3.5 text-warning" /> Premium
-                </span>
-              ) : (
-                <Link
-                  to="/premium"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground/80 transition-colors hover:bg-accent"
-                >
-                   <Crown className="size-3.5 text-warning" /> {t("Go Premium")}
-                </Link>
-              )}
+                {profile.plan === "premium" ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold text-warning-foreground">
+                    <Crown className="size-3.5 text-warning" /> Premium
+                  </span>
+                ) : (
+                  <Link
+                    to="/premium"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground/80 transition-colors hover:bg-accent"
+                  >
+                    <Crown className="size-3.5 text-warning" /> {t("Go Premium")}
+                  </Link>
+                )}
               </div>
             </div>
             <div className="card-soft hidden min-w-0 p-3 lg:block">
-              <EvoDailyReflection userId={profile.id} name={profile.name} placement="dashboard-header" />
+              <EvoDailyReflection
+                userId={profile.id}
+                name={profile.name}
+                placement="dashboard-header"
+              />
             </div>
           </header>
 
@@ -175,9 +179,7 @@ function Dashboard() {
                   <Calendar className="size-4 text-success" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-bold">
-                    {streakDays} days
-                  </p>
+                  <p className="truncate text-base font-bold">{streakDays} days</p>
                   <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
                   <NextLeagueStatus streakDays={streakDays} />
                 </div>
@@ -190,7 +192,11 @@ function Dashboard() {
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
             <div className="card-soft min-w-0 p-3">
-              <WeeklyFrequency userId={profile.id} daysPerWeek={profile.study_days_per_week ?? 7} compact />
+              <WeeklyFrequency
+                userId={profile.id}
+                daysPerWeek={profile.study_days_per_week ?? 7}
+                compact
+              />
             </div>
           </div>
 
@@ -199,34 +205,64 @@ function Dashboard() {
           </section>
 
           <div className="order-3 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12">
-            <section className="card-soft min-w-0 p-3 lg:col-span-4" aria-labelledby="today-progress-title">
-              <h2 id="today-progress-title" className="text-sm font-semibold">{t("Today's Progress")}</h2>
+            <section
+              className="card-soft min-w-0 p-3 lg:col-span-4"
+              aria-labelledby="today-progress-title"
+            >
+              <h2 id="today-progress-title" className="text-sm font-semibold">
+                {t("Today's Progress")}
+              </h2>
               <div className="mt-3 grid grid-cols-4 gap-2">
                 {learningCards.map((card) => (
                   <div key={card.label} className="min-w-0 rounded-md bg-secondary p-2 text-center">
-                    <span className="text-base" aria-hidden="true">{card.emoji}</span>
+                    <span className="text-base" aria-hidden="true">
+                      {card.emoji}
+                    </span>
                     <p className="text-sm font-bold">{card.value}</p>
-                    <p className="line-clamp-2 text-[10px] text-muted-foreground">{t(card.label)}</p>
+                    <p className="line-clamp-2 text-[10px] text-muted-foreground">
+                      {t(card.label)}
+                    </p>
                   </div>
                 ))}
               </div>
             </section>
-            <div className="min-w-0 lg:col-span-4"><PathProgressCard compact /></div>
-            <div className="min-w-0 lg:col-span-4"><SmartReviewCard streakDays={streakDays} compact /></div>
+            <div className="min-w-0 lg:col-span-4">
+              <PathProgressCard compact />
+            </div>
+            <div className="min-w-0 lg:col-span-4">
+              <SmartReviewCard streakDays={streakDays} compact />
+            </div>
           </div>
 
-          <section className="order-4 card-soft min-w-0 p-3 lg:order-none" aria-labelledby="quick-access-title">
+          <section
+            className="order-4 card-soft min-w-0 p-3 lg:order-none"
+            aria-labelledby="quick-access-title"
+          >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <h2 id="quick-access-title" className="text-sm font-semibold">{t("Quick Access")}</h2>
+              <h2 id="quick-access-title" className="text-sm font-semibold">
+                {t("Quick Access")}
+              </h2>
               <ArrowRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-8">
               {quickAccess.map((item) => {
-                const hasNew = Boolean((indicators as Record<string, boolean>)[item.to.replace("/", "")]);
+                const hasNew = Boolean(
+                  (indicators as Record<string, boolean>)[item.to.replace("/", "")],
+                );
                 return (
-                  <Link key={item.to} to={item.to} className="group relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-border bg-background px-2 py-2 transition-colors hover:bg-accent">
-                    {hasNew && <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success"><span className="sr-only">{t("New activity available")}</span></span>}
-                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-secondary"><item.icon className="size-4 text-primary" /></span>
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="group relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-border bg-background px-2 py-2 transition-colors hover:bg-accent"
+                  >
+                    {hasNew && (
+                      <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
+                        <span className="sr-only">{t("New activity available")}</span>
+                      </span>
+                    )}
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-secondary">
+                      <item.icon className="size-4 text-primary" />
+                    </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
                   </Link>
                 );

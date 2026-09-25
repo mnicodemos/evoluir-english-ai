@@ -44,22 +44,38 @@ export function DailyGoalCard({
   return (
     <div className={cn("card-soft flex min-w-0 flex-col justify-center", compact ? "p-3" : "p-5")}>
       <div className="flex items-center gap-4">
-        <span className={cn("grid shrink-0 place-items-center rounded-xl bg-warning/15", compact ? "size-9" : "size-12")}>
+        <span
+          className={cn(
+            "grid shrink-0 place-items-center rounded-xl bg-warning/15",
+            compact ? "size-9" : "size-12",
+          )}
+        >
           <Hourglass className={cn("text-warning", compact ? "size-4" : "size-6")} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className={cn("truncate font-bold", compact ? "text-base" : "text-lg sm:text-base md:text-lg")}>
+          <p
+            className={cn(
+              "truncate font-bold",
+              compact ? "text-base" : "text-lg sm:text-base md:text-lg",
+            )}
+          >
             {done}{" "}
             <span className="text-xs font-medium text-muted-foreground sm:text-sm md:text-base">
               / {goalMinutes} <span className="inline">minutes</span>
             </span>
           </p>
-          <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-base sm:text-sm")}>Your daily goal</p>
+          <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-base sm:text-sm")}>
+            Your daily goal
+          </p>
         </div>
       </div>
       <Progress value={percent} className={cn("h-2", compact ? "mt-2" : "mt-4")} />
       <p
-        className={cn("mt-2 text-xs", compact && "hidden 2xl:block", done >= goalMinutes ? "text-success/80" : "text-muted-foreground")}
+        className={cn(
+          "mt-2 text-xs",
+          compact && "hidden 2xl:block",
+          done >= goalMinutes ? "text-success/80" : "text-muted-foreground",
+        )}
       >
         {done >= goalMinutes ? (
           "Goal reached today. Great work!"

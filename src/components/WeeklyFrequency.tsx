@@ -7,7 +7,6 @@ import { STUDY_DAY_ACTIVITY_TYPES } from "@/lib/studyDay";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
-
 type Props = { userId: string; daysPerWeek?: number; compact?: boolean };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
@@ -94,7 +93,17 @@ export function WeeklyFrequency({ userId, daysPerWeek, compact = false }: Props)
   );
 }
 
-function TrophyBadge({ active, lang, days, compact }: { active: boolean; lang: "pt" | "en"; days: number; compact: boolean }) {
+function TrophyBadge({
+  active,
+  lang,
+  days,
+  compact,
+}: {
+  active: boolean;
+  lang: "pt" | "en";
+  days: number;
+  compact: boolean;
+}) {
   const unlockedText =
     lang === "pt" ? `Troféu de ${days} dias desbloqueado` : `${days}-day trophy unlocked`;
   const lockedText =
@@ -107,7 +116,7 @@ function TrophyBadge({ active, lang, days, compact }: { active: boolean; lang: "
         compact ? "size-9" : "size-11",
         active
           ? "bg-gradient-to-br from-[oklch(0.90_0.15_95)] to-[oklch(0.68_0.15_80)] text-[oklch(0.45_0.10_80)] motion-safe:animate-pulse"
-          : "bg-gradient-to-br from-[oklch(0.80_0.01_250)] to-[oklch(0.60_0.02_240)] text-[oklch(0.55_0.01_250)]"
+          : "bg-gradient-to-br from-[oklch(0.80_0.01_250)] to-[oklch(0.60_0.02_240)] text-[oklch(0.55_0.01_250)]",
       )}
       role="img"
       aria-label={active ? unlockedText : lockedText}

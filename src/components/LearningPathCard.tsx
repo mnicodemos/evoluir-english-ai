@@ -396,7 +396,9 @@ export function PathProgressCard({
       <section className="card-soft h-full min-w-0 p-3" aria-labelledby="skills-progress-heading">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
           <div className="min-w-0">
-            <h2 id="skills-progress-heading" className="text-sm font-semibold">{t("Your English Skills")}</h2>
+            <h2 id="skills-progress-heading" className="text-sm font-semibold">
+              {t("Your English Skills")}
+            </h2>
             <p className="truncate text-xs text-muted-foreground">
               {findLevel(path.level).cefr} · {path.completed}/{path.total} {t("lessons completed")}
             </p>
@@ -416,7 +418,11 @@ export function PathProgressCard({
             </div>
           ))}
         </div>
-        {!latest && <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{t("Finish your first conversation or writing task to unlock your scores.")}</p>}
+        {!latest && (
+          <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+            {t("Finish your first conversation or writing task to unlock your scores.")}
+          </p>
+        )}
       </section>
     );
   }

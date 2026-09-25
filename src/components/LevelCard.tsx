@@ -55,13 +55,30 @@ export function LevelCard({
   };
 
   return (
-    <div className={cn("card-soft flex h-full min-w-0 flex-col justify-center", compact ? "p-3" : "p-4")}>
+    <div
+      className={cn(
+        "card-soft flex h-full min-w-0 flex-col justify-center",
+        compact ? "p-3" : "p-4",
+      )}
+    >
       <div className="flex items-center gap-4">
-        <span className={cn("grid shrink-0 place-items-center rounded-xl bg-accent", compact ? "size-9" : "size-12")}>
+        <span
+          className={cn(
+            "grid shrink-0 place-items-center rounded-xl bg-accent",
+            compact ? "size-9" : "size-12",
+          )}
+        >
           <GraduationCap className={cn("text-accent-foreground", compact ? "size-4" : "size-6")} />
         </span>
         <div className="flex-1 min-w-0">
-          <p className={cn("truncate font-bold", compact ? "text-sm" : "text-lg sm:text-base md:text-lg")}>{current.label}</p>
+          <p
+            className={cn(
+              "truncate font-bold",
+              compact ? "text-sm" : "text-lg sm:text-base md:text-lg",
+            )}
+          >
+            {current.label}
+          </p>
           <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-base sm:text-xs")}>
             <span>Your English level</span>
             <span> · </span>

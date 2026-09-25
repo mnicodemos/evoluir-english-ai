@@ -924,7 +924,7 @@ export const uiPt: Record<string, string> = {
   "Today's focus": "Foco de hoje",
   "lessons completed": "lições concluídas",
   "New activity available": "Nova atividade disponível",
-  "student": "estudante",
+  student: "estudante",
   Performance: "Desempenho",
   Frequency: "Frequência",
   "days studied": "dias de estudo",

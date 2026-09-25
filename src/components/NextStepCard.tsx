@@ -96,7 +96,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <p className="text-[11px] font-bold uppercase text-brand-green">
               EVO · {t("Your AI Learning Coach")}
             </p>
-            <p className="mt-2 text-sm font-semibold text-sidebar-foreground/75">{t("Today's focus")}</p>
+            <p className="mt-2 text-sm font-semibold text-sidebar-foreground/75">
+              {t("Today's focus")}
+            </p>
             <h2 className="mt-1 break-words text-2xl font-bold text-sidebar-foreground xl:text-3xl">
               {skillLabel}
             </h2>
@@ -107,7 +109,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {t("How to practise")}: <span className="font-semibold">{data.activity.title}</span>
             </p>
             {mainAvailable && (
-              <Button asChild className="mt-4 w-fit bg-brand-green text-sidebar hover:bg-brand-green/90">
+              <Button
+                asChild
+                className="mt-4 w-fit bg-brand-green text-sidebar hover:bg-brand-green/90"
+              >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
                     {t("Practice now")} <ArrowRight aria-hidden="true" />
@@ -122,7 +127,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {(quickWinAvailable || challengeAvailable) && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {quickWin && quickWinAvailable && (
-                  <Button asChild variant="ghost" size="sm" className="text-sidebar-foreground hover:bg-sidebar-accent">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="text-sidebar-foreground hover:bg-sidebar-accent"
+                  >
                     {quickWin.activity.params ? (
                       <Link to="/learning/$lessonId" params={quickWin.activity.params}>
                         <Zap /> {t("Quick Win")}
@@ -135,7 +145,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   </Button>
                 )}
                 {data.quest && challengeAvailable && (
-                  <Button asChild variant="ghost" size="sm" className="text-sidebar-foreground hover:bg-sidebar-accent">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="text-sidebar-foreground hover:bg-sidebar-accent"
+                  >
                     {data.quest.resource.params ? (
                       <Link to="/learning/$lessonId" params={data.quest.resource.params}>
                         <Sparkles /> {t("Take the challenge")}
@@ -160,7 +175,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {cefrLevel && (
                 <li className="flex items-start gap-2">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
-                  <span>{cefrLevel} · {skillLabel}</span>
+                  <span>
+                    {cefrLevel} · {skillLabel}
+                  </span>
                 </li>
               )}
               <li className="flex items-start gap-2">
