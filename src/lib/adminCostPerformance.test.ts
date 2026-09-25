@@ -14,6 +14,7 @@ describe("aggregateCostPerformance", () => {
           input_tokens: 10,
           output_tokens: 5,
           estimated_cost: null,
+          error_code: null,
         },
         {
           operation: "dictionary",
@@ -23,6 +24,7 @@ describe("aggregateCostPerformance", () => {
           input_tokens: null,
           output_tokens: null,
           estimated_cost: null,
+          error_code: "timeout",
         },
       ],
       [
@@ -52,6 +54,10 @@ describe("aggregateCostPerformance", () => {
       cacheMisses: null,
       firstChunkMs: null,
       retries: null,
+      medianMs: null,
+      p95Ms: null,
+      timeouts: 1,
+      cancellations: 0,
     });
   });
 
@@ -66,6 +72,7 @@ describe("aggregateCostPerformance", () => {
           input_tokens: 2,
           output_tokens: 3,
           estimated_cost: 0.01,
+          error_code: null,
         },
       ],
       [],
@@ -74,5 +81,37 @@ describe("aggregateCostPerformance", () => {
     expect(result.estimatedCost).toBe(0.01);
     expect(result.projectedCost1k).toBe(10);
     expect(result.comparisons[0]?.provider).toBe("Lovable AI");
+  });
+
+  it("calculates median and p95 only with a sufficient sample", () => {
+    const rows = Array.from({ length: 10 }, (_, index) => ({
+      operation: "teacher",
+      model: "gemini-3.5-flash-lite",
+      success: true,
+      duration_ms: (index + 1) * 100,
+      input_tokens: 1,
+      output_tokens: 1,
+      estimated_cost: null,
+      error_code: null,
+    }));
+    const result = aggregateCostPerformance(rows, []);
+    expect(result.comparisons[0]).toMatchObject({ medianMs: 550, p95Ms: 955 });
+  });
+
+  it("does not falsely attribute the historical transcription provider", () => {
+    const result = aggregateCostPerformance(
+      [{
+        operation: "transcription",
+        model: "gemini-3.5-flash-lite",
+        success: true,
+        duration_ms: 500,
+        input_tokens: null,
+        output_tokens: null,
+        estimated_cost: null,
+        error_code: null,
+      }],
+      [],
+    );
+    expect(result.comparisons[0]?.provider).toBe("N/D — provider não registrado");
   });
 });
