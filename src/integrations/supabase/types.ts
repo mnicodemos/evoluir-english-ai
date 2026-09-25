@@ -109,6 +109,7 @@ export type Database = {
           cache_ttl_seconds: number
           daily_limit: number
           enabled: boolean
+          global_max_concurrent: number | null
           max_concurrent: number
           min_interval_seconds: number
           monthly_limit: number
@@ -121,6 +122,7 @@ export type Database = {
           cache_ttl_seconds?: number
           daily_limit: number
           enabled?: boolean
+          global_max_concurrent?: number | null
           max_concurrent?: number
           min_interval_seconds?: number
           monthly_limit: number
@@ -133,6 +135,7 @@ export type Database = {
           cache_ttl_seconds?: number
           daily_limit?: number
           enabled?: boolean
+          global_max_concurrent?: number | null
           max_concurrent?: number
           min_interval_seconds?: number
           monthly_limit?: number
@@ -1543,6 +1546,7 @@ export type Database = {
       reserve_ai_usage: {
         Args: {
           p_daily_limit: number
+          p_global_max_concurrent?: number
           p_max_concurrent: number
           p_min_interval_seconds: number
           p_model: string
