@@ -39,14 +39,14 @@ describe("lesson Quiz completion", () => {
 
 describe("vocabulary unlock after a lesson", () => {
   it("unlocks only when a lesson passes for the first time", () => {
-    expect(
-      lessonCompletionUnlocksVocabulary({ passed: true, wasAlreadyCompleted: false }),
-    ).toBe(true);
-    expect(
-      lessonCompletionUnlocksVocabulary({ passed: false, wasAlreadyCompleted: false }),
-    ).toBe(false);
-    expect(
-      lessonCompletionUnlocksVocabulary({ passed: true, wasAlreadyCompleted: true }),
-    ).toBe(false);
+    expect(lessonCompletionUnlocksVocabulary({ passed: true, wasAlreadyCompleted: false })).toBe(
+      true,
+    );
+    expect(lessonCompletionUnlocksVocabulary({ passed: false, wasAlreadyCompleted: false })).toBe(
+      false,
+    );
+    expect(lessonCompletionUnlocksVocabulary({ passed: true, wasAlreadyCompleted: true })).toBe(
+      false,
+    );
   });
 });
