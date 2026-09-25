@@ -118,6 +118,7 @@ function Dashboard() {
     },
     { to: "/writing", label: "Writing", icon: PenLine },
     { to: "/teacher", label: "AI Teacher", icon: Sparkles },
+    { to: "/study-plan", label: "My Study Plan", icon: CalendarCheck },
     { to: "/progress", label: "Progress", icon: LineChart },
   ] as const;
 
@@ -254,7 +255,7 @@ function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="group relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-border bg-background px-2 py-2 transition-colors hover:bg-accent"
+                    className={`group relative min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-border bg-background px-2 py-2 transition-colors hover:bg-accent ${item.to === "/study-plan" ? "hidden lg:grid" : "grid"}`}
                   >
                     {hasNew && (
                       <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
