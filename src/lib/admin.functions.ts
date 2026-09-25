@@ -66,6 +66,121 @@ function providerOf(model: string) {
   return model.includes("/") ? "Lovable AI" : "Gemini (personal key)";
 }
 
+type BenchmarkUsageRow = {
+  operation: string;
+  model: string;
+  success: boolean | null;
+  duration_ms: number | null;
+  input_tokens: number | null;
+  output_tokens: number | null;
+  estimated_cost: number | null;
+};
+
+type BenchmarkCacheRow = {
+  operation: string;
+  model: string;
+  hit_count: number;
+  expires_at: string;
+};
+
+function sumOrNull(values: Array<number | null>): number | null {
+  const measured = values.filter((value): value is number => typeof value === "number");
+  return measured.length === values.length && measured.length > 0
+    ? measured.reduce((sum, value) => sum + value, 0)
+    : null;
+}
+
+export function aggregateCostPerformance(
+  rows: BenchmarkUsageRow[],
+  cacheRows: BenchmarkCacheRow[],
+) {
+  const cacheByGroup = new Map<string, { hits: number; activeEntries: number }>();
+  const now = Date.now();
+  for (const row of cacheRows) {
+    const key = `${row.operation}\u0000${row.model}`;
+    const current = cacheByGroup.get(key) ?? { hits: 0, activeEntries: 0 };
+    current.hits += row.hit_count;
+    if (Date.parse(row.expires_at) > now) current.activeEntries += 1;
+    cacheByGroup.set(key, current);
+  }
+
+  const groups = new Map<string, BenchmarkUsageRow[]>();
+  for (const row of rows) {
+    const key = `${row.operation}\u0000${row.model}`;
+    groups.set(key, [...(groups.get(key) ?? []), row]);
+  }
+
+  const comparisons = [...groups.entries()]
+    .map(([key, groupRows]) => {
+      const [operation, model] = key.split("\u0000");
+      const durations = groupRows
+        .map((row) => row.duration_ms)
+        .filter((value): value is number => typeof value === "number");
+      const inputTokens = sumOrNull(groupRows.map((row) => row.input_tokens));
+      const outputTokens = sumOrNull(groupRows.map((row) => row.output_tokens));
+      const estimatedCost = sumOrNull(groupRows.map((row) => row.estimated_cost));
+      const cache = cacheByGroup.get(key) ?? { hits: 0, activeEntries: 0 };
+      const costPerCall = estimatedCost === null ? null : estimatedCost / groupRows.length;
+      return {
+        operation,
+        label: OPERATION_FACTS[operation]?.label ?? operation,
+        provider: providerOf(model),
+        model,
+        calls: groupRows.length,
+        inputTokens,
+        outputTokens,
+        totalTokens:
+          inputTokens === null || outputTokens === null ? null : inputTokens + outputTokens,
+        tokenCoverage: groupRows.filter(
+          (row) => row.input_tokens !== null || row.output_tokens !== null,
+        ).length,
+        avgMs: durations.length
+          ? Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length)
+          : null,
+        errors: groupRows.filter((row) => row.success === false).length,
+        firstTokenMs: null,
+        firstChunkMs: null,
+        retries: null,
+        fallback: null,
+        cacheHits: cache.hits,
+        activeCacheEntries: cache.activeEntries,
+        cacheMisses: null,
+        lovableCredits: null,
+        estimatedCost,
+        projectedCost1k: costPerCall === null ? null : costPerCall * 1_000,
+        projectedCost10k: costPerCall === null ? null : costPerCall * 10_000,
+        projectedCost100k: costPerCall === null ? null : costPerCall * 100_000,
+      };
+    })
+    .sort((a, b) => b.calls - a.calls);
+
+  const measuredDurations = rows
+    .map((row) => row.duration_ms)
+    .filter((value): value is number => typeof value === "number");
+  const estimatedCost = sumOrNull(rows.map((row) => row.estimated_cost));
+  const costPerCall = estimatedCost === null || rows.length === 0 ? null : estimatedCost / rows.length;
+  return {
+    calls: rows.length,
+    operations: new Set(rows.map((row) => row.operation)).size,
+    avgMs: measuredDurations.length
+      ? Math.round(
+          measuredDurations.reduce((sum, value) => sum + value, 0) / measuredDurations.length,
+        )
+      : null,
+    errorRate: rows.length
+      ? (rows.filter((row) => row.success === false).length / rows.length) * 100
+      : null,
+    cacheHits: cacheRows.reduce((sum, row) => sum + row.hit_count, 0),
+    activeCacheEntries: cacheRows.filter((row) => Date.parse(row.expires_at) > now).length,
+    lovableCredits: null,
+    estimatedCost,
+    projectedCost1k: costPerCall === null ? null : costPerCall * 1_000,
+    projectedCost10k: costPerCall === null ? null : costPerCall * 10_000,
+    projectedCost100k: costPerCall === null ? null : costPerCall * 100_000,
+    comparisons,
+  };
+}
+
 /** Read-only aggregation of the existing ai_usage_events table. Runs only on admin request. */
 export const getAiUsageSummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -187,5 +302,38 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
       totalCalls: (rows ?? []).length,
       truncated: (rows ?? []).length >= 10000,
       operations,
+    };
+  });
+
+/** Economic and technical benchmark. Read-only and loaded only when its admin tab is opened. */
+export const getAiCostPerformance = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ days: z.number().int().min(1).max(90) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!isAdminClaims(context.claims as unknown as Record<string, unknown>)) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - data.days * 86_400_000).toISOString();
+    const [{ data: rows, error }, { data: cacheRows, error: cacheError }] = await Promise.all([
+      supabaseAdmin
+        .from("ai_usage_events")
+        .select(
+          "operation, model, success, duration_ms, input_tokens, output_tokens, estimated_cost",
+        )
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(10000),
+      supabaseAdmin
+        .from("ai_response_cache")
+        .select("operation, model, hit_count, expires_at")
+        .limit(10000),
+    ]);
+    if (error) throw error;
+    if (cacheError) throw cacheError;
+    return {
+      days: data.days,
+      truncated: (rows ?? []).length >= 10000,
+      ...aggregateCostPerformance(rows ?? [], cacheRows ?? []),
     };
   });
