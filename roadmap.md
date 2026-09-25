@@ -116,3 +116,5 @@
 - [x] Variar a cor da árvore da saudação por período do dia
 - [x] Exibir a saudação e a reflexão diária no espaço superior do Dashboard mobile
 - [x] Gerar o novo lote do Vocabulary ao concluir uma lição e atualizar o ponto verde do Dashboard
+
+- [ ] Fase 3B — Ativação do Dictionary Knowledge Cache: TTL 315360000 aplicado; validar persistência/HIT real, proteção da pronúncia (áudio/TTS/transcrição/avaliação inalterados), testes, relatório.
