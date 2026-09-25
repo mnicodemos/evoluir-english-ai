@@ -107,16 +107,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <h2 className="mt-1 break-words text-xl font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
               {skillLabel}
             </h2>
-            <p className="mt-2 line-clamp-2 text-sm text-sidebar-foreground/70">
+            <p className="mt-2 line-clamp-2 text-sm text-sidebar-foreground/70 xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
-            <p className="mt-2 line-clamp-1 text-sm text-sidebar-foreground/85">
+            <p className="mt-2 line-clamp-1 text-sm text-sidebar-foreground/85 xl:mt-1 xl:text-xs">
               {t("How to practise")}: <span className="font-semibold">{data.activity.title}</span>
             </p>
             {mainAvailable && (
               <Button
                 asChild
-                className="mt-4 w-full bg-brand-green text-sidebar hover:bg-brand-green/90 sm:w-fit"
+                className="mt-4 w-full bg-brand-green text-sidebar hover:bg-brand-green/90 sm:w-fit xl:mt-2 xl:h-9"
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
@@ -130,7 +130,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </Button>
             )}
             {(quickWinAvailable || challengeAvailable) && (
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-2 xl:mt-1 xl:gap-1">
                 {quickWin && quickWinAvailable && (
                   <Button
                     asChild
@@ -176,7 +176,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
             </div>
-            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2 xl:gap-1">
+            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2 xl:gap-1 xl:text-[10px] xl:leading-tight">
               {cefrLevel && (
                 <li className="flex items-start gap-2">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
