@@ -8,9 +8,14 @@ import { useUiLang } from "@/lib/uiLang";
 type EvoDailyReflectionProps = {
   userId: string;
   name: string;
+  placement?: "desktop" | "mobile-card";
 };
 
-export function EvoDailyReflection({ userId, name }: EvoDailyReflectionProps) {
+export function EvoDailyReflection({
+  userId,
+  name,
+  placement = "desktop",
+}: EvoDailyReflectionProps) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [now, setNow] = useState<Date | null>(null);
@@ -31,7 +36,13 @@ export function EvoDailyReflection({ userId, name }: EvoDailyReflectionProps) {
   const copy = lang === "pt" ? "pt" : "en";
 
   return (
-    <aside className="hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex">
+    <aside
+      className={
+        placement === "mobile-card"
+          ? "card-soft flex min-w-0 items-start gap-4 p-4 lg:hidden"
+          : "hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex"
+      }
+    >
       <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
         <TreePine className={`size-5 ${treeToneClass}`} aria-hidden="true" />
       </span>
