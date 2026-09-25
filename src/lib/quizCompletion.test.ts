@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { finalizeLessonQuiz } from "./quizCompletion";
+import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "./quizCompletion";
 
 describe("lesson Quiz completion", () => {
   it("persists a failed 30% result before leaving the lesson incomplete", async () => {
@@ -34,5 +34,19 @@ describe("lesson Quiz completion", () => {
 
     expect(result).toEqual({ passed: true, legacyPersisted: true });
     expect(order).toEqual(["legacy", "complete"]);
+  });
+});
+
+describe("vocabulary unlock after a lesson", () => {
+  it("unlocks only when a lesson passes for the first time", () => {
+    expect(
+      lessonCompletionUnlocksVocabulary({ passed: true, wasAlreadyCompleted: false }),
+    ).toBe(true);
+    expect(
+      lessonCompletionUnlocksVocabulary({ passed: false, wasAlreadyCompleted: false }),
+    ).toBe(false);
+    expect(
+      lessonCompletionUnlocksVocabulary({ passed: true, wasAlreadyCompleted: true }),
+    ).toBe(false);
   });
 });

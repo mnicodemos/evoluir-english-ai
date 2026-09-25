@@ -37,7 +37,7 @@ import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
 import { formatVideoDuration, videoReviewPoints } from "@/lib/lessonVideoDisplay";
-import { finalizeLessonQuiz } from "@/lib/quizCompletion";
+import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
@@ -158,12 +158,13 @@ function LessonPage() {
     queryClient.invalidateQueries({ queryKey: ["lesson-round"] });
     queryClient.invalidateQueries({ queryKey: ["daily-words"] });
     queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
+    queryClient.invalidateQueries({ queryKey: ["lesson", lessonId] });
 
     toast.success(`Lesson completed with ${score}%`);
 
     // Only a newly completed lesson unlocks a batch. Generate it now so the
     // Dashboard can advertise saved words before Vocabulary is ever opened.
-    if (!wasAlreadyCompleted) {
+    if (lessonCompletionUnlocksVocabulary({ passed: result.passed, wasAlreadyCompleted })) {
       const unlockedRound = lessonRound === undefined ? null : lessonRound + 1;
       const failureKey =
         unlockedRound === null ? null : vocabularyGenerationFailureKey(profile.id, unlockedRound);
