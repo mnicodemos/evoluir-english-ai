@@ -430,7 +430,7 @@ export function PathProgressCard({
 
   if (compact) {
     return (
-      <section className="card-soft h-full min-w-0 p-3" aria-labelledby="skills-progress-heading">
+      <section className="card-soft h-full min-w-0 p-3 xl:p-4" aria-labelledby="skills-progress-heading">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
           <BarChart3 className="size-5 text-dashboard-cyan" aria-hidden="true" />
           <h2 id="skills-progress-heading" className="text-sm font-semibold">
@@ -438,7 +438,7 @@ export function PathProgressCard({
           </h2>
           <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <div className="mt-3 grid gap-2.5">
+        <div className="mt-3 grid gap-2.5 xl:mt-4 xl:gap-3">
           {skills.map((skill) => (
             <div
               key={skill.label}
