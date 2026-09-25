@@ -1,6 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { BookOpen, CheckCircle2, Download, Loader2, Lock, Play, Trophy } from "lucide-react";
+import {
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  Download,
+  Headphones,
+  Loader2,
+  Lock,
+  Mic,
+  PenLine,
+  Play,
+  Trophy,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -293,10 +305,10 @@ export function PathProgressCard({
   });
 
   const skills = [
-    { label: "Listening", value: latest?.listening_score ?? 0 },
-    { label: "Reading", value: latest?.reading_score ?? 0 },
-    { label: "Talking", value: latest?.speaking_score ?? 0 },
-    { label: "Writing", value: latest?.writing_score ?? 0 },
+    { label: "Reading", value: latest?.reading_score ?? 0, icon: BookOpen, tone: "text-dashboard-cyan", bar: "[&>div]:bg-dashboard-cyan" },
+    { label: "Listening", value: latest?.listening_score ?? 0, icon: Headphones, tone: "text-dashboard-purple", bar: "[&>div]:bg-dashboard-blue" },
+    { label: "Writing", value: latest?.writing_score ?? 0, icon: PenLine, tone: "text-dashboard-pink", bar: "[&>div]:bg-dashboard-blue" },
+    { label: "Talking", value: latest?.speaking_score ?? 0, icon: Mic, tone: "text-dashboard-coral", bar: "[&>div]:bg-warning" },
   ];
 
   const download = async () => {
@@ -394,27 +406,23 @@ export function PathProgressCard({
   if (compact) {
     return (
       <section className="card-soft h-full min-w-0 p-3" aria-labelledby="skills-progress-heading">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-          <div className="min-w-0">
-            <h2 id="skills-progress-heading" className="text-sm font-semibold">
-              {t("Your English Skills")}
-            </h2>
-            <p className="truncate text-xs text-muted-foreground">
-              {findLevel(path.level).cefr} · {path.completed}/{path.total} {t("lessons completed")}
-            </p>
-          </div>
-          <span className="text-xs font-semibold text-success">
-            {Math.round((path.completed / path.total) * 100)}%
-          </span>
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
+          <BarChart3 className="size-5 text-dashboard-cyan" aria-hidden="true" />
+          <h2 id="skills-progress-heading" className="text-sm font-semibold">
+            {t("Your English Skills")}
+          </h2>
+          <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+        <div className="mt-3 grid gap-2.5">
           {skills.map((skill) => (
-            <div key={skill.label} className="min-w-0">
-              <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="truncate font-medium">{t(skill.label)}</span>
-                <span className="shrink-0 text-muted-foreground">{skill.value}%</span>
-              </div>
-              <Progress value={skill.value} className="mt-1 h-1.5 [&>div]:bg-success" />
+            <div key={skill.label} className="grid min-w-0 grid-cols-[1.25rem_4.75rem_minmax(0,1fr)_2.25rem_4.5rem] items-center gap-2 text-xs">
+              <skill.icon className={`size-5 ${skill.tone}`} aria-hidden="true" />
+              <span className="truncate font-medium">{t(skill.label)}</span>
+              <Progress value={skill.value} className={`h-2 ${skill.bar}`} />
+              <span className="text-right text-muted-foreground">{skill.value}%</span>
+              <span className="rounded-full bg-secondary px-2 py-1 text-center text-[10px] font-semibold text-secondary-foreground">
+                {skill.value >= 95 ? t("Advanced") : skill.value >= 80 ? t("Strong") : t("Focus area")}
+              </span>
             </div>
           ))}
         </div>
