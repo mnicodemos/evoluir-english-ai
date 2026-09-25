@@ -76,9 +76,15 @@ export function AdminPanelButton({
 
         <Tabs defaultValue="users" className="min-w-0">
           <TabsList className="grid h-auto w-full grid-cols-3">
-            <TabsTrigger value="users" className="min-w-0 px-2 text-xs sm:text-sm">{t("Users")}</TabsTrigger>
-            <TabsTrigger value="usage" className="min-w-0 px-2 text-xs sm:text-sm">{t("AI Usage")}</TabsTrigger>
-            <TabsTrigger value="cost" className="min-w-0 px-2 text-xs sm:text-sm">{t("Cost & Performance")}</TabsTrigger>
+            <TabsTrigger value="users" className="min-w-0 px-2 text-xs sm:text-sm">
+              {t("Users")}
+            </TabsTrigger>
+            <TabsTrigger value="usage" className="min-w-0 px-2 text-xs sm:text-sm">
+              {t("AI Usage")}
+            </TabsTrigger>
+            <TabsTrigger value="cost" className="min-w-0 px-2 text-xs sm:text-sm">
+              {t("Cost & Performance")}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="mt-4">
@@ -112,8 +118,12 @@ export function AdminPanelButton({
               </div>
             )}
           </TabsContent>
-          <TabsContent value="usage"><AdminAiUsage /></TabsContent>
-          <TabsContent value="cost"><AdminCostPerformance /></TabsContent>
+          <TabsContent value="usage">
+            <AdminAiUsage />
+          </TabsContent>
+          <TabsContent value="cost">
+            <AdminCostPerformance />
+          </TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>

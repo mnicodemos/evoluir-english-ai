@@ -6,10 +6,33 @@ describe("aggregateCostPerformance", () => {
   it("groups observed metrics and keeps unavailable costs and misses null", () => {
     const result = aggregateCostPerformance(
       [
-        { operation: "dictionary", model: "gemini-3", success: true, duration_ms: 1000, input_tokens: 10, output_tokens: 5, estimated_cost: null },
-        { operation: "dictionary", model: "gemini-3", success: false, duration_ms: 3000, input_tokens: null, output_tokens: null, estimated_cost: null },
+        {
+          operation: "dictionary",
+          model: "gemini-3",
+          success: true,
+          duration_ms: 1000,
+          input_tokens: 10,
+          output_tokens: 5,
+          estimated_cost: null,
+        },
+        {
+          operation: "dictionary",
+          model: "gemini-3",
+          success: false,
+          duration_ms: 3000,
+          input_tokens: null,
+          output_tokens: null,
+          estimated_cost: null,
+        },
       ],
-      [{ operation: "dictionary", model: "gemini-3", hit_count: 4, expires_at: "2999-01-01T00:00:00.000Z" }],
+      [
+        {
+          operation: "dictionary",
+          model: "gemini-3",
+          hit_count: 4,
+          expires_at: "2999-01-01T00:00:00.000Z",
+        },
+      ],
     );
 
     expect(result.calls).toBe(2);
@@ -34,7 +57,17 @@ describe("aggregateCostPerformance", () => {
 
   it("calculates projections only when every call has recorded cost", () => {
     const result = aggregateCostPerformance(
-      [{ operation: "talking", model: "google/gemini", success: true, duration_ms: 500, input_tokens: 2, output_tokens: 3, estimated_cost: 0.01 }],
+      [
+        {
+          operation: "talking",
+          model: "google/gemini",
+          success: true,
+          duration_ms: 500,
+          input_tokens: 2,
+          output_tokens: 3,
+          estimated_cost: 0.01,
+        },
+      ],
       [],
     );
 

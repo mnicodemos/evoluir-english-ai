@@ -165,7 +165,8 @@ export function aggregateCostPerformance(
     .map((row) => row.duration_ms)
     .filter((value): value is number => typeof value === "number");
   const estimatedCost = sumOrNull(rows.map((row) => row.estimated_cost));
-  const costPerCall = estimatedCost === null || rows.length === 0 ? null : estimatedCost / rows.length;
+  const costPerCall =
+    estimatedCost === null || rows.length === 0 ? null : estimatedCost / rows.length;
   return {
     calls: rows.length,
     operations: new Set(rows.map((row) => row.operation)).size,
