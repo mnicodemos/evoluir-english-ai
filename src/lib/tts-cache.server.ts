@@ -27,12 +27,10 @@ export async function writeTtsCache(key: string, chunks: string[]): Promise<void
   if (!isValidTtsEntry(entry)) return;
   try {
     const db = await admin();
-    const { error } = await db.storage
-      .from(BUCKET)
-      .upload(`${key}.json`, JSON.stringify(entry), {
-        contentType: "application/json",
-        upsert: true,
-      });
+    const { error } = await db.storage.from(BUCKET).upload(`${key}.json`, JSON.stringify(entry), {
+      contentType: "application/json",
+      upsert: true,
+    });
     if (error) console.error(`[tts-cache] write failed: ${error.message}`);
   } catch (error) {
     console.error(`[tts-cache] write failed: ${error instanceof Error ? error.message : error}`);
