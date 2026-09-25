@@ -123,4 +123,7 @@
   - [x] Adicionar benchmark somente com dados confiáveis existentes e N/D para lacunas
   - [x] Validar proteção administrativa, desktop e mobile sem alterar operações, limites ou banco
 
-- [ ] Fase 6A — benchmark controlado Lovable AI × Google, somente medição
+- [x] Fase 6A — benchmark controlado Lovable AI × Google, somente medição
+  - [x] Reutilizar eventos e caches existentes sem chamadas artificiais, migrations ou mudanças de produção
+  - [x] Exibir média, mediana, p95, cobertura de tokens, erros e filtros com classificação de confiabilidade
+  - [x] Manter como N/D toda métrica sem atribuição segura e preservar as demais abas administrativas

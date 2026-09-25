@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { getAiCostPerformance } from "@/lib/admin.functions";
@@ -17,6 +17,8 @@ const fmtCost = (value: number | null) =>
 
 export function AdminCostPerformance() {
   const [days, setDays] = useState(7);
+  const [operation, setOperation] = useState("all");
+  const [providerModel, setProviderModel] = useState("all");
   const fetchBenchmark = useServerFn(getAiCostPerformance);
   const query = useQuery({
     queryKey: ["admin-cost-performance", days],
@@ -24,6 +26,20 @@ export function AdminCostPerformance() {
     retry: false,
     staleTime: Infinity,
   });
+  const rows = useMemo(() => query.data?.comparisons ?? [], [query.data?.comparisons]);
+  const operationOptions = useMemo(
+    () => [...new Map(rows.map((row) => [row.operation, row.label])).entries()],
+    [rows],
+  );
+  const providerModelOptions = useMemo(
+    () => [...new Set(rows.map((row) => `${row.provider}\u0000${row.model}`))],
+    [rows],
+  );
+  const filteredRows = rows.filter(
+    (row) =>
+      (operation === "all" || row.operation === operation) &&
+      (providerModel === "all" || `${row.provider}\u0000${row.model}` === providerModel),
+  );
 
   return (
     <section className="pt-2">
@@ -57,6 +73,42 @@ export function AdminCostPerformance() {
         </div>
       </div>
 
+      <div className="mb-4 grid gap-2 sm:grid-cols-2">
+        <label className="text-xs text-muted-foreground">
+          Operação
+          <select
+            className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+            value={operation}
+            onChange={(event) => setOperation(event.target.value)}
+          >
+            <option value="all">Todas</option>
+            {operationOptions.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs text-muted-foreground">
+          Provider / modelo
+          <select
+            className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+            value={providerModel}
+            onChange={(event) => setProviderModel(event.target.value)}
+          >
+            <option value="all">Todos</option>
+            {providerModelOptions.map((value) => {
+              const [provider, model] = value.split("\u0000");
+              return (
+                <option key={value} value={value}>
+                  {provider} · {model}
+                </option>
+              );
+            })}
+          </select>
+        </label>
+      </div>
+
       {query.isPending ? (
         <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" /> Carregando
@@ -76,7 +128,7 @@ export function AdminCostPerformance() {
               ["Latência média", fmtMs(query.data.avgMs)],
               ["Taxa de erro", fmtPct(query.data.errorRate)],
               ["Cache HIT", query.data.cacheHits.toLocaleString()],
-              ["Cache ativo", query.data.activeCacheEntries.toLocaleString()],
+              ["Economia do cache", ND],
             ].map(([label, value]) => (
               <div key={label} className="rounded-md border border-border bg-muted/30 p-3">
                 <p className="text-xs text-muted-foreground">{label}</p>
@@ -103,10 +155,11 @@ export function AdminCostPerformance() {
           </div>
 
           <p className="mt-3 text-xs text-muted-foreground">
-            Observado: chamadas, tokens, latência, erros e HITs cumulativos do cache. Calculado:
-            totais e médias. Estimado: custo e projeções somente quando todos os registros possuem
-            custo. Provider: derivado do identificador do modelo registrado. First token, first
-            chunk, retries, fallback e cache MISS: N/D.
+            Observado: chamadas, tokens, duração, erros e HITs cumulativos do cache. Calculado:
+            totais, médias, mediana e p95 com pelo menos 10 durações. Estimado: custo e projeções
+            somente quando todos os registros possuem custo. N/D: first token/chunk/audio,
+            streaming, retries, fallback, créditos e economia do cache. O provider da Transcription
+            histórica não é atribuível porque o registro guardou o modelo de fallback.
           </p>
           {query.data.truncated && (
             <p className="mt-1 text-xs text-muted-foreground">
@@ -115,7 +168,7 @@ export function AdminCostPerformance() {
           )}
 
           <div className="mt-4 max-h-[48vh] overflow-auto">
-            <table className="w-full min-w-[1680px] text-left text-xs">
+            <table className="w-full min-w-[2100px] text-left text-xs">
               <thead className="sticky top-0 bg-background">
                 <tr className="border-b border-border font-semibold uppercase text-muted-foreground">
                   {[
@@ -126,10 +179,17 @@ export function AdminCostPerformance() {
                     "Input",
                     "Output",
                     "Total",
-                    "Latência",
+                    "Duração total",
+                    "Média",
+                    "Mediana",
+                    "P95",
                     "First token",
                     "First chunk",
                     "Erros",
+                    "Taxa erro",
+                    "Timeouts",
+                    "Cancelamentos",
+                    "Tipos de erro",
                     "Retries",
                     "Fallback",
                     "Cache HIT",
@@ -147,7 +207,7 @@ export function AdminCostPerformance() {
                 </tr>
               </thead>
               <tbody>
-                {query.data.comparisons.map((row) => (
+                {filteredRows.map((row) => (
                   <tr
                     key={`${row.operation}-${row.model}`}
                     className="border-b border-border/60 align-top"
@@ -164,10 +224,19 @@ export function AdminCostPerformance() {
                         {row.tokenCoverage}/{row.calls} medidos
                       </div>
                     </td>
+                    <td className="pr-3">{fmtMs(row.totalDurationMs)}</td>
                     <td className="pr-3">{fmtMs(row.avgMs)}</td>
+                    <td className="pr-3">{fmtMs(row.medianMs)}</td>
+                    <td className="pr-3">{fmtMs(row.p95Ms)}</td>
                     <td className="pr-3">{ND}</td>
                     <td className="pr-3">{ND}</td>
                     <td className="pr-3">{row.errors}</td>
+                    <td className="pr-3">{fmtPct(row.errorRate)}</td>
+                    <td className="pr-3">{row.timeouts}</td>
+                    <td className="pr-3">{row.cancellations}</td>
+                    <td className="max-w-56 pr-3 text-muted-foreground">
+                      {row.errorTypes.join(", ") || "—"}
+                    </td>
                     <td className="pr-3">{ND}</td>
                     <td className="pr-3">{ND}</td>
                     <td className="pr-3">

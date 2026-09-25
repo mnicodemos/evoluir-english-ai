@@ -66,6 +66,13 @@ function providerOf(model: string) {
   return model.includes("/") ? "Lovable AI" : "Gemini (personal key)";
 }
 
+function benchmarkProviderOf(operation: string, model: string) {
+  if (operation === "transcription" && !model.includes("/")) {
+    return "N/D — provider não registrado";
+  }
+  return providerOf(model);
+}
+
 type BenchmarkUsageRow = {
   operation: string;
   model: string;
@@ -74,6 +81,7 @@ type BenchmarkUsageRow = {
   input_tokens: number | null;
   output_tokens: number | null;
   estimated_cost: number | null;
+  error_code?: string | null;
 };
 
 type BenchmarkCacheRow = {
@@ -93,6 +101,17 @@ function sumOrNull(values: Array<number | null>): number | null {
 function sumMeasured(values: Array<number | null>): number | null {
   const measured = values.filter((value): value is number => typeof value === "number");
   return measured.length ? measured.reduce((sum, value) => sum + value, 0) : null;
+}
+
+function percentile(sorted: number[], value: number): number | null {
+  if (sorted.length < 10) return null;
+  const index = (sorted.length - 1) * value;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) return Math.round(sorted[lower] ?? 0);
+  const lowerValue = sorted[lower] ?? 0;
+  const upperValue = sorted[upper] ?? lowerValue;
+  return Math.round(lowerValue + (upperValue - lowerValue) * (index - lower));
 }
 
 export function aggregateCostPerformance(
@@ -122,7 +141,8 @@ export function aggregateCostPerformance(
       const model = key.slice(separator + 1);
       const durations = groupRows
         .map((row) => row.duration_ms)
-        .filter((value): value is number => typeof value === "number");
+        .filter((value): value is number => typeof value === "number")
+        .sort((a, b) => a - b);
       const inputTokens = sumMeasured(groupRows.map((row) => row.input_tokens));
       const outputTokens = sumMeasured(groupRows.map((row) => row.output_tokens));
       const estimatedCost = sumOrNull(groupRows.map((row) => row.estimated_cost));
@@ -131,7 +151,7 @@ export function aggregateCostPerformance(
       return {
         operation,
         label: OPERATION_FACTS[operation]?.label ?? operation,
-        provider: providerOf(model),
+        provider: benchmarkProviderOf(operation, model),
         model,
         calls: groupRows.length,
         inputTokens,
@@ -144,14 +164,37 @@ export function aggregateCostPerformance(
         avgMs: durations.length
           ? Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length)
           : null,
+        totalDurationMs: durations.length ? durations.reduce((sum, value) => sum + value, 0) : null,
+        medianMs: percentile(durations, 0.5),
+        p95Ms: percentile(durations, 0.95),
         errors: groupRows.filter((row) => row.success === false).length,
+        errorRate: groupRows.length
+          ? (groupRows.filter((row) => row.success === false).length / groupRows.length) * 100
+          : null,
+        timeouts: groupRows.filter((row) => row.error_code === "timeout").length,
+        cancellations: groupRows.filter(
+          (row) => row.error_code === "cancelled" || row.error_code === "abandoned",
+        ).length,
+        errorTypes: Object.entries(
+          groupRows.reduce<Record<string, number>>((counts, row) => {
+            if (row.success === false) {
+              const code = row.error_code ?? "unknown";
+              counts[code] = (counts[code] ?? 0) + 1;
+            }
+            return counts;
+          }, {}),
+        )
+          .sort((a, b) => b[1] - a[1])
+          .map(([code, count]) => `${code} (${count})`),
         firstTokenMs: null,
         firstChunkMs: null,
         retries: null,
         fallback: null,
         cacheHits: cache.hits,
         activeCacheEntries: cache.activeEntries,
-        cacheMisses: null,
+        cacheMisses: operation === "dictionary" ? groupRows.length : null,
+        cacheHitRate: null,
+        cacheSavings: null,
         lovableCredits: null,
         estimatedCost,
         projectedCost1k: costPerCall === null ? null : costPerCall * 1_000,
@@ -327,7 +370,7 @@ export const getAiCostPerformance = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("ai_usage_events")
         .select(
-          "operation, model, success, duration_ms, input_tokens, output_tokens, estimated_cost",
+          "operation, model, success, duration_ms, input_tokens, output_tokens, estimated_cost, error_code",
         )
         .gte("created_at", since)
         .order("created_at", { ascending: false })
