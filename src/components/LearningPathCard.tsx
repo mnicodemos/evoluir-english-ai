@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
   BookOpen,
+  BarChart3,
   CheckCircle2,
   ChevronRight,
   Download,
