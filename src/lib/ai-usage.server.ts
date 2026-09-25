@@ -74,23 +74,44 @@ async function releaseAbandonedAiUsage(_userId: string, _operation: AiOperation)
     .lt("created_at", cutoff);
 }
 
+export type AiLimitRow = {
+  daily_limit: number;
+  monthly_limit: number;
+  premium_daily_limit: number;
+  premium_monthly_limit: number;
+  min_interval_seconds: number;
+  max_concurrent: number;
+  enabled: boolean;
+  cache_ttl_seconds: number;
+};
+
+/** Single read of the operation's ai_limits row (limits + cache TTL). Null on failure. */
+export async function loadAiLimit(operation: AiOperation): Promise<AiLimitRow | null> {
+  const db = await admin();
+  const { data, error } = await db
+    .from("ai_limits")
+    .select(
+      "daily_limit, monthly_limit, premium_daily_limit, premium_monthly_limit, min_interval_seconds, max_concurrent, enabled, cache_ttl_seconds",
+    )
+    .eq("operation", operation)
+    .maybeSingle();
+  return error || !data ? null : data;
+}
+
 export async function reserveAiUsage(input: {
   userId: string;
   operation: AiOperation;
   model: string;
   requestHash?: string;
+  /** ai_limits row already loaded in this request; omitted = read it here. */
+  limit?: AiLimitRow | null;
 }): Promise<UsageTicket> {
   await releaseAbandonedAiUsage(input.userId, input.operation);
   const db = await admin();
 
-  const { data: limit, error: limitError } = await db
-    .from("ai_limits")
-    .select(
-      "daily_limit, monthly_limit, premium_daily_limit, premium_monthly_limit, min_interval_seconds, max_concurrent, enabled",
-    )
-    .eq("operation", input.operation)
-    .single();
-  if (limitError || !limit)
+  // Reuse the row already read by the caller (same request) instead of reading ai_limits again.
+  const limit = input.limit ?? (await loadAiLimit(input.operation));
+  if (!limit)
     throw new AiUsageError(
       503,
       "limits_unavailable",

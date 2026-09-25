@@ -32,12 +32,19 @@ export async function callGateway(
   const GEMINI_TEXT_MODEL = lovable ? lovable.LOVABLE_TALKING_MODEL : geminiModel;
   const usageTools = usage ? await import("./ai-usage.server") : null;
   const requestHash = usageTools ? await usageTools.hashAiRequest({ messages, jsonMode }) : "";
-  const ttl = usage && usageTools ? await usageTools.operationCacheTtl(usage.operation) : 0;
+  // One ai_limits read per call: TTL comes from it and reserveAiUsage reuses it.
+  const limitRow = usage && usageTools ? await usageTools.loadAiLimit(usage.operation) : null;
+  const ttl = limitRow?.cache_ttl_seconds ?? 0;
   const cached = ttl > 0 && usageTools ? await usageTools.readAiCache(requestHash) : null;
   if (cached !== null) return cached;
   const ticket =
     usage && usageTools
-      ? await usageTools.reserveAiUsage({ ...usage, model: GEMINI_TEXT_MODEL, requestHash })
+      ? await usageTools.reserveAiUsage({
+          ...usage,
+          model: GEMINI_TEXT_MODEL,
+          requestHash,
+          limit: limitRow,
+        })
       : null;
   let text: string | null = null;
   let usageTokens: { inputTokens?: number; outputTokens?: number } = {};
