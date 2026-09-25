@@ -79,20 +79,28 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-sidebar-border bg-sidebar p-4 text-sidebar-foreground shadow-[var(--shadow-soft)]"
+        className="dashboard-focus relative min-w-0 overflow-hidden rounded-xl border border-brand-green/25 bg-sidebar px-4 py-3 text-sidebar-foreground shadow-[var(--shadow-soft)] sm:py-4"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse at 18% 60%, color-mix(in oklab, var(--brand-green) 22%, transparent), transparent 60%)",
+        }}
         aria-label={t("Your next step")}
       >
-        <div className="grid h-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-[9rem_minmax(0,1fr)] xl:grid-cols-[11rem_minmax(0,1fr)_minmax(12rem,0.72fr)]">
-          <div className="absolute right-3 top-3 h-28 w-24 opacity-35 sm:relative sm:right-auto sm:top-auto sm:h-auto sm:w-auto sm:opacity-100">
-            <EvoGuide
-              title={t("Your focus is here. Get started now!")}
-              imageSize="lesson"
-              contrast="inverse"
-              className="h-full grid-cols-1 content-end [&>div:first-child]:absolute [&>div:first-child]:inset-0 [&>div:first-child]:w-full [&>div:first-child]:opacity-95 [&>div:last-child]:sr-only"
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_7rem] gap-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-5 xl:grid-cols-[13rem_minmax(0,1fr)_minmax(13rem,0.62fr)]">
+          <div
+            className="relative order-2 -my-3 -mr-4 min-h-[9rem] sm:order-none sm:-my-4 sm:mr-0 sm:-ml-4"
+            aria-hidden="true"
+          >
+            <img
+              src={evoGuideOfficial.url}
+              alt=""
+              width={1273}
+              height={1236}
+              className="absolute inset-x-0 bottom-0 h-full w-full object-contain object-bottom drop-shadow-[0_8px_24px_color-mix(in_oklab,var(--brand-green)_35%,transparent)]"
             />
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-center pr-20 sm:pr-0 xl:px-2">
+          <div className="relative z-10 flex min-w-0 flex-col justify-center xl:px-1">
             <p className="text-[11px] font-bold uppercase text-brand-green">
               EVO · {t("Your AI Learning Coach")}
             </p>

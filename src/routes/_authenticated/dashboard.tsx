@@ -138,7 +138,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-3 lg:min-h-[calc(100vh-3rem)] lg:grid-rows-[auto_auto_minmax(15rem,1fr)_auto_auto] xl:min-h-[calc(100vh-1.5rem)]">
+        <div className="dashboard-one-screen grid gap-3">
           <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center">
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">{t("Welcome back")}</p>
@@ -202,7 +202,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <section className="order-1 min-h-[19rem] lg:order-none lg:min-h-[15rem] [@media(min-height:850px)]:lg:min-h-[19rem]">
+          <section className="order-1 lg:order-none">
             <NextStepCard compact />
           </section>
 
