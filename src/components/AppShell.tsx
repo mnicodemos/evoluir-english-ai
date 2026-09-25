@@ -93,12 +93,12 @@ function AppShellContent({
       <div
         className={cn(
           "min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0",
-          dashboardLayout ? "dark lg:pl-52" : "lg:pl-20",
+          dashboardLayout ? "dashboard-shell dark lg:pl-52" : "lg:pl-20",
         )}
       >
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-30 hidden flex-col bg-sidebar py-5 text-sidebar-foreground lg:flex",
+            "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-sidebar-border bg-sidebar py-5 text-sidebar-foreground lg:flex",
             dashboardLayout ? "w-52 items-stretch px-3" : "w-20 items-center",
           )}
         >
@@ -138,7 +138,10 @@ function AppShellContent({
                         ? "grid h-10 grid-cols-[2rem_minmax(0,1fr)] items-center px-2 text-sm font-medium"
                         : "grid size-10 place-items-center",
                     )}
-                    activeProps={{ className: "bg-sidebar-accent text-sidebar-foreground" }}
+                    activeProps={{
+                      className:
+                        "border border-brand-green/35 bg-sidebar-accent text-brand-green shadow-[inset_3px_0_0_var(--brand-green)]",
+                    }}
                   >
                     <item.icon className="size-5" />
                     {dashboardLayout && (
@@ -180,7 +183,7 @@ function AppShellContent({
           </div>
         </aside>
 
-        <header className="sticky top-0 z-20 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/85 px-3 backdrop-blur sm:px-4 lg:hidden">
+        <header className="sticky top-0 z-20 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4 lg:hidden">
           <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
             <Logo className="size-[1.3rem] shrink-0" />
             <BrandName className="truncate text-sm" />

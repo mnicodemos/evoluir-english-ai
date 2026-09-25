@@ -135,7 +135,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-3 xl:gap-2">
+        <div className="dashboard-one-screen grid gap-2.5 xl:gap-2">
           <header className="animate-rise grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-center xl:h-[4.5rem]">
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">{t("Welcome back")}</p>
@@ -146,7 +146,7 @@ function Dashboard() {
                 <div className="flex shrink-0 items-center gap-2">
                   <WandSparkles className="size-5 shrink-0 text-brand-green" aria-hidden="true" />
                   {profile.plan === "premium" ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold text-warning-foreground">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-warning px-2 py-1 text-xs font-bold text-warning-foreground shadow-sm">
                       <Crown className="size-3.5 text-warning" /> Premium
                     </span>
                   ) : (
@@ -212,7 +212,10 @@ function Dashboard() {
               </h2>
               <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1 xl:grid-cols-2">
                 {learningCards.map((card) => (
-                  <div key={card.label} className="min-w-0 rounded-md bg-secondary p-2 text-center">
+                  <div
+                    key={card.label}
+                    className="dashboard-tile min-w-0 rounded-md border p-2 text-center"
+                  >
                     <span className="text-base" aria-hidden="true">
                       {card.emoji}
                     </span>
@@ -254,15 +257,15 @@ function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="group relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-border bg-background px-2 py-2 transition-colors hover:bg-accent"
+                    className="dashboard-quick-link group relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border px-2 py-2 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5"
                   >
                     {hasNew && (
                       <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
                         <span className="sr-only">{t("New activity available")}</span>
                       </span>
                     )}
-                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-secondary">
-                      <item.icon className="size-4 text-primary" />
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-background/45">
+                      <item.icon className="size-4 text-foreground" />
                     </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
                   </Link>
