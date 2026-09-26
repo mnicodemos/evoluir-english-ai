@@ -68,7 +68,7 @@ export function SmartReviewCard({
 
   if (compact) {
     return (
-      <section className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4" aria-labelledby="smart-review-title">
+      <section className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-3" aria-labelledby="smart-review-title">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
           <BookOpen className="size-6 text-dashboard-cyan" strokeWidth={2.5} aria-hidden="true" />
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
@@ -76,7 +76,7 @@ export function SmartReviewCard({
           </h2>
           <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <ul className="mt-3 grid flex-1 grid-rows-2 gap-2 overflow-hidden xl:mt-4 xl:gap-2">
+        <ul className="mt-2.5 grid flex-1 grid-rows-2 gap-2 overflow-hidden xl:mt-2.5 xl:gap-2">
           {items.slice(0, 2).map((item, index) => {
             const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
             return (

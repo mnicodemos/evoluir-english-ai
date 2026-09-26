@@ -246,7 +246,7 @@ function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="dashboard-quick-link group relative grid min-h-14 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-md border px-2.5 py-2 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:grid-cols-[3rem_minmax(0,1fr)_auto] xl:px-3.5"
+                    className="dashboard-quick-link group relative grid min-h-12 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-md border px-2.5 py-1.5 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:max-h-14 xl:grid-cols-[2.5rem_minmax(0,1fr)_auto] xl:px-3"
                   >
                     {hasNew && (
                       <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
