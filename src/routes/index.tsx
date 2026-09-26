@@ -185,7 +185,7 @@ function CommercialLanding() {
               </div>
             </div>
 
-            <div className="relative mx-auto flex h-[390px] w-full max-w-[540px] items-end justify-center sm:h-[540px] lg:h-[680px] lg:self-end">
+            <div className="relative mx-auto flex h-[519px] w-full max-w-[718px] items-end justify-center sm:h-[718px] lg:h-[904px] lg:self-end">
               <div
                 className="absolute bottom-[13%] left-1/2 h-[18%] w-[62%] -translate-x-1/2 rounded-full bg-success/10 blur-3xl"
                 aria-hidden="true"
