@@ -13,7 +13,7 @@
 
 - Dashboard-only density and navigation styling must use opt-in presentation props on existing components, preserving their shared data and behavior.
 - The Dashboard Today's Focus must use the complete, unedited `Evo_novo_Dashboard.jpg` attachment through its CDN pointer; never remove its background, and keep it left of the text on mobile. Other EVO placements remain unchanged.
-- Dashboard visual tokens and dark surfaces stay scoped under `dashboard-shell`; this preserves the shared light/dark presentation of every other authenticated page.
+- `dashboard-shell` dark tokens are applied by AppShell to every authenticated page (user request: one visual identity); portaled surfaces like the Admin dialog opt in with their own `dashboard-shell dark` class.
 - Dashboard desktop height uses dynamic viewport units with a `vh` fallback and a 50px safety budget; this prevents browser-specific vertical scroll.
 - Daily Reflection weather is a client-only visual enhancement using permitted geolocation and Open-Meteo; deterministic sun/moon remains the no-location fallback.
 - Public home and auth opt into Dashboard tokens through `brand-dashboard-theme`; this shares visual identity without changing shared authenticated screens.

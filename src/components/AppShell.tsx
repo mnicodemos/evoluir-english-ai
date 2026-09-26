@@ -108,8 +108,8 @@ function AppShellContent({
     <TooltipProvider delayDuration={200}>
       <div
         className={cn(
-          "min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0",
-          dashboardLayout ? "dashboard-shell dark lg:pl-[13.2rem]" : "lg:pl-20",
+          "dashboard-shell dark min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0",
+          dashboardLayout ? "lg:pl-[13.2rem]" : "lg:pl-20",
         )}
       >
         <aside
