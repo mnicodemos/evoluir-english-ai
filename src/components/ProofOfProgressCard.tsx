@@ -59,17 +59,25 @@ export function ProofOfProgressCard() {
   })).filter((group) => group.items.length > 0);
 
   return (
-    <section className="card-soft mt-5 p-5" aria-labelledby="proof-of-progress-title">
-      <EvoGuide
-        title={
-          data.highlights.length > 0
-            ? t("We already have evidence of development in your skills.")
-            : t("We are still building evidence about your evolution.")
-        }
-        imageSize="lesson"
-      />
+    <>
+      <section
+        className="card-soft mt-5 overflow-hidden bg-primary"
+        aria-label={t("EVO")}
+      >
+        <EvoGuide
+          title={
+            data.highlights.length > 0
+              ? t("We already have evidence of development in your skills.")
+              : t("We are still building evidence about your evolution.")
+          }
+          imageSize="lesson"
+          contrast="inverse"
+          className="pr-4 sm:pr-5"
+        />
+      </section>
 
-      <div className="mt-5 flex min-w-0 items-start gap-4 border-t border-border pt-5">
+      <section className="card-soft mt-5 p-5" aria-labelledby="proof-of-progress-title">
+        <div className="flex min-w-0 items-start gap-4">
         <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
           <Sparkles className="size-5 text-[oklch(0.55_0.14_158)]" aria-hidden="true" />
         </span>
@@ -114,6 +122,7 @@ export function ProofOfProgressCard() {
           )}
         </div>
       </div>
-    </section>
+      </section>
+    </>
   );
 }

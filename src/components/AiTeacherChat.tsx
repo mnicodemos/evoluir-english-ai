@@ -230,6 +230,8 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
                 <EvoGuide
                   title={t("Hi! I'm EVO. I'm here to help you practise and develop your English.")}
                   imageSize="lesson"
+                  contrast="inverse"
+                  className="card-soft overflow-hidden bg-primary -mx-4 -mt-4 pr-4"
                 />
                 <div className="flex flex-wrap gap-2">
                   {suggestions.map((suggestion) => (
@@ -303,7 +305,8 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             disabled={turn.isPending}
             onChange={(event) => setInput(event.target.value)}
             onFocus={(event) => {
-              window.setTimeout(() => event.currentTarget.scrollIntoView({ block: "center" }), 150);
+              const target = event.currentTarget;
+              window.setTimeout(() => target.scrollIntoView({ block: "center" }), 150);
             }}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
