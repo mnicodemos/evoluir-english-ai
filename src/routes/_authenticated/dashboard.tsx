@@ -275,9 +275,6 @@ function Dashboard() {
             <ArrowRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           </Link>
 
-          <div className="order-6 lg:hidden">
-            <EvoDailyReflection userId={profile.id} name={profile.name} placement="mobile-card" />
-          </div>
         </div>
       )}
     </AppShell>
