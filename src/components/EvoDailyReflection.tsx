@@ -39,19 +39,19 @@ export function EvoDailyReflection({
     return (
       <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.68fr)] lg:items-center">
         <div className="min-w-0">
-          <h1 className="flex min-w-0 items-center gap-2 text-2xl font-bold text-foreground 2xl:text-3xl">
+          <h1 className="flex min-w-0 items-center gap-2 font-display text-2xl font-bold text-foreground 2xl:text-3xl">
             <span className="truncate">
               {greeting}, {displayName}!
             </span>
-            <Hand className="size-5 shrink-0 text-warning" aria-hidden="true" />
+             <Hand className="size-6 shrink-0 fill-warning/25 text-warning" strokeWidth={2.2} aria-hidden="true" />
           </h1>
           <p className="mt-1 truncate text-sm text-muted-foreground">
             {t("Great to have you back. Let's keep building your fluency.")}
           </p>
         </div>
         <aside className="dashboard-panel flex min-w-0 items-center gap-3 rounded-lg px-3 py-2">
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-warning/10">
-            <Sun className="size-5 text-warning" aria-hidden="true" />
+           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-warning/10">
+             <Sun className="size-6 text-warning" strokeWidth={2.4} aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="line-clamp-1 text-xs text-muted-foreground">

@@ -69,7 +69,7 @@ export function LevelCard({
           )}
         >
           {compact ? (
-            <ChartNoAxesColumnIncreasing className="size-7 text-dashboard-cyan" strokeWidth={2.6} />
+            <ChartNoAxesColumnIncreasing className="size-7 text-dashboard-cyan" strokeWidth={2.8} />
           ) : (
             <GraduationCap className="size-6 text-accent-foreground" />
           )}
@@ -78,7 +78,7 @@ export function LevelCard({
           <p
             className={cn(
               "truncate font-bold",
-              compact ? "text-sm" : "text-lg sm:text-base md:text-lg",
+              compact ? "font-display text-sm" : "text-lg sm:text-base md:text-lg",
             )}
           >
             {current.label}
