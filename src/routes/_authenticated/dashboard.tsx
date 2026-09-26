@@ -96,7 +96,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-3 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4rem_6.5rem_17.333rem_minmax(10.5rem,0.9fr)_minmax(5.25rem,0.4fr)] xl:gap-3.5">
+        <div className="dashboard-one-screen grid gap-3 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4rem_6.5rem_17.333rem_minmax(10.5rem,0.9fr)_minmax(4.75rem,0.35fr)] xl:gap-3">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
