@@ -311,16 +311,6 @@ function AppShellContent({
           ))}
         </nav>
 
-        {location.pathname === "/dashboard" && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <AiTeacherFloatButton />
-            </TooltipTrigger>
-            <TooltipContent side="left" sideOffset={8}>
-              {translate("AI Teacher")}
-            </TooltipContent>
-          </Tooltip>
-        )}
       </div>
     </TooltipProvider>
   );
