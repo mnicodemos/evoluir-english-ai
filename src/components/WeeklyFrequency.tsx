@@ -157,13 +157,19 @@ export function WeeklyFrequency({
                 <span
                   className={cn(
                     "text-[9px] text-muted-foreground",
-                    isToday && !studied && "font-semibold text-warning",
+                    isToday && "font-semibold text-warning",
                   )}
                 >
                   {labels[i]}
                 </span>
                 {studied ? (
-                  <span className="grid size-5 place-items-center rounded-full bg-brand-green text-primary-foreground">
+                  <span
+                    className={cn(
+                      "grid size-5 place-items-center rounded-full text-primary-foreground",
+                      isToday ? "bg-warning" : "bg-brand-green",
+                    )}
+                    title={isToday ? (lang === "pt" ? "Hoje" : "Today") : undefined}
+                  >
                     <Check className="size-3" strokeWidth={3} />
                   </span>
                 ) : isToday ? (
