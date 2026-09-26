@@ -195,8 +195,33 @@ function AppShellContent({
           </nav>
 
           <div
-            className={cn("flex gap-1", dashboardLayout ? "items-center" : "flex-col items-center")}
+            className={cn(
+              "flex gap-1",
+              dashboardLayout ? "flex-col items-stretch" : "flex-col items-center",
+            )}
           >
+            {dashboardLayout && (
+              <div className="flex items-center gap-1 px-1 pb-1">
+                <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
+                <span className="flex-1" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={translate("Sign out")}
+                      className="size-9 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                      onClick={signOut}
+                    >
+                      <LogOut className="size-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" sideOffset={8}>
+                    {translate("Sign out")}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            )}
             {!dashboardLayout && (
               <>
                 <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />

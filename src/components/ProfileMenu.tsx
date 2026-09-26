@@ -180,7 +180,7 @@ export function ProfileMenu({
           aria-label={translate("Edit profile", lang)}
           className={cn(
             presentation === "dashboard-sidebar"
-              ? "h-auto w-full justify-start gap-2 rounded-none border-t border-sidebar-border px-1 pt-3 pb-0 text-sidebar-foreground hover:bg-transparent"
+              ? "h-auto min-h-[4.5rem] w-full justify-start gap-2 rounded-none border-t border-sidebar-border px-1 pt-4 pb-4 text-sidebar-foreground hover:bg-transparent"
               : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
             className,
           )}
