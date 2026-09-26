@@ -159,11 +159,11 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   const ctx = session.data?.context;
 
   return (
-    <div className="flex w-full max-w-none flex-col gap-4">
-      <header className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:justify-between">
+    <div className="flex w-full max-w-none flex-col gap-3 sm:gap-4">
+      <header className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-lg font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
+          <p className="text-xs text-muted-foreground sm:text-sm">
             {t("Practice English with your personal AI teacher")}
           </p>
         </div>
