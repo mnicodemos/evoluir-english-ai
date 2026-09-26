@@ -1,6 +1,14 @@
-import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { Hand, MoreVertical, Share2, Sun, Target, TreePine } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
