@@ -62,19 +62,28 @@ const dashboardAccountNav = [
 export function AppShell({
   children,
   dashboardLayout = false,
+  mobileOneScreen = false,
 }: {
   children: ReactNode;
   dashboardLayout?: boolean;
+  /** Opt-in: drops the page footer on mobile so the screen fits one viewport. */
+  mobileOneScreen?: boolean;
 }) {
-  return <AppShellContent dashboardLayout={dashboardLayout}>{children}</AppShellContent>;
+  return (
+    <AppShellContent dashboardLayout={dashboardLayout} mobileOneScreen={mobileOneScreen}>
+      {children}
+    </AppShellContent>
+  );
 }
 
 function AppShellContent({
   children,
   dashboardLayout,
+  mobileOneScreen,
 }: {
   children: ReactNode;
   dashboardLayout: boolean;
+  mobileOneScreen: boolean;
 }) {
   const navigate = useNavigate();
   const location = useLocation();
