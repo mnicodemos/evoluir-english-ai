@@ -279,6 +279,19 @@
   animation: weather-icon-change 240ms ease-out;
 }
 
+.brand-dashboard-theme {
+  --gradient-hero: linear-gradient(
+    140deg,
+    var(--background) 0%,
+    var(--card) 58%,
+    var(--secondary) 100%
+  );
+}
+
+.brand-dashboard-theme .lucide {
+  stroke-width: 2.4;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .weather-icon-change {
     animation: none;
