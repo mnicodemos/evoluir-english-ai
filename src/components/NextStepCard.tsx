@@ -93,11 +93,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               alt=""
                width={1536}
                height={1024}
-              className="absolute inset-0 h-full w-full object-contain object-left"
+               className="absolute inset-0 h-full w-full object-cover object-left"
             />
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-center px-3 py-3 sm:px-4 xl:px-3 xl:py-2">
+          <div className="relative z-10 flex min-w-0 flex-col justify-between px-3 py-3 sm:px-4 xl:px-3 xl:py-2">
             <p className="text-[11px] font-bold uppercase text-brand-green">
               EVO · {t("Your AI Learning Coach")}
             </p>
@@ -171,7 +171,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 xl:col-span-1 xl:m-1.5 xl:ml-0 xl:self-center">
+          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 xl:col-span-1 xl:m-1.5 xl:ml-0 xl:self-stretch">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
