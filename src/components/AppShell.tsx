@@ -261,7 +261,6 @@ function AppShellContent({
             <BrandName className="truncate text-sm" />
           </Link>
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
-            <UiLangToggle />
             <Button
               variant="ghost"
               size="icon"
