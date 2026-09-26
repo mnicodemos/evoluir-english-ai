@@ -235,7 +235,7 @@ function Dashboard() {
                     className="dashboard-quick-link group relative grid min-h-14 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-md border px-2.5 py-2 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:min-h-12 xl:grid-cols-[3rem_minmax(0,1fr)_auto] xl:px-3.5"
                   >
                     {hasNew && (
-                      <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
+                      <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-brand-green">
                         <span className="sr-only">{t("New activity available")}</span>
                       </span>
                     )}
