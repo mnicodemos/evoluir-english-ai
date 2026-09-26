@@ -24,6 +24,8 @@ export const uiPt: Record<string, string> = {
   "EVO Daily Reflection": "Reflexão diária da EVO",
   "Daily reflection": "Reflexão do dia",
   "Share reflection": "Compartilhar reflexão",
+  "Great to have you back. Let's keep building your fluency.":
+    "Que bom ter você de volta. Vamos continuar construindo sua fluência.",
   "Go to study plan": "Ir para plano de estudo",
   "Change language": "Alterar idioma",
   "Reflection copied to clipboard": "Reflexão copiada para a área de transferência",
