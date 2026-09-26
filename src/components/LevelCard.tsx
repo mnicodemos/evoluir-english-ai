@@ -62,18 +62,16 @@ export function LevelCard({
       )}
     >
       <div className="flex items-center gap-3">
-        <span
-          className={cn(
-            "grid shrink-0 place-items-center rounded-md bg-dashboard-cyan/10",
-            compact ? "size-11" : "size-12",
-          )}
-        >
-          {compact ? (
-            <ChartNoAxesColumnIncreasing className="size-7 text-dashboard-cyan" strokeWidth={2.8} />
-          ) : (
+        {compact ? (
+          <ChartNoAxesColumnIncreasing
+            className="size-[1.925rem] shrink-0 text-dashboard-cyan"
+            strokeWidth={2.8}
+          />
+        ) : (
+          <span className="grid size-12 shrink-0 place-items-center rounded-md bg-dashboard-cyan/10">
             <GraduationCap className="size-6 text-accent-foreground" />
-          )}
-        </span>
+          </span>
+        )}
         <div className="flex-1 min-w-0">
           <p
             className={cn(

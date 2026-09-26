@@ -432,7 +432,7 @@ export function PathProgressCard({
     return (
       <section className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4" aria-labelledby="skills-progress-heading">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
-          <BarChart3 className="size-6 text-dashboard-cyan" strokeWidth={2.6} aria-hidden="true" />
+          <BarChart3 className="size-[1.65rem] text-dashboard-cyan" strokeWidth={2.6} aria-hidden="true" />
           <h2 id="skills-progress-heading" className="font-display text-sm font-semibold">
             {t("Your English Skills")}
           </h2>
@@ -442,9 +442,9 @@ export function PathProgressCard({
           {skills.map((skill) => (
             <div
               key={skill.label}
-              className="grid min-w-0 grid-cols-[1.5rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] items-center gap-2.5 text-xs"
+              className="grid min-w-0 grid-cols-[1.75rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] items-center gap-2.5 text-xs"
             >
-              <skill.icon className={`size-6 ${skill.tone}`} strokeWidth={2.5} aria-hidden="true" />
+              <skill.icon className={`size-[1.65rem] ${skill.tone}`} strokeWidth={2.5} aria-hidden="true" />
               <span className="truncate font-medium">{t(skill.label)}</span>
               <Progress value={skill.value} className={`h-2.5 bg-secondary/80 ${skill.bar}`} />
               <span className="text-right font-semibold text-foreground">{skill.value}%</span>

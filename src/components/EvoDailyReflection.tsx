@@ -84,9 +84,7 @@ export function EvoDailyReflection({
           </p>
         </div>
         <aside className="dashboard-panel flex min-w-0 items-center gap-3 rounded-lg px-3 py-2">
-           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-warning/10">
-             <Sun className="size-6 text-warning" strokeWidth={2.4} aria-hidden="true" />
-          </span>
+            <Sun className="size-[1.65rem] shrink-0 text-warning" strokeWidth={2.4} aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <p className="line-clamp-1 text-xs text-muted-foreground">
               “{reflection.thought[copy]}”

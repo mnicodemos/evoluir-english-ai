@@ -70,7 +70,7 @@ export function SmartReviewCard({
     return (
       <section className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4" aria-labelledby="smart-review-title">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
-          <BookOpen className="size-6 text-dashboard-cyan" strokeWidth={2.5} aria-hidden="true" />
+          <BookOpen className="size-[1.65rem] text-dashboard-cyan" strokeWidth={2.5} aria-hidden="true" />
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
             {t("Keep improving")}
           </h2>

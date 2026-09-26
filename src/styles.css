@@ -257,35 +257,6 @@
   border-color: color-mix(in oklab, var(--dashboard-cyan) 50%, var(--border));
 }
 
-.dashboard-shell .dashboard-quick-link:nth-child(1) .dashboard-quick-icon {
-  background-color: color-mix(in oklab, var(--dashboard-blue) 34%, var(--background));
-  color: var(--dashboard-cyan);
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(2) .dashboard-quick-icon {
-  background-color: color-mix(in oklab, var(--dashboard-cyan) 24%, var(--background));
-  color: var(--brand-green);
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(3) .dashboard-quick-icon {
-  background-color: color-mix(in oklab, var(--dashboard-purple) 38%, var(--background));
-  color: var(--dashboard-purple);
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(4) .dashboard-quick-icon {
-  background-color: color-mix(in oklab, var(--dashboard-coral) 36%, var(--background));
-  color: var(--dashboard-coral);
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(5) .dashboard-quick-icon {
-  background-color: color-mix(in oklab, var(--dashboard-pink) 36%, var(--background));
-  color: var(--dashboard-pink);
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(6) .dashboard-quick-icon {
-  background-color: color-mix(in oklab, var(--dashboard-cyan) 25%, var(--background));
-  color: var(--dashboard-cyan);
-}
 
 @layer base {
   * {
