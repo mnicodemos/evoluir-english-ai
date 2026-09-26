@@ -180,12 +180,12 @@ export function ProfileMenu({
           aria-label={translate("Edit profile", lang)}
           className={cn(
             presentation === "dashboard-sidebar"
-              ? "h-auto w-full justify-start gap-3 rounded-none border-t border-sidebar-border px-3 pt-3 pb-0 text-sidebar-foreground hover:bg-transparent"
+              ? "h-auto w-full justify-start gap-2 rounded-none border-t border-sidebar-border px-1 pt-3 pb-0 text-sidebar-foreground hover:bg-transparent"
               : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
             className,
           )}
         >
-          <Avatar className="size-9 shrink-0 border border-border bg-muted">
+          <Avatar className="size-8 shrink-0 border border-border bg-muted">
             <AvatarImage src={photo} alt={displayName} className="object-cover" />
             <AvatarFallback className="bg-accent text-[11px] font-bold text-accent-foreground">
               {profile ? initials(profile.name, profile.email) : <UserRound className="size-4" />}
@@ -194,14 +194,14 @@ export function ProfileMenu({
           {presentation === "dashboard-sidebar" && (
             <>
               <span className="min-w-0 flex-1 text-left">
-                <span className="block truncate text-[13px] font-semibold text-sidebar-foreground">
+                <span className="block truncate text-xs font-semibold text-sidebar-foreground">
                   {displayName.split(/\s+/)[0]}
                 </span>
                 <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
                   {profile?.plan === "premium" ? "Premium" : translate("Profile", lang)}
                 </span>
               </span>
-              <Settings className="size-[1.125rem] shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
+              <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
             </>
           )}
         </Button>

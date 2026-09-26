@@ -204,16 +204,6 @@
   color: var(--foreground);
 }
 
-.dashboard-sidebar {
-  background:
-    radial-gradient(circle at 0% 100%, color-mix(in oklab, var(--brand-green) 13%, transparent), transparent 31%),
-    var(--sidebar);
-}
-
-.dashboard-sidebar-link[data-status="active"] > svg {
-  color: var(--brand-green);
-}
-
 .dashboard-shell .card-soft {
   background-color: var(--card);
   color: var(--card-foreground);

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { ChevronRight, Hand, Sun, TreePine } from "lucide-react";
+import { Hand, MoreVertical, Share2, Sun, Target, TreePine } from "lucide-react";
 
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
@@ -50,23 +49,27 @@ export function EvoDailyReflection({
             {t("Great to have you back. Let's keep building your fluency.")}
           </p>
         </div>
-        <Link
-          to="/progress"
-          className="dashboard-panel flex min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-accent"
-        >
+        <aside className="dashboard-panel flex min-w-0 items-center gap-3 rounded-lg px-3 py-2">
            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-warning/10">
              <Sun className="size-6 text-warning" strokeWidth={2.4} aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-1 text-sm text-foreground">
+            <p className="line-clamp-1 text-xs text-muted-foreground">
               “{reflection.thought[copy]}”
             </p>
-            <p className="mt-0.5 truncate text-xs text-muted-foreground/75">
+            <p className="mt-0.5 truncate text-[10px] text-muted-foreground/70">
               {reflection.reflection[copy]}
             </p>
           </div>
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-        </Link>
+          <div
+            className="flex shrink-0 items-center gap-2 text-muted-foreground"
+            aria-hidden="true"
+          >
+            <Share2 className="size-3.5" />
+            <Target className="size-3.5" />
+            <MoreVertical className="size-3.5" />
+          </div>
+        </aside>
       </div>
     );
   }
