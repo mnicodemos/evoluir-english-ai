@@ -76,7 +76,7 @@ export function SmartReviewCard({
           </h2>
           <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <ul className="mt-3 grid flex-1 grid-rows-2 gap-2 overflow-hidden xl:mt-4 xl:gap-2">
+        <ul className="mt-2.5 grid flex-1 grid-rows-2 gap-2 overflow-hidden xl:mt-2 xl:gap-1.5">
           {items.slice(0, 2).map((item, index) => {
             const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
             return (

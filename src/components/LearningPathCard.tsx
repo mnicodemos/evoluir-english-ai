@@ -438,13 +438,13 @@ export function PathProgressCard({
           </h2>
           <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <div className="mt-3 grid flex-1 content-between gap-3 xl:mt-4 xl:gap-2">
+        <div className="mt-2.5 grid flex-1 content-between gap-2 xl:mt-2 xl:gap-1.5">
           {skills.map((skill) => (
             <div
               key={skill.label}
               className="grid min-w-0 grid-cols-[1.5rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] items-center gap-2.5 text-xs"
             >
-              <skill.icon className={`size-6 ${skill.tone}`} strokeWidth={2.5} aria-hidden="true" />
+              <skill.icon className={`size-5 ${skill.tone}`} strokeWidth={2.5} aria-hidden="true" />
               <span className="truncate font-medium">{t(skill.label)}</span>
               <Progress value={skill.value} className={`h-2.5 bg-secondary/80 ${skill.bar}`} />
               <span className="text-right font-semibold text-foreground">{skill.value}%</span>
