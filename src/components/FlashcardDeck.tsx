@@ -138,9 +138,9 @@ export function FlashcardDeck({
           <button
             type="button"
             onClick={() => setFlipped(true)}
-            className="relative z-10 flex min-h-72 w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-primary-foreground/25 bg-primary p-6 text-center text-primary-foreground shadow-[var(--shadow-lift)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:aspect-[4/3] sm:min-h-0"
+            className="relative z-10 flex min-h-72 w-full max-w-md flex-col items-center justify-center gap-4 rounded-xl border-4 border-black/15 bg-white p-6 text-center text-black shadow-[var(--shadow-lift)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:aspect-[4/3] sm:min-h-0"
           >
-            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-primary-foreground/15 px-2 py-1 text-[0.65rem] font-bold uppercase text-primary-foreground">
+            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-1 text-[0.65rem] font-bold uppercase text-black">
               {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
               {isListenCard ? "Listen card" : "Question card"}
             </span>
@@ -148,30 +148,30 @@ export function FlashcardDeck({
             <p className="max-w-xs text-xl font-black uppercase leading-tight sm:text-2xl">
               {prompt}
             </p>
-            <p className="text-xs font-medium uppercase text-primary-foreground/75">
+            <p className="text-xs font-medium uppercase text-black/60">
               Tap to see the answer
             </p>
           </button>
         ) : (
           <div
             className={cn(
-              "relative z-10 flex min-h-72 w-full max-w-md flex-col items-center justify-center gap-4 overflow-y-auto rounded-xl border-4 bg-primary p-6 text-center text-primary-foreground shadow-[var(--shadow-lift)] transition-colors sm:aspect-[4/3] sm:min-h-0",
+              "relative z-10 flex min-h-72 w-full max-w-md flex-col items-center justify-center gap-4 overflow-y-auto rounded-xl border-4 bg-white p-6 text-center text-black shadow-[var(--shadow-lift)] transition-colors sm:aspect-[4/3] sm:min-h-0",
               feedback === "correct" && "border-success",
               feedback === "incorrect" && "border-destructive",
-              !feedback && "border-primary-foreground/25",
+              !feedback && "border-black/15",
             )}
           >
-            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-primary-foreground/15 px-2 py-1 text-[0.65rem] font-bold uppercase text-primary-foreground">
+            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-1 text-[0.65rem] font-bold uppercase text-black">
               {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
               {isListenCard ? "Listen card" : "Question card"}
             </span>
 
             <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl">{answerText}</p>
             {card.example && card.example !== answerText && (
-              <p className="max-w-sm text-sm italic text-primary-foreground/80">“{card.example}”</p>
+              <p className="max-w-sm text-sm italic text-black/70">“{card.example}”</p>
             )}
             {card.pronunciation && (
-              <p className="text-xs text-primary-foreground/75">{card.pronunciation}</p>
+              <p className="text-xs text-black/60">{card.pronunciation}</p>
             )}
             {isListenCard && listenText && (
               <Button
@@ -179,7 +179,7 @@ export function FlashcardDeck({
                 onClick={() => void speak(listenText)}
                 disabled={isPlaying}
                 aria-label="Listen to the answer"
-                className="border-2 border-primary-foreground/30 bg-primary text-primary-foreground hover:bg-primary/90"
+                className="border-2 border-black/20 bg-white text-black hover:bg-black/5"
               >
                 <Volume2 className="size-4" /> Listen
               </Button>
@@ -189,6 +189,7 @@ export function FlashcardDeck({
               size="sm"
               onClick={() => setFlipped(false)}
               disabled={feedback !== null}
+              className="text-black hover:bg-black/5 hover:text-black"
             >
               See question
             </Button>
