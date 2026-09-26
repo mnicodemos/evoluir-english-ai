@@ -83,7 +83,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-brand-green/30 bg-sidebar text-sidebar-foreground shadow-[var(--shadow-soft)]"
         aria-label={t("Your next step")}
       >
-        <div className="grid h-full min-w-0 grid-cols-1 sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(13.65rem,0.806fr)]">
+        <div className="grid h-full min-w-0 grid-cols-1 sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(16.38rem,0.9672fr)]">
           <div
             className="relative w-full self-stretch bg-sidebar sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
@@ -176,7 +176,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
             </div>
-            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2 xl:gap-1 xl:text-[10px] xl:leading-tight">
+            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
               {cefrLevel && (
                 <li className="flex items-start gap-2">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
