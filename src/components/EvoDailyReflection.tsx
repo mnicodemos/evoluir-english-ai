@@ -5,6 +5,7 @@ import {
   CloudSnow,
   CloudSun,
   Hand,
+  Languages,
   Moon,
   Share2,
   Sun,
@@ -57,7 +58,7 @@ export function EvoDailyReflection({
   name,
   placement = "desktop",
 }: EvoDailyReflectionProps) {
-  const { lang } = useUiLang();
+  const { lang, setLang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [now, setNow] = useState<Date | null>(null);
   const [weatherCondition, setWeatherCondition] = useState<WeatherCondition | null>(null);
@@ -175,6 +176,21 @@ export function EvoDailyReflection({
               </TooltipTrigger>
               <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
                 {t("Share reflection")}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => setLang(lang === "en" ? "pt" : "en")}
+                  aria-label={t("Change language")}
+                  className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
+                >
+                  <Languages className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
+                {t("Change language")}
               </TooltipContent>
             </Tooltip>
           </div>
