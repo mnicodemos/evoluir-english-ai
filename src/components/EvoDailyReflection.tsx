@@ -146,7 +146,7 @@ export function EvoDailyReflection({
             {t("Great to have you back. Let's keep building your fluency.")}
           </p>
         </div>
-        <aside className="dashboard-panel flex min-w-0 items-center gap-3 rounded-lg px-3 py-2">
+        <aside className="dashboard-panel flex min-w-0 items-start gap-3 rounded-lg px-3 py-2 lg:items-center">
             <WeatherIcon
               key={activeWeatherCondition}
               className="weather-icon-change size-[1.65rem] shrink-0 text-warning"
@@ -154,10 +154,10 @@ export function EvoDailyReflection({
               aria-hidden="true"
             />
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-1 text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground lg:line-clamp-1">
               “{reflection.thought[copy]}”
             </p>
-            <p className="mt-0.5 truncate text-[10px] text-muted-foreground/70">
+            <p className="mt-0.5 text-[10px] text-muted-foreground/70 lg:truncate">
               {reflection.reflection[copy]}
             </p>
           </div>
