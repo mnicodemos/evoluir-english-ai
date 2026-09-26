@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Bolt,
   BookOpen,
-  CalendarCheck,
   Check,
   Flame,
   GraduationCap,
@@ -250,13 +249,6 @@ function Dashboard() {
             </div>
           </section>
 
-          <Link
-            to="/study-plan"
-            className="order-5 grid min-h-14 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-border bg-card px-3 py-2 text-card-foreground shadow-[var(--shadow-soft)] transition-colors hover:bg-accent lg:hidden"
-          >
-             <CalendarCheck className="size-[1.375rem] shrink-0 text-primary" aria-hidden="true" />
-            <span className="min-w-0 truncate text-sm font-semibold">{t("My Study Plan")}</span>
-          </Link>
 
         </div>
       )}
