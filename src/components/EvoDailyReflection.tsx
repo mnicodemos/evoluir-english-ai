@@ -12,6 +12,7 @@ import {
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
