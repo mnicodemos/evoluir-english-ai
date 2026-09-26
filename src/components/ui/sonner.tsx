@@ -2,10 +2,10 @@ import { Toaster as Sonner } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ ...props }: ToasterProps) => {
+const Toaster = ({ className, ...props }: ToasterProps) => {
   return (
     <Sonner
-      className="toaster group"
+      className={`toaster group ${className ?? ""}`}
       toastOptions={{
         classNames: {
           toast:
