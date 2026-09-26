@@ -58,7 +58,7 @@ export function EvoDailyReflection({
   name,
   placement = "desktop",
 }: EvoDailyReflectionProps) {
-  const { lang } = useUiLang();
+  const { lang, setLang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [now, setNow] = useState<Date | null>(null);
   const [weatherCondition, setWeatherCondition] = useState<WeatherCondition | null>(null);
