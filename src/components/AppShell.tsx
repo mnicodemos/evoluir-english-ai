@@ -200,8 +200,7 @@ function AppShellContent({
             )}
           >
             {dashboardLayout && (
-              <div className="flex items-center justify-end gap-1 px-1 pb-1">
-                <span className="flex-1" />
+              <div className="flex items-center gap-1 px-1 pb-1">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
