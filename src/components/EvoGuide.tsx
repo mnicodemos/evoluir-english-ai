@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import evoGuideOfficial from "@/assets/evo-guide-official.png.asset.json";
+import evoGuideOfficial from "@/assets/evo-dashboard-final.jpg.asset.json";
 import { cn } from "@/lib/utils";
 
 type EvoGuideProps = {
