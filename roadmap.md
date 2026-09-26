@@ -137,3 +137,4 @@
 
 - [ ] Quizzes: texto branco no aviso de refazer o quiz (score box + toast 'Score below 70%')
 - [ ] Mudar cor do item quando o nível está selecionado para o verde da barra 'Your daily goal'
+- [ ] Ícone flutuante: usar o mesmo verde do Daily Goal (brand-green)
