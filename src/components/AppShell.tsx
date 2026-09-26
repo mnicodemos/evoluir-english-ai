@@ -18,7 +18,6 @@ import { useEffect, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
 import { BrandName } from "@/components/BrandName";
 import { Footer } from "@/components/Footer";
@@ -223,10 +222,7 @@ function AppShellContent({
               </div>
             )}
             {!dashboardLayout && (
-              <>
-                <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
-                <ThemeToggle className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
-              </>
+              <UiLangToggle className="border-sidebar-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
             )}
             {!dashboardLayout && (
               <Tooltip>
@@ -260,7 +256,6 @@ function AppShellContent({
           </Link>
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
             <UiLangToggle />
-            <ThemeToggle />
             <Button
               variant="ghost"
               size="icon"
