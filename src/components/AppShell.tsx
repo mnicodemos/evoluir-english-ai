@@ -143,7 +143,7 @@ function AppShellContent({
             )}
           </Link>
 
-          <nav className={cn("flex flex-1 flex-col", dashboardLayout ? "mt-0" : "mt-8 gap-1.5")}>
+          <nav className={cn("flex flex-1 flex-col", dashboardLayout ? "mt-0 gap-0.5" : "mt-8 gap-1.5")}>
             {(dashboardLayout ? dashboardSidebarNav : sidebarNav).map((item) => (
               <Tooltip key={item.to}>
                 <TooltipTrigger asChild>
@@ -153,7 +153,7 @@ function AppShellContent({
                     className={cn(
                       "rounded-lg text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground",
                       dashboardLayout
-                        ? "dashboard-sidebar-link -mx-1 grid h-8 grid-cols-[1.75rem_minmax(0,1fr)] items-center px-2 text-xs font-medium"
+                        ? "dashboard-sidebar-link -mx-1 grid h-[2.35rem] grid-cols-[1.9rem_minmax(0,1fr)] items-center px-2 text-[13px] font-medium"
                         : "grid size-10 place-items-center",
                     )}
                     activeProps={{
@@ -161,7 +161,7 @@ function AppShellContent({
                         "border border-brand-green/35 bg-sidebar-accent text-sidebar-foreground shadow-[inset_3px_0_0_var(--brand-green)]",
                     }}
                   >
-                    <item.icon className="size-5 stroke-[2.25]" />
+                    <item.icon className="size-[1.15rem] stroke-[2.15]" />
                     {dashboardLayout && (
                       <span className="truncate text-left">{translate(item.label)}</span>
                     )}
@@ -176,19 +176,19 @@ function AppShellContent({
             ))}
             {dashboardLayout && (
               <>
-                <div className="mx-3 my-3 border-t border-sidebar-border" />
+                <div className="mx-3 my-2.5 border-t border-sidebar-border" />
                 {dashboardAccountNav.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
                     aria-label={translate(item.label)}
-                    className="dashboard-sidebar-link -mx-1 grid h-8 grid-cols-[1.75rem_minmax(0,1fr)] items-center rounded-lg px-2 text-xs font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    className="dashboard-sidebar-link -mx-1 grid h-[2.35rem] grid-cols-[1.9rem_minmax(0,1fr)] items-center rounded-lg px-2 text-[13px] font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     activeProps={{
                       className:
                         "border border-brand-green/35 bg-sidebar-accent text-sidebar-foreground shadow-[inset_3px_0_0_var(--brand-green)]",
                     }}
                   >
-                    <item.icon className="size-5 stroke-[2.25]" />
+                    <item.icon className="size-[1.15rem] stroke-[2.15]" />
                     <span className="truncate text-left">{translate(item.label)}</span>
                   </Link>
                 ))}

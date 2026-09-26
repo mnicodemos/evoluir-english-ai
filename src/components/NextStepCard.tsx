@@ -83,7 +83,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-brand-green/30 bg-sidebar text-sidebar-foreground shadow-[var(--shadow-soft)]"
         aria-label={t("Your next step")}
       >
-        <div className="grid h-full min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(10.5rem,0.62fr)]">
+        <div className="grid h-full min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[20.5rem_minmax(12rem,1fr)_minmax(13rem,0.9fr)]">
           <div
             className="relative min-h-[18rem] self-stretch bg-sidebar sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
@@ -104,7 +104,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <p className="mt-2 text-sm font-semibold text-sidebar-foreground/75">
               {t("Today's focus")}
             </p>
-            <h2 className="mt-1 break-words text-xl font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
+            <h2 className="mt-1 break-words text-xl font-bold text-sidebar-foreground sm:text-2xl">
               {skillLabel}
             </h2>
             <p className="mt-2 line-clamp-2 text-sm text-sidebar-foreground/70 xl:mt-1 xl:text-xs">
@@ -171,12 +171,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 xl:col-span-1 xl:m-1.5 xl:ml-0 xl:self-stretch">
+          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 xl:col-span-1 xl:m-1.5 xl:ml-0 xl:self-stretch xl:px-3.5 xl:py-2.5">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
-              <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
+              <h3 className="text-sm font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
             </div>
-            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2 xl:gap-1 xl:text-[10px] xl:leading-tight">
+            <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2.5 xl:gap-1.5 xl:text-[11px] xl:leading-snug">
               {cefrLevel && (
                 <li className="flex items-start gap-2">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
