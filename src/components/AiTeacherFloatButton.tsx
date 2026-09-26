@@ -4,10 +4,10 @@ import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const GRAD = {
-  from: "oklch(0.80 0.16 158)",
-  to: "oklch(0.48 0.14 160)",
-  glow: "oklch(0.65 0.16 158 / 0.6)",
-  icon: "oklch(0.99 0 0)",
+  from: "var(--brand-green)",
+  to: "var(--brand-green)",
+  glow: "rgb(0 245 206 / 0.55)",
+  icon: "oklch(0.13 0.025 230)",
 } as const;
 
 export function AiTeacherFloatButton({ className }: { className?: string }) {
