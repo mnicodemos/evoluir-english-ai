@@ -100,7 +100,7 @@ export function WeeklyFrequency({
           </h2>
         </div>
         <div className="mt-2 grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3">
-          <div className="relative grid size-[5.5rem] place-items-center text-brand-green">
+          <div className="relative grid size-[5.75rem] place-items-center text-brand-green">
             <svg
               className="absolute inset-0 size-full -rotate-90"
               viewBox="0 0 80 80"
@@ -112,7 +112,7 @@ export function WeeklyFrequency({
                 r={radius}
                 fill="none"
                 stroke="var(--secondary)"
-                strokeWidth="8"
+                strokeWidth="9"
               />
               <circle
                 cx="40"
@@ -120,13 +120,13 @@ export function WeeklyFrequency({
                 r={radius}
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="8"
+                strokeWidth="9"
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={circumference * (1 - progress)}
               />
             </svg>
-            <span className="relative text-center text-lg font-bold leading-none text-foreground">
+            <span className="relative text-center font-display text-xl font-bold leading-none text-foreground">
               {studiedCount}/{weeklyGoal}
               <span className="mt-1 block text-[9px] font-medium text-muted-foreground">
                 {daysLabel}

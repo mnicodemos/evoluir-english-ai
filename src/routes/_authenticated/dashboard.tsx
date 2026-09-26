@@ -148,7 +148,7 @@ function Dashboard() {
                 <ChevronRight className="ml-auto size-4 text-muted-foreground" aria-hidden="true" />
               </div>
               <div className="mt-3 grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:h-[calc(100%-2rem)] xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
-                <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:size-28 xl:mx-0">
+                <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
                     viewBox="0 0 96 96"
@@ -160,7 +160,7 @@ function Dashboard() {
                       r="39"
                       fill="none"
                       stroke="var(--secondary)"
-                      strokeWidth="10"
+                      strokeWidth="11"
                     />
                     <circle
                       cx="48"
@@ -168,7 +168,7 @@ function Dashboard() {
                       r="39"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="10"
+                      strokeWidth="11"
                       strokeLinecap="round"
                       strokeDasharray={2 * Math.PI * 39}
                       strokeDashoffset={
@@ -179,24 +179,24 @@ function Dashboard() {
                       }
                     />
                   </svg>
-                  <span className="relative text-center text-xl font-bold leading-none text-foreground">
+                  <span className="relative text-center font-display text-2xl font-bold leading-none text-foreground">
                     {minutesToday}
                     <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
                       min
                     </span>
                   </span>
                 </div>
-                <div className="grid gap-2">
+                <div className="grid gap-2.5">
                   {learningCards.map((card) => (
                     <div
                       key={card.label}
-                      className="grid min-w-0 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-2"
+                      className="grid min-w-0 grid-cols-[1.5rem_minmax(0,1fr)] items-center gap-2.5"
                     >
-                      <span className="grid size-5 place-items-center rounded-full bg-brand-green text-primary-foreground">
-                        <Check className="size-3" strokeWidth={3} aria-hidden="true" />
+                      <span className="grid size-6 place-items-center rounded-full bg-brand-green text-primary-foreground">
+                        <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
                       </span>
-                      <p className="line-clamp-2 text-[10px] text-muted-foreground">
-                        <span className="font-bold text-foreground">{card.value}</span>{" "}
+                      <p className="line-clamp-2 text-[11px] text-muted-foreground">
+                        <span className="font-display text-sm font-bold text-foreground">{card.value}</span>{" "}
                         {t(card.label)}
                       </p>
                     </div>
@@ -246,15 +246,15 @@ function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="dashboard-quick-link group relative grid min-h-12 min-w-0 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border px-2 py-2 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:grid-cols-[2.5rem_minmax(0,1fr)_auto] xl:px-3"
+                    className="dashboard-quick-link group relative grid min-h-14 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-md border px-2.5 py-2 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:grid-cols-[3rem_minmax(0,1fr)_auto] xl:px-3.5"
                   >
                     {hasNew && (
                       <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
                         <span className="sr-only">{t("New activity available")}</span>
                       </span>
                     )}
-                     <span className="dashboard-quick-icon grid size-8 shrink-0 place-items-center rounded-md xl:size-10">
-                       <item.icon className="size-4 xl:size-5" strokeWidth={2.4} />
+                     <span className="dashboard-quick-icon grid size-9 shrink-0 place-items-center rounded-md xl:size-11">
+                       <item.icon className="size-5 xl:size-6" strokeWidth={2.4} />
                     </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
                     <ArrowRight className="size-3.5 text-foreground/65" aria-hidden="true" />

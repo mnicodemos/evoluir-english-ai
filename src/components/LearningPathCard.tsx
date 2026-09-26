@@ -438,16 +438,16 @@ export function PathProgressCard({
           </h2>
           <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <div className="mt-3 grid gap-2.5 xl:mt-4 xl:gap-3">
+        <div className="mt-3 grid gap-3 xl:mt-4 xl:gap-3.5">
           {skills.map((skill) => (
             <div
               key={skill.label}
-              className="grid min-w-0 grid-cols-[1.25rem_4.75rem_minmax(0,1fr)_2.25rem_4.5rem] items-center gap-2 text-xs"
+              className="grid min-w-0 grid-cols-[1.5rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] items-center gap-2.5 text-xs"
             >
               <skill.icon className={`size-6 ${skill.tone}`} strokeWidth={2.5} aria-hidden="true" />
               <span className="truncate font-medium">{t(skill.label)}</span>
-              <Progress value={skill.value} className={`h-2 ${skill.bar}`} />
-              <span className="text-right text-muted-foreground">{skill.value}%</span>
+              <Progress value={skill.value} className={`h-2.5 bg-secondary/80 ${skill.bar}`} />
+              <span className="text-right font-semibold text-foreground">{skill.value}%</span>
               <span className={`rounded-full px-2 py-1 text-center text-[10px] font-semibold ${
                 skill.value >= 95
                   ? "bg-brand-green/15 text-brand-green"
