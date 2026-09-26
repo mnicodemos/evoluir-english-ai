@@ -1,4 +1,3 @@
-import { useNavigate } from "@tanstack/react-router";
 import {
   Cloud,
   CloudLightning,
@@ -7,21 +6,13 @@ import {
   CloudSun,
   Hand,
   Moon,
-  MoreVertical,
   Share2,
   Sun,
-  Target,
   TreePine,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -66,8 +57,7 @@ export function EvoDailyReflection({
   name,
   placement = "desktop",
 }: EvoDailyReflectionProps) {
-  const { lang, setLang } = useUiLang();
-  const navigate = useNavigate();
+  const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [now, setNow] = useState<Date | null>(null);
   const [weatherCondition, setWeatherCondition] = useState<WeatherCondition | null>(null);
@@ -187,37 +177,6 @@ export function EvoDailyReflection({
                 {t("Share reflection")}
               </TooltipContent>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={() => navigate({ to: "/study-plan" })}
-                  aria-label={t("Go to study plan")}
-                  className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
-                >
-                  <Target className="size-3.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
-                {t("Go to study plan")}
-              </TooltipContent>
-            </Tooltip>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={t("More options")}
-                  className="-m-1 rounded-md p-1 outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent active:scale-95"
-                >
-                  <MoreVertical className="size-3.5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem onClick={() => setLang(lang === "en" ? "pt" : "en")}>
-                  {t("Change language")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
           </TooltipProvider>
         </aside>
