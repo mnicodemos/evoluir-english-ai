@@ -68,7 +68,7 @@ export function SmartReviewCard({
 
   if (compact) {
     return (
-      <section className="card-soft h-full min-w-0 p-3 xl:p-4" aria-labelledby="smart-review-title">
+      <section className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4" aria-labelledby="smart-review-title">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
           <BookOpen className="size-6 text-dashboard-cyan" strokeWidth={2.5} aria-hidden="true" />
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
@@ -76,18 +76,18 @@ export function SmartReviewCard({
           </h2>
           <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <ul className="mt-3 grid gap-2 xl:mt-4 xl:gap-3">
+        <ul className="mt-3 grid flex-1 grid-rows-2 gap-2 overflow-hidden xl:mt-4 xl:gap-2">
           {items.slice(0, 2).map((item, index) => {
             const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
             return (
               <li
                 key={item.skill}
-                className="grid min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/45 pr-2"
+                className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/45 pr-2"
               >
                 <img
                   src={(index === 0 ? reviewWriting : reviewListening).url}
                   alt=""
-                  className="h-[4.25rem] w-16 object-cover xl:h-[4.75rem]"
+                  className="h-full min-h-0 w-16 object-cover"
                 />
                 <div className="min-w-0">
                   <p className="text-[10px] text-muted-foreground">{skillLabel}</p>

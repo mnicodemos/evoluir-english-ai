@@ -90,7 +90,7 @@ export function WeeklyFrequency({
     const circumference = 2 * Math.PI * radius;
     const progress = weeklyGoal > 0 ? Math.min(1, studiedCount / weeklyGoal) : 0;
     return (
-      <section className="card-soft h-full min-w-0 p-3" aria-labelledby="weekly-rhythm-title">
+      <section className="card-soft flex h-full min-w-0 flex-col p-3" aria-labelledby="weekly-rhythm-title">
         <div className="flex items-center gap-2">
           <span className="grid size-9 place-items-center rounded-md bg-dashboard-cyan/10">
             <CalendarDays className="size-5 text-dashboard-cyan" strokeWidth={2.4} />
@@ -99,7 +99,7 @@ export function WeeklyFrequency({
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
           </h2>
         </div>
-        <div className="mt-2 grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3">
+        <div className="mt-2 grid flex-1 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3">
           <div className="relative grid size-[5.75rem] place-items-center text-brand-green">
             <svg
               className="absolute inset-0 size-full -rotate-90"
