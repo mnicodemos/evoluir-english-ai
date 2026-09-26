@@ -288,7 +288,8 @@
   );
 }
 
-.brand-dashboard-theme .lucide {
+.brand-dashboard-theme .lucide,
+.dashboard-shell .lucide {
   stroke-width: 2.4;
 }
 

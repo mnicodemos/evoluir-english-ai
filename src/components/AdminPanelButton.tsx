@@ -65,7 +65,7 @@ export function AdminPanelButton({
           {showLabel && <span>{t("Admin panel")}</span>}
         </Button>
       </DialogTrigger>
-      <DialogContent className="dashboard-shell dark max-h-[90vh] max-w-[min(96vw,90rem)] overflow-y-auto">
+      <DialogContent className="dashboard-shell dark max-h-[90vh] max-w-[min(96vw,90rem)] overflow-y-auto shadow-[var(--shadow-soft)]">
         <DialogHeader>
           <DialogTitle>{t("Admin panel")}</DialogTitle>
           <DialogDescription>
