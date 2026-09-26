@@ -123,10 +123,10 @@ export function LessonQuiz({
   return (
     <div className="space-y-5">
       {submitted && (
-        <div className="card-soft bg-primary p-6 text-primary-foreground">
-          <p className="text-sm text-primary-foreground/70">Your score</p>
+        <div className="card-soft bg-primary p-6 text-foreground">
+          <p className="text-sm text-foreground/70">Your score</p>
           <p className="text-4xl font-bold">{score}%</p>
-          <p className="mt-2 text-sm text-primary-foreground/80">
+          <p className="mt-2 text-sm text-foreground/80">
             {lang === "pt"
               ? `${correct} de ${questions.length} corretas. `
               : `${correct} of ${questions.length} correct. `}
