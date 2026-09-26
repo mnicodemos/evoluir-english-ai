@@ -204,7 +204,7 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="border-b border-border/70 py-20 sm:py-28">
+        <section className="border-b border-border/70 py-10 sm:py-14">
           <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
             <SectionHeading title="Você já estudou inglês. Mas será que seu estudo está fazendo você evoluir?" />
             <div>
@@ -230,7 +230,7 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="bg-secondary/40 py-20 sm:py-28">
+        <section className="bg-secondary/40 py-10 sm:py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHeading eyebrow="O diferencial" title="Não é apenas sobre estudar inglês." />
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -249,7 +249,7 @@ function CommercialLanding() {
 
         <section
           id="como-funciona"
-          className="scroll-mt-20 border-y border-border/70 py-20 sm:py-28"
+          className="scroll-mt-20 border-y border-border/70 py-10 sm:py-14"
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHeading eyebrow="Como funciona" title="Uma jornada que evolui com você." />
@@ -265,9 +265,9 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="overflow-hidden bg-secondary/40 py-20 sm:py-28">
+        <section className="overflow-hidden bg-secondary/40 py-10 sm:py-14">
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-              <div className="relative mx-auto aspect-[3/2] w-full max-w-[480px] overflow-hidden rounded-lg">
+              <div className="relative mx-auto aspect-[3/2] w-full max-w-[336px] overflow-hidden rounded-lg">
               <img
                 src={evoProfile.url}
                 alt="EVO apresentando orientações personalizadas de aprendizagem"
@@ -298,7 +298,7 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="border-y border-border/70 py-20 sm:py-28">
+        <section className="border-y border-border/70 py-10 sm:py-14">
           <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
             <div>
               <SectionHeading title="Aprender inglês é mais do que acertar exercícios." />
@@ -333,7 +333,7 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="py-20 sm:py-28">
+        <section className="py-10 sm:py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHeading
               eyebrow="Habilidades"
@@ -359,7 +359,7 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="bg-secondary/40 py-20 sm:py-28">
+        <section className="bg-secondary/40 py-10 sm:py-14">
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
             <div>
               <SectionHeading eyebrow="Seu progresso" title="Veja sua evolução ganhar forma." />
@@ -406,7 +406,7 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="border-y border-border/70 py-20 sm:py-28">
+        <section className="border-y border-border/70 py-10 sm:py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHeading title="Para quem quer evoluir de verdade no inglês." />
             <div className="mt-12 grid gap-4 sm:grid-cols-2">
@@ -428,7 +428,7 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden py-24 sm:py-32">
+        <section className="relative overflow-hidden py-12 sm:py-16">
           <div className="absolute inset-0 surface-hero opacity-50" aria-hidden="true" />
           <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
             <Logo className="mx-auto size-12" />
