@@ -131,7 +131,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow?: string; title: string })
 
 function CommercialLanding() {
   return (
-    <div className="dark min-h-screen overflow-x-clip bg-background text-foreground">
+    <div className="dashboard-shell brand-dashboard-theme dark min-h-screen overflow-x-clip bg-background text-foreground">
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Link
@@ -236,8 +236,8 @@ function CommercialLanding() {
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {pillars.map(({ icon: Icon, title, text }) => (
                 <article key={title} className="card-soft p-6">
-                  <span className="grid size-11 place-items-center rounded-lg bg-accent text-accent-foreground">
-                    <Icon className="size-5" aria-hidden="true" />
+                    <span className="grid size-11 place-items-center text-primary">
+                    <Icon className="size-6" aria-hidden="true" />
                   </span>
                   <h3 className="mt-5 text-sm font-bold text-card-foreground">{title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p>
@@ -379,8 +379,8 @@ function CommercialLanding() {
                   </p>
                   <p className="mt-1 font-display font-semibold">Evidências da sua jornada</p>
                 </div>
-                <span className="grid size-10 place-items-center rounded-full bg-accent text-accent-foreground">
-                  <TrendingUp className="size-5" aria-hidden="true" />
+                <span className="grid size-10 place-items-center text-primary">
+                  <TrendingUp className="size-6" aria-hidden="true" />
                 </span>
               </div>
               <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-7">
@@ -415,8 +415,8 @@ function CommercialLanding() {
                   key={title}
                   className="card-soft flex gap-4 p-5 text-card-foreground sm:p-6"
                 >
-                  <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
-                    <Icon className="size-5" aria-hidden="true" />
+                  <span className="grid size-11 shrink-0 place-items-center text-primary">
+                    <Icon className="size-6" aria-hidden="true" />
                   </span>
                   <div>
                     <h3 className="text-sm font-bold text-card-foreground">{title}</h3>
