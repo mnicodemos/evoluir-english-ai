@@ -138,3 +138,5 @@
 - [x] Quizzes: texto branco no aviso de refazer o quiz
 - [x] Item de nível selecionado no verde do Daily Goal
 - [x] Ícone flutuante: verde do Daily Goal (brand-green)
+- [x] AI Teacher mobile: tela de digitação em uma página (footer oculto no mobile via prop opt-in mobileOneScreen; card 47dvh; header compacto)
+- [x] Ponto de nova atividade do Acesso rápido em brand-green (verde do dia)
