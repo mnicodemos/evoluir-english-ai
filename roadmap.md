@@ -120,8 +120,8 @@
 - [x] Variar a cor da árvore da saudação por período do dia
 - [x] Exibir a saudação e a reflexão diária no espaço superior do Dashboard mobile
 - [x] Gerar o novo lote do Vocabulary ao concluir uma lição e atualizar o ponto verde do Dashboard
-- [ ] Ajustar o Dashboard para uma única tela no Chrome e Brave, com viewport dinâmica e margem de segurança
-- [ ] Tornar o ícone do Daily Reflection dinâmico conforme o clima, com localização permitida e fallback
+- [x] Ajustar o Dashboard para uma única tela no Chrome e Brave, com viewport dinâmica e margem de segurança
+- [x] Tornar o ícone do Daily Reflection dinâmico conforme o clima, com localização permitida e fallback
 
 - [x] Fase 3B — Ativação do Dictionary Knowledge Cache concluída: TTL 315360000 aplicado (apenas dictionary), HIT real confirmado, pronúncia intocada, 449 testes OK.
 - [x] Admin Panel — organizar Usuários, Consumo IA e Custo & Performance em abas independentes
