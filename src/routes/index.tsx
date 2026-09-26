@@ -266,8 +266,8 @@ function CommercialLanding() {
         </section>
 
         <section className="overflow-hidden bg-secondary/40 py-10 sm:py-14">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-              <div className="relative mx-auto aspect-[3/2] w-full max-w-[336px] overflow-hidden rounded-lg">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.12fr_0.72fr] lg:px-8">
+            <div className="relative mx-auto aspect-[3/2] w-full max-w-[470px] overflow-hidden rounded-lg">
               <img
                 src={evoProfile.url}
                 alt="EVO apresentando orientações personalizadas de aprendizagem"
@@ -278,17 +278,24 @@ function CommercialLanding() {
               />
             </div>
             <div>
-              <SectionHeading eyebrow="Sua companheira de evolução" title="Conheça a EVO." />
-              <p className="mt-5 text-lg text-muted-foreground">
+              <div className="max-w-xl">
+                <p className="mb-3 text-xs font-bold uppercase text-success">
+                  Sua companheira de evolução
+                </p>
+                <h2 className="text-2xl font-bold leading-tight text-foreground sm:text-[1.75rem]">
+                  Conheça a EVO.
+                </h2>
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">
                 Sua companheira inteligente de evolução em inglês.
               </p>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
                 {evoMessages.map((message, index) => (
-                  <div key={message} className="card-soft p-5 text-card-foreground">
-                    <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase text-success">
-                      <Logo className="size-5" /> EVO {String(index + 1).padStart(2, "0")}
+                  <div key={message} className="card-soft p-3.5 text-card-foreground">
+                    <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase text-success">
+                      <Logo className="size-3.5" /> EVO {String(index + 1).padStart(2, "0")}
                     </div>
-                    <p className="text-sm font-medium leading-relaxed text-card-foreground">
+                    <p className="text-xs font-medium leading-relaxed text-card-foreground">
                       “{message}”
                     </p>
                   </div>
