@@ -116,7 +116,7 @@ export function LevelCard({
               className={cn(
                 "flex w-full min-w-0 items-center justify-center gap-1 rounded-lg border px-1 text-xs font-semibold transition sm:text-sm",
                 compact ? "h-6" : "h-10",
-                active && "border-transparent bg-success text-success-foreground",
+                active && "border-transparent bg-brand-green text-primary-foreground",
                 conquered &&
                   "border-border text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
                 locked && "cursor-not-allowed border-border/50 text-muted-foreground/50",
