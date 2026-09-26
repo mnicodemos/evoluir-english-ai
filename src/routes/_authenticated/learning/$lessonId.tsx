@@ -228,7 +228,7 @@ function LessonPage() {
           }
           imageSize="lesson"
           contrast="inverse"
-          className="card-soft bg-primary p-4 sm:p-5"
+          className="card-soft overflow-hidden bg-primary pr-4 sm:pr-5"
         />
 
         {data.userLesson?.completed_at && (
