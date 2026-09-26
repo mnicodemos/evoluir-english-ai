@@ -39,6 +39,7 @@ export function EvoGuide({
           "aspect-[1536/1024] w-full",
           imageSize === "diagnosis" && "w-28 sm:order-2 sm:w-full",
           imageSize === "diagnosisIntro" && "w-24 sm:order-2 sm:w-full",
+          imageSize === "lesson" && "h-full",
         )}
       >
         <img
@@ -46,19 +47,23 @@ export function EvoGuide({
           alt="EVO, sua companheira de evolução em inglês"
           width={1536}
           height={1024}
-          className="h-full w-full object-contain object-center"
+          className={cn(
+            "h-full w-full object-contain object-center",
+            imageSize === "lesson" && "object-cover",
+          )}
         />
       </div>
       <div
         className={cn(
           "min-w-0",
           (imageSize === "diagnosis" || imageSize === "diagnosisIntro") && "sm:order-1",
+          imageSize === "lesson" && "self-center",
         )}
       >
         <p
           className={cn(
             "text-xs font-semibold uppercase",
-            contrast === "inverse" ? "text-primary-foreground/75" : "text-primary",
+            contrast === "inverse" ? "text-white/80" : "text-primary",
           )}
         >
           EVO
@@ -66,7 +71,7 @@ export function EvoGuide({
         <h2
           className={cn(
             "mt-1 text-base font-semibold sm:text-lg",
-            contrast === "inverse" ? "text-primary-foreground" : "text-card-foreground",
+            contrast === "inverse" ? "text-white" : "text-card-foreground",
           )}
         >
           {title}
@@ -75,7 +80,7 @@ export function EvoGuide({
           <p
             className={cn(
               "mt-1 text-sm",
-              contrast === "inverse" ? "text-primary-foreground/75" : "text-muted-foreground",
+              contrast === "inverse" ? "text-white/80" : "text-muted-foreground",
             )}
           >
             {description}
