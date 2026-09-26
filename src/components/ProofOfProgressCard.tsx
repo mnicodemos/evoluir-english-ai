@@ -122,6 +122,7 @@ export function ProofOfProgressCard() {
           )}
         </div>
       </div>
-    </section>
+      </section>
+    </>
   );
 }
