@@ -160,7 +160,7 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </UiLangProvider>
-      <Toaster richColors position="top-center" />
+      <Toaster className="dashboard-shell dark" position="top-center" />
     </QueryClientProvider>
   );
 }

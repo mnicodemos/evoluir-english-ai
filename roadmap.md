@@ -134,3 +134,6 @@
   - [x] Reutilizar eventos e caches existentes sem chamadas artificiais, migrations ou mudanças de produção
   - [x] Exibir média, mediana, p95, cobertura de tokens, erros e filtros com classificação de confiabilidade
   - [x] Manter como N/D toda métrica sem atribuição segura e preservar as demais abas administrativas
+
+- [ ] Quizzes: texto branco no aviso de refazer o quiz (score box + toast 'Score below 70%')
+- [ ] Mudar cor do item quando o nível está selecionado para o verde da barra 'Your daily goal'
