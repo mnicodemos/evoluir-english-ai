@@ -96,7 +96,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-2.5 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4rem_5.75rem_minmax(13.5rem,1.35fr)_minmax(12rem,1fr)_minmax(5.5rem,0.55fr)] xl:gap-2.5">
+        <div className="dashboard-one-screen grid gap-2.5 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4rem_5.75rem_17.333rem_minmax(12rem,1fr)_minmax(6.5rem,0.6fr)] xl:gap-2.5">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
@@ -135,7 +135,7 @@ function Dashboard() {
               <NextStepCard compact />
             </section>
             <section
-              className="card-soft min-w-0 p-3 lg:col-span-3 xl:h-full xl:p-4"
+              className="card-soft flex min-w-0 flex-col p-3 lg:col-span-3 xl:h-full xl:p-4"
               aria-labelledby="today-progress-title"
             >
               <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ function Dashboard() {
                 </h2>
                 <ChevronRight className="ml-auto size-4 text-muted-foreground" aria-hidden="true" />
               </div>
-              <div className="mt-3 grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:h-[calc(100%-2rem)] xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
+              <div className="mt-3 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
                 <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
