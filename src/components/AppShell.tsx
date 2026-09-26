@@ -22,7 +22,6 @@ import { Logo } from "@/components/Logo";
 import { BrandName } from "@/components/BrandName";
 import { Footer } from "@/components/Footer";
 import { ProfileMenu } from "@/components/ProfileMenu";
-import { AiTeacherFloatButton } from "@/components/AiTeacherFloatButton";
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
