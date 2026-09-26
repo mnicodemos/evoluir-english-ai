@@ -96,8 +96,8 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-2.5 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4rem_5.75rem_17.333rem_minmax(12rem,1fr)_minmax(6.5rem,0.6fr)] xl:gap-2.5">
-          <header className="animate-rise min-w-0 xl:h-16">
+        <div className="dashboard-one-screen grid gap-2.5 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4.44rem_6.5rem_17.333rem_minmax(0,1fr)_5.655rem] xl:gap-5">
+          <header className="animate-rise min-w-0 xl:h-full">
             <EvoDailyReflection
               userId={profile.id}
               name={profile.name}
@@ -105,7 +105,7 @@ function Dashboard() {
             />
           </header>
 
-          <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[5.75rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
+          <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-full [&>*+*]:border-border sm:[&>*+*]:border-l">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
             <div className="flex min-w-0 items-center gap-3 px-3 py-2">
