@@ -94,6 +94,7 @@ export function EvoDailyReflection({
               {reflection.reflection[copy]}
             </p>
           </div>
+          <TooltipProvider delayDuration={200}>
           <div className="flex shrink-0 items-center gap-2 text-muted-foreground">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -142,7 +143,7 @@ export function EvoDailyReflection({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </aside>
+          </TooltipProvider>
       </div>
     );
   }
