@@ -99,8 +99,8 @@ export function WeeklyFrequency({
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
           </h2>
         </div>
-        <div className="mt-2 grid flex-1 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3">
-          <div className="relative grid size-[5.75rem] place-items-center text-brand-green">
+        <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)] items-center gap-2.5">
+          <div className="relative grid size-[5.5rem] place-items-center text-brand-green">
             <svg
               className="absolute inset-0 size-full -rotate-90"
               viewBox="0 0 80 80"
@@ -148,7 +148,7 @@ export function WeeklyFrequency({
             </p>
           </div>
         </div>
-        <div className="mt-2 grid grid-cols-7 gap-1">
+        <div className="mt-1.5 grid grid-cols-7 gap-1">
           {weekKeys.map((key, i) => {
             const studied = studyDays?.has(key) ?? false;
             return (

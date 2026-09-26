@@ -430,7 +430,7 @@ export function PathProgressCard({
 
   if (compact) {
     return (
-      <section className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4" aria-labelledby="skills-progress-heading">
+      <section className="card-soft flex h-full min-w-0 flex-col p-3" aria-labelledby="skills-progress-heading">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
           <BarChart3 className="size-6 text-dashboard-cyan" strokeWidth={2.6} aria-hidden="true" />
           <h2 id="skills-progress-heading" className="font-display text-sm font-semibold">
@@ -438,11 +438,11 @@ export function PathProgressCard({
           </h2>
           <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
-        <div className="mt-3 grid flex-1 content-between gap-3 xl:mt-4 xl:gap-2">
+        <div className="mt-2.5 grid flex-1 content-between gap-2">
           {skills.map((skill) => (
             <div
               key={skill.label}
-              className="grid min-w-0 grid-cols-[1.5rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] items-center gap-2.5 text-xs"
+              className="grid min-w-0 grid-cols-[1.5rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] items-center gap-2 text-xs"
             >
               <skill.icon className={`size-6 ${skill.tone}`} strokeWidth={2.5} aria-hidden="true" />
               <span className="truncate font-medium">{t(skill.label)}</span>

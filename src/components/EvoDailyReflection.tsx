@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Hand, MoreVertical, Share2, Sun, Target, TreePine } from "lucide-react";
 
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
@@ -61,13 +62,28 @@ export function EvoDailyReflection({
               {reflection.reflection[copy]}
             </p>
           </div>
-          <div
-            className="flex shrink-0 items-center gap-2 text-muted-foreground"
-            aria-hidden="true"
-          >
-            <Share2 className="size-3.5" />
-            <Target className="size-3.5" />
-            <MoreVertical className="size-3.5" />
+          <div className="flex shrink-0 items-center gap-1 text-muted-foreground">
+            <Link
+              to="/progress"
+              aria-label={t("My Progress")}
+              className="grid size-7 place-items-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              <Share2 className="size-3.5" />
+            </Link>
+            <Link
+              to="/study-plan"
+              aria-label={t("Study Plan")}
+              className="grid size-7 place-items-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              <Target className="size-3.5" />
+            </Link>
+            <Link
+              to="/premium"
+              aria-label={t("My Subscription")}
+              className="grid size-7 place-items-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              <MoreVertical className="size-3.5" />
+            </Link>
           </div>
         </aside>
       </div>
