@@ -267,14 +267,14 @@ function CommercialLanding() {
 
         <section className="overflow-hidden bg-secondary/40 py-20 sm:py-28">
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-              <div className="relative mx-auto aspect-[339/452] w-full max-w-[400px] overflow-hidden rounded-lg">
+              <div className="relative mx-auto aspect-[3/2] w-full max-w-[480px] overflow-hidden rounded-lg">
               <img
                 src={evoProfile.url}
                 alt="EVO apresentando orientações personalizadas de aprendizagem"
-                width={339}
-                height={452}
+                width={1536}
+                height={1024}
                 loading="lazy"
-                className="h-full w-full object-cover object-left"
+                className="h-full w-full object-contain"
               />
             </div>
             <div>
