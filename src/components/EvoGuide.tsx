@@ -36,7 +36,7 @@ export function EvoGuide({
     >
       <div
         className={cn(
-          "aspect-[1273/1236] w-full",
+          "aspect-[1536/1024] w-full",
           imageSize === "diagnosis" && "w-28 sm:order-2 sm:w-full",
           imageSize === "diagnosisIntro" && "w-24 sm:order-2 sm:w-full",
         )}
@@ -44,8 +44,8 @@ export function EvoGuide({
         <img
           src={evoGuideOfficial.url}
           alt="EVO, sua companheira de evolução em inglês"
-          width={1273}
-          height={1236}
+          width={1536}
+          height={1024}
           className="h-full w-full object-contain object-center"
         />
       </div>
