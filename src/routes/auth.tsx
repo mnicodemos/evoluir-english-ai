@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { UiLangToggle, useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,8 +34,9 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { lang } = useUiLang();
-  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  // Login screen is always in Portuguese — no language option here.
+  const lang = "pt" as const;
+  const t = (label: string) => uiPt[label] ?? label;
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -121,15 +121,12 @@ function AuthPage() {
               <BrandName />
             </Link>
 
-            <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <Link
-                to="/"
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <span aria-hidden="true">←</span> {t("Back to home")}
-              </Link>
-              <UiLangToggle />
-            </div>
+            <Link
+              to="/"
+              className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <span aria-hidden="true">←</span> {t("Back to home")}
+            </Link>
 
             {sent ? (
               <div className="card-soft p-7 text-center">
