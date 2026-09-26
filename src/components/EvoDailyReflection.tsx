@@ -1,6 +1,14 @@
-import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { Hand, MoreVertical, Share2, Sun, Target, TreePine } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -16,7 +24,8 @@ export function EvoDailyReflection({
   name,
   placement = "desktop",
 }: EvoDailyReflectionProps) {
-  const { lang } = useUiLang();
+  const { lang, setLang } = useUiLang();
+  const navigate = useNavigate();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [now, setNow] = useState<Date | null>(null);
 
@@ -34,6 +43,25 @@ export function EvoDailyReflection({
   }[greetingTone];
   const displayName = name.trim().split(/\s+/)[0];
   const copy = lang === "pt" ? "pt" : "en";
+
+  async function shareReflection() {
+    const text = `“${reflection.thought[copy]}” — ${reflection.reflection[copy]}`;
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: t("EVO Daily Reflection"), text });
+      } catch {
+        // user dismissed the native share sheet
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(t("Reflection copied to clipboard"));
+    } catch {
+      // clipboard unavailable
+    }
+  }
+
 
   if (placement === "dashboard-header") {
     return (
@@ -61,13 +89,45 @@ export function EvoDailyReflection({
               {reflection.reflection[copy]}
             </p>
           </div>
-          <div
-            className="flex shrink-0 items-center gap-2 text-muted-foreground"
-            aria-hidden="true"
-          >
-            <Share2 className="size-3.5" />
-            <Target className="size-3.5" />
-            <MoreVertical className="size-3.5" />
+          <div className="flex shrink-0 items-center gap-2 text-muted-foreground">
+            <button
+              type="button"
+              onClick={shareReflection}
+              aria-label={t("Share reflection")}
+              className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
+            >
+              <Share2 className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/study-plan" })}
+              aria-label={t("Go to study plan")}
+              className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
+            >
+              <Target className="size-3.5" />
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t("More options")}
+                  className="-m-1 rounded-md p-1 outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent active:scale-95"
+                >
+                  <MoreVertical className="size-3.5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={shareReflection}>
+                  {t("Share reflection")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/study-plan" })}>
+                  {t("Go to study plan")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLang(lang === "en" ? "pt" : "en")}>
+                  {t("Change language")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </aside>
       </div>
