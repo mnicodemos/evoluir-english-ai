@@ -96,7 +96,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-2.5 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4rem_5.75rem_17.333rem_minmax(12rem,1fr)_minmax(6.5rem,0.6fr)] xl:gap-2.5">
+        <div className="dashboard-one-screen grid gap-3 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4.25rem_7rem_17.333rem_minmax(9.5rem,1fr)_minmax(5rem,0.42fr)] xl:gap-3.5">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
@@ -105,18 +105,18 @@ function Dashboard() {
             />
           </header>
 
-          <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[5.75rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
+          <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[7rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
-            <div className="flex min-w-0 items-center gap-3 px-3 py-2">
-              <span className="grid size-11 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
+            <div className="flex min-w-0 items-center gap-3 px-4 py-3">
+              <span className="grid size-12 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
                  <Flame
-                   className="size-7 fill-dashboard-coral text-dashboard-coral"
+                   className="size-8 fill-dashboard-coral text-dashboard-coral"
                    strokeWidth={2.1}
                  />
               </span>
               <div className="min-w-0 flex-1">
-                 <p className="truncate font-display text-base font-bold">{streakDays} days</p>
+                 <p className="truncate font-display text-xl font-bold">{streakDays} days</p>
                 <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
               </div>
               <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
@@ -223,7 +223,7 @@ function Dashboard() {
           </div>
 
           <section
-            className="order-3 card-soft min-w-0 p-3 lg:order-none xl:flex xl:min-h-0 xl:flex-col xl:p-4"
+            className="order-3 card-soft min-w-0 p-3 lg:order-none xl:flex xl:min-h-0 xl:flex-col xl:p-3"
             aria-labelledby="quick-access-title"
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
@@ -237,7 +237,7 @@ function Dashboard() {
               </div>
               <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-6 xl:gap-3">
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-5 xl:gap-2.5">
               {quickAccess.map((item) => {
                 const hasNew = Boolean(
                   (indicators as Record<string, boolean>)[item.to.replace("/", "")],
