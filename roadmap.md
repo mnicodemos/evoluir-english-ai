@@ -135,6 +135,6 @@
   - [x] Exibir média, mediana, p95, cobertura de tokens, erros e filtros com classificação de confiabilidade
   - [x] Manter como N/D toda métrica sem atribuição segura e preservar as demais abas administrativas
 
-- [ ] Quizzes: texto branco no aviso de refazer o quiz (score box + toast 'Score below 70%')
-- [ ] Mudar cor do item quando o nível está selecionado para o verde da barra 'Your daily goal'
-- [ ] Ícone flutuante: usar o mesmo verde do Daily Goal (brand-green)
+- [x] Quizzes: texto branco no aviso de refazer o quiz
+- [x] Item de nível selecionado no verde do Daily Goal
+- [x] Ícone flutuante: verde do Daily Goal (brand-green)
