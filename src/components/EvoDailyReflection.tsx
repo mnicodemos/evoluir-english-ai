@@ -144,6 +144,7 @@ export function EvoDailyReflection({
             </DropdownMenu>
           </div>
           </TooltipProvider>
+        </aside>
       </div>
     );
   }
