@@ -27,6 +27,7 @@ export const uiPt: Record<string, string> = {
   "Go to study plan": "Ir para plano de estudo",
   "Change language": "Alterar idioma",
   "Reflection copied to clipboard": "Reflexão copiada para a área de transferência",
+  "More options": "Mais opções",
   "Good morning": "Bom dia",
   "Good afternoon": "Boa tarde",
   "Good evening": "Boa noite",
