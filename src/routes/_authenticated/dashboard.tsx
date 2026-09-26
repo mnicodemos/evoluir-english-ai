@@ -228,8 +228,8 @@ function Dashboard() {
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="flex items-center gap-2">
-                 <span className="grid size-9 place-items-center rounded-md bg-warning/10 text-warning">
-                   <Bolt className="size-6 fill-warning text-warning" strokeWidth={2.2} aria-hidden="true" />
+                 <span className="grid size-9 place-items-center text-warning">
+                   <Bolt className="size-7 text-warning" strokeWidth={2.6} aria-hidden="true" />
                 </span>
                  <h2 id="quick-access-title" className="font-display text-sm font-semibold">
                   {t("Quick Access")}
