@@ -5,6 +5,7 @@ import {
   CloudSnow,
   CloudSun,
   Hand,
+  Languages,
   Moon,
   Share2,
   Sun,
