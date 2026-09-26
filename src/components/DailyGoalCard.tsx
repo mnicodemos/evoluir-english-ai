@@ -56,7 +56,7 @@ export function DailyGoalCard({
           )}
         >
           {compact ? (
-            <CircleDotDashed className="size-7 text-brand-green" strokeWidth={3} />
+            <CircleDotDashed className="size-7 text-brand-green" strokeWidth={3.2} />
           ) : (
             <Hourglass className="size-6 text-warning" />
           )}
@@ -65,7 +65,7 @@ export function DailyGoalCard({
           <p
             className={cn(
               "truncate font-bold",
-              compact ? "text-base" : "text-lg sm:text-base md:text-lg",
+              compact ? "font-display text-base" : "text-lg sm:text-base md:text-lg",
             )}
           >
             {done}{" "}

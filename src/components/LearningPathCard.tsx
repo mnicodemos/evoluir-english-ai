@@ -432,8 +432,8 @@ export function PathProgressCard({
     return (
       <section className="card-soft h-full min-w-0 p-3 xl:p-4" aria-labelledby="skills-progress-heading">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
-          <BarChart3 className="size-5 text-dashboard-cyan" aria-hidden="true" />
-          <h2 id="skills-progress-heading" className="text-sm font-semibold">
+          <BarChart3 className="size-6 text-dashboard-cyan" strokeWidth={2.6} aria-hidden="true" />
+          <h2 id="skills-progress-heading" className="font-display text-sm font-semibold">
             {t("Your English Skills")}
           </h2>
           <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
@@ -444,11 +444,17 @@ export function PathProgressCard({
               key={skill.label}
               className="grid min-w-0 grid-cols-[1.25rem_4.75rem_minmax(0,1fr)_2.25rem_4.5rem] items-center gap-2 text-xs"
             >
-              <skill.icon className={`size-5 ${skill.tone}`} aria-hidden="true" />
+              <skill.icon className={`size-6 ${skill.tone}`} strokeWidth={2.5} aria-hidden="true" />
               <span className="truncate font-medium">{t(skill.label)}</span>
               <Progress value={skill.value} className={`h-2 ${skill.bar}`} />
               <span className="text-right text-muted-foreground">{skill.value}%</span>
-              <span className="rounded-full bg-secondary px-2 py-1 text-center text-[10px] font-semibold text-secondary-foreground">
+              <span className={`rounded-full px-2 py-1 text-center text-[10px] font-semibold ${
+                skill.value >= 95
+                  ? "bg-brand-green/15 text-brand-green"
+                  : skill.value >= 80
+                    ? "bg-dashboard-blue/20 text-dashboard-cyan"
+                    : "bg-warning/15 text-warning"
+              }`}>
                 {skill.value >= 95
                   ? t("Advanced")
                   : skill.value >= 80

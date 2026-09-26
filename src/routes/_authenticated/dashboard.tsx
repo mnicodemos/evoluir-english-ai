@@ -110,13 +110,13 @@ function Dashboard() {
 
             <div className="flex min-w-0 items-center gap-3 px-3 py-2">
               <span className="grid size-11 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
-                <Flame
-                  className="size-7 fill-dashboard-coral text-dashboard-coral"
-                  strokeWidth={1.8}
-                />
+                 <Flame
+                   className="size-7 fill-dashboard-coral text-dashboard-coral"
+                   strokeWidth={2.1}
+                 />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-bold">{streakDays} days</p>
+                 <p className="truncate font-display text-base font-bold">{streakDays} days</p>
                 <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
               </div>
               <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
@@ -139,10 +139,10 @@ function Dashboard() {
               aria-labelledby="today-progress-title"
             >
               <div className="flex items-center gap-2">
-                <span className="grid size-6 place-items-center rounded-sm border border-dashboard-cyan text-dashboard-cyan">
-                  <Flame className="size-4" />
+                 <span className="grid size-9 place-items-center rounded-md bg-dashboard-blue/15 text-dashboard-cyan">
+                   <Flame className="size-5" strokeWidth={2.5} />
                 </span>
-                <h2 id="today-progress-title" className="text-sm font-semibold">
+                 <h2 id="today-progress-title" className="font-display text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
                 <ChevronRight className="ml-auto size-4 text-muted-foreground" aria-hidden="true" />
@@ -228,10 +228,10 @@ function Dashboard() {
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="flex items-center gap-2">
-                <span className="grid size-7 place-items-center rounded-sm bg-warning text-warning-foreground">
-                  <Bolt className="size-5 fill-warning-foreground" aria-hidden="true" />
+                 <span className="grid size-9 place-items-center text-warning">
+                   <Bolt className="size-7 text-warning" strokeWidth={2.6} aria-hidden="true" />
                 </span>
-                <h2 id="quick-access-title" className="text-sm font-semibold">
+                 <h2 id="quick-access-title" className="font-display text-sm font-semibold">
                   {t("Quick Access")}
                 </h2>
               </div>
@@ -253,8 +253,8 @@ function Dashboard() {
                         <span className="sr-only">{t("New activity available")}</span>
                       </span>
                     )}
-                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-background/45 xl:size-10">
-                      <item.icon className="size-4 text-foreground xl:size-5" />
+                     <span className="dashboard-quick-icon grid size-8 shrink-0 place-items-center rounded-md xl:size-10">
+                       <item.icon className="size-4 xl:size-5" strokeWidth={2.4} />
                     </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
                     <ArrowRight className="size-3.5 text-foreground/65" aria-hidden="true" />

@@ -70,10 +70,10 @@ export function WeeklyFrequency({
     return (
       <div className="flex h-full min-w-0 items-center gap-3 px-3 py-2">
         <span className="grid size-11 shrink-0 place-items-center rounded-md bg-warning/10">
-          <Trophy className="size-7 fill-warning text-warning" strokeWidth={2} />
+          <Trophy className="size-7 fill-warning text-warning" strokeWidth={2.4} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-bold">
+          <p className="truncate font-display text-base font-bold">
             {studiedCount} / {weeklyGoal} {daysLabel}
           </p>
           <p className="text-xs text-muted-foreground">
@@ -92,10 +92,10 @@ export function WeeklyFrequency({
     return (
       <section className="card-soft h-full min-w-0 p-3" aria-labelledby="weekly-rhythm-title">
         <div className="flex items-center gap-2">
-          <span className="grid size-8 place-items-center rounded-md bg-dashboard-cyan/10">
-            <CalendarDays className="size-4 text-dashboard-cyan" />
+          <span className="grid size-9 place-items-center rounded-md bg-dashboard-cyan/10">
+            <CalendarDays className="size-5 text-dashboard-cyan" strokeWidth={2.4} />
           </span>
-          <h2 id="weekly-rhythm-title" className="text-sm font-semibold">
+          <h2 id="weekly-rhythm-title" className="font-display text-sm font-semibold">
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
           </h2>
         </div>
