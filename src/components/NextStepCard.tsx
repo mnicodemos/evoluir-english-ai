@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import evoDashboardApproved from "@/assets/evo-novo-dashboard.jpg.asset.json";
+import evoDashboardApproved from "@/assets/evo-novo-dashboard-2.jpg.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
@@ -85,7 +85,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         <div className="grid h-full min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[22rem_minmax(0,1fr)_minmax(12rem,0.62fr)]">
           <div
-            className="relative min-h-[18rem] overflow-hidden self-stretch sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative min-h-[18rem] self-stretch bg-sidebar sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
             <img
@@ -93,7 +93,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               alt=""
               width={1152}
               height={768}
-              className="absolute inset-0 h-full w-full object-cover object-left"
+              className="absolute inset-0 h-full w-full object-contain object-left"
             />
           </div>
 

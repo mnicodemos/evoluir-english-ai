@@ -85,7 +85,7 @@ export function DailyGoalCard({
       </div>
       <Progress
         value={percent}
-        className={cn("h-2", compact ? "mt-1.5 [&>div]:bg-brand-green" : "mt-4")}
+        className={cn("h-2.5 bg-secondary/80", compact ? "mt-1.5 [&>div]:bg-brand-green" : "mt-4")}
       />
       <p
         className={cn(
