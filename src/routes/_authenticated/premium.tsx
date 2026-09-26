@@ -223,14 +223,14 @@ function Premium() {
           </section>
 
           {isPremium ? (
-            <section className="card-soft bg-primary p-6 text-primary-foreground">
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-medium">
+            <section className="card-soft bg-primary p-6 text-foreground">
+              <span className="inline-flex items-center gap-2 rounded-full bg-foreground/10 px-3 py-1 text-xs font-medium">
                 <Sparkles className="size-3.5" /> Premium active
               </span>
               <h2 className="mt-4 text-xl font-semibold">
                 You have full access, {profile.name || "student"}.
               </h2>
-              <p className="mt-2 text-sm text-primary-foreground/75">
+              <p className="mt-2 text-sm text-foreground/75">
                 {profile.plan_interval === "monthly"
                   ? "Monthly plan — R$ 79,90/month"
                   : "Yearly plan — R$ 799,90/year"}
@@ -238,7 +238,7 @@ function Premium() {
                   ? ` · renews on ${new Date(profile.plan_expires_at).toLocaleDateString()}`
                   : ""}
               </p>
-              <ul className="mt-5 grid gap-2 text-sm text-primary-foreground/85 sm:grid-cols-2">
+              <ul className="mt-5 grid gap-2 text-sm text-foreground/85 sm:grid-cols-2">
                 {premiumPerks.map((p) => (
                   <li key={p} className="flex items-center gap-2">
                     <Check className="size-4 text-success" /> {p}
