@@ -9,6 +9,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -90,22 +95,36 @@ export function EvoDailyReflection({
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2 text-muted-foreground">
-            <button
-              type="button"
-              onClick={shareReflection}
-              aria-label={t("Share reflection")}
-              className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
-            >
-              <Share2 className="size-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate({ to: "/study-plan" })}
-              aria-label={t("Go to study plan")}
-              className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
-            >
-              <Target className="size-3.5" />
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={shareReflection}
+                  aria-label={t("Share reflection")}
+                  className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
+                >
+                  <Share2 className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
+                {t("Share reflection")}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/study-plan" })}
+                  aria-label={t("Go to study plan")}
+                  className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
+                >
+                  <Target className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
+                {t("Go to study plan")}
+              </TooltipContent>
+            </Tooltip>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -117,12 +136,6 @@ export function EvoDailyReflection({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem onClick={shareReflection}>
-                  {t("Share reflection")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate({ to: "/study-plan" })}>
-                  {t("Go to study plan")}
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setLang(lang === "en" ? "pt" : "en")}>
                   {t("Change language")}
                 </DropdownMenuItem>
