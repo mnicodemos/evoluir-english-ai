@@ -1,11 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
-  ArrowRight,
   Bolt,
   BookOpen,
   CalendarCheck,
   Check,
-  ChevronRight,
   Flame,
   GraduationCap,
   Headphones,
@@ -117,7 +115,6 @@ function Dashboard() {
                  <p className="truncate font-display text-base font-bold">{streakDays} days</p>
                 <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
               </div>
-              <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
             </div>
 
             <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
@@ -141,7 +138,6 @@ function Dashboard() {
                  <h2 id="today-progress-title" className="font-display text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
-                <ChevronRight className="ml-auto size-4 text-muted-foreground" aria-hidden="true" />
               </div>
               <div className="mt-3 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
                 <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:size-30 xl:mx-0">
@@ -227,7 +223,6 @@ function Dashboard() {
                   {t("Quick Access")}
                 </h2>
               </div>
-              <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-6 xl:gap-3">
               {quickAccess.map((item) => {
@@ -249,7 +244,6 @@ function Dashboard() {
                        <item.icon className="size-[1.375rem] xl:size-[1.65rem]" strokeWidth={2.4} />
                     </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
-                    <ArrowRight className="size-3.5 text-foreground/65" aria-hidden="true" />
                   </Link>
                 );
               })}
@@ -262,7 +256,6 @@ function Dashboard() {
           >
              <CalendarCheck className="size-[1.375rem] shrink-0 text-primary" aria-hidden="true" />
             <span className="min-w-0 truncate text-sm font-semibold">{t("My Study Plan")}</span>
-            <ArrowRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           </Link>
 
         </div>

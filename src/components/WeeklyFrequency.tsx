@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, Check, ChevronRight, Trophy } from "lucide-react";
+import { CalendarDays, Check, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -78,7 +78,6 @@ export function WeeklyFrequency({
             {lang === "pt" ? "Esta semana" : "This week"}
           </p>
         </div>
-        <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
       </div>
     );
   }

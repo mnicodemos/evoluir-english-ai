@@ -120,11 +120,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
-                    {t("Practice now")} <ArrowRight aria-hidden="true" />
+                    {t("Practice now")}
                   </Link>
                 ) : (
                   <Link to={data.activity.to}>
-                    {t("Practice now")} <ArrowRight aria-hidden="true" />
+                    {t("Practice now")}
                   </Link>
                 )}
               </Button>

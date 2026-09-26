@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, ChevronRight, RotateCcw } from "lucide-react";
+import { ArrowRight, BookOpen, RotateCcw } from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
 import reviewWriting from "@/assets/review-writing.jpg.asset.json";
@@ -74,7 +74,6 @@ export function SmartReviewCard({
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
             {t("Keep improving")}
           </h2>
-          <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
         <ul className="mt-3 grid flex-1 grid-rows-2 gap-2 overflow-hidden xl:mt-4 xl:gap-2">
           {items.slice(0, 2).map((item, index) => {
