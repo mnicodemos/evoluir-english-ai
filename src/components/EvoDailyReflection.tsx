@@ -1,5 +1,18 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Hand, MoreVertical, Share2, Sun, Target, TreePine } from "lucide-react";
+import {
+  Cloud,
+  CloudLightning,
+  CloudRain,
+  CloudSnow,
+  CloudSun,
+  Hand,
+  Moon,
+  MoreVertical,
+  Share2,
+  Sun,
+  Target,
+  TreePine,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -25,6 +38,29 @@ type EvoDailyReflectionProps = {
   placement?: "desktop" | "mobile-card" | "dashboard-header";
 };
 
+type WeatherCondition = "sunny" | "partly-cloudy" | "cloudy" | "rain" | "storm" | "snow" | "night";
+
+function weatherConditionFromCode(code: number, isDay: boolean): WeatherCondition {
+  if (!isDay) return "night";
+  if (code === 0) return "sunny";
+  if (code === 1 || code === 2) return "partly-cloudy";
+  if (code === 3 || code === 45 || code === 48) return "cloudy";
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return "snow";
+  if ([95, 96, 99].includes(code)) return "storm";
+  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "rain";
+  return "partly-cloudy";
+}
+
+const weatherIcons = {
+  sunny: Sun,
+  "partly-cloudy": CloudSun,
+  cloudy: Cloud,
+  rain: CloudRain,
+  storm: CloudLightning,
+  snow: CloudSnow,
+  night: Moon,
+} as const;
+
 export function EvoDailyReflection({
   userId,
   name,
@@ -34,10 +70,43 @@ export function EvoDailyReflection({
   const navigate = useNavigate();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [now, setNow] = useState<Date | null>(null);
+  const [weatherCondition, setWeatherCondition] = useState<WeatherCondition | null>(null);
 
   useEffect(() => {
     setNow(new Date());
   }, []);
+
+  useEffect(() => {
+    if (placement !== "dashboard-header" || typeof navigator === "undefined" || !navigator.geolocation) return;
+
+    const controller = new AbortController();
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const query = new URLSearchParams({
+          latitude: String(coords.latitude),
+          longitude: String(coords.longitude),
+          current: "weather_code,is_day",
+          timezone: "auto",
+        });
+        void fetch(`https://api.open-meteo.com/v1/forecast?${query.toString()}`, {
+          signal: controller.signal,
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error("Weather unavailable");
+            return response.json() as Promise<{ current?: { weather_code?: number; is_day?: number } }>;
+          })
+          .then(({ current }) => {
+            if (typeof current?.weather_code !== "number") return;
+            setWeatherCondition(weatherConditionFromCode(current.weather_code, current.is_day !== 0));
+          })
+          .catch(() => undefined);
+      },
+      () => undefined,
+      { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 },
+    );
+
+    return () => controller.abort();
+  }, [placement]);
 
   const reflection = getDailyReflection(userId, now ?? new Date(0));
   const greeting = now ? t(getGreeting(now.getHours())) : t("Hello");
@@ -49,6 +118,9 @@ export function EvoDailyReflection({
   }[greetingTone];
   const displayName = name.trim().split(/\s+/)[0];
   const copy = lang === "pt" ? "pt" : "en";
+  const fallbackCondition: WeatherCondition = now && (now.getHours() < 6 || now.getHours() >= 18) ? "night" : "sunny";
+  const activeWeatherCondition = weatherCondition ?? fallbackCondition;
+  const WeatherIcon = weatherIcons[activeWeatherCondition];
 
   async function shareReflection() {
     const text = `“${reflection.thought[copy]}” — ${reflection.reflection[copy]}`;
@@ -84,7 +156,12 @@ export function EvoDailyReflection({
           </p>
         </div>
         <aside className="dashboard-panel flex min-w-0 items-center gap-3 rounded-lg px-3 py-2">
-            <Sun className="size-[1.65rem] shrink-0 text-warning" strokeWidth={2.4} aria-hidden="true" />
+            <WeatherIcon
+              key={activeWeatherCondition}
+              className="weather-icon-change size-[1.65rem] shrink-0 text-warning"
+              strokeWidth={2.4}
+              aria-hidden="true"
+            />
           <div className="min-w-0 flex-1">
             <p className="line-clamp-1 text-xs text-muted-foreground">
               “{reflection.thought[copy]}”
