@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import evoDashboardApproved from "@/assets/evo-novo-dashboard-2.jpg.asset.json";
+import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
@@ -83,7 +83,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-brand-green/30 bg-sidebar text-sidebar-foreground shadow-[var(--shadow-soft)]"
         aria-label={t("Your next step")}
       >
-        <div className="grid h-full min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[22rem_minmax(0,1fr)_minmax(12rem,0.62fr)]">
+        <div className="grid h-full min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[26rem_minmax(10.5rem,1fr)_minmax(10.5rem,0.62fr)]">
           <div
             className="relative min-h-[18rem] self-stretch bg-sidebar sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
@@ -91,13 +91,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <img
               src={evoDashboardApproved.url}
               alt=""
-              width={1152}
-              height={768}
+               width={1536}
+               height={1024}
               className="absolute inset-0 h-full w-full object-contain object-left"
             />
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-center px-3 py-3 sm:px-4 xl:px-6 xl:py-4">
+          <div className="relative z-10 flex min-w-0 flex-col justify-center px-3 py-3 sm:px-4 xl:px-3 xl:py-2">
             <p className="text-[11px] font-bold uppercase text-brand-green">
               EVO · {t("Your AI Learning Coach")}
             </p>
@@ -171,7 +171,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 xl:col-span-1 xl:m-2 xl:ml-0 xl:self-center">
+          <aside className="relative z-10 col-span-2 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 xl:col-span-1 xl:m-1.5 xl:ml-0 xl:self-center">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
