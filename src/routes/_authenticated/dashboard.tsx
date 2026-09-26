@@ -105,7 +105,7 @@ function Dashboard() {
             />
           </header>
 
-          <div className="order-5 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[7.59rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
+          <div className="order-1 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[7.59rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
             <div className="flex min-w-0 items-center gap-3 px-3 py-2">
@@ -130,7 +130,7 @@ function Dashboard() {
             />
           </div>
 
-          <div className="order-1 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">
+          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">
             <section className="min-w-0 lg:col-span-9 xl:h-full">
               <NextStepCard compact />
             </section>
@@ -206,7 +206,7 @@ function Dashboard() {
             </section>
           </div>
 
-          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">
+          <div className="order-3 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">
             <div className="min-w-0 lg:col-span-5 xl:h-full">
               <PathProgressCard compact />
             </div>
@@ -223,7 +223,7 @@ function Dashboard() {
           </div>
 
           <section
-            className="order-3 card-soft min-w-0 p-3 lg:order-none xl:flex xl:min-h-0 xl:flex-col xl:px-4 xl:py-3"
+            className="order-4 card-soft min-w-0 p-3 lg:order-none xl:flex xl:min-h-0 xl:flex-col xl:px-4 xl:py-3"
             aria-labelledby="quick-access-title"
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
@@ -266,7 +266,7 @@ function Dashboard() {
 
           <Link
             to="/study-plan"
-            className="order-4 grid min-h-14 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-border bg-card px-3 py-2 text-card-foreground shadow-[var(--shadow-soft)] transition-colors hover:bg-accent lg:hidden"
+            className="order-5 grid min-h-14 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-border bg-card px-3 py-2 text-card-foreground shadow-[var(--shadow-soft)] transition-colors hover:bg-accent lg:hidden"
           >
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-secondary">
               <CalendarCheck className="size-5 text-primary" aria-hidden="true" />
