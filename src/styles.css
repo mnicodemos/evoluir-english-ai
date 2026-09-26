@@ -211,6 +211,14 @@
   box-shadow: var(--shadow-soft);
 }
 
+/* Toasts (sonner) render in a portal with their own stylesheet; match the
+   dashboard dark identity by beating the library's attribute-selector rules. */
+.dashboard-shell [data-sonner-toast] {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+}
+
 .dashboard-shell .dashboard-panel {
   background-color: var(--card);
   color: var(--card-foreground);
