@@ -49,18 +49,13 @@ export function DailyGoalCard({
       )}
     >
       <div className="flex items-center gap-3">
-        <span
-          className={cn(
-            "grid shrink-0 place-items-center rounded-md bg-success/10",
-            compact ? "size-11" : "size-12",
-          )}
-        >
-          {compact ? (
-            <CircleDotDashed className="size-7 text-brand-green" strokeWidth={3.2} />
-          ) : (
+        {compact ? (
+          <CircleDotDashed className="size-[1.925rem] shrink-0 text-brand-green" strokeWidth={3.2} />
+        ) : (
+          <span className="grid size-12 shrink-0 place-items-center rounded-md bg-success/10">
             <Hourglass className="size-6 text-warning" />
-          )}
-        </span>
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <p
             className={cn(

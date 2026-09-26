@@ -109,12 +109,10 @@ function Dashboard() {
             <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
 
             <div className="flex min-w-0 items-center gap-3 px-3 py-2">
-              <span className="grid size-11 shrink-0 place-items-center rounded-md bg-dashboard-coral/10">
-                 <Flame
-                   className="size-7 fill-dashboard-coral text-dashboard-coral"
-                   strokeWidth={2.1}
-                 />
-              </span>
+              <Flame
+                className="size-[1.925rem] shrink-0 fill-dashboard-coral text-dashboard-coral"
+                strokeWidth={2.1}
+              />
               <div className="min-w-0 flex-1">
                  <p className="truncate font-display text-base font-bold">{streakDays} days</p>
                 <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
@@ -139,9 +137,7 @@ function Dashboard() {
               aria-labelledby="today-progress-title"
             >
               <div className="flex items-center gap-2">
-                 <span className="grid size-9 place-items-center rounded-md bg-dashboard-blue/15 text-dashboard-cyan">
-                   <Flame className="size-5" strokeWidth={2.5} />
-                </span>
+                 <Flame className="size-[1.375rem] shrink-0 text-dashboard-cyan" strokeWidth={2.5} />
                  <h2 id="today-progress-title" className="font-display text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
@@ -190,11 +186,9 @@ function Dashboard() {
                   {learningCards.map((card) => (
                     <div
                       key={card.label}
-                      className="grid min-w-0 grid-cols-[1.5rem_minmax(0,1fr)] items-center gap-2.5"
+                      className="grid min-w-0 grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-2.5"
                     >
-                      <span className="grid size-6 place-items-center rounded-full bg-brand-green text-primary-foreground">
-                        <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
-                      </span>
+                      <Check className="size-4 shrink-0 text-brand-green" strokeWidth={3} aria-hidden="true" />
                       <p className="line-clamp-2 text-[11px] text-muted-foreground">
                         <span className="font-display text-sm font-bold text-foreground">{card.value}</span>{" "}
                         {t(card.label)}
@@ -228,9 +222,7 @@ function Dashboard() {
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="flex items-center gap-2">
-                 <span className="grid size-9 xl:size-8 place-items-center text-warning">
-                   <Bolt className="size-7 text-warning" strokeWidth={2.6} aria-hidden="true" />
-                </span>
+                 <Bolt className="size-[1.925rem] shrink-0 text-warning" strokeWidth={2.6} aria-hidden="true" />
                  <h2 id="quick-access-title" className="font-display text-sm font-semibold">
                   {t("Quick Access")}
                 </h2>
@@ -253,8 +245,8 @@ function Dashboard() {
                         <span className="sr-only">{t("New activity available")}</span>
                       </span>
                     )}
-                     <span className="dashboard-quick-icon grid size-9 shrink-0 place-items-center rounded-md xl:size-11">
-                       <item.icon className="size-5 xl:size-6" strokeWidth={2.4} />
+                     <span className="dashboard-quick-icon grid shrink-0 place-items-center">
+                       <item.icon className="size-[1.375rem] xl:size-[1.65rem]" strokeWidth={2.4} />
                     </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
                     <ArrowRight className="size-3.5 text-foreground/65" aria-hidden="true" />
@@ -268,9 +260,7 @@ function Dashboard() {
             to="/study-plan"
             className="order-5 grid min-h-14 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-border bg-card px-3 py-2 text-card-foreground shadow-[var(--shadow-soft)] transition-colors hover:bg-accent lg:hidden"
           >
-            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-secondary">
-              <CalendarCheck className="size-5 text-primary" aria-hidden="true" />
-            </span>
+             <CalendarCheck className="size-[1.375rem] shrink-0 text-primary" aria-hidden="true" />
             <span className="min-w-0 truncate text-sm font-semibold">{t("My Study Plan")}</span>
             <ArrowRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           </Link>
