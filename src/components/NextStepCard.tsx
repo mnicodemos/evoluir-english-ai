@@ -83,7 +83,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-brand-green/30 bg-sidebar text-sidebar-foreground shadow-[var(--shadow-soft)]"
         aria-label={t("Your next step")}
       >
-        <div className="grid h-full min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(8.5rem,0.65fr)_minmax(13rem,1fr)]">
+        <div className="grid h-full min-w-0 grid-cols-[8.5rem_minmax(0,1fr)] sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[20.5rem_minmax(12rem,1fr)_minmax(13rem,0.9fr)]">
           <div
             className="relative min-h-[18rem] self-stretch bg-sidebar sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
@@ -104,7 +104,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <p className="mt-2 text-sm font-semibold text-sidebar-foreground/75">
               {t("Today's focus")}
             </p>
-            <h2 className="mt-1 break-words text-xl font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
+            <h2 className="mt-1 break-words text-xl font-bold text-sidebar-foreground sm:text-2xl">
               {skillLabel}
             </h2>
             <p className="mt-2 line-clamp-2 text-sm text-sidebar-foreground/70 xl:mt-1 xl:text-xs">
