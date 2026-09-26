@@ -292,7 +292,7 @@ function AppShellContent({
           {children}
         </main>
 
-        <div className={cn("mb-0", dashboardLayout && "hidden")}>
+        <div className={cn("mb-0", dashboardLayout && "hidden", mobileOneScreen && "hidden sm:block")}>
           <Footer
             lang={lang}
             containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10"
