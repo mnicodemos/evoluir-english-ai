@@ -96,7 +96,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-3 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4rem_6.5rem_17.333rem_minmax(9rem,1fr)_minmax(4.5rem,0.38fr)] xl:gap-3">
+        <div className="dashboard-one-screen grid gap-3 xl:h-[calc(100vh-1rem)] xl:grid-rows-[4rem_6.5rem_17.333rem_minmax(9rem,1fr)_minmax(5.25rem,0.4fr)] xl:gap-3">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
@@ -246,7 +246,7 @@ function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="dashboard-quick-link group relative grid min-h-12 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-md border px-2.5 py-1.5 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:max-h-14 xl:grid-cols-[2.5rem_minmax(0,1fr)_auto] xl:px-3"
+                    className="dashboard-quick-link group relative grid min-h-12 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-md border px-2.5 py-1.5 text-foreground shadow-sm transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:min-h-0 xl:grid-cols-[2.5rem_minmax(0,1fr)_auto] xl:px-3"
                   >
                     {hasNew && (
                       <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-success">
