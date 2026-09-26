@@ -151,13 +151,32 @@ export function WeeklyFrequency({
         <div className="mt-2 grid grid-cols-7 gap-1">
           {weekKeys.map((key, i) => {
             const studied = studyDays?.has(key) ?? false;
+            const isToday = key === todayKey;
             return (
               <div key={key} className="grid justify-items-center gap-1">
-                <span className="text-[9px] text-muted-foreground">{labels[i]}</span>
+                <span
+                  className={cn(
+                    "text-[9px] text-muted-foreground",
+                    isToday && "font-semibold text-warning",
+                  )}
+                >
+                  {labels[i]}
+                </span>
                 {studied ? (
-                  <span className="grid size-5 place-items-center rounded-full bg-brand-green text-primary-foreground">
+                  <span
+                    className={cn(
+                      "grid size-5 place-items-center rounded-full text-primary-foreground",
+                      isToday ? "bg-warning" : "bg-brand-green",
+                    )}
+                    title={isToday ? (lang === "pt" ? "Hoje" : "Today") : undefined}
+                  >
                     <Check className="size-3" strokeWidth={3} />
                   </span>
+                ) : isToday ? (
+                  <span
+                    className="size-5 rounded-full border border-dashed border-warning bg-warning/15"
+                    title={lang === "pt" ? "Hoje" : "Today"}
+                  />
                 ) : (
                   <span className="size-5 rounded-full border border-dashed border-muted-foreground" />
                 )}
