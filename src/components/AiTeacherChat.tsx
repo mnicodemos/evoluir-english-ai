@@ -305,7 +305,8 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             disabled={turn.isPending}
             onChange={(event) => setInput(event.target.value)}
             onFocus={(event) => {
-              window.setTimeout(() => event.currentTarget.scrollIntoView({ block: "center" }), 150);
+              const target = event.currentTarget;
+              window.setTimeout(() => target.scrollIntoView({ block: "center" }), 150);
             }}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
