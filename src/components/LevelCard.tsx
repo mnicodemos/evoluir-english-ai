@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChartNoAxesColumnIncreasing, ChevronRight, GraduationCap, Lock } from "lucide-react";
+import { ChartNoAxesColumnIncreasing, GraduationCap, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -93,7 +93,6 @@ export function LevelCard({
             )}
           </p>
         </div>
-        {compact && <ChevronRight className="size-4 shrink-0 text-muted-foreground" />}
       </div>
 
       <div className={cn("grid grid-cols-6", compact ? "mt-1.5 gap-1" : "mt-3 gap-2")}>

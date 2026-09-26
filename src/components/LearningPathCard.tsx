@@ -4,7 +4,6 @@ import {
   BookOpen,
   BarChart3,
   CheckCircle2,
-  ChevronRight,
   Download,
   Headphones,
   Loader2,
@@ -436,7 +435,6 @@ export function PathProgressCard({
           <h2 id="skills-progress-heading" className="font-display text-sm font-semibold">
             {t("Your English Skills")}
           </h2>
-          <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         </div>
         <div className="mt-3 grid flex-1 content-between gap-3 xl:mt-4 xl:gap-2">
           {skills.map((skill) => (
