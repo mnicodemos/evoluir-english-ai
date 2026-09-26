@@ -109,13 +109,15 @@ function AppShellContent({
       <div
         className={cn(
           "min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0",
-          dashboardLayout ? "dashboard-shell dark lg:pl-44" : "lg:pl-20",
+          dashboardLayout ? "dashboard-shell dark lg:pl-[12.25rem]" : "lg:pl-20",
         )}
       >
         <aside
           className={cn(
             "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-sidebar-border bg-sidebar py-5 text-sidebar-foreground lg:flex",
-            dashboardLayout ? "w-44 items-stretch px-3 pt-3 pb-4" : "w-20 items-center",
+            dashboardLayout
+              ? "dashboard-sidebar w-[12.25rem] items-stretch px-2 pt-3 pb-3"
+              : "w-20 items-center",
           )}
         >
           <Link
@@ -124,24 +126,24 @@ function AppShellContent({
             className={cn(
               "rounded-lg hover:bg-sidebar-accent",
               dashboardLayout
-                ? "flex h-14 min-w-0 items-center gap-2 px-1"
+                 ? "flex h-16 min-w-0 items-center gap-3 px-3"
                 : "grid size-11 place-items-center",
             )}
           >
-            <Logo className={dashboardLayout ? "size-9 shrink-0" : "size-11"} />
+            <Logo className={dashboardLayout ? "size-10 shrink-0" : "size-11"} />
             {dashboardLayout && (
               <span className="min-w-0 whitespace-nowrap leading-none">
-                <span className="block font-display text-[15px] font-semibold">
+                <span className="block font-display text-base font-semibold">
                   Evoluir<span className="text-brand-green">+</span>
                 </span>
-                <span className="mt-1 block text-[10px] font-semibold uppercase text-sidebar-foreground/70">
+                <span className="mt-1 block text-[10px] font-semibold uppercase text-sidebar-foreground/65">
                   English AI
                 </span>
               </span>
             )}
           </Link>
 
-          <nav className={cn("flex flex-1 flex-col gap-1", dashboardLayout ? "mt-4" : "mt-8")}>
+          <nav className={cn("flex flex-1 flex-col gap-1.5", dashboardLayout ? "mt-4" : "mt-8")}>
             {(dashboardLayout ? dashboardSidebarNav : sidebarNav).map((item) => (
               <Tooltip key={item.to}>
                 <TooltipTrigger asChild>
@@ -151,15 +153,15 @@ function AppShellContent({
                     className={cn(
                       "rounded-lg text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground",
                       dashboardLayout
-                        ? "grid h-10 grid-cols-[2rem_minmax(0,1fr)] items-center px-2 text-xs font-medium"
+                        ? "dashboard-sidebar-link grid h-10 grid-cols-[2.5rem_minmax(0,1fr)] items-center px-3 text-[13px] font-medium"
                         : "grid size-10 place-items-center",
                     )}
                     activeProps={{
                       className:
-                        "border border-brand-green/35 bg-sidebar-accent text-brand-green shadow-[inset_3px_0_0_var(--brand-green)]",
+                        "border border-brand-green/35 bg-sidebar-accent text-sidebar-foreground shadow-[inset_3px_0_0_var(--brand-green)]",
                     }}
                   >
-                    <item.icon className="size-5" />
+                    <item.icon className="size-5 stroke-[2.25]" />
                     {dashboardLayout && (
                       <span className="truncate text-left">{translate(item.label)}</span>
                     )}
@@ -174,19 +176,19 @@ function AppShellContent({
             ))}
             {dashboardLayout && (
               <>
-                <div className="my-2 border-t border-sidebar-border" />
+                <div className="mx-3 my-2.5 border-t border-sidebar-border" />
                 {dashboardAccountNav.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
                     aria-label={translate(item.label)}
-                    className="grid h-10 grid-cols-[2rem_minmax(0,1fr)] items-center rounded-lg px-2 text-xs font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    className="dashboard-sidebar-link grid h-10 grid-cols-[2.5rem_minmax(0,1fr)] items-center rounded-lg px-3 text-[13px] font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     activeProps={{
                       className:
-                        "border border-brand-green/35 bg-sidebar-accent text-brand-green shadow-[inset_3px_0_0_var(--brand-green)]",
+                        "border border-brand-green/35 bg-sidebar-accent text-sidebar-foreground shadow-[inset_3px_0_0_var(--brand-green)]",
                     }}
                   >
-                    <item.icon className="size-5" />
+                    <item.icon className="size-5 stroke-[2.25]" />
                     <span className="truncate text-left">{translate(item.label)}</span>
                   </Link>
                 ))}
