@@ -1,4 +1,3 @@
-import { useNavigate } from "@tanstack/react-router";
 import {
   Cloud,
   CloudLightning,
@@ -7,21 +6,13 @@ import {
   CloudSun,
   Hand,
   Moon,
-  MoreVertical,
   Share2,
   Sun,
-  Target,
   TreePine,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
