@@ -253,8 +253,8 @@ function Dashboard() {
                         <span className="sr-only">{t("New activity available")}</span>
                       </span>
                     )}
-                     <span className="dashboard-quick-icon grid size-9 shrink-0 place-items-center rounded-md xl:size-11">
-                       <item.icon className="size-5 xl:size-6" strokeWidth={2.4} />
+                     <span className="dashboard-quick-icon grid size-9 shrink-0 place-items-center rounded-md xl:size-9">
+                       <item.icon className="size-5" strokeWidth={2.4} />
                     </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
                     <ArrowRight className="size-3.5 text-foreground/65" aria-hidden="true" />
