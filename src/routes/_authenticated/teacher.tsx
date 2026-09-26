@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/teacher")({
 function TeacherPage() {
   const { lesson } = Route.useSearch();
   return (
-    <AppShell>
+    <AppShell mobileOneScreen>
       <AiTeacherChat {...(lesson ? { lessonId: lesson } : {})} />
     </AppShell>
   );
