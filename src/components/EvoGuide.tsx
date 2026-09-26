@@ -23,14 +23,14 @@ export function EvoGuide({
   return (
     <div
       className={cn(
-        "grid min-w-0 grid-cols-[4.25rem_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[5.25rem_minmax(0,1fr)] sm:gap-4",
+        "grid min-w-0 grid-cols-[4.25rem_minmax(0,1fr)] gap-3 sm:grid-cols-[5.25rem_minmax(0,1fr)] sm:gap-4",
         imageSize === "dashboard" &&
-          "grid-cols-[5.1rem_minmax(0,1fr)] sm:grid-cols-[6.3rem_minmax(0,1fr)]",
+          "grid-cols-[5.1rem_minmax(0,1fr)] items-center sm:grid-cols-[6.3rem_minmax(0,1fr)]",
         (imageSize === "diagnosis" || imageSize === "diagnosisIntro") &&
-          "grid-cols-1 justify-items-center gap-4 text-center sm:grid-cols-[minmax(0,1fr)_8rem] sm:gap-6 sm:text-left",
+          "grid-cols-1 items-center justify-items-center gap-4 text-center sm:grid-cols-[minmax(0,1fr)_8rem] sm:gap-6 sm:text-left",
         imageSize === "diagnosisIntro" && "sm:grid-cols-[minmax(0,1fr)_7rem]",
         imageSize === "lesson" &&
-          "grid-cols-[5.5rem_minmax(0,1fr)] gap-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-5",
+          "grid-cols-[5.5rem_minmax(0,1fr)] items-stretch gap-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-5",
         className,
       )}
     >
