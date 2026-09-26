@@ -237,7 +237,7 @@ function Dashboard() {
               </div>
               <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-5 xl:gap-2.5">
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-6 xl:gap-2.5">
               {quickAccess.map((item) => {
                 const hasNew = Boolean(
                   (indicators as Record<string, boolean>)[item.to.replace("/", "")],
