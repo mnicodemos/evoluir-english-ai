@@ -177,37 +177,6 @@ export function EvoDailyReflection({
                 {t("Share reflection")}
               </TooltipContent>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={() => navigate({ to: "/study-plan" })}
-                  aria-label={t("Go to study plan")}
-                  className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
-                >
-                  <Target className="size-3.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
-                {t("Go to study plan")}
-              </TooltipContent>
-            </Tooltip>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={t("More options")}
-                  className="-m-1 rounded-md p-1 outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent active:scale-95"
-                >
-                  <MoreVertical className="size-3.5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem onClick={() => setLang(lang === "en" ? "pt" : "en")}>
-                  {t("Change language")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
           </TooltipProvider>
         </aside>
