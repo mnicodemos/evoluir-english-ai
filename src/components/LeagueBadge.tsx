@@ -76,61 +76,28 @@ export function LeagueBadge({
       title={label ? `${league.name} league · ${label}` : `${league.name} league`}
     >
 
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-full blur-md motion-safe:animate-[pulse_2.4s_ease-in-out_infinite]"
-        style={{ background: `radial-gradient(circle, ${league.glow} 0%, transparent 70%)` }}
-      />
       <svg
         viewBox="0 0 64 64"
         width={size}
         height={size}
-        className="relative motion-safe:animate-[league-float_3.6s_ease-in-out_infinite]"
+        className="relative"
       >
-        <defs>
-          <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor={league.from} />
-            <stop offset="100%" stopColor={league.to} />
-          </linearGradient>
-          <clipPath id={`${id}-clip`}>
-            <path d="M32 4 54 18 54 46 32 60 10 46 10 18Z" />
-          </clipPath>
-        </defs>
-        <path d="M32 4 54 18 54 46 32 60 10 46 10 18Z" fill={`url(#${id})`} />
-        <path d="M32 4 54 18 32 30 10 18Z" fill="white" opacity="0.22" />
-        <path d="M32 30 54 18 54 46 32 60Z" fill="black" opacity="0.14" />
-        <g clipPath={`url(#${id}-clip)`}>
-          <rect
-            x="-40"
-            y="0"
-            width="24"
-            height="64"
-            fill="white"
-            opacity="0.35"
-            transform="skewX(-18)"
-            className="motion-safe:animate-[league-shine_3.2s_linear_infinite]"
-          />
-        </g>
         <path
           d="M32 4 54 18 54 46 32 60 10 46 10 18Z"
           fill="none"
-          stroke="white"
-          strokeOpacity="0.5"
-          strokeWidth="1.5"
+          stroke={league.from}
+          strokeWidth="3"
+          strokeLinejoin="round"
         />
         {label && (
           <text
             x="32"
-            y="34"
+            y="33"
             textAnchor="middle"
             dominantBaseline="middle"
-            fontSize="20"
-            fontWeight="800"
-            fill={league.ink}
-            stroke={league.inkEdge}
-            strokeWidth="2"
-            strokeLinejoin="round"
-            paintOrder="stroke"
+            fontSize="16"
+            fontWeight="700"
+            fill={league.from}
             style={{ letterSpacing: "0.5px" }}
           >
             {label}
