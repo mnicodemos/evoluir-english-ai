@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
+import evoDashboardMobile from "@/assets/evo-dashboard-mobile.jpg.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
 
@@ -89,11 +90,18 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             aria-hidden="true"
           >
             <img
+              src={evoDashboardMobile.url}
+              alt=""
+              width={1600}
+              height={768}
+              className="aspect-[3.7/1] h-auto w-full object-cover object-center sm:hidden"
+            />
+            <img
               src={evoDashboardApproved.url}
               alt=""
                width={1536}
                height={1024}
-               className="h-auto w-full sm:absolute sm:inset-0 sm:h-full sm:object-contain sm:object-left"
+               className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-contain sm:object-left"
             />
           </div>
 
@@ -101,22 +109,33 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <p className="text-[11px] font-bold uppercase text-brand-green">
               EVO · {t("Your AI Learning Coach")}
             </p>
-            <p className="mt-2 text-sm font-semibold text-sidebar-foreground/75">
+            <p className="mt-1.5 text-xs font-semibold text-sidebar-foreground/75 sm:mt-2 sm:text-sm">
               {t("Today's focus")}
             </p>
-            <h2 className="mt-1 break-words text-xl font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
-              {skillLabel}
-            </h2>
-            <p className="mt-2 line-clamp-2 text-sm text-sidebar-foreground/70 xl:mt-1 xl:text-xs">
+            <div className="mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:block">
+              <h2 className="min-w-0 break-words text-lg font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
+                {skillLabel}
+              </h2>
+              {mainAvailable && (
+                <Button asChild size="sm" className="h-8 shrink-0 bg-brand-green px-3 text-xs text-sidebar hover:bg-brand-green/90 sm:hidden">
+                  {data.activity.params ? (
+                    <Link to="/learning/$lessonId" params={data.activity.params}>{t("Practice now")}</Link>
+                  ) : (
+                    <Link to={data.activity.to}>{t("Practice now")}</Link>
+                  )}
+                </Button>
+              )}
+            </div>
+            <p className="mt-1.5 line-clamp-2 text-xs text-sidebar-foreground/70 sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
-            <p className="mt-2 line-clamp-1 text-sm text-sidebar-foreground/85 xl:mt-1 xl:text-xs">
+            <p className="mt-2 hidden line-clamp-1 text-sm text-sidebar-foreground/85 sm:block xl:mt-1 xl:text-xs">
               {t("How to practise")}: <span className="font-semibold">{data.activity.title}</span>
             </p>
             {mainAvailable && (
               <Button
                 asChild
-                className="mt-4 w-full bg-brand-green text-sidebar hover:bg-brand-green/90 sm:w-fit xl:mt-2 xl:h-9"
+                className="mt-4 hidden w-full bg-brand-green text-sidebar hover:bg-brand-green/90 sm:flex sm:w-fit xl:mt-2 xl:h-9"
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
@@ -130,13 +149,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </Button>
             )}
             {(quickWinAvailable || challengeAvailable) && (
-              <div className="mt-3 flex flex-wrap gap-2 xl:mt-1 xl:gap-1">
+              <div className="mt-2 grid grid-cols-2 gap-1 sm:mt-3 sm:flex sm:flex-wrap sm:gap-2 xl:mt-1 xl:gap-1">
                 {quickWin && quickWinAvailable && (
                   <Button
                     asChild
                     variant="ghost"
                     size="sm"
-                    className="text-sidebar-foreground hover:bg-sidebar-accent"
+                    className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
                   >
                     {quickWin.activity.params ? (
                       <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -154,7 +173,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     asChild
                     variant="ghost"
                     size="sm"
-                    className="text-sidebar-foreground hover:bg-sidebar-accent"
+                    className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
                   >
                     {data.quest.resource.params ? (
                       <Link to="/learning/$lessonId" params={data.quest.resource.params}>
