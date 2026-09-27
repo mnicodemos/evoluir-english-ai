@@ -147,13 +147,13 @@ export function EvoDailyReflection({
         <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-1 lg:block">
           <div className="lg:hidden">{mobileLeading}</div>
           <div className="min-w-0">
-          <h1 className="flex min-w-0 items-center gap-2 font-display text-2xl font-bold text-foreground 2xl:text-3xl">
+          <h1 className="flex min-w-0 items-center gap-2 font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
             <span className="truncate">
               {greeting}, {displayName}!
             </span>
-             <Hand className="size-6 shrink-0 fill-warning/25 text-warning" strokeWidth={2.2} aria-hidden="true" />
+             <Hand className="size-4 shrink-0 fill-warning/25 text-warning sm:size-6" strokeWidth={2.2} aria-hidden="true" />
           </h1>
-          <p className="mt-1 truncate text-sm text-muted-foreground">
+          <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:truncate sm:text-sm">
             {t("Great to have you back. Let's keep building your fluency.")}
           </p>
           </div>
