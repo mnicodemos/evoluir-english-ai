@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import reflectionBg from "@/assets/reflection-bg.jpg.asset.json";
 import {
   Tooltip,
   TooltipContent,
@@ -23,6 +24,12 @@ import {
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+
+const reflectionBgStyle = {
+  backgroundImage: `url(${reflectionBg.url})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+} as const;
 
 type EvoDailyReflectionProps = {
   userId: string;
@@ -146,7 +153,10 @@ export function EvoDailyReflection({
             {t("Great to have you back. Let's keep building your fluency.")}
           </p>
         </div>
-        <aside className="dashboard-panel flex min-w-0 items-start gap-3 rounded-lg px-3 py-2 lg:items-center">
+        <aside
+          style={reflectionBgStyle}
+          className="dashboard-panel flex min-w-0 items-start gap-3 rounded-lg border border-border px-3 py-2 lg:items-center"
+        >
             <WeatherIcon
               key={activeWeatherCondition}
               className="weather-icon-change size-[1.65rem] shrink-0 text-warning"
@@ -202,9 +212,10 @@ export function EvoDailyReflection({
 
   return (
     <aside
+      style={reflectionBgStyle}
       className={
         placement === "mobile-card"
-          ? "card-soft flex min-w-0 items-start gap-4 p-4 lg:hidden"
+          ? "card-soft flex min-w-0 items-start gap-4 overflow-hidden p-4 lg:hidden"
           : "hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex"
       }
     >
