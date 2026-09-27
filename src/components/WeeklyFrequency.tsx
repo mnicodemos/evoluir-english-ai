@@ -85,10 +85,10 @@ export function WeeklyFrequency({
         </div>
         <Trophy
           className={cn(
-            "hidden size-[3.85rem] shrink-0 sm:block",
+            "hidden size-[3.75rem] shrink-0 sm:block",
             sevenDayTrophyUnlocked
               ? "fill-warning text-warning"
-              : "fill-muted-foreground/10 text-muted-foreground/45",
+              : "fill-transparent text-warning",
           )}
           strokeWidth={1.9}
           aria-label={
