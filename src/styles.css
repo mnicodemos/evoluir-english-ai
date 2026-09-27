@@ -211,12 +211,17 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* Toasts (sonner) render in a portal with their own stylesheet; match the
-   dashboard dark identity by beating the library's attribute-selector rules. */
+/* Toasts (sonner) render in a portal with their own stylesheet; use the
+   Evoluir+ green consistently for feedback across every page. */
 .dashboard-shell [data-sonner-toast] {
-  background-color: var(--card) !important;
-  color: var(--foreground) !important;
-  border: 1px solid var(--border) !important;
+  background-color: var(--brand-green) !important;
+  color: var(--primary-foreground) !important;
+  border: 1px solid color-mix(in oklab, var(--brand-green) 72%, var(--background)) !important;
+}
+
+.dashboard-shell [data-sonner-toast] [data-description],
+.dashboard-shell [data-sonner-toast] [data-icon] {
+  color: var(--primary-foreground) !important;
 }
 
 .dashboard-shell .dashboard-panel {
