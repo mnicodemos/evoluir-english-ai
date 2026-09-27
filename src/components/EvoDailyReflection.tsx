@@ -212,9 +212,10 @@ export function EvoDailyReflection({
 
   return (
     <aside
+      style={reflectionBgStyle}
       className={
         placement === "mobile-card"
-          ? "card-soft flex min-w-0 items-start gap-4 p-4 lg:hidden"
+          ? "card-soft flex min-w-0 items-start gap-4 overflow-hidden p-4 lg:hidden"
           : "hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex"
       }
     >
