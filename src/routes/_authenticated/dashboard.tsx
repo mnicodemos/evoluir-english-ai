@@ -120,7 +120,7 @@ function Dashboard() {
                 <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">{t("Study streak")}</p>
                 {nextLeague && (
                   <p
-                    className="mt-0.5 truncate text-[10px] font-semibold leading-tight sm:text-xs"
+                    className="mt-0.5 hidden truncate text-[10px] font-semibold leading-tight sm:block sm:text-xs"
                     style={{ color: nextLeague.from }}
                   >
                     {lang === "pt"
