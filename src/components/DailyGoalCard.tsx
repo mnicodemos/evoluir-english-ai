@@ -46,7 +46,7 @@ export function DailyGoalCard({
   return (
     <div
       className={cn(
-        "flex h-full min-w-0 flex-col justify-center",
+        "flex min-w-0 flex-col justify-center sm:h-full",
         compact ? "px-3 py-2" : "card-soft p-5",
         mobileSummary && "items-center px-1.5 py-2 sm:items-stretch sm:px-3",
       )}
