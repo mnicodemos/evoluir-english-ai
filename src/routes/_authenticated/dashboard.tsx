@@ -111,16 +111,22 @@ function Dashboard() {
 
             <div className="flex min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
               <Flame
-                className="size-6 shrink-0 fill-dashboard-coral text-dashboard-coral sm:hidden"
-                strokeWidth={2.1}
-              />
-              <Hourglass
-                className="hidden size-[1.925rem] shrink-0 text-dashboard-coral sm:block"
+                className="size-6 shrink-0 fill-dashboard-coral text-dashboard-coral sm:size-[1.925rem]"
                 strokeWidth={2.4}
               />
               <div className="min-w-0 flex-1">
                  <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">{streakDays} days</p>
                 <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">{t("Study streak")}</p>
+                {nextLeague && (
+                  <p
+                    className="mt-0.5 truncate text-[10px] font-semibold leading-tight sm:text-xs"
+                    style={{ color: nextLeague.from }}
+                  >
+                    {lang === "pt"
+                      ? `Próxima liga: ${nextLeague.namePt}`
+                      : `Next league: ${nextLeague.name}`}
+                  </p>
+                )}
               </div>
               <LeagueBadge
                 streakDays={streakDays}
