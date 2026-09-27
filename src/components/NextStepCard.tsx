@@ -114,7 +114,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <p className="mt-1.5 text-xs font-semibold text-sidebar-foreground/75 sm:mt-2 sm:text-sm">
               {t("Today's focus")}
             </p>
-            <div className="mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:block">
+            <div className="mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 sm:block">
               <h2 className="min-w-0 break-words text-lg font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
                 {skillLabel}
               </h2>
