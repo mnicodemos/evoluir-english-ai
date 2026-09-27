@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, Check, Trophy } from "lucide-react";
+import { CalendarDays, Check, Hourglass, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -71,6 +71,10 @@ export function WeeklyFrequency({
     return (
       <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
         <Trophy className="size-6 shrink-0 fill-warning text-warning sm:hidden" strokeWidth={2.4} />
+        <Hourglass
+          className="hidden size-[1.925rem] shrink-0 text-dashboard-coral sm:block"
+          strokeWidth={2.4}
+        />
         <div className="min-w-0 flex-1 sm:text-left">
           <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">
             {studiedCount} / {weeklyGoal} {daysLabel}
