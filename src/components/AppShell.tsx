@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LineChart,
   LogOut,
+  Menu,
   MessageSquareText,
   PenLine,
   Sparkles,
@@ -22,6 +23,14 @@ import { Logo } from "@/components/Logo";
 import { BrandName } from "@/components/BrandName";
 import { Footer } from "@/components/Footer";
 import { ProfileMenu } from "@/components/ProfileMenu";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
@@ -58,6 +67,85 @@ const dashboardAccountNav = [
   { to: "/progress", label: "My Progress", icon: LineChart },
   { to: "/premium", label: "My Subscription", icon: Crown },
 ] as const;
+
+type MobileNavigationMenuProps = {
+  translate: (label: string) => string;
+  className?: string;
+};
+
+export function MobileNavigationMenu({
+  translate,
+  className,
+}: MobileNavigationMenuProps) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={translate("Open menu")}
+          className={cn("size-10 shrink-0", className)}
+        >
+          <Menu className="size-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="dashboard-shell dark flex w-[min(19rem,86vw)] flex-col border-sidebar-border bg-sidebar p-4 text-sidebar-foreground">
+        <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
+          <SheetTitle className="flex items-center gap-2 text-sidebar-foreground">
+            <Logo className="size-9 shrink-0" />
+            <BrandName className="text-base" />
+          </SheetTitle>
+        </SheetHeader>
+        <nav className="grid gap-1 overflow-y-auto py-3">
+          {sidebarNav.map((item) => (
+            <SheetClose asChild key={item.to}>
+              <Link
+                to={item.to}
+                className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
+              >
+                <item.icon className="size-5 shrink-0" />
+                <span className="truncate">{translate(item.label)}</span>
+              </Link>
+            </SheetClose>
+          ))}
+          <SheetClose asChild>
+            <Link
+              to="/premium"
+              className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
+            >
+              <Crown className="size-5 shrink-0" />
+              <span className="truncate">{translate("Premium")}</span>
+            </Link>
+          </SheetClose>
+        </nav>
+        <div className="mt-auto border-t border-sidebar-border pt-3">
+          <SheetClose asChild>
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-2 text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              onClick={signOut}
+            >
+              <LogOut className="size-5" />
+              {translate("Sign out")}
+            </Button>
+          </SheetClose>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
 
 export function AppShell({
   children,
@@ -115,7 +203,7 @@ function AppShellContent({
     <TooltipProvider delayDuration={200}>
       <div
         className={cn(
-          "dashboard-shell dark min-h-screen bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0",
+          "dashboard-shell dark min-h-screen bg-background lg:pb-0",
           dashboardLayout ? "lg:pl-[13.2rem]" : "lg:pl-20",
         )}
       >
@@ -255,11 +343,14 @@ function AppShellContent({
           </div>
         </aside>
 
-        <header className="sticky top-0 z-20 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4 lg:hidden">
-          <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
-            <Logo className="size-[1.3rem] shrink-0" />
-            <BrandName className="truncate text-sm" />
-          </Link>
+        <header className={cn("sticky top-0 z-20 h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4 lg:hidden", dashboardLayout ? "hidden" : "grid")}>
+          <div className="flex min-w-0 items-center gap-1">
+            <MobileNavigationMenu translate={translate} />
+            <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
+              <Logo className="size-[1.3rem] shrink-0" />
+              <BrandName className="truncate text-sm" />
+            </Link>
+          </div>
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
             <Button
               variant="ghost"
@@ -297,26 +388,6 @@ function AppShellContent({
             containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10"
           />
         </div>
-
-        <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 place-items-center border-t border-border bg-background/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur sm:grid-cols-10 lg:hidden">
-          {sidebarNav.map((item) => (
-            <Tooltip key={item.to}>
-              <TooltipTrigger asChild>
-                <Link
-                  to={item.to}
-                  aria-label={translate(item.label)}
-                  className="grid size-11 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:size-10"
-                  activeProps={{ className: "bg-accent text-foreground" }}
-                >
-                  <item.icon className="size-5" />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="top" sideOffset={8}>
-                {translate(item.label)}
-              </TooltipContent>
-            </Tooltip>
-          ))}
-        </nav>
 
       </div>
     </TooltipProvider>

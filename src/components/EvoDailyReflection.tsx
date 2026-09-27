@@ -11,7 +11,7 @@ import {
   Sun,
   TreePine,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import reflectionBg from "@/assets/reflection-bg.jpg.asset.json";
@@ -35,6 +35,7 @@ type EvoDailyReflectionProps = {
   userId: string;
   name: string;
   placement?: "desktop" | "mobile-card" | "dashboard-header";
+  mobileLeading?: ReactNode;
 };
 
 type WeatherCondition = "sunny" | "partly-cloudy" | "cloudy" | "rain" | "storm" | "snow" | "night";
@@ -64,6 +65,7 @@ export function EvoDailyReflection({
   userId,
   name,
   placement = "desktop",
+  mobileLeading,
 }: EvoDailyReflectionProps) {
   const { lang, setLang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -142,7 +144,9 @@ export function EvoDailyReflection({
   if (placement === "dashboard-header") {
     return (
       <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.68fr)] lg:items-center">
-        <div className="min-w-0">
+        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-1 lg:block">
+          <div className="lg:hidden">{mobileLeading}</div>
+          <div className="min-w-0">
           <h1 className="flex min-w-0 items-center gap-2 font-display text-2xl font-bold text-foreground 2xl:text-3xl">
             <span className="truncate">
               {greeting}, {displayName}!
@@ -152,6 +156,7 @@ export function EvoDailyReflection({
           <p className="mt-1 truncate text-sm text-muted-foreground">
             {t("Great to have you back. Let's keep building your fluency.")}
           </p>
+          </div>
         </div>
         <aside
           style={reflectionBgStyle}

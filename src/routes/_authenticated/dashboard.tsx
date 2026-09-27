@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 
-import { AppShell } from "@/components/AppShell";
+import { AppShell, MobileNavigationMenu } from "@/components/AppShell";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
@@ -99,6 +99,7 @@ function Dashboard() {
               userId={profile.id}
               name={profile.name}
               placement="dashboard-header"
+              mobileLeading={<MobileNavigationMenu translate={t} />}
             />
           </header>
 
