@@ -77,7 +77,12 @@ export function DailyGoalCard({
           </p>
         </div>
         {compact && done >= goalMinutes && (
-          <span className="grid size-5 shrink-0 place-items-center rounded-full bg-brand-green text-primary-foreground">
+          <span
+            className={cn(
+              "grid size-5 shrink-0 place-items-center rounded-full bg-brand-green text-primary-foreground",
+              mobileSummary && "hidden sm:grid",
+            )}
+          >
             <Check className="size-3" strokeWidth={3} />
           </span>
         )}
