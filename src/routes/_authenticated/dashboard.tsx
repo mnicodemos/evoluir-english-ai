@@ -55,6 +55,7 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const streakDays = profile ? effectiveStreak(profile) : 0;
+  const nextLeague = profile ? getNextLeague(streakDays) : null;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
 
   useEffect(() => {
@@ -131,7 +132,7 @@ function Dashboard() {
               <LeagueBadge
                 streakDays={streakDays}
                 label={profile.level.toUpperCase()}
-                size={72}
+                size={60}
                 className="hidden sm:grid"
               />
             </div>
