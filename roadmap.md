@@ -140,3 +140,5 @@
 - [x] Ícone flutuante: verde do Daily Goal (brand-green)
 - [x] AI Teacher mobile: tela de digitação em uma página (footer oculto no mobile via prop opt-in mobileOneScreen; card 47dvh; header compacto)
 - [x] Ponto de nova atividade do Acesso rápido em brand-green (verde do dia)
+- [x] Fundo do bloco de saudação/reflexão igual à paisagem de montanhas enviada (desktop e mobile)
+- [x] Análise visual — Your English Skills (somente leitura, sem alterações)
