@@ -135,6 +135,9 @@ function Dashboard() {
             <section className="min-w-0 lg:col-span-9 xl:h-full">
               <NextStepCard compact />
             </section>
+            <div className="min-w-0 lg:hidden">
+              <SmartReviewCard streakDays={streakDays} compact />
+            </div>
             <section
               className="card-soft flex min-w-0 flex-col p-3 lg:col-span-3 xl:h-full xl:p-4"
               aria-labelledby="today-progress-title"
@@ -206,7 +209,7 @@ function Dashboard() {
             <div className="min-w-0 lg:col-span-5 xl:h-full">
               <PathProgressCard compact />
             </div>
-            <div className="min-w-0 lg:col-span-4 xl:h-full">
+            <div className="hidden min-w-0 lg:col-span-4 lg:block xl:h-full">
               <SmartReviewCard streakDays={streakDays} compact />
             </div>
             <div className="min-w-0 lg:col-span-3 xl:h-full">
