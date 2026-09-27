@@ -102,26 +102,32 @@ function Dashboard() {
             />
           </header>
 
-          <div className="order-1 card-soft grid min-w-0 overflow-hidden sm:grid-cols-2 lg:order-none lg:grid-cols-4 xl:h-[7.59rem] [&>*+*]:border-border sm:[&>*+*]:border-l">
-            <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
+          <div className="order-1 card-soft grid min-w-0 grid-cols-3 overflow-hidden lg:order-none lg:grid-cols-4 xl:h-[7.59rem]">
+            <div className="col-span-3 border-b border-border lg:col-span-1 lg:border-b-0 lg:border-r">
+              <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
+            </div>
 
-            <div className="flex min-w-0 items-center gap-3 px-3 py-2">
+            <div className="flex min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
               <Flame
-                className="size-[1.925rem] shrink-0 fill-dashboard-coral text-dashboard-coral"
+                className="size-6 shrink-0 fill-dashboard-coral text-dashboard-coral sm:size-[1.925rem]"
                 strokeWidth={2.1}
               />
               <div className="min-w-0 flex-1">
-                 <p className="truncate font-display text-base font-bold">{streakDays} days</p>
-                <p className="text-xs text-muted-foreground">{t("Study streak")}</p>
+                 <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">{streakDays} days</p>
+                <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">{t("Study streak")}</p>
               </div>
             </div>
 
-            <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact />
-            <WeeklyFrequency
-              userId={profile.id}
-              daysPerWeek={profile.study_days_per_week ?? 7}
-              presentation="summary"
-            />
+            <div className="min-w-0 border-l border-border">
+              <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact mobileSummary />
+            </div>
+            <div className="min-w-0 border-l border-border">
+              <WeeklyFrequency
+                userId={profile.id}
+                daysPerWeek={profile.study_days_per_week ?? 7}
+                presentation="summary"
+              />
+            </div>
           </div>
 
           <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">

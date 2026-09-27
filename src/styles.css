@@ -265,6 +265,16 @@
   border-color: color-mix(in oklab, var(--dashboard-cyan) 50%, var(--border));
 }
 
+@media (max-width: 39.999rem) {
+  .dashboard-one-screen h2 {
+    letter-spacing: 0;
+  }
+
+  .dashboard-one-screen .lucide {
+    stroke-width: 2.25;
+  }
+}
+
 @media (min-width: 80rem) {
   .dashboard-one-screen {
     height: calc(100vh - 4.125rem);

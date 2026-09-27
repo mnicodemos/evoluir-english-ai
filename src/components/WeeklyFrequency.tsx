@@ -68,13 +68,13 @@ export function WeeklyFrequency({
 
   if (presentation === "summary") {
     return (
-      <div className="flex h-full min-w-0 items-center gap-3 px-3 py-2">
-         <Trophy className="size-[1.925rem] shrink-0 fill-warning text-warning" strokeWidth={2.4} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-display text-base font-bold">
+      <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
+         <Trophy className="size-6 shrink-0 fill-warning text-warning sm:size-[1.925rem]" strokeWidth={2.4} />
+        <div className="min-w-0 flex-1 sm:text-left">
+          <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">
             {studiedCount} / {weeklyGoal} {daysLabel}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">
             {lang === "pt" ? "Esta semana" : "This week"}
           </p>
         </div>
