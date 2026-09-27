@@ -69,16 +69,24 @@ const dashboardAccountNav = [
 ] as const;
 
 type MobileNavigationMenuProps = {
-  onSignOut: () => void | Promise<void>;
   translate: (label: string) => string;
   className?: string;
 };
 
 export function MobileNavigationMenu({
-  onSignOut,
   translate,
   className,
 }: MobileNavigationMenuProps) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -127,7 +135,7 @@ export function MobileNavigationMenu({
             <Button
               variant="ghost"
               className="w-full justify-start gap-2 text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              onClick={onSignOut}
+              onClick={signOut}
             >
               <LogOut className="size-5" />
               {translate("Sign out")}
@@ -337,7 +345,7 @@ function AppShellContent({
 
         <header className={cn("sticky top-0 z-20 h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4 lg:hidden", dashboardLayout ? "hidden" : "grid")}>
           <div className="flex min-w-0 items-center gap-1">
-            <MobileNavigationMenu onSignOut={signOut} translate={translate} />
+            <MobileNavigationMenu translate={translate} />
             <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
               <Logo className="size-[1.3rem] shrink-0" />
               <BrandName className="truncate text-sm" />

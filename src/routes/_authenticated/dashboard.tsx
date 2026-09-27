@@ -56,12 +56,6 @@ function Dashboard() {
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
 
-  async function signOut() {
-    const { supabase } = await import("@/integrations/supabase/client");
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
-
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
   }, [profile, navigate]);
@@ -105,7 +99,7 @@ function Dashboard() {
               userId={profile.id}
               name={profile.name}
               placement="dashboard-header"
-              mobileLeading={<MobileNavigationMenu onSignOut={signOut} translate={t} />}
+              mobileLeading={<MobileNavigationMenu translate={t} />}
             />
           </header>
 
