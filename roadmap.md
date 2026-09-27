@@ -144,3 +144,4 @@
 - [x] Análise visual — Your English Skills (somente leitura, sem alterações)
 - [x] Dashboard mobile — reorganizar indicadores em uma faixa, compactar ações do foco e aplicar nova imagem horizontal da EVO
 - [x] Dashboard mobile — alinhar a EVO ao topo do bloco e reduzir os ícones em 13%
+- [x] Mobile — substituir a barra inferior por menu suspenso antes da saudação e eliminar espaço acima da EVO

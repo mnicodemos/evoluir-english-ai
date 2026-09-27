@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 
-import { AppShell } from "@/components/AppShell";
+import { AppShell, MobileNavigationMenu } from "@/components/AppShell";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
@@ -55,6 +55,12 @@ function Dashboard() {
   const indicators = useActivityIndicators();
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
+
+  async function signOut() {
+    const { supabase } = await import("@/integrations/supabase/client");
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
@@ -99,6 +105,7 @@ function Dashboard() {
               userId={profile.id}
               name={profile.name}
               placement="dashboard-header"
+              mobileLeading={<MobileNavigationMenu onSignOut={signOut} translate={t} />}
             />
           </header>
 
