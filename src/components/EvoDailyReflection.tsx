@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import reflectionBg from "@/assets/reflection-bg.jpg.asset.json";
 import {
   Tooltip,
   TooltipContent,
@@ -23,6 +24,12 @@ import {
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+
+const reflectionBgStyle = {
+  backgroundImage: `url(${reflectionBg.url})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+} as const;
 
 type EvoDailyReflectionProps = {
   userId: string;
