@@ -273,6 +273,11 @@
   .dashboard-one-screen .lucide {
     stroke-width: 2.25;
   }
+
+  .brand-dashboard-theme .lucide,
+  .dashboard-shell .lucide {
+    scale: 0.87;
+  }
 }
 
 @media (min-width: 80rem) {
