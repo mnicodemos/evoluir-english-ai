@@ -94,7 +94,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               alt=""
               width={1600}
               height={768}
-              className="aspect-[3.7/1] block h-auto w-full object-cover object-center sm:hidden"
+              className="aspect-[3.7/1] block h-auto w-full rounded-t-lg object-cover object-center sm:hidden"
             />
             <img
               src={evoDashboardApproved.url}
