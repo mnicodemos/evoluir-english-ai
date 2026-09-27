@@ -67,9 +67,10 @@ export function WeeklyFrequency({
   const daysLabel = lang === "pt" ? "dias" : "days";
 
   if (presentation === "summary") {
+    const sevenDayTrophyUnlocked = studiedCount >= 7;
     return (
       <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
-         <Trophy className="size-6 shrink-0 fill-warning text-warning sm:size-[1.925rem]" strokeWidth={2.4} />
+        <CalendarDays className="size-6 shrink-0 text-warning sm:hidden" strokeWidth={2.4} />
         <div className="min-w-0 flex-1 sm:text-left">
           <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">
             {studiedCount} / {weeklyGoal} {daysLabel}
@@ -78,6 +79,24 @@ export function WeeklyFrequency({
             {lang === "pt" ? "Esta semana" : "This week"}
           </p>
         </div>
+        <Trophy
+          className={cn(
+            "hidden size-[3.85rem] shrink-0 sm:block",
+            sevenDayTrophyUnlocked
+              ? "fill-warning text-warning"
+              : "fill-muted-foreground/10 text-muted-foreground/45",
+          )}
+          strokeWidth={1.9}
+          aria-label={
+            sevenDayTrophyUnlocked
+              ? lang === "pt"
+                ? "Troféu de 7 dias desbloqueado"
+                : "7-day trophy unlocked"
+              : lang === "pt"
+                ? "Troféu de 7 dias bloqueado"
+                : "7-day trophy locked"
+          }
+        />
       </div>
     );
   }
