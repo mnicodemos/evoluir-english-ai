@@ -153,7 +153,10 @@ export function EvoDailyReflection({
             {t("Great to have you back. Let's keep building your fluency.")}
           </p>
         </div>
-        <aside className="dashboard-panel flex min-w-0 items-start gap-3 rounded-lg px-3 py-2 lg:items-center">
+        <aside
+          style={reflectionBgStyle}
+          className="dashboard-panel flex min-w-0 items-start gap-3 rounded-lg border border-border px-3 py-2 lg:items-center"
+        >
             <WeatherIcon
               key={activeWeatherCondition}
               className="weather-icon-change size-[1.65rem] shrink-0 text-warning"
