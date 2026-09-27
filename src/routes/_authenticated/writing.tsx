@@ -258,7 +258,7 @@ function Writing() {
                 isDone
                   ? "opacity-70 hover:bg-accent/50"
                   : isActive
-                    ? "border-brand-green ring-brand-green/60 ring-1"
+                    ? "border-brand-green! ring-2 ring-brand-green/40!"
                     : "hover:bg-accent/50"
               }`}
             >
