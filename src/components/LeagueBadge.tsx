@@ -65,7 +65,6 @@ export function LeagueBadge({
   className?: string;
 }) {
   const league = getLeague(streakDays);
-  const id = `league-grad-${league.index}`;
 
   return (
     <span
