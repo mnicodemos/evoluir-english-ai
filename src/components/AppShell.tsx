@@ -119,16 +119,6 @@ export function MobileNavigationMenu({
               </Link>
             </SheetClose>
           ))}
-          <SheetClose asChild>
-            <Link
-              to="/premium"
-              className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
-            >
-              <Crown className="size-5 shrink-0" />
-              <span className="truncate">{translate("Premium")}</span>
-            </Link>
-          </SheetClose>
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
           <SheetClose asChild>
