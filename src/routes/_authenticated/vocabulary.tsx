@@ -32,6 +32,7 @@ import {
 } from "@/lib/voice-recorder";
 import { lookupWord } from "@/lib/dictionary.functions";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
+import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { logPracticeTelemetry, persistPronunciationLegacy } from "@/lib/legacyActivity.functions";
