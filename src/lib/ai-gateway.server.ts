@@ -87,7 +87,12 @@ export async function callGateway(
     }
     if (err instanceof AiError) throw err;
     if (signal?.aborted)
-      throw new AiError(504, "Voice processing is taking longer than expected. Please try again.");
+      throw new AiError(
+        504,
+        usage?.operation === "tts" || usage?.operation === "transcription" || usage?.operation === "talking"
+          ? "Voice processing is taking longer than expected. Please try again."
+          : "The AI service is busy right now. Please try again in a few minutes.",
+      );
     const message =
       err instanceof Error ? err.message : "Google Gemini could not answer right now.";
     const status =
