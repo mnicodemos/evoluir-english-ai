@@ -131,7 +131,7 @@ function Dashboard() {
               </div>
               <LeagueBadge
                 streakDays={streakDays}
-                size={60}
+                size={53}
                 className="hidden sm:grid"
               />
             </div>
