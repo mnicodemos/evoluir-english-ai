@@ -134,13 +134,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             className="relative w-full self-stretch bg-sidebar sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
-            <div className="m-3 overflow-hidden rounded-lg border border-brand-green/35 bg-background/35 sm:m-0 sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent">
+            <div className="relative m-3 aspect-[4.1/1] overflow-hidden rounded-lg border border-brand-green/35 bg-background/35 sm:static sm:m-0 sm:aspect-auto sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent">
               <img
                 src={evoDashboardMobile.url}
                 alt=""
                 width={1600}
                 height={768}
-                className="aspect-[4.1/1] block h-auto w-full object-cover object-center sm:hidden"
+                className="absolute inset-0 block h-full w-full scale-[1.02] object-cover object-center sm:hidden"
               />
               <img
                 src={evoDashboardApproved.url}
