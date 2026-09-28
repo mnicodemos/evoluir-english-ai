@@ -9,6 +9,9 @@ export class AiError extends Error {
   }
 }
 
+/** Below the 90 s abandoned-record limit, far above normal latency (3–5 s). */
+export const AI_CALL_TIMEOUT_MS = 60_000;
+
 /**
  * All AI usage runs on the workspace's own Google Gemini key.
  * There is no third-party fallback on purpose.
@@ -24,8 +27,12 @@ export async function callGateway(
     /** The caller already looked this key up and missed; skip the second read. */
     cacheChecked?: boolean;
   },
-  signal?: AbortSignal,
+  callerSignal?: AbortSignal,
 ): Promise<string> {
+  // Every AI call has a hard time limit, so a hung provider response can never
+  // leave its usage record "running" (the record is always closed below).
+  const timeoutSignal = AbortSignal.timeout(AI_CALL_TIMEOUT_MS);
+  const signal = callerSignal ? AbortSignal.any([callerSignal, timeoutSignal]) : timeoutSignal;
   const {
     callGemini,
     GEMINI_TEXT_MODEL: geminiModel,
