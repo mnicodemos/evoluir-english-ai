@@ -1,3 +1,5 @@
+import { ShieldCheck } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 export type League = {
@@ -55,13 +57,10 @@ export function getNextLeague(streakDays: number) {
 export function LeagueBadge({
   streakDays,
   size = 56,
-  label,
   className,
 }: {
   streakDays: number;
   size?: number;
-  /** CEFR level shown inside the badge, e.g. "B1". */
-  label?: string;
   className?: string;
 }) {
   const league = getLeague(streakDays);
@@ -69,41 +68,12 @@ export function LeagueBadge({
   return (
     <span
       className={cn("relative grid shrink-0 place-items-center", className)}
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, color: league.from }}
       role="img"
-      aria-label={label ? `${league.name} league, level ${label}` : `${league.name} league`}
-      title={label ? `${league.name} league · ${label}` : `${league.name} league`}
+      aria-label={`${league.name} league`}
+      title={`${league.name} league`}
     >
-
-      <svg
-        viewBox="0 0 64 64"
-        width={size}
-        height={size}
-        className="relative"
-      >
-        <path
-          d="M32 4 54 18 54 46 32 60 10 46 10 18Z"
-          fill="none"
-          stroke={league.from}
-          strokeWidth="3"
-          strokeLinejoin="round"
-        />
-        {label && (
-          <text
-            x="32"
-            y="33"
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fontSize="16"
-            fontWeight="700"
-            fill={league.from}
-            style={{ letterSpacing: "0.5px" }}
-          >
-            {label}
-          </text>
-        )}
-
-      </svg>
+      <ShieldCheck size={size} strokeWidth={2.4} aria-hidden="true" />
     </span>
   );
 }
