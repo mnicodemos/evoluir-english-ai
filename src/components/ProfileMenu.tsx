@@ -176,12 +176,14 @@ export function ProfileMenu({
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          size={presentation === "dashboard-sidebar" ? "default" : "icon"}
+          size={presentation === "icon" ? "icon" : "default"}
           aria-label={translate("Edit profile", lang)}
           className={cn(
             presentation === "dashboard-sidebar"
               ? "h-auto min-h-[4.5rem] w-full justify-start gap-2 rounded-none border-t border-sidebar-border px-1 pt-4 pb-4 text-sidebar-foreground hover:bg-transparent"
-              : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
+              : presentation === "mobile-menu"
+                ? "h-11 w-full justify-start gap-2 rounded-lg px-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
             className,
           )}
         >
@@ -191,15 +193,17 @@ export function ProfileMenu({
               {profile ? initials(profile.name, profile.email) : <UserRound className="size-4" />}
             </AvatarFallback>
           </Avatar>
-          {presentation === "dashboard-sidebar" && (
+          {presentation !== "icon" && (
             <>
               <span className="min-w-0 flex-1 text-left">
                 <span className="block truncate text-xs font-semibold text-sidebar-foreground">
                   {displayName.split(/\s+/)[0]}
                 </span>
-                <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
-                  {profile?.plan === "premium" ? "Premium" : translate("Profile", lang)}
-                </span>
+                {presentation === "dashboard-sidebar" && (
+                  <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
+                    {profile?.plan === "premium" ? "Premium" : translate("Profile", lang)}
+                  </span>
+                )}
               </span>
               <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
             </>
