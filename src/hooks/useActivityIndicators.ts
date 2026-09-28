@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 
 import { useLessonRound } from "@/hooks/useLessonRound";
@@ -15,10 +16,15 @@ import {
   vocabularyIndicatorVisible,
   WRITING_DONE_ROUND_PREFIX,
   WRITING_HISTORY_ROUND_PREFIX,
+  writeText,
   writingHasNewActivity,
 } from "@/lib/activityIndicators";
 import { lessonBatchKey } from "@/lib/vocabularyBatch";
+import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
+
+/** One recovery attempt per lesson round per page load. */
+const recoveryAttempts = new Set<string>();
 
 export type ActivityIndicators = {
   listening: boolean;
@@ -78,6 +84,25 @@ export function useActivityIndicators(): ActivityIndicators {
     writing: false,
     vocabulary: false,
   });
+
+  // A finished lesson whose words were never saved (e.g. the lesson screen was
+  // closed mid-request) asks for them once, reusing the same Vocabulary request.
+  const generateVocabulary = useServerFn(dailyWords);
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (!profile || round < 1 || !vocabularyBatch || vocabularyFetching || vocabularyError) return;
+    if (vocabularyBatch.batchWordIds.length > 0) return;
+    const failureKey = vocabularyGenerationFailureKey(profile.id, round);
+    const attemptKey = `${profile.id}:${round}`;
+    if (readText(failureKey) === "1" || recoveryAttempts.has(attemptKey)) return;
+    recoveryAttempts.add(attemptKey);
+    generateVocabulary({ data: { level: profile.level } })
+      .then((words) => {
+        if (words.length > 0)
+          void queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
+      })
+      .catch(() => writeText(failureKey, "1"));
+  }, [profile, round, vocabularyBatch, vocabularyFetching, vocabularyError, generateVocabulary, queryClient]);
 
   useEffect(() => {
     if (!profile) return;
