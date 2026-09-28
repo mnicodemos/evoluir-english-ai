@@ -32,6 +32,7 @@ import {
 } from "@/lib/voice-recorder";
 import { lookupWord } from "@/lib/dictionary.functions";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
+import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { logPracticeTelemetry, persistPronunciationLegacy } from "@/lib/legacyActivity.functions";
@@ -162,9 +163,9 @@ function Vocabulary() {
     refetchOnMount: false,
     queryFn: async () => {
       try {
-        return (await loadDailyWords({
-          data: { level: profile?.level ?? "intermediate" },
-        })) as Word[];
+        return (await vocabularySingleFlight(profile?.id ?? "", () =>
+          loadDailyWords({ data: { level: profile?.level ?? "intermediate" } }),
+        )) as Word[];
       } catch (error) {
         if (failKey) window.localStorage.setItem(failKey, "1");
         setGenBlocked(true);

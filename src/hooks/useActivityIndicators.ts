@@ -21,6 +21,7 @@ import {
 } from "@/lib/activityIndicators";
 import { lessonBatchKey } from "@/lib/vocabularyBatch";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
+import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
 
 /** One recovery attempt per lesson round per page load. */
@@ -96,12 +97,18 @@ export function useActivityIndicators(): ActivityIndicators {
     const attemptKey = `${profile.id}:${round}`;
     if (readText(failureKey) === "1" || recoveryAttempts.has(attemptKey)) return;
     recoveryAttempts.add(attemptKey);
-    generateVocabulary({ data: { level: profile.level } })
+    vocabularySingleFlight(profile.id, () =>
+      generateVocabulary({ data: { level: profile.level } }),
+    )
       .then((words) => {
         if (words.length > 0)
           void queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
       })
-      .catch(() => writeText(failureKey, "1"));
+      .catch((error: unknown) => {
+        // A request already running elsewhere is not a failure: it will save the words.
+        const busy = error instanceof Error && /already running/i.test(error.message);
+        if (!busy) writeText(failureKey, "1");
+      });
   }, [profile, round, vocabularyBatch, vocabularyFetching, vocabularyError, generateVocabulary, queryClient]);
 
   useEffect(() => {
