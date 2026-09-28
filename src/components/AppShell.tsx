@@ -122,9 +122,12 @@ export function MobileNavigationMenu({
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
           <SheetClose asChild>
+            <ProfileMenu presentation="mobile-menu" />
+          </SheetClose>
+          <SheetClose asChild>
             <Button
               variant="ghost"
-              className="w-full justify-start gap-2 text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              className="mt-1 w-full justify-start gap-2 text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               onClick={signOut}
             >
               <LogOut className="size-5" />
