@@ -41,6 +41,7 @@ import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/qui
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
+import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
   head: () => ({
@@ -169,7 +170,9 @@ function LessonPage() {
       const failureKey =
         unlockedRound === null ? null : vocabularyGenerationFailureKey(profile.id, unlockedRound);
       try {
-        const words = await generateVocabulary({ data: { level: profile.level } });
+        const words = await vocabularySingleFlight(profile.id, () =>
+          generateVocabulary({ data: { level: profile.level } }),
+        );
         if (failureKey) window.localStorage.removeItem(failureKey);
         if (words.length > 0) {
           await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });

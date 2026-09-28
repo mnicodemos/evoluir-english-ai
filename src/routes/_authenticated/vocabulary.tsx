@@ -162,9 +162,9 @@ function Vocabulary() {
     refetchOnMount: false,
     queryFn: async () => {
       try {
-        return (await loadDailyWords({
-          data: { level: profile?.level ?? "intermediate" },
-        })) as Word[];
+        return (await vocabularySingleFlight(profile?.id ?? "", () =>
+          loadDailyWords({ data: { level: profile?.level ?? "intermediate" } }),
+        )) as Word[];
       } catch (error) {
         if (failKey) window.localStorage.setItem(failKey, "1");
         setGenBlocked(true);
