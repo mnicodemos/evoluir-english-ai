@@ -77,6 +77,48 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const challengeAvailable = data.quest
     ? dashboardActionAvailable(data.quest.resource.to, activityIndicators)
     : false;
+  // Shared action buttons: rendered under the focus text on mobile/tablet and
+  // inside the "Why now?" card on desktop (xl).
+  const actionButtons = (
+    <>
+      {quickWin && quickWinAvailable && (
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+        >
+          {quickWin.activity.params ? (
+            <Link to="/learning/$lessonId" params={quickWin.activity.params}>
+              <Zap /> {t("Quick Win")}
+            </Link>
+          ) : (
+            <Link to={quickWin.activity.to}>
+              <Zap /> {t("Quick Win")}
+            </Link>
+          )}
+        </Button>
+      )}
+      {data.quest && challengeAvailable && (
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+        >
+          {data.quest.resource.params ? (
+            <Link to="/learning/$lessonId" params={data.quest.resource.params}>
+              <Sparkles /> {t("Take the challenge")}
+            </Link>
+          ) : (
+            <Link to={data.quest.resource.to}>
+              <Sparkles /> {t("Take the challenge")}
+            </Link>
+          )}
+        </Button>
+      )}
+    </>
+  );
 
   if (compact) {
     return (
@@ -107,7 +149,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-between px-3 py-3 sm:px-4 xl:order-2 xl:px-3 xl:py-2">
+          <div className="relative z-10 flex min-w-0 flex-col justify-between px-3 py-3 sm:px-4 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
             <p className="text-[11px] font-bold uppercase text-brand-green">
               EVO · {t("Your AI Learning Coach")}
             </p>
@@ -151,48 +193,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </Button>
             )}
             {(quickWinAvailable || challengeAvailable) && (
-              <div className="mt-2 grid grid-cols-2 gap-1 sm:mt-3 sm:flex sm:flex-wrap sm:gap-2 xl:mt-1 xl:gap-1">
-                {quickWin && quickWinAvailable && (
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
-                  >
-                    {quickWin.activity.params ? (
-                      <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-                        <Zap /> {t("Quick Win")}
-                      </Link>
-                    ) : (
-                      <Link to={quickWin.activity.to}>
-                        <Zap /> {t("Quick Win")}
-                      </Link>
-                    )}
-                  </Button>
-                )}
-                {data.quest && challengeAvailable && (
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
-                  >
-                    {data.quest.resource.params ? (
-                      <Link to="/learning/$lessonId" params={data.quest.resource.params}>
-                        <Sparkles /> {t("Take the challenge")}
-                      </Link>
-                    ) : (
-                      <Link to={data.quest.resource.to}>
-                        <Sparkles /> {t("Take the challenge")}
-                      </Link>
-                    )}
-                  </Button>
-                )}
+              <div className="mt-2 grid grid-cols-2 gap-1 sm:mt-3 sm:flex sm:flex-wrap sm:gap-2 xl:mt-1 xl:gap-1 xl:hidden">
+                {actionButtons}
               </div>
             )}
           </div>
 
-          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 sm:col-span-2 xl:order-3 xl:col-span-1 xl:m-1.5 xl:self-stretch">
+          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 sm:col-span-2 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
@@ -226,6 +233,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <span>{actionText}</span>
               </li>
             </ul>
+            {(quickWinAvailable || challengeAvailable) && (
+              <div className="mt-3 hidden flex-wrap gap-1 xl:mt-auto xl:flex xl:items-center xl:gap-2 xl:pt-3">
+                {actionButtons}
+              </div>
+            )}
           </aside>
         </div>
       </section>
