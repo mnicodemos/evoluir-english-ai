@@ -240,6 +240,7 @@ function LessonPage() {
               : t("Let's practise this skill in a new context.")
           }
           imageSize="lesson"
+          image="wide"
           contrast="inverse"
           className="card-soft overflow-hidden bg-primary pr-4 sm:pr-5"
         />
