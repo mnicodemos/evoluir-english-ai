@@ -77,46 +77,49 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const challengeAvailable = data.quest
     ? dashboardActionAvailable(data.quest.resource.to, activityIndicators)
     : false;
-  // Shared action buttons: rendered under the focus text on mobile/tablet and
-  // inside the "Why now?" card on desktop (xl).
+  // Shared action buttons: Quick Win sits next to "Today's focus" on mobile and
+  // inside the "Why now?" card on larger screens; the challenge button sits
+  // next to the focus title on mobile and inside the card on larger screens.
+  const quickWinButton = quickWin && quickWinAvailable ? (
+    <Button
+      asChild
+      variant="ghost"
+      size="sm"
+      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+    >
+      {quickWin.activity.params ? (
+        <Link to="/learning/$lessonId" params={quickWin.activity.params}>
+          <Zap /> {t("Quick Win")}
+        </Link>
+      ) : (
+        <Link to={quickWin.activity.to}>
+          <Zap /> {t("Quick Win")}
+        </Link>
+      )}
+    </Button>
+  ) : null;
+  const challengeButton = data.quest && challengeAvailable ? (
+    <Button
+      asChild
+      variant="ghost"
+      size="sm"
+      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+    >
+      {data.quest.resource.params ? (
+        <Link to="/learning/$lessonId" params={data.quest.resource.params}>
+          <Sparkles /> {t("Take the challenge")}
+        </Link>
+      ) : (
+        <Link to={data.quest.resource.to}>
+          <Sparkles /> {t("Take the challenge")}
+        </Link>
+      )}
+    </Button>
+  ) : null;
   const actionButtons = (
     <>
-      {quickWin && quickWinAvailable && (
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
-        >
-          {quickWin.activity.params ? (
-            <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-              <Zap /> {t("Quick Win")}
-            </Link>
-          ) : (
-            <Link to={quickWin.activity.to}>
-              <Zap /> {t("Quick Win")}
-            </Link>
-          )}
-        </Button>
-      )}
-      {data.quest && challengeAvailable && (
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
-        >
-          {data.quest.resource.params ? (
-            <Link to="/learning/$lessonId" params={data.quest.resource.params}>
-              <Sparkles /> {t("Take the challenge")}
-            </Link>
-          ) : (
-            <Link to={data.quest.resource.to}>
-              <Sparkles /> {t("Take the challenge")}
-            </Link>
-          )}
-        </Button>
-      )}
+      {quickWinButton}
+      {challengeButton}
     </>
   );
 
