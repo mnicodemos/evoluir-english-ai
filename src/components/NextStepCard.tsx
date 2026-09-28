@@ -241,8 +241,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <span>{actionText}</span>
               </li>
             </ul>
-            {(quickWinAvailable || challengeAvailable) && (
-              <div className="mt-3 flex flex-wrap gap-1 xl:mt-auto xl:items-center xl:gap-2 xl:pt-3">
+            {(quickWinButton || challengeButton) && (
+              <div className="mt-3 hidden flex-wrap gap-1 sm:flex xl:mt-auto xl:items-center xl:gap-2 xl:pt-3">
                 {actionButtons}
               </div>
             )}
