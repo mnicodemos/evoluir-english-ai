@@ -77,46 +77,49 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const challengeAvailable = data.quest
     ? dashboardActionAvailable(data.quest.resource.to, activityIndicators)
     : false;
-  // Shared action buttons: rendered under the focus text on mobile/tablet and
-  // inside the "Why now?" card on desktop (xl).
+  // Shared action buttons: Quick Win sits next to "Today's focus" on mobile and
+  // inside the "Why now?" card on larger screens; the challenge button sits
+  // next to the focus title on mobile and inside the card on larger screens.
+  const quickWinButton = quickWin && quickWinAvailable ? (
+    <Button
+      asChild
+      variant="ghost"
+      size="sm"
+      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+    >
+      {quickWin.activity.params ? (
+        <Link to="/learning/$lessonId" params={quickWin.activity.params}>
+          <Zap /> {t("Quick Win")}
+        </Link>
+      ) : (
+        <Link to={quickWin.activity.to}>
+          <Zap /> {t("Quick Win")}
+        </Link>
+      )}
+    </Button>
+  ) : null;
+  const challengeButton = data.quest && challengeAvailable ? (
+    <Button
+      asChild
+      variant="ghost"
+      size="sm"
+      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+    >
+      {data.quest.resource.params ? (
+        <Link to="/learning/$lessonId" params={data.quest.resource.params}>
+          <Sparkles /> {t("Take the challenge")}
+        </Link>
+      ) : (
+        <Link to={data.quest.resource.to}>
+          <Sparkles /> {t("Take the challenge")}
+        </Link>
+      )}
+    </Button>
+  ) : null;
   const actionButtons = (
     <>
-      {quickWin && quickWinAvailable && (
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
-        >
-          {quickWin.activity.params ? (
-            <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-              <Zap /> {t("Quick Win")}
-            </Link>
-          ) : (
-            <Link to={quickWin.activity.to}>
-              <Zap /> {t("Quick Win")}
-            </Link>
-          )}
-        </Button>
-      )}
-      {data.quest && challengeAvailable && (
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
-        >
-          {data.quest.resource.params ? (
-            <Link to="/learning/$lessonId" params={data.quest.resource.params}>
-              <Sparkles /> {t("Take the challenge")}
-            </Link>
-          ) : (
-            <Link to={data.quest.resource.to}>
-              <Sparkles /> {t("Take the challenge")}
-            </Link>
-          )}
-        </Button>
-      )}
+      {quickWinButton}
+      {challengeButton}
     </>
   );
 
@@ -164,12 +167,22 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </Button>
               )}
             </div>
-            <p className="mt-1.5 text-xs font-semibold text-sidebar-foreground/75 sm:mt-2 sm:text-sm">
-              {t("Today's focus")}
-            </p>
-            <h2 className="mt-1 min-w-0 break-words text-lg font-bold text-sidebar-foreground sm:mt-0 sm:text-2xl xl:text-3xl">
-              {skillLabel}
-            </h2>
+            <div className="mt-1.5 flex items-start justify-between gap-2 sm:mt-2 sm:block">
+              <p className="text-xs font-semibold text-sidebar-foreground/75 sm:text-sm">
+                {t("Today's focus")}
+              </p>
+              {quickWinButton && (
+                <div className="shrink-0 sm:hidden">{quickWinButton}</div>
+              )}
+            </div>
+            <div className="mt-1 flex items-start justify-between gap-2 sm:block">
+              <h2 className="min-w-0 break-words text-lg font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
+                {skillLabel}
+              </h2>
+              {challengeButton && (
+                <div className="shrink-0 sm:hidden">{challengeButton}</div>
+              )}
+            </div>
             <p className="mt-1.5 line-clamp-2 text-xs text-sidebar-foreground/70 sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
@@ -228,8 +241,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <span>{actionText}</span>
               </li>
             </ul>
-            {(quickWinAvailable || challengeAvailable) && (
-              <div className="mt-3 flex flex-wrap gap-1 xl:mt-auto xl:items-center xl:gap-2 xl:pt-3">
+            {(quickWinButton || challengeButton) && (
+              <div className="mt-3 hidden flex-wrap gap-1 sm:flex xl:mt-auto xl:items-center xl:gap-2 xl:pt-3">
                 {actionButtons}
               </div>
             )}
