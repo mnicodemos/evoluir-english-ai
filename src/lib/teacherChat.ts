@@ -25,6 +25,9 @@ export function buildTeacherHistory(messages: TeacherChatMessage[]): TeacherChat
 export function teacherErrorMessage(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error ?? "");
   if (typeof navigator !== "undefined" && navigator.onLine === false) return "offline";
+  // Provider overload / temporary unavailability is not the student's quota.
+  if (/busy|high demand|overloaded|could not answer|unavailable|already running|503/i.test(raw))
+    return "busy";
   if (/429|quota|limit/i.test(raw)) return "quota";
   if (/401|403|unauthorized|authorization/i.test(raw)) return "auth";
   if (/network|fetch|timeout|timed out|503|502|504/i.test(raw)) return "network";
