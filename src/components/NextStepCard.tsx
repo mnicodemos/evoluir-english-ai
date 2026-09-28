@@ -207,7 +207,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-2.5 sm:col-span-2 sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
+          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:border-brand-green/35 sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
