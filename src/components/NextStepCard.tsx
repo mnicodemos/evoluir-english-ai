@@ -198,23 +198,30 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
             </div>
             <ul className="mt-3 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
+              {/* Mobile: a single two-line summary of the desktop items. */}
+              <li className="flex items-start gap-2 sm:hidden">
+                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span className="line-clamp-2">
+                  {situationText} {actionText}
+                </span>
+              </li>
               {cefrLevel && (
-                <li className="flex items-start gap-2">
+                <li className="hidden items-start gap-2 sm:flex">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
                   <span>
                     {cefrLevel} · {skillLabel}
                   </span>
                 </li>
               )}
-              <li className="flex items-start gap-2">
+              <li className="hidden items-start gap-2 sm:flex">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
                 <span>{situationText}</span>
               </li>
-              <li className="flex items-start gap-2">
+              <li className="hidden items-start gap-2 sm:flex">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
                 <span>{t(NEXT_STEP_REASON_TEXT[data.reason])}</span>
               </li>
-              <li className="flex items-start gap-2">
+              <li className="hidden items-start gap-2 sm:flex">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
                 <span>{actionText}</span>
               </li>
