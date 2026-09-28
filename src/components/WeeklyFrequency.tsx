@@ -87,8 +87,8 @@ export function WeeklyFrequency({
           className={cn(
             "hidden size-12 shrink-0 sm:block",
             sevenDayTrophyUnlocked
-              ? "fill-warning text-warning"
-              : "fill-transparent text-warning",
+              ? "fill-transparent text-warning"
+              : "fill-transparent text-muted-foreground/40",
           )}
           strokeWidth={1.5}
           aria-label={
