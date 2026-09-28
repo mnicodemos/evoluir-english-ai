@@ -192,6 +192,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 )}
               </Button>
             )}
+          </div>
 
           <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 sm:col-span-2 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
