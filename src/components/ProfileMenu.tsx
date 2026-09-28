@@ -77,7 +77,7 @@ export function ProfileMenu({
   presentation = "icon",
 }: {
   className?: string;
-  presentation?: "icon" | "dashboard-sidebar";
+  presentation?: "icon" | "dashboard-sidebar" | "mobile-menu";
 }) {
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
