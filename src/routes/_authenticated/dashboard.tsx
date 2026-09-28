@@ -95,7 +95,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-2.5 xl:grid-rows-[4rem_7.59rem_16.45rem_minmax(9.5rem,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
+        <div className="dashboard-one-screen grid gap-[7px] xl:grid-rows-[4rem_7.59rem_16.45rem_minmax(9.5rem,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
@@ -148,7 +148,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="order-2 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">
+          <div className="order-2 grid min-w-0 gap-2 lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
             <section className="min-w-0 lg:col-span-9 xl:h-full">
               <NextStepCard compact />
             </section>
@@ -222,7 +222,7 @@ function Dashboard() {
             </section>
           </div>
 
-          <div className="order-3 grid min-w-0 gap-3 lg:order-none lg:grid-cols-12 xl:min-h-0">
+          <div className="order-3 grid min-w-0 gap-2 lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
             <div className="min-w-0 lg:col-span-5 xl:h-full">
               <PathProgressCard compact />
             </div>
