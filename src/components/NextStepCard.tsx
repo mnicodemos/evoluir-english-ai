@@ -167,12 +167,22 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </Button>
               )}
             </div>
-            <p className="mt-1.5 text-xs font-semibold text-sidebar-foreground/75 sm:mt-2 sm:text-sm">
-              {t("Today's focus")}
-            </p>
-            <h2 className="mt-1 min-w-0 break-words text-lg font-bold text-sidebar-foreground sm:mt-0 sm:text-2xl xl:text-3xl">
-              {skillLabel}
-            </h2>
+            <div className="mt-1.5 flex items-start justify-between gap-2 sm:mt-2 sm:block">
+              <p className="text-xs font-semibold text-sidebar-foreground/75 sm:text-sm">
+                {t("Today's focus")}
+              </p>
+              {quickWinButton && (
+                <div className="shrink-0 sm:hidden">{quickWinButton}</div>
+              )}
+            </div>
+            <div className="mt-1 flex items-start justify-between gap-2 sm:block">
+              <h2 className="min-w-0 break-words text-lg font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
+                {skillLabel}
+              </h2>
+              {challengeButton && (
+                <div className="shrink-0 sm:hidden">{challengeButton}</div>
+              )}
+            </div>
             <p className="mt-1.5 line-clamp-2 text-xs text-sidebar-foreground/70 sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
