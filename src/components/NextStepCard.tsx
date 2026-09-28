@@ -140,7 +140,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 alt=""
                 width={1600}
                 height={768}
-                className="aspect-[4.11/1] block h-auto w-full object-cover object-center sm:hidden"
+                className="aspect-[4.5/1] block h-auto w-full object-cover object-center sm:hidden"
               />
               <img
                 src={evoDashboardApproved.url}
@@ -152,7 +152,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-between px-3 py-2 sm:px-4 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
+          <div className="relative z-10 flex min-w-0 flex-col justify-between px-3 py-1 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
             <div className="flex items-start justify-between gap-2">
               <p className="text-[11px] font-bold uppercase text-brand-green">
                 EVO · {t("Your AI Learning Coach")}
@@ -175,8 +175,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <div className="shrink-0 sm:hidden">{quickWinButton}</div>
               )}
             </div>
-            <div className="mt-0.5 flex items-start justify-between gap-2 sm:block">
-              <h2 className="min-w-0 break-words text-lg font-bold text-sidebar-foreground sm:text-2xl xl:text-3xl">
+            <div className="flex items-start justify-between gap-2 sm:mt-0.5 sm:block">
+              <h2 className="min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:text-2xl sm:leading-normal xl:text-3xl">
                 {skillLabel}
               </h2>
               {challengeButton && (
@@ -207,16 +207,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-3 sm:col-span-2 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
+          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-brand-green/35 bg-background/35 p-2.5 sm:col-span-2 sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
             </div>
-            <ul className="mt-2 grid gap-2 text-xs text-sidebar-foreground/80 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
+            <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
               {/* Mobile: a single two-line summary of the desktop items. */}
               <li className="flex items-start gap-2 sm:hidden">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
-                <span className="line-clamp-2">
+                 <span className="line-clamp-2 leading-tight">
                   {situationText} {actionText}
                 </span>
               </li>
