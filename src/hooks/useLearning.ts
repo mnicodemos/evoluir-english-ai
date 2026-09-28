@@ -116,6 +116,8 @@ export function useLesson(lessonId: string) {
           .eq("lesson_id", lessonId)
           .maybeSingle(),
       ]);
+      // A failed read is not "lesson not found": surface it so the page can retry.
+      if (lesson.error) throw new Error(lesson.error.message);
       return {
         lesson: (lesson.data ?? null) as Lesson | null,
         flashcards: (flashcards.data ?? []) as Flashcard[],

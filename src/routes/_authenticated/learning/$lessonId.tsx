@@ -67,7 +67,7 @@ function LessonPage() {
   const { lessonId } = Route.useParams();
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
-  const { data, isLoading } = useLesson(lessonId);
+  const { data, isLoading, error: lessonError, refetch: refetchLesson } = useLesson(lessonId);
   const { data: profile } = useProfile();
   const { data: lessonRound } = useLessonRound();
   const { data: cardStates } = useUserFlashcards();
@@ -192,6 +192,16 @@ function LessonPage() {
           <div className="space-y-4">
             <Skeleton className="h-8 w-64" />
             <Skeleton className="h-64 w-full" />
+          </div>
+        ) : lessonError ? (
+          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+            <span>We couldn't open this lesson right now. Check your connection and try again.</span>
+            <Button variant="outline" size="sm" onClick={() => void refetchLesson()}>
+              Try again
+            </Button>
+            <Link to="/learning" className="underline">
+              Learning Center
+            </Link>
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">This lesson was not found.</p>

@@ -52,6 +52,7 @@ const errorCopy: Record<string, string> = {
   quota: "You have reached your AI usage limit for now. Please try again later.",
   auth: "Your session expired. Please sign in again.",
   network: "The teacher is unavailable right now. Please try again.",
+  busy: "The AI service is very busy right now. Please wait a minute and send your message again.",
   unknown: "Something went wrong. Please try again.",
 };
 

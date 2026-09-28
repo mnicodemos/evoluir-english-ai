@@ -646,7 +646,11 @@ function Vocabulary() {
                   </p>
                 ) : genFailed && (daily?.length ?? 0) < 10 ? (
                   <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    <span>{t("No new words available right now. Please try again later.")}</span>
+                    <span>
+                      {genError instanceof Error && genError.message
+                        ? genError.message
+                        : t("No new words available right now. Please try again later.")}
+                    </span>
                     <Button variant="outline" size="sm" onClick={retryGeneration}>
                       <RotateCcw className="size-4" /> {t("Try again")}
                     </Button>
