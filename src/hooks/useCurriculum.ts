@@ -109,12 +109,36 @@ export function useLearningPath() {
 }
 
 /** Opens a path lesson, asking the AI to write it the first time. */
+// One opening per lesson at a time in this browser: a second tap shares it.
+const openingLessons = new Map<string, Promise<{ lessonId: string }>>();
+/** While the lesson is still being written, wait for it instead of failing (≈ 75 s max). */
+const BUSY_WAIT_MS = 7_500;
+const BUSY_WAIT_ATTEMPTS = 10;
+
 export function useOpenPathLesson() {
   const open = useServerFn(openCurriculumLesson);
   const queryClient = useQueryClient();
 
+  const openOnce = (key: string) => {
+    const running = openingLessons.get(key);
+    if (running) return running;
+    const run = (async () => {
+      for (let attempt = 1; ; attempt++) {
+        try {
+          return (await open({ data: { key } })) as { lessonId: string };
+        } catch (err) {
+          const busy = err instanceof Error && /already running/i.test(err.message);
+          if (!busy || attempt >= BUSY_WAIT_ATTEMPTS) throw err;
+          await new Promise((r) => setTimeout(r, BUSY_WAIT_MS));
+        }
+      }
+    })().finally(() => openingLessons.delete(key));
+    openingLessons.set(key, run);
+    return run;
+  };
+
   return useMutation({
-    mutationFn: async (key: string) => open({ data: { key } }),
+    mutationFn: openOnce,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["lessons"] });
       queryClient.invalidateQueries({ queryKey: ["all-flashcards"] });
