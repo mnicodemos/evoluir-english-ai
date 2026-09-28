@@ -140,7 +140,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 alt=""
                 width={1600}
                 height={768}
-                className="aspect-[4.37/1] block h-auto w-full object-cover object-center sm:hidden"
+                className="aspect-[4.1/1] block h-auto w-full object-cover object-center sm:hidden"
               />
               <img
                 src={evoDashboardApproved.url}
@@ -152,7 +152,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-between px-3 py-0.5 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
+          <div className="relative z-10 flex min-w-0 flex-col justify-between px-3 py-1 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
             <div className="flex items-start justify-between gap-2">
               <p className="text-[11px] font-bold uppercase text-brand-green">
                 EVO · {t("Your AI Learning Coach")}
