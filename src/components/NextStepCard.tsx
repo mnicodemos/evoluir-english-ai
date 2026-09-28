@@ -134,7 +134,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             className="relative w-full self-stretch bg-sidebar sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
-            <div className="relative m-3 aspect-[4.1/1] overflow-hidden rounded-lg border border-brand-green/35 bg-background/35 sm:static sm:m-0 sm:aspect-auto sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent">
+            <div className="relative m-3 aspect-[4.1/1] overflow-hidden rounded-lg border border-border bg-secondary/45 sm:static sm:m-0 sm:aspect-auto sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent">
               <img
                 src={evoDashboardMobile.url}
                 alt=""
