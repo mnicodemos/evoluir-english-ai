@@ -131,7 +131,6 @@ function Dashboard() {
               </div>
               <LeagueBadge
                 streakDays={streakDays}
-                label={profile.level.toUpperCase()}
                 size={60}
                 className="hidden sm:grid"
               />
