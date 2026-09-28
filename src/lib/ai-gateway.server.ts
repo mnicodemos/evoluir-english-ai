@@ -38,10 +38,12 @@ export async function callGateway(
     GEMINI_TEXT_MODEL: geminiModel,
     GeminiError,
   } = await import("./gemini.server");
-  // AI Talking conversation text (first sentence + replies) runs on the
-  // standard Lovable AI service; the JSON report and every other feature keep
-  // their current provider.
-  const useLovable = usage?.operation === "talking" && !jsonMode;
+  // AI Talking conversation text (first sentence + replies) and Vocabulary word
+  // generation run on the standard Lovable AI service; the AI Talking JSON report
+  // and every other feature keep their current provider.
+  const useLovable =
+    (usage?.operation === "talking" && !jsonMode) ||
+    usage?.operation === "vocabulary_generation";
   const lovable = useLovable ? await import("./lovable-chat.server") : null;
   const GEMINI_TEXT_MODEL = lovable ? lovable.LOVABLE_TALKING_MODEL : geminiModel;
   const usageTools = usage ? await import("./ai-usage.server") : null;
