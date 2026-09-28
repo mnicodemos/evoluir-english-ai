@@ -183,7 +183,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <div className="shrink-0 sm:hidden">{challengeButton}</div>
               )}
             </div>
-            <p className="mt-1 line-clamp-2 text-xs text-sidebar-foreground/70 sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
+            <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
             <p className="mt-2 hidden line-clamp-1 text-sm text-sidebar-foreground/85 sm:block xl:mt-1 xl:text-xs">
