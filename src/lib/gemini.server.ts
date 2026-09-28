@@ -5,6 +5,30 @@ const GATEWAY_URL = "https://connector-gateway.lovable.dev/udc_marcelo_s_google_
 export const GEMINI_TEXT_MODEL = "gemini-3.6-flash";
 const MODELS = [GEMINI_TEXT_MODEL, "gemini-3.5-flash"];
 
+/** Attempts per model for temporary errors; total calls are bounded (2 models x 2). */
+export const GEMINI_ATTEMPTS_PER_MODEL = 2;
+
+export function isTemporaryGeminiStatus(status: number): boolean {
+  return status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
+}
+
+/** 1.5 s, then 3 s; honours Retry-After up to 5 s. */
+export function geminiBackoffMs(attempt: number, retryAfterSeconds = 0): number {
+  const base = 1500 * 2 ** (attempt - 1);
+  return retryAfterSeconds > 0 ? Math.min(retryAfterSeconds * 1000, 5000) : base;
+}
+
+function sleep(ms: number, signal?: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) return reject(signal.reason);
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => {
+      clearTimeout(timer);
+      reject(signal.reason);
+    }, { once: true });
+  });
+}
+
 export type GeminiMessage = { role: "system" | "user" | "assistant"; content: string };
 
 export class GeminiError extends Error {
@@ -99,48 +123,67 @@ export async function callGemini(
   let lastStatus = 503;
   let retryAfter = 0;
   for (const model of MODELS) {
-    const res = await fetch(`${GATEWAY_URL}/v1beta/models/${model}:generateContent`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${credentials.lovableKey}`,
-        "X-Connection-Api-Key": credentials.connectionKey,
-        "Content-Type": "application/json",
-      },
-      body,
-      ...(signal ? { signal } : {}),
-    });
+    // Controlled retry for temporary provider errors only (429/5xx), with a fixed
+    // small number of attempts and backoff. Terminal errors stop immediately.
+    for (let attempt = 1; attempt <= GEMINI_ATTEMPTS_PER_MODEL; attempt++) {
+      const started = Date.now();
+      const res = await fetch(`${GATEWAY_URL}/v1beta/models/${model}:generateContent`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${credentials.lovableKey}`,
+          "X-Connection-Api-Key": credentials.connectionKey,
+          "Content-Type": "application/json",
+        },
+        body,
+        ...(signal ? { signal } : {}),
+      });
 
-    if (!res.ok) {
-      lastStatus = res.status;
-      retryAfter = Number(res.headers.get("Retry-After") ?? 0);
-      const errorBody = await res.text();
+      if (!res.ok) {
+        lastStatus = res.status;
+        retryAfter = Number(res.headers.get("Retry-After") ?? 0);
+        const errorBody = await res.text();
+        const temporary = isTemporaryGeminiStatus(res.status);
+        console.error(
+          `Gemini attempt ${attempt}/${GEMINI_ATTEMPTS_PER_MODEL} failed [${res.status}] on ${model} after ${Date.now() - started}ms (temporary=${temporary}): ${errorBody.slice(0, 300)}`,
+        );
+        if (!temporary) break;
+        if (attempt < GEMINI_ATTEMPTS_PER_MODEL) {
+          await sleep(geminiBackoffMs(attempt, retryAfter), signal);
+          continue;
+        }
+        break; // attempts exhausted on this model: try the next model
+      }
+
+      const data = (await res.json()) as {
+        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
+      };
+      const text = (data.candidates?.[0]?.content?.parts ?? [])
+        .map((p) => p.text ?? "")
+        .join("")
+        .trim();
+      if (text) {
+        if (attempt > 1 || model !== MODELS[0])
+          console.info(`Gemini succeeded on ${model}, attempt ${attempt}`);
+        onUsage?.(extractGeminiUsage(data));
+        return text;
+      }
+      lastStatus = 502;
       console.error(
-        `Gemini request failed [${res.status}] on ${model}: ${errorBody.slice(0, 300)}`,
+        `Gemini returned an empty answer on ${model} (finishReason=${data.candidates?.[0]?.finishReason ?? "none"})`,
       );
-      // Quota/rate and temporary upstream failures can be model-specific.
-      // Terminal request errors would fail identically on the next model.
-      if (res.status === 429 || res.status >= 500) continue;
       break;
     }
-
-    const data = (await res.json()) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    };
-    const text = (data.candidates?.[0]?.content?.parts ?? [])
-      .map((p) => p.text ?? "")
-      .join("")
-      .trim();
-    if (text) {
-      onUsage?.(extractGeminiUsage(data));
-      return text;
-    }
+    // A terminal (non-temporary) error would fail identically on the next model.
+    if (!isTemporaryGeminiStatus(lastStatus) && lastStatus !== 502) break;
   }
 
   throw new GeminiError(
     lastStatus,
     lastStatus === 429
       ? "Your Google Gemini limit is temporarily busy. Please try again in a moment."
-      : "Google Gemini could not answer right now. Please try again in a moment.",
+      : lastStatus >= 500
+        ? "The AI service is very busy right now (high demand). Please try again in a few minutes."
+        : "Google Gemini could not answer right now. Please try again in a moment.",
     retryAfter,
   );
 }
