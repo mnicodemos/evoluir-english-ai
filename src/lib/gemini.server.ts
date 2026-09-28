@@ -2,7 +2,7 @@ const GATEWAY_URL = "https://connector-gateway.lovable.dev/udc_marcelo_s_google_
 // Use the lighter model for short tutoring exchanges and keep the larger
 // model as a quota fallback. This avoids exhausting the smaller free quota
 // assigned to the larger model during normal speaking practice.
-export const GEMINI_TEXT_MODEL = "gemini-3.5-flash-lite";
+export const GEMINI_TEXT_MODEL = "gemini-3.6-flash";
 const MODELS = [GEMINI_TEXT_MODEL, "gemini-3.5-flash"];
 
 export type GeminiMessage = { role: "system" | "user" | "assistant"; content: string };
