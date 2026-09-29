@@ -13,6 +13,7 @@ import {
   readJson,
   readText,
   vocabularyGenerationFailureKey,
+  vocabularyGenerationRecentlyFailed,
   vocabularyIndicatorVisible,
   WRITING_DONE_ROUND_PREFIX,
   WRITING_HISTORY_ROUND_PREFIX,
@@ -26,6 +27,7 @@ import { WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
 
 /** One recovery attempt per lesson round per page load. */
 const recoveryAttempts = new Set<string>();
+const retryCounts = new Map<string, number>();
 
 export type ActivityIndicators = {
   listening: boolean;
