@@ -437,7 +437,7 @@ describe("why this matters now", () => {
   it("states the priority with the skill and level already resolved", () => {
     expect(
       NEXT_STEP_PRIORITY_TEXT.replaceAll("{skill}", "Vocabulary").replaceAll("{level}", "B2"),
-    ).toBe("Vocabulary is the next skill to strengthen in your B2 journey.");
+    ).toBe("Vocabulary is your next area to strengthen in your B2 journey.");
   });
 
   it("has one evidence line per reason with no placeholders, score or confidence", () => {

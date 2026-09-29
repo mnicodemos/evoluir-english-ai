@@ -238,7 +238,7 @@ export const uiPt: Record<string, string> = {
   "{skill} is your next area to strengthen in your {level} journey.":
     "{skill} é sua próxima área a fortalecer na sua jornada {level}.",
   "More practice will help EVO understand your learning path.":
-    "Precisamos de mais evidências de prática para entender esta habilidade.",
+    "Mais prática vai ajudar a EVO a entender sua trilha de aprendizado.",
   "Your {strongest} has strong evidence at {level}.": "Seu {strongest} tem evidências fortes no {level}.",
   "You are continuing to build your English skills.":
     "Você continua evoluindo no seu inglês.",
