@@ -104,8 +104,8 @@ function Dashboard() {
   const learningCards = [
     { emoji: "📚", label: "Lessons completed", value: `${snapshot?.todayLessonsCompleted ?? 0}` },
     { emoji: "🎬", label: "Videos watched", value: `${snapshot?.todayVideosWatched ?? 0}` },
-    { emoji: "🧠", label: "Vocabulary mastered", value: `${snapshot?.todayVocabularyMastered ?? 0}` },
-    { emoji: "🎯", label: "Quiz score", value: `${snapshot?.todayQuizAverage ?? 0}%` },
+    { emoji: "🧠", label: "Words mastered", value: `${snapshot?.todayVocabularyMastered ?? 0}` },
+    { emoji: "🎯", label: "Accuracy", value: `${snapshot?.todayQuizAverage ?? 0}%` },
   ];
 
   return (
@@ -227,6 +227,9 @@ function Dashboard() {
                   </span>
                 </div>
                 <div className="grid gap-2.5">
+                  <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block">
+                    {t("Your evidence:")}
+                  </p>
                   {learningCards.map((card) => (
                     <div
                       key={card.label}
