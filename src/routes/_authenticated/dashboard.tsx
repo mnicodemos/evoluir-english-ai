@@ -233,7 +233,7 @@ function Dashboard() {
                 </div>
                 <div className="grid gap-2.5">
                   <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block">
-                    {t("Your evidence:")}
+                    {t("Today's Progress")}
                   </p>
                   {learningCards.map((card) => (
                     <div

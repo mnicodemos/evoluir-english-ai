@@ -403,7 +403,7 @@ export const NEXT_STEP_REASON_TEXT: Record<NextStepReason, string> = {
  */
 export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
   recent_errors: "Your recent practice shows opportunities to improve in this area.",
-  not_measured_yet: "Your {level} {skill} progress needs more evidence to understand your current level.",
+  not_measured_yet: "Your {skill} needs more {level} evidence to understand your current level.",
   low_confidence: "More evidence is needed to better understand your {skill} progress.",
   not_practised_recently: "You haven't practised {skill} recently.",
   lowest_score: "{skill} is currently the area that needs more practice.",
@@ -415,7 +415,7 @@ export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
  * already resolved by buildNextStep — never a new decision.
  */
 export const NEXT_STEP_PRIORITY_TEXT =
-  "{skill} is the next skill to strengthen in your {level} journey.";
+  "{skill} is your next area to strengthen in your {level} journey.";
 
 /**
  * Evidence line for the same block: the real cause that produced the priority,
@@ -424,11 +424,11 @@ export const NEXT_STEP_PRIORITY_TEXT =
  */
 export const NEXT_STEP_EVIDENCE_TEXT: Record<NextStepReason, string> = {
   recent_errors: "Your recent practice shows opportunities to improve in this area.",
-  not_measured_yet: "Your {level} {skill} progress needs more evidence to understand your current level.",
+  not_measured_yet: "Your {skill} needs more {level} evidence to understand your current level.",
   low_confidence: "More evidence is needed to better understand your {skill} progress.",
   not_practised_recently: "You haven't practised {skill} recently.",
   lowest_score: "{skill} is currently the area that needs more practice.",
-  no_data: "We need more practice evidence to understand this skill.",
+  no_data: "More practice will help EVO understand your learning path.",
 };
 
 /**
