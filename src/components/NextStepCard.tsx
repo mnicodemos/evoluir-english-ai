@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile.jpg.asset.json";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Compass, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Check, Compass, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
@@ -310,7 +310,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <div className="border-t border-border pt-3">
               <div className="flex min-w-0 items-start gap-4">
                 <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-                  <Zap className="size-5 text-primary" aria-hidden="true" />
+                  <span aria-hidden="true" className="text-lg leading-none">⚡</span>
                 </span>
                 <div className="min-w-0 flex-1">
                   <h2 className="text-lg font-semibold">{t("Quick Win")}</h2>
