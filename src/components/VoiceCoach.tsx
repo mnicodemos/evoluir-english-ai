@@ -542,7 +542,8 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
                 voiceState === "sending" ||
                 voiceState === "transcribing"
               }
-              className={`size-[4.8rem] rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}
+              style={{ width: "4.8rem", height: "4.8rem" }}
+              className={`rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}
             >
               {voiceState === "recording" ? (
                 <MicOff className="size-[2.1rem]" />
