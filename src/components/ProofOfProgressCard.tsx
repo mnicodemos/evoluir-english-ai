@@ -70,6 +70,7 @@ export function ProofOfProgressCard() {
               ? t("We already have evidence of development in your skills.")
               : t("We are still building evidence about your evolution.")
           }
+          image="wide"
           imageSize="lesson"
           contrast="inverse"
           className="pr-4 sm:pr-5"
