@@ -85,6 +85,7 @@ export function EvoGuide({
           className={cn(
             "mt-1 text-base font-semibold sm:text-lg",
             contrast === "inverse" ? "text-white" : "text-card-foreground",
+            isWide && "hidden sm:block",
           )}
         >
           {title}
@@ -94,9 +95,21 @@ export function EvoGuide({
             className={cn(
               "mt-1 text-sm",
               contrast === "inverse" ? "text-white/80" : "text-muted-foreground",
+              isWide && "hidden sm:block",
             )}
           >
             {description}
+          </p>
+        ) : null}
+        {isWide ? (
+          <p
+            className={cn(
+              "mt-1 text-sm",
+              contrast === "inverse" ? "text-white/80" : "text-muted-foreground",
+              "sm:hidden",
+            )}
+          >
+            Let's practice!
           </p>
         ) : null}
         {children ? <div className="mt-3">{children}</div> : null}
