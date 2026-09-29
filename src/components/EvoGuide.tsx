@@ -39,6 +39,9 @@ export function EvoGuide({
         imageSize === "diagnosisIntro" && "sm:grid-cols-[minmax(0,1fr)_7rem]",
         imageSize === "lesson" &&
           "grid-cols-[5.5rem_minmax(0,1fr)] items-stretch gap-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-5",
+        isWide &&
+          imageSize === "lesson" &&
+          "grid-cols-[10.5rem_minmax(0,1fr)] gap-4 sm:grid-cols-[19rem_minmax(0,1fr)] sm:gap-6",
         className,
       )}
     >
@@ -59,7 +62,7 @@ export function EvoGuide({
           className={cn(
             "h-full w-full object-contain object-center",
             imageSize === "lesson" && "object-cover",
-            isWide && imageSize === "lesson" && "object-[20%_center]",
+            isWide && imageSize === "lesson" && "object-cover object-center",
           )}
         />
       </div>
