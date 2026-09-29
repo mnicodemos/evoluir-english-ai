@@ -48,11 +48,11 @@ export function useStudySnapshot() {
             .select("lesson_id, video_progress, video_completed_at, completed_at"),
           supabase
             .from("user_flashcards")
-            .select("flashcard_id, mastery_level, last_rating, times_reviewed"),
+            .select("flashcard_id, mastery_level, last_rating, times_reviewed, last_reviewed_at"),
           fetchUserVocabularyMastery(queryClient),
           supabase
             .from("quiz_results")
-            .select("lesson_id, score")
+            .select("lesson_id, score, created_at")
             .order("created_at", { ascending: false })
             .limit(30),
           supabase.from("learning_profile").select("common_errors").maybeSingle(),
