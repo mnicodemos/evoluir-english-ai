@@ -67,37 +67,37 @@ function Dashboard() {
       to: "/learning",
       label: "Learning Center",
       icon: GraduationCap,
-      mobileOrder: "order-1 lg:order-none",
+      mobileOrder: "order-1 lg:order-1",
     },
     {
       to: "/teacher",
       label: "AI Teacher",
       icon: Sparkles,
-      mobileOrder: "order-2 lg:order-none",
+      mobileOrder: "order-2 lg:order-2",
     },
     {
       to: "/coach",
       label: "AI Talking",
       icon: MessageSquareText,
-      mobileOrder: "order-3 lg:order-none",
-    },
-    {
-      to: "/writing",
-      label: "Writing",
-      icon: PenLine,
-      mobileOrder: "order-4 lg:order-none",
-    },
-    {
-      to: "/listening",
-      label: "Listening",
-      icon: Headphones,
-      mobileOrder: "order-5 lg:order-none",
+      mobileOrder: "order-3 lg:order-3",
     },
     {
       to: "/vocabulary",
       label: "Vocabulary",
       icon: BookOpen,
-      mobileOrder: "order-6 lg:order-none",
+      mobileOrder: "order-6 lg:order-4",
+    },
+    {
+      to: "/listening",
+      label: "Listening",
+      icon: Headphones,
+      mobileOrder: "order-5 lg:order-5",
+    },
+    {
+      to: "/writing",
+      label: "Writing",
+      icon: PenLine,
+      mobileOrder: "order-4 lg:order-6",
     },
   ] as const;
 
