@@ -16,6 +16,7 @@ import {
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
   NEXT_STEP_SKILL_TEXT,
+  NEXT_STEP_WHY_NOW_TEXT,
 } from "@/lib/pedagogy/nextStep";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
@@ -68,6 +69,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"))
     .replaceAll("{strongest}", strongestLabel ?? skillLabel);
+  // "Why now?" explains the real reason that won the SAME server-side priority
+  // decision — never a parallel logic, never score or confidence.
+  const whyNowText = t(NEXT_STEP_WHY_NOW_TEXT[data.reason])
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"));
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   const quickWin = data.quickWin;
   const mainAvailable = dashboardActionAvailable(data.activity.to, activityIndicators);
@@ -241,11 +247,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               )}
               <li className="hidden items-start gap-2 sm:flex">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
-                <span>{situationText}</span>
-              </li>
-              <li className="hidden items-start gap-2 sm:flex">
-                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
-                <span>{t(NEXT_STEP_REASON_TEXT[data.reason])}</span>
+                <span>{whyNowText}</span>
               </li>
               <li className="hidden items-start gap-2 sm:flex">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
@@ -390,7 +392,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
                 {t("Why this matters now")}
               </p>
-              <p className="mt-1 text-sm">{t(NEXT_STEP_REASON_TEXT[data.reason])}</p>
+              <p className="mt-1 text-sm">{whyNowText}</p>
 
               <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
                 {t("Next step")}

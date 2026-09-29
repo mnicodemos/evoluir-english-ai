@@ -6,7 +6,9 @@ import {
   lessonSkillToProfileSkill,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
+  NEXT_STEP_WHY_NOW_TEXT,
   type NextStepInput,
+  type NextStepReason,
 } from "./nextStep";
 
 const base: NextStepInput = {
@@ -360,6 +362,70 @@ describe("next step copy", () => {
     for (const text of Object.values(NEXT_STEP_REASON_TEXT)) {
       expect(text.length).toBeGreaterThan(10);
       expect(text).not.toMatch(/bad|weak|poor|terrible/i);
+    }
+  });
+});
+
+describe("why now justification", () => {
+  const fill = (reason: NextStepReason) =>
+    NEXT_STEP_WHY_NOW_TEXT[reason]
+      .replaceAll("{skill}", "Vocabulary")
+      .replaceAll("{level}", "B2");
+
+  it("has one justification per reason, matching the priority hierarchy", () => {
+    expect(Object.keys(NEXT_STEP_WHY_NOW_TEXT).sort()).toEqual(
+      [
+        "recent_errors",
+        "not_measured_yet",
+        "low_confidence",
+        "not_practised_recently",
+        "lowest_score",
+        "no_data",
+      ].sort(),
+    );
+  });
+
+  it("explains the real reason that won the selection", () => {
+    expect(fill("recent_errors")).toBe("Your recent practice shows mistakes in this area.");
+    expect(fill("not_measured_yet")).toBe("Vocabulary hasn't been measured enough yet.");
+    expect(fill("low_confidence")).toBe(
+      "More evidence is needed to understand your Vocabulary at B2.",
+    );
+    expect(fill("not_practised_recently")).toBe("You haven't practised Vocabulary recently.");
+    expect(fill("lowest_score")).toBe(
+      "Vocabulary is currently the area that needs more practice.",
+    );
+    expect(fill("no_data")).toBe("Start anywhere and we will personalise your next step.");
+  });
+
+  it("never exposes score or confidence to justify the decision", () => {
+    for (const text of Object.values(NEXT_STEP_WHY_NOW_TEXT)) {
+      expect(text).not.toMatch(/score|confidence|%/i);
+    }
+  });
+
+  it("changes the justification when the winning reason changes", () => {
+    const errorsFirst = buildNextStep({
+      ...base,
+      skills: [skill("vocabulary", 40), skill("writing", 30)],
+      recurringErrors: ["vocabulary: confuses false friends"],
+      recentlyPractised: ["vocabulary", "writing"],
+    });
+    const noErrors = buildNextStep({
+      ...base,
+      skills: [skill("vocabulary", 40), skill("writing", 30)],
+      recentlyPractised: ["vocabulary", "writing"],
+    });
+    expect(errorsFirst.reason).toBe("recent_errors");
+    expect(noErrors.reason).toBe("lowest_score");
+    expect(NEXT_STEP_WHY_NOW_TEXT[errorsFirst.reason]).not.toBe(
+      NEXT_STEP_WHY_NOW_TEXT[noErrors.reason],
+    );
+  });
+
+  it("never invents a comparison with other skills", () => {
+    for (const text of Object.values(NEXT_STEP_WHY_NOW_TEXT)) {
+      expect(text).not.toMatch(/doing well|better than|stronger/i);
     }
   });
 });

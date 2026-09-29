@@ -395,6 +395,21 @@ export const NEXT_STEP_REASON_TEXT: Record<NextStepReason, string> = {
   no_data: "Start anywhere and we will personalise your next step.",
 };
 
+/**
+ * "Why now?" justification: a short, human explanation of the REAL reason that
+ * won the existing priority selection. Same decision as the Next Step — one
+ * entry per reason, filled only with {skill} and {level} values the server
+ * already resolved. Never exposes score or confidence.
+ */
+export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
+  recent_errors: "Your recent practice shows mistakes in this area.",
+  not_measured_yet: "{skill} hasn't been measured enough yet.",
+  low_confidence: "More evidence is needed to understand your {skill} at {level}.",
+  not_practised_recently: "You haven't practised {skill} recently.",
+  lowest_score: "{skill} is currently the area that needs more practice.",
+  no_data: "Start anywhere and we will personalise your next step.",
+};
+
 export const NEXT_STEP_ACTION_TEXT: Record<NextStepAction, string> = {
   review_lesson: "Review lesson",
   practise_listening: "Practise listening",
