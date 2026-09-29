@@ -90,26 +90,46 @@ export function useActivityIndicators(): ActivityIndicators {
   // closed mid-request) asks for them once, reusing the same Vocabulary request.
   const generateVocabulary = useServerFn(dailyWords);
   const queryClient = useQueryClient();
+  // Bumped to re-check when a previous request is still holding the AI slot or a
+  // brief failure pause expires (e.g. the lesson request was cut off by leaving
+  // the page, which leaves its slot busy for a few minutes).
+  const [retryTick, setRetryTick] = useState(0);
   useEffect(() => {
     if (!profile || round < 1 || !vocabularyBatch || vocabularyFetching || vocabularyError) return;
     if (vocabularyBatch.batchWordIds.length > 0) return;
     const failureKey = vocabularyGenerationFailureKey(profile.id, round);
     const attemptKey = `${profile.id}:${round}`;
-    if (readText(failureKey) === "1" || recoveryAttempts.has(attemptKey)) return;
+    const scheduleRetry = (ms: number) => {
+      const attempts = (retryCounts.get(attemptKey) ?? 0) + 1;
+      retryCounts.set(attemptKey, attempts);
+      if (attempts > 12) return;
+      window.setTimeout(() => {
+        recoveryAttempts.delete(attemptKey);
+        setRetryTick((n) => n + 1);
+      }, ms);
+    };
+    if (recoveryAttempts.has(attemptKey)) return;
+    if (vocabularyGenerationRecentlyFailed(readText(failureKey))) {
+      recoveryAttempts.add(attemptKey);
+      scheduleRetry(60_000);
+      return;
+    }
     recoveryAttempts.add(attemptKey);
     vocabularySingleFlight(profile.id, () =>
       generateVocabulary({ data: { level: profile.level } }),
     )
       .then((words) => {
+        writeText(failureKey, "");
         if (words.length > 0)
           void queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
       })
       .catch((error: unknown) => {
-        // A request already running elsewhere is not a failure: it will save the words.
-        const busy = error instanceof Error && /already running/i.test(error.message);
-        if (!busy) writeText(failureKey, "1");
+        // A request already holding the slot is not a failure: check again shortly.
+        const busy = error instanceof Error && /already running|wait|busy/i.test(error.message);
+        if (!busy) writeText(failureKey, String(Date.now()));
+        scheduleRetry(busy ? 60_000 : 90_000);
       });
-  }, [profile, round, vocabularyBatch, vocabularyFetching, vocabularyError, generateVocabulary, queryClient]);
+  }, [profile, round, vocabularyBatch, vocabularyFetching, vocabularyError, generateVocabulary, queryClient, retryTick]);
 
   useEffect(() => {
     if (!profile) return;
@@ -131,7 +151,9 @@ export function useActivityIndicators(): ActivityIndicators {
         batch: vocabularyBatch,
         isLoading: vocabularyLoading || vocabularyFetching,
         isError: vocabularyError,
-        generationFailed: readText(vocabularyGenerationFailureKey(profile.id, round)) === "1",
+        generationFailed: vocabularyGenerationRecentlyFailed(
+          readText(vocabularyGenerationFailureKey(profile.id, round)),
+        ),
       }),
     });
   }, [profile, round, vocabularyBatch, vocabularyError, vocabularyFetching, vocabularyLoading]);

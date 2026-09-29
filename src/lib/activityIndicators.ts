@@ -17,6 +17,17 @@ export function vocabularyGenerationFailureKey(userId: string, round: number) {
   return `${VOCABULARY_GENERATION_FAILED_PREFIX}${userId}:${round}`;
 }
 
+/** A failed generation pauses automatic retries only briefly, never forever. */
+export const VOCABULARY_FAILURE_PAUSE_MS = 10 * 60_000;
+
+/** Stored value is the failure timestamp; legacy "1" flags count as expired. */
+export function vocabularyGenerationRecentlyFailed(raw: string | null, now = Date.now()) {
+  if (!raw) return false;
+  const at = Number(raw);
+  if (!Number.isFinite(at) || at < 1e12) return false;
+  return now - at < VOCABULARY_FAILURE_PAUSE_MS;
+}
+
 /** The Listening round is new until it is completed for this lesson count. */
 export function listeningHasNewActivity(input: {
   round: number;
