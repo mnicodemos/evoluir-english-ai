@@ -113,6 +113,30 @@ export function useStudySnapshot() {
 
       const myLessons = (userLessons.data ?? []).filter((l) => lessonIds.has(l.lesson_id));
 
+      // Today's Progress: same rows, but each metric needs a completion
+      // timestamp from today — opening a screen never counts.
+      const dayStart = new Date();
+      dayStart.setHours(0, 0, 0, 0);
+      const today = todayStudyMetrics(
+        {
+          lessons: myLessons.map((l) => ({
+            completed_at: l.completed_at ?? null,
+            video_completed_at: l.video_completed_at ?? null,
+          })),
+          cards: cardsRows.map((c) => ({
+            mastery_level: c.mastery_level ?? 0,
+            times_reviewed: c.times_reviewed ?? 0,
+            last_reviewed_at: c.last_reviewed_at ?? null,
+          })),
+          words: masteredWords.map((w) => ({
+            mastery_level: w.mastery_level,
+            last_reviewed_at: w.last_reviewed_at,
+          })),
+          quizzes: quizRows.map((q) => ({ score: q.score, created_at: q.created_at ?? null })),
+        },
+        dayStart,
+      );
+
       return {
         lessonsCompleted: myLessons.filter((l) => l.completed_at).length,
         lessonsTotal: lessons.length,
@@ -122,6 +146,10 @@ export function useStudySnapshot() {
           masteredCardIds.size +
           masteredWords.filter((w) => levelWordIds.has(w.word_id) && w.mastery_level >= 70).length,
         quizAverage,
+        todayLessonsCompleted: today.lessonsCompleted,
+        todayVideosWatched: today.videosWatched,
+        todayVocabularyMastered: today.vocabularyMastered,
+        todayQuizAverage: today.quizAverage,
         weakWords,
         weakLessons,
         commonErrors: (lp.data?.common_errors ?? []).slice(-5),

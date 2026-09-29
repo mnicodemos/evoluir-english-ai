@@ -102,10 +102,10 @@ function Dashboard() {
   ] as const;
 
   const learningCards = [
-    { emoji: "📚", label: "Lessons completed", value: `${snapshot?.lessonsCompleted ?? 0}` },
-    { emoji: "🎬", label: "Videos watched", value: `${snapshot?.videosWatched ?? 0}` },
-    { emoji: "🧠", label: "Vocabulary mastered", value: `${snapshot?.vocabularyMastered ?? 0}` },
-    { emoji: "🎯", label: "Quiz score", value: `${snapshot?.quizAverage ?? 0}%` },
+    { emoji: "📚", label: "Lessons completed", value: `${snapshot?.todayLessonsCompleted ?? 0}` },
+    { emoji: "🎬", label: "Videos watched", value: `${snapshot?.todayVideosWatched ?? 0}` },
+    { emoji: "🧠", label: "Vocabulary mastered", value: `${snapshot?.todayVocabularyMastered ?? 0}` },
+    { emoji: "🎯", label: "Quiz score", value: `${snapshot?.todayQuizAverage ?? 0}%` },
   ];
 
   return (
