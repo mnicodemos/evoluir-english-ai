@@ -61,7 +61,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const skillLabel = data.prioritySkill
     ? t(NEXT_STEP_SKILL_TEXT[data.prioritySkill] ?? data.prioritySkill)
     : t("Free practice");
-  const cefrLevel = data.insight?.cefrLevel ? findLevel(data.insight.cefrLevel).cefr : null;
+  const cefrLevel = data.insight?.cefrLevel ? findLevel(data.insight.cefrLevel).cefr.replace(/^CEFR /, "") : null;
   const strongestLabel = data.insight?.strongestSkill
     ? t(NEXT_STEP_SKILL_TEXT[data.insight.strongestSkill] ?? data.insight.strongestSkill)
     : null;

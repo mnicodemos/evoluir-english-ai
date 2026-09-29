@@ -403,7 +403,7 @@ export const NEXT_STEP_REASON_TEXT: Record<NextStepReason, string> = {
  */
 export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
   recent_errors: "Your recent practice shows opportunities to improve in this area.",
-  not_measured_yet: "Your {skill} needs more {level} evidence to understand your current level.",
+  not_measured_yet: "Your {skill} needs more evidence at {level} to understand your current level.",
   low_confidence: "More evidence is needed to better understand your {skill} progress.",
   not_practised_recently: "You haven't practised {skill} recently.",
   lowest_score: "{skill} is currently the area that needs more practice.",
@@ -424,7 +424,7 @@ export const NEXT_STEP_PRIORITY_TEXT =
  */
 export const NEXT_STEP_EVIDENCE_TEXT: Record<NextStepReason, string> = {
   recent_errors: "Your recent practice shows opportunities to improve in this area.",
-  not_measured_yet: "Your {skill} needs more {level} evidence to understand your current level.",
+  not_measured_yet: "Your {skill} needs more evidence at {level} to understand your current level.",
   low_confidence: "More evidence is needed to better understand your {skill} progress.",
   not_practised_recently: "You haven't practised {skill} recently.",
   lowest_score: "{skill} is currently the area that needs more practice.",
@@ -438,7 +438,7 @@ export const NEXT_STEP_EVIDENCE_TEXT: Record<NextStepReason, string> = {
  */
 export const NEXT_STEP_PROGRESS_TEXT = {
   withStrongSkill: "Your {strongest} has strong evidence at {level}.",
-  neutral: "You are continuing to build your English skills.",
+  neutral: "Your learning evidence shows where to focus next.",
 } as const;
 
 export const NEXT_STEP_ACTION_TEXT: Record<NextStepAction, string> = {
