@@ -167,7 +167,7 @@ function Vocabulary() {
           loadDailyWords({ data: { level: profile?.level ?? "intermediate" } }),
         )) as Word[];
       } catch (error) {
-        if (failKey) window.localStorage.setItem(failKey, "1");
+        if (failKey) window.localStorage.setItem(failKey, String(Date.now()));
         setGenBlocked(true);
         throw error;
       }
