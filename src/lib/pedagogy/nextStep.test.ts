@@ -390,7 +390,7 @@ describe("why now justification", () => {
 
   it("explains the real reason that won the selection", () => {
     expect(fill("recent_errors")).toBe("Your recent practice shows opportunities to improve in this area.");
-    expect(fill("not_measured_yet")).toBe("Your Vocabulary needs more B2 evidence to understand your current level.");
+    expect(fill("not_measured_yet")).toBe("Your Vocabulary needs more evidence at B2 to understand your current level.");
     expect(fill("low_confidence")).toBe(
       "More evidence is needed to better understand your Vocabulary progress.",
     );
