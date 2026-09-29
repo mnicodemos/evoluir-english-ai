@@ -226,6 +226,15 @@ export const uiPt: Record<string, string> = {
   "You have not practised this skill yet.": "Você ainda não praticou essa habilidade.",
   "Start anywhere and we will personalise your next step.":
     "Comece por onde quiser e personalizamos seu próximo passo.",
+  "Your recent practice shows mistakes in this area.":
+    "Sua prática recente mostra erros nessa área.",
+  "{skill} hasn't been measured enough yet.":
+    "{skill} ainda não foi medida o suficiente.",
+  "More evidence is needed to understand your {skill} at {level}.":
+    "Precisamos de mais evidências para entender seu nível de {skill} em {level}.",
+  "You haven't practised {skill} recently.": "Você não praticou {skill} recentemente.",
+  "{skill} is currently the area that needs more practice.":
+    "{skill} é a área que mais precisa de prática no momento.",
   "Review lesson": "Revisar aula",
   "Practise listening": "Praticar escuta",
   "Practise writing": "Praticar escrita",
