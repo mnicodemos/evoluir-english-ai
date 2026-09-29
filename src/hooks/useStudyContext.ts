@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useProfile } from "@/hooks/useProfile";
 import { fetchUserVocabularyMastery } from "@/hooks/useUserVocabularyMastery";
 import { supabase } from "@/integrations/supabase/client";
+import { todayStudyMetrics } from "@/lib/studyDay";
 
 export type StudySnapshot = {
   lessonsCompleted: number;
@@ -10,6 +11,13 @@ export type StudySnapshot = {
   videosWatched: number;
   vocabularyMastered: number;
   quizAverage: number;
+  // Today's Progress metrics: same sources and thresholds as above, but only
+  // rows with a completion timestamp from today count. The cumulative fields
+  // stay untouched for AI context (VoiceCoach / AI Talking).
+  todayLessonsCompleted: number;
+  todayVideosWatched: number;
+  todayVocabularyMastered: number;
+  todayQuizAverage: number;
   weakWords: string[];
   weakLessons: string[];
   commonErrors: string[];
