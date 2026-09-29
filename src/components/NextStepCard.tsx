@@ -126,12 +126,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] sm:border-t sm:border-brand-green/30 sm:bg-sidebar"
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] sm:border-t sm:border-border"
         aria-label={t("Your next step")}
       >
         <div className="grid h-full min-w-0 grid-cols-1 sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
           <div
-            className="relative w-full self-stretch bg-sidebar sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative w-full self-stretch bg-sidebar sm:bg-card sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
             <div className="relative aspect-[4.1/1] w-full overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
@@ -207,7 +207,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:border-brand-green/35 sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
+          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
