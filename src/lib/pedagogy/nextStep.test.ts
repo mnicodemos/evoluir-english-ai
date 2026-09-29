@@ -6,7 +6,9 @@ import {
   lessonSkillToProfileSkill,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
+  NEXT_STEP_WHY_NOW_TEXT,
   type NextStepInput,
+  type NextStepReason,
 } from "./nextStep";
 
 const base: NextStepInput = {
