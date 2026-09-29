@@ -316,7 +316,7 @@ export function PathProgressCard({
       label: "Listening",
       value: latest?.listening_score ?? 0,
       icon: Headphones,
-      tone: "text-dashboard-purple",
+      tone: "text-[#4a273f]",
       bar: "[&>div]:bg-dashboard-blue",
     },
     {
