@@ -542,16 +542,16 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
                 voiceState === "sending" ||
                 voiceState === "transcribing"
               }
-              className={`size-16 rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}
+              className={`size-[4.8rem] rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}
             >
               {voiceState === "recording" ? (
-                <MicOff className="size-7" />
+                <MicOff className="size-[2.1rem]" />
               ) : voiceState === "thinking" ||
                 voiceState === "sending" ||
                 voiceState === "transcribing" ? (
-                <Loader2 className="size-7 animate-spin" />
+                <Loader2 className="size-[2.1rem] animate-spin" />
               ) : (
-                <Mic className="size-7" />
+                <Mic className="size-[2.1rem]" />
               )}
             </Button>
             <span className="size-9" aria-hidden="true" />
