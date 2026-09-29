@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import evoBannerWide from "@/assets/evo-banner-wide.png.asset.json";
+import evoBannerWide from "@/assets/evo-ai-teacher-history-lessons.jpg.asset.json";
 import evoGuideOfficial from "@/assets/evo-dashboard-final.jpg.asset.json";
 import { cn } from "@/lib/utils";
 
@@ -10,7 +10,7 @@ type EvoGuideProps = {
   children?: ReactNode;
   className?: string;
   imageSize?: "default" | "dashboard" | "diagnosis" | "diagnosisIntro" | "lesson";
-  /** Opt-in image variant: "wide" uses the wide EVO banner (AI Teacher, lessons). */
+  /** Opt-in image variant: "wide" uses the complete horizontal EVO image. */
   image?: "official" | "wide";
   contrast?: "default" | "inverse";
 };
@@ -26,8 +26,8 @@ export function EvoGuide({
 }: EvoGuideProps) {
   const isWide = image === "wide";
   const imageSrc = isWide ? evoBannerWide : evoGuideOfficial;
-  const imageWidth = isWide ? 1765 : 1536;
-  const imageHeight = isWide ? 738 : 1024;
+  const imageWidth = isWide ? 1600 : 1536;
+  const imageHeight = isWide ? 669 : 1024;
   return (
     <div
       className={cn(
@@ -51,7 +51,7 @@ export function EvoGuide({
           imageSize === "diagnosis" && "w-28 sm:order-2 sm:w-full",
           imageSize === "diagnosisIntro" && "w-24 sm:order-2 sm:w-full",
           imageSize === "lesson" && "h-full",
-          isWide && imageSize !== "lesson" && "aspect-[1765/738]",
+          isWide && "aspect-[1600/669]",
         )}
       >
         <img
@@ -62,7 +62,7 @@ export function EvoGuide({
           className={cn(
             "h-full w-full object-contain object-center",
             imageSize === "lesson" && "object-cover",
-            isWide && imageSize === "lesson" && "object-cover object-center",
+            isWide && imageSize === "lesson" && "object-contain object-center",
           )}
         />
       </div>
