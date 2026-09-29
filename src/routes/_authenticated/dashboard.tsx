@@ -16,7 +16,7 @@ import { AppShell, MobileNavigationMenu } from "@/components/AppShell";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
-import { getNextLeague, LeagueBadge } from "@/components/LeagueBadge";
+import { getLeague, getNextLeague, LeagueBadge } from "@/components/LeagueBadge";
 import { PathProgressCard } from "@/components/LearningPathCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
