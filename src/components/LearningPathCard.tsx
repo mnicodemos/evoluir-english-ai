@@ -309,7 +309,7 @@ export function PathProgressCard({
       label: "Reading",
       value: latest?.reading_score ?? 0,
       icon: BookOpen,
-      tone: "text-dashboard-cyan",
+      tone: "text-[#4c3126]",
       bar: "[&>div]:bg-dashboard-cyan",
     },
     {
