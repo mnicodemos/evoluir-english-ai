@@ -451,8 +451,9 @@ describe("why this matters now", () => {
         "no_data",
       ].sort(),
     );
+    expect(NEXT_STEP_EVIDENCE_TEXT.not_measured_yet).not.toMatch(/never|hasn't been|not been measured/i);
     for (const text of Object.values(NEXT_STEP_EVIDENCE_TEXT)) {
-      expect(text).not.toMatch(/\{skill\}|\{level\}|score|confidence|%/i);
+      expect(text.replace(/\{(skill|level)\}/g, "")).not.toMatch(/\{|score|confidence|%/i);
     }
   });
 
