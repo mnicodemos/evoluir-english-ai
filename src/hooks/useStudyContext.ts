@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useProfile } from "@/hooks/useProfile";
 import { fetchUserVocabularyMastery } from "@/hooks/useUserVocabularyMastery";
 import { supabase } from "@/integrations/supabase/client";
+import { todayStudyMetrics } from "@/lib/studyDay";
 
 export type StudySnapshot = {
   lessonsCompleted: number;
@@ -10,6 +11,13 @@ export type StudySnapshot = {
   videosWatched: number;
   vocabularyMastered: number;
   quizAverage: number;
+  // Today's Progress metrics: same sources and thresholds as above, but only
+  // rows with a completion timestamp from today count. The cumulative fields
+  // stay untouched for AI context (VoiceCoach / AI Talking).
+  todayLessonsCompleted: number;
+  todayVideosWatched: number;
+  todayVocabularyMastered: number;
+  todayQuizAverage: number;
   weakWords: string[];
   weakLessons: string[];
   commonErrors: string[];
@@ -40,11 +48,11 @@ export function useStudySnapshot() {
             .select("lesson_id, video_progress, video_completed_at, completed_at"),
           supabase
             .from("user_flashcards")
-            .select("flashcard_id, mastery_level, last_rating, times_reviewed"),
+            .select("flashcard_id, mastery_level, last_rating, times_reviewed, last_reviewed_at"),
           fetchUserVocabularyMastery(queryClient),
           supabase
             .from("quiz_results")
-            .select("lesson_id, score")
+            .select("lesson_id, score, created_at")
             .order("created_at", { ascending: false })
             .limit(30),
           supabase.from("learning_profile").select("common_errors").maybeSingle(),
@@ -105,6 +113,30 @@ export function useStudySnapshot() {
 
       const myLessons = (userLessons.data ?? []).filter((l) => lessonIds.has(l.lesson_id));
 
+      // Today's Progress: same rows, but each metric needs a completion
+      // timestamp from today — opening a screen never counts.
+      const dayStart = new Date();
+      dayStart.setHours(0, 0, 0, 0);
+      const today = todayStudyMetrics(
+        {
+          lessons: myLessons.map((l) => ({
+            completed_at: l.completed_at ?? null,
+            video_completed_at: l.video_completed_at ?? null,
+          })),
+          cards: cardsRows.map((c) => ({
+            mastery_level: c.mastery_level ?? 0,
+            times_reviewed: c.times_reviewed ?? 0,
+            last_reviewed_at: c.last_reviewed_at ?? null,
+          })),
+          words: masteredWords.map((w) => ({
+            mastery_level: w.mastery_level,
+            last_reviewed_at: w.last_reviewed_at,
+          })),
+          quizzes: quizRows.map((q) => ({ score: q.score, created_at: q.created_at ?? null })),
+        },
+        dayStart,
+      );
+
       return {
         lessonsCompleted: myLessons.filter((l) => l.completed_at).length,
         lessonsTotal: lessons.length,
@@ -114,6 +146,10 @@ export function useStudySnapshot() {
           masteredCardIds.size +
           masteredWords.filter((w) => levelWordIds.has(w.word_id) && w.mastery_level >= 70).length,
         quizAverage,
+        todayLessonsCompleted: today.lessonsCompleted,
+        todayVideosWatched: today.videosWatched,
+        todayVocabularyMastered: today.vocabularyMastered,
+        todayQuizAverage: today.quizAverage,
         weakWords,
         weakLessons,
         commonErrors: (lp.data?.common_errors ?? []).slice(-5),
