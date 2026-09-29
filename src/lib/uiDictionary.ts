@@ -396,7 +396,6 @@ export const uiPt: Record<string, string> = {
   "Lessons completed": "Lições concluídas",
   "Videos watched": "Vídeos assistidos",
   "Words mastered": "Palavras dominadas",
-  "Accuracy": "Precisão",
   "Your evidence:": "Suas evidências:",
   "Recent activity": "Atividade recente",
   "Nothing here yet — keep practicing.": "Nada por aqui ainda — continue praticando.",
