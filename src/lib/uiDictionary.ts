@@ -226,28 +226,20 @@ export const uiPt: Record<string, string> = {
   "You have not practised this skill yet.": "Você ainda não praticou essa habilidade.",
   "Start anywhere and we will personalise your next step.":
     "Comece por onde quiser e personalizamos seu próximo passo.",
-  "Your recent practice shows mistakes in this area.":
-    "Sua prática recente mostra erros nessa área.",
-  "{skill} hasn't been measured enough yet.":
-    "{skill} ainda não foi medida o suficiente.",
-  "More evidence is needed to understand your {skill} at {level}.":
-    "Precisamos de mais evidências para entender seu nível de {skill} em {level}.",
+  "Your recent practice shows opportunities to improve in this area.":
+    "Sua prática recente mostra oportunidades de melhoria nessa área.",
+  "Your {level} {skill} progress needs more evidence to understand your current level.":
+    "Seu progresso em {skill} no {level} precisa de mais evidências para entendermos seu nível atual.",
+  "More evidence is needed to better understand your {skill} progress.":
+    "Precisamos de mais evidências para entender melhor seu progresso em {skill}.",
   "You haven't practised {skill} recently.": "Você não praticou {skill} recentemente.",
   "{skill} is currently the area that needs more practice.":
     "{skill} é a área que mais precisa de prática no momento.",
   "{skill} is the next skill to strengthen in your {level} journey.":
     "{skill} é a próxima habilidade a fortalecer na sua jornada {level}.",
-  "This skill hasn't been measured enough yet.":
-    "Esta habilidade ainda não foi medida o suficiente.",
-  "More evidence is needed to understand this skill.":
-    "Faltam evidências para entender esta habilidade.",
-  "You haven't practised this skill recently.":
-    "Você não praticou esta habilidade recentemente.",
-  "This is currently the skill that needs more attention.":
-    "Atualmente, é a habilidade que precisa de mais atenção.",
   "We need more practice evidence to understand this skill.":
     "Precisamos de mais evidências de prática para entender esta habilidade.",
-  "Your {strongest} is going well.": "Seu {strongest} vai bem.",
+  "Your {strongest} has strong evidence at {level}.": "Seu {strongest} tem evidências fortes no {level}.",
   "You are continuing to build your English skills.":
     "Você continua evoluindo no seu inglês.",
   "Review lesson": "Revisar aula",

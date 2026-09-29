@@ -83,10 +83,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const priorityText = t(NEXT_STEP_PRIORITY_TEXT)
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
-  const evidenceText = t(NEXT_STEP_EVIDENCE_TEXT[data.reason]);
+  const evidenceText = t(NEXT_STEP_EVIDENCE_TEXT[data.reason])
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"));
   const progressText =
     data.insight?.situation === "strong_elsewhere" && strongestLabel
-      ? t(NEXT_STEP_PROGRESS_TEXT.withStrongSkill).replaceAll("{strongest}", strongestLabel)
+      ? t(NEXT_STEP_PROGRESS_TEXT.withStrongSkill)
+          .replaceAll("{strongest}", strongestLabel)
+          .replaceAll("{level}", cefrLevel ?? t("your current level"))
       : t(NEXT_STEP_PROGRESS_TEXT.neutral);
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   const quickWin = data.quickWin;
