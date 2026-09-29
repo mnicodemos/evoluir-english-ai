@@ -70,7 +70,22 @@ export function WeeklyFrequency({
     const sevenDayTrophyUnlocked = studiedCount >= 7;
     return (
       <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
-        <Hourglass className="size-6 shrink-0 fill-warning text-warning sm:hidden" strokeWidth={2.4} />
+        <Hourglass
+          className={cn(
+            "size-6 shrink-0 sm:hidden",
+            sevenDayTrophyUnlocked ? "fill-warning text-warning" : "fill-transparent text-warning",
+          )}
+          strokeWidth={2.4}
+          aria-label={
+            sevenDayTrophyUnlocked
+              ? lang === "pt"
+                ? "Semana completa: 7 dias"
+                : "Week complete: 7 days"
+              : lang === "pt"
+                ? "Semana ainda não completa"
+                : "Week not complete yet"
+          }
+        />
         <Hourglass
           className="hidden size-[1.925rem] shrink-0 text-dashboard-coral sm:block"
           strokeWidth={2.4}
