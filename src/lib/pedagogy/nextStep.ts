@@ -410,6 +410,37 @@ export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
   no_data: "Start anywhere and we will personalise your next step.",
 };
 
+/**
+ * "Why this matters now?" priority line: reuses prioritySkill and the level
+ * already resolved by buildNextStep — never a new decision.
+ */
+export const NEXT_STEP_PRIORITY_TEXT =
+  "{skill} is the next skill to strengthen in your {level} journey.";
+
+/**
+ * Evidence line for the same block: the real cause that produced the priority,
+ * one entry per reason. Same decision, no score, no confidence, no technical
+ * reason names, and never a repeated action (the buttons execute; this explains).
+ */
+export const NEXT_STEP_EVIDENCE_TEXT: Record<NextStepReason, string> = {
+  recent_errors: "Your recent practice shows mistakes in this area.",
+  not_measured_yet: "This skill hasn't been measured enough yet.",
+  low_confidence: "More evidence is needed to understand this skill.",
+  not_practised_recently: "You haven't practised this skill recently.",
+  lowest_score: "This is currently the skill that needs more attention.",
+  no_data: "We need more practice evidence to understand this skill.",
+};
+
+/**
+ * Evolution context line. The positive variant is only allowed when the server
+ * already resolved a strongest other skill with evidence at the same level;
+ * otherwise a neutral, factual fallback is used — nothing is invented.
+ */
+export const NEXT_STEP_PROGRESS_TEXT = {
+  withStrongSkill: "Your {strongest} is going well.",
+  neutral: "You are continuing to build your English skills.",
+} as const;
+
 export const NEXT_STEP_ACTION_TEXT: Record<NextStepAction, string> = {
   review_lesson: "Review lesson",
   practise_listening: "Practise listening",

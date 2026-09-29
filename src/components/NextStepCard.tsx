@@ -13,6 +13,9 @@ import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import {
   NEXT_STEP_ACTION_TEXT,
+  NEXT_STEP_EVIDENCE_TEXT,
+  NEXT_STEP_PRIORITY_TEXT,
+  NEXT_STEP_PROGRESS_TEXT,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
   NEXT_STEP_SKILL_TEXT,
