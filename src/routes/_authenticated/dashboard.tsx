@@ -134,7 +134,12 @@ function Dashboard() {
 
             <div className="flex min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
               <Flame
-                className="size-6 shrink-0 fill-dashboard-coral text-dashboard-coral sm:size-[1.925rem]"
+                className="size-6 shrink-0 fill-current text-current sm:hidden"
+                style={{ color: getLeague(streakDays).from }}
+                strokeWidth={2.4}
+              />
+              <Flame
+                className="hidden size-[1.925rem] shrink-0 fill-dashboard-coral text-dashboard-coral sm:block"
                 strokeWidth={2.4}
               />
               <div className="min-w-0 flex-1">
