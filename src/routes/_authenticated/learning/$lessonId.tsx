@@ -178,7 +178,7 @@ function LessonPage() {
           await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
         }
       } catch {
-        if (failureKey) window.localStorage.setItem(failureKey, "1");
+        if (failureKey) window.localStorage.setItem(failureKey, String(Date.now()));
         // Lesson completion remains authoritative. Vocabulary keeps its existing
         // manual retry path when generation is temporarily unavailable.
       }
