@@ -67,16 +67,38 @@ function Dashboard() {
       to: "/learning",
       label: "Learning Center",
       icon: GraduationCap,
+      mobileOrder: "order-1 lg:order-none",
     },
-    { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
-    { to: "/listening", label: "Listening", icon: Headphones },
+    {
+      to: "/teacher",
+      label: "AI Teacher",
+      icon: Sparkles,
+      mobileOrder: "order-2 lg:order-none",
+    },
     {
       to: "/coach",
       label: "AI Talking",
       icon: MessageSquareText,
+      mobileOrder: "order-3 lg:order-none",
     },
-    { to: "/writing", label: "Writing", icon: PenLine },
-    { to: "/teacher", label: "AI Teacher", icon: Sparkles },
+    {
+      to: "/writing",
+      label: "Writing",
+      icon: PenLine,
+      mobileOrder: "order-4 lg:order-none",
+    },
+    {
+      to: "/listening",
+      label: "Listening",
+      icon: Headphones,
+      mobileOrder: "order-5 lg:order-none",
+    },
+    {
+      to: "/vocabulary",
+      label: "Vocabulary",
+      icon: BookOpen,
+      mobileOrder: "order-6 lg:order-none",
+    },
   ] as const;
 
   const learningCards = [
