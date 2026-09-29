@@ -80,6 +80,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // Shared action buttons: Quick Win sits next to "Today's focus" on mobile and
   // inside the "Why now?" card on larger screens; the challenge button sits
   // next to the focus title on mobile and inside the card on larger screens.
+  // Colored action icons: ⚡ renders in its native yellow, ✣ uses the button
+  // text color as a filled glyph instead of the previous outline strokes.
+  const quickWinIcon = (
+    <span aria-hidden="true" className="text-[13px] leading-none">⚡</span>
+  );
+  const challengeIcon = (
+    <span aria-hidden="true" className="text-[13px] leading-none text-sidebar-foreground">✣</span>
+  );
   const quickWinButton = quickWin && quickWinAvailable ? (
     <Button
       asChild
@@ -89,11 +97,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       {quickWin.activity.params ? (
         <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-          <Zap /> {t("Quick Win")}
+          {quickWinIcon} {t("Quick Win")}
         </Link>
       ) : (
         <Link to={quickWin.activity.to}>
-          <Zap /> {t("Quick Win")}
+          {quickWinIcon} {t("Quick Win")}
         </Link>
       )}
     </Button>
@@ -107,11 +115,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       {data.quest.resource.params ? (
         <Link to="/learning/$lessonId" params={data.quest.resource.params}>
-          <Sparkles /> {t("Take the challenge")}
+          {challengeIcon} {t("Take the challenge")}
         </Link>
       ) : (
         <Link to={data.quest.resource.to}>
-          <Sparkles /> {t("Take the challenge")}
+          {challengeIcon} {t("Take the challenge")}
         </Link>
       )}
     </Button>
