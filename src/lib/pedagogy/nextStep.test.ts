@@ -390,7 +390,7 @@ describe("why now justification", () => {
 
   it("explains the real reason that won the selection", () => {
     expect(fill("recent_errors")).toBe("Your recent practice shows opportunities to improve in this area.");
-    expect(fill("not_measured_yet")).toBe("Your B2 Vocabulary progress needs more evidence to understand your current level.");
+    expect(fill("not_measured_yet")).toBe("Your Vocabulary needs more B2 evidence to understand your current level.");
     expect(fill("low_confidence")).toBe(
       "More evidence is needed to better understand your Vocabulary progress.",
     );
@@ -437,7 +437,7 @@ describe("why this matters now", () => {
   it("states the priority with the skill and level already resolved", () => {
     expect(
       NEXT_STEP_PRIORITY_TEXT.replaceAll("{skill}", "Vocabulary").replaceAll("{level}", "B2"),
-    ).toBe("Vocabulary is the next skill to strengthen in your B2 journey.");
+    ).toBe("Vocabulary is your next area to strengthen in your B2 journey.");
   });
 
   it("has one evidence line per reason with no placeholders, score or confidence", () => {
