@@ -15,7 +15,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { createAttemptGate } from "@/lib/attemptGate";
-import { vocabularyGenerationFailureKey } from "@/lib/activityIndicators";
+import { vocabularyGenerationFailureKey, vocabularyGenerationRecentlyFailed } from "@/lib/activityIndicators";
 
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
@@ -148,7 +148,7 @@ function Vocabulary() {
   const [genBlocked, setGenBlocked] = useState<boolean | null>(null);
   useEffect(() => {
     if (!failKey) return;
-    setGenBlocked(window.localStorage.getItem(failKey) === "1");
+    setGenBlocked(vocabularyGenerationRecentlyFailed(window.localStorage.getItem(failKey)));
   }, [failKey]);
   const needsGeneration = roundReady && !!saved && saved.length < 10 && genBlocked === false;
   const {
