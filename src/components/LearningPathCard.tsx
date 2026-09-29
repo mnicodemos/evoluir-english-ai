@@ -323,7 +323,7 @@ export function PathProgressCard({
       label: "Writing",
       value: latest?.writing_score ?? 0,
       icon: PenLine,
-      tone: "text-dashboard-pink",
+      tone: "text-[#12403e]",
       bar: "[&>div]:bg-dashboard-blue",
     },
     {
