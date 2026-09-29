@@ -27,7 +27,7 @@ export function EvoGuide({
   const isWide = image === "wide";
   const imageSrc = isWide ? evoBannerWide : evoGuideOfficial;
   const imageWidth = isWide ? 1600 : 1536;
-  const imageHeight = isWide ? 669 : 1024;
+  const imageHeight = isWide ? 400 : 1024;
   return (
     <div
       className={cn(
@@ -51,7 +51,7 @@ export function EvoGuide({
           imageSize === "diagnosis" && "w-28 sm:order-2 sm:w-full",
           imageSize === "diagnosisIntro" && "w-24 sm:order-2 sm:w-full",
           imageSize === "lesson" && "h-full",
-          isWide && "aspect-[1600/669]",
+          isWide && "aspect-[1600/400]",
         )}
       >
         <img
