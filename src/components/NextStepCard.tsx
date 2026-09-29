@@ -77,6 +77,17 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const whyNowText = t(NEXT_STEP_WHY_NOW_TEXT[data.reason])
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  // "Why this matters now?" reuses the SAME server-side decision: priority line
+  // filled only with the resolved skill/level, evidence line from the real
+  // reason, and an evolution-context line backed by existing insight data.
+  const priorityText = t(NEXT_STEP_PRIORITY_TEXT)
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  const evidenceText = t(NEXT_STEP_EVIDENCE_TEXT[data.reason]);
+  const progressText =
+    data.insight?.situation === "strong_elsewhere" && strongestLabel
+      ? t(NEXT_STEP_PROGRESS_TEXT.withStrongSkill).replaceAll("{strongest}", strongestLabel)
+      : t(NEXT_STEP_PROGRESS_TEXT.neutral);
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   const quickWin = data.quickWin;
   const mainAvailable = dashboardActionAvailable(data.activity.to, activityIndicators);
