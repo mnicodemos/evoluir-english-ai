@@ -389,10 +389,10 @@ describe("why now justification", () => {
   });
 
   it("explains the real reason that won the selection", () => {
-    expect(fill("recent_errors")).toBe("Your recent practice shows mistakes in this area.");
-    expect(fill("not_measured_yet")).toBe("Vocabulary hasn't been measured enough yet.");
+    expect(fill("recent_errors")).toBe("Your recent practice shows opportunities to improve in this area.");
+    expect(fill("not_measured_yet")).toBe("Your B2 Vocabulary progress needs more evidence to understand your current level.");
     expect(fill("low_confidence")).toBe(
-      "More evidence is needed to understand your Vocabulary at B2.",
+      "More evidence is needed to better understand your Vocabulary progress.",
     );
     expect(fill("not_practised_recently")).toBe("You haven't practised Vocabulary recently.");
     expect(fill("lowest_score")).toBe(
@@ -451,8 +451,9 @@ describe("why this matters now", () => {
         "no_data",
       ].sort(),
     );
+    expect(NEXT_STEP_EVIDENCE_TEXT.not_measured_yet).not.toMatch(/never|hasn't been|not been measured/i);
     for (const text of Object.values(NEXT_STEP_EVIDENCE_TEXT)) {
-      expect(text).not.toMatch(/\{skill\}|\{level\}|score|confidence|%/i);
+      expect(text.replace(/\{(skill|level)\}/g, "")).not.toMatch(/\{|score|confidence|%/i);
     }
   });
 
@@ -468,7 +469,7 @@ describe("why this matters now", () => {
   });
 
   it("keeps the evolution context factual and never invented", () => {
-    expect(NEXT_STEP_PROGRESS_TEXT.withStrongSkill).toBe("Your {strongest} is going well.");
+    expect(NEXT_STEP_PROGRESS_TEXT.withStrongSkill).toBe("Your {strongest} has strong evidence at {level}.");
     expect(NEXT_STEP_PROGRESS_TEXT.neutral).toBe("You are continuing to build your English skills.");
   });
 });

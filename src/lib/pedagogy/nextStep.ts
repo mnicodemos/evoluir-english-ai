@@ -402,9 +402,9 @@ export const NEXT_STEP_REASON_TEXT: Record<NextStepReason, string> = {
  * already resolved. Never exposes score or confidence.
  */
 export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
-  recent_errors: "Your recent practice shows mistakes in this area.",
-  not_measured_yet: "{skill} hasn't been measured enough yet.",
-  low_confidence: "More evidence is needed to understand your {skill} at {level}.",
+  recent_errors: "Your recent practice shows opportunities to improve in this area.",
+  not_measured_yet: "Your {level} {skill} progress needs more evidence to understand your current level.",
+  low_confidence: "More evidence is needed to better understand your {skill} progress.",
   not_practised_recently: "You haven't practised {skill} recently.",
   lowest_score: "{skill} is currently the area that needs more practice.",
   no_data: "Start anywhere and we will personalise your next step.",
@@ -423,11 +423,11 @@ export const NEXT_STEP_PRIORITY_TEXT =
  * reason names, and never a repeated action (the buttons execute; this explains).
  */
 export const NEXT_STEP_EVIDENCE_TEXT: Record<NextStepReason, string> = {
-  recent_errors: "Your recent practice shows mistakes in this area.",
-  not_measured_yet: "This skill hasn't been measured enough yet.",
-  low_confidence: "More evidence is needed to understand this skill.",
-  not_practised_recently: "You haven't practised this skill recently.",
-  lowest_score: "This is currently the skill that needs more attention.",
+  recent_errors: "Your recent practice shows opportunities to improve in this area.",
+  not_measured_yet: "Your {level} {skill} progress needs more evidence to understand your current level.",
+  low_confidence: "More evidence is needed to better understand your {skill} progress.",
+  not_practised_recently: "You haven't practised {skill} recently.",
+  lowest_score: "{skill} is currently the area that needs more practice.",
   no_data: "We need more practice evidence to understand this skill.",
 };
 
@@ -437,7 +437,7 @@ export const NEXT_STEP_EVIDENCE_TEXT: Record<NextStepReason, string> = {
  * otherwise a neutral, factual fallback is used — nothing is invented.
  */
 export const NEXT_STEP_PROGRESS_TEXT = {
-  withStrongSkill: "Your {strongest} is going well.",
+  withStrongSkill: "Your {strongest} has strong evidence at {level}.",
   neutral: "You are continuing to build your English skills.",
 } as const;
 
