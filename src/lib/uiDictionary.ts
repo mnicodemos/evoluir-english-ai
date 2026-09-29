@@ -216,7 +216,8 @@ export const uiPt: Record<string, string> = {
   "Builds on your recent practice": "Aproveita sua prática recente",
   "Adds recent evidence to your progress": "Adiciona evidências recentes à sua evolução",
   "Supports your progression": "Apoia sua progressão",
-  "Based on your recent mistakes in this area.": "Com base nos seus erros recentes nesse tema.",
+  "Your next step is based on your learning evidence.":
+    "Seu próximo passo se baseia nas suas evidências de aprendizado.",
   "We still have little evidence about this skill.":
     "Ainda temos poucos dados sobre essa habilidade.",
   "This is your lowest skill score right now.":
@@ -930,7 +931,6 @@ export const uiPt: Record<string, string> = {
   "Your English Skills": "Suas habilidades em inglês",
   "Keep improving": "Continue evoluindo",
   "Quick Access": "Acesso rápido",
-  "Today's focus": "Foco de hoje",
   "TODAY'S PRIORITY": "PRIORIDADE DE HOJE",
   "lessons completed": "lições concluídas",
   "New activity available": "Nova atividade disponível",

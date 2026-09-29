@@ -177,8 +177,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
             <div className="mt-1 flex items-start justify-between gap-2 sm:mt-2 sm:block">
               <p className="text-xs font-semibold text-sidebar-foreground/75 sm:text-sm">
-                <span className="sm:hidden">{t("TODAY'S PRIORITY")}</span>
-                <span className="hidden sm:inline">{t("Today's focus")}</span>
+                {t("TODAY'S PRIORITY")}
               </p>
               {quickWinButton && (
                 <div className="shrink-0 sm:hidden">{quickWinButton}</div>

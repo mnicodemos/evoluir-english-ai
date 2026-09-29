@@ -387,7 +387,7 @@ export function buildNextStep(input: NextStepInput): NextStep {
 
 /** Factual, positive copy. One entry per reason; nothing is invented. */
 export const NEXT_STEP_REASON_TEXT: Record<NextStepReason, string> = {
-  recent_errors: "Based on your recent mistakes in this area.",
+  recent_errors: "Your next step is based on your learning evidence.",
   low_confidence: "We still have little evidence about this skill.",
   lowest_score: "This is your lowest skill score right now.",
   not_practised_recently: "You have not practised this recently.",
