@@ -330,7 +330,7 @@ export function PathProgressCard({
       label: "Talking",
       value: latest?.speaking_score ?? 0,
       icon: Mic,
-      tone: "text-dashboard-coral",
+      tone: "text-[#362b53]",
       bar: "[&>div]:bg-warning",
     },
   ];
