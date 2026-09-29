@@ -67,16 +67,38 @@ function Dashboard() {
       to: "/learning",
       label: "Learning Center",
       icon: GraduationCap,
+      mobileOrder: "order-1 lg:order-none",
     },
-    { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
-    { to: "/listening", label: "Listening", icon: Headphones },
+    {
+      to: "/teacher",
+      label: "AI Teacher",
+      icon: Sparkles,
+      mobileOrder: "order-2 lg:order-none",
+    },
     {
       to: "/coach",
       label: "AI Talking",
       icon: MessageSquareText,
+      mobileOrder: "order-3 lg:order-none",
     },
-    { to: "/writing", label: "Writing", icon: PenLine },
-    { to: "/teacher", label: "AI Teacher", icon: Sparkles },
+    {
+      to: "/writing",
+      label: "Writing",
+      icon: PenLine,
+      mobileOrder: "order-4 lg:order-none",
+    },
+    {
+      to: "/listening",
+      label: "Listening",
+      icon: Headphones,
+      mobileOrder: "order-5 lg:order-none",
+    },
+    {
+      to: "/vocabulary",
+      label: "Vocabulary",
+      icon: BookOpen,
+      mobileOrder: "order-6 lg:order-none",
+    },
   ] as const;
 
   const learningCards = [
@@ -259,7 +281,7 @@ function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="dashboard-quick-link group relative grid min-h-7 min-w-0 grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-0 px-2 py-1 text-foreground transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:min-h-12 xl:grid-cols-[3rem_minmax(0,1fr)_auto] xl:px-3.5 xl:py-2"
+                    className={`dashboard-quick-link group relative grid min-h-7 min-w-0 grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-0 px-2 py-1 text-foreground transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:min-h-12 xl:grid-cols-[3rem_minmax(0,1fr)_auto] xl:px-3.5 xl:py-2 ${item.mobileOrder}`}
                   >
                     {hasNew && (
                       <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-brand-green">

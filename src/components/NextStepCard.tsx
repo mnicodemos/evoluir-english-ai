@@ -169,7 +169,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
             <div className="mt-1 flex items-start justify-between gap-2 sm:mt-2 sm:block">
               <p className="text-xs font-semibold text-sidebar-foreground/75 sm:text-sm">
-                {t("Today's focus")}
+                <span className="sm:hidden">{t("TODAY'S PRIORITY")}</span>
+                <span className="hidden sm:inline">{t("Today's focus")}</span>
               </p>
               {quickWinButton && (
                 <div className="shrink-0 sm:hidden">{quickWinButton}</div>
@@ -210,14 +211,17 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
-              <h3 className="font-semibold text-sidebar-foreground">{t("Why now?")}</h3>
+              <h3 className="font-semibold text-sidebar-foreground">
+                <span className="sm:hidden">{t("Why this matters now?")}</span>
+                <span className="hidden sm:inline">{t("Why now?")}</span>
+              </h3>
             </div>
             <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
               {/* Mobile: a single two-line summary of the desktop items. */}
               <li className="flex items-start gap-2 sm:hidden">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
                  <span className="line-clamp-2 leading-tight">
-                  {situationText} {actionText}
+                  {actionText}
                 </span>
               </li>
               {cefrLevel && (
