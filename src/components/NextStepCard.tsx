@@ -13,6 +13,9 @@ import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import {
   NEXT_STEP_ACTION_TEXT,
+  NEXT_STEP_EVIDENCE_TEXT,
+  NEXT_STEP_PRIORITY_TEXT,
+  NEXT_STEP_PROGRESS_TEXT,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
   NEXT_STEP_SKILL_TEXT,
@@ -74,6 +77,17 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const whyNowText = t(NEXT_STEP_WHY_NOW_TEXT[data.reason])
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  // "Why this matters now?" reuses the SAME server-side decision: priority line
+  // filled only with the resolved skill/level, evidence line from the real
+  // reason, and an evolution-context line backed by existing insight data.
+  const priorityText = t(NEXT_STEP_PRIORITY_TEXT)
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  const evidenceText = t(NEXT_STEP_EVIDENCE_TEXT[data.reason]);
+  const progressText =
+    data.insight?.situation === "strong_elsewhere" && strongestLabel
+      ? t(NEXT_STEP_PROGRESS_TEXT.withStrongSkill).replaceAll("{strongest}", strongestLabel)
+      : t(NEXT_STEP_PROGRESS_TEXT.neutral);
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   const quickWin = data.quickWin;
   const mainAvailable = dashboardActionAvailable(data.activity.to, activityIndicators);
@@ -225,33 +239,27 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">
-                <span className="sm:hidden">{t("Why this matters now?")}</span>
-                <span className="hidden sm:inline">{t("Why now?")}</span>
+                {t("Why this matters now?")}
               </h3>
             </div>
             <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
-              {/* Mobile: a single two-line summary of the desktop items. */}
+              {/* Mobile: one short summary item — never clamped, never cut. */}
               <li className="flex items-start gap-2 sm:hidden">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
-                 <span className="line-clamp-2 leading-tight">
-                  {actionText}
-                </span>
+                <span className="leading-tight">{priorityText}</span>
               </li>
-              {cefrLevel && (
-                <li className="hidden items-start gap-2 sm:flex">
-                  <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
-                  <span>
-                    {cefrLevel} · {skillLabel}
-                  </span>
-                </li>
-              )}
+              {/* Desktop/tablet: the complete three-line explanation. */}
               <li className="hidden items-start gap-2 sm:flex">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
-                <span>{whyNowText}</span>
+                <span>{progressText}</span>
               </li>
               <li className="hidden items-start gap-2 sm:flex">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
-                <span>{actionText}</span>
+                <span>{priorityText}</span>
+              </li>
+              <li className="hidden items-start gap-2 sm:flex">
+                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span>{evidenceText}</span>
               </li>
             </ul>
             {(quickWinButton || challengeButton) && (

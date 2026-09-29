@@ -4,6 +4,9 @@ import {
   buildQuickWin,
   buildNextStep,
   lessonSkillToProfileSkill,
+  NEXT_STEP_EVIDENCE_TEXT,
+  NEXT_STEP_PRIORITY_TEXT,
+  NEXT_STEP_PROGRESS_TEXT,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
   NEXT_STEP_WHY_NOW_TEXT,
@@ -427,6 +430,46 @@ describe("why now justification", () => {
     for (const text of Object.values(NEXT_STEP_WHY_NOW_TEXT)) {
       expect(text).not.toMatch(/doing well|better than|stronger/i);
     }
+  });
+});
+
+describe("why this matters now", () => {
+  it("states the priority with the skill and level already resolved", () => {
+    expect(
+      NEXT_STEP_PRIORITY_TEXT.replaceAll("{skill}", "Vocabulary").replaceAll("{level}", "B2"),
+    ).toBe("Vocabulary is the next skill to strengthen in your B2 journey.");
+  });
+
+  it("has one evidence line per reason with no placeholders, score or confidence", () => {
+    expect(Object.keys(NEXT_STEP_EVIDENCE_TEXT).sort()).toEqual(
+      [
+        "recent_errors",
+        "not_measured_yet",
+        "low_confidence",
+        "not_practised_recently",
+        "lowest_score",
+        "no_data",
+      ].sort(),
+    );
+    for (const text of Object.values(NEXT_STEP_EVIDENCE_TEXT)) {
+      expect(text).not.toMatch(/\{skill\}|\{level\}|score|confidence|%/i);
+    }
+  });
+
+  it("changes the evidence line when the winning reason changes", () => {
+    expect(NEXT_STEP_EVIDENCE_TEXT.recent_errors).not.toBe(NEXT_STEP_EVIDENCE_TEXT.lowest_score);
+    expect(NEXT_STEP_EVIDENCE_TEXT.recent_errors).not.toBe(NEXT_STEP_EVIDENCE_TEXT.low_confidence);
+  });
+
+  it("explains instead of repeating the action — the buttons execute", () => {
+    for (const text of [...Object.values(NEXT_STEP_EVIDENCE_TEXT), NEXT_STEP_PRIORITY_TEXT]) {
+      expect(text).not.toMatch(/practise |practice now|review lesson/i);
+    }
+  });
+
+  it("keeps the evolution context factual and never invented", () => {
+    expect(NEXT_STEP_PROGRESS_TEXT.withStrongSkill).toBe("Your {strongest} is going well.");
+    expect(NEXT_STEP_PROGRESS_TEXT.neutral).toBe("You are continuing to build your English skills.");
   });
 });
 
