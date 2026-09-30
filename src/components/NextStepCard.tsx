@@ -247,10 +247,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </h3>
             </div>
             <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
-              {/* Mobile: one short summary item — never clamped, never cut. */}
+              {/* Mobile: short summary + evidence item — never clamped, never cut. */}
               <li className="flex items-start gap-2 sm:hidden">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
                 <span className="leading-tight">{priorityText}</span>
+              </li>
+              <li className="flex items-start gap-2 sm:hidden">
+                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span className="leading-tight">{evidenceText}</span>
               </li>
               {/* Desktop/tablet: the complete three-line explanation. */}
               <li className="hidden items-start gap-2 sm:flex">
