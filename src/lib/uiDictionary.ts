@@ -229,7 +229,7 @@ export const uiPt: Record<string, string> = {
   "Your recent practice shows opportunities to improve in this area.":
     "Sua prática recente mostra oportunidades de melhoria nessa área.",
   "More {skill} evidence will help EVO understand your current level.":
-    "Seu {skill} precisa de mais evidências no {level} para entendermos seu nível atual.",
+    "Mais evidências de {skill} vão ajudar a EVO a entender seu nível atual.",
   "More evidence is needed to better understand your {skill} progress.":
     "Precisamos de mais evidências para entender melhor seu progresso em {skill}.",
   "You haven't practised {skill} recently.": "Você não praticou {skill} recentemente.",
