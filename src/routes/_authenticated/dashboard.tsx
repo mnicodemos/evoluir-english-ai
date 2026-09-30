@@ -192,7 +192,7 @@ function Dashboard() {
                   {t("Today's Progress")}
                 </h2>
               </div>
-              <div className="mt-3 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-center gap-3 lg:grid-cols-1 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
+              <div className="mt-2 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-start gap-3 lg:grid-cols-1 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
                 <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
@@ -231,9 +231,9 @@ function Dashboard() {
                     </span>
                   </span>
                 </div>
-                <div className="grid gap-2.5">
+                <div className="grid gap-2">
                   <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block">
-                    {t("Today's Progress")}
+                    {t("KEEPING LEARNING")}
                   </p>
                   {learningCards.map((card) => (
                     <div
