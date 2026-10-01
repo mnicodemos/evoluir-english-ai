@@ -45,7 +45,11 @@ export async function callGateway(
     (usage?.operation === "talking" && !jsonMode) ||
     usage?.operation === "vocabulary_generation";
   const lovable = useLovable ? await import("./lovable-chat.server") : null;
-  const GEMINI_TEXT_MODEL = lovable ? lovable.LOVABLE_TALKING_MODEL : geminiModel;
+  const GEMINI_TEXT_MODEL = lovable
+    ? usage?.operation === "vocabulary_generation"
+      ? lovable.LOVABLE_VOCABULARY_MODEL
+      : lovable.LOVABLE_TALKING_MODEL
+    : geminiModel;
   const usageTools = usage ? await import("./ai-usage.server") : null;
   const requestHash = usageTools ? await usageTools.hashAiRequest({ messages, jsonMode }) : "";
   const cacheKey = usage?.cacheKey ?? requestHash;
@@ -71,7 +75,7 @@ export async function callGateway(
   };
   try {
     text = lovable
-      ? await lovable.callLovableTalking(messages, onUsage, signal)
+      ? await lovable.callLovableTalking(messages, onUsage, signal, GEMINI_TEXT_MODEL)
       : await callGemini(messages, jsonMode, onUsage, signal);
   } catch (err) {
     if (ticket && usageTools) {

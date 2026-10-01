@@ -1,6 +1,8 @@
 // AI Talking text generation on the standard Lovable AI service.
 // Receives exactly the same system/user/assistant messages the Gemini path used.
 export const LOVABLE_TALKING_MODEL = "openai/gpt-6-astra";
+/** Vocabulary word lists: a faster model, so a batch finishes well inside the call time limit. */
+export const LOVABLE_VOCABULARY_MODEL = "openai/gpt-5-mini";
 const RESPONSES_URL = "https://ai.gateway.lovable.dev/v1/responses";
 
 type Msg = { role: "system" | "user" | "assistant"; content: string };
@@ -14,7 +16,7 @@ export class LovableChatError extends Error {
   }
 }
 
-function body(messages: Msg[]) {
+function body(messages: Msg[], model: string) {
   const instructions = messages
     .filter((m) => m.role === "system")
     .map((m) => m.content)
@@ -26,7 +28,7 @@ function body(messages: Msg[]) {
       content: [{ type: m.role === "assistant" ? "output_text" : "input_text", text: m.content }],
     }));
   return JSON.stringify({
-    model: LOVABLE_TALKING_MODEL,
+    model,
     ...(instructions ? { instructions } : {}),
     input,
     stream: true,
@@ -39,6 +41,7 @@ function body(messages: Msg[]) {
 export async function openLovableTalkingStream(
   messages: Msg[],
   signal?: AbortSignal,
+  model: string = LOVABLE_TALKING_MODEL,
 ): Promise<Response | null> {
   const key = process.env["LOVABLE_API_KEY"];
   if (!key) return null;
@@ -49,7 +52,7 @@ export async function openLovableTalkingStream(
       "Lovable-API-Key": key,
       "X-Lovable-AIG-SDK": "fetch",
     },
-    body: body(messages),
+    body: body(messages, model),
     ...(signal ? { signal } : {}),
   });
 }
@@ -102,8 +105,9 @@ export async function callLovableTalking(
   messages: Msg[],
   onUsage?: (usage: LovableUsage) => void,
   signal?: AbortSignal,
+  model: string = LOVABLE_TALKING_MODEL,
 ): Promise<string | null> {
-  const res = await openLovableTalkingStream(messages, signal);
+  const res = await openLovableTalkingStream(messages, signal, model);
   if (!res) return null;
   if (!res.ok || !res.body) {
     const raw = await res.text().catch(() => "");
