@@ -416,12 +416,36 @@ function LessonPage() {
           </TabsContent>
 
           <TabsContent value="quiz" className="mt-5">
-            <LessonQuiz
-              questions={data.quiz}
-              userId={profile?.id}
-              lessonId={lessonId}
-              onFinished={finishLesson}
-            />
+            {needsQuizRepair ? (
+              <div className="card-soft space-y-3 p-6 text-sm text-muted-foreground">
+                <p>
+                  {repairLesson.isError
+                    ? t("We could not prepare this quiz. Please try again.")
+                    : t("Preparing this lesson's quiz… this can take about a minute.")}
+                </p>
+                {repairLesson.isError ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      repairTried.current = null;
+                      repairLesson.reset();
+                    }}
+                  >
+                    {t("Try again")}
+                  </Button>
+                ) : (
+                  <Skeleton className="h-24 w-full" />
+                )}
+              </div>
+            ) : (
+              <LessonQuiz
+                questions={data.quiz}
+                userId={profile?.id}
+                lessonId={lessonId}
+                onFinished={finishLesson}
+              />
+            )}
           </TabsContent>
         </Tabs>
 
