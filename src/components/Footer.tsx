@@ -90,7 +90,7 @@ export function Footer({
           {/* Brand & Social */}
           <div className="space-y-5">
             <div className="flex items-center gap-2.5">
-              <Logo className="size-8 shrink-0 lg:size-[2.66rem]" />
+              <Logo className="size-10 shrink-0 lg:size-[3.32rem]" />
               <BrandName className="text-lg text-foreground dark:text-white" />
             </div>
             <p className="max-w-[320px] text-sm font-semibold italic leading-snug text-foreground dark:text-white sm:max-w-none sm:text-base sm:leading-relaxed">

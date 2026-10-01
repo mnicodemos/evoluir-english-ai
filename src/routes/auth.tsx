@@ -117,7 +117,7 @@ function AuthPage() {
         <div className="flex items-center justify-center px-5 py-8 sm:py-14">
           <div className="w-full max-w-sm">
             <Link to="/" className="mb-8 flex items-center gap-2 lg:hidden">
-              <Logo className="size-[1.2rem]" />
+              <Logo className="size-[1.5rem]" />
               <BrandName />
             </Link>
 
