@@ -156,10 +156,15 @@ export function useActivityIndicators(): ActivityIndicators {
     const done = [...new Set([...readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []), ...serverDone])];
 
     setIndicators({
-      listening: listeningHasNewActivity({
-        round,
-        completedRound: completion[LISTENING_TRACK_ID] ?? null,
-      }),
+      // Same rule as the Listening page: a listening saved after the round
+      // began counts as done on every device of this account.
+      listening:
+        !(roundStart !== undefined &&
+          (savedPractice?.listening ?? []).some((at) => !roundStart || at > roundStart)) &&
+        listeningHasNewActivity({
+          round,
+          completedRound: completion[LISTENING_TRACK_ID] ?? null,
+        }),
       writing: writingHasNewActivity({
         prompts,
         done,
