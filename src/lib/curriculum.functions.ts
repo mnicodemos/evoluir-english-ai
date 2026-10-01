@@ -175,6 +175,53 @@ function generatedLessonSchema(cardTotal: number, listenTotal: number, quizTotal
     .strict();
 }
 
+const QUIZ_KEYS = ["question", "options", "correct_answer", "explanation", "pedagogical_skill"];
+const CARD_KEYS = [
+  "word",
+  "translation",
+  "definition",
+  "pronunciation",
+  "example",
+  "difficulty",
+  "prompt",
+  "answer",
+  "card_type",
+  "listen_text",
+];
+
+function pickKeys(value: unknown, keys: string[]) {
+  if (!value || typeof value !== "object") return value;
+  const source = value as Record<string, unknown>;
+  return Object.fromEntries(keys.filter((k) => k in source).map((k) => [k, source[k]]));
+}
+
+/** Keeps the individually valid parts of a lesson reply that failed strict validation. */
+function salvageLessonContent(value: unknown, cardTotal: number, quizTotal: number) {
+  if (!value || typeof value !== "object") return null;
+  const source = value as Record<string, unknown>;
+  const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  const summary = text(source["summary"], 3000);
+  const transcript = text(source["transcript"], 15000);
+  if (!summary || !transcript) return null;
+  const list = (v: unknown) => (Array.isArray(v) ? v : []);
+  const quiz = list(source["quiz"])
+    .map((item) => quizItemSchema.safeParse(pickKeys(item, QUIZ_KEYS)))
+    .flatMap((r) => (r.success ? [r.data] : []))
+    .slice(0, quizTotal);
+  const flashcards = list(source["flashcards"])
+    .map((item) => flashcardSchema.safeParse(pickKeys(item, CARD_KEYS)))
+    .flatMap((r) => (r.success ? [r.data] : []))
+    .slice(0, cardTotal);
+  return {
+    summary,
+    transcript,
+    transcript_pt: text(source["transcript_pt"], 15000),
+    flashcards,
+    quiz,
+  };
+}
+
+
 function jsonValue(raw: string): unknown {
   try {
     return JSON.parse(
