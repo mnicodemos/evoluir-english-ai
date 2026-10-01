@@ -250,7 +250,7 @@ function Dashboard() {
                 </div>
               </div>
               {/* Desktop-only closing line, placed at the marked spot below the content. */}
-              <p className="mt-auto hidden pt-3 text-center text-[9px] lg:block">
+              <p className="mt-auto hidden pt-3 text-center text-[11px] font-semibold tracking-wide text-warning lg:block">
                 {t("Small steps create progress.")}
               </p>
             </section>
