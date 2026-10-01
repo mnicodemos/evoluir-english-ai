@@ -37,6 +37,7 @@ export function FlashcardDeck({
   });
   const [flipped, setFlipped] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasListened, setHasListened] = useState(false);
   const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null);
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
@@ -49,6 +50,7 @@ export function FlashcardDeck({
     setIsPlaying(true);
     try {
       await speakEnglish(text, { cache: "persistent" });
+      setHasListened(true);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("Could not play this audio."));
     } finally {
@@ -80,6 +82,7 @@ export function FlashcardDeck({
     }
     await new Promise((resolve) => window.setTimeout(resolve, 500));
     setFlipped(false);
+    setHasListened(false);
     setFeedback(null);
     if (index + 1 >= cards.length) {
       setSaved({ index, done: true });
@@ -93,6 +96,7 @@ export function FlashcardDeck({
     clearSaved();
     setSaved({ index: 0, done: false });
     setFlipped(false);
+    setHasListened(false);
     setFeedback(null);
   }
 
@@ -204,7 +208,7 @@ export function FlashcardDeck({
           <Button
             variant="default"
             onClick={() => answer(true)}
-            disabled={feedback !== null}
+            disabled={feedback !== null || (isListenCard && !hasListened)}
             className="flex items-center justify-center gap-2 rounded-lg bg-success px-3 py-3 text-sm font-semibold text-success-foreground transition-transform hover:scale-[1.02]"
           >
             <Check className="size-4" /> {lang === "pt" ? "Acerto" : "Correct"}
@@ -212,7 +216,7 @@ export function FlashcardDeck({
           <Button
             variant="destructive"
             onClick={() => answer(false)}
-            disabled={feedback !== null}
+            disabled={feedback !== null || (isListenCard && !hasListened)}
             className="flex items-center justify-center gap-2 rounded-lg bg-destructive px-3 py-3 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.02]"
           >
             <X className="size-4" /> {lang === "pt" ? "Erro" : "Incorrect"}
