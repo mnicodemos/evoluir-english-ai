@@ -249,13 +249,29 @@ async function writeLesson(
     true,
   );
 
+  const rawValue = jsonValue(raw);
   const parsedContent = generatedLessonSchema(cardTotal, listenTotal, quizTotal).safeParse(
-    jsonValue(raw),
+    rawValue,
   );
-  if (!parsedContent.success) {
-    throw new Error("The AI could not write this lesson. Please try again.");
+  let content: z.infer<ReturnType<typeof generatedLessonSchema>>;
+  if (parsedContent.success) {
+    content = parsedContent.data;
+  } else {
+    // One imperfect item (an extra field, a wrong count, an answer that does not
+    // match its options) must not throw the whole lesson away: keep every item
+    // that is valid on its own, and only fail when too few remain.
+    console.error(
+      "Lesson content failed strict validation",
+      plan.key,
+      parsedContent.error.issues.slice(0, 5),
+    );
+    const salvaged = salvageLessonContent(rawValue, cardTotal, quizTotal);
+    const minimumQuiz = plan.isReviewTest ? quizTotal : Math.min(quizTotal, Math.max(5, Math.ceil(quizTotal * 0.7)));
+    if (!salvaged || salvaged.quiz.length < minimumQuiz) {
+      throw new Error("The AI could not write this lesson. Please try again.");
+    }
+    content = salvaged;
   }
-  const content = parsedContent.data;
 
   if (!plan.isReviewTest) {
     const usable = (content.quiz ?? []).filter(
