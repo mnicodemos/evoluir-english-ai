@@ -45,11 +45,11 @@ function todayKey() {
  * Both come from existing state: the batch rows in `vocabulary` (same batch key
  * the Vocabulary page uses) and `user_vocabulary` mastery.
  */
-function useVocabularyBatchProgress(round: number, userId: string | undefined) {
+function useVocabularyBatchProgress(round: number, userId: string | undefined, level: string | undefined) {
   const queryClient = useQueryClient();
   return useQuery({
-    queryKey: ["vocabulary-batch-progress", userId, round],
-    enabled: !!userId,
+    queryKey: ["vocabulary-batch-progress", userId, round, level],
+    enabled: !!userId && !!level,
     queryFn: async () => {
       if (!userId) return { batchWordIds: [], masteryByWordId: {} };
       const [batch, mine] = await Promise.all([
@@ -57,7 +57,8 @@ function useVocabularyBatchProgress(round: number, userId: string | undefined) {
           .from("vocabulary")
           .select("id")
           .eq("created_by", userId)
-          .eq("batch_key", lessonBatchKey(round)),
+          .eq("batch_key", lessonBatchKey(round))
+          .eq("level", level ?? ""),
         fetchUserVocabularyMastery(queryClient),
       ]);
       if (batch.error) throw batch.error;
@@ -81,7 +82,7 @@ export function useActivityIndicators(): ActivityIndicators {
     isPending: vocabularyLoading,
     isFetching: vocabularyFetching,
     isError: vocabularyError,
-  } = useVocabularyBatchProgress(round, profile?.id);
+  } = useVocabularyBatchProgress(round, profile?.id, profile?.level);
   const [indicators, setIndicators] = useState<ActivityIndicators>({
     listening: false,
     writing: false,

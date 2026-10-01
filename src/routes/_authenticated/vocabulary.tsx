@@ -126,7 +126,7 @@ function Vocabulary() {
   });
 
   // Starting a new lesson means a new set of ten words.
-  const dailyKey = ["daily-words", profile?.id, studyToday(), startedLessons ?? 0] as const;
+  const dailyKey = ["daily-words", profile?.id, profile?.level, studyToday(), startedLessons ?? 0] as const;
   const roundReady = !!profile && startedLessons !== undefined;
 
   // 1) Words already saved for this batch: a plain read, shown right away.
