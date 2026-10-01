@@ -21,6 +21,7 @@ let active: {
   recognition: Recognition;
   text: string;
   error: string | null;
+  stopping: boolean;
   done: Promise<void>;
 } | null = null;
 
@@ -51,16 +52,44 @@ export function startBrowserRecognition(): boolean {
     recognition.maxAlternatives = 1;
     let finish: () => void = () => {};
     const done = new Promise<void>((resolve) => (finish = resolve));
-    const state: NonNullable<typeof active> = { recognition, text: "", error: null, done };
+    const state: NonNullable<typeof active> = {
+      recognition,
+      text: "",
+      error: null,
+      stopping: false,
+      done,
+    };
+    // Some mobile browsers (Samsung Internet) close the session on their own
+    // after a short silence, before the student speaks. While the student is
+    // still recording, the session is reopened so the word is not lost.
+    let heard = "";
+    let restarts = 0;
     recognition.onresult = (event) => {
-      state.text = Array.from(event.results)
+      const current = Array.from(event.results)
         .map((r) => r[0]?.transcript ?? "")
         .join(" ")
         .trim();
+      state.text = [heard, current].filter(Boolean).join(" ").trim();
     };
-    recognition.onend = () => finish();
+    recognition.onend = () => {
+      if (!state.stopping && active === state && restarts < 20) {
+        restarts++;
+        heard = state.text;
+        try {
+          recognition.start();
+          return;
+        } catch {
+          /* fall through */
+        }
+      }
+      finish();
+    };
     recognition.onerror = (event) => {
-      state.error = event.error ?? "recognition_failed";
+      const code = event.error ?? "recognition_failed";
+      // Silence and early-close errors are followed by onend, which restarts.
+      if (!state.stopping && (code === "no-speech" || code === "aborted" || code === "network"))
+        return;
+      state.error = code;
       finish();
     };
     recognition.start();
@@ -77,6 +106,7 @@ export async function stopBrowserRecognition(timeoutMs = 2500): Promise<string |
   const state = active;
   active = null;
   if (!state) return null;
+  state.stopping = true;
   try {
     state.recognition.stop();
   } catch {
@@ -91,6 +121,7 @@ export async function stopBrowserRecognition(timeoutMs = 2500): Promise<string |
 export function cancelBrowserRecognition(): void {
   const state = active;
   active = null;
+  if (state) state.stopping = true;
   try {
     state?.recognition.abort();
   } catch {
