@@ -360,6 +360,7 @@ function ListeningPage() {
       const result = saved as { score?: number };
       const final = result.score ?? average;
       queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
+      queryClient.invalidateQueries({ queryKey: ["saved-practice"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast.success(`Listening session saved with ${final}%`);
     }
