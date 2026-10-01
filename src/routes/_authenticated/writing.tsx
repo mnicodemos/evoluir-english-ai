@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { useLessonRound } from "@/hooks/useLessonRound";
+import { useRoundStart, useSavedPractice } from "@/hooks/usePracticeSync";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { type WritingFeedback } from "@/lib/ai-prompts";
@@ -83,23 +84,17 @@ function rememberAnswered(prompt: string) {
  * the student's CEFR level. Already answered tasks are skipped while fresh ones
  * exist; when the whole level pool is used the history is cleared.
  */
-function roundPrompts(signature: string, config: WritingLevelConfig, rotation: number): string[] {
-  const key = `writing-prompts-round-${signature}`;
-  const saved = readList(key);
-  if (saved.length === TASKS_PER_ROUND) return saved;
-
-  let history = loadHistory();
+function roundPrompts(config: WritingLevelConfig, rotation: number, serverHistory: string[]): string[] {
+  // Same inputs on every device (server history before this round) → same tasks.
+  let history = serverHistory;
   const levelExhausted = WRITING_CATEGORIES.every(({ id }) =>
     config.tasks[id].every((task) => history.includes(task)),
   );
   if (levelExhausted) {
     history = [];
-    writeList(HISTORY_KEY, history);
   }
 
-  const picked = pickWritingTasks({ config, history, rotation });
-  writeList(key, picked);
-  return picked;
+  return pickWritingTasks({ config, history, rotation });
 }
 
 function loadDone(signature: string): string[] {
@@ -127,9 +122,21 @@ function Writing() {
   const rotation = startedLessons ?? 0;
   // A fresh set of tasks every day, and every time the student starts a new lesson.
   const signature = `${todayKey()}-${config.level}-${rotation}`;
+  const roundStart = useRoundStart();
+  const { data: saved } = useSavedPractice();
+  const cutoff = [`${todayKey()}T00:00:00.000Z`, roundStart ?? ""].sort().at(-1)!;
+  const serverBefore = useMemo(
+    () => [...new Set((saved?.writing ?? []).filter((w) => w.at < cutoff).map((w) => w.prompt))],
+    [saved, cutoff],
+  );
+  const serverDone = useMemo(
+    () => (saved?.writing ?? []).filter((w) => w.at >= cutoff).map((w) => w.prompt),
+    [saved, cutoff],
+  );
+  const ready = !!saved && roundStart !== undefined;
   const prompts = useMemo(
-    () => roundPrompts(signature, config, rotation),
-    [signature, config, rotation],
+    () => (ready ? roundPrompts(config, rotation, serverBefore) : []),
+    [ready, config, rotation, serverBefore],
   );
   const [done, setDone] = useState<string[]>([]);
   const [prompt, setPrompt] = useState("");
@@ -141,13 +148,13 @@ function Writing() {
   const saveLegacyWriting = useServerFn(persistWritingLegacy);
 
   useEffect(() => {
-    const finished = loadDone(signature);
+    const finished = [...new Set([...loadDone(signature), ...serverDone])];
     setDone(finished);
     setPrompt(prompts.find((p) => !finished.includes(p)) ?? prompts[0] ?? "");
     setText("");
     setResult(null);
     operationKey.current = null;
-  }, [signature, prompts]);
+  }, [signature, prompts, serverDone]);
 
   const currentDone = done.includes(prompt);
   const allDone = prompts.every((p) => done.includes(p));
@@ -210,6 +217,7 @@ function Writing() {
           data: { operationKey: stableOperationKey, minutes: minutesSpent(1) },
         });
         await refreshAfterActivity(queryClient);
+      queryClient.invalidateQueries({ queryKey: ["saved-practice"] });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not analyse your text");
