@@ -17,14 +17,13 @@ import {
   vocabularyGenerationRecentlyFailed,
   vocabularyIndicatorVisible,
   WRITING_DONE_ROUND_PREFIX,
-  WRITING_HISTORY_ROUND_PREFIX,
   writeText,
   writingHasNewActivity,
 } from "@/lib/activityIndicators";
 import { lessonBatchKey } from "@/lib/vocabularyBatch";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
-import { WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
+import { roundPrompts, WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
 
 /** One recovery attempt per lesson round per page load. */
 const recoveryAttempts = new Set<string>();
@@ -150,6 +149,10 @@ export function useActivityIndicators(): ActivityIndicators {
     const serverDone = (savedPractice?.writing ?? [])
       .filter((w) => w.at >= cutoff)
       .map((w) => w.prompt);
+    const serverBefore = [
+      ...new Set((savedPractice?.writing ?? []).filter((w) => w.at < cutoff).map((w) => w.prompt)),
+    ];
+    const prompts = savedPractice && roundStart !== undefined ? roundPrompts(config, round, serverBefore) : [];
     const done = [...new Set([...readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []), ...serverDone])];
 
     setIndicators({
@@ -158,7 +161,7 @@ export function useActivityIndicators(): ActivityIndicators {
         completedRound: completion[LISTENING_TRACK_ID] ?? null,
       }),
       writing: writingHasNewActivity({
-        prompts: readJson<string[]>(`${WRITING_HISTORY_ROUND_PREFIX}${signature}`, []),
+        prompts,
         done,
         tasksPerRound: WRITING_CATEGORIES.length,
       }),
