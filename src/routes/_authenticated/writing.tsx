@@ -23,7 +23,6 @@ import {
   roundPrompts,
   WRITING_CATEGORIES,
   writingLevelConfig,
-  type WritingLevelConfig,
 } from "@/lib/writingLevels";
 
 export const Route = createFileRoute("/_authenticated/writing")({
