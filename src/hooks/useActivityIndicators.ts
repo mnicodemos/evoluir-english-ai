@@ -171,7 +171,7 @@ export function useActivityIndicators(): ActivityIndicators {
         ),
       }),
     });
-  }, [profile, round, vocabularyBatch, vocabularyError, vocabularyFetching, vocabularyLoading]);
+  }, [profile, round, roundStart, savedPractice, vocabularyBatch, vocabularyError, vocabularyFetching, vocabularyLoading]);
 
   return indicators;
 }
