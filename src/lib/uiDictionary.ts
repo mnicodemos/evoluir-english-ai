@@ -950,6 +950,8 @@ export const uiPt: Record<string, string> = {
   "Today's Progress": "Progresso de hoje",
   "Your English Skills": "Suas habilidades em inglês",
   "Keep improving": "Continue evoluindo",
+  "All reviews done for now": "Revisões em dia por enquanto",
+  "New reviews appear after your next lesson.": "Novas revisões aparecem após a próxima lição.",
   "Quick Access": "Acesso rápido",
   "TODAY'S PRIORITY": "PRIORIDADE DE HOJE",
   "lessons completed": "lições concluídas",
