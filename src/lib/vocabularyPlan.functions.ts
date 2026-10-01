@@ -101,6 +101,7 @@ export const dailyWords = createServerFn({ method: "POST" })
       .select(SELECT)
       .eq("created_by", userId)
       .eq("batch_key", batchKey)
+      .eq("level", data.level)
       .order("created_at");
 
     const todays = (existing.data ?? []) as DailyWord[];
