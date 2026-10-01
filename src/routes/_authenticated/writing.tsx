@@ -20,10 +20,9 @@ import { persistWritingLegacy } from "@/lib/legacyActivity.functions";
 import { refreshAfterActivity } from "@/lib/refreshKeys";
 import {
   expectedLengthLabel,
-  pickWritingTasks,
+  roundPrompts,
   WRITING_CATEGORIES,
   writingLevelConfig,
-  type WritingLevelConfig,
 } from "@/lib/writingLevels";
 
 export const Route = createFileRoute("/_authenticated/writing")({
@@ -77,24 +76,6 @@ function loadHistory(): string[] {
 function rememberAnswered(prompt: string) {
   const history = loadHistory();
   if (!history.includes(prompt)) writeList(HISTORY_KEY, [...history, prompt]);
-}
-
-/**
- * One task per theme (Everyday, Professional, Travel), taken from the pool of
- * the student's CEFR level. Already answered tasks are skipped while fresh ones
- * exist; when the whole level pool is used the history is cleared.
- */
-function roundPrompts(config: WritingLevelConfig, rotation: number, serverHistory: string[]): string[] {
-  // Same inputs on every device (server history before this round) → same tasks.
-  let history = serverHistory;
-  const levelExhausted = WRITING_CATEGORIES.every(({ id }) =>
-    config.tasks[id].every((task) => history.includes(task)),
-  );
-  if (levelExhausted) {
-    history = [];
-  }
-
-  return pickWritingTasks({ config, history, rotation });
 }
 
 function loadDone(signature: string): string[] {

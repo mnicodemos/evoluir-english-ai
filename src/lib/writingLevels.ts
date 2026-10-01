@@ -268,3 +268,17 @@ export function pickWritingTasks(options: {
     return usable[index]!;
   }).filter(Boolean);
 }
+
+/**
+ * The tasks of a Writing round: one per theme, skipping tasks answered before
+ * this round. Same inputs on every device → same tasks (Writing page and the
+ * Dashboard indicator share it).
+ */
+export function roundPrompts(config: WritingLevelConfig, rotation: number, serverHistory: string[]): string[] {
+  let history = serverHistory;
+  const levelExhausted = WRITING_CATEGORIES.every(({ id }) =>
+    config.tasks[id].every((task) => history.includes(task)),
+  );
+  if (levelExhausted) history = [];
+  return pickWritingTasks({ config, history, rotation });
+}
