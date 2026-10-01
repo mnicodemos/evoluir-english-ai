@@ -190,6 +190,13 @@
       "when": 1790337309517,
       "tag": "0026_ai_limits_global_max_concurrent",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1790852535956,
+      "tag": "0027_study_streak_daily_goal_rule",
+      "breakpoints": true
     }
   ]
 }

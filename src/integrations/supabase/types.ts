@@ -1485,6 +1485,7 @@ export type Database = {
           source_type: string
         }[]
       }
+      credit_study_day: { Args: { p_user_id: string }; Returns: undefined }
       has_active_entitlement: {
         Args: { _feature: string; _user_id: string }
         Returns: boolean
