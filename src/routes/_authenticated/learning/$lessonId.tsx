@@ -10,7 +10,7 @@ import {
   MessageSquareText,
   Video,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
@@ -28,12 +28,14 @@ import {
   useLesson,
   useUserFlashcards,
 } from "@/hooks/useLearning";
+import { useOpenPathLesson } from "@/hooks/useCurriculum";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { vocabularyGenerationFailureKey } from "@/lib/activityIndicators";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
+import { findCurriculumLesson } from "@/lib/curriculum";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
 import { formatVideoDuration, videoReviewPoints } from "@/lib/lessonVideoDisplay";
