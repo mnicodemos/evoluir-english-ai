@@ -308,7 +308,16 @@ async function writeLesson(
     .map((card) => ({ card, random: Math.random() }))
     .sort((a, b) => a.random - b.random)
     .map(({ card }) => card);
-  if (cards.length) {
+  // A repaired lesson keeps any flashcards that were already saved (no duplicates).
+  const existingCards = repairLessonId
+    ? (
+        await supabase
+          .from("flashcards")
+          .select("id", { count: "exact", head: true })
+          .eq("lesson_id", repairLessonId)
+      ).count ?? 0
+    : 0;
+  if (cards.length && !existingCards) {
     await supabase.from("flashcards").insert(
       cards.map((c, index) => ({
         lesson_id: lesson.id,

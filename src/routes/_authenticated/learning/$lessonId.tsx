@@ -10,7 +10,7 @@ import {
   MessageSquareText,
   Video,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
@@ -28,12 +28,14 @@ import {
   useLesson,
   useUserFlashcards,
 } from "@/hooks/useLearning";
+import { useOpenPathLesson } from "@/hooks/useCurriculum";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { vocabularyGenerationFailureKey } from "@/lib/activityIndicators";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
+import { findCurriculumLesson } from "@/lib/curriculum";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
 import { formatVideoDuration, videoReviewPoints } from "@/lib/lessonVideoDisplay";
@@ -88,6 +90,25 @@ function LessonPage() {
   const [activeTab, setActiveTab] = usePersistentState<string>(`lesson-tab:${lessonId}`, "video");
 
   const lesson = data?.lesson;
+
+  // A path lesson saved without its quiz (interrupted generation) is repaired on
+  // open, whatever link brought the student here. The server only writes the
+  // missing quiz/cards into the same lesson, never a second lesson.
+  const repairLesson = useOpenPathLesson();
+  const repairTried = useRef<string | null>(null);
+  const repairPlan = lesson?.curriculum_key ? findCurriculumLesson(lesson.curriculum_key) : null;
+  const needsQuizRepair =
+    !!data && !!repairPlan && !repairPlan.isReviewTest && data.quiz.length === 0;
+  useEffect(() => {
+    if (!needsQuizRepair || !repairPlan || repairTried.current === lessonId) return;
+    repairTried.current = lessonId;
+    repairLesson
+      .mutateAsync(repairPlan.key)
+      .then(() => queryClient.invalidateQueries({ queryKey: ["lesson", lessonId] }))
+      .catch(() => {
+        toast.error("We could not prepare this quiz. Please try again.");
+      });
+  }, [needsQuizRepair, repairPlan, lessonId, repairLesson, queryClient]);
   // Reinforcement copy comes from the lesson text that already exists.
   const reviewPoints = videoReviewPoints(lesson?.summary);
   const videoLength = formatVideoDuration(lesson?.video_duration_seconds);
@@ -395,12 +416,36 @@ function LessonPage() {
           </TabsContent>
 
           <TabsContent value="quiz" className="mt-5">
-            <LessonQuiz
-              questions={data.quiz}
-              userId={profile?.id}
-              lessonId={lessonId}
-              onFinished={finishLesson}
-            />
+            {needsQuizRepair ? (
+              <div className="card-soft space-y-3 p-6 text-sm text-muted-foreground">
+                <p>
+                  {repairLesson.isError
+                    ? t("We could not prepare this quiz. Please try again.")
+                    : t("Preparing this lesson's quiz… this can take about a minute.")}
+                </p>
+                {repairLesson.isError ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      repairTried.current = null;
+                      repairLesson.reset();
+                    }}
+                  >
+                    {t("Try again")}
+                  </Button>
+                ) : (
+                  <Skeleton className="h-24 w-full" />
+                )}
+              </div>
+            ) : (
+              <LessonQuiz
+                questions={data.quiz}
+                userId={profile?.id}
+                lessonId={lessonId}
+                onFinished={finishLesson}
+              />
+            )}
           </TabsContent>
         </Tabs>
 
