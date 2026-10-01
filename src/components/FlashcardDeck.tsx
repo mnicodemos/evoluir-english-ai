@@ -37,6 +37,7 @@ export function FlashcardDeck({
   });
   const [flipped, setFlipped] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasListened, setHasListened] = useState(false);
   const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null);
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
@@ -49,6 +50,7 @@ export function FlashcardDeck({
     setIsPlaying(true);
     try {
       await speakEnglish(text, { cache: "persistent" });
+      setHasListened(true);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("Could not play this audio."));
     } finally {
@@ -80,6 +82,7 @@ export function FlashcardDeck({
     }
     await new Promise((resolve) => window.setTimeout(resolve, 500));
     setFlipped(false);
+    setHasListened(false);
     setFeedback(null);
     if (index + 1 >= cards.length) {
       setSaved({ index, done: true });
@@ -93,6 +96,7 @@ export function FlashcardDeck({
     clearSaved();
     setSaved({ index: 0, done: false });
     setFlipped(false);
+    setHasListened(false);
     setFeedback(null);
   }
 
@@ -155,44 +159,46 @@ export function FlashcardDeck({
         ) : (
           <div
             className={cn(
-              "relative z-10 flex min-h-72 w-full max-w-md flex-col items-center justify-center gap-4 overflow-y-auto rounded-xl border-4 bg-white p-6 text-center text-black shadow-[var(--shadow-lift)] transition-colors sm:aspect-[4/3] sm:min-h-0",
+              "relative z-10 min-h-72 w-full max-w-md overflow-hidden rounded-xl border-4 bg-white text-center text-black shadow-[var(--shadow-lift)] transition-colors sm:aspect-[4/3] sm:min-h-0",
               feedback === "correct" && "border-success",
               feedback === "incorrect" && "border-destructive",
               !feedback && "border-black/15",
             )}
           >
-            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-1 text-[0.65rem] font-bold uppercase text-black">
+            <span className="pointer-events-none absolute left-4 top-4 z-20 inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-1 text-[0.65rem] font-bold uppercase text-black">
               {isListenCard ? <Headphones className="size-3" /> : <RotateCcw className="size-3" />}
               {isListenCard ? "Listen card" : "Question card"}
             </span>
 
-            <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl">{answerText}</p>
-            {card.example && card.example !== answerText && (
-              <p className="max-w-sm text-sm italic text-black/70">“{card.example}”</p>
-            )}
-            {card.pronunciation && (
-              <p className="text-xs text-black/60">{card.pronunciation}</p>
-            )}
-            {isListenCard && listenText && (
+            <div className="flex min-h-72 w-full flex-col items-center justify-center gap-4 overflow-y-auto px-6 pb-6 pt-14 sm:min-h-full">
+              <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl">{answerText}</p>
+              {card.example && card.example !== answerText && (
+                <p className="max-w-sm text-sm italic text-black/70">“{card.example}”</p>
+              )}
+              {card.pronunciation && (
+                <p className="text-xs text-black/60">{card.pronunciation}</p>
+              )}
+              {isListenCard && listenText && (
+                <Button
+                  size="sm"
+                  onClick={() => void speak(listenText)}
+                  disabled={isPlaying}
+                  aria-label="Listen to the answer"
+                  className="border-2 border-black/20 bg-white text-black hover:bg-black/5"
+                >
+                  <Volume2 className="size-4" /> Listen
+                </Button>
+              )}
               <Button
+                variant="ghost"
                 size="sm"
-                onClick={() => void speak(listenText)}
-                disabled={isPlaying}
-                aria-label="Listen to the answer"
-                className="border-2 border-black/20 bg-white text-black hover:bg-black/5"
+                onClick={() => setFlipped(false)}
+                disabled={feedback !== null}
+                className="text-black hover:bg-black/5 hover:text-black"
               >
-                <Volume2 className="size-4" /> Listen
+                See question
               </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setFlipped(false)}
-              disabled={feedback !== null}
-              className="text-black hover:bg-black/5 hover:text-black"
-            >
-              See question
-            </Button>
+            </div>
           </div>
         )}
       </div>
@@ -202,7 +208,7 @@ export function FlashcardDeck({
           <Button
             variant="default"
             onClick={() => answer(true)}
-            disabled={feedback !== null}
+            disabled={feedback !== null || (isListenCard && !hasListened)}
             className="flex items-center justify-center gap-2 rounded-lg bg-success px-3 py-3 text-sm font-semibold text-success-foreground transition-transform hover:scale-[1.02]"
           >
             <Check className="size-4" /> {lang === "pt" ? "Acerto" : "Correct"}
@@ -210,7 +216,7 @@ export function FlashcardDeck({
           <Button
             variant="destructive"
             onClick={() => answer(false)}
-            disabled={feedback !== null}
+            disabled={feedback !== null || (isListenCard && !hasListened)}
             className="flex items-center justify-center gap-2 rounded-lg bg-destructive px-3 py-3 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.02]"
           >
             <X className="size-4" /> {lang === "pt" ? "Erro" : "Incorrect"}
