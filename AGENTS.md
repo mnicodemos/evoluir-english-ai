@@ -18,3 +18,4 @@
 - Daily Reflection weather is a client-only visual enhancement using permitted geolocation and Open-Meteo; deterministic sun/moon remains the no-location fallback.
 - Public home and auth opt into Dashboard tokens through `brand-dashboard-theme`; this shares visual identity without changing shared authenticated screens.
 - AI Teacher, My History, and lesson openings share the complete horizontal EVO image with contain-fit; this preserves all artwork without cropping.
+- Path lessons are repaired on open from the lesson page (any entry link) and AI lesson replies are salvaged item by item; an interrupted or imperfect generation must never leave a lesson without its quiz.
