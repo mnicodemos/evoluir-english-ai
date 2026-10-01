@@ -102,7 +102,7 @@ export function MobileNavigationMenu({
       <SheetContent side="left" className="dashboard-shell dark flex w-[min(19rem,86vw)] flex-col border-sidebar-border bg-sidebar p-4 text-sidebar-foreground">
         <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
           <SheetTitle className="flex items-center gap-2 text-sidebar-foreground">
-            <Logo className="size-9 shrink-0" />
+            <Logo className="size-[2.8rem] shrink-0" />
             <BrandName className="text-base" />
           </SheetTitle>
         </SheetHeader>
@@ -216,7 +216,7 @@ function AppShellContent({
                 : "grid size-11 place-items-center",
             )}
           >
-            <Logo className={dashboardLayout ? "size-11 shrink-0" : "size-11"} />
+            <Logo className={dashboardLayout ? "size-[3.45rem] shrink-0" : "size-[3.45rem]"} />
             {dashboardLayout && (
               <span className="min-w-0 whitespace-nowrap leading-none">
                 <span className="block font-display text-lg font-semibold">
@@ -340,7 +340,7 @@ function AppShellContent({
           <div className="flex min-w-0 items-center gap-1">
             <MobileNavigationMenu translate={translate} />
             <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
-              <Logo className="size-[1.3rem] shrink-0" />
+              <Logo className="size-[1.6rem] shrink-0" />
               <BrandName className="truncate text-sm" />
             </Link>
           </div>

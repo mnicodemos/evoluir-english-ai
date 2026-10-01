@@ -198,7 +198,7 @@ function Onboarding() {
     <div className="flex min-h-screen flex-col bg-background">
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-5 py-10">
         <div className="flex items-center gap-2">
-          <Logo className="size-[1.8rem] shrink-0 self-center" />
+          <Logo className="size-[2.25rem] shrink-0 self-center" />
           <BrandName />
         </div>
 

@@ -69,7 +69,7 @@ function ResetPasswordPage() {
         <div className="w-full max-w-sm">
           <div className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
-              <Logo className="size-[1.2rem]" />
+              <Logo className="size-[1.5rem]" />
               <BrandName />
             </Link>
             <UiLangToggle />

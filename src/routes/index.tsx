@@ -139,7 +139,7 @@ function CommercialLanding() {
             aria-label="Evoluir+ English AI — início"
             className="flex min-w-0 items-center gap-2.5"
           >
-            <Logo className="size-8 shrink-0 lg:size-[2.66rem]" />
+            <Logo className="size-10 shrink-0 lg:size-[3.32rem]" />
             <BrandName className="truncate text-sm sm:text-base" />
           </Link>
           <Button asChild size="sm" className="shrink-0">
@@ -293,7 +293,7 @@ function CommercialLanding() {
                 {evoMessages.map((message, index) => (
                   <div key={message} className="card-soft p-3.5 text-card-foreground">
                     <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase text-success">
-                      <Logo className="size-3.5" /> EVO {String(index + 1).padStart(2, "0")}
+                      <Logo className="size-[1.1rem]" /> EVO {String(index + 1).padStart(2, "0")}
                     </div>
                     <p className="text-xs font-medium leading-relaxed text-card-foreground">
                       “{message}”
@@ -438,7 +438,7 @@ function CommercialLanding() {
         <section className="relative overflow-hidden py-12 sm:py-16">
           <div className="absolute inset-0 surface-hero opacity-50" aria-hidden="true" />
           <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
-            <Logo className="mx-auto size-12" />
+            <Logo className="mx-auto size-[3.75rem]" />
             <h2 className="mt-7 text-3xl font-bold leading-tight sm:text-5xl">
               Descubra qual é o seu próximo passo.
             </h2>
