@@ -322,10 +322,18 @@ function Vocabulary() {
 
     try {
       stopSpeaking();
-      usingBrowserSpeech.current = startBrowserRecognition();
-      // Mobile Chrome cannot reliably share the microphone between its native
-      // recognizer and the WAV recorder. Use exactly one capture path.
-      if (!usingBrowserSpeech.current) await startVoiceRecording();
+      // The full recording (the same path the Listening Lab uses) is the main
+      // capture: built-in browser recognizers on Android Chrome and Samsung
+      // Internet often return nothing for a single short word. Browsers that
+      // cannot record fall back to their own recognizer. Exactly one capture
+      // path is used, because mobile browsers cannot share the microphone.
+      usingBrowserSpeech.current = false;
+      try {
+        await startVoiceRecording();
+      } catch (recordError) {
+        usingBrowserSpeech.current = startBrowserRecognition();
+        if (!usingBrowserSpeech.current) throw recordError;
+      }
       minutesSpent.start();
       setRecordingId(word.id);
     } catch (error) {
