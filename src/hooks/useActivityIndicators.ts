@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 
 import { useLessonRound } from "@/hooks/useLessonRound";
+import { useRoundStart, useSavedPractice } from "@/hooks/usePracticeSync";
 import { useProfile } from "@/hooks/useProfile";
 import { fetchUserVocabularyMastery } from "@/hooks/useUserVocabularyMastery";
 import { supabase } from "@/integrations/supabase/client";
@@ -134,11 +135,22 @@ export function useActivityIndicators(): ActivityIndicators {
       });
   }, [profile, round, vocabularyBatch, vocabularyFetching, vocabularyError, generateVocabulary, queryClient, retryTick]);
 
+  const roundStart = useRoundStart();
+  const { data: savedPractice } = useSavedPractice();
+
   useEffect(() => {
     if (!profile) return;
     const completion = readJson<Record<string, number>>(LISTENING_COMPLETION_KEY, {});
     const config = writingLevelConfig(profile.level);
     const signature = `${todayKey()}-${config.level}-${round}`;
+
+    // Same round boundary the Writing page uses, so tasks corrected on any
+    // device of this account turn the dot off everywhere.
+    const cutoff = [`${todayKey()}T00:00:00.000Z`, roundStart ?? ""].sort().at(-1)!;
+    const serverDone = (savedPractice?.writing ?? [])
+      .filter((w) => w.at >= cutoff)
+      .map((w) => w.prompt);
+    const done = [...new Set([...readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []), ...serverDone])];
 
     setIndicators({
       listening: listeningHasNewActivity({
@@ -147,7 +159,7 @@ export function useActivityIndicators(): ActivityIndicators {
       }),
       writing: writingHasNewActivity({
         prompts: readJson<string[]>(`${WRITING_HISTORY_ROUND_PREFIX}${signature}`, []),
-        done: readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []),
+        done,
         tasksPerRound: WRITING_CATEGORIES.length,
       }),
       vocabulary: vocabularyIndicatorVisible({
