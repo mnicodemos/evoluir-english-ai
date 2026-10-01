@@ -139,7 +139,7 @@ function CommercialLanding() {
             aria-label="Evoluir+ English AI — início"
             className="flex min-w-0 items-center gap-2.5"
           >
-            <Logo className="size-8 shrink-0" />
+            <Logo className="size-8 shrink-0 lg:size-[2.66rem]" />
             <BrandName className="truncate text-sm sm:text-base" />
           </Link>
           <Button asChild size="sm" className="shrink-0">

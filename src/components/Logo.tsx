@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/evoluir-logo-official.png.asset.json";
+import logoAsset from "@/assets/evoluir-logo-new.png.asset.json";
 
 export function Logo({
   className = "size-7",
@@ -9,12 +9,12 @@ export function Logo({
 }) {
   return (
     <span
-      className={`inline-flex items-center justify-center overflow-hidden rounded-full bg-white ${className}`}
+      className={`inline-flex items-center justify-center overflow-hidden rounded-xl bg-white ${className}`}
     >
       <img
         src={logoAsset.url}
         alt="Evoluir+ English AI logo"
-        className={`block h-full w-full shrink-0 self-center object-contain p-0.5 ${invert ? "invert" : ""}`}
+        className={`block h-full w-full shrink-0 self-center object-contain ${invert ? "invert" : ""}`}
       />
     </span>
   );
