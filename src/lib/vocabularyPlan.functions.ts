@@ -33,38 +33,36 @@ type AiWord = {
   difficulty?: string;
 };
 
-const aiWordsSchema = z
-  .object({
-    words: z
-      .array(
-        z
-          .object({
-            word: z.string().trim().min(1).max(120),
-            translation: z.string().trim().min(1).max(200),
-            meaning: z.string().trim().min(1).max(400),
-            pronunciation: z.string().max(120),
-            example: z.string().trim().min(1).max(400),
-            lesson_title: z.string().max(240),
-            difficulty: z.enum(["easy", "medium", "hard"]),
-          })
-          .strict(),
-      )
-      .min(1)
-      .max(20),
-  })
-  .strict();
+const aiWordSchema = z.object({
+  word: z.string().trim().min(1).max(120),
+  translation: z.string().trim().min(1).max(200),
+  meaning: z.string().trim().min(1).max(400),
+  pronunciation: z.string().max(120).catch(""),
+  example: z.string().trim().min(1).max(400),
+  lesson_title: z.string().max(240).catch(""),
+  difficulty: z.enum(["easy", "medium", "hard"]).catch("medium"),
+});
 
-function parseWords(raw: string) {
+/**
+ * Keeps every well-formed word and drops only the broken ones, so one bad item
+ * (extra field, odd difficulty) never throws away the whole batch.
+ */
+export function parseWords(raw: string): { success: true; data: { words: AiWord[] } } | { success: false } {
   try {
     const value = JSON.parse(
       raw
         .replace(/^```(?:json)?/i, "")
         .replace(/```$/, "")
         .trim(),
-    ) as unknown;
-    return aiWordsSchema.safeParse(value);
+    ) as { words?: unknown };
+    const items = Array.isArray(value?.words) ? value.words.slice(0, 20) : [];
+    const words = items.flatMap((item) => {
+      const parsed = aiWordSchema.safeParse(item);
+      return parsed.success ? [parsed.data] : [];
+    });
+    return words.length ? { success: true, data: { words } } : { success: false };
   } catch {
-    return aiWordsSchema.safeParse(null);
+    return { success: false };
   }
 }
 
