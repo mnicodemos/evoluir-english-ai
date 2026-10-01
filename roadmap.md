@@ -146,3 +146,4 @@
 - [x] Dashboard mobile — alinhar a EVO ao topo do bloco e reduzir os ícones em 13%
 - [x] Mobile — substituir a barra inferior por menu suspenso antes da saudação e eliminar espaço acima da EVO
 - [x] EVO — trocar a imagem no AI Teacher, My History e aulas, preservando a arte completa entre as bordas superior e inferior
+- [ ] Flashcards com áudio — manter “LISTEN CARD” visível e liberar Correct/Incorrect somente após ouvir o áudio
