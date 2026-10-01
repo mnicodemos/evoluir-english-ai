@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
 import { useLessonRound } from "@/hooks/useLessonRound";
+import { useRoundStart, useSavedPractice } from "@/hooks/usePracticeSync";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { findLevel } from "@/lib/level";
@@ -184,10 +185,16 @@ function ListeningPage() {
   );
 
   const sentence = sentences[index] ?? "";
-  const isDone = completed[track.id] === lessonCount;
+  // Finished on any device of this account during the current round.
+  const roundStart = useRoundStart();
+  const { data: saved } = useSavedPractice();
+  const doneOnServer =
+    roundStart !== undefined && (saved?.listening ?? []).some((at) => !roundStart || at > roundStart);
+  const redoneHere = completed[track.id] === -1 - lessonCount;
+  const isDone = (completed[track.id] === lessonCount || doneOnServer) && !redoneHere;
   const trackProgress = progress[track.id];
   const trackRound = trackProgress?.round ?? -1;
-  const trackDone = isDone && trackRound === lessonCount;
+  const trackDone = isDone && (trackRound === lessonCount || doneOnServer);
   // The student advances when reaching 70% or after using all 3 attempts (best score is kept).
   const passed = checked !== null && (checked >= 70 || attempts >= 3);
   const finished = index >= sentences.length - 1 && passed;
@@ -206,7 +213,8 @@ function ListeningPage() {
   /** Lets the student redo the current round to try to improve the score. */
   function redoActivity() {
     const completion = readCompletion();
-    delete completion[track.id];
+    // Remembered as "redoing this round" so the server's record does not hide it again.
+    completion[track.id] = -1 - lessonCount;
     setCompleted(completion);
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(completion));
