@@ -15,6 +15,20 @@ type SubmittedDetail = {
   is_correct: boolean;
 };
 
+/** Same order every render for a question (seeded by its id), so the right answer's
+ * position varies between questions even when the AI always lists it first. */
+function stableShuffle<T>(items: T[], seed: string): T[] {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
+    const j = h % (i + 1);
+    [out[i], out[j]] = [out[j]!, out[i]!];
+  }
+  return out;
+}
+
 /** Multiple-choice / fill-in quiz with instant score, explanations and review advice. */
 export function LessonQuiz({
   questions,
@@ -155,7 +169,7 @@ export function LessonQuiz({
             </p>
             <p className="mt-1 font-medium">{q.question}</p>
             <div className="mt-3 grid gap-2">
-              {q.options.map((opt) => {
+              {stableShuffle(q.options, q.id).map((opt) => {
                 const selected = chosen === opt;
                 let style = "border-border hover:bg-secondary";
                 let textColor = "";
