@@ -147,3 +147,4 @@
 - [x] Mobile — substituir a barra inferior por menu suspenso antes da saudação e eliminar espaço acima da EVO
 - [x] EVO — trocar a imagem no AI Teacher, My History e aulas, preservando a arte completa entre as bordas superior e inferior
 - [x] Flashcards com áudio — manter “LISTEN CARD” visível e liberar Correct/Incorrect somente após ouvir o áudio
+- [x] Aplicar o novo logo como ícone responsivo do navegador e do app instalado
