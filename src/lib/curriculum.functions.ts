@@ -114,7 +114,8 @@ async function insertQuizQuestions(
     pedagogical_skill: resolveQuizEvidenceSkill(q.pedagogical_skill, structuralDefault),
   }));
 
-  await supabase.from("quizzes").insert(rows);
+  const { error: quizError } = await supabase.from("quizzes").insert(rows);
+  if (quizError) throw new Error(quizError.message);
 
   const unmapped = rows.filter((row) => row.pedagogical_skill === null).length;
   if (unmapped === 0) return;
@@ -374,7 +375,17 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
       .eq("created_by", userId)
       .eq("curriculum_key", plan.key)
       .maybeSingle();
-    if (existing?.id) return { lessonId: existing.id as string };
+    if (existing?.id) {
+      // A lesson saved without its quiz (interrupted generation) is repaired once.
+      if (!plan.isReviewTest) {
+        const { count } = await supabase
+          .from("quizzes")
+          .select("id", { count: "exact", head: true })
+          .eq("lesson_id", existing.id);
+        if (!count) await writeLesson(supabase, userId, plan, existing.id as string);
+      }
+      return { lessonId: existing.id as string };
+    }
 
     if (plan.index > 0) {
       const previous = getCurriculum(plan.level)[plan.index - 1]!;
