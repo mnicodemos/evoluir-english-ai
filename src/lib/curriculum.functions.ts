@@ -191,6 +191,8 @@ async function writeLesson(
   supabase: SupabaseClient<Database>,
   userId: string,
   plan: CurriculumLesson,
+  /** Lesson saved earlier whose cards/quiz never arrived: only fill those in. */
+  repairLessonId?: string,
 ): Promise<string> {
   const descriptor = CEFR[plan.level] ?? CEFR["b1"]!;
   const reviewScope = plan.reviewUnits.length
@@ -254,32 +256,43 @@ async function writeLesson(
   }
   const content = parsedContent.data;
 
-  const video = await pickVideo(supabase, plan);
+  if (!plan.isReviewTest) {
+    const usable = (content.quiz ?? []).filter(
+      (q) => q.question && Array.isArray(q.options) && q.options.length > 1 && q.correct_answer,
+    );
+    if (!usable.length) throw new Error("The AI could not write this lesson. Please try again.");
+  }
 
-  const { data: lesson, error } = await supabase
-    .from("lessons")
-    .insert({
-      title: plan.title,
-      category: plan.category,
-      level: plan.level,
-      objective: plan.objective,
-      summary: content.summary,
-      transcript: content.transcript,
-      transcript_pt: content.transcript_pt ?? "",
-      video_url: video.url,
-      video_duration_seconds: video.seconds,
-      sort_order: plan.index,
-      curriculum_key: plan.key,
-      unit_number: plan.unit,
-      position_in_unit: plan.position,
-      skill: plan.skill,
-      created_by: userId,
-      generated: true,
-    })
-    .select("id")
-    .single();
-
-  if (error || !lesson) throw new Error(error?.message ?? "Could not save this lesson.");
+  let lesson: { id: string } | null = repairLessonId ? { id: repairLessonId } : null;
+  if (!lesson) {
+    const video = await pickVideo(supabase, plan);
+    const inserted = await supabase
+      .from("lessons")
+      .insert({
+        title: plan.title,
+        category: plan.category,
+        level: plan.level,
+        objective: plan.objective,
+        summary: content.summary,
+        transcript: content.transcript,
+        transcript_pt: content.transcript_pt ?? "",
+        video_url: video.url,
+        video_duration_seconds: video.seconds,
+        sort_order: plan.index,
+        curriculum_key: plan.key,
+        unit_number: plan.unit,
+        position_in_unit: plan.position,
+        skill: plan.skill,
+        created_by: userId,
+        generated: true,
+      })
+      .select("id")
+      .single();
+    if (inserted.error || !inserted.data) {
+      throw new Error(inserted.error?.message ?? "Could not save this lesson.");
+    }
+    lesson = { id: inserted.data.id as string };
+  }
 
   const generatedCards = (content.flashcards ?? []).filter(
     (c) => c.word && (c.answer || c.definition || c.example),
