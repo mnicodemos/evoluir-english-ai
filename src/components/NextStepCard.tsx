@@ -190,7 +190,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 EVO · {t("Your AI Learning Coach")}
               </p>
             </div>
-            <div className="mt-1 grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-center gap-3 sm:mt-2 sm:block">
+            <div className="mt-2 grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-center gap-3 sm:mt-2 sm:block">
               <div className="min-w-0">
                 <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:whitespace-normal sm:text-sm sm:leading-normal">
                   {t("TODAY'S PRIORITY")}
