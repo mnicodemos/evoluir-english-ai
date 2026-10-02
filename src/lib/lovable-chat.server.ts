@@ -114,7 +114,7 @@ export async function callLovableTalking(
     console.error(`Lovable AI talking failed [${res.status}]: ${raw.slice(0, 300)}`);
     throw new LovableChatError(
       res.status,
-      "AI Talking could not answer right now. Please try again.",
+      "AI Speaking could not answer right now. Please try again.",
     );
   }
   const reader = res.body.getReader();
@@ -125,7 +125,7 @@ export async function callLovableTalking(
     const parsed = parseLovableEvent(event);
     text += parsed.delta;
     if (parsed.usage) onUsage?.(parsed.usage);
-    if (parsed.error) throw new LovableChatError(502, "AI Talking could not answer right now.");
+    if (parsed.error) throw new LovableChatError(502, "AI Speaking could not answer right now.");
   };
   while (true) {
     const { value, done } = await reader.read();
@@ -137,6 +137,6 @@ export async function callLovableTalking(
   }
   if (pending.trim()) handle(pending);
   const trimmed = text.trim();
-  if (!trimmed) throw new LovableChatError(502, "AI Talking returned an empty reply.");
+  if (!trimmed) throw new LovableChatError(502, "AI Speaking returned an empty reply.");
   return trimmed;
 }

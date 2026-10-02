@@ -181,7 +181,7 @@ function StudyPlanPage() {
             onChange={(v) => setDaysPerWeek(Number(v))}
           />
           <Choice
-            label="Focus area"
+            label="Priority"
             options={STUDY_PLAN_FOCUS_AREAS.map((f) => ({ value: f.value, label: f.label }))}
             value={focus}
             onChange={(v) => setFocus(v as StudyFocus)}

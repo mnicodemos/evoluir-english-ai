@@ -98,7 +98,7 @@ export async function startVoiceRecording(): Promise<void> {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch {
-    throw new Error("Microphone access is needed to talk with AI Talking.");
+    throw new Error("Microphone access is needed to talk with AI Speaking.");
   }
 
   const context = new AudioContext();

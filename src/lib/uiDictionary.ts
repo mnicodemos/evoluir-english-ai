@@ -410,7 +410,6 @@ export const uiPt: Record<string, string> = {
   "Overall average": "Média geral",
   Overall: "Geral",
   Talking: "Fala",
-  Speaking: "Fala",
   Priority: "Prioridade",
   Grammar: "Gramática",
   Fluency: "Fluência",
@@ -662,7 +661,7 @@ export const uiPt: Record<string, string> = {
   "Source: context.reverso.net": "Fonte: context.reverso.net",
   ".": ".",
 
-  // AI Talking
+  // AI Speaking
   "Voice conversation · the AI chooses today's subject":
     "Conversa por voz · a IA escolhe o assunto de hoje",
   "Practice English conversation with instant feedback.":
@@ -680,11 +679,11 @@ export const uiPt: Record<string, string> = {
   "Speak at least 3 answers to unlock your report":
     "Fale pelo menos 3 respostas para liberar seu relatório",
   "Lesson:": "Lição:",
-  "Talking report": "Relatório da conversa",
+  "Speaking report": "Relatório da conversa",
   "Answer at least three times before finishing the session.":
     "Responda pelo menos três vezes antes de encerrar a sessão.",
   "Ready — get your personalized feedback.": "Pronto — receba seu feedback personalizado.",
-  "AI Talking could not hear or answer you.": "O AI Talking não conseguiu ouvir ou responder.",
+  "AI Speaking could not hear or answer you.": "O AI Speaking não conseguiu ouvir ou responder.",
   "I couldn't hear that clearly. Please try again.":
     "Não consegui ouvir com clareza. Tente novamente.",
   "The microphone could not start.": "Não foi possível iniciar o microfone.",
@@ -696,7 +695,7 @@ export const uiPt: Record<string, string> = {
     "Não foi possível montar seu relatório. Tente novamente.",
   "Use what you just learned in a real conversation":
     "Use o que você acabou de aprender em uma conversa real",
-  "Practice with AI Talking": "Praticar com o AI Talking",
+  "Practice with AI Speaking": "Praticar com o AI Speaking",
   "Speak and get a scored report": "Fale e receba um relatório com nota",
 
   // Subscription portal (Phase 7)
@@ -772,8 +771,8 @@ export const uiPt: Record<string, string> = {
     "Dez palavras novas por dia, escolhidas a partir das lições da sua trilha, com significado, exemplos e um microfone para testar sua pronúncia.",
   "One task for Everyday, Professional and Travel English. New tasks every day — nothing repeats.":
     "Uma tarefa de Everyday, Professional e Travel English. Novas tarefas todos os dias — nada se repete.",
-  "Each lesson gives you a short video, a summary, the key vocabulary in flashcards, a quiz and a guided practice with AI Talking.":
-    "Cada lição traz um vídeo curto, um resumo, o vocabulário-chave em flashcards, um quiz e uma prática guiada com o AI Talking.",
+  "Each lesson gives you a short video, a summary, the key vocabulary in flashcards, a quiz and a guided practice with AI Speaking.":
+    "Cada lição traz um vídeo curto, um resumo, o vocabulário-chave em flashcards, um quiz e uma prática guiada com o AI Speaking.",
   "come back tomorrow,": "voltam amanhã,",
   "in a few days and": "em alguns dias e",
   "much later.": "bem mais tarde.",
@@ -810,9 +809,9 @@ export const uiPt: Record<string, string> = {
   "Basic progress": "Evolução básica",
   "Priority support": "Suporte prioritário",
   "Unlimited writing corrections": "Correções de escrita ilimitadas",
-  "Unlimited AI Talking sessions, every day": "Sessões ilimitadas de AI Talking, todos os dias",
-  "Unlimited AI Talking, pronunciation and audio lessons.":
-    "AI Talking, pronúncia e aulas em áudio ilimitados.",
+  "Unlimited AI Speaking sessions, every day": "Sessões ilimitadas de AI Speaking, todos os dias",
+  "Unlimited AI Speaking, pronunciation and audio lessons.":
+    "AI Speaking, pronúncia e aulas em áudio ilimitados.",
   "Personalised study plan for your goal": "Plano de estudos personalizado para o seu objetivo",
   "Advanced weekly progress reports": "Relatórios semanais avançados de evolução",
   "Secure payment is being finalised. You will be able to pay by card or Pix.":
@@ -894,10 +893,10 @@ export const uiPt: Record<string, string> = {
   "Meetings, emails, career": "Reuniões, e-mails, carreira",
   "Airport, hotel, restaurant": "Aeroporto, hotel, restaurante",
 
-  // AI Talking extras
+  // AI Speaking extras
   "Starting a new conversation… the AI is choosing today's subject.":
     "Começando uma nova conversa… a IA está escolhendo o assunto de hoje.",
-  "We could not score this session, so your Talking progress was not changed.":
+  "We could not score this session, so your Speaking progress was not changed.":
     "Não conseguimos pontuar esta sessão, então sua evolução de fala não mudou.",
   "Practice everyday, professional and travel English with your AI teacher.":
     "Pratique inglês do dia a dia, profissional e de viagem com seu professor de IA.",
@@ -938,8 +937,8 @@ export const uiPt: Record<string, string> = {
   "Meetings, emails and presentations": "Reuniões, e-mails e apresentações",
   "Airports, hotels and restaurants": "Aeroportos, hotéis e restaurantes",
   "TOEFL, IELTS and similar": "TOEFL, IELTS e similares",
-  "Tell AI Talking your level, goal and daily study time.":
-    "Informe ao AI Talking seu nível, objetivo e tempo diário de estudo.",
+  "Tell AI Speaking your level, goal and daily study time.":
+    "Informe ao AI Speaking seu nível, objetivo e tempo diário de estudo.",
 
   // Daily goal / level / progress
   minutes: "minutos",
