@@ -195,7 +195,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </div>
 
           <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
-            <div className="flex items-stretch justify-between gap-3 sm:block">
+            <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-bold uppercase text-brand-green">
                   EVO · {t("Your AI Learning Coach")}
@@ -212,8 +212,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {mainAvailable && (
                 <Button
                   asChild
-                  className="h-auto min-h-[3.25rem] w-[42%] shrink-0 self-stretch rounded-xl bg-brand-green px-2 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden"
+                  className="h-[2.875rem] w-[42%] shrink-0 self-center rounded-xl bg-brand-green px-2 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden"
                 >
+
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>
                       {t("Practice now")}
