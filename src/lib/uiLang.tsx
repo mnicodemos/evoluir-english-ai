@@ -38,6 +38,10 @@ export function UiLangProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
+  }, [lang]);
+
+  useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
 

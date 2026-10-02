@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Evoluir+ English AI" },
       { name: "theme-color", content: "#000000" },
@@ -117,7 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
         <script
