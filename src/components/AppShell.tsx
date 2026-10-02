@@ -35,7 +35,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
-import { UiLangToggle, useUiLang } from "@/lib/uiLang";
+import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
 
