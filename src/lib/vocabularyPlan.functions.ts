@@ -1,5 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+
+import type { Database } from "@/integrations/supabase/types";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -82,6 +85,16 @@ export const dailyWords = createServerFn({ method: "POST" })
       .parse(input ?? {}),
   )
   .handler(async ({ data, context }): Promise<DailyWord[]> => {
+    // The batch must be saved even if the student leaves the lesson screen
+    // while the words are being written.
+    const { keepAlive } = await import("./keepAlive.server");
+    return keepAlive(buildDailyWords(data, context));
+  });
+
+async function buildDailyWords(
+  data: { level: string; generate: boolean },
+  context: { supabase: SupabaseClient<Database>; userId: string },
+): Promise<DailyWord[]> {
     const { supabase, userId } = context;
     const today = studyToday();
 
@@ -236,4 +249,4 @@ export const dailyWords = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
     return [...todays, ...((inserted ?? []) as DailyWord[])].slice(0, DAILY_COUNT);
-  });
+}
