@@ -22,7 +22,33 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Require test credentials (no silent skips)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || '' }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY || '' }}
+          E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL || '' }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD || '' }}
+          SECURITY_USER_B_EMAIL: ${{ secrets.SECURITY_USER_B_EMAIL || '' }}
+          SECURITY_USER_B_PASSWORD: ${{ secrets.SECURITY_USER_B_PASSWORD || '' }}
+        run: |
+          missing=""
+          for v in SUPABASE_URL SUPABASE_PUBLISHABLE_KEY E2E_USER_EMAIL E2E_USER_PASSWORD SECURITY_USER_B_EMAIL SECURITY_USER_B_PASSWORD; do
+            [ -n "${!v}" ] || missing="$missing $v"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing CI secrets/variables:$missing (cross-user and authenticated E2E would be skipped)"
+            exit 1
+          fi
+          echo "All test credentials present."
+
       - uses: oven-sh/setup-bun@v2
+
+      - name: Dependency audit (js-yaml effective version)
+        run: |
+          bun install --frozen-lockfile
+          bun pm ls --all 2>/dev/null | grep -i "js-yaml" || true
+          bun audit
+
 
       - name: Install dependencies (frozen lockfile)
         run: bun install --frozen-lockfile
