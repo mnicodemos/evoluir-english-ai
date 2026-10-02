@@ -170,10 +170,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           >
             <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
               <img
-                src={evoDashboardMobile.url}
+                src={evoDashboardMobileFlush.url}
                 alt=""
                 width={1600}
-                height={768}
+                height={425}
                 className="absolute inset-0 block h-full w-full scale-[1.02] object-cover object-center sm:hidden"
               />
               <img
