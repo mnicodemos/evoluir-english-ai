@@ -158,7 +158,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-b-lg rounded-t-none border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] sm:rounded-lg sm:border-t sm:border-border sm:bg-evo-block"
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] sm:border-t sm:border-border sm:bg-evo-block"
         aria-label={t("Your next step")}
       >
         <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">

@@ -156,4 +156,3 @@
 - [x] Dashboard mobile — bloco da EVO cresce com o espaço livre (flex-1 + imagem absoluta)
 - [x] Mobile — reduzir a altura do menu inferior em 5% (4.5rem → 4.275rem em nav, padding e cálculo do dashboard)
 - [x] Mobile — rótulo "Prioridade de hoje" centralizado verticalmente entre os textos de cima e de baixo (mt-1 → mt-2)
-- [x] Dashboard mobile — imagem da EVO colada na borda superior (EVO primeiro no mobile, saudação/frase abaixo, padding superior do main zerado)
