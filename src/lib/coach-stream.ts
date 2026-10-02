@@ -60,7 +60,7 @@ export async function streamCoachReply(
 
     if (!response.ok || !response.body) {
       const body = (await response.json().catch(() => null)) as { message?: string } | null;
-      throw new Error(body?.message ?? `AI Talking failed (${response.status}).`);
+      throw new Error(body?.message ?? `AI Speaking failed (${response.status}).`);
     }
 
     let buffer = "";
@@ -80,7 +80,7 @@ export async function streamCoachReply(
             onDelta(payload.delta);
           }
           if (payload.type === "coach.text.error")
-            streamError = payload.message ?? "AI Talking could not answer.";
+            streamError = payload.message ?? "AI Speaking could not answer.";
         } catch {
           // Ignore provider keep-alives and metadata-only events.
         }
@@ -99,7 +99,7 @@ export async function streamCoachReply(
     }
     if (buffer.trim()) consume(buffer);
     if (streamError) throw new Error(streamError);
-    if (!text.trim()) throw new Error("AI Talking returned an empty reply.");
+    if (!text.trim()) throw new Error("AI Speaking returned an empty reply.");
     return text.trim();
   } catch (error) {
     if (timedOut) throw new Error(COACH_TIMEOUT_MESSAGE);

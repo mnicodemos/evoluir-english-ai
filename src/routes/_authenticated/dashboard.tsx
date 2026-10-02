@@ -77,7 +77,7 @@ function Dashboard() {
     },
     {
       to: "/coach",
-      label: "AI Talking",
+      label: "AI Speaking",
       icon: MessageSquareText,
       mobileOrder: "order-3 lg:order-3",
     },

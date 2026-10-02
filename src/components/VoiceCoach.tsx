@@ -377,7 +377,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
           : current,
       );
       toast.error(
-        error instanceof Error ? error.message : "AI Talking could not hear or answer you.",
+        error instanceof Error ? error.message : "AI Speaking could not hear or answer you.",
       );
     }
   }
@@ -403,7 +403,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       setReport(result);
       const scored = result.fluency > 0 || result.grammar > 0 || result.vocabulary > 0;
       if (!scored)
-        toast.error("We could not score this session, so your Talking progress was not changed.");
+        toast.error("We could not score this session, so your Speaking progress was not changed.");
       await refreshAfterActivity(queryClient);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not generate your report.");
@@ -415,7 +415,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   if (!scenario) {
     return (
       <>
-        <h1 className="text-3xl font-bold">AI Talking</h1>
+        <h1 className="text-3xl font-bold">AI Speaking</h1>
         <p className="mt-2 text-muted-foreground">
           Starting a new conversation… the AI is choosing today's subject.
         </p>
@@ -444,7 +444,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
           : voiceState === "thinking"
             ? "Preparing a reply…"
             : voiceState === "speaking"
-              ? "AI Talking is speaking…"
+              ? "AI Speaking is speaking…"
               : "Tap the microphone and speak in English";
 
   const newTopic = () => {
@@ -457,7 +457,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     <div className="space-y-5">
       <div>
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold">AI Talking</h1>
+          <h1 className="text-2xl font-bold">AI Speaking</h1>
           <p className="max-w-full text-sm leading-snug text-muted-foreground">
             Voice conversation · the AI chooses today's subject
           </p>
@@ -587,7 +587,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
 
       {report && (
         <section className="card-soft animate-rise p-6">
-          <h2 className="text-lg font-semibold">Talking report</h2>
+          <h2 className="text-lg font-semibold">Speaking report</h2>
           <div className="mt-5 grid gap-5 sm:grid-cols-3">
             {[
               { label: "Fluency", value: report.fluency },

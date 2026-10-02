@@ -64,7 +64,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           return Response.json(
             {
               message:
-                error instanceof Error ? error.message : "AI Talking is temporarily unavailable.",
+                error instanceof Error ? error.message : "AI Speaking is temporarily unavailable.",
             },
             { status, headers },
           );
@@ -116,14 +116,14 @@ export const Route = createFileRoute("/api/coach-stream")({
             error instanceof Error ? error.message : "Network failure",
           );
           return Response.json(
-            { message: timedOut ? TIMEOUT_MESSAGE : "AI Talking could not answer right now." },
+            { message: timedOut ? TIMEOUT_MESSAGE : "AI Speaking could not answer right now." },
             { status: timedOut ? 504 : 503 },
           );
         }
         if (!upstream) {
           await settle(false, "not_configured", "LOVABLE_API_KEY missing");
           return Response.json(
-            { message: "AI Talking is temporarily unavailable." },
+            { message: "AI Speaking is temporarily unavailable." },
             { status: 500 },
           );
         }
@@ -133,7 +133,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           const message =
             upstream.status === 402
               ? "AI credits are exhausted. Please try again later."
-              : "AI Talking could not answer right now. Please try again.";
+              : "AI Speaking could not answer right now. Please try again.";
           const headers = new Headers();
           if (upstream.status === 429)
             headers.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
@@ -161,7 +161,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           if (parsedEvent.error)
             send(controller, {
               type: "coach.text.error",
-              message: "AI Talking could not finish the reply.",
+              message: "AI Speaking could not finish the reply.",
             });
         };
 
@@ -183,12 +183,12 @@ export const Route = createFileRoute("/api/coach-stream")({
                 controller,
                 emittedText
                   ? { type: "coach.text.done" }
-                  : { type: "coach.text.error", message: "AI Talking returned an empty reply." },
+                  : { type: "coach.text.error", message: "AI Speaking returned an empty reply." },
               );
               await settle(
                 emittedText,
                 emittedText ? undefined : "empty_response",
-                emittedText ? undefined : "AI Talking returned an empty reply.",
+                emittedText ? undefined : "AI Speaking returned an empty reply.",
               );
               controller.close();
             } catch (error) {
@@ -204,7 +204,7 @@ export const Route = createFileRoute("/api/coach-stream")({
               try {
                 send(controller, {
                   type: "coach.text.error",
-                  message: timedOut ? TIMEOUT_MESSAGE : "AI Talking could not finish the reply.",
+                  message: timedOut ? TIMEOUT_MESSAGE : "AI Speaking could not finish the reply.",
                 });
                 controller.close();
               } catch {

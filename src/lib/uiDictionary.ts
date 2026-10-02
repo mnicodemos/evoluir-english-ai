@@ -367,7 +367,7 @@ export const uiPt: Record<string, string> = {
   "No assessed history yet. Complete an activity to start your evolution chart.":
     "Ainda não há histórico avaliado. Conclua uma atividade para iniciar seu gráfico de evolução.",
 
-  "AI Talking": "AI Talking",
+  "AI Speaking": "AI Speaking",
   Writing: "Escrita",
   Vocabulary: "Vocabulário",
   Progress: "Evolução",
@@ -410,6 +410,7 @@ export const uiPt: Record<string, string> = {
   "Overall average": "Média geral",
   Overall: "Geral",
   Talking: "Fala",
+  Priority: "Prioridade",
   Grammar: "Gramática",
   Fluency: "Fluência",
   Clarity: "Clareza",
@@ -660,7 +661,7 @@ export const uiPt: Record<string, string> = {
   "Source: context.reverso.net": "Fonte: context.reverso.net",
   ".": ".",
 
-  // AI Talking
+  // AI Speaking
   "Voice conversation · the AI chooses today's subject":
     "Conversa por voz · a IA escolhe o assunto de hoje",
   "Practice English conversation with instant feedback.":
@@ -678,11 +679,11 @@ export const uiPt: Record<string, string> = {
   "Speak at least 3 answers to unlock your report":
     "Fale pelo menos 3 respostas para liberar seu relatório",
   "Lesson:": "Lição:",
-  "Talking report": "Relatório da conversa",
+  "Speaking report": "Relatório da conversa",
   "Answer at least three times before finishing the session.":
     "Responda pelo menos três vezes antes de encerrar a sessão.",
   "Ready — get your personalized feedback.": "Pronto — receba seu feedback personalizado.",
-  "AI Talking could not hear or answer you.": "O AI Talking não conseguiu ouvir ou responder.",
+  "AI Speaking could not hear or answer you.": "O AI Speaking não conseguiu ouvir ou responder.",
   "I couldn't hear that clearly. Please try again.":
     "Não consegui ouvir com clareza. Tente novamente.",
   "The microphone could not start.": "Não foi possível iniciar o microfone.",
@@ -892,10 +893,10 @@ export const uiPt: Record<string, string> = {
   "Meetings, emails, career": "Reuniões, e-mails, carreira",
   "Airport, hotel, restaurant": "Aeroporto, hotel, restaurante",
 
-  // AI Talking extras
+  // AI Speaking extras
   "Starting a new conversation… the AI is choosing today's subject.":
     "Começando uma nova conversa… a IA está escolhendo o assunto de hoje.",
-  "We could not score this session, so your Talking progress was not changed.":
+  "We could not score this session, so your Speaking progress was not changed.":
     "Não conseguimos pontuar esta sessão, então sua evolução de fala não mudou.",
   "Practice everyday, professional and travel English with your AI teacher.":
     "Pratique inglês do dia a dia, profissional e de viagem com seu professor de IA.",
