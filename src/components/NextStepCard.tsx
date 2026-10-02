@@ -166,7 +166,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             className="relative w-full self-stretch bg-sidebar sm:bg-evo-block sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
-            <div className="relative aspect-[4.1/1] w-full overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
+            <div className="relative aspect-[4.8/1] w-full overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
               <img
                 src={evoDashboardMobile.url}
                 alt=""
@@ -195,12 +195,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {t("TODAY'S PRIORITY")}
               </p>
             </div>
-            <div className="grid grid-cols-[minmax(0,1fr)_minmax(8.5rem,0.8fr)] items-center gap-3 sm:mt-0.5 sm:block">
+            <div className="grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-center gap-3 sm:mt-0.5 sm:block">
               <h2 className="min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:text-2xl sm:leading-normal xl:text-3xl">
                 {skillLabel}
               </h2>
               {mainAvailable && (
-                <Button asChild className="h-10 w-full bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
+                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>{t("Practice now")}</Link>
                   ) : (
