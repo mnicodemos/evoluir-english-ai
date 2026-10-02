@@ -117,7 +117,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-[5px] lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_16.45rem_minmax(9.5rem,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
+        <div className="dashboard-one-screen flex h-full flex-col gap-[5px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_16.45rem_minmax(9.5rem,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
@@ -190,8 +190,8 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="order-2 grid min-w-0 gap-[5px] lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
-            <section className="min-w-0 lg:col-span-9 xl:h-full">
+          <div className="order-2 flex min-h-0 min-w-0 flex-1 flex-col gap-[5px] lg:order-none lg:grid lg:grid-cols-12 lg:gap-3 xl:min-h-0">
+            <section className="flex min-h-0 min-w-0 flex-1 flex-col lg:col-span-9 lg:block xl:h-full">
               <NextStepCard compact />
             </section>
             <section
@@ -204,7 +204,7 @@ function Dashboard() {
                   {t("Today's Progress")}
                 </h2>
               </div>
-               <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_4.75rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
+               <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
                  <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:size-24 xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"

@@ -1,7 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
-  ArrowLeft,
   BookOpen,
   CalendarCheck,
   Crown,
@@ -189,7 +188,6 @@ function AppShellContent({
   const location = useLocation();
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
-  const showBackButton = location.pathname !== "/dashboard";
   const translate = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
   // Stop any playing audio (flashcards, listening, vocabulary, AI voice) on page change.
@@ -222,8 +220,10 @@ function AppShellContent({
     <TooltipProvider delayDuration={200}>
       <div
         className={cn(
-          "dashboard-shell dark min-h-screen bg-background lg:pb-0",
-          dashboardLayout && "h-dvh overflow-hidden lg:h-auto lg:overflow-visible",
+          "dashboard-shell dark min-h-screen bg-background",
+          dashboardLayout
+            ? "h-dvh overflow-hidden lg:h-auto lg:overflow-visible lg:pb-0"
+            : "pb-[calc(4.5rem+_env(safe-area-inset-bottom))] lg:pb-0",
           dashboardLayout ? "lg:pl-[13.2rem]" : "lg:pl-20",
         )}
       >
@@ -390,46 +390,35 @@ function AppShellContent({
             dashboardLayout && "h-[calc(100dvh-4.5rem)] overflow-hidden py-3 pb-0 lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
           )}
         >
-          {showBackButton && (
-            <Link
-              to="/dashboard"
-              className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-card-foreground transition-colors hover:bg-accent"
-            >
-              <ArrowLeft className="size-4" />
-              {translate("Back to Dashboard")}
-            </Link>
-          )}
           {children}
         </main>
 
-        {dashboardLayout && (
-          <nav
-            className="fixed inset-x-0 bottom-0 z-40 grid h-[4.5rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[env(safe-area-inset-bottom)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
-            aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
-          >
-            {dashboardMobileNav.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className="grid min-w-0 place-items-center text-muted-foreground"
-                activeProps={{ className: "text-brand-green" }}
-              >
-                <span className="grid justify-items-center gap-0.5">
-                  <item.icon className="size-6" />
-                  <span className="max-w-full truncate text-[10px] font-medium leading-none">
-                    {item.label}
-                  </span>
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.5rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[env(safe-area-inset-bottom)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
+          aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
+        >
+          {dashboardMobileNav.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="grid min-w-0 place-items-center text-muted-foreground"
+              activeProps={{ className: "text-brand-green" }}
+            >
+              <span className="grid justify-items-center gap-0.5">
+                <item.icon className="size-6" />
+                <span className="max-w-full truncate text-[10px] font-medium leading-none">
+                  {item.label}
                 </span>
-              </Link>
-            ))}
-            <MobileNavigationMenu
-              translate={translate}
-              presentation="bottom-tab"
-              bottomLabel={lang === "pt" ? "Mais" : "More"}
-              className="w-full hover:bg-transparent hover:text-brand-green"
-            />
-          </nav>
-        )}
+              </span>
+            </Link>
+          ))}
+          <MobileNavigationMenu
+            translate={translate}
+            presentation="bottom-tab"
+            bottomLabel={lang === "pt" ? "Mais" : "More"}
+            className="w-full hover:bg-transparent hover:text-brand-green"
+          />
+        </nav>
 
         <div className={cn("mb-0", dashboardLayout && "hidden lg:block", mobileOneScreen && "hidden sm:block")}>
           <Footer
