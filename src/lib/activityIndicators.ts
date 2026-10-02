@@ -64,14 +64,18 @@ export function vocabularyHasNewActivity(input: {
   return input.batchWordIds.some((id) => (input.masteryByWordId[id] ?? 0) < VOCABULARY_MASTERED);
 }
 
-/** Loading and failed reads never advertise vocabulary as available. */
+/**
+ * Loading and failed reads never advertise vocabulary as available. Saved words
+ * always win over an earlier generation failure: a retry (or another device)
+ * may have saved the batch after the failure was noted.
+ */
 export function vocabularyIndicatorVisible(input: {
   batch: { batchWordIds: string[]; masteryByWordId: Record<string, number> } | null | undefined;
   isLoading: boolean;
   isError: boolean;
   generationFailed?: boolean;
 }) {
-  if (input.isLoading || input.isError || input.generationFailed || !input.batch) return false;
+  if (input.isLoading || input.isError || !input.batch) return false;
   return vocabularyHasNewActivity(input.batch);
 }
 
