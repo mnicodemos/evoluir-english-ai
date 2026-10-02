@@ -8,12 +8,12 @@ export const Route = createFileRoute("/_authenticated/coach")({
     typeof search["lesson"] === "string" ? { lesson: search["lesson"] as string } : {},
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · AI Talking" },
+      { title: "Evoluir+ English AI · AI Speaking" },
       {
         name: "description",
         content: "Practice everyday, professional and travel English with your AI teacher.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · AI Talking" },
+      { property: "og:title", content: "Evoluir+ English AI · AI Speaking" },
       {
         property: "og:description",
         content: "Practice English conversation with instant feedback.",

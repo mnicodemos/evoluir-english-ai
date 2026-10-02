@@ -327,7 +327,7 @@ export function PathProgressCard({
       bar: "[&>div]:bg-dashboard-blue",
     },
     {
-      label: "Talking",
+      label: "Speaking",
       value: latest?.speaking_score ?? 0,
       icon: Mic,
       tone: "text-[#362b53]",
@@ -470,7 +470,7 @@ export function PathProgressCard({
                   ? t("Advanced")
                   : skill.value >= 80
                     ? t("Strong")
-                    : t("Focus area")}
+                    : t("Priority")}
               </span>
             </div>
           ))}

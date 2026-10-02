@@ -367,7 +367,7 @@ export const uiPt: Record<string, string> = {
   "No assessed history yet. Complete an activity to start your evolution chart.":
     "Ainda não há histórico avaliado. Conclua uma atividade para iniciar seu gráfico de evolução.",
 
-  "AI Talking": "AI Talking",
+  "AI Speaking": "AI Speaking",
   Writing: "Escrita",
   Vocabulary: "Vocabulário",
   Progress: "Evolução",
@@ -410,6 +410,8 @@ export const uiPt: Record<string, string> = {
   "Overall average": "Média geral",
   Overall: "Geral",
   Talking: "Fala",
+  Speaking: "Fala",
+  Priority: "Prioridade",
   Grammar: "Gramática",
   Fluency: "Fluência",
   Clarity: "Clareza",

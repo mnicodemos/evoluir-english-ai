@@ -44,7 +44,7 @@ const nav = [
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/listening", label: "Listening", icon: Headphones },
-  { to: "/coach", label: "AI Talking", icon: MessageSquareText },
+  { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
   { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
@@ -59,7 +59,7 @@ const dashboardSidebarNav = [
   { to: "/learning", label: "Lessons", icon: GraduationCap },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/listening", label: "Listening", icon: Headphones },
-  { to: "/coach", label: "Speaking", icon: MessageSquareText },
+  { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
   { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
 ] as const;
@@ -216,7 +216,7 @@ function AppShellContent({
   const dashboardMobileNav = [
     { to: "/dashboard", label: lang === "pt" ? "Início" : "Home", icon: LayoutDashboard },
     { to: "/learning", label: lang === "pt" ? "Aulas" : "Lessons", icon: GraduationCap },
-    { to: "/coach", label: "Speaking", icon: Mic },
+    { to: "/coach", label: "AI Speaking", icon: Mic },
     { to: "/progress", label: lang === "pt" ? "Progresso" : "Progress", icon: LineChart },
   ] as const;
 
