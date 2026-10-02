@@ -118,7 +118,7 @@ function Dashboard() {
         </div>
       ) : (
         <div className="dashboard-one-screen flex h-full flex-col gap-[5px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_16.45rem_minmax(9.5rem,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
-          <header className="animate-rise min-w-0 xl:h-16">
+          <header className="animate-rise order-2 min-w-0 lg:order-none xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
               name={profile.name}
@@ -190,12 +190,12 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="order-2 flex min-h-0 min-w-0 flex-1 flex-col gap-[5px] lg:order-none lg:grid lg:grid-cols-12 lg:gap-3 xl:min-h-0">
-            <section className="flex min-h-0 min-w-0 flex-1 flex-col lg:col-span-9 lg:block xl:h-full">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[5px] max-lg:[display:contents] lg:order-none lg:grid lg:grid-cols-12 lg:gap-3 xl:min-h-0">
+            <section className="order-1 flex min-h-0 min-w-0 flex-1 flex-col lg:order-none lg:col-span-9 lg:block xl:h-full">
               <NextStepCard compact />
             </section>
             <section
-              className="card-soft flex min-w-0 flex-col p-3 lg:col-span-3 xl:h-full xl:p-4"
+              className="card-soft order-3 flex min-w-0 flex-col p-3 lg:order-none lg:col-span-3 xl:h-full xl:p-4"
               aria-labelledby="today-progress-title"
             >
               <div className="flex items-center gap-2">
@@ -280,7 +280,7 @@ function Dashboard() {
             </section>
           </div>
 
-          <div className="order-3 grid min-w-0 gap-[5px] lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
+          <div className="order-4 grid min-w-0 gap-[5px] lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
             <div className="min-w-0 lg:col-span-5 xl:h-full">
               <PathProgressCard compact />
             </div>
