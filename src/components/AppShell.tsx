@@ -102,7 +102,7 @@ export function MobileNavigationMenu({
           >
             <MoreHorizontal className="size-6" />
             <span className="text-[10px] font-medium leading-none">
-              {translate("More")}
+              {translate("More") === "More" && document.documentElement.lang === "pt" ? "Mais" : translate("More")}
             </span>
           </Button>
         ) : (
