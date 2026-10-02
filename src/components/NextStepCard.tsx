@@ -214,7 +214,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   asChild
                   className="h-[2.875rem] w-[42%] shrink-0 self-center rounded-xl bg-brand-green px-2 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden"
                 >
-
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>
                       {t("Practice now")}
