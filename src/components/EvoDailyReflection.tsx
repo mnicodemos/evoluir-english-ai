@@ -36,6 +36,7 @@ type EvoDailyReflectionProps = {
   name: string;
   placement?: "desktop" | "mobile-card" | "dashboard-header";
   mobileLeading?: ReactNode;
+  mobileTrailing?: ReactNode;
 };
 
 type WeatherCondition = "sunny" | "partly-cloudy" | "cloudy" | "rain" | "storm" | "snow" | "night";
@@ -66,6 +67,7 @@ export function EvoDailyReflection({
   name,
   placement = "desktop",
   mobileLeading,
+  mobileTrailing,
 }: EvoDailyReflectionProps) {
   const { lang, setLang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -144,19 +146,20 @@ export function EvoDailyReflection({
   if (placement === "dashboard-header") {
     return (
       <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.68fr)] lg:items-center">
-        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-1 lg:block">
+        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:block">
           <div className="lg:hidden">{mobileLeading}</div>
-          <div className="min-w-0">
+          <div className="min-w-0 text-left">
           <h1 className="flex min-w-0 items-center gap-2 font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
             <span className="truncate">
               {greeting}, {displayName}!
             </span>
              <Hand className="size-4 shrink-0 fill-warning/25 text-warning sm:size-6" strokeWidth={2.2} aria-hidden="true" />
           </h1>
-          <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:truncate sm:text-sm">
+          <p className="mt-0.5 hidden text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:block sm:truncate sm:text-sm">
             {t("Great to have you back. Let's keep building your fluency.")}
           </p>
           </div>
+          <div className="lg:hidden">{mobileTrailing}</div>
         </div>
         <aside
           style={reflectionBgStyle}

@@ -11,7 +11,7 @@ type Props = {
   userId: string;
   daysPerWeek?: number;
   compact?: boolean;
-  presentation?: "default" | "summary" | "dashboard-panel" | "mobile-strip";
+  presentation?: "default" | "summary" | "dashboard-panel" | "mobile-strip" | "mobile-progress-summary";
 };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
@@ -87,6 +87,28 @@ export function WeeklyFrequency({
             </div>
           );
         })}
+      </div>
+    );
+  }
+
+  if (presentation === "mobile-progress-summary") {
+    const sevenDayTrophyUnlocked = studiedCount >= 7;
+    return (
+      <div className="flex h-24 min-w-0 flex-col items-center justify-center gap-1 text-center lg:hidden">
+        <Hourglass
+          className={cn(
+            "size-7 shrink-0",
+            sevenDayTrophyUnlocked ? "fill-warning text-warning" : "fill-transparent text-warning",
+          )}
+          strokeWidth={2.4}
+          aria-hidden="true"
+        />
+        <p className="font-display text-sm font-bold leading-tight">
+          {studiedCount} / {weeklyGoal} {daysLabel}
+        </p>
+        <p className="text-[10px] leading-tight text-muted-foreground">
+          {lang === "pt" ? "Esta semana" : "This week"}
+        </p>
       </div>
     );
   }

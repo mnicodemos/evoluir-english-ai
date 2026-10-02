@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 
-import { AppShell, MobileNavigationMenu } from "@/components/AppShell";
+import { AppShell } from "@/components/AppShell";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
@@ -123,7 +123,17 @@ function Dashboard() {
               userId={profile.id}
               name={profile.name}
               placement="dashboard-header"
-              mobileLeading={<MobileNavigationMenu translate={t} />}
+              mobileTrailing={(
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
+                  <Flame
+                    className="size-5 shrink-0 fill-current text-current"
+                    style={{ color: getLeague(streakDays).from }}
+                    strokeWidth={2.4}
+                    aria-hidden="true"
+                  />
+                  <span className="font-display text-sm font-bold">{streakDays} {t("days")}</span>
+                </div>
+              )}
             />
           </header>
 
@@ -132,7 +142,7 @@ function Dashboard() {
               <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
             </div>
 
-            <div className="flex min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
+            <div className="hidden min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
               <Flame
                 className="size-6 shrink-0 fill-current text-current sm:hidden"
                 style={{ color: getLeague(streakDays).from }}
@@ -163,10 +173,10 @@ function Dashboard() {
               />
             </div>
 
-            <div className="min-w-0 border-l border-border">
+            <div className="hidden min-w-0 border-l border-border sm:block">
               <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact mobileSummary />
             </div>
-            <div className="min-w-0 border-l border-border">
+            <div className="hidden min-w-0 border-l border-border sm:block">
               <WeeklyFrequency
                 userId={profile.id}
                 daysPerWeek={profile.study_days_per_week ?? 7}
@@ -189,7 +199,7 @@ function Dashboard() {
                   {t("Today's Progress")}
                 </h2>
               </div>
-              <div className="mt-2 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-start gap-3 lg:grid-cols-1 lg:items-center xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
+              <div className="mt-2 grid flex-1 grid-cols-[6rem_minmax(0,1fr)_5.25rem] items-center gap-2 lg:grid-cols-1 lg:items-center xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
                 <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
@@ -245,6 +255,11 @@ function Dashboard() {
                     </div>
                   ))}
                 </div>
+                <WeeklyFrequency
+                  userId={profile.id}
+                  daysPerWeek={profile.study_days_per_week ?? 7}
+                  presentation="mobile-progress-summary"
+                />
               </div>
               {/* Desktop-only closing line, placed at the marked spot below the content. */}
               <p className="mt-auto hidden pt-3 text-center text-[11px] font-semibold tracking-wide text-warning lg:block">
