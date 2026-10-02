@@ -166,7 +166,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             className="relative min-h-[4.9rem] w-full flex-1 self-stretch bg-sidebar sm:min-h-[13.5rem] sm:flex-none sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
-            <div className="relative h-full w-full overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
+            <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
               <img
                 src={evoDashboardMobile.url}
                 alt=""
