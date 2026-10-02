@@ -22,6 +22,9 @@ test.describe("public smoke", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     const results = await new AxeBuilder({ page }).analyze();
     const critical = results.violations.filter((v) => v.impact === "critical");
-    expect(critical, JSON.stringify(critical.map((v) => ({ id: v.id, nodes: v.nodes.length })))).toHaveLength(0);
+    expect(
+      critical,
+      JSON.stringify(critical.map((v) => ({ id: v.id, nodes: v.nodes.length }))),
+    ).toHaveLength(0);
   });
 });
