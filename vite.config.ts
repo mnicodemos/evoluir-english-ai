@@ -10,7 +10,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { loadEnv } from "vite";
 
 // Load all env vars (including non-VITE_ server secrets) into process.env for server routes only.
-const serverEnv = loadEnv(process.env['NODE_ENV'] || "development", process.cwd(), "");
+const serverEnv = loadEnv(process.env["NODE_ENV"] || "development", process.cwd(), "");
 Object.assign(process.env, serverEnv);
 
 export default defineConfig({

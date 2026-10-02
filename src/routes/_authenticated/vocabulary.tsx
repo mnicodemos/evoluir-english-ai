@@ -15,7 +15,10 @@ import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { createAttemptGate } from "@/lib/attemptGate";
-import { vocabularyGenerationFailureKey, vocabularyGenerationRecentlyFailed } from "@/lib/activityIndicators";
+import {
+  vocabularyGenerationFailureKey,
+  vocabularyGenerationRecentlyFailed,
+} from "@/lib/activityIndicators";
 
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
@@ -126,7 +129,13 @@ function Vocabulary() {
   });
 
   // Starting a new lesson means a new set of ten words.
-  const dailyKey = ["daily-words", profile?.id, profile?.level, studyToday(), startedLessons ?? 0] as const;
+  const dailyKey = [
+    "daily-words",
+    profile?.id,
+    profile?.level,
+    studyToday(),
+    startedLessons ?? 0,
+  ] as const;
   const roundReady = !!profile && startedLessons !== undefined;
 
   // 1) Words already saved for this batch: a plain read, shown right away.

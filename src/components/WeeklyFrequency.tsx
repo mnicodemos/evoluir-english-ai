@@ -11,7 +11,8 @@ type Props = {
   userId: string;
   daysPerWeek?: number;
   compact?: boolean;
-  presentation?: "default" | "summary" | "dashboard-panel" | "mobile-strip" | "mobile-progress-summary";
+  presentation?:
+    "default" | "summary" | "dashboard-panel" | "mobile-strip" | "mobile-progress-summary";
 };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
@@ -74,15 +75,30 @@ export function WeeklyFrequency({
           const isToday = key === todayKey;
           return (
             <div key={key} className="grid justify-items-center gap-1">
-              <span className={cn("text-[9px] text-muted-foreground", isToday && "font-semibold text-warning")}>
+              <span
+                className={cn(
+                  "text-[9px] text-muted-foreground",
+                  isToday && "font-semibold text-warning",
+                )}
+              >
                 {labels[i]}
               </span>
               {studied ? (
-                 <span className={cn("grid size-5 place-items-center rounded-full text-primary-foreground", isToday ? "bg-warning" : "bg-brand-green")}>
+                <span
+                  className={cn(
+                    "grid size-5 place-items-center rounded-full text-primary-foreground",
+                    isToday ? "bg-warning" : "bg-brand-green",
+                  )}
+                >
                   <Check className="size-3.5" strokeWidth={3} />
                 </span>
               ) : (
-                 <span className={cn("size-5 rounded-full border border-dashed", isToday ? "border-warning bg-warning/15" : "border-muted-foreground")} />
+                <span
+                  className={cn(
+                    "size-5 rounded-full border border-dashed",
+                    isToday ? "border-warning bg-warning/15" : "border-muted-foreground",
+                  )}
+                />
               )}
             </div>
           );
@@ -172,9 +188,15 @@ export function WeeklyFrequency({
     const circumference = 2 * Math.PI * radius;
     const progress = weeklyGoal > 0 ? Math.min(1, studiedCount / weeklyGoal) : 0;
     return (
-      <section className="card-soft flex h-full min-w-0 flex-col p-3" aria-labelledby="weekly-rhythm-title">
+      <section
+        className="card-soft flex h-full min-w-0 flex-col p-3"
+        aria-labelledby="weekly-rhythm-title"
+      >
         <div className="flex items-center gap-2">
-           <CalendarDays className="size-[1.375rem] shrink-0 text-dashboard-cyan" strokeWidth={2.4} />
+          <CalendarDays
+            className="size-[1.375rem] shrink-0 text-dashboard-cyan"
+            strokeWidth={2.4}
+          />
           <h2 id="weekly-rhythm-title" className="font-display text-sm font-semibold">
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
           </h2>

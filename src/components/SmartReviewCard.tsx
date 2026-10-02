@@ -68,9 +68,16 @@ export function SmartReviewCard({
     // Compact Dashboard slot keeps its place: everything to review is done.
     if (!compact) return null;
     return (
-      <section className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4" aria-labelledby="smart-review-title">
+      <section
+        className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
+        aria-labelledby="smart-review-title"
+      >
         <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
-          <BookOpen className="size-[1.65rem] text-dashboard-cyan" strokeWidth={2.5} aria-hidden="true" />
+          <BookOpen
+            className="size-[1.65rem] text-dashboard-cyan"
+            strokeWidth={2.5}
+            aria-hidden="true"
+          />
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
             {t("Keep improving")}
           </h2>
@@ -78,7 +85,9 @@ export function SmartReviewCard({
         <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
           <CheckCircle2 className="size-8 text-brand-green" aria-hidden="true" />
           <p className="text-sm font-semibold">{t("All reviews done for now")}</p>
-          <p className="text-[11px] text-muted-foreground">{t("New reviews appear after your next lesson.")}</p>
+          <p className="text-[11px] text-muted-foreground">
+            {t("New reviews appear after your next lesson.")}
+          </p>
         </div>
       </section>
     );
@@ -86,9 +95,16 @@ export function SmartReviewCard({
 
   if (compact) {
     return (
-      <section className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4" aria-labelledby="smart-review-title">
+      <section
+        className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
+        aria-labelledby="smart-review-title"
+      >
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
-          <BookOpen className="size-[1.65rem] text-dashboard-cyan" strokeWidth={2.5} aria-hidden="true" />
+          <BookOpen
+            className="size-[1.65rem] text-dashboard-cyan"
+            strokeWidth={2.5}
+            aria-hidden="true"
+          />
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
             {t("Keep improving")}
           </h2>

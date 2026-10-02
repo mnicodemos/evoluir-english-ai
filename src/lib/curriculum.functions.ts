@@ -221,7 +221,6 @@ function salvageLessonContent(value: unknown, cardTotal: number, quizTotal: numb
   };
 }
 
-
 function jsonValue(raw: string): unknown {
   try {
     return JSON.parse(
@@ -258,7 +257,6 @@ async function writeLesson(
     : plan.reviewUnits.length
       ? `This is a consolidation lesson. Summarize and practise only Units ${plan.reviewUnits.join(" and ")} from the supplied course outline. Connect their main grammar, vocabulary and communication skills without introducing new material.`
       : "";
-
 
   const raw = await callContentAi(
     [
@@ -313,7 +311,9 @@ async function writeLesson(
       parsedContent.error.issues.slice(0, 5),
     );
     const salvaged = salvageLessonContent(rawValue, cardTotal, quizTotal);
-    const minimumQuiz = plan.isReviewTest ? quizTotal : Math.min(quizTotal, Math.max(5, Math.ceil(quizTotal * 0.7)));
+    const minimumQuiz = plan.isReviewTest
+      ? quizTotal
+      : Math.min(quizTotal, Math.max(5, Math.ceil(quizTotal * 0.7)));
     if (!salvaged || salvaged.quiz.length < minimumQuiz) {
       throw new Error("The AI could not write this lesson. Please try again.");
     }
@@ -373,12 +373,12 @@ async function writeLesson(
     .map(({ card }) => card);
   // A repaired lesson keeps any flashcards that were already saved (no duplicates).
   const existingCards = repairLessonId
-    ? (
+    ? ((
         await supabase
           .from("flashcards")
           .select("id", { count: "exact", head: true })
           .eq("lesson_id", repairLessonId)
-      ).count ?? 0
+      ).count ?? 0)
     : 0;
   if (cards.length && !existingCards) {
     await supabase.from("flashcards").insert(
@@ -467,7 +467,6 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
         .eq("curriculum_key", previous.key)
         .limit(1)
         .maybeSingle();
-
 
       const prevId = prevLesson?.id as string | undefined;
       const done = prevId
@@ -621,7 +620,9 @@ export const openFinalTest = createServerFn({ method: "POST" })
 export const openUnitTest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ level: z.string().min(2).max(10), unit: z.number().int().min(1).max(6) }).parse(input),
+    z
+      .object({ level: z.string().min(2).max(10), unit: z.number().int().min(1).max(6) })
+      .parse(input),
   )
   .handler(async ({ data, context }): Promise<{ lessonId: string }> => {
     const { supabase, userId } = context;
@@ -700,7 +701,8 @@ export const openUnitTest = createServerFn({ method: "POST" })
       .object({ quiz: z.array(quizItemSchema).length(total) })
       .strict()
       .safeParse(jsonValue(raw));
-    if (!parsed.success) throw new Error("The AI could not write this unit test. Please try again.");
+    if (!parsed.success)
+      throw new Error("The AI could not write this unit test. Please try again.");
 
     const { data: lesson, error } = await supabase
       .from("lessons")

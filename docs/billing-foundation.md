@@ -4,18 +4,18 @@ No gateway is integrated. No checkout, no webhook, no payment data.
 
 ## Existing architecture (reused, not recreated)
 
-| Area | Current state | Reuse | Gap |
-| --- | --- | --- | --- |
-| Auth | Supabase auth, `_authenticated` layout gate, bearer middleware | Yes | — |
-| Profiles | `public.profiles` (1:1 with auth user), RLS `auth.uid() = id` | Yes | — |
-| Plan fields | `profiles.plan`, `plan_interval`, `plan_started_at`, `plan_expires_at`; trigger `protect_profile_plan_fields` reverts any non-service_role change | Yes | Plan is a flat field, not a subscription lifecycle |
-| Premium UI | `/premium` route (informational pricing: R$ 79,90/mês, R$ 799,90/ano), Crown badge in dashboard/sidebar | Yes | Checkout not wired (intentional) |
-| Subscription | did not exist | — | created: `public.subscriptions` |
-| Entitlement | did not exist | — | created: `public.entitlements` + `has_active_entitlement()` |
-| AI limits | `ai_limits` (free + premium daily/monthly, interval, concurrency, cache TTL), `ai_usage_events`, `reserve_ai_usage()` reads `profiles.plan` + `plan_expires_at` | Yes — untouched | Entitlement is not yet the input to `reserve_ai_usage` |
-| Feature gating | No hard gate exists. Free vs Premium differ **only** by AI quotas | Yes | Commercial Free/Premium feature split is undefined — recorded as a gap, not invented |
-| RLS | Enabled on all user tables; pedagogical/legacy writes only via privileged RPCs | Yes | — |
-| Webhook | did not exist | — | contract documented below only |
+| Area           | Current state                                                                                                                                                   | Reuse           | Gap                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------ |
+| Auth           | Supabase auth, `_authenticated` layout gate, bearer middleware                                                                                                  | Yes             | —                                                                                    |
+| Profiles       | `public.profiles` (1:1 with auth user), RLS `auth.uid() = id`                                                                                                   | Yes             | —                                                                                    |
+| Plan fields    | `profiles.plan`, `plan_interval`, `plan_started_at`, `plan_expires_at`; trigger `protect_profile_plan_fields` reverts any non-service_role change               | Yes             | Plan is a flat field, not a subscription lifecycle                                   |
+| Premium UI     | `/premium` route (informational pricing: R$ 79,90/mês, R$ 799,90/ano), Crown badge in dashboard/sidebar                                                         | Yes             | Checkout not wired (intentional)                                                     |
+| Subscription   | did not exist                                                                                                                                                   | —               | created: `public.subscriptions`                                                      |
+| Entitlement    | did not exist                                                                                                                                                   | —               | created: `public.entitlements` + `has_active_entitlement()`                          |
+| AI limits      | `ai_limits` (free + premium daily/monthly, interval, concurrency, cache TTL), `ai_usage_events`, `reserve_ai_usage()` reads `profiles.plan` + `plan_expires_at` | Yes — untouched | Entitlement is not yet the input to `reserve_ai_usage`                               |
+| Feature gating | No hard gate exists. Free vs Premium differ **only** by AI quotas                                                                                               | Yes             | Commercial Free/Premium feature split is undefined — recorded as a gap, not invented |
+| RLS            | Enabled on all user tables; pedagogical/legacy writes only via privileged RPCs                                                                                  | Yes             | —                                                                                    |
+| Webhook        | did not exist                                                                                                                                                   | —               | contract documented below only                                                       |
 
 ## Model
 

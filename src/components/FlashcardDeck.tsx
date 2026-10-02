@@ -152,9 +152,7 @@ export function FlashcardDeck({
             <p className="max-w-xs text-xl font-black uppercase leading-tight sm:text-2xl">
               {prompt}
             </p>
-            <p className="text-xs font-medium uppercase text-black/60">
-              Tap to see the answer
-            </p>
+            <p className="text-xs font-medium uppercase text-black/60">Tap to see the answer</p>
           </button>
         ) : (
           <div
@@ -175,9 +173,7 @@ export function FlashcardDeck({
               {card.example && card.example !== answerText && (
                 <p className="max-w-sm text-sm italic text-black/70">“{card.example}”</p>
               )}
-              {card.pronunciation && (
-                <p className="text-xs text-black/60">{card.pronunciation}</p>
-              )}
+              {card.pronunciation && <p className="text-xs text-black/60">{card.pronunciation}</p>}
               {isListenCard && listenText && (
                 <Button
                   size="sm"

@@ -198,7 +198,7 @@ function Writing() {
           data: { operationKey: stableOperationKey, minutes: minutesSpent(1) },
         });
         await refreshAfterActivity(queryClient);
-      queryClient.invalidateQueries({ queryKey: ["saved-practice"] });
+        queryClient.invalidateQueries({ queryKey: ["saved-practice"] });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not analyse your text");

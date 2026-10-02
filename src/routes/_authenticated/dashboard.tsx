@@ -123,7 +123,7 @@ function Dashboard() {
               userId={profile.id}
               name={profile.name}
               placement="dashboard-header"
-              mobileTrailing={(
+              mobileTrailing={
                 <div className="flex items-center gap-3 whitespace-nowrap">
                   <span className="rounded-full border border-brand-green/35 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
                     {profile.level}
@@ -135,10 +135,12 @@ function Dashboard() {
                       strokeWidth={2.4}
                       aria-hidden="true"
                     />
-                    <span className="font-display text-sm font-bold">{streakDays} {t("days")}</span>
+                    <span className="font-display text-sm font-bold">
+                      {streakDays} {t("days")}
+                    </span>
                   </span>
                 </div>
-              )}
+              }
             />
           </header>
 
@@ -158,8 +160,12 @@ function Dashboard() {
                 strokeWidth={2.4}
               />
               <div className="min-w-0 flex-1">
-                 <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">{streakDays} days</p>
-                <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">{t("Study streak")}</p>
+                <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">
+                  {streakDays} days
+                </p>
+                <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">
+                  {t("Study streak")}
+                </p>
                 {nextLeague && (
                   <p
                     className="mt-0.5 hidden truncate text-[10px] font-semibold leading-tight sm:block sm:text-xs"
@@ -171,15 +177,16 @@ function Dashboard() {
                   </p>
                 )}
               </div>
-              <LeagueBadge
-                streakDays={streakDays}
-                size={53}
-                className="hidden sm:grid"
-              />
+              <LeagueBadge streakDays={streakDays} size={53} className="hidden sm:grid" />
             </div>
 
             <div className="hidden min-w-0 border-l border-border sm:block">
-              <DailyGoalCard userId={profile.id} goalMinutes={profile.daily_minutes} compact mobileSummary />
+              <DailyGoalCard
+                userId={profile.id}
+                goalMinutes={profile.daily_minutes}
+                compact
+                mobileSummary
+              />
             </div>
             <div className="hidden min-w-0 border-l border-border sm:block">
               <WeeklyFrequency
@@ -199,13 +206,13 @@ function Dashboard() {
               aria-labelledby="today-progress-title"
             >
               <div className="flex items-center gap-2">
-                 <Flame className="size-[1.375rem] shrink-0 text-dashboard-cyan" strokeWidth={2.5} />
-                 <h2 id="today-progress-title" className="font-display text-sm font-semibold">
+                <Flame className="size-[1.375rem] shrink-0 text-dashboard-cyan" strokeWidth={2.5} />
+                <h2 id="today-progress-title" className="font-display text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
               </div>
-               <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
-                 <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:size-24 xl:size-30 xl:mx-0">
+              <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
+                <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:size-24 xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
                     viewBox="0 0 96 96"
@@ -236,7 +243,7 @@ function Dashboard() {
                       }
                     />
                   </svg>
-                   <span className="relative text-center font-display text-xl font-bold leading-none text-foreground lg:text-2xl">
+                  <span className="relative text-center font-display text-xl font-bold leading-none text-foreground lg:text-2xl">
                     {minutesToday}
                     <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
                       min
@@ -252,31 +259,37 @@ function Dashboard() {
                       key={card.label}
                       className="grid min-w-0 grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-2.5"
                     >
-                      <Check className="size-4 shrink-0 text-brand-green" strokeWidth={3} aria-hidden="true" />
+                      <Check
+                        className="size-4 shrink-0 text-brand-green"
+                        strokeWidth={3}
+                        aria-hidden="true"
+                      />
                       <p className="line-clamp-2 text-[11px] text-muted-foreground">
-                        <span className="font-display text-sm font-bold text-foreground">{card.value}</span>{" "}
+                        <span className="font-display text-sm font-bold text-foreground">
+                          {card.value}
+                        </span>{" "}
                         {t(card.label)}
                       </p>
                     </div>
                   ))}
                 </div>
-                 <div className="border-l border-border pl-1.5 lg:border-0 lg:pl-0">
-                   <WeeklyFrequency
-                     userId={profile.id}
-                     daysPerWeek={profile.study_days_per_week ?? 7}
-                     presentation="mobile-progress-summary"
-                   />
-                 </div>
+                <div className="border-l border-border pl-1.5 lg:border-0 lg:pl-0">
+                  <WeeklyFrequency
+                    userId={profile.id}
+                    daysPerWeek={profile.study_days_per_week ?? 7}
+                    presentation="mobile-progress-summary"
+                  />
+                </div>
               </div>
               {/* Desktop-only closing line, placed at the marked spot below the content. */}
               <p className="mt-auto hidden pt-3 text-center text-[11px] font-semibold tracking-wide text-warning lg:block">
                 {t("Small steps create progress.")}
               </p>
-               <WeeklyFrequency
-                 userId={profile.id}
-                 daysPerWeek={profile.study_days_per_week ?? 7}
-                 presentation="mobile-strip"
-               />
+              <WeeklyFrequency
+                userId={profile.id}
+                daysPerWeek={profile.study_days_per_week ?? 7}
+                presentation="mobile-strip"
+              />
             </section>
           </div>
 
@@ -302,8 +315,12 @@ function Dashboard() {
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="flex items-center gap-2">
-                 <Bolt className="size-[1.925rem] shrink-0 text-warning" strokeWidth={2.6} aria-hidden="true" />
-                 <h2 id="quick-access-title" className="font-display text-sm font-semibold">
+                <Bolt
+                  className="size-[1.925rem] shrink-0 text-warning"
+                  strokeWidth={2.6}
+                  aria-hidden="true"
+                />
+                <h2 id="quick-access-title" className="font-display text-sm font-semibold">
                   {t("Quick Access")}
                 </h2>
               </div>
@@ -324,8 +341,8 @@ function Dashboard() {
                         <span className="sr-only">{t("New activity available")}</span>
                       </span>
                     )}
-                     <span className="dashboard-quick-icon grid shrink-0 place-items-center">
-                       <item.icon className="size-4 xl:size-[1.65rem]" strokeWidth={2.4} />
+                    <span className="dashboard-quick-icon grid shrink-0 place-items-center">
+                      <item.icon className="size-4 xl:size-[1.65rem]" strokeWidth={2.4} />
                     </span>
                     <span className="truncate text-xs font-medium">{t(item.label)}</span>
                   </Link>
@@ -333,8 +350,6 @@ function Dashboard() {
               })}
             </div>
           </section>
-
-
         </div>
       )}
     </AppShell>

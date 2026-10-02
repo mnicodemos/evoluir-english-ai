@@ -29,35 +29,35 @@ resolves `userId` server-side (`requireSupabaseAuth` for server functions,
 
 ## 3. Current limits (table `ai_limits`, live values)
 
-| Operation | Free daily | Free monthly | Premium daily | Premium monthly | Max concurrent | Min interval (s) | Cache TTL (s) |
-|---|---|---|---|---|---|---|---|
-| chat | 60 | 1000 | 300 | 6000 | 2 | 1 | 0 |
-| teacher | 60 | 1000 | 300 | 6000 | 1 | 1 | 0 |
-| talking | 80 | 1500 | 400 | 8000 | 2 | 1 | 0 |
-| transcription | 60 | 1000 | 300 | 6000 | 1 | 2 | 0 |
-| tts | 100 | 1800 | 500 | 9000 | 2 | 1 | 0 |
-| writing_correction | 10 | 200 | 50 | 1000 | 1 | 3 | 0 |
-| dictionary | 30 | 500 | 150 | 3000 | 2 | 1 | 86400 |
-| lesson_generation | 10 | 120 | 30 | 500 | 1 | 10 | 0 |
-| quiz_generation | 5 | 40 | 20 | 200 | 1 | 10 | 0 |
-| vocabulary_generation | 10 | 180 | 40 | 800 | 1 | 5 | 0 |
+| Operation             | Free daily | Free monthly | Premium daily | Premium monthly | Max concurrent | Min interval (s) | Cache TTL (s) |
+| --------------------- | ---------- | ------------ | ------------- | --------------- | -------------- | ---------------- | ------------- |
+| chat                  | 60         | 1000         | 300           | 6000            | 2              | 1                | 0             |
+| teacher               | 60         | 1000         | 300           | 6000            | 1              | 1                | 0             |
+| talking               | 80         | 1500         | 400           | 8000            | 2              | 1                | 0             |
+| transcription         | 60         | 1000         | 300           | 6000            | 1              | 2                | 0             |
+| tts                   | 100        | 1800         | 500           | 9000            | 2              | 1                | 0             |
+| writing_correction    | 10         | 200          | 50            | 1000            | 1              | 3                | 0             |
+| dictionary            | 30         | 500          | 150           | 3000            | 2              | 1                | 86400         |
+| lesson_generation     | 10         | 120          | 30            | 500             | 1              | 10               | 0             |
+| quiz_generation       | 5          | 40           | 20            | 200             | 1              | 10               | 0             |
+| vocabulary_generation | 10         | 180          | 40            | 800             | 1              | 5                | 0             |
 
 The 60/1000 and 300/6000 reference values apply to `chat`, `teacher` and `transcription`; the other
 operations have their own values. Confirmed live, not from constants.
 
 ## 4. AI consumption points
 
-| Feature | File | Operation | Reserve | Finish | Notes |
-|---|---|---|---|---|---|
-| AI Teacher | `src/lib/aiTeacher.functions.ts` | teacher | gateway | gateway | concurrency 1 |
-| AI Talking / Coach | `src/lib/coach.functions.ts`, `src/routes/api/coach-stream.ts` | talking | gateway / route | yes | streaming route authenticates first |
-| Writing correction | `src/lib/coach.functions.ts` | writing_correction | gateway | gateway | |
-| Listening / audio | `src/routes/api/speech.ts` | tts | route | route | |
-| Speaking / pronunciation | `src/routes/api/transcribe.ts` | transcription | route | route | |
-| Dictionary | `src/lib/dictionary.functions.ts` | dictionary | gateway | gateway | 24h cache |
-| Lessons / quizzes | `src/lib/curriculum.functions.ts` | lesson_generation, quiz_generation | gateway | gateway | |
-| Vocabulary plan | `src/lib/vocabularyPlan.functions.ts` | vocabulary_generation | gateway | gateway | |
-| Legacy activity | `src/lib/legacyActivity.functions.ts` | talking | gateway | gateway | |
+| Feature                  | File                                                           | Operation                          | Reserve         | Finish  | Notes                               |
+| ------------------------ | -------------------------------------------------------------- | ---------------------------------- | --------------- | ------- | ----------------------------------- |
+| AI Teacher               | `src/lib/aiTeacher.functions.ts`                               | teacher                            | gateway         | gateway | concurrency 1                       |
+| AI Talking / Coach       | `src/lib/coach.functions.ts`, `src/routes/api/coach-stream.ts` | talking                            | gateway / route | yes     | streaming route authenticates first |
+| Writing correction       | `src/lib/coach.functions.ts`                                   | writing_correction                 | gateway         | gateway |                                     |
+| Listening / audio        | `src/routes/api/speech.ts`                                     | tts                                | route           | route   |                                     |
+| Speaking / pronunciation | `src/routes/api/transcribe.ts`                                 | transcription                      | route           | route   |                                     |
+| Dictionary               | `src/lib/dictionary.functions.ts`                              | dictionary                         | gateway         | gateway | 24h cache                           |
+| Lessons / quizzes        | `src/lib/curriculum.functions.ts`                              | lesson_generation, quiz_generation | gateway         | gateway |                                     |
+| Vocabulary plan          | `src/lib/vocabularyPlan.functions.ts`                          | vocabulary_generation              | gateway         | gateway |                                     |
+| Legacy activity          | `src/lib/legacyActivity.functions.ts`                          | talking                            | gateway         | gateway |                                     |
 
 Double counting: not observed. One reservation per gateway call; denied events are excluded from the
 counters (`status IN ('pending','completed')` only); a cache hit returns before reserving.
@@ -94,18 +94,18 @@ estimated here.
 
 ## 9. Risk matrix
 
-| Item | Current state | Risk | Severity | Action |
-|---|---|---|---|---|
-| Premium authority | Valid entitlement in DB | None found | — | Keep |
-| Daily quota | Per operation, calendar day (São Paulo) | None found | — | Keep |
-| Monthly quota | Per operation, calendar month | None found | — | Keep |
-| Reset | Calendar based, fixed timezone | None found | — | Keep |
-| Concurrency | Pending events in a 10-min window | Stale pending event keeps consuming one slot for 10 min (1 observed) | Low | Document |
-| Retry / rate limit | Minimum interval per operation | None found | — | Keep |
-| Idempotency | Request hash + one reservation per call | None found | — | Keep |
-| Cost | Tokens and cost never recorded | Cannot measure cost per user or per plan | Medium | Future phase |
-| UX | Distinct messages for daily, monthly, concurrency, rate limit | None found | — | Keep |
-| Free/Premium differentiation | 5x daily and 6x monthly, no exclusive feature gated | Premium differs by volume only | Medium (commercial) | Future decision |
+| Item                         | Current state                                                 | Risk                                                                 | Severity            | Action          |
+| ---------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------- | --------------- |
+| Premium authority            | Valid entitlement in DB                                       | None found                                                           | —                   | Keep            |
+| Daily quota                  | Per operation, calendar day (São Paulo)                       | None found                                                           | —                   | Keep            |
+| Monthly quota                | Per operation, calendar month                                 | None found                                                           | —                   | Keep            |
+| Reset                        | Calendar based, fixed timezone                                | None found                                                           | —                   | Keep            |
+| Concurrency                  | Pending events in a 10-min window                             | Stale pending event keeps consuming one slot for 10 min (1 observed) | Low                 | Document        |
+| Retry / rate limit           | Minimum interval per operation                                | None found                                                           | —                   | Keep            |
+| Idempotency                  | Request hash + one reservation per call                       | None found                                                           | —                   | Keep            |
+| Cost                         | Tokens and cost never recorded                                | Cannot measure cost per user or per plan                             | Medium              | Future phase    |
+| UX                           | Distinct messages for daily, monthly, concurrency, rate limit | None found                                                           | —                   | Keep            |
+| Free/Premium differentiation | 5x daily and 6x monthly, no exclusive feature gated           | Premium differs by volume only                                       | Medium (commercial) | Future decision |
 
 ## 10. Conclusion
 

@@ -16,9 +16,15 @@ export const Route = createFileRoute("/_authenticated/learning/review")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · Smart review" },
-      { name: "description", content: "Review your hardest English words first with spaced repetition." },
+      {
+        name: "description",
+        content: "Review your hardest English words first with spaced repetition.",
+      },
       { property: "og:title", content: "Evoluir+ English AI · Smart review" },
-      { property: "og:description", content: "Spaced repetition review of your English flashcards." },
+      {
+        property: "og:description",
+        content: "Spaced repetition review of your English flashcards.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -36,11 +42,14 @@ function ReviewPage() {
   const queryClient = useQueryClient();
   const [round, setRound] = useState(0);
 
-
   const { data: cards, isLoading } = useQuery({
     queryKey: ["all-flashcards"],
     queryFn: async (): Promise<Flashcard[]> => {
-      const { data } = await supabase.from("flashcards").select("*").order("sort_order").order("created_at");
+      const { data } = await supabase
+        .from("flashcards")
+        .select("*")
+        .order("sort_order")
+        .order("created_at");
       return (data ?? []) as Flashcard[];
     },
   });
@@ -73,11 +82,13 @@ function ReviewPage() {
     return [...list].sort((a, b) => weight(a) - weight(b));
   }, [cards, states, today, startedLessonIds]);
 
-
   return (
     <AppShell>
       <div className="space-y-6">
-        <Link to="/learning" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/learning"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="size-4" /> Learning Center
         </Link>
 
@@ -85,7 +96,8 @@ function ReviewPage() {
           <p className="text-sm text-muted-foreground">Smart review</p>
           <h1 className="text-3xl font-bold">Your hardest words first</h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            Cards marked as <strong>Erro</strong> come back sooner. Cards marked as <strong>Acerto</strong> move forward.
+            Cards marked as <strong>Erro</strong> come back sooner. Cards marked as{" "}
+            <strong>Acerto</strong> move forward.
           </p>
         </header>
 
@@ -93,7 +105,8 @@ function ReviewPage() {
           <Skeleton className="h-64 w-full" />
         ) : queue.length === 0 ? (
           <p className="card-soft p-6 text-sm text-muted-foreground">
-            <Sparkles className="mb-2 size-5" /> No cards yet — open a lesson to start building your deck.
+            <Sparkles className="mb-2 size-5" /> No cards yet — open a lesson to start building your
+            deck.
           </p>
         ) : (
           <FlashcardDeck

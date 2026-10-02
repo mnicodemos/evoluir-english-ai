@@ -24,7 +24,9 @@ async function collectDayData(userId: string, lessonIds: string[], levelValue: s
 
   const { data: levelLessons } = await supabase
     .from("lessons")
-    .select("id, title, category, level, objective, summary, transcript, transcript_pt, curriculum_key")
+    .select(
+      "id, title, category, level, objective, summary, transcript, transcript_pt, curriculum_key",
+    )
     .in("id", lessonIds.length ? lessonIds : ["00000000-0000-0000-0000-000000000000"])
     .like("curriculum_key", `${levelValue}-%`);
 
@@ -33,12 +35,25 @@ async function collectDayData(userId: string, lessonIds: string[], levelValue: s
 
   const [cards, quizzes, activities] = await Promise.all([
     ids.length
-      ? supabase.from("flashcards").select("word, translation, example, lesson_id").in("lesson_id", ids)
+      ? supabase
+          .from("flashcards")
+          .select("word, translation, example, lesson_id")
+          .in("lesson_id", ids)
       : Promise.resolve({
-          data: [] as { word: string; translation: string; example: string | null; lesson_id: string | null }[],
+          data: [] as {
+            word: string;
+            translation: string;
+            example: string | null;
+            lesson_id: string | null;
+          }[],
         }),
     ids.length
-      ? supabase.from("quiz_results").select("score").eq("user_id", userId).in("lesson_id", ids).gte("created_at", since)
+      ? supabase
+          .from("quiz_results")
+          .select("score")
+          .eq("user_id", userId)
+          .in("lesson_id", ids)
+          .gte("created_at", since)
       : Promise.resolve({ data: [] as { score: number }[] }),
     supabase
       .from("activities")
@@ -63,12 +78,19 @@ async function collectDayData(userId: string, lessonIds: string[], levelValue: s
 /** Builds and downloads the personal progress workbook of the current level. */
 export async function downloadDailyReport(userId: string, input: DailyReportInput) {
   const level = findLevel(input.level);
-  const [data, logo] = await Promise.all([collectDayData(userId, input.lessonIds, level.value), loadLogo()]);
+  const [data, logo] = await Promise.all([
+    collectDayData(userId, input.lessonIds, level.value),
+    loadLogo(),
+  ]);
   const reference = getLevelReference(level.value);
 
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  const wb = createWorkbook(doc, logo, { brand: BRAND, levelLabel: level.label, docTitle: "Progress workbook" });
+  const wb = createWorkbook(doc, logo, {
+    brand: BRAND,
+    levelLabel: level.label,
+    docTitle: "Progress workbook",
+  });
 
   wb.cover({
     title: "Your progress",
@@ -228,5 +250,8 @@ export async function downloadDailyReport(userId: string, input: DailyReportInpu
 
   wb.finish();
 
-  return savePdf(doc, `evoluir-progress-${level.value}-${new Date().toISOString().slice(0, 10)}.pdf`);
+  return savePdf(
+    doc,
+    `evoluir-progress-${level.value}-${new Date().toISOString().slice(0, 10)}.pdf`,
+  );
 }

@@ -189,7 +189,8 @@ function ListeningPage() {
   const roundStart = useRoundStart();
   const { data: saved } = useSavedPractice();
   const doneOnServer =
-    roundStart !== undefined && (saved?.listening ?? []).some((at) => !roundStart || at > roundStart);
+    roundStart !== undefined &&
+    (saved?.listening ?? []).some((at) => !roundStart || at > roundStart);
   const redoneHere = completed[track.id] === -1 - lessonCount;
   const isDone = (completed[track.id] === lessonCount || doneOnServer) && !redoneHere;
   const trackProgress = progress[track.id];

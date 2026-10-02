@@ -15,7 +15,8 @@ export const landingCopy = {
     ctaSecondary: "I already have an account",
     trust: ["No credit card", "10 minutes a day is enough", "Feedback in seconds"],
     whyTitle: "Why it works",
-    whyText: "Not another exercise app. A coach that knows your level, your goals and your mistakes.",
+    whyText:
+      "Not another exercise app. A coach that knows your level, your goals and your mistakes.",
     benefits: [
       {
         title: "Real conversation practice",
@@ -36,10 +37,22 @@ export const landingCopy = {
     ],
     howTitle: "How it works",
     steps: [
-      { title: "Tell us your goal", text: "Two minutes of onboarding: level, goal and time per day." },
-      { title: "Get your plan", text: "Your coach builds a routine that fits the minutes you actually have." },
-      { title: "Practice daily", text: "Conversation, writing and vocabulary sessions with instant feedback." },
-      { title: "Watch yourself grow", text: "Every session updates your learner profile and your scores." },
+      {
+        title: "Tell us your goal",
+        text: "Two minutes of onboarding: level, goal and time per day.",
+      },
+      {
+        title: "Get your plan",
+        text: "Your coach builds a routine that fits the minutes you actually have.",
+      },
+      {
+        title: "Practice daily",
+        text: "Conversation, writing and vocabulary sessions with instant feedback.",
+      },
+      {
+        title: "Watch yourself grow",
+        text: "Every session updates your learner profile and your scores.",
+      },
     ],
     insideTitle: "Inside your coach",
     features: [
@@ -71,7 +84,11 @@ export const landingCopy = {
     ],
     goPremium: "Go Premium",
     footer: {
-      connectionLinks: ["About the project", "Frequently asked questions", "Contact & Partnerships"],
+      connectionLinks: [
+        "About the project",
+        "Frequently asked questions",
+        "Contact & Partnerships",
+      ],
       tagline: "Seu inglês não segue um curso. Ele evolui com você.",
       taglineLine2: "Aprenda. Pratique. Produza. Evolua.",
       newsletterTitle: "MORE INFORMATION",
@@ -97,7 +114,8 @@ export const landingCopy = {
     ctaSecondary: "Já tenho uma conta",
     trust: ["Sem cartão de crédito", "10 minutos por dia bastam", "Feedback em segundos"],
     whyTitle: "Por que funciona",
-    whyText: "Não é mais um app de exercícios. É um professor que conhece seu nível, seus objetivos e seus erros.",
+    whyText:
+      "Não é mais um app de exercícios. É um professor que conhece seu nível, seus objetivos e seus erros.",
     benefits: [
       {
         title: "Conversação de verdade",
@@ -118,10 +136,22 @@ export const landingCopy = {
     ],
     howTitle: "Como funciona",
     steps: [
-      { title: "Conte seu objetivo", text: "Dois minutos de cadastro: nível, objetivo e tempo por dia." },
-      { title: "Receba seu plano", text: "Seu professor monta uma rotina que cabe nos minutos que você tem." },
-      { title: "Pratique todo dia", text: "Sessões de conversa, escrita e vocabulário com feedback imediato." },
-      { title: "Veja seu progresso", text: "Cada sessão atualiza seu perfil de aprendizado e suas notas." },
+      {
+        title: "Conte seu objetivo",
+        text: "Dois minutos de cadastro: nível, objetivo e tempo por dia.",
+      },
+      {
+        title: "Receba seu plano",
+        text: "Seu professor monta uma rotina que cabe nos minutos que você tem.",
+      },
+      {
+        title: "Pratique todo dia",
+        text: "Sessões de conversa, escrita e vocabulário com feedback imediato.",
+      },
+      {
+        title: "Veja seu progresso",
+        text: "Cada sessão atualiza seu perfil de aprendizado e suas notas.",
+      },
     ],
     insideTitle: "Dentro do seu professor",
     features: [
@@ -141,7 +171,12 @@ export const landingCopy = {
     plansTitle: "Planos",
     plansText: "Comece grátis e assine quando quiser praticar mais.",
     free: "Grátis",
-    freeItems: ["AI Talking", "Correção de textos", "Construtor de vocabulário", "Acompanhamento de progresso"],
+    freeItems: [
+      "AI Talking",
+      "Correção de textos",
+      "Construtor de vocabulário",
+      "Acompanhamento de progresso",
+    ],
     premium: "Premium",
     perMonth: "/mês",
     yearly: "ou R$ 799,90/ano — 2 meses grátis",

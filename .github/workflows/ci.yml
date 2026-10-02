@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks (secret scan)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies (frozen lockfile)
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: TypeScript
+        run: bunx tsgo --noEmit
+
+      - name: Unit tests (Vitest)
+        run: bun run test
+
+      - name: Build
+        run: bun run build
+
+      - name: E2E tests (Playwright)
+        run: |
+          bunx playwright install chromium --with-deps
+          bun run e2e
+        env:
+          # Publishable backend values; CI relies on the tracked .env for now —
+          # move these into repository secrets when .env leaves version control.
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || '' }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY || '' }}
+          E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL || '' }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD || '' }}

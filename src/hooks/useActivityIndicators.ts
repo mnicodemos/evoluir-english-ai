@@ -45,7 +45,11 @@ function todayKey() {
  * Both come from existing state: the batch rows in `vocabulary` (same batch key
  * the Vocabulary page uses) and `user_vocabulary` mastery.
  */
-function useVocabularyBatchProgress(round: number, userId: string | undefined, level: string | undefined) {
+function useVocabularyBatchProgress(
+  round: number,
+  userId: string | undefined,
+  level: string | undefined,
+) {
   const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["vocabulary-batch-progress", userId, round, level],
@@ -122,9 +126,7 @@ export function useActivityIndicators(): ActivityIndicators {
       return;
     }
     recoveryAttempts.add(attemptKey);
-    vocabularySingleFlight(profile.id, () =>
-      generateVocabulary({ data: { level: profile.level } }),
-    )
+    vocabularySingleFlight(profile.id, () => generateVocabulary({ data: { level: profile.level } }))
       .then((words) => {
         writeText(failureKey, "");
         if (words.length > 0)
@@ -136,7 +138,16 @@ export function useActivityIndicators(): ActivityIndicators {
         if (!busy) writeText(failureKey, String(Date.now()));
         scheduleRetry(busy ? 60_000 : 90_000);
       });
-  }, [profile, round, vocabularyBatch, vocabularyFetching, vocabularyError, generateVocabulary, queryClient, retryTick]);
+  }, [
+    profile,
+    round,
+    vocabularyBatch,
+    vocabularyFetching,
+    vocabularyError,
+    generateVocabulary,
+    queryClient,
+    retryTick,
+  ]);
 
   const roundStart = useRoundStart();
   const { data: savedPractice } = useSavedPractice();
@@ -156,15 +167,23 @@ export function useActivityIndicators(): ActivityIndicators {
     const serverBefore = [
       ...new Set((savedPractice?.writing ?? []).filter((w) => w.at < cutoff).map((w) => w.prompt)),
     ];
-    const prompts = savedPractice && roundStart !== undefined ? roundPrompts(config, round, serverBefore) : [];
-    const done = [...new Set([...readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []), ...serverDone])];
+    const prompts =
+      savedPractice && roundStart !== undefined ? roundPrompts(config, round, serverBefore) : [];
+    const done = [
+      ...new Set([
+        ...readJson<string[]>(`${WRITING_DONE_ROUND_PREFIX}${signature}`, []),
+        ...serverDone,
+      ]),
+    ];
 
     setIndicators({
       // Same rule as the Listening page: a listening saved after the round
       // began counts as done on every device of this account.
       listening:
-        !(roundStart !== undefined &&
-          (savedPractice?.listening ?? []).some((at) => !roundStart || at > roundStart)) &&
+        !(
+          roundStart !== undefined &&
+          (savedPractice?.listening ?? []).some((at) => !roundStart || at > roundStart)
+        ) &&
         listeningHasNewActivity({
           round,
           completedRound: completion[LISTENING_TRACK_ID] ?? null,
@@ -183,7 +202,16 @@ export function useActivityIndicators(): ActivityIndicators {
         ),
       }),
     });
-  }, [profile, round, roundStart, savedPractice, vocabularyBatch, vocabularyError, vocabularyFetching, vocabularyLoading]);
+  }, [
+    profile,
+    round,
+    roundStart,
+    savedPractice,
+    vocabularyBatch,
+    vocabularyError,
+    vocabularyFetching,
+    vocabularyLoading,
+  ]);
 
   return indicators;
 }

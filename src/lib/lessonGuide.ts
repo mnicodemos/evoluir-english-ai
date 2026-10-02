@@ -90,17 +90,13 @@ export function buildLessonGuide(
   ).slice(0, 4);
 
   const usage = unique(
-    cardList
-      .map((card) => card.example?.trim() ?? "")
-      .filter((example) => example.length > 8),
+    cardList.map((card) => card.example?.trim() ?? "").filter((example) => example.length > 8),
   ).slice(0, 4);
 
   const attention = unique([
     ...cardList
       .filter((card) => String(card.difficulty) === "hard")
-      .map((card) =>
-        `${card.word}: ${String(card.answer || card.definition || "").trim()}`.trim(),
-      )
+      .map((card) => `${card.word}: ${String(card.answer || card.definition || "").trim()}`.trim())
       .filter((item) => item.length > 4),
     SKILL_ATTENTION[String(lesson.skill ?? "")] ?? SKILL_ATTENTION["grammar"]!,
   ]).slice(0, 3);

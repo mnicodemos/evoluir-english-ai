@@ -137,13 +137,9 @@ export const Route = createFileRoute("/api/speech")({
 
         if (!upstream.ok || !upstream.body) {
           const raw = await upstream.text().catch(() => "");
-          let message = "Audio generation failed.";
-          try {
-            const parsedBody = JSON.parse(raw) as { error?: { message?: string } };
-            message = parsedBody.error?.message ?? message;
-          } catch {
-            if (raw) message = raw.slice(0, 200);
-          }
+          // Log the provider detail server-side only; the client gets a generic
+          // message so no provider internals are ever exposed.
+          console.error(`[speech] tts upstream failed [${upstream.status}]: ${raw.slice(0, 300)}`);
           const responseHeaders = new Headers();
           if (upstream.status === 429) {
             responseHeaders.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
@@ -151,14 +147,14 @@ export const Route = createFileRoute("/api/speech")({
           await finishAiUsage(ticket, {
             success: false,
             errorCode: `gemini_${upstream.status}`,
-            errorMessage: message,
+            errorMessage: "TTS upstream failed",
           });
           return Response.json(
             {
               message:
                 upstream.status === 429
                   ? "Your Google audio limit is busy. Please try again in a moment."
-                  : message,
+                  : "Audio generation failed. Please try again in a moment.",
             },
             {
               status: upstream.status,

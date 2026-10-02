@@ -221,7 +221,9 @@ function LessonPage() {
           </div>
         ) : lessonError ? (
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            <span>We couldn't open this lesson right now. Check your connection and try again.</span>
+            <span>
+              We couldn't open this lesson right now. Check your connection and try again.
+            </span>
             <Button variant="outline" size="sm" onClick={() => void refetchLesson()}>
               Try again
             </Button>

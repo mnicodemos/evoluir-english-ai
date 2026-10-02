@@ -51,9 +51,20 @@ export function DailyGoalCard({
         mobileSummary && "items-center px-1.5 py-2 sm:items-stretch sm:px-3",
       )}
     >
-      <div className={cn("flex items-center gap-3", mobileSummary && "flex-col gap-1 text-center sm:flex-row sm:gap-3 sm:text-left")}>
+      <div
+        className={cn(
+          "flex items-center gap-3",
+          mobileSummary && "flex-col gap-1 text-center sm:flex-row sm:gap-3 sm:text-left",
+        )}
+      >
         {compact ? (
-          <CircleDotDashed className={cn("size-[1.925rem] shrink-0 text-brand-green", mobileSummary && "size-6 sm:size-[1.925rem]")} strokeWidth={3.2} />
+          <CircleDotDashed
+            className={cn(
+              "size-[1.925rem] shrink-0 text-brand-green",
+              mobileSummary && "size-6 sm:size-[1.925rem]",
+            )}
+            strokeWidth={3.2}
+          />
         ) : (
           <span className="grid size-12 shrink-0 place-items-center rounded-md bg-success/10">
             <Hourglass className="size-6 text-warning" />
@@ -64,15 +75,27 @@ export function DailyGoalCard({
             className={cn(
               "truncate font-bold",
               compact ? "font-display text-base" : "text-lg sm:text-base md:text-lg",
-              mobileSummary && "whitespace-normal text-[13px] leading-tight sm:truncate sm:text-base",
+              mobileSummary &&
+                "whitespace-normal text-[13px] leading-tight sm:truncate sm:text-base",
             )}
           >
             {done}{" "}
-            <span className={cn("text-xs font-medium text-muted-foreground sm:text-sm md:text-base", mobileSummary && "text-[10px] sm:text-sm")}>
+            <span
+              className={cn(
+                "text-xs font-medium text-muted-foreground sm:text-sm md:text-base",
+                mobileSummary && "text-[10px] sm:text-sm",
+              )}
+            >
               / {goalMinutes} <span className="inline">minutes</span>
             </span>
           </p>
-          <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-base sm:text-sm", mobileSummary && "text-[10px] leading-tight sm:text-xs")}>
+          <p
+            className={cn(
+              "text-muted-foreground",
+              compact ? "text-xs" : "text-base sm:text-sm",
+              mobileSummary && "text-[10px] leading-tight sm:text-xs",
+            )}
+          >
             Your daily goal
           </p>
         </div>
@@ -89,7 +112,11 @@ export function DailyGoalCard({
       </div>
       <Progress
         value={percent}
-        className={cn("h-2.5 bg-secondary/80", compact ? "mt-1.5 [&>div]:bg-brand-green" : "mt-4", mobileSummary && "hidden sm:block")}
+        className={cn(
+          "h-2.5 bg-secondary/80",
+          compact ? "mt-1.5 [&>div]:bg-brand-green" : "mt-4",
+          mobileSummary && "hidden sm:block",
+        )}
       />
       <p
         className={cn(
