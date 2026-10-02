@@ -163,3 +163,4 @@
 ## Mobile — ajustes marcados em capturas (2026-10-02)
 - [x] Today's Progress: mover a coluna de marcas verdes para a direita e aproximá-la dos textos
 - [x] Remover a barra superior (menu/logo/logout) das páginas autenticadas no mobile
+- [x] Padronizar textos visíveis: Focus area → Priority, Talking → Speaking e AI Talking → AI Speaking
