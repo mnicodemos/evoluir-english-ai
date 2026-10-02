@@ -158,8 +158,8 @@
 - [x] Mobile — rótulo "Prioridade de hoje" centralizado verticalmente entre os textos de cima e de baixo (mt-1 → mt-2)
 - [x] Mobile — EVO encosta na borda superior do bloco: faixas pretas embutidas no banner (linhas 0–153 e 571–668) recortadas em novo asset evo-dashboard-mobile-flush.jpg (1600×425), aplicado só na variante mobile do NextStepCard; desktop inalterado.
 - [x] Mobile — descolar o último bloco do Dashboard do menu inferior (pb-0 → pb-[10px] no contêiner do shell)
-- [ ] Fase 1 — Hardening e confiabilidade: lint/testes/E2E, secrets/env, RLS, cross-user, AI limits, APIs, Stripe webhook, quiz, roles, logs, CI, relatório
+- [x] Fase 1 — Hardening e confiabilidade: lint/testes/E2E, secrets/env, RLS, cross-user, AI limits, APIs, Stripe webhook, quiz, roles, logs, CI, relatório (E2E pendente de libs do navegador no sandbox; specs prontos para CI)
 
 ## Mobile — ajustes marcados em capturas (2026-10-02)
-- [ ] Today's Progress: afastar a coluna de marcas verdes do texto (conteúdo em vermelho) para ficarem mais juntos
-- [ ] Remover a barra superior amarela (menu/logo/logout) das páginas autenticadas no mobile
+- [ ] Today's Progress: afastar a coluna de marcas verdes do texto (conteúdo em vermelho) — PRÓXIMO TURNO
+- [ ] Remover a barra superior amarela (menu/logo/logout) das páginas autenticadas no mobile — PRÓXIMO TURNO
