@@ -367,32 +367,6 @@ function AppShellContent({
           </div>
         </aside>
 
-        <header
-          className={cn(
-            "sticky top-0 z-20 h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4 lg:hidden",
-            dashboardLayout ? "hidden" : "grid",
-          )}
-        >
-          <div className="flex min-w-0 items-center gap-1">
-            <MobileNavigationMenu translate={translate} />
-            <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
-              <Logo className="size-[1.6rem] shrink-0" />
-              <BrandName className="truncate text-sm" />
-            </Link>
-          </div>
-          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={signOut}
-              aria-label={translate("Sign out")}
-            >
-              <LogOut className="size-4" />
-            </Button>
-            <ProfileMenu className="hover:bg-accent hover:text-foreground" />
-          </div>
-        </header>
-
         <main
           className={cn(
             "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
