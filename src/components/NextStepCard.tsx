@@ -189,30 +189,24 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <p className="text-[11px] font-bold uppercase text-brand-green">
                 EVO · {t("Your AI Learning Coach")}
               </p>
+            </div>
+            <div className="mt-1 sm:mt-2 sm:block">
+              <p className="text-xs font-semibold text-sidebar-foreground/75 sm:text-sm">
+                {t("TODAY'S PRIORITY")}
+              </p>
+            </div>
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(8.5rem,0.8fr)] items-center gap-3 sm:mt-0.5 sm:block">
+              <h2 className="min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:text-2xl sm:leading-normal xl:text-3xl">
+                {skillLabel}
+              </h2>
               {mainAvailable && (
-                <Button asChild size="sm" className="h-7 shrink-0 bg-brand-green px-3 text-xs text-sidebar hover:bg-brand-green/90 sm:hidden">
+                <Button asChild className="h-10 w-full bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>{t("Practice now")}</Link>
                   ) : (
                     <Link to={data.activity.to}>{t("Practice now")}</Link>
                   )}
                 </Button>
-              )}
-            </div>
-            <div className="mt-1 flex items-start justify-between gap-2 sm:mt-2 sm:block">
-              <p className="text-xs font-semibold text-sidebar-foreground/75 sm:text-sm">
-                {t("TODAY'S PRIORITY")}
-              </p>
-              {quickWinButton && (
-                <div className="shrink-0 sm:hidden">{quickWinButton}</div>
-              )}
-            </div>
-            <div className="flex items-start justify-between gap-2 sm:mt-0.5 sm:block">
-              <h2 className="min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:text-2xl sm:leading-normal xl:text-3xl">
-                {skillLabel}
-              </h2>
-              {challengeButton && (
-                <div className="shrink-0 sm:hidden">{challengeButton}</div>
               )}
             </div>
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
@@ -239,7 +233,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 m-3 mt-0 min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
+          <aside className="relative z-10 m-3 mt-0 hidden min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:block sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">
