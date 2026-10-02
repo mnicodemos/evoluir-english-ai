@@ -212,7 +212,7 @@ function Dashboard() {
                 </h2>
               </div>
               <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
-                <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:size-24 xl:size-30 xl:mx-0">
+                <div className="relative ml-2 grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:ml-0 lg:size-24 xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
                     viewBox="0 0 96 96"
