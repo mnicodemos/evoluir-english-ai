@@ -74,12 +74,14 @@ type MobileNavigationMenuProps = {
   translate: (label: string) => string;
   className?: string;
   presentation?: "menu" | "bottom-tab";
+  bottomLabel?: string;
 };
 
 export function MobileNavigationMenu({
   translate,
   className,
   presentation = "menu",
+  bottomLabel = "More",
 }: MobileNavigationMenuProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -102,7 +104,7 @@ export function MobileNavigationMenu({
           >
             <MoreHorizontal className="size-6" />
             <span className="text-[10px] font-medium leading-none">
-              {translate("More")}
+              {bottomLabel}
             </span>
           </Button>
         ) : (
@@ -422,6 +424,7 @@ function AppShellContent({
             <MobileNavigationMenu
               translate={translate}
               presentation="bottom-tab"
+              bottomLabel={lang === "pt" ? "Mais" : "More"}
               className="w-full hover:bg-transparent hover:text-brand-green"
             />
           </nav>
