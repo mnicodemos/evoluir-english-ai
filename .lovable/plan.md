@@ -1,19 +1,13 @@
-# Compatibilidade vertical do Dashboard
-
-## Objetivo
-Manter o Dashboard inteiro visível no Chrome e Brave, sem alterar o design, a altura do card EVO, a estrutura ou as proporções atuais.
+# Reorganização do Dashboard mobile
 
 ## Alterações
-- Trocar o cálculo desktop baseado em `100vh` por viewport dinâmica (`100dvh`), com fallback compatível.
-- Reservar aproximadamente 50 px de folga vertical dentro da área disponível do Dashboard.
-- Aplicar o ajuste somente ao modo desktop do Dashboard, preservando o comportamento mobile e as demais telas.
-- Manter as alturas fixas já aprovadas e permitir que apenas as faixas flexíveis absorvam pequenas diferenças entre navegadores.
+- No foco da EVO, remover apenas no celular os ícones e ações de Quick Win e Take the challenge, retirar “Why this matters now?” e reposicionar “Practice now” na área indicada.
+- Ocultar “Keep improving” no celular.
+- Incorporar o resumo semanal de dias dentro de “Today's Progress” no celular e retirar o bloco separado “Your learning rhythm”.
+- Retirar o bloco “Quick Access” no celular e substituí-lo por uma barra inferior fixa com Início, Aulas, Speaking, Progresso e Mais, usando os ícones já existentes; “Mais” abre o menu completo.
+- Preservar integralmente o Dashboard desktop, destinos, indicadores e regras atuais.
 
 ## Validação
-- Conferir ausência de scroll vertical e preservação visual em Chrome/Chromium nas dimensões desktop relevantes.
-- Confirmar que o card EVO mantém a mesma altura e que não há cortes ou sobreposição.
-- Verificar o estado final da compilação.
-
-## Detalhes técnicos
-- O contêiner principal usará uma variável CSS de viewport com fallback `vh` e preferência por `dvh` quando suportado.
-- O orçamento vertical considerará o espaçamento externo atual e uma margem adicional de segurança próxima de 50 px.
+- Conferir visualmente em 411 px e 390 px, incluindo conteúdo não coberto pela barra inferior.
+- Confirmar os quatro destinos e a abertura do menu “Mais”.
+- Verificar que o desktop permanece inalterado e que a aplicação compila sem erros.
