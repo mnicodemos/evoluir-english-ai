@@ -223,6 +223,7 @@ function AppShellContent({
       <div
         className={cn(
           "dashboard-shell dark min-h-screen bg-background lg:pb-0",
+          dashboardLayout && "h-dvh overflow-hidden lg:h-auto lg:overflow-visible",
           dashboardLayout ? "lg:pl-[13.2rem]" : "lg:pl-20",
         )}
       >
@@ -386,7 +387,7 @@ function AppShellContent({
         <main
           className={cn(
             "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
-            dashboardLayout && "py-3 pb-20 lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
+            dashboardLayout && "h-[calc(100dvh-4.5rem)] overflow-hidden py-3 pb-0 lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
           )}
         >
           {showBackButton && (

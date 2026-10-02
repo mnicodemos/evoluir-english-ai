@@ -200,7 +200,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {skillLabel}
               </h2>
               {mainAvailable && (
-                <Button asChild className="h-10 w-full bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
+                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>{t("Practice now")}</Link>
                   ) : (
