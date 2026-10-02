@@ -1,30 +1,37 @@
-// Admin panel backend. Authorization happens server-side only: the signed-in
-// user's email comes from the verified token claims, never from the client.
-// Reuses the existing auth middleware and the existing profiles table.
+// Admin panel backend. Authorization happens server-side only through the
+// existing user_roles/has_role database authority.
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const ADMIN_EMAILS = ["mncelo.n@gmail.com"];
-
-function isAdminClaims(claims: Record<string, unknown>): boolean {
-  const email = claims["email"];
-  if (typeof email !== "string") return false;
-  return ADMIN_EMAILS.includes(email.trim().toLowerCase());
+async function hasAdminRole(
+  supabase: {
+    rpc: (
+      fn: "has_role",
+      args: { _user_id: string; _role: "admin" },
+    ) => PromiseLike<{ data: boolean | null; error: unknown }>;
+  },
+  userId: string,
+) {
+  const { data, error } = await supabase.rpc("has_role", {
+    _user_id: userId,
+    _role: "admin",
+  });
+  return error === null && data === true;
 }
 
 export const isAdminUser = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => ({
-    isAdmin: isAdminClaims(context.claims as unknown as Record<string, unknown>),
+    isAdmin: await hasAdminRole(context.supabase, context.userId),
   }));
 
 export const listRegisteredUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    if (!isAdminClaims(context.claims as unknown as Record<string, unknown>)) {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
       throw new Error("Forbidden");
     }
 
@@ -237,7 +244,7 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ days: z.number().int().min(1).max(90) }).parse(data))
   .handler(async ({ context, data }) => {
-    if (!isAdminClaims(context.claims as unknown as Record<string, unknown>)) {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
       throw new Error("Forbidden");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -361,7 +368,7 @@ export const getAiCostPerformance = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ days: z.number().int().min(1).max(90) }).parse(data))
   .handler(async ({ context, data }) => {
-    if (!isAdminClaims(context.claims as unknown as Record<string, unknown>)) {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
       throw new Error("Forbidden");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

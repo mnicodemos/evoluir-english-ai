@@ -215,9 +215,9 @@ function AppShellContent({
 
   const dashboardMobileNav = [
     { to: "/dashboard", label: lang === "pt" ? "Início" : "Home", icon: LayoutDashboard },
-    { to: "/learning", label: lang === "pt" ? "Aulas" : "Lessons", icon: GraduationCap },
-    { to: "/coach", label: "AI Speaking", icon: Mic },
+    { to: "/teacher", label: "AI Teacher", icon: Sparkles },
     { to: "/progress", label: lang === "pt" ? "Progresso" : "Progress", icon: LineChart },
+    { to: "/coach", label: "AI Speaking", icon: Mic },
   ] as const;
 
   return (

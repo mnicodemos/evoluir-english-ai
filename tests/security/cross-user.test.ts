@@ -2,7 +2,7 @@
  * Cross-user security checks (data isolation between students).
  *
  * These are INTEGRATION tests: they run against the real backend and need two
- * dedicated test accounts. They are skipped unless all of these are set:
+ * dedicated test accounts. CI fails explicitly unless all of these are set:
  *
  *   E2E_USER_EMAIL / E2E_USER_PASSWORD          — user A (fresh test account)
  *   SECURITY_USER_B_EMAIL / SECURITY_USER_B_PASSWORD — user B (fresh test account)
@@ -29,6 +29,14 @@ const emailB = process.env["SECURITY_USER_B_EMAIL"];
 const passwordB = process.env["SECURITY_USER_B_PASSWORD"];
 
 const configured = Boolean(url && publishableKey && emailA && passwordA && emailB && passwordB);
+const runningInCi = process.env["CI"] === "true";
+
+if (runningInCi && !configured) {
+  throw new Error(
+    "Cross-user security tests require SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, E2E_USER_EMAIL, E2E_USER_PASSWORD, SECURITY_USER_B_EMAIL and SECURITY_USER_B_PASSWORD in CI.",
+  );
+}
+
 const d = configured ? describe : describe.skip;
 
 async function signIn(email: string, password: string): Promise<SupabaseClient> {
@@ -117,5 +125,41 @@ d("cross-user data isolation", () => {
     expect(quiz.data).toHaveLength(0);
     const acts = await a.from("activities").select("id").eq("user_id", idB);
     expect(acts.data).toHaveLength(0);
+  });
+
+  it("B reads its own profile but not A's", async () => {
+    const own = await b.from("profiles").select("id, name").eq("id", idB).maybeSingle();
+    expect(own.error).toBeNull();
+    expect(own.data?.id).toBe(idB);
+
+    const foreign = await b.from("profiles").select("id").eq("id", idA);
+    expect(foreign.error).toBeNull();
+    expect(foreign.data).toHaveLength(0);
+  });
+
+  it("B cannot update or delete A's profile", async () => {
+    const upd = await b.from("profiles").update({ bio: "hacked" }).eq("id", idA);
+    expect(upd.error).toBeNull();
+    const victim = await a.from("profiles").select("bio").eq("id", idA).maybeSingle();
+    expect(victim.data?.bio).not.toBe("hacked");
+
+    const del = await b.from("profiles").delete().eq("id", idA);
+    expect(del.error).toBeNull();
+    const stillThere = await a.from("profiles").select("id").eq("id", idA).maybeSingle();
+    expect(stillThere.data?.id).toBe(idA);
+  });
+
+  it("B cannot insert progress rows that claim A's user_id", async () => {
+    const inserted = await b.from("progress").insert({
+      user_id: idA,
+      speaking_score: 10,
+      grammar_score: 10,
+      listening_score: 10,
+      vocabulary_score: 10,
+      writing_score: 10,
+      reading_score: 10,
+      recorded_at: new Date().toISOString(),
+    });
+    expect(inserted.error).not.toBeNull();
   });
 });

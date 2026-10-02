@@ -35,6 +35,13 @@ jobs:
 
       - name: Unit tests (Vitest)
         run: bun run test
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || '' }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY || '' }}
+          E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL || '' }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD || '' }}
+          SECURITY_USER_B_EMAIL: ${{ secrets.SECURITY_USER_B_EMAIL || '' }}
+          SECURITY_USER_B_PASSWORD: ${{ secrets.SECURITY_USER_B_PASSWORD || '' }}
 
       - name: Build
         run: bun run build
@@ -50,3 +57,5 @@ jobs:
           SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY || '' }}
           E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL || '' }}
           E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD || '' }}
+          SECURITY_USER_B_EMAIL: ${{ secrets.SECURITY_USER_B_EMAIL || '' }}
+          SECURITY_USER_B_PASSWORD: ${{ secrets.SECURITY_USER_B_PASSWORD || '' }}
