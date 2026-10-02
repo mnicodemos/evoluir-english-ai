@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
-import evoDashboardMobile from "@/assets/evo-dashboard-mobile.jpg.asset.json";
+// Mobile-only variant cropped flush: the supplied wide banner carries baked-in
+// black bands (rows 0-153 / 571-668) that read as a gap inside the EVO block.
+import evoDashboardMobileFlush from "@/assets/evo-dashboard-mobile-flush.jpg.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles } from "lucide-react";
 
@@ -168,10 +170,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           >
             <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
               <img
-                src={evoDashboardMobile.url}
+                src={evoDashboardMobileFlush.url}
                 alt=""
                 width={1600}
-                height={768}
+                height={425}
                 className="absolute inset-0 block h-full w-full scale-[1.02] object-cover object-center sm:hidden"
               />
               <img
