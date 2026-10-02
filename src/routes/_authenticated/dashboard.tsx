@@ -117,7 +117,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen grid gap-[7px] xl:grid-rows-[4rem_7.59rem_16.45rem_minmax(9.5rem,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
+        <div className="dashboard-one-screen grid gap-[5px] lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_16.45rem_minmax(9.5rem,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
@@ -202,8 +202,8 @@ function Dashboard() {
                   {t("Today's Progress")}
                 </h2>
               </div>
-              <div className="mt-2 grid flex-1 grid-cols-[6rem_minmax(0,1fr)_5.25rem] items-center gap-2 lg:grid-cols-1 lg:items-center xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
-                <div className="relative grid size-24 place-items-center text-brand-green lg:mx-auto xl:size-30 xl:mx-0">
+               <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_4.75rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
+                 <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:size-24 xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
                     viewBox="0 0 96 96"
@@ -234,7 +234,7 @@ function Dashboard() {
                       }
                     />
                   </svg>
-                  <span className="relative text-center font-display text-2xl font-bold leading-none text-foreground">
+                   <span className="relative text-center font-display text-xl font-bold leading-none text-foreground lg:text-2xl">
                     {minutesToday}
                     <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
                       min

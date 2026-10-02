@@ -68,21 +68,21 @@ export function WeeklyFrequency({
 
   if (presentation === "mobile-strip") {
     return (
-      <div className="mt-3 grid grid-cols-7 gap-1 border-t border-border pt-3 lg:hidden">
+      <div className="mt-2 grid grid-cols-7 gap-1 border-t border-border pt-2 lg:hidden">
         {weekKeys.map((key, i) => {
           const studied = studyDays?.has(key) ?? false;
           const isToday = key === todayKey;
           return (
-            <div key={key} className="grid justify-items-center gap-1.5">
+            <div key={key} className="grid justify-items-center gap-1">
               <span className={cn("text-[9px] text-muted-foreground", isToday && "font-semibold text-warning")}>
                 {labels[i]}
               </span>
               {studied ? (
-                <span className={cn("grid size-6 place-items-center rounded-full text-primary-foreground", isToday ? "bg-warning" : "bg-brand-green")}>
+                 <span className={cn("grid size-5 place-items-center rounded-full text-primary-foreground", isToday ? "bg-warning" : "bg-brand-green")}>
                   <Check className="size-3.5" strokeWidth={3} />
                 </span>
               ) : (
-                <span className={cn("size-6 rounded-full border border-dashed", isToday ? "border-warning bg-warning/15" : "border-muted-foreground")} />
+                 <span className={cn("size-5 rounded-full border border-dashed", isToday ? "border-warning bg-warning/15" : "border-muted-foreground")} />
               )}
             </div>
           );
@@ -94,10 +94,10 @@ export function WeeklyFrequency({
   if (presentation === "mobile-progress-summary") {
     const sevenDayTrophyUnlocked = studiedCount >= 7;
     return (
-      <div className="flex h-24 min-w-0 flex-col items-center justify-center gap-1 text-center lg:hidden">
+      <div className="flex h-20 min-w-0 flex-col items-center justify-center gap-1 text-center lg:hidden">
         <Hourglass
           className={cn(
-            "size-7 shrink-0",
+            "size-6 shrink-0",
             sevenDayTrophyUnlocked ? "fill-warning text-warning" : "fill-transparent text-warning",
           )}
           strokeWidth={2.4}
