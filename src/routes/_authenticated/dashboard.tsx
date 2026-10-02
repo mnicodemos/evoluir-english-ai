@@ -179,9 +179,6 @@ function Dashboard() {
             <section className="min-w-0 lg:col-span-9 xl:h-full">
               <NextStepCard compact />
             </section>
-            <div className="min-w-0 lg:hidden">
-              <SmartReviewCard streakDays={streakDays} compact />
-            </div>
             <section
               className="card-soft flex min-w-0 flex-col p-3 lg:col-span-3 xl:h-full xl:p-4"
               aria-labelledby="today-progress-title"
@@ -253,6 +250,11 @@ function Dashboard() {
               <p className="mt-auto hidden pt-3 text-center text-[11px] font-semibold tracking-wide text-warning lg:block">
                 {t("Small steps create progress.")}
               </p>
+               <WeeklyFrequency
+                 userId={profile.id}
+                 daysPerWeek={profile.study_days_per_week ?? 7}
+                 presentation="mobile-strip"
+               />
             </section>
           </div>
 
@@ -263,7 +265,7 @@ function Dashboard() {
             <div className="hidden min-w-0 lg:col-span-4 lg:block xl:h-full">
               <SmartReviewCard streakDays={streakDays} compact />
             </div>
-            <div className="min-w-0 lg:col-span-3 xl:h-full">
+            <div className="hidden min-w-0 lg:col-span-3 lg:block xl:h-full">
               <WeeklyFrequency
                 userId={profile.id}
                 daysPerWeek={profile.study_days_per_week ?? 7}
@@ -273,7 +275,7 @@ function Dashboard() {
           </div>
 
           <section
-            className="order-4 card-soft min-w-0 p-3 lg:order-none xl:flex xl:min-h-0 xl:flex-col xl:px-4 xl:py-3"
+            className="order-4 hidden card-soft min-w-0 p-3 lg:order-none lg:block xl:flex xl:min-h-0 xl:flex-col xl:px-4 xl:py-3"
             aria-labelledby="quick-access-title"
           >
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">

@@ -23,3 +23,4 @@
 - Vocabulary word generation uses the faster Lovable AI model (LOVABLE_VOCABULARY_MODEL); the slower talking model exceeded the 60 s call limit and left batches empty.
 - Vocabulary AI replies are salvaged word by word and the browser releases a stuck generation after 80 s; one bad item or a dropped connection must never leave a lesson's batch empty.
 - Vocabulary generation runs under the host's keep-alive (keepAlive in src/lib/keepAlive.server.ts, context set in src/server.ts); leaving the lesson screen mid-generation must not cancel the batch.
+- Dashboard mobile uses a fixed five-item bottom navigation and folds the weekly day strip into Today's Progress; desktop composition remains unchanged.

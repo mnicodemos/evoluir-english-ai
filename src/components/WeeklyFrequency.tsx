@@ -11,7 +11,7 @@ type Props = {
   userId: string;
   daysPerWeek?: number;
   compact?: boolean;
-  presentation?: "default" | "summary" | "dashboard-panel";
+  presentation?: "default" | "summary" | "dashboard-panel" | "mobile-strip";
 };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
@@ -65,6 +65,31 @@ export function WeeklyFrequency({
   const studiedCount = studyDays?.size ?? 0;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
+
+  if (presentation === "mobile-strip") {
+    return (
+      <div className="mt-3 grid grid-cols-7 gap-1 border-t border-border pt-3 lg:hidden">
+        {weekKeys.map((key, i) => {
+          const studied = studyDays?.has(key) ?? false;
+          const isToday = key === todayKey;
+          return (
+            <div key={key} className="grid justify-items-center gap-1.5">
+              <span className={cn("text-[9px] text-muted-foreground", isToday && "font-semibold text-warning")}>
+                {labels[i]}
+              </span>
+              {studied ? (
+                <span className={cn("grid size-6 place-items-center rounded-full text-primary-foreground", isToday ? "bg-warning" : "bg-brand-green")}>
+                  <Check className="size-3.5" strokeWidth={3} />
+                </span>
+              ) : (
+                <span className={cn("size-6 rounded-full border border-dashed", isToday ? "border-warning bg-warning/15" : "border-muted-foreground")} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   if (presentation === "summary") {
     const sevenDayTrophyUnlocked = studiedCount >= 7;

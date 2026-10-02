@@ -12,6 +12,8 @@ import {
   LogOut,
   Menu,
   MessageSquareText,
+  Mic,
+  MoreHorizontal,
   PenLine,
   Sparkles,
 } from "lucide-react";
@@ -71,11 +73,13 @@ const dashboardAccountNav = [
 type MobileNavigationMenuProps = {
   translate: (label: string) => string;
   className?: string;
+  presentation?: "menu" | "bottom-tab";
 };
 
 export function MobileNavigationMenu({
   translate,
   className,
+  presentation = "menu",
 }: MobileNavigationMenuProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -90,14 +94,27 @@ export function MobileNavigationMenu({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={translate("Open menu")}
-          className={cn("size-10 shrink-0", className)}
-        >
-          <Menu className="size-5" />
-        </Button>
+        {presentation === "bottom-tab" ? (
+          <Button
+            variant="ghost"
+            aria-label={translate("Open menu")}
+            className={cn("h-14 min-w-0 flex-col gap-0.5 rounded-none px-1 text-muted-foreground", className)}
+          >
+            <MoreHorizontal className="size-6" />
+            <span className="text-[10px] font-medium leading-none">
+              {translate("More")}
+            </span>
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={translate("Open menu")}
+            className={cn("size-10 shrink-0", className)}
+          >
+            <Menu className="size-5" />
+          </Button>
+        )}
       </SheetTrigger>
       <SheetContent side="left" className="dashboard-shell dark flex w-[min(19rem,86vw)] flex-col border-sidebar-border bg-sidebar p-4 text-sidebar-foreground">
         <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
@@ -191,6 +208,13 @@ function AppShellContent({
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
+
+  const dashboardMobileNav = [
+    { to: "/dashboard", label: lang === "pt" ? "Início" : "Home", icon: LayoutDashboard },
+    { to: "/learning", label: lang === "pt" ? "Aulas" : "Lessons", icon: GraduationCap },
+    { to: "/coach", label: "Speaking", icon: Mic },
+    { to: "/progress", label: lang === "pt" ? "Progresso" : "Progress", icon: LineChart },
+  ] as const;
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -360,7 +384,7 @@ function AppShellContent({
         <main
           className={cn(
             "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
-            dashboardLayout && "xl:px-5 xl:py-2",
+            dashboardLayout && "pb-24 xl:px-5 xl:py-2",
           )}
         >
           {showBackButton && (
@@ -374,6 +398,34 @@ function AppShellContent({
           )}
           {children}
         </main>
+
+        {dashboardLayout && (
+          <nav
+            className="fixed inset-x-0 bottom-0 z-40 grid h-[4.5rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[env(safe-area-inset-bottom)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
+            aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
+          >
+            {dashboardMobileNav.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="grid min-w-0 place-items-center text-muted-foreground"
+                activeProps={{ className: "text-brand-green" }}
+              >
+                <span className="grid justify-items-center gap-0.5">
+                  <item.icon className="size-6" />
+                  <span className="max-w-full truncate text-[10px] font-medium leading-none">
+                    {item.label}
+                  </span>
+                </span>
+              </Link>
+            ))}
+            <MobileNavigationMenu
+              translate={translate}
+              presentation="bottom-tab"
+              className="w-full hover:bg-transparent hover:text-brand-green"
+            />
+          </nav>
+        )}
 
         <div className={cn("mb-0", dashboardLayout && "hidden lg:block", mobileOneScreen && "hidden sm:block")}>
           <Footer
