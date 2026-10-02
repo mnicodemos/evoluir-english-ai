@@ -39,12 +39,23 @@ if (runningInCi && !configured) {
 
 const d = configured ? describe : describe.skip;
 
-async function signIn(email: string, password: string): Promise<SupabaseClient> {
+// Safe error category only — never includes credentials, keys or tokens.
+function classify(error: { message: string; status?: number; code?: string }): string {
+  const msg = error.message.toLowerCase();
+  if (msg.includes("invalid supabaseurl")) return "A) invalid URL";
+  if (msg.includes("fetch failed") || error.status === 0) return "B) network/DNS/fetch";
+  if (error.status && error.status >= 500) return `C) backend unavailable (HTTP ${error.status})`;
+  if (error.code === "invalid_credentials") return "D/E) invalid credentials or user not found";
+  if (error.code === "email_not_confirmed") return "F) email not confirmed";
+  return `F) auth HTTP error (${error.status ?? "?"}, ${error.code ?? "no code"})`;
+}
+
+async function signIn(label: string, email: string, password: string): Promise<SupabaseClient> {
   const client = createClient(url!, publishableKey!, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const { error } = await client.auth.signInWithPassword({ email, password });
-  if (error) throw new Error(`Sign-in failed for ${email}: ${error.message}`);
+  if (error) throw new Error(`Sign-in failed for user ${label}: ${classify(error)}`);
   return client;
 }
 
