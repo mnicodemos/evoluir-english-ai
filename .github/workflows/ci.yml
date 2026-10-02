@@ -47,6 +47,29 @@ jobs:
           fi
           echo "SUPABASE_URL format: valid"
 
+      - name: Backend reachability diagnostic (safe, no values printed)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || '' }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY || '' }}
+          E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL || '' }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD || '' }}
+          SECURITY_USER_B_EMAIL: ${{ secrets.SECURITY_USER_B_EMAIL || '' }}
+          SECURITY_USER_B_PASSWORD: ${{ secrets.SECURITY_USER_B_PASSWORD || '' }}
+        run: |
+          yn() { [ -n "$1" ] && echo yes || echo no; }
+          echo "SUPABASE_URL present: $(yn "$SUPABASE_URL")"
+          case "$SUPABASE_URL" in https://*) echo "URL is HTTPS: yes";; *) echo "URL is HTTPS: no";; esac
+          host=$(printf '%s' "$SUPABASE_URL" | sed -E 's#^https?://([^/:]+).*#\1#')
+          echo "Hostname: $host"
+          echo "Publishable key present: $(yn "$SUPABASE_PUBLISHABLE_KEY")"
+          echo "Key prefix ok (sb_publishable_ or JWT): $(printf '%s' "$SUPABASE_PUBLISHABLE_KEY" | grep -Eq '^(sb_publishable_|eyJ)' && echo yes || echo no)"
+          echo "User A email/password present: $(yn "$E2E_USER_EMAIL")/$(yn "$E2E_USER_PASSWORD")"
+          echo "User B email/password present: $(yn "$SECURITY_USER_B_EMAIL")/$(yn "$SECURITY_USER_B_PASSWORD")"
+          echo "DNS lookup:"; getent hosts "$host" >/dev/null && echo "  resolves: yes" || echo "  resolves: no"
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" "https://$host/auth/v1/health" || echo "000")
+          echo "Auth health HTTP status: $code (000 = network/DNS failure)"
+
       - uses: oven-sh/setup-bun@v2
 
       - name: Dependency audit (js-yaml effective version)
