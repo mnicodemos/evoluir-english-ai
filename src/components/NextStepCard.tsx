@@ -161,12 +161,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] sm:border-t sm:border-border sm:bg-evo-block"
         aria-label={t("Your next step")}
       >
-        <div className="grid h-full min-w-0 grid-cols-1 sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
+        <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
           <div
-            className="relative w-full self-stretch bg-sidebar sm:bg-evo-block sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative min-h-[4.9rem] w-full flex-1 self-stretch bg-sidebar sm:min-h-[13.5rem] sm:flex-none sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
-            <div className="relative aspect-[4.8/1] w-full overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
+            <div className="relative h-full w-full overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
               <img
                 src={evoDashboardMobile.url}
                 alt=""
@@ -190,7 +190,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 EVO · {t("Your AI Learning Coach")}
               </p>
             </div>
-            <div className="mt-1 grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-start gap-3 sm:mt-2 sm:block">
+            <div className="mt-1 grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-center gap-3 sm:mt-2 sm:block">
               <div className="min-w-0">
                 <p className="text-xs font-semibold leading-none text-sidebar-foreground/75 sm:text-sm sm:leading-normal">
                   {t("TODAY'S PRIORITY")}
@@ -200,7 +200,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </h2>
               </div>
               {mainAvailable && (
-                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] self-start bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
+                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>{t("Practice now")}</Link>
                   ) : (
