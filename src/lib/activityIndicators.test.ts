@@ -107,12 +107,27 @@ describe("Vocabulary indicator", () => {
     ).toBe(false);
   });
 
-  it("stays hidden after a saved-word read or generation error", () => {
+  it("stays hidden after a saved-word read error", () => {
     const batch = { batchWordIds: ["w1"], masteryByWordId: {} };
     expect(vocabularyIndicatorVisible({ batch, isLoading: false, isError: true })).toBe(false);
+  });
+
+  it("shows saved words even after an earlier generation failure", () => {
+    const batch = { batchWordIds: ["w1"], masteryByWordId: {} };
     expect(
       vocabularyIndicatorVisible({
         batch,
+        isLoading: false,
+        isError: false,
+        generationFailed: true,
+      }),
+    ).toBe(true);
+  });
+
+  it("stays hidden for an empty batch after a generation failure", () => {
+    expect(
+      vocabularyIndicatorVisible({
+        batch: { batchWordIds: [], masteryByWordId: {} },
         isLoading: false,
         isError: false,
         generationFailed: true,

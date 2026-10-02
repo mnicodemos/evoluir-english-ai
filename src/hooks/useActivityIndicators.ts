@@ -50,6 +50,10 @@ function useVocabularyBatchProgress(round: number, userId: string | undefined, l
   return useQuery({
     queryKey: ["vocabulary-batch-progress", userId, round, level],
     enabled: !!userId && !!level,
+    // Words may be saved after the lesson screen closed (the server finishes the
+    // batch on its own), so an empty batch is re-read until its words appear.
+    refetchInterval: (query) =>
+      query.state.data && query.state.data.batchWordIds.length === 0 ? 15_000 : false,
     queryFn: async () => {
       if (!userId) return { batchWordIds: [], masteryByWordId: {} };
       const [batch, mine] = await Promise.all([
