@@ -198,8 +198,13 @@ function LessonPage() {
         if (words.length > 0) {
           await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
         }
-      } catch {
-        if (failureKey) window.localStorage.setItem(failureKey, String(Date.now()));
+      } catch (error) {
+        // A dropped connection or a slot still busy is not a failed batch: the
+        // Dashboard and Vocabulary pick it up again right away.
+        const transient =
+          error instanceof Error &&
+          /already running|busy|wait|fetch|network|abort|load failed/i.test(error.message);
+        if (failureKey && !transient) window.localStorage.setItem(failureKey, String(Date.now()));
         // Lesson completion remains authoritative. Vocabulary keeps its existing
         // manual retry path when generation is temporarily unavailable.
       }

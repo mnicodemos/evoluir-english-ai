@@ -1,5 +1,7 @@
 import "./lib/error-capture";
 
+import { requestContext } from "./lib/keepAlive.server";
+
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -48,7 +50,10 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
+      const response = await requestContext.run(
+        ctx as { waitUntil?: (promise: Promise<unknown>) => void } | undefined,
+        () => handler.fetch(request, env, ctx),
+      );
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);
