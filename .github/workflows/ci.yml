@@ -40,6 +40,12 @@ jobs:
             exit 1
           fi
           echo "All test credentials present."
+          # Format check only — values are never printed.
+          if ! printf '%s' "$SUPABASE_URL" | grep -Eq '^https://[A-Za-z0-9.-]+(:[0-9]+)?/?$'; then
+            echo "::error::vars.SUPABASE_URL is set but is not a valid URL (expected https://<project>.supabase.co, no quotes, spaces or path)."
+            exit 1
+          fi
+          echo "SUPABASE_URL format: valid"
 
       - uses: oven-sh/setup-bun@v2
 
