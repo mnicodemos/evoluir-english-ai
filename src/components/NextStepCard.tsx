@@ -192,7 +192,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
             <div className="mt-1 grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-start gap-3 sm:mt-2 sm:block">
               <div className="min-w-0">
-                <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:text-sm sm:leading-normal">
+                <p className="text-xs font-semibold leading-none text-sidebar-foreground/75 sm:text-sm sm:leading-normal">
                   {t("TODAY'S PRIORITY")}
                 </p>
                 <h2 className="mt-2 min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:text-2xl sm:leading-normal xl:text-3xl">
@@ -200,7 +200,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </h2>
               </div>
               {mainAvailable && (
-                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] self-start bg-brand-green px-3 text-base text-sidebar hover:bg-brand-green/90 sm:hidden">
+                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] self-start bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>{t("Practice now")}</Link>
                   ) : (
