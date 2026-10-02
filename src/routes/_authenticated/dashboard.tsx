@@ -124,7 +124,10 @@ function Dashboard() {
               name={profile.name}
               placement="dashboard-header"
               mobileTrailing={(
-                <div className="flex items-center gap-1.5 whitespace-nowrap">
+                <div className="flex items-center gap-3 whitespace-nowrap">
+                  <span className="rounded-full border border-brand-green/35 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
+                    {profile.level}
+                  </span>
                   <Flame
                     className="size-5 shrink-0 fill-current text-current"
                     style={{ color: getLeague(streakDays).from }}
@@ -137,7 +140,7 @@ function Dashboard() {
             />
           </header>
 
-          <div className="order-1 card-soft grid min-w-0 grid-cols-3 overflow-hidden lg:order-none lg:grid-cols-4 xl:h-[7.59rem]">
+          <div className="order-1 hidden card-soft min-w-0 grid-cols-3 overflow-hidden lg:order-none lg:grid lg:grid-cols-4 xl:h-[7.59rem]">
             <div className="col-span-3 border-b border-border lg:col-span-1 lg:border-b-0 lg:border-r">
               <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
             </div>

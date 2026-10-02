@@ -150,3 +150,4 @@
 - [x] Aplicar o novo logo como ícone responsivo do navegador e do app instalado
 - [x] Dashboard mobile — reorganizar foco e progresso, ocultar blocos substituídos e adicionar navegação inferior
 - [x] Dashboard mobile — mover sequência ao cabeçalho, frequência ao progresso e remover resumo diário duplicado
+- [x] Dashboard mobile — mover nível ao cabeçalho, retirar bloco de nível e compactar habilidades em uma tela

@@ -195,7 +195,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {t("TODAY'S PRIORITY")}
               </p>
             </div>
-            <div className="grid grid-cols-[minmax(0,1fr)_minmax(8.5rem,0.8fr)] items-center gap-3 sm:mt-0.5 sm:block">
+            <div className="grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-center gap-3 sm:mt-0.5 sm:block">
               <h2 className="min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:text-2xl sm:leading-normal xl:text-3xl">
                 {skillLabel}
               </h2>
