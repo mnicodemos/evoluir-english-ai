@@ -6,7 +6,10 @@ import { defineConfig } from "vitest/config";
 // executed by `bun run e2e` and must never be collected here.
 export default defineConfig({
   resolve: {
-    alias: [{ find: /^@$/, replacement: path.resolve(__dirname, "src") }, { find: "@", replacement: path.resolve(__dirname, "src") }],
+    alias: [
+      { find: /^@$/, replacement: path.resolve(__dirname, "src") },
+      { find: "@", replacement: path.resolve(__dirname, "src") },
+    ],
   },
   test: {
     include: ["src/**/*.test.{ts,tsx}", "tests/**/*.test.{ts,tsx}"],

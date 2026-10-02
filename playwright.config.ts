@@ -25,5 +25,20 @@ export default defineConfig({
         reuseExistingServer: true,
         timeout: 120_000,
       },
-  projects: [{ name: "chromium", use: { browserName: "chromium" } }],
+  projects: [
+    {
+      name: "desktop-chromium",
+      use: { browserName: "chromium", viewport: { width: 1280, height: 1800 } },
+    },
+    {
+      name: "pixel-7",
+      use: {
+        browserName: "chromium",
+        viewport: { width: 412, height: 915 },
+        deviceScaleFactor: 2.625,
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+  ],
 });
