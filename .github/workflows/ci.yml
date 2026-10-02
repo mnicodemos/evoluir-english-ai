@@ -62,7 +62,7 @@ jobs:
         run: bun run lint
 
       - name: TypeScript
-        run: bunx tsgo --noEmit
+        run: bun run typecheck
 
       - name: Unit tests (Vitest)
         run: bun run test
