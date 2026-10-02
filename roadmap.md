@@ -152,4 +152,5 @@
 - [x] Dashboard mobile — mover sequência ao cabeçalho, frequência ao progresso e remover resumo diário duplicado
 - [x] Dashboard mobile — mover nível ao cabeçalho, retirar bloco de nível e compactar habilidades em uma tela
 - [x] Dashboard mobile — aproximar sequência, alinhar ação ao título, adicionar divisória e uniformizar espaços
-- [ ] Mobile — exibir o menu inferior em todas as páginas e remover os botões superiores de voltar ao Dashboard
+- [x] Mobile — exibir o menu inferior em todas as páginas e remover os botões superiores de voltar ao Dashboard
+- [x] Dashboard mobile — bloco da EVO cresce com o espaço livre (flex-1 + imagem absoluta)
