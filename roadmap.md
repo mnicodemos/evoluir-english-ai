@@ -156,3 +156,4 @@
 - [x] Dashboard mobile — bloco da EVO cresce com o espaço livre (flex-1 + imagem absoluta)
 - [x] Mobile — reduzir a altura do menu inferior em 5% (4.5rem → 4.275rem em nav, padding e cálculo do dashboard)
 - [x] Mobile — rótulo "Prioridade de hoje" centralizado verticalmente entre os textos de cima e de baixo (mt-1 → mt-2)
+- [x] Mobile — EVO encosta na borda superior do bloco: faixas pretas embutidas no banner (linhas 0–153 e 571–668) recortadas em novo asset evo-dashboard-mobile-flush.jpg (1600×425), aplicado só na variante mobile do NextStepCard; desktop inalterado.
