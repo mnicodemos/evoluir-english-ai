@@ -128,13 +128,15 @@ function Dashboard() {
                   <span className="rounded-full border border-brand-green/35 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
                     {profile.level}
                   </span>
-                  <Flame
-                    className="size-5 shrink-0 fill-current text-current"
-                    style={{ color: getLeague(streakDays).from }}
-                    strokeWidth={2.4}
-                    aria-hidden="true"
-                  />
-                  <span className="font-display text-sm font-bold">{streakDays} {t("days")}</span>
+                  <span className="flex items-center gap-1">
+                    <Flame
+                      className="size-5 shrink-0 fill-current text-current"
+                      style={{ color: getLeague(streakDays).from }}
+                      strokeWidth={2.4}
+                      aria-hidden="true"
+                    />
+                    <span className="font-display text-sm font-bold">{streakDays} {t("days")}</span>
+                  </span>
                 </div>
               )}
             />
@@ -188,7 +190,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="order-2 grid min-w-0 gap-2 lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
+          <div className="order-2 grid min-w-0 gap-[5px] lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
             <section className="min-w-0 lg:col-span-9 xl:h-full">
               <NextStepCard compact />
             </section>
@@ -258,11 +260,13 @@ function Dashboard() {
                     </div>
                   ))}
                 </div>
-                <WeeklyFrequency
-                  userId={profile.id}
-                  daysPerWeek={profile.study_days_per_week ?? 7}
-                  presentation="mobile-progress-summary"
-                />
+                 <div className="border-l border-border pl-1.5 lg:border-0 lg:pl-0">
+                   <WeeklyFrequency
+                     userId={profile.id}
+                     daysPerWeek={profile.study_days_per_week ?? 7}
+                     presentation="mobile-progress-summary"
+                   />
+                 </div>
               </div>
               {/* Desktop-only closing line, placed at the marked spot below the content. */}
               <p className="mt-auto hidden pt-3 text-center text-[11px] font-semibold tracking-wide text-warning lg:block">
@@ -276,7 +280,7 @@ function Dashboard() {
             </section>
           </div>
 
-          <div className="order-3 grid min-w-0 gap-2 lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
+          <div className="order-3 grid min-w-0 gap-[5px] lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
             <div className="min-w-0 lg:col-span-5 xl:h-full">
               <PathProgressCard compact />
             </div>

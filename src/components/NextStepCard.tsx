@@ -184,23 +184,23 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col justify-between px-3 pt-3 pb-1 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
             <div className="flex items-start justify-between gap-2">
               <p className="text-[11px] font-bold uppercase text-brand-green">
                 EVO · {t("Your AI Learning Coach")}
               </p>
             </div>
-            <div className="mt-1 sm:mt-2 sm:block">
-              <p className="text-xs font-semibold text-sidebar-foreground/75 sm:text-sm">
-                {t("TODAY'S PRIORITY")}
-              </p>
-            </div>
-            <div className="grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-center gap-3 sm:mt-0.5 sm:block">
-              <h2 className="min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:text-2xl sm:leading-normal xl:text-3xl">
-                {skillLabel}
-              </h2>
+            <div className="mt-1 grid grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] items-start gap-3 sm:mt-2 sm:block">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold leading-none text-sidebar-foreground/75 sm:text-sm sm:leading-normal">
+                  {t("TODAY'S PRIORITY")}
+                </p>
+                <h2 className="mt-2 min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:text-2xl sm:leading-normal xl:text-3xl">
+                  {skillLabel}
+                </h2>
+              </div>
               {mainAvailable && (
-                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
+                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] self-start bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>{t("Practice now")}</Link>
                   ) : (

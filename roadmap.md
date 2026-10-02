@@ -151,3 +151,4 @@
 - [x] Dashboard mobile — reorganizar foco e progresso, ocultar blocos substituídos e adicionar navegação inferior
 - [x] Dashboard mobile — mover sequência ao cabeçalho, frequência ao progresso e remover resumo diário duplicado
 - [x] Dashboard mobile — mover nível ao cabeçalho, retirar bloco de nível e compactar habilidades em uma tela
+- [x] Dashboard mobile — aproximar sequência, alinhar ação ao título, adicionar divisória e uniformizar espaços
