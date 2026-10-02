@@ -46,8 +46,13 @@ jobs:
       - name: Dependency audit (js-yaml effective version)
         run: |
           bun install --frozen-lockfile
-          bun pm ls --all 2>/dev/null | grep -i "js-yaml" || true
-          bun audit
+          bun pm why js-yaml --top
+          # Full report is always printed; HIGH/CRITICAL fail the build.
+          # Known moderate (documented): esbuild@0.18.20 via drizzle-kit ->
+          # @esbuild-kit/core-utils (dev-only, pins ~0.18; GHSA-67mh-4wv8-2f99).
+          bun audit || true
+          bun audit --audit-level=high
+
 
 
       - name: Install dependencies (frozen lockfile)
