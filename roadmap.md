@@ -148,3 +148,4 @@
 - [x] EVO — trocar a imagem no AI Teacher, My History e aulas, preservando a arte completa entre as bordas superior e inferior
 - [x] Flashcards com áudio — manter “LISTEN CARD” visível e liberar Correct/Incorrect somente após ouvir o áudio
 - [x] Aplicar o novo logo como ícone responsivo do navegador e do app instalado
+- [ ] Dashboard mobile — reorganizar foco e progresso, ocultar blocos substituídos e adicionar navegação inferior
