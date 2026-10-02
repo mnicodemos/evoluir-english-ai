@@ -4,7 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const USER_VOCABULARY_MASTERY_KEY = ["user-vocabulary-mastery"] as const;
 
-export type WordMastery = { word_id: string; mastery_level: number; last_reviewed_at: string | null };
+export type WordMastery = {
+  word_id: string;
+  mastery_level: number;
+  last_reviewed_at: string | null;
+};
 
 /**
  * The student's own word mastery, read once and shared by every reader

@@ -236,7 +236,7 @@ function CommercialLanding() {
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {pillars.map(({ icon: Icon, title, text }) => (
                 <article key={title} className="card-soft p-6">
-                    <span className="grid size-11 place-items-center text-primary">
+                  <span className="grid size-11 place-items-center text-primary">
                     <Icon className="size-6" aria-hidden="true" />
                   </span>
                   <h3 className="mt-5 text-sm font-bold text-card-foreground">{title}</h3>

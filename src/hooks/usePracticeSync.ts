@@ -21,7 +21,8 @@ export function useSavedPractice() {
     queryFn: async () => {
       const { data: auth } = await supabase.auth.getUser();
       const userId = auth.user?.id;
-      if (!userId) return { listening: [] as string[], writing: [] as { prompt: string; at: string }[] };
+      if (!userId)
+        return { listening: [] as string[], writing: [] as { prompt: string; at: string }[] };
       const [listening, writing] = await Promise.all([
         supabase
           .from("activities")

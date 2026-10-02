@@ -42,8 +42,7 @@ export async function callGateway(
   // generation run on the standard Lovable AI service; the AI Talking JSON report
   // and every other feature keep their current provider.
   const useLovable =
-    (usage?.operation === "talking" && !jsonMode) ||
-    usage?.operation === "vocabulary_generation";
+    (usage?.operation === "talking" && !jsonMode) || usage?.operation === "vocabulary_generation";
   const lovable = useLovable ? await import("./lovable-chat.server") : null;
   const GEMINI_TEXT_MODEL = lovable
     ? usage?.operation === "vocabulary_generation"
@@ -95,7 +94,9 @@ export async function callGateway(
     if (signal?.aborted)
       throw new AiError(
         504,
-        usage?.operation === "tts" || usage?.operation === "transcription" || usage?.operation === "talking"
+        usage?.operation === "tts" ||
+          usage?.operation === "transcription" ||
+          usage?.operation === "talking"
           ? "Voice processing is taking longer than expected. Please try again."
           : "The AI service is busy right now. Please try again in a few minutes.",
       );

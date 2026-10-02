@@ -60,13 +60,20 @@ export function useLearningPath() {
           lessonId,
           started: !!state,
           completed,
-          progress: completed ? 100 : Math.round(((state?.video_progress ?? 0) + (state?.progress ?? 0)) / 2),
+          progress: completed
+            ? 100
+            : Math.round(((state?.video_progress ?? 0) + (state?.progress ?? 0)) / 2),
           locked: !previousDone,
         };
         previousDone = completed;
         return item;
       });
-      return { unit: unit.unit, title: unit.title, lessons: list, completed: list.filter((l) => l.completed).length };
+      return {
+        unit: unit.unit,
+        title: unit.title,
+        lessons: list,
+        completed: list.filter((l) => l.completed).length,
+      };
     });
 
     const all = units.flatMap((u) => u.lessons);

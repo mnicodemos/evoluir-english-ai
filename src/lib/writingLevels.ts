@@ -274,7 +274,11 @@ export function pickWritingTasks(options: {
  * this round. Same inputs on every device → same tasks (Writing page and the
  * Dashboard indicator share it).
  */
-export function roundPrompts(config: WritingLevelConfig, rotation: number, serverHistory: string[]): string[] {
+export function roundPrompts(
+  config: WritingLevelConfig,
+  rotation: number,
+  serverHistory: string[],
+): string[] {
   let history = serverHistory;
   const levelExhausted = WRITING_CATEGORIES.every(({ id }) =>
     config.tasks[id].every((task) => history.includes(task)),

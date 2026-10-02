@@ -197,6 +197,13 @@
       "when": 1790852535956,
       "tag": "0027_study_streak_daily_goal_rule",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1790957231184,
+      "tag": "0028_create_roles_and_quiz_protection",
+      "breakpoints": true
     }
   ]
 }

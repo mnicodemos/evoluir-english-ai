@@ -68,12 +68,13 @@ function collect(node: unknown, out: { id: string; seconds: number }[]): void {
     return;
   }
   if (!node || typeof node !== "object") return;
-  const obj = node as Record<string, any>;
+  const obj = node as Record<string, unknown>;
   const id = typeof obj["videoId"] === "string" ? (obj["videoId"] as string) : null;
-  const length = obj["lengthText"]?.simpleText as string | undefined;
+  const length = (obj["lengthText"] as { simpleText?: string } | undefined)?.simpleText;
   if (id && length) {
     const seconds = toSeconds(length);
-    if (seconds && seconds >= MIN_VIDEO_SECONDS && seconds <= MAX_VIDEO_SECONDS) out.push({ id, seconds });
+    if (seconds && seconds >= MIN_VIDEO_SECONDS && seconds <= MAX_VIDEO_SECONDS)
+      out.push({ id, seconds });
   }
   Object.values(obj).forEach((value) => collect(value, out));
 }

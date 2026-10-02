@@ -47,7 +47,20 @@ const IRREGULARS: Irregular[] = [
 ];
 
 const PARTICLES = [
-  "up", "out", "on", "off", "in", "into", "over", "down", "back", "away", "through", "along", "around", "forward",
+  "up",
+  "out",
+  "on",
+  "off",
+  "in",
+  "into",
+  "over",
+  "down",
+  "back",
+  "away",
+  "through",
+  "along",
+  "around",
+  "forward",
 ];
 
 const PHRASAL_MEANINGS: Record<string, string> = {
@@ -111,7 +124,10 @@ const LINKING_WORDS: Record<string, string> = {
 
 /** Finds linking words (connectors) present in the given text. */
 export function findLinkingWords(text: string, limit = 12): { word: string; pt: string }[] {
-  const lower = ` ${text.toLowerCase().replace(/[^a-z\s']/g, " ").replace(/\s+/g, " ")} `;
+  const lower = ` ${text
+    .toLowerCase()
+    .replace(/[^a-z\s']/g, " ")
+    .replace(/\s+/g, " ")} `;
   const out: { word: string; pt: string }[] = [];
   for (const [word, pt] of Object.entries(LINKING_WORDS)) {
     if (lower.includes(` ${word} `)) out.push({ word, pt });
@@ -139,7 +155,10 @@ export function essentialPhrasalVerbs(limit = 16) {
 
 /** Finds irregular verbs (any form) present in the given text. */
 export function findIrregularVerbs(text: string, limit = 12): Irregular[] {
-  const lower = ` ${text.toLowerCase().replace(/[^a-z\s']/g, " ").replace(/\s+/g, " ")} `;
+  const lower = ` ${text
+    .toLowerCase()
+    .replace(/[^a-z\s']/g, " ")
+    .replace(/\s+/g, " ")} `;
   const found: Irregular[] = [];
   for (const verb of IRREGULARS) {
     const forms = [verb.base, ...verb.past.split("/"), verb.participle];
@@ -151,7 +170,11 @@ export function findIrregularVerbs(text: string, limit = 12): Irregular[] {
 
 /** Finds phrasal verbs (verb + particle) present in the given text. */
 export function findPhrasalVerbs(text: string, limit = 10): { phrase: string; pt: string }[] {
-  const words = text.toLowerCase().replace(/[^a-z\s']/g, " ").split(/\s+/).filter(Boolean);
+  const words = text
+    .toLowerCase()
+    .replace(/[^a-z\s']/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
   const seen = new Map<string, string>();
   for (let i = 0; i < words.length - 1; i += 1) {
     const pair = `${words[i]} ${words[i + 1]}`;

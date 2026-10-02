@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { geminiBackoffMs, isTemporaryGeminiStatus, GEMINI_ATTEMPTS_PER_MODEL } from "./gemini.server";
+import {
+  geminiBackoffMs,
+  isTemporaryGeminiStatus,
+  GEMINI_ATTEMPTS_PER_MODEL,
+} from "./gemini.server";
 import { teacherErrorMessage } from "./teacherChat";
 
 describe("gemini retry policy", () => {
@@ -16,7 +20,9 @@ describe("gemini retry policy", () => {
     expect(geminiBackoffMs(1, 60)).toBe(5000);
   });
   it("maps provider overload to busy, not quota", () => {
-    expect(teacherErrorMessage(new Error("The AI service is very busy right now (high demand)."))).toBe("busy");
+    expect(
+      teacherErrorMessage(new Error("The AI service is very busy right now (high demand).")),
+    ).toBe("busy");
     expect(teacherErrorMessage(new Error("Another AI request is already running."))).toBe("busy");
   });
 });

@@ -17,7 +17,6 @@ export async function resetAllProgress(userId: string) {
     supabase.from("progress").delete().eq("user_id", userId),
   ]);
 
-
   await Promise.all([
     supabase.from("quizzes").delete().eq("created_by", userId),
     supabase.from("flashcards").delete().eq("created_by", userId),

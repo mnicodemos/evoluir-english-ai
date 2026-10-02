@@ -9,9 +9,15 @@ export const Route = createFileRoute("/_authenticated/coach")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · AI Talking" },
-      { name: "description", content: "Practice everyday, professional and travel English with your AI teacher." },
+      {
+        name: "description",
+        content: "Practice everyday, professional and travel English with your AI teacher.",
+      },
       { property: "og:title", content: "Evoluir+ English AI · AI Talking" },
-      { property: "og:description", content: "Practice English conversation with instant feedback." },
+      {
+        property: "og:description",
+        content: "Practice English conversation with instant feedback.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

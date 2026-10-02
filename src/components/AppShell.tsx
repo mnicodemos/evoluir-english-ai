@@ -99,12 +99,13 @@ export function MobileNavigationMenu({
           <Button
             variant="ghost"
             aria-label={translate("Open menu")}
-            className={cn("h-14 min-w-0 flex-col gap-0.5 rounded-none px-1 text-muted-foreground", className)}
+            className={cn(
+              "h-14 min-w-0 flex-col gap-0.5 rounded-none px-1 text-muted-foreground",
+              className,
+            )}
           >
             <MoreHorizontal className="size-6" />
-            <span className="text-[10px] font-medium leading-none">
-              {bottomLabel}
-            </span>
+            <span className="text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
           <Button
@@ -117,7 +118,10 @@ export function MobileNavigationMenu({
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent side="left" className="dashboard-shell dark flex w-[min(19rem,86vw)] flex-col border-sidebar-border bg-sidebar p-4 text-sidebar-foreground">
+      <SheetContent
+        side="left"
+        className="dashboard-shell dark flex w-[min(19rem,86vw)] flex-col border-sidebar-border bg-sidebar p-4 text-sidebar-foreground"
+      >
         <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
           <SheetTitle className="flex items-center gap-2 text-sidebar-foreground">
             <Logo className="size-[2.8rem] shrink-0" />
@@ -363,7 +367,12 @@ function AppShellContent({
           </div>
         </aside>
 
-        <header className={cn("sticky top-0 z-20 h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4 lg:hidden", dashboardLayout ? "hidden" : "grid")}>
+        <header
+          className={cn(
+            "sticky top-0 z-20 h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4 lg:hidden",
+            dashboardLayout ? "hidden" : "grid",
+          )}
+        >
           <div className="flex min-w-0 items-center gap-1">
             <MobileNavigationMenu translate={translate} />
             <Link to="/dashboard" className="flex min-h-11 min-w-0 items-center gap-2">
@@ -387,7 +396,8 @@ function AppShellContent({
         <main
           className={cn(
             "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
-            dashboardLayout && "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-0 lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
+            dashboardLayout &&
+              "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-[10px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
           )}
         >
           {children}
@@ -420,13 +430,18 @@ function AppShellContent({
           />
         </nav>
 
-        <div className={cn("mb-0", dashboardLayout && "hidden lg:block", mobileOneScreen && "hidden sm:block")}>
+        <div
+          className={cn(
+            "mb-0",
+            dashboardLayout && "hidden lg:block",
+            mobileOneScreen && "hidden sm:block",
+          )}
+        >
           <Footer
             lang={lang}
             containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10"
           />
         </div>
-
       </div>
     </TooltipProvider>
   );

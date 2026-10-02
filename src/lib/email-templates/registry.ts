@@ -1,14 +1,16 @@
-import type { ComponentType } from 'react'
+import type { ComponentType } from "react";
 
-import { template as courseGuideTemplate } from './course-guide'
+import { template as courseGuideTemplate } from "./course-guide";
 
 export interface TemplateEntry {
-  component: ComponentType<any>
-  subject: string | ((data: Record<string, any>) => string)
-  displayName?: string
-  previewData?: Record<string, any>
+  // Props vary per template; createElement accepts the caller's data object.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: ComponentType<any>;
+  subject: string | ((data: Record<string, unknown>) => string);
+  displayName?: string;
+  previewData?: Record<string, unknown>;
   /** Fixed recipient — overrides caller-provided recipientEmail when set. */
-  to?: string
+  to?: string;
 }
 
 /**
@@ -20,5 +22,5 @@ export interface TemplateEntry {
  *   // then add to TEMPLATES: 'welcome': welcomeTemplate
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
-  'course-guide': courseGuideTemplate,
-}
+  "course-guide": courseGuideTemplate,
+};

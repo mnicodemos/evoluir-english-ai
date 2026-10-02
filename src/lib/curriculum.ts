@@ -6,7 +6,14 @@
  * The content of each lesson is written by the AI the first time the student opens it.
  */
 
-export const SKILL_ORDER = ["listening", "reading", "talking", "writing", "vocabulary", "grammar"] as const;
+export const SKILL_ORDER = [
+  "listening",
+  "reading",
+  "talking",
+  "writing",
+  "vocabulary",
+  "grammar",
+] as const;
 export type Skill = (typeof SKILL_ORDER)[number];
 
 export const LESSONS_PER_UNIT = 6;
@@ -44,20 +51,41 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
       title: "Unit 1 — First Contact",
       category: "speaking",
       lessons: [
-        ["Hearing Greetings and Names", "Understand simple greetings, names and countries when people speak slowly."],
-        ["Reading Short Introductions", "Read very short profiles and find names, jobs and countries."],
+        [
+          "Hearing Greetings and Names",
+          "Understand simple greetings, names and countries when people speak slowly.",
+        ],
+        [
+          "Reading Short Introductions",
+          "Read very short profiles and find names, jobs and countries.",
+        ],
         ["Introducing Yourself", "Say your name, age, country and job in short sentences."],
-        ["Writing a Simple Profile", "Write four short sentences about yourself with correct punctuation."],
-        ["Everyday Greeting Words", "Use 12 core words for greetings, farewells and polite answers."],
-        ["Verb To Be in the Present", "Use am, is and are correctly in positive, negative and question forms."],
+        [
+          "Writing a Simple Profile",
+          "Write four short sentences about yourself with correct punctuation.",
+        ],
+        [
+          "Everyday Greeting Words",
+          "Use 12 core words for greetings, farewells and polite answers.",
+        ],
+        [
+          "Verb To Be in the Present",
+          "Use am, is and are correctly in positive, negative and question forms.",
+        ],
       ],
     },
     {
       title: "Unit 2 — People and Places",
       category: "vocabulary",
       lessons: [
-        ["Listening to Descriptions of People", "Catch simple details about age, family and appearance."],
-        ["Reading About a Family", "Understand a short text about a family and answer basic questions."],
+        [
+          "Listening to Descriptions of People",
+          "Catch simple details about age, family and appearance.",
+        ],
+        [
+          "Reading About a Family",
+          "Understand a short text about a family and answer basic questions.",
+        ],
         ["Talking About Your Family", "Describe your family with have/has and simple adjectives."],
         ["Writing About Where You Live", "Write five sentences about your home and city."],
         ["Home and Family Words", "Learn key nouns for rooms, furniture and family members."],
@@ -68,12 +96,21 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
       title: "Unit 3 — Daily Routine",
       category: "grammar",
       lessons: [
-        ["Listening to Daily Routines", "Understand times and daily actions in a slow description."],
-        ["Reading a Weekly Schedule", "Read a simple schedule and find days, times and activities."],
+        [
+          "Listening to Daily Routines",
+          "Understand times and daily actions in a slow description.",
+        ],
+        [
+          "Reading a Weekly Schedule",
+          "Read a simple schedule and find days, times and activities.",
+        ],
         ["Describing Your Day", "Talk about your routine using times and frequency words."],
         ["Writing Your Daily Routine", "Write a short paragraph about a typical day."],
         ["Time and Routine Words", "Use words for days, months, clock times and common actions."],
-        ["Present Simple and Frequency", "Form present simple with he/she/it and always, often, never."],
+        [
+          "Present Simple and Frequency",
+          "Form present simple with he/she/it and always, often, never.",
+        ],
       ],
     },
     {
@@ -83,8 +120,14 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Listening at a Café", "Understand simple orders, prices and short answers."],
         ["Reading a Menu and a Price List", "Find dishes, prices and quantities in a short menu."],
         ["Ordering Food and Drinks", "Order politely with I'd like and ask for the price."],
-        ["Writing a Shopping List and Note", "Write a clear list and a short note with quantities."],
-        ["Food, Drinks and Money Words", "Learn common food items, containers and money expressions."],
+        [
+          "Writing a Shopping List and Note",
+          "Write a clear list and a short note with quantities.",
+        ],
+        [
+          "Food, Drinks and Money Words",
+          "Learn common food items, containers and money expressions.",
+        ],
         ["Countable and Uncountable Nouns", "Use some, any, much and many correctly."],
       ],
     },
@@ -111,7 +154,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Telling What You Did", "Talk about last weekend with past simple verbs."],
         ["Writing a Short Diary Entry", "Write a paragraph about a past day with linkers."],
         ["Past Time Expressions", "Use ago, last, yesterday and time sequencers correctly."],
-        ["Past Simple: Regular and Irregular", "Form positive, negative and questions in past simple."],
+        [
+          "Past Simple: Regular and Irregular",
+          "Form positive, negative and questions in past simple.",
+        ],
       ],
     },
     {
@@ -123,7 +169,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Giving Directions", "Explain how to get somewhere with clear instructions."],
         ["Writing a Place Description", "Describe a neighbourhood in one organised paragraph."],
         ["City and Direction Words", "Learn key places, prepositions of place and movement verbs."],
-        ["There Is / There Are and Prepositions", "Describe locations accurately with there is/are."],
+        [
+          "There Is / There Are and Prepositions",
+          "Describe locations accurately with there is/are.",
+        ],
       ],
     },
     {
@@ -144,7 +193,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
       lessons: [
         ["Listening at the Airport", "Understand announcements, gates and simple instructions."],
         ["Reading Tickets and Signs", "Find times, gates and rules in travel documents."],
-        ["Checking In and Asking for Help", "Handle check-in, hotels and simple problems by speaking."],
+        [
+          "Checking In and Asking for Help",
+          "Handle check-in, hotels and simple problems by speaking.",
+        ],
         ["Writing a Booking Message", "Write a clear booking or change request."],
         ["Travel and Transport Words", "Learn essential airport, hotel and transport vocabulary."],
         ["Comparatives and Superlatives", "Compare options with cheaper, faster and the best."],
@@ -159,7 +211,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Talking About Your Goals", "Explain plans and intentions for the next months."],
         ["Writing About Next Year", "Write a short structured text about your plans."],
         ["Plans and Ambition Words", "Learn verbs and nouns for goals, courses and projects."],
-        ["Will, Going To and Present Continuous", "Choose the right future form for each situation."],
+        [
+          "Will, Going To and Present Continuous",
+          "Choose the right future form for each situation.",
+        ],
       ],
     },
   ],
@@ -168,12 +223,24 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
       title: "Unit 1 — Everyday Fluency",
       category: "speaking",
       lessons: [
-        ["Listening to Natural Conversations", "Follow relaxed speech with contractions and fillers."],
-        ["Reading Blog Posts About Daily Life", "Understand attitude and detail in an informal text."],
-        ["Keeping a Conversation Going", "Use follow-up questions and reactions to stay in the talk."],
+        [
+          "Listening to Natural Conversations",
+          "Follow relaxed speech with contractions and fillers.",
+        ],
+        [
+          "Reading Blog Posts About Daily Life",
+          "Understand attitude and detail in an informal text.",
+        ],
+        [
+          "Keeping a Conversation Going",
+          "Use follow-up questions and reactions to stay in the talk.",
+        ],
         ["Writing an Informal Message", "Write a natural message with a clear tone and purpose."],
         ["Common Phrasal Verbs", "Use 12 high-frequency phrasal verbs in real contexts."],
-        ["Present Perfect vs Past Simple", "Choose the right tense to talk about experience and news."],
+        [
+          "Present Perfect vs Past Simple",
+          "Choose the right tense to talk about experience and news.",
+        ],
       ],
     },
     {
@@ -192,7 +259,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
       title: "Unit 3 — Stories and Experiences",
       category: "vocabulary",
       lessons: [
-        ["Listening to a Podcast Story", "Follow a longer narrative and catch the speaker's feelings."],
+        [
+          "Listening to a Podcast Story",
+          "Follow a longer narrative and catch the speaker's feelings.",
+        ],
         ["Reading a Personal Story", "Understand sequence, reason and result in a narrative."],
         ["Telling Your Own Story", "Tell a past experience with clear structure and detail."],
         ["Writing a Narrative Paragraph", "Write a story with linkers and varied past tenses."],
@@ -208,7 +278,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Reading a Travel Article", "Identify main idea, details and recommendations."],
         ["Sorting Out Travel Problems", "Explain a problem and negotiate a solution politely."],
         ["Writing a Review", "Write a balanced review with pros, cons and a verdict."],
-        ["Travel and Culture Vocabulary", "Use richer vocabulary for places, customs and services."],
+        [
+          "Travel and Culture Vocabulary",
+          "Use richer vocabulary for places, customs and services.",
+        ],
         ["Conditionals 0 and 1", "Talk about real possibilities and consequences."],
       ],
     },
@@ -219,9 +292,15 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Listening to a Discussion", "Follow two speakers agreeing and disagreeing."],
         ["Reading Opinion Texts", "Separate facts from opinions in a short article."],
         ["Giving Your Opinion", "Express and support an opinion with reasons and examples."],
-        ["Writing a Short Opinion Text", "Write an organised text with introduction and conclusion."],
+        [
+          "Writing a Short Opinion Text",
+          "Write an organised text with introduction and conclusion.",
+        ],
         ["Opinion and Linking Words", "Use however, although, in my view and similar linkers."],
-        ["Modals of Advice and Deduction", "Use should, might, must and can't for advice and guesses."],
+        [
+          "Modals of Advice and Deduction",
+          "Use should, might, must and can't for advice and guesses.",
+        ],
       ],
     },
   ],
@@ -234,7 +313,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Reading Argumentative Texts", "Identify claim, evidence and bias in an article."],
         ["Defending Your Position", "Argue a point and respond to objections fluently."],
         ["Writing a Balanced Essay", "Write a for-and-against text with clear paragraphs."],
-        ["Argument Vocabulary", "Use precise verbs and nouns for claiming, conceding and refuting."],
+        [
+          "Argument Vocabulary",
+          "Use precise verbs and nouns for claiming, conceding and refuting.",
+        ],
         ["Complex Linking and Cohesion", "Connect ideas with advanced linkers and referencing."],
       ],
     },
@@ -245,7 +327,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Listening to a Client Call", "Understand nuance, hedging and implied requests."],
         ["Reading Business Documents", "Scan proposals and reports for key commitments."],
         ["Presenting Your Work", "Deliver a short structured presentation with signposting."],
-        ["Writing a Persuasive Proposal", "Write a proposal with benefits, risks and a call to action."],
+        [
+          "Writing a Persuasive Proposal",
+          "Write a proposal with benefits, risks and a call to action.",
+        ],
         ["Formal Register Vocabulary", "Replace informal words with professional equivalents."],
         ["Passive Voice in Reports", "Use passive structures to describe processes and results."],
       ],
@@ -258,8 +343,14 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
         ["Reading Long-Form Journalism", "Follow a complex article and summarise its argument."],
         ["Discussing Current Issues", "Discuss social topics with examples and nuance."],
         ["Writing a Summary and Comment", "Summarise a text and add a critical comment."],
-        ["Society and Media Vocabulary", "Use topic vocabulary for politics, economy and technology."],
-        ["Relative Clauses and Nominalisation", "Pack information into denser, more academic sentences."],
+        [
+          "Society and Media Vocabulary",
+          "Use topic vocabulary for politics, economy and technology.",
+        ],
+        [
+          "Relative Clauses and Nominalisation",
+          "Pack information into denser, more academic sentences.",
+        ],
       ],
     },
     {
@@ -294,7 +385,10 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
       lessons: [
         ["Listening to Academic Talks", "Follow abstract lectures and note the line of reasoning."],
         ["Reading Dense Analysis", "Understand implicit structure in a demanding text."],
-        ["Building a Sophisticated Argument", "Argue with concession, qualification and precision."],
+        [
+          "Building a Sophisticated Argument",
+          "Argue with concession, qualification and precision.",
+        ],
         ["Writing an Analytical Essay", "Write a well-argued essay with sustained coherence."],
         ["Academic Vocabulary", "Use precise abstract nouns and reporting verbs."],
         ["Advanced Cohesion Devices", "Control reference, ellipsis and discourse markers."],
@@ -424,7 +518,9 @@ const LEGACY: Record<string, string> = {
 };
 
 export function normalizeLevel(level: string | null | undefined): string {
-  const raw = String(level ?? "").toLowerCase().trim();
+  const raw = String(level ?? "")
+    .toLowerCase()
+    .trim();
   const code = LEGACY[raw] ?? raw;
   return CURRICULUM[code] ? code : "b1";
 }
@@ -434,13 +530,17 @@ export function curriculumKey(level: string, unit: number, position: number) {
 }
 
 function reviewUnit(coreUnits: UnitBlueprint[]): UnitBlueprint {
-  const unitName = (index: number) => coreUnits[index]?.title.replace(/^Unit \d+ — /, "") ?? `Unit ${index + 1}`;
+  const unitName = (index: number) =>
+    coreUnits[index]?.title.replace(/^Unit \d+ — /, "") ?? `Unit ${index + 1}`;
   return {
     title: "Unit 6 — Review",
     category: "review",
     lessons: [
       ["Review I", `Review and summarize Units 1 and 2: ${unitName(0)} and ${unitName(1)}.`],
-      ["Review II", `Review and summarize Units 3, 4 and 5: ${unitName(2)}, ${unitName(3)} and ${unitName(4)}.`],
+      [
+        "Review II",
+        `Review and summarize Units 3, 4 and 5: ${unitName(2)}, ${unitName(3)} and ${unitName(4)}.`,
+      ],
       ["Test", "Answer 10 questions reviewing the content studied across Units 1 to 5."],
     ],
   };

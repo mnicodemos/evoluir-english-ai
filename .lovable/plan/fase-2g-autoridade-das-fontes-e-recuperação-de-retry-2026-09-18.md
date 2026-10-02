@@ -1,9 +1,11 @@
 # Fase 2G — Autoridade das fontes e recuperação de retry
 
 ## Escopo
+
 Corrigir somente a autoria confiável de Quiz e Writing e a recuperação segura de retries abandonados. Não executar operações reais, não alterar telas, prompts, questões ou fontes atuais de progresso.
 
 ## Implementação
+
 1. **Quiz autoritativo no servidor**
    - Criar uma função autenticada que receba apenas `attemptKey`, `lessonId` e respostas por `questionId`.
    - Buscar questões e gabaritos no servidor, validar que pertencem à lição, recalcular `is_correct`, acertos, total, score e `details`, persistir via acesso privilegiado e iniciar o Dual Write somente com esse registro.
@@ -28,6 +30,7 @@ Corrigir somente a autoria confiável de Quiz e Writing e a recuperação segura
    - Conferir grants, policies e funções no banco sem criar dados reais ou artificiais permanentes.
 
 ## Restrições preservadas
+
 - Sem alterações em `progress.*`, `profiles.level`, `learning_profile`, `learning_errors`, UX, telas, navegação, prompts, 20 questões ou modelo pedagógico.
 - Sem Speaking, Assessment ou Fase 2F.
 - Se surgir outro problema estrutural relevante, interromper e relatar antes de ampliar o escopo.

@@ -2,7 +2,16 @@ import { jsPDF } from "jspdf";
 
 import type { LandingLang } from "@/lib/landingCopy";
 import { savePdf } from "@/lib/pdfDownload";
-import { ACCENT, DARK, INK, MUTED, drawCover, drawFooters, drawHeader, loadLogo } from "@/lib/pdfTheme";
+import {
+  ACCENT,
+  DARK,
+  INK,
+  MUTED,
+  drawCover,
+  drawFooters,
+  drawHeader,
+  loadLogo,
+} from "@/lib/pdfTheme";
 
 type Section = { title: string; intro?: string; bullets?: string[] };
 

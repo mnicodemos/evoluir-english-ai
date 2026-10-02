@@ -1,6 +1,7 @@
 # One Screen Dashboard — Evoluir+ English AI
 
 ## Objetivo
+
 Reorganizar visualmente o Dashboard existente como um centro de comando pessoal, premium e orientado à ação. Em 1440×900, todas as informações essenciais ficarão na primeira viewport, sem alterar dados, regras, fluxos ou arquitetura.
 
 ## Implementação
@@ -39,6 +40,7 @@ Reorganizar visualmente o Dashboard existente como um centro de comando pessoal,
    - Usar apenas tokens semânticos existentes ou novos tokens visuais no sistema global; preservar temas claro e escuro.
 
 ## Arquivos previstos
+
 - `src/routes/_authenticated/dashboard.tsx`
 - `src/components/AppShell.tsx`
 - `src/components/NextStepCard.tsx`
@@ -52,12 +54,14 @@ Reorganizar visualmente o Dashboard existente como um centro de comando pessoal,
 - Traduções/testes apenas se novos rótulos visuais exigirem.
 
 ## Restrições garantidas
+
 - Nenhuma tabela, coluna ou migration.
 - Nenhuma rota, API, server function, hook, query ou chamada de IA nova.
 - Nenhuma alteração em CEFR, evidências, confidence, recomendação, Next Step, Smart Review, Study Plan, streak, daily goal, weekly frequency, quotas, entitlements, auth ou permissões.
 - Nenhuma segunda implementação do Dashboard e nenhum dado fictício.
 
 ## Validação
+
 - Regressão automatizada completa e verificação do build.
 - Validação visual em 1440×900, 1280×800, 768px, 414px, 390px, 375px e 320px.
 - Conferir overflow e scroll, nomes longos, inglês/português, loading, vazio, erro, ausência de evidência, níveis CEFR, frequências semanais e todos os CTAs/links.

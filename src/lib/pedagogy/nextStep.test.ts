@@ -371,9 +371,7 @@ describe("next step copy", () => {
 
 describe("why now justification", () => {
   const fill = (reason: NextStepReason) =>
-    NEXT_STEP_WHY_NOW_TEXT[reason]
-      .replaceAll("{skill}", "Vocabulary")
-      .replaceAll("{level}", "B2");
+    NEXT_STEP_WHY_NOW_TEXT[reason].replaceAll("{skill}", "Vocabulary").replaceAll("{level}", "B2");
 
   it("has one justification per reason, matching the priority hierarchy", () => {
     expect(Object.keys(NEXT_STEP_WHY_NOW_TEXT).sort()).toEqual(
@@ -389,15 +387,17 @@ describe("why now justification", () => {
   });
 
   it("explains the real reason that won the selection", () => {
-    expect(fill("recent_errors")).toBe("Your recent practice shows opportunities to improve in this area.");
-    expect(fill("not_measured_yet")).toBe("More Vocabulary evidence will help EVO understand your current level.");
+    expect(fill("recent_errors")).toBe(
+      "Your recent practice shows opportunities to improve in this area.",
+    );
+    expect(fill("not_measured_yet")).toBe(
+      "More Vocabulary evidence will help EVO understand your current level.",
+    );
     expect(fill("low_confidence")).toBe(
       "More evidence is needed to better understand your Vocabulary progress.",
     );
     expect(fill("not_practised_recently")).toBe("You haven't practised Vocabulary recently.");
-    expect(fill("lowest_score")).toBe(
-      "Vocabulary is currently the area that needs more practice.",
-    );
+    expect(fill("lowest_score")).toBe("Vocabulary is currently the area that needs more practice.");
     expect(fill("no_data")).toBe("Start anywhere and we will personalise your next step.");
   });
 
@@ -451,7 +451,9 @@ describe("why this matters now", () => {
         "no_data",
       ].sort(),
     );
-    expect(NEXT_STEP_EVIDENCE_TEXT.not_measured_yet).not.toMatch(/never|hasn't been|not been measured/i);
+    expect(NEXT_STEP_EVIDENCE_TEXT.not_measured_yet).not.toMatch(
+      /never|hasn't been|not been measured/i,
+    );
     for (const text of Object.values(NEXT_STEP_EVIDENCE_TEXT)) {
       expect(text.replace(/\{(skill|level)\}/g, "")).not.toMatch(/\{|score|confidence|%/i);
     }
@@ -469,8 +471,12 @@ describe("why this matters now", () => {
   });
 
   it("keeps the evolution context factual and never invented", () => {
-    expect(NEXT_STEP_PROGRESS_TEXT.withStrongSkill).toBe("Your {strongest} has strong evidence at {level}.");
-    expect(NEXT_STEP_PROGRESS_TEXT.neutral).toBe("Your learning evidence shows where to focus next.");
+    expect(NEXT_STEP_PROGRESS_TEXT.withStrongSkill).toBe(
+      "Your {strongest} has strong evidence at {level}.",
+    );
+    expect(NEXT_STEP_PROGRESS_TEXT.neutral).toBe(
+      "Your learning evidence shows where to focus next.",
+    );
   });
 });
 

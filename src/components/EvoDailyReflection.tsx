@@ -15,12 +15,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import reflectionBg from "@/assets/reflection-bg.jpg.asset.json";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -79,7 +74,12 @@ export function EvoDailyReflection({
   }, []);
 
   useEffect(() => {
-    if (placement !== "dashboard-header" || typeof navigator === "undefined" || !navigator.geolocation) return;
+    if (
+      placement !== "dashboard-header" ||
+      typeof navigator === "undefined" ||
+      !navigator.geolocation
+    )
+      return;
 
     const controller = new AbortController();
     navigator.geolocation.getCurrentPosition(
@@ -95,11 +95,15 @@ export function EvoDailyReflection({
         })
           .then((response) => {
             if (!response.ok) throw new Error("Weather unavailable");
-            return response.json() as Promise<{ current?: { weather_code?: number; is_day?: number } }>;
+            return response.json() as Promise<{
+              current?: { weather_code?: number; is_day?: number };
+            }>;
           })
           .then(({ current }) => {
             if (typeof current?.weather_code !== "number") return;
-            setWeatherCondition(weatherConditionFromCode(current.weather_code, current.is_day !== 0));
+            setWeatherCondition(
+              weatherConditionFromCode(current.weather_code, current.is_day !== 0),
+            );
           })
           .catch(() => undefined);
       },
@@ -120,7 +124,8 @@ export function EvoDailyReflection({
   }[greetingTone];
   const displayName = name.trim().split(/\s+/)[0];
   const copy = lang === "pt" ? "pt" : "en";
-  const fallbackCondition: WeatherCondition = now && (now.getHours() < 6 || now.getHours() >= 18) ? "night" : "sunny";
+  const fallbackCondition: WeatherCondition =
+    now && (now.getHours() < 6 || now.getHours() >= 18) ? "night" : "sunny";
   const activeWeatherCondition = weatherCondition ?? fallbackCondition;
   const WeatherIcon = weatherIcons[activeWeatherCondition];
 
@@ -142,22 +147,25 @@ export function EvoDailyReflection({
     }
   }
 
-
   if (placement === "dashboard-header") {
     return (
       <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.68fr)] lg:items-center">
         <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:block">
           <div className="lg:hidden">{mobileLeading}</div>
           <div className="min-w-0 text-left">
-          <h1 className="flex min-w-0 items-center gap-2 font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
-            <span className="truncate">
-              {greeting}, {displayName}!
-            </span>
-             <Hand className="size-4 shrink-0 fill-warning/25 text-warning sm:size-6" strokeWidth={2.2} aria-hidden="true" />
-          </h1>
-          <p className="mt-0.5 hidden text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:block sm:truncate sm:text-sm">
-            {t("Great to have you back. Let's keep building your fluency.")}
-          </p>
+            <h1 className="flex min-w-0 items-center gap-2 font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
+              <span className="truncate">
+                {greeting}, {displayName}!
+              </span>
+              <Hand
+                className="size-4 shrink-0 fill-warning/25 text-warning sm:size-6"
+                strokeWidth={2.2}
+                aria-hidden="true"
+              />
+            </h1>
+            <p className="mt-0.5 hidden text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:block sm:truncate sm:text-sm">
+              {t("Great to have you back. Let's keep building your fluency.")}
+            </p>
           </div>
           <div className="lg:hidden">{mobileTrailing}</div>
         </div>
@@ -165,12 +173,12 @@ export function EvoDailyReflection({
           style={reflectionBgStyle}
           className="dashboard-panel flex min-w-0 items-start gap-3 rounded-lg border border-border px-3 py-2 lg:items-center"
         >
-            <WeatherIcon
-              key={activeWeatherCondition}
-              className="weather-icon-change size-[1.65rem] shrink-0 text-warning"
-              strokeWidth={2.4}
-              aria-hidden="true"
-            />
+          <WeatherIcon
+            key={activeWeatherCondition}
+            className="weather-icon-change size-[1.65rem] shrink-0 text-warning"
+            strokeWidth={2.4}
+            aria-hidden="true"
+          />
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground lg:line-clamp-1">
               “{reflection.thought[copy]}”
@@ -180,38 +188,38 @@ export function EvoDailyReflection({
             </p>
           </div>
           <TooltipProvider delayDuration={200}>
-          <div className="flex shrink-0 items-center gap-2 text-muted-foreground">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={shareReflection}
-                  aria-label={t("Share reflection")}
-                  className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
-                >
-                  <Share2 className="size-3.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
-                {t("Share reflection")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={() => setLang(lang === "en" ? "pt" : "en")}
-                  aria-label={t("Change language")}
-                  className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
-                >
-                  <Languages className="size-3.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
-                {t("Change language")}
-              </TooltipContent>
-            </Tooltip>
-          </div>
+            <div className="flex shrink-0 items-center gap-2 text-muted-foreground">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={shareReflection}
+                    aria-label={t("Share reflection")}
+                    className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
+                  >
+                    <Share2 className="size-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
+                  {t("Share reflection")}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setLang(lang === "en" ? "pt" : "en")}
+                    aria-label={t("Change language")}
+                    className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
+                  >
+                    <Languages className="size-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
+                  {t("Change language")}
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </TooltipProvider>
         </aside>
       </div>

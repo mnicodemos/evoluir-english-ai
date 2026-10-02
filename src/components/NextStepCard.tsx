@@ -63,7 +63,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const skillLabel = data.prioritySkill
     ? t(NEXT_STEP_SKILL_TEXT[data.prioritySkill] ?? data.prioritySkill)
     : t("Free practice");
-  const cefrLevel = data.insight?.cefrLevel ? findLevel(data.insight.cefrLevel).cefr.replace(/^CEFR /, "") : null;
+  const cefrLevel = data.insight?.cefrLevel
+    ? findLevel(data.insight.cefrLevel).cefr.replace(/^CEFR /, "")
+    : null;
   const strongestLabel = data.insight?.strongestSkill
     ? t(NEXT_STEP_SKILL_TEXT[data.insight.strongestSkill] ?? data.insight.strongestSkill)
     : null;
@@ -109,47 +111,53 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // Colored action icons: ⚡ renders in its native yellow, ✣ uses the button
   // text color as a filled glyph instead of the previous outline strokes.
   const quickWinIcon = (
-    <span aria-hidden="true" className="text-[13px] leading-none">⚡</span>
+    <span aria-hidden="true" className="text-[13px] leading-none">
+      ⚡
+    </span>
   );
   const challengeIcon = (
-    <span aria-hidden="true" className="text-[13px] leading-none text-sidebar-foreground">✣</span>
+    <span aria-hidden="true" className="text-[13px] leading-none text-sidebar-foreground">
+      ✣
+    </span>
   );
-  const quickWinButton = quickWin && quickWinAvailable ? (
-    <Button
-      asChild
-      variant="ghost"
-      size="sm"
-      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
-    >
-      {quickWin.activity.params ? (
-        <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-          {quickWinIcon} {t("Quick Win")}
-        </Link>
-      ) : (
-        <Link to={quickWin.activity.to}>
-          {quickWinIcon} {t("Quick Win")}
-        </Link>
-      )}
-    </Button>
-  ) : null;
-  const challengeButton = data.quest && challengeAvailable ? (
-    <Button
-      asChild
-      variant="ghost"
-      size="sm"
-      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
-    >
-      {data.quest.resource.params ? (
-        <Link to="/learning/$lessonId" params={data.quest.resource.params}>
-          {challengeIcon} {t("Take the challenge")}
-        </Link>
-      ) : (
-        <Link to={data.quest.resource.to}>
-          {challengeIcon} {t("Take the challenge")}
-        </Link>
-      )}
-    </Button>
-  ) : null;
+  const quickWinButton =
+    quickWin && quickWinAvailable ? (
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+      >
+        {quickWin.activity.params ? (
+          <Link to="/learning/$lessonId" params={quickWin.activity.params}>
+            {quickWinIcon} {t("Quick Win")}
+          </Link>
+        ) : (
+          <Link to={quickWin.activity.to}>
+            {quickWinIcon} {t("Quick Win")}
+          </Link>
+        )}
+      </Button>
+    ) : null;
+  const challengeButton =
+    data.quest && challengeAvailable ? (
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+      >
+        {data.quest.resource.params ? (
+          <Link to="/learning/$lessonId" params={data.quest.resource.params}>
+            {challengeIcon} {t("Take the challenge")}
+          </Link>
+        ) : (
+          <Link to={data.quest.resource.to}>
+            {challengeIcon} {t("Take the challenge")}
+          </Link>
+        )}
+      </Button>
+    ) : null;
   const actionButtons = (
     <>
       {quickWinButton}
@@ -179,9 +187,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <img
                 src={evoDashboardApproved.url}
                 alt=""
-                 width={1536}
-                 height={1024}
-                 className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-contain sm:object-left"
+                width={1536}
+                height={1024}
+                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-contain sm:object-left"
               />
             </div>
           </div>
@@ -202,9 +210,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </h2>
               </div>
               {mainAvailable && (
-                <Button asChild className="ml-4 h-10 w-[calc(100%-1.5rem)] bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden">
+                <Button
+                  asChild
+                  className="ml-4 h-10 w-[calc(100%-1.5rem)] bg-brand-green px-3 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden"
+                >
                   {data.activity.params ? (
-                    <Link to="/learning/$lessonId" params={data.activity.params}>{t("Practice now")}</Link>
+                    <Link to="/learning/$lessonId" params={data.activity.params}>
+                      {t("Practice now")}
+                    </Link>
                   ) : (
                     <Link to={data.activity.to}>{t("Practice now")}</Link>
                   )}
@@ -227,9 +240,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     {t("Practice now")}
                   </Link>
                 ) : (
-                  <Link to={data.activity.to}>
-                    {t("Practice now")}
-                  </Link>
+                  <Link to={data.activity.to}>{t("Practice now")}</Link>
                 )}
               </Button>
             )}
@@ -323,7 +334,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <div className="border-t border-border pt-3">
               <div className="flex min-w-0 items-start gap-4">
                 <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-                  <span aria-hidden="true" className="text-lg leading-none">⚡</span>
+                  <span aria-hidden="true" className="text-lg leading-none">
+                    ⚡
+                  </span>
                 </span>
                 <div className="min-w-0 flex-1">
                   <h2 className="text-lg font-semibold">{t("Quick Win")}</h2>

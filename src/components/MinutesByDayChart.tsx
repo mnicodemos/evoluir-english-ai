@@ -74,18 +74,37 @@ export function MinutesByDayChart({ userId, level }: Props) {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={minutesByDay ?? []} margin={{ left: -24, right: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={44} />
-            <YAxis tick={{ fontSize: 11 }} allowDecimals={false} tickFormatter={(v: number) => `${v}m`} />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 11 }}
+              interval={0}
+              angle={-30}
+              textAnchor="end"
+              height={44}
+            />
+            <YAxis
+              tick={{ fontSize: 11 }}
+              allowDecimals={false}
+              tickFormatter={(v: number) => `${v}m`}
+            />
             <Tooltip
               formatter={(value: number, name: string) => [`${value} min`, name]}
-              contentStyle={{ backgroundColor: "var(--color-card)", borderColor: "var(--color-border)" }}
+              contentStyle={{
+                backgroundColor: "var(--color-card)",
+                borderColor: "var(--color-border)",
+              }}
               labelClassName="text-foreground"
             />
             <Legend wrapperStyle={{ fontSize: "12px" }} iconSize={10} />
             <Bar dataKey="Listening" stackId="min" fill="var(--color-chart-1)" />
             <Bar dataKey="Reading" stackId="min" fill="var(--color-chart-2)" />
             <Bar dataKey="Talking" stackId="min" fill="var(--color-chart-3)" />
-            <Bar dataKey="Writing" stackId="min" fill="var(--color-chart-4)" radius={[4, 4, 0, 0]} />
+            <Bar
+              dataKey="Writing"
+              stackId="min"
+              fill="var(--color-chart-4)"
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -1,8 +1,10 @@
 // Portuguese translations for the app interface (course area).
 // Lesson content, practice sentences and any AI generated text stay in English.
 export const uiPt: Record<string, string> = {
-  "We could not prepare this quiz. Please try again.": "Não foi possível preparar este quiz. Tente novamente.",
-  "Preparing this lesson's quiz… this can take about a minute.": "Preparando o quiz desta lição… isso pode levar cerca de um minuto.",
+  "We could not prepare this quiz. Please try again.":
+    "Não foi possível preparar este quiz. Tente novamente.",
+  "Preparing this lesson's quiz… this can take about a minute.":
+    "Preparando o quiz desta lição… isso pode levar cerca de um minuto.",
   // Navigation / shell
   "AI Teacher": "AI Teacher",
   "Practice English with your personal AI teacher":
@@ -241,7 +243,8 @@ export const uiPt: Record<string, string> = {
     "{skill} é sua próxima área a fortalecer na sua jornada {level}.",
   "More practice will help EVO understand your learning path.":
     "Mais prática vai ajudar a EVO a entender sua trilha de aprendizado.",
-  "Your {strongest} has strong evidence at {level}.": "Seu {strongest} tem evidências fortes no {level}.",
+  "Your {strongest} has strong evidence at {level}.":
+    "Seu {strongest} tem evidências fortes no {level}.",
   "Your learning evidence shows where to focus next.":
     "Suas evidências de aprendizado mostram onde focar agora.",
   "Review lesson": "Revisar aula",

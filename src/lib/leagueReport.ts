@@ -22,7 +22,6 @@ async function collectLeagueData(userId: string) {
     .maybeSingle();
   const level = profileRow?.level ?? "b1";
 
-
   const [lessons, quizzes, words, activities, progress] = await Promise.all([
     supabase
       .from("user_lessons")
@@ -30,7 +29,11 @@ async function collectLeagueData(userId: string) {
       .eq("user_id", userId)
       .gte("updated_at", since)
       .order("updated_at", { ascending: true }),
-    supabase.from("quiz_results").select("score, created_at").eq("user_id", userId).gte("created_at", since),
+    supabase
+      .from("quiz_results")
+      .select("score, created_at")
+      .eq("user_id", userId)
+      .gte("created_at", since),
     supabase
       .from("user_vocabulary")
       .select("mastery_level, last_reviewed_at, vocabulary(word, translation)")
@@ -41,14 +44,14 @@ async function collectLeagueData(userId: string) {
       .select("activity_type, duration_minutes, created_at")
       .eq("user_id", userId)
       .gte("created_at", since),
-      supabase
-        .from("progress")
-        .select("speaking_score, writing_score, reading_score, grammar_score, listening_score")
-        .eq("user_id", userId)
-        .eq("level", level)
-        .order("recorded_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
+    supabase
+      .from("progress")
+      .select("speaking_score, writing_score, reading_score, grammar_score, listening_score")
+      .eq("user_id", userId)
+      .eq("level", level)
+      .order("recorded_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   const lessonRows = (lessons.data ?? []).filter((r) => r.lessons);
@@ -167,13 +170,12 @@ export async function downloadLeagueReport(userId: string, input: LeagueReportIn
       doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
       doc.setTextColor(20, 24, 33);
-      doc.text(
-        `${row.completed_at ? "[done] " : "[in progress] "}${lesson.title}`,
-        margin,
-        y,
-      );
+      doc.text(`${row.completed_at ? "[done] " : "[in progress] "}${lesson.title}`, margin, y);
       y += 14;
-      body(`${lesson.category} · ${String(lesson.level).toUpperCase()} · ${lesson.objective || ""}`.trim(), 10);
+      body(
+        `${lesson.category} · ${String(lesson.level).toUpperCase()} · ${lesson.objective || ""}`.trim(),
+        10,
+      );
       if (lesson.summary) body(shorten(lesson.summary, 260), 10);
       y += 6;
     }
