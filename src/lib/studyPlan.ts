@@ -58,7 +58,7 @@ const SKILLS_BY_GOAL: Record<string, readonly string[]> = {
 /** Existing practice surfaces, used when no lesson of that skill is available. */
 const FALLBACK_BY_SKILL: Record<string, { title: string; to: string }> = {
   listening: { title: "Listening Lab", to: "/listening" },
-  speaking: { title: "AI Speaking", to: "/coach" },
+  speaking: { title: "AI Talking", to: "/coach" },
   writing: { title: "Writing", to: "/writing" },
   vocabulary: { title: "Vocabulary", to: "/vocabulary" },
   grammar: { title: "AI Teacher", to: "/teacher" },

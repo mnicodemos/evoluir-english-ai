@@ -457,7 +457,7 @@ function LessonPage() {
         </Tabs>
 
         <section className="card-soft bg-primary p-6 text-foreground">
-          <p className="text-sm text-foreground/75">Practice with AI Speaking</p>
+          <p className="text-sm text-foreground/75">Practice with AI Talking</p>
           <h2 className="mt-1 text-xl font-semibold">
             Use what you just learned in a real conversation
           </h2>
