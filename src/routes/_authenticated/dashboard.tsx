@@ -203,7 +203,7 @@ function Dashboard() {
               <NextStepCard compact />
             </section>
             <section
-              className="card-soft flex min-w-0 flex-col p-3 lg:col-span-3 xl:h-full xl:p-4"
+              className="card-soft flex min-w-0 flex-col p-3 lg:col-span-3 xl:h-full xl:px-4 xl:py-3 2xl:p-4"
               aria-labelledby="today-progress-title"
             >
               <div className="flex items-center gap-2">
@@ -251,8 +251,8 @@ function Dashboard() {
                     </span>
                   </span>
                 </div>
-                <div className="grid gap-2 xl:gap-1.5 2xl:gap-2">
-                  <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block">
+                <div className="grid gap-2 xl:gap-1 2xl:gap-2">
+                  <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
                     {t("KEEPING LEARNING")}
                   </p>
                   {learningCards.map((card) => (
@@ -265,7 +265,7 @@ function Dashboard() {
                         strokeWidth={3}
                         aria-hidden="true"
                       />
-                      <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:leading-tight 2xl:leading-normal">
+                      <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
                         <span className="font-display text-sm font-bold text-foreground">
                           {card.value}
                         </span>{" "}
