@@ -416,3 +416,12 @@
     transform: translateX(120px) skewX(-18deg);
   }
 }
+
+/* EVO card: between 1280px and 1439px the approved 25rem image column does not
+   fit next to the "Why this matters" aside, so the image column shrinks. The
+   image itself is object-contain, so nothing is cropped or distorted. */
+@media (min-width: 1280px) and (max-width: 1439.98px) {
+  .dashboard-evo-grid {
+    grid-template-columns: 17rem minmax(10.5rem, 1fr) minmax(19.66rem, 1.16fr);
+  }
+}
