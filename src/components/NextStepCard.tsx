@@ -247,6 +247,19 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {challengeButton}
               {mapButton}
             </div>
+            {/* Mobile-only "Why this matters now": a single summary item
+                condensed from the desktop aside, below the action buttons. */}
+            <div className="mt-2 flex items-start gap-2 sm:hidden">
+              <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-green">
+                  {t("Why this matters now?")}
+                </p>
+                <p className="mt-0.5 text-[11px] leading-snug text-sidebar-foreground/80">
+                  {priorityText} {evidenceText}
+                </p>
+              </div>
+            </div>
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
