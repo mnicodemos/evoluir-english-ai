@@ -100,11 +100,8 @@ export function WeeklyFrequency({
     const sevenDayTrophyUnlocked = studiedCount >= 7;
     return (
       <div className="flex h-20 min-w-0 flex-col items-center justify-center gap-1 text-center lg:hidden">
-        <Hourglass
-          className={cn(
-            "size-6 shrink-0",
-            sevenDayTrophyUnlocked ? "fill-warning text-warning" : "fill-transparent text-warning",
-          )}
+        <CalendarDays
+          className="size-[1.8rem] shrink-0 text-warning"
           strokeWidth={2.4}
           aria-hidden="true"
         />
@@ -122,24 +119,13 @@ export function WeeklyFrequency({
     const sevenDayTrophyUnlocked = studiedCount >= 7;
     return (
       <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
-        <Hourglass
-          className={cn(
-            "size-6 shrink-0 sm:hidden",
-            sevenDayTrophyUnlocked ? "fill-warning text-warning" : "fill-transparent text-warning",
-          )}
+        <CalendarDays
+          className="size-[1.8rem] shrink-0 sm:hidden text-warning"
           strokeWidth={2.4}
-          aria-label={
-            sevenDayTrophyUnlocked
-              ? lang === "pt"
-                ? "Semana completa: 7 dias"
-                : "Week complete: 7 days"
-              : lang === "pt"
-                ? "Semana ainda não completa"
-                : "Week not complete yet"
-          }
+          aria-hidden="true"
         />
-        <Hourglass
-          className="hidden size-[1.925rem] shrink-0 text-dashboard-coral sm:block"
+        <CalendarDays
+          className="hidden size-[2.31rem] shrink-0 text-dashboard-coral sm:block"
           strokeWidth={2.4}
         />
         <div className="min-w-0 flex-1 sm:text-left">
