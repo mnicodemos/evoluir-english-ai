@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Compass, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Compass, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
@@ -210,14 +210,18 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {mainAvailable && (
                 <Button
                   asChild
-                  className="h-[2.875rem] w-[42%] shrink-0 self-center rounded-xl bg-brand-green px-2 text-sm text-sidebar hover:bg-brand-green/90 sm:hidden"
+                  className="h-[2.875rem] w-[42%] shrink-0 self-center rounded-xl bg-brand-green px-2 text-sm font-bold text-sidebar hover:bg-brand-green/90 sm:hidden"
                 >
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>
                       {t("Practice now")}
+                      <ChevronRight strokeWidth={3} aria-hidden="true" />
                     </Link>
                   ) : (
-                    <Link to={data.activity.to}>{t("Practice now")}</Link>
+                    <Link to={data.activity.to}>
+                      {t("Practice now")}
+                      <ChevronRight strokeWidth={3} aria-hidden="true" />
+                    </Link>
                   )}
                 </Button>
               )}
