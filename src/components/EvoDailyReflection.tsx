@@ -1,21 +1,7 @@
-import {
-  Cloud,
-  CloudLightning,
-  CloudRain,
-  CloudSnow,
-  CloudSun,
-  Hand,
-  Languages,
-  Moon,
-  Share2,
-  Sun,
-  TreePine,
-} from "lucide-react";
+import { Hand, TreePine } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import { toast } from "sonner";
 
 import reflectionBg from "@/assets/reflection-bg.jpg.asset.json";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getDailyReflection, getGreeting, getGreetingTone } from "@/lib/dailyReflection";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -34,29 +20,6 @@ type EvoDailyReflectionProps = {
   mobileTrailing?: ReactNode;
 };
 
-type WeatherCondition = "sunny" | "partly-cloudy" | "cloudy" | "rain" | "storm" | "snow" | "night";
-
-function weatherConditionFromCode(code: number, isDay: boolean): WeatherCondition {
-  if (!isDay) return "night";
-  if (code === 0) return "sunny";
-  if (code === 1 || code === 2) return "partly-cloudy";
-  if (code === 3 || code === 45 || code === 48) return "cloudy";
-  if ([71, 73, 75, 77, 85, 86].includes(code)) return "snow";
-  if ([95, 96, 99].includes(code)) return "storm";
-  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "rain";
-  return "partly-cloudy";
-}
-
-const weatherIcons = {
-  sunny: Sun,
-  "partly-cloudy": CloudSun,
-  cloudy: Cloud,
-  rain: CloudRain,
-  storm: CloudLightning,
-  snow: CloudSnow,
-  night: Moon,
-} as const;
-
 export function EvoDailyReflection({
   userId,
   name,
@@ -64,55 +27,13 @@ export function EvoDailyReflection({
   mobileLeading,
   mobileTrailing,
 }: EvoDailyReflectionProps) {
-  const { lang, setLang } = useUiLang();
+  const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [now, setNow] = useState<Date | null>(null);
-  const [weatherCondition, setWeatherCondition] = useState<WeatherCondition | null>(null);
 
   useEffect(() => {
     setNow(new Date());
   }, []);
-
-  useEffect(() => {
-    if (
-      placement !== "dashboard-header" ||
-      typeof navigator === "undefined" ||
-      !navigator.geolocation
-    )
-      return;
-
-    const controller = new AbortController();
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const query = new URLSearchParams({
-          latitude: String(coords.latitude),
-          longitude: String(coords.longitude),
-          current: "weather_code,is_day",
-          timezone: "auto",
-        });
-        void fetch(`https://api.open-meteo.com/v1/forecast?${query.toString()}`, {
-          signal: controller.signal,
-        })
-          .then((response) => {
-            if (!response.ok) throw new Error("Weather unavailable");
-            return response.json() as Promise<{
-              current?: { weather_code?: number; is_day?: number };
-            }>;
-          })
-          .then(({ current }) => {
-            if (typeof current?.weather_code !== "number") return;
-            setWeatherCondition(
-              weatherConditionFromCode(current.weather_code, current.is_day !== 0),
-            );
-          })
-          .catch(() => undefined);
-      },
-      () => undefined,
-      { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 },
-    );
-
-    return () => controller.abort();
-  }, [placement]);
 
   const reflection = getDailyReflection(userId, now ?? new Date(0));
   const greeting = now ? t(getGreeting(now.getHours())) : t("Hello");
@@ -124,106 +45,27 @@ export function EvoDailyReflection({
   }[greetingTone];
   const displayName = name.trim().split(/\s+/)[0];
   const copy = lang === "pt" ? "pt" : "en";
-  const fallbackCondition: WeatherCondition =
-    now && (now.getHours() < 6 || now.getHours() >= 18) ? "night" : "sunny";
-  const activeWeatherCondition = weatherCondition ?? fallbackCondition;
-  const WeatherIcon = weatherIcons[activeWeatherCondition];
-
-  async function shareReflection() {
-    const text = `“${reflection.thought[copy]}” — ${reflection.reflection[copy]}`;
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-      try {
-        await navigator.share({ title: t("EVO Daily Reflection"), text });
-      } catch {
-        // user dismissed the native share sheet
-      }
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success(t("Reflection copied to clipboard"));
-    } catch {
-      // clipboard unavailable
-    }
-  }
 
   if (placement === "dashboard-header") {
     return (
-      <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.68fr)] lg:items-center">
-        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:block">
-          <div className="lg:hidden">{mobileLeading}</div>
-          <div className="min-w-0 text-left">
-            <h1 className="flex min-w-0 items-center gap-2 font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
-              <span className="truncate">
-                {greeting}, {displayName}!
-              </span>
-              <Hand
-                className="size-4 shrink-0 fill-warning/25 text-warning sm:size-6"
-                strokeWidth={2.2}
-                aria-hidden="true"
-              />
-            </h1>
-            <p className="mt-0.5 hidden text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:block sm:truncate sm:text-sm">
-              {t("Great to have you back. Let's keep building your fluency.")}
-            </p>
-          </div>
-          <div className="lg:hidden">{mobileTrailing}</div>
+      <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:block">
+        <div className="lg:hidden">{mobileLeading}</div>
+        <div className="min-w-0 text-left">
+          <h1 className="flex min-w-0 items-center gap-2 font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
+            <span className="truncate">
+              {greeting}, {displayName}!
+            </span>
+            <Hand
+              className="size-4 shrink-0 fill-warning/25 text-warning sm:size-6"
+              strokeWidth={2.2}
+              aria-hidden="true"
+            />
+          </h1>
+          <p className="mt-0.5 hidden text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:block sm:truncate sm:text-sm">
+            {t("Great to have you back. Let's keep building your fluency.")}
+          </p>
         </div>
-        <aside
-          style={reflectionBgStyle}
-          className="reflection-aside card-soft flex min-w-0 items-start gap-3 rounded-lg border border-border p-3 lg:items-center lg:px-3 lg:py-2"
-        >
-          <WeatherIcon
-            key={activeWeatherCondition}
-            className="weather-icon-change size-[1.65rem] shrink-0 text-warning"
-            strokeWidth={2.4}
-            aria-hidden="true"
-          />
-          {/* Mentoring phrase is desktop-only: on mobile the block collapses
-              to the weather icon plus the share and language controls. */}
-          <div className="min-w-0 flex-1 max-lg:hidden">
-            <p className="text-xs text-muted-foreground lg:line-clamp-1">
-              “{reflection.thought[copy]}”
-            </p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground/70 lg:truncate">
-              {reflection.reflection[copy]}
-            </p>
-          </div>
-          <TooltipProvider delayDuration={200}>
-            <div className="flex shrink-0 items-center gap-2 text-muted-foreground">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={shareReflection}
-                    aria-label={t("Share reflection")}
-                    className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
-                  >
-                    <Share2 className="size-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
-                  {t("Share reflection")}
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => setLang(lang === "en" ? "pt" : "en")}
-                    aria-label={t("Change language")}
-                    className="-m-1 rounded-md p-1 transition-colors hover:bg-accent hover:text-foreground active:scale-95"
-                  >
-                    <Languages className="size-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="border border-border bg-secondary text-secondary-foreground">
-                  {t("Change language")}
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </TooltipProvider>
-        </aside>
+        <div className="lg:hidden">{mobileTrailing}</div>
       </div>
     );
   }
