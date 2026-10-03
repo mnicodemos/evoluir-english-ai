@@ -171,7 +171,7 @@ export function EvoDailyReflection({
         </div>
         <aside
           style={reflectionBgStyle}
-          className="dashboard-panel flex min-w-0 items-start gap-3 rounded-lg border border-border px-3 py-2 lg:items-center"
+          className="reflection-aside card-soft flex min-w-0 items-start gap-3 rounded-lg border border-border p-3 lg:items-center lg:px-3 lg:py-2"
         >
           <WeatherIcon
             key={activeWeatherCondition}
