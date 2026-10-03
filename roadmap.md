@@ -176,3 +176,6 @@
 - AppShell — botões de idioma e previsão do tempo do menu Mais não deixam o texto do condition sair para fora (min-w-0 + truncate + overflow-hidden)
 - Dashboard mobile — etiqueta de nível no topo (B2) em dourado (border-warning/40 bg-warning/15 text-warning)
 - Dashboard mobile — "Por que isso importa agora?" desce um pouco (mt-2 → mt-3.5) para descolar dos chips, sem alterar a altura do bloco da EVO
+
+## Pendente → ✅ (2026-10-03)
+- [x] Desktop: subtítulos no Quick Access (6 cartões) e no Quick Win / Take the challenge (layout em duas linhas com divisor), linha separadora acima dos botões; subtítulos do Quick Access sem corte (quebram linha). Mobile inalterado.

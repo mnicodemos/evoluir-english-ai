@@ -422,7 +422,7 @@ function Dashboard() {
                     </span>
                     <span className="flex min-w-0 flex-col justify-center gap-0.5">
                       <span className="truncate text-xs font-medium">{t(item.label)}</span>
-                      <span className="hidden truncate text-[10px] leading-tight text-foreground/65 xl:block">
+                      <span className="hidden text-[10px] leading-tight text-foreground/65 xl:block">
                         {t(item.subtitle)}
                       </span>
                     </span>
