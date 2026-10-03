@@ -122,7 +122,8 @@ export function WeeklyFrequency({
   }
 
   if (presentation === "summary") {
-    const sevenDayTrophyUnlocked = studiedCount >= 7;
+    // Gold once the student's own weekly plan (2, 3, 5 or 7 days) is reached.
+    const sevenDayTrophyUnlocked = studiedCount >= weeklyGoal;
     return (
       <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
         <div className="relative shrink-0 sm:hidden">
