@@ -19,6 +19,12 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import {
+  useWeatherCondition,
+  weatherIcons,
+  type WeatherCondition,
+} from "@/hooks/useWeatherCondition";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Logo } from "@/components/Logo";
 import { BrandName } from "@/components/BrandName";
