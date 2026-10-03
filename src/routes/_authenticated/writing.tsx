@@ -86,6 +86,24 @@ function saveDone(signature: string, done: string[]) {
   writeList(`writing-done-round-${signature}`, done);
 }
 
+function loadResults(signature: string): Record<string, WritingFeedback> {
+  try {
+    const raw = localStorage.getItem(`writing-results-round-${signature}`);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveResults(signature: string, results: Record<string, WritingFeedback>) {
+  try {
+    localStorage.setItem(`writing-results-round-${signature}`, JSON.stringify(results));
+  } catch {
+    // ignore storage failures
+  }
+}
+
 function Writing() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
@@ -124,6 +142,8 @@ function Writing() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WritingFeedback | null>(null);
+  const [results, setResults] = useState<Record<string, WritingFeedback>>({});
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const operationKey = useRef<string | null>(null);
   const analyseWriting = useServerFn(analyseAuthoritativeWriting);
   const saveLegacyWriting = useServerFn(persistWritingLegacy);
@@ -131,6 +151,13 @@ function Writing() {
   useEffect(() => {
     const finished = [...new Set([...loadDone(signature), ...serverDone])];
     setDone(finished);
+    const stored = loadResults(signature);
+    setResults(stored);
+    setAnswers(
+      Object.fromEntries(
+        Object.entries(stored).map(([k, v]) => [k, (v as { original?: string }).original ?? ""]),
+      ),
+    );
     setPrompt(prompts.find((p) => !finished.includes(p)) ?? prompts[0] ?? "");
     setText("");
     setResult(null);
@@ -151,6 +178,8 @@ function Writing() {
   function redoToday() {
     setDone([]);
     saveDone(signature, []);
+    setResults({});
+    saveResults(signature, {});
     setPrompt(prompts[0] ?? "");
     setText("");
     setResult(null);
@@ -162,6 +191,10 @@ function Writing() {
     const nextDone = done.filter((p) => p !== prompt);
     setDone(nextDone);
     saveDone(signature, nextDone);
+    const nextResults = { ...results };
+    delete nextResults[prompt];
+    setResults(nextResults);
+    saveResults(signature, nextResults);
     setText("");
     setResult(null);
     operationKey.current = null;
@@ -186,6 +219,11 @@ function Writing() {
       });
       const feedback = authoritative.feedback;
       setResult(feedback);
+      const original = text.trim();
+      const nextResults = { ...results, [prompt]: { ...feedback, original } as WritingFeedback };
+      setResults(nextResults);
+      saveResults(signature, nextResults);
+      setAnswers((a) => ({ ...a, [prompt]: original }));
 
       // Mark this task as answered — it is never offered again.
       const nextDone = [...done, prompt];
@@ -337,67 +375,87 @@ function Writing() {
         )}
       </section>
 
-      {result && (
-        <section className="mt-6 space-y-5 animate-rise">
-          <div className="card-soft grid gap-5 p-6 sm:grid-cols-3">
-            {[
-              { label: "Grammar", value: result.grammar },
-              { label: "Vocabulary", value: result.vocabulary },
-              { label: "Clarity", value: result.clarity },
-            ].map((s) => (
-              <div key={s.label}>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{s.label}</span>
-                  <span className="text-muted-foreground">{s.value}%</span>
-                </div>
-                <Progress value={s.value} className="mt-2 h-2" />
+      {(() => {
+        // Every corrected task of this round stays visible for review, the
+        // current one first, until a new set of tasks is generated.
+        const order = [prompt, ...prompts.filter((p) => p !== prompt)];
+        const entries = order
+          .map((p) => ({ p, r: p === prompt && result ? result : results[p] }))
+          .filter((e): e is { p: string; r: WritingFeedback } => !!e.r && (done.includes(e.p) || (e.p === prompt && !!result)));
+        return entries.map(({ p, r }, i) => (
+          <section key={p} className="mt-6 space-y-5 animate-rise">
+            {(entries.length > 1 || p !== prompt) && (
+              <h2 className="text-sm font-semibold text-muted-foreground">{p}</h2>
+            )}
+            {answers[p] && (
+              <div className="card-soft p-6">
+                <h3 className="font-semibold">Your text</h3>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{answers[p]}</p>
               </div>
-            ))}
-          </div>
-
-          <div className="card-soft p-6">
-            <h2 className="flex items-center gap-2 font-semibold">
-              <PenLine className="size-4" /> Corrected text
-            </h2>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{result.corrected}</p>
-          </div>
-
-          <div className="card-soft p-6">
-            <h2 className="font-semibold">Natural version</h2>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{result.natural}</p>
-          </div>
-
-          {result.explanations.length > 0 && (
-            <div className="card-soft p-6">
-              <h2 className="font-semibold">What to fix</h2>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                {result.explanations.map((e, i) => (
-                  <li key={i}>{e}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {result.suggestions.length > 0 && (
-            <div className="card-soft p-6">
-              <h2 className="font-semibold">Suggestions</h2>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                {result.suggestions.map((e, i) => (
-                  <li key={i}>{e}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {!allDone && (
-            <div className="flex justify-end">
-              <Button variant="outline" onClick={nextPrompt}>
-                Next task ({done.length}/{prompts.length} done)
-              </Button>
-            </div>
-          )}
-        </section>
-      )}
+            )}
+            <WritingResultView result={r} />
+            {i === 0 && p === prompt && result && !allDone && (
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={nextPrompt}>
+                  Next task ({done.length}/{prompts.length} done)
+                </Button>
+              </div>
+            )}
+          </section>
+        ));
+      })()}
     </AppShell>
+  );
+}
+
+function WritingResultView({ result }: { result: WritingFeedback }) {
+  return (
+    <>
+      <div className="card-soft grid gap-5 p-6 sm:grid-cols-3">
+        {[
+          { label: "Grammar", value: result.grammar },
+          { label: "Vocabulary", value: result.vocabulary },
+          { label: "Clarity", value: result.clarity },
+        ].map((s) => (
+          <div key={s.label}>
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium">{s.label}</span>
+              <span className="text-muted-foreground">{s.value}%</span>
+            </div>
+            <Progress value={s.value} className="mt-2 h-2" />
+          </div>
+        ))}
+      </div>
+      <div className="card-soft p-6">
+        <h3 className="flex items-center gap-2 font-semibold">
+          <PenLine className="size-4" /> Corrected text
+        </h3>
+        <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{result.corrected}</p>
+      </div>
+      <div className="card-soft p-6">
+        <h3 className="font-semibold">Natural version</h3>
+        <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{result.natural}</p>
+      </div>
+      {result.explanations.length > 0 && (
+        <div className="card-soft p-6">
+          <h3 className="font-semibold">What to fix</h3>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+            {result.explanations.map((e, i) => (
+              <li key={i}>{e}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {result.suggestions.length > 0 && (
+        <div className="card-soft p-6">
+          <h3 className="font-semibold">Suggestions</h3>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+            {result.suggestions.map((e, i) => (
+              <li key={i}>{e}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
   );
 }
