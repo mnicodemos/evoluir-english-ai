@@ -72,6 +72,95 @@ const dashboardAccountNav = [
   { to: "/premium", label: "My Subscription", icon: Crown },
 ] as const;
 
+const weatherLabels: Record<WeatherCondition, string> = {
+  sunny: "Sunny",
+  "partly-cloudy": "Partly cloudy",
+  cloudy: "Cloudy",
+  rain: "Rain",
+  storm: "Storm",
+  snow: "Snow",
+  night: "Clear night",
+};
+
+// Translation and weather controls moved here from the dashboard reflection
+// block: one home in the sidebar (desktop) and the sheet menu (mobile).
+function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
+  const { lang, setLang } = useUiLang();
+  const { condition, refresh } = useWeatherCondition();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const WeatherIcon = weatherIcons[condition];
+  const weatherText = t(weatherLabels[condition]);
+
+  function toggleLang() {
+    setLang(lang === "pt" ? "en" : "pt");
+  }
+
+  function refreshWeather() {
+    refresh();
+    toast(`${t("Weather")}: ${weatherText}`);
+  }
+
+  if (variant === "sidebar") {
+    return (
+      <>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t("Change language")}
+              className="size-9 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              onClick={toggleLang}
+            >
+              <Languages className="size-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top" sideOffset={8}>
+            {lang === "pt" ? "English" : "Português"}
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t("Weather")}
+              className="size-9 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              onClick={refreshWeather}
+            >
+              <WeatherIcon className="size-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top" sideOffset={8}>
+            {weatherText}
+          </TooltipContent>
+        </Tooltip>
+      </>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-2 pb-2">
+      <Button
+        variant="ghost"
+        className="h-10 justify-start gap-2 border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        onClick={toggleLang}
+      >
+        <Languages className="size-5 shrink-0" />
+        <span className="truncate">{lang === "pt" ? "Português" : "English"}</span>
+      </Button>
+      <Button
+        variant="ghost"
+        className="h-10 justify-start gap-2 border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        onClick={refreshWeather}
+      >
+        <WeatherIcon className="size-5 shrink-0" />
+        <span className="truncate">{weatherText}</span>
+      </Button>
+    </div>
+  );
+}
+
 type MobileNavigationMenuProps = {
   translate: (label: string) => string;
   className?: string;
