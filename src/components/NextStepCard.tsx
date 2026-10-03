@@ -171,7 +171,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
           <div
-            className="relative h-40 w-full flex-none self-stretch overflow-hidden bg-sidebar sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative aspect-[4/1] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
             <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
@@ -180,7 +180,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 alt=""
                 width={1920}
                 height={709}
-                className="absolute left-[47%] top-[-2.104rem] block h-[14.771rem] w-auto max-w-none -translate-x-[47%] sm:hidden"
+                className="absolute inset-x-0 top-0 block h-auto w-full -translate-y-[14.245%] sm:hidden"
               />
               <img
                 src={evoDashboardApproved.url}
