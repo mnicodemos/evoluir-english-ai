@@ -60,6 +60,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-dashboard-cyan: var(--dashboard-cyan);
   --color-dashboard-blue: var(--dashboard-blue);
+  --color-dashboard-petrol: var(--dashboard-petrol);
   --color-dashboard-purple: var(--dashboard-purple);
   --color-dashboard-coral: var(--dashboard-coral);
   --color-dashboard-pink: var(--dashboard-pink);
@@ -115,6 +116,7 @@
   --sidebar-ring: oklch(0.66 0.15 158);
   --dashboard-cyan: oklch(0.83 0.16 177);
   --dashboard-blue: oklch(0.65 0.18 245);
+  --dashboard-petrol: oklch(0.62 0.085 215);
   --dashboard-purple: oklch(0.64 0.2 304);
   --dashboard-coral: oklch(0.7 0.17 47);
   --dashboard-pink: oklch(0.66 0.21 350);

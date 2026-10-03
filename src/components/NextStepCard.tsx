@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight, Compass, Map, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Compass, Lightbulb, Map, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
@@ -118,13 +118,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       ✣
     </span>
   );
+  // Mobile-only chips with outline: Quick Win, challenge and "Your trail".
   const quickWinButton =
     quickWin && quickWinAvailable ? (
       <Button
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -143,7 +144,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
@@ -156,17 +157,17 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         )}
       </Button>
     ) : null;
-  // Mobile-only companion button: opens the Study Plan page ("Your map").
+  // Mobile-only companion chip: opens the Study Plan page ("Your trail").
   const mapButton = (
     <Button
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
     >
       <Link to="/study-plan">
         <Map className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
-        {t("Your map")}
+        {t("Your trail")}
       </Link>
     </Button>
   );
@@ -240,25 +241,33 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </Button>
               )}
             </div>
-            {/* Mobile-only action row: Quick Win + challenge + Your map on a
-                single non-wrapping line, right below the priority row. */}
+            {/* Mobile-only action row: Quick Win + challenge + Your trail. */}
             <div className="mt-2.5 flex flex-nowrap items-center gap-1 sm:hidden">
               {quickWinButton}
               {challengeButton}
               {mapButton}
             </div>
-            {/* Mobile-only "Why this matters now": a single summary item
-                condensed from the desktop aside, below the action buttons. */}
-            <div className="mt-2 flex items-start gap-2 sm:hidden">
-              <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-green">
-                  {t("Why this matters now?")}
-                </p>
-                <p className="mt-0.5 text-[11px] leading-snug text-sidebar-foreground/80">
-                  {priorityText} {evidenceText}
-                </p>
-              </div>
+            {/* Mobile-only "Why this matters now": two of the three desktop
+                sentences, each with the same leading check as the desktop. */}
+            <div className="mt-2 sm:hidden">
+              <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-green">
+                <Lightbulb className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
+                {t("Why this matters now?")}
+              </p>
+              <ul className="mt-1 grid gap-1">
+                <li className="flex items-start gap-2">
+                  <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
+                  <span className="min-w-0 text-[11px] leading-snug text-sidebar-foreground/80">
+                    {priorityText}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
+                  <span className="min-w-0 text-[11px] leading-snug text-sidebar-foreground/80">
+                    {evidenceText}
+                  </span>
+                </li>
+              </ul>
             </div>
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
@@ -288,7 +297,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
 
           <aside className="relative z-10 m-3 mt-0 hidden min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:block sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
-              <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
+              <Lightbulb className="size-4 text-warning" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">
                 {t("Why this matters now?")}
               </h3>
