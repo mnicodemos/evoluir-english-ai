@@ -170,3 +170,4 @@
 - [x] Remover a barra superior (menu/logo/logout) das páginas autenticadas no mobile
 - [x] Padronizar textos visíveis: Focus area → Priority, Talking → Speaking e AI Talking → AI Speaking
 - [x] Mobile — ordenar os três atalhos centrais do menu inferior como AI Teacher, Progress e AI Speaking
+- Dashboard/NextStepCard — ícone do "Why this matters now?" vira lâmpada dourada (pendente → fazer agora)
