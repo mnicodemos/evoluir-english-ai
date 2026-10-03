@@ -212,8 +212,8 @@ function Dashboard() {
                   {t("Today's Progress")}
                 </h2>
               </div>
-              <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:grid-cols-[7rem_minmax(0,1fr)] xl:gap-4">
-                <div className="relative ml-2 grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:ml-0 lg:size-24 xl:size-30 xl:mx-0">
+              <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
+                <div className="relative ml-2 grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:ml-0 lg:size-24 2xl:size-30 xl:mx-0">
                   <svg
                     className="absolute inset-0 size-full -rotate-90"
                     viewBox="0 0 96 96"
@@ -251,7 +251,7 @@ function Dashboard() {
                     </span>
                   </span>
                 </div>
-                <div className="grid gap-2">
+                <div className="grid gap-2 xl:gap-1.5 2xl:gap-2">
                   <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block">
                     {t("KEEPING LEARNING")}
                   </p>
@@ -265,7 +265,7 @@ function Dashboard() {
                         strokeWidth={3}
                         aria-hidden="true"
                       />
-                      <p className="line-clamp-2 text-[11px] text-muted-foreground">
+                      <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:leading-tight 2xl:leading-normal">
                         <span className="font-display text-sm font-bold text-foreground">
                           {card.value}
                         </span>{" "}
@@ -285,7 +285,7 @@ function Dashboard() {
               {/* Desktop-only "Your map" badge: same pill formatting as the
                   Priority label (Your English Skills), 20% larger, opening the
                   Study Plan page — above the closing line. */}
-              <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex">
+              <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-2 2xl:gap-1.5 2xl:pt-3">
                 <Link
                   to="/study-plan"
                   className="inline-flex items-center gap-1.5 rounded-full bg-brand-green/15 px-2.5 py-[5px] text-[12px] font-semibold text-brand-green transition-colors hover:bg-brand-green/25"
