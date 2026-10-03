@@ -124,17 +124,26 @@ export function MobileNavigationMenu({
           </SheetTitle>
         </SheetHeader>
         <nav className="grid gap-1 overflow-y-auto py-3">
-          {mobileSheetNav.map((item) => (
-            <SheetClose asChild key={item.to}>
-              <Link
-                to={item.to}
-                className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
-              >
-                <item.icon className="size-5 shrink-0" />
-                <span className="truncate">{translate(item.label)}</span>
-              </Link>
-            </SheetClose>
+          {mobileSheetNav.map((item, index) => (
+            <div
+              key={item.to}
+              className={
+                index > 0 && item.to === "/premium"
+                  ? "border-t border-sidebar-border pt-2"
+                  : undefined
+              }
+            >
+              <SheetClose asChild>
+                <Link
+                  to={item.to}
+                  className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
+                >
+                  <item.icon className="size-5 shrink-0" />
+                  <span className="truncate">{translate(item.label)}</span>
+                </Link>
+              </SheetClose>
+            </div>
           ))}
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
