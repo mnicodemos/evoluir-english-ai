@@ -99,11 +99,18 @@ export function WeeklyFrequency({
   if (presentation === "mobile-progress-summary") {
     return (
       <div className="flex h-20 min-w-0 flex-col items-center justify-center gap-1 text-center lg:hidden">
-        <CalendarDays
-          className="size-[1.8rem] shrink-0 text-warning"
-          strokeWidth={2.4}
-          aria-hidden="true"
-        />
+        <div className="relative shrink-0">
+          <CalendarDays
+            className="size-[1.8rem] text-warning"
+            strokeWidth={2.4}
+            aria-hidden="true"
+          />
+          {allStudied && (
+            <span className="absolute -right-1.5 -bottom-1 grid size-4 place-items-center rounded-full bg-brand-green text-primary-foreground">
+              <Check className="size-2.5" strokeWidth={3.5} aria-hidden="true" />
+            </span>
+          )}
+        </div>
         <p className="font-display text-sm font-bold leading-tight">
           {studiedCount} / {weeklyGoal} {daysLabel}
         </p>
