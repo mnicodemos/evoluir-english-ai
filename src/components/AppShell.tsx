@@ -6,6 +6,7 @@ import {
   Crown,
   GraduationCap,
   Headphones,
+  Languages,
   LayoutDashboard,
   LineChart,
   LogOut,
