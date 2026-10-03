@@ -324,7 +324,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {t("Why this matters now?")}
               </h3>
             </div>
-            <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
+            <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mb-5 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
               {/* Mobile: short summary + evidence item — never clamped, never cut. */}
               <li className="flex items-start gap-2 sm:hidden">
                 <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
