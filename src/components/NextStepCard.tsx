@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
-// Mobile-only variant cropped flush: the supplied wide banner carries baked-in
-// black bands (rows 0-153 / 571-668) that read as a gap inside the EVO block.
-import evoDashboardMobileFlush from "@/assets/evo-dashboard-mobile-flush.jpg.asset.json";
+import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles } from "lucide-react";
 
@@ -173,16 +171,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
           <div
-            className="relative min-h-[4.9rem] w-full flex-1 self-stretch bg-sidebar sm:min-h-[13.5rem] sm:flex-none sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative h-40 w-full flex-none self-stretch overflow-hidden bg-sidebar sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
             <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
               <img
-                src={evoDashboardMobileFlush.url}
+                src={evoDashboardMobile.url}
                 alt=""
-                width={1600}
-                height={425}
-                className="absolute inset-0 block h-full w-full scale-[1.02] object-cover object-center sm:hidden"
+                width={1920}
+                height={709}
+                className="absolute left-[47%] top-[-2.104rem] block h-[14.771rem] w-auto max-w-none -translate-x-[47%] sm:hidden"
               />
               <img
                 src={evoDashboardApproved.url}
