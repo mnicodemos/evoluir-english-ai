@@ -273,7 +273,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 sentences, each with the same leading check as the desktop. */}
             <div className="mt-3.5 sm:hidden">
               <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-green">
-                <Lightbulb className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
+                <Lightbulb className="size-[1.65rem] shrink-0 text-warning" aria-hidden="true" />
                 {t("Why this matters now?")}
               </p>
               <ul className="mt-1 grid gap-1">
@@ -319,7 +319,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
 
           <aside className="relative z-10 m-3 mt-0 hidden min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:block sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
             <div className="flex items-center gap-2">
-              <Lightbulb className="size-4 text-warning" aria-hidden="true" />
+              <Lightbulb className="size-[1.65rem] text-warning" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">
                 {t("Why this matters now?")}
               </h3>
