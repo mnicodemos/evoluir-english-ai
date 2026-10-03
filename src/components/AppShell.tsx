@@ -51,7 +51,15 @@ const nav = [
   { to: "/progress", label: "Progress", icon: LineChart },
 ] as const;
 
-const sidebarNav = [...nav, { to: "/premium", label: "Premium", icon: Crown }] as const;
+// Mobile sheet menu: excludes the four items already in the bottom navigation bar.
+const mobileSheetNav = [
+  { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
+  { to: "/learning", label: "Learning", icon: GraduationCap },
+  { to: "/listening", label: "Listening", icon: Headphones },
+  { to: "/writing", label: "Writing", icon: PenLine },
+  { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
+  { to: "/premium", label: "Premium", icon: Crown },
+] as const;
 
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -104,7 +112,7 @@ export function MobileNavigationMenu({
               className,
             )}
           >
-            <MoreHorizontal className="size-6" />
+            <Menu className="size-6" />
             <span className="text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
@@ -129,7 +137,7 @@ export function MobileNavigationMenu({
           </SheetTitle>
         </SheetHeader>
         <nav className="grid gap-1 overflow-y-auto py-3">
-          {sidebarNav.map((item) => (
+          {mobileSheetNav.map((item) => (
             <SheetClose asChild key={item.to}>
               <Link
                 to={item.to}
