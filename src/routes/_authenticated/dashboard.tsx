@@ -283,24 +283,47 @@ function Dashboard() {
                   <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
                     {t("KEEPING LEARNING")}
                   </p>
-                  {learningCards.map((card) => (
-                    <div
-                      key={card.label}
-                      className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
-                    >
-                      <Check
-                        className="size-4 shrink-0 justify-self-end text-brand-green lg:justify-self-auto"
-                        strokeWidth={3}
-                        aria-hidden="true"
-                      />
-                      <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
-                        <span className="font-display text-sm font-bold text-foreground">
-                          {card.value}
-                        </span>{" "}
-                        {t(card.label)}
-                      </p>
-                    </div>
-                  ))}
+                  {learningCards.map((card) => {
+                    const stateVisual = {
+                      done: { Icon: Check, iconClass: "text-brand-green", sr: "Done today." },
+                      attention: {
+                        Icon: TriangleAlert,
+                        iconClass: "text-warning",
+                        sr: "Needs attention.",
+                      },
+                      empty: {
+                        Icon: Minus,
+                        iconClass: "text-muted-foreground/60",
+                        sr: "Nothing yet.",
+                      },
+                    } as const;
+                    const { Icon, iconClass, sr } = stateVisual[card.state];
+                    const valueClass =
+                      card.state === "attention"
+                        ? "text-warning"
+                        : card.state === "empty"
+                          ? "text-muted-foreground/60"
+                          : "text-foreground";
+                    return (
+                      <div
+                        key={card.label}
+                        className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
+                      >
+                        <Icon
+                          className={`size-4 shrink-0 justify-self-end lg:justify-self-auto ${iconClass}`}
+                          strokeWidth={3}
+                          aria-hidden="true"
+                        />
+                        <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
+                          <span className={`font-display text-sm font-bold ${valueClass}`}>
+                            {card.value}
+                          </span>{" "}
+                          {t(card.label)}
+                        </p>
+                        <span className="sr-only">{sr}</span>
+                      </div>
+                    );
+                  })}
                 </div>
                 <div className="border-l border-border pl-1.5 lg:border-0 lg:pl-0">
                   <WeeklyFrequency
