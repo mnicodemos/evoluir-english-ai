@@ -6,6 +6,7 @@ import {
   Flame,
   GraduationCap,
   Headphones,
+  Map,
   MessageSquareText,
   PenLine,
   Sparkles,
@@ -281,10 +282,21 @@ function Dashboard() {
                   />
                 </div>
               </div>
-              {/* Desktop-only closing line, placed at the marked spot below the content. */}
-              <p className="mt-auto hidden pt-3 text-center text-[11px] font-semibold tracking-wide text-warning lg:block">
-                {t("Small steps create progress.")}
-              </p>
+              {/* Desktop-only "Your map" badge: same pill formatting as the
+                  Priority label (Your English Skills), 20% larger, opening the
+                  Study Plan page — above the closing line. */}
+              <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex">
+                <Link
+                  to="/study-plan"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-brand-green/15 px-2.5 py-[5px] text-[12px] font-semibold text-brand-green transition-colors hover:bg-brand-green/25"
+                >
+                  <Map className="size-4 shrink-0" aria-hidden="true" />
+                  {t("Your map")}
+                </Link>
+                <p className="text-center text-[11px] font-semibold tracking-wide text-warning">
+                  {t("Small steps create progress.")}
+                </p>
+              </div>
               <WeeklyFrequency
                 userId={profile.id}
                 daysPerWeek={profile.study_days_per_week ?? 7}
