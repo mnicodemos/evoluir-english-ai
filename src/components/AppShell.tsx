@@ -99,7 +99,7 @@ export function MobileNavigationMenu({
               className,
             )}
           >
-            <Menu className="size-6" />
+            <Menu className="size-7" strokeWidth={2.25} />
             <span className="text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
