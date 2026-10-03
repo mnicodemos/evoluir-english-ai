@@ -241,8 +241,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </Button>
               )}
             </div>
-            {/* Mobile-only action row: Quick Win + challenge + Your map on a
-                single non-wrapping line, right below the priority row. */}
+            {/* Mobile-only action row: Quick Win + challenge + Your trail. */}
             <div className="mt-2.5 flex flex-nowrap items-center gap-1 sm:hidden">
               {quickWinButton}
               {challengeButton}
