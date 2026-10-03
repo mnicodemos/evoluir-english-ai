@@ -240,11 +240,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </Button>
               )}
             </div>
-            {/* Mobile-only action row: Quick Win + challenge side by side,
-                right below the priority title and the Practice now button. */}
-            {(quickWinButton || challengeButton) && (
-              <div className="mt-2.5 flex gap-2 sm:hidden">{actionButtons}</div>
-            )}
+            {/* Mobile-only action row: Quick Win + challenge + Your map on a
+                single non-wrapping line, right below the priority row. */}
+            <div className="mt-2.5 flex flex-nowrap items-center gap-1 sm:hidden">
+              {quickWinButton}
+              {challengeButton}
+              {mapButton}
+            </div>
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
