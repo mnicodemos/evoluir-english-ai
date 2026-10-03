@@ -249,7 +249,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
             {/* Mobile-only "Why this matters now": two of the three desktop
                 sentences, each with the same leading check as the desktop. */}
-            <div className="mt-2 sm:hidden">
+            <div className="mt-3.5 sm:hidden">
               <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-green">
                 <Lightbulb className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
                 {t("Why this matters now?")}
