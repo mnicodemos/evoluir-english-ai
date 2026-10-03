@@ -124,7 +124,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -143,7 +143,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
@@ -156,6 +156,20 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         )}
       </Button>
     ) : null;
+  // Mobile-only companion button: opens the Study Plan page ("Your map").
+  const mapButton = (
+    <Button
+      asChild
+      variant="ghost"
+      size="sm"
+      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+    >
+      <Link to="/study-plan">
+        <Map className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+        {t("Your map")}
+      </Link>
+    </Button>
+  );
   const actionButtons = (
     <>
       {quickWinButton}
