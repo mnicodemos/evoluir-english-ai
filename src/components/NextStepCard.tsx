@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import evoDashboardApproved from "@/assets/evo-dashboard-desktop-2026-10-03.png.asset.json";
+import evoDashboardApproved from "@/assets/evo-dashboard-desktop-4x1.png.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, ChevronRight, Compass, Sparkles } from "lucide-react";
@@ -169,9 +169,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] sm:border-t sm:border-border sm:bg-evo-block"
         aria-label={t("Your next step")}
       >
-        <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:flex xl:flex-col">
+        <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:flex xl:flex-col 2xl:grid 2xl:grid-cols-[auto_minmax(0,1fr)] 2xl:items-center">
           <div
-            className="relative aspect-[4/1] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:h-40 xl:min-h-0 2xl:h-32"
+            className="relative aspect-[4/1] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:aspect-[4/1] xl:h-auto xl:max-h-[10.5rem] xl:min-h-0 2xl:h-44 2xl:max-h-none 2xl:self-center"
             aria-hidden="true"
           >
             <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
