@@ -154,7 +154,7 @@ function Dashboard() {
               placement="dashboard-header"
               mobileTrailing={
                 <div className="flex items-center gap-3 whitespace-nowrap">
-                  <span className="rounded-full border border-brand-green/35 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
+                  <span className="rounded-full border border-warning/40 bg-warning/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-warning">
                     {profile.level}
                   </span>
                   <span className="flex items-center gap-1">

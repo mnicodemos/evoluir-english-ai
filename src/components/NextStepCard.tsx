@@ -125,7 +125,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:gap-1.5 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -144,7 +144,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:gap-1.5 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
@@ -163,7 +163,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:gap-1.5 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
     >
       <Link to="/study-plan">
         <Map className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
@@ -242,7 +242,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               )}
             </div>
             {/* Mobile-only action row: Quick Win + challenge + Your trail. */}
-            <div className="mt-2.5 flex flex-nowrap items-center gap-1 sm:hidden">
+            <div className="mt-2.5 flex flex-nowrap items-center gap-2 sm:hidden">
               {quickWinButton}
               {challengeButton}
               {mapButton}
