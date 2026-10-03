@@ -95,11 +95,11 @@ export function MobileNavigationMenu({
             variant="ghost"
             aria-label={translate("Open menu")}
             className={cn(
-              "h-14 min-w-0 flex-col gap-0.5 rounded-none px-1 text-muted-foreground",
+              "h-14 min-w-0 flex-col gap-0.5 rounded-none px-1 text-muted-foreground [&_svg]:size-6",
               className,
             )}
           >
-            <Menu className="size-7" strokeWidth={2.25} />
+            <Menu strokeWidth={2.25} />
             <span className="text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
