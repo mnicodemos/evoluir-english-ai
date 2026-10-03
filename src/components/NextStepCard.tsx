@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight, Compass, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Compass, Map, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
