@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import evoDashboardApproved from "@/assets/evo-dashboard-desktop-wide4.png.asset.json";
+import evoDashboardApproved from "@/assets/evo-dashboard-desktop-wide5.png.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, ChevronRight, Compass, Sparkles } from "lucide-react";
