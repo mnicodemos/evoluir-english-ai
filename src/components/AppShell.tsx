@@ -143,19 +143,19 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
     <div className="grid grid-cols-2 gap-2 pb-2">
       <Button
         variant="ghost"
-        className="h-10 justify-start gap-2 border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        className="h-10 min-w-0 justify-start gap-2 overflow-hidden border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
         onClick={toggleLang}
       >
         <Languages className="size-5 shrink-0" />
-        <span className="truncate">{lang === "pt" ? "Português" : "English"}</span>
+        <span className="min-w-0 truncate">{lang === "pt" ? "Português" : "English"}</span>
       </Button>
       <Button
         variant="ghost"
-        className="h-10 justify-start gap-2 border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        className="h-10 min-w-0 justify-start gap-2 overflow-hidden border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
         onClick={refreshWeather}
       >
         <WeatherIcon className="size-5 shrink-0" />
-        <span className="truncate">{weatherText}</span>
+        <span className="min-w-0 truncate">{weatherText}</span>
       </Button>
     </div>
   );

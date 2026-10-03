@@ -125,7 +125,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 max-sm:text-[10px] sm:text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -144,7 +144,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 max-sm:text-[10px] sm:text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
@@ -163,7 +163,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+      className="h-8 min-w-0 px-2 max-sm:text-[10px] sm:text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
     >
       <Link to="/study-plan">
         <Map className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
@@ -242,14 +242,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               )}
             </div>
             {/* Mobile-only action row: Quick Win + challenge + Your trail. */}
-            <div className="mt-2.5 flex flex-nowrap items-center gap-1 sm:hidden">
+            <div className="mt-2.5 flex flex-nowrap items-center gap-1.5 sm:hidden">
               {quickWinButton}
               {challengeButton}
               {mapButton}
             </div>
             {/* Mobile-only "Why this matters now": two of the three desktop
                 sentences, each with the same leading check as the desktop. */}
-            <div className="mt-2 sm:hidden">
+            <div className="mt-3.5 sm:hidden">
               <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-green">
                 <Lightbulb className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
                 {t("Why this matters now?")}

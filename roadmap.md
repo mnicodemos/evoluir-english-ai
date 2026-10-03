@@ -172,3 +172,7 @@
 - [x] Mobile — ordenar os três atalhos centrais do menu inferior como AI Teacher, Progress e AI Speaking
 - Dashboard/NextStepCard — ícone do "Why this matters now?" vira lâmpada dourada (pendente → fazer agora)
 - Dashboard/NextStepCard — ícone do "Why this matters now?" virou lâmpada dourada (Lightbulb, text-warning) no aside desktop e no título mobile ✅
+- Dashboard/NextStepCard — bordas dos chips (Ganho rápido / Aceitar o desafio / Sua trilha) sem sobreposição: gap-2 entre chips e padding interno reduzido no mobile
+- AppShell — botões de idioma e previsão do tempo do menu Mais não deixam o texto do condition sair para fora (min-w-0 + truncate + overflow-hidden)
+- Dashboard mobile — etiqueta de nível no topo (B2) em dourado (border-warning/40 bg-warning/15 text-warning)
+- Dashboard mobile — "Por que isso importa agora?" desce um pouco (mt-2 → mt-3.5) para descolar dos chips, sem alterar a altura do bloco da EVO
