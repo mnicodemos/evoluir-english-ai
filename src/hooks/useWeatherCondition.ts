@@ -1,3 +1,12 @@
+import {
+  Cloud,
+  CloudLightning,
+  CloudRain,
+  CloudSnow,
+  CloudSun,
+  Moon,
+  Sun,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 export type WeatherCondition =
