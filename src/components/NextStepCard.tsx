@@ -186,14 +186,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 src={evoDashboardApproved.url}
                 alt=""
                 width={880}
-                height={300}
-                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-cover sm:object-left xl:object-[50%_22%]"
+                height={220}
+                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-cover sm:object-left xl:object-center"
               />
             </div>
           </div>
 
-          <div className="sm:contents xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(19.66rem,1.16fr)] xl:items-stretch">
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
+          <div className="sm:contents xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(19.66rem,1.16fr)] xl:items-stretch 2xl:flex 2xl:min-w-0 2xl:flex-col 2xl:justify-center 2xl:gap-2">
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2 2xl:order-1">
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-bold uppercase text-brand-green">
@@ -253,7 +253,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 m-3 mt-0 hidden min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:block sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
+          <aside className="relative z-10 m-3 mt-0 hidden min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:block sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch 2xl:order-2 2xl:m-0 2xl:self-auto">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand-green" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">
