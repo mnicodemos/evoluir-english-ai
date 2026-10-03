@@ -125,15 +125,30 @@ export function WeeklyFrequency({
     const sevenDayTrophyUnlocked = studiedCount >= 7;
     return (
       <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
-        <CalendarDays
-          className="size-[1.8rem] shrink-0 sm:hidden text-warning"
-          strokeWidth={2.4}
-          aria-hidden="true"
-        />
-        <CalendarDays
-          className="hidden size-[2.31rem] shrink-0 text-dashboard-coral sm:block"
-          strokeWidth={2.4}
-        />
+        <div className="relative shrink-0 sm:hidden">
+          <CalendarDays
+            className="size-[1.8rem] text-warning"
+            strokeWidth={2.4}
+            aria-hidden="true"
+          />
+          {allStudied && (
+            <span className="absolute -right-1.5 -bottom-1 grid size-4 place-items-center rounded-full bg-brand-green text-primary-foreground">
+              <Check className="size-2.5" strokeWidth={3.5} aria-hidden="true" />
+            </span>
+          )}
+        </div>
+        <div className="relative hidden shrink-0 sm:block">
+          <CalendarDays
+            className="size-[2.31rem] text-dashboard-coral"
+            strokeWidth={2.4}
+            aria-hidden="true"
+          />
+          {allStudied && (
+            <span className="absolute -right-2 -bottom-1 grid size-[1.15rem] place-items-center rounded-full bg-brand-green text-primary-foreground">
+              <Check className="size-3" strokeWidth={3.5} aria-hidden="true" />
+            </span>
+          )}
+        </div>
         <div className="min-w-0 flex-1 sm:text-left">
           <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">
             {studiedCount} / {weeklyGoal} {daysLabel}
