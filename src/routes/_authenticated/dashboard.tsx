@@ -8,8 +8,10 @@ import {
   Headphones,
   Map,
   MessageSquareText,
+  Minus,
   PenLine,
   Sparkles,
+  TriangleAlert,
 } from "lucide-react";
 import { useEffect } from "react";
 
