@@ -133,6 +133,9 @@ export const uiPt: Record<string, string> = {
   "You have practised this skill. Now let's use it in another context.":
     "Você já praticou esta habilidade. Agora vamos usá-la em outro contexto.",
   "Quick Win": "Ganho rápido",
+  "A 10-minute speaking practice can already make a difference.":
+    "Uma prática de fala de 10 minutos já faz diferença.",
+  "Try a short conversation with EVO today.": "Tente uma conversa curta com a EVO hoje.",
   "Strengthen your vocabulary": "Fortaleça seu vocabulário",
   "Strengthen your grammar": "Fortaleça sua gramática",
   "Strengthen your writing": "Fortaleça sua escrita",
@@ -971,6 +974,12 @@ export const uiPt: Record<string, string> = {
   "All reviews done for now": "Revisões em dia por enquanto",
   "New reviews appear after your next lesson.": "Novas revisões aparecem após a próxima lição.",
   "Quick Access": "Acesso rápido",
+  "Continue your lessons": "Continue suas lições",
+  "Ask questions anytime": "Pergunte quando quiser",
+  "Practice conversations": "Pratique conversas",
+  "Build your vocabulary": "Amplie seu vocabulário",
+  "Train your listening": "Treine sua escuta",
+  "Get AI feedback": "Receba feedback da IA",
   "TODAY'S PRIORITY": "PRIORIDADE DE HOJE",
   "lessons completed": "lições concluídas",
   "New activity available": "Nova atividade disponível",

@@ -69,36 +69,42 @@ function Dashboard() {
     {
       to: "/learning",
       label: "Learning Center",
+      subtitle: "Continue your lessons",
       icon: GraduationCap,
       mobileOrder: "order-1 lg:order-1",
     },
     {
       to: "/teacher",
       label: "AI Teacher",
+      subtitle: "Ask questions anytime",
       icon: Sparkles,
       mobileOrder: "order-2 lg:order-2",
     },
     {
       to: "/coach",
       label: "AI Speaking",
+      subtitle: "Practice conversations",
       icon: MessageSquareText,
       mobileOrder: "order-3 lg:order-3",
     },
     {
       to: "/vocabulary",
       label: "Vocabulary",
+      subtitle: "Build your vocabulary",
       icon: BookOpen,
       mobileOrder: "order-6 lg:order-4",
     },
     {
       to: "/listening",
       label: "Listening",
+      subtitle: "Train your listening",
       icon: Headphones,
       mobileOrder: "order-5 lg:order-5",
     },
     {
       to: "/writing",
       label: "Writing",
+      subtitle: "Get AI feedback",
       icon: PenLine,
       mobileOrder: "order-4 lg:order-6",
     },
@@ -414,7 +420,12 @@ function Dashboard() {
                     <span className="dashboard-quick-icon grid shrink-0 place-items-center">
                       <item.icon className="size-4 xl:size-[1.65rem]" strokeWidth={2.4} />
                     </span>
-                    <span className="truncate text-xs font-medium">{t(item.label)}</span>
+                    <span className="flex min-w-0 flex-col justify-center gap-0.5">
+                      <span className="truncate text-xs font-medium">{t(item.label)}</span>
+                      <span className="hidden text-[10px] leading-tight text-foreground/65 xl:block">
+                        {t(item.subtitle)}
+                      </span>
+                    </span>
                   </Link>
                 );
               })}
