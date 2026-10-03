@@ -187,7 +187,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 alt=""
                 width={880}
                 height={300}
-                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-cover sm:object-left"
+                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-cover sm:object-left xl:object-center"
               />
             </div>
           </div>
