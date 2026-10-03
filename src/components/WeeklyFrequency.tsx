@@ -1,4 +1,4 @@
-import { CalendarDays, Check, Hourglass, Trophy } from "lucide-react";
+import { CalendarDays, Check, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
@@ -97,7 +97,6 @@ export function WeeklyFrequency({
   }
 
   if (presentation === "mobile-progress-summary") {
-    const sevenDayTrophyUnlocked = studiedCount >= 7;
     return (
       <div className="flex h-20 min-w-0 flex-col items-center justify-center gap-1 text-center lg:hidden">
         <CalendarDays
