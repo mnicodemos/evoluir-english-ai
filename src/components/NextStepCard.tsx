@@ -192,6 +192,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
 
+          <div className="sm:contents xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(19.66rem,1.16fr)] xl:items-stretch">
           <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
@@ -289,6 +290,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </div>
             )}
           </aside>
+          </div>
         </div>
       </section>
     );
