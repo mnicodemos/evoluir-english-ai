@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import evoDashboardApproved from "@/assets/evo-dashboard-desktop-wide2.png.asset.json";
+import evoDashboardApproved from "@/assets/evo-dashboard-desktop-wide3.png.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, ChevronRight, Compass, Sparkles } from "lucide-react";
@@ -171,7 +171,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:flex xl:flex-col 2xl:grid 2xl:grid-cols-[auto_minmax(0,1fr)] 2xl:items-center">
           <div
-            className="relative aspect-[4/1] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:h-[9.5rem] xl:min-h-0 2xl:w-[32rem] 2xl:self-center"
+            className="relative aspect-[4/1] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:h-[9.5rem] xl:min-h-0 2xl:h-36 2xl:w-[40rem] 2xl:self-center"
             aria-hidden="true"
           >
             <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
@@ -192,7 +192,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
 
-          <div className="sm:contents xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(19.66rem,1.16fr)] xl:items-stretch 2xl:flex 2xl:min-w-0 2xl:flex-col 2xl:justify-center 2xl:gap-2">
+          <div className="sm:contents xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(19.66rem,1.16fr)] xl:items-stretch 2xl:min-w-0 2xl:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] 2xl:items-center">
           <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2 2xl:order-1">
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
