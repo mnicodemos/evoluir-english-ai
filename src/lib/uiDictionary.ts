@@ -6,7 +6,7 @@ export const uiPt: Record<string, string> = {
   "Preparing this lesson's quiz… this can take about a minute.":
     "Preparando o quiz desta lição… isso pode levar cerca de um minuto.",
   // Navigation / shell
-  "AI Teacher": "AI Teacher",
+  "AI Teacher": "Professor de IA",
   "Practice English with your personal AI teacher":
     "Pratique inglês com seu professor de IA pessoal",
   "New conversation": "Nova conversa",
@@ -368,7 +368,7 @@ export const uiPt: Record<string, string> = {
   "No assessed history yet. Complete an activity to start your evolution chart.":
     "Ainda não há histórico avaliado. Conclua uma atividade para iniciar seu gráfico de evolução.",
 
-  "AI Speaking": "AI Speaking",
+  "AI Speaking": "Conversação com IA",
   Writing: "Escrita",
   Vocabulary: "Vocabulário",
   Progress: "Evolução",
@@ -406,8 +406,12 @@ export const uiPt: Record<string, string> = {
     "Não foi possível atualizar sua meta. Tente novamente.",
   "Custom (5–240 minutes)": "Personalizado (5–240 minutos)",
   "Goal reached today. Great work!": "Meta alcançada hoje. Ótimo trabalho!",
+  "Goal reached": "Meta alcançada",
   "Your progress": "Sua evolução",
+  "My Progress": "Meu progresso",
   "My progress": "Minha evolução",
+  "My Subscription": "Minha assinatura",
+  "Your AI Learning Coach": "Sua mentora de aprendizagem com IA",
   "Overall average": "Média geral",
   Overall: "Geral",
   Talking: "Fala",

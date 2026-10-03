@@ -241,43 +241,50 @@ function Dashboard() {
                 </h2>
               </div>
               <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
-                <div className="relative ml-2 grid size-[5.25rem] place-items-center text-brand-green lg:mx-auto lg:ml-0 lg:size-24 2xl:size-30 xl:mx-0">
-                  <svg
-                    className="absolute inset-0 size-full -rotate-90"
-                    viewBox="0 0 96 96"
-                    aria-hidden="true"
-                  >
-                    <circle
-                      cx="48"
-                      cy="48"
-                      r="39"
-                      fill="none"
-                      stroke="var(--secondary)"
-                      strokeWidth="11"
-                    />
-                    <circle
-                      cx="48"
-                      cy="48"
-                      r="39"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="11"
-                      strokeLinecap="round"
-                      strokeDasharray={2 * Math.PI * 39}
-                      strokeDashoffset={
-                        2 *
-                        Math.PI *
-                        39 *
-                        (1 - Math.min(1, minutesToday / Math.max(profile.daily_minutes, 1)))
-                      }
-                    />
-                  </svg>
-                  <span className="relative text-center font-display text-xl font-bold leading-none text-foreground lg:text-2xl">
-                    {minutesToday}
-                    <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
-                      min
+                <div className="ml-2 flex flex-col items-center lg:mx-auto lg:ml-0 xl:mx-0">
+                  <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:size-24 2xl:size-30">
+                    <svg
+                      className="absolute inset-0 size-full -rotate-90"
+                      viewBox="0 0 96 96"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="39"
+                        fill="none"
+                        stroke="var(--secondary)"
+                        strokeWidth="11"
+                      />
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="39"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="11"
+                        strokeLinecap="round"
+                        strokeDasharray={2 * Math.PI * 39}
+                        strokeDashoffset={
+                          2 *
+                          Math.PI *
+                          39 *
+                          (1 - Math.min(1, minutesToday / Math.max(profile.daily_minutes, 1)))
+                        }
+                      />
+                    </svg>
+                    <span className="relative text-center font-display text-xl font-bold leading-none text-foreground lg:text-2xl">
+                      {minutesToday}
+                      <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
+                        min
+                      </span>
                     </span>
-                  </span>
+                  </div>
+                  {minutesToday >= profile.daily_minutes && (
+                    <p className="mt-1 text-center text-[10px] font-semibold text-brand-green lg:text-[11px]">
+                      {t("Goal reached")}
+                    </p>
+                  )}
                 </div>
                 <div className="grid gap-2 xl:gap-1 2xl:gap-2">
                   <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">

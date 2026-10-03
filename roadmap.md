@@ -161,6 +161,7 @@
 - [x] Mobile — mostrar indicadores verdes por atividade no menu lateral e no botão Mais
 - [x] Vocabulary desktop — organizar as 10 palavras em 5 linhas e 2 colunas
 - [x] Unificar “This week” e Frequency com a regra oficial do Study Streak
+- [x] Dashboard — indicar meta diária atingida, uniformizar barras de habilidades, reforçar ícones e completar traduções de navegação
 - [x] Fase 1 — Hardening e confiabilidade: lint/testes/E2E, secrets/env, RLS, cross-user, AI limits, APIs, Stripe webhook, quiz, roles, logs, CI, relatório (E2E pendente de libs do navegador no sandbox; specs prontos para CI)
 
 ## Mobile — ajustes marcados em capturas (2026-10-02)
