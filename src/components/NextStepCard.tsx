@@ -124,7 +124,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm max-sm:h-10 max-sm:flex-1 max-sm:rounded-lg max-sm:border max-sm:border-border max-sm:bg-sidebar max-sm:px-3 max-sm:text-xs max-sm:font-semibold max-sm:justify-center"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -143,7 +143,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm max-sm:h-10 max-sm:flex-1 max-sm:rounded-lg max-sm:border max-sm:border-border max-sm:bg-sidebar max-sm:px-3 max-sm:text-xs max-sm:font-semibold max-sm:justify-center"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
@@ -227,6 +227,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </Button>
               )}
             </div>
+            {/* Mobile-only action row: Quick Win + challenge side by side,
+                right below the priority title and the Practice now button. */}
+            {(quickWinButton || challengeButton) && (
+              <div className="mt-2.5 flex gap-2 sm:hidden">{actionButtons}</div>
+            )}
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:hidden">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
