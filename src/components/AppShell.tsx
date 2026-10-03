@@ -273,6 +273,7 @@ export function MobileNavigationMenu({
           })}
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
+          <UtilityButtons variant="sheet" />
           <SheetClose asChild>
             <ProfileMenu presentation="mobile-menu" />
           </SheetClose>
