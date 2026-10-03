@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
@@ -28,72 +27,6 @@ import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
 import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
-
-function MobileWhyThatFits({
-  title,
-  priorityText,
-  evidenceText,
-}: {
-  title: string;
-  priorityText: string;
-  evidenceText: string;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [visibleItems, setVisibleItems] = useState(2);
-
-  useEffect(() => {
-    setVisibleItems(2);
-  }, [title, priorityText, evidenceText]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const card = container?.closest<HTMLElement>("[data-evo-card]");
-    if (!container || !card) return;
-
-    const fitText = () => {
-      if (card.scrollHeight > card.clientHeight + 1) {
-        setVisibleItems((current) => Math.max(0, current - 1));
-      }
-    };
-
-    fitText();
-    const observer = new ResizeObserver(fitText);
-    observer.observe(card);
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, [visibleItems, title, priorityText, evidenceText]);
-
-  if (visibleItems === 0) return null;
-
-  return (
-    <div ref={containerRef} className="mt-3.5 sm:hidden">
-      <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-        <Lightbulb
-          className="size-[1.375rem] shrink-0 text-warning"
-          strokeWidth={2.5}
-          aria-hidden="true"
-        />
-        {title}
-      </p>
-      <ul className="mt-1 grid gap-1">
-        <li className="flex items-start gap-2 pl-2">
-          <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
-          <span className="min-w-0 text-[11px] leading-snug text-sidebar-foreground/80">
-            {priorityText}
-          </span>
-        </li>
-        {visibleItems === 2 && (
-          <li className="flex items-start gap-2 pl-2">
-            <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
-            <span className="min-w-0 text-[11px] leading-snug text-sidebar-foreground/80">
-              {evidenceText}
-            </span>
-          </li>
-        )}
-      </ul>
-    </div>
-  );
-}
 
 /**
  * Adaptive next step. Everything shown here is decided server-side from the
@@ -270,11 +203,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5 sm:border-t sm:border-border sm:bg-evo-block"
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5 max-sm:h-auto max-sm:shrink-0 sm:border-t sm:border-border sm:bg-evo-block"
         aria-label={t("Your next step")}
-        data-evo-card
       >
-        <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
+        <div className="dashboard-evo-grid flex h-full min-w-0 flex-col max-sm:h-auto sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
           <div
             className="relative aspect-[17/4] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
@@ -339,11 +271,30 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
             {/* Mobile-only "Why this matters now": two of the three desktop
                 sentences, each with the same leading check as the desktop. */}
-            <MobileWhyThatFits
-              title={t("Why this matters now?")}
-              priorityText={priorityText}
-              evidenceText={evidenceText}
-            />
+            <div className="mt-3.5 sm:hidden">
+              <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Lightbulb
+                  className="size-[1.375rem] shrink-0 text-warning"
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                />
+                {t("Why this matters now?")}
+              </p>
+              <ul className="mt-1 grid gap-1">
+                <li className="flex items-start gap-2 pl-2">
+                  <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
+                  <span className="min-w-0 text-[11px] leading-snug text-sidebar-foreground/80">
+                    {priorityText}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2 pl-2">
+                  <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
+                  <span className="min-w-0 text-[11px] leading-snug text-sidebar-foreground/80">
+                    {evidenceText}
+                  </span>
+                </li>
+              </ul>
+            </div>
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
