@@ -235,14 +235,18 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {mainAvailable && (
               <Button
                 asChild
-                className="mt-4 hidden w-full bg-brand-green text-sidebar hover:bg-brand-green/90 sm:flex sm:w-fit xl:mt-2 xl:h-9"
+                className="mt-4 hidden w-full bg-brand-green text-sidebar [word-spacing:0.2em] hover:bg-brand-green/90 sm:flex sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold xl:mt-2 xl:h-9"
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
                     {t("Practice now")}
+                    <ChevronRight strokeWidth={3} aria-hidden="true" />
                   </Link>
                 ) : (
-                  <Link to={data.activity.to}>{t("Practice now")}</Link>
+                  <Link to={data.activity.to}>
+                    {t("Practice now")}
+                    <ChevronRight strokeWidth={3} aria-hidden="true" />
+                  </Link>
                 )}
               </Button>
             )}
