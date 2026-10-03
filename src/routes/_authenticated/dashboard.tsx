@@ -104,11 +104,37 @@ function Dashboard() {
     },
   ] as const;
 
-  const learningCards = [
-    { emoji: "📚", label: "Lessons completed", value: `${snapshot?.todayLessonsCompleted ?? 0}` },
-    { emoji: "🎬", label: "Videos watched", value: `${snapshot?.todayVideosWatched ?? 0}` },
-    { emoji: "🧠", label: "Words mastered", value: `${snapshot?.todayVocabularyMastered ?? 0}` },
-    { emoji: "🎯", label: "Accuracy", value: `${snapshot?.todayQuizAverage ?? 0}%` },
+  // Accuracy at or above this percentage shows the "done" icon; below it (but above 0) shows "attention".
+  const ACCURACY_DONE_THRESHOLD = 70;
+
+  type ProgressState = "done" | "attention" | "empty";
+  const accuracyToday = snapshot?.todayQuizAverage ?? 0;
+  const learningCards: { label: string; value: string; state: ProgressState }[] = [
+    {
+      label: "Lessons completed",
+      value: `${snapshot?.todayLessonsCompleted ?? 0}`,
+      state: (snapshot?.todayLessonsCompleted ?? 0) > 0 ? "done" : "empty",
+    },
+    {
+      label: "Videos watched",
+      value: `${snapshot?.todayVideosWatched ?? 0}`,
+      state: (snapshot?.todayVideosWatched ?? 0) > 0 ? "done" : "empty",
+    },
+    {
+      label: "Words mastered",
+      value: `${snapshot?.todayVocabularyMastered ?? 0}`,
+      state: (snapshot?.todayVocabularyMastered ?? 0) > 0 ? "done" : "empty",
+    },
+    {
+      label: "Accuracy",
+      value: accuracyToday === 0 ? "—" : `${accuracyToday}%`,
+      state:
+        accuracyToday >= ACCURACY_DONE_THRESHOLD
+          ? "done"
+          : accuracyToday > 0
+            ? "attention"
+            : "empty",
+    },
   ];
 
   return (
