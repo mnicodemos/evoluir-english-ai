@@ -431,7 +431,7 @@ export const uiPt: Record<string, string> = {
   Fluency: "Fluência",
   Clarity: "Clareza",
   "Learning progress": "Progresso do aprendizado",
-  "Lessons": "Lições",
+  Lessons: "Lições",
   "Lessons completed": "Lições concluídas",
   "Videos watched": "Vídeos assistidos",
   "Words mastered": "Palavras dominadas",

@@ -1,22 +1,8 @@
-import {
-  Cloud,
-  CloudLightning,
-  CloudRain,
-  CloudSnow,
-  CloudSun,
-  Moon,
-  Sun,
-} from "lucide-react";
+import { Cloud, CloudLightning, CloudRain, CloudSnow, CloudSun, Moon, Sun } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 export type WeatherCondition =
-  | "sunny"
-  | "partly-cloudy"
-  | "cloudy"
-  | "rain"
-  | "storm"
-  | "snow"
-  | "night";
+  "sunny" | "partly-cloudy" | "cloudy" | "rain" | "storm" | "snow" | "night";
 
 export function weatherConditionFromCode(code: number, isDay: boolean): WeatherCondition {
   if (!isDay) return "night";
@@ -72,9 +58,7 @@ export function useWeatherCondition() {
           })
           .then(({ current }) => {
             if (typeof current?.weather_code !== "number") return;
-            setCondition(
-              weatherConditionFromCode(current.weather_code, current.is_day !== 0),
-            );
+            setCondition(weatherConditionFromCode(current.weather_code, current.is_day !== 0));
           })
           .catch(() => undefined);
       },

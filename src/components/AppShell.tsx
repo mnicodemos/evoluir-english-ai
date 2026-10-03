@@ -243,32 +243,32 @@ export function MobileNavigationMenu({
               (item.to === "/writing" && indicators.writing) ||
               (item.to === "/vocabulary" && indicators.vocabulary);
             return (
-            <div
-              key={item.to}
-              className={
-                index > 0 && item.to === "/premium"
-                  ? "border-t border-sidebar-border pt-2"
-                  : undefined
-              }
-            >
-              <SheetClose asChild>
-                <Link
-                  to={item.to}
-                  className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
-                  inactiveProps={{ className: "text-sidebar-foreground/75" }}
-                >
-                  <item.icon className="size-5 shrink-0" />
-                  <span className="truncate">{translate(item.label)}</span>
-                  {hasNew && (
-                    <span
-                      className="size-2.5 shrink-0 rounded-full bg-brand-green"
-                      aria-label={translate("New activity")}
-                    />
-                  )}
-                </Link>
-              </SheetClose>
-            </div>
+              <div
+                key={item.to}
+                className={
+                  index > 0 && item.to === "/premium"
+                    ? "border-t border-sidebar-border pt-2"
+                    : undefined
+                }
+              >
+                <SheetClose asChild>
+                  <Link
+                    to={item.to}
+                    className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
+                    inactiveProps={{ className: "text-sidebar-foreground/75" }}
+                  >
+                    <item.icon className="size-5 shrink-0" />
+                    <span className="truncate">{translate(item.label)}</span>
+                    {hasNew && (
+                      <span
+                        className="size-2.5 shrink-0 rounded-full bg-brand-green"
+                        aria-label={translate("New activity")}
+                      />
+                    )}
+                  </Link>
+                </SheetClose>
+              </div>
             );
           })}
         </nav>
