@@ -11,6 +11,7 @@ import {
   Minus,
   PenLine,
   Sparkles,
+  Star,
   TriangleAlert,
 } from "lucide-react";
 import { useEffect } from "react";
