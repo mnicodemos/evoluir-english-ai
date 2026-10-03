@@ -418,6 +418,7 @@ function AppShellContent({
 
           <div className="flex flex-col items-stretch gap-1">
             <div className="flex items-center gap-1 px-1 pb-1">
+              <UtilityButtons variant="sidebar" />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
