@@ -179,7 +179,9 @@ export function EvoDailyReflection({
             strokeWidth={2.4}
             aria-hidden="true"
           />
-          <div className="min-w-0 flex-1">
+          {/* Mentoring phrase is desktop-only: on mobile the block collapses
+              to the weather icon plus the share and language controls. */}
+          <div className="min-w-0 flex-1 max-lg:hidden">
             <p className="text-xs text-muted-foreground lg:line-clamp-1">
               “{reflection.thought[copy]}”
             </p>
