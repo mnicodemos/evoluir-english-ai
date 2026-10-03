@@ -8,8 +8,10 @@ import {
   Headphones,
   Map,
   MessageSquareText,
+  Minus,
   PenLine,
   Sparkles,
+  TriangleAlert,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -102,11 +104,37 @@ function Dashboard() {
     },
   ] as const;
 
-  const learningCards = [
-    { emoji: "📚", label: "Lessons completed", value: `${snapshot?.todayLessonsCompleted ?? 0}` },
-    { emoji: "🎬", label: "Videos watched", value: `${snapshot?.todayVideosWatched ?? 0}` },
-    { emoji: "🧠", label: "Words mastered", value: `${snapshot?.todayVocabularyMastered ?? 0}` },
-    { emoji: "🎯", label: "Accuracy", value: `${snapshot?.todayQuizAverage ?? 0}%` },
+  // Accuracy at or above this percentage shows the "done" icon; below it (but above 0) shows "attention".
+  const ACCURACY_DONE_THRESHOLD = 70;
+
+  type ProgressState = "done" | "attention" | "empty";
+  const accuracyToday = snapshot?.todayQuizAverage ?? 0;
+  const learningCards: { label: string; value: string; state: ProgressState }[] = [
+    {
+      label: "Lessons completed",
+      value: `${snapshot?.todayLessonsCompleted ?? 0}`,
+      state: (snapshot?.todayLessonsCompleted ?? 0) > 0 ? "done" : "empty",
+    },
+    {
+      label: "Videos watched",
+      value: `${snapshot?.todayVideosWatched ?? 0}`,
+      state: (snapshot?.todayVideosWatched ?? 0) > 0 ? "done" : "empty",
+    },
+    {
+      label: "Words mastered",
+      value: `${snapshot?.todayVocabularyMastered ?? 0}`,
+      state: (snapshot?.todayVocabularyMastered ?? 0) > 0 ? "done" : "empty",
+    },
+    {
+      label: "Accuracy",
+      value: accuracyToday === 0 ? "—" : `${accuracyToday}%`,
+      state:
+        accuracyToday >= ACCURACY_DONE_THRESHOLD
+          ? "done"
+          : accuracyToday > 0
+            ? "attention"
+            : "empty",
+    },
   ];
 
   return (
@@ -255,24 +283,47 @@ function Dashboard() {
                   <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
                     {t("KEEPING LEARNING")}
                   </p>
-                  {learningCards.map((card) => (
-                    <div
-                      key={card.label}
-                      className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
-                    >
-                      <Check
-                        className="size-4 shrink-0 justify-self-end text-brand-green lg:justify-self-auto"
-                        strokeWidth={3}
-                        aria-hidden="true"
-                      />
-                      <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
-                        <span className="font-display text-sm font-bold text-foreground">
-                          {card.value}
-                        </span>{" "}
-                        {t(card.label)}
-                      </p>
-                    </div>
-                  ))}
+                  {learningCards.map((card) => {
+                    const stateVisual = {
+                      done: { Icon: Check, iconClass: "text-brand-green", sr: "Done today." },
+                      attention: {
+                        Icon: TriangleAlert,
+                        iconClass: "text-warning",
+                        sr: "Needs attention.",
+                      },
+                      empty: {
+                        Icon: Minus,
+                        iconClass: "text-muted-foreground/60",
+                        sr: "Nothing yet.",
+                      },
+                    } as const;
+                    const { Icon, iconClass, sr } = stateVisual[card.state];
+                    const valueClass =
+                      card.state === "attention"
+                        ? "text-warning"
+                        : card.state === "empty"
+                          ? "text-muted-foreground/60"
+                          : "text-foreground";
+                    return (
+                      <div
+                        key={card.label}
+                        className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
+                      >
+                        <Icon
+                          className={`size-4 shrink-0 justify-self-end lg:justify-self-auto ${iconClass}`}
+                          strokeWidth={3}
+                          aria-hidden="true"
+                        />
+                        <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
+                          <span className={`font-display text-sm font-bold ${valueClass}`}>
+                            {card.value}
+                          </span>{" "}
+                          {t(card.label)}
+                        </p>
+                        <span className="sr-only">{sr}</span>
+                      </div>
+                    );
+                  })}
                 </div>
                 <div className="border-l border-border pl-1.5 lg:border-0 lg:pl-0">
                   <WeeklyFrequency
