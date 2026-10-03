@@ -169,9 +169,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] sm:border-t sm:border-border sm:bg-evo-block"
         aria-label={t("Your next step")}
       >
-        <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
+        <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:flex xl:flex-col">
           <div
-            className="relative aspect-[4/1] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative aspect-[4/1] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:h-40 xl:min-h-0 2xl:h-32"
             aria-hidden="true"
           >
             <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
@@ -187,11 +187,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 alt=""
                 width={880}
                 height={300}
-                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-cover sm:object-left"
+                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-cover sm:object-left xl:object-[50%_22%]"
               />
             </div>
           </div>
 
+          <div className="sm:contents xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(19.66rem,1.16fr)] xl:items-stretch">
           <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
@@ -289,6 +290,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </div>
             )}
           </aside>
+          </div>
         </div>
       </section>
     );
