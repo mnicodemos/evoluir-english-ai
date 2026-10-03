@@ -12,7 +12,6 @@ import {
   Menu,
   MessageSquareText,
   Mic,
-  MoreHorizontal,
   PenLine,
   Sparkles,
 } from "lucide-react";
