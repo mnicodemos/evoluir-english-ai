@@ -158,6 +158,9 @@
 - [x] Mobile — rótulo "Prioridade de hoje" centralizado verticalmente entre os textos de cima e de baixo (mt-1 → mt-2)
 - [x] Mobile — EVO encosta na borda superior do bloco: faixas pretas embutidas no banner (linhas 0–153 e 571–668) recortadas em novo asset evo-dashboard-mobile-flush.jpg (1600×425), aplicado só na variante mobile do NextStepCard; desktop inalterado.
 - [x] Mobile — descolar o último bloco do Dashboard do menu inferior (pb-0 → pb-[10px] no contêiner do shell)
+- [ ] Mobile — mostrar indicadores verdes por atividade no menu lateral e no botão Mais
+- [ ] Vocabulary desktop — organizar as 10 palavras em 5 linhas e 2 colunas
+- [ ] Unificar “This week” e Frequency com a regra oficial do Study Streak
 - [x] Fase 1 — Hardening e confiabilidade: lint/testes/E2E, secrets/env, RLS, cross-user, AI limits, APIs, Stripe webhook, quiz, roles, logs, CI, relatório (E2E pendente de libs do navegador no sandbox; specs prontos para CI)
 
 ## Mobile — ajustes marcados em capturas (2026-10-02)
