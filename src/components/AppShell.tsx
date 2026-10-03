@@ -95,7 +95,7 @@ export function MobileNavigationMenu({
             variant="ghost"
             aria-label={translate("Open menu")}
             className={cn(
-              "h-14 min-w-0 flex-col gap-0.5 rounded-none px-1 text-muted-foreground [&_svg]:size-6",
+              "h-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-none px-1 text-muted-foreground [&_svg]:size-6",
               className,
             )}
           >
