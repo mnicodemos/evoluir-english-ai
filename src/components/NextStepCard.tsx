@@ -118,13 +118,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       ✣
     </span>
   );
+  // Mobile-only chips with outline: Quick Win, challenge and "Your trail".
   const quickWinButton =
     quickWin && quickWinAvailable ? (
       <Button
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-2.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
