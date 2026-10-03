@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight, Compass, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Compass, Map, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
@@ -124,7 +124,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -143,7 +143,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent sm:h-9 sm:text-sm"
+        className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
@@ -156,6 +156,20 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         )}
       </Button>
     ) : null;
+  // Mobile-only companion button: opens the Study Plan page ("Your map").
+  const mapButton = (
+    <Button
+      asChild
+      variant="ghost"
+      size="sm"
+      className="h-8 min-w-0 px-2 text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:flex-1 max-sm:justify-center max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+    >
+      <Link to="/study-plan">
+        <Map className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+        {t("Your map")}
+      </Link>
+    </Button>
+  );
   const actionButtons = (
     <>
       {quickWinButton}
@@ -226,11 +240,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </Button>
               )}
             </div>
-            {/* Mobile-only action row: Quick Win + challenge side by side,
-                right below the priority title and the Practice now button. */}
-            {(quickWinButton || challengeButton) && (
-              <div className="mt-2.5 flex gap-2 sm:hidden">{actionButtons}</div>
-            )}
+            {/* Mobile-only action row: Quick Win + challenge + Your map on a
+                single non-wrapping line, right below the priority row. */}
+            <div className="mt-2.5 flex flex-nowrap items-center gap-1 sm:hidden">
+              {quickWinButton}
+              {challengeButton}
+              {mapButton}
+            </div>
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
