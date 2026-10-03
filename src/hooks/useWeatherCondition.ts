@@ -92,13 +92,3 @@ export function useWeatherCondition() {
 
   return { condition: activeCondition, refresh };
 }
-
-import {
-  Cloud,
-  CloudLightning,
-  CloudRain,
-  CloudSnow,
-  CloudSun,
-  Moon,
-  Sun,
-} from "lucide-react";
