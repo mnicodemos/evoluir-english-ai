@@ -381,7 +381,10 @@ function Writing() {
         const order = [prompt, ...prompts.filter((p) => p !== prompt)];
         const entries = order
           .map((p) => ({ p, r: p === prompt && result ? result : results[p] }))
-          .filter((e): e is { p: string; r: WritingFeedback } => !!e.r && (done.includes(e.p) || (e.p === prompt && !!result)));
+          .filter(
+            (e): e is { p: string; r: WritingFeedback } =>
+              !!e.r && (done.includes(e.p) || (e.p === prompt && !!result)),
+          );
         return entries.map(({ p, r }, i) => (
           <section key={p} className="mt-6 space-y-5 animate-rise">
             {(entries.length > 1 || p !== prompt) && (
