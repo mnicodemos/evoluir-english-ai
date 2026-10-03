@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight, Compass, Map, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Compass, Lightbulb, Map, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
@@ -250,7 +250,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Mobile-only "Why this matters now": two of the three desktop
                 sentences, each with the same leading check as the desktop. */}
             <div className="mt-2 sm:hidden">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-green">
+              <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-green">
+                <Lightbulb className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
                 {t("Why this matters now?")}
               </p>
               <ul className="mt-1 grid gap-1">
