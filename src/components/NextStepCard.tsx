@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
-import evoDashboardMobile from "@/assets/evo-dashboard-mobile-2026-10-03.png.asset.json";
+import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Compass, Sparkles } from "lucide-react";
 
@@ -179,8 +179,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 src={evoDashboardMobile.url}
                 alt=""
                 width={1920}
-                height={480}
-                className="absolute inset-0 block size-full object-cover object-[47%_center] sm:hidden"
+                height={709}
+                className="absolute left-[47%] top-[-2.104rem] block h-[14.771rem] w-auto max-w-none -translate-x-[47%] sm:hidden"
               />
               <img
                 src={evoDashboardApproved.url}
