@@ -206,7 +206,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5 sm:border-t sm:border-border sm:bg-evo-block"
         aria-label={t("Your next step")}
       >
-        <div className="flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] min-[1280px]:grid-cols-[17rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)] min-[1440px]:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
+        <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
           <div
             className="relative aspect-[17/4] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
@@ -349,7 +349,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </li>
             </ul>
             {(quickWinButton || challengeButton) && (
-              <div className="mt-3 hidden items-stretch gap-2 border-t border-sidebar-foreground/15 pt-3 sm:flex xl:mt-auto xl:pt-3">
+              <div className="mt-3 hidden items-stretch gap-2 border-t border-sidebar-foreground/15 pt-3 sm:flex xl:mb-2 xl:mt-auto xl:pt-3">
                 {quickWinButton}
                 {quickWinButton && challengeButton && (
                   <div
