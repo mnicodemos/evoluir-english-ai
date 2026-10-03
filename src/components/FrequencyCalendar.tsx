@@ -1,10 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { STUDY_DAY_ACTIVITY_TYPES } from "@/lib/studyDay";
+import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -30,29 +28,16 @@ export function FrequencyCalendar({ userId }: Props) {
   const month = shifted.getMonth() + 1;
   const monthKey = `${year}-${String(month).padStart(2, "0")}`;
 
-  const { data: studyDays } = useQuery({
-    queryKey: ["study-frequency", userId, monthKey],
-    enabled: !!userId,
-    queryFn: async () => {
-      // Fetch activities between the start and end of the shown month (Brazil time).
-      const monthStartLocal = new Date(`${monthKey}-01T00:00:00-03:00`);
-      const nextMonth = new Date(year, month, 1);
-      const monthEndLocal = new Date(
-        `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, "0")}-01T00:00:00-03:00`,
-      );
-      const { data } = await supabase
-        .from("activities")
-        .select("created_at")
-        // Same rule as the streak: only lessons and AI Talking sessions mark a day.
-        .in("activity_type", [...STUDY_DAY_ACTIVITY_TYPES])
-        .gte("created_at", monthStartLocal.toISOString())
-        .lt("created_at", monthEndLocal.toISOString());
-      const days = new Set<string>();
-      for (const row of data ?? []) {
-        days.add(dayFmt.format(new Date(row.created_at)));
-      }
-      return days;
-    },
+  const monthStartLocal = new Date(`${monthKey}-01T00:00:00-03:00`);
+  const nextMonth = new Date(year, month, 1);
+  const monthEndLocal = new Date(
+    `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, "0")}-01T00:00:00-03:00`,
+  );
+  const { data: studyDays } = useQualifiedStudyDays({
+    userId,
+    start: monthStartLocal,
+    end: monthEndLocal,
+    queryKey: `month:${monthKey}`,
   });
 
   const daysInMonth = new Date(year, month, 0).getDate();
