@@ -210,7 +210,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {mainAvailable && (
                 <Button
                   asChild
-                  className="h-[2.875rem] w-[42%] shrink-0 self-center rounded-xl bg-brand-green px-2 text-sm font-bold text-sidebar hover:bg-brand-green/90 sm:hidden"
+                  className="h-[2.875rem] w-[42%] shrink-0 self-center rounded-xl bg-brand-green px-2 text-sm font-bold text-sidebar [word-spacing:0.2em] hover:bg-brand-green/90 sm:hidden"
                 >
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>
