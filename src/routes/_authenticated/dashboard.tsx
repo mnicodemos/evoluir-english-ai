@@ -11,6 +11,7 @@ import {
   Minus,
   PenLine,
   Sparkles,
+  Star,
   TriangleAlert,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -357,7 +358,9 @@ function Dashboard() {
                   <Map className="size-4 shrink-0" aria-hidden="true" />
                   {t("Your trail")}
                 </Link>
-                <p className="text-center text-[11px] font-semibold tracking-wide text-warning">
+                 <p className="flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold uppercase tracking-wide text-warning">
+                  <Star className="size-3.5 shrink-0" aria-hidden="true" />
+                  <span className="sr-only">Star.</span>
                   {t("Small steps create progress.")}
                 </p>
               </div>
