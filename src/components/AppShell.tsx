@@ -82,6 +82,10 @@ export function MobileNavigationMenu({
 }: MobileNavigationMenuProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const pathname = useLocation().pathname;
+  // The More button lights up when the current route belongs to one of its
+  // own sections (the four bottom tabs stay responsible for themselves).
+  const moreActive = mobileSheetNav.some((item) => pathname.startsWith(item.to));
   const hasPendingActivity = indicators.listening || indicators.writing || indicators.vocabulary;
 
   async function signOut() {
@@ -99,7 +103,8 @@ export function MobileNavigationMenu({
             variant="ghost"
             aria-label={translate("Open menu")}
             className={cn(
-              "h-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-none px-1 text-muted-foreground [&_svg]:size-6",
+              "h-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-none px-1 [&_svg]:size-6",
+              moreActive ? "text-brand-green" : "text-muted-foreground",
               className,
             )}
           >
@@ -153,8 +158,9 @@ export function MobileNavigationMenu({
               <SheetClose asChild>
                 <Link
                   to={item.to}
-                  className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                   activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
+                  inactiveProps={{ className: "text-sidebar-foreground/75" }}
                 >
                   <item.icon className="size-5 shrink-0" />
                   <span className="truncate">{translate(item.label)}</span>
@@ -283,11 +289,12 @@ function AppShellContent({
                 key={item.to}
                 to={item.to}
                 aria-label={translate(item.label)}
-                className="grid h-12 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                className="grid h-12 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 activeProps={{
                   className:
                     "border border-brand-green/35 bg-sidebar-accent text-brand-green shadow-[inset_3px_0_0_var(--brand-green)]",
                 }}
+                inactiveProps={{ className: "text-sidebar-foreground/70" }}
               >
                 <item.icon className="size-6" />
                 <span className="truncate text-left">{translate(item.label)}</span>
@@ -299,11 +306,12 @@ function AppShellContent({
                 key={item.to}
                 to={item.to}
                 aria-label={translate(item.label)}
-                className="grid h-12 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                className="grid h-12 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 activeProps={{
                   className:
                     "border border-brand-green/35 bg-sidebar-accent text-brand-green shadow-[inset_3px_0_0_var(--brand-green)]",
                 }}
+                inactiveProps={{ className: "text-sidebar-foreground/70" }}
               >
                 <item.icon className="size-6" />
                 <span className="truncate text-left">{translate(item.label)}</span>
@@ -355,8 +363,9 @@ function AppShellContent({
             <Link
               key={item.to}
               to={item.to}
-              className="grid min-w-0 place-items-center text-muted-foreground"
+              className="grid min-w-0 place-items-center transition-colors"
               activeProps={{ className: "text-brand-green" }}
+              inactiveProps={{ className: "text-muted-foreground" }}
             >
               <span className="grid justify-items-center gap-0.5">
                 <item.icon className="size-6" />
