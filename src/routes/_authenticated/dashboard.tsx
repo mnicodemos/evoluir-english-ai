@@ -420,7 +420,12 @@ function Dashboard() {
                     <span className="dashboard-quick-icon grid shrink-0 place-items-center">
                       <item.icon className="size-4 xl:size-[1.65rem]" strokeWidth={2.4} />
                     </span>
-                    <span className="truncate text-xs font-medium">{t(item.label)}</span>
+                    <span className="flex min-w-0 flex-col justify-center gap-0.5">
+                      <span className="truncate text-xs font-medium">{t(item.label)}</span>
+                      <span className="hidden truncate text-[10px] leading-tight text-foreground/65 xl:block">
+                        {t(item.subtitle)}
+                      </span>
+                    </span>
                   </Link>
                 );
               })}
