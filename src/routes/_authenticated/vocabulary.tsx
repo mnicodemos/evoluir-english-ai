@@ -428,7 +428,7 @@ function Vocabulary() {
         <p className="mt-6 text-sm text-muted-foreground">Nothing here yet — keep practicing.</p>
       );
     return (
-      <div className="mt-5 grid gap-4">
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
         {items.map((w) => {
           const isRecording = recordingId === w.id;
           const isChecking = checkingId === w.id;

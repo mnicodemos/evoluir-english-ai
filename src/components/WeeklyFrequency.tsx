@@ -1,9 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, Check, Hourglass, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
-import { STUDY_DAY_ACTIVITY_TYPES } from "@/lib/studyDay";
+import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -43,23 +41,14 @@ export function WeeklyFrequency({
     return day.toISOString().slice(0, 10);
   });
 
-  const { data: studyDays } = useQuery({
-    queryKey: ["weekly-frequency", userId, weekKeys[0]],
-    enabled: !!userId,
-    queryFn: async () => {
-      const start = new Date(`${weekKeys[0]}T00:00:00-03:00`);
-      const end = new Date(start);
-      end.setDate(end.getDate() + 7);
-      const { data } = await supabase
-        .from("activities")
-        .select("created_at")
-        .in("activity_type", [...STUDY_DAY_ACTIVITY_TYPES])
-        .gte("created_at", start.toISOString())
-        .lt("created_at", end.toISOString());
-      const days = new Set<string>();
-      for (const row of data ?? []) days.add(dayFmt.format(new Date(row.created_at)));
-      return days;
-    },
+  const weekStartDate = new Date(`${weekKeys[0]}T00:00:00-03:00`);
+  const weekEndDate = new Date(weekStartDate);
+  weekEndDate.setDate(weekEndDate.getDate() + 7);
+  const { data: studyDays } = useQualifiedStudyDays({
+    userId,
+    start: weekStartDate,
+    end: weekEndDate,
+    queryKey: `week:${weekKeys[0]}`,
   });
 
   const allStudied = (studyDays?.size ?? 0) >= weeklyGoal;

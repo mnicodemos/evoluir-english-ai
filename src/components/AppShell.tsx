@@ -37,6 +37,7 @@ import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.function
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
+import { useActivityIndicators, type ActivityIndicators } from "@/hooks/useActivityIndicators";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 const mobileSheetNav = [
@@ -69,6 +70,7 @@ type MobileNavigationMenuProps = {
   className?: string;
   presentation?: "menu" | "bottom-tab";
   bottomLabel?: string;
+  indicators: ActivityIndicators;
 };
 
 export function MobileNavigationMenu({
@@ -76,9 +78,11 @@ export function MobileNavigationMenu({
   className,
   presentation = "menu",
   bottomLabel = "More",
+  indicators,
 }: MobileNavigationMenuProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const hasPendingActivity = indicators.listening || indicators.writing || indicators.vocabulary;
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -99,7 +103,15 @@ export function MobileNavigationMenu({
               className,
             )}
           >
-            <Menu strokeWidth={2.25} />
+            <span className="relative grid place-items-center">
+              <Menu strokeWidth={2.25} />
+              {hasPendingActivity && (
+                <span
+                  className="absolute -right-1.5 -top-0.5 size-2 rounded-full bg-brand-green ring-2 ring-sidebar"
+                  aria-label={translate("New activity")}
+                />
+              )}
+            </span>
             <span className="text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
@@ -124,7 +136,12 @@ export function MobileNavigationMenu({
           </SheetTitle>
         </SheetHeader>
         <nav className="grid gap-1 overflow-y-auto py-3">
-          {mobileSheetNav.map((item, index) => (
+          {mobileSheetNav.map((item, index) => {
+            const hasNew =
+              (item.to === "/listening" && indicators.listening) ||
+              (item.to === "/writing" && indicators.writing) ||
+              (item.to === "/vocabulary" && indicators.vocabulary);
+            return (
             <div
               key={item.to}
               className={
@@ -136,15 +153,22 @@ export function MobileNavigationMenu({
               <SheetClose asChild>
                 <Link
                   to={item.to}
-                  className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                   activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
                 >
                   <item.icon className="size-5 shrink-0" />
                   <span className="truncate">{translate(item.label)}</span>
+                  {hasNew && (
+                    <span
+                      className="size-2.5 shrink-0 rounded-full bg-brand-green"
+                      aria-label={translate("New activity")}
+                    />
+                  )}
                 </Link>
               </SheetClose>
             </div>
-          ))}
+            );
+          })}
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
           <SheetClose asChild>
@@ -196,6 +220,7 @@ function AppShellContent({
   const location = useLocation();
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
+  const activityIndicators = useActivityIndicators();
   const translate = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
   // Stop any playing audio (flashcards, listening, vocabulary, AI voice) on page change.
@@ -343,6 +368,7 @@ function AppShellContent({
           ))}
           <MobileNavigationMenu
             translate={translate}
+            indicators={activityIndicators}
             presentation="bottom-tab"
             bottomLabel={lang === "pt" ? "Mais" : "More"}
             className="w-full hover:bg-transparent hover:text-brand-green"
