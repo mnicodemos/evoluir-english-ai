@@ -203,7 +203,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5 max-sm:h-auto sm:border-t sm:border-border sm:bg-evo-block"
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5 max-sm:h-auto max-sm:shrink-0 sm:border-t sm:border-border sm:bg-evo-block"
         aria-label={t("Your next step")}
       >
         <div className="dashboard-evo-grid flex h-full min-w-0 flex-col max-sm:h-auto sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[25rem_minmax(10.5rem,1fr)_minmax(19.66rem,1.16fr)]">
