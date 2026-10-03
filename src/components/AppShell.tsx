@@ -38,18 +38,6 @@ import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
 
-const nav = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
-  { to: "/learning", label: "Learning", icon: GraduationCap },
-  { to: "/listening", label: "Listening", icon: Headphones },
-  { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
-  { to: "/teacher", label: "AI Teacher", icon: Sparkles },
-  { to: "/writing", label: "Writing", icon: PenLine },
-  { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
-  { to: "/progress", label: "Progress", icon: LineChart },
-] as const;
-
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 const mobileSheetNav = [
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
