@@ -231,6 +231,14 @@
   border-color: var(--border);
 }
 
+/* Mobile reflection block matches Today's Progress (card-soft); the photo
+   background is a desktop-only enhancement. */
+@media (max-width: 1023.98px) {
+  .dashboard-shell .reflection-aside {
+    background-image: none !important;
+  }
+}
+
 .dashboard-shell .dashboard-muted {
   color: var(--muted-foreground);
 }
