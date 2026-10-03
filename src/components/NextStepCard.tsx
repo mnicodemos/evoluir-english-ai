@@ -349,7 +349,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </li>
             </ul>
             {(quickWinButton || challengeButton) && (
-              <div className="mt-3 hidden items-stretch gap-2 border-t border-sidebar-foreground/15 pt-3 sm:flex xl:mb-2 xl:mt-auto xl:pt-3">
+              <div className="mt-3 hidden items-stretch gap-2 border-t border-sidebar-foreground/15 pt-5 sm:flex xl:mb-2 xl:mt-auto xl:pt-5">
                 {quickWinButton}
                 {quickWinButton && challengeButton && (
                   <div
