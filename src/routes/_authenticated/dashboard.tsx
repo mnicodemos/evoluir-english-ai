@@ -302,7 +302,7 @@ function Dashboard() {
                     {t("KEEPING LEARNING")}
                   </p>
                   {!hasProgressToday && (
-                    <p className="flex min-h-[5.75rem] items-center text-[11px] font-medium leading-snug text-muted-foreground lg:hidden">
+                    <p className="flex min-h-[5.75rem] items-center text-[11px] font-medium leading-snug text-muted-foreground">
                       {t("Nothing yet today · {minutes} min to hit your goal").replace(
                         "{minutes}",
                         String(Math.max(minutesToGoal, 0)),
@@ -310,7 +310,7 @@ function Dashboard() {
                     </p>
                   )}
                   <div
-                    className={`${hasProgressToday ? "grid" : "hidden lg:grid"} gap-2 xl:gap-1 2xl:gap-2`}
+                    className={`${hasProgressToday ? "grid" : "hidden"} gap-2 xl:gap-1 2xl:gap-2`}
                   >
                     {learningCards.map((card) => {
                       const stateVisual = {
