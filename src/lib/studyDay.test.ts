@@ -76,12 +76,13 @@ describe("todayStudyMetrics", () => {
           { mastery_level: 100, last_reviewed_at: today }, // mastered today
           { mastery_level: 100, last_reviewed_at: null }, // opened only, never reviewed
           { mastery_level: 100, last_reviewed_at: yesterday }, // older mastery
-          { mastery_level: 40, last_reviewed_at: today }, // reviewed today, not mastered
+          { mastery_level: 40, last_reviewed_at: today }, // climbed a review step today
+          { mastery_level: 0, last_reviewed_at: today }, // reset, not known
         ],
       }),
       dayStart,
     );
-    expect(result.vocabularyMastered).toBe(1);
+    expect(result.vocabularyMastered).toBe(2);
   });
 
   it("a flashcard mastered today counts only after real reviews", () => {
