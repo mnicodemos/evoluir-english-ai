@@ -196,17 +196,30 @@ function Vocabulary() {
   // Opening this page is not doing the practice: the dashboard dot is driven by
   // real reviews (user_vocabulary), so nothing is marked here.
 
+  async function invalidateVocabulary() {
+    await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
+    await queryClient.invalidateQueries({ queryKey: ["user-vocabulary-mastery"] });
+    await queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
+    await queryClient.invalidateQueries({ queryKey: ["vocabulary-progress"] });
+    await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
+  }
+
+  /** "I know it" moves the word one step up the spaced review ladder. */
   async function markKnown(wordId: string) {
     if (!profile) return;
+    const existing = byWord.get(wordId);
+    // Not due yet: marking again must not skip steps of the ladder.
+    if (!canAdvance(existing)) return;
     setBusy(wordId);
     minutesSpent.start();
     try {
-      const existing = byWord.get(wordId);
+      const next = advance(existing);
       const { error } = await supabase.from("user_vocabulary").upsert(
         {
           user_id: profile.id,
           word_id: wordId,
-          mastery_level: 100,
+          mastery_level: next.mastery_level,
+          next_review_at: next.next_review_at,
           is_difficult: false,
           times_reviewed: (existing?.times_reviewed ?? 0) + 1,
           last_reviewed_at: new Date().toISOString(),
@@ -214,15 +227,37 @@ function Vocabulary() {
         { onConflict: "user_id,word_id" },
       );
       if (error) throw error;
-      await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
-      await queryClient.invalidateQueries({ queryKey: ["user-vocabulary-mastery"] });
-      await queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
-      await queryClient.invalidateQueries({ queryKey: ["vocabulary-progress"] });
-      await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
+      await invalidateVocabulary();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save this word");
     } finally {
       minutesSpent.stop();
+      setBusy(null);
+    }
+  }
+
+  /** A failed review sends the word back two steps and due again tomorrow. */
+  async function markForgotten(wordId: string) {
+    if (!profile) return;
+    const existing = byWord.get(wordId);
+    if (!existing || !isDue(existing)) return;
+    setBusy(wordId);
+    try {
+      const next = fallBack(existing);
+      const { error } = await supabase
+        .from("user_vocabulary")
+        .update({
+          mastery_level: next.mastery_level,
+          next_review_at: next.next_review_at,
+          is_difficult: true,
+        })
+        .eq("user_id", profile.id)
+        .eq("word_id", wordId);
+      if (error) throw error;
+      await invalidateVocabulary();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save this word");
+    } finally {
       setBusy(null);
     }
   }
@@ -236,7 +271,7 @@ function Vocabulary() {
     try {
       const { error } = await supabase
         .from("user_vocabulary")
-        .update({ mastery_level: 0 })
+        .update({ mastery_level: 0, next_review_at: null })
         .eq("user_id", profile.id)
         .in("word_id", ids);
       if (error) throw error;
