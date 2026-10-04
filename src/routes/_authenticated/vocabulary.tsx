@@ -425,9 +425,21 @@ function Vocabulary() {
   });
 
   // Ten new words each day, written by the AI from the lessons in the learning path.
-  const today = (daily ?? []).filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) < 75);
+  // Words already marked as known stay in the list, dimmed with a badge, so the
+  // day's progress is visible at a glance.
+  const today = daily ?? [];
+  const todayKnownCount = today.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75).length;
+  const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
 
-  function List({ items, showActions = true }: { items: Word[]; showActions?: boolean }) {
+  function List({
+    items,
+    showActions = true,
+    highlightKnown = false,
+  }: {
+    items: Word[];
+    showActions?: boolean;
+    highlightKnown?: boolean;
+  }) {
     if (items.length === 0)
       return (
         <p className="mt-6 text-sm text-muted-foreground">Nothing here yet — keep practicing.</p>
@@ -437,14 +449,20 @@ function Vocabulary() {
         {items.map((w) => {
           const isRecording = recordingId === w.id;
           const isChecking = checkingId === w.id;
+          const isKnown = highlightKnown && (byWord.get(w.id)?.mastery_level ?? 0) >= 75;
           return (
-            <article key={w.id} className="card-soft p-4 xl:p-3">
+            <article key={w.id} className={`card-soft p-4 xl:p-3 ${isKnown ? "opacity-60" : ""}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1 break-words">
                   <h3 className="text-lg font-semibold">{w.word}</h3>
                   <p className="text-sm text-muted-foreground">{w.translation}</p>
                 </div>
                 <div className="flex items-center gap-2">
+                  {isKnown && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-medium text-success">
+                      <Check className="size-3" aria-hidden /> {t("Known")}
+                    </span>
+                  )}
                   <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
                     {w.difficulty}
                   </span>
@@ -470,16 +488,18 @@ function Vocabulary() {
               </p>
               {showActions && (
                 <div className="mt-3 flex gap-2">
-                  <Button
-                    size="sm"
-                    className="min-h-11 flex-1"
-                    disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
-                    onClick={() => markKnown(w.id)}
-                    aria-label="I know this word"
-                    title="I know this word"
-                  >
-                    <Check className="size-4" /> {t("I know it")}
-                  </Button>
+                  {!isKnown && (
+                    <Button
+                      size="sm"
+                      className="min-h-11 flex-1"
+                      disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
+                      onClick={() => markKnown(w.id)}
+                      aria-label="I know this word"
+                      title="I know this word"
+                    >
+                      <Check className="size-4" /> {t("I know it")}
+                    </Button>
+                  )}
                   <Button
                     className="min-h-11 flex-1"
                     variant={isRecording ? "destructive" : "outline"}
@@ -682,7 +702,31 @@ function Vocabulary() {
                   </div>
                 ) : null}
                 {today.length > 0 ? (
-                  <List items={today} />
+                  <>
+                    {allTodayKnown ? (
+                      <p className="mt-4 flex items-center gap-2 text-sm font-medium text-success">
+                        <Check className="size-4" aria-hidden />{" "}
+                        {t("All words known today. Nice work!")}
+                      </p>
+                    ) : (
+                      <div className="mt-4">
+                        <p className="text-sm text-muted-foreground">
+                          {t("{n} of {total} words known")
+                            .replace("{n}", String(todayKnownCount))
+                            .replace("{total}", String(today.length))}
+                        </p>
+                        <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-secondary">
+                          <div
+                            className="h-full rounded-full bg-success transition-all"
+                            style={{
+                              width: `${Math.round((todayKnownCount / today.length) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    <List items={today} highlightKnown />
+                  </>
                 ) : !generating && !genFailed ? (
                   <p className="mt-6 text-sm text-muted-foreground">
                     {t("No new words available right now. Please try again later.")}
