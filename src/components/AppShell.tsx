@@ -515,7 +515,7 @@ function AppShellContent({
             >
               <span className="grid justify-items-center gap-0.5">
                 <item.icon className="size-6" />
-                <span className="max-w-full truncate text-[10px] font-medium leading-none">
+                <span className="max-w-full truncate pb-0.5 text-[10px] font-medium leading-none">
                   {item.label}
                 </span>
               </span>
