@@ -205,3 +205,4 @@
 - [ ] Menu lateral mobile: remover item "Study plan"; menu desktop: renomear "Lessons" para "Learning".
 - [ ] Menu inferior mobile: texto cortado na parte inferior — subir ícones/texto; reduzir espaçamento das frases do "Why this matters" (última frase cortando), sem deixar espaço grande após a última.
 - [ ] Migrar AI Speaking e Vocabulary para a API Gemini.
+- [ ] Vocabulary spaced review: convert 230 legacy mastery_level=100 rows to step 5 (90) with staggered next_review_at — waiting for user confirmation of the count.
