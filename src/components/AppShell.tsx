@@ -1,6 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
+  Bell,
+  BellOff,
   BookOpen,
   CalendarCheck,
   Crown,
@@ -41,10 +43,12 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
+import { sendActivityPush } from "@/lib/push.functions";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
 import { useActivityIndicators, type ActivityIndicators } from "@/hooks/useActivityIndicators";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 const mobileSheetNav = [
@@ -87,12 +91,36 @@ const weatherLabels: Record<WeatherCondition, string> = {
 function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
   const { lang, setLang } = useUiLang();
   const { condition, refresh } = useWeatherCondition();
+  const push = usePushNotifications();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const WeatherIcon = weatherIcons[condition];
   const weatherText = t(weatherLabels[condition]);
+  const pushOn = push.state === "enabled";
+  const pushLabel = pushOn ? t("Notifications on") : t("Notifications off");
 
   function toggleLang() {
     setLang(lang === "pt" ? "en" : "pt");
+  }
+
+  async function togglePush() {
+    if (pushOn) {
+      await push.disable();
+      toast(t("Notifications off"));
+      return;
+    }
+    const result = await push.enable();
+    if (result === "enabled") {
+      toast(t("Notifications on"));
+    } else if (result === "disabled") {
+      // Browser-level causes: iframe preview or denied permission.
+      if (window.top !== window.self) {
+        toast(t("Open the app in its own tab to enable notifications"));
+      } else {
+        toast(t("Notification permission was denied"));
+      }
+    } else if (result === "unsupported") {
+      toast(t("Notifications are not supported on this device"));
+    }
   }
 
   function refreshWeather() {
@@ -122,6 +150,15 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
           <WeatherIcon className="size-5 shrink-0" />
           <span className="min-w-0 truncate text-left">{weatherText}</span>
         </Button>
+        <Button
+          variant="ghost"
+          aria-label={t("Notifications")}
+          className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          onClick={() => void togglePush()}
+        >
+          {pushOn ? <Bell className="size-5 shrink-0" /> : <BellOff className="size-5 shrink-0" />}
+          <span className="min-w-0 truncate text-left">{pushLabel}</span>
+        </Button>
       </div>
     );
   }
@@ -143,6 +180,15 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
       >
         <WeatherIcon className="size-5 shrink-0" />
         <span className="min-w-0 truncate">{weatherText}</span>
+      </Button>
+      <Button
+        variant="ghost"
+        aria-label={t("Notifications")}
+        className="h-10 min-w-0 justify-start gap-2 overflow-hidden border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        onClick={() => void togglePush()}
+      >
+        {pushOn ? <Bell className="size-5 shrink-0" /> : <BellOff className="size-5 shrink-0" />}
+        <span className="min-w-0 truncate">{pushLabel}</span>
       </Button>
     </div>
   );
@@ -324,6 +370,29 @@ function AppShellContent({
     window.sessionStorage.setItem(retryKey, "1");
     void retryPendingPedagogicalWrites({ data: { limit: 3 } }).catch(() => undefined);
   }, []);
+
+  // Push warning for new activities: at most once per day, only when the
+  // device is registered and something new (lesson, writing or vocabulary)
+  // is waiting for the student.
+  const hasNewActivity =
+    activityIndicators.listening ||
+    activityIndicators.writing ||
+    activityIndicators.vocabulary;
+  useEffect(() => {
+    if (!hasNewActivity) return;
+    if (localStorage.getItem("push-token") === null) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem("push-activity-notified") === today) return;
+    localStorage.setItem("push-activity-notified", today);
+    void sendActivityPush({
+      data: {
+        title: translate("New activities available"),
+        body: translate("Small consistent actions create meaningful progress."),
+        path: "/dashboard",
+      },
+    }).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasNewActivity]);
 
   async function signOut() {
     await queryClient.cancelQueries();
