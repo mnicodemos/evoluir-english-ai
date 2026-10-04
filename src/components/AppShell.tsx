@@ -149,6 +149,15 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
           <WeatherIcon className="size-5 shrink-0" />
           <span className="min-w-0 truncate text-left">{weatherText}</span>
         </Button>
+        <Button
+          variant="ghost"
+          aria-label={t("Notifications")}
+          className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          onClick={() => void togglePush()}
+        >
+          {pushOn ? <Bell className="size-5 shrink-0" /> : <BellOff className="size-5 shrink-0" />}
+          <span className="min-w-0 truncate text-left">{pushLabel}</span>
+        </Button>
       </div>
     );
   }
