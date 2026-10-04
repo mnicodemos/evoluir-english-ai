@@ -433,7 +433,7 @@ function Vocabulary() {
         <p className="mt-6 text-sm text-muted-foreground">Nothing here yet — keep practicing.</p>
       );
     return (
-      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
         {items.map((w) => {
           const isRecording = recordingId === w.id;
           const isChecking = checkingId === w.id;
@@ -463,9 +463,9 @@ function Vocabulary() {
                   </Button>
                 </div>
               </div>
-              <p className="mt-2 text-sm">{w.meaning}</p>
+              <p className="mt-1.5 text-sm">{w.meaning}</p>
               <p className="mt-1 text-sm text-muted-foreground">{w.pronunciation}</p>
-              <p className="mt-2 rounded-lg bg-secondary/70 px-3 py-2 text-sm italic">
+              <p className="mt-1.5 rounded-lg bg-secondary/70 px-3 py-1.5 text-xs italic line-clamp-2">
                 "{w.example}"
               </p>
               {showActions && (
