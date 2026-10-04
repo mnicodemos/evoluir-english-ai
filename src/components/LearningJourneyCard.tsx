@@ -68,9 +68,9 @@ export function LearningJourneyCard() {
 
   return (
     <div className="mt-3 grid items-start gap-3 sm:mt-5 sm:gap-5 lg:grid-cols-2">
-      {/* Desktop: the EVO banner spans both columns above the two cards; mobile keeps the stacked order. */}
+      {/* Mobile: EVO banner comes first; desktop keeps the banner spanning both columns above the two cards. */}
       <section
-        className="card-soft min-w-0 p-3 sm:p-5 lg:col-start-1 lg:row-start-2"
+        className="card-soft order-2 min-w-0 p-3 sm:p-5 lg:order-none lg:col-start-1 lg:row-start-2"
         aria-labelledby="learning-journey-title"
       >
         <div className="flex min-w-0 items-start gap-3 sm:gap-4">
@@ -167,11 +167,11 @@ export function LearningJourneyCard() {
       </section>
 
       {/* "What you already evolved": the existing section, reused, never rebuilt. */}
-      <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-1">
+      <div className="order-1 min-w-0 lg:order-none lg:col-span-2 lg:col-start-1 lg:row-start-1">
         <ProofOfProgressEvoBanner />
       </div>
 
-      <div className="min-w-0 lg:col-start-2 lg:row-start-2">
+      <div className="order-3 min-w-0 lg:order-none lg:col-start-2 lg:row-start-2">
         <ProofOfProgressCard />
       </div>
     </div>
