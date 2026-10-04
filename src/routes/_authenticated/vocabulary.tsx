@@ -493,16 +493,18 @@ function Vocabulary() {
               </p>
               {showActions && (
                 <div className="mt-3 flex gap-2">
-                  <Button
-                    size="sm"
-                    className="min-h-11 flex-1"
-                    disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
-                    onClick={() => markKnown(w.id)}
-                    aria-label="I know this word"
-                    title="I know this word"
-                  >
-                    <Check className="size-4" /> {t("I know it")}
-                  </Button>
+                  {!isKnown && (
+                    <Button
+                      size="sm"
+                      className="min-h-11 flex-1"
+                      disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
+                      onClick={() => markKnown(w.id)}
+                      aria-label="I know this word"
+                      title="I know this word"
+                    >
+                      <Check className="size-4" /> {t("I know it")}
+                    </Button>
+                  )}
                   <Button
                     className="min-h-11 flex-1"
                     variant={isRecording ? "destructive" : "outline"}
