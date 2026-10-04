@@ -304,9 +304,14 @@ function Vocabulary() {
         const score = authoritative.score;
         if (score !== previewScore)
           console.warn("Pronunciation preview differed from the authoritative result");
-        if (score >= 80) toast.success(`Great pronunciation — ${score}% match.`);
-        else if (score >= 55) toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
-        else toast.error(`I heard “${spoken}”. Listen again and try once more.`);
+        if (score > 70) {
+          toast.success(`Great pronunciation — ${score}% match.`);
+          await markKnown(word.id);
+        } else if (score >= 55) {
+          toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
+        } else {
+          toast.error(`I heard “${spoken}”. Listen again and try once more.`);
+        }
       } catch (error) {
         const cancelled = error instanceof Error && error.name === "AbortError";
         if (!cancelled && pronunciationGate.current.isCurrent(attempt))
@@ -428,12 +433,12 @@ function Vocabulary() {
         <p className="mt-6 text-sm text-muted-foreground">Nothing here yet — keep practicing.</p>
       );
     return (
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
         {items.map((w) => {
           const isRecording = recordingId === w.id;
           const isChecking = checkingId === w.id;
           return (
-            <article key={w.id} className="card-soft p-5">
+            <article key={w.id} className="card-soft p-4 xl:p-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1 break-words">
                   <h3 className="text-lg font-semibold">{w.word}</h3>
@@ -458,15 +463,16 @@ function Vocabulary() {
                   </Button>
                 </div>
               </div>
-              <p className="mt-3 text-sm">{w.meaning}</p>
+              <p className="mt-2 text-sm">{w.meaning}</p>
               <p className="mt-1 text-sm text-muted-foreground">{w.pronunciation}</p>
-              <p className="mt-3 rounded-lg bg-secondary/70 px-3 py-2 text-sm italic">
+              <p className="mt-2 rounded-lg bg-secondary/70 px-3 py-2 text-sm italic">
                 "{w.example}"
               </p>
               {showActions && (
-                <div className="mt-4 flex gap-2">
+                <div className="mt-3 flex gap-2">
                   <Button
-                    disabled={busy === w.id}
+                    size="sm"
+                    disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
                     onClick={() => markKnown(w.id)}
                     aria-label="I know this word"
                     title="I know this word"
@@ -501,9 +507,9 @@ function Vocabulary() {
   }
 
   return (
-    <AppShell>
-      <h1 className="text-3xl font-bold">Vocabulary Builder</h1>
-      <p className="mt-2 text-muted-foreground">
+    <AppShell mobileOneScreen>
+      <h1 className="text-2xl font-bold lg:text-3xl">Vocabulary Builder</h1>
+      <p className="mt-1 text-sm text-muted-foreground lg:mt-2">
         Ten new words every time you start a new lesson, chosen from your learning path, with
         meaning, examples and a microphone to test your pronunciation.
       </p>
@@ -519,7 +525,7 @@ function Vocabulary() {
         </Button>
       )}
 
-      <label htmlFor="vocab-search" className="mt-6 block text-sm font-medium text-foreground">
+      <label htmlFor="vocab-search" className="mt-3 block text-sm font-medium text-foreground">
         Search in English:
       </label>
       <div className="relative mt-1">
@@ -531,7 +537,7 @@ function Vocabulary() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Enter text or word..."
           aria-label="Search vocabulary"
-          className="h-11 w-full rounded-xl border border-border bg-card pl-10 pr-10 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
+          className="h-9 w-full rounded-lg border border-border bg-card pl-10 pr-10 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
         />
         {query && (
           <button
@@ -638,7 +644,7 @@ function Vocabulary() {
           <Skeleton className="h-40 w-full" />
         </div>
       ) : (
-        <Tabs defaultValue="today" className="mt-7">
+        <Tabs defaultValue="today" className="mt-4">
           <TabsList>
             <TabsTrigger value="today">
               <span>Today</span>

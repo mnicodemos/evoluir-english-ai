@@ -139,18 +139,18 @@ function StudyPlanPage() {
       }));
 
   return (
-    <AppShell>
-      <div className="space-y-5 lg:space-y-6">
+    <AppShell mobileOneScreen>
+      <div className="space-y-3 lg:space-y-4">
         <header className="animate-rise">
           <p className="text-sm text-muted-foreground">My Study Plan</p>
-          <h1 className="text-3xl font-bold">Your weekly study plan</h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          <h1 className="text-2xl font-bold lg:text-3xl">Your weekly study plan</h1>
+          <p className="mt-1 max-w-2xl text-xs text-muted-foreground sm:text-sm">
             Choose your goal, your available time and your focus area. Your plan uses the lessons
             and practice already available for your level.
           </p>
         </header>
 
-        <section className="card-soft space-y-5 p-5">
+        <section className="card-soft space-y-3 p-3 sm:p-4">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             <Target className="size-5 text-primary" />
             Plan settings
@@ -189,7 +189,7 @@ function StudyPlanPage() {
 
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button
-              className="min-h-11 w-full sm:w-auto"
+              className="h-9 w-full sm:w-auto"
               disabled={save.isPending}
               onClick={() => {
                 if (plan) setPrevious(plan.days);
@@ -201,7 +201,7 @@ function StudyPlanPage() {
             </Button>
             <Button
               variant="outline"
-              className="min-h-11 w-full sm:w-auto"
+              className="h-9 w-full sm:w-auto"
               disabled={isFetching || !plan}
               onClick={recalculate}
             >
@@ -222,12 +222,12 @@ function StudyPlanPage() {
           </div>
         ) : (
           <>
-            <section className="card-soft p-5">
+            <section className="card-soft p-3 sm:p-4">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <Clock className="size-5 text-primary" />
                 Weekly progress
               </h2>
-              <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+              <dl className="mt-3 grid gap-2 sm:grid-cols-3">
                 <Stat
                   label="Completed activities"
                   value={`${plan.completedCount} / ${plan.totalCount}`}
@@ -249,13 +249,13 @@ function StudyPlanPage() {
               )}
             </section>
 
-            <section className="card-soft p-5">
+            <section className="card-soft p-3 sm:p-4">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <Sparkles className="size-5 text-primary" />
                 Why this plan?
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">Based on your progress:</p>
-              <ul className="mt-3 space-y-2">
+              <ul className="mt-2 space-y-1.5">
                 {plan.reasons.map((reason) => (
                   <li
                     key={`${reason.code}-${reason.skill ?? ""}`}
@@ -319,9 +319,9 @@ function StudyPlanPage() {
                 <CalendarCheck className="size-5 text-primary" />
                 Week 1
               </h2>
-              <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
                 {plan.days.map((day) => (
-                  <li key={day.day} className="card-soft p-4">
+                  <li key={day.day} className="card-soft p-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-sm font-semibold">{day.day}</p>
@@ -336,19 +336,19 @@ function StudyPlanPage() {
                         </span>
                       )}
                     </div>
-                    <p className="mt-3 font-medium break-words">{day.title}</p>
+                    <p className="mt-2 font-medium break-words">{day.title}</p>
                     {day.lessonId ? (
                       <Link
                         to="/learning/$lessonId"
                         params={{ lessonId: day.lessonId }}
-                        className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                        className="mt-2 inline-flex h-9 items-center rounded-lg border border-border px-3 py-1 text-sm font-medium transition-colors hover:bg-accent"
                       >
                         Start activity
                       </Link>
                     ) : (
                       <Link
                         to={day.to as "/listening"}
-                        className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                        className="mt-2 inline-flex h-9 items-center rounded-lg border border-border px-3 py-1 text-sm font-medium transition-colors hover:bg-accent"
                       >
                         Start activity
                       </Link>
@@ -370,9 +370,9 @@ function StudyPlanPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-border p-3">
+    <div className="rounded-lg border border-border p-2">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-1 text-xl font-bold">{value}</dd>
+      <dd className="mt-1 text-lg font-bold">{value}</dd>
     </div>
   );
 }
@@ -389,7 +389,7 @@ function Choice({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="grid gap-2 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:items-center">
       <p className="text-sm font-medium">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => (
@@ -398,7 +398,7 @@ function Choice({
             type="button"
             onClick={() => onChange(option.value)}
             aria-pressed={value === option.value}
-            className={`min-h-11 rounded-lg border px-3 py-2 text-sm transition-colors ${
+            className={`h-9 rounded-lg border px-3 py-1 text-sm transition-colors ${
               value === option.value
                 ? "border-transparent bg-primary text-primary-foreground"
                 : "border-border hover:bg-secondary"
