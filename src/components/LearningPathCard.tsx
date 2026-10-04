@@ -121,10 +121,7 @@ export function CurriculumPath() {
       </section>
 
       {(() => {
-        const next =
-          path.units
-            .flatMap((unit) => unit.lessons)
-            .find((lesson) => !lesson.completed && !lesson.locked) ?? null;
+        const next = nextLesson;
         if (!next) {
           return (
             <section className="card-soft p-4" aria-label="All lessons completed">
