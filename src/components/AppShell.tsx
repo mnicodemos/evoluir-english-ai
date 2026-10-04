@@ -404,25 +404,18 @@ function AppShellContent({
           </nav>
 
           <div className="flex flex-col items-stretch gap-1">
-            <div className="flex items-center gap-1 px-1 pb-1">
-              <UtilityButtons variant="sidebar" />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={translate("Sign out")}
-                    className="size-9 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                    onClick={signOut}
-                  >
-                    <LogOut className="size-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={8}>
-                  {translate("Sign out")}
-                </TooltipContent>
-              </Tooltip>
-            </div>
+          <div className="flex flex-col items-stretch gap-0.5 pb-1">
+            <UtilityButtons variant="sidebar" />
+            <Button
+              variant="ghost"
+              aria-label={translate("Sign out")}
+              className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              onClick={signOut}
+            >
+              <LogOut className="size-5 shrink-0" />
+              <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
+            </Button>
+          </div>
             <ProfileMenu
               presentation="dashboard-sidebar"
               className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
