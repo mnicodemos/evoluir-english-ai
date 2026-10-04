@@ -90,6 +90,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const evidenceText = t(NEXT_STEP_EVIDENCE_TEXT[data.reason])
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  // Mobile-only one-line versions of the same sentences: summarized, never cut.
+  const shortPriorityText = t(NEXT_STEP_PRIORITY_TEXT_SHORT)
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  const shortEvidenceText = t(NEXT_STEP_EVIDENCE_TEXT_SHORT[data.reason])
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"));
   const progressText =
     data.insight?.situation === "strong_elsewhere" && strongestLabel
       ? t(NEXT_STEP_PROGRESS_TEXT.withStrongSkill)
