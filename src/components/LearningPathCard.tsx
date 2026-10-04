@@ -4,6 +4,8 @@ import {
   BookOpen,
   BarChart3,
   CheckCircle2,
+  ChevronDown,
+  ChevronRight,
   Download,
   Headphones,
   Loader2,
