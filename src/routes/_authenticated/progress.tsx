@@ -180,35 +180,35 @@ function ProgressPage() {
 
         {recent && recent.length > 0 && (
           <section className="card-soft p-3 sm:p-5">
-          <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
-          <ul className="mt-2 divide-y divide-border sm:mt-4">
-            {recent.map((a) => (
-              <li
-                key={a.id}
-                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm"
-              >
-                <span className="min-w-0">
-                  <span className="block break-words font-medium">
-                    {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
-                      <>
-                        <span>Lesson:</span> {(a.title as string).slice(8)}
-                      </>
-                    ) : (
-                      a.title || a.activity_type
-                    )}
+            <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
+            <ul className="mt-2 divide-y divide-border sm:mt-4">
+              {recent.map((a) => (
+                <li
+                  key={a.id}
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm"
+                >
+                  <span className="min-w-0">
+                    <span className="block break-words font-medium">
+                      {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
+                        <>
+                          <span>Lesson:</span> {(a.title as string).slice(8)}
+                        </>
+                      ) : (
+                        a.title || a.activity_type
+                      )}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {new Date(a.created_at).toLocaleDateString()} · {a.duration_minutes} min
+                    </span>
                   </span>
-                  <span className="text-muted-foreground">
-                    {new Date(a.created_at).toLocaleDateString()} · {a.duration_minutes} min
-                  </span>
-                </span>
-                {a.score != null && (
-                  <span className="shrink-0 font-semibold text-[oklch(0.55_0.14_158)]">
-                    {a.score}%
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
+                  {a.score != null && (
+                    <span className="shrink-0 font-semibold text-[oklch(0.55_0.14_158)]">
+                      {a.score}%
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
           </section>
         )}
       </div>
