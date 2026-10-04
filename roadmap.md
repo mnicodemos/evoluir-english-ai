@@ -179,6 +179,7 @@
 - Dashboard mobile — "Por que isso importa agora?" desce um pouco (mt-2 → mt-3.5) para descolar dos chips, sem alterar a altura do bloco da EVO
 
 ## Pendente → ✅ (2026-10-03)
+
 - [x] Desktop: subtítulos no Quick Access (6 cartões) e no Quick Win / Take the challenge (layout em duas linhas com divisor), linha separadora acima dos botões; subtítulos do Quick Access sem corte (quebram linha). Mobile inalterado.
 
 - ✅ 2026-10-03 — Desktop 1280–1439: coluna da imagem do card EVO reduzida para 17rem (CSS próprio .dashboard-evo-grid; variantes arbitrárias min-[1280px] não compilaram) mantendo 1440+ com 25rem; botões Quick Win / Aceitar o desafio descolados 8px da borda inferior (xl:mb-2). Mobile inalterado.

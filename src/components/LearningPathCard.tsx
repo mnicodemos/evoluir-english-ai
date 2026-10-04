@@ -439,10 +439,22 @@ export function PathProgressCard({
           {skills.map((skill) => {
             const statusTone =
               skill.value >= 95
-                ? { text: "text-brand-green", bar: "[&>div]:bg-brand-green", badge: "bg-brand-green/15 text-brand-green" }
+                ? {
+                    text: "text-brand-green",
+                    bar: "[&>div]:bg-brand-green",
+                    badge: "bg-brand-green/15 text-brand-green",
+                  }
                 : skill.value >= 80
-                  ? { text: "text-dashboard-cyan", bar: "[&>div]:bg-dashboard-cyan", badge: "bg-dashboard-blue/20 text-dashboard-cyan" }
-                  : { text: "text-warning", bar: "[&>div]:bg-warning", badge: "bg-warning/15 text-warning" };
+                  ? {
+                      text: "text-dashboard-cyan",
+                      bar: "[&>div]:bg-dashboard-cyan",
+                      badge: "bg-dashboard-blue/20 text-dashboard-cyan",
+                    }
+                  : {
+                      text: "text-warning",
+                      bar: "[&>div]:bg-warning",
+                      badge: "bg-warning/15 text-warning",
+                    };
             return (
               <div
                 key={skill.label}
@@ -453,16 +465,21 @@ export function PathProgressCard({
                   strokeWidth={2.5}
                   aria-hidden="true"
                 />
-              <span className="truncate font-medium">{t(skill.label)}</span>
-              <Progress value={skill.value} className={`h-2.5 bg-secondary/80 ${statusTone.bar}`} />
-              <span className="text-right font-semibold text-foreground">{skill.value}%</span>
-              <span className={`rounded-full px-2 py-1 text-center text-[10px] font-semibold ${statusTone.badge}`}>
-                {skill.value >= 95
-                  ? t("Advanced")
-                  : skill.value >= 80
-                    ? t("Strong")
-                    : t("Priority")}
-              </span>
+                <span className="truncate font-medium">{t(skill.label)}</span>
+                <Progress
+                  value={skill.value}
+                  className={`h-2.5 bg-secondary/80 ${statusTone.bar}`}
+                />
+                <span className="text-right font-semibold text-foreground">{skill.value}%</span>
+                <span
+                  className={`rounded-full px-2 py-1 text-center text-[10px] font-semibold ${statusTone.badge}`}
+                >
+                  {skill.value >= 95
+                    ? t("Advanced")
+                    : skill.value >= 80
+                      ? t("Strong")
+                      : t("Priority")}
+                </span>
               </div>
             );
           })}

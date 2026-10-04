@@ -298,19 +298,28 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </p>
               <ul className="mt-1 grid gap-1">
                 <li className="flex items-start gap-2 pl-2">
-                  <span className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80" aria-hidden="true" />
+                  <span
+                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
+                    aria-hidden="true"
+                  />
                   <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
                     {shortPriorityText}
                   </span>
                 </li>
                 <li className="flex items-start gap-2 pl-2">
-                  <span className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80" aria-hidden="true" />
+                  <span
+                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
+                    aria-hidden="true"
+                  />
                   <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
                     {shortEvidenceText}
                   </span>
                 </li>
                 <li className="flex items-start gap-2 pl-2">
-                  <span className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80" aria-hidden="true" />
+                  <span
+                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
+                    aria-hidden="true"
+                  />
                   <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
                     {shortProgressText}
                   </span>
@@ -353,24 +362,39 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mb-5 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
               {/* Mobile: short summary + evidence item — never clamped, never cut. */}
               <li className="flex items-start gap-2 sm:hidden">
-                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
+                <span
+                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
+                  aria-hidden="true"
+                />
                 <span className="leading-tight">{priorityText}</span>
               </li>
               <li className="flex items-start gap-2 sm:hidden">
-                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
+                <span
+                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
+                  aria-hidden="true"
+                />
                 <span className="leading-tight">{evidenceText}</span>
               </li>
               {/* Desktop/tablet: the complete three-line explanation. */}
               <li className="hidden items-start gap-2 sm:flex">
-                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
+                <span
+                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
+                  aria-hidden="true"
+                />
                 <span>{progressText}</span>
               </li>
               <li className="hidden items-start gap-2 sm:flex">
-                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
+                <span
+                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
+                  aria-hidden="true"
+                />
                 <span>{priorityText}</span>
               </li>
               <li className="hidden items-start gap-2 sm:flex">
-                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
+                <span
+                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
+                  aria-hidden="true"
+                />
                 <span>{evidenceText}</span>
               </li>
             </ul>
