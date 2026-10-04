@@ -61,7 +61,7 @@ export function vocabularyHasNewActivity(input: {
   batchSize?: number;
 }) {
   if (input.batchWordIds.length === 0) return false;
-  return input.batchWordIds.some((id) => (input.masteryByWordId[id] ?? 0) < VOCABULARY_MASTERED);
+  return input.batchWordIds.some((id) => (input.masteryByWordId[id] ?? 0) <= 0);
 }
 
 /**

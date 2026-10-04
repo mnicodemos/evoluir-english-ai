@@ -64,7 +64,7 @@ export function todayStudyMetrics(rows: StudyDayRows, dayStart: Date) {
   ).length;
   const vocabularyMastered =
     rows.words.filter(
-      (w) => w.mastery_level >= 70 && isTimestampToday(w.last_reviewed_at, dayStart),
+      (w) => w.mastery_level > 0 && isTimestampToday(w.last_reviewed_at, dayStart),
     ).length +
     rows.cards.filter(
       (c) =>
