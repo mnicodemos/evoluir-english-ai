@@ -196,3 +196,7 @@
 - [x] Dashboard — selo Strong alinhado à cor da barra (fundo ciano/15); cada barra, texto e fundo do selo na mesma cor do status
 - [x] My Progress — 'Sua jornada' e 'Sua evolução' lado a lado no desktop (lg:grid-cols-2) com banner EVO em largura total acima de ambos, tops alinhados; mobile preserva jornada → banner → evolução. Validado em 1920/411px; lint 0 erros, typecheck, 478 testes e build OK
 - 2026-10-04: My History mobile — bloco EVO movido para acima de "Your journey" via order (order-1/2/3, lg:order-none); desktop inalterado. Validado 411px/1280px; lint 0 erros, typecheck, 478 testes e build OK.
+
+## 2026-10-04 — Menu lateral desktop com ícone + texto
+- AppShell.tsx: UtilityButtons (variante sidebar) e o botão Sair passaram de ícone-only (tooltip) para itens de linha com ícone + texto, iguais aos do menu lateral mobile; tooltips removidos nesses pontos (TooltipProvider mantido).
+- Validação: Playwright 1280/1920 mostra Português, Ensolarado e Sair com ícone e texto; build OK.
