@@ -3,6 +3,7 @@ import {
   Bolt,
   BookOpen,
   Check,
+  CircleX,
   Flame,
   GraduationCap,
   Headphones,
@@ -302,12 +303,18 @@ function Dashboard() {
                     {t("KEEPING LEARNING")}
                   </p>
                   {!hasProgressToday && (
-                    <p className="flex min-h-[5.75rem] items-center text-[11px] font-medium leading-snug text-muted-foreground">
-                      {t("Nothing yet today · {minutes} min to hit your goal").replace(
-                        "{minutes}",
-                        String(Math.max(minutesToGoal, 0)),
-                      )}
-                    </p>
+                    <div className="flex min-h-[5.75rem] flex-col items-start justify-center gap-1 text-muted-foreground">
+                      <CircleX className="size-5" strokeWidth={1.8} aria-hidden="true" />
+                      <p className="text-[11px] font-bold leading-tight">
+                        {t("Nothing yet today")}
+                      </p>
+                      <p className="text-[11px] font-medium leading-tight">
+                        {t("{minutes} min to hit your goal").replace(
+                          "{minutes}",
+                          String(Math.max(minutesToGoal, 0)),
+                        )}
+                      </p>
+                    </div>
                   )}
                   <div
                     className={`${hasProgressToday ? "grid" : "hidden"} gap-2 xl:gap-1 2xl:gap-2`}

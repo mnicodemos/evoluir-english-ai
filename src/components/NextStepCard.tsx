@@ -2,7 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
 import evoDashboardMobile from "@/assets/evo-dashboard-mobile-original-2026-10-03.png.asset.json";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight, Compass, Lightbulb, Map, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Check,
+  ChevronRight,
+  Compass,
+  GraduationCap,
+  Headphones,
+  Lightbulb,
+  Map,
+  MessageSquareText,
+  Mic,
+  PenLine,
+  Sparkles,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
@@ -64,6 +78,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const skillLabel = data.prioritySkill
     ? t(NEXT_STEP_SKILL_TEXT[data.prioritySkill] ?? data.prioritySkill)
     : t("Free practice");
+  const PriorityIcon =
+    {
+      speaking: Mic,
+      pronunciation: Mic,
+      writing: PenLine,
+      listening: Headphones,
+      vocabulary: BookOpen,
+      reading: BookOpen,
+      grammar: GraduationCap,
+    }[data.prioritySkill ?? ""] ?? MessageSquareText;
   const cefrLevel = data.insight?.cefrLevel
     ? findLevel(data.insight.cefrLevel).cefr.replace(/^CEFR /, "")
     : null;
@@ -255,8 +279,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:whitespace-normal sm:text-sm sm:leading-normal">
                     {t("TODAY'S PRIORITY")}
                   </p>
-                  <h2 className="mt-2 min-w-0 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:text-2xl sm:leading-normal xl:text-3xl">
-                    {skillLabel}
+                  <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:text-2xl sm:leading-normal xl:text-3xl">
+                    <PriorityIcon
+                      className="size-5 shrink-0 text-warning sm:size-6"
+                      aria-hidden="true"
+                    />
+                    <span>{skillLabel}</span>
                   </h2>
                 </div>
               </div>
@@ -296,7 +324,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 />
                 {t("Why this matters now?")}
               </p>
-              <ul className="mt-1 grid gap-1">
+              <ul className="mt-1.5 grid gap-2">
                 <li className="flex items-start gap-2 pl-2">
                   <span
                     className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"

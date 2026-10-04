@@ -165,6 +165,11 @@
 - [x] Fase 1 — Hardening e confiabilidade: lint/testes/E2E, secrets/env, RLS, cross-user, AI limits, APIs, Stripe webhook, quiz, roles, logs, CI, relatório (E2E pendente de libs do navegador no sandbox; specs prontos para CI)
 - [x] Dashboard mobile — terceira frase curta no contexto EVO, pontos nos três motivos, nível teal, meta X/Y min., Accuracy 0%, habilidades por status e mensagem de progresso vazio
 - [x] Dashboard desktop — aplicar também a mensagem única quando os quatro indicadores do dia estiverem zerados
+- [x] Dashboard — formatar estado vazio em duas linhas com ícone de X circular no mobile e desktop
+- [x] Dashboard EVO mobile — ampliar espaçamento das três frases e adicionar ícone âmbar conforme a prioridade
+- [x] Vocabulary — aprovar palavra com pronúncia acima de 70%, desabilitar “That's OK” durante fala/verificação e compactar em uma tela
+- [x] Study Plan — compactar conteúdo para uma tela sem alterar os controles ou dados
+- [x] Frequency — usar teal na marcação dos dias estudados
 
 ## Mobile — ajustes marcados em capturas (2026-10-02)
 

@@ -977,8 +977,8 @@ export const uiPt: Record<string, string> = {
   "KEEPING LEARNING": "CONTINUE APRENDENDO",
   "Small steps create progress.": "Pequenos passos criam progresso.",
   "Today's Progress": "Progresso de hoje",
-  "Nothing yet today · {minutes} min to hit your goal":
-    "Nada ainda hoje · {minutes} min para atingir sua meta",
+  "Nothing yet today": "Nada ainda hoje",
+  "{minutes} min to hit your goal": "{minutes} min para atingir sua meta",
   "Your English Skills": "Suas habilidades em inglês",
   "Keep improving": "Continue evoluindo",
   "All reviews done for now": "Revisões em dia por enquanto",
