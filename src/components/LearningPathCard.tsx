@@ -448,7 +448,7 @@ export function PathProgressCard({
                   ? {
                       text: "text-dashboard-cyan",
                       bar: "[&>div]:bg-dashboard-cyan",
-                      badge: "bg-dashboard-blue/20 text-dashboard-cyan",
+                      badge: "bg-dashboard-cyan/15 text-dashboard-cyan",
                     }
                   : {
                       text: "text-warning",

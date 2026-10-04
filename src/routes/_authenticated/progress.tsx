@@ -166,50 +166,52 @@ function ProgressPage() {
         </>
       )}
 
-      {learning?.common_errors && learning.common_errors.length > 0 && (
-        <section className="card-soft mt-3 p-3 sm:mt-5 sm:p-5">
-          <h2 className="text-base font-semibold sm:text-lg">{t("Frequent mistakes")}</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-            {learning.common_errors.map((e: string, i: number) => (
-              <li key={i}>{e}</li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <div className="mt-3 grid gap-3 sm:mt-5 sm:gap-5 xl:grid-cols-2">
+        {learning?.common_errors && learning.common_errors.length > 0 && (
+          <section className="card-soft p-3 sm:p-5">
+            <h2 className="text-base font-semibold sm:text-lg">{t("Frequent mistakes")}</h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
+              {learning.common_errors.map((e: string, i: number) => (
+                <li key={i}>{e}</li>
+              ))}
+            </ul>
+          </section>
+        )}
 
-      {recent && recent.length > 0 && (
-        <section className="card-soft mt-3 p-3 sm:mt-5 sm:p-6">
-          <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
-          <ul className="mt-2 divide-y divide-border sm:mt-4">
-            {recent.map((a) => (
-              <li
-                key={a.id}
-                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm"
-              >
-                <span className="min-w-0">
-                  <span className="block break-words font-medium">
-                    {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
-                      <>
-                        <span>Lesson:</span> {(a.title as string).slice(8)}
-                      </>
-                    ) : (
-                      a.title || a.activity_type
-                    )}
+        {recent && recent.length > 0 && (
+          <section className="card-soft p-3 sm:p-5">
+            <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
+            <ul className="mt-2 divide-y divide-border sm:mt-4">
+              {recent.map((a) => (
+                <li
+                  key={a.id}
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm"
+                >
+                  <span className="min-w-0">
+                    <span className="block break-words font-medium">
+                      {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
+                        <>
+                          <span>Lesson:</span> {(a.title as string).slice(8)}
+                        </>
+                      ) : (
+                        a.title || a.activity_type
+                      )}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {new Date(a.created_at).toLocaleDateString()} · {a.duration_minutes} min
+                    </span>
                   </span>
-                  <span className="text-muted-foreground">
-                    {new Date(a.created_at).toLocaleDateString()} · {a.duration_minutes} min
-                  </span>
-                </span>
-                {a.score != null && (
-                  <span className="shrink-0 font-semibold text-[oklch(0.55_0.14_158)]">
-                    {a.score}%
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                  {a.score != null && (
+                    <span className="shrink-0 font-semibold text-[oklch(0.55_0.14_158)]">
+                      {a.score}%
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
     </AppShell>
   );
 }
