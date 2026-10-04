@@ -42,6 +42,8 @@ export function CurriculumPath() {
   const open = useOpenPathLesson();
   const navigate = useNavigate();
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  // Units whose lessons are all done collapse into a single row until expanded.
+  const [expandedUnits, setExpandedUnits] = useState<Set<number>>(() => new Set());
   const { data: profile } = useProfile();
   const [planLoading, setPlanLoading] = useState(false);
   // Current lesson = same one the "Next lesson" card shows.
@@ -49,6 +51,15 @@ export function CurriculumPath() {
     path.units
       .flatMap((unit) => unit.lessons)
       .find((lesson) => !lesson.completed && !lesson.locked) ?? null;
+
+  const toggleUnit = (unitNumber: number) => {
+    setExpandedUnits((prev) => {
+      const nextSet = new Set(prev);
+      if (nextSet.has(unitNumber)) nextSet.delete(unitNumber);
+      else nextSet.add(unitNumber);
+      return nextSet;
+    });
+  };
 
   const downloadPlan = async () => {
     setPlanLoading(true);
