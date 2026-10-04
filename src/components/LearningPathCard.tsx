@@ -247,9 +247,13 @@ export function CurriculumPath() {
               if (!test) return null;
               return (
                 <Button
-                  variant={test.passed ? "outline" : "default"}
+                  variant={test.unlocked && !test.passed ? "default" : "outline"}
                   size="sm"
-                  className="mt-4 w-full"
+                  className={`mt-4 w-full ${
+                    test.unlocked && !test.passed
+                      ? "bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+                      : "text-muted-foreground"
+                  }`}
                   disabled={!test.unlocked}
                   onClick={() =>
                     navigate({ to: "/learning/unit-test", search: { unit: unit.unit } })
