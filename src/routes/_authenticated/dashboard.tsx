@@ -304,7 +304,11 @@ function Dashboard() {
                   </p>
                   {!hasProgressToday && (
                     <div className="flex min-h-[5.75rem] flex-col items-center justify-center gap-1 text-center text-muted-foreground">
-                      <Clock className="size-5 text-brand-green" strokeWidth={1.8} aria-hidden="true" />
+                      <Clock
+                        className="size-5 text-brand-green"
+                        strokeWidth={1.8}
+                        aria-hidden="true"
+                      />
                       <p className="text-[11px] font-bold leading-tight">
                         {t("Nothing yet today")}
                       </p>
