@@ -432,6 +432,22 @@ export const NEXT_STEP_EVIDENCE_TEXT: Record<NextStepReason, string> = {
 };
 
 /**
+ * Mobile-only one-line summaries of the same sentences above: same decision,
+ * same placeholders, shorter copy so each line fits a narrow screen without
+ * truncation. Never rendered on larger screens.
+ */
+export const NEXT_STEP_PRIORITY_TEXT_SHORT = "{skill} is next in your {level} journey.";
+
+export const NEXT_STEP_EVIDENCE_TEXT_SHORT: Record<NextStepReason, string> = {
+  recent_errors: "Recent practice shows room to improve.",
+  not_measured_yet: "More {skill} evidence will guide EVO.",
+  low_confidence: "More evidence will clarify your progress.",
+  not_practised_recently: "You haven't practised {skill} recently.",
+  lowest_score: "{skill} needs more practice now.",
+  no_data: "Practice will shape your path.",
+};
+
+/**
  * Evolution context line. The positive variant is only allowed when the server
  * already resolved a strongest other skill with evidence at the same level;
  * otherwise a neutral, factual fallback is used — nothing is invented.

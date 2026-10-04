@@ -14,7 +14,9 @@ import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import {
   NEXT_STEP_ACTION_TEXT,
   NEXT_STEP_EVIDENCE_TEXT,
+  NEXT_STEP_EVIDENCE_TEXT_SHORT,
   NEXT_STEP_PRIORITY_TEXT,
+  NEXT_STEP_PRIORITY_TEXT_SHORT,
   NEXT_STEP_PROGRESS_TEXT,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
@@ -86,6 +88,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
   const evidenceText = t(NEXT_STEP_EVIDENCE_TEXT[data.reason])
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  // Mobile-only one-line versions of the same sentences: summarized, never cut.
+  const shortPriorityText = t(NEXT_STEP_PRIORITY_TEXT_SHORT)
+    .replaceAll("{skill}", skillLabel)
+    .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  const shortEvidenceText = t(NEXT_STEP_EVIDENCE_TEXT_SHORT[data.reason])
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
   const progressText =
@@ -283,14 +292,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <ul className="mt-1 grid gap-1">
                 <li className="flex items-start gap-2 pl-2">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
-                  <span className="min-w-0 text-[11px] leading-snug text-sidebar-foreground/80">
-                    {priorityText}
+                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
+                    {shortPriorityText}
                   </span>
                 </li>
                 <li className="flex items-start gap-2 pl-2">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
-                  <span className="min-w-0 text-[11px] leading-snug text-sidebar-foreground/80">
-                    {evidenceText}
+                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
+                    {shortEvidenceText}
                   </span>
                 </li>
               </ul>
