@@ -247,7 +247,7 @@ export function MobileNavigationMenu({
                 />
               )}
             </span>
-            <span className="text-[10px] font-medium leading-none">{bottomLabel}</span>
+            <span className="pb-0.5 text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
           <Button
@@ -502,7 +502,7 @@ function AppShellContent({
         </main>
 
         <nav
-          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[env(safe-area-inset-bottom)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
           aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
         >
           {dashboardMobileNav.map((item) => (

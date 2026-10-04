@@ -324,7 +324,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 />
                 {t("Why this matters now?")}
               </p>
-              <ul className="mt-1.5 grid gap-2">
+              <ul className="mt-1 grid gap-1">
                 <li className="flex items-start gap-2 pl-2">
                   <span
                     className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
