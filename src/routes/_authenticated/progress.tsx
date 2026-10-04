@@ -86,52 +86,52 @@ function ProgressPage() {
   const gaps = sorted.slice(-2).filter((s) => s.value > 0);
 
   return (
-    <AppShell>
-      <h1 className="text-3xl font-bold">{t("My history")}</h1>
+    <AppShell mobileOneScreen>
+      <h1 className="text-xl font-bold lg:text-3xl">{t("My history")}</h1>
       <LearningJourneyCard />
 
       {isLoading ? (
-        <Skeleton className="mt-7 h-72 w-full" />
+        <Skeleton className="mt-4 h-72 w-full sm:mt-7" />
       ) : (
         <>
-          <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto_auto]">
-            <section className="card-soft p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
-              <h2 className="text-lg font-semibold">{t("Frequency")}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+          <div className="mt-3 grid gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto_auto]">
+            <section className="card-soft p-3 sm:p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
+              <h2 className="text-base font-semibold sm:text-lg">{t("Frequency")}</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
                 {t("The days you studied this month.")}
               </p>
-              <div className="mt-4">{profile && <FrequencyCalendar userId={profile.id} />}</div>
+              <div className="mt-2 sm:mt-4">{profile && <FrequencyCalendar userId={profile.id} />}</div>
             </section>
 
-            <section className="card-soft p-5 xl:col-start-2 xl:row-start-1">
-              <h2 className="text-lg font-semibold">{t("Current level")}</h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
+              <h2 className="text-base font-semibold sm:text-lg">{t("Current level")}</h2>
+              <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4">
                 {skills.map((s) => (
                   <div key={s.label}>
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
                       <span className="font-medium">{t(s.label)}</span>
                       <span className="text-muted-foreground">{s.value}%</span>
                     </div>
-                    <Bar value={s.value} className="mt-2 h-2" />
+                    <Bar value={s.value} className="mt-1.5 h-2 sm:mt-2" />
                   </div>
                 ))}
               </div>
             </section>
 
-            <section className="card-soft p-5 xl:col-span-2 xl:row-start-3">
-              <h2 className="text-lg font-semibold">{t("Evolution")}</h2>
+            <section className="card-soft p-3 sm:p-5 xl:col-span-2 xl:row-start-3">
+              <h2 className="text-base font-semibold sm:text-lg">{t("Evolution")}</h2>
               <div>
                 {profile && <EvolutionChart userId={profile.id} level={profile.level} />}
                 {profile && <MinutesByDayChart userId={profile.id} level={profile.level} />}
               </div>
             </section>
 
-            <div className="grid gap-5 sm:grid-cols-2 xl:col-start-2 xl:row-start-2">
-              <section className="card-soft flex min-h-32 flex-col justify-center p-6">
-                <h2 className="flex items-center gap-2 font-semibold">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:col-start-2 xl:row-start-2">
+              <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
+                <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
                   <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" /> {t("Strengths")}
                 </h2>
-                <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
                   {strengths.length ? (
                     strengths.map((s) => (
                       <li key={s.label}>
@@ -143,11 +143,11 @@ function ProgressPage() {
                   )}
                 </ul>
               </section>
-              <section className="card-soft flex min-h-32 flex-col justify-center p-6">
-                <h2 className="flex items-center gap-2 font-semibold">
+              <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
+                <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
                   <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" /> {t("To improve")}
                 </h2>
-                <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
                   {gaps.length ? (
                     gaps.map((s) => (
                       <li key={s.label}>
@@ -165,9 +165,9 @@ function ProgressPage() {
       )}
 
       {learning?.common_errors && learning.common_errors.length > 0 && (
-        <section className="card-soft mt-5 p-5">
-          <h2 className="text-lg font-semibold">{t("Frequent mistakes")}</h2>
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+        <section className="card-soft mt-3 p-3 sm:mt-5 sm:p-5">
+          <h2 className="text-base font-semibold sm:text-lg">{t("Frequent mistakes")}</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
             {learning.common_errors.map((e: string, i: number) => (
               <li key={i}>{e}</li>
             ))}
@@ -176,13 +176,13 @@ function ProgressPage() {
       )}
 
       {recent && recent.length > 0 && (
-        <section className="card-soft mt-5 p-6">
-          <h2 className="text-lg font-semibold">{t("Recent activity")}</h2>
-          <ul className="mt-4 divide-y divide-border">
+        <section className="card-soft mt-3 p-3 sm:mt-5 sm:p-6">
+          <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
+          <ul className="mt-2 divide-y divide-border sm:mt-4">
             {recent.map((a) => (
               <li
                 key={a.id}
-                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 text-sm"
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm"
               >
                 <span className="min-w-0">
                   <span className="block break-words font-medium">
