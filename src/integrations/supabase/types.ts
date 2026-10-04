@@ -1254,6 +1254,7 @@ export type Database = {
           is_difficult: boolean
           last_reviewed_at: string | null
           mastery_level: number
+          next_review_at: string | null
           times_reviewed: number
           user_id: string
           word_id: string
@@ -1264,6 +1265,7 @@ export type Database = {
           is_difficult?: boolean
           last_reviewed_at?: string | null
           mastery_level?: number
+          next_review_at?: string | null
           times_reviewed?: number
           user_id: string
           word_id: string
@@ -1274,6 +1276,7 @@ export type Database = {
           is_difficult?: boolean
           last_reviewed_at?: string | null
           mastery_level?: number
+          next_review_at?: string | null
           times_reviewed?: number
           user_id?: string
           word_id?: string

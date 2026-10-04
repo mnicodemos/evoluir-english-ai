@@ -225,6 +225,13 @@
       "when": 1791131042265,
       "tag": "0031_push_tokens",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1791156805336,
+      "tag": "0032_user_vocabulary_next_review_at",
+      "breakpoints": true
     }
   ]
 }
