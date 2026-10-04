@@ -100,42 +100,29 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
     toast(`${t("Weather")}: ${weatherText}`);
   }
 
+  // Desktop sidebar matches the mobile sheet: icon + text, one item per row.
   if (variant === "sidebar") {
     return (
-      <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t("Change language")}
-              className="size-9 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              onClick={toggleLang}
-            >
-              <Languages className="size-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top" sideOffset={8}>
-            {lang === "pt" ? "English" : "Português"}
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t("Weather")}
-              className="size-9 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              onClick={refreshWeather}
-            >
-              <WeatherIcon className="size-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top" sideOffset={8}>
-            {weatherText}
-          </TooltipContent>
-        </Tooltip>
-      </>
+      <div className="flex flex-col items-stretch gap-0.5">
+        <Button
+          variant="ghost"
+          aria-label={t("Change language")}
+          className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          onClick={toggleLang}
+        >
+          <Languages className="size-5 shrink-0" />
+          <span className="min-w-0 truncate text-left">{lang === "pt" ? "Português" : "English"}</span>
+        </Button>
+        <Button
+          variant="ghost"
+          aria-label={t("Weather")}
+          className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          onClick={refreshWeather}
+        >
+          <WeatherIcon className="size-5 shrink-0" />
+          <span className="min-w-0 truncate text-left">{weatherText}</span>
+        </Button>
+      </div>
     );
   }
 
