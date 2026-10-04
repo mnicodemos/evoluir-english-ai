@@ -289,7 +289,7 @@ function Dashboard() {
                   </div>
                   {minutesToday >= profile.daily_minutes && (
                     <p className="mt-1 text-center text-[10px] font-semibold text-brand-green lg:text-[11px]">
-                      {t("Goal reached")}
+                      {t("Goal OK")}
                     </p>
                   )}
                 </div>

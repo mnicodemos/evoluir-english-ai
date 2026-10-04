@@ -429,7 +429,7 @@ export const uiPt: Record<string, string> = {
     "Não foi possível atualizar sua meta. Tente novamente.",
   "Custom (5–240 minutes)": "Personalizado (5–240 minutos)",
   "Goal reached today. Great work!": "Meta alcançada hoje. Ótimo trabalho!",
-  "Goal reached": "Meta alcançada",
+  "Goal OK": "Meta OK",
   "Your progress": "Sua evolução",
   "My Progress": "Meu progresso",
   "My progress": "Minha evolução",
