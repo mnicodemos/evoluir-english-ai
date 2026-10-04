@@ -90,12 +90,36 @@ const weatherLabels: Record<WeatherCondition, string> = {
 function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
   const { lang, setLang } = useUiLang();
   const { condition, refresh } = useWeatherCondition();
+  const push = usePushNotifications();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const WeatherIcon = weatherIcons[condition];
   const weatherText = t(weatherLabels[condition]);
+  const pushOn = push.state === "enabled";
+  const pushLabel = pushOn ? t("Notifications on") : t("Notifications off");
 
   function toggleLang() {
     setLang(lang === "pt" ? "en" : "pt");
+  }
+
+  async function togglePush() {
+    if (pushOn) {
+      await push.disable();
+      toast(t("Notifications off"));
+      return;
+    }
+    const result = await push.enable();
+    if (result === "enabled") {
+      toast(t("Notifications on"));
+    } else if (result === "disabled") {
+      // Browser-level causes: iframe preview or denied permission.
+      if (window.top !== window.self) {
+        toast(t("Open the app in its own tab to enable notifications"));
+      } else {
+        toast(t("Notification permission was denied"));
+      }
+    } else if (result === "unsupported") {
+      toast(t("Notifications are not supported on this device"));
+    }
   }
 
   function refreshWeather() {
