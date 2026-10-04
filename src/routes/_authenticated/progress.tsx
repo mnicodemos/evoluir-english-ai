@@ -100,7 +100,9 @@ function ProgressPage() {
               <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
                 {t("The days you studied this month.")}
               </p>
-              <div className="mt-2 sm:mt-4">{profile && <FrequencyCalendar userId={profile.id} />}</div>
+              <div className="mt-2 sm:mt-4">
+                {profile && <FrequencyCalendar userId={profile.id} />}
+              </div>
             </section>
 
             <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
