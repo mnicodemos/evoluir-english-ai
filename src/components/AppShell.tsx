@@ -127,7 +127,7 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
     toast(`${t("Weather")}: ${weatherText}`);
   }
 
-  // Desktop sidebar matches the mobile sheet: icon + text, one item per row.
+  // Desktop sidebar and mobile sheet share the same full-width icon + text rows.
   if (variant === "sidebar") {
     return (
       <div className="flex flex-col items-stretch gap-0.5">
