@@ -320,7 +320,7 @@ export function CurriculumPath() {
                   className="flex min-h-12 w-full items-center gap-3 rounded-xl text-left"
                 >
                   <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-muted-foreground">
+                  <span className="min-w-0 w-0 flex-1 truncate text-sm font-medium text-muted-foreground">
                     {t("Unit")} {unit.unit} · {unit.title}
                   </span>
                   {test?.passed ? (
