@@ -167,7 +167,11 @@ export function LearningJourneyCard() {
       </section>
 
       {/* "What you already evolved": the existing section, reused, never rebuilt. */}
-      <div className="min-w-0">
+      <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-1">
+        <ProofOfProgressEvoBanner />
+      </div>
+
+      <div className="min-w-0 lg:col-start-2 lg:row-start-2">
         <ProofOfProgressCard />
       </div>
     </div>
