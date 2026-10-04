@@ -150,7 +150,7 @@ function StudyPlanPage() {
           </p>
         </header>
 
-        <section className="card-soft space-y-2.5 p-3 sm:p-4">
+        <section className="card-soft space-y-2 p-2.5 sm:space-y-2.5 sm:p-4">
           <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
             <Target className="size-4 text-primary sm:size-5" />
             Plan settings
@@ -395,16 +395,16 @@ function Choice({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="grid gap-1.5 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:items-center sm:gap-2">
-      <p className="text-xs font-medium sm:text-sm">{label}</p>
-      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+    <div className="grid gap-1 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+      <p className="text-[11px] font-medium sm:text-sm">{label}</p>
+      <div className="flex flex-wrap gap-1 sm:gap-2">
         {options.map((option) => (
           <button
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
             aria-pressed={value === option.value}
-            className={`h-7 rounded-lg border px-2 py-0.5 text-xs transition-colors sm:h-9 sm:px-3 sm:py-1 sm:text-sm ${
+            className={`h-6 rounded-md border px-2 text-[11px] transition-colors sm:h-9 sm:rounded-lg sm:px-3 sm:py-1 sm:text-sm ${
               value === option.value
                 ? "border-transparent bg-primary text-primary-foreground"
                 : "border-border hover:bg-secondary"
