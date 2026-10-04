@@ -422,7 +422,7 @@ export const uiPt: Record<string, string> = {
   "My Progress": "Meu progresso",
   "My progress": "Minha evolução",
   "My Subscription": "Minha assinatura",
-  "Your AI Learning Coach": "Sua mentora de aprendizagem com IA",
+  "Your AI Learning Coach": "Sua mentora de IA",
   "Overall average": "Média geral",
   Overall: "Geral",
   Talking: "Fala",
