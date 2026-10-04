@@ -67,8 +67,9 @@ export function LearningJourneyCard() {
   const skillLabel = (skill: string) => t(NEXT_STEP_SKILL_TEXT[skill] ?? skill);
 
   return (
-    <section className="card-soft mt-3 p-3 sm:mt-5 sm:p-5" aria-labelledby="learning-journey-title">
-      <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+    <div className="mt-3 grid items-start gap-3 sm:mt-5 sm:gap-5 lg:grid-cols-2">
+      <section className="card-soft min-w-0 p-3 sm:p-5" aria-labelledby="learning-journey-title">
+        <div className="flex min-w-0 items-start gap-3 sm:gap-4">
         <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary sm:size-11">
           <Compass className="size-4 text-[oklch(0.45_0.11_255)] sm:size-5" aria-hidden="true" />
         </span>
