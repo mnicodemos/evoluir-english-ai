@@ -47,7 +47,7 @@ import { sendActivityPush } from "@/lib/push.functions";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
-import { useActivityIndicators, type ActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
@@ -206,7 +206,6 @@ type MobileNavigationMenuProps = {
   className?: string;
   presentation?: "menu" | "bottom-tab";
   bottomLabel?: string;
-  indicators: ActivityIndicators;
 };
 
 export function MobileNavigationMenu({
@@ -214,7 +213,6 @@ export function MobileNavigationMenu({
   className,
   presentation = "menu",
   bottomLabel = "More",
-  indicators,
 }: MobileNavigationMenuProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -222,8 +220,6 @@ export function MobileNavigationMenu({
   // The More button lights up when the current route belongs to one of its
   // own sections (the four bottom tabs stay responsible for themselves).
   const moreActive = mobileSheetNav.some((item) => pathname.startsWith(item.to));
-  const hasPendingActivity = indicators.listening || indicators.writing || indicators.vocabulary;
-
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -244,15 +240,7 @@ export function MobileNavigationMenu({
               className,
             )}
           >
-            <span className="relative grid place-items-center">
-              <Menu strokeWidth={2.25} />
-              {hasPendingActivity && (
-                <span
-                  className="absolute -right-1.5 -top-0.5 size-2 rounded-full bg-brand-green ring-2 ring-sidebar"
-                  aria-label={translate("New activity")}
-                />
-              )}
-            </span>
+            <Menu strokeWidth={2.25} />
             <span className="pb-0.5 text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
@@ -278,10 +266,6 @@ export function MobileNavigationMenu({
         </SheetHeader>
         <nav className="grid gap-1 overflow-y-auto py-3">
           {mobileSheetNav.map((item, index) => {
-            const hasNew =
-              (item.to === "/listening" && indicators.listening) ||
-              (item.to === "/writing" && indicators.writing) ||
-              (item.to === "/vocabulary" && indicators.vocabulary);
             return (
               <div
                 key={item.to}
@@ -294,18 +278,12 @@ export function MobileNavigationMenu({
                 <SheetClose asChild>
                   <Link
                     to={item.to}
-                    className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2.5 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
                     inactiveProps={{ className: "text-sidebar-foreground/75" }}
                   >
                     <item.icon className="size-5 shrink-0" />
                     <span className="truncate">{translate(item.label)}</span>
-                    {hasNew && (
-                      <span
-                        className="size-2.5 shrink-0 rounded-full bg-brand-green"
-                        aria-label={translate("New activity")}
-                      />
-                    )}
                   </Link>
                 </SheetClose>
               </div>
@@ -529,7 +507,6 @@ function AppShellContent({
           ))}
           <MobileNavigationMenu
             translate={translate}
-            indicators={activityIndicators}
             presentation="bottom-tab"
             bottomLabel={lang === "pt" ? "Mais" : "More"}
             className="w-full hover:bg-transparent hover:text-brand-green"
