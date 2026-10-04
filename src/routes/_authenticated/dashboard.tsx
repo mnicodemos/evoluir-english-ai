@@ -3,7 +3,7 @@ import {
   Bolt,
   BookOpen,
   Check,
-  CircleX,
+  Clock,
   Flame,
   GraduationCap,
   Headphones,
@@ -288,7 +288,7 @@ function Dashboard() {
                         {minutesToday}/{profile.daily_minutes}
                       </span>
                       <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
-                        min.
+                        min
                       </span>
                     </span>
                   </div>
@@ -304,7 +304,7 @@ function Dashboard() {
                   </p>
                   {!hasProgressToday && (
                     <div className="flex min-h-[5.75rem] flex-col items-center justify-center gap-1 text-center text-muted-foreground">
-                      <CircleX className="size-5" strokeWidth={1.8} aria-hidden="true" />
+                      <Clock className="size-5" strokeWidth={1.8} aria-hidden="true" />
                       <p className="text-[11px] font-bold leading-tight">
                         {t("Nothing yet today")}
                       </p>

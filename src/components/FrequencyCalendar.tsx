@@ -60,25 +60,27 @@ export function FrequencyCalendar({ userId }: Props) {
         <Button
           variant="ghost"
           size="icon"
+          className="size-7 sm:size-9"
           onClick={() => setMonthOffset((v) => v - 1)}
           aria-label="Previous month"
         >
           <ChevronLeft className="size-4" />
         </Button>
-        <h3 className="text-sm font-medium capitalize">{monthLabel}</h3>
+        <h3 className="text-xs font-medium capitalize sm:text-sm">{monthLabel}</h3>
         <Button
           variant="ghost"
           size="icon"
+          className="size-7 sm:size-9"
           onClick={() => setMonthOffset((v) => v + 1)}
           aria-label="Next month"
         >
           <ChevronRight className="size-4" />
         </Button>
       </div>
-      <p className="mt-1 text-center text-xs text-muted-foreground">
+      <p className="mt-0.5 text-center text-[11px] text-muted-foreground sm:mt-1 sm:text-xs">
         {studiedCount} {studiedCount === 1 ? "day studied" : "days studied"}
       </p>
-      <div className="mt-3 grid grid-cols-7 gap-1 text-center">
+      <div className="mt-2 grid grid-cols-7 gap-0.5 text-center sm:mt-3 sm:gap-1">
         {(lang === "pt" ? WEEKDAYS_PT : WEEKDAYS_EN).map((w, i) => (
           <span key={i} className="text-[10px] font-medium text-muted-foreground">
             {w}
@@ -93,7 +95,7 @@ export function FrequencyCalendar({ userId }: Props) {
             <span
               key={key}
               className={
-                "mx-auto flex size-7 items-center justify-center rounded-full text-xs " +
+                "mx-auto flex size-6 items-center justify-center rounded-full text-[11px] sm:size-7 sm:text-xs " +
                 (studied
                   ? "bg-brand-green font-semibold text-primary-foreground"
                   : "text-muted-foreground") +
@@ -105,7 +107,7 @@ export function FrequencyCalendar({ userId }: Props) {
           );
         })}
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">
+      <p className="mt-2 hidden text-xs text-muted-foreground sm:mt-3 sm:block">
         Green days are the days you practiced. Keep the streak going!
       </p>
     </div>

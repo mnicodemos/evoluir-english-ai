@@ -41,7 +41,11 @@ export function ProofOfProgressCard() {
 
   if (isLoading) {
     return (
-      <section className="card-soft mt-5 p-5" aria-busy="true" aria-label={t("Your evolution")}>
+      <section
+        className="card-soft mt-3 p-3 sm:mt-5 sm:p-5"
+        aria-busy="true"
+        aria-label={t("Your evolution")}
+      >
         <Skeleton className="h-5 w-48" />
         <Skeleton className="mt-3 h-4 w-64" />
       </section>
@@ -60,7 +64,7 @@ export function ProofOfProgressCard() {
 
   return (
     <>
-      <section className="card-soft mt-5 overflow-hidden bg-primary" aria-label={t("EVO")}>
+      <section className="card-soft mt-3 overflow-hidden sm:mt-5 bg-primary" aria-label={t("EVO")}>
         <EvoGuide
           title={
             data.highlights.length > 0
@@ -74,16 +78,21 @@ export function ProofOfProgressCard() {
         />
       </section>
 
-      <section className="card-soft mt-5 p-5" aria-labelledby="proof-of-progress-title">
-        <div className="flex min-w-0 items-start gap-4">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-            <Sparkles className="size-5 text-[oklch(0.55_0.14_158)]" aria-hidden="true" />
+      <section
+        className="card-soft mt-3 p-3 sm:mt-5 sm:p-5"
+        aria-labelledby="proof-of-progress-title"
+      >
+        <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+          <span className="grid size-9 shrink-0 sm:size-11 place-items-center rounded-xl bg-secondary">
+            <Sparkles className="size-4 text-[oklch(0.55_0.14_158)] sm:size-5" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 id="proof-of-progress-title" className="text-lg font-semibold">
+            <h2 id="proof-of-progress-title" className="text-base font-semibold sm:text-lg">
               {t("Your evolution")}
             </h2>
-            <p className="text-sm text-muted-foreground">{t("What your practice already shows")}</p>
+            <p className="text-xs text-muted-foreground sm:text-sm">
+              {t("What your practice already shows")}
+            </p>
 
             {data.levelChange && (
               <p className="mt-2 break-words text-sm font-medium">
@@ -92,9 +101,9 @@ export function ProofOfProgressCard() {
             )}
 
             {groups.map((group) => (
-              <div key={group.title} className="mt-4">
-                <h3 className="text-sm font-semibold">{t(group.title)}</h3>
-                <ul className="mt-2 grid gap-3">
+              <div key={group.title} className="mt-3 sm:mt-4">
+                <h3 className="text-xs font-semibold sm:text-sm">{t(group.title)}</h3>
+                <ul className="mt-2 grid gap-2 sm:gap-3">
                   {group.items.map((item: ProofOfProgressHighlight) => (
                     <li key={item.skill} className="min-w-0">
                       <p className="break-words font-medium">{skillLabel(item.skill)}</p>
@@ -108,8 +117,8 @@ export function ProofOfProgressCard() {
             ))}
 
             {data.keepPractising.length > 0 && (
-              <div className="mt-4 border-t border-border pt-4">
-                <h3 className="text-sm font-semibold">{t("Keep practising")}</h3>
+              <div className="mt-3 border-t border-border pt-3 sm:mt-4 sm:pt-4">
+                <h3 className="text-xs font-semibold sm:text-sm">{t("Keep practising")}</h3>
                 <p className="mt-1 break-words text-sm text-muted-foreground">
                   {t(PROOF_OF_PROGRESS_NO_BASE_TEXT)}
                 </p>

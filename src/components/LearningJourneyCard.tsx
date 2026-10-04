@@ -47,7 +47,7 @@ export function LearningJourneyCard() {
   if (step.isLoading || proof.isLoading) {
     return (
       <section
-        className="card-soft mt-5 p-5"
+        className="card-soft mt-3 p-3 sm:mt-5 sm:p-5"
         aria-busy="true"
         aria-label={t(LEARNING_JOURNEY_TEXT.title)}
       >
@@ -67,16 +67,18 @@ export function LearningJourneyCard() {
   const skillLabel = (skill: string) => t(NEXT_STEP_SKILL_TEXT[skill] ?? skill);
 
   return (
-    <section className="card-soft mt-5 p-5" aria-labelledby="learning-journey-title">
-      <div className="flex min-w-0 items-start gap-4">
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
-          <Compass className="size-5 text-[oklch(0.45_0.11_255)]" aria-hidden="true" />
+    <section className="card-soft mt-3 p-3 sm:mt-5 sm:p-5" aria-labelledby="learning-journey-title">
+      <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary sm:size-11">
+          <Compass className="size-4 text-[oklch(0.45_0.11_255)] sm:size-5" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 id="learning-journey-title" className="text-lg font-semibold">
+          <h2 id="learning-journey-title" className="text-base font-semibold sm:text-lg">
             {t(LEARNING_JOURNEY_TEXT.title)}
           </h2>
-          <p className="text-sm text-muted-foreground">{t(LEARNING_JOURNEY_TEXT.subtitle)}</p>
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            {t(LEARNING_JOURNEY_TEXT.subtitle)}
+          </p>
 
           {!journey.hasData ? (
             <p className="mt-3 break-words text-sm text-muted-foreground">
@@ -84,8 +86,10 @@ export function LearningJourneyCard() {
             </p>
           ) : (
             <>
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold">{t(LEARNING_JOURNEY_TEXT.where)}</h3>
+              <div className="mt-3 sm:mt-4">
+                <h3 className="text-xs font-semibold sm:text-sm">
+                  {t(LEARNING_JOURNEY_TEXT.where)}
+                </h3>
                 {journey.currentLevel && (
                   <p className="mt-1 break-words text-sm">
                     {t(LEARNING_JOURNEY_TEXT.level)}:{" "}
@@ -106,8 +110,10 @@ export function LearningJourneyCard() {
               </div>
 
               {journey.attention && (
-                <div className="mt-4 border-t border-border pt-4">
-                  <h3 className="text-sm font-semibold">{t(LEARNING_JOURNEY_TEXT.attention)}</h3>
+                <div className="mt-3 border-t border-border pt-3 sm:mt-4 sm:pt-4">
+                  <h3 className="text-xs font-semibold sm:text-sm">
+                    {t(LEARNING_JOURNEY_TEXT.attention)}
+                  </h3>
                   <p className="mt-1 break-words font-medium">
                     {skillLabel(journey.attention.skill)}
                   </p>
@@ -118,13 +124,15 @@ export function LearningJourneyCard() {
               )}
 
               {journey.nextMove && (
-                <div className="mt-4 border-t border-border pt-4">
-                  <h3 className="text-sm font-semibold">{t(LEARNING_JOURNEY_TEXT.nextMove)}</h3>
+                <div className="mt-3 border-t border-border pt-3 sm:mt-4 sm:pt-4">
+                  <h3 className="text-xs font-semibold sm:text-sm">
+                    {t(LEARNING_JOURNEY_TEXT.nextMove)}
+                  </h3>
                   <p className="mt-1 break-words text-sm">
                     <span className="font-medium">{t(journey.nextMove.title)}</span>
                   </p>
                   {journey.nextMove.params ? (
-                    <Button asChild className="mt-3 w-full sm:w-auto">
+                    <Button asChild className="mt-2 h-9 w-full sm:mt-3 sm:w-auto">
                       <Link
                         to="/learning/$lessonId"
                         params={journey.nextMove.params}
@@ -135,7 +143,7 @@ export function LearningJourneyCard() {
                       </Link>
                     </Button>
                   ) : (
-                    <Button asChild className="mt-3 w-full sm:w-auto">
+                    <Button asChild className="mt-2 h-9 w-full sm:mt-3 sm:w-auto">
                       <Link
                         to={journey.nextMove.to}
                         aria-label={`${t(LEARNING_JOURNEY_TEXT.cta)}: ${t(journey.nextMove.title)}`}
