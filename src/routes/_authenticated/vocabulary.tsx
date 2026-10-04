@@ -39,6 +39,14 @@ import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { logPracticeTelemetry, persistPronunciationLegacy } from "@/lib/legacyActivity.functions";
+import {
+  DAILY_REVIEW_LIMIT,
+  LEARNED_MASTERY,
+  advance,
+  canAdvance,
+  fallBack,
+  isDue,
+} from "@/lib/vocabularyReview";
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
@@ -346,6 +354,8 @@ function Vocabulary() {
           toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
         } else {
           toast.error(`I heard “${spoken}”. Listen again and try once more.`);
+          // A clear miss on a due review counts as a failed review.
+          await markForgotten(word.id);
         }
       } catch (error) {
         const cancelled = error instanceof Error && error.name === "AbortError";
@@ -399,7 +409,8 @@ function Vocabulary() {
   }
 
   const all = words ?? [];
-  const learned = all.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75);
+  // Learned = remembered across the 1, 3 and 7 day reviews (step 4 or above).
+  const learned = all.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= LEARNED_MASTERY);
 
   // Dictionary search: answers come from context.reverso.net, not from the lessons.
   const [query, setQuery] = useState("");
@@ -460,11 +471,34 @@ function Vocabulary() {
   });
 
   // Ten new words each day, written by the AI from the lessons in the learning path.
-  // Words already marked as known stay in the list, dimmed with a badge, so the
-  // day's progress is visible at a glance.
+  // A word counts as known for now once it has climbed a step and its next review
+  // has not arrived yet; it stays in the list, dimmed with a badge.
+  const knownNow = (id: string) => {
+    const s = byWord.get(id);
+    return (s?.mastery_level ?? 0) > 0 && !canAdvance(s);
+  };
   const today = daily ?? [];
-  const todayKnownCount = today.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75).length;
+  const todayIds = new Set(today.map((w) => w.id));
+  const todayKnownCount = today.filter((w) => knownNow(w.id)).length;
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
+
+  // Spaced reviews: earlier words whose review date has arrived come back here,
+  // most overdue first. Words reviewed today stay visible (dimmed) until tomorrow.
+  const localDay = (iso: string | null | undefined) =>
+    iso ? new Date(iso).toLocaleDateString("en-CA") : "";
+  const todayKey = new Date().toLocaleDateString("en-CA");
+  const reviewItems = all
+    .filter((w) => !todayIds.has(w.id))
+    .filter((w) => {
+      const s = byWord.get(w.id);
+      return isDue(s) || (s?.next_review_at && localDay(s.last_reviewed_at) === todayKey);
+    })
+    .sort((a, b) =>
+      (byWord.get(a.id)?.next_review_at ?? "").localeCompare(
+        byWord.get(b.id)?.next_review_at ?? "",
+      ),
+    )
+    .slice(0, DAILY_REVIEW_LIMIT);
 
   function List({
     items,
