@@ -86,44 +86,21 @@ export function CurriculumPath() {
 
   return (
     <div className="space-y-5">
-      <section className="card-soft p-6" aria-labelledby="path-heading">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-xl bg-[oklch(0.96_0.05_75)]">
-            <BookOpen className="size-6 text-[oklch(0.62_0.16_50)]" />
+      <section className="card-soft p-4" aria-labelledby="path-heading">
+        <div className="flex items-center gap-3">
+          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[oklch(0.28_0.045_200)]">
+            <BookOpen className="size-5 text-[oklch(0.72_0.13_185)]" />
           </span>
-          <div className="flex-1">
-            <h2 id="path-heading" className="text-lg font-semibold">
-              <span>Course</span>
-              <span> - </span>
-              <span>{findLevel(path.level).label}</span>
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              <span>
-                33 lessons in 6 units, including an optional review unit with a 10-question test.
-              </span>
-            </p>
-          </div>
-          <p className="text-sm font-semibold">
-            {path.completed}/{path.total}
+          <h2 id="path-heading" className="min-w-0 flex-1 truncate text-sm font-semibold">
+            <span>{findLevel(path.level).label}</span>
+          </h2>
+          <p className="shrink-0 text-xs font-semibold text-muted-foreground">
+            {path.completed}/{path.total} · {Math.round((path.completed / path.total) * 100)}%
           </p>
         </div>
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium">Completed</span>
-            <span className="text-muted-foreground">
-              {Math.round((path.completed / path.total) * 100)}%
-            </span>
-          </div>
-          <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-2 h-2" />
-        </div>
+        <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-3 h-2" />
 
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-4 w-full sm:w-auto"
-          onClick={() => void downloadPlan()}
-          disabled={planLoading}
-        >
+        <Button variant="outline" size="sm" className="mt-3" onClick={() => void downloadPlan()} disabled={planLoading}>
           {planLoading ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
