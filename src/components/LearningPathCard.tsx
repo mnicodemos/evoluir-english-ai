@@ -446,9 +446,9 @@ export function PathProgressCard({
                   }
                 : skill.value >= 80
                   ? {
-                      text: "text-dashboard-cyan",
-                      bar: "[&>div]:bg-dashboard-cyan",
-                      badge: "bg-dashboard-cyan/15 text-dashboard-cyan",
+                      text: "text-dashboard-blue",
+                      bar: "[&>div]:bg-dashboard-blue",
+                      badge: "bg-dashboard-blue/15 text-dashboard-blue",
                     }
                   : {
                       text: "text-warning",
