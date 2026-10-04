@@ -44,8 +44,9 @@ export function CurriculumPath() {
   const [planLoading, setPlanLoading] = useState(false);
   // Current lesson = same one the "Next lesson" card shows.
   const nextLesson =
-    path.units.flatMap((unit) => unit.lessons).find((lesson) => !lesson.completed && !lesson.locked) ??
-    null;
+    path.units
+      .flatMap((unit) => unit.lessons)
+      .find((lesson) => !lesson.completed && !lesson.locked) ?? null;
 
   const downloadPlan = async () => {
     setPlanLoading(true);
