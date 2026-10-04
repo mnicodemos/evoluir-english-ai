@@ -41,7 +41,11 @@ export function ProofOfProgressCard() {
 
   if (isLoading) {
     return (
-      <section className="card-soft mt-3 p-3 sm:mt-5 sm:p-5" aria-busy="true" aria-label={t("Your evolution")}>
+      <section
+        className="card-soft mt-3 p-3 sm:mt-5 sm:p-5"
+        aria-busy="true"
+        aria-label={t("Your evolution")}
+      >
         <Skeleton className="h-5 w-48" />
         <Skeleton className="mt-3 h-4 w-64" />
       </section>
@@ -74,19 +78,21 @@ export function ProofOfProgressCard() {
         />
       </section>
 
-      <section className="card-soft mt-3 p-3 sm:mt-5 sm:p-5" aria-labelledby="proof-of-progress-title">
+      <section
+        className="card-soft mt-3 p-3 sm:mt-5 sm:p-5"
+        aria-labelledby="proof-of-progress-title"
+      >
         <div className="flex min-w-0 items-start gap-3 sm:gap-4">
           <span className="grid size-9 shrink-0 sm:size-11 place-items-center rounded-xl bg-secondary">
-            <Sparkles
-              className="size-4 text-[oklch(0.55_0.14_158)] sm:size-5"
-              aria-hidden="true"
-            />
+            <Sparkles className="size-4 text-[oklch(0.55_0.14_158)] sm:size-5" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
             <h2 id="proof-of-progress-title" className="text-base font-semibold sm:text-lg">
               {t("Your evolution")}
             </h2>
-            <p className="text-xs text-muted-foreground sm:text-sm">{t("What your practice already shows")}</p>
+            <p className="text-xs text-muted-foreground sm:text-sm">
+              {t("What your practice already shows")}
+            </p>
 
             {data.levelChange && (
               <p className="mt-2 break-words text-sm font-medium">
