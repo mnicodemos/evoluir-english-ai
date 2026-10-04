@@ -192,3 +192,4 @@
 - [ ] My Progress — otimizar espaço para caber em uma página (mobile)
 - [x] Dashboard — trocar ícone CircleX do estado vazio por Clock e "min." por "min" no anel de minutos
 - [x] My Progress — compactação mobile (calendário, jornada, evolução, cartões menores)
+- [x] My Progress — Erros frequentes e Atividade recente lado a lado no desktop (xl:grid-cols-2), eliminando o espaço vazio; empilhados no mobile
