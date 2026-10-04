@@ -100,7 +100,13 @@ export function CurriculumPath() {
         </div>
         <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-3 h-2" />
 
-        <Button variant="outline" size="sm" className="mt-3" onClick={() => void downloadPlan()} disabled={planLoading}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-3"
+          onClick={() => void downloadPlan()}
+          disabled={planLoading}
+        >
           {planLoading ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
