@@ -64,7 +64,7 @@ export function ProofOfProgressCard() {
 
   return (
     <>
-      <section className="card-soft mt-3 overflow-hidden sm:mt-5 bg-primary" aria-label={t("EVO")}>
+      <section className="card-soft overflow-hidden bg-primary" aria-label={t("EVO")}>
         <EvoGuide
           title={
             data.highlights.length > 0
