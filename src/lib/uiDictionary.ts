@@ -667,7 +667,7 @@ export const uiPt: Record<string, string> = {
   "Learn and review words": "Aprenda e revise palavras",
   "I know this word": "Eu já sei esta palavra",
   "I know it": "Já sei",
-  Say it: "Falar",
+  "Say it": "Falar",
   Stop: "Parar",
   Known: "Sabida",
   "{n} of {total} words known": "{n} de {total} palavras sabidas",
