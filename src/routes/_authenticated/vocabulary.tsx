@@ -39,6 +39,14 @@ import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { logPracticeTelemetry, persistPronunciationLegacy } from "@/lib/legacyActivity.functions";
+import {
+  DAILY_REVIEW_LIMIT,
+  LEARNED_MASTERY,
+  advance,
+  canAdvance,
+  fallBack,
+  isDue,
+} from "@/lib/vocabularyReview";
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
@@ -196,17 +204,30 @@ function Vocabulary() {
   // Opening this page is not doing the practice: the dashboard dot is driven by
   // real reviews (user_vocabulary), so nothing is marked here.
 
+  async function invalidateVocabulary() {
+    await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
+    await queryClient.invalidateQueries({ queryKey: ["user-vocabulary-mastery"] });
+    await queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
+    await queryClient.invalidateQueries({ queryKey: ["vocabulary-progress"] });
+    await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
+  }
+
+  /** "I know it" moves the word one step up the spaced review ladder. */
   async function markKnown(wordId: string) {
     if (!profile) return;
+    const existing = byWord.get(wordId);
+    // Not due yet: marking again must not skip steps of the ladder.
+    if (!canAdvance(existing)) return;
     setBusy(wordId);
     minutesSpent.start();
     try {
-      const existing = byWord.get(wordId);
+      const next = advance(existing);
       const { error } = await supabase.from("user_vocabulary").upsert(
         {
           user_id: profile.id,
           word_id: wordId,
-          mastery_level: 100,
+          mastery_level: next.mastery_level,
+          next_review_at: next.next_review_at,
           is_difficult: false,
           times_reviewed: (existing?.times_reviewed ?? 0) + 1,
           last_reviewed_at: new Date().toISOString(),
@@ -214,15 +235,37 @@ function Vocabulary() {
         { onConflict: "user_id,word_id" },
       );
       if (error) throw error;
-      await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
-      await queryClient.invalidateQueries({ queryKey: ["user-vocabulary-mastery"] });
-      await queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
-      await queryClient.invalidateQueries({ queryKey: ["vocabulary-progress"] });
-      await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
+      await invalidateVocabulary();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save this word");
     } finally {
       minutesSpent.stop();
+      setBusy(null);
+    }
+  }
+
+  /** A failed review sends the word back two steps and due again tomorrow. */
+  async function markForgotten(wordId: string) {
+    if (!profile) return;
+    const existing = byWord.get(wordId);
+    if (!existing || !isDue(existing)) return;
+    setBusy(wordId);
+    try {
+      const next = fallBack(existing);
+      const { error } = await supabase
+        .from("user_vocabulary")
+        .update({
+          mastery_level: next.mastery_level,
+          next_review_at: next.next_review_at,
+          is_difficult: true,
+        })
+        .eq("user_id", profile.id)
+        .eq("word_id", wordId);
+      if (error) throw error;
+      await invalidateVocabulary();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save this word");
+    } finally {
       setBusy(null);
     }
   }
@@ -236,7 +279,7 @@ function Vocabulary() {
     try {
       const { error } = await supabase
         .from("user_vocabulary")
-        .update({ mastery_level: 0 })
+        .update({ mastery_level: 0, next_review_at: null })
         .eq("user_id", profile.id)
         .in("word_id", ids);
       if (error) throw error;
@@ -311,6 +354,8 @@ function Vocabulary() {
           toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
         } else {
           toast.error(`I heard “${spoken}”. Listen again and try once more.`);
+          // A clear miss on a due review counts as a failed review.
+          await markForgotten(word.id);
         }
       } catch (error) {
         const cancelled = error instanceof Error && error.name === "AbortError";
@@ -364,7 +409,8 @@ function Vocabulary() {
   }
 
   const all = words ?? [];
-  const learned = all.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75);
+  // Learned = remembered across the 1, 3 and 7 day reviews (step 4 or above).
+  const learned = all.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= LEARNED_MASTERY);
 
   // Dictionary search: answers come from context.reverso.net, not from the lessons.
   const [query, setQuery] = useState("");
@@ -425,11 +471,34 @@ function Vocabulary() {
   });
 
   // Ten new words each day, written by the AI from the lessons in the learning path.
-  // Words already marked as known stay in the list, dimmed with a badge, so the
-  // day's progress is visible at a glance.
+  // A word counts as known for now once it has climbed a step and its next review
+  // has not arrived yet; it stays in the list, dimmed with a badge.
+  const knownNow = (id: string) => {
+    const s = byWord.get(id);
+    return (s?.mastery_level ?? 0) > 0 && !canAdvance(s);
+  };
   const today = daily ?? [];
-  const todayKnownCount = today.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75).length;
+  const todayIds = new Set(today.map((w) => w.id));
+  const todayKnownCount = today.filter((w) => knownNow(w.id)).length;
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
+
+  // Spaced reviews: earlier words whose review date has arrived come back here,
+  // most overdue first. Words reviewed today stay visible (dimmed) until tomorrow.
+  const localDay = (iso: string | null | undefined) =>
+    iso ? new Date(iso).toLocaleDateString("en-CA") : "";
+  const todayKey = new Date().toLocaleDateString("en-CA");
+  const reviewItems = all
+    .filter((w) => !todayIds.has(w.id))
+    .filter((w) => {
+      const s = byWord.get(w.id);
+      return isDue(s) || (s?.next_review_at && localDay(s.last_reviewed_at) === todayKey);
+    })
+    .sort((a, b) =>
+      (byWord.get(a.id)?.next_review_at ?? "").localeCompare(
+        byWord.get(b.id)?.next_review_at ?? "",
+      ),
+    )
+    .slice(0, DAILY_REVIEW_LIMIT);
 
   function List({
     items,
@@ -449,7 +518,10 @@ function Vocabulary() {
         {items.map((w) => {
           const isRecording = recordingId === w.id;
           const isChecking = checkingId === w.id;
-          const isKnown = highlightKnown && (byWord.get(w.id)?.mastery_level ?? 0) >= 75;
+          const state = byWord.get(w.id);
+          const isKnown = highlightKnown && knownNow(w.id);
+          const mastery = state?.mastery_level ?? 0;
+          const isLearning = highlightKnown && !isKnown && mastery > 0 && mastery < LEARNED_MASTERY;
           return (
             <article key={w.id} className={`card-soft p-4 xl:p-3 ${isKnown ? "opacity-60" : ""}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -461,6 +533,11 @@ function Vocabulary() {
                   {isKnown && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-medium text-success">
                       <Check className="size-3" aria-hidden /> {t("Known")}
+                    </span>
+                  )}
+                  {isLearning && (
+                    <span className="rounded-full bg-warning/15 px-2.5 py-1 text-xs font-medium text-warning">
+                      {t("Still learning")}
                     </span>
                   )}
                   <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
@@ -498,6 +575,17 @@ function Vocabulary() {
                       title="I know this word"
                     >
                       <Check className="size-4" /> {t("I know it")}
+                    </Button>
+                  )}
+                  {!isKnown && isDue(state) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="min-h-11 flex-1"
+                      disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
+                      onClick={() => markForgotten(w.id)}
+                    >
+                      <X className="size-4" /> {t("Not yet")}
                     </Button>
                   )}
                   <Button
@@ -701,6 +789,14 @@ function Vocabulary() {
                     </Button>
                   </div>
                 ) : null}
+                {reviewItems.length > 0 && (
+                  <section aria-label={t("Review due")} className="mt-4">
+                    <h2 className="text-sm font-semibold">
+                      {t("Review due")} ({reviewItems.filter((w) => !knownNow(w.id)).length})
+                    </h2>
+                    <List items={reviewItems} highlightKnown />
+                  </section>
+                )}
                 {today.length > 0 ? (
                   <>
                     {allTodayKnown ? (

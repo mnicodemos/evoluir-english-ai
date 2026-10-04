@@ -144,7 +144,7 @@ export function useStudySnapshot() {
           .length,
         vocabularyMastered:
           masteredCardIds.size +
-          masteredWords.filter((w) => levelWordIds.has(w.word_id) && w.mastery_level >= 70).length,
+          masteredWords.filter((w) => levelWordIds.has(w.word_id) && w.mastery_level >= 75).length,
         quizAverage,
         todayLessonsCompleted: today.lessonsCompleted,
         todayVideosWatched: today.videosWatched,
