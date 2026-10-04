@@ -209,8 +209,9 @@ function ProgressPage() {
               </li>
             ))}
           </ul>
-        </section>
-      )}
+          </section>
+        )}
+      </div>
     </AppShell>
   );
 }
