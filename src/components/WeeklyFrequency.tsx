@@ -67,7 +67,7 @@ export function WeeklyFrequency({
               <span
                 className={cn(
                   "text-[9px] text-muted-foreground",
-                  isToday && "font-semibold text-warning",
+                  isToday && "font-semibold text-brand-green",
                 )}
               >
                 {labels[i]}
@@ -76,7 +76,7 @@ export function WeeklyFrequency({
                 <span
                   className={cn(
                     "grid size-5 place-items-center rounded-full text-primary-foreground",
-                    isToday ? "bg-warning" : "bg-brand-green",
+                    "bg-brand-green",
                   )}
                 >
                   <Check className="size-3.5" strokeWidth={3} />
@@ -85,7 +85,7 @@ export function WeeklyFrequency({
                 <span
                   className={cn(
                     "size-5 rounded-full border border-dashed",
-                    isToday ? "border-warning bg-warning/15" : "border-muted-foreground",
+                    isToday ? "border-brand-green bg-brand-green/15" : "border-muted-foreground",
                   )}
                 />
               )}
@@ -101,7 +101,7 @@ export function WeeklyFrequency({
       <div className="flex h-20 min-w-0 flex-col items-center justify-center gap-1 text-center lg:hidden">
         <div className="relative shrink-0">
           <CalendarDays
-            className="size-[1.8rem] text-warning"
+            className="size-[1.8rem] text-brand-green"
             strokeWidth={2.4}
             aria-hidden="true"
           />
@@ -128,7 +128,7 @@ export function WeeklyFrequency({
       <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
         <div className="relative shrink-0 sm:hidden">
           <CalendarDays
-            className="size-[1.8rem] text-warning"
+            className="size-[1.8rem] text-brand-green"
             strokeWidth={2.4}
             aria-hidden="true"
           />
@@ -140,7 +140,7 @@ export function WeeklyFrequency({
         </div>
         <div className="relative hidden shrink-0 sm:block">
           <CalendarDays
-            className="size-[2.31rem] text-dashboard-coral"
+            className="size-[2.31rem] text-brand-green"
             strokeWidth={2.4}
             aria-hidden="true"
           />
@@ -256,7 +256,7 @@ export function WeeklyFrequency({
                 <span
                   className={cn(
                     "text-[9px] text-muted-foreground",
-                    isToday && "font-semibold text-warning",
+                    isToday && "font-semibold text-brand-green",
                   )}
                 >
                   {labels[i]}
@@ -265,7 +265,7 @@ export function WeeklyFrequency({
                   <span
                     className={cn(
                       "grid size-5 place-items-center rounded-full text-primary-foreground",
-                      isToday ? "bg-warning" : "bg-brand-green",
+                      "bg-brand-green",
                     )}
                     title={isToday ? (lang === "pt" ? "Hoje" : "Today") : undefined}
                   >
@@ -273,7 +273,7 @@ export function WeeklyFrequency({
                   </span>
                 ) : isToday ? (
                   <span
-                    className="size-5 rounded-full border border-dashed border-warning bg-warning/15"
+                    className="size-5 rounded-full border border-dashed border-brand-green bg-brand-green/15"
                     title={lang === "pt" ? "Hoje" : "Today"}
                   />
                 ) : (
@@ -307,7 +307,7 @@ export function WeeklyFrequency({
               return (
                 <div key={key} className="flex flex-col items-center gap-1">
                   {studied ? (
-                    <span className="grid size-6 place-items-center rounded-full bg-success text-success-foreground">
+                    <span className="grid size-6 place-items-center rounded-full bg-brand-green text-primary-foreground">
                       <Check className="size-3.5" strokeWidth={3} />
                     </span>
                   ) : (

@@ -95,7 +95,7 @@ export function FrequencyCalendar({ userId }: Props) {
               className={
                 "mx-auto flex size-7 items-center justify-center rounded-full text-xs " +
                 (studied
-                  ? "bg-success font-semibold text-success-foreground"
+                  ? "bg-brand-green font-semibold text-primary-foreground"
                   : "text-muted-foreground") +
                 (isToday ? " ring-1 ring-foreground/50" : "")
               }
