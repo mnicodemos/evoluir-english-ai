@@ -158,11 +158,14 @@ export function LearningJourneyCard() {
               )}
             </>
           )}
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* "What you already evolved": the existing section, reused, never rebuilt. */}
-      <ProofOfProgressCard />
-    </section>
+      <div className="min-w-0">
+        <ProofOfProgressCard />
+      </div>
+    </div>
   );
 }
