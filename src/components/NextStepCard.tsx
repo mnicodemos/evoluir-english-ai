@@ -18,6 +18,7 @@ import {
   NEXT_STEP_PRIORITY_TEXT,
   NEXT_STEP_PRIORITY_TEXT_SHORT,
   NEXT_STEP_PROGRESS_TEXT,
+  NEXT_STEP_PROGRESS_TEXT_SHORT,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
   NEXT_STEP_SKILL_TEXT,
@@ -97,6 +98,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const shortEvidenceText = t(NEXT_STEP_EVIDENCE_TEXT_SHORT[data.reason])
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  const shortProgressText =
+    data.insight?.situation === "strong_elsewhere" && strongestLabel
+      ? t(NEXT_STEP_PROGRESS_TEXT_SHORT.withStrongSkill)
+          .replaceAll("{strongest}", strongestLabel)
+          .replaceAll("{level}", cefrLevel ?? t("your current level"))
+      : t(NEXT_STEP_PROGRESS_TEXT_SHORT.neutral);
   const progressText =
     data.insight?.situation === "strong_elsewhere" && strongestLabel
       ? t(NEXT_STEP_PROGRESS_TEXT.withStrongSkill)
@@ -278,8 +285,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {challengeButton}
               {mapButton}
             </div>
-            {/* Mobile-only "Why this matters now": two of the three desktop
-                sentences, each with the same leading check as the desktop. */}
+            {/* Mobile-only "Why this matters now": short versions of the same
+                three desktop sentences, each kept to one complete line. */}
             <div className="mt-3.5 sm:hidden">
               <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <Lightbulb
@@ -291,15 +298,21 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </p>
               <ul className="mt-1 grid gap-1">
                 <li className="flex items-start gap-2 pl-2">
-                  <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
+                  <span className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80" aria-hidden="true" />
                   <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
                     {shortPriorityText}
                   </span>
                 </li>
                 <li className="flex items-start gap-2 pl-2">
-                  <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
+                  <span className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80" aria-hidden="true" />
                   <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
                     {shortEvidenceText}
+                  </span>
+                </li>
+                <li className="flex items-start gap-2 pl-2">
+                  <span className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80" aria-hidden="true" />
+                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
+                    {shortProgressText}
                   </span>
                 </li>
               </ul>
@@ -340,24 +353,24 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mb-5 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
               {/* Mobile: short summary + evidence item — never clamped, never cut. */}
               <li className="flex items-start gap-2 sm:hidden">
-                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
                 <span className="leading-tight">{priorityText}</span>
               </li>
               <li className="flex items-start gap-2 sm:hidden">
-                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
                 <span className="leading-tight">{evidenceText}</span>
               </li>
               {/* Desktop/tablet: the complete three-line explanation. */}
               <li className="hidden items-start gap-2 sm:flex">
-                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
                 <span>{progressText}</span>
               </li>
               <li className="hidden items-start gap-2 sm:flex">
-                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
                 <span>{priorityText}</span>
               </li>
               <li className="hidden items-start gap-2 sm:flex">
-                <Check className="mt-0.5 size-3.5 shrink-0 text-brand-green" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
                 <span>{evidenceText}</span>
               </li>
             </ul>

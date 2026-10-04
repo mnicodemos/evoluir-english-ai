@@ -447,6 +447,11 @@ export const NEXT_STEP_EVIDENCE_TEXT_SHORT: Record<NextStepReason, string> = {
   no_data: "Practice will shape your path.",
 };
 
+export const NEXT_STEP_PROGRESS_TEXT_SHORT = {
+  withStrongSkill: "{strongest} is strong at {level}.",
+  neutral: "Your path is taking shape.",
+} as const;
+
 /**
  * Evolution context line. The positive variant is only allowed when the server
  * already resolved a strongest other skill with evidence at the same level;

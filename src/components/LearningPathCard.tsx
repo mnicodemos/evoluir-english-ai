@@ -309,29 +309,21 @@ export function PathProgressCard({
       label: "Reading",
       value: latest?.reading_score ?? 0,
       icon: BookOpen,
-      tone: "text-dashboard-petrol",
-      bar: "[&>div]:bg-dashboard-cyan",
     },
     {
       label: "Listening",
       value: latest?.listening_score ?? 0,
       icon: Headphones,
-      tone: "text-dashboard-coral",
-      bar: "[&>div]:bg-dashboard-cyan",
     },
     {
       label: "Writing",
       value: latest?.writing_score ?? 0,
       icon: PenLine,
-      tone: "text-brand-green",
-      bar: "[&>div]:bg-dashboard-cyan",
     },
     {
       label: "Speaking",
       value: latest?.speaking_score ?? 0,
       icon: Mic,
-      tone: "text-warning",
-      bar: "[&>div]:bg-dashboard-cyan",
     },
   ];
 
@@ -444,36 +436,36 @@ export function PathProgressCard({
           </h2>
         </div>
         <div className="mt-2 grid flex-1 content-between gap-2 lg:mt-3 lg:gap-3 xl:mt-4 xl:gap-2">
-          {skills.map((skill) => (
-            <div
-              key={skill.label}
-              className="grid min-w-0 grid-cols-[1.5rem_4.25rem_minmax(0,1fr)_2.25rem_4rem] items-center gap-2 text-xs sm:grid-cols-[1.75rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] sm:gap-2.5"
-            >
-              <skill.icon
-                className={`size-[1.65rem] ${skill.tone}`}
-                strokeWidth={2.5}
-                aria-hidden="true"
-              />
-              <span className="truncate font-medium">{t(skill.label)}</span>
-              <Progress value={skill.value} className={`h-2.5 bg-secondary/80 ${skill.bar}`} />
-              <span className="text-right font-semibold text-foreground">{skill.value}%</span>
-              <span
-                className={`rounded-full px-2 py-1 text-center text-[10px] font-semibold ${
-                  skill.value >= 95
-                    ? "bg-brand-green/15 text-brand-green"
-                    : skill.value >= 80
-                      ? "bg-dashboard-blue/20 text-dashboard-cyan"
-                      : "bg-warning/15 text-warning"
-                }`}
+          {skills.map((skill) => {
+            const statusTone =
+              skill.value >= 95
+                ? { text: "text-brand-green", bar: "[&>div]:bg-brand-green", badge: "bg-brand-green/15 text-brand-green" }
+                : skill.value >= 80
+                  ? { text: "text-dashboard-cyan", bar: "[&>div]:bg-dashboard-cyan", badge: "bg-dashboard-blue/20 text-dashboard-cyan" }
+                  : { text: "text-warning", bar: "[&>div]:bg-warning", badge: "bg-warning/15 text-warning" };
+            return (
+              <div
+                key={skill.label}
+                className="grid min-w-0 grid-cols-[1.5rem_4.25rem_minmax(0,1fr)_2.25rem_4rem] items-center gap-2 text-xs sm:grid-cols-[1.75rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] sm:gap-2.5"
               >
+                <skill.icon
+                  className={`size-[1.65rem] ${statusTone.text}`}
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                />
+              <span className="truncate font-medium">{t(skill.label)}</span>
+              <Progress value={skill.value} className={`h-2.5 bg-secondary/80 ${statusTone.bar}`} />
+              <span className="text-right font-semibold text-foreground">{skill.value}%</span>
+              <span className={`rounded-full px-2 py-1 text-center text-[10px] font-semibold ${statusTone.badge}`}>
                 {skill.value >= 95
                   ? t("Advanced")
                   : skill.value >= 80
                     ? t("Strong")
                     : t("Priority")}
               </span>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
         {!latest && (
           <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">

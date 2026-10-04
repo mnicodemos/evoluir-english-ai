@@ -134,7 +134,7 @@ function Dashboard() {
     },
     {
       label: "Accuracy",
-      value: accuracyToday === 0 ? "—" : `${accuracyToday}%`,
+      value: `${accuracyToday}%`,
       state:
         accuracyToday >= ACCURACY_DONE_THRESHOLD
           ? "done"
@@ -143,6 +143,8 @@ function Dashboard() {
             : "empty",
     },
   ];
+  const hasProgressToday = learningCards.some((card) => card.state !== "empty");
+  const minutesToGoal = Math.max(profile?.daily_minutes ?? 0, 0) - minutesToday;
 
   return (
     <AppShell dashboardLayout>
@@ -161,7 +163,7 @@ function Dashboard() {
               placement="dashboard-header"
               mobileTrailing={
                 <div className="flex items-center gap-3 whitespace-nowrap">
-                  <span className="rounded-full border border-warning/40 bg-warning/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-warning">
+                  <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
                     {profile.level}
                   </span>
                   <span className="flex items-center gap-1">
@@ -280,10 +282,12 @@ function Dashboard() {
                         }
                       />
                     </svg>
-                    <span className="relative text-center font-display text-xl font-bold leading-none text-foreground lg:text-2xl">
-                      {minutesToday}
+                    <span className="relative text-center font-display text-base font-bold leading-none text-foreground lg:text-xl">
+                      <span className="block whitespace-nowrap">
+                        {minutesToday}/{profile.daily_minutes}
+                      </span>
                       <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
-                        min
+                        min.
                       </span>
                     </span>
                   </div>
@@ -293,11 +297,20 @@ function Dashboard() {
                     </p>
                   )}
                 </div>
-                <div className="grid gap-2 xl:gap-1 2xl:gap-2">
+                <div className="grid min-w-0 gap-2 xl:gap-1 2xl:gap-2">
                   <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
                     {t("KEEPING LEARNING")}
                   </p>
-                  {learningCards.map((card) => {
+                  {!hasProgressToday && (
+                    <p className="flex min-h-[5.75rem] items-center text-[11px] font-medium leading-snug text-muted-foreground lg:hidden">
+                      {t("Nothing yet today · {minutes} min to hit your goal").replace(
+                        "{minutes}",
+                        String(Math.max(minutesToGoal, 0)),
+                      )}
+                    </p>
+                  )}
+                  <div className={`${hasProgressToday ? "grid" : "hidden lg:grid"} gap-2 xl:gap-1 2xl:gap-2`}>
+                    {learningCards.map((card) => {
                     const stateVisual = {
                       done: { Icon: Check, iconClass: "text-brand-green", sr: "Done today." },
                       attention: {
@@ -318,7 +331,7 @@ function Dashboard() {
                         : card.state === "empty"
                           ? "text-muted-foreground/60"
                           : "text-foreground";
-                    return (
+                      return (
                       <div
                         key={card.label}
                         className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
@@ -336,8 +349,9 @@ function Dashboard() {
                         </p>
                         <span className="sr-only">{sr}</span>
                       </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="border-l border-border pl-1.5 lg:border-0 lg:pl-0">
                   <WeeklyFrequency
