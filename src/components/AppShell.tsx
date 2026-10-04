@@ -52,7 +52,6 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 const mobileSheetNav = [
-  { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/writing", label: "Writing", icon: PenLine },
@@ -63,7 +62,7 @@ const mobileSheetNav = [
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
-  { to: "/learning", label: "Lessons", icon: GraduationCap },
+  { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
