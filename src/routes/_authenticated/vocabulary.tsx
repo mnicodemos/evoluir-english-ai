@@ -472,15 +472,16 @@ function Vocabulary() {
                 <div className="mt-3 flex gap-2">
                   <Button
                     size="sm"
+                    className="min-h-11 flex-1"
                     disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
                     onClick={() => markKnown(w.id)}
                     aria-label="I know this word"
                     title="I know this word"
                   >
-                    <Check className="size-4" /> That's OK
+                    <Check className="size-4" /> {t("I know it")}
                   </Button>
                   <Button
-                    size="icon"
+                    className="min-h-11 flex-1"
                     variant={isRecording ? "destructive" : "outline"}
                     disabled={isChecking || Boolean(checkingId)}
                     onClick={() => togglePronunciation(w)}
@@ -496,6 +497,7 @@ function Vocabulary() {
                     ) : (
                       <Mic className="size-4" />
                     )}
+                    {isRecording ? t("Stop") : t("Say it")}
                   </Button>
                 </div>
               )}
