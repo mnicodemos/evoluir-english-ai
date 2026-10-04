@@ -518,7 +518,10 @@ function Vocabulary() {
         {items.map((w) => {
           const isRecording = recordingId === w.id;
           const isChecking = checkingId === w.id;
-          const isKnown = highlightKnown && (byWord.get(w.id)?.mastery_level ?? 0) >= 75;
+          const state = byWord.get(w.id);
+          const isKnown = highlightKnown && knownNow(w.id);
+          const mastery = state?.mastery_level ?? 0;
+          const isLearning = highlightKnown && !isKnown && mastery > 0 && mastery < LEARNED_MASTERY;
           return (
             <article key={w.id} className={`card-soft p-4 xl:p-3 ${isKnown ? "opacity-60" : ""}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -530,6 +533,11 @@ function Vocabulary() {
                   {isKnown && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-medium text-success">
                       <Check className="size-3" aria-hidden /> {t("Known")}
+                    </span>
+                  )}
+                  {isLearning && (
+                    <span className="rounded-full bg-warning/15 px-2.5 py-1 text-xs font-medium text-warning">
+                      {t("Learning")}
                     </span>
                   )}
                   <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
@@ -567,6 +575,17 @@ function Vocabulary() {
                       title="I know this word"
                     >
                       <Check className="size-4" /> {t("I know it")}
+                    </Button>
+                  )}
+                  {!isKnown && isDue(state) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="min-h-11 flex-1"
+                      disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
+                      onClick={() => markForgotten(w.id)}
+                    >
+                      <X className="size-4" /> {t("Not yet")}
                     </Button>
                   )}
                   <Button
