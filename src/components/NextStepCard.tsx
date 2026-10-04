@@ -280,7 +280,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     {t("TODAY'S PRIORITY")}
                   </p>
                   <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:text-2xl sm:leading-normal xl:text-3xl">
-                    <PriorityIcon className="size-5 shrink-0 text-warning sm:size-6" aria-hidden="true" />
+                    <PriorityIcon
+                      className="size-5 shrink-0 text-warning sm:size-6"
+                      aria-hidden="true"
+                    />
                     <span>{skillLabel}</span>
                   </h2>
                 </div>

@@ -305,7 +305,9 @@ function Dashboard() {
                   {!hasProgressToday && (
                     <div className="flex min-h-[5.75rem] flex-col items-start justify-center gap-1 text-muted-foreground">
                       <CircleX className="size-5" strokeWidth={1.8} aria-hidden="true" />
-                      <p className="text-[11px] font-bold leading-tight">{t("Nothing yet today")}</p>
+                      <p className="text-[11px] font-bold leading-tight">
+                        {t("Nothing yet today")}
+                      </p>
                       <p className="text-[11px] font-medium leading-tight">
                         {t("{minutes} min to hit your goal").replace(
                           "{minutes}",
