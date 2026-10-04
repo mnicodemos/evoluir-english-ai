@@ -43,6 +43,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
+import { sendActivityPush } from "@/lib/push.functions";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
@@ -369,6 +370,29 @@ function AppShellContent({
     window.sessionStorage.setItem(retryKey, "1");
     void retryPendingPedagogicalWrites({ data: { limit: 3 } }).catch(() => undefined);
   }, []);
+
+  // Push warning for new activities: at most once per day, only when the
+  // device is registered and something new (lesson, writing or vocabulary)
+  // is waiting for the student.
+  const hasNewActivity =
+    activityIndicators.listening ||
+    activityIndicators.writing ||
+    activityIndicators.vocabulary;
+  useEffect(() => {
+    if (!hasNewActivity) return;
+    if (localStorage.getItem("push-token") === null) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem("push-activity-notified") === today) return;
+    localStorage.setItem("push-activity-notified", today);
+    void sendActivityPush({
+      data: {
+        title: translate("New activities available"),
+        body: translate("Small consistent actions create meaningful progress."),
+        path: "/dashboard",
+      },
+    }).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasNewActivity]);
 
   async function signOut() {
     await queryClient.cancelQueries();
