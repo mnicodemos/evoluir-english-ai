@@ -27,6 +27,39 @@ const GROUPS: { title: string; kinds: readonly ProofOfProgressKind[] }[] = [
  * from existing evidence. No percentage, no progress score, no AI: when there is
  * nothing comparable, the section says so instead of inventing progress.
  */
+export function ProofOfProgressEvoBanner() {
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const { data: profile } = useProfile();
+
+  // Same query key as the card below: fetched once, shared by both.
+  const { data } = useQuery({
+    queryKey: ["proof-of-progress", profile?.level ?? null],
+    queryFn: () => loadProofOfProgress({ data: undefined }),
+    enabled: !!profile,
+    staleTime: 60 * 1000,
+  });
+
+  // While loading or without data the banner simply stays out of the way.
+  if (!data) return null;
+
+  return (
+    <section className="card-soft overflow-hidden bg-primary" aria-label={t("EVO")}>
+      <EvoGuide
+        title={
+          data.highlights.length > 0
+            ? t("We already have evidence of development in your skills.")
+            : t("We are still building evidence about your evolution.")
+        }
+        image="wide"
+        imageSize="lesson"
+        contrast="inverse"
+        className="pr-4 sm:pr-5"
+      />
+    </section>
+  );
+}
+
 export function ProofOfProgressCard() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -64,19 +97,7 @@ export function ProofOfProgressCard() {
 
   return (
     <>
-      <section className="card-soft overflow-hidden bg-primary" aria-label={t("EVO")}>
-        <EvoGuide
-          title={
-            data.highlights.length > 0
-              ? t("We already have evidence of development in your skills.")
-              : t("We are still building evidence about your evolution.")
-          }
-          image="wide"
-          imageSize="lesson"
-          contrast="inverse"
-          className="pr-4 sm:pr-5"
-        />
-      </section>
+
 
       <section
         className="card-soft mt-3 p-3 sm:mt-5 sm:p-5"
