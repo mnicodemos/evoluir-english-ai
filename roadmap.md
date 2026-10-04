@@ -195,3 +195,4 @@
 - [x] My Progress — Erros frequentes e Atividade recente lado a lado no desktop (xl:grid-cols-2), eliminando o espaço vazio; empilhados no mobile
 - [x] Dashboard — selo Strong alinhado à cor da barra (fundo ciano/15); cada barra, texto e fundo do selo na mesma cor do status
 - [x] My Progress — 'Sua jornada' e 'Sua evolução' lado a lado no desktop (lg:grid-cols-2) com banner EVO em largura total acima de ambos, tops alinhados; mobile preserva jornada → banner → evolução. Validado em 1920/411px; lint 0 erros, typecheck, 478 testes e build OK
+- 2026-10-04: My History mobile — bloco EVO movido para acima de "Your journey" via order (order-1/2/3, lg:order-none); desktop inalterado. Validado 411px/1280px; lint 0 erros, typecheck, 478 testes e build OK.
