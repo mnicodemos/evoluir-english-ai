@@ -25,6 +25,7 @@ import {
   weatherIcons,
   type WeatherCondition,
 } from "@/hooks/useWeatherCondition";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Logo } from "@/components/Logo";
 import { BrandName } from "@/components/BrandName";
 import { Footer } from "@/components/Footer";
