@@ -194,3 +194,4 @@
 - [x] My Progress — compactação mobile (calendário, jornada, evolução, cartões menores)
 - [x] My Progress — Erros frequentes e Atividade recente lado a lado no desktop (xl:grid-cols-2), eliminando o espaço vazio; empilhados no mobile
 - [x] Dashboard — selo Strong alinhado à cor da barra (fundo ciano/15); cada barra, texto e fundo do selo na mesma cor do status
+- [x] My Progress — 'Sua jornada' e 'Sua evolução' lado a lado no desktop (lg:grid-cols-2), empilhados no mobile; banner EVO acima de 'Sua evolução' na coluna direita ✅
