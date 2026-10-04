@@ -668,7 +668,7 @@ export const uiPt: Record<string, string> = {
   "I know this word": "Eu já sei esta palavra",
   "I know it": "Já sei",
   "Say it": "Falar",
-  "Stop": "Parar",
+  Stop: "Parar",
   "Test your pronunciation": "Teste sua pronúncia",
   "Listen to the pronunciation": "Ouvir a pronúncia",
   "Stop and check pronunciation": "Parar e verificar a pronúncia",
