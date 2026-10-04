@@ -491,7 +491,7 @@ function Vocabulary() {
                     title={isRecording ? "Stop and check pronunciation" : "Test your pronunciation"}
                   >
                     {isChecking ? (
-                      <Loader2 className="size-4" />
+                      <Loader2 className="size-4 animate-spin" />
                     ) : isRecording ? (
                       <Square className="size-4" />
                     ) : (
