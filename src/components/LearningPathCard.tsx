@@ -110,6 +110,49 @@ export function CurriculumPath() {
         </Button>
       </section>
 
+      {(() => {
+        const next =
+          path.units
+            .flatMap((unit) => unit.lessons)
+            .find((lesson) => !lesson.completed && !lesson.locked) ?? null;
+        if (!next) {
+          return (
+            <section className="card-soft p-4" aria-label="All lessons completed">
+              <p className="text-sm font-semibold">{t("All lessons completed")}</p>
+              {path.finalTest.unlocked && (
+                <Button
+                  className="mt-3 min-h-12 w-full bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+                  onClick={() => navigate({ to: "/learning/final-test" })}
+                >
+                  <Trophy className="size-4" /> <span>{t("Take the final test")}</span>
+                </Button>
+              )}
+            </section>
+          );
+        }
+        const busy = busyKey === next.key;
+        return (
+          <section
+            className="card-soft border-[1.5px] border-[rgb(0_245_206)]/45 p-4"
+            aria-label="Next lesson"
+          >
+            <p className="text-[11px] font-semibold tracking-wider text-[oklch(0.72_0.13_185)] uppercase">
+              {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
+            </p>
+            <h3 className="mt-1 truncate text-sm font-semibold">{next.title}</h3>
+            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{next.objective}</p>
+            <Button
+              className="mt-3 min-h-12 w-full bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+              onClick={() => void start(next)}
+              disabled={busy || open.isPending}
+            >
+              {busy ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
+              <span>{t("Continue lesson")}</span>
+            </Button>
+          </section>
+        );
+      })()}
+
       <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
         {path.units.map((unit) => (
           <section key={unit.unit} className="card-soft p-5" aria-label={unit.title}>
