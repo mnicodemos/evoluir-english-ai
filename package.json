@@ -20,7 +20,8 @@
     "rolldown": "1.2.1",
     "js-yaml": "4.3.2",
     "nanoid": "3.3.19",
-    "dompurify": "3.4.16"
+    "dompurify": "3.4.16",
+    "@grpc/grpc-js": "1.13.6"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
