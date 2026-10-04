@@ -425,9 +425,23 @@ function Vocabulary() {
   });
 
   // Ten new words each day, written by the AI from the lessons in the learning path.
-  const today = (daily ?? []).filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) < 75);
+  // Words already marked as known stay in the list, dimmed with a badge, so the
+  // day's progress is visible at a glance.
+  const today = daily ?? [];
+  const todayKnownCount = today.filter(
+    (w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75,
+  ).length;
+  const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
 
-  function List({ items, showActions = true }: { items: Word[]; showActions?: boolean }) {
+  function List({
+    items,
+    showActions = true,
+    highlightKnown = false,
+  }: {
+    items: Word[];
+    showActions?: boolean;
+    highlightKnown?: boolean;
+  }) {
     if (items.length === 0)
       return (
         <p className="mt-6 text-sm text-muted-foreground">Nothing here yet — keep practicing.</p>
@@ -437,14 +451,23 @@ function Vocabulary() {
         {items.map((w) => {
           const isRecording = recordingId === w.id;
           const isChecking = checkingId === w.id;
+          const isKnown = highlightKnown && (byWord.get(w.id)?.mastery_level ?? 0) >= 75;
           return (
-            <article key={w.id} className="card-soft p-4 xl:p-3">
+            <article
+              key={w.id}
+              className={`card-soft p-4 xl:p-3 ${isKnown ? "opacity-60" : ""}`}
+            >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1 break-words">
                   <h3 className="text-lg font-semibold">{w.word}</h3>
                   <p className="text-sm text-muted-foreground">{w.translation}</p>
                 </div>
                 <div className="flex items-center gap-2">
+                  {isKnown && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-medium text-success">
+                      <Check className="size-3" aria-hidden /> {t("Known")}
+                    </span>
+                  )}
                   <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
                     {w.difficulty}
                   </span>
