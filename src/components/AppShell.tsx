@@ -139,7 +139,9 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
           onClick={toggleLang}
         >
           <Languages className="size-5 shrink-0" />
-          <span className="min-w-0 truncate text-left">{lang === "pt" ? "Português" : "English"}</span>
+          <span className="min-w-0 truncate text-left">
+            {lang === "pt" ? "Português" : "English"}
+          </span>
         </Button>
         <Button
           variant="ghost"
@@ -375,9 +377,7 @@ function AppShellContent({
   // device is registered and something new (lesson, writing or vocabulary)
   // is waiting for the student.
   const hasNewActivity =
-    activityIndicators.listening ||
-    activityIndicators.writing ||
-    activityIndicators.vocabulary;
+    activityIndicators.listening || activityIndicators.writing || activityIndicators.vocabulary;
   useEffect(() => {
     if (!hasNewActivity) return;
     if (localStorage.getItem("push-token") === null) return;
@@ -473,18 +473,18 @@ function AppShellContent({
           </nav>
 
           <div className="flex flex-col items-stretch gap-1">
-          <div className="flex flex-col items-stretch gap-0.5 pb-1">
-            <UtilityButtons variant="sidebar" />
-            <Button
-              variant="ghost"
-              aria-label={translate("Sign out")}
-              className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              onClick={signOut}
-            >
-              <LogOut className="size-5 shrink-0" />
-              <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
-            </Button>
-          </div>
+            <div className="flex flex-col items-stretch gap-0.5 pb-1">
+              <UtilityButtons variant="sidebar" />
+              <Button
+                variant="ghost"
+                aria-label={translate("Sign out")}
+                className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                onClick={signOut}
+              >
+                <LogOut className="size-5 shrink-0" />
+                <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
+              </Button>
+            </div>
             <ProfileMenu
               presentation="dashboard-sidebar"
               className="hover:bg-sidebar-accent hover:text-sidebar-foreground"

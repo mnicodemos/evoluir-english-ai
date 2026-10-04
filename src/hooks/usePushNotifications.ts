@@ -6,12 +6,7 @@ import { registerPushToken, unregisterPushToken } from "@/lib/push.functions";
 
 const TOKEN_KEY = "push-token";
 
-export type PushState =
-  | "unknown"
-  | "enabled"
-  | "disabled"
-  | "unsupported"
-  | "not-configured";
+export type PushState = "unknown" | "enabled" | "disabled" | "unsupported" | "not-configured";
 
 /**
  * Manages this device's push registration: enabling stores the FCM token on
