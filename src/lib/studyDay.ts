@@ -63,9 +63,8 @@ export function todayStudyMetrics(rows: StudyDayRows, dayStart: Date) {
     isTimestampToday(l.video_completed_at, dayStart),
   ).length;
   const vocabularyMastered =
-    rows.words.filter(
-      (w) => w.mastery_level > 0 && isTimestampToday(w.last_reviewed_at, dayStart),
-    ).length +
+    rows.words.filter((w) => w.mastery_level > 0 && isTimestampToday(w.last_reviewed_at, dayStart))
+      .length +
     rows.cards.filter(
       (c) =>
         c.times_reviewed > 0 &&
