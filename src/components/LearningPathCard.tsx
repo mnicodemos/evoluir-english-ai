@@ -42,6 +42,11 @@ export function CurriculumPath() {
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const { data: profile } = useProfile();
   const [planLoading, setPlanLoading] = useState(false);
+  // Current lesson = same one the "Next lesson" card shows.
+  const nextLesson =
+    path.units
+      .flatMap((unit) => unit.lessons)
+      .find((lesson) => !lesson.completed && !lesson.locked) ?? null;
 
   const downloadPlan = async () => {
     setPlanLoading(true);
@@ -117,10 +122,7 @@ export function CurriculumPath() {
       </section>
 
       {(() => {
-        const next =
-          path.units
-            .flatMap((unit) => unit.lessons)
-            .find((lesson) => !lesson.completed && !lesson.locked) ?? null;
+        const next = nextLesson;
         if (!next) {
           return (
             <section className="card-soft p-4" aria-label="All lessons completed">
@@ -178,6 +180,8 @@ export function CurriculumPath() {
             <ul className="mt-4 space-y-2">
               {unit.lessons.map((lesson) => {
                 const busy = busyKey === lesson.key;
+                const isCurrent = nextLesson?.key === lesson.key;
+                const isDone = lesson.completed;
                 return (
                   <li key={lesson.key}>
                     <button
@@ -185,22 +189,49 @@ export function CurriculumPath() {
                       onClick={() => void start(lesson)}
                       disabled={busy || open.isPending}
                       aria-label={lesson.title}
-                      className={`flex w-full items-center gap-3 rounded-xl border border-border p-3 text-left transition-shadow hover:shadow-[var(--shadow-lift)] ${
-                        lesson.locked ? "opacity-60" : ""
-                      }`}
+                      aria-current={isCurrent ? "true" : undefined}
+                      className={`flex w-full items-center gap-3 rounded-xl border-[1.5px] p-3 text-left transition-shadow hover:shadow-[var(--shadow-lift)] ${
+                        isCurrent
+                          ? "border-[rgb(0_245_206)]/45 bg-[rgb(0_245_206)]/10"
+                          : "border-border"
+                      } ${lesson.locked && !isCurrent ? "opacity-60" : ""}`}
                     >
-                      <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-secondary text-xs font-semibold">
+                      <span
+                        className={`grid size-8 shrink-0 place-items-center rounded-lg text-xs font-semibold ${
+                          isCurrent
+                            ? "bg-[rgb(0_245_206)] text-[#03231f]"
+                            : "bg-secondary text-muted-foreground"
+                        }`}
+                      >
                         {lesson.position}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium">{lesson.title}</span>
-                        <span className="mt-1 block text-xs text-muted-foreground">
+                        <span
+                          className={`block truncate text-sm ${
+                            isCurrent
+                              ? "font-bold"
+                              : isDone
+                                ? "text-muted-foreground"
+                                : "font-medium"
+                          }`}
+                        >
+                          {lesson.title}
+                        </span>
+                        <span
+                          className={`mt-1 block text-xs ${
+                            isDone && !isCurrent
+                              ? "text-muted-foreground/70"
+                              : "text-muted-foreground"
+                          }`}
+                        >
                           {lesson.objective}
                         </span>
                       </span>
                       {busy ? (
                         <Loader2 className="size-4 shrink-0 animate-spin" />
-                      ) : lesson.completed ? (
+                      ) : isCurrent ? (
+                        <Play className="size-4 shrink-0 fill-current text-[rgb(0_245_206)]" />
+                      ) : isDone ? (
                         <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
                       ) : lesson.locked ? (
                         <Lock className="size-4 shrink-0 text-muted-foreground" />
@@ -217,9 +248,13 @@ export function CurriculumPath() {
               if (!test) return null;
               return (
                 <Button
-                  variant={test.passed ? "outline" : "default"}
+                  variant={test.unlocked && !test.passed ? "default" : "outline"}
                   size="sm"
-                  className="mt-4 w-full"
+                  className={`mt-4 w-full ${
+                    test.unlocked && !test.passed
+                      ? "bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+                      : "text-muted-foreground"
+                  }`}
                   disabled={!test.unlocked}
                   onClick={() =>
                     navigate({ to: "/learning/unit-test", search: { unit: unit.unit } })
