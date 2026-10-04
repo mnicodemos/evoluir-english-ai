@@ -428,9 +428,7 @@ function Vocabulary() {
   // Words already marked as known stay in the list, dimmed with a badge, so the
   // day's progress is visible at a glance.
   const today = daily ?? [];
-  const todayKnownCount = today.filter(
-    (w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75,
-  ).length;
+  const todayKnownCount = today.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= 75).length;
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
 
   function List({
@@ -453,10 +451,7 @@ function Vocabulary() {
           const isChecking = checkingId === w.id;
           const isKnown = highlightKnown && (byWord.get(w.id)?.mastery_level ?? 0) >= 75;
           return (
-            <article
-              key={w.id}
-              className={`card-soft p-4 xl:p-3 ${isKnown ? "opacity-60" : ""}`}
-            >
+            <article key={w.id} className={`card-soft p-4 xl:p-3 ${isKnown ? "opacity-60" : ""}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1 break-words">
                   <h3 className="text-lg font-semibold">{w.word}</h3>
