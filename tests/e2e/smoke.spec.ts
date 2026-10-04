@@ -76,7 +76,9 @@ test.describe("public smoke", () => {
       probe.remove();
       return result;
     });
-    expect(timing.animation).toBe("0.01ms");
-    expect(timing.transition).toBe("0.01ms");
+    // Browsers serialize the same duration differently ("0.01ms" vs "1e-05s").
+    const toMs = (v: string) => (v.endsWith("ms") ? parseFloat(v) : parseFloat(v) * 1000);
+    expect(toMs(timing.animation)).toBeLessThanOrEqual(0.01);
+    expect(toMs(timing.transition)).toBeLessThanOrEqual(0.01);
   });
 });
