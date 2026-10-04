@@ -38,8 +38,7 @@ export const uiPt: Record<string, string> = {
   "New activities available": "Novas atividades disponíveis",
   "Open the app in its own tab to enable notifications":
     "Abra o app em uma aba própria para ativar as notificações",
-  "Notifications are not supported on this device":
-    "Este dispositivo não aceita notificações",
+  "Notifications are not supported on this device": "Este dispositivo não aceita notificações",
   "Notification permission was denied": "Permissão de notificação negada",
   Weather: "Previsão do tempo",
   Sunny: "Ensolarado",
