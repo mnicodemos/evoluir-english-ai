@@ -4,6 +4,8 @@ import {
   BookOpen,
   BarChart3,
   CheckCircle2,
+  ChevronDown,
+  ChevronRight,
   Download,
   Headphones,
   Loader2,
@@ -40,6 +42,8 @@ export function CurriculumPath() {
   const open = useOpenPathLesson();
   const navigate = useNavigate();
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  // Units whose lessons are all done collapse into a single row until expanded.
+  const [expandedUnits, setExpandedUnits] = useState<Set<number>>(() => new Set());
   const { data: profile } = useProfile();
   const [planLoading, setPlanLoading] = useState(false);
   // Current lesson = same one the "Next lesson" card shows.
@@ -47,6 +51,15 @@ export function CurriculumPath() {
     path.units
       .flatMap((unit) => unit.lessons)
       .find((lesson) => !lesson.completed && !lesson.locked) ?? null;
+
+  const toggleUnit = (unitNumber: number) => {
+    setExpandedUnits((prev) => {
+      const nextSet = new Set(prev);
+      if (nextSet.has(unitNumber)) nextSet.delete(unitNumber);
+      else nextSet.add(unitNumber);
+      return nextSet;
+    });
+  };
 
   const downloadPlan = async () => {
     setPlanLoading(true);
@@ -162,21 +175,32 @@ export function CurriculumPath() {
       })()}
 
       <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
-        {path.units.map((unit) => (
-          <section key={unit.unit} className="card-soft p-5" aria-label={unit.title}>
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-              <div className="min-w-0">
-                <h3 className="font-semibold">{unit.title}</h3>
-                {unit.unit === 6 && (
-                  <p className="text-xs text-muted-foreground">
-                    Optional review · does not block the Final Test
-                  </p>
-                )}
-              </div>
-              <span className="text-xs text-muted-foreground">
-                {unit.completed}/{unit.lessons.length}
-              </span>
-            </div>
+        {path.units.map((unit) => {
+          const allDone = unit.lessons.length > 0 && unit.completed === unit.lessons.length;
+          const containsNext = nextLesson?.unit === unit.unit;
+          const collapsible = allDone && !containsNext;
+          const isExpanded = collapsible && expandedUnits.has(unit.unit);
+          const test = path.unitTests.find((item) => item.unit === unit.unit);
+          const unitLocked = unit.lessons.every((lesson) => lesson.locked);
+
+          // The optional review unit stays a discreet locked row until it unlocks.
+          if (unit.unit === 6 && unitLocked && !isExpanded) {
+            return (
+              <section key={unit.unit} className="card-soft p-4 opacity-70" aria-label={unit.title}>
+                <div className="flex min-h-12 items-center gap-3">
+                  <Lock className="size-4 shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                    {t("Unit")} {unit.unit} · {unit.title}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("Optional review · does not block the Final Test")}
+                </p>
+              </section>
+            );
+          }
+
+          const lessonsList = (
             <ul className="mt-4 space-y-2">
               {unit.lessons.map((lesson) => {
                 const busy = busyKey === lesson.key;
@@ -243,53 +267,101 @@ export function CurriculumPath() {
                 );
               })}
             </ul>
-            {(() => {
-              const test = path.unitTests.find((item) => item.unit === unit.unit);
-              if (!test) return null;
-              return (
-                <Button
-                  variant={test.unlocked && !test.passed ? "default" : "outline"}
-                  size="sm"
-                  className={`mt-4 w-full ${
-                    test.unlocked && !test.passed
-                      ? "bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
-                      : "text-muted-foreground"
-                  }`}
-                  disabled={!test.unlocked}
-                  onClick={() =>
-                    navigate({ to: "/learning/unit-test", search: { unit: unit.unit } })
-                  }
-                >
-                  {test.unlocked ? (
-                    <>
-                      {test.passed ? (
-                        <CheckCircle2 className="size-4" />
-                      ) : (
-                        <Trophy className="size-4" />
-                      )}
-                      <span>
-                        {test.passed
-                          ? t("Unit test passed")
-                          : lang === "pt"
-                            ? "Teste Final da Unidade"
-                            : "Unit Final Test"}
-                      </span>
-                    </>
+          );
+
+          const testButton = test ? (
+            <Button
+              variant={test.unlocked && !test.passed ? "default" : "outline"}
+              size="sm"
+              className={`mt-4 w-full ${
+                test.unlocked && !test.passed
+                  ? "bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+                  : "text-muted-foreground"
+              }`}
+              disabled={!test.unlocked}
+              onClick={() => navigate({ to: "/learning/unit-test", search: { unit: unit.unit } })}
+            >
+              {test.unlocked ? (
+                <>
+                  {test.passed ? (
+                    <CheckCircle2 className="size-4" />
                   ) : (
-                    <>
-                      <Lock className="size-4" />
-                      <span>
-                        {lang === "pt"
-                          ? "Conclua as 6 lições para liberar"
-                          : "Finish the 6 lessons to unlock"}
-                      </span>
-                    </>
+                    <Trophy className="size-4" />
                   )}
-                </Button>
-              );
-            })()}
-          </section>
-        ))}
+                  <span>
+                    {test.passed
+                      ? t("Unit test passed")
+                      : lang === "pt"
+                        ? "Teste Final da Unidade"
+                        : "Unit Final Test"}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Lock className="size-4" />
+                  <span>
+                    {lang === "pt"
+                      ? "Conclua as 6 lições para liberar"
+                      : "Finish the 6 lessons to unlock"}
+                  </span>
+                </>
+              )}
+            </Button>
+          ) : null;
+
+          return (
+            <section key={unit.unit} className="card-soft p-4" aria-label={unit.title}>
+              {collapsible ? (
+                <button
+                  type="button"
+                  onClick={() => toggleUnit(unit.unit)}
+                  aria-expanded={isExpanded}
+                  aria-label={`${t("Unit")} ${unit.unit} · ${unit.title}`}
+                  className="flex min-h-12 w-full items-center gap-3 rounded-xl text-left"
+                >
+                  <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-muted-foreground">
+                    {t("Unit")} {unit.unit} · {unit.title}
+                  </span>
+                  {test?.passed ? (
+                    <span className="shrink-0 text-xs font-medium text-[oklch(0.55_0.15_150)]">
+                      {t("Test passed")}
+                    </span>
+                  ) : (
+                    <span className="shrink-0 rounded-full border border-[rgb(0_245_206)]/50 px-2 py-0.5 text-xs font-medium text-[rgb(0_245_206)]">
+                      {t("Take test")}
+                    </span>
+                  )}
+                  {isExpanded ? (
+                    <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+                  )}
+                </button>
+              ) : (
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold">{unit.title}</h3>
+                    {unit.unit === 6 && (
+                      <p className="text-xs text-muted-foreground">
+                        Optional review · does not block the Final Test
+                      </p>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {unit.completed}/{unit.lessons.length}
+                  </span>
+                </div>
+              )}
+              {(isExpanded || !collapsible) && (
+                <>
+                  {lessonsList}
+                  {testButton}
+                </>
+              )}
+            </section>
+          );
+        })}
       </div>
 
       <section className="card-soft p-5" aria-label="Final Test">
