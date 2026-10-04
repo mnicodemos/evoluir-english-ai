@@ -382,7 +382,7 @@ export function CurriculumPath() {
           )}
         </div>
         <Button
-          className="mt-4 w-full"
+          className="mt-4 w-full whitespace-normal"
           disabled={!path.finalTest.unlocked}
           onClick={() => navigate({ to: "/learning/final-test" })}
         >
