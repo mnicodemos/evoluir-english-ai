@@ -707,7 +707,31 @@ function Vocabulary() {
                   </div>
                 ) : null}
                 {today.length > 0 ? (
-                  <List items={today} />
+                  <>
+                    {allTodayKnown ? (
+                      <p className="mt-4 flex items-center gap-2 text-sm font-medium text-success">
+                        <Check className="size-4" aria-hidden />{" "}
+                        {t("All words known today. Nice work!")}
+                      </p>
+                    ) : (
+                      <div className="mt-4">
+                        <p className="text-sm text-muted-foreground">
+                          {t("{n} of {total} words known")
+                            .replace("{n}", String(todayKnownCount))
+                            .replace("{total}", String(today.length))}
+                        </p>
+                        <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-secondary">
+                          <div
+                            className="h-full rounded-full bg-success transition-all"
+                            style={{
+                              width: `${Math.round((todayKnownCount / today.length) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    <List items={today} highlightKnown />
+                  </>
                 ) : !generating && !genFailed ? (
                   <p className="mt-6 text-sm text-muted-foreground">
                     {t("No new words available right now. Please try again later.")}
