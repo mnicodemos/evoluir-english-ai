@@ -789,6 +789,14 @@ function Vocabulary() {
                     </Button>
                   </div>
                 ) : null}
+                {reviewItems.length > 0 && (
+                  <section aria-label={t("Review due")} className="mt-4">
+                    <h2 className="text-sm font-semibold">
+                      {t("Review due")} ({reviewItems.filter((w) => !knownNow(w.id)).length})
+                    </h2>
+                    <List items={reviewItems} highlightKnown />
+                  </section>
+                )}
                 {today.length > 0 ? (
                   <>
                     {allTodayKnown ? (
