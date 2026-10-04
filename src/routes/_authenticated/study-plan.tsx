@@ -144,7 +144,7 @@ function StudyPlanPage() {
         <header className="animate-rise">
           <p className="text-xs text-muted-foreground sm:text-sm">My Study Plan</p>
           <h1 className="text-xl font-bold lg:text-3xl">Your weekly study plan</h1>
-          <p className="mt-0.5 max-w-2xl text-xs text-muted-foreground sm:mt-1 sm:text-sm">
+          <p className="mt-0.5 hidden max-w-2xl text-xs text-muted-foreground sm:mt-1 sm:block sm:text-sm">
             Choose your goal, your available time and your focus area. Your plan uses the lessons
             and practice already available for your level.
           </p>
@@ -187,9 +187,9 @@ function StudyPlanPage() {
             onChange={(v) => setFocus(v as StudyFocus)}
           />
 
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-row gap-2">
             <Button
-              className="h-9 w-full sm:w-auto"
+              className="h-9 flex-1 sm:flex-none"
               disabled={save.isPending}
               onClick={() => {
                 if (plan) setPrevious(plan.days);
@@ -201,7 +201,7 @@ function StudyPlanPage() {
             </Button>
             <Button
               variant="outline"
-              className="h-9 w-full sm:w-auto"
+              className="h-9 flex-1 sm:flex-none"
               disabled={isFetching || !plan}
               onClick={recalculate}
             >
@@ -404,7 +404,7 @@ function Choice({
             type="button"
             onClick={() => onChange(option.value)}
             aria-pressed={value === option.value}
-            className={`h-8 rounded-lg border px-2.5 py-1 text-xs transition-colors sm:h-9 sm:px-3 sm:text-sm ${
+            className={`h-7 rounded-lg border px-2 py-0.5 text-xs transition-colors sm:h-9 sm:px-3 sm:py-1 sm:text-sm ${
               value === option.value
                 ? "border-transparent bg-primary text-primary-foreground"
                 : "border-border hover:bg-secondary"
