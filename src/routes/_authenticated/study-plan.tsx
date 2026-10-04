@@ -140,10 +140,10 @@ function StudyPlanPage() {
 
   return (
     <AppShell mobileOneScreen>
-      <div className="space-y-2.5 lg:space-y-4">
+      <div className="space-y-2 lg:space-y-4">
         <header className="animate-rise">
-          <p className="text-xs text-muted-foreground sm:text-sm">My Study Plan</p>
-          <h1 className="text-xl font-bold lg:text-3xl">Your weekly study plan</h1>
+          <p className="hidden text-xs text-muted-foreground sm:block sm:text-sm">My Study Plan</p>
+          <h1 className="text-lg font-bold lg:text-3xl">Your weekly study plan</h1>
           <p className="mt-0.5 hidden max-w-2xl text-xs text-muted-foreground sm:mt-1 sm:block sm:text-sm">
             Choose your goal, your available time and your focus area. Your plan uses the lessons
             and practice already available for your level.
@@ -227,7 +227,7 @@ function StudyPlanPage() {
                 <Clock className="size-4 text-primary sm:size-5" />
                 Weekly progress
               </h2>
-              <dl className="mt-2 grid gap-2 sm:grid-cols-3">
+              <dl className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
                 <Stat
                   label="Completed activities"
                   value={`${plan.completedCount} / ${plan.totalCount}`}
@@ -323,38 +323,38 @@ function StudyPlanPage() {
                 <CalendarCheck className="size-4 text-primary sm:size-5" />
                 Week 1
               </h2>
-              <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+              <ul className="grid grid-cols-2 gap-2 xl:grid-cols-3">
                 {plan.days.map((day) => (
-                  <li key={day.day} className="card-soft p-2.5 sm:p-3">
-                    <div className="flex items-start justify-between gap-3">
+                  <li key={day.day} className="card-soft p-2 sm:p-3">
+                    <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold">{day.day}</p>
-                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        <p className="text-xs font-semibold sm:text-sm">{day.day}</p>
+                        <p className="text-[10px] uppercase tracking-wide text-muted-foreground sm:text-xs">
                           {SKILL_LABELS[day.skill] ?? day.skill}
                         </p>
                       </div>
                       {day.completed && (
-                        <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-primary">
-                          <Check className="size-4" />
+                        <span className="flex shrink-0 items-center gap-1 text-[10px] font-medium text-primary sm:text-xs">
+                          <Check className="size-3.5 sm:size-4" />
                           Completed
                         </span>
                       )}
                     </div>
-                    <p className="mt-1.5 text-sm font-medium break-words sm:mt-2 sm:text-base">
+                    <p className="mt-1 text-xs font-medium break-words sm:mt-2 sm:text-base">
                       {day.title}
                     </p>
                     {day.lessonId ? (
                       <Link
                         to="/learning/$lessonId"
                         params={{ lessonId: day.lessonId }}
-                        className="mt-1.5 inline-flex h-8 items-center rounded-lg border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:text-sm"
+                        className="mt-1.5 inline-flex h-7 items-center rounded-lg border border-border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:py-1 sm:text-sm"
                       >
                         Start activity
                       </Link>
                     ) : (
                       <Link
                         to={day.to as "/listening"}
-                        className="mt-1.5 inline-flex h-8 items-center rounded-lg border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:text-sm"
+                        className="mt-1.5 inline-flex h-7 items-center rounded-lg border border-border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:py-1 sm:text-sm"
                       >
                         Start activity
                       </Link>
@@ -362,7 +362,7 @@ function StudyPlanPage() {
                   </li>
                 ))}
               </ul>
-              <p className="text-xs text-muted-foreground">
+              <p className="hidden text-xs text-muted-foreground sm:block">
                 The plan reuses your existing lessons and practice areas. When no lesson of that
                 skill is available for your level, we point you to the matching practice area.
               </p>
@@ -376,9 +376,9 @@ function StudyPlanPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-border p-1.5 sm:p-2">
-      <dt className="text-[11px] text-muted-foreground sm:text-xs">{label}</dt>
-      <dd className="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg">{value}</dd>
+    <div className="rounded-lg border border-border p-1 sm:p-2">
+      <dt className="text-[10px] text-muted-foreground sm:text-xs">{label}</dt>
+      <dd className="mt-0.5 text-sm font-bold sm:mt-1 sm:text-lg">{value}</dd>
     </div>
   );
 }
