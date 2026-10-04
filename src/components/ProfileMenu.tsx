@@ -204,6 +204,11 @@ export function ProfileMenu({
                     {profile?.plan === "premium" ? "Premium" : translate("Profile", lang)}
                   </span>
                 )}
+                {presentation === "mobile-menu" && profile?.plan === "premium" && (
+                  <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
+                    Premium
+                  </span>
+                )}
               </span>
               <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
             </>
