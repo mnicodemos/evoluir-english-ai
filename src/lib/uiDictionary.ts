@@ -982,7 +982,6 @@ export const uiPt: Record<string, string> = {
   "Next lesson:": "Próxima lição:",
   "Next lesson": "Próxima lição",
   Unit: "Unidade",
-  Lesson: "Lição",
   "Continue lesson": "Continuar lição",
   "All lessons completed": "Todas as aulas concluídas",
   "days left": "dias restantes",
