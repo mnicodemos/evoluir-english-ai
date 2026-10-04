@@ -127,7 +127,7 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
     toast(`${t("Weather")}: ${weatherText}`);
   }
 
-  // Desktop sidebar matches the mobile sheet: icon + text, one item per row.
+  // Desktop sidebar and mobile sheet share the same full-width icon + text rows.
   if (variant === "sidebar") {
     return (
       <div className="flex flex-col items-stretch gap-0.5">
@@ -164,32 +164,38 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
     );
   }
 
+  // Mobile sheet matches the desktop sidebar: full-width icon + text rows,
+  // no borders.
   return (
-    <div className="grid grid-cols-2 gap-2 pb-2">
+    <div className="flex flex-col items-stretch gap-0.5">
       <Button
         variant="ghost"
-        className="h-10 min-w-0 justify-start gap-2 overflow-hidden border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        aria-label={t("Change language")}
+        className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
         onClick={toggleLang}
       >
         <Languages className="size-5 shrink-0" />
-        <span className="min-w-0 truncate">{lang === "pt" ? "Português" : "English"}</span>
+        <span className="min-w-0 truncate text-left">
+          {lang === "pt" ? "Português" : "English"}
+        </span>
       </Button>
       <Button
         variant="ghost"
-        className="h-10 min-w-0 justify-start gap-2 overflow-hidden border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        aria-label={t("Weather")}
+        className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
         onClick={refreshWeather}
       >
         <WeatherIcon className="size-5 shrink-0" />
-        <span className="min-w-0 truncate">{weatherText}</span>
+        <span className="min-w-0 truncate text-left">{weatherText}</span>
       </Button>
       <Button
         variant="ghost"
         aria-label={t("Notifications")}
-        className="h-10 min-w-0 justify-start gap-2 overflow-hidden border border-sidebar-border text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
         onClick={() => void togglePush()}
       >
         {pushOn ? <Bell className="size-5 shrink-0" /> : <BellOff className="size-5 shrink-0" />}
-        <span className="min-w-0 truncate">{pushLabel}</span>
+        <span className="min-w-0 truncate text-left">{pushLabel}</span>
       </Button>
     </div>
   );
