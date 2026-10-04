@@ -1,6 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
+  Bell,
+  BellOff,
   BookOpen,
   CalendarCheck,
   Crown,
@@ -45,6 +47,7 @@ import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
 import { useActivityIndicators, type ActivityIndicators } from "@/hooks/useActivityIndicators";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 const mobileSheetNav = [
