@@ -440,9 +440,9 @@ export function PathProgressCard({
             const statusTone =
               skill.value >= 95
                 ? {
-                    text: "text-brand-green",
-                    bar: "[&>div]:bg-brand-green",
-                    badge: "bg-brand-green/15 text-brand-green",
+                    text: "text-success",
+                    bar: "[&>div]:bg-success",
+                    badge: "bg-success/15 text-success",
                   }
                 : skill.value >= 80
                   ? {
