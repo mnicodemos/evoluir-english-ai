@@ -100,7 +100,7 @@ export function ProofOfProgressCard() {
 
 
       <section
-        className="card-soft mt-3 p-3 sm:mt-5 sm:p-5"
+        className="card-soft mt-3 p-3 sm:mt-5 sm:p-5 lg:mt-0"
         aria-labelledby="proof-of-progress-title"
       >
         <div className="flex min-w-0 items-start gap-3 sm:gap-4">
