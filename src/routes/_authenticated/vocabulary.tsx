@@ -537,7 +537,7 @@ function Vocabulary() {
                   )}
                   {isLearning && (
                     <span className="rounded-full bg-warning/15 px-2.5 py-1 text-xs font-medium text-warning">
-                      {t("Learning")}
+                      {t("Still learning")}
                     </span>
                   )}
                   <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
