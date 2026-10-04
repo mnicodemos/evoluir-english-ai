@@ -163,6 +163,8 @@
 - [x] Unificar “This week” e Frequency com a regra oficial do Study Streak
 - [x] Dashboard — indicar meta diária atingida, uniformizar barras de habilidades, reforçar ícones e completar traduções de navegação
 - [x] Fase 1 — Hardening e confiabilidade: lint/testes/E2E, secrets/env, RLS, cross-user, AI limits, APIs, Stripe webhook, quiz, roles, logs, CI, relatório (E2E pendente de libs do navegador no sandbox; specs prontos para CI)
+- [x] Dashboard mobile — terceira frase curta no contexto EVO, pontos nos três motivos, nível teal, meta X/Y min., Accuracy 0%, habilidades por status e mensagem de progresso vazio
+- [x] Dashboard desktop — aplicar também a mensagem única quando os quatro indicadores do dia estiverem zerados
 
 ## Mobile — ajustes marcados em capturas (2026-10-02)
 
@@ -178,6 +180,7 @@
 - Dashboard mobile — "Por que isso importa agora?" desce um pouco (mt-2 → mt-3.5) para descolar dos chips, sem alterar a altura do bloco da EVO
 
 ## Pendente → ✅ (2026-10-03)
+
 - [x] Desktop: subtítulos no Quick Access (6 cartões) e no Quick Win / Take the challenge (layout em duas linhas com divisor), linha separadora acima dos botões; subtítulos do Quick Access sem corte (quebram linha). Mobile inalterado.
 
 - ✅ 2026-10-03 — Desktop 1280–1439: coluna da imagem do card EVO reduzida para 17rem (CSS próprio .dashboard-evo-grid; variantes arbitrárias min-[1280px] não compilaram) mantendo 1440+ com 25rem; botões Quick Win / Aceitar o desafio descolados 8px da borda inferior (xl:mb-2). Mobile inalterado.
