@@ -52,7 +52,6 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 const mobileSheetNav = [
-  { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/writing", label: "Writing", icon: PenLine },
@@ -63,7 +62,7 @@ const mobileSheetNav = [
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
-  { to: "/learning", label: "Lessons", icon: GraduationCap },
+  { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
@@ -139,7 +138,9 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
           onClick={toggleLang}
         >
           <Languages className="size-5 shrink-0" />
-          <span className="min-w-0 truncate text-left">{lang === "pt" ? "Português" : "English"}</span>
+          <span className="min-w-0 truncate text-left">
+            {lang === "pt" ? "Português" : "English"}
+          </span>
         </Button>
         <Button
           variant="ghost"
@@ -246,7 +247,7 @@ export function MobileNavigationMenu({
                 />
               )}
             </span>
-            <span className="text-[10px] font-medium leading-none">{bottomLabel}</span>
+            <span className="pb-0.5 text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
           <Button
@@ -375,9 +376,7 @@ function AppShellContent({
   // device is registered and something new (lesson, writing or vocabulary)
   // is waiting for the student.
   const hasNewActivity =
-    activityIndicators.listening ||
-    activityIndicators.writing ||
-    activityIndicators.vocabulary;
+    activityIndicators.listening || activityIndicators.writing || activityIndicators.vocabulary;
   useEffect(() => {
     if (!hasNewActivity) return;
     if (localStorage.getItem("push-token") === null) return;
@@ -473,18 +472,18 @@ function AppShellContent({
           </nav>
 
           <div className="flex flex-col items-stretch gap-1">
-          <div className="flex flex-col items-stretch gap-0.5 pb-1">
-            <UtilityButtons variant="sidebar" />
-            <Button
-              variant="ghost"
-              aria-label={translate("Sign out")}
-              className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              onClick={signOut}
-            >
-              <LogOut className="size-5 shrink-0" />
-              <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
-            </Button>
-          </div>
+            <div className="flex flex-col items-stretch gap-0.5 pb-1">
+              <UtilityButtons variant="sidebar" />
+              <Button
+                variant="ghost"
+                aria-label={translate("Sign out")}
+                className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                onClick={signOut}
+              >
+                <LogOut className="size-5 shrink-0" />
+                <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
+              </Button>
+            </div>
             <ProfileMenu
               presentation="dashboard-sidebar"
               className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
@@ -503,7 +502,7 @@ function AppShellContent({
         </main>
 
         <nav
-          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[env(safe-area-inset-bottom)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
           aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
         >
           {dashboardMobileNav.map((item) => (
@@ -516,7 +515,7 @@ function AppShellContent({
             >
               <span className="grid justify-items-center gap-0.5">
                 <item.icon className="size-6" />
-                <span className="max-w-full truncate text-[10px] font-medium leading-none">
+                <span className="max-w-full truncate pb-0.5 text-[10px] font-medium leading-none">
                   {item.label}
                 </span>
               </span>

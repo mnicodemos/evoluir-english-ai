@@ -200,3 +200,8 @@
 ## 2026-10-04 — Menu lateral desktop com ícone + texto
 - AppShell.tsx: UtilityButtons (variante sidebar) e o botão Sair passaram de ícone-only (tooltip) para itens de linha com ícone + texto, iguais aos do menu lateral mobile; tooltips removidos nesses pontos (TooltipProvider mantido).
 - Validação: Playwright 1280/1920 mostra Português, Ensolarado e Sair com ícone e texto; build OK.
+
+## Novos pedidos (04/10 22:03 UTC)
+- [ ] Menu lateral mobile: remover item "Study plan"; menu desktop: renomear "Lessons" para "Learning".
+- [ ] Menu inferior mobile: texto cortado na parte inferior — subir ícones/texto; reduzir espaçamento das frases do "Why this matters" (última frase cortando), sem deixar espaço grande após a última.
+- [ ] Migrar AI Speaking e Vocabulary para a API Gemini.

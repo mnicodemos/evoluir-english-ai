@@ -38,11 +38,9 @@ export async function callGateway(
     GEMINI_TEXT_MODEL: geminiModel,
     GeminiError,
   } = await import("./gemini.server");
-  // AI Talking conversation text (first sentence + replies) and Vocabulary word
-  // generation run on the standard Lovable AI service; the AI Talking JSON report
-  // and every other feature keep their current provider.
-  const useLovable =
-    (usage?.operation === "talking" && !jsonMode) || usage?.operation === "vocabulary_generation";
+  // AI Speaking and Vocabulary generation run on Google Gemini like every
+  // other feature (user request, 2026-10-04: migrate both to the Gemini API).
+  const useLovable = false;
   const lovable = useLovable ? await import("./lovable-chat.server") : null;
   const GEMINI_TEXT_MODEL = lovable
     ? usage?.operation === "vocabulary_generation"

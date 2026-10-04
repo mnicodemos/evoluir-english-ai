@@ -2,18 +2,10 @@ import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, isSupported } from "firebase/messaging";
 
 const env = import.meta.env;
-const appId = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_APP_ID"] as
-  | string
-  | undefined;
-const vapidKey = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_VAPID_KEY"] as
-  | string
-  | undefined;
-const apiKey = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_WEB_API_KEY"] as
-  | string
-  | undefined;
-const projectId = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_PROJECT_ID"] as
-  | string
-  | undefined;
+const appId = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_APP_ID"] as string | undefined;
+const vapidKey = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_VAPID_KEY"] as string | undefined;
+const apiKey = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_WEB_API_KEY"] as string | undefined;
+const projectId = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_PROJECT_ID"] as string | undefined;
 
 export type PushResult =
   | { status: "registered"; token: string }
@@ -36,9 +28,7 @@ export async function enablePush(): Promise<PushResult> {
   }
 
   const permission =
-    Notification.permission === "granted"
-      ? "granted"
-      : await Notification.requestPermission();
+    Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
   if (permission !== "granted") {
     return { status: "denied" };
   }
