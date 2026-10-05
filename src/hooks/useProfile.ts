@@ -14,7 +14,6 @@ export function effectiveStreak(profile: {
   streak_days: number;
   last_activity_date: string | null;
   streak_freeze_used_on?: string | null;
-  league_opt_in?: boolean;
 }) {
   return streakAlive(profile.last_activity_date, profile.streak_freeze_used_on, studyToday()).alive
     ? profile.streak_days
@@ -36,6 +35,7 @@ export type Profile = {
   last_activity_date: string | null;
   streak_freeze_used_on?: string | null;
   league_opt_in?: boolean;
+  created_at?: string | null;
   onboarding_completed: boolean;
   plan: string;
   plan_interval: string | null;

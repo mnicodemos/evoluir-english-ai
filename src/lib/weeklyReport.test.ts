@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  isLeagueResetDay,
   isWeeklyReportDay,
   leaguePositions,
   weekStartIso,
@@ -70,5 +71,12 @@ describe("weekly report", () => {
       league: { position: 2, total: 5, level: "b2" },
     });
     expect(message.body).toContain("Liga B2: 2º de 5 🥈. Nova semana começa amanhã!");
+  });
+
+  it("resets the league on Monday in São Paulo time", () => {
+    // 12:00 UTC Monday is 09:00 Monday in São Paulo (word of the day).
+    expect(isLeagueResetDay(new Date("2026-10-12T12:00:00Z"))).toBe(true);
+    // 01:00 UTC Monday is still Sunday evening in São Paulo.
+    expect(isLeagueResetDay(new Date("2026-10-12T01:00:00Z"))).toBe(false);
   });
 });
