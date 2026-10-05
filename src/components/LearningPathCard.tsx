@@ -567,6 +567,13 @@ export function PathProgressCard({
           <h2 id="skills-progress-heading" className="font-display text-sm font-semibold">
             {t("Your English Skills")}
           </h2>
+          {/* Level badge moved here from the dashboard header (mobile only —
+              desktop shows the level in its own summary strip). */}
+          {profile?.level && (
+            <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green lg:hidden">
+              {profile.level}
+            </span>
+          )}
         </div>
         <div className="mt-2 grid flex-1 content-between gap-2 lg:mt-3 lg:gap-3 xl:mt-4 xl:gap-2">
           {skills.map((skill) => {
