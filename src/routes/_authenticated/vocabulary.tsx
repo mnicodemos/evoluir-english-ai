@@ -446,7 +446,13 @@ function Vocabulary() {
 
   const all = words ?? [];
   // Learned = remembered across the 1, 3 and 7 day reviews (step 4 or above).
-  const learned = all.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) >= LEARNED_MASTERY);
+  // Today's words are merged in so a word learned today shows up even if the
+  // full word list was cut off by the row limit.
+  const learnedPool = new Map(all.map((w) => [w.id, w]));
+  for (const w of daily ?? []) learnedPool.set(w.id, w);
+  const learned = [...learnedPool.values()].filter(
+    (w) => (byWord.get(w.id)?.mastery_level ?? 0) >= LEARNED_MASTERY,
+  );
 
   // Dictionary search: answers come from context.reverso.net, not from the lessons.
   const [query, setQuery] = useState("");
@@ -799,7 +805,7 @@ function Vocabulary() {
           <TabsList>
             <TabsTrigger value="today">
               <span>Today</span>
-              <span> ({today.length})</span>
+              <span> ({todayOpen.length})</span>
             </TabsTrigger>
             <TabsTrigger value="learned">
               <span>Learned</span>
@@ -862,7 +868,7 @@ function Vocabulary() {
                         </div>
                       </div>
                     )}
-                    <List items={todayOpen} highlightKnown />
+                    {todayOpen.length > 0 && <List items={todayOpen} highlightKnown />}
                   </>
                 ) : !generating && !genFailed ? (
                   <p className="mt-6 text-sm text-muted-foreground">
