@@ -234,7 +234,14 @@ export function WeeklyFrequency({
           </div>
           <div>
             <p className="text-sm font-semibold">
-              {studiedCount} {lang === "pt" ? "dias ativos esta semana" : "days active this week"}
+              {studiedCount}{" "}
+              {lang === "pt"
+                ? studiedCount === 1
+                  ? "dia ativo esta semana"
+                  : "dias ativos esta semana"
+                : studiedCount === 1
+                  ? "day active this week"
+                  : "days active this week"}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {allStudied

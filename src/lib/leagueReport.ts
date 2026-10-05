@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { findLevel } from "@/lib/level";
 import { savePdf } from "@/lib/pdfDownload";
 import { drawCover, drawFooters, drawHeader, loadLogo, shorten } from "@/lib/pdfTheme";
+import { formatDate } from "@/lib/formatDate";
 
 export type LeagueReportInput = {
   name: string;
@@ -120,14 +121,14 @@ export async function downloadLeagueReport(userId: string, input: LeagueReportIn
     title: "Evoluir+ English AI",
     subtitle: `${league.name} league report`,
     meta: `${level.label}  ·  ${DAYS_PER_LEAGUE} days of study`,
-    footnote: `${input.name || "Student"}  ·  ${new Date().toLocaleDateString()}`,
+    footnote: `${input.name || "Student"}  ·  ${formatDate(new Date(), "en", "long")}`,
   });
   doc.addPage();
 
   drawHeader(doc, logo, {
     title: "Evoluir+ English AI",
     subtitle: `${league.name} league report - ${DAYS_PER_LEAGUE} days of study`,
-    meta: `${input.name || "Student"}  ·  ${level.label}  ·  ${new Date().toLocaleDateString()}`,
+    meta: `${input.name || "Student"}  ·  ${level.label}  ·  ${formatDate(new Date(), "en", "long")}`,
     margin,
   });
   y = 152;

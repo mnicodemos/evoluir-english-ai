@@ -8,6 +8,7 @@ import { savePdf } from "@/lib/pdfDownload";
 import { ACCENT, INK, MUTED, loadLogo, shorten } from "@/lib/pdfTheme";
 import { createWorkbook } from "@/lib/pdfWorkbook";
 import { QUIZ_PUBLIC_FIELDS } from "@/lib/quizPublicFields";
+import { formatDate } from "@/lib/formatDate";
 
 type LessonRow = {
   id: string;
@@ -94,7 +95,7 @@ export async function downloadCoursePlan(input: { name: string; level: string })
   wb.cover({
     title: "Full course content",
     subtitle: "33 lessons in 6 units, including review, grammar, vocabulary and reference material",
-    footnote: `Generated on ${new Date().toLocaleDateString()}`,
+    footnote: `Generated on ${formatDate(new Date(), "en", "long")}`,
   });
 
   // How to use

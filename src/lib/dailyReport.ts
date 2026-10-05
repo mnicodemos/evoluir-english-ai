@@ -6,6 +6,7 @@ import { type GrammarPoint, getLevelReference } from "@/lib/levelReference";
 import { savePdf } from "@/lib/pdfDownload";
 import { ACCENT, INK, MUTED, loadLogo, shorten } from "@/lib/pdfTheme";
 import { createWorkbook } from "@/lib/pdfWorkbook";
+import { formatDate } from "@/lib/formatDate";
 
 export type DailyReportInput = {
   name: string;
@@ -95,11 +96,11 @@ export async function downloadDailyReport(userId: string, input: DailyReportInpu
   wb.cover({
     title: "Your progress",
     subtitle: "What you studied, your vocabulary and the reference of your level",
-    footnote: `Generated on ${new Date().toLocaleDateString()}`,
+    footnote: `Generated on ${formatDate(new Date(), "en", "long")}`,
   });
 
   // Part 1 — progress
-  wb.divider("Progress", new Date().toLocaleDateString());
+  wb.divider("Progress", formatDate(new Date(), "en", "long"));
 
   const chips: [string, string][] = [
     ["Lessons", `${data.lessons.length}`],
