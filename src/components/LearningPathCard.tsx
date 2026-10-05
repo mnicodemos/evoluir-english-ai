@@ -104,8 +104,8 @@ export function CurriculumPath() {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="grid gap-5 lg:grid-cols-2">
+    <div className="space-y-5 lg:space-y-3">
+      <div className="grid gap-5 lg:grid-cols-2 lg:gap-4">
         <section className="card-soft p-4" aria-labelledby="path-heading">
           <div className="flex items-center gap-3">
             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[oklch(0.28_0.045_200)]">
@@ -165,7 +165,7 @@ export function CurriculumPath() {
               <h3 className="mt-1 truncate text-sm font-semibold">{next.title}</h3>
               <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{next.objective}</p>
               <Button
-                className="mt-3 min-h-12 w-full bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+                className="mt-3 min-h-12 w-full lg:min-h-10 bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
                 onClick={() => void start(next)}
                 disabled={busy || open.isPending}
               >
@@ -178,7 +178,7 @@ export function CurriculumPath() {
       </div>
 
       {/* The open unit fills the left column; the collapsed ones stack on the right. */}
-      <div className="grid items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3">
+      <div className="grid items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3 lg:gap-x-4 lg:gap-y-2.5">
         {path.units.map((unit) => {
           const allDone = unit.lessons.length > 0 && unit.completed === unit.lessons.length;
           const containsNext = nextLesson?.unit === unit.unit;
@@ -192,7 +192,7 @@ export function CurriculumPath() {
           const placement = !nextLesson
             ? ""
             : collapsible
-              ? "md:col-start-2 md:py-2"
+              ? "md:col-start-2 md:py-2 lg:py-0.5"
               : "md:col-start-1 md:row-span-6 md:row-start-1";
 
           // The optional review unit stays a discreet locked row until it unlocks.
@@ -200,16 +200,19 @@ export function CurriculumPath() {
             return (
               <section
                 key={unit.unit}
-                className={`card-soft p-4 opacity-70 ${placement}`}
+                className={`card-soft p-4 opacity-70 lg:flex lg:items-center lg:gap-3 ${placement}`}
                 aria-label={unit.title}
               >
-                <div className="flex min-h-12 items-center gap-3">
+                <div className="flex min-h-12 items-center gap-3 lg:min-h-10 lg:shrink-0">
                   <Lock className="size-4 shrink-0 text-muted-foreground" />
-                  <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                  <span className="min-w-0 flex-1 truncate text-sm lg:flex-none text-muted-foreground">
                     {unit.title}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p
+                  className="text-xs text-muted-foreground lg:min-w-0 lg:flex-1 lg:truncate lg:text-right"
+                  title={t("Optional review · does not block the Final Test")}
+                >
                   {t("Optional review · does not block the Final Test")}
                 </p>
               </section>
@@ -229,8 +232,9 @@ export function CurriculumPath() {
                       onClick={() => void start(lesson)}
                       disabled={busy || open.isPending}
                       aria-label={lesson.title}
+                      title={lesson.objective}
                       aria-current={isCurrent ? "true" : undefined}
-                      className={`flex w-full items-center gap-3 rounded-xl border-[1.5px] p-3 text-left transition-shadow lg:py-2 hover:shadow-[var(--shadow-lift)] ${
+                      className={`flex w-full items-center gap-3 rounded-xl border-[1.5px] p-3 text-left transition-shadow lg:py-1.5 hover:shadow-[var(--shadow-lift)] ${
                         isCurrent
                           ? "border-[rgb(0_245_206)]/45 bg-[rgb(0_245_206)]/10"
                           : "border-border"
@@ -258,7 +262,7 @@ export function CurriculumPath() {
                           {lesson.title}
                         </span>
                         <span
-                          className={`mt-1 block text-xs ${
+                          className={`mt-1 block text-xs lg:hidden ${
                             isDone && !isCurrent
                               ? "text-muted-foreground/70"
                               : "text-muted-foreground"
@@ -289,7 +293,7 @@ export function CurriculumPath() {
             <Button
               variant={test.unlocked && !test.passed ? "default" : "outline"}
               size="sm"
-              className={`mt-4 w-full ${
+              className={`mt-4 w-full lg:mt-2.5 ${
                 test.unlocked && !test.passed
                   ? "bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
                   : "text-muted-foreground"
@@ -337,7 +341,7 @@ export function CurriculumPath() {
                   onClick={() => toggleUnit(unit.unit)}
                   aria-expanded={isExpanded}
                   aria-label={`${t("Unit")} ${unit.unit} · ${unit.title}`}
-                  className="flex min-h-12 w-full items-center gap-3 rounded-xl text-left"
+                  className="flex min-h-12 w-full items-center gap-3 rounded-xl text-left lg:min-h-10"
                 >
                   {allDone ? (
                     <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
@@ -392,7 +396,7 @@ export function CurriculumPath() {
         })}
 
         <section
-          className={`card-soft p-5 ${nextLesson ? "md:col-start-2" : "md:col-span-2"}`}
+          className={`card-soft p-5 lg:p-4 ${nextLesson ? "md:col-start-2" : "md:col-span-2"}`}
           aria-label="Final Test"
         >
           <div className="flex items-center gap-3">
@@ -412,7 +416,7 @@ export function CurriculumPath() {
             )}
           </div>
           <Button
-            className="mt-4 w-full whitespace-normal"
+            className="mt-4 w-full whitespace-normal lg:mt-3"
             disabled={!path.finalTest.unlocked}
             onClick={() => navigate({ to: "/learning/final-test" })}
           >
