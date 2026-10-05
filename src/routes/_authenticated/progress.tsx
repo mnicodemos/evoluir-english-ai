@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, TriangleAlert } from "lucide-react";
 
@@ -29,12 +30,12 @@ interface RecentActivity {
 export const Route = createFileRoute("/_authenticated/progress")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · My history" },
+      { title: "Evoluir+ English AI · My Progress" },
       {
         name: "description",
         content: "Track your speaking, grammar, listening and vocabulary evolution.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · My history" },
+      { property: "og:title", content: "Evoluir+ English AI · My Progress" },
       { property: "og:description", content: "Track your English evolution week by week." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -47,6 +48,9 @@ function ProgressPage() {
   const { data: profile } = useProfile();
   const { lang } = useUiLang();
   const t = (s: string) => (lang === "pt" ? ((uiPt as Record<string, string>)[s] ?? s) : s);
+  // Inline pt/en for the few new strings, so the shared dictionary stays untouched.
+  const L = (en: string, pt: string) => (lang === "pt" ? pt : en);
+  const [showAllMistakes, setShowAllMistakes] = useState(false);
   const { data: vocabProgress } = useVocabularyProgress();
 
   const { data: history, isLoading } = useProgressHistory(profile?.id, profile?.level);
@@ -78,17 +82,21 @@ function ProgressPage() {
   const skills = [
     { label: "Listening", value: latest?.listening_score ?? 0 },
     { label: "Reading", value: latest?.reading_score ?? 0 },
-    { label: "Talking", value: latest?.speaking_score ?? 0 },
+    { label: "Speaking", value: latest?.speaking_score ?? 0 },
     { label: "Writing", value: latest?.writing_score ?? 0 },
   ];
   const overall = Math.round(skills.reduce((sum, s) => sum + s.value, 0) / skills.length);
   const sorted = [...skills].sort((a, b) => b.value - a.value);
   const strengths = sorted.slice(0, 2).filter((s) => s.value > 0);
-  const gaps = sorted.slice(-2).filter((s) => s.value > 0);
+  const IMPROVE_BELOW = 80;
+  const gaps = [...skills]
+    .filter((s) => s.value > 0 && s.value < IMPROVE_BELOW)
+    .sort((a, b) => a.value - b.value)
+    .slice(0, 2);
 
   return (
     <AppShell mobileOneScreen>
-      <h1 className="text-xl font-bold lg:text-3xl">{t("My history")}</h1>
+      <h1 className="text-xl font-bold lg:text-3xl">{t("My Progress")}</h1>
       <LearningJourneyCard />
 
       {isLoading ? (
@@ -112,7 +120,9 @@ function ProgressPage() {
                 {skills.map((s) => (
                   <div key={s.label}>
                     <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <span className="font-medium">{t(s.label)}</span>
+                      <span className="font-medium">
+                        {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
+                      </span>
                       <span className="text-muted-foreground">{s.value}%</span>
                     </div>
                     <Bar value={s.value} className="mt-1.5 h-2 sm:mt-2" />
@@ -138,7 +148,7 @@ function ProgressPage() {
                   {strengths.length ? (
                     strengths.map((s) => (
                       <li key={s.label}>
-                        {t(s.label)} — {s.value}%
+                        {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} — {s.value}%
                       </li>
                     ))
                   ) : (
@@ -154,7 +164,7 @@ function ProgressPage() {
                   {gaps.length ? (
                     gaps.map((s) => (
                       <li key={s.label}>
-                        {t(s.label)} — {s.value}%
+                        {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} — {s.value}%
                       </li>
                     ))
                   ) : (
@@ -172,10 +182,27 @@ function ProgressPage() {
           <section className="card-soft p-3 sm:p-5">
             <h2 className="text-base font-semibold sm:text-lg">{t("Frequent mistakes")}</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-              {learning.common_errors.map((e: string, i: number) => (
-                <li key={i}>{e}</li>
-              ))}
+              {(showAllMistakes ? learning.common_errors : learning.common_errors.slice(0, 5)).map(
+                (e: string, i: number) => (
+                  <li key={i}>{e}</li>
+                ),
+              )}
             </ul>
+            {learning.common_errors.length > 5 && (
+              <button
+                type="button"
+                onClick={() => setShowAllMistakes((v) => !v)}
+                aria-expanded={showAllMistakes}
+                className="mt-2 min-h-11 text-xs font-medium text-brand-green hover:underline sm:text-sm"
+              >
+                {showAllMistakes
+                  ? L("Show less", "Mostrar menos")
+                  : L(
+                      `Show all (${learning.common_errors.length})`,
+                      `Mostrar todos (${learning.common_errors.length})`,
+                    )}
+              </button>
+            )}
           </section>
         )}
 
@@ -195,13 +222,21 @@ function ProgressPage() {
                           <span>Lesson:</span> {(a.title as string).slice(8)}
                         </>
                       ) : (
-                        a.title || a.activity_type
+                        (() => {
+                          const label = a.title || a.activity_type || "";
+                          return label.charAt(0).toUpperCase() + label.slice(1);
+                        })()
                       )}
                     </span>
                     <span className="text-muted-foreground">
                       {formatDate(a.created_at, lang)} · {a.duration_minutes} min
                     </span>
                   </span>
+                  {a.score == null && (
+                    <span className="shrink-0 text-muted-foreground" aria-label={L("No score", "Sem nota")}>
+                      —
+                    </span>
+                  )}
                   {a.score != null && (
                     <span
                       className={`shrink-0 font-semibold ${
