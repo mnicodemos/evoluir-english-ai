@@ -65,6 +65,7 @@
   --color-dashboard-coral: var(--dashboard-coral);
   --color-dashboard-pink: var(--dashboard-pink);
   --color-dashboard-yellow: var(--dashboard-yellow);
+  --color-notification-border: var(--notification-border);
   --color-evo-block: #000201;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Sora", "Plus Jakarta Sans", ui-sans-serif, sans-serif;
@@ -73,6 +74,7 @@
 }
 
 :root {
+  --notification-border: #ffffff;
   --radius: 0.9rem;
   --background: oklch(0.975 0.003 250);
   --foreground: oklch(0.24 0.005 250);

@@ -113,7 +113,7 @@ function DashboardNotifications({ indicators, translate, placement }: DashboardN
       <PopoverContent
         align={placement === "mobile" ? "end" : "start"}
         sideOffset={8}
-        className="dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] border-border bg-popover p-2 text-popover-foreground"
+        className="dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] border-notification-border bg-popover p-2 text-popover-foreground"
       >
         <p className="px-2 py-1.5 font-display text-sm font-semibold">
           {translate("Notifications")}
