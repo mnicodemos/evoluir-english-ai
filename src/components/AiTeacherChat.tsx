@@ -275,7 +275,9 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
                 <span className="text-xs font-medium text-muted-foreground group-[.is-user]:ml-auto">
                   {message.role === "user" ? t("You") : t("AI Teacher")}
                 </span>
-                <MessageContent className={message.role === "assistant" ? "max-w-prose" : undefined}>
+                <MessageContent
+                  className={message.role === "assistant" ? "max-w-prose" : undefined}
+                >
                   <MessageResponse>
                     {message.role === "assistant"
                       ? formatTeacherReply(message.content)
