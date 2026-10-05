@@ -23,6 +23,7 @@ import { AppShell } from "@/components/AppShell";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { WeatherTalk } from "@/components/WeatherTalk";
+import { FirstWeekGuide } from "@/components/FirstWeekGuide";
 import { LevelCard } from "@/components/LevelCard";
 import { getLeague, getNextLeague, LeagueBadge } from "@/components/LeagueBadge";
 import { PathProgressCard } from "@/components/LearningPathCard";
@@ -266,6 +267,7 @@ function Dashboard() {
                     placement="desktop"
                   />
                   <WeatherTalk translate={t} placement="desktop" />
+                  <FirstWeekGuide profile={profile} placement="desktop" />
                 </div>
               }
               mobileTrailing={
@@ -276,6 +278,7 @@ function Dashboard() {
                     placement="mobile"
                   />
                   <WeatherTalk translate={t} placement="mobile" />
+                  <FirstWeekGuide profile={profile} placement="mobile" />
                   <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
                     {profile.level}
                   </span>

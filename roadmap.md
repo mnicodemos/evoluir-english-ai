@@ -241,6 +241,7 @@
 - [x] Fechamento da liga no relatório de domingo: quem entrou na liga recebe a posição final ("Liga B2: 2º de 5 🥈. Nova semana começa amanhã!"), calculada com o mesmo league_week_xp do ranking (empates dividem a posição, como rank()); se algum XP falhar, a linha da liga é omitida.
 - [x] Notificações (toasts) levemente transparentes, com desfoque de fundo.
 - [x] Painéis de notificações (sino) e "Clima em inglês" translúcidos com desfoque (bg-popover/80 + backdrop-blur); o do clima ganhou a mesma borda branca do de notificações.
+- [x] Primeira semana guiada: para contas com até 14 dias, um botão "Primeira semana N/7" (avatar da EVO) no topo do Dashboard abre 7 passos (conversa, Writing, lição, Listening, 10 palavras, Meus erros, liga) com link para cada um; cada passo é marcado pelo que o aluno fez de verdade (src/lib/firstWeek.ts); some quando os 7 estão feitos.
 - [x] Troféu da meta semanal no Dashboard desktop: troféu dourado preenchido com estrela e brilho (GoldTrophy) no lugar do ícone de contorno; cinza apagado enquanto a meta não é batida.
 - [ ] Modo offline (PWA): estudar as palavras do dia sem internet.
 
