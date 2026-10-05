@@ -333,6 +333,17 @@ function Dashboard() {
                 <h2 id="today-progress-title" className="font-display text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
+                <span className="ml-auto flex items-center gap-1 whitespace-nowrap lg:hidden">
+                  <Flame
+                    className="size-4 shrink-0 fill-current text-current"
+                    style={{ color: getLeague(streakDays).from }}
+                    strokeWidth={2.4}
+                    aria-hidden="true"
+                  />
+                  <span className="font-display text-xs font-bold">
+                    {streakDays} {t("days")}
+                  </span>
+                </span>
               </div>
               <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
                 <div className="ml-2 flex flex-col items-center lg:mx-auto lg:ml-0 xl:mx-0">
