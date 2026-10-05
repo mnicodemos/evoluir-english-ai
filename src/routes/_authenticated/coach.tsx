@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/coach")({
 function Coach() {
   const { lesson: lessonTopic } = Route.useSearch();
   return (
-    <AppShell>
+    <AppShell mobileOneScreen>
       <VoiceCoach lessonTopic={lessonTopic} />
     </AppShell>
   );

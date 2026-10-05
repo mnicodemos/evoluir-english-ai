@@ -407,7 +407,7 @@ function AppShellContent({
           "lg:pl-[13.2rem]",
         )}
       >
-        <aside className="fixed inset-y-0 left-0 z-30 hidden w-[13.2rem] flex-col items-stretch border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
+        <aside className="fixed inset-y-0 left-0 z-30 hidden w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
           <Link
             to="/dashboard"
             aria-label={translate("Dashboard")}
