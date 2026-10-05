@@ -280,5 +280,5 @@
 - [x] Listening mobile/tablet: "Sessão de hoje" e "Foco de pronúncia" aparecem abaixo do bloco principal (lado a lado no tablet); no xl continuam à direita. A linha de foco do topo saiu (o card mostra o mesmo texto).
 
 - [x] Selo de nível B2 mais próximo do texto (NextStepCard.tsx)
-- [ ] Sino e clima no topo mobile: juntar mais e à direita (dashboard.tsx)
-- [ ] Verificar com sessão assinada (lovable auth-session --self) + Playwright
+- [x] Sino e clima no topo mobile: juntar mais e à direita (dashboard.tsx)
+- [x] Verificado no painel com sessão assinada + Playwright
