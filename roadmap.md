@@ -204,7 +204,9 @@
 - Validação: Playwright 1280/1920 mostra Português, Ensolarado e Sair com ícone e texto; build OK.
 
 ## Novos pedidos (04/10 22:03 UTC)
-- [ ] Menu lateral mobile: remover item "Study plan"; menu desktop: renomear "Lessons" para "Learning".
-- [ ] Menu inferior mobile: texto cortado na parte inferior — subir ícones/texto; reduzir espaçamento das frases do "Why this matters" (última frase cortando), sem deixar espaço grande após a última.
+- [x] Menu lateral mobile: remover item "Study plan"; menu desktop: renomear "Lessons" para "Learning". (já refletido no AppShell: mobileSheetNav sem Study Plan; sidebar desktop usa "Learning")
+- [x] Menu inferior mobile: texto cortado na parte inferior — subir ícones/texto; reduzir espaçamento das frases do "Why this matters" (última frase cortando), sem deixar espaço grande após a última.
+  - AppShell: a área segura do iPhone passou a somar à altura do menu (4.275rem + safe-area) em vez de ocupá-la; rótulos com leading 1.3 para não cortar descendentes (g, p); altura do Dashboard mobile desconta a mesma área segura.
+  - NextStepCard mobile: lista do "Why this matters" com mt-0.5, gap-0.5 e leading-tight; desktop inalterado.
 - [ ] Migrar AI Speaking e Vocabulary para a API Gemini.
 - [ ] Vocabulary spaced review: convert 230 legacy mastery_level=100 rows to step 5 (90) with staggered next_review_at — waiting for user confirmation of the count.
