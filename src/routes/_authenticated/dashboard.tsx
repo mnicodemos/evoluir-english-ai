@@ -259,6 +259,9 @@ function Dashboard() {
                     translate={t}
                     placement="mobile"
                   />
+                  <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
+                    {profile.level}
+                  </span>
                   <span className="flex items-center gap-1">
                     <Flame
                       className="size-5 shrink-0 fill-current text-current"
