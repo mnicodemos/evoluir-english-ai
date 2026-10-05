@@ -448,7 +448,7 @@ function AppShellContent({
           </nav>
 
           <div className="flex flex-col items-stretch gap-1">
-            <div className="flex flex-col items-stretch gap-0.5 pb-1">
+            <div className="flex flex-col items-stretch gap-0.5 border-t border-sidebar-border pb-1 pt-2">
               <UtilityButtons variant="sidebar" />
               <Button
                 variant="ghost"
