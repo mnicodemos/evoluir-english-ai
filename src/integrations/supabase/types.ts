@@ -567,7 +567,10 @@ export type Database = {
           frequency: number
           id: string
           last_detected: string
+          last_reviewed_at: string | null
+          next_review_at: string
           original_text: string
+          review_step: number
           severity: string
           skill: string
           source: string
@@ -584,7 +587,10 @@ export type Database = {
           frequency?: number
           id?: string
           last_detected?: string
+          last_reviewed_at?: string | null
+          next_review_at?: string
           original_text: string
+          review_step?: number
           severity?: string
           skill: string
           source?: string
@@ -601,7 +607,10 @@ export type Database = {
           frequency?: number
           id?: string
           last_detected?: string
+          last_reviewed_at?: string | null
+          next_review_at?: string
           original_text?: string
+          review_step?: number
           severity?: string
           skill?: string
           source?: string
@@ -798,6 +807,7 @@ export type Database = {
           goal: string
           id: string
           last_activity_date: string | null
+          league_opt_in: boolean
           level: string
           max_level: string
           name: string
@@ -808,6 +818,7 @@ export type Database = {
           plan_interval: string | null
           plan_started_at: string | null
           streak_days: number
+          streak_freeze_used_on: string | null
           study_days_per_week: number | null
           study_focus: string | null
           updated_at: string
@@ -821,6 +832,7 @@ export type Database = {
           goal?: string
           id: string
           last_activity_date?: string | null
+          league_opt_in?: boolean
           level?: string
           max_level?: string
           name?: string
@@ -831,6 +843,7 @@ export type Database = {
           plan_interval?: string | null
           plan_started_at?: string | null
           streak_days?: number
+          streak_freeze_used_on?: string | null
           study_days_per_week?: number | null
           study_focus?: string | null
           updated_at?: string
@@ -844,6 +857,7 @@ export type Database = {
           goal?: string
           id?: string
           last_activity_date?: string | null
+          league_opt_in?: boolean
           level?: string
           max_level?: string
           name?: string
@@ -854,6 +868,7 @@ export type Database = {
           plan_interval?: string | null
           plan_started_at?: string | null
           streak_days?: number
+          streak_freeze_used_on?: string | null
           study_days_per_week?: number | null
           study_focus?: string | null
           updated_at?: string
@@ -1537,6 +1552,7 @@ export type Database = {
       }
     }
     Functions: {
+      cefr_rank: { Args: { p_level: string }; Returns: number }
       claim_pedagogical_retries: {
         Args: { p_limit?: number; p_stale_seconds?: number; p_user_id: string }
         Returns: {
@@ -1559,6 +1575,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      league_week_xp: {
+        Args: { p_user_id: string; p_week_start: string }
+        Returns: number
       }
       persist_authoritative_legacy_activity: {
         Args: {
@@ -1642,6 +1662,16 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      weekly_league: {
+        Args: never
+        Returns: {
+          display_name: string
+          is_me: boolean
+          joined: boolean
+          rank_position: number
+          xp: number
+        }[]
       }
     }
     Enums: {

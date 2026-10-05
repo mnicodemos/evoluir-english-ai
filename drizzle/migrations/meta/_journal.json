@@ -281,6 +281,13 @@
       "when": 1791208228255,
       "tag": "0039_weekly_league",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1791222601327,
+      "tag": "0040_protect_profile_level_fields",
+      "breakpoints": true
     }
   ]
 }
