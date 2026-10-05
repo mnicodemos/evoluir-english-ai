@@ -34,6 +34,8 @@ export const uiPt: Record<string, string> = {
   "Change language": "Alterar idioma",
   Notifications: "Notificações",
   "Open notifications": "Abrir notificações",
+  "Mark as read": "Marcar como lida",
+  "Mark all as read": "Marcar todas como lidas",
   "Notifications on": "Notificações ativas",
   "Notifications off": "Notificações desativadas",
   "New activities available": "Novas atividades disponíveis",
