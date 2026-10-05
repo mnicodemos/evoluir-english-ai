@@ -1,7 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
-
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
 
 /** Small per-level fallback when the shared word bank has nothing new. */
@@ -43,8 +41,17 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const denied = await authenticateCronRequest(request);
-        if (denied) return denied;
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        // Caller must present the scheduler key that only the database knows.
+        const provided = /^Bearer (\S+)$/.exec(request.headers.get("authorization") ?? "")?.[1];
+        const { data: keyRow } = await supabaseAdmin
+          .from("push_cron_key")
+          .select("key")
+          .eq("id", 1)
+          .maybeSingle();
+        if (!provided || !keyRow?.key || provided !== keyRow.key) {
+          return new Response("Unauthorized", { status: 401 });
+        }
 
         const body = (await request.json().catch(() => ({}))) as { kind?: string };
         const kind = body.kind === "reminder" ? "reminder" : "word";
@@ -54,8 +61,6 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
         if (!lovableKey || !connectionKey) {
           return Response.json({ error: "Push not configured" }, { status: 500 });
         }
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
         const { data: tokens, error } = await supabaseAdmin
           .from("push_tokens")
           .select("user_id, token");
