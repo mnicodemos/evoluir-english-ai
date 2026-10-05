@@ -378,7 +378,7 @@ function Dashboard() {
                         }
                       />
                     </svg>
-                    <span className="relative text-center font-display text-base font-bold leading-none text-foreground lg:text-xl">
+                    <span className="relative text-center font-display text-sm font-bold leading-none text-foreground lg:text-lg">
                       <span className="block whitespace-nowrap">
                         {minutesToday}/{profile.daily_minutes}
                       </span>
