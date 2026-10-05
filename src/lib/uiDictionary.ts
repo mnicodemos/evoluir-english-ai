@@ -1117,6 +1117,8 @@ export const uiPt: Record<string, string> = {
   "Cost & Performance": "Custo & Performance",
   Loading: "Carregando",
   "Could not load the users right now.": "Não foi possível carregar os usuários agora.",
+  "Send test error to Sentry": "Enviar erro de teste ao Sentry",
+  "Test error sent": "Erro de teste enviado",
 
   // Password recovery
   "Forgot my password": "Esqueci minha senha",
