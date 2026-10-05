@@ -1,0 +1,260 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+
+import { authenticateApiRequest } from "@/lib/api-auth.server";
+import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
+import { readTtsCache, writeTtsCache } from "@/lib/tts-cache.server";
+import { ttsCacheKey } from "@/lib/ttsCacheKey";
+
+const requestSchema = z.object({
+  text: z.string().trim().min(1).max(500),
+  cacheable: z.boolean().default(false),
+});
+
+// The Lovable audio gateway needs workspace credits; this project has its own
+// Google Gemini key connected, so speech is generated there instead.
+const GEMINI_TTS_MODEL = "gemini-2.5-flash-preview-tts";
+
+const GEMINI_VOICE = "Kore";
+
+const TTS_PROMPT_PREFIX = "Say clearly and naturally in English for a Brazilian learner:";
+
+export const Route = createFileRoute("/api/speech")({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        let userId: string;
+        try {
+          userId = await authenticateApiRequest(request);
+        } catch (error) {
+          return Response.json(
+            {
+              message:
+                error instanceof Response && error.status === 401
+                  ? "Please sign in again to use audio."
+                  : "Audio is not configured yet.",
+            },
+            { status: error instanceof Response ? error.status : 500 },
+          );
+        }
+        const apiKey = process.env["LOVABLE_API_KEY"];
+        if (!apiKey) {
+          return Response.json({ message: "Audio is not configured yet." }, { status: 500 });
+        }
+
+        const bodyResult = await request.json().catch(() => null);
+
+        const parsed = requestSchema.safeParse(bodyResult);
+        if (!parsed.success) {
+          return Response.json({ message: "Choose a valid word to hear." }, { status: 400 });
+        }
+
+        const geminiKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
+        if (!geminiKey) {
+          return Response.json({ message: "Audio is not configured yet." }, { status: 500 });
+        }
+
+        const prompt = `${TTS_PROMPT_PREFIX} ${parsed.data.text}`;
+        // Shared cache only for audio the client already marks as reusable.
+        const cacheKey = parsed.data.cacheable
+          ? await ttsCacheKey({
+              text: parsed.data.text,
+              voice: GEMINI_VOICE,
+              model: GEMINI_TTS_MODEL,
+              prompt: TTS_PROMPT_PREFIX,
+            })
+          : null;
+        if (cacheKey) {
+          const startedAt = Date.now();
+          const cached = await readTtsCache(cacheKey);
+          if (cached) {
+            // Cache HIT: no provider call and no AI usage reservation.
+            console.log(`[tts-cache] hit ${cacheKey.slice(0, 12)} ${Date.now() - startedAt}ms`);
+            const encoder = new TextEncoder();
+            const events =
+              cached
+                .map(
+                  (audio) => `data: ${JSON.stringify({ type: "speech.audio.delta", audio })}\n\n`,
+                )
+                .join("") + `data: ${JSON.stringify({ type: "speech.audio.done" })}\n\n`;
+            return new Response(encoder.encode(events), {
+              headers: {
+                "Content-Type": "text/event-stream",
+                "Cache-Control": "private, max-age=31536000, immutable",
+                Vary: "Authorization",
+                "X-TTS-Cache": "hit",
+              },
+            });
+          }
+          console.log(`[tts-cache] miss ${cacheKey.slice(0, 12)}`);
+        }
+
+        let ticket;
+        try {
+          ticket = await reserveAiUsage({
+            userId,
+            operation: "tts",
+            model: GEMINI_TTS_MODEL,
+            requestHash: await hashAiRequest(parsed.data.text),
+          });
+        } catch (error) {
+          const headers = new Headers();
+          if (error instanceof AiUsageError && error.retryAfter)
+            headers.set("Retry-After", String(error.retryAfter));
+          return Response.json(
+            {
+              message: error instanceof Error ? error.message : "Audio is temporarily unavailable.",
+            },
+            { status: error instanceof AiUsageError ? error.status : 503, headers },
+          );
+        }
+
+        const body = JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            responseModalities: ["AUDIO"],
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: GEMINI_VOICE } } },
+          },
+        });
+
+        const upstream = await fetch(
+          `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${GEMINI_TTS_MODEL}:streamGenerateContent?alt=sse`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "X-Connection-Api-Key": geminiKey,
+              "Content-Type": "application/json",
+            },
+            body,
+          },
+        );
+
+        if (!upstream.ok || !upstream.body) {
+          const raw = await upstream.text().catch(() => "");
+          // Log the provider detail server-side only; the client gets a generic
+          // message so no provider internals are ever exposed.
+          console.error(`[speech] tts upstream failed [${upstream.status}]: ${raw.slice(0, 300)}`);
+          const responseHeaders = new Headers();
+          if (upstream.status === 429) {
+            responseHeaders.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
+          }
+          await finishAiUsage(ticket, {
+            success: false,
+            errorCode: `gemini_${upstream.status}`,
+            errorMessage: "TTS upstream failed",
+          });
+          return Response.json(
+            {
+              message:
+                upstream.status === 429
+                  ? "Your Google audio limit is busy. Please try again in a moment."
+                  : "Audio generation failed. Please try again in a moment.",
+            },
+            {
+              status: upstream.status,
+              headers: responseHeaders,
+            },
+          );
+        }
+
+        const decoder = new TextDecoder();
+        const encoder = new TextEncoder();
+        let pending = "";
+        let sentAudio = false;
+        const audioChunks: string[] = [];
+        let settled = false;
+        // Closing the usage record exactly once keeps the "one request at a
+        // time" guard from staying locked when the listener stops the audio.
+        const settle = async (success: boolean, errorCode?: string, errorMessage?: string) => {
+          if (settled) return;
+          settled = true;
+          await finishAiUsage(ticket, {
+            success,
+            ...(errorCode ? { errorCode, errorMessage: errorMessage ?? errorCode } : {}),
+          });
+        };
+        // `cancel` runs when the listener stops the audio; it is part of the
+        // stream spec but missing from the bundled DOM types.
+        const transformer: Transformer<Uint8Array, Uint8Array> & {
+          cancel?: () => Promise<void>;
+        } = {
+          transform(chunk, controller) {
+            pending += decoder.decode(chunk, { stream: true });
+            const events = pending.split(/\r?\n\r?\n/);
+            pending = events.pop() ?? "";
+            for (const event of events) {
+              for (const line of event.split(/\r?\n/)) {
+                if (!line.startsWith("data:")) continue;
+                try {
+                  const payload = JSON.parse(line.slice(5).trim()) as {
+                    candidates?: Array<{
+                      content?: { parts?: Array<{ inlineData?: { data?: string } }> };
+                    }>;
+                  };
+                  for (const candidate of payload.candidates ?? []) {
+                    for (const part of candidate.content?.parts ?? []) {
+                      const audio = part.inlineData?.data;
+                      if (!audio) continue;
+                      sentAudio = true;
+                      audioChunks.push(audio);
+                      controller.enqueue(
+                        encoder.encode(
+                          `data: ${JSON.stringify({ type: "speech.audio.delta", audio })}\n\n`,
+                        ),
+                      );
+                    }
+                  }
+                } catch {
+                  // Ignore provider keep-alives and metadata-only events.
+                }
+              }
+            }
+          },
+          async flush(controller) {
+            // Only a fully streamed, non-empty audio is stored (never errors or cancelled audio).
+            if (sentAudio && cacheKey) await writeTtsCache(cacheKey, audioChunks);
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify(
+                  sentAudio
+                    ? { type: "speech.audio.done" }
+                    : {
+                        type: "speech.audio.error",
+                        message: "The audio service returned no sound.",
+                      },
+                )}\n\n`,
+              ),
+            );
+            await settle(
+              sentAudio,
+              sentAudio ? undefined : "empty_audio",
+              sentAudio ? undefined : "The audio service returned no sound.",
+            );
+          },
+          async cancel() {
+            // The listener stopped the audio: end the attempt instead of
+            // leaving the record open.
+            await settle(sentAudio, sentAudio ? undefined : "cancelled", "Playback was stopped");
+          },
+        };
+        const stream = upstream.body.pipeThrough(new TransformStream(transformer));
+
+        return new Response(stream, {
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": parsed.data.cacheable
+              ? "private, max-age=31536000, immutable"
+              : "no-store",
+            Vary: "Authorization",
+          },
+        });
+      },
+    },
+  },
+});
