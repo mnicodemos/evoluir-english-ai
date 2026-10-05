@@ -7,13 +7,18 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import evoImage from "@/assets/evo-landing.webp";
+import { authErrorMessage } from "@/lib/authErrors";
 import { uiPt } from "@/lib/uiDictionary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
-const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
+const searchSchema = z.object({ mode: z.enum(["signin", "signup", "forgot"]).optional() });
+
+/** Seconds before another confirmation or reset e-mail can be requested. */
+const RESEND_SECONDS = 60;
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
@@ -37,15 +42,25 @@ function AuthPage() {
   // Login screen is always in Portuguese — no language option here.
   const lang = "pt" as const;
   const t = (label: string) => uiPt[label] ?? label;
-  const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
+  const [mode, setMode] = useState<"signin" | "signup">(
+    search.mode === "signup" ? "signup" : "signin",
+  );
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [forgot, setForgot] = useState(false);
+  const [forgot, setForgot] = useState(search.mode === "forgot");
   const [resetSent, setResetSent] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = window.setTimeout(() => setResendIn((value) => value - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [resendIn]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -74,6 +89,7 @@ function AuthPage() {
         if (error) throw error;
         setResetSent(true);
         setSent(true);
+        setResendIn(RESEND_SECONDS);
         return;
       }
       if (mode === "signup") {
@@ -85,36 +101,88 @@ function AuthPage() {
         if (error) throw error;
         if (!data.session) {
           setSent(true);
+          setResendIn(RESEND_SECONDS);
           return;
         }
         navigate({ to: "/onboarding", replace: true });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          setNeedsConfirmation(
+            error.code === "email_not_confirmed" || /not confirmed/i.test(error.message),
+          );
+          throw error;
+        }
         navigate({ to: "/dashboard", replace: true });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(authErrorMessage(err));
     } finally {
       setLoading(false);
     }
   }
 
+  /** Sends the confirmation or reset e-mail again (Supabase rate-limits it too). */
+  async function resend() {
+    if (resendIn > 0 || !email) return;
+    setLoading(true);
+    try {
+      const { error } = resetSent
+        ? await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/reset-password`,
+          })
+        : await supabase.auth.resend({
+            type: "signup",
+            email,
+            options: { emailRedirectTo: window.location.origin },
+          });
+      if (error) throw error;
+      setResendIn(RESEND_SECONDS);
+      toast.success(t("Email sent again"));
+    } catch (err) {
+      toast.error(authErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function backToSignIn() {
+    setSent(false);
+    setResetSent(false);
+    setForgot(false);
+    setNeedsConfirmation(false);
+    setMode("signin");
+  }
+
   return (
     <div className="dashboard-shell brand-dashboard-theme dark flex min-h-dvh flex-col bg-background text-foreground">
       <div className="grid flex-1 lg:grid-cols-2">
-        <div className="relative hidden flex-col border-r border-border bg-card p-12 shadow-[var(--shadow-soft)] lg:flex">
-          <div className="flex flex-1 flex-col justify-center">
-            <h2 className="max-w-sm text-3xl font-bold text-foreground">
-              {t("Your English teacher is waiting for you.")}
-            </h2>
-            <p className="mt-4 max-w-sm text-muted-foreground">
-              {t("Conversation, writing and vocabulary practice with feedback in seconds.")}
-            </p>
+        <aside className="relative hidden flex-col overflow-hidden border-r border-border bg-card p-10 shadow-[var(--shadow-soft)] lg:flex">
+          <div className="absolute inset-0 surface-hero opacity-40" aria-hidden="true" />
+          <Link to="/" className="relative flex items-center gap-2.5">
+            <Logo className="size-10" />
+            <BrandName />
+          </Link>
+          <div className="relative grid flex-1 grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] items-center gap-4">
+            <div>
+              <h2 className="max-w-sm text-3xl font-bold leading-tight text-foreground xl:text-4xl">
+                {t("Your English teacher is waiting for you.")}
+              </h2>
+              <p className="mt-4 max-w-sm text-muted-foreground">
+                {t("Conversation, writing and vocabulary practice with feedback in seconds.")}
+              </p>
+            </div>
+            <img
+              src={evoImage}
+              alt=""
+              width={848}
+              height={1264}
+              className="max-h-[min(70dvh,34rem)] w-full object-contain object-bottom drop-shadow-2xl"
+            />
           </div>
-        </div>
+        </aside>
 
-        <div className="flex items-center justify-center px-5 py-8 sm:py-14">
+        <main className="flex items-center justify-center px-5 py-8 sm:py-14">
           <div className="w-full max-w-sm">
             <Link to="/" className="mb-8 flex items-center gap-2 lg:hidden">
               <Logo className="size-[1.5rem]" />
@@ -143,16 +211,25 @@ function AuthPage() {
                     </>
                   )}
                 </p>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {t("It can take a few minutes. Check your spam folder too.")}
+                </p>
                 <Button
-                  variant="outline"
-                  className="mt-6 w-full"
-                  onClick={() => {
-                    setSent(false);
-                    setResetSent(false);
-                    setForgot(false);
-                    setMode("signin");
-                  }}
+                  variant="secondary"
+                  className="mt-5 w-full"
+                  disabled={loading || resendIn > 0}
+                  onClick={() => void resend()}
                 >
+                  {loading && <Loader2 className="size-4 animate-spin" />}
+                  {resendIn > 0 ? (
+                    <span>
+                      {t("Resend in")} {resendIn}s
+                    </span>
+                  ) : (
+                    t("Resend email")
+                  )}
+                </Button>
+                <Button variant="outline" className="mt-3 w-full" onClick={backToSignIn}>
                   {t("Back to sign in")}
                 </Button>
               </div>
@@ -183,8 +260,9 @@ function AuthPage() {
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        autoComplete="name"
                         className="scroll-mt-20"
-                        placeholder="Marcelo"
+                        placeholder="Como você quer ser chamado"
                         required
                       />
                     </div>
@@ -196,14 +274,29 @@ function AuthPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                      inputMode="email"
+                      autoCapitalize="none"
+                      spellCheck={false}
                       className="scroll-mt-20"
-                      placeholder="you@company.com"
+                      placeholder="seu@email.com"
                       required
                     />
                   </div>
                   {!forgot && (
                     <div className="space-y-2">
-                      <Label htmlFor="password">{t("Password")}</Label>
+                      <div className="flex items-center justify-between gap-3">
+                        <Label htmlFor="password">{t("Password")}</Label>
+                        {mode === "signin" && (
+                          <button
+                            type="button"
+                            className="text-xs font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                            onClick={() => setForgot(true)}
+                          >
+                            {t("Forgot my password")}
+                          </button>
+                        )}
+                      </div>
                       <div className="relative">
                         <Input
                           id="password"
@@ -213,6 +306,8 @@ function AuthPage() {
                           placeholder="••••••••"
                           minLength={6}
                           required
+                          autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                          aria-describedby={mode === "signup" ? "password-hint" : undefined}
                           className="scroll-mt-20 pr-12"
                         />
                         <button
@@ -228,6 +323,11 @@ function AuthPage() {
                           )}
                         </button>
                       </div>
+                      {mode === "signup" && (
+                        <p id="password-hint" className="text-xs text-muted-foreground">
+                          {t("At least 6 characters.")}
+                        </p>
+                      )}
                     </div>
                   )}
                   <Button type="submit" className="w-full" size="lg" disabled={loading}>
@@ -240,6 +340,23 @@ function AuthPage() {
                           : "Sign in",
                     )}
                   </Button>
+                  {needsConfirmation && mode === "signin" && !forgot && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="w-full"
+                      disabled={loading || resendIn > 0 || !email}
+                      onClick={() => void resend()}
+                    >
+                      {resendIn > 0 ? (
+                        <span>
+                          {t("Resend in")} {resendIn}s
+                        </span>
+                      ) : (
+                        t("Resend confirmation email")
+                      )}
+                    </Button>
+                  )}
                   {mode === "signup" && !forgot ? (
                     <p className="text-center text-xs leading-relaxed text-muted-foreground">
                       Ao criar uma conta, você concorda com os{" "}
@@ -261,32 +378,37 @@ function AuthPage() {
                   ) : null}
                 </form>
 
-                <p className="mt-4 text-center text-sm">
-                  <button
-                    type="button"
-                    className="font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-                    onClick={() => setForgot((v) => !v)}
-                  >
-                    {t(forgot ? "Back to sign in" : "Forgot my password")}
-                  </button>
-                </p>
-
-                <p className="mt-6 text-center text-sm text-muted-foreground">
-                  {t(mode === "signup" ? "Already have an account?" : "New here?")}{" "}
-                  <button
-                    type="button"
-                    className="font-medium text-foreground underline underline-offset-4"
-                    onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-                  >
-                    {t(mode === "signup" ? "Sign in" : "Create an account")}
-                  </button>
-                </p>
+                {forgot ? (
+                  <p className="mt-6 text-center text-sm">
+                    <button
+                      type="button"
+                      className="font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                      onClick={backToSignIn}
+                    >
+                      {t("Back to sign in")}
+                    </button>
+                  </p>
+                ) : (
+                  <p className="mt-6 text-center text-sm text-muted-foreground">
+                    {t(mode === "signup" ? "Already have an account?" : "New here?")}{" "}
+                    <button
+                      type="button"
+                      className="font-medium text-foreground underline underline-offset-4"
+                      onClick={() => {
+                        setNeedsConfirmation(false);
+                        setMode(mode === "signup" ? "signin" : "signup");
+                      }}
+                    >
+                      {t(mode === "signup" ? "Sign in" : "Create an account")}
+                    </button>
+                  </p>
+                )}
               </>
             )}
           </div>
-        </div>
+        </main>
       </div>
-      <Footer leftAligned lang={lang} />
+      <Footer minimal leftAligned lang={lang} />
     </div>
   );
 }
