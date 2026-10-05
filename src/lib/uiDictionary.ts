@@ -1158,4 +1158,24 @@ export const uiPt: Record<string, string> = {
   "Choose a new password to finish signing in.": "Escolha uma nova senha para concluir o acesso.",
   "Save new password": "Salvar nova senha",
   "Password updated": "Senha atualizada",
+
+  // My mistakes
+  "My mistakes": "Meus erros",
+  "Mistakes from your Writing corrections come back for review until you get them right five times in a row.":
+    "Os erros das suas correções de Writing voltam para revisão até você acertá-los cinco vezes seguidas.",
+  "No mistakes saved yet.": "Nenhum erro salvo ainda.",
+  "All caught up for today!": "Tudo revisado por hoje!",
+  "Correct a text in Writing and your mistakes will appear here.":
+    "Corrija um texto no Writing e seus erros aparecerão aqui.",
+  "Come back tomorrow for the next reviews.": "Volte amanhã para as próximas revisões.",
+  "Go to Writing": "Ir para o Writing",
+  "Correct this sentence:": "Corrija esta frase:",
+  "Correct!": "Correto!",
+  "Not quite.": "Quase.",
+  "Type the corrected sentence": "Digite a frase corrigida",
+  Next: "Próximo",
+  "All mistakes": "Todos os erros",
+  "Nothing here yet.": "Nada aqui ainda.",
+  "Could not check your answer. Try again.":
+    "Não foi possível verificar sua resposta. Tente novamente.",
 };
