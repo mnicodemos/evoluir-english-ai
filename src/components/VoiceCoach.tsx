@@ -216,6 +216,9 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     if (lessonTopic || started.current) return;
     started.current = true;
     void start(0);
+    // Runs once per screen: `start` is recreated on every render, and the
+    // `started` ref already guarantees a single opener.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonTopic]);
 
   async function playResponse(text: string) {

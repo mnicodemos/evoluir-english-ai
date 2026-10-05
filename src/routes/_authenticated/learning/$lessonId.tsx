@@ -44,6 +44,7 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
+import { removeStorage, writeStorage } from "@/lib/safeStorage";
 
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
   head: () => ({
@@ -194,7 +195,7 @@ function LessonPage() {
         const words = await vocabularySingleFlight(profile.id, () =>
           generateVocabulary({ data: { level: profile.level } }),
         );
-        if (failureKey) window.localStorage.removeItem(failureKey);
+        if (failureKey) removeStorage(failureKey);
         if (words.length > 0) {
           await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
         }
@@ -204,7 +205,7 @@ function LessonPage() {
         const transient =
           error instanceof Error &&
           /already running|busy|wait|fetch|network|abort|load failed/i.test(error.message);
-        if (failureKey && !transient) window.localStorage.setItem(failureKey, String(Date.now()));
+        if (failureKey && !transient) writeStorage(failureKey, String(Date.now()));
         // Lesson completion remains authoritative. Vocabulary keeps its existing
         // manual retry path when generation is temporarily unavailable.
       }

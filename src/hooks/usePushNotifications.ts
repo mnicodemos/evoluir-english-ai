@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { enablePush, resumePush } from "@/lib/pushNotifications";
 import { registerPushToken, unregisterPushToken } from "@/lib/push.functions";
+import { readStorage, removeStorage, writeStorage } from "@/lib/safeStorage";
 
 const TOKEN_KEY = "push-token";
 
@@ -23,7 +24,7 @@ export function usePushNotifications() {
   const unregister = useServerFn(unregisterPushToken);
 
   useEffect(() => {
-    const saved = localStorage.getItem(TOKEN_KEY);
+    const saved = readStorage(TOKEN_KEY);
     if (saved && "Notification" in window && Notification.permission === "granted") {
       setToken(saved);
       setState("enabled");
@@ -32,12 +33,12 @@ export function usePushNotifications() {
       if (tokenSynced) return;
       tokenSynced = true;
       void resumePush().then(async (current) => {
-        if (!current || localStorage.getItem(TOKEN_KEY) !== saved) return;
+        if (!current || readStorage(TOKEN_KEY) !== saved) return;
         try {
           await register({ data: { token: current } });
           if (current !== saved) {
             await unregister({ data: { token: saved } });
-            localStorage.setItem(TOKEN_KEY, current);
+            writeStorage(TOKEN_KEY, current);
             setToken(current);
           }
         } catch {
@@ -53,7 +54,7 @@ export function usePushNotifications() {
     const result = await enablePush();
     if (result.status === "registered") {
       await register({ data: { token: result.token } });
-      localStorage.setItem(TOKEN_KEY, result.token);
+      writeStorage(TOKEN_KEY, result.token);
       setToken(result.token);
       setState("enabled");
       // Show messages that arrive while the app is open, from now on.
@@ -74,11 +75,11 @@ export function usePushNotifications() {
 
   const disable = useCallback(async () => {
     // The stored token is the current one even if another mount refreshed it.
-    const current = localStorage.getItem(TOKEN_KEY) ?? token;
+    const current = readStorage(TOKEN_KEY) ?? token;
     if (current) {
       await unregister({ data: { token: current } });
     }
-    localStorage.removeItem(TOKEN_KEY);
+    removeStorage(TOKEN_KEY);
     setToken(null);
     setState("disabled");
   }, [token, unregister]);
