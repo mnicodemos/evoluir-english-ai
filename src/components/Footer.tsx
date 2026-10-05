@@ -69,13 +69,33 @@ export function Footer({
             )}
           >
             <p>{t.rights}</p>
-            <div className="flex items-center gap-5">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
               <a href="#" className="transition-colors hover:text-foreground dark:hover:text-white">
                 {t.terms}
               </a>
               <a href="#" className="transition-colors hover:text-foreground dark:hover:text-white">
                 {t.privacy}
               </a>
+              <a
+                href="mailto:evoluirmaisoficial@hotmail.com"
+                className="transition-colors hover:text-foreground dark:hover:text-white"
+              >
+                {lang === "pt" ? "Contato" : "Contact"}
+              </a>
+              <span className="flex items-center">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    className="grid size-11 place-items-center transition-colors hover:text-foreground dark:hover:text-white"
+                  >
+                    <social.icon className="size-4" />
+                  </a>
+                ))}
+              </span>
             </div>
           </div>
         </div>

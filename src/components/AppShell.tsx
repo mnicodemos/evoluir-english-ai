@@ -395,7 +395,7 @@ function AppShellContent({
     <TooltipProvider delayDuration={200}>
       <div
         className={cn(
-          "dashboard-shell dark min-h-screen bg-background",
+          "dashboard-shell dark flex min-h-screen flex-col bg-background",
           dashboardLayout
             ? "h-dvh overflow-hidden lg:h-auto lg:overflow-visible lg:pb-0"
             : "pb-[calc(4.275rem+_env(safe-area-inset-bottom))] lg:pb-0",
@@ -478,6 +478,7 @@ function AppShellContent({
         <main
           className={cn(
             "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
+            !dashboardLayout && "flex-1",
             dashboardLayout &&
               "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-[10px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
           )}
@@ -521,6 +522,7 @@ function AppShellContent({
           )}
         >
           <Footer
+            minimal
             lang={lang}
             containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10"
           />
