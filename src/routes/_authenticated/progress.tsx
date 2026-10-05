@@ -11,6 +11,8 @@ import { LearningJourneyCard } from "@/components/LearningJourneyCard";
 
 import { Progress as Bar } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { usePersistentState } from "@/hooks/usePersistentState";
 import { useProfile } from "@/hooks/useProfile";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
@@ -51,6 +53,7 @@ function ProgressPage() {
   // Inline pt/en for the few new strings, so the shared dictionary stays untouched.
   const L = (en: string, pt: string) => (lang === "pt" ? pt : en);
   const [showAllMistakes, setShowAllMistakes] = useState(false);
+  const [tab, setTab] = usePersistentState<string>("progress-tab", "overview");
   const { data: vocabProgress } = useVocabularyProgress();
 
   const { data: history, isLoading } = useProgressHistory(profile?.id, profile?.level);
@@ -97,41 +100,96 @@ function ProgressPage() {
   return (
     <AppShell mobileOneScreen>
       <h1 className="text-xl font-bold lg:text-3xl">{t("My Progress")}</h1>
-      <LearningJourneyCard />
 
-      {isLoading ? (
-        <Skeleton className="mt-4 h-72 w-full sm:mt-7" />
-      ) : (
-        <>
-          <div className="mt-3 grid gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto_auto]">
-            <section className="card-soft p-3 sm:p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
-              <h2 className="text-base font-semibold sm:text-lg">{t("Frequency")}</h2>
-              <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
-                {t("The days you studied this month.")}
-              </p>
-              <div className="mt-2 sm:mt-4">
-                {profile && <FrequencyCalendar userId={profile.id} />}
-              </div>
-            </section>
-
-            <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
-              <h2 className="text-base font-semibold sm:text-lg">{t("Current level")}</h2>
-              <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4">
-                {skills.map((s) => (
-                  <div key={s.label}>
-                    <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <span className="font-medium">
-                        {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
-                      </span>
-                      <span className="text-muted-foreground">{s.value}%</span>
-                    </div>
-                    <Bar value={s.value} className="mt-1.5 h-2 sm:mt-2" />
+      {/* Three tabs keep each view on one screen: the overview first, the EVO
+          journey and the history one tap away. The chosen tab is remembered. */}
+      <Tabs value={tab} onValueChange={setTab} className="mt-3 sm:mt-4">
+        <TabsList>
+          <TabsTrigger value="overview">{L("Overview", "Visão geral")}</TabsTrigger>
+          <TabsTrigger value="journey">{L("Journey", "Jornada")}</TabsTrigger>
+          <TabsTrigger value="history">{L("History", "Histórico")}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">
+          {isLoading ? (
+            <Skeleton className="mt-4 h-72 w-full sm:mt-7" />
+          ) : (
+            <>
+              <div className="mt-3 grid gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto]">
+                <section className="card-soft p-3 sm:p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
+                  <h2 className="text-base font-semibold sm:text-lg">{t("Frequency")}</h2>
+                  <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
+                    {t("The days you studied this month.")}
+                  </p>
+                  <div className="mt-2 sm:mt-4">
+                    {profile && <FrequencyCalendar userId={profile.id} />}
                   </div>
-                ))}
-              </div>
-            </section>
+                </section>
 
-            <section className="card-soft p-3 sm:p-5 xl:col-span-2 xl:row-start-3">
+                <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
+                  <h2 className="text-base font-semibold sm:text-lg">{t("Current level")}</h2>
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4">
+                    {skills.map((s) => (
+                      <div key={s.label}>
+                        <div className="flex items-center justify-between text-xs sm:text-sm">
+                          <span className="font-medium">
+                            {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
+                          </span>
+                          <span className="text-muted-foreground">{s.value}%</span>
+                        </div>
+                        <Bar value={s.value} className="mt-1.5 h-2 sm:mt-2" />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:col-start-2 xl:row-start-2">
+                  <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
+                    <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
+                      <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" />{" "}
+                      {t("Strengths")}
+                    </h2>
+                    <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
+                      {strengths.length ? (
+                        strengths.map((s) => (
+                          <li key={s.label}>
+                            {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} —{" "}
+                            {s.value}%
+                          </li>
+                        ))
+                      ) : (
+                        <li>{t("Practice more to reveal your strengths.")}</li>
+                      )}
+                    </ul>
+                  </section>
+                  <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
+                    <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
+                      <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" />{" "}
+                      {t("To improve")}
+                    </h2>
+                    <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
+                      {gaps.length ? (
+                        gaps.map((s) => (
+                          <li key={s.label}>
+                            {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} —{" "}
+                            {s.value}%
+                          </li>
+                        ))
+                      ) : (
+                        <li>{t("Keep going to find your weak spots.")}</li>
+                      )}
+                    </ul>
+                  </section>
+                </div>
+              </div>
+            </>
+          )}
+        </TabsContent>
+        <TabsContent value="journey">
+          <LearningJourneyCard />
+        </TabsContent>
+        <TabsContent value="history">
+          <div className="mt-3 grid items-start gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+            <section className="card-soft p-3 sm:p-5">
               <h2 className="text-base font-semibold sm:text-lg">{t("Evolution")}</h2>
               <div className="grid gap-4 xl:grid-cols-2 xl:gap-8">
                 <div className="min-w-0">
@@ -142,127 +200,92 @@ function ProgressPage() {
                 </div>
               </div>
             </section>
+            <div className="grid content-start gap-3 sm:gap-5">
+              {learning?.common_errors && learning.common_errors.length > 0 && (
+                <section className="card-soft p-3 sm:p-5">
+                  <h2 className="text-base font-semibold sm:text-lg">{t("Frequent mistakes")}</h2>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
+                    {(showAllMistakes
+                      ? learning.common_errors
+                      : learning.common_errors.slice(0, 5)
+                    ).map((e: string, i: number) => (
+                      <li key={i}>{e}</li>
+                    ))}
+                  </ul>
+                  {learning.common_errors.length > 5 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllMistakes((v) => !v)}
+                      aria-expanded={showAllMistakes}
+                      className="mt-2 min-h-11 text-xs font-medium text-brand-green hover:underline sm:text-sm"
+                    >
+                      {showAllMistakes
+                        ? L("Show less", "Mostrar menos")
+                        : L(
+                            `Show all (${learning.common_errors.length})`,
+                            `Mostrar todos (${learning.common_errors.length})`,
+                          )}
+                    </button>
+                  )}
+                </section>
+              )}
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:col-start-2 xl:row-start-2">
-              <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
-                <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
-                  <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" /> {t("Strengths")}
-                </h2>
-                <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-                  {strengths.length ? (
-                    strengths.map((s) => (
-                      <li key={s.label}>
-                        {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} — {s.value}%
+              {recent && recent.length > 0 && (
+                <section className="card-soft p-3 sm:p-5">
+                  <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
+                  <ul className="mt-2 divide-y divide-border sm:mt-4">
+                    {recent.map((a) => (
+                      <li
+                        key={a.id}
+                        className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm xl:py-2"
+                      >
+                        <span className="min-w-0">
+                          <span className="block break-words font-medium">
+                            {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
+                              <>
+                                <span>Lesson:</span> {(a.title as string).slice(8)}
+                              </>
+                            ) : (
+                              (() => {
+                                const label = a.title || a.activity_type || "";
+                                return label.charAt(0).toUpperCase() + label.slice(1);
+                              })()
+                            )}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {formatDate(a.created_at, lang)} · {a.duration_minutes} min
+                          </span>
+                        </span>
+                        {a.score == null && (
+                          <span
+                            className="shrink-0 text-muted-foreground"
+                            aria-label={L("No score", "Sem nota")}
+                          >
+                            —
+                          </span>
+                        )}
+                        {a.score != null && (
+                          <span
+                            className={`shrink-0 font-semibold ${
+                              a.score >= 70
+                                ? "text-[oklch(0.55_0.14_158)]"
+                                : a.score >= 50
+                                  ? "text-warning"
+                                  : "text-destructive"
+                            }`}
+                          >
+                            {a.score}%
+                          </span>
+                        )}
                       </li>
-                    ))
-                  ) : (
-                    <li>{t("Practice more to reveal your strengths.")}</li>
-                  )}
-                </ul>
-              </section>
-              <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
-                <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
-                  <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" /> {t("To improve")}
-                </h2>
-                <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-                  {gaps.length ? (
-                    gaps.map((s) => (
-                      <li key={s.label}>
-                        {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} — {s.value}%
-                      </li>
-                    ))
-                  ) : (
-                    <li>{t("Keep going to find your weak spots.")}</li>
-                  )}
-                </ul>
-              </section>
+                    ))}
+                  </ul>
+                </section>
+              )}
             </div>
           </div>
-        </>
-      )}
-
-      <div className="mt-3 grid gap-3 sm:mt-5 sm:gap-5 xl:grid-cols-2">
-        {learning?.common_errors && learning.common_errors.length > 0 && (
-          <section className="card-soft p-3 sm:p-5">
-            <h2 className="text-base font-semibold sm:text-lg">{t("Frequent mistakes")}</h2>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-              {(showAllMistakes ? learning.common_errors : learning.common_errors.slice(0, 5)).map(
-                (e: string, i: number) => (
-                  <li key={i}>{e}</li>
-                ),
-              )}
-            </ul>
-            {learning.common_errors.length > 5 && (
-              <button
-                type="button"
-                onClick={() => setShowAllMistakes((v) => !v)}
-                aria-expanded={showAllMistakes}
-                className="mt-2 min-h-11 text-xs font-medium text-brand-green hover:underline sm:text-sm"
-              >
-                {showAllMistakes
-                  ? L("Show less", "Mostrar menos")
-                  : L(
-                      `Show all (${learning.common_errors.length})`,
-                      `Mostrar todos (${learning.common_errors.length})`,
-                    )}
-              </button>
-            )}
-          </section>
-        )}
-
-        {recent && recent.length > 0 && (
-          <section className="card-soft p-3 sm:p-5">
-            <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
-            <ul className="mt-2 divide-y divide-border sm:mt-4">
-              {recent.map((a) => (
-                <li
-                  key={a.id}
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm"
-                >
-                  <span className="min-w-0">
-                    <span className="block break-words font-medium">
-                      {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
-                        <>
-                          <span>Lesson:</span> {(a.title as string).slice(8)}
-                        </>
-                      ) : (
-                        (() => {
-                          const label = a.title || a.activity_type || "";
-                          return label.charAt(0).toUpperCase() + label.slice(1);
-                        })()
-                      )}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {formatDate(a.created_at, lang)} · {a.duration_minutes} min
-                    </span>
-                  </span>
-                  {a.score == null && (
-                    <span
-                      className="shrink-0 text-muted-foreground"
-                      aria-label={L("No score", "Sem nota")}
-                    >
-                      —
-                    </span>
-                  )}
-                  {a.score != null && (
-                    <span
-                      className={`shrink-0 font-semibold ${
-                        a.score >= 70
-                          ? "text-[oklch(0.55_0.14_158)]"
-                          : a.score >= 50
-                            ? "text-warning"
-                            : "text-destructive"
-                      }`}
-                    >
-                      {a.score}%
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </AppShell>
   );
 }

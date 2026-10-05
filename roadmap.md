@@ -241,5 +241,6 @@
 - [x] Escrita no celular: categorias viram três abas compactas (a tarefa aparece no cabeçalho do editor) e a descrição longa fica só a partir de sm; cabe em uma tela antes da correção.
 - [x] Menu lateral desktop rola em telas baixas (o perfil não fica mais cortado em 800px de altura).
 - Já em uma tela: Dashboard, Escuta, Escrita (desktop), Vocabulário, Professor de IA, Revisão, Aula, Premium.
-- [ ] A decidir: Meu progresso (≈1.585px) e Trilha de aprendizado (≈2.500px) só cabem com mudança de estrutura (abas/colapsáveis).
+- [x] Meu progresso em três abas (Visão geral, Jornada, Histórico; a escolhida fica lembrada): cada aba cabe em 1280×800; no Histórico, Evolução à esquerda e Erros frequentes/Atividade recente à direita.
+- [x] Trilha de aprendizado: só a unidade da próxima lição fica aberta (à esquerda); as demais viram linhas recolhidas à direita, com o Teste final; curso e próxima lição lado a lado. Cabe em 1920×1080; em 1280×800 caiu de 2.526 para 1.132px; no celular de 4.444 para 2.124px.
 

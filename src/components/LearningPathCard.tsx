@@ -105,93 +105,108 @@ export function CurriculumPath() {
 
   return (
     <div className="space-y-5">
-      <section className="card-soft p-4" aria-labelledby="path-heading">
-        <div className="flex items-center gap-3">
-          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[oklch(0.28_0.045_200)]">
-            <BookOpen className="size-5 text-[oklch(0.72_0.13_185)]" />
-          </span>
-          <h2 id="path-heading" className="min-w-0 flex-1 truncate text-sm font-semibold">
-            <span>{findLevel(path.level).label}</span>
-          </h2>
-          <p className="shrink-0 text-xs font-semibold text-muted-foreground">
-            {path.completed}/{path.total} · {Math.round((path.completed / path.total) * 100)}%
-          </p>
-        </div>
-        <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-3 h-2" />
+      <div className="grid gap-5 lg:grid-cols-2">
+        <section className="card-soft p-4" aria-labelledby="path-heading">
+          <div className="flex items-center gap-3">
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[oklch(0.28_0.045_200)]">
+              <BookOpen className="size-5 text-[oklch(0.72_0.13_185)]" />
+            </span>
+            <h2 id="path-heading" className="min-w-0 flex-1 truncate text-sm font-semibold">
+              <span>{findLevel(path.level).label}</span>
+            </h2>
+            <p className="shrink-0 text-xs font-semibold text-muted-foreground">
+              {path.completed}/{path.total} · {Math.round((path.completed / path.total) * 100)}%
+            </p>
+          </div>
+          <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-3 h-2" />
 
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-3"
-          onClick={() => void downloadPlan()}
-          disabled={planLoading}
-        >
-          {planLoading ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Download className="size-4" />
-          )}
-          Download course
-        </Button>
-      </section>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={() => void downloadPlan()}
+            disabled={planLoading}
+          >
+            {planLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Download className="size-4" />
+            )}
+            Download course
+          </Button>
+        </section>
 
-      {(() => {
-        const next = nextLesson;
-        if (!next) {
+        {(() => {
+          const next = nextLesson;
+          if (!next) {
+            return (
+              <section className="card-soft p-4" aria-label="All lessons completed">
+                <p className="text-sm font-semibold">{t("All lessons completed")}</p>
+                {path.finalTest.unlocked && (
+                  <Button
+                    className="mt-3 min-h-12 w-full bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+                    onClick={() => navigate({ to: "/learning/final-test" })}
+                  >
+                    <Trophy className="size-4" /> <span>{t("Take the final test")}</span>
+                  </Button>
+                )}
+              </section>
+            );
+          }
+          const busy = busyKey === next.key;
           return (
-            <section className="card-soft p-4" aria-label="All lessons completed">
-              <p className="text-sm font-semibold">{t("All lessons completed")}</p>
-              {path.finalTest.unlocked && (
-                <Button
-                  className="mt-3 min-h-12 w-full bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
-                  onClick={() => navigate({ to: "/learning/final-test" })}
-                >
-                  <Trophy className="size-4" /> <span>{t("Take the final test")}</span>
-                </Button>
-              )}
+            <section
+              className="card-soft border-[1.5px] border-[rgb(0_245_206)]/45 p-4"
+              aria-label="Next lesson"
+            >
+              <p className="text-[11px] font-semibold tracking-wider text-[oklch(0.72_0.13_185)] uppercase">
+                {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
+              </p>
+              <h3 className="mt-1 truncate text-sm font-semibold">{next.title}</h3>
+              <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{next.objective}</p>
+              <Button
+                className="mt-3 min-h-12 w-full bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+                onClick={() => void start(next)}
+                disabled={busy || open.isPending}
+              >
+                {busy ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
+                <span>{t("Continue lesson")}</span>
+              </Button>
             </section>
           );
-        }
-        const busy = busyKey === next.key;
-        return (
-          <section
-            className="card-soft border-[1.5px] border-[rgb(0_245_206)]/45 p-4"
-            aria-label="Next lesson"
-          >
-            <p className="text-[11px] font-semibold tracking-wider text-[oklch(0.72_0.13_185)] uppercase">
-              {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
-            </p>
-            <h3 className="mt-1 truncate text-sm font-semibold">{next.title}</h3>
-            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{next.objective}</p>
-            <Button
-              className="mt-3 min-h-12 w-full bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
-              onClick={() => void start(next)}
-              disabled={busy || open.isPending}
-            >
-              {busy ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
-              <span>{t("Continue lesson")}</span>
-            </Button>
-          </section>
-        );
-      })()}
+        })()}
+      </div>
 
-      <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
+      {/* The open unit fills the left column; the collapsed ones stack on the right. */}
+      <div className="grid items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3">
         {path.units.map((unit) => {
           const allDone = unit.lessons.length > 0 && unit.completed === unit.lessons.length;
           const containsNext = nextLesson?.unit === unit.unit;
-          const collapsible = allDone && !containsNext;
+          // Only the unit with the next lesson stays open, so the path fits one
+          // screen; finished and upcoming units collapse into a row that opens
+          // on tap.
+          const collapsible = !containsNext;
           const isExpanded = collapsible && expandedUnits.has(unit.unit);
           const test = path.unitTests.find((item) => item.unit === unit.unit);
           const unitLocked = unit.lessons.every((lesson) => lesson.locked);
+          const placement = !nextLesson
+            ? ""
+            : collapsible
+              ? "md:col-start-2 md:py-2"
+              : "md:col-start-1 md:row-span-6 md:row-start-1";
 
           // The optional review unit stays a discreet locked row until it unlocks.
           if (unit.unit === 6 && unitLocked && !isExpanded) {
             return (
-              <section key={unit.unit} className="card-soft p-4 opacity-70" aria-label={unit.title}>
+              <section
+                key={unit.unit}
+                className={`card-soft p-4 opacity-70 ${placement}`}
+                aria-label={unit.title}
+              >
                 <div className="flex min-h-12 items-center gap-3">
                   <Lock className="size-4 shrink-0 text-muted-foreground" />
                   <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
-                    {t("Unit")} {unit.unit} · {unit.title}
+                    {unit.title}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -202,7 +217,7 @@ export function CurriculumPath() {
           }
 
           const lessonsList = (
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4 space-y-2 lg:mt-3 lg:space-y-1.5">
               {unit.lessons.map((lesson) => {
                 const busy = busyKey === lesson.key;
                 const isCurrent = nextLesson?.key === lesson.key;
@@ -215,7 +230,7 @@ export function CurriculumPath() {
                       disabled={busy || open.isPending}
                       aria-label={lesson.title}
                       aria-current={isCurrent ? "true" : undefined}
-                      className={`flex w-full items-center gap-3 rounded-xl border-[1.5px] p-3 text-left transition-shadow hover:shadow-[var(--shadow-lift)] ${
+                      className={`flex w-full items-center gap-3 rounded-xl border-[1.5px] p-3 text-left transition-shadow lg:py-2 hover:shadow-[var(--shadow-lift)] ${
                         isCurrent
                           ? "border-[rgb(0_245_206)]/45 bg-[rgb(0_245_206)]/10"
                           : "border-border"
@@ -311,7 +326,11 @@ export function CurriculumPath() {
           ) : null;
 
           return (
-            <section key={unit.unit} className="card-soft p-4" aria-label={unit.title}>
+            <section
+              key={unit.unit}
+              className={`card-soft p-4 ${placement}`}
+              aria-label={unit.title}
+            >
               {collapsible ? (
                 <button
                   type="button"
@@ -320,11 +339,19 @@ export function CurriculumPath() {
                   aria-label={`${t("Unit")} ${unit.unit} · ${unit.title}`}
                   className="flex min-h-12 w-full items-center gap-3 rounded-xl text-left"
                 >
-                  <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
+                  {allDone ? (
+                    <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
+                  ) : (
+                    <Lock className="size-4 shrink-0 text-muted-foreground" />
+                  )}
                   <span className="min-w-0 w-0 flex-1 truncate text-sm font-medium text-muted-foreground">
-                    {t("Unit")} {unit.unit} · {unit.title}
+                    {unit.title}
                   </span>
-                  {test?.passed ? (
+                  {!allDone ? (
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {unit.completed}/{unit.lessons.length}
+                    </span>
+                  ) : test?.passed ? (
                     <span className="shrink-0 text-xs font-medium text-[oklch(0.55_0.15_150)]">
                       {t("Test passed")}
                     </span>
@@ -363,41 +390,45 @@ export function CurriculumPath() {
             </section>
           );
         })}
-      </div>
 
-      <section className="card-soft p-5" aria-label="Final Test">
-        <div className="flex items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent">
-            <Trophy className="size-5 text-accent-foreground" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h3 className="font-semibold">
-              <span>Final Test</span>
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              <span>30 questions. Score 70% or more to move up to the next level.</span>
-            </p>
-          </div>
-          {path.finalTest.passed && (
-            <CheckCircle2 className="size-5 shrink-0 text-[oklch(0.55_0.15_150)]" />
-          )}
-        </div>
-        <Button
-          className="mt-4 w-full whitespace-normal"
-          disabled={!path.finalTest.unlocked}
-          onClick={() => navigate({ to: "/learning/final-test" })}
+        <section
+          className={`card-soft p-5 ${nextLesson ? "md:col-start-2" : "md:col-span-2"}`}
+          aria-label="Final Test"
         >
-          {path.finalTest.unlocked ? (
-            <>
-              <Trophy className="size-4" /> <span>Take the final test</span>
-            </>
-          ) : (
-            <>
-              <Lock className="size-4" /> <span>Finish the 30 lessons in Units 1–5 to unlock</span>
-            </>
-          )}
-        </Button>
-      </section>
+          <div className="flex items-center gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent">
+              <Trophy className="size-5 text-accent-foreground" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold">
+                <span>Final Test</span>
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                <span>30 questions. Score 70% or more to move up to the next level.</span>
+              </p>
+            </div>
+            {path.finalTest.passed && (
+              <CheckCircle2 className="size-5 shrink-0 text-[oklch(0.55_0.15_150)]" />
+            )}
+          </div>
+          <Button
+            className="mt-4 w-full whitespace-normal"
+            disabled={!path.finalTest.unlocked}
+            onClick={() => navigate({ to: "/learning/final-test" })}
+          >
+            {path.finalTest.unlocked ? (
+              <>
+                <Trophy className="size-4" /> <span>Take the final test</span>
+              </>
+            ) : (
+              <>
+                <Lock className="size-4" />{" "}
+                <span>Finish the 30 lessons in Units 1–5 to unlock</span>
+              </>
+            )}
+          </Button>
+        </section>
+      </div>
     </div>
   );
 }
