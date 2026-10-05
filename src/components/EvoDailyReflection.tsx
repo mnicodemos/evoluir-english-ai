@@ -1,4 +1,4 @@
-import { Hand, TreePine } from "lucide-react";
+import { TreePine } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import reflectionBg from "@/assets/reflection-bg.jpg.asset.json";
