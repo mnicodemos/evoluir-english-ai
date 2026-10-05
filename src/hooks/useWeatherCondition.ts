@@ -29,23 +29,18 @@ export const weatherIcons = {
   night: Moon,
 } as const;
 
-/**
- * Today's weather for "Weather talk". The location is never asked for on page
- * load: live weather is used only when the student taps "use my weather" or
- * already granted the permission before; otherwise sun/moon by the hour.
- */
+// Client-only visual enhancement: uses permitted geolocation and Open-Meteo;
+// the deterministic sun/moon icon remains the no-location fallback.
 export function useWeatherCondition() {
   const [now, setNow] = useState<Date | null>(null);
   const [condition, setCondition] = useState<WeatherCondition | null>(null);
-  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     setNow(new Date());
   }, []);
 
-  const requestLocation = useCallback(() => {
+  const refresh = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) return;
-    setLocating(true);
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const query = new URLSearchParams({
@@ -65,27 +60,20 @@ export function useWeatherCondition() {
             if (typeof current?.weather_code !== "number") return;
             setCondition(weatherConditionFromCode(current.weather_code, current.is_day !== 0));
           })
-          .catch(() => undefined)
-          .finally(() => setLocating(false));
+          .catch(() => undefined);
       },
-      () => setLocating(false),
+      () => undefined,
       { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 },
     );
   }, []);
 
-  // Silent refresh only when the permission was already granted earlier.
   useEffect(() => {
-    if (typeof navigator === "undefined" || !navigator.permissions?.query) return;
-    navigator.permissions
-      .query({ name: "geolocation" as PermissionName })
-      .then((status) => {
-        if (status.state === "granted") requestLocation();
-      })
-      .catch(() => undefined);
-  }, [requestLocation]);
+    refresh();
+  }, [refresh]);
 
   const activeCondition: WeatherCondition =
     condition ?? (now ? fallbackWeatherCondition(now) : "sunny");
 
-  return { condition: activeCondition, live: condition !== null, locating, requestLocation };
+  // isLive is false while we only have the time-of-day estimate (no location or API answer yet).
+  return { condition: activeCondition, isLive: condition !== null, refresh };
 }
