@@ -1178,4 +1178,10 @@ export const uiPt: Record<string, string> = {
   "Nothing here yet.": "Nada aqui ainda.",
   "Could not check your answer. Try again.":
     "Não foi possível verificar sua resposta. Tente novamente.",
+
+  // Writing side panel
+  "Writing focus": "Foco da escrita",
+  "Target length": "Tamanho esperado",
+  "Mistakes from your corrections come back here for review.":
+    "Os erros das suas correções voltam aqui para revisão.",
 };
