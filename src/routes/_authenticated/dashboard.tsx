@@ -19,6 +19,7 @@ import {
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { DashboardNotifications } from "@/components/DashboardNotifications";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { WeatherTalk } from "@/components/WeatherTalk";
@@ -188,12 +189,6 @@ function Dashboard() {
               }
               mobileTrailing={
                 <div className="flex items-center gap-2 whitespace-nowrap">
-                  <DashboardNotifications
-                    indicators={indicators}
-                    translate={t}
-                    placement="mobile"
-                  />
-                  <WeatherTalk translate={t} placement="mobile" />
                   <FirstWeekGuide profile={profile} placement="mobile" />
                   <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
                     {profile.level}
