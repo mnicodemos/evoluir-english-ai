@@ -232,6 +232,20 @@
   color: oklch(0.82 0.008 240) !important;
 }
 
+/* Follow the user's system theme: light-mode phones get light toasts. */
+@media (prefers-color-scheme: light) {
+  .dashboard-shell [data-sonner-toast] {
+    background-color: oklch(0.97 0.004 240 / 92%) !important;
+    color: oklch(0.22 0.01 240) !important;
+    border: 1px solid oklch(0.7 0.01 240 / 60%) !important;
+  }
+
+  .dashboard-shell [data-sonner-toast] [data-description],
+  .dashboard-shell [data-sonner-toast] [data-icon] {
+    color: oklch(0.35 0.01 240) !important;
+  }
+}
+
 .dashboard-shell .dashboard-panel {
   background-color: var(--card);
   color: var(--card-foreground);
