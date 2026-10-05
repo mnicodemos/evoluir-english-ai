@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { UiLangProvider } from "@/lib/uiLang";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { initSentry, setSentryUser } from "../lib/sentry";
 
 function NotFoundComponent() {
   return (
@@ -146,7 +147,12 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    initSentry();
+    supabase.auth.getSession().then(({ data }) => {
+      setSentryUser(data.session?.user.id ?? null);
+    });
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      setSentryUser(session?.user.id ?? null);
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
