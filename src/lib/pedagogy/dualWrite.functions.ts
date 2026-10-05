@@ -706,6 +706,11 @@ export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
       return { sourceId: submissionId, feedback: writingFeedbackFromRow(concurrent) };
     }
     await processWritingSafely(admin, context.userId, submissionId, key);
+    const { recordMistakes } = await import("@/lib/learningErrors.server");
+    await recordMistakes(admin, context.userId, feedback.mistakes, {
+      skill: "writing",
+      source: "writing",
+    });
     return { sourceId: submissionId, feedback };
   });
 

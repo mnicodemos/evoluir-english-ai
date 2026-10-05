@@ -568,6 +568,9 @@ export type Database = {
           id: string
           last_detected: string
           original_text: string
+          review_step: number
+          next_review_at: string
+          last_reviewed_at: string | null
           severity: string
           skill: string
           source: string
@@ -585,6 +588,9 @@ export type Database = {
           id?: string
           last_detected?: string
           original_text: string
+          review_step?: number
+          next_review_at?: string
+          last_reviewed_at?: string | null
           severity?: string
           skill: string
           source?: string
@@ -602,6 +608,9 @@ export type Database = {
           id?: string
           last_detected?: string
           original_text?: string
+          review_step?: number
+          next_review_at?: string
+          last_reviewed_at?: string | null
           severity?: string
           skill?: string
           source?: string

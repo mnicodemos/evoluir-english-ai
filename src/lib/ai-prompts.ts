@@ -144,7 +144,17 @@ export function parseConversationReport(raw: string): ConversationReport {
   return result.data;
 }
 
+/** One concrete mistake from a corrected text, kept for spaced review in "My mistakes". */
+export type WritingMistake = {
+  original: string;
+  corrected: string;
+  explanation: string;
+  category: string;
+};
+
 export type WritingFeedback = {
+  /** Up to five structured mistakes; older answers and rows have none. */
+  mistakes?: WritingMistake[];
   corrected: string;
   natural: string;
   explanations: string[];
@@ -163,8 +173,18 @@ const writingFeedbackSchema = z
     grammar: score,
     vocabulary: score,
     clarity: score,
+    // Structured mistakes are salvaged item by item below, so one malformed
+    // entry never invalidates the whole correction.
+    mistakes: z.array(z.unknown()).optional(),
   })
   .strict();
+
+const writingMistakeSchema = z.object({
+  original: z.string().trim().min(1).max(300),
+  corrected: z.string().trim().min(1).max(300),
+  explanation: z.string().trim().max(400).catch(""),
+  category: z.string().trim().max(40).catch("grammar"),
+});
 
 /** CEFR context for the correction. Resolved on the server, never sent by the browser. */
 export type WritingLevelGuidance = {
@@ -193,7 +213,10 @@ export function writingCorrectionMessages(
         "You are a CELTA English writing teacher for Brazilian learners. " +
         'Reply with strict JSON: {"corrected":"grammatically corrected version","natural":"how a native speaker would write it",' +
         '"explanations":["short explanation of each important mistake, in simple English"],"suggestions":["2-4 tips to improve"],' +
-        '"grammar":0-100,"vocabulary":0-100,"clarity":0-100}',
+        '"grammar":0-100,"vocabulary":0-100,"clarity":0-100,' +
+        '"mistakes":[{"original":"the exact wrong phrase copied from the student text","corrected":"the same phrase, corrected",' +
+        '"explanation":"one short line in simple English","category":"grammar|vocabulary|spelling|punctuation|word order"}]} ' +
+        "List in mistakes only real errors (at most 5, the most important first), each one short phrase, never the whole text.",
     },
     {
       role: "user",
@@ -209,5 +232,11 @@ export function parseWritingFeedback(raw: string, originalText: string): Writing
       "The AI returned invalid writing feedback. Your text was preserved; please try again.",
     );
   }
-  return result.data;
+  const mistakes = (result.data.mistakes ?? [])
+    .flatMap((item) => {
+      const parsed = writingMistakeSchema.safeParse(item);
+      return parsed.success && parsed.data.original !== parsed.data.corrected ? [parsed.data] : [];
+    })
+    .slice(0, 5);
+  return { ...result.data, mistakes };
 }
