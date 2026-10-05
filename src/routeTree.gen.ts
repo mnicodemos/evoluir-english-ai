@@ -13,7 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LandingRouteImport } from './routes/landing'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedBillingSuccessRouteImport } from './routes/_authenticated/billing-success'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
@@ -57,9 +59,19 @@ const LandingRoute = LandingRouteImport.update({
   path: '/landing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -189,7 +201,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -218,7 +232,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -249,7 +265,9 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
@@ -280,7 +298,9 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/landing'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/admin'
     | '/billing-success'
     | '/coach'
@@ -309,7 +329,9 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/landing'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/admin'
     | '/billing-success'
     | '/coach'
@@ -339,7 +361,9 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/landing'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/billing-success'
     | '/_authenticated/coach'
@@ -370,7 +394,9 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   LandingRoute: typeof LandingRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TermsRoute: typeof TermsRoute
   ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
@@ -409,11 +435,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -628,7 +668,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LandingRoute: LandingRoute,
+  PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TermsRoute: TermsRoute,
   ApiCoachStreamRoute: ApiCoachStreamRoute,
   ApiSpeechRoute: ApiSpeechRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,

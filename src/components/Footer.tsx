@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Instagram, Mail } from "lucide-react";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -70,12 +71,18 @@ export function Footer({
           >
             <p>{t.rights}</p>
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
-              <a href="#" className="transition-colors hover:text-foreground dark:hover:text-white">
+              <Link
+                to="/terms"
+                className="transition-colors hover:text-foreground dark:hover:text-white"
+              >
                 {t.terms}
-              </a>
-              <a href="#" className="transition-colors hover:text-foreground dark:hover:text-white">
+              </Link>
+              <Link
+                to="/privacy"
+                className="transition-colors hover:text-foreground dark:hover:text-white"
+              >
                 {t.privacy}
-              </a>
+              </Link>
               <a
                 href="mailto:evoluirmaisoficial@hotmail.com"
                 className="transition-colors hover:text-foreground dark:hover:text-white"
@@ -165,12 +172,18 @@ export function Footer({
         >
           <p>{t.rights}</p>
           <div className="flex items-center gap-5">
-            <a href="#" className="transition-colors hover:text-foreground dark:hover:text-white">
+            <Link
+              to="/terms"
+              className="transition-colors hover:text-foreground dark:hover:text-white"
+            >
               {t.terms}
-            </a>
-            <a href="#" className="transition-colors hover:text-foreground dark:hover:text-white">
+            </Link>
+            <Link
+              to="/privacy"
+              className="transition-colors hover:text-foreground dark:hover:text-white"
+            >
               {t.privacy}
-            </a>
+            </Link>
           </div>
         </div>
       </div>
