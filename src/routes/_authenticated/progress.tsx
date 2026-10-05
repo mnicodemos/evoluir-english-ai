@@ -57,6 +57,9 @@ function ProgressPage() {
   const { data: vocabProgress } = useVocabularyProgress();
 
   const { data: history, isLoading } = useProgressHistory(profile?.id, profile?.level);
+  const [chosenChart, setChartView] = useState<"scores" | "minutes" | null>(null);
+  // Scores first when there is assessed history; otherwise the minutes chart.
+  const chartView = chosenChart ?? (history && history.length > 0 ? "scores" : "minutes");
 
   const { data: learning } = useQuery({
     queryKey: ["learning-profile", profile?.id],
@@ -195,12 +198,41 @@ function ProgressPage() {
         <TabsContent value="history">
           <div className="mt-3 grid items-start gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
             <section className="card-soft p-3 sm:p-5">
-              <h2 className="text-base font-semibold sm:text-lg">{t("Evolution")}</h2>
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-base font-semibold sm:text-lg">{t("Evolution")}</h2>
+                {/* Below xl one chart at a time keeps the tab on one screen. */}
+                <div
+                  className="flex rounded-lg bg-secondary p-0.5 text-xs xl:hidden"
+                  role="group"
+                  aria-label={L("Chart", "Gráfico")}
+                >
+                  {(
+                    [
+                      ["scores", L("Scores", "Notas")],
+                      ["minutes", L("Minutes", "Minutos")],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={chartView === value}
+                      onClick={() => setChartView(value)}
+                      className={`min-h-8 rounded-md px-3 font-medium transition-colors ${
+                        chartView === value
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="grid gap-4 xl:grid-cols-2 xl:gap-8">
-                <div className="min-w-0">
+                <div className={`min-w-0 ${chartView === "scores" ? "" : "hidden xl:block"}`}>
                   {profile && <EvolutionChart userId={profile.id} level={profile.level} />}
                 </div>
-                <div className="min-w-0">
+                <div className={`min-w-0 ${chartView === "minutes" ? "" : "hidden xl:block"}`}>
                   {profile && <MinutesByDayChart userId={profile.id} level={profile.level} />}
                 </div>
               </div>
@@ -239,10 +271,12 @@ function ProgressPage() {
                 <section className="card-soft p-3 sm:p-5">
                   <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
                   <ul className="mt-2 divide-y divide-border sm:mt-4">
-                    {recent.map((a) => (
+                    {recent.map((a, index) => (
                       <li
                         key={a.id}
-                        className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm xl:py-2"
+                        className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm xl:py-2 ${
+                          index >= 3 ? "max-sm:hidden" : ""
+                        }`}
                       >
                         <span className="min-w-0">
                           <span className="block break-words font-medium">

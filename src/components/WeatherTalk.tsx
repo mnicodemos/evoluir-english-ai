@@ -55,7 +55,7 @@ export function WeatherTalk({
       </PopoverTrigger>
       <PopoverContent
         align={placement === "mobile" ? "end" : "start"}
-        className="dashboard-shell dark w-80 space-y-3 p-4"
+        className="dashboard-shell dark w-80 space-y-3 border-notification-border bg-popover/80 p-4 backdrop-blur-md backdrop-saturate-150"
       >
         <div className="flex items-center gap-2">
           <span className="grid size-9 place-items-center rounded-lg bg-brand-green/15 text-brand-green">
