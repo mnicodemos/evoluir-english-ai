@@ -19,10 +19,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { DashboardNotifications } from "@/components/DashboardNotifications";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
-import { EvoGuide } from "@/components/EvoGuide";
-import { WeatherTalk } from "@/components/WeatherTalk";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
