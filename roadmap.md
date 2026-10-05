@@ -230,6 +230,7 @@
 - [x] Limpeza técnica: dualWrite.functions.ts (771 → 292 linhas, núcleo em pedagogy/dualWriteCore.ts), curriculum.functions.ts (735 → 326, geração de lição em curriculumContent.server.ts) e VoiceCoach.tsx (664 → 493: cenários em coach/coachScenarios.ts, relatório em coach/SpeakingReport.tsx e transcrição reaproveitando lib/transcribe.ts, que estava duplicada).
 - [x] Proteção do Streak: faltar 1 dia por semana (seg–dom, São Paulo) não quebra a sequência. Aplicada só no banco (credit_study_day, migration 0038, coluna streak_freeze_used_on protegida contra escrita do navegador); o Dashboard mostra um floco de neve quando a proteção está cobrindo um dia.
 - [x] Modo shadowing no Listening: o botão "Shadowing: fale junto" toca a frase e grava ao mesmo tempo; mostra a porcentagem de palavras acompanhadas e o que foi dito. É só prática (não entra na nota da sessão), porque o microfone pode captar o áudio sem fone.
+- [x] Pronúncia por som no Vocabulary: abaixo de 70%, o aviso mostra a palavra com as letras que não foram ouvidas destacadas e diz em qual som prestar atenção (alinhamento letra a letra com o trecho mais parecido da transcrição; a nota continua a mesma).
 
 ## 2026-10-05 — Auditoria, bloco 2
 - [x] Envio de push com um helper único (src/lib/fcm.server.ts) para o aviso de atividades e o cron diário.
