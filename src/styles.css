@@ -245,9 +245,10 @@
     color: oklch(0.35 0.01 240) !important;
   }
 
-  /* The bell popup follows the phone theme too: a light-mode phone gets a
+/* The bell popup follows the phone theme too: a light-mode phone gets a
      light notification, still translucent over the dark dashboard. */
   .notification-popover.dashboard-shell.dark {
+    background-color: oklch(0.115 0.016 238 / 78%);
     --popover: oklch(0.97 0.004 240);
     --popover-foreground: oklch(0.24 0.01 240);
     --foreground: oklch(0.24 0.01 240);
