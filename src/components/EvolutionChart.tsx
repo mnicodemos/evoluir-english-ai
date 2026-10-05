@@ -40,6 +40,7 @@ export function useProgressHistory(userId: string | undefined, level: string | u
       const { data, error } = await supabase
         .from("progress")
         .select("*")
+        .eq("user_id", userId!)
         .eq("level", level!)
         .gte("recorded_at", since)
         .order("recorded_at", { ascending: true });
@@ -67,6 +68,7 @@ export function useSkillHistory(userId: string | undefined) {
       const { data, error } = await supabase
         .from("assessment_skill_results")
         .select("skill, score, assessed_at")
+        .eq("user_id", userId!)
         .gte("assessed_at", since)
         .order("assessed_at", { ascending: true });
       if (error) throw error;

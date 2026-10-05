@@ -112,7 +112,10 @@ function Vocabulary() {
     queryKey: ["user-vocabulary", profile?.id],
     enabled: !!profile,
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_vocabulary").select("*");
+      const { data, error } = await supabase
+        .from("user_vocabulary")
+        .select("*")
+        .eq("user_id", profile!.id);
       if (error) throw error;
       return data ?? [];
     },

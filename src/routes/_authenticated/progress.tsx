@@ -62,7 +62,11 @@ function ProgressPage() {
     queryKey: ["learning-profile", profile?.id],
     enabled: !!profile,
     queryFn: async () => {
-      const { data } = await supabase.from("learning_profile").select("*").maybeSingle();
+      const { data } = await supabase
+        .from("learning_profile")
+        .select("*")
+        .eq("user_id", profile!.id)
+        .maybeSingle();
       return data;
     },
   });
@@ -74,6 +78,7 @@ function ProgressPage() {
       const { data } = await supabase
         .from("activities")
         .select("id, title, activity_type, created_at, duration_minutes, score")
+        .eq("user_id", profile!.id)
         .eq("level", profile!.level)
         .order("created_at", { ascending: false })
         .limit(5);
