@@ -3,15 +3,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isAdminUser, listRegisteredUsers } from "@/lib/admin.functions";
+import { captureSentryException } from "@/lib/sentry";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
