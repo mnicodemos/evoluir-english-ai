@@ -29,12 +29,16 @@ export function coachReplyMessages(
   goal: string,
   studyContext: string | undefined,
   messages: { role: "user" | "assistant"; content: string }[],
+  rolePlay?: string,
 ): AiMsg[] {
   const cefr = findLevel(level);
   const system = [
     "You are a CELTA-certified English teacher.",
     `Student level: ${cefr.label}. ${cefr.descriptor} Goal: "${goal}".`,
     `Scenario — ${scenarioPrompts[scenario] ?? scenarioPrompts["everyday"]}`,
+    rolePlay
+      ? `Role-play — ${rolePlay} Stay in this role for the whole conversation and keep it realistic; the student plays themself. Tips about mistakes still start with 'Tip:'.`
+      : "",
     studyContext ? `Student history (personalise with it):\n${studyContext.slice(0, 900)}` : "",
     "Rules:",
     `- Speak English only, strictly at ${cefr.cefr}: grammar, vocabulary and speed the student can follow.`,

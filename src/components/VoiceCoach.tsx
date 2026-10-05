@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-import { Loader2, Mic, MicOff, Sparkles, Volume2 } from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles, Star, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -34,7 +34,9 @@ import { transcribeAudio } from "@/lib/transcribe";
 import {
   loadUsedOpeners,
   rememberOpener,
+  rolePlaysForGoal,
   scenarioOfTheDay,
+  type RolePlay,
 } from "@/components/coach/coachScenarios";
 import { SpeakingReport } from "@/components/coach/SpeakingReport";
 
@@ -55,6 +57,8 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   // The conversation always follows the CEFR level the student actually reached.
   const cefrLevel = getLevelState(profile?.level).current.value;
   const [scenario, setScenario] = useState<string | null>(null);
+  // A real-life situation where EVO plays a role (null = free conversation).
+  const [rolePlay, setRolePlay] = useState<RolePlay | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [report, setReport] = useState<ConversationReport | null>(null);
@@ -123,6 +127,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   async function start(offset = 0) {
     const selected = scenarioOfTheDay(offset);
     stopSpeaking();
+    setRolePlay(null);
     setScenario(selected.id);
     setReport(null);
     setMessages([]);
@@ -219,6 +224,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
           profile?.goal ?? "conversation",
           buildStudyContext(snapshot),
           next.slice(-8),
+          rolePlay?.role,
         ),
         (delta) => {
           streamedReply += delta;
@@ -328,6 +334,17 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
               ? "EVO is speaking… tap the microphone to answer now"
               : "Tap the microphone and speak in English";
 
+  /** Starts a real-life role-play; its fixed opener plays right away. */
+  const startRolePlay = (play: RolePlay) => {
+    cancelVoiceRecording();
+    stopSpeaking();
+    setRolePlay(play);
+    setScenario(play.scenario);
+    setReport(null);
+    setMessages([{ role: "assistant", content: play.opener }]);
+    void playResponse(play.opener);
+  };
+
   const newTopic = () => {
     cancelVoiceRecording();
     topicOffset.current += 1;
@@ -340,17 +357,48 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">AI Speaking</h1>
           <p className="max-w-full text-sm leading-snug text-muted-foreground">
-            Voice conversation · the AI chooses today's subject
+            {rolePlay ? (
+              <>
+                <span>Real situation</span> · <span>{rolePlay.label}</span>
+              </>
+            ) : (
+              "Voice conversation · the AI chooses today's subject"
+            )}
           </p>
         </div>
       </div>
 
       {userAnswers === 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3 text-sm">
-          <span className="text-muted-foreground">Don't like today's topic?</span>
-          <Button size="sm" variant="outline" disabled={isProcessingAnswer} onClick={newTopic}>
-            New topic
-          </Button>
+        <div className="space-y-2 rounded-xl border border-border bg-card p-2.5 text-sm sm:flex sm:items-center sm:gap-3 sm:space-y-0">
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="text-muted-foreground">Don't like today's topic?</span>
+            <Button size="sm" variant="outline" disabled={isProcessingAnswer} onClick={newTopic}>
+              New topic
+            </Button>
+          </div>
+          {/* Real situations: one compact row that scrolls sideways on small screens. */}
+          <div className="-mx-1 flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto px-1 pb-0.5">
+            <span className="shrink-0 text-xs text-muted-foreground">
+              Or practise a real situation:
+            </span>
+            {rolePlaysForGoal(profile?.goal).map((play, index) => (
+              <button
+                key={play.id}
+                type="button"
+                disabled={isProcessingAnswer}
+                onClick={() => startRolePlay(play)}
+                title={index === 0 ? "Suggested for your study plan goal" : undefined}
+                className={`inline-flex h-7 shrink-0 items-center gap-1 rounded-full border px-2.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+                  rolePlay?.id === play.id
+                    ? "border-brand-green bg-brand-green/15 text-brand-green"
+                    : "border-border hover:bg-accent/50"
+                }`}
+              >
+                {index === 0 && <Star className="size-3 fill-current text-amber-400" />}
+                {play.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

@@ -231,6 +231,7 @@
 - [x] Proteção do Streak: faltar 1 dia por semana (seg–dom, São Paulo) não quebra a sequência. Aplicada só no banco (credit_study_day, migration 0038, coluna streak_freeze_used_on protegida contra escrita do navegador); o Dashboard mostra um floco de neve quando a proteção está cobrindo um dia.
 - [x] Modo shadowing no Listening: o botão "Shadowing: fale junto" toca a frase e grava ao mesmo tempo; mostra a porcentagem de palavras acompanhadas e o que foi dito. É só prática (não entra na nota da sessão), porque o microfone pode captar o áudio sem fone.
 - [x] Pronúncia por som no Vocabulary: abaixo de 70%, o aviso mostra a palavra com as letras que não foram ouvidas destacadas e diz em qual som prestar atenção (alinhamento letra a letra com o trecho mais parecido da transcrição; a nota continua a mesma).
+- [x] Situações reais no AI Speaking: 6 role-plays (entrevista de emprego, reunião de equipe, check-in no hotel, restaurante, aeroporto, médico) com abertura fixa e a EVO no papel; a primeira sugerida segue o objetivo do Plano de estudo (⭐). O relatório usa a categoria da situação.
 
 ## 2026-10-05 — Auditoria, bloco 2
 - [x] Envio de push com um helper único (src/lib/fcm.server.ts) para o aviso de atividades e o cron diário.
