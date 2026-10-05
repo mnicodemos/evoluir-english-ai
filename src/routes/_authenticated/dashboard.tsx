@@ -528,20 +528,12 @@ function Dashboard() {
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-6 xl:gap-3">
               {quickAccess.map((item) => {
-                const hasNew = Boolean(
-                  (indicators as Record<string, boolean>)[item.to.replace("/", "")],
-                );
                 return (
                   <Link
                     key={item.to}
                     to={item.to}
                     className={`dashboard-quick-link group relative grid min-h-7 min-w-0 grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-0 px-2 py-1 text-foreground transition-[filter,transform] hover:brightness-110 lg:hover:-translate-y-0.5 xl:h-full xl:min-h-12 xl:grid-cols-[3rem_minmax(0,1fr)_auto] xl:px-3.5 xl:py-2 ${item.mobileOrder}`}
                   >
-                    {hasNew && (
-                      <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-brand-green">
-                        <span className="sr-only">{t("New activity available")}</span>
-                      </span>
-                    )}
                     <span className="dashboard-quick-icon grid shrink-0 place-items-center">
                       <item.icon className="size-4 xl:size-[1.65rem]" strokeWidth={2.4} />
                     </span>
