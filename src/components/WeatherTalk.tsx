@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useWeatherCondition, weatherIcons } from "@/hooks/useWeatherCondition";
 import { speakEnglish } from "@/lib/speech";
+import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
 import { WEATHER_TALK } from "@/lib/weatherTalk";
 
 /**
@@ -46,7 +47,7 @@ export function WeatherTalk({
           title={translate("Weather talk")}
           className={
             placement === "mobile"
-              ? "size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+              ? `relative size-8 shrink-0 rounded-full ${graphiteIconButtonClass}`
               : "size-7 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
           }
         >
@@ -55,7 +56,8 @@ export function WeatherTalk({
       </PopoverTrigger>
       <PopoverContent
         align={placement === "mobile" ? "end" : "start"}
-        className="dashboard-shell dark w-80 space-y-3 border-notification-border bg-popover/80 p-4 backdrop-blur-md backdrop-saturate-150"
+        sideOffset={8}
+        className={`dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] space-y-3 p-4 ${graphitePanelClass}`}
       >
         <div className="flex items-center gap-2">
           <span className="grid size-9 place-items-center rounded-lg bg-brand-green/15 text-brand-green">
@@ -73,7 +75,7 @@ export function WeatherTalk({
           type="button"
           onClick={() => void hear(talk.sentence)}
           disabled={speaking}
-          className="flex w-full items-start gap-2 rounded-lg border border-border bg-secondary/40 p-2.5 text-left text-sm transition-colors hover:bg-accent/50"
+          className="flex w-full items-start gap-2 rounded-lg border border-white/10 bg-white/5 p-2.5 text-left text-sm transition-colors hover:bg-white/10"
         >
           <Volume2 className="mt-0.5 size-4 shrink-0 text-brand-green" aria-hidden="true" />
           <span>{talk.sentence}</span>
@@ -86,7 +88,7 @@ export function WeatherTalk({
                 type="button"
                 onClick={() => void hear(word)}
                 disabled={speaking}
-                className="flex w-full items-center justify-between gap-3 rounded-md px-1.5 py-1 text-sm transition-colors hover:bg-accent/50"
+                className="flex w-full items-center justify-between gap-3 rounded-md px-1.5 py-1 text-sm transition-colors hover:bg-white/10"
               >
                 <span className="flex items-center gap-1.5 font-medium">
                   <Volume2 className="size-3.5 text-muted-foreground" aria-hidden="true" />
@@ -107,7 +109,7 @@ export function WeatherTalk({
         </Button>
 
         {!live && (
-          <div className="border-t border-border pt-2.5">
+          <div className="border-t border-white/10 pt-2.5">
             <Button
               variant="ghost"
               size="sm"

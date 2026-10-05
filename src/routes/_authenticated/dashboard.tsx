@@ -35,7 +35,7 @@ import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
-import { WeatherButton } from "@/components/WeatherButton";
+import { WeatherTalk } from "@/components/WeatherTalk";
 import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -252,7 +252,10 @@ function Dashboard() {
               name={profile.name}
               placement="dashboard-header"
               desktopSubtitleTrailing={
-                <DashboardNotifications indicators={indicators} translate={t} placement="desktop" />
+                <div className="flex items-center gap-1">
+                  <DashboardNotifications indicators={indicators} translate={t} placement="desktop" />
+                  <WeatherTalk translate={t} placement="desktop" />
+                </div>
               }
               mobileTrailing={
                 <div className="flex items-center justify-end gap-2 whitespace-nowrap">
@@ -267,7 +270,7 @@ function Dashboard() {
                       {streakDays} {t("days")}
                     </span>
                   </span>
-                  <WeatherButton translate={t} />
+                  <WeatherTalk translate={t} placement="mobile" />
                   <DashboardNotifications
                     indicators={indicators}
                     translate={t}
