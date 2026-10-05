@@ -38,6 +38,27 @@ export const uiPt: Record<string, string> = {
   "Notifications off": "Notificações desativadas",
   "New activities available": "Novas atividades disponíveis",
   "New vocabulary words": "Novas palavras no Vocabulário",
+  "Today's session": "Sessão de hoje",
+  "In progress": "Em andamento",
+  "Up next": "A seguir",
+  "Pronunciation focus": "Foco de pronúncia",
+  "Last result": "Último resultado",
+  "Listen once at normal speed, then word by word.":
+    "Ouça uma vez na velocidade normal e depois palavra por palavra.",
+  "Say every word clearly, including the endings.":
+    "Pronuncie cada palavra com clareza, inclusive as terminações.",
+  "Repeat right after the audio, while it is fresh.":
+    "Repita logo depois do áudio, enquanto ainda está fresco.",
+  "Keep the rhythm without pausing between ideas.": "Mantenha o ritmo sem pausar entre as ideias.",
+  "Reduce small words (to, of, and) as natives do.":
+    "Reduza palavras pequenas (to, of, and) como os nativos fazem.",
+  "Match the rise and fall of the speaker's voice.":
+    "Acompanhe a subida e a descida da voz de quem fala.",
+  "Stress the content words: nouns, verbs and adjectives.":
+    "Dê ênfase às palavras de conteúdo: substantivos, verbos e adjetivos.",
+  "Link words together instead of saying them one by one.":
+    "Ligue as palavras em vez de dizê-las uma a uma.",
+  "Copy the rise and fall of the sentence.": "Imite a subida e a descida da entonação da frase.",
   "New words from your last lesson are ready to practise.":
     "As palavras novas da sua última aula estão prontas para praticar.",
   "New listening activity": "Nova atividade de escuta",

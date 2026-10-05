@@ -60,3 +60,10 @@ describe("listening level configuration", () => {
     expect(picked).toContain("Open your book now.");
   });
 });
+
+describe("pickListeningSentences fallback", () => {
+  it("uses the level's built-in drills when no sentence fits its word range", () => {
+    const config = listeningLevelConfig("b2");
+    expect(pickListeningSentences({ config, rotation: 5, count: 3 })).toHaveLength(3);
+  });
+});
