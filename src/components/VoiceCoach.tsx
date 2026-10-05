@@ -427,6 +427,10 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   }
 
   const userAnswers = messages.filter((message) => message.role === "user").length;
+  const lastAssistantIndex = messages.reduce(
+    (last, message, index) => (message.role === "assistant" ? index : last),
+    -1,
+  );
   const hasEnoughAnswers = userAnswers >= 3;
   const isProcessingAnswer =
     voiceState === "recording" ||
@@ -444,7 +448,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
           : voiceState === "thinking"
             ? "Preparing a reply…"
             : voiceState === "speaking"
-              ? "AI Speaking is speaking…"
+              ? "EVO is speaking… tap the microphone to answer now"
               : "Tap the microphone and speak in English";
 
   const newTopic = () => {
@@ -480,7 +484,11 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
               <Message key={`${message.role}-${index}`} from={message.role}>
                 <MessageContent
                   className={
-                    message.role === "user" ? "bg-primary text-primary-foreground" : undefined
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : index === lastAssistantIndex
+                        ? "text-base leading-relaxed sm:text-lg"
+                        : undefined
                   }
                 >
                   <MessageResponse>{message.content}</MessageResponse>
@@ -524,9 +532,10 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
                   .find((message) => message.role === "assistant");
                 if (last) void playResponse(last.content);
               }}
+              title="Replay"
               className={
                 voiceState === "speaking"
-                  ? "bg-success text-success-foreground hover:bg-success/90"
+                  ? "bg-brand-green/15 text-brand-green hover:bg-brand-green/25"
                   : ""
               }
             >
@@ -543,7 +552,13 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
                 voiceState === "transcribing"
               }
               style={{ width: "4.8rem", height: "4.8rem" }}
-              className={`rounded-full ${voiceState === "recording" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}`}
+              className={`rounded-full ${
+                voiceState === "recording"
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : voiceState === "speaking"
+                    ? "bg-brand-green/20 text-brand-green ring-2 ring-brand-green/40 hover:bg-brand-green/30"
+                    : ""
+              }`}
             >
               {voiceState === "recording" ? (
                 <MicOff className="size-[2.1rem]" />
@@ -564,13 +579,23 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
         <Button
           className="w-full"
           size="lg"
-          variant="outline"
+          variant={hasEnoughAnswers ? "default" : "outline"}
           onClick={finish}
           disabled={!canFinish}
         >
           {finishing ? <Loader2 className="animate-spin" /> : <Sparkles />}{" "}
           <span>Finish session and get my report</span>
         </Button>
+        <div className="flex items-center justify-center gap-1.5 pt-1" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className={`size-2.5 rounded-full ${
+                i < Math.min(userAnswers, 3) ? "bg-brand-green" : "bg-muted"
+              }`}
+            />
+          ))}
+        </div>
         <p className="text-xs text-muted-foreground">
           {hasEnoughAnswers ? (
             <span className="text-success font-medium">
