@@ -1184,4 +1184,9 @@ export const uiPt: Record<string, string> = {
   "Target length": "Tamanho esperado",
   "Mistakes from your corrections come back here for review.":
     "Os erros das suas correções voltam aqui para revisão.",
+
+  // Streak protection
+  "Streak protection: missing one day per week does not break your streak.":
+    "Proteção do Streak: faltar um dia por semana não quebra sua sequência.",
+  "Streak protected this week": "Streak protegido nesta semana",
 };

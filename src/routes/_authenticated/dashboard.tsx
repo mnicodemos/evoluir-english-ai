@@ -6,6 +6,7 @@ import {
   Check,
   Clock,
   Flame,
+  Snowflake,
   GraduationCap,
   Headphones,
   Map,
@@ -34,6 +35,8 @@ import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
+import { streakAlive } from "@/lib/streakFreeze";
+import { studyToday } from "@/lib/today";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -147,6 +150,11 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const streakDays = profile ? effectiveStreak(profile) : 0;
+  // A missed day this week covered by the streak protection (one per week).
+  const protectedDay = profile
+    ? streakAlive(profile.last_activity_date, profile.streak_freeze_used_on, studyToday())
+        .protectedDay
+    : null;
   const nextLeague = profile ? getNextLeague(streakDays) : null;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
 
@@ -283,7 +291,10 @@ function Dashboard() {
               <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
             </div>
 
-            <div className="hidden min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
+            <div
+              className="hidden min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex sm:flex-row sm:gap-3 sm:px-3 sm:text-left"
+              title={t("Streak protection: missing one day per week does not break your streak.")}
+            >
               <Flame
                 className="size-6 shrink-0 fill-current text-current sm:hidden"
                 style={{ color: getLeague(streakDays).from }}
@@ -294,8 +305,14 @@ function Dashboard() {
                 strokeWidth={2.4}
               />
               <div className="min-w-0 flex-1">
-                <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">
-                  {streakDays} days
+                <p className="flex items-center gap-1 font-display text-[13px] font-bold leading-tight sm:text-base">
+                  <span className="sm:truncate">{streakDays} days</span>
+                  {protectedDay && (
+                    <Snowflake
+                      className="size-4 shrink-0 text-sky-400"
+                      aria-label={t("Streak protected this week")}
+                    />
+                  )}
                 </p>
                 <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">
                   {t("Study streak")}
