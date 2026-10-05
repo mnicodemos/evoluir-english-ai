@@ -1,8 +1,16 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 
-import { CheckCircle2, Loader2, PenLine, Wand2 } from "lucide-react";
+import {
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  Loader2,
+  PenLine,
+  SpellCheck,
+  Wand2,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -308,7 +316,7 @@ function Writing() {
       <p className="mt-1 text-sm font-medium text-muted-foreground">
         Writing Practice • {config.label} — {config.focus}
       </p>
-      <p className="mt-2 hidden text-muted-foreground sm:block">
+      <p className="mt-2 hidden text-muted-foreground sm:block xl:hidden">
         One task for Everyday, Professional and Travel English, at your level. New tasks every day
         and every time you start a new lesson — nothing repeats.
       </p>
@@ -318,152 +326,240 @@ function Writing() {
         </Button>
       )}
 
-      <div className="mt-4 grid grid-cols-3 gap-2 sm:mt-7 sm:gap-3">
-        {prompts.map((p, index) => {
-          const category = WRITING_CATEGORIES[index]!;
-          const isDone = done.includes(p);
-          const isActive = prompt === p;
-          return (
-            <button
-              key={p}
-              onClick={() => selectPrompt(p)}
-              title={isDone ? "Checked — click to redo" : undefined}
-              className={`card-soft flex h-full flex-col gap-1.5 p-2.5 text-left transition-colors sm:p-4 ${
-                isDone
-                  ? "opacity-70 hover:bg-accent/50"
-                  : isActive
-                    ? "border-brand-green! ring-2 ring-brand-green/40!"
-                    : "hover:bg-accent/50"
-              }`}
-            >
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-tight tracking-wide text-muted-foreground sm:text-xs">
-                {isDone ? (
-                  <CheckCircle2 className="size-3.5 text-green-600" />
-                ) : (
-                  <PenLine className="size-3.5" />
-                )}
-                {category.label}
-              </span>
-              <span className="hidden text-sm font-medium sm:block">{p}</span>
-              <span className="mt-auto hidden pt-2 text-xs text-muted-foreground sm:block">
-                {isDone ? "Checked · click to redo" : category.hint}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <section className="card-soft mt-3 p-4 sm:mt-5 sm:p-6">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-          <label className="min-w-0 break-words text-sm font-medium">
-            {allDone ? <span>Today's tasks</span> : prompt}
-          </label>
-          <span className="text-sm text-muted-foreground">
-            <span>
-              {done.length}/{prompts.length}{" "}
-            </span>
-            <span>done</span>
-          </span>
-        </div>
-
-        {allDone ? (
-          <div className="mt-6 rounded-xl border border-green-500/40 bg-green-500/10 p-5 text-center">
-            <CheckCircle2 className="mx-auto size-8 text-green-600" />
-            <p className="mt-2 font-semibold">All 3 writing tasks completed!</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              New writing tasks arrive tomorrow, or as soon as you start a new lesson in the
-              Learning Center.
-            </p>
-            <Button variant="outline" className="mt-4" onClick={redoPrompt}>
-              Redo this task to improve your score
-            </Button>
+      {/* Wide desktop: practice on the left, session status and level focus on
+          the right (like Listening); below the practice on smaller screens. */}
+      <div className="mt-4 grid items-start gap-5 sm:mt-7 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,1fr)]">
+        <div className="min-w-0">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            {prompts.map((p, index) => {
+              const category = WRITING_CATEGORIES[index]!;
+              const isDone = done.includes(p);
+              const isActive = prompt === p;
+              return (
+                <button
+                  key={p}
+                  onClick={() => selectPrompt(p)}
+                  title={isDone ? "Checked — click to redo" : undefined}
+                  className={`card-soft flex h-full flex-col gap-1.5 p-2.5 text-left transition-colors sm:p-4 ${
+                    isDone
+                      ? "opacity-70 hover:bg-accent/50"
+                      : isActive
+                        ? "border-brand-green! ring-2 ring-brand-green/40!"
+                        : "hover:bg-accent/50"
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-tight tracking-wide text-muted-foreground sm:text-xs">
+                    {isDone ? (
+                      <CheckCircle2 className="size-3.5 text-green-600" />
+                    ) : (
+                      <PenLine className="size-3.5" />
+                    )}
+                    {category.label}
+                  </span>
+                  <span className="hidden text-sm font-medium sm:block">{p}</span>
+                  <span className="mt-auto hidden pt-2 text-xs text-muted-foreground sm:block">
+                    {isDone ? "Checked · click to redo" : category.hint}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        ) : currentDone ? (
-          <div className="mt-6 rounded-xl border border-green-500/40 bg-green-500/10 p-5 text-center">
-            <CheckCircle2 className="mx-auto size-8 text-green-600" />
-            <p className="mt-2 font-semibold">This task is already checked.</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Want a better score? Redo it and submit a new version.
-            </p>
-            <Button variant="outline" className="mt-4" onClick={redoPrompt}>
-              Redo this task
-            </Button>
-          </div>
-        ) : (
-          <>
-            <Textarea
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-                saveDraft(prompt, e.target.value);
-              }}
-              onKeyDown={(e) => {
-                // Ctrl/Cmd + Enter sends the text, like other chat and editor tools.
-                if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !loading) {
-                  e.preventDefault();
-                  void analyse();
-                }
-              }}
-              onFocus={(event) => {
-                window.setTimeout(
-                  () => event.currentTarget.scrollIntoView({ block: "center" }),
-                  150,
-                );
-              }}
-              rows={9}
-              placeholder="Write your answer in English…"
-              className="mt-4 min-h-44 scroll-mb-40 text-base sm:mt-5 sm:min-h-52"
-            />
-            <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+          <section className="card-soft mt-3 p-4 sm:mt-5 sm:p-6">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+              <label className="min-w-0 break-words text-sm font-medium">
+                {allDone ? <span>Today's tasks</span> : prompt}
+              </label>
               <span className="text-sm text-muted-foreground">
-                {text.trim().split(/\s+/).filter(Boolean).length} words · <span>target</span>{" "}
-                {expectedLengthLabel(config)}
+                <span>
+                  {done.length}/{prompts.length}{" "}
+                </span>
+                <span>done</span>
               </span>
-              <Button className="w-full sm:w-auto" onClick={analyse} disabled={loading}>
-                {loading ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <Wand2 className="size-4" />
-                )}
-                Correct my text
-              </Button>
             </div>
-          </>
-        )}
-      </section>
 
-      {(() => {
-        // Every corrected task of this round stays visible for review, the
-        // current one first, until a new set of tasks is generated.
-        const order = [prompt, ...prompts.filter((p) => p !== prompt)];
-        const entries = order
-          .map((p) => ({ p, r: p === prompt && result ? result : results[p] }))
-          .filter(
-            (e): e is { p: string; r: WritingFeedback } =>
-              !!e.r && (done.includes(e.p) || (e.p === prompt && !!result)),
-          );
-        return entries.map(({ p, r }, i) => (
-          <section key={p} className="mt-6 space-y-5 animate-rise">
-            {(entries.length > 1 || p !== prompt) && (
-              <h2 className="text-sm font-semibold text-muted-foreground">{p}</h2>
-            )}
-            {answers[p] && (
-              <div className="card-soft p-6">
-                <h3 className="font-semibold">Your text</h3>
-                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{answers[p]}</p>
-              </div>
-            )}
-            <WritingResultView result={r} />
-            {i === 0 && p === prompt && result && !allDone && (
-              <div className="flex justify-end">
-                <Button variant="outline" onClick={nextPrompt}>
-                  Next task ({done.length}/{prompts.length} done)
+            {allDone ? (
+              <div className="mt-6 rounded-xl border border-green-500/40 bg-green-500/10 p-5 text-center">
+                <CheckCircle2 className="mx-auto size-8 text-green-600" />
+                <p className="mt-2 font-semibold">All 3 writing tasks completed!</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  New writing tasks arrive tomorrow, or as soon as you start a new lesson in the
+                  Learning Center.
+                </p>
+                <Button variant="outline" className="mt-4" onClick={redoPrompt}>
+                  Redo this task to improve your score
                 </Button>
               </div>
+            ) : currentDone ? (
+              <div className="mt-6 rounded-xl border border-green-500/40 bg-green-500/10 p-5 text-center">
+                <CheckCircle2 className="mx-auto size-8 text-green-600" />
+                <p className="mt-2 font-semibold">This task is already checked.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Want a better score? Redo it and submit a new version.
+                </p>
+                <Button variant="outline" className="mt-4" onClick={redoPrompt}>
+                  Redo this task
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Textarea
+                  value={text}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    saveDraft(prompt, e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    // Ctrl/Cmd + Enter sends the text, like other chat and editor tools.
+                    if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !loading) {
+                      e.preventDefault();
+                      void analyse();
+                    }
+                  }}
+                  onFocus={(event) => {
+                    window.setTimeout(
+                      () => event.currentTarget.scrollIntoView({ block: "center" }),
+                      150,
+                    );
+                  }}
+                  rows={9}
+                  placeholder="Write your answer in English…"
+                  className="mt-4 min-h-44 scroll-mb-40 text-base sm:mt-5 sm:min-h-52"
+                />
+                <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    {text.trim().split(/\s+/).filter(Boolean).length} words · <span>target</span>{" "}
+                    {expectedLengthLabel(config)}
+                  </span>
+                  <Button className="w-full sm:w-auto" onClick={analyse} disabled={loading}>
+                    {loading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Wand2 className="size-4" />
+                    )}
+                    Correct my text
+                  </Button>
+                </div>
+              </>
             )}
           </section>
-        ));
-      })()}
+
+          {(() => {
+            // Every corrected task of this round stays visible for review, the
+            // current one first, until a new set of tasks is generated.
+            const order = [prompt, ...prompts.filter((p) => p !== prompt)];
+            const entries = order
+              .map((p) => ({ p, r: p === prompt && result ? result : results[p] }))
+              .filter(
+                (e): e is { p: string; r: WritingFeedback } =>
+                  !!e.r && (done.includes(e.p) || (e.p === prompt && !!result)),
+              );
+            return entries.map(({ p, r }, i) => (
+              <section key={p} className="mt-6 space-y-5 animate-rise">
+                {(entries.length > 1 || p !== prompt) && (
+                  <h2 className="text-sm font-semibold text-muted-foreground">{p}</h2>
+                )}
+                {answers[p] && (
+                  <div className="card-soft p-6">
+                    <h3 className="font-semibold">Your text</h3>
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{answers[p]}</p>
+                  </div>
+                )}
+                <WritingResultView result={r} />
+                {i === 0 && p === prompt && result && !allDone && (
+                  <div className="flex justify-end">
+                    <Button variant="outline" onClick={nextPrompt}>
+                      Next task ({done.length}/{prompts.length} done)
+                    </Button>
+                  </div>
+                )}
+              </section>
+            ));
+          })()}
+        </div>
+
+        <aside className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+          {/* The task cards above already show this on smaller screens. */}
+          <section className="card-soft hidden p-4 xl:block">
+            <h2 className="text-sm font-semibold">Today's tasks</h2>
+            <ol className="mt-2.5 space-y-1.5">
+              {prompts.map((p, index) => {
+                const isDone = done.includes(p);
+                const current = p === prompt && !isDone;
+                const feedback = results[p];
+                const score = feedback
+                  ? Math.round((feedback.grammar + feedback.vocabulary + feedback.clarity) / 3)
+                  : null;
+                return (
+                  <li key={p}>
+                    <button
+                      type="button"
+                      onClick={() => selectPrompt(p)}
+                      className={`flex w-full items-center gap-3 rounded-lg border px-3 py-1.5 text-left text-sm transition-colors hover:bg-accent/50 ${
+                        current ? "border-brand-green/50 bg-brand-green/10" : "border-border"
+                      }`}
+                    >
+                      <span
+                        className={`grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${
+                          isDone ? "bg-brand-green text-sidebar" : "bg-secondary"
+                        }`}
+                      >
+                        {isDone ? <Check className="size-3.5" /> : index + 1}
+                      </span>
+                      <span className="min-w-0 flex-1">{WRITING_CATEGORIES[index]!.label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {isDone ? (
+                          score != null ? (
+                            `${score}%`
+                          ) : (
+                            <span>Checked</span>
+                          )
+                        ) : current ? (
+                          <span>In progress</span>
+                        ) : (
+                          <span>Up next</span>
+                        )}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+
+          <section className="card-soft p-4">
+            <h2 className="text-sm font-semibold">
+              <span>Writing focus</span> · {config.label}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">{config.focus}</p>
+            <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
+              {config.priorities.map((tip) => (
+                <li key={tip} className="flex gap-2">
+                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-green" />
+                  <span className="block first-letter:uppercase">{tip}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
+              <span>Target length</span> · {expectedLengthLabel(config)}
+            </p>
+          </section>
+
+          <Link
+            to="/mistakes"
+            className="card-soft flex items-center gap-3 p-4 transition-colors hover:bg-accent/50"
+          >
+            <SpellCheck className="size-5 shrink-0 text-brand-green" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-semibold">My mistakes</span>
+              <span className="block text-xs text-muted-foreground">
+                Mistakes from your corrections come back here for review.
+              </span>
+            </span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </Link>
+        </aside>
+      </div>
     </AppShell>
   );
 }
