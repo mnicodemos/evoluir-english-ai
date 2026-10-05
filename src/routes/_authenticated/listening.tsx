@@ -17,7 +17,6 @@ import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useRoundStart, useSavedPractice } from "@/hooks/usePracticeSync";
@@ -30,7 +29,9 @@ import {
   sentencesFromText,
   type ListeningLevelConfig,
 } from "@/lib/listeningLevels";
+import { formatDate } from "@/lib/formatDate";
 import { speakEnglish } from "@/lib/speech";
+import { useUiLang } from "@/lib/uiLang";
 import { transcribeAudio } from "@/lib/transcribe";
 import {
   cancelVoiceRecording,
@@ -132,7 +133,29 @@ function readCompletion(): CompletionMap {
   }
 }
 
+/** Three short pronunciation tips for the student's CEFR band. */
+function listeningTips(level: string): string[] {
+  if (level === "a1" || level === "a2")
+    return [
+      "Listen once at normal speed, then word by word.",
+      "Say every word clearly, including the endings.",
+      "Repeat right after the audio, while it is fresh.",
+    ];
+  if (level === "c1" || level === "c2")
+    return [
+      "Keep the rhythm without pausing between ideas.",
+      "Reduce small words (to, of, and) as natives do.",
+      "Match the rise and fall of the speaker's voice.",
+    ];
+  return [
+    "Stress the content words: nouns, verbs and adjectives.",
+    "Link words together instead of saying them one by one.",
+    "Copy the rise and fall of the sentence.",
+  ];
+}
+
 function ListeningPage() {
+  const { lang } = useUiLang();
   const { data: profile } = useProfile();
   const { data: lessons } = useLessons();
   const queryClient = useQueryClient();
@@ -402,7 +425,7 @@ function ListeningPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell mobileOneScreen>
       <div className="space-y-6">
         <header>
           <p className="text-sm text-muted-foreground">
@@ -410,11 +433,11 @@ function ListeningPage() {
             <span> • {config.label}</span>
           </p>
           <h1 className="text-2xl font-semibold">Train your ear with real English</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
             Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
             activity — a new set arrives every time you start a new lesson in the Learning Center.
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground xl:hidden">
             <span>Pronunciation</span>
             <span> • {config.label} — </span>
             <span>{config.focus}</span>
@@ -445,127 +468,227 @@ function ListeningPage() {
             </div>
           </section>
         ) : (
-          <section className="card-soft space-y-5 p-6">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-muted-foreground">
-                <span>Sentence</span>
-                <span> {index + 1} </span>
-                <span>of</span>
-                <span> {sentences.length}</span>
-              </p>
-              <p className="text-sm font-medium">
-                <span>Accuracy</span>
-                <span> {average}%</span>
-              </p>
-            </div>
-            <Progress
-              value={((index + (checked !== null ? 1 : 0)) / Math.max(1, sentences.length)) * 100}
-            />
+          // Desktop: the practice stage on the left, today's session and the
+          // level focus on the right. Phones stack them in the same order.
+          <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,1fr)]">
+            <section className="card-soft space-y-6 p-5 sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <p className="text-sm text-muted-foreground">
+                    <span>Sentence</span>
+                    <span> {index + 1} </span>
+                    <span>of</span>
+                    <span> {sentences.length}</span>
+                  </p>
+                  <span className="flex gap-1.5" aria-hidden="true">
+                    {sentences.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`h-1.5 w-6 rounded-full ${
+                          i < index || (i === index && passed)
+                            ? "bg-brand-green"
+                            : i === index
+                              ? "bg-brand-green/50"
+                              : "bg-secondary"
+                        }`}
+                      />
+                    ))}
+                  </span>
+                </div>
+                <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold">
+                  <span>Accuracy</span>
+                  <span> {average}%</span>
+                </span>
+              </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Button onClick={() => play(false)} disabled={playing}>
-                <Volume2 className="mr-2 size-4" /> {playing ? "Playing..." : "Play sentence"}
-              </Button>
-              <Button variant="outline" onClick={() => play(true)} disabled={playing}>
-                <RotateCcw className="mr-2 size-4" />{" "}
-                {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
-              </Button>
-            </div>
+              {/* Listening stage: one big play control, slower replay underneath. */}
+              <div className="flex flex-col items-center gap-3 py-2 text-center">
+                <button
+                  type="button"
+                  onClick={() => play(false)}
+                  disabled={playing}
+                  aria-label={playing ? "Playing..." : "Play sentence"}
+                  className="grid size-20 place-items-center rounded-full bg-brand-green text-sidebar shadow-[0_0_0_10px_oklch(0.8_0.15_175/0.12)] transition-transform hover:scale-105 disabled:opacity-70"
+                >
+                  <Volume2 className="size-8" />
+                </button>
+                <p className="text-sm font-medium">{playing ? "Playing..." : "Play sentence"}</p>
+                <Button variant="outline" size="sm" onClick={() => play(true)} disabled={playing}>
+                  <RotateCcw className="mr-2 size-4" />{" "}
+                  {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
+                </Button>
+              </div>
 
-            {(canReveal || revealed) && (
-              <div className="space-y-2">
-                {!revealed ? (
+              {/* One slot per word: the length of the sentence before listening,
+                  the words heard after a check, the full text when revealed. */}
+              <div
+                className="flex min-h-12 flex-wrap items-end justify-center gap-x-2 gap-y-3 rounded-xl bg-secondary/40 px-4 py-4"
+                aria-label="Sentence words"
+              >
+                {checked !== null
+                  ? wordMatches(sentence, answer).map((item, i) => (
+                      <span
+                        key={`${item.word}-${i}`}
+                        className={
+                          item.hit
+                            ? "rounded bg-green-500/15 px-1.5 py-0.5 text-sm text-green-700 dark:text-green-400"
+                            : "rounded bg-destructive/15 px-1.5 py-0.5 text-sm text-destructive"
+                        }
+                      >
+                        {item.word}
+                      </span>
+                    ))
+                  : sentence
+                      .split(/\s+/)
+                      .filter(Boolean)
+                      .map((word, i) =>
+                        revealed ? (
+                          <span key={`${word}-${i}`} className="text-sm">
+                            {word}
+                          </span>
+                        ) : (
+                          <span
+                            key={`${word}-${i}`}
+                            className="h-1 rounded-full bg-muted-foreground/40"
+                            style={{ width: `${Math.max(2, word.length) * 0.55}rem` }}
+                          />
+                        ),
+                      )}
+              </div>
+
+              {(canReveal || revealed) && checked === null && (
+                <div className="text-center">
                   <button
                     type="button"
-                    onClick={() => setRevealed(true)}
+                    onClick={() => setRevealed((value) => !value)}
                     className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-success underline-offset-4 hover:underline"
                   >
-                    REVEAL
+                    {revealed ? "Hide sentence" : "REVEAL"}
                   </button>
-                ) : (
-                  <div className="space-y-1">
-                    <p className="rounded-xl bg-secondary p-3 text-sm">{sentence}</p>
-                    <button
-                      type="button"
-                      onClick={() => setRevealed(false)}
-                      className="inline-flex min-h-11 items-center text-xs font-medium text-muted-foreground hover:text-foreground"
-                    >
-                      Hide sentence
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Now repeat the sentence out loud</p>
-              <p className="text-sm text-muted-foreground">
-                Record your voice and the AI checks which words you understood and repeated.
-              </p>
-            </div>
-
-            {checked !== null && (
-              <div className="rounded-xl bg-secondary p-4 text-sm">
-                <p className="flex items-center gap-2 font-medium">
-                  {checked >= 80 ? (
-                    <Check className="size-4 text-primary" />
-                  ) : (
-                    <X className="size-4 text-destructive" />
-                  )}
-                  You repeated {checked}% of the words.
-                </p>
-                <p className="mt-2 flex flex-wrap gap-1">
-                  {wordMatches(sentence, answer).map((item, i) => (
-                    <span
-                      key={`${item.word}-${i}`}
-                      className={
-                        item.hit
-                          ? "rounded bg-green-500/15 px-1.5 py-0.5 text-green-700 dark:text-green-400"
-                          : "rounded bg-destructive/15 px-1.5 py-0.5 text-destructive"
-                      }
-                    >
-                      {item.word}
-                    </span>
-                  ))}
-                </p>
-                <p className="mt-2 break-words text-muted-foreground">
-                  Correct sentence: {sentence}
-                </p>
-                {answer && (
-                  <p className="mt-1 break-words text-muted-foreground">You said: {answer}</p>
-                )}
-                <p className="mt-2 text-muted-foreground">
-                  Attempt {attempts} of 3 · Best result: {best}%
-                  {!passed && checked < 70 && " · You need at least 70% — try again."}
-                  {passed && checked < 70 && " · No attempts left, keeping your best result."}
-                </p>
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-3">
-              {checked === null || !passed ? (
-                recording ? (
-                  <Button variant="destructive" onClick={stopRepeat}>
-                    <Square className="mr-2 size-4" /> Stop and check
-                  </Button>
-                ) : (
-                  <Button onClick={startRepeat} disabled={checking || playing}>
-                    <Mic className="mr-2 size-4" />{" "}
-                    {checking
-                      ? "Checking..."
-                      : checked !== null
-                        ? "Try again"
-                        : "Repeat the sentence"}
-                  </Button>
-                )
-              ) : (
-                <Button onClick={next} disabled={saving}>
-                  {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
-                  {finished ? "Finish session" : "Next sentence"}
-                </Button>
+                </div>
               )}
-            </div>
-          </section>
+
+              {checked !== null ? (
+                <div className="rounded-xl bg-secondary p-4 text-sm">
+                  <p className="flex items-center gap-2 font-medium">
+                    {checked >= 80 ? (
+                      <Check className="size-4 text-primary" />
+                    ) : (
+                      <X className="size-4 text-destructive" />
+                    )}
+                    You repeated {checked}% of the words.
+                  </p>
+                  <p className="mt-2 break-words text-muted-foreground">
+                    Correct sentence: {sentence}
+                  </p>
+                  {answer && (
+                    <p className="mt-1 break-words text-muted-foreground">You said: {answer}</p>
+                  )}
+                  <p className="mt-2 text-muted-foreground">
+                    Attempt {attempts} of 3 · Best result: {best}%
+                    {!passed && checked < 70 && " · You need at least 70% — try again."}
+                    {passed && checked < 70 && " · No attempts left, keeping your best result."}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1 text-center">
+                  <p className="text-sm font-medium">Now repeat the sentence out loud</p>
+                  <p className="text-sm text-muted-foreground">
+                    Record your voice and the AI checks which words you understood and repeated.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex justify-center">
+                {checked === null || !passed ? (
+                  recording ? (
+                    <Button size="lg" variant="destructive" onClick={stopRepeat}>
+                      <Square className="mr-2 size-4" /> Stop and check
+                    </Button>
+                  ) : (
+                    <Button size="lg" onClick={startRepeat} disabled={checking || playing}>
+                      <Mic className="mr-2 size-4" />{" "}
+                      {checking
+                        ? "Checking..."
+                        : checked !== null
+                          ? "Try again"
+                          : "Repeat the sentence"}
+                    </Button>
+                  )
+                ) : (
+                  <Button size="lg" onClick={next} disabled={saving}>
+                    {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
+                    {finished ? "Finish session" : "Next sentence"}
+                  </Button>
+                )}
+              </div>
+            </section>
+
+            <aside className="hidden space-y-4 xl:block">
+              <section className="card-soft p-4">
+                <h2 className="text-sm font-semibold">Today's session</h2>
+                <ol className="mt-2.5 space-y-1.5">
+                  {sentences.map((_, i) => {
+                    const done = i < index || (i === index && passed);
+                    const current = i === index && !passed;
+                    return (
+                      <li
+                        key={i}
+                        className={`flex items-center gap-3 rounded-lg border px-3 py-1.5 text-sm ${
+                          current ? "border-brand-green/50 bg-brand-green/10" : "border-border"
+                        }`}
+                      >
+                        <span
+                          className={`grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${
+                            done ? "bg-brand-green text-sidebar" : "bg-secondary"
+                          }`}
+                        >
+                          {done ? <Check className="size-3.5" /> : i + 1}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span>Sentence</span> <span>{i + 1}</span>
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {done ? (
+                            `${scores[i] ?? 0}%`
+                          ) : current ? (
+                            <span>In progress</span>
+                          ) : (
+                            <span>Up next</span>
+                          )}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+                {saved?.lastListening && (
+                  <p className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
+                    <span>
+                      <span>Last result</span> · {formatDate(saved.lastListening.at, lang)}
+                    </span>
+                    <span className="text-base font-bold text-brand-green">
+                      {saved.lastListening.score != null ? `${saved.lastListening.score}%` : "—"}
+                    </span>
+                  </p>
+                )}
+              </section>
+
+              <section className="card-soft p-4">
+                <h2 className="text-sm font-semibold">
+                  <span>Pronunciation focus</span> · {config.label}
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">{config.focus}</p>
+                <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
+                  {listeningTips(config.level).map((tip) => (
+                    <li key={tip} className="flex gap-2">
+                      <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-green" />
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </aside>
+          </div>
         )}
       </div>
     </AppShell>

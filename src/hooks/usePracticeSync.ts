@@ -22,11 +22,15 @@ export function useSavedPractice() {
       const { data: auth } = await supabase.auth.getUser();
       const userId = auth.user?.id;
       if (!userId)
-        return { listening: [] as string[], writing: [] as { prompt: string; at: string }[] };
+        return {
+          listening: [] as string[],
+          lastListening: null as { at: string; score: number | null } | null,
+          writing: [] as { prompt: string; at: string }[],
+        };
       const [listening, writing] = await Promise.all([
         supabase
           .from("activities")
-          .select("created_at")
+          .select("created_at, score")
           .eq("user_id", userId)
           .eq("activity_type", "listening")
           .order("created_at", { ascending: false })
@@ -40,6 +44,10 @@ export function useSavedPractice() {
       ]);
       return {
         listening: (listening.data ?? []).map((row) => row.created_at),
+        // The latest saved Listening session, shown as "last result" on the page.
+        lastListening: listening.data?.[0]
+          ? { at: listening.data[0].created_at, score: listening.data[0].score ?? null }
+          : null,
         writing: (writing.data ?? []).map((row) => ({ prompt: row.prompt, at: row.created_at })),
       };
     },

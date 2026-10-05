@@ -249,3 +249,7 @@
 - [x] Push próprio de "Novas palavras no Vocabulário" uma vez por aula concluída (o push diário costuma ser gasto antes por Escrita/Escuta).
 - [x] Geração de palavras aceita respostas do Gemini como array ou outro invólucro, e a primeira resposta ilegível cai na segunda tentativa em vez de falhar o lote.
 
+## 2026-10-05 — Listening: duas colunas (opção A)
+- [x] Desktop (xl): prática à esquerda (botão grande de ouvir, lacunas por palavra que mostram o tamanho da frase e depois as palavras acertadas, gravação centralizada) e, à direita, Sessão de hoje (3 frases com status/nota e último resultado) e Foco de pronúncia do nível com 3 dicas. Cabe em 1280×800 e 1920×1080; celular continua em uma tela (painel lateral só no xl).
+- [x] Correção: frases fixas de B2/C1 eram mais curtas que a faixa de palavras do nível; sem frases das aulas o exercício ficava vazio ("Frase 1 de 0"). Agora servem de reserva.
+
