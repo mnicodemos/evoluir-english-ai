@@ -249,7 +249,7 @@ const privacy: Record<UiLang, LegalDocument> = {
           "Uso e aprendizado: aulas concluídas, respostas, notas, tempo de estudo, sequência de dias, erros frequentes e palavras estudadas.",
           "Conteúdo enviado: textos escritos, mensagens aos assistentes de IA e gravações de voz para transcrição e avaliação de pronúncia. As gravações de voz não são armazenadas por nós: são enviadas para processamento e descartadas em seguida.",
           "Pagamento: plano, status e histórico da assinatura, informados pela Stripe. Os dados do cartão ficam somente com a Stripe.",
-          "Dados técnicos: tipo de dispositivo e navegador, registros de acesso e de erros e, se você ativar, o identificador para notificações.",
+          "Dados técnicos: tipo de dispositivo e navegador, registros de acesso e de erros e, se você ativar, o identificador para notificações. Quando ocorre um erro no app, registramos a descrição técnica do erro, a página em que ele aconteceu e o identificador interno da sua conta, sem nome, e-mail ou conteúdo das aulas.",
           "Armazenamento local: preferências como idioma, tema e rascunhos ficam salvas no seu navegador.",
         ],
       },
@@ -265,7 +265,7 @@ const privacy: Record<UiLang, LegalDocument> = {
       {
         title: "4. Com quem compartilhamos",
         paragraphs: [
-          "Somente com fornecedores necessários para o serviço funcionar: Supabase (hospedagem, banco de dados e autenticação), Lovable (plataforma do app e intermediação dos serviços de IA), Google (modelos Gemini, para processar texto e voz) e Stripe (pagamentos). Não vendemos seus dados. Podemos compartilhar dados com autoridades quando exigido por lei.",
+          "Somente com fornecedores necessários para o serviço funcionar: Supabase (hospedagem, banco de dados e autenticação), Lovable (plataforma do app e intermediação dos serviços de IA), Google (modelos Gemini, para processar texto e voz), Stripe (pagamentos) e Sentry (registro de erros técnicos do app, sem o conteúdo das aulas, textos ou áudios). Não vendemos seus dados. Podemos compartilhar dados com autoridades quando exigido por lei.",
         ],
       },
       {
@@ -333,7 +333,7 @@ const privacy: Record<UiLang, LegalDocument> = {
           "Use and learning: completed lessons, responses, scores, study time, day streak, frequent mistakes, and words studied.",
           "Submitted content: written texts, messages to AI assistants, and voice recordings for transcription and pronunciation assessment. Voice recordings are not stored by us: they are sent for processing and then discarded.",
           "Payment: subscription plan, status, and history provided by Stripe. Card details remain solely with Stripe.",
-          "Technical data: device and browser type, access and error logs, and, if you enable it, the notification identifier.",
+          "Technical data: device and browser type, access and error logs, and, if you enable it, the notification identifier. When an error occurs in the app, we record the technical description of the error, the page where it happened, and your account's internal identifier — without name, email, or lesson content.",
           "Local storage: preferences such as language, theme, and drafts are stored in your browser.",
         ],
       },
@@ -349,7 +349,7 @@ const privacy: Record<UiLang, LegalDocument> = {
       {
         title: "4. Who we share data with",
         paragraphs: [
-          "Only with providers required for the service to operate: Supabase (hosting, database, and authentication), Lovable (app platform and intermediary for AI services), Google (Gemini models, to process text and voice), and Stripe (payments). We do not sell your data. We may share data with authorities when required by law.",
+          "Only with providers required for the service to operate: Supabase (hosting, database, and authentication), Lovable (app platform and intermediary for AI services), Google (Gemini models, to process text and voice), Stripe (payments), and Sentry (technical error logging for the app, without lesson content, texts, or audio). We do not sell your data. We may share data with authorities when required by law.",
         ],
       },
       {
