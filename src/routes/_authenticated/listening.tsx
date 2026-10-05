@@ -437,11 +437,6 @@ function ListeningPage() {
             Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
             activity — a new set arrives every time you start a new lesson in the Learning Center.
           </p>
-          <p className="mt-1 text-sm text-muted-foreground xl:hidden">
-            <span>Pronunciation</span>
-            <span> • {config.label} — </span>
-            <span>{config.focus}</span>
-          </p>
           <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
             <RotateCcw className="mr-2 size-4" /> Redo today's activity
           </Button>
@@ -469,7 +464,7 @@ function ListeningPage() {
           </section>
         ) : (
           // Desktop: the practice stage on the left, today's session and the
-          // level focus on the right. Phones stack them in the same order.
+          // level focus on the right. Below xl both cards sit under the stage.
           <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,1fr)]">
             <section className="card-soft space-y-6 p-5 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -624,7 +619,7 @@ function ListeningPage() {
               </div>
             </section>
 
-            <aside className="hidden space-y-4 xl:block">
+            <aside className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
               <section className="card-soft p-4">
                 <h2 className="text-sm font-semibold">Today's session</h2>
                 <ol className="mt-2.5 space-y-1.5">
