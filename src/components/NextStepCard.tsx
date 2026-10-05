@@ -315,7 +315,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
             {/* Mobile-only "Why this matters now": short versions of the same
                 three desktop sentences, each kept to one complete line. */}
-            <div className="mt-3.5 sm:hidden">
+            <div className="mt-2 sm:hidden">
               <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <Lightbulb
                   className="size-[1.375rem] shrink-0 text-warning"
