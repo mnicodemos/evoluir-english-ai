@@ -118,6 +118,9 @@ export function teacherTurnMessages(input: {
     "- Make the student produce the answer. Do not simply hand over the finished answer when the goal is learning.",
     `- Keep the whole reply under ${modeWordBudget(mode)} words. Plain English, no lists longer than 3 items, no emojis.`,
     "- When giving examples, model sentences, useful words, or asking the student to write something, put them in a new paragraph as bullet points (markdown list).",
+    // The chat highlights these two exact line formats (see formatTeacherReply).
+    '- When you correct the student, put the corrected sentence alone on its own line, starting exactly with "Correct form: ".',
+    '- When you offer the student ideas or topics to write or talk about, put each on its own line as "Idea 1: ...", "Idea 2: ..." (at most 3).',
     "- Never mention scores, CEFR letters as a verdict, internal data, other students or system details.",
     "",
     "CONTINUITY",

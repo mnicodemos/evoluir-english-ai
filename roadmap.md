@@ -114,8 +114,10 @@
 
 - [x] Fase — Vocabulary performance (a)+(b) e botão "✓ That's OK"
   - Palavras salvas carregam sem IA; geração em segundo plano; falha memorizada por lote, com "Tentar novamente" manual
-- [ ] Pendente: investigar por que o lote completed-16 não está persistindo as palavras geradas (fase futura)
-- [ ] Pendente: latência da validação de pronúncia (2,4–45 s, provedor de IA)
+- [x] Pendente: investigar por que o lote completed-16 não está persistindo as palavras geradas (fase futura)
+  - Verificado em 05/10: os 10 lotes mais recentes da conta (completed-21 a completed-30, B2, 26/09–02/10) têm 10 palavras cada; as proteções posteriores (modelo rápido, aproveitamento palavra por palavra, keep-alive e nova tentativa no Dashboard) resolveram a perda.
+- [x] Pendente: latência da validação de pronúncia (2,4–45 s, provedor de IA)
+  - /api/transcribe passou a ter orçamento total de 20 s (src/lib/transcriptionBudget.ts) dividido entre Lovable (até 8 s) e os fallbacks Gemini; pausas de nova tentativa só acontecem se ainda houver tempo, e o modelo que recusa thinkingConfig é lembrado para não repetir a chamada inválida. A latência normal continua dependendo do provedor.
 - [x] AI Talking: limite de 20 s (primeira resposta) e 15 s (entre trechos), cancelamento real e liberação imediata da vaga
 - [x] Mover o acesso ao painel administrativo para dentro da janela de perfil
 - [x] Sincronizar o indicador do Vocabulary com palavras realmente salvas e estados de erro
@@ -204,7 +206,7 @@
 - Validação: Playwright 1280/1920 mostra Português, Ensolarado e Sair com ícone e texto; build OK.
 
 ## Novos pedidos (04/10 22:03 UTC)
-- [ ] Menu lateral mobile: remover item "Study plan"; menu desktop: renomear "Lessons" para "Learning".
+- [x] Menu lateral mobile: remover item "Study plan"; menu desktop: renomear "Lessons" para "Learning". (já refletido no AppShell: mobileSheetNav sem Study Plan; sidebar desktop usa "Learning")
 - [ ] Menu inferior mobile: texto cortado na parte inferior — subir ícones/texto; reduzir espaçamento das frases do "Why this matters" (última frase cortando), sem deixar espaço grande após a última.
-- [ ] Migrar AI Speaking e Vocabulary para a API Gemini.
-- [ ] Vocabulary spaced review: convert 230 legacy mastery_level=100 rows to step 5 (90) with staggered next_review_at — waiting for user confirmation of the count.
+- [x] Migrar AI Speaking e Vocabulary para a API Gemini.
+- [x] Vocabulary spaced review: convert 230 legacy mastery_level=100 rows to step 5 (90) with staggered next_review_at — waiting for user confirmation of the count.

@@ -1,7 +1,17 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, CheckCircle2, Headphones, Mic, RotateCcw, Square, Volume2, X } from "lucide-react";
+import {
+  Check,
+  CheckCircle2,
+  Headphones,
+  Loader2,
+  Mic,
+  RotateCcw,
+  Square,
+  Volume2,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -153,6 +163,7 @@ function ListeningPage() {
   const [revealed, setRevealed] = useState(false);
   const [recording, setRecording] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [completed, setCompleted] = useState<CompletionMap>({});
   const [progress, setProgress] = useState<ProgressMap>({});
 
@@ -337,6 +348,37 @@ function ListeningPage() {
       setChecked(null);
       return;
     }
+    // Saved first: only a stored session marks the round as completed, so a
+    // failed save keeps the answers and the Finish button for a safe retry
+    // (the same operation key makes the retry idempotent).
+    let final: number | null = null;
+    if (profile) {
+      setSaving(true);
+      try {
+        const saved = (await saveListening({
+          data: {
+            operationKey: operationKey.current,
+            trackId: track.id as "everyday" | "professional" | "travel",
+            round: lessonCount,
+            minutes: minutesSpent(1),
+            evidence: sentences.map((expected, sentenceIndex) => ({
+              expected,
+              transcripts: transcripts[sentenceIndex] ?? [],
+            })),
+          },
+        })) as { score?: number };
+        final = saved.score ?? average;
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Could not save your listening session. Please try again.",
+        );
+        return;
+      } finally {
+        setSaving(false);
+      }
+    }
     markCompleted(track.id);
     const map = readProgress();
     const nextProgress: ProgressMap = {
@@ -345,21 +387,7 @@ function ListeningPage() {
     };
     setProgress(nextProgress);
     writeProgress(nextProgress);
-    if (profile) {
-      const saved = await saveListening({
-        data: {
-          operationKey: operationKey.current,
-          trackId: track.id as "everyday" | "professional" | "travel",
-          round: lessonCount,
-          minutes: minutesSpent(1),
-          evidence: sentences.map((expected, sentenceIndex) => ({
-            expected,
-            transcripts: transcripts[sentenceIndex] ?? [],
-          })),
-        },
-      });
-      const result = saved as { score?: number };
-      const final = result.score ?? average;
+    if (final !== null) {
       queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
       queryClient.invalidateQueries({ queryKey: ["saved-practice"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
@@ -531,7 +559,10 @@ function ListeningPage() {
                   </Button>
                 )
               ) : (
-                <Button onClick={next}>{finished ? "Finish session" : "Next sentence"}</Button>
+                <Button onClick={next} disabled={saving}>
+                  {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
+                  {finished ? "Finish session" : "Next sentence"}
+                </Button>
               )}
             </div>
           </section>

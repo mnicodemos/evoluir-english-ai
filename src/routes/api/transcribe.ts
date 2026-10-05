@@ -2,6 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
 import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
+import {
+  attemptTimeout,
+  canWaitForRetry,
+  TRANSCRIPTION_TOTAL_BUDGET_MS,
+} from "@/lib/transcriptionBudget";
 
 const MAX_AUDIO_BYTES = 14 * 1024 * 1024;
 const GEMINI_TRANSCRIPTION_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash"] as const;
@@ -26,6 +31,13 @@ type GeminiTranscription = {
 // the recording itself.
 const MAX_TRANSCRIPTION_ATTEMPTS = 2;
 const TRANSCRIPTION_ATTEMPT_TIMEOUT_MS = 15_000;
+// A short word or sentence is transcribed in 1–3 s; a slower primary answer
+// hands over to the fallback instead of using most of the total budget.
+const LOVABLE_ATTEMPT_TIMEOUT_MS = 8_000;
+
+// Models that answered 400 to thinkingConfig and accepted the plain request.
+// Remembered per server instance so later checks skip the doomed first call.
+const modelsWithoutThinkingConfig = new Set<string>();
 
 function retryDelay(response: Response, attempt: number) {
   const retryAfter = Number(response.headers.get("Retry-After"));
@@ -51,10 +63,15 @@ async function sendWithDeadline(
   url: string,
   init: Omit<RequestInit, "signal">,
   requestSignal: AbortSignal,
+  timeoutMs: number,
 ): Promise<Response> {
+  // The request's total budget is spent: report a timeout without calling out.
+  if (timeoutMs <= 0) {
+    return Response.json({ message: "Transcription attempt timed out." }, { status: 504 });
+  }
   const controller = new AbortController();
   const abortFromRequest = () => controller.abort();
-  const timeout = setTimeout(() => controller.abort(), TRANSCRIPTION_ATTEMPT_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   requestSignal.addEventListener("abort", abortFromRequest, { once: true });
 
   try {
@@ -78,6 +95,7 @@ async function transcribeWithLovable(
   audio: File,
   lovableKey: string,
   requestSignal: AbortSignal,
+  deadline: number,
 ): Promise<string | null> {
   const form = new FormData();
   form.append("model", LOVABLE_TRANSCRIPTION_MODEL);
@@ -88,6 +106,7 @@ async function transcribeWithLovable(
     "https://ai.gateway.lovable.dev/v1/audio/transcriptions",
     { method: "POST", headers: { Authorization: `Bearer ${lovableKey}` }, body: form },
     requestSignal,
+    attemptTimeout(deadline, LOVABLE_ATTEMPT_TIMEOUT_MS),
   );
   if (!response.ok) {
     console.error(`Lovable transcription failed [${response.status}]`);
@@ -102,6 +121,7 @@ export const Route = createFileRoute("/api/transcribe")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const deadline = Date.now() + TRANSCRIPTION_TOTAL_BUDGET_MS;
         let userId: string;
         try {
           userId = await authenticateApiRequest(request);
@@ -187,7 +207,7 @@ export const Route = createFileRoute("/api/transcribe")({
           // Primary: Lovable AI dedicated transcription service. The previous
           // personal-key Gemini flow below stays as a fallback until approved
           // for removal.
-          const primary = await transcribeWithLovable(audio, lovableKey, request.signal);
+          const primary = await transcribeWithLovable(audio, lovableKey, request.signal, deadline);
           if (primary) {
             await settle({ success: true });
             return new Response(
@@ -228,14 +248,19 @@ export const Route = createFileRoute("/api/transcribe")({
                 body: requestBody(fast),
               },
               request.signal,
+              attemptTimeout(deadline, TRANSCRIPTION_ATTEMPT_TIMEOUT_MS),
             );
 
           for (const model of GEMINI_TRANSCRIPTION_MODELS) {
             for (let attempt = 0; attempt < MAX_TRANSCRIPTION_ATTEMPTS; attempt += 1) {
-              let response = await send(model, true);
+              const fast = !modelsWithoutThinkingConfig.has(model);
+              let response = await send(model, fast);
               // A 400 here can mean this model version does not accept thinkingConfig.
               // Repair that request once by removing only the unsupported setting.
-              if (response.status === 400) response = await send(model, false);
+              if (fast && response.status === 400) {
+                response = await send(model, false);
+                if (response.ok) modelsWithoutThinkingConfig.add(model);
+              }
 
               if (response.ok) {
                 result = (await response.json()) as GeminiTranscription;
@@ -250,7 +275,9 @@ export const Route = createFileRoute("/api/transcribe")({
 
               const retryable = response.status === 429 || response.status >= 500;
               if (!retryable || attempt === MAX_TRANSCRIPTION_ATTEMPTS - 1) break;
-              await waitForRetry(retryDelay(response, attempt), request.signal);
+              const delay = retryDelay(response, attempt);
+              if (!canWaitForRetry(deadline, delay)) break;
+              await waitForRetry(delay, request.signal);
             }
 
             if (result) break;

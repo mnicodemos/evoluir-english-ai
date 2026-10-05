@@ -1,10 +1,13 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useState } from "react";
 
-import { enablePush } from "@/lib/pushNotifications";
+import { enablePush, resumePush } from "@/lib/pushNotifications";
 import { registerPushToken, unregisterPushToken } from "@/lib/push.functions";
 
 const TOKEN_KEY = "push-token";
+
+// The hook is mounted in more than one place; the server sync runs once per app start.
+let tokenSynced = false;
 
 export type PushState = "unknown" | "enabled" | "disabled" | "unsupported" | "not-configured";
 
@@ -21,13 +24,30 @@ export function usePushNotifications() {
 
   useEffect(() => {
     const saved = localStorage.getItem(TOKEN_KEY);
-    if (saved && Notification.permission === "granted") {
+    if (saved && "Notification" in window && Notification.permission === "granted") {
       setToken(saved);
       setState("enabled");
+      // The FCM token can rotate: re-read it on start and keep the server in
+      // step (this also refreshes last_seen_at), so the device keeps receiving.
+      if (tokenSynced) return;
+      tokenSynced = true;
+      void resumePush().then(async (current) => {
+        if (!current || localStorage.getItem(TOKEN_KEY) !== saved) return;
+        try {
+          await register({ data: { token: current } });
+          if (current !== saved) {
+            await unregister({ data: { token: saved } });
+            localStorage.setItem(TOKEN_KEY, current);
+            setToken(current);
+          }
+        } catch {
+          // Next app start tries again.
+        }
+      });
     } else {
       setState("disabled");
     }
-  }, []);
+  }, [register, unregister]);
 
   const enable = useCallback(async (): Promise<PushState> => {
     const result = await enablePush();
@@ -36,6 +56,8 @@ export function usePushNotifications() {
       localStorage.setItem(TOKEN_KEY, result.token);
       setToken(result.token);
       setState("enabled");
+      // Show messages that arrive while the app is open, from now on.
+      void resumePush();
       return "enabled";
     }
     if (result.status === "not-configured") {
@@ -51,8 +73,10 @@ export function usePushNotifications() {
   }, [register]);
 
   const disable = useCallback(async () => {
-    if (token) {
-      await unregister({ data: { token } });
+    // The stored token is the current one even if another mount refreshed it.
+    const current = localStorage.getItem(TOKEN_KEY) ?? token;
+    if (current) {
+      await unregister({ data: { token: current } });
     }
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);

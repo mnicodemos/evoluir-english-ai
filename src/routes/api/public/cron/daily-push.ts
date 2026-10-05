@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { isStaleTokenResponse } from "@/lib/pushStaleToken";
+import { studyToday } from "@/lib/today";
+
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
 
 /** Small per-level fallback when the shared word bank has nothing new. */
@@ -26,10 +29,6 @@ const FALLBACK_WORDS: Record<string, { word: string; translation: string; meanin
   ],
   c2: [{ word: "ubiquitous", translation: "onipresente", meaning: "found everywhere" }],
 };
-
-function saoPauloToday() {
-  return new Date(Date.now() - 3 * 3600_000).toISOString().slice(0, 10);
-}
 
 function hashIndex(seed: string, size: number) {
   let h = 0;
@@ -72,7 +71,8 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           .from("profiles")
           .select("id, level, last_activity_date")
           .in("id", userIds);
-        const today = saoPauloToday();
+        // Same study day as credit_study_day (America/Sao_Paulo).
+        const today = studyToday();
 
         const messages = new Map<string, { title: string; body: string; path: string }>();
         for (const p of profiles ?? []) {
@@ -133,8 +133,9 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           });
           if (res.ok) sent += 1;
           else {
-            console.error(`daily-push FCM failed [${res.status}]: ${await res.text()}`);
-            if (res.status === 404 || res.status === 400) stale.push(t.token);
+            const errorBody = await res.text();
+            console.error(`daily-push FCM failed [${res.status}]: ${errorBody}`);
+            if (isStaleTokenResponse(res.status, errorBody)) stale.push(t.token);
           }
         }
         if (stale.length) await supabaseAdmin.from("push_tokens").delete().in("token", stale);

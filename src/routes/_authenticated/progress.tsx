@@ -233,7 +233,10 @@ function ProgressPage() {
                     </span>
                   </span>
                   {a.score == null && (
-                    <span className="shrink-0 text-muted-foreground" aria-label={L("No score", "Sem nota")}>
+                    <span
+                      className="shrink-0 text-muted-foreground"
+                      aria-label={L("No score", "Sem nota")}
+                    >
                       —
                     </span>
                   )}
