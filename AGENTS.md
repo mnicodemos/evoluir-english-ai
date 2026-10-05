@@ -32,3 +32,5 @@
 - Pending Listening, Writing, and Vocabulary state may trigger app notifications but must not render novelty circles in mobile navigation.
 - Daily push (word of the day, study reminder) runs from pg_cron calling /api/public/cron/daily-push, authenticated by the service-only push_cron_key row; the app need not be open.
 - Public legal documents share one bilingual presentation component while keeping independent routes and metadata; this prevents copy and layout drift.
+- Lovable Publish does not apply new files in drizzle/migrations; each new migration must be applied by asking the Lovable chat to run it (it re-registers the SQL under the next number), followed by `NOTIFY pgrst, 'reload schema'`, so every migration must stay idempotent.
+- The weekly league mascot (src/assets/evo-liga.svg) is a vector girl version of EVO holding the trophy; it appears only on the league screen.

@@ -1257,4 +1257,5 @@ export const uiPt: Record<string, string> = {
   "Use the weather where I am": "Usar o clima de onde estou",
   "Only to show today's weather. Your location is not saved.":
     "Só para mostrar o clima de hoje. Sua localização não é salva.",
+  "Join now and be the first in the ranking!": "Entre agora e seja o primeiro do ranking!",
 };

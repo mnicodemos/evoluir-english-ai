@@ -4,6 +4,7 @@ import { Loader2, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import evoLeague from "@/assets/evo-liga.svg";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
@@ -75,12 +76,21 @@ function League() {
   return (
     <AppShell mobileOneScreen>
       <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,1fr)] lg:items-start lg:gap-4 lg:space-y-0">
-        <header className="animate-rise lg:col-span-2">
-          <h1 className="text-lg font-bold lg:text-3xl">Weekly league</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            <span>{profile ? findLevel(profile.level).label : ""}</span> ·{" "}
-            <span>Monday to Sunday · resets every Monday</span>
-          </p>
+        <header className="animate-rise flex items-center gap-3 lg:col-span-2">
+          <img
+            src={evoLeague}
+            alt=""
+            width={240}
+            height={280}
+            className="size-14 shrink-0 object-contain lg:size-20"
+          />
+          <div className="min-w-0">
+            <h1 className="text-lg font-bold lg:text-3xl">Weekly league</h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              <span>{profile ? findLevel(profile.level).label : ""}</span> ·{" "}
+              <span>Monday to Sunday · resets every Monday</span>
+            </p>
+          </div>
         </header>
 
         <section className="card-soft space-y-2 p-3 sm:p-5">
@@ -100,9 +110,23 @@ function League() {
               <Loader2 className="size-5 animate-spin text-muted-foreground" />
             </div>
           ) : ranking.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
-              No one at your level joined the league this week yet.
-            </p>
+            <div className="flex flex-col items-center gap-2 py-4 text-center">
+              <img
+                src={evoLeague}
+                alt="EVO Liga"
+                width={240}
+                height={280}
+                className="h-28 w-auto object-contain"
+              />
+              <p className="text-sm text-muted-foreground">
+                No one at your level joined the league this week yet.
+              </p>
+              {!joined && (
+                <p className="text-sm font-medium text-foreground">
+                  Join now and be the first in the ranking!
+                </p>
+              )}
+            </div>
           ) : (
             <ol className="max-h-[55vh] space-y-1.5 overflow-y-auto pr-1">
               {ranking.map((row) => (
