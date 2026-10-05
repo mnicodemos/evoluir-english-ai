@@ -46,6 +46,7 @@ import {
   canAdvance,
   fallBack,
   isDue,
+  markPronounced,
 } from "@/lib/vocabularyReview";
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
@@ -244,6 +245,34 @@ function Vocabulary() {
     }
   }
 
+  /** Passed pronunciation (>= 70%): the word goes straight to the Learned tab. */
+  async function markPronouncedKnown(wordId: string) {
+    if (!profile) return;
+    const existing = byWord.get(wordId);
+    setBusy(wordId);
+    try {
+      const next = markPronounced();
+      const { error } = await supabase.from("user_vocabulary").upsert(
+        {
+          user_id: profile.id,
+          word_id: wordId,
+          mastery_level: next.mastery_level,
+          next_review_at: next.next_review_at,
+          is_difficult: false,
+          times_reviewed: (existing?.times_reviewed ?? 0) + 1,
+          last_reviewed_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,word_id" },
+      );
+      if (error) throw error;
+      await invalidateVocabulary();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save this word");
+    } finally {
+      setBusy(null);
+    }
+  }
+
   /** A failed review sends the word back two steps and due again tomorrow. */
   async function markForgotten(wordId: string) {
     if (!profile) return;
@@ -354,7 +383,7 @@ function Vocabulary() {
               ? `Pronúncia OK — ${score}%. Próxima palavra!`
               : `Pronunciation OK — ${score}%. Next word!`,
           );
-          await markKnown(word.id);
+          await markPronouncedKnown(word.id);
         } else {
           toast.error(
             pt
