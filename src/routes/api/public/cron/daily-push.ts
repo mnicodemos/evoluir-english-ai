@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { studyToday } from "@/lib/today";
-import { isWeeklyReportDay, weekStartIso, weeklyReportMessage } from "@/lib/weeklyReport";
+import { weekStartOf } from "@/lib/streakFreeze";
+import {
+  isWeeklyReportDay,
+  leaguePositions,
+  weekStartIso,
+  weeklyReportMessage,
+} from "@/lib/weeklyReport";
 
 /** Small per-level fallback when the shared word bank has nothing new. */
 const FALLBACK_WORDS: Record<string, { word: string; translation: string; meaning: string }[]> = {
@@ -80,13 +86,46 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
 
         const { data: profiles } = await supabaseAdmin
           .from("profiles")
-          .select("id, level, last_activity_date, streak_days")
+          .select("id, level, last_activity_date, streak_days, league_opt_in")
           .in("id", userIds);
         // Same study day as credit_study_day (America/Sao_Paulo).
         const today = studyToday();
 
         const messages = new Map<string, { title: string; body: string; path: string }>();
         const weekStart = weekStartIso();
+
+        // Weekly league: final positions per level, from the same XP rule the
+        // ranking uses (league_week_xp), for the levels of students who joined.
+        const leagueByUser = new Map<string, { position: number; total: number; level: string }>();
+        if (kind === "weekly") {
+          const leagueWeek = weekStartOf(today);
+          const levels = [
+            ...new Set((profiles ?? []).filter((p) => p.league_opt_in).map((p) => p.level)),
+          ];
+          for (const level of levels) {
+            const { data: members } = await supabaseAdmin
+              .from("profiles")
+              .select("id")
+              .eq("level", level)
+              .eq("league_opt_in", true);
+            const entries = await Promise.all(
+              (members ?? []).map(async (member) => {
+                const { data: xp, error: xpError } = await supabaseAdmin.rpc("league_week_xp", {
+                  p_user_id: member.id,
+                  p_week_start: leagueWeek,
+                });
+                return { id: member.id, xp: typeof xp === "number" ? xp : 0, failed: !!xpError };
+              }),
+            );
+            // A partial ranking would show wrong positions: leave the league line out.
+            if (entries.some((entry) => entry.failed)) continue;
+            const positions = leaguePositions(entries);
+            for (const [id, position] of positions) {
+              leagueByUser.set(id, { position, total: entries.length, level });
+            }
+          }
+        }
+
         for (const p of profiles ?? []) {
           if (kind === "weekly") {
             const count = { count: "exact" as const, head: true };
@@ -120,6 +159,7 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
               words: words.count ?? 0,
               mistakesReviewed: reviewed.count ?? 0,
               streakDays: p.streak_days ?? 0,
+              league: p.league_opt_in ? (leagueByUser.get(p.id) ?? null) : null,
             });
             if (p.last_activity_date !== today) {
               message.body = `${message.body} Ainda dá tempo de cumprir a meta de hoje!`.slice(

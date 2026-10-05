@@ -12,7 +12,31 @@ export type WeeklyStats = {
   words: number;
   mistakesReviewed: number;
   streakDays: number;
+  /** Final position in the weekly league, only for students who joined it. */
+  league?: { position: number; total: number; level: string } | null;
 };
+
+/**
+ * Positions like the database's rank(): equal XP shares a position and the
+ * next one skips (100, 80, 80, 50 → 1, 2, 2, 4).
+ */
+export function leaguePositions(entries: { id: string; xp: number }[]) {
+  const sorted = [...entries].sort((a, b) => b.xp - a.xp);
+  const positions = new Map<string, number>();
+  sorted.forEach((entry, index) => {
+    const previous = sorted[index - 1];
+    positions.set(
+      entry.id,
+      previous && previous.xp === entry.xp ? positions.get(previous.id)! : index + 1,
+    );
+  });
+  return positions;
+}
+
+function leagueSentence(league: NonNullable<WeeklyStats["league"]>) {
+  const medal = ["🥇", "🥈", "🥉"][league.position - 1] ?? "🏆";
+  return ` Liga ${league.level.toUpperCase()}: ${league.position}º de ${league.total} ${medal}. Nova semana começa amanhã!`;
+}
 
 const DAY_MS = 86_400_000;
 
@@ -54,9 +78,10 @@ export function weeklyReportMessage(stats: WeeklyStats) {
     stats.streakDays > 1
       ? ` Streak de ${stats.streakDays} dias 🔥`
       : " Continue firme na próxima semana!";
+  const league = stats.league ? leagueSentence(stats.league) : "";
   return {
     title,
-    body: `${parts.join(" · ")}.${streak}`.slice(0, 280),
+    body: `${parts.join(" · ")}.${streak}${league}`.slice(0, 280),
     path: "/progress",
   };
 }
