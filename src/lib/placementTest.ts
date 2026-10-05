@@ -1,101 +1,179 @@
 import { LEVELS, findLevel, type LevelInfo } from "@/lib/level";
 
-export type PlacementQuestion = {
+type Band = (typeof LEVELS)[number]["value"];
+
+/** The student hears a sentence (text-to-speech) and picks what it means. */
+export type ListeningQuestion = {
   id: string;
+  kind: "listen";
   /** CEFR band this question belongs to. */
-  band: (typeof LEVELS)[number]["value"];
+  band: Band;
+  /** Sentence spoken aloud; shown as text only if the audio cannot play. */
+  audio: string;
   prompt: string;
   options: string[];
   answer: string;
 };
 
-/** Two graded questions per CEFR band, from A1 to C2. */
+/** The student types the missing words; any accepted spelling scores. */
+export type WritingQuestion = {
+  id: string;
+  kind: "write";
+  band: Band;
+  prompt: string;
+  /** Sentence with "___" where the typed answer goes. */
+  sentence: string;
+  accepted: string[];
+};
+
+export type PlacementQuestion = ListeningQuestion | WritingQuestion;
+
+/** One listening and one writing question per CEFR band, from A1 to C2. */
 export const PLACEMENT_QUESTIONS: PlacementQuestion[] = [
   {
-    id: "a1-1",
+    id: "a1-listen",
+    kind: "listen",
     band: "a1",
-    prompt: "She ___ a teacher.",
-    options: ["is", "are", "be", "am"],
-    answer: "is",
+    audio: "Hello! My name is Anna. I am from Brazil.",
+    prompt: "Where is Anna from?",
+    options: ["Spain", "Brazil", "Italy", "Canada"],
+    answer: "Brazil",
   },
   {
-    id: "a1-2",
+    id: "a1-write",
+    kind: "write",
     band: "a1",
-    prompt: "I have two ___.",
-    options: ["childs", "children", "childrens", "child"],
-    answer: "children",
+    prompt: "Write the missing word (verb to be).",
+    sentence: "She ___ a teacher.",
+    accepted: ["is"],
   },
   {
-    id: "a2-1",
+    id: "a2-listen",
+    kind: "listen",
     band: "a2",
-    prompt: "Yesterday we ___ to the cinema.",
-    options: ["go", "gone", "went", "goes"],
-    answer: "went",
+    audio: "I usually take the bus to work, but yesterday I walked because it was sunny.",
+    prompt: "How did the speaker get to work yesterday?",
+    options: ["By bus", "By car", "On foot", "By train"],
+    answer: "On foot",
   },
   {
-    id: "a2-2",
+    id: "a2-write",
+    kind: "write",
     band: "a2",
-    prompt: "There isn't ___ milk in the fridge.",
-    options: ["many", "some", "a few", "any"],
-    answer: "any",
+    prompt: "Write the past of the verb go.",
+    sentence: "Yesterday we ___ to the cinema.",
+    accepted: ["went"],
   },
   {
-    id: "b1-1",
+    id: "b1-listen",
+    kind: "listen",
     band: "b1",
-    prompt: "I ___ in this company since 2019.",
-    options: ["work", "have worked", "am working", "worked"],
-    answer: "have worked",
+    audio:
+      "I'd love to come to the party, but I've got an exam on Monday, so I'd better stay home and study.",
+    prompt: "Why won't the speaker go to the party?",
+    options: ["They have to work", "They weren't invited", "They are sick", "They need to study"],
+    answer: "They need to study",
   },
   {
-    id: "b1-2",
+    id: "b1-write",
+    kind: "write",
     band: "b1",
-    prompt: "If it rains tomorrow, we ___ the meeting online.",
-    options: ["will hold", "would hold", "held", "hold would"],
-    answer: "will hold",
+    prompt: "Complete with the verb work in the right tense.",
+    sentence: "I ___ in this company since 2019.",
+    accepted: ["have worked", "'ve worked", "have been working", "'ve been working"],
   },
   {
-    id: "b2-1",
+    id: "b2-listen",
+    kind: "listen",
     band: "b2",
-    prompt: "The report ___ by the team before the deadline.",
-    options: ["was finished", "has finish", "finished was", "is finish"],
-    answer: "was finished",
+    audio:
+      "Had the flight not been delayed, we would have made it to the conference in time for the keynote.",
+    prompt: "What happened?",
+    options: [
+      "They arrived early for the keynote",
+      "They missed the keynote because of the delay",
+      "The keynote was cancelled",
+      "They chose a later flight",
+    ],
+    answer: "They missed the keynote because of the delay",
   },
   {
-    id: "b2-2",
+    id: "b2-write",
+    kind: "write",
     band: "b2",
-    prompt: "If I had known about the delay, I ___ you earlier.",
-    options: ["would call", "will have called", "would have called", "had called"],
-    answer: "would have called",
+    prompt: "Complete with the verb call.",
+    sentence: "If I had known about the delay, I ___ you earlier.",
+    accepted: ["would have called", "would've called", "'d have called"],
   },
   {
-    id: "c1-1",
+    id: "c1-listen",
+    kind: "listen",
     band: "c1",
-    prompt: "Choose the most natural option: The proposal was turned ___ by the board.",
-    options: ["down", "off", "over", "away"],
-    answer: "down",
+    audio:
+      "Frankly, the new policy is a far cry from what we were promised. It barely scratches the surface of the problem.",
+    prompt: "What does the speaker think of the policy?",
+    options: [
+      "It is exactly what was promised",
+      "It solves the problem",
+      "It does much less than expected",
+      "It goes too far",
+    ],
+    answer: "It does much less than expected",
   },
   {
-    id: "c1-2",
+    id: "c1-write",
+    kind: "write",
     band: "c1",
-    prompt: "Hardly ___ the presentation when the system crashed.",
-    options: ["we had started", "had we started", "we started", "did we started"],
-    answer: "had we started",
+    prompt: "Write the one missing word.",
+    sentence: "Hardly ___ we started the presentation when the system crashed.",
+    accepted: ["had"],
   },
   {
-    id: "c2-1",
+    id: "c2-listen",
+    kind: "listen",
     band: "c2",
-    prompt: "Her argument was compelling, albeit ___ on questionable data.",
-    options: ["predicated", "predicting", "predicament", "predictable"],
-    answer: "predicated",
+    audio:
+      "Notwithstanding the board's assurances, investors remained unconvinced, and the share price languished for months.",
+    prompt: "What does the speaker say?",
+    options: [
+      "Investors trusted the board",
+      "The share price rose quickly",
+      "Investors doubted the board and the shares stayed low",
+      "The board gave no assurances",
+    ],
+    answer: "Investors doubted the board and the shares stayed low",
   },
   {
-    id: "c2-2",
+    id: "c2-write",
+    kind: "write",
     band: "c2",
-    prompt: "The minister's remarks were widely seen as a thinly ___ criticism of the policy.",
-    options: ["veiled", "covered", "hidden away", "shaded"],
-    answer: "veiled",
+    prompt: "Complete the expression (an indirect but obvious criticism).",
+    sentence: "The minister's remarks were a thinly ___ criticism of the policy.",
+    accepted: ["veiled"],
   },
 ];
+
+/** Lowercase, straight apostrophes, single spaces, no surrounding punctuation. */
+export function normalizeWritten(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[‘’ʼ`]/g, "'")
+    .replace(/[.,!?;:"]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function isCorrectAnswer(question: PlacementQuestion, answer: string | undefined): boolean {
+  if (!answer) return false;
+  if (question.kind === "listen") return answer === question.answer;
+  const typed = normalizeWritten(answer);
+  return question.accepted.some((accepted) => normalizeWritten(accepted) === typed);
+}
+
+/** A question counts as answered once a choice is made or something was typed. */
+export function isAnswered(answer: string | undefined): boolean {
+  return Boolean(answer?.trim());
+}
 
 export type PlacementResult = {
   level: LevelInfo;
@@ -116,7 +194,7 @@ export function scorePlacement(answers: Record<string, string>): PlacementResult
     return {
       band,
       total: questions.length,
-      correct: questions.filter((q) => answers[q.id] === q.answer).length,
+      correct: questions.filter((q) => isCorrectAnswer(q, answers[q.id])).length,
     };
   });
 
@@ -125,7 +203,6 @@ export function scorePlacement(answers: Record<string, string>): PlacementResult
     if (byBand[i]!.correct >= 1) index = i;
     else break;
   }
-  // A perfect band unlocks the next one only when the following band was also passed.
   const level = findLevel(bands[index]);
 
   return {

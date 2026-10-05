@@ -1260,4 +1260,13 @@ export const uiPt: Record<string, string> = {
   "Only to show today's weather. Your location is not saved.":
     "Só para mostrar o clima de hoje. Sua localização não é salva.",
   "Join now and be the first in the ranking!": "Entre agora e seja o primeiro do ranking!",
+  "Listen and write. The questions get harder as you go — it is normal not to know the last ones.":
+    "Ouça e escreva. As questões ficam mais difíceis — é normal não saber as últimas.",
+  answered: "respondidas",
+  Previous: "Anterior",
+  "Next question": "Próxima questão",
+  "Play the audio": "Ouvir o áudio",
+  "The audio did not play. Read the sentence instead:": "O áudio não tocou. Leia a frase:",
+  "Your answer": "Sua resposta",
+  "Type the missing words": "Digite as palavras que faltam",
 };
