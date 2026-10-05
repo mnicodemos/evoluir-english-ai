@@ -347,15 +347,22 @@ function Vocabulary() {
         const score = authoritative.score;
         if (score !== previewScore)
           console.warn("Pronunciation preview differed from the authoritative result");
-        if (score > 70) {
-          toast.success(`Great pronunciation — ${score}% match.`);
+        const pt = lang === "pt";
+        if (score >= 70) {
+          toast.success(
+            pt
+              ? `Pronúncia OK — ${score}%. Próxima palavra!`
+              : `Pronunciation OK — ${score}%. Next word!`,
+          );
           await markKnown(word.id);
-        } else if (score >= 55) {
-          toast(`Almost there — ${score}% match. I heard “${spoken}”.`);
         } else {
-          toast.error(`I heard “${spoken}”. Listen again and try once more.`);
+          toast.error(
+            pt
+              ? `${score}% — abaixo de 70%. Ouvi “${spoken}”. Repita a palavra.`
+              : `${score}% — below 70%. I heard “${spoken}”. Please repeat the word.`,
+          );
           // A clear miss on a due review counts as a failed review.
-          await markForgotten(word.id);
+          if (score < 55) await markForgotten(word.id);
         }
       } catch (error) {
         const cancelled = error instanceof Error && error.name === "AbortError";
