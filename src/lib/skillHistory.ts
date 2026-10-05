@@ -1,3 +1,5 @@
+import { studyToday } from "./today";
+
 export type SkillResultRow = {
   skill: string;
   score: number | null;
@@ -47,7 +49,7 @@ export function buildSkillHistory(
     if (typeof row.score !== "number" || Number.isNaN(row.score)) continue;
     const at = new Date(row.assessed_at).getTime();
     if (Number.isNaN(at)) continue;
-    const date = new Date(row.assessed_at).toISOString().slice(0, 10);
+    const date = studyToday(new Date(row.assessed_at));
     const key = `${date}|${series}`;
     const current = latest.get(key);
     if (!current || at >= current.at) {

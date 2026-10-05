@@ -215,3 +215,12 @@
 - [x] Stripe webhook: sem configuração do Stripe a requisição é rejeitada com 400 (como assinatura inválida), nunca 500.
 - [x] E2E: o login espera a hidratação do formulário; clicar antes enviava o formulário HTML (GET /auth?) e o login não acontecia.
 - [x] Lembrete diário: texto passa a dizer "ainda não completou sua meta de hoje", alinhado à regra do Study Streak.
+
+## 2026-10-05 — Auditoria, bloco 1
+- [x] Streak protegido no banco (0035): o navegador só pode zerar streak_days/last_activity_date; somente credit_study_day e as funções SECURITY DEFINER creditam.
+- [x] Chave do cron diário comparada em tempo constante (timingSafeEqual).
+- [x] Dia de estudo de São Paulo em Writing, indicadores, aviso de atividades, revisão de flashcards e gráficos (antes virava às 21h, em UTC).
+- [x] jsPDF carregado só ao baixar o PDF (LearningPathCard 460 KB → 17 KB).
+- [x] Removida a função de e-mail do guia sem uso e sem autenticação.
+- [ ] Pendente: mover a promoção de nível (level/max_level) para o servidor com validação do teste final.
+

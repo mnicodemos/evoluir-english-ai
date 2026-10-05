@@ -24,6 +24,7 @@ import {
   WRITING_CATEGORIES,
   writingLevelConfig,
 } from "@/lib/writingLevels";
+import { studyDayStartIso, studyToday } from "@/lib/today";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
@@ -45,10 +46,6 @@ export const Route = createFileRoute("/_authenticated/writing")({
 
 const HISTORY_KEY = "writing-history";
 const TASKS_PER_ROUND = WRITING_CATEGORIES.length;
-
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function readList(key: string): string[] {
   try {
@@ -159,10 +156,10 @@ function Writing() {
   const config = useMemo(() => writingLevelConfig(profile?.level), [profile?.level]);
   const rotation = startedLessons ?? 0;
   // A fresh set of tasks every day, and every time the student starts a new lesson.
-  const signature = `${todayKey()}-${config.level}-${rotation}`;
+  const signature = `${studyToday()}-${config.level}-${rotation}`;
   const roundStart = useRoundStart();
   const { data: saved } = useSavedPractice();
-  const cutoff = [`${todayKey()}T00:00:00.000Z`, roundStart ?? ""].sort().at(-1)!;
+  const cutoff = [studyDayStartIso(), roundStart ?? ""].sort().at(-1)!;
   const serverBefore = useMemo(
     () => [...new Set((saved?.writing ?? []).filter((w) => w.at < cutoff).map((w) => w.prompt))],
     [saved, cutoff],

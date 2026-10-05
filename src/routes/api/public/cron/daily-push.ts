@@ -30,6 +30,13 @@ const FALLBACK_WORDS: Record<string, { word: string; translation: string; meanin
   c2: [{ word: "ubiquitous", translation: "onipresente", meaning: "found everywhere" }],
 };
 
+/** Constant-time comparison, so response timing never reveals the scheduler key. */
+async function sameSecret(provided: string, expected: string) {
+  const { createHash, timingSafeEqual } = await import("node:crypto");
+  const digest = (value: string) => createHash("sha256").update(value, "utf8").digest();
+  return timingSafeEqual(digest(provided), digest(expected));
+}
+
 function hashIndex(seed: string, size: number) {
   let h = 0;
   for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
@@ -48,7 +55,7 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           .select("key")
           .eq("id", 1)
           .maybeSingle();
-        if (!provided || !keyRow?.key || provided !== keyRow.key) {
+        if (!provided || !keyRow?.key || !(await sameSecret(provided, keyRow.key))) {
           return new Response("Unauthorized", { status: 401 });
         }
 

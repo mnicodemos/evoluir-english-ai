@@ -23,8 +23,6 @@ import { Progress } from "@/components/ui/progress";
 import { useLearningPath, useOpenPathLesson, type PathLesson } from "@/hooks/useCurriculum";
 import { useUserLessons } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
-import { downloadCoursePlan } from "@/lib/coursePlanReport";
-import { downloadDailyReport } from "@/lib/dailyReport";
 import { findLevel } from "@/lib/level";
 import { supabase } from "@/integrations/supabase/client";
 import { useUiLang } from "@/lib/uiLang";
@@ -64,6 +62,9 @@ export function CurriculumPath() {
   const downloadPlan = async () => {
     setPlanLoading(true);
     try {
+      // The PDF library is loaded only when a download is requested, keeping
+      // it out of the Dashboard bundle.
+      const { downloadCoursePlan } = await import("@/lib/coursePlanReport");
       const saved = await downloadCoursePlan({
         name: profile?.name ?? "",
         level: path.level,
@@ -464,6 +465,7 @@ export function PathProgressCard({
     if (!profile) return;
     setDownloading(true);
     try {
+      const { downloadDailyReport } = await import("@/lib/dailyReport");
       const saved = await downloadDailyReport(profile.id, {
         name: profile.name,
         level: profile.level,

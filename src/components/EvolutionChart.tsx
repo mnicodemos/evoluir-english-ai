@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { buildSkillHistory, type SkillResultRow } from "@/lib/skillHistory";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
+import { studyToday } from "@/lib/today";
 
 type Props = {
   userId: string;
@@ -88,7 +89,7 @@ export function EvolutionChart({ userId }: Props) {
         day: "2-digit",
         month: "short",
       }),
-      date: d.toISOString().slice(0, 10),
+      date: studyToday(d),
     });
   }
 

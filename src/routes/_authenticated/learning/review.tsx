@@ -11,6 +11,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 
 import { supabase } from "@/integrations/supabase/client";
+import { studyToday } from "@/lib/today";
 
 export const Route = createFileRoute("/_authenticated/learning/review")({
   head: () => ({
@@ -54,7 +55,7 @@ function ReviewPage() {
     },
   });
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = studyToday();
 
   const startedLessonIds = useMemo(
     () =>

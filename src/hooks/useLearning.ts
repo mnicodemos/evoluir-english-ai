@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { runProgressMutation } from "@/lib/auth-retry";
 import { QUIZ_PUBLIC_FIELDS } from "@/lib/quizPublicFields";
+import { studyToday } from "@/lib/today";
 
 export type Lesson = {
   id: string;
@@ -244,7 +245,7 @@ export async function reviewFlashcard(
   const prevInterval = current?.interval_days ?? 1;
   const interval = Math.min(60, intervalByRating[rating]!(prevInterval));
   const mastery = Math.max(0, Math.min(100, (current?.mastery_level ?? 0) + masteryDelta[rating]!));
-  const next = new Date(Date.now() + interval * 86400000).toISOString().slice(0, 10);
+  const next = studyToday(new Date(Date.now() + interval * 86400000));
 
   await runProgressMutation(() =>
     supabase.from("user_flashcards").upsert(
