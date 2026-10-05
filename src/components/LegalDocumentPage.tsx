@@ -126,8 +126,7 @@ const terms: Record<UiLang, LegalDocument> = {
     title: "Terms of Use",
     updated: "Last updated: October 5, 2026",
     back: "Back",
-    translationNote:
-      "This is a translation. In case of conflict, the Portuguese version prevails.",
+    translationNote: "This is a translation. In case of conflict, the Portuguese version prevails.",
     sections: [
       {
         title: "1. Who we are",
@@ -318,8 +317,7 @@ const privacy: Record<UiLang, LegalDocument> = {
     title: "Privacy Policy",
     updated: "Last updated: October 5, 2026",
     back: "Back",
-    translationNote:
-      "This is a translation. In case of conflict, the Portuguese version prevails.",
+    translationNote: "This is a translation. In case of conflict, the Portuguese version prevails.",
     sections: [
       {
         title: "1. Data controller",
@@ -435,9 +433,14 @@ export function LegalDocumentPage({ kind }: { kind: "terms" | "privacy" }) {
           <div className="space-y-9 py-10">
             {document.sections.map((section) => (
               <section key={section.title}>
-                <h2 className="text-lg font-semibold text-foreground sm:text-xl">{section.title}</h2>
+                <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+                  {section.title}
+                </h2>
                 {section.paragraphs?.map((paragraph) => (
-                  <p key={paragraph} className="mt-3 text-sm leading-7 text-muted-foreground sm:text-base">
+                  <p
+                    key={paragraph}
+                    className="mt-3 text-sm leading-7 text-muted-foreground sm:text-base"
+                  >
                     {paragraph}
                   </p>
                 ))}
