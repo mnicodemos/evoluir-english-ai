@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { advance, canAdvance, fallBack, isDue, stepFromMastery } from "./vocabularyReview";
+import {
+  advance,
+  canAdvance,
+  fallBack,
+  isDue,
+  markPronounced,
+  stepFromMastery,
+} from "./vocabularyReview";
 
 const now = new Date("2026-10-04T12:00:00Z");
 const days = (iso: string | null) =>
@@ -43,5 +50,11 @@ describe("vocabulary review ladder", () => {
     expect(fallBack({ mastery_level: 90 }, now).mastery_level).toBe(60);
     expect(fallBack({ mastery_level: 20 }, now).mastery_level).toBe(20);
     expect(days(fallBack({ mastery_level: 75 }, now).next_review_at)).toBe(1);
+  });
+
+  it("passed pronunciation goes straight to learned with a 30-day review", () => {
+    const next = markPronounced(now);
+    expect(next.mastery_level).toBe(90);
+    expect(days(next.next_review_at)).toBe(30);
   });
 });
