@@ -19,8 +19,10 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { DashboardNotifications } from "@/components/DashboardNotifications";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { EvoGuide } from "@/components/EvoGuide";
+import { WeatherTalk } from "@/components/WeatherTalk";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
@@ -276,9 +278,21 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   EVO · {t("Your AI Learning Coach")}
                 </p>
                 <div className="mt-2">
-                  <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:whitespace-normal sm:text-sm sm:leading-normal">
-                    {t("TODAY'S PRIORITY")}
-                  </p>
+                  {/* Mobile-only bell + weather moved next to the priority label;
+                      the desktop keeps them in the greeting row. */}
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:whitespace-normal sm:text-sm sm:leading-normal">
+                      {t("TODAY'S PRIORITY")}
+                    </p>
+                    <div className="flex shrink-0 items-center gap-0.5 sm:hidden">
+                      <DashboardNotifications
+                        indicators={activityIndicators}
+                        translate={t}
+                        placement="mobile"
+                      />
+                      <WeatherTalk translate={t} placement="mobile" />
+                    </div>
+                  </div>
                   <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:text-2xl sm:leading-normal xl:text-3xl">
                     <PriorityIcon
                       className="size-5 shrink-0 text-warning sm:size-6"
