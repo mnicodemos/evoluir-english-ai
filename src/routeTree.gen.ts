@@ -34,6 +34,7 @@ import { Route as AuthenticatedLearningLessonIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedLearningFinalTestRouteImport } from './routes/_authenticated/learning/final-test'
 import { Route as AuthenticatedLearningReviewRouteImport } from './routes/_authenticated/learning/review'
 import { Route as AuthenticatedLearningUnitTestRouteImport } from './routes/_authenticated/learning/unit-test'
+import { Route as ApiPublicCronDailyPushRouteImport } from './routes/api/public/cron/daily-push'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
@@ -167,6 +168,11 @@ const AuthenticatedLearningUnitTestRoute =
     path: '/learning/unit-test',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicCronDailyPushRoute = ApiPublicCronDailyPushRouteImport.update({
+  id: '/api/public/cron/daily-push',
+  path: '/api/public/cron/daily-push',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe/webhook',
   path: '/api/public/stripe/webhook',
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/learning/review': typeof AuthenticatedLearningReviewRoute
   '/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
   '/learning/': typeof AuthenticatedLearningIndexRoute
+  '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/learning/review': typeof AuthenticatedLearningReviewRoute
   '/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
   '/learning': typeof AuthenticatedLearningIndexRoute
+  '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/_authenticated/learning/review': typeof AuthenticatedLearningReviewRoute
   '/_authenticated/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
   '/_authenticated/learning/': typeof AuthenticatedLearningIndexRoute
+  '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/learning/review'
     | '/learning/unit-test'
     | '/learning/'
+    | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/learning/review'
     | '/learning/unit-test'
     | '/learning'
+    | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
   id:
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/_authenticated/learning/review'
     | '/_authenticated/learning/unit-test'
     | '/_authenticated/learning/'
+    | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -362,6 +374,7 @@ export interface RootRouteChildren {
   ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
+  ApiPublicCronDailyPushRoute: typeof ApiPublicCronDailyPushRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -543,6 +556,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearningUnitTestRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/cron/daily-push': {
+      id: '/api/public/cron/daily-push'
+      path: '/api/public/cron/daily-push'
+      fullPath: '/api/public/cron/daily-push'
+      preLoaderRoute: typeof ApiPublicCronDailyPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stripe/webhook': {
       id: '/api/public/stripe/webhook'
       path: '/api/public/stripe/webhook'
@@ -612,6 +632,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCoachStreamRoute: ApiCoachStreamRoute,
   ApiSpeechRoute: ApiSpeechRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
+  ApiPublicCronDailyPushRoute: ApiPublicCronDailyPushRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }

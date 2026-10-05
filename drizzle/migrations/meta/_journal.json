@@ -232,6 +232,13 @@
       "when": 1791156805336,
       "tag": "0032_user_vocabulary_next_review_at",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1791159484546,
+      "tag": "0033_enable_cron_net",
+      "breakpoints": true
     }
   ]
 }
