@@ -28,3 +28,4 @@
 - Administrative authorization is decided server-side through `user_roles` and `has_role`; email addresses are never authorization rules.
 - Vocabulary "I know it" climbs a spaced-review ladder (src/lib/vocabularyReview.ts: mastery_level = step, next_review_at = due date); Learned stays mastery_level >= 75 so every count shares one threshold.
 - Pending Listening, Writing, and Vocabulary state may trigger app notifications but must not render novelty circles in mobile navigation.
+- Daily push (word of the day, study reminder) runs from pg_cron calling /api/public/cron/daily-push, authenticated by the service-only push_cron_key row; the app need not be open.

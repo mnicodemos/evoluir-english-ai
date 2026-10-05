@@ -899,6 +899,21 @@ export type Database = {
         }
         Relationships: []
       }
+      push_cron_key: {
+        Row: {
+          id: number
+          key: string
+        }
+        Insert: {
+          id?: number
+          key?: string
+        }
+        Update: {
+          id?: number
+          key?: string
+        }
+        Relationships: []
+      }
       push_tokens: {
         Row: {
           created_at: string
