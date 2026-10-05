@@ -274,6 +274,13 @@
       "when": 1791207928255,
       "tag": "0038_streak_freeze",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1791208228255,
+      "tag": "0039_weekly_league",
+      "breakpoints": true
     }
   ]
 }

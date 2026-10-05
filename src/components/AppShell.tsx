@@ -18,6 +18,7 @@ import {
   PenLine,
   Sparkles,
   SpellCheck,
+  Trophy,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
@@ -61,6 +62,7 @@ const mobileSheetNav = [
   { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
+  { to: "/league", label: "Weekly league", icon: Trophy },
   { to: "/premium", label: "Premium", icon: Crown },
 ] as const;
 
@@ -78,6 +80,7 @@ const dashboardSidebarNav = [
 const dashboardAccountNav = [
   { to: "/progress", label: "My Progress", icon: LineChart },
   { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
+  { to: "/league", label: "Weekly league", icon: Trophy },
   { to: "/premium", label: "My Subscription", icon: Crown },
 ] as const;
 
