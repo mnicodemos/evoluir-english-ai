@@ -4,7 +4,8 @@ import { Loader2, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import evoLeague from "@/assets/evo-liga.svg";
+import evoLeagueAvatar from "@/assets/evo-liga-avatar.webp";
+import evoLeaguePortrait from "@/assets/evo-liga-portrait.webp";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
@@ -78,11 +79,11 @@ function League() {
       <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,1fr)] lg:items-start lg:gap-4 lg:space-y-0">
         <header className="animate-rise flex items-center gap-3 lg:col-span-2">
           <img
-            src={evoLeague}
+            src={evoLeagueAvatar}
             alt=""
-            width={240}
-            height={280}
-            className="size-14 shrink-0 object-contain lg:size-20"
+            width={320}
+            height={320}
+            className="size-14 shrink-0 rounded-full object-cover ring-2 ring-brand-green/60 ring-offset-2 ring-offset-background lg:size-20"
           />
           <div className="min-w-0">
             <h1 className="text-lg font-bold lg:text-3xl">Weekly league</h1>
@@ -112,11 +113,12 @@ function League() {
           ) : ranking.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-4 text-center">
               <img
-                src={evoLeague}
-                alt="EVO Liga"
-                width={240}
-                height={280}
-                className="h-28 w-auto object-contain"
+                src={evoLeaguePortrait}
+                alt="EVO, a mascote da liga"
+                width={480}
+                height={600}
+                loading="lazy"
+                className="h-40 w-auto rounded-2xl object-cover ring-1 ring-border"
               />
               <p className="text-sm text-muted-foreground">
                 No one at your level joined the league this week yet.

@@ -237,7 +237,7 @@
 - [ ] Home, rodada 2 (depende de informações do dono): plano grátis/teste e preço do Premium, depoimentos ou números reais, FAQ, garantia/cancelamento e e-mail de contato com domínio próprio.
 - [x] Login e recuperação de senha: link de recuperação sempre termina em /reset-password (evento PASSWORD_RECOVERY em qualquer página); link expirado/usado mostra "Este link não é mais válido" com botão para pedir outro; nova senha com confirmação e mostrar/ocultar; erros do Supabase em português (authErrors.ts); reenviar e-mail (confirmação e redefinição) com espera de 60 s e dica de spam; "Esqueci minha senha" ao lado de Senha e só no login; painel esquerdo com logo e EVO; rodapé mínimo (cabe em uma tela); autocomplete para gerenciadores de senha; landmarks main/aside (axe sem violações).
 - [x] Clima virou prática ("Clima em inglês"): saiu da barra lateral; ícone no topo do Dashboard abre frase com áudio, 3 palavras com tradução, uma pergunta e "Falar sobre o clima com a EVO" (AI Speaking com papel de vizinho conversando sobre o tempo). Localização só ao tocar em "Usar o clima de onde estou" ou se já permitida; nunca pedida ao carregar a página.
-- [x] Mascote da liga: "EVO Liga" (src/assets/evo-liga.svg), versão menina e vetorial da EVO segurando o troféu, no título da Liga semanal e no ranking vazio ("Entre agora e seja o primeiro do ranking!").
+- [x] Mascote da liga: EVO em estilo anime, extraída do vídeo do Gemini enviado pelo dono (quadro sem legenda; avatar 320×320 e retrato 480×600 em WebP, 13 KB e 23 KB), no título da Liga semanal (avatar redondo com anel verde) e no ranking vazio (retrato) com "Entre agora e seja o primeiro do ranking!".
 - [ ] Modo offline (PWA): estudar as palavras do dia sem internet.
 
 ## 2026-10-05 — Auditoria, bloco 2
