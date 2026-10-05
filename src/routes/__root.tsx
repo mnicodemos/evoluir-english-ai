@@ -153,6 +153,12 @@ function RootComponent() {
     });
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       setSentryUser(session?.user.id ?? null);
+      // A reset link may land on any page (e.g. the Site URL when /reset-password
+      // is not an allowed redirect): always finish on the new-password screen.
+      if (event === "PASSWORD_RECOVERY" && window.location.pathname !== "/reset-password") {
+        void router.navigate({ to: "/reset-password", replace: true });
+        return;
+      }
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();

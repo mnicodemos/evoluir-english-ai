@@ -1233,4 +1233,21 @@ export const uiPt: Record<string, string> = {
   "Could not update your league participation.":
     "Não foi possível atualizar sua participação na liga.",
   "The league is not available right now.": "A liga não está disponível agora.",
+
+  // Sign-in and password recovery
+  "Email sent again": "E-mail enviado de novo",
+  "It can take a few minutes. Check your spam folder too.":
+    "Pode levar alguns minutos. Confira também a caixa de spam.",
+  "Resend in": "Reenviar em",
+  "Resend email": "Reenviar e-mail",
+  "Resend confirmation email": "Reenviar e-mail de confirmação",
+  "At least 6 characters.": "Pelo menos 6 caracteres.",
+  "The passwords do not match.": "As senhas não conferem.",
+  "Checking your link…": "Verificando seu link…",
+  "This link is no longer valid": "Este link não é mais válido",
+  "Reset links expire after a while and work only once. Ask for a new one.":
+    "Os links de redefinição expiram depois de um tempo e funcionam uma vez só. Peça um novo.",
+  "Ask for a new link": "Pedir um novo link",
+  "New password": "Nova senha",
+  "Confirm the new password": "Confirme a nova senha",
 };
