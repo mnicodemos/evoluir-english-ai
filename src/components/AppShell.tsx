@@ -49,6 +49,7 @@ import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { studyToday } from "@/lib/today";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 const mobileSheetNav = [
@@ -363,10 +364,14 @@ function AppShellContent({
     activityIndicators.listening || activityIndicators.writing || activityIndicators.vocabulary;
   useEffect(() => {
     if (!hasNewActivity) return;
-    if (localStorage.getItem("push-token") === null) return;
-    const today = new Date().toISOString().slice(0, 10);
-    if (localStorage.getItem("push-activity-notified") === today) return;
-    localStorage.setItem("push-activity-notified", today);
+    const today = studyToday();
+    try {
+      if (localStorage.getItem("push-token") === null) return;
+      if (localStorage.getItem("push-activity-notified") === today) return;
+      localStorage.setItem("push-activity-notified", today);
+    } catch {
+      return; // storage unavailable (private mode): skip the reminder
+    }
     void sendActivityPush({
       data: {
         title: translate("New activities available"),

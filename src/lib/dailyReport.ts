@@ -7,6 +7,7 @@ import { savePdf } from "@/lib/pdfDownload";
 import { ACCENT, INK, MUTED, loadLogo, shorten } from "@/lib/pdfTheme";
 import { createWorkbook } from "@/lib/pdfWorkbook";
 import { formatDate } from "@/lib/formatDate";
+import { studyToday } from "./today";
 
 export type DailyReportInput = {
   name: string;
@@ -251,8 +252,5 @@ export async function downloadDailyReport(userId: string, input: DailyReportInpu
 
   wb.finish();
 
-  return savePdf(
-    doc,
-    `evoluir-progress-${level.value}-${new Date().toISOString().slice(0, 10)}.pdf`,
-  );
+  return savePdf(doc, `evoluir-progress-${level.value}-${studyToday()}.pdf`);
 }

@@ -24,6 +24,7 @@ import { lessonBatchKey } from "@/lib/vocabularyBatch";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { roundPrompts, WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
+import { studyDayStartIso, studyToday } from "@/lib/today";
 
 /** One recovery attempt per lesson round per page load. */
 const recoveryAttempts = new Set<string>();
@@ -34,11 +35,6 @@ export type ActivityIndicators = {
   writing: boolean;
   vocabulary: boolean;
 };
-
-/** Same day key the Writing page uses for its round signature. */
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 /**
  * The current vocabulary batch and how much of it the student has mastered.
@@ -156,11 +152,11 @@ export function useActivityIndicators(): ActivityIndicators {
     if (!profile) return;
     const completion = readJson<Record<string, number>>(LISTENING_COMPLETION_KEY, {});
     const config = writingLevelConfig(profile.level);
-    const signature = `${todayKey()}-${config.level}-${round}`;
+    const signature = `${studyToday()}-${config.level}-${round}`;
 
     // Same round boundary the Writing page uses, so tasks corrected on any
     // device of this account turn the dot off everywhere.
-    const cutoff = [`${todayKey()}T00:00:00.000Z`, roundStart ?? ""].sort().at(-1)!;
+    const cutoff = [studyDayStartIso(), roundStart ?? ""].sort().at(-1)!;
     const serverDone = (savedPractice?.writing ?? [])
       .filter((w) => w.at >= cutoff)
       .map((w) => w.prompt);
