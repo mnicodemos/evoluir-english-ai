@@ -9,7 +9,6 @@ import { AppShell } from "@/components/AppShell";
 import { LessonQuiz } from "@/components/LessonQuiz";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { supabase } from "@/integrations/supabase/client";
 import { useLearningPath, useOpenFinalTest } from "@/hooks/useCurriculum";
 import { completeLesson, useLesson } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
@@ -19,6 +18,7 @@ import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 import { refreshAfterActivity, refreshAfterLevelChange } from "@/lib/refreshKeys";
+import { promoteAfterFinalTest } from "@/lib/levelPromotion.functions";
 
 export const Route = createFileRoute("/_authenticated/learning/final-test")({
   head: () => ({
@@ -51,6 +51,7 @@ function FinalTestPage() {
   const navigate = useNavigate();
   const minutesSpent = useTimeSpent();
   const saveQuizLegacy = useServerFn(persistQuizLegacy);
+  const promote = useServerFn(promoteAfterFinalTest);
   useLogTimeOnExit({
     timer: minutesSpent,
     profile,
@@ -104,11 +105,9 @@ function FinalTestPage() {
 
     setPromoting(true);
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ level: upcoming.value, max_level: upcoming.value })
-        .eq("id", profile.id);
-      if (error) throw error;
+      // The server re-checks the stored result before moving the level up.
+      const promotion = await promote({ data: { attemptKey } });
+      if (!promotion.promoted) throw new Error(promotion.reason);
       await refreshAfterLevelChange(queryClient);
       toast.success(
         lang === "pt"

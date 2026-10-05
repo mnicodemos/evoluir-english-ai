@@ -253,6 +253,13 @@
       "when": 1791201177172,
       "tag": "0035_protect_profile_streak_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1791207299190,
+      "tag": "0036_protect_profile_level_fields",
+      "breakpoints": true
     }
   ]
 }

@@ -222,7 +222,7 @@
 - [x] Dia de estudo de São Paulo em Writing, indicadores, aviso de atividades, revisão de flashcards e gráficos (antes virava às 21h, em UTC).
 - [x] jsPDF carregado só ao baixar o PDF (LearningPathCard 460 KB → 17 KB).
 - [x] Removida a função de e-mail do guia sem uso e sem autenticação.
-- [ ] Pendente: mover a promoção de nível (level/max_level) para o servidor com validação do teste final.
+- [x] Promoção de nível no servidor (promoteAfterFinalTest confere o resultado do Teste Final do nível atual, ≥ 70%) e migration 0036: após o onboarding o navegador só troca entre níveis já conquistados, não altera max_level nem reabre o onboarding.
 
 ## 2026-10-05 — Auditoria, bloco 2
 - [x] Envio de push com um helper único (src/lib/fcm.server.ts) para o aviso de atividades e o cron diário.
