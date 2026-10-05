@@ -61,11 +61,7 @@ type DashboardNotificationsProps = {
   placement: "mobile" | "desktop";
 };
 
-function DashboardNotifications({
-  indicators,
-  translate,
-  placement,
-}: DashboardNotificationsProps) {
+function DashboardNotifications({ indicators, translate, placement }: DashboardNotificationsProps) {
   const items = [
     {
       to: "/listening",
@@ -254,11 +250,7 @@ function Dashboard() {
               name={profile.name}
               placement="dashboard-header"
               desktopSubtitleTrailing={
-                <DashboardNotifications
-                  indicators={indicators}
-                  translate={t}
-                  placement="desktop"
-                />
+                <DashboardNotifications indicators={indicators} translate={t} placement="desktop" />
               }
               mobileTrailing={
                 <div className="flex items-center gap-2 whitespace-nowrap">
