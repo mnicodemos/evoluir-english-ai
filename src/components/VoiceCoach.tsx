@@ -1,16 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-import {
-  Briefcase,
-  Coffee,
-  Headphones,
-  Loader2,
-  Mic,
-  MicOff,
-  Plane,
-  Sparkles,
-  Volume2,
-} from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -22,11 +12,9 @@ import {
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { buildStudyContext, useStudySnapshot } from "@/hooks/useStudyContext";
-import { supabase } from "@/integrations/supabase/client";
 import { coachOpenerMessages, coachReplyMessages, type ConversationReport } from "@/lib/ai-prompts";
 import { aiChat } from "@/lib/aiChat.functions";
 import { getLevelState } from "@/lib/level";
@@ -42,130 +30,16 @@ import {
 import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { refreshAfterActivity } from "@/lib/refreshKeys";
+import { transcribeAudio } from "@/lib/transcribe";
+import {
+  loadUsedOpeners,
+  rememberOpener,
+  scenarioOfTheDay,
+} from "@/components/coach/coachScenarios";
+import { SpeakingReport } from "@/components/coach/SpeakingReport";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type VoiceState = "idle" | "recording" | "sending" | "transcribing" | "thinking" | "speaking";
-
-const scenarios = [
-  {
-    id: "everyday",
-    label: "Everyday English",
-    hint: "Family, friends, routine",
-    icon: Coffee,
-    fallbackOpeners: [
-      "Hi! Great to see you again. How was your day today?",
-      "Hey! Imagine we're neighbours chatting over coffee. What did you do last weekend?",
-      "Hello! Let's talk about your routine. What is the first thing you do every morning?",
-      "Hi there! Tell me about your family. Who do you spend the most time with?",
-      "Hey! Let's chat about food. What did you cook or eat yesterday?",
-      "Hi! Picture us meeting at a friend's birthday party. What do you usually talk about at parties?",
-    ],
-  },
-  {
-    id: "professional",
-    label: "Professional English",
-    hint: "Meetings, interviews, networking",
-    icon: Briefcase,
-    fallbackOpeners: [
-      "Welcome! Let's warm up for work situations. Can you tell me what you do and what a typical week looks like?",
-      "Hi! Imagine I'm interviewing you for your dream job. Tell me a little about yourself.",
-      "Hello! You're about to start a team meeting. Can you give a quick status update on your current project?",
-      "Hi! We just met at a networking event. What do you do, and why do you like it?",
-      "Welcome! You need to ask your manager for a day off. How would you start that conversation?",
-      "Hi! A new colleague just joined your team. How would you welcome them and explain your work?",
-    ],
-  },
-  {
-    id: "travel",
-    label: "Travel English",
-    hint: "Airport, hotel, restaurant",
-    icon: Plane,
-    fallbackOpeners: [
-      "Let's travel! You just landed and you're at the check-in desk of your hotel. What do you say to the receptionist?",
-      "Ready for a trip? You're at the airport and your flight is delayed. What do you ask at the information desk?",
-      "Let's go! You're at a restaurant in New York. How do you order your meal?",
-      "Imagine you're lost in London. Stop a stranger and ask for directions to the nearest station.",
-      "You're checking out of your hotel and noticed a wrong charge on the bill. What do you say?",
-      "You just met another traveller on a train. Introduce yourself and ask about their trip.",
-    ],
-  },
-] as const;
-
-const OPENERS_STORAGE_KEY = "ai-talking-openers-v2";
-
-/** Every topic already used, so the AI never opens with the same subject twice. */
-function loadUsedOpeners(): string[] {
-  try {
-    const parsed: unknown = JSON.parse(window.localStorage.getItem(OPENERS_STORAGE_KEY) ?? "[]");
-    return Array.isArray(parsed) ? parsed.filter((p): p is string => typeof p === "string") : [];
-  } catch {
-    return [];
-  }
-}
-
-function rememberOpener(opener: string): string[] {
-  const next = [...loadUsedOpeners().filter((line) => line !== opener), opener].slice(-40);
-  try {
-    window.localStorage.setItem(OPENERS_STORAGE_KEY, JSON.stringify(next));
-  } catch {
-    // Storage unavailable — repetition guard just won't persist.
-  }
-  return next;
-}
-
-/** A different scenario each day, so the daily subject always changes. */
-function scenarioOfTheDay(offset = 0) {
-  const day = Math.floor(Date.now() / 86400000);
-  return scenarios[(day + offset) % scenarios.length]!;
-}
-
-async function transcribe(audio: Blob): Promise<string> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  if (!token) throw new Error("Please sign in again to use voice conversation.");
-  const form = new FormData();
-  form.append("file", audio, "recording.wav");
-  const response = await fetch("/api/transcribe", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
-  });
-  if (!response.ok || !response.body) {
-    const body = (await response.json().catch(() => null)) as { message?: string } | null;
-    throw new Error(body?.message ?? `Transcription failed (${response.status}).`);
-  }
-
-  let buffer = "";
-  let transcript = "";
-  const consume = (event: string) => {
-    for (const line of event.split(/\r?\n/)) {
-      if (!line.startsWith("data:")) continue;
-      try {
-        const payload = JSON.parse(line.slice(5).trim()) as {
-          type?: string;
-          delta?: string;
-          text?: string;
-        };
-        if (payload.type === "transcript.text.delta") transcript += payload.delta ?? "";
-        if (payload.type === "transcript.text.done" && payload.text) transcript = payload.text;
-      } catch {
-        // Ignore keep-alive events.
-      }
-    }
-  };
-  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += value;
-    const events = buffer.split(/\r?\n\r?\n/);
-    buffer = events.pop() ?? "";
-    events.forEach(consume);
-  }
-  if (buffer.trim()) consume(buffer);
-  if (!transcript.trim()) throw new Error("I couldn't hear that clearly. Please try again.");
-  return transcript.trim();
-}
 
 export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }) {
   const { data: profile } = useProfile();
@@ -327,7 +201,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
     try {
       const audio = await stopVoiceRecording();
       if (mounted.current) setVoiceState("transcribing");
-      const text = await transcribe(audio);
+      const text = await transcribeAudio(audio);
       const next: ChatMessage[] = [...messages, { role: "user", content: text }];
       setMessages(next);
       setVoiceState("thinking");
@@ -613,52 +487,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
         </p>
       </div>
 
-      {report && (
-        <section className="card-soft animate-rise p-6">
-          <h2 className="text-lg font-semibold">Speaking report</h2>
-          <div className="mt-5 grid gap-5 sm:grid-cols-3">
-            {[
-              { label: "Fluency", value: report.fluency },
-              { label: "Grammar", value: report.grammar },
-              { label: "Vocabulary", value: report.vocabulary },
-            ].map((score) => (
-              <div key={score.label}>
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium">{score.label}</span>
-                  <span className="text-muted-foreground">{score.value}</span>
-                </div>
-                <Progress value={score.value} className="mt-2 h-2" />
-              </div>
-            ))}
-          </div>
-          <p className="mt-5 text-sm text-muted-foreground">{report.summary}</p>
-          {report.suggestions.length > 0 && (
-            <>
-              <h3 className="mt-6 font-semibold">Improvement suggestions</h3>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                {report.suggestions.map((suggestion) => (
-                  <li key={suggestion}>{suggestion}</li>
-                ))}
-              </ul>
-            </>
-          )}
-          {report.new_words.length > 0 && (
-            <>
-              <h3 className="mt-6 font-semibold">Words to learn</h3>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {report.new_words.map((word) => (
-                  <span
-                    key={word}
-                    className="rounded-full bg-accent px-3 py-1 text-sm text-accent-foreground"
-                  >
-                    {word}
-                  </span>
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-      )}
+      {report && <SpeakingReport report={report} />}
     </div>
   );
 }

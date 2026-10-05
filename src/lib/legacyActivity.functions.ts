@@ -12,7 +12,7 @@ import {
   telemetryInputSchema,
 } from "@/lib/legacyActivity.schemas";
 import { listeningAnswerScore, pronunciationSimilarity } from "@/lib/legacyScores";
-import { activityItemLevel, persistActivityEvidence } from "@/lib/pedagogy/dualWrite.functions";
+import { activityItemLevel, persistActivityEvidence } from "@/lib/pedagogy/dualWriteCore";
 import {
   LISTENING_RUBRIC_VERSION,
   PRONUNCIATION_RUBRIC_VERSION,

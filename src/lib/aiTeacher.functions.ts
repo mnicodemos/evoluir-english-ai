@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callGateway } from "@/lib/ai-gateway.server";
-import { deterministicUuid, persistTeacherEvidence } from "@/lib/pedagogy/dualWrite.functions";
+import { deterministicUuid, persistTeacherEvidence } from "@/lib/pedagogy/dualWriteCore";
 import { itemLevelFromStoredLevel } from "@/lib/pedagogy/cefr";
 import { loadTeacherContext } from "@/lib/pedagogy/teacherContext.server";
 import { classifyTeacherMode } from "@/lib/pedagogy/teacherMode";
