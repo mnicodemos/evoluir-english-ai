@@ -1,4 +1,4 @@
-import { Hand, TreePine } from "lucide-react";
+import { TreePine } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import reflectionBg from "@/assets/reflection-bg.jpg.asset.json";
@@ -53,15 +53,8 @@ export function EvoDailyReflection({
       <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:block">
         <div className="lg:hidden">{mobileLeading}</div>
         <div className="min-w-0 text-left">
-          <h1 className="flex min-w-0 items-center gap-2 font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
-            <span className="truncate">
-              {greeting}, {displayName}!
-            </span>
-            <Hand
-              className="size-4 shrink-0 fill-warning/25 text-warning sm:size-6"
-              strokeWidth={2.2}
-              aria-hidden="true"
-            />
+          <h1 className="truncate font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
+            {greeting}, {displayName}!
           </h1>
           <div className="mt-0.5 hidden min-w-0 items-center gap-2 sm:mt-1 sm:flex">
             <p className="min-w-0 truncate text-[11px] leading-tight text-muted-foreground sm:text-sm">
