@@ -9,6 +9,16 @@ export async function signIn(page: Page) {
     throw new Error("Authenticated E2E requires E2E_USER_EMAIL and E2E_USER_PASSWORD.");
   }
   await page.goto("/auth", { waitUntil: "domcontentloaded" });
+  // Wait for React to take over the form: a click before hydration submits the
+  // plain HTML form (GET /auth?) and the sign-in never runs.
+  await page.waitForFunction(
+    () => {
+      const form = document.querySelector("form");
+      return !!form && Object.keys(form).some((key) => key.startsWith("__react"));
+    },
+    undefined,
+    { timeout: 20_000 },
+  );
   await page.locator('input[type="email"]').fill(email);
   await page.locator('input[type="password"]').fill(password);
   await page.locator('button[type="submit"]').click();

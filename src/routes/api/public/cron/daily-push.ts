@@ -77,10 +77,11 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
         const messages = new Map<string, { title: string; body: string; path: string }>();
         for (const p of profiles ?? []) {
           if (kind === "reminder") {
-            if (p.last_activity_date === today) continue; // already studied today
+            // last_activity_date is set only when the day's goal is met (credit_study_day).
+            if (p.last_activity_date === today) continue;
             messages.set(p.id, {
               title: "Hora de estudar inglês 📚",
-              body: "Você ainda não estudou hoje. Faça uma atividade rápida e mantenha seu Streak!",
+              body: "Você ainda não completou sua meta de hoje. Faça uma atividade rápida e mantenha seu Streak!",
               path: "/dashboard",
             });
             continue;
