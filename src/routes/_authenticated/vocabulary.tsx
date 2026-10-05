@@ -370,7 +370,8 @@ function Vocabulary() {
           );
           await markPronouncedKnown(word.id);
         } else {
-          toast.error(
+          // A low score is coaching, not a failure: amber "try again", not a red error.
+          toast.warning(
             pt
               ? `${score}% — abaixo de 70%. Ouvi “${spoken}”. Repita a palavra.`
               : `${score}% — below 70%. I heard “${spoken}”. Please repeat the word.`,
