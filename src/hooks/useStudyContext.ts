@@ -45,17 +45,24 @@ export function useStudySnapshot() {
         await Promise.all([
           supabase
             .from("user_lessons")
-            .select("lesson_id, video_progress, video_completed_at, completed_at"),
+            .select("lesson_id, video_progress, video_completed_at, completed_at")
+            .eq("user_id", profile!.id),
           supabase
             .from("user_flashcards")
-            .select("flashcard_id, mastery_level, last_rating, times_reviewed, last_reviewed_at"),
+            .select("flashcard_id, mastery_level, last_rating, times_reviewed, last_reviewed_at")
+            .eq("user_id", profile!.id),
           fetchUserVocabularyMastery(queryClient),
           supabase
             .from("quiz_results")
             .select("lesson_id, score, created_at")
+            .eq("user_id", profile!.id)
             .order("created_at", { ascending: false })
             .limit(30),
-          supabase.from("learning_profile").select("common_errors").maybeSingle(),
+          supabase
+            .from("learning_profile")
+            .select("common_errors")
+            .eq("user_id", profile!.id)
+            .maybeSingle(),
           lessons.length
             ? supabase
                 .from("flashcards")

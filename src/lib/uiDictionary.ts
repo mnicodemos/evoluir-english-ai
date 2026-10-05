@@ -37,6 +37,9 @@ export const uiPt: Record<string, string> = {
   "Notifications on": "Notificações ativas",
   "Notifications off": "Notificações desativadas",
   "New activities available": "Novas atividades disponíveis",
+  "New vocabulary words": "Novas palavras no Vocabulário",
+  "New words from your last lesson are ready to practise.":
+    "As palavras novas da sua última aula estão prontas para praticar.",
   "New listening activity": "Nova atividade de escuta",
   "New writing activity": "Nova atividade de escrita",
   "New vocabulary activity": "Nova atividade de vocabulário",

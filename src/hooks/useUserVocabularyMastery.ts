@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import { currentUserId } from "@/lib/currentUserId";
 
 export const USER_VOCABULARY_MASTERY_KEY = ["user-vocabulary-mastery"] as const;
 
@@ -21,9 +22,12 @@ export function fetchUserVocabularyMastery(queryClient: QueryClient): Promise<Wo
     queryKey: [...USER_VOCABULARY_MASTERY_KEY],
     staleTime: 30_000,
     queryFn: async (): Promise<WordMastery[]> => {
+      const userId = await currentUserId();
+      if (!userId) return [];
       const { data, error } = await supabase
         .from("user_vocabulary")
-        .select("word_id, mastery_level, last_reviewed_at");
+        .select("word_id, mastery_level, last_reviewed_at")
+        .eq("user_id", userId);
       if (error) throw error;
       return (data ?? []).map((row) => ({
         word_id: row.word_id,

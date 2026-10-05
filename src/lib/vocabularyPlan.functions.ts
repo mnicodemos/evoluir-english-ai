@@ -59,8 +59,15 @@ export function parseWords(
         .replace(/^```(?:json)?/i, "")
         .replace(/```$/, "")
         .trim(),
-    ) as { words?: unknown };
-    const items = Array.isArray(value?.words) ? value.words.slice(0, 20) : [];
+    ) as unknown;
+    // Gemini may answer {"words": [...]}, another wrapper key, or a bare array.
+    const list = Array.isArray(value)
+      ? value
+      : value && typeof value === "object"
+        ? (Object.values(value as Record<string, unknown>).find(Array.isArray) as
+            unknown[] | undefined)
+        : undefined;
+    const items = Array.isArray(list) ? list.slice(0, 20) : [];
     const words = items.flatMap((item) => {
       const parsed = aiWordSchema.safeParse(item);
       return parsed.success ? [parsed.data] : [];
@@ -196,7 +203,14 @@ async function buildDailyWords(
   }
 
   const exclude = new Set(usedWords);
-  const first = await askAi(exclude);
+  // An unreadable first answer is retried below with the wider prompt instead
+  // of failing the whole batch.
+  let first: AiWord[] = [];
+  try {
+    first = await askAi(exclude);
+  } catch (error) {
+    console.error("[vocabulary] first generation attempt failed", (error as Error).message);
+  }
   // Saving fewer than ten words is fine; the batch is never padded with existing words.
   let fresh = selectNewWords(first, usedWords, missing);
 
@@ -213,7 +227,8 @@ async function buildDailyWords(
     try {
       await new Promise((resolve) => setTimeout(resolve, 6_000));
       fresh = selectNewWords(await askAi(exclude, true), usedWords, missing);
-    } catch {
+    } catch (error) {
+      console.error("[vocabulary] widened generation attempt failed", (error as Error).message);
       fresh = [];
     }
   }

@@ -29,6 +29,7 @@ export function MinutesByDayChart({ userId, level }: Props) {
       const { data } = await supabase
         .from("activities")
         .select("activity_type, duration_minutes, created_at")
+        .eq("user_id", userId)
         .eq("level", level)
         .gte("created_at", since);
       const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });

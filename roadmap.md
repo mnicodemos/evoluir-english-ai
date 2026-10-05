@@ -244,3 +244,8 @@
 - [x] Meu progresso em três abas (Visão geral, Jornada, Histórico; a escolhida fica lembrada): cada aba cabe em 1280×800; no Histórico, Evolução à esquerda e Erros frequentes/Atividade recente à direita.
 - [x] Trilha de aprendizado: só a unidade da próxima lição fica aberta (à esquerda); as demais viram linhas recolhidas à direita, com o Teste final; curso e próxima lição lado a lado. Cabe em 1920×1080; em 1280×800 caiu de 2.526 para 1.132px; no celular de 4.444 para 2.124px.
 
+## 2026-10-05 — Vocabulary após a aula e notificação
+- [x] Leituras por aluno filtram explicitamente o usuário logado (aulas, flashcards, quiz, vocabulário, progresso, perfil de aprendizagem, atividades): a rodada de aulas do app volta a bater com a do servidor mesmo numa conta que vê outros alunos (admin), e o lote/aviso do Vocabulary é encontrado.
+- [x] Push próprio de "Novas palavras no Vocabulário" uma vez por aula concluída (o push diário costuma ser gasto antes por Escrita/Escuta).
+- [x] Geração de palavras aceita respostas do Gemini como array ou outro invólucro, e a primeira resposta ilegível cai na segunda tentativa em vez de falhar o lote.
+

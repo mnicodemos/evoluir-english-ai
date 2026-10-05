@@ -461,6 +461,7 @@ export function PathProgressCard({
       const { data } = await supabase
         .from("progress")
         .select("*")
+        .eq("user_id", profile!.id)
         .eq("level", profile!.level)
         .order("recorded_at", { ascending: false })
         .limit(1)

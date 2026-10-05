@@ -48,6 +48,8 @@ import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useLessonRound } from "@/hooks/useLessonRound";
+import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { studyToday } from "@/lib/today";
 
@@ -381,6 +383,26 @@ function AppShellContent({
     }).catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasNewActivity]);
+
+  // A finished lesson's vocabulary batch gets its own push, once per lesson
+  // round: the daily push above is usually spent earlier by the day's new
+  // Writing and Listening tasks, so new words were never announced.
+  const { data: lessonRound } = useLessonRound();
+  useEffect(() => {
+    if (!activityIndicators.vocabulary || lessonRound === undefined) return;
+    const round = String(lessonRound);
+    if (readStorage("push-token") === null) return;
+    if (readStorage("push-vocabulary-notified") === round) return;
+    writeStorage("push-vocabulary-notified", round);
+    void sendActivityPush({
+      data: {
+        title: translate("New vocabulary words"),
+        body: translate("New words from your last lesson are ready to practise."),
+        path: "/vocabulary",
+      },
+    }).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activityIndicators.vocabulary, lessonRound]);
 
   async function signOut() {
     await queryClient.cancelQueries();

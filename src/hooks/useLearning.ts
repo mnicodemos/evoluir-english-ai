@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { runProgressMutation } from "@/lib/auth-retry";
 import { QUIZ_PUBLIC_FIELDS } from "@/lib/quizPublicFields";
 import { studyToday } from "@/lib/today";
+import { currentUserId } from "@/lib/currentUserId";
 
 export type Lesson = {
   id: string;
@@ -85,9 +86,12 @@ export function useUserLessons() {
   return useQuery({
     queryKey: ["user-lessons"],
     queryFn: async (): Promise<UserLesson[]> => {
+      const userId = await currentUserId();
+      if (!userId) return [];
       const { data, error } = await supabase
         .from("user_lessons")
-        .select("lesson_id, video_progress, progress, completed_at");
+        .select("lesson_id, video_progress, progress, completed_at")
+        .eq("user_id", userId);
       if (error) throw error;
       return (data ?? []) as UserLesson[];
     },
@@ -98,6 +102,7 @@ export function useLesson(lessonId: string) {
   return useQuery({
     queryKey: ["lesson", lessonId],
     queryFn: async () => {
+      const userId = (await currentUserId()) ?? "";
       const [lesson, flashcards, quiz, mine] = await Promise.all([
         supabase.from("lessons").select("*").eq("id", lessonId).maybeSingle(),
         supabase
@@ -115,6 +120,7 @@ export function useLesson(lessonId: string) {
           .from("user_lessons")
           .select("lesson_id, video_progress, progress, completed_at")
           .eq("lesson_id", lessonId)
+          .eq("user_id", userId)
           .maybeSingle(),
       ]);
       // A failed read is not "lesson not found": surface it so the page can retry.
@@ -150,11 +156,14 @@ export function useUserFlashcards() {
   return useQuery({
     queryKey: ["user-flashcards"],
     queryFn: async (): Promise<UserFlashcard[]> => {
+      const userId = await currentUserId();
+      if (!userId) return [];
       const { data, error } = await supabase
         .from("user_flashcards")
         .select(
           "flashcard_id, mastery_level, times_reviewed, last_rating, interval_days, next_review_date",
-        );
+        )
+        .eq("user_id", userId);
       if (error) throw error;
       return (data ?? []) as UserFlashcard[];
     },
@@ -165,9 +174,12 @@ export function useQuizResults() {
   return useQuery({
     queryKey: ["quiz-results"],
     queryFn: async () => {
+      const userId = await currentUserId();
+      if (!userId) return [];
       const { data, error } = await supabase
         .from("quiz_results")
         .select("id, lesson_id, score, total_questions, correct_count, created_at")
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;
