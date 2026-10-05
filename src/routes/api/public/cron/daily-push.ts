@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { studyToday } from "@/lib/today";
+import { isWeeklyReportDay, weekStartIso, weeklyReportMessage } from "@/lib/weeklyReport";
 
 /** Small per-level fallback when the shared word bank has nothing new. */
 const FALLBACK_WORDS: Record<string, { word: string; translation: string; meaning: string }[]> = {
@@ -57,7 +58,13 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
         }
 
         const body = (await request.json().catch(() => ({}))) as { kind?: string };
-        const kind = body.kind === "reminder" ? "reminder" : "word";
+        // Sunday's evening reminder becomes the weekly EVO report (one push, same schedule).
+        const kind =
+          body.kind === "weekly" || (body.kind === "reminder" && isWeeklyReportDay())
+            ? "weekly"
+            : body.kind === "reminder"
+              ? "reminder"
+              : "word";
 
         const { fcmCredentials, sendFcm } = await import("@/lib/fcm.server");
         const credentials = fcmCredentials();
@@ -73,13 +80,56 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
 
         const { data: profiles } = await supabaseAdmin
           .from("profiles")
-          .select("id, level, last_activity_date")
+          .select("id, level, last_activity_date, streak_days")
           .in("id", userIds);
         // Same study day as credit_study_day (America/Sao_Paulo).
         const today = studyToday();
 
         const messages = new Map<string, { title: string; body: string; path: string }>();
+        const weekStart = weekStartIso();
         for (const p of profiles ?? []) {
+          if (kind === "weekly") {
+            const count = { count: "exact" as const, head: true };
+            const [activities, lessons, words, reviewed] = await Promise.all([
+              supabaseAdmin
+                .from("activities")
+                .select("duration_minutes")
+                .eq("user_id", p.id)
+                .gte("created_at", weekStart),
+              supabaseAdmin
+                .from("user_lessons")
+                .select("id", count)
+                .eq("user_id", p.id)
+                .gte("completed_at", weekStart),
+              supabaseAdmin
+                .from("user_vocabulary")
+                .select("id", count)
+                .eq("user_id", p.id)
+                .gte("created_at", weekStart),
+              supabaseAdmin
+                .from("learning_errors")
+                .select("id", count)
+                .eq("user_id", p.id)
+                .gte("last_reviewed_at", weekStart),
+            ]);
+            const rows = activities.data ?? [];
+            const message = weeklyReportMessage({
+              minutes: rows.reduce((sum, row) => sum + (row.duration_minutes ?? 0), 0),
+              activities: rows.length,
+              lessons: lessons.count ?? 0,
+              words: words.count ?? 0,
+              mistakesReviewed: reviewed.count ?? 0,
+              streakDays: p.streak_days ?? 0,
+            });
+            if (p.last_activity_date !== today) {
+              message.body = `${message.body} Ainda dá tempo de cumprir a meta de hoje!`.slice(
+                0,
+                280,
+              );
+            }
+            messages.set(p.id, message);
+            continue;
+          }
           if (kind === "reminder") {
             // last_activity_date is set only when the day's goal is met (credit_study_day).
             if (p.last_activity_date === today) continue;
