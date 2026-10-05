@@ -1,11 +1,17 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Mic, RotateCcw, Search, Square, Volume2, X } from "lucide-react";
+import { Check, Loader2, RotateCcw, Search, Volume2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { highlightWord } from "@/components/vocabulary/highlightWord";
+import {
+  VocabularyWordList,
+  type VocabularyListContext,
+  type Word,
+} from "@/components/vocabulary/VocabularyWordList";
 import { Button } from "@/components/ui/button";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -69,32 +75,6 @@ export const Route = createFileRoute("/_authenticated/vocabulary")({
   }),
   component: Vocabulary,
 });
-
-type Word = {
-  id: string;
-  word: string;
-  translation: string;
-  meaning: string;
-  pronunciation: string;
-  example: string;
-  category: string;
-  difficulty: string;
-};
-
-function highlightWord(sentence: string, word: string) {
-  const safe = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const re = new RegExp(`(${safe})`, "gi");
-  const parts = sentence.split(re);
-  return parts.map((part, i) =>
-    part.toLowerCase() === word.toLowerCase() ? (
-      <strong key={i} className="text-foreground">
-        {part}
-      </strong>
-    ) : (
-      <span key={i}>{part}</span>
-    ),
-  );
-}
 
 function Vocabulary() {
   const { lang } = useUiLang();
@@ -548,121 +528,20 @@ function Vocabulary() {
     )
     .slice(0, DAILY_REVIEW_LIMIT);
 
-  function List({
-    items,
-    showActions = true,
-    highlightKnown = false,
-  }: {
-    items: Word[];
-    showActions?: boolean;
-    highlightKnown?: boolean;
-  }) {
-    if (items.length === 0)
-      return (
-        <p className="mt-6 text-sm text-muted-foreground">Nothing here yet — keep practicing.</p>
-      );
-    return (
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {items.map((w) => {
-          const isRecording = recordingId === w.id;
-          const isChecking = checkingId === w.id;
-          const state = byWord.get(w.id);
-          const isKnown = highlightKnown && knownNow(w.id);
-          const mastery = state?.mastery_level ?? 0;
-          const isLearning = highlightKnown && !isKnown && mastery > 0 && mastery < LEARNED_MASTERY;
-          return (
-            <article key={w.id} className={`card-soft p-4 xl:p-3 ${isKnown ? "opacity-60" : ""}`}>
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0 flex-1 break-words">
-                  <h3 className="text-lg font-semibold">{w.word}</h3>
-                  <p className="text-sm text-muted-foreground">{w.translation}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {isKnown && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-medium text-success">
-                      <Check className="size-3" aria-hidden /> {t("Known")}
-                    </span>
-                  )}
-                  {isLearning && (
-                    <span className="rounded-full bg-warning/15 px-2.5 py-1 text-xs font-medium text-warning">
-                      {t("Still learning")}
-                    </span>
-                  )}
-                  <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
-                    {w.difficulty}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => speak(`daily-${w.id}`, w.word)}
-                    aria-label="Listen"
-                    className={
-                      playingKey === `daily-${w.id}`
-                        ? "bg-success text-success-foreground hover:bg-success/90"
-                        : ""
-                    }
-                  >
-                    <Volume2 className="size-4" />
-                  </Button>
-                </div>
-              </div>
-              <p className="mt-1.5 text-sm">{w.meaning}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{w.pronunciation}</p>
-              <p className="mt-1.5 rounded-lg bg-secondary/70 px-3 py-1.5 text-xs italic line-clamp-2">
-                "{w.example}"
-              </p>
-              {showActions && (
-                <div className="mt-3 flex gap-2">
-                  {!isKnown && (
-                    <Button
-                      size="sm"
-                      className="min-h-11 flex-1"
-                      disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
-                      onClick={() => markKnown(w.id)}
-                      aria-label="I know this word"
-                      title="I know this word"
-                    >
-                      <Check className="size-4" /> {t("I know it")}
-                    </Button>
-                  )}
-                  {!isKnown && isDue(state) && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="min-h-11 flex-1"
-                      disabled={busy === w.id || Boolean(recordingId) || Boolean(checkingId)}
-                      onClick={() => markForgotten(w.id)}
-                    >
-                      <X className="size-4" /> {t("Not yet")}
-                    </Button>
-                  )}
-                  <Button
-                    className="min-h-11 flex-1"
-                    variant={isRecording ? "destructive" : "outline"}
-                    disabled={isChecking || Boolean(checkingId)}
-                    onClick={() => togglePronunciation(w)}
-                    aria-label={
-                      isRecording ? "Stop and check pronunciation" : "Test your pronunciation"
-                    }
-                    title={isRecording ? "Stop and check pronunciation" : "Test your pronunciation"}
-                  >
-                    {isChecking ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : isRecording ? (
-                      <Square className="size-4" />
-                    ) : (
-                      <Mic className="size-4" />
-                    )}
-                    {isRecording ? t("Stop") : t("Say it")}
-                  </Button>
-                </div>
-              )}
-            </article>
-          );
-        })}
-      </div>
-    );
-  }
+  // Shared state and actions for the three word lists (review, today, learned).
+  const listProps: VocabularyListContext = {
+    t,
+    byWord,
+    knownNow,
+    busy,
+    recordingId,
+    checkingId,
+    playingKey,
+    onSpeak: speak,
+    onMarkKnown: markKnown,
+    onMarkForgotten: markForgotten,
+    onTogglePronunciation: togglePronunciation,
+  };
 
   return (
     <AppShell mobileOneScreen>
@@ -842,7 +721,7 @@ function Vocabulary() {
                     <h2 className="text-sm font-semibold">
                       {t("Review due")} ({reviewItems.filter((w) => !knownNow(w.id)).length})
                     </h2>
-                    <List items={reviewItems} highlightKnown />
+                    <VocabularyWordList items={reviewItems} highlightKnown {...listProps} />
                   </section>
                 )}
                 {today.length > 0 ? (
@@ -869,7 +748,9 @@ function Vocabulary() {
                         </div>
                       </div>
                     )}
-                    {todayOpen.length > 0 && <List items={todayOpen} highlightKnown />}
+                    {todayOpen.length > 0 && (
+                      <VocabularyWordList items={todayOpen} highlightKnown {...listProps} />
+                    )}
                   </>
                 ) : !generating && !genFailed ? (
                   <p className="mt-6 text-sm text-muted-foreground">
@@ -880,7 +761,7 @@ function Vocabulary() {
             )}
           </TabsContent>
           <TabsContent value="learned">
-            <List items={learned} showActions={false} />
+            <VocabularyWordList items={learned} showActions={false} {...listProps} />
           </TabsContent>
         </Tabs>
       )}

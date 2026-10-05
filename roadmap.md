@@ -234,4 +234,5 @@
 - [x] VoiceCoach: dependência do efeito de abertura documentada (sem aviso de lint).
 - [x] Repositório: removidos o link simbólico do Chromium local e a captura avulsa em shots/; .gitignore cobre binários do navegador e relatórios do Playwright.
 - [ ] Próximos lotes: dividir arquivos grandes (vocabulary.tsx, dualWrite.functions.ts, curriculum.functions.ts, VoiceCoach.tsx, LearningPathCard.tsx), um por PR.
+- [x] Bloco 3, lote 2: lista de palavras do Vocabulary extraída para components/vocabulary/VocabularyWordList.tsx (antes recriada a cada renderização); vocabulary.tsx 888 → 770 linhas.
 
