@@ -15,6 +15,7 @@ import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { useVocabularyProgress } from "@/hooks/useVocabularyProgress";
 import { supabase } from "@/integrations/supabase/client";
+import { formatDate } from "@/lib/formatDate";
 
 interface RecentActivity {
   id: string;
@@ -198,11 +199,19 @@ function ProgressPage() {
                       )}
                     </span>
                     <span className="text-muted-foreground">
-                      {new Date(a.created_at).toLocaleDateString()} · {a.duration_minutes} min
+                      {formatDate(a.created_at, lang)} · {a.duration_minutes} min
                     </span>
                   </span>
                   {a.score != null && (
-                    <span className="shrink-0 font-semibold text-[oklch(0.55_0.14_158)]">
+                    <span
+                      className={`shrink-0 font-semibold ${
+                        a.score >= 70
+                          ? "text-[oklch(0.55_0.14_158)]"
+                          : a.score >= 50
+                            ? "text-warning"
+                            : "text-destructive"
+                      }`}
+                    >
                       {a.score}%
                     </span>
                   )}
