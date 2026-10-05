@@ -190,9 +190,14 @@ function Dashboard() {
               mobileTrailing={
                 <div className="flex items-center gap-2 whitespace-nowrap">
                   <FirstWeekGuide profile={profile} placement="mobile" />
-                  <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
-                    {profile.level}
-                  </span>
+                  {/* Mobile-only bell + weather back at the top; the level badge
+                      moved next to the priority label in NextStepCard. */}
+                  <DashboardNotifications
+                    indicators={indicators}
+                    translate={t}
+                    placement="mobile"
+                  />
+                  <WeatherTalk translate={t} placement="mobile" />
                   <span className="flex items-center gap-1">
                     <Flame
                       className="size-5 shrink-0 fill-current text-current"
