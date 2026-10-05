@@ -29,6 +29,7 @@ import {
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
 import { pronunciationScore, transcribeAudio } from "@/lib/transcribe";
+import { PronunciationHint } from "@/components/vocabulary/PronunciationHint";
 import {
   cancelBrowserRecognition,
   startBrowserRecognition,
@@ -373,6 +374,11 @@ function Vocabulary() {
             pt
               ? `${score}% — abaixo de 70%. Ouvi “${spoken}”. Repita a palavra.`
               : `${score}% — below 70%. I heard “${spoken}”. Please repeat the word.`,
+            {
+              // Which part of the word came out different, not only the percentage.
+              description: <PronunciationHint target={word.word} spoken={spoken} pt={pt} />,
+              duration: 8000,
+            },
           );
           // A clear miss on a due review counts as a failed review.
           if (score < 55) await markForgotten(word.id);
