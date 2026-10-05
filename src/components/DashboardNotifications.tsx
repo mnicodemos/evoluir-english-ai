@@ -81,7 +81,7 @@ export function DashboardNotifications({
       <PopoverContent
         align={placement === "mobile" ? "end" : "start"}
         sideOffset={8}
-        className="notification-popover dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] border-notification-border bg-popover/80 p-2 text-popover-foreground backdrop-blur-md backdrop-saturate-150"
+        className="notification-popover dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] border-notification-border bg-popover/70 p-2 text-popover-foreground backdrop-blur-md backdrop-saturate-150"
       >
         <div className="flex items-center justify-between gap-2 px-2 py-1.5">
           <p className="font-display text-sm font-semibold">{translate("Notifications")}</p>
