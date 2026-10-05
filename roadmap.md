@@ -158,7 +158,7 @@
 - [x] Mobile — rótulo "Prioridade de hoje" centralizado verticalmente entre os textos de cima e de baixo (mt-1 → mt-2)
 - [x] Mobile — EVO encosta na borda superior do bloco: faixas pretas embutidas no banner (linhas 0–153 e 571–668) recortadas em novo asset evo-dashboard-mobile-flush.jpg (1600×425), aplicado só na variante mobile do NextStepCard; desktop inalterado.
 - [x] Mobile — descolar o último bloco do Dashboard do menu inferior (pb-0 → pb-[10px] no contêiner do shell)
-- [x] Mobile — mostrar indicadores verdes por atividade no menu lateral e no botão Mais
+- [x] Mobile — remover indicadores verdes por atividade do menu lateral e do botão Mais; manter a detecção somente para notificações
 - [x] Vocabulary desktop — organizar as 10 palavras em 5 linhas e 2 colunas
 - [x] Unificar “This week” e Frequency com a regra oficial do Study Streak
 - [x] Dashboard — indicar meta diária atingida, uniformizar barras de habilidades, reforçar ícones e completar traduções de navegação
