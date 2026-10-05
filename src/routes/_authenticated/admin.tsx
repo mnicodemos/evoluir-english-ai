@@ -3,15 +3,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isAdminUser, listRegisteredUsers } from "@/lib/admin.functions";
+import { captureSentryException } from "@/lib/sentry";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -36,6 +38,7 @@ function AdminPage() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const navigate = useNavigate();
+  const [sentrySent, setSentrySent] = useState(false);
 
   const checkAdmin = useServerFn(isAdminUser);
   const fetchUsers = useServerFn(listRegisteredUsers);
@@ -78,7 +81,26 @@ function AdminPage() {
 
       <div className="mt-3 sm:mt-6">
         <section className="card-soft p-3 sm:p-5">
-          <p className="text-xs text-muted-foreground sm:text-sm">
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                captureSentryException(new Error("Teste do Sentry pelo painel de admin"));
+                setSentrySent(true);
+              }}
+            >
+              {t("Send test error to Sentry")}
+            </Button>
+            {sentrySent ? (
+              <span className="text-sm text-muted-foreground" role="status">
+                {t("Test error sent")}
+              </span>
+            ) : null}
+          </div>
+
+          <p className="mt-3 text-xs text-muted-foreground sm:text-sm">
             {t("Registered users")}
             {usersQuery.data ? `: ${usersQuery.data.total}` : ""}
           </p>
