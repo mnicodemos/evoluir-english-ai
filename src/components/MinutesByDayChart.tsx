@@ -66,12 +66,12 @@ export function MinutesByDayChart({ userId, level }: Props) {
   if (!hasMinutes) return null;
 
   return (
-    <div className="mt-6">
+    <div className="mt-3 sm:mt-6">
       <h3 className="text-sm font-medium">Minutes per day</h3>
-      <p className="mt-1 text-xs text-muted-foreground">
+      <p className="mt-1 hidden text-xs text-muted-foreground sm:block">
         Each bar is your practice time that day, split by activity.
       </p>
-      <div className="mt-3 h-56 w-full">
+      <div className="mt-3 h-48 w-full sm:h-56">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={minutesByDay ?? []} margin={{ left: -24, right: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />

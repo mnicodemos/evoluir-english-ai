@@ -193,7 +193,7 @@
 - [x] Desktop: subtítulos no Quick Access (6 cartões) e no Quick Win / Take the challenge (layout em duas linhas com divisor), linha separadora acima dos botões; subtítulos do Quick Access sem corte (quebram linha). Mobile inalterado.
 
 - ✅ 2026-10-03 — Desktop 1280–1439: coluna da imagem do card EVO reduzida para 17rem (CSS próprio .dashboard-evo-grid; variantes arbitrárias min-[1280px] não compilaram) mantendo 1440+ com 25rem; botões Quick Win / Aceitar o desafio descolados 8px da borda inferior (xl:mb-2). Mobile inalterado.
-- [ ] My Progress — otimizar espaço para caber em uma página (mobile)
+- [x] My Progress — otimizar espaço para caber em uma página (mobile): Histórico mostra um gráfico por vez abaixo do xl (Notas | Minutos; minutos primeiro sem notas avaliadas), gráficos mais baixos e legenda de minutos oculta no celular, atividade recente com 3 itens no celular. Visão geral e Jornada já cabiam.
 - [x] Dashboard — trocar ícone CircleX do estado vazio por Clock e "min." por "min" no anel de minutos
 - [x] My Progress — compactação mobile (calendário, jornada, evolução, cartões menores)
 - [x] My Progress — Erros frequentes e Atividade recente lado a lado no desktop (xl:grid-cols-2), eliminando o espaço vazio; empilhados no mobile
@@ -240,6 +240,7 @@
 - [x] Mascote da liga: EVO em estilo anime, extraída do vídeo do Gemini enviado pelo dono (quadro sem legenda; avatar 320×320 e retrato 480×600 em WebP, 13 KB e 23 KB), no título da Liga semanal (avatar redondo com anel verde) e no ranking vazio (retrato) com "Entre agora e seja o primeiro do ranking!".
 - [x] Fechamento da liga no relatório de domingo: quem entrou na liga recebe a posição final ("Liga B2: 2º de 5 🥈. Nova semana começa amanhã!"), calculada com o mesmo league_week_xp do ranking (empates dividem a posição, como rank()); se algum XP falhar, a linha da liga é omitida.
 - [x] Notificações (toasts) levemente transparentes, com desfoque de fundo.
+- [x] Painéis de notificações (sino) e "Clima em inglês" translúcidos com desfoque (bg-popover/80 + backdrop-blur); o do clima ganhou a mesma borda branca do de notificações.
 - [x] Troféu da meta semanal no Dashboard desktop: troféu dourado preenchido com estrela e brilho (GoldTrophy) no lugar do ícone de contorno; cinza apagado enquanto a meta não é batida.
 - [ ] Modo offline (PWA): estudar as palavras do dia sem internet.
 

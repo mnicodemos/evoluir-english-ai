@@ -120,7 +120,7 @@ export function EvolutionChart({ userId }: Props) {
         <span>{chartData[0]?.name}</span> <span>{t("and day 7 is today")}</span>{" "}
         <span>({chartData[6]?.name})</span>. <span>{t("Each line shows your score in %.")}</span>
       </p>
-      <div className="mt-5 h-72 w-full">
+      <div className="mt-4 h-56 w-full sm:mt-5 sm:h-72">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ left: -20, right: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
