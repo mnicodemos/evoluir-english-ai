@@ -255,7 +255,7 @@
     --accent: oklch(0.92 0.006 240);
     --accent-foreground: oklch(0.24 0.01 240);
     --brand-green: oklch(0.55 0.14 168);
-    background-color: oklch(0.97 0.004 240 / 90%);
+    background-color: oklch(0.97 0.004 240 / 78%);
     color: oklch(0.24 0.01 240);
   }
 }
