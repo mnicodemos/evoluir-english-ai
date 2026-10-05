@@ -49,6 +49,15 @@ export function advance(state: ReviewState | undefined, now = new Date()) {
   };
 }
 
+/** Passed pronunciation (>= 70%): straight to the learned step, review in 30 days. */
+export function markPronounced(now = new Date()) {
+  const step = 5; // mastery 90
+  return {
+    mastery_level: REVIEW_MASTERY[step]!,
+    next_review_at: new Date(now.getTime() + REVIEW_INTERVAL_DAYS[step]! * DAY_MS).toISOString(),
+  };
+}
+
 /** Failed review: back two steps (never below step 1), due again tomorrow. */
 export function fallBack(state: ReviewState | undefined, now = new Date()) {
   const step = Math.max(1, stepFromMastery(state?.mastery_level) - 2);
