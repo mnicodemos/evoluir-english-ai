@@ -26,6 +26,25 @@ import {
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 
+/**
+ * Display-only formatting for teacher replies: the "Correct form:" line becomes a
+ * highlighted quote and "Idea 1/Idea 2" lines become a short list, so the student
+ * spots the fix and the task at a glance. The stored message text is unchanged.
+ */
+function formatTeacherReply(content: string): string {
+  return content
+    .split("\n")
+    .map((line) => {
+      const trimmed = line.trim().replace(/^\*\*(.+?)\*\*/, "$1");
+      const correct = trimmed.match(/^correct(?:ed)? (?:form|sentence|version):\s*(.+)$/i);
+      if (correct) return `> ✅ **Correct form:** ${correct[1]}`;
+      const idea = trimmed.match(/^idea (\d+):\s*(.+)$/i);
+      if (idea) return `- **Idea ${idea[1]}:** ${idea[2]}`;
+      return line;
+    })
+    .join("\n");
+}
+
 const suggestions = [
   "Explain a grammar topic",
   "Practice vocabulary",
@@ -235,14 +254,14 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
                   contrast="inverse"
                   className="card-soft overflow-hidden bg-primary -mx-4 -mt-4 pr-4"
                 />
-                <div className="flex flex-wrap gap-2">
+                <div className="grid gap-2 sm:grid-cols-2">
                   {suggestions.map((suggestion) => (
                     <Button
                       key={suggestion}
                       variant="outline"
-                      size="sm"
                       onClick={() => send(suggestion)}
                       disabled={turn.isPending}
+                      className="h-auto min-h-11 justify-start whitespace-normal py-2.5 text-left"
                     >
                       {t(suggestion)}
                     </Button>
@@ -256,8 +275,12 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
                 <span className="text-xs font-medium text-muted-foreground group-[.is-user]:ml-auto">
                   {message.role === "user" ? t("You") : t("AI Teacher")}
                 </span>
-                <MessageContent>
-                  <MessageResponse>{message.content}</MessageResponse>
+                <MessageContent className={message.role === "assistant" ? "max-w-prose" : undefined}>
+                  <MessageResponse>
+                    {message.role === "assistant"
+                      ? formatTeacherReply(message.content)
+                      : message.content}
+                  </MessageResponse>
                 </MessageContent>
               </Message>
             ))}
