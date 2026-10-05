@@ -81,7 +81,26 @@ function AdminPage() {
 
       <div className="mt-3 sm:mt-6">
         <section className="card-soft p-3 sm:p-5">
-          <p className="text-xs text-muted-foreground sm:text-sm">
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                captureSentryException(new Error("Teste do Sentry pelo painel de admin"));
+                setSentrySent(true);
+              }}
+            >
+              {t("Send test error to Sentry")}
+            </Button>
+            {sentrySent ? (
+              <span className="text-sm text-muted-foreground" role="status">
+                {t("Test error sent")}
+              </span>
+            ) : null}
+          </div>
+
+          <p className="mt-3 text-xs text-muted-foreground sm:text-sm">
             {t("Registered users")}
             {usersQuery.data ? `: ${usersQuery.data.total}` : ""}
           </p>
