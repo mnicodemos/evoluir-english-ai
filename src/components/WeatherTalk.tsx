@@ -20,7 +20,8 @@ export function WeatherTalk({
   translate: (label: string) => string;
   placement: "desktop" | "mobile";
 }) {
-  const { condition, live, locating, requestLocation } = useWeatherCondition();
+  const { condition, isLive: live, refresh: requestLocation } = useWeatherCondition();
+  const locating = false;
   const [speaking, setSpeaking] = useState(false);
   const talk = WEATHER_TALK[condition];
   const Icon = weatherIcons[condition];

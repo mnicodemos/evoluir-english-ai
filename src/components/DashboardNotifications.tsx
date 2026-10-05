@@ -15,7 +15,9 @@ type DashboardNotificationsProps = {
 
 /** Manual "read" marks last for the current São Paulo day only, so tomorrow's activity shows again. */
 function readKey() {
-  const day = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+  const day = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(
+    new Date(),
+  );
   return `notifications-read:${day}`;
 }
 
@@ -50,9 +52,19 @@ export function DashboardNotifications({
   };
 
   const items = [
-    { to: "/listening", label: "New listening activity", icon: Headphones, visible: indicators.listening },
+    {
+      to: "/listening",
+      label: "New listening activity",
+      icon: Headphones,
+      visible: indicators.listening,
+    },
     { to: "/writing", label: "New writing activity", icon: PenLine, visible: indicators.writing },
-    { to: "/vocabulary", label: "New vocabulary activity", icon: BookOpen, visible: indicators.vocabulary },
+    {
+      to: "/vocabulary",
+      label: "New vocabulary activity",
+      icon: BookOpen,
+      visible: indicators.vocabulary,
+    },
   ] as const;
   const activeItems = items.filter((item) => item.visible && !read.includes(item.to));
   const hasNotifications = activeItems.length > 0;

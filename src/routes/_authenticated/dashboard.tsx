@@ -23,7 +23,7 @@ import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
 import { getLeague, getNextLeague, LeagueBadge } from "@/components/LeagueBadge";
-import { PathProgressCard } from "@/components/LearningPathCard";
+import { PathProgressCard } from "@/components/PathProgressCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
 
