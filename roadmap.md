@@ -224,6 +224,7 @@
 - [x] Removida a função de e-mail do guia sem uso e sem autenticação.
 - [x] Promoção de nível no servidor (promoteAfterFinalTest confere o resultado do Teste Final do nível atual, ≥ 70%) e migration 0036: após o onboarding o navegador só troca entre níveis já conquistados, não altera max_level nem reabre o onboarding.
 - [x] Meus erros (/mistakes): a correção do Writing devolve até 5 erros estruturados (salvos item a item em learning_errors; repetição reforça o mesmo erro). Revisão espaçada 1/3/7/14/30 dias decidida no servidor (reviewMistake); errar volta ao início. Migration 0037 (review_step, next_review_at, last_reviewed_at). Item no menu lateral e no "Mais" do celular.
+- [x] Relatório semanal da EVO: no domingo, o lembrete das 19h (São Paulo) vira um push com o resumo dos últimos 7 dias de estudo (minutos, lições, palavras novas, erros revisados, Streak); quem não estudou recebe um convite para o plano. Sem novo agendamento: usa o mesmo pg_cron/daily-push (kind "weekly" também pode ser chamado direto).
 
 ## 2026-10-05 — Auditoria, bloco 2
 - [x] Envio de push com um helper único (src/lib/fcm.server.ts) para o aviso de atividades e o cron diário.
