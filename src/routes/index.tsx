@@ -2,24 +2,28 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowDown,
   ArrowRight,
-  BookOpenText,
+  AudioLines,
   BriefcaseBusiness,
-  CheckCircle2,
-  Compass,
+  CalendarCheck,
+  CircleAlert,
   Ear,
   GraduationCap,
-  Languages,
+  Mail,
   MessageCircleMore,
   Mic2,
   PenLine,
-  RouteIcon,
+  ShieldCheck,
+  Snowflake,
   Sparkles,
-  Target,
-  TrendingUp,
+  SpellCheck,
+  Trophy,
   Users,
-  Volume2,
 } from "lucide-react";
 
+import appCoach from "@/assets/home/app-coach.jpg";
+import appLearning from "@/assets/home/app-learning.jpg";
+import appMistakes from "@/assets/home/app-mistakes.jpg";
+import appWriting from "@/assets/home/app-writing.jpg";
 import evoImage from "@/assets/evo-landing.webp";
 import evoProfile from "@/assets/evo-profile.jpg.asset.json";
 import { Footer } from "@/components/Footer";
@@ -27,26 +31,53 @@ import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 
+const SITE_URL = "https://evoluirmaisenglishai.com/";
+const OG_IMAGE = `${SITE_URL}og-image.jpg`;
+const TITLE = "Evoluir+ English AI | Aprenda inglês com inteligência artificial";
+const DESCRIPTION =
+  "App de inglês com IA: converse por voz com a EVO, tenha seus textos corrigidos na hora e siga uma trilha do A1 ao C2 com revisão dos seus próprios erros.";
+
+/** Organization + app description for search engines (no prices or ratings claimed). */
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      name: "Evoluir+ English AI",
+      url: SITE_URL,
+      logo: `${SITE_URL}icon-512.png`,
+    },
+    {
+      "@type": "WebApplication",
+      name: "Evoluir+ English AI",
+      url: SITE_URL,
+      applicationCategory: "EducationalApplication",
+      operatingSystem: "Web, Android, iOS",
+      inLanguage: "pt-BR",
+      description: DESCRIPTION,
+    },
+  ],
+};
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI | Seu inglês evolui com você" },
-      {
-        name: "description",
-        content:
-          "Aprenda, pratique e acompanhe sua evolução em inglês com uma jornada personalizada pelo Evoluir+ English AI.",
-      },
-      { property: "og:title", content: "Evoluir+ English AI | Seu inglês evolui com você" },
-      {
-        property: "og:description",
-        content:
-          "Aprenda, pratique e acompanhe sua evolução em inglês com uma jornada personalizada pelo Evoluir+ English AI.",
-      },
+      { title: TITLE },
+      { name: "description", content: DESCRIPTION },
+      { property: "og:title", content: TITLE },
+      { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://evoluirmaisenglishai.com/" },
+      { property: "og:url", content: SITE_URL },
+      { property: "og:locale", content: "pt_BR" },
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "EVO, a professora de inglês com IA do Evoluir+" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: OG_IMAGE },
     ],
-    links: [{ rel: "canonical", href: "https://evoluirmaisenglishai.com/" }],
+    links: [{ rel: "canonical", href: SITE_URL }],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(STRUCTURED_DATA) }],
   }),
   component: CommercialLanding,
 });
@@ -55,29 +86,6 @@ const problems = [
   "Você estuda, mas não sabe o que priorizar.",
   "Você aprende conteúdo, mas nem sempre consegue usá-lo em situações reais.",
   "Você pratica, mas nem sempre consegue perceber sua evolução.",
-];
-
-const pillars = [
-  {
-    icon: Compass,
-    title: "DIAGNÓSTICO",
-    text: "Entenda suas habilidades e pontos que precisam de atenção.",
-  },
-  {
-    icon: RouteIcon,
-    title: "PLANO PERSONALIZADO",
-    text: "Tenha uma jornada orientada para seu objetivo.",
-  },
-  {
-    icon: Target,
-    title: "PRÁTICA",
-    text: "Aprenda e pratique dentro da mesma experiência.",
-  },
-  {
-    icon: TrendingUp,
-    title: "EVOLUÇÃO",
-    text: "Acompanhe evidências da sua evolução.",
-  },
 ];
 
 const journey = [
@@ -94,13 +102,61 @@ const evoMessages = [
   "Agora vamos usar essa habilidade em outro contexto.",
 ];
 
-const skills = [
-  [Ear, "Listening"],
-  [MessageCircleMore, "Speaking"],
-  [PenLine, "Writing"],
-  [BookOpenText, "Vocabulary"],
-  [Volume2, "Pronunciation"],
-  [Languages, "Reading"],
+/** Screens of the real app, captured with demonstration data. */
+const screens = [
+  {
+    image: appLearning,
+    title: "Trilha do seu nível, do A1 ao C2",
+    text: "Lições com vídeo, resumo, flashcards, quiz e prática guiada. A próxima lição sempre à vista.",
+  },
+  {
+    image: appCoach,
+    title: "Converse por voz com a EVO",
+    text: "Fale de verdade, em situações reais: entrevista de emprego, reunião, hotel, restaurante.",
+  },
+  {
+    image: appWriting,
+    title: "Escrita corrigida na hora",
+    text: "Seu texto corrigido, uma versão natural e notas de gramática, vocabulário e clareza.",
+  },
+  {
+    image: appMistakes,
+    title: "Seus erros viram revisão",
+    text: "Os erros das suas correções voltam em revisão espaçada até você acertar de vez.",
+  },
+] as const;
+
+const heroProofs = [
+  [AudioLines, "Conversa por voz com IA"],
+  [PenLine, "Correção de escrita"],
+  [GraduationCap, "Trilha A1–C2"],
+] as const;
+
+const extras = [
+  [SpellCheck, "Meus erros com revisão espaçada"],
+  [Mail, "Relatório semanal da EVO"],
+  [ShieldCheck, "Seus dados não aparecem para outros alunos sem permissão"],
+] as const;
+
+const features = [
+  [
+    Ear,
+    "Listening com shadowing",
+    "Ouça frases reais, repita e fale junto com o áudio para pegar o ritmo.",
+  ],
+  [Mic2, "Pronúncia por som", "Veja qual parte da palavra saiu diferente, não só uma porcentagem."],
+  [
+    MessageCircleMore,
+    "Situações reais",
+    "Role-plays com a EVO escolhidos pelo objetivo do seu plano.",
+  ],
+  [
+    CalendarCheck,
+    "Plano de estudo semanal",
+    "Um plano pelo seu objetivo, tempo disponível e foco.",
+  ],
+  [Trophy, "Liga semanal", "Ranking opcional com alunos do seu nível. Participa quem quiser."],
+  [Snowflake, "Proteção do Streak", "Faltou um dia na semana? Sua sequência continua."],
 ] as const;
 
 const audiences = [
@@ -142,11 +198,18 @@ function CommercialLanding() {
             <Logo className="size-10 shrink-0 lg:size-[3.32rem]" />
             <BrandName className="truncate text-sm sm:text-base" />
           </Link>
-          <Button asChild size="sm" className="shrink-0">
-            <Link to="/auth" search={{ mode: "signup" }}>
-              Começar <ArrowRight aria-hidden="true" />
-            </Link>
-          </Button>
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <Button asChild size="sm" variant="ghost">
+              <Link to="/auth" search={{ mode: "signin" }}>
+                Entrar
+              </Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link to="/auth" search={{ mode: "signup" }}>
+                Começar <ArrowRight aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -156,20 +219,21 @@ function CommercialLanding() {
           <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-7xl items-center gap-6 px-4 pb-0 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pt-10">
             <div className="z-10 max-w-3xl pb-12 lg:pb-20">
               <p className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-success">
-                <Sparkles className="size-4" aria-hidden="true" /> Uma jornada feita para você
+                <Sparkles className="size-4" aria-hidden="true" /> App de inglês com inteligência
+                artificial
               </p>
               <h1 className="text-4xl font-bold leading-[1.08] sm:text-6xl lg:text-7xl">
                 Seu inglês não segue um curso.
                 <span className="mt-2 block text-gradient-growth">Ele evolui com você.</span>
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-xl">
-                Descubra o que você realmente precisa melhorar, pratique de forma personalizada e
-                acompanhe sua evolução em inglês.
+                Converse por voz com a EVO, tenha seus textos corrigidos na hora e siga uma trilha
+                do A1 ao C2 no seu ritmo, revisando os seus próprios erros até acertar.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="min-h-12 w-full sm:w-auto">
                   <Link to="/auth" search={{ mode: "signup" }}>
-                    DESCUBRA SEU PRÓXIMO PASSO <ArrowRight aria-hidden="true" />
+                    Descubra seu próximo passo <ArrowRight aria-hidden="true" />
                   </Link>
                 </Button>
                 <Button
@@ -178,11 +242,19 @@ function CommercialLanding() {
                   variant="outline"
                   className="min-h-12 w-full bg-background/40 sm:w-auto"
                 >
-                  <a href="#como-funciona">
-                    CONHEÇA O EVOLUIR+ <ArrowDown aria-hidden="true" />
+                  <a href="#por-dentro">
+                    Veja o app por dentro <ArrowDown aria-hidden="true" />
                   </a>
                 </Button>
               </div>
+              <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                {heroProofs.map(([Icon, label]) => (
+                  <li key={label} className="flex items-center gap-1.5">
+                    <Icon className="size-4 text-success" aria-hidden="true" />
+                    {label}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div className="relative mx-auto flex h-[519px] w-full max-w-[718px] items-end justify-center sm:h-[718px] lg:h-[904px] lg:self-end">
@@ -214,7 +286,7 @@ function CommercialLanding() {
                     key={problem}
                     className="card-soft flex items-start gap-4 p-5 text-card-foreground sm:p-6"
                   >
-                    <CheckCircle2
+                    <CircleAlert
                       className="mt-0.5 size-5 shrink-0 text-warning"
                       aria-hidden="true"
                     />
@@ -226,23 +298,6 @@ function CommercialLanding() {
                 O problema nem sempre é falta de estudo.
                 <span className="block text-success">Pode ser falta de direção.</span>
               </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-secondary/40 py-10 sm:py-14">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading eyebrow="O diferencial" title="Não é apenas sobre estudar inglês." />
-            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {pillars.map(({ icon: Icon, title, text }) => (
-                <article key={title} className="card-soft p-6">
-                  <span className="grid size-11 place-items-center text-primary">
-                    <Icon className="size-6" aria-hidden="true" />
-                  </span>
-                  <h3 className="mt-5 text-sm font-bold text-card-foreground">{title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p>
-                </article>
-              ))}
             </div>
           </div>
         </section>
@@ -265,7 +320,37 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="overflow-hidden bg-secondary/40 py-10 sm:py-14">
+        <section id="por-dentro" className="scroll-mt-20 bg-secondary/40 py-10 sm:py-14">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading eyebrow="Por dentro do app" title="Veja como é estudar no Evoluir+." />
+            <div className="mt-10 grid gap-5 lg:grid-cols-2">
+              {screens.map((screen) => (
+                <figure key={screen.title} className="card-soft overflow-hidden">
+                  <img
+                    src={screen.image}
+                    alt={`Tela do Evoluir+: ${screen.title}`}
+                    width={1069}
+                    height={715}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[1069/715] w-full border-b border-border bg-background object-contain object-top"
+                  />
+                  <figcaption className="p-5">
+                    <h3 className="font-semibold text-card-foreground">{screen.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                      {screen.text}
+                    </p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Telas reais do app, com dados de demonstração.
+            </p>
+          </div>
+        </section>
+
+        <section className="overflow-hidden py-10 sm:py-14">
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.12fr_0.72fr] lg:px-8">
             <div className="relative mx-auto aspect-[3/2] w-full max-w-[470px] overflow-hidden rounded-lg">
               <img
@@ -305,111 +390,30 @@ function CommercialLanding() {
           </div>
         </section>
 
-        <section className="border-y border-border/70 py-10 sm:py-14">
-          <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-            <div>
-              <SectionHeading title="Aprender inglês é mais do que acertar exercícios." />
-              <p className="mt-6 max-w-xl leading-relaxed text-muted-foreground">
-                O Evoluir+ considera sua jornada de aprendizagem para orientar os próximos passos,
-                em vez de simplesmente contar quantas atividades você realizou.
-              </p>
-            </div>
-            <div
-              className="card-soft p-5 text-card-foreground sm:p-8"
-              aria-label="Caminho da evidência até a evolução"
-            >
-              {["Evidência", "Prática", "Contexto", "Evolução"].map((item, index, array) => (
-                <div key={item}>
-                  <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary/60 p-4">
-                    <span className="font-display font-semibold text-card-foreground">{item}</span>
-                    {index === array.length - 1 ? (
-                      <Sparkles className="size-5 text-success" aria-hidden="true" />
-                    ) : (
-                      <span className="size-2 rounded-full bg-warning" aria-hidden="true" />
-                    )}
-                  </div>
-                  {index < array.length - 1 ? (
-                    <ArrowDown
-                      className="mx-auto my-2 size-5 text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-10 sm:py-14">
+        <section className="border-y border-border/70 bg-secondary/40 py-10 sm:py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading
-              eyebrow="Habilidades"
-              title="Uma experiência. Diferentes habilidades."
-            />
-            <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              {skills.map(([Icon, label]) => (
-                <div
-                  key={label}
-                  className="card-soft flex min-h-32 flex-col justify-between p-5 text-card-foreground"
-                >
-                  <Icon className="size-6 text-success" aria-hidden="true" />
-                  <h3 className="mt-8 text-sm font-semibold text-card-foreground">
-                    {[...label].map((letter, index) => (
-                      <span key={`${letter}-${index}`} aria-hidden="true">
-                        {letter}
-                      </span>
-                    ))}
-                  </h3>
-                </div>
+            <SectionHeading eyebrow="Recursos" title="Tudo para praticar um pouco todos os dias." />
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {features.map(([Icon, title, text]) => (
+                <article key={title} className="card-soft flex gap-4 p-5 text-card-foreground">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-success/10 text-success">
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-bold">{title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{text}</p>
+                  </div>
+                </article>
               ))}
             </div>
-          </div>
-        </section>
-
-        <section className="bg-secondary/40 py-10 sm:py-14">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-            <div>
-              <SectionHeading eyebrow="Seu progresso" title="Veja sua evolução ganhar forma." />
-              <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
-                Visualize o que você já conquistou, onde está agora e qual caminho faz sentido
-                seguir.
-              </p>
-            </div>
-            <div
-              className="card-soft overflow-hidden text-card-foreground"
-              aria-label="Exemplo visual da área de evolução, sem dados pessoais"
-            >
-              <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-7">
-                <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">
-                    Minha evolução
-                  </p>
-                  <p className="mt-1 font-display font-semibold">Evidências da sua jornada</p>
-                </div>
-                <span className="grid size-10 place-items-center text-primary">
-                  <TrendingUp className="size-6" aria-hidden="true" />
-                </span>
-              </div>
-              <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-7">
-                {[
-                  "Você evoluiu em",
-                  "Você consolidou",
-                  "Continue praticando",
-                  "Seu próximo passo",
-                ].map((label) => (
-                  <div key={label} className="rounded-lg border border-border bg-secondary/60 p-4">
-                    <p className="text-xs font-semibold text-card-foreground">{label}</p>
-                    <div className="mt-5 flex items-center gap-2 text-success" aria-hidden="true">
-                      <CheckCircle2 className="size-5" />
-                      <span className="h-px flex-1 bg-border" />
-                    </div>
-                    <p className="mt-4 text-xs text-muted-foreground">
-                      Baseado na sua própria prática.
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+              {extras.map(([Icon, label]) => (
+                <li key={label} className="flex items-center gap-1.5">
+                  <Icon className="size-4 text-success" aria-hidden="true" />
+                  {label}
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -447,7 +451,7 @@ function CommercialLanding() {
             </p>
             <Button asChild size="lg" className="mt-8 min-h-12 w-full sm:w-auto">
               <Link to="/auth" search={{ mode: "signup" }}>
-                COMEÇAR AGORA <ArrowRight aria-hidden="true" />
+                Começar agora <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
           </div>
