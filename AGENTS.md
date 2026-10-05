@@ -21,6 +21,7 @@
 - Path lessons are repaired on open from the lesson page (any entry link) and AI lesson replies are salvaged item by item; an interrupted or imperfect generation must never leave a lesson without its quiz.
 - Study streak days are credited only in the database (credit_study_day, fired by triggers on activities, user_lessons and user_vocabulary); clients never write streak fields, so the daily rule has one home.
 - Streak protection (one missed day per week, Monday to Sunday in São Paulo) is applied only by credit_study_day into streak_freeze_used_on; src/lib/streakFreeze.ts mirrors it for display, so a protected streak never looks broken.
+- Weekly league XP is computed only in the database (league_week_xp / weekly_league); other students are exposed only by first name + initial and only after they opt in (profiles.league_opt_in).
 - Weekly and monthly frequency views read the same qualifying evidence as `credit_study_day`; this keeps presentation aligned while the database remains the sole streak writer.
 - Vocabulary word generation uses the faster Lovable AI model (LOVABLE_VOCABULARY_MODEL); the slower talking model exceeded the 60 s call limit and left batches empty.
 - Vocabulary AI replies are salvaged word by word and the browser releases a stuck generation after 80 s; one bad item or a dropped connection must never leave a lesson's batch empty.

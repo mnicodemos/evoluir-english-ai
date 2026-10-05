@@ -232,6 +232,9 @@
 - [x] Modo shadowing no Listening: o botão "Shadowing: fale junto" toca a frase e grava ao mesmo tempo; mostra a porcentagem de palavras acompanhadas e o que foi dito. É só prática (não entra na nota da sessão), porque o microfone pode captar o áudio sem fone.
 - [x] Pronúncia por som no Vocabulary: abaixo de 70%, o aviso mostra a palavra com as letras que não foram ouvidas destacadas e diz em qual som prestar atenção (alinhamento letra a letra com o trecho mais parecido da transcrição; a nota continua a mesma).
 - [x] Situações reais no AI Speaking: 6 role-plays (entrevista de emprego, reunião de equipe, check-in no hotel, restaurante, aeroporto, médico) com abertura fixa e a EVO no papel; a primeira sugerida segue o objetivo do Plano de estudo (⭐). O relatório usa a categoria da situação.
+- [x] Liga semanal (/league): ranking opt-in por nível CEFR, segunda a domingo (São Paulo). XP calculado só no banco (migration 0039: league_week_xp/weekly_league): lição 50, sessão de Writing/Listening/Speaking 20, meta do dia 30, erro revisado 5, palavra revisada 2. Outros alunos aparecem só com primeiro nome + inicial e só se entraram na liga.
+- [ ] Análise da página inicial do site (home pública): proposta de valor, hierarquia, chamadas para ação, prova social, desempenho, SEO e mobile, com melhorias em ordem de impacto.
+- [ ] Modo offline (PWA): estudar as palavras do dia sem internet.
 
 ## 2026-10-05 — Auditoria, bloco 2
 - [x] Envio de push com um helper único (src/lib/fcm.server.ts) para o aviso de atividades e o cron diário.

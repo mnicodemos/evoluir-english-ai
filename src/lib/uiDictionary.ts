@@ -1209,4 +1209,27 @@ export const uiPt: Record<string, string> = {
   "At a restaurant": "No restaurante",
   "Airport check-in": "Check-in no aeroporto",
   "At the doctor's": "No médico",
+
+  // Weekly league
+  "Weekly league": "Liga semanal",
+  "Monday to Sunday · resets every Monday": "Segunda a domingo · recomeça toda segunda",
+  Ranking: "Ranking",
+  "No one at your level joined the league this week yet.":
+    "Ninguém do seu nível entrou na liga nesta semana ainda.",
+  "(you)": "(você)",
+  "Your participation": "Sua participação",
+  "This week": "Nesta semana",
+  "Other students at your level see your first name and initial, and your XP.":
+    "Alunos do seu nível veem seu primeiro nome, a inicial do sobrenome e seu XP.",
+  "You are not in the ranking. Join to appear with your first name and initial.":
+    "Você não está no ranking. Entre para aparecer com seu primeiro nome e a inicial do sobrenome.",
+  "Leave the league": "Sair da liga",
+  "Join the league": "Entrar na liga",
+  "How to earn XP": "Como ganhar XP",
+  "Writing, Listening or Speaking session": "Sessão de Writing, Listening ou Speaking",
+  "Daily goal met": "Meta do dia cumprida",
+  "Mistake reviewed": "Erro revisado",
+  "Word reviewed": "Palavra revisada",
+  "Could not update your league participation.":
+    "Não foi possível atualizar sua participação na liga.",
 };

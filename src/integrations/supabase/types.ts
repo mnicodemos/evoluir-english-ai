@@ -807,6 +807,7 @@ export type Database = {
           goal: string
           id: string
           last_activity_date: string | null
+          league_opt_in: boolean
           level: string
           max_level: string
           name: string
@@ -831,6 +832,7 @@ export type Database = {
           goal?: string
           id: string
           last_activity_date?: string | null
+          league_opt_in?: boolean
           level?: string
           max_level?: string
           name?: string
@@ -855,6 +857,7 @@ export type Database = {
           goal?: string
           id?: string
           last_activity_date?: string | null
+          league_opt_in?: boolean
           level?: string
           max_level?: string
           name?: string
@@ -1549,6 +1552,16 @@ export type Database = {
       }
     }
     Functions: {
+      weekly_league: {
+        Args: never
+        Returns: {
+          rank_position: number | null
+          display_name: string
+          xp: number
+          is_me: boolean
+          joined: boolean
+        }[]
+      }
       claim_pedagogical_retries: {
         Args: { p_limit?: number; p_stale_seconds?: number; p_user_id: string }
         Returns: {
