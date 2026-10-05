@@ -228,6 +228,7 @@
 - [x] Writing em duas colunas no desktop (xl), como o Listening: prática à esquerda; à direita Tarefas de hoje (com nota de cada tarefa), Foco da escrita do nível (prioridades e tamanho esperado) e atalho para Meus erros. Abaixo do editor no celular, sem repetir as tarefas. Cabe em 1280×800 e 1920×1080.
 - [x] Trilha de aprendizado numa tela só no notebook (lg): lições numa linha (objetivo no tooltip), unidades recolhidas mais baixas, Unidade 6 numa linha e descrição do topo escondida. Cabe em 1280×800 e 1920×1080; celular sem mudança.
 - [x] Limpeza técnica: dualWrite.functions.ts (771 → 292 linhas, núcleo em pedagogy/dualWriteCore.ts), curriculum.functions.ts (735 → 326, geração de lição em curriculumContent.server.ts) e VoiceCoach.tsx (664 → 493: cenários em coach/coachScenarios.ts, relatório em coach/SpeakingReport.tsx e transcrição reaproveitando lib/transcribe.ts, que estava duplicada).
+- [x] Proteção do Streak: faltar 1 dia por semana (seg–dom, São Paulo) não quebra a sequência. Aplicada só no banco (credit_study_day, migration 0038, coluna streak_freeze_used_on protegida contra escrita do navegador); o Dashboard mostra um floco de neve quando a proteção está cobrindo um dia.
 
 ## 2026-10-05 — Auditoria, bloco 2
 - [x] Envio de push com um helper único (src/lib/fcm.server.ts) para o aviso de atividades e o cron diário.

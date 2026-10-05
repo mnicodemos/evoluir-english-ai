@@ -1,22 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import { streakAlive } from "@/lib/streakFreeze";
 import { studyToday } from "@/lib/today";
 
 /**
- * Streak as it should be shown today: it only stays alive when the last study day
- * was today or yesterday (Brazilian time). Otherwise the streak is broken.
+ * Streak as it should be shown today: it stays alive when the last study day
+ * was today or yesterday (Brazilian time), or the day before yesterday when
+ * this week's streak protection still covers yesterday (credit_study_day
+ * applies it on the next study day). Otherwise the streak is broken.
  */
 export function effectiveStreak(profile: {
   streak_days: number;
   last_activity_date: string | null;
+  streak_freeze_used_on?: string | null;
 }) {
-  if (!profile.last_activity_date) return 0;
-  const today = studyToday();
-  const yesterday = studyToday(new Date(Date.now() - 86400000));
-  if (profile.last_activity_date === today || profile.last_activity_date === yesterday)
-    return profile.streak_days;
-  return 0;
+  return streakAlive(profile.last_activity_date, profile.streak_freeze_used_on, studyToday()).alive
+    ? profile.streak_days
+    : 0;
 }
 
 export type Profile = {
@@ -32,6 +33,7 @@ export type Profile = {
   daily_minutes: number;
   streak_days: number;
   last_activity_date: string | null;
+  streak_freeze_used_on?: string | null;
   onboarding_completed: boolean;
   plan: string;
   plan_interval: string | null;

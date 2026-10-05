@@ -267,6 +267,13 @@
       "when": 1791207628255,
       "tag": "0037_learning_errors_review",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1791207928255,
+      "tag": "0038_streak_freeze",
+      "breakpoints": true
     }
   ]
 }
