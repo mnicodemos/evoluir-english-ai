@@ -227,6 +227,7 @@
 - [x] Relatório semanal da EVO: no domingo, o lembrete das 19h (São Paulo) vira um push com o resumo dos últimos 7 dias de estudo (minutos, lições, palavras novas, erros revisados, Streak); quem não estudou recebe um convite para o plano. Sem novo agendamento: usa o mesmo pg_cron/daily-push (kind "weekly" também pode ser chamado direto).
 - [x] Writing em duas colunas no desktop (xl), como o Listening: prática à esquerda; à direita Tarefas de hoje (com nota de cada tarefa), Foco da escrita do nível (prioridades e tamanho esperado) e atalho para Meus erros. Abaixo do editor no celular, sem repetir as tarefas. Cabe em 1280×800 e 1920×1080.
 - [x] Trilha de aprendizado numa tela só no notebook (lg): lições numa linha (objetivo no tooltip), unidades recolhidas mais baixas, Unidade 6 numa linha e descrição do topo escondida. Cabe em 1280×800 e 1920×1080; celular sem mudança.
+- [x] Limpeza técnica: dualWrite.functions.ts (771 → 292 linhas, núcleo em pedagogy/dualWriteCore.ts), curriculum.functions.ts (735 → 326, geração de lição em curriculumContent.server.ts) e VoiceCoach.tsx (664 → 493: cenários em coach/coachScenarios.ts, relatório em coach/SpeakingReport.tsx e transcrição reaproveitando lib/transcribe.ts, que estava duplicada).
 
 ## 2026-10-05 — Auditoria, bloco 2
 - [x] Envio de push com um helper único (src/lib/fcm.server.ts) para o aviso de atividades e o cron diário.
