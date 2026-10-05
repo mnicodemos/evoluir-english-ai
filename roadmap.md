@@ -224,3 +224,8 @@
 - [x] Removida a função de e-mail do guia sem uso e sem autenticação.
 - [ ] Pendente: mover a promoção de nível (level/max_level) para o servidor com validação do teste final.
 
+## 2026-10-05 — Auditoria, bloco 2
+- [x] Envio de push com um helper único (src/lib/fcm.server.ts) para o aviso de atividades e o cron diário.
+- [x] E2E: falha de login mostra a mensagem do app (ex.: "Invalid login credentials"); os 10 testes autenticados restantes dependem das credenciais E2E_USER_* no GitHub.
+- [x] Chat do AI Teacher e do AI Speaking sem plugins de código/matemática/diagramas/CJK: assets do front 17,2 MB → 3,7 MB (511 → 93 arquivos JS).
+

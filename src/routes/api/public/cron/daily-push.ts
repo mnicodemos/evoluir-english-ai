@@ -1,9 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { isStaleTokenResponse } from "@/lib/pushStaleToken";
 import { studyToday } from "@/lib/today";
-
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
 
 /** Small per-level fallback when the shared word bank has nothing new. */
 const FALLBACK_WORDS: Record<string, { word: string; translation: string; meaning: string }[]> = {
@@ -62,9 +59,9 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
         const body = (await request.json().catch(() => ({}))) as { kind?: string };
         const kind = body.kind === "reminder" ? "reminder" : "word";
 
-        const lovableKey = process.env["LOVABLE_API_KEY"];
-        const connectionKey = process.env["FIREBASE_MESSAGING_API_KEY"];
-        if (!lovableKey || !connectionKey) {
+        const { fcmCredentials, sendFcm } = await import("@/lib/fcm.server");
+        const credentials = fcmCredentials();
+        if (!credentials) {
           return Response.json({ error: "Push not configured" }, { status: 500 });
         }
         const { data: tokens, error } = await supabaseAdmin
@@ -124,27 +121,9 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
         for (const t of tokens ?? []) {
           const msg = messages.get(t.user_id);
           if (!msg) continue;
-          const res = await fetch(`${GATEWAY_URL}/v1/projects/_/messages:send`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${lovableKey}`,
-              "X-Connection-Api-Key": connectionKey,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              message: {
-                token: t.token,
-                notification: { title: msg.title, body: msg.body },
-                data: { path: msg.path },
-              },
-            }),
-          });
-          if (res.ok) sent += 1;
-          else {
-            const errorBody = await res.text();
-            console.error(`daily-push FCM failed [${res.status}]: ${errorBody}`);
-            if (isStaleTokenResponse(res.status, errorBody)) stale.push(t.token);
-          }
+          const result = await sendFcm(credentials, t.token, msg, "daily-push FCM");
+          if (result.ok) sent += 1;
+          else if (result.stale) stale.push(t.token);
         }
         if (stale.length) await supabaseAdmin.from("push_tokens").delete().in("token", stale);
 

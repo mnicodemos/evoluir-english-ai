@@ -22,7 +22,19 @@ export async function signIn(page: Page) {
   await page.locator('input[type="email"]').fill(email);
   await page.locator('input[type="password"]').fill(password);
   await page.locator('button[type="submit"]').click();
-  await expect(page).toHaveURL(/\/(dashboard|onboarding)/, { timeout: 20_000 });
+  // An error toast (e.g. "Invalid login credentials") ends the wait early and
+  // names the cause, so a CI failure says whether the test account or the app
+  // is at fault.
+  const errorToast = page.locator('[data-sonner-toast][data-type="error"]').first();
+  const failure = await Promise.race([
+    page.waitForURL(/\/(dashboard|onboarding)/, { timeout: 20_000 }).then(() => null),
+    errorToast
+      .waitFor({ timeout: 20_000 })
+      .then(() => errorToast.textContent())
+      .catch(() => null),
+  ]);
+  if (failure) throw new Error(`Sign-in failed for the E2E account: ${failure.trim()}`);
+  await expect(page).toHaveURL(/\/(dashboard|onboarding)/);
 }
 
 export function requireCiAccount() {
