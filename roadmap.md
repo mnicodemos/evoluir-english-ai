@@ -279,3 +279,6 @@
 - [x] xl: configuração do plano em largura total com Salvar/Atualizar no título; abaixo, a semana em linhas compactas (dia · habilidade · ✓, atividade, botão) à esquerda e, à direita, o progresso semanal resumido (percentual, barra e "4 / 5 atividades · 7 / 75 min") e o "Por que este plano?". 1280×800: 1.337 → 800px; celular inalterado.
 - [x] Listening mobile/tablet: "Sessão de hoje" e "Foco de pronúncia" aparecem abaixo do bloco principal (lado a lado no tablet); no xl continuam à direita. A linha de foco do topo saiu (o card mostra o mesmo texto).
 
+- [x] Selo de nível B2 mais próximo do texto (NextStepCard.tsx)
+- [ ] Sino e clima no topo mobile: juntar mais e à direita (dashboard.tsx)
+- [ ] Verificar com sessão assinada (lovable auth-session --self) + Playwright

@@ -192,12 +192,14 @@ function Dashboard() {
                   <FirstWeekGuide profile={profile} placement="mobile" />
                   {/* Mobile-only bell + weather back at the top; the level badge
                       moved next to the priority label in NextStepCard. */}
-                  <DashboardNotifications
-                    indicators={indicators}
-                    translate={t}
-                    placement="mobile"
-                  />
-                  <WeatherTalk translate={t} placement="mobile" />
+                  <div className="-mr-1 flex items-center gap-0.5">
+                    <DashboardNotifications
+                      indicators={indicators}
+                      translate={t}
+                      placement="mobile"
+                    />
+                    <WeatherTalk translate={t} placement="mobile" />
+                  </div>
                   <span className="flex items-center gap-1">
                     <Flame
                       className="size-5 shrink-0 fill-current text-current"

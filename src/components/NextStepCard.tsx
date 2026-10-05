@@ -279,7 +279,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <div className="mt-2">
                   {/* Mobile-only level badge next to the priority label; the bell
                       and weather moved back to the top row. Desktop unchanged. */}
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
                     <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:whitespace-normal sm:text-sm sm:leading-normal">
                       {t("TODAY'S PRIORITY")}
                     </p>
