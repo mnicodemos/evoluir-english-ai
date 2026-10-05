@@ -288,6 +288,20 @@
       "when": 1791222601327,
       "tag": "0040_protect_profile_level_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1791222622514,
+      "tag": "0041_learning_errors_review",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1791222635985,
+      "tag": "0042_streak_freeze",
+      "breakpoints": true
     }
   ]
 }
