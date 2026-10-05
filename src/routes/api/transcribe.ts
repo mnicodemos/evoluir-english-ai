@@ -90,8 +90,7 @@ async function transcribeWithLovable(
     requestSignal,
   );
   if (!response.ok) {
-    const body = await response.text().catch(() => "");
-    console.error(`Lovable transcription failed [${response.status}]: ${body.slice(0, 300)}`);
+    console.error(`Lovable transcription failed [${response.status}]`);
     return null;
   }
   const data = (await response.json().catch(() => null)) as { text?: string } | null;

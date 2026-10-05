@@ -80,7 +80,7 @@ export const Route = createFileRoute("/api/speech")({
             return new Response(encoder.encode(events), {
               headers: {
                 "Content-Type": "text/event-stream",
-                "Cache-Control": "public, max-age=31536000, immutable",
+                "Cache-Control": "private, max-age=31536000, immutable",
                 Vary: "Authorization",
                 "X-TTS-Cache": "hit",
               },
@@ -249,7 +249,7 @@ export const Route = createFileRoute("/api/speech")({
           headers: {
             "Content-Type": "text/event-stream",
             "Cache-Control": parsed.data.cacheable
-              ? "public, max-age=31536000, immutable"
+              ? "private, max-age=31536000, immutable"
               : "no-store",
             Vary: "Authorization",
           },
