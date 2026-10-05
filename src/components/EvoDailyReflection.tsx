@@ -18,6 +18,7 @@ type EvoDailyReflectionProps = {
   placement?: "desktop" | "mobile-card" | "dashboard-header";
   mobileLeading?: ReactNode;
   mobileTrailing?: ReactNode;
+  desktopSubtitleTrailing?: ReactNode;
 };
 
 export function EvoDailyReflection({
@@ -26,6 +27,7 @@ export function EvoDailyReflection({
   placement = "desktop",
   mobileLeading,
   mobileTrailing,
+  desktopSubtitleTrailing,
 }: EvoDailyReflectionProps) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -61,9 +63,12 @@ export function EvoDailyReflection({
               aria-hidden="true"
             />
           </h1>
-          <p className="mt-0.5 hidden text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:block sm:truncate sm:text-sm">
-            {t("Great to have you back. Let's keep building your fluency.")}
-          </p>
+          <div className="mt-0.5 hidden min-w-0 items-center gap-2 sm:mt-1 sm:flex">
+            <p className="min-w-0 truncate text-[11px] leading-tight text-muted-foreground sm:text-sm">
+              {t("Great to have you back. Let's keep building your fluency.")}
+            </p>
+            {desktopSubtitleTrailing}
+          </div>
         </div>
         <div className="lg:hidden">{mobileTrailing}</div>
       </div>

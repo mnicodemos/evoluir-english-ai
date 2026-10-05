@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Adicionar sino de notificações ao cabeçalho mobile e desktop do Dashboard
 - [x] Redesign visual do Dashboard como One Screen, preservando integralmente dados, lógica e rotas
 - [x] Limitar a espera da validação de fala e evitar repetição automática excessiva
 - [x] Tratar indisponibilidade temporária da transcrição com repetição limitada no mesmo modelo
