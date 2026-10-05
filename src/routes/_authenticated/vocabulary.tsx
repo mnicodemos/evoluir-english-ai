@@ -517,6 +517,8 @@ function Vocabulary() {
   const todayIds = new Set(today.map((w) => w.id));
   const todayKnownCount = today.filter((w) => knownNow(w.id)).length;
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
+  // Learned words (e.g. passed pronunciation) move out of Today into the Learned tab.
+  const todayOpen = today.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) < LEARNED_MASTERY);
 
   // Spaced reviews: earlier words whose review date has arrived come back here,
   // most overdue first. Words reviewed today stay visible (dimmed) until tomorrow.
@@ -527,7 +529,10 @@ function Vocabulary() {
     .filter((w) => !todayIds.has(w.id))
     .filter((w) => {
       const s = byWord.get(w.id);
-      return isDue(s) || (s?.next_review_at && localDay(s.last_reviewed_at) === todayKey);
+      if (isDue(s)) return true;
+      // Words that reached Learned leave Today and live in the Learned tab.
+      if ((s?.mastery_level ?? 0) >= LEARNED_MASTERY) return false;
+      return Boolean(s?.next_review_at && localDay(s.last_reviewed_at) === todayKey);
     })
     .sort((a, b) =>
       (byWord.get(a.id)?.next_review_at ?? "").localeCompare(
@@ -857,7 +862,7 @@ function Vocabulary() {
                         </div>
                       </div>
                     )}
-                    <List items={today} highlightKnown />
+                    <List items={todayOpen} highlightKnown />
                   </>
                 ) : !generating && !genFailed ? (
                   <p className="mt-6 text-sm text-muted-foreground">
