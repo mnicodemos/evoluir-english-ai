@@ -315,7 +315,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
             {/* Mobile-only "Why this matters now": short versions of the same
                 three desktop sentences, each kept to one complete line. */}
-            <div className="mt-2 sm:hidden">
+            <div className="mt-2 pb-1.5 sm:hidden">
               <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <Lightbulb
                   className="size-[1.375rem] shrink-0 text-warning"
@@ -324,7 +324,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 />
                 {t("Why this matters now?")}
               </p>
-              <ul className="mt-1 grid gap-1">
+              <ul className="mt-1 grid gap-[0.55rem]">
                 <li className="flex items-start gap-2 pl-2">
                   <span
                     className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
