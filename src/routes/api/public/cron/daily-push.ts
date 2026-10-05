@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { studyToday } from "@/lib/today";
 import { weekStartOf } from "@/lib/streakFreeze";
 import {
+  isLeagueResetDay,
   isWeeklyReportDay,
+  LEAGUE_RESET_LINE,
   leaguePositions,
   weekStartIso,
   weeklyReportMessage,
@@ -199,9 +201,11 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           });
           const pool = fresh.length ? fresh : (FALLBACK_WORDS[level] ?? FALLBACK_WORDS["a1"]!);
           const w = pool[hashIndex(`${p.id}:${today}`, pool.length)]!;
+          // Monday: students in the league also hear that the ranking restarted.
+          const leagueLine = p.league_opt_in && isLeagueResetDay() ? ` · ${LEAGUE_RESET_LINE}` : "";
           messages.set(p.id, {
             title: `Palavra do dia: ${w.word}`,
-            body: `${w.translation} — ${w.meaning}`.slice(0, 280),
+            body: `${w.translation} — ${w.meaning}${leagueLine}`.slice(0, 280),
             path: "/vocabulary",
           });
         }

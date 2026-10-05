@@ -54,6 +54,18 @@ export function isWeeklyReportDay(now = new Date()): boolean {
   return weekday === "Sun";
 }
 
+/** The league ranking restarts on Monday (study time zone). */
+export function isLeagueResetDay(now = new Date()): boolean {
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: STUDY_TIME_ZONE,
+    weekday: "short",
+  }).format(now);
+  return weekday === "Mon";
+}
+
+/** Line added to Monday's word of the day for students in the league. */
+export const LEAGUE_RESET_LINE = "🏆 Nova semana na liga: o ranking recomeçou. Some XP hoje!";
+
 function plural(count: number, one: string, many: string) {
   return `${count} ${count === 1 ? one : many}`;
 }
