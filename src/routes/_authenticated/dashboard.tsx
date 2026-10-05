@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
+  Bell,
   Bolt,
   BookOpen,
   Check,
   Clock,
   Flame,
-  Snowflake,
   GraduationCap,
   Headphones,
   Map,
@@ -19,11 +19,8 @@ import {
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
-import { DashboardNotifications } from "@/components/DashboardNotifications";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
-import { WeatherTalk } from "@/components/WeatherTalk";
-import { FirstWeekGuide } from "@/components/FirstWeekGuide";
 import { LevelCard } from "@/components/LevelCard";
 import { getLeague, getNextLeague, LeagueBadge } from "@/components/LeagueBadge";
 import { PathProgressCard } from "@/components/LearningPathCard";
@@ -37,9 +34,8 @@ import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
-import { streakAlive } from "@/lib/streakFreeze";
-import { studyToday } from "@/lib/today";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
+import { graphitePanelClass } from "@/lib/surfaces";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -60,6 +56,89 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
 
+type DashboardNotificationsProps = {
+  indicators: ReturnType<typeof useActivityIndicators>;
+  translate: (label: string) => string;
+  placement: "mobile" | "desktop";
+};
+
+function DashboardNotifications({ indicators, translate, placement }: DashboardNotificationsProps) {
+  const items = [
+    {
+      to: "/listening",
+      label: "New listening activity",
+      icon: Headphones,
+      visible: indicators.listening,
+    },
+    {
+      to: "/writing",
+      label: "New writing activity",
+      icon: PenLine,
+      visible: indicators.writing,
+    },
+    {
+      to: "/vocabulary",
+      label: "New vocabulary activity",
+      icon: BookOpen,
+      visible: indicators.vocabulary,
+    },
+  ] as const;
+  const activeItems = items.filter((item) => item.visible);
+  const hasNotifications = activeItems.length > 0;
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={translate("Open notifications")}
+          className={
+            placement === "mobile"
+              ? "relative size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+              : "relative size-7 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+          }
+        >
+          <Bell className={placement === "mobile" ? "size-[1.15rem]" : "size-4"} />
+          {hasNotifications && (
+            <span className="absolute right-0.5 top-0.5 size-2 rounded-full bg-brand-green ring-2 ring-background">
+              <span className="sr-only">{translate("New activities available")}</span>
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        align={placement === "mobile" ? "end" : "start"}
+        sideOffset={8}
+        className={`dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] p-2 ${graphitePanelClass}`}
+      >
+        <p className="px-2 py-1.5 font-display text-sm font-semibold">
+          {translate("Notifications")}
+        </p>
+        {hasNotifications ? (
+          <div className="grid gap-1">
+            {activeItems.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+              >
+                <span className="grid size-8 place-items-center rounded-full bg-brand-green/15 text-brand-green">
+                  <item.icon className="size-4" aria-hidden="true" />
+                </span>
+                <span>{translate(item.label)}</span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="px-2 py-3 text-sm text-muted-foreground">
+            {translate("No new activities right now")}
+          </p>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 function Dashboard() {
   const { data: profile, isLoading } = useProfile();
@@ -69,11 +148,6 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const streakDays = profile ? effectiveStreak(profile) : 0;
-  // A missed day this week covered by the streak protection (one per week).
-  const protectedDay = profile
-    ? streakAlive(profile.last_activity_date, profile.streak_freeze_used_on, studyToday())
-        .protectedDay
-    : null;
   const nextLeague = profile ? getNextLeague(streakDays) : null;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
 
@@ -177,29 +251,18 @@ function Dashboard() {
               name={profile.name}
               placement="dashboard-header"
               desktopSubtitleTrailing={
-                <div className="flex items-center gap-0.5">
-                  <DashboardNotifications
-                    indicators={indicators}
-                    translate={t}
-                    placement="desktop"
-                  />
-                  <WeatherTalk translate={t} placement="desktop" />
-                  <FirstWeekGuide profile={profile} placement="desktop" />
-                </div>
+                <DashboardNotifications indicators={indicators} translate={t} placement="desktop" />
               }
               mobileTrailing={
                 <div className="flex items-center gap-2 whitespace-nowrap">
-                  <FirstWeekGuide profile={profile} placement="mobile" />
-                  {/* Mobile-only bell + weather back at the top; the level badge
-                      moved next to the priority label in NextStepCard. */}
-                  <div className="-mr-1 flex items-center gap-0.5">
-                    <DashboardNotifications
-                      indicators={indicators}
-                      translate={t}
-                      placement="mobile"
-                    />
-                    <WeatherTalk translate={t} placement="mobile" />
-                  </div>
+                  <DashboardNotifications
+                    indicators={indicators}
+                    translate={t}
+                    placement="mobile"
+                  />
+                  <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
+                    {profile.level}
+                  </span>
                   <span className="flex items-center gap-1">
                     <Flame
                       className="size-5 shrink-0 fill-current text-current"
@@ -221,10 +284,7 @@ function Dashboard() {
               <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
             </div>
 
-            <div
-              className="hidden min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex sm:flex-row sm:gap-3 sm:px-3 sm:text-left"
-              title={t("Streak protection: missing one day per week does not break your streak.")}
-            >
+            <div className="hidden min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
               <Flame
                 className="size-6 shrink-0 fill-current text-current sm:hidden"
                 style={{ color: getLeague(streakDays).from }}
@@ -235,14 +295,8 @@ function Dashboard() {
                 strokeWidth={2.4}
               />
               <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-1 font-display text-[13px] font-bold leading-tight sm:text-base">
-                  <span className="sm:truncate">{streakDays} days</span>
-                  {protectedDay && (
-                    <Snowflake
-                      className="size-4 shrink-0 text-sky-400"
-                      aria-label={t("Streak protected this week")}
-                    />
-                  )}
+                <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">
+                  {streakDays} days
                 </p>
                 <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">
                   {t("Study streak")}
