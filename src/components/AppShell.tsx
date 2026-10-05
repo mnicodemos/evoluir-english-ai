@@ -24,11 +24,6 @@ import { useEffect, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import {
-  useWeatherCondition,
-  weatherIcons,
-  type WeatherCondition,
-} from "@/hooks/useWeatherCondition";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Logo } from "@/components/Logo";
 import { BrandName } from "@/components/BrandName";
@@ -84,25 +79,12 @@ const dashboardAccountNav = [
   { to: "/premium", label: "My Subscription", icon: Crown },
 ] as const;
 
-const weatherLabels: Record<WeatherCondition, string> = {
-  sunny: "Sunny",
-  "partly-cloudy": "Partly cloudy",
-  cloudy: "Cloudy",
-  rain: "Rain",
-  storm: "Storm",
-  snow: "Snow",
-  night: "Clear night",
-};
-
-// Translation and weather controls moved here from the dashboard reflection
+// Translation and notification controls moved here from the dashboard reflection
 // block: one home in the sidebar (desktop) and the sheet menu (mobile).
 function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
   const { lang, setLang } = useUiLang();
-  const { condition, refresh } = useWeatherCondition();
   const push = usePushNotifications();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
-  const WeatherIcon = weatherIcons[condition];
-  const weatherText = t(weatherLabels[condition]);
   const pushOn = push.state === "enabled";
   const pushLabel = pushOn ? t("Notifications on") : t("Notifications off");
 
@@ -131,11 +113,6 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
     }
   }
 
-  function refreshWeather() {
-    refresh();
-    toast(`${t("Weather")}: ${weatherText}`);
-  }
-
   // Desktop sidebar and mobile sheet share the same full-width icon + text rows.
   if (variant === "sidebar") {
     return (
@@ -150,15 +127,6 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
           <span className="min-w-0 truncate text-left">
             {lang === "pt" ? "Português" : "English"}
           </span>
-        </Button>
-        <Button
-          variant="ghost"
-          aria-label={t("Weather")}
-          className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-          onClick={refreshWeather}
-        >
-          <WeatherIcon className="size-5 shrink-0" />
-          <span className="min-w-0 truncate text-left">{weatherText}</span>
         </Button>
         <Button
           variant="ghost"
@@ -187,15 +155,6 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
         <span className="min-w-0 truncate text-left">
           {lang === "pt" ? "Português" : "English"}
         </span>
-      </Button>
-      <Button
-        variant="ghost"
-        aria-label={t("Weather")}
-        className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-        onClick={refreshWeather}
-      >
-        <WeatherIcon className="size-5 shrink-0" />
-        <span className="min-w-0 truncate text-left">{weatherText}</span>
       </Button>
       <Button
         variant="ghost"

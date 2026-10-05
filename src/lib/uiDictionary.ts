@@ -1250,4 +1250,11 @@ export const uiPt: Record<string, string> = {
   "Ask for a new link": "Pedir um novo link",
   "New password": "Nova senha",
   "Confirm the new password": "Confirme a nova senha",
+
+  // Weather talk
+  "Weather talk": "Clima em inglês",
+  "Talk about the weather": "Falar sobre o clima com a EVO",
+  "Use the weather where I am": "Usar o clima de onde estou",
+  "Only to show today's weather. Your location is not saved.":
+    "Só para mostrar o clima de hoje. Sua localização não é salva.",
 };

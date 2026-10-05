@@ -22,6 +22,7 @@ import { useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
+import { WeatherTalk } from "@/components/WeatherTalk";
 import { LevelCard } from "@/components/LevelCard";
 import { getLeague, getNextLeague, LeagueBadge } from "@/components/LeagueBadge";
 import { PathProgressCard } from "@/components/LearningPathCard";
@@ -258,7 +259,14 @@ function Dashboard() {
               name={profile.name}
               placement="dashboard-header"
               desktopSubtitleTrailing={
-                <DashboardNotifications indicators={indicators} translate={t} placement="desktop" />
+                <div className="flex items-center gap-0.5">
+                  <DashboardNotifications
+                    indicators={indicators}
+                    translate={t}
+                    placement="desktop"
+                  />
+                  <WeatherTalk translate={t} placement="desktop" />
+                </div>
               }
               mobileTrailing={
                 <div className="flex items-center gap-2 whitespace-nowrap">
@@ -267,6 +275,7 @@ function Dashboard() {
                     translate={t}
                     placement="mobile"
                   />
+                  <WeatherTalk translate={t} placement="mobile" />
                   <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
                     {profile.level}
                   </span>
