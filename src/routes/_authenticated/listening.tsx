@@ -9,6 +9,7 @@ import {
   Mic,
   RotateCcw,
   Square,
+  AudioLines,
   Volume2,
   X,
 } from "lucide-react";
@@ -185,6 +186,10 @@ function ListeningPage() {
   const [canReveal, setCanReveal] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [recording, setRecording] = useState(false);
+  // Shadowing: speaking along with the audio. Practice only, never scored for
+  // the session, since the microphone can also pick up the playback.
+  const [shadowing, setShadowing] = useState(false);
+  const [shadowResult, setShadowResult] = useState<{ score: number; spoken: string } | null>(null);
   const [checking, setChecking] = useState(false);
   const [saving, setSaving] = useState(false);
   const [completed, setCompleted] = useState<CompletionMap>({});
@@ -314,6 +319,37 @@ function ListeningPage() {
           }),
         5000,
       );
+    }
+  }
+
+  useEffect(() => {
+    setShadowResult(null);
+  }, [index, sentence]);
+
+  /** Plays the sentence while recording, so the student speaks along with it. */
+  async function shadow() {
+    setShadowResult(null);
+    try {
+      await startVoiceRecording();
+    } catch (error) {
+      cancelVoiceRecording();
+      toast.error(error instanceof Error ? error.message : "Microphone is unavailable right now.");
+      return;
+    }
+    setShadowing(true);
+    try {
+      await speakEnglish(sentence, { cache: "persistent", rate: config.rate });
+      // A short tail so the last word the student says is not cut off.
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const spoken = await transcribeAudio(await stopVoiceRecording());
+      setShadowResult({ score: listeningAnswerScore(sentence, spoken), spoken });
+    } catch (error) {
+      cancelVoiceRecording();
+      toast.error(
+        error instanceof Error ? error.message : "I couldn't hear that clearly. Please try again.",
+      );
+    } finally {
+      setShadowing(false);
     }
   }
 
@@ -508,10 +544,39 @@ function ListeningPage() {
                   <Volume2 className="size-8" />
                 </button>
                 <p className="text-sm font-medium">{playing ? "Playing..." : "Play sentence"}</p>
-                <Button variant="outline" size="sm" onClick={() => play(true)} disabled={playing}>
-                  <RotateCcw className="mr-2 size-4" />{" "}
-                  {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
-                </Button>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => play(true)} disabled={playing}>
+                    <RotateCcw className="mr-2 size-4" />{" "}
+                    {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void shadow()}
+                    disabled={playing || shadowing || recording || checking}
+                    title="Speak along with the audio, at the same time. Headphones help."
+                  >
+                    {shadowing ? (
+                      <Loader2 className="mr-2 size-4 animate-spin" />
+                    ) : (
+                      <AudioLines className="mr-2 size-4" />
+                    )}
+                    {shadowing ? "Speak along now..." : "Shadowing: speak along"}
+                  </Button>
+                </div>
+                {shadowResult && (
+                  <p className="max-w-md text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">
+                      <span>Shadowing</span> · {shadowResult.score}%
+                    </span>{" "}
+                    <span>(practice only, not scored)</span>
+                    {shadowResult.spoken && (
+                      <span className="block break-words">
+                        <span>You said:</span> {shadowResult.spoken}
+                      </span>
+                    )}
+                  </p>
+                )}
               </div>
 
               {/* One slot per word: the length of the sentence before listening,
