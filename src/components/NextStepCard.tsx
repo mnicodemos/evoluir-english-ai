@@ -324,31 +324,31 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 />
                 {t("Why this matters now?")}
               </p>
-              <ul className="mt-0.5 grid gap-0.5">
+              <ul className="mt-1 grid gap-1">
                 <li className="flex items-start gap-2 pl-2">
                   <span
-                    className="mt-[0.3rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
+                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
                     aria-hidden="true"
                   />
-                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-tight text-sidebar-foreground/80">
+                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
                     {shortPriorityText}
                   </span>
                 </li>
                 <li className="flex items-start gap-2 pl-2">
                   <span
-                    className="mt-[0.3rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
+                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
                     aria-hidden="true"
                   />
-                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-tight text-sidebar-foreground/80">
+                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
                     {shortEvidenceText}
                   </span>
                 </li>
                 <li className="flex items-start gap-2 pl-2">
                   <span
-                    className="mt-[0.3rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
+                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
                     aria-hidden="true"
                   />
-                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-tight text-sidebar-foreground/80">
+                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
                     {shortProgressText}
                   </span>
                 </li>

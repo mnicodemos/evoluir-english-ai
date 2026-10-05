@@ -241,7 +241,7 @@ export function MobileNavigationMenu({
             )}
           >
             <Menu strokeWidth={2.25} />
-            <span className="text-[10px] font-medium leading-[1.3]">{bottomLabel}</span>
+            <span className="pb-0.5 text-[10px] font-medium leading-none">{bottomLabel}</span>
           </Button>
         ) : (
           <Button
@@ -480,14 +480,14 @@ function AppShellContent({
             "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
             !dashboardLayout && "flex-1",
             dashboardLayout &&
-              "h-[calc(100dvh-4.275rem-_env(safe-area-inset-bottom))] overflow-hidden py-3 pb-[10px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
+              "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-[10px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
           )}
         >
           {children}
         </main>
 
         <nav
-          className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(4.275rem+_env(safe-area-inset-bottom))] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[env(safe-area-inset-bottom)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
           aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
         >
           {dashboardMobileNav.map((item) => (
@@ -500,7 +500,7 @@ function AppShellContent({
             >
               <span className="grid justify-items-center gap-0.5">
                 <item.icon className="size-6" />
-                <span className="max-w-full truncate text-[10px] font-medium leading-[1.3]">
+                <span className="max-w-full truncate pb-0.5 text-[10px] font-medium leading-none">
                   {item.label}
                 </span>
               </span>
