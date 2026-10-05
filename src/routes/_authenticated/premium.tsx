@@ -9,6 +9,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
+import { useUiLang } from "@/lib/uiLang";
 import { createStripeCheckoutSession } from "@/lib/billing/checkout.functions";
 import { getMyAccess } from "@/lib/billing/entitlements.functions";
 import { createStripePortalSession } from "@/lib/billing/portal.functions";
@@ -78,7 +79,19 @@ const STATUS_LABEL: Record<string, string> = {
   refunded: "Refunded",
 };
 
+function formatAccessDate(value: string, lang: "en" | "pt"): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  // Long month names avoid the 9/18 vs 18/9 ambiguity between US and Brazilian formats.
+  return date.toLocaleDateString(lang === "pt" ? "pt-BR" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 function Premium() {
+  const { lang } = useUiLang();
   const { data: profile, isLoading } = useProfile();
   const fetchAccess = useServerFn(getMyAccess);
   const { data: access } = useQuery({
@@ -176,7 +189,7 @@ function Premium() {
                     <dd className="font-medium">
                       {view.plan === "premium"
                         ? view.accessUntil
-                          ? `Active until ${new Date(view.accessUntil).toLocaleDateString()}`
+                          ? `Active until ${formatAccessDate(view.accessUntil, lang)}`
                           : "Active"
                         : "Not active"}
                     </dd>
@@ -230,14 +243,7 @@ function Premium() {
               <h2 className="mt-4 text-xl font-semibold">
                 You have full access, {profile.name || "student"}.
               </h2>
-              <p className="mt-2 text-sm text-foreground/75">
-                {profile.plan_interval === "monthly"
-                  ? "Monthly plan — R$ 79,90/month"
-                  : "Yearly plan — R$ 799,90/year"}
-                {profile.plan_expires_at
-                  ? ` · renews on ${new Date(profile.plan_expires_at).toLocaleDateString()}`
-                  : ""}
-              </p>
+              <p className="mt-2 text-sm text-foreground/75">Everything included in your plan:</p>
               <ul className="mt-5 grid gap-2 text-sm text-foreground/85 sm:grid-cols-2">
                 {premiumPerks.map((p) => (
                   <li key={p} className="flex items-center gap-2">
