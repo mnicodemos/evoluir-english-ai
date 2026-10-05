@@ -133,7 +133,7 @@ function ProgressPage() {
 
             <section className="card-soft p-3 sm:p-5 xl:col-span-2 xl:row-start-3">
               <h2 className="text-base font-semibold sm:text-lg">{t("Evolution")}</h2>
-              <div>
+              <div className="grid gap-4 xl:grid-cols-2 xl:gap-8">
                 {profile && <EvolutionChart userId={profile.id} level={profile.level} />}
                 {profile && <MinutesByDayChart userId={profile.id} level={profile.level} />}
               </div>
