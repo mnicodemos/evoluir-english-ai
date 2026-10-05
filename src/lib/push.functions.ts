@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+import { isStaleTokenResponse } from "./pushStaleToken";
+
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
 
 /** Saves (or refreshes) this device's push token for the signed-in user. */
@@ -92,7 +94,7 @@ export const sendActivityPush = createServerFn({ method: "POST" })
       const body = await res.text();
       console.error(`FCM send failed [${res.status}]: ${body}`);
       // Stale device token: remove it instead of retrying forever.
-      if (res.status === 404 || res.status === 400) staleTokens.push(row.token);
+      if (isStaleTokenResponse(res.status, body)) staleTokens.push(row.token);
     }
 
     if (staleTokens.length > 0) {
