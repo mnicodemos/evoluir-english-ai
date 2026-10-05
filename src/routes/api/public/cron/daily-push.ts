@@ -11,11 +11,21 @@ const FALLBACK_WORDS: Record<string, { word: string; translation: string; meanin
     { word: "neighbor", translation: "vizinho", meaning: "a person who lives near you" },
   ],
   a2: [
-    { word: "borrow", translation: "pegar emprestado", meaning: "to take something you will give back" },
+    {
+      word: "borrow",
+      translation: "pegar emprestado",
+      meaning: "to take something you will give back",
+    },
   ],
   b1: [{ word: "improve", translation: "melhorar", meaning: "to make something better" }],
   b2: [{ word: "outcome", translation: "resultado", meaning: "the final result of a process" }],
-  c1: [{ word: "nuanced", translation: "sutil, com nuances", meaning: "showing small but important differences" }],
+  c1: [
+    {
+      word: "nuanced",
+      translation: "sutil, com nuances",
+      meaning: "showing small but important differences",
+    },
+  ],
   c2: [{ word: "ubiquitous", translation: "onipresente", meaning: "found everywhere" }],
 };
 

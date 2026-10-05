@@ -8,7 +8,8 @@ firebase.messaging();
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const data = event.notification.data || {};
-  const path = (data.FCM_MSG && data.FCM_MSG.data && data.FCM_MSG.data.path) || data.path || "/dashboard";
+  const path =
+    (data.FCM_MSG && data.FCM_MSG.data && data.FCM_MSG.data.path) || data.path || "/dashboard";
   const url = new URL(path, self.location.origin).href;
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
