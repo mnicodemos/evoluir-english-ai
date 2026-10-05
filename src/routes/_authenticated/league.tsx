@@ -35,7 +35,11 @@ function League() {
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
 
-  const { data: rows = [], isLoading } = useQuery({
+  const {
+    data: rows = [],
+    isLoading,
+    error: loadError,
+  } = useQuery({
     queryKey: ["weekly-league", profile?.id, profile?.level],
     enabled: !!profile?.id,
     queryFn: async () => {
@@ -58,7 +62,8 @@ function League() {
       .eq("id", profile.id);
     setSaving(false);
     if (error) {
-      toast.error("Could not update your league participation.");
+      // The database message tells a missing migration apart from a permission problem.
+      toast.error("Could not update your league participation.", { description: error.message });
       return;
     }
     await Promise.all([
@@ -83,7 +88,14 @@ function League() {
             <Trophy className="size-4 text-amber-400 sm:size-5" />
             Ranking
           </h2>
-          {isLoading ? (
+          {loadError ? (
+            <p className="py-6 text-center text-sm text-destructive">
+              <span>The league is not available right now.</span>{" "}
+              <span className="block text-xs text-muted-foreground">
+                {(loadError as { message?: string }).message ?? ""}
+              </span>
+            </p>
+          ) : isLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="size-5 animate-spin text-muted-foreground" />
             </div>
