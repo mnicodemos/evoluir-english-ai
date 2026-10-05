@@ -714,6 +714,8 @@ export const uiPt: Record<string, string> = {
   "Practice English conversation with instant feedback.":
     "Pratique conversação em inglês com feedback imediato.",
   "Tap the microphone and speak in English": "Toque no microfone e fale em inglês",
+    "EVO is speaking… tap the microphone to answer now":
+    "A EVO está falando… toque no microfone para responder agora",
   "Preparing your topic…": "Preparando seu assunto…",
   "Do you want to keep this topic?": "Você quer manter este assunto?",
   "Keep this topic": "Manter este assunto",
