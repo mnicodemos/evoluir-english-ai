@@ -240,6 +240,25 @@ function AuthPage() {
                           : "Sign in",
                     )}
                   </Button>
+                  {mode === "signup" && !forgot ? (
+                    <p className="text-center text-xs leading-relaxed text-muted-foreground">
+                      Ao criar uma conta, você concorda com os{" "}
+                      <Link
+                        to="/terms"
+                        className="font-medium text-foreground underline underline-offset-4"
+                      >
+                        Termos de Uso
+                      </Link>{" "}
+                      e a{" "}
+                      <Link
+                        to="/privacy"
+                        className="font-medium text-foreground underline underline-offset-4"
+                      >
+                        Política de Privacidade
+                      </Link>
+                      .
+                    </p>
+                  ) : null}
                 </form>
 
                 <p className="mt-4 text-center text-sm">

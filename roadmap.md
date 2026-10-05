@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Criar páginas públicas de Termos de Uso e Política de Privacidade, com versões em português e inglês, e conectar rodapé e cadastro
 - [x] Adicionar sino de notificações ao cabeçalho mobile e desktop do Dashboard
 - [x] Redesign visual do Dashboard como One Screen, preservando integralmente dados, lógica e rotas
 - [x] Limitar a espera da validação de fala e evitar repetição automática excessiva
