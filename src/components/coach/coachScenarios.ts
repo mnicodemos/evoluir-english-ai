@@ -73,3 +73,73 @@ export function scenarioOfTheDay(offset = 0) {
   const day = Math.floor(Date.now() / 86400000);
   return scenarios[(day + offset) % scenarios.length]!;
 }
+
+/** Real-life role-plays: EVO takes a role and the student plays themself. */
+export type RolePlay = {
+  id: string;
+  label: string;
+  /** Skill bucket used for the session report. */
+  scenario: "everyday" | "professional" | "travel";
+  /** Study plan goals this situation suits best. */
+  goals: string[];
+  role: string;
+  opener: string;
+};
+
+export const rolePlays: RolePlay[] = [
+  {
+    id: "job-interview",
+    label: "Job interview",
+    scenario: "professional",
+    goals: ["interview", "work"],
+    role: "You are a friendly hiring manager interviewing the student for a job in their field. Ask one typical interview question at a time and react to the answers.",
+    opener: "Hello, thank you for coming in today. Could you tell me a little about yourself?",
+  },
+  {
+    id: "team-meeting",
+    label: "Team meeting",
+    scenario: "professional",
+    goals: ["work"],
+    role: "You are the student's manager in a weekly team meeting. Ask about progress, deadlines, problems and next steps.",
+    opener:
+      "Good morning! Let's start our weekly meeting. What have you been working on this week?",
+  },
+  {
+    id: "hotel-check-in",
+    label: "Hotel check-in",
+    scenario: "travel",
+    goals: ["travel"],
+    role: "You are a hotel receptionist checking the student in: reservation, room, breakfast, Wi-Fi and checkout time.",
+    opener: "Good evening and welcome! Do you have a reservation with us?",
+  },
+  {
+    id: "restaurant",
+    label: "At a restaurant",
+    scenario: "travel",
+    goals: ["travel", "conversation"],
+    role: "You are a waiter at a casual restaurant taking the student's order, suggesting dishes and bringing the bill.",
+    opener: "Hi there, welcome! Can I get you something to drink while you look at the menu?",
+  },
+  {
+    id: "airport",
+    label: "Airport check-in",
+    scenario: "travel",
+    goals: ["travel"],
+    role: "You are an airline check-in agent: destination, passport, luggage, seat and boarding time.",
+    opener: "Good morning! Where are you flying to today?",
+  },
+  {
+    id: "doctor",
+    label: "At the doctor's",
+    scenario: "everyday",
+    goals: ["conversation", "certification"],
+    role: "You are a doctor at a clinic and the student is the patient describing how they feel.",
+    opener: "Hello, please have a seat. What brings you in today?",
+  },
+];
+
+/** Role-plays ordered so the ones matching the study plan goal come first. */
+export function rolePlaysForGoal(goal: string | null | undefined): RolePlay[] {
+  const matching = rolePlays.filter((play) => goal && play.goals.includes(goal));
+  return [...matching, ...rolePlays.filter((play) => !matching.includes(play))];
+}

@@ -1198,4 +1198,15 @@ export const uiPt: Record<string, string> = {
   Shadowing: "Shadowing",
   "(practice only, not scored)": "(só prática, não conta na nota)",
   "You said:": "Você disse:",
+
+  // AI Speaking real situations
+  "Or practise a real situation:": "Ou pratique uma situação real:",
+  "Real situation": "Situação real",
+  "Suggested for your study plan goal": "Sugerida para o objetivo do seu plano de estudo",
+  "Job interview": "Entrevista de emprego",
+  "Team meeting": "Reunião de equipe",
+  "Hotel check-in": "Check-in no hotel",
+  "At a restaurant": "No restaurante",
+  "Airport check-in": "Check-in no aeroporto",
+  "At the doctor's": "No médico",
 };
