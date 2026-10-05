@@ -38,6 +38,7 @@ function AdminPage() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const navigate = useNavigate();
+  const [sentrySent, setSentrySent] = useState(false);
 
   const checkAdmin = useServerFn(isAdminUser);
   const fetchUsers = useServerFn(listRegisteredUsers);
