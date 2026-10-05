@@ -3,10 +3,6 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-import { isStaleTokenResponse } from "./pushStaleToken";
-
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
-
 /** Saves (or refreshes) this device's push token for the signed-in user. */
 export const registerPushToken = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -61,40 +57,17 @@ export const sendActivityPush = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!rows || rows.length === 0) return { sent: 0 };
 
-    const lovableKey = process.env["LOVABLE_API_KEY"];
-    const connectionKey = process.env["FIREBASE_MESSAGING_API_KEY"];
-    if (!lovableKey || !connectionKey) {
-      throw new Error("Push credentials are not configured");
-    }
-
-    const headers = {
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": connectionKey,
-      "Content-Type": "application/json",
-    };
+    const { fcmCredentials, sendFcm } = await import("./fcm.server");
+    const credentials = fcmCredentials();
+    if (!credentials) throw new Error("Push credentials are not configured");
 
     let sent = 0;
     const staleTokens: string[] = [];
     for (const row of rows) {
-      const res = await fetch(`${GATEWAY_URL}/v1/projects/_/messages:send`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          message: {
-            token: row.token,
-            notification: { title: data.title, body: data.body },
-            data: data.path ? { path: data.path } : undefined,
-          },
-        }),
-      });
-      if (res.ok) {
-        sent += 1;
-        continue;
-      }
-      const body = await res.text();
-      console.error(`FCM send failed [${res.status}]: ${body}`);
+      const result = await sendFcm(credentials, row.token, data);
+      if (result.ok) sent += 1;
       // Stale device token: remove it instead of retrying forever.
-      if (isStaleTokenResponse(res.status, body)) staleTokens.push(row.token);
+      else if (result.stale) staleTokens.push(row.token);
     }
 
     if (staleTokens.length > 0) {
