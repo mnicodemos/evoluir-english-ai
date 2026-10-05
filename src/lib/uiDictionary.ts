@@ -1189,4 +1189,13 @@ export const uiPt: Record<string, string> = {
   "Streak protection: missing one day per week does not break your streak.":
     "Proteção do Streak: faltar um dia por semana não quebra sua sequência.",
   "Streak protected this week": "Streak protegido nesta semana",
+
+  // Listening shadowing
+  "Shadowing: speak along": "Shadowing: fale junto",
+  "Speak along now...": "Fale junto agora...",
+  "Speak along with the audio, at the same time. Headphones help.":
+    "Fale junto com o áudio, ao mesmo tempo. Usar fone ajuda.",
+  Shadowing: "Shadowing",
+  "(practice only, not scored)": "(só prática, não conta na nota)",
+  "You said:": "Você disse:",
 };
