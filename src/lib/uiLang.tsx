@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { uiPt } from "@/lib/uiDictionary";
+import { readStorage, writeStorage } from "./safeStorage";
 
 export type UiLang = "en" | "pt";
 
@@ -28,12 +29,12 @@ export function UiLangProvider({ children }: { children: ReactNode }) {
   const attrOriginals = useRef(new WeakMap<Element, Record<string, string>>());
 
   useEffect(() => {
-    const stored = localStorage.getItem(UI_LANG_KEY);
+    const stored = readStorage(UI_LANG_KEY);
     if (stored === "pt" || stored === "en") setLangState(stored);
   }, []);
 
   function setLang(next: UiLang) {
-    localStorage.setItem(UI_LANG_KEY, next);
+    writeStorage(UI_LANG_KEY, next);
     setLangState(next);
   }
 

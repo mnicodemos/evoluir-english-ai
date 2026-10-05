@@ -38,3 +38,9 @@ dist-ssr
 # Playwright
 test-results/
 playwright-report/
+
+# Local browser binaries and ad-hoc screenshots
+chromium_headless_shell-*
+shots/
+test-results/
+playwright-report/

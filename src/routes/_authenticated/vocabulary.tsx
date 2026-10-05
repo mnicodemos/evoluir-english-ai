@@ -48,6 +48,7 @@ import {
   isDue,
   markPronounced,
 } from "@/lib/vocabularyReview";
+import { readStorage, removeStorage, writeStorage } from "@/lib/safeStorage";
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
@@ -166,7 +167,7 @@ function Vocabulary() {
   const [genBlocked, setGenBlocked] = useState<boolean | null>(null);
   useEffect(() => {
     if (!failKey) return;
-    setGenBlocked(vocabularyGenerationRecentlyFailed(window.localStorage.getItem(failKey)));
+    setGenBlocked(vocabularyGenerationRecentlyFailed(readStorage(failKey)));
   }, [failKey]);
   const needsGeneration = roundReady && !!saved && saved.length < 10 && genBlocked === false;
   const {
@@ -185,14 +186,14 @@ function Vocabulary() {
           loadDailyWords({ data: { level: profile?.level ?? "intermediate" } }),
         )) as Word[];
       } catch (error) {
-        if (failKey) window.localStorage.setItem(failKey, String(Date.now()));
+        if (failKey) writeStorage(failKey, String(Date.now()));
         setGenBlocked(true);
         throw error;
       }
     },
   });
   function retryGeneration() {
-    if (failKey) window.localStorage.removeItem(failKey);
+    if (failKey) removeStorage(failKey);
     queryClient.removeQueries({ queryKey: [...dailyKey, "generate"] });
     setGenBlocked(false);
   }

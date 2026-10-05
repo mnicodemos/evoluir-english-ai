@@ -2,12 +2,13 @@ import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { readStorage, writeStorage } from "@/lib/safeStorage";
 
 const STORAGE_KEY = "ecap-theme";
 
 function initialDark(): boolean {
   if (typeof window === "undefined") return false;
-  const saved = window.localStorage.getItem(STORAGE_KEY);
+  const saved = readStorage(STORAGE_KEY);
   if (saved === "dark") return true;
   if (saved === "light") return false;
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -26,7 +27,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     const next = !dark;
     setDark(next);
     document.documentElement.classList.toggle("dark", next);
-    window.localStorage.setItem(STORAGE_KEY, next ? "dark" : "light");
+    writeStorage(STORAGE_KEY, next ? "dark" : "light");
   }
 
   return (

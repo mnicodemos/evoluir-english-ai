@@ -229,3 +229,9 @@
 - [x] E2E: falha de login mostra a mensagem do app (ex.: "Invalid login credentials"); os 10 testes autenticados restantes dependem das credenciais E2E_USER_* no GitHub.
 - [x] Chat do AI Teacher e do AI Speaking sem plugins de código/matemática/diagramas/CJK: assets do front 17,2 MB → 3,7 MB (511 → 93 arquivos JS).
 
+## 2026-10-05 — Auditoria, bloco 3 (lote 1)
+- [x] localStorage seguro (src/lib/safeStorage.ts) em tema, idioma, push, aula e Vocabulary: modo privado ou armazenamento bloqueado não quebram a tela.
+- [x] VoiceCoach: dependência do efeito de abertura documentada (sem aviso de lint).
+- [x] Repositório: removidos o link simbólico do Chromium local e a captura avulsa em shots/; .gitignore cobre binários do navegador e relatórios do Playwright.
+- [ ] Próximos lotes: dividir arquivos grandes (vocabulary.tsx, dualWrite.functions.ts, curriculum.functions.ts, VoiceCoach.tsx, LearningPathCard.tsx), um por PR.
+
