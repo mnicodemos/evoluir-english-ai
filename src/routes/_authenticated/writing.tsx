@@ -96,6 +96,45 @@ function loadResults(signature: string): Record<string, WritingFeedback> {
   }
 }
 
+/** Tasks reopened with "Redo": the server record must not mark them checked again. */
+function loadRedone(signature: string): string[] {
+  return readList(`writing-redo-round-${signature}`);
+}
+
+function saveRedone(signature: string, redone: string[]) {
+  writeList(`writing-redo-round-${signature}`, redone);
+}
+
+// Unsent text per task, so leaving the page or reloading never loses an answer.
+const DRAFTS_KEY = "writing-drafts-v1";
+
+function readDrafts(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(DRAFTS_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? (parsed as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
+}
+
+function loadDraft(prompt: string): string {
+  const draft = readDrafts()[prompt];
+  return typeof draft === "string" ? draft : "";
+}
+
+function saveDraft(prompt: string, text: string) {
+  if (!prompt) return;
+  const drafts = readDrafts();
+  if (text.trim()) drafts[prompt] = text;
+  else delete drafts[prompt];
+  try {
+    localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+  } catch {
+    // ignore storage failures
+  }
+}
+
 function saveResults(signature: string, results: Record<string, WritingFeedback>) {
   try {
     localStorage.setItem(`writing-results-round-${signature}`, JSON.stringify(results));
@@ -149,7 +188,10 @@ function Writing() {
   const saveLegacyWriting = useServerFn(persistWritingLegacy);
 
   useEffect(() => {
-    const finished = [...new Set([...loadDone(signature), ...serverDone])];
+    const redone = loadRedone(signature);
+    const finished = [...new Set([...loadDone(signature), ...serverDone])].filter(
+      (p) => !redone.includes(p),
+    );
     setDone(finished);
     const stored = loadResults(signature);
     setResults(stored);
@@ -158,8 +200,9 @@ function Writing() {
         Object.entries(stored).map(([k, v]) => [k, (v as { original?: string }).original ?? ""]),
       ),
     );
-    setPrompt(prompts.find((p) => !finished.includes(p)) ?? prompts[0] ?? "");
-    setText("");
+    const first = prompts.find((p) => !finished.includes(p)) ?? prompts[0] ?? "";
+    setPrompt(first);
+    setText(loadDraft(first));
     setResult(null);
     operationKey.current = null;
   }, [signature, prompts, serverDone]);
@@ -169,7 +212,7 @@ function Writing() {
 
   function selectPrompt(p: string) {
     setPrompt(p);
-    setText("");
+    setText(loadDraft(p));
     setResult(null);
     operationKey.current = null;
   }
@@ -178,6 +221,7 @@ function Writing() {
   function redoToday() {
     setDone([]);
     saveDone(signature, []);
+    saveRedone(signature, prompts);
     setResults({});
     saveResults(signature, {});
     setPrompt(prompts[0] ?? "");
@@ -191,6 +235,7 @@ function Writing() {
     const nextDone = done.filter((p) => p !== prompt);
     setDone(nextDone);
     saveDone(signature, nextDone);
+    saveRedone(signature, [...new Set([...loadRedone(signature), prompt])]);
     const nextResults = { ...results };
     delete nextResults[prompt];
     setResults(nextResults);
@@ -229,6 +274,11 @@ function Writing() {
       const nextDone = [...done, prompt];
       setDone(nextDone);
       saveDone(signature, nextDone);
+      saveRedone(
+        signature,
+        loadRedone(signature).filter((p) => p !== prompt),
+      );
+      saveDraft(prompt, "");
       rememberAnswered(prompt);
 
       if (profile) {
@@ -249,7 +299,7 @@ function Writing() {
     const remaining = prompts.filter((p) => !done.includes(p));
     if (remaining.length > 0) {
       setPrompt(remaining[0]!);
-      setText("");
+      setText(loadDraft(remaining[0]!));
       setResult(null);
       operationKey.current = null;
     }
@@ -346,7 +396,17 @@ function Writing() {
           <>
             <Textarea
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                setText(e.target.value);
+                saveDraft(prompt, e.target.value);
+              }}
+              onKeyDown={(e) => {
+                // Ctrl/Cmd + Enter sends the text, like other chat and editor tools.
+                if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !loading) {
+                  e.preventDefault();
+                  void analyse();
+                }
+              }}
               onFocus={(event) => {
                 window.setTimeout(
                   () => event.currentTarget.scrollIntoView({ block: "center" }),
