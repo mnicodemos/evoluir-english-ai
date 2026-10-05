@@ -207,6 +207,11 @@
 
 ## Novos pedidos (04/10 22:03 UTC)
 - [x] Menu lateral mobile: remover item "Study plan"; menu desktop: renomear "Lessons" para "Learning". (já refletido no AppShell: mobileSheetNav sem Study Plan; sidebar desktop usa "Learning")
-- [ ] Menu inferior mobile: texto cortado na parte inferior — subir ícones/texto; reduzir espaçamento das frases do "Why this matters" (última frase cortando), sem deixar espaço grande após a última.
+- [x] Menu inferior mobile: texto cortado na parte inferior — subir ícones/texto; reduzir espaçamento das frases do "Why this matters" (última frase cortando), sem deixar espaço grande após a última.
 - [x] Migrar AI Speaking e Vocabulary para a API Gemini.
 - [x] Vocabulary spaced review: convert 230 legacy mastery_level=100 rows to step 5 (90) with staggered next_review_at — waiting for user confirmation of the count.
+
+## 2026-10-05 — CI e notificações
+- [x] Stripe webhook: sem configuração do Stripe a requisição é rejeitada com 400 (como assinatura inválida), nunca 500.
+- [x] E2E: o login espera a hidratação do formulário; clicar antes enviava o formulário HTML (GET /auth?) e o login não acontecia.
+- [x] Lembrete diário: texto passa a dizer "ainda não completou sua meta de hoje", alinhado à regra do Study Streak.

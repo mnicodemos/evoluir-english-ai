@@ -16,14 +16,25 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
         const rawBody = await request.text();
 
         const { getStripe, getWebhookSecret } = await import("@/lib/billing/stripe.server");
-        const stripe = getStripe();
+
+        // Without Stripe configuration no signature can be verified, so the
+        // request is rejected the same way as an invalid one (never a 500).
+        let stripe: Stripe;
+        let webhookSecret: string;
+        try {
+          stripe = getStripe();
+          webhookSecret = getWebhookSecret();
+        } catch (error) {
+          console.error("[stripe] webhook not configured", (error as Error).message);
+          return new Response("Invalid signature", { status: 400 });
+        }
 
         let event: Stripe.Event;
         try {
           event = await stripe.webhooks.constructEventAsync(
             rawBody,
             signature,
-            getWebhookSecret(),
+            webhookSecret,
             undefined,
             (
               stripe as unknown as { createSubtleCryptoProvider?: () => unknown }
