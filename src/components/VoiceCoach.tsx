@@ -39,11 +39,19 @@ import {
   type RolePlay,
 } from "@/components/coach/coachScenarios";
 import { SpeakingReport } from "@/components/coach/SpeakingReport";
+import { isWeatherCondition, weatherRolePlay } from "@/lib/weatherTalk";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type VoiceState = "idle" | "recording" | "sending" | "transcribing" | "thinking" | "speaking";
 
-export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }) {
+export function VoiceCoach({
+  lessonTopic,
+  weather,
+}: {
+  lessonTopic?: string | undefined;
+  /** Opens a "Weather talk" conversation about today's weather. */
+  weather?: string | undefined;
+}) {
   const { data: profile } = useProfile();
   const { data: snapshot } = useStudySnapshot();
   const queryClient = useQueryClient();
@@ -93,7 +101,8 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
   useEffect(() => {
     if (lessonTopic || started.current) return;
     started.current = true;
-    void start(0);
+    if (isWeatherCondition(weather)) startRolePlay(weatherRolePlay(weather));
+    else void start(0);
     // Runs once per screen: `start` is recreated on every render, and the
     // `started` ref already guarantees a single opener.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -121,6 +130,17 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
       .catch((error: unknown) => {
         toast.error(error instanceof Error ? error.message : "The response could not be played.");
       });
+  }
+
+  /** Starts a real-life role-play; its fixed opener plays right away. */
+  function startRolePlay(play: RolePlay) {
+    cancelVoiceRecording();
+    stopSpeaking();
+    setRolePlay(play);
+    setScenario(play.scenario);
+    setReport(null);
+    setMessages([{ role: "assistant", content: play.opener }]);
+    void playResponse(play.opener);
   }
 
   /** Starts a conversation with a subject picked by the AI. `offset` asks for another subject. */
@@ -333,17 +353,6 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
             : voiceState === "speaking"
               ? "EVO is speaking… tap the microphone to answer now"
               : "Tap the microphone and speak in English";
-
-  /** Starts a real-life role-play; its fixed opener plays right away. */
-  const startRolePlay = (play: RolePlay) => {
-    cancelVoiceRecording();
-    stopSpeaking();
-    setRolePlay(play);
-    setScenario(play.scenario);
-    setReport(null);
-    setMessages([{ role: "assistant", content: play.opener }]);
-    void playResponse(play.opener);
-  };
 
   const newTopic = () => {
     cancelVoiceRecording();
