@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
-import { PLACEMENT_QUESTIONS, scorePlacement } from "@/lib/placementTest";
+import { PlacementTest } from "@/components/onboarding/PlacementTest";
+import { PLACEMENT_QUESTIONS, isAnswered, scorePlacement } from "@/lib/placementTest";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -58,7 +59,7 @@ function Onboarding() {
 
   const result = scorePlacement(answers);
   const level = result.level.value;
-  const answeredAll = Object.keys(answers).length === PLACEMENT_QUESTIONS.length;
+  const answeredAll = PLACEMENT_QUESTIONS.every((q) => isAnswered(answers[q.id]));
 
   useEffect(() => {
     if (profile?.name) setName(profile.name);
@@ -126,6 +127,7 @@ function Onboarding() {
         <PlacementTest
           answers={answers}
           onAnswer={(id, value) => setAnswers((a) => ({ ...a, [id]: value }))}
+          t={t}
         />
       ),
       canContinue: answeredAll,
@@ -237,48 +239,6 @@ function Onboarding() {
           </Button>
         </div>
       </div>
-    </div>
-  );
-}
-
-/** Graded CEFR questions, from A1 to C2, used to place the student. */
-function PlacementTest({
-  answers,
-  onAnswer,
-}: {
-  answers: Record<string, string>;
-  onAnswer: (id: string, value: string) => void;
-}) {
-  return (
-    <div className="space-y-5">
-      <p className="text-sm text-muted-foreground">
-        Answer all {PLACEMENT_QUESTIONS.length} questions. They get harder as you go — it is normal
-        not to know the last ones.
-      </p>
-      {PLACEMENT_QUESTIONS.map((q, index) => (
-        <fieldset key={q.id} className="card-soft p-4">
-          <legend className="sr-only">{`Question ${index + 1}`}</legend>
-          <p className="text-sm font-medium">
-            {index + 1}. {q.prompt}
-          </p>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            {q.options.map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => onAnswer(q.id, option)}
-                className={`rounded-lg border p-2.5 text-left text-sm transition-colors ${
-                  answers[q.id] === option
-                    ? "border-transparent bg-primary text-primary-foreground"
-                    : "border-border hover:bg-secondary"
-                }`}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-      ))}
     </div>
   );
 }

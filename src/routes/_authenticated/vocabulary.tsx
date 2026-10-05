@@ -1,12 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, RotateCcw, Search, Volume2, X } from "lucide-react";
+import { Check, Loader2, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
-import { highlightWord } from "@/components/vocabulary/highlightWord";
 import {
   VocabularyWordList,
   type VocabularyListContext,
@@ -30,6 +29,8 @@ import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
 import { pronunciationScore, transcribeAudio } from "@/lib/transcribe";
 import { PronunciationHint } from "@/components/vocabulary/PronunciationHint";
+import { DictionaryResult } from "@/components/vocabulary/DictionaryResult";
+import { useDictionarySearch } from "@/hooks/useDictionarySearch";
 import {
   cancelBrowserRecognition,
   startBrowserRecognition,
@@ -40,7 +41,6 @@ import {
   startVoiceRecording,
   stopVoiceRecording,
 } from "@/lib/voice-recorder";
-import { lookupWord } from "@/lib/dictionary.functions";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { useUiLang } from "@/lib/uiLang";
@@ -82,7 +82,6 @@ function Vocabulary() {
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data: profile } = useProfile();
   const loadDailyWords = useServerFn(dailyWords);
-  const searchDictionary = useServerFn(lookupWord);
   const savePronunciation = useServerFn(persistPronunciationLegacy);
   const logTelemetry = useServerFn(logPracticeTelemetry);
   const queryClient = useQueryClient();
@@ -446,26 +445,7 @@ function Vocabulary() {
   );
 
   // Dictionary search: answers come from context.reverso.net, not from the lessons.
-  const [query, setQuery] = useState("");
-  const [term, setTerm] = useState("");
-  const q = term.trim();
-
-  useEffect(() => {
-    const id = setTimeout(() => setTerm(query), 450);
-    return () => clearTimeout(id);
-  }, [query]);
-
-  // Time spent looking words up in the search field counts as reading practice,
-  // but pauses one minute after the last keystroke.
-  useEffect(() => {
-    if (query.trim().length < 2) {
-      minutesSpent.stop();
-      return;
-    }
-    minutesSpent.start();
-    const idle = setTimeout(() => minutesSpent.stop(), 60_000);
-    return () => clearTimeout(idle);
-  }, [query, minutesSpent]);
+  const { query, setQuery, q, entry, searching } = useDictionarySearch(minutesSpent);
 
   // When leaving the page, store the practice minutes that were not logged yet.
   const profileRef = useRef(profile);
@@ -495,13 +475,6 @@ function Vocabulary() {
       }
     };
   }, [minutesSpent, logTelemetry]);
-
-  const { data: entry, isFetching: searching } = useQuery({
-    queryKey: ["dictionary-v2", q.toLowerCase()],
-    queryFn: () => searchDictionary({ data: { term: q } }),
-    enabled: q.length >= 2,
-    staleTime: 1000 * 60 * 60,
-  });
 
   // Ten new words each day, written by the AI from the lessons in the learning path.
   // A word counts as known for now once it has climbed a step and its next review
@@ -599,92 +572,13 @@ function Vocabulary() {
       </div>
 
       {q.length >= 2 ? (
-        <section aria-label="Search results" className="mt-6">
-          {searching ? (
-            <Skeleton className="h-40 w-full" />
-          ) : !entry?.found ? (
-            <div className="space-y-1 text-sm text-muted-foreground">
-              <p>
-                No dictionary entry found for <span className="font-medium">“{q}”</span>.
-              </p>
-              <p>Check the spelling and try another English word.</p>
-            </div>
-          ) : (
-            <article className="card-soft p-5">
-              <div className="flex items-center gap-3">
-                <h3 className="text-2xl font-bold">{entry.word}</h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => speak(`dict-${entry.word}`, entry.word)}
-                  aria-label="Listen"
-                  className={
-                    playingKey === `dict-${entry.word}`
-                      ? "bg-success text-success-foreground hover:bg-success/90"
-                      : ""
-                  }
-                >
-                  <Volume2 className="size-5" />
-                </Button>
-              </div>
-
-              {(entry.ipaUs || entry.ipaUk) && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {entry.ipaUs && <span>US /{entry.ipaUs}/</span>}
-                  {entry.ipaUs && entry.ipaUk && <span> · </span>}
-                  {entry.ipaUk && <span>UK /{entry.ipaUk}/</span>}
-                </p>
-              )}
-
-              {entry.meanings.length > 0 && (
-                <ol className="mt-5 grid gap-4">
-                  {entry.meanings.map((m, i) => (
-                    <li key={i} className="border-b border-border pb-4 last:border-0">
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">{i + 1}.</span>{" "}
-                        {m.context && (
-                          <span className="italic text-muted-foreground">({m.context})</span>
-                        )}{" "}
-                        {m.definition}
-                      </p>
-
-                      {m.translations.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {m.translations.map((t, j) => (
-                            <span
-                              key={j}
-                              className="rounded-md bg-secondary px-2.5 py-1 text-sm font-medium text-secondary-foreground"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      {m.example && (
-                        <div className="mt-3 text-sm">
-                          <p className="italic text-foreground">
-                            "{highlightWord(m.example.en, entry.word)}"
-                          </p>
-                          <p className="mt-1 text-muted-foreground">{m.example.pt}</p>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              )}
-
-              <a
-                href={entry.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-block text-xs text-muted-foreground underline"
-              >
-                Source: context.reverso.net
-              </a>
-            </article>
-          )}
-        </section>
+        <DictionaryResult
+          q={q}
+          searching={searching}
+          entry={entry}
+          playing={entry?.found ? playingKey === `dict-${entry.word}` : false}
+          onSpeak={(word) => void speak(`dict-${word}`, word)}
+        />
       ) : isLoading ? (
         <div className="mt-7 space-y-4">
           <Skeleton className="h-40 w-full" />

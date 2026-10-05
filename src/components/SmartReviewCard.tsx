@@ -7,7 +7,7 @@ import reviewWriting from "@/assets/review-writing.jpg.asset.json";
 
 import { EvoGuide } from "@/components/EvoGuide";
 import { LearningMomentum } from "@/components/LearningMomentum";
-import { PathProgressCard } from "@/components/LearningPathCard";
+import { PathProgressCard } from "@/components/PathProgressCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
