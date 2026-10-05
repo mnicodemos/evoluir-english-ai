@@ -518,9 +518,7 @@ function Vocabulary() {
   const todayKnownCount = today.filter((w) => knownNow(w.id)).length;
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
   // Learned words (e.g. passed pronunciation) move out of Today into the Learned tab.
-  const todayOpen = today.filter(
-    (w) => (byWord.get(w.id)?.mastery_level ?? 0) < LEARNED_MASTERY,
-  );
+  const todayOpen = today.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) < LEARNED_MASTERY);
 
   // Spaced reviews: earlier words whose review date has arrived come back here,
   // most overdue first. Words reviewed today stay visible (dimmed) until tomorrow.
