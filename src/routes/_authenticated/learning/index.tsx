@@ -30,11 +30,11 @@ function LearningCenter() {
 
   return (
     <AppShell>
-      <div className="space-y-5 lg:space-y-6">
+      <div className="space-y-5 lg:space-y-4">
         <header className="animate-rise">
           <p className="text-sm text-muted-foreground">Learning Center</p>
           <h1 className="text-3xl font-bold">Your learning path</h1>
-          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+          <p className="mt-2 max-w-xl text-sm text-muted-foreground lg:hidden">
             A complete course for your level: 30 core lessons plus 3 optional review lessons, with
             video, summary, flashcards, quiz and guided practice. Each lesson unlocks when you
             finish the one before it.
