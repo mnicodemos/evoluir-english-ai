@@ -253,3 +253,6 @@
 - [x] Desktop (xl): prática à esquerda (botão grande de ouvir, lacunas por palavra que mostram o tamanho da frase e depois as palavras acertadas, gravação centralizada) e, à direita, Sessão de hoje (3 frases com status/nota e último resultado) e Foco de pronúncia do nível com 3 dicas. Cabe em 1280×800 e 1920×1080; celular continua em uma tela (painel lateral só no xl).
 - [x] Correção: frases fixas de B2/C1 eram mais curtas que a faixa de palavras do nível; sem frases das aulas o exercício ficava vazio ("Frase 1 de 0"). Agora servem de reserva.
 
+## 2026-10-05 — Plano de estudo em uma tela (desktop)
+- [x] xl: configuração do plano em largura total com Salvar/Atualizar no título; abaixo, a semana em linhas compactas (dia · habilidade · ✓, atividade, botão) à esquerda e, à direita, o progresso semanal resumido (percentual, barra e "4 / 5 atividades · 7 / 75 min") e o "Por que este plano?". 1280×800: 1.337 → 800px; celular inalterado.
+

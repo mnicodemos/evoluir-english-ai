@@ -138,23 +138,61 @@ function StudyPlanPage() {
         );
       }));
 
+  // Same two buttons under the settings (phones/tablets) or in the settings
+  // title row (wide desktop), where they free a full row of height.
+  const planActions = (
+    <>
+      <Button
+        className="h-9 flex-1 sm:flex-none"
+        disabled={save.isPending}
+        onClick={() => {
+          if (plan) setPrevious(plan.days);
+          save.mutate();
+        }}
+      >
+        {save.isPending && <Loader2 className="size-4 animate-spin" />}
+        Save my plan
+      </Button>
+      <Button
+        variant="outline"
+        className="h-9 flex-1 sm:flex-none"
+        disabled={isFetching || !plan}
+        onClick={recalculate}
+      >
+        {isFetching ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <RefreshCw className="size-4" />
+        )}
+        Update my plan
+      </Button>
+    </>
+  );
+
   return (
     <AppShell mobileOneScreen>
-      <div className="space-y-2 lg:space-y-4">
-        <header className="animate-rise">
-          <p className="hidden text-xs text-muted-foreground sm:block sm:text-sm">My Study Plan</p>
+      {/* Wide desktop: settings across the top, then the week as compact rows on
+          the left and progress with the reasons on the right (one screen). */}
+      <div className="space-y-2 lg:space-y-4 xl:grid xl:grid-cols-[minmax(0,1.8fr)_minmax(19rem,1fr)] xl:items-start xl:gap-3 xl:space-y-0">
+        <header className="animate-rise xl:col-span-2">
+          <p className="hidden text-xs text-muted-foreground sm:block sm:text-sm xl:hidden">
+            My Study Plan
+          </p>
           <h1 className="text-lg font-bold lg:text-3xl">Your weekly study plan</h1>
-          <p className="mt-0.5 hidden max-w-2xl text-xs text-muted-foreground sm:mt-1 sm:block sm:text-sm">
+          <p className="mt-0.5 hidden max-w-2xl text-xs text-muted-foreground sm:mt-1 sm:block sm:text-sm xl:hidden">
             Choose your goal, your available time and your focus area. Your plan uses the lessons
             and practice already available for your level.
           </p>
         </header>
 
-        <section className="card-soft space-y-2 p-2.5 sm:space-y-2.5 sm:p-4">
-          <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
-            <Target className="size-4 text-primary sm:size-5" />
-            Plan settings
-          </h2>
+        <section className="card-soft space-y-2 p-2.5 sm:space-y-2.5 sm:p-4 xl:col-span-2 xl:row-start-2 xl:space-y-1.5">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
+              <Target className="size-4 text-primary sm:size-5" />
+              Plan settings
+            </h2>
+            <div className="hidden gap-2 xl:flex">{planActions}</div>
+          </div>
 
           <Choice
             label="Main goal"
@@ -187,93 +225,78 @@ function StudyPlanPage() {
             onChange={(v) => setFocus(v as StudyFocus)}
           />
 
-          <div className="flex flex-row gap-2">
-            <Button
-              className="h-9 flex-1 sm:flex-none"
-              disabled={save.isPending}
-              onClick={() => {
-                if (plan) setPrevious(plan.days);
-                save.mutate();
-              }}
-            >
-              {save.isPending && <Loader2 className="size-4 animate-spin" />}
-              Save my plan
-            </Button>
-            <Button
-              variant="outline"
-              className="h-9 flex-1 sm:flex-none"
-              disabled={isFetching || !plan}
-              onClick={recalculate}
-            >
-              {isFetching ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <RefreshCw className="size-4" />
-              )}
-              Update my plan
-            </Button>
-          </div>
+          <div className="flex flex-row gap-2 xl:hidden">{planActions}</div>
         </section>
 
         {isLoading || !plan ? (
-          <div className="space-y-4">
+          <div className="space-y-4 xl:col-span-2">
             <Skeleton className="h-28 w-full" />
             <Skeleton className="h-28 w-full" />
           </div>
         ) : (
           <>
-            <section className="card-soft p-3 sm:p-4">
-              <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
-                <Clock className="size-4 text-primary sm:size-5" />
-                Weekly progress
-              </h2>
-              <dl className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
-                <Stat
-                  label="Completed activities"
-                  value={`${plan.completedCount} / ${plan.totalCount}`}
-                />
-                <Stat label="Weekly progress" value={`${plan.progressPercent}%`} />
-                <Stat
-                  label="Minutes studied"
-                  value={`${plan.minutesThisWeek} / ${plan.weeklyMinutesTarget}`}
-                />
-              </dl>
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-primary transition-all"
-                  style={{ width: `${plan.progressPercent}%` }}
-                />
-              </div>
-              {levelLabel && (
-                <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-                  Your level: {levelLabel}
+            <div className="space-y-2 lg:space-y-4 xl:col-start-2 xl:row-start-3">
+              <section className="card-soft p-3 sm:p-4">
+                <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
+                  <Clock className="size-4 text-primary sm:size-5" />
+                  Weekly progress
+                </h2>
+                <dl className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2 xl:hidden">
+                  <Stat
+                    label="Completed activities"
+                    value={`${plan.completedCount} / ${plan.totalCount}`}
+                  />
+                  <Stat label="Weekly progress" value={`${plan.progressPercent}%`} />
+                  <Stat
+                    label="Minutes studied"
+                    value={`${plan.minutesThisWeek} / ${plan.weeklyMinutesTarget}`}
+                  />
+                </dl>
+                {/* Wide desktop: the same three numbers on one line, above the bar. */}
+                <p className="mt-2 hidden items-baseline justify-between gap-3 text-sm xl:flex">
+                  <span className="text-2xl font-bold">{plan.progressPercent}%</span>
+                  <span className="text-muted-foreground">
+                    {plan.completedCount} / {plan.totalCount} <span>activities</span> ·{" "}
+                    {plan.minutesThisWeek} / {plan.weeklyMinutesTarget} min
+                  </span>
                 </p>
-              )}
-            </section>
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted xl:mt-2">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all"
+                    style={{ width: `${plan.progressPercent}%` }}
+                  />
+                </div>
+                {levelLabel && (
+                  <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
+                    Your level: {levelLabel}
+                  </p>
+                )}
+              </section>
 
-            <section className="card-soft p-3 sm:p-4">
-              <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
-                <Sparkles className="size-4 text-primary sm:size-5" />
-                Why this plan?
-              </h2>
-              <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
-                Based on your progress:
-              </p>
-              <ul className="mt-1.5 space-y-1 sm:mt-2 sm:space-y-1.5">
-                {plan.reasons.map((reason) => (
-                  <li
-                    key={`${reason.code}-${reason.skill ?? ""}`}
-                    className="flex items-start gap-2 text-xs sm:text-sm"
-                  >
-                    <Check className="mt-0.5 size-3.5 shrink-0 text-primary sm:size-4" />
-                    <span className="break-words">{planReasonText(reason)}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
+              <section className="card-soft p-3 sm:p-4">
+                <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
+                  <Sparkles className="size-4 text-primary sm:size-5" />
+                  Why this plan?
+                </h2>
+                <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm xl:hidden">
+                  Based on your progress:
+                </p>
+                <ul className="mt-1.5 space-y-1 sm:mt-2 sm:space-y-1.5">
+                  {plan.reasons.map((reason) => (
+                    <li
+                      key={`${reason.code}-${reason.skill ?? ""}`}
+                      className="flex items-start gap-2 text-xs sm:text-sm"
+                    >
+                      <Check className="mt-0.5 size-3.5 shrink-0 text-primary sm:size-4" />
+                      <span className="break-words">{planReasonText(reason)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
 
             {changed && previous && (
-              <section className="card-soft p-5">
+              <section className="card-soft p-5 xl:col-span-2 xl:row-start-4">
                 <h2 className="flex items-center gap-2 text-lg font-semibold">
                   <RefreshCw className="size-5 text-primary" />
                   Previous plan → Updated plan
@@ -318,16 +341,19 @@ function StudyPlanPage() {
               </section>
             )}
 
-            <section className="space-y-2 sm:space-y-3">
+            <section className="space-y-2 sm:space-y-3 xl:col-start-1 xl:row-start-3 xl:space-y-2">
               <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
                 <CalendarCheck className="size-4 text-primary sm:size-5" />
                 Week 1
               </h2>
-              <ul className="grid grid-cols-2 gap-2 xl:grid-cols-3">
+              <ul className="grid grid-cols-2 gap-2 xl:grid-cols-1 xl:gap-1.5">
                 {plan.days.map((day) => (
-                  <li key={day.day} className="card-soft p-2 sm:p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
+                  <li
+                    key={day.day}
+                    className="card-soft p-2 sm:p-3 xl:flex xl:items-center xl:gap-4 xl:py-1.5"
+                  >
+                    <div className="flex items-start justify-between gap-2 xl:w-56 xl:shrink-0 xl:items-center xl:justify-start">
+                      <div className="min-w-0 xl:flex xl:items-baseline xl:gap-2">
                         <p className="text-xs font-semibold sm:text-sm">{day.day}</p>
                         <p className="text-[10px] uppercase tracking-wide text-muted-foreground sm:text-xs">
                           {SKILL_LABELS[day.skill] ?? day.skill}
@@ -336,25 +362,28 @@ function StudyPlanPage() {
                       {day.completed && (
                         <span className="flex shrink-0 items-center gap-1 text-[10px] font-medium text-primary sm:text-xs">
                           <Check className="size-3.5 sm:size-4" />
-                          Completed
+                          <span className="xl:sr-only">Completed</span>
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-xs font-medium break-words sm:mt-2 sm:text-base">
+                    <p
+                      className="mt-1 text-xs font-medium break-words sm:mt-2 sm:text-base xl:mt-0 xl:min-w-0 xl:flex-1 xl:truncate xl:text-sm"
+                      title={day.title}
+                    >
                       {day.title}
                     </p>
                     {day.lessonId ? (
                       <Link
                         to="/learning/$lessonId"
                         params={{ lessonId: day.lessonId }}
-                        className="mt-1.5 inline-flex h-7 items-center rounded-lg border border-border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:py-1 sm:text-sm"
+                        className="mt-1.5 inline-flex h-7 shrink-0 items-center rounded-lg border border-border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:py-1 sm:text-sm xl:mt-0 xl:h-8"
                       >
                         Start activity
                       </Link>
                     ) : (
                       <Link
                         to={day.to as "/listening"}
-                        className="mt-1.5 inline-flex h-7 items-center rounded-lg border border-border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:py-1 sm:text-sm"
+                        className="mt-1.5 inline-flex h-7 shrink-0 items-center rounded-lg border border-border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:py-1 sm:text-sm xl:mt-0 xl:h-8"
                       >
                         Start activity
                       </Link>
@@ -362,7 +391,7 @@ function StudyPlanPage() {
                   </li>
                 ))}
               </ul>
-              <p className="hidden text-xs text-muted-foreground sm:block">
+              <p className="hidden text-xs text-muted-foreground sm:block xl:hidden">
                 The plan reuses your existing lessons and practice areas. When no lesson of that
                 skill is available for your level, we point you to the matching practice area.
               </p>
@@ -404,7 +433,7 @@ function Choice({
             type="button"
             onClick={() => onChange(option.value)}
             aria-pressed={value === option.value}
-            className={`h-6 rounded-md border px-2 text-[11px] transition-colors sm:h-9 sm:rounded-lg sm:px-3 sm:py-1 sm:text-sm ${
+            className={`h-6 rounded-md border px-2 text-[11px] transition-colors sm:h-9 sm:rounded-lg sm:px-3 sm:py-1 sm:text-sm xl:h-8 xl:py-0 ${
               value === option.value
                 ? "border-transparent bg-primary text-primary-foreground"
                 : "border-border hover:bg-secondary"

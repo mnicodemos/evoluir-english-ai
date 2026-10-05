@@ -38,6 +38,7 @@ export const uiPt: Record<string, string> = {
   "Notifications off": "Notificações desativadas",
   "New activities available": "Novas atividades disponíveis",
   "New vocabulary words": "Novas palavras no Vocabulário",
+  activities: "atividades",
   "Today's session": "Sessão de hoje",
   "In progress": "Em andamento",
   "Up next": "A seguir",
