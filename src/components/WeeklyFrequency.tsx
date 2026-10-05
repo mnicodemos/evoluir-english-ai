@@ -1,6 +1,7 @@
 import { CalendarDays, Check, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { GoldTrophy } from "@/components/GoldTrophy";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
@@ -158,22 +159,17 @@ export function WeeklyFrequency({
             {lang === "pt" ? "Esta semana" : "This week"}
           </p>
         </div>
-        <Trophy
-          className={cn(
-            "hidden size-12 shrink-0 sm:block",
-            sevenDayTrophyUnlocked
-              ? "fill-transparent text-warning"
-              : "fill-transparent text-muted-foreground/40",
-          )}
-          strokeWidth={1.5}
-          aria-label={
+        <GoldTrophy
+          unlocked={sevenDayTrophyUnlocked}
+          className="hidden size-12 sm:block"
+          label={
             sevenDayTrophyUnlocked
               ? lang === "pt"
-                ? "Troféu de 7 dias desbloqueado"
-                : "7-day trophy unlocked"
+                ? "Troféu da semana desbloqueado"
+                : "Weekly trophy unlocked"
               : lang === "pt"
-                ? "Troféu de 7 dias bloqueado"
-                : "7-day trophy locked"
+                ? "Troféu da semana bloqueado"
+                : "Weekly trophy locked"
           }
         />
       </div>

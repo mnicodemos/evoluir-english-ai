@@ -219,7 +219,10 @@
 /* Toasts (sonner) render in a portal with their own stylesheet; use the
    Evoluir+ green consistently for feedback across every page. */
 .dashboard-shell [data-sonner-toast] {
-  background-color: var(--brand-green) !important;
+  /* Slightly see-through (owner request) with a blur so the text keeps its contrast. */
+  background-color: color-mix(in oklab, var(--brand-green) 84%, transparent) !important;
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
   color: var(--primary-foreground) !important;
   border: 1px solid color-mix(in oklab, var(--brand-green) 72%, var(--background)) !important;
 }

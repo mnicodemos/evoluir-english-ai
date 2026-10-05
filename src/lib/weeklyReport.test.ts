@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { isWeeklyReportDay, weekStartIso, weeklyReportMessage } from "./weeklyReport";
+import {
+  isWeeklyReportDay,
+  leaguePositions,
+  weekStartIso,
+  weeklyReportMessage,
+} from "./weeklyReport";
 
 const base = {
   minutes: 0,
@@ -44,5 +49,26 @@ describe("weekly report", () => {
     const message = weeklyReportMessage(base);
     expect(message.path).toBe("/study-plan");
     expect(message.body).toContain("recomeçar");
+  });
+
+  it("ranks the league like the database, sharing ties", () => {
+    const positions = leaguePositions([
+      { id: "a", xp: 80 },
+      { id: "b", xp: 100 },
+      { id: "c", xp: 80 },
+      { id: "d", xp: 50 },
+    ]);
+    expect([...["b", "a", "c", "d"].map((id) => positions.get(id))]).toEqual([1, 2, 2, 4]);
+  });
+
+  it("adds the final league position with a medal", () => {
+    const message = weeklyReportMessage({
+      ...base,
+      minutes: 30,
+      activities: 2,
+      lessons: 1,
+      league: { position: 2, total: 5, level: "b2" },
+    });
+    expect(message.body).toContain("Liga B2: 2º de 5 🥈. Nova semana começa amanhã!");
   });
 });
