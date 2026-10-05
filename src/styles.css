@@ -216,20 +216,20 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* Toasts (sonner) render in a portal with their own stylesheet; light gray,
-   slightly see-through (owner request) so the text keeps its contrast. */
+/* Toasts (sonner) render in a portal with their own stylesheet; dark like a
+   phone's dark-mode notification shade (owner request), with light text. */
 .dashboard-shell [data-sonner-toast] {
-  /* Light gray with transparency and a blur so the text stays readable. */
-  background-color: oklch(0.87 0.008 240 / 88%) !important;
+  /* Dark gray with transparency and a blur, like Android/iOS dark notifications. */
+  background-color: oklch(0.27 0.008 240 / 92%) !important;
   backdrop-filter: blur(10px) saturate(140%);
   -webkit-backdrop-filter: blur(10px) saturate(140%);
-  color: oklch(0.22 0.01 240) !important;
-  border: 1px solid oklch(0.62 0.012 240 / 70%) !important;
+  color: oklch(0.93 0.008 240) !important;
+  border: 1px solid oklch(0.45 0.01 240 / 70%) !important;
 }
 
 .dashboard-shell [data-sonner-toast] [data-description],
 .dashboard-shell [data-sonner-toast] [data-icon] {
-  color: oklch(0.22 0.01 240) !important;
+  color: oklch(0.82 0.008 240) !important;
 }
 
 .dashboard-shell .dashboard-panel {
