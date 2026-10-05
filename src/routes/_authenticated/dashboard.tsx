@@ -35,7 +35,8 @@ import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
-import { graphitePanelClass } from "@/lib/surfaces";
+import { WeatherButton } from "@/components/WeatherButton";
+import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -95,7 +96,7 @@ function DashboardNotifications({ indicators, translate, placement }: DashboardN
           aria-label={translate("Open notifications")}
           className={
             placement === "mobile"
-              ? "relative size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+              ? `relative size-8 shrink-0 rounded-full ${graphiteIconButtonClass}`
               : "relative size-7 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
           }
         >
@@ -254,15 +255,7 @@ function Dashboard() {
                 <DashboardNotifications indicators={indicators} translate={t} placement="desktop" />
               }
               mobileTrailing={
-                <div className="flex items-center gap-2 whitespace-nowrap">
-                  <DashboardNotifications
-                    indicators={indicators}
-                    translate={t}
-                    placement="mobile"
-                  />
-                  <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
-                    {profile.level}
-                  </span>
+                <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                   <span className="flex items-center gap-1">
                     <Flame
                       className="size-5 shrink-0 fill-current text-current"
@@ -274,6 +267,12 @@ function Dashboard() {
                       {streakDays} {t("days")}
                     </span>
                   </span>
+                  <WeatherButton translate={t} />
+                  <DashboardNotifications
+                    indicators={indicators}
+                    translate={t}
+                    placement="mobile"
+                  />
                 </div>
               }
             />
