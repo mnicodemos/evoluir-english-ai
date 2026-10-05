@@ -1232,4 +1232,5 @@ export const uiPt: Record<string, string> = {
   "Word reviewed": "Palavra revisada",
   "Could not update your league participation.":
     "Não foi possível atualizar sua participação na liga.",
+  "The league is not available right now.": "A liga não está disponível agora.",
 };
