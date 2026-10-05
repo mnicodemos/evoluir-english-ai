@@ -115,7 +115,8 @@
 - [x] Fase — Vocabulary performance (a)+(b) e botão "✓ That's OK"
   - Palavras salvas carregam sem IA; geração em segundo plano; falha memorizada por lote, com "Tentar novamente" manual
 - [ ] Pendente: investigar por que o lote completed-16 não está persistindo as palavras geradas (fase futura)
-- [ ] Pendente: latência da validação de pronúncia (2,4–45 s, provedor de IA)
+- [x] Pendente: latência da validação de pronúncia (2,4–45 s, provedor de IA)
+  - /api/transcribe passou a ter orçamento total de 20 s (src/lib/transcriptionBudget.ts) dividido entre Lovable (até 8 s) e os fallbacks Gemini; pausas de nova tentativa só acontecem se ainda houver tempo, e o modelo que recusa thinkingConfig é lembrado para não repetir a chamada inválida. A latência normal continua dependendo do provedor.
 - [x] AI Talking: limite de 20 s (primeira resposta) e 15 s (entre trechos), cancelamento real e liberação imediata da vaga
 - [x] Mover o acesso ao painel administrativo para dentro da janela de perfil
 - [x] Sincronizar o indicador do Vocabulary com palavras realmente salvas e estados de erro
