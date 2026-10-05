@@ -253,7 +253,7 @@ function Dashboard() {
                 <DashboardNotifications indicators={indicators} translate={t} placement="desktop" />
               }
               mobileTrailing={
-                <div className="flex items-center gap-2 whitespace-nowrap">
+                <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                   <DashboardNotifications
                     indicators={indicators}
                     translate={t}
@@ -261,17 +261,6 @@ function Dashboard() {
                   />
                   <span className="rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green">
                     {profile.level}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Flame
-                      className="size-5 shrink-0 fill-current text-current"
-                      style={{ color: getLeague(streakDays).from }}
-                      strokeWidth={2.4}
-                      aria-hidden="true"
-                    />
-                    <span className="font-display text-sm font-bold">
-                      {streakDays} {t("days")}
-                    </span>
                   </span>
                 </div>
               }
