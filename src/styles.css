@@ -216,6 +216,12 @@
   box-shadow: var(--shadow-soft);
 }
 
+/* The bell popup is translucent over the dashboard, dark like a phone's
+   dark-mode notification shade. */
+.notification-popover.dashboard-shell.dark {
+  background-color: oklch(0.115 0.016 238 / 78%);
+}
+
 /* Toasts (sonner) render in a portal with their own stylesheet; dark like a
    phone's dark-mode notification shade (owner request), with light text. */
 .dashboard-shell [data-sonner-toast] {
