@@ -303,12 +303,12 @@ function Writing() {
   }
 
   return (
-    <AppShell>
-      <h1 className="text-3xl font-bold">Writing AI Corrector</h1>
+    <AppShell mobileOneScreen>
+      <h1 className="text-2xl font-bold sm:text-3xl">Writing AI Corrector</h1>
       <p className="mt-1 text-sm font-medium text-muted-foreground">
         Writing Practice • {config.label} — {config.focus}
       </p>
-      <p className="mt-2 text-muted-foreground">
+      <p className="mt-2 hidden text-muted-foreground sm:block">
         One task for Everyday, Professional and Travel English, at your level. New tasks every day
         and every time you start a new lesson — nothing repeats.
       </p>
@@ -318,7 +318,7 @@ function Writing() {
         </Button>
       )}
 
-      <div className="mt-7 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-3 gap-2 sm:mt-7 sm:gap-3">
         {prompts.map((p, index) => {
           const category = WRITING_CATEGORIES[index]!;
           const isDone = done.includes(p);
@@ -328,7 +328,7 @@ function Writing() {
               key={p}
               onClick={() => selectPrompt(p)}
               title={isDone ? "Checked — click to redo" : undefined}
-              className={`card-soft flex h-full flex-col gap-1.5 p-4 text-left transition-colors ${
+              className={`card-soft flex h-full flex-col gap-1.5 p-2.5 text-left transition-colors sm:p-4 ${
                 isDone
                   ? "opacity-70 hover:bg-accent/50"
                   : isActive
@@ -336,7 +336,7 @@ function Writing() {
                     : "hover:bg-accent/50"
               }`}
             >
-              <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-tight tracking-wide text-muted-foreground sm:text-xs">
                 {isDone ? (
                   <CheckCircle2 className="size-3.5 text-green-600" />
                 ) : (
@@ -344,8 +344,8 @@ function Writing() {
                 )}
                 {category.label}
               </span>
-              <span className="text-sm font-medium">{p}</span>
-              <span className="mt-auto pt-2 text-xs text-muted-foreground">
+              <span className="hidden text-sm font-medium sm:block">{p}</span>
+              <span className="mt-auto hidden pt-2 text-xs text-muted-foreground sm:block">
                 {isDone ? "Checked · click to redo" : category.hint}
               </span>
             </button>
@@ -353,7 +353,7 @@ function Writing() {
         })}
       </div>
 
-      <section className="card-soft mt-5 p-4 sm:p-6">
+      <section className="card-soft mt-3 p-4 sm:mt-5 sm:p-6">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
           <label className="min-w-0 break-words text-sm font-medium">
             {allDone ? <span>Today's tasks</span> : prompt}
@@ -412,7 +412,7 @@ function Writing() {
               }}
               rows={9}
               placeholder="Write your answer in English…"
-              className="mt-5 min-h-52 scroll-mb-40 text-base"
+              className="mt-4 min-h-44 scroll-mb-40 text-base sm:mt-5 sm:min-h-52"
             />
             <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm text-muted-foreground">

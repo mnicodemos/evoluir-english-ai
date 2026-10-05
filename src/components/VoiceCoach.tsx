@@ -480,7 +480,7 @@ export function VoiceCoach({ lessonTopic }: { lessonTopic?: string | undefined }
         </div>
       )}
 
-      <section className="card-soft flex h-[min(58dvh,38rem)] min-h-[22rem] flex-col overflow-hidden sm:min-h-[26.875rem]">
+      <section className="card-soft flex h-[min(50dvh,38rem)] min-h-[20rem] flex-col overflow-hidden sm:min-h-[22rem]">
         <Conversation>
           <ConversationContent className="gap-5 p-5">
             {messages.map((message, index) => (

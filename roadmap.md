@@ -236,3 +236,10 @@
 - [ ] Próximos lotes: dividir arquivos grandes (vocabulary.tsx, dualWrite.functions.ts, curriculum.functions.ts, VoiceCoach.tsx, LearningPathCard.tsx), um por PR.
 - [x] Bloco 3, lote 2: lista de palavras do Vocabulary extraída para components/vocabulary/VocabularyWordList.tsx (antes recriada a cada renderização); vocabulary.tsx 888 → 770 linhas.
 
+## 2026-10-05 — One page (avaliação de todas as páginas)
+- [x] Fala com AI: cabe em uma tela no desktop 1280×800 e no celular (cartão da conversa 50dvh, mínimo 22rem; rodapé oculto no mobile).
+- [x] Escrita no celular: categorias viram três abas compactas (a tarefa aparece no cabeçalho do editor) e a descrição longa fica só a partir de sm; cabe em uma tela antes da correção.
+- [x] Menu lateral desktop rola em telas baixas (o perfil não fica mais cortado em 800px de altura).
+- Já em uma tela: Dashboard, Escuta, Escrita (desktop), Vocabulário, Professor de IA, Revisão, Aula, Premium.
+- [ ] A decidir: Meu progresso (≈1.585px) e Trilha de aprendizado (≈2.500px) só cabem com mudança de estrutura (abas/colapsáveis).
+
