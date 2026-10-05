@@ -13,8 +13,17 @@ export function initSentry() {
   Sentry.init({
     dsn,
     environment: "production",
-    sendDefaultPii: false,
     tracesSampleRate: 0,
+    // Sentry v11 replaced sendDefaultPii:false with dataCollection; this
+    // disables user info, cookies, headers, query params, bodies and locals.
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      urlQueryParams: false,
+      httpBodies: [],
+      stackFrameVariables: false,
+    },
   });
   initialized = true;
 }
