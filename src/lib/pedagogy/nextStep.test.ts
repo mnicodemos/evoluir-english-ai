@@ -226,35 +226,31 @@ describe("quick win", () => {
     });
   });
 
-  it("changes the shortcut for grammar, speaking, writing, listening and reading", () => {
-    expect(buildNextStep({ ...base, skills: [skill("grammar", 30)] }).quickWin).toMatchObject({
-      skill: "grammar",
-      cta: "Practice grammar",
-      activity: { to: "/teacher" },
-    });
+  it("opens a different screen than Practice now for every skill", () => {
+    for (const name of ["grammar", "speaking", "writing", "listening", "reading", "vocabulary"]) {
+      const step = buildNextStep({ ...base, skills: [skill(name, 30)] });
+      expect(step.quickWin?.activity.to, name).not.toBe(step.activity.to);
+    }
     expect(buildNextStep({ ...base, skills: [skill("speaking", 30)] }).quickWin).toMatchObject({
       skill: "speaking",
-      cta: "Practice speaking",
-      activity: { to: "/coach" },
+      cta: "Say 5 words out loud",
+      activity: { to: "/vocabulary" },
     });
     expect(buildNextStep({ ...base, skills: [skill("writing", 30)] }).quickWin).toMatchObject({
       skill: "writing",
-      cta: "Practice writing",
-      activity: { to: "/writing" },
+      activity: { to: "/mistakes" },
     });
+    expect(buildNextStep({ ...base, skills: [skill("grammar", 30)] }).quickWin).toMatchObject({
+      skill: "grammar",
+      activity: { to: "/mistakes" },
+    });
+    // When the quick practice would land on the main screen, the smart review steps in.
     expect(buildNextStep({ ...base, skills: [skill("listening", 30)] }).quickWin).toMatchObject({
-      skill: "listening",
-      cta: "Practice listening",
-      activity: { to: "/listening" },
-    });
-    expect(buildNextStep({ ...base, skills: [skill("reading", 30)] }).quickWin).toMatchObject({
-      skill: "reading",
-      cta: "Practice reading",
-      activity: { to: "/learning" },
+      activity: { to: "/learning/review" },
     });
   });
 
-  it("uses an existing lesson for grammar and reading when one is already selected", () => {
+  it("keeps a selected grammar or reading lesson for Practice now and points the quick win elsewhere", () => {
     const grammar = buildNextStep({
       ...base,
       skills: [skill("grammar", 30)],
@@ -265,14 +261,10 @@ describe("quick win", () => {
       skills: [skill("reading", 30)],
       lessonBySkill: { reading: { id: "lesson-reading", title: "A work email" } },
     });
-    expect(grammar.quickWin?.activity).toMatchObject({
-      to: "/learning/$lessonId",
-      params: { lessonId: "lesson-grammar" },
-    });
-    expect(reading.quickWin?.activity).toMatchObject({
-      to: "/learning/$lessonId",
-      params: { lessonId: "lesson-reading" },
-    });
+    expect(grammar.activity).toMatchObject({ params: { lessonId: "lesson-grammar" } });
+    expect(grammar.quickWin?.activity).toMatchObject({ to: "/teacher" });
+    expect(reading.activity).toMatchObject({ params: { lessonId: "lesson-reading" } });
+    expect(reading.quickWin?.activity).toMatchObject({ to: "/learning" });
   });
 
   it("returns no quick win when there is no suitable micropractice", () => {

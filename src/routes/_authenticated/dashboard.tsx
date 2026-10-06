@@ -3,6 +3,7 @@ import {
   Bell,
   Bolt,
   CalendarCheck2,
+  ChartLine,
   BookOpen,
   Check,
   ChevronRight,
@@ -10,19 +11,19 @@ import {
   Flame,
   GraduationCap,
   Headphones,
-  Map,
   MessageSquareText,
   Minus,
   PenLine,
   RotateCcw,
   Sparkles,
+  SpellCheck,
   TriangleAlert,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
-import { DailyGoalCard, useMinutesToday } from "@/components/DailyGoalCard";
+import { useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
 import { getLeague, getNextLeague, LeagueBadge } from "@/components/LeagueBadge";
@@ -43,6 +44,9 @@ import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { WeatherTalk } from "@/components/WeatherTalk";
 import { FirstWeekGuide } from "@/components/FirstWeekGuide";
+import { WeeklyLeagueSummary } from "@/components/WeeklyLeagueSummary";
+import { supabase } from "@/integrations/supabase/client";
+import { MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
 import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -68,6 +72,12 @@ type DashboardNotificationsProps = {
   indicators: ReturnType<typeof useActivityIndicators>;
   /** Vocabulary reviews due today (already capped at the daily review limit). */
   reviewCount: number;
+  /** The study plan's day to do now (today or a missed day), if any. */
+  planTask: StudyPlanDay | null | undefined;
+  /** "My mistakes" corrections whose review date has arrived. */
+  mistakesDue: number;
+  /** Minutes still missing for today's goal (0 when reached). */
+  goalMinutesLeft: number;
   translate: (label: string) => string;
   placement: "mobile" | "desktop";
 };
@@ -75,10 +85,38 @@ type DashboardNotificationsProps = {
 function DashboardNotifications({
   indicators,
   reviewCount,
+  planTask,
+  mistakesDue,
+  goalMinutesLeft,
   translate,
   placement,
 }: DashboardNotificationsProps) {
+  // Everything the student still has to do, most immediate first: the plan's
+  // day, today's goal, due reviews, then new content in each area.
   const items = [
+    {
+      id: "plan",
+      to: "/study-plan",
+      label: planTask
+        ? `${translate(planTask.status === "missed" ? "Catch up" : "Today in your plan")}: ${planTask.title}`
+        : "",
+      icon: CalendarCheck2,
+      visible: !!planTask && (planTask.status === "today" || planTask.status === "missed"),
+    },
+    {
+      id: "goal",
+      to: "/study-plan",
+      label: `${translate("Minutes left for today's goal")}: ${goalMinutesLeft}`,
+      icon: Clock,
+      visible: goalMinutesLeft > 0,
+    },
+    {
+      id: "mistakes",
+      to: "/mistakes",
+      label: `${translate("Mistakes to review")}: ${mistakesDue}`,
+      icon: SpellCheck,
+      visible: mistakesDue > 0,
+    },
     {
       id: "review",
       to: "/vocabulary",
@@ -220,6 +258,20 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const reviewCount = useDueReviewCount(profile?.id);
+  const { data: mistakesDue = 0 } = useQuery({
+    queryKey: ["mistakes-due", profile?.id],
+    enabled: !!profile?.id,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("learning_errors")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", profile!.id)
+        .lt("review_step", MISTAKE_MASTERED_STEP)
+        .lte("next_review_at", new Date().toISOString());
+      return count ?? 0;
+    },
+  });
   // Same query as the Study Plan page, so opening the plan reuses it.
   const { data: studyPlan } = useQuery({
     queryKey: ["study-plan", profile?.id],
@@ -337,6 +389,9 @@ function Dashboard() {
                   <DashboardNotifications
                     indicators={indicators}
                     reviewCount={reviewCount}
+                    planTask={planNext}
+                    mistakesDue={mistakesDue}
+                    goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
                     translate={t}
                     placement="desktop"
                   />
@@ -362,6 +417,9 @@ function Dashboard() {
                   <DashboardNotifications
                     indicators={indicators}
                     reviewCount={reviewCount}
+                    planTask={planNext}
+                    mistakesDue={mistakesDue}
+                    goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
                     translate={t}
                     placement="mobile"
                   />
@@ -407,12 +465,9 @@ function Dashboard() {
             </div>
 
             <div className="hidden min-w-0 border-l border-border sm:block">
-              <DailyGoalCard
-                userId={profile.id}
-                goalMinutes={profile.daily_minutes}
-                compact
-                mobileSummary
-              />
+              {/* Minutes today already live in Today's Progress; this slot shows the
+                  weekly league instead. */}
+              <WeeklyLeagueSummary profile={profile} translate={t} />
             </div>
             <div className="hidden min-w-0 border-l border-border sm:block">
               {/* The week count already lives in "Your learning rhythm"; this slot
@@ -566,12 +621,14 @@ function Dashboard() {
               {/* Desktop-only secondary action to the Study Plan, styled like the
                   app's other buttons (not a status pill), above a quiet closing line. */}
               <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5 min-[1680px]:gap-1.5 min-[1680px]:pt-3">
+                {/* The study plan has its own header slot; this button opens My Progress,
+                    which left the sidebar. */}
                 <Link
-                  to="/study-plan"
+                  to="/progress"
                   className="inline-flex h-9 items-center gap-2 rounded-lg border border-border xl:h-8 min-[1680px]:h-9 bg-sidebar-foreground/[0.04] px-3.5 text-[13px] font-semibold text-sidebar-foreground transition-colors hover:border-brand-green/50 hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
                 >
-                  <Map className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
-                  {t("View your trail")}
+                  <ChartLine className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+                  {t("My progress")}
                   <ChevronRight
                     className="size-4 shrink-0 text-muted-foreground"
                     aria-hidden="true"

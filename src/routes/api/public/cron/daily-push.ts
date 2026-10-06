@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { leagueLevelOf } from "@/lib/level";
-import { studyReminder, wordOfDayBody } from "@/lib/reviewReminder";
+import { studyReminder, wordOfDayBody, type PlanTaskForPush } from "@/lib/reviewReminder";
 import { studyToday } from "@/lib/today";
 import { weekStartOf } from "@/lib/streakFreeze";
 import {
@@ -151,6 +151,21 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           return count ?? 0;
         };
 
+        // The study plan's day to do now (today or a missed day), the same plan
+        // the student sees; a failure only leaves the plan line out.
+        const planTask = async (userId: string): Promise<PlanTaskForPush> => {
+          try {
+            const { loadStudyPlanFor } = await import("@/lib/studyPlan.server");
+            const { plan } = await loadStudyPlanFor(userId);
+            const next = plan.nextIndex === null ? null : plan.days[plan.nextIndex];
+            return next && (next.status === "today" || next.status === "missed")
+              ? { title: next.title, status: next.status }
+              : null;
+          } catch {
+            return null;
+          }
+        };
+
         for (const p of profiles ?? []) {
           if (kind === "weekly") {
             const count = { count: "exact" as const, head: true };
@@ -198,11 +213,12 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           if (kind === "reminder") {
             // last_activity_date is set only when the day's goal is met (credit_study_day).
             if (p.last_activity_date === today) continue;
-            messages.set(p.id, studyReminder(await dueReviews(p.id)));
+            const [due, task] = await Promise.all([dueReviews(p.id), planTask(p.id)]);
+            messages.set(p.id, studyReminder(due, task));
             continue;
           }
           const level = (p.level ?? "a1").toLowerCase();
-          const [{ data: bank }, { data: known }, due] = await Promise.all([
+          const [{ data: bank }, { data: known }, due, task] = await Promise.all([
             supabaseAdmin
               .from("vocabulary")
               .select("id, word, translation, meaning")
@@ -210,6 +226,7 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
               .limit(500),
             supabaseAdmin.from("user_vocabulary").select("word_id").eq("user_id", p.id),
             dueReviews(p.id),
+            planTask(p.id),
           ]);
           const knownIds = new Set((known ?? []).map((k) => k.word_id));
           const seen = new Set<string>();
@@ -225,7 +242,7 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           const leagueLine = p.league_opt_in && isLeagueResetDay() ? ` · ${LEAGUE_RESET_LINE}` : "";
           messages.set(p.id, {
             title: `Palavra do dia: ${w.word}`,
-            body: wordOfDayBody(`${w.translation} — ${w.meaning}`, due, leagueLine),
+            body: wordOfDayBody(`${w.translation} — ${w.meaning}`, due, leagueLine, task),
             path: "/vocabulary",
           });
         }

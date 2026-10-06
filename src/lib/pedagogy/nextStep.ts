@@ -194,21 +194,21 @@ const QUICK_WIN_COPY: Record<string, Omit<NextStepQuickWin, "skill" | "activity"
     ],
   },
   speaking: {
-    title: "Strengthen your speaking",
-    cta: "Practice speaking",
+    title: "Warm up your speaking",
+    cta: "Say 5 words out loud",
     steps: [
-      { label: "Prepare", text: "Think of one short answer" },
-      { label: "Speak", text: "Record it naturally" },
-      { label: "Adjust", text: "Use the feedback in a new attempt" },
+      { label: "Listen", text: "Hear how the word sounds" },
+      { label: "Say it", text: "Use the microphone on 5 words" },
+      { label: "Check", text: "Repeat the ones below 70%" },
     ],
   },
   pronunciation: {
     title: "Strengthen your pronunciation",
-    cta: "Practice speaking",
+    cta: "Say 5 words out loud",
     steps: [
       { label: "Listen first", text: "Focus on the target sounds" },
-      { label: "Repeat", text: "Say the sentence naturally" },
-      { label: "Record", text: "Check your pronunciation once" },
+      { label: "Say it", text: "Use the microphone on 5 words" },
+      { label: "Check", text: "Repeat the ones below 70%" },
     ],
   },
   listening: {
@@ -238,22 +238,41 @@ const SMART_REVIEW: NextStepActivity = {
   to: "/learning/review",
 };
 
+/** Short practice routes that sit next to the main action, never on top of it. */
+const PRONUNCIATION_DRILL: NextStepActivity = {
+  type: "vocabulary",
+  title: "Pronunciation drill",
+  to: "/vocabulary",
+};
+const MISTAKES_PRACTICE: NextStepActivity = {
+  type: "learning",
+  title: "Fix your recent mistakes",
+  to: "/mistakes",
+};
+
+function sameRoute(a: NextStepActivity, b: NextStepActivity) {
+  return a.to === b.to && a.params?.lessonId === b.params?.lessonId;
+}
+
+/**
+ * The Quick Win is a five-minute practice for the same skill on a DIFFERENT
+ * screen than "Practice now", so the two buttons never open the same place.
+ */
 function quickWinActivity(
   skill: string,
   selectedActivity: NextStepActivity,
 ): NextStepActivity | null {
-  // Vocabulary: the main action opens the daily words, so the Quick Win uses the
-  // existing spaced-repetition review instead of repeating the same activity.
-  if (skill === "vocabulary") return SMART_REVIEW;
-  if (skill === "listening") return FALLBACK_BY_SKILL["listening"]?.activity ?? null;
-  if (skill === "writing") return FALLBACK_BY_SKILL["writing"]?.activity ?? null;
-  if (skill === "speaking" || skill === "pronunciation")
-    return FALLBACK_BY_SKILL["speaking"]?.activity ?? null;
-  if (skill === "grammar")
-    return selectedActivity.type === "lesson" ? selectedActivity : TEACHER_FALLBACK.activity;
-  if (skill === "reading")
-    return selectedActivity.type === "lesson" ? selectedActivity : LEARNING_CENTER;
-  return null;
+  let activity: NextStepActivity | null;
+  if (skill === "vocabulary") activity = SMART_REVIEW;
+  else if (skill === "speaking" || skill === "pronunciation") activity = PRONUNCIATION_DRILL;
+  else if (skill === "writing") activity = MISTAKES_PRACTICE;
+  else if (skill === "listening") activity = FALLBACK_BY_SKILL["listening"]?.activity ?? null;
+  else if (skill === "grammar")
+    activity = selectedActivity.type === "lesson" ? TEACHER_FALLBACK.activity : MISTAKES_PRACTICE;
+  else if (skill === "reading") activity = LEARNING_CENTER;
+  else activity = null;
+  if (activity && sameRoute(activity, selectedActivity)) return SMART_REVIEW;
+  return activity;
 }
 
 export function buildQuickWin(

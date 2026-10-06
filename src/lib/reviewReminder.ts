@@ -17,16 +17,43 @@ export function reviewWordsPt(count: number): string {
   return count === 1 ? "1 palavra para revisar" : `${count} palavras para revisar`;
 }
 
-/** Morning word-of-the-day body, with the due reviews when there are any. */
-export function wordOfDayBody(base: string, due: number, extra = ""): string {
+/** The study plan's day to do now, as the pushes mention it. */
+export type PlanTaskForPush = { title: string; status: "today" | "missed" } | null;
+
+function planLinePt(task: PlanTaskForPush): string {
+  if (!task) return "";
+  return task.status === "missed"
+    ? `📅 Recupere no plano: ${task.title}`
+    : `📅 Hoje no plano: ${task.title}`;
+}
+
+/** Morning word-of-the-day body, with the plan's day and due reviews when there are any. */
+export function wordOfDayBody(
+  base: string,
+  due: number,
+  extra = "",
+  planTask: PlanTaskForPush = null,
+): string {
   const shown = shownReviewCount(due);
+  const plan = planTask ? ` · ${planLinePt(planTask)}` : "";
   const reviews = shown ? ` · 🔁 ${reviewWordsPt(shown)} hoje` : "";
-  return `${base}${reviews}${extra}`.slice(0, 280);
+  return `${base}${plan}${reviews}${extra}`.slice(0, 280);
 }
 
 /** Evening reminder for a student who has not met today's goal yet. */
-export function studyReminder(due: number): { title: string; body: string; path: string } {
+export function studyReminder(
+  due: number,
+  planTask: PlanTaskForPush = null,
+): { title: string; body: string; path: string } {
   const shown = shownReviewCount(due);
+  if (planTask) {
+    const reviews = shown ? ` Depois, ${reviewWordsPt(shown)}.` : "";
+    return {
+      title: "Hora de estudar inglês 📚",
+      body: `${planLinePt(planTask)}. Faça agora e mantenha seu Streak!${reviews}`.slice(0, 280),
+      path: "/study-plan",
+    };
+  }
   if (!shown) {
     return {
       title: "Hora de estudar inglês 📚",
