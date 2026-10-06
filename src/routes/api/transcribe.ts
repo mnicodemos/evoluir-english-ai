@@ -197,6 +197,8 @@ export const Route = createFileRoute("/api/transcribe")({
           success: boolean;
           errorCode?: string;
           errorMessage?: string;
+          /** The model that actually answered, when it is not the reserved one. */
+          model?: string;
         }) => {
           if (settled) return;
           settled = true;
@@ -204,18 +206,9 @@ export const Route = createFileRoute("/api/transcribe")({
         };
 
         try {
-          // Primary: Lovable AI dedicated transcription service. The previous
-          // personal-key Gemini flow below stays as a fallback until approved
-          // for removal.
-          const primary = await transcribeWithLovable(audio, lovableKey, request.signal, deadline);
-          if (primary) {
-            await settle({ success: true });
-            return new Response(
-              `data: ${JSON.stringify({ type: "transcript.text.done", text: primary })}\n\n`,
-              { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" } },
-            );
-          }
-
+          // Primary: the workspace's own Gemini key (owner request, 2026-10-06),
+          // like AI Speaking; the Lovable AI transcription service is only the
+          // fallback, so an exhausted Lovable balance no longer costs a round trip.
           let result: GeminiTranscription | null = null;
           let failureStatus = 503;
 
@@ -287,6 +280,19 @@ export const Route = createFileRoute("/api/transcribe")({
           }
 
           if (!result) {
+            const fallback = await transcribeWithLovable(
+              audio,
+              lovableKey,
+              request.signal,
+              deadline,
+            ).catch(() => null);
+            if (fallback) {
+              await settle({ success: true, model: LOVABLE_TRANSCRIPTION_MODEL });
+              return new Response(
+                `data: ${JSON.stringify({ type: "transcript.text.done", text: fallback })}\n\n`,
+                { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" } },
+              );
+            }
             const message =
               failureStatus === 429
                 ? "Your Google AI voice limit is busy right now. Please wait about a minute and try again."

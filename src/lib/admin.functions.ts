@@ -64,7 +64,7 @@ const OPERATION_FACTS: Record<string, { label: string; streaming: string; path: 
   transcription: {
     label: "Transcription",
     streaming: "Yes",
-    path: "Primary: Lovable AI · Fallback: Gemini",
+    path: "Primary: Gemini (personal key) · Fallback: Lovable AI",
   },
   tts: { label: "TTS", streaming: "Yes", path: "Primary: Gemini (personal key)" },
   writing_correction: { label: "Writing / Correction", streaming: "No", path: "Primary: Gemini" },
@@ -79,10 +79,9 @@ function providerOf(model: string) {
   return model.includes("/") ? "Lovable AI" : "Gemini (personal key)";
 }
 
-function benchmarkProviderOf(operation: string, model: string) {
-  if (operation === "transcription" && !model.includes("/")) {
-    return "N/D — provider não registrado";
-  }
+// Transcription records the model that actually answered since 2026-10-06
+// (before, a Lovable answer was stored under the reserved Gemini name).
+function benchmarkProviderOf(_operation: string, model: string) {
   return providerOf(model);
 }
 
