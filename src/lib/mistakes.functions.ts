@@ -84,6 +84,8 @@ export const practiceMistake = createServerFn({ method: "POST" })
         userId: context.userId,
         operation: "quiz_generation",
         cacheKey: `mistake-practice:${row.id}:${attempt}`,
+        fast: true,
+        maxOutputTokens: 800,
       });
       const practice = parseMistakePractice(raw);
       if (practice) return practice;

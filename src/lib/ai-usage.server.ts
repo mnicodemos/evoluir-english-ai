@@ -58,7 +58,7 @@ export function isAbandonedUsage(createdAt: string, now = Date.now()): boolean {
  * Closes every abandoned record (any user, any operation) older than the
  * limit, so nothing stays "running" indefinitely in the usage queue.
  */
-async function releaseAbandonedAiUsage(_userId: string, _operation: AiOperation) {
+export async function releaseAbandonedAiUsage(_userId: string, _operation: AiOperation) {
   const db = await admin();
   const cutoff = new Date(Date.now() - ABANDONED_USAGE_SECONDS * 1000).toISOString();
   await db
@@ -107,8 +107,10 @@ export async function reserveAiUsage(input: {
   requestHash?: string;
   /** ai_limits row already loaded in this request; omitted = read it here. */
   limit?: AiLimitRow | null;
+  /** The caller already closed abandoned records in parallel with its reads. */
+  abandonedReleased?: boolean;
 }): Promise<UsageTicket> {
-  await releaseAbandonedAiUsage(input.userId, input.operation);
+  if (!input.abandonedReleased) await releaseAbandonedAiUsage(input.userId, input.operation);
   const db = await admin();
 
   // Reuse the row already read by the caller (same request) instead of reading ai_limits again.
@@ -238,10 +240,16 @@ export async function readAiCache(cacheKey: string): Promise<string | null> {
     .gt("expires_at", new Date().toISOString())
     .maybeSingle();
   if (!data) return null;
-  await db
-    .from("ai_response_cache")
-    .update({ hit_count: data.hit_count + 1, last_hit_at: new Date().toISOString() })
-    .eq("cache_key", cacheKey);
+  // The hit counter is bookkeeping: it finishes after the answer is returned.
+  const { keepAlive } = await import("./keepAlive.server");
+  void keepAlive(
+    Promise.resolve(
+      db
+        .from("ai_response_cache")
+        .update({ hit_count: data.hit_count + 1, last_hit_at: new Date().toISOString() })
+        .eq("cache_key", cacheKey),
+    ),
+  );
   return data.response_text;
 }
 

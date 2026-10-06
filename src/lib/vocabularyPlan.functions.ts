@@ -199,7 +199,7 @@ async function buildDailyWords(
         },
       ],
       true,
-      { userId, operation: "vocabulary_generation" },
+      { userId, operation: "vocabulary_generation", fast: true, maxOutputTokens: 4000 },
     );
     const parsed = parseWords(raw);
     if (!parsed.success)

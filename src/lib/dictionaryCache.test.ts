@@ -17,6 +17,7 @@ vi.mock("./ai-usage.server", () => ({
     return { eventId: "e", startedAt: Date.now() };
   },
   finishAiUsage: async () => {},
+  releaseAbandonedAiUsage: async () => {},
   writeAiCache: async (i: { cacheKey: string; responseText: string; ttlSeconds: number }) => {
     spy.writes.push(i.cacheKey);
     store.set(i.cacheKey, { text: i.responseText, expiresAt: Date.now() + i.ttlSeconds * 1000 });

@@ -26,6 +26,10 @@ export async function callGateway(
     cacheKey?: string;
     /** The caller already looked this key up and missed; skip the second read. */
     cacheChecked?: boolean;
+    /** No "thinking" step: for short, simple answers (see GeminiSpeed). */
+    fast?: boolean;
+    /** Cap on the answer length, in tokens. */
+    maxOutputTokens?: number;
   },
   callerSignal?: AbortSignal,
 ): Promise<string> {
@@ -50,11 +54,19 @@ export async function callGateway(
   const usageTools = usage ? await import("./ai-usage.server") : null;
   const requestHash = usageTools ? await usageTools.hashAiRequest({ messages, jsonMode }) : "";
   const cacheKey = usage?.cacheKey ?? requestHash;
-  // One ai_limits read per call: TTL comes from it and reserveAiUsage reuses it.
-  const limitRow = usage && usageTools ? await usageTools.loadAiLimit(usage.operation) : null;
+  // The three reads before the call run together instead of one after the
+  // other: the ai_limits row (TTL + limits, read once), the cache and the
+  // closing of abandoned usage records.
+  const [limitRow, cachedRead] =
+    usage && usageTools
+      ? await Promise.all([
+          usageTools.loadAiLimit(usage.operation),
+          usage.cacheChecked ? Promise.resolve(null) : usageTools.readAiCache(cacheKey),
+          usageTools.releaseAbandonedAiUsage(usage.userId, usage.operation),
+        ])
+      : [null, null];
   const ttl = limitRow?.cache_ttl_seconds ?? 0;
-  const cached =
-    ttl > 0 && usageTools && !usage?.cacheChecked ? await usageTools.readAiCache(cacheKey) : null;
+  const cached = ttl > 0 ? cachedRead : null;
   if (cached !== null) return cached;
   const ticket =
     usage && usageTools
@@ -63,6 +75,7 @@ export async function callGateway(
           model: GEMINI_TEXT_MODEL,
           requestHash,
           limit: limitRow,
+          abandonedReleased: true,
         })
       : null;
   let text: string | null = null;
@@ -73,7 +86,10 @@ export async function callGateway(
   try {
     text = lovable
       ? await lovable.callLovableTalking(messages, onUsage, signal, GEMINI_TEXT_MODEL)
-      : await callGemini(messages, jsonMode, onUsage, signal);
+      : await callGemini(messages, jsonMode, onUsage, signal, {
+          ...(usage?.fast ? { fast: true } : {}),
+          ...(usage?.maxOutputTokens ? { maxOutputTokens: usage.maxOutputTokens } : {}),
+        });
   } catch (err) {
     if (ticket && usageTools) {
       await usageTools.finishAiUsage(ticket, {
@@ -112,17 +128,27 @@ export async function callGateway(
       await usageTools.finishAiUsage(ticket, { success: false, errorCode: "not_configured" });
     throw new AiError(500, "Your Google Gemini key is not connected yet.");
   }
-  if (ticket && usageTools)
-    await usageTools.finishAiUsage(ticket, { success: true, ...usageTokens });
-
-  if (usage && usageTools && ttl > 0) {
-    await usageTools.writeAiCache({
-      cacheKey,
-      operation: usage.operation,
-      model: GEMINI_TEXT_MODEL,
-      responseText: text,
-      ttlSeconds: ttl,
-    });
+  // Closing the usage record and saving the cache happen after the answer is
+  // returned (waitUntil keeps them running), so the student does not wait on
+  // these writes.
+  if (usage && usageTools) {
+    const tools = usageTools;
+    const answer = text;
+    const { keepAlive } = await import("./keepAlive.server");
+    void keepAlive(
+      Promise.all([
+        ticket ? tools.finishAiUsage(ticket, { success: true, ...usageTokens }) : null,
+        ttl > 0
+          ? tools.writeAiCache({
+              cacheKey,
+              operation: usage.operation,
+              model: GEMINI_TEXT_MODEL,
+              responseText: answer,
+              ttlSeconds: ttl,
+            })
+          : null,
+      ]),
+    );
   }
   return text;
 }

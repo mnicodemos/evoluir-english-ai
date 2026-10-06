@@ -66,7 +66,7 @@ export const coachReply = createServerFn({ method: "POST" })
         ...data.messages,
       ],
       false,
-      { userId: context.userId, operation: "talking" },
+      { userId: context.userId, operation: "talking", fast: true, maxOutputTokens: 600 },
     );
     return { reply: text.trim() };
   });
@@ -108,7 +108,7 @@ export const coachOpener = createServerFn({ method: "POST" })
         { role: "user", content: "Start our conversation now." },
       ],
       false,
-      { userId: context.userId, operation: "talking" },
+      { userId: context.userId, operation: "talking", fast: true, maxOutputTokens: 250 },
     );
     return { opener: text.trim() };
   });

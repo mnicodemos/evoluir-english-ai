@@ -167,7 +167,14 @@ export const lookupWord = createServerFn({ method: "GET" })
           },
         ],
         true,
-        { userId: context.userId, operation: "dictionary", cacheKey, cacheChecked: true },
+        {
+          userId: context.userId,
+          operation: "dictionary",
+          cacheKey,
+          cacheChecked: true,
+          fast: true,
+          maxOutputTokens: 2000,
+        },
       );
       {
         const meanings = meaningsFromRaw(raw);
