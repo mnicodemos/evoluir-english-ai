@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import evoDashboardApproved from "@/assets/evo-dashboard-final.jpg.asset.json";
+import evoDashboardApproved from "@/assets/evo-dashboard-more-than-english.png.asset.json";
 import evoDashboardMobile from "@/assets/evo-banner-mobile-2026-10-05.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import {
