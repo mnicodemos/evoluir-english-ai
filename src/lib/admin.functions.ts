@@ -79,9 +79,13 @@ function providerOf(model: string) {
   return model.includes("/") ? "Lovable AI" : "Gemini (personal key)";
 }
 
-// Transcription records the model that actually answered since 2026-10-06
-// (before, a Lovable answer was stored under the reserved Gemini name).
-function benchmarkProviderOf(_operation: string, model: string) {
+// Older transcription rows stored a Lovable answer under the reserved Gemini
+// name, so a plain model name cannot name the provider; a Lovable fallback is
+// recorded as its own model from 2026-10-06 on.
+function benchmarkProviderOf(operation: string, model: string) {
+  if (operation === "transcription" && !model.includes("/")) {
+    return "N/D — provider não registrado";
+  }
   return providerOf(model);
 }
 
