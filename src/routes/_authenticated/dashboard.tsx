@@ -26,7 +26,7 @@ import { AppShell } from "@/components/AppShell";
 import { useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
-import { getLeague, getNextLeague, LeagueBadge } from "@/components/LeagueBadge";
+import { getLeague, getNextLeague } from "@/components/LeagueBadge";
 import { PathProgressCard } from "@/components/PathProgressCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
@@ -45,6 +45,7 @@ import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { WeatherTalk } from "@/components/WeatherTalk";
 import { FirstWeekGuide } from "@/components/FirstWeekGuide";
 import { WeeklyLeagueSummary } from "@/components/WeeklyLeagueSummary";
+import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
 import { MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
 import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
@@ -203,7 +204,16 @@ function DashboardNotifications({
   );
 }
 
-/** Header slot: the study plan's day to do now (today, catch up or next). */
+const PLAN_SKILL_LABELS: Record<string, string> = {
+  grammar: "Grammar",
+  listening: "Listening",
+  speaking: "Speaking",
+  vocabulary: "Vocabulary",
+  writing: "Writing",
+  reading: "Reading",
+};
+
+/** Header cell: the study plan's day to do now (today, catch up or next). */
 function PlanTodaySummary({
   next,
   weekDone,
@@ -223,30 +233,22 @@ function PlanTodaySummary({
           ? translate("Catch up")
           : translate("Next in your plan");
   return (
-    <Link
+    <DashboardHeaderStat
+      icon={<CalendarCheck2 className="size-6" strokeWidth={2.2} />}
+      tone="green"
+      label={label}
+      value={
+        weekDone
+          ? translate("Every planned day is done")
+          : (next?.title ?? translate("See your week"))
+      }
+      detail={
+        next && !weekDone
+          ? `${translate(PLAN_SKILL_LABELS[next.skill] ?? next.skill)} · ${translate(next.day)}`
+          : null
+      }
       to="/study-plan"
-      className="group flex h-full min-w-0 items-center gap-3 px-3 py-2 transition-colors hover:bg-brand-green/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-    >
-      <CalendarCheck2
-        className="size-[2.31rem] shrink-0 text-brand-green"
-        strokeWidth={2.2}
-        aria-hidden="true"
-      />
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-green sm:text-[11px]">
-          {label}
-        </p>
-        <p className="truncate font-display text-sm font-bold leading-tight sm:text-base">
-          {weekDone
-            ? translate("Every planned day is done")
-            : (next?.title ?? translate("See your week"))}
-        </p>
-      </div>
-      <ChevronRight
-        className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
-        aria-hidden="true"
-      />
-    </Link>
+    />
   );
 }
 
@@ -433,35 +435,23 @@ function Dashboard() {
               <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
             </div>
 
-            <div className="hidden min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
-              <Flame
-                className="size-6 shrink-0 fill-current text-current sm:hidden"
-                style={{ color: getLeague(streakDays).from }}
-                strokeWidth={2.4}
-              />
-              <Flame
-                className="hidden size-[1.925rem] shrink-0 fill-dashboard-coral text-dashboard-coral sm:block"
-                strokeWidth={2.4}
-              />
-              <div className="min-w-0 flex-1">
-                <p className="font-display text-[13px] font-bold leading-tight sm:truncate sm:text-base">
-                  {streakDays} days
-                </p>
-                <p className="text-[10px] leading-tight text-muted-foreground sm:text-xs">
-                  {t("Study streak")}
-                </p>
-                {nextLeague && (
-                  <p
-                    className="mt-0.5 hidden truncate text-[10px] font-semibold leading-tight sm:block sm:text-xs"
-                    style={{ color: nextLeague.from }}
-                  >
-                    {lang === "pt"
+            <div className="hidden min-w-0 border-l border-border sm:block lg:border-l-0">
+              {/* One badge per cell: the streak keeps its flame; the streak league
+                  name moves to the supporting line instead of a second shield. */}
+              <DashboardHeaderStat
+                icon={<Flame className="size-6 fill-current" strokeWidth={2.2} />}
+                tone="coral"
+                label={t("Study streak")}
+                value={`${streakDays} ${t("days")}`}
+                detail={
+                  nextLeague
+                    ? lang === "pt"
                       ? `Próxima liga: ${nextLeague.namePt}`
-                      : `Next league: ${nextLeague.name}`}
-                  </p>
-                )}
-              </div>
-              <LeagueBadge streakDays={streakDays} size={53} className="hidden sm:grid" />
+                      : `Next league: ${nextLeague.name}`
+                    : null
+                }
+                detailStyle={nextLeague ? { color: nextLeague.from } : undefined}
+              />
             </div>
 
             <div className="hidden min-w-0 border-l border-border sm:block">
