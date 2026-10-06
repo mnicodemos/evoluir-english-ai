@@ -327,10 +327,13 @@
   }
 }
 
+/* Desktop Dashboard fills one screen; the screen height is a minimum, so a row
+   whose cards need more room grows (and the page scrolls) instead of letting
+   its cards run over the next row. */
 @media (min-width: 80rem) {
   .dashboard-one-screen {
-    height: calc(100vh - 4.125rem);
-    height: calc(100dvh - 4.125rem);
+    min-height: calc(100vh - 4.125rem);
+    min-height: calc(100dvh - 4.125rem);
   }
 }
 

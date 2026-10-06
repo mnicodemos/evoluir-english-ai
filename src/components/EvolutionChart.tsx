@@ -21,35 +21,6 @@ type Props = {
   level?: string;
 };
 
-type ProgressRow = {
-  id: string;
-  user_id: string;
-  speaking_score: number;
-  reading_score: number;
-  listening_score: number;
-  writing_score: number;
-  recorded_at: string;
-};
-
-export function useProgressHistory(userId: string | undefined, level: string | undefined) {
-  return useQuery({
-    queryKey: ["progress-history", userId, level],
-    enabled: !!userId && !!level,
-    queryFn: async () => {
-      const since = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString();
-      const { data, error } = await supabase
-        .from("progress")
-        .select("*")
-        .eq("user_id", userId!)
-        .eq("level", level!)
-        .gte("recorded_at", since)
-        .order("recorded_at", { ascending: true });
-      if (error) throw error;
-      return (data ?? []) as ProgressRow[];
-    },
-  });
-}
-
 const SERIES_COLORS: Record<string, string> = {
   Listening: "var(--color-chart-1)",
   Reading: "var(--color-chart-2)",

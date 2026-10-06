@@ -174,7 +174,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1679.98px]:hidden!">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
                 {t("A 10-minute speaking practice can already make a difference.")}
               </span>
             </span>
@@ -185,7 +185,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1679.98px]:hidden!">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
                 {t("A 10-minute speaking practice can already make a difference.")}
               </span>
             </span>
@@ -207,7 +207,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1679.98px]:hidden!">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
                 {t("Try a short conversation with EVO today.")}
               </span>
             </span>
@@ -218,7 +218,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1679.98px]:hidden!">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
                 {t("Try a short conversation with EVO today.")}
               </span>
             </span>

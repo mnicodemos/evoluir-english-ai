@@ -30,11 +30,22 @@ export const SKILL_METER_SKILLS = ["listening", "speaking", "writing", "grammar"
 export const SKILL_STRONG_AT = 85;
 export const SKILL_ON_TRACK_AT = 65;
 
+/** My Progress shows every skill the app measures, with the same rules. */
+export const PROGRESS_SKILLS = [
+  "listening",
+  "speaking",
+  "writing",
+  "reading",
+  "grammar",
+  "vocabulary",
+] as const;
+
 export function skillMeterRows(
   snapshots: readonly SkillMeterSnapshot[] | null | undefined,
   prioritySkill: string | null | undefined,
+  skills: readonly string[] = SKILL_METER_SKILLS,
 ): SkillMeterRow[] {
-  return SKILL_METER_SKILLS.map((skill) => {
+  return skills.map((skill) => {
     const snapshot = (snapshots ?? []).find((item) => item.skill === skill);
     const measured =
       !!snapshot &&

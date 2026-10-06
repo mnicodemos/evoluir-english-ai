@@ -245,7 +245,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen flex h-full flex-col gap-[5px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_16.45rem_minmax(9.5rem,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
+        <div className="dashboard-one-screen flex h-full flex-col gap-[5px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(16.45rem,min-content)_minmax(min-content,1fr)_minmax(5.625rem,0.62fr)] xl:gap-5">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
@@ -478,10 +478,10 @@ function Dashboard() {
               </div>
               {/* Desktop-only secondary action to the Study Plan, styled like the
                   app's other buttons (not a status pill), above a quiet closing line. */}
-              <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-2 2xl:gap-1.5 2xl:pt-3">
+              <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5 min-[1680px]:gap-1.5 min-[1680px]:pt-3">
                 <Link
                   to="/study-plan"
-                  className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-sidebar-foreground/[0.04] px-3.5 text-[13px] font-semibold text-sidebar-foreground transition-colors hover:border-brand-green/50 hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                  className="inline-flex h-9 items-center gap-2 rounded-lg border border-border xl:h-8 min-[1680px]:h-9 bg-sidebar-foreground/[0.04] px-3.5 text-[13px] font-semibold text-sidebar-foreground transition-colors hover:border-brand-green/50 hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
                 >
                   <Map className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
                   {t("View your trail")}
@@ -490,7 +490,8 @@ function Dashboard() {
                     aria-hidden="true"
                   />
                 </Link>
-                <p className="text-center text-xs text-muted-foreground">
+                {/* The closing line only shows where the row has height to spare. */}
+                <p className="text-center text-xs text-muted-foreground xl:max-[1679.98px]:hidden!">
                   {t("Small steps create progress.")}
                 </p>
               </div>

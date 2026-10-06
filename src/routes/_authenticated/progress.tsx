@@ -4,7 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, TriangleAlert } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
-import { EvolutionChart, useProgressHistory } from "@/components/EvolutionChart";
+import { EvolutionChart, useSkillHistory } from "@/components/EvolutionChart";
 import { FrequencyCalendar } from "@/components/FrequencyCalendar";
 import { MinutesByDayChart } from "@/components/MinutesByDayChart";
 import { LearningJourneyCard } from "@/components/LearningJourneyCard";
@@ -19,6 +19,8 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useVocabularyProgress } from "@/hooks/useVocabularyProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/formatDate";
+import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
+import { PROGRESS_SKILLS, SKILL_STRONG_AT, skillMeterRows } from "@/lib/pedagogy/skillMeter";
 
 interface RecentActivity {
   id: string;
@@ -56,7 +58,15 @@ function ProgressPage() {
   const [tab, setTab] = usePersistentState<string>("progress-tab", "overview");
   const { data: vocabProgress } = useVocabularyProgress();
 
-  const { data: history, isLoading } = useProgressHistory(profile?.id, profile?.level);
+  // Same evidence-based skills as the Dashboard card (shared next-step cache),
+  // never the old best-ever scores; the chart below reads the assessed history.
+  const { data: nextStep, isLoading } = useQuery({
+    queryKey: ["next-step", profile?.level ?? null],
+    queryFn: () => loadNextStep({ data: undefined }),
+    staleTime: 60 * 1000,
+    enabled: !!profile,
+  });
+  const { data: history } = useSkillHistory(profile?.id);
   const [chosenChart, setChartView] = useState<"scores" | "minutes" | null>(null);
   // Scores first when there is assessed history; otherwise the minutes chart.
   const chartView = chosenChart ?? (history && history.length > 0 ? "scores" : "minutes");
@@ -89,19 +99,17 @@ function ProgressPage() {
     },
   });
 
-  const latest = history?.[history.length - 1];
-  const skills = [
-    { label: "Listening", value: latest?.listening_score ?? 0 },
-    { label: "Reading", value: latest?.reading_score ?? 0 },
-    { label: "Speaking", value: latest?.speaking_score ?? 0 },
-    { label: "Writing", value: latest?.writing_score ?? 0 },
-  ];
-  const overall = Math.round(skills.reduce((sum, s) => sum + s.value, 0) / skills.length);
-  const sorted = [...skills].sort((a, b) => b.value - a.value);
-  const strengths = sorted.slice(0, 2).filter((s) => s.value > 0);
-  const IMPROVE_BELOW = 80;
-  const gaps = [...skills]
-    .filter((s) => s.value > 0 && s.value < IMPROVE_BELOW)
+  const skills = skillMeterRows(nextStep?.skills, null, PROGRESS_SKILLS).map((row) => ({
+    label: row.skill.charAt(0).toUpperCase() + row.skill.slice(1),
+    value: row.value,
+  }));
+  const measured = skills.filter((s): s is { label: string; value: number } => s.value !== null);
+  const strengths = [...measured]
+    .filter((s) => s.value >= SKILL_STRONG_AT)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 2);
+  const gaps = [...measured]
+    .filter((s) => s.value < SKILL_STRONG_AT)
     .sort((a, b) => a.value - b.value)
     .slice(0, 2);
 
@@ -142,9 +150,18 @@ function ProgressPage() {
                           <span className="font-medium">
                             {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
                           </span>
-                          <span className="text-muted-foreground">{s.value}%</span>
+                          <span className="text-muted-foreground">
+                            {s.value === null ? t("No data") : `${s.value}%`}
+                          </span>
                         </div>
-                        <Bar value={s.value} className="mt-1.5 h-2 sm:mt-2" />
+                        {s.value === null ? (
+                          <div
+                            className="mt-1.5 h-2 rounded-full border border-dashed border-border sm:mt-2"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <Bar value={s.value} className="mt-1.5 h-2 sm:mt-2" />
+                        )}
                       </div>
                     ))}
                   </div>

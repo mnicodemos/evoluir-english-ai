@@ -89,6 +89,33 @@ export function quizEvidence(
   };
 }
 
+/**
+ * A reading lesson's quiz checks comprehension of the lesson text, so each
+ * answered question is also reading evidence (in addition to the grammar or
+ * vocabulary label of the question itself). Other lessons add nothing here.
+ */
+export function readingQuizEvidence(
+  details: QuizDetail[],
+  lessonSkill: string | null | undefined,
+  itemCefr?: MeasuredCefrLevel | null,
+): AssessmentEvidence[] {
+  if (lessonSkill !== "reading") return [];
+  return details.flatMap((detail) =>
+    detail.question_id
+      ? [
+          {
+            ...quizEvidence(
+              { ...detail, question_id: detail.question_id, pedagogical_skill: "grammar" },
+              itemCefr,
+            ),
+            skill: "reading" as const,
+            subskill: "reading_comprehension",
+          },
+        ]
+      : [],
+  );
+}
+
 export function classifyQuizEvidence(
   details: QuizDetail[],
   skills: ReadonlyMap<string, "grammar" | "vocabulary">,

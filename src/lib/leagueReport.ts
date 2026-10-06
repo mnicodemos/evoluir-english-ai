@@ -6,6 +6,7 @@ import { findLevel } from "@/lib/level";
 import { savePdf } from "@/lib/pdfDownload";
 import { drawCover, drawFooters, drawHeader, loadLogo, shorten } from "@/lib/pdfTheme";
 import { formatDate } from "@/lib/formatDate";
+import { skillMeterRows } from "@/lib/pedagogy/skillMeter";
 
 export type LeagueReportInput = {
   name: string;
@@ -16,12 +17,6 @@ export type LeagueReportInput = {
 /** Collects everything the student studied in the days of the league that just closed. */
 async function collectLeagueData(userId: string) {
   const since = new Date(Date.now() - DAYS_PER_LEAGUE * 24 * 60 * 60 * 1000).toISOString();
-  const { data: profileRow } = await supabase
-    .from("profiles")
-    .select("level")
-    .eq("id", userId)
-    .maybeSingle();
-  const level = profileRow?.level ?? "b1";
 
   const [lessons, quizzes, words, activities, progress] = await Promise.all([
     supabase
@@ -45,14 +40,11 @@ async function collectLeagueData(userId: string) {
       .select("activity_type, duration_minutes, created_at")
       .eq("user_id", userId)
       .gte("created_at", since),
+    // Evidence-based skill scores (same source as the Dashboard skills card).
     supabase
-      .from("progress")
-      .select("speaking_score, writing_score, reading_score, grammar_score, listening_score")
-      .eq("user_id", userId)
-      .eq("level", level)
-      .order("recorded_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .from("current_skill_profile")
+      .select("skill, score, cefr_level, evidence_count")
+      .eq("user_id", userId),
   ]);
 
   const lessonRows = (lessons.data ?? []).filter((r) => r.lessons);
@@ -69,7 +61,16 @@ async function collectLeagueData(userId: string) {
     words: (words.data ?? []).filter((w) => w.vocabulary).slice(0, 40),
     minutes,
     sessions: (activities.data ?? []).length,
-    scores: progress.data,
+    skills: skillMeterRows(
+      (progress.data ?? []).map((row) => ({
+        skill: String(row.skill ?? ""),
+        score: row.score === null ? null : Number(row.score),
+        cefrLevel: row.cefr_level ?? "insufficient_evidence",
+        evidenceCount: row.evidence_count,
+      })),
+      null,
+      ["speaking", "writing", "reading", "listening", "grammar"],
+    ),
   };
 }
 
@@ -141,10 +142,10 @@ export async function downloadLeagueReport(userId: string, input: LeagueReportIn
     ["Quizzes taken", `${data.quizCount}`],
     ["Quiz average", `${data.quizAverage}%`],
     ["Words mastered", `${data.words.length}`],
-    ["Talking score", `${data.scores?.speaking_score ?? 0}%`],
-    ["Writing score", `${data.scores?.writing_score ?? 0}%`],
-    ["Reading score", `${data.scores?.reading_score ?? 0}%`],
-    ["Listening score", `${data.scores?.listening_score ?? 0}%`],
+    ...data.skills.map((row): [string, string] => [
+      `${row.skill.charAt(0).toUpperCase()}${row.skill.slice(1)} score`,
+      row.value === null ? "No data yet" : `${row.value}%`,
+    ]),
   ];
   const colW = (pageW - margin * 2) / 2;
   stats.forEach(([label, value], i) => {
