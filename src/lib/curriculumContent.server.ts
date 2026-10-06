@@ -223,13 +223,11 @@ export function jsonValue(raw: string): unknown {
   }
 }
 
-export async function writeLesson(
-  supabase: SupabaseClient<Database>,
-  userId: string,
-  plan: CurriculumLesson,
-  /** Lesson saved earlier whose cards/quiz never arrived: only fill those in. */
-  repairLessonId?: string,
-): Promise<string> {
+/**
+ * The exact request a path lesson is written from, shared by writeLesson and
+ * the admin comparison (same prompt, only the Gemini speed differs).
+ */
+export function lessonGenerationRequest(plan: CurriculumLesson) {
   const descriptor = CEFR[plan.level] ?? CEFR["b1"]!;
   const reviewScope = plan.reviewUnits.length
     ? getCurriculum(plan.level)
@@ -247,41 +245,68 @@ export async function writeLesson(
       ? `This is a consolidation lesson. Summarize and practise only Units ${plan.reviewUnits.join(" and ")} from the supplied course outline. Connect their main grammar, vocabulary and communication skills without introducing new material.`
       : "";
 
-  const raw = await callContentAi(
-    [
-      {
-        role: "system",
-        content:
-          `You are a CELTA English teacher writing lesson ${plan.position} of ${plan.unitTitle} in a structured ${plan.level.toUpperCase()} course for a Brazilian learner. ` +
-          `${descriptor} ` +
-          `${SKILL_BRIEF[plan.skill] ?? ""} ` +
-          `${reviewInstructions} ` +
-          `Keep EVERY part of the lesson inside ${plan.level.toUpperCase()}: grammar, vocabulary, sentence length and idioms must match this level exactly. ` +
-          'Reply with strict JSON: {"summary":"120-180 words explaining the language point with clear examples, in simple English",' +
-          '"transcript":"a 450-600 word mini-lesson script in English, written in short paragraphs separated by blank lines",' +
-          '"transcript_pt":"a faithful Brazilian Portuguese translation of the script, same paragraph structure",' +
-          '"flashcards":[{"card_type":"listen|question","prompt":"front of card, uppercase English instruction or question","answer":"back of card, short English answer","listen_text":"English sentence to hear only on the answer side; empty for non-listen cards","word":"short label from the lesson","definition":"short English-only definition or explanation, no Portuguese","pronunciation":"simple phonetic hint","example":"natural English sentence from or based on this lesson","difficulty":"easy|medium|hard"}],' +
-          '"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence","pedagogical_skill":"grammar or vocabulary - grammar when the item tests form, structure, tense or word order; vocabulary when it tests word choice, collocation, linking expressions or register"}]}. ' +
-          `Give exactly ${cardTotal} flashcards and ${quizTotal} quiz questions. ` +
-          `Exactly ${listenTotal} flashcards must have card_type 'listen'. For these, the prompt must be a listening question or repeat instruction, the answer must reveal the sentence or phrase, and listen_text must contain that same English audio sentence. ` +
-          `The other ${questionCards} flashcards must have card_type 'question'. Randomly vary them between grammar use, meaning, key expressions, sentence completion, and real-life situations from the lesson, without repeating the same format. ` +
-          "The flashcards must train recognition and recall of the lesson vocabulary and key expressions; they must NOT repeat the quiz questions or test the same items in the same way. " +
-          "Every flashcard must use content from THIS lesson transcript, and every flashcard field must be in English only - never Portuguese, never a translation. " +
-          "Every flashcard answer, definition and example must be SHORT: one brief sentence or phrase, maximum 15 words. " +
-          `${plan.reviewUnits.length ? "Every quiz question must review content from the supplied previous-unit outline, with balanced grammar, vocabulary and usage." : "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage)."} ` +
-          "The quiz must check understanding and use, not memorisation: move from recognising the form to applying it in a new sentence, and vary the structure of the questions. " +
-          "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
-          "Each question must be self-contained: a sentence to complete or correct, or a direct grammar rule question.",
-      },
-      {
-        role: "user",
-        content: `Lesson title: ${plan.title}\nObjective: ${plan.objective}\nMain skill: ${plan.skill}\nCEFR level: ${plan.level.toUpperCase()}\nUnit: ${plan.unitTitle}${reviewScope ? `\nPrevious-unit course outline:\n${reviewScope}` : ""}`,
-      },
-    ],
-    userId,
-    "lesson_generation",
-    true,
-  );
+  const messages: { role: "system" | "user" | "assistant"; content: string }[] = [
+    {
+      role: "system",
+      content:
+        `You are a CELTA English teacher writing lesson ${plan.position} of ${plan.unitTitle} in a structured ${plan.level.toUpperCase()} course for a Brazilian learner. ` +
+        `${descriptor} ` +
+        `${SKILL_BRIEF[plan.skill] ?? ""} ` +
+        `${reviewInstructions} ` +
+        `Keep EVERY part of the lesson inside ${plan.level.toUpperCase()}: grammar, vocabulary, sentence length and idioms must match this level exactly. ` +
+        'Reply with strict JSON: {"summary":"120-180 words explaining the language point with clear examples, in simple English",' +
+        '"transcript":"a 450-600 word mini-lesson script in English, written in short paragraphs separated by blank lines",' +
+        '"transcript_pt":"a faithful Brazilian Portuguese translation of the script, same paragraph structure",' +
+        '"flashcards":[{"card_type":"listen|question","prompt":"front of card, uppercase English instruction or question","answer":"back of card, short English answer","listen_text":"English sentence to hear only on the answer side; empty for non-listen cards","word":"short label from the lesson","definition":"short English-only definition or explanation, no Portuguese","pronunciation":"simple phonetic hint","example":"natural English sentence from or based on this lesson","difficulty":"easy|medium|hard"}],' +
+        '"quiz":[{"question":"","options":["4 options"],"correct_answer":"exactly one of the options","explanation":"one short sentence","pedagogical_skill":"grammar or vocabulary - grammar when the item tests form, structure, tense or word order; vocabulary when it tests word choice, collocation, linking expressions or register"}]}. ' +
+        `Give exactly ${cardTotal} flashcards and ${quizTotal} quiz questions. ` +
+        `Exactly ${listenTotal} flashcards must have card_type 'listen'. For these, the prompt must be a listening question or repeat instruction, the answer must reveal the sentence or phrase, and listen_text must contain that same English audio sentence. ` +
+        `The other ${questionCards} flashcards must have card_type 'question'. Randomly vary them between grammar use, meaning, key expressions, sentence completion, and real-life situations from the lesson, without repeating the same format. ` +
+        "The flashcards must train recognition and recall of the lesson vocabulary and key expressions; they must NOT repeat the quiz questions or test the same items in the same way. " +
+        "Every flashcard must use content from THIS lesson transcript, and every flashcard field must be in English only - never Portuguese, never a translation. " +
+        "Every flashcard answer, definition and example must be SHORT: one brief sentence or phrase, maximum 15 words. " +
+        `${plan.reviewUnits.length ? "Every quiz question must review content from the supplied previous-unit outline, with balanced grammar, vocabulary and usage." : "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage)."} ` +
+        "The quiz must check understanding and use, not memorisation: move from recognising the form to applying it in a new sentence, and vary the structure of the questions. " +
+        "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
+        "Each question must be self-contained: a sentence to complete or correct, or a direct grammar rule question.",
+    },
+    {
+      role: "user",
+      content: `Lesson title: ${plan.title}\nObjective: ${plan.objective}\nMain skill: ${plan.skill}\nCEFR level: ${plan.level.toUpperCase()}\nUnit: ${plan.unitTitle}${reviewScope ? `\nPrevious-unit course outline:\n${reviewScope}` : ""}`,
+    },
+  ];
+  return { messages, cardTotal, listenTotal, quizTotal, questionCards };
+}
+
+/**
+ * How a model reply would fare as lesson content: strict validation, and what
+ * the item-by-item salvage would keep. Read-only (nothing is saved).
+ */
+export function checkLessonContent(raw: string, plan: CurriculumLesson) {
+  const { cardTotal, listenTotal, quizTotal } = lessonGenerationRequest(plan);
+  const value = jsonValue(raw);
+  const strict = generatedLessonSchema(cardTotal, listenTotal, quizTotal).safeParse(value);
+  const salvaged = strict.success ? null : salvageLessonContent(value, cardTotal, quizTotal);
+  return {
+    strictValid: strict.success,
+    issues: strict.success ? [] : strict.error.issues.slice(0, 5).map((issue) => issue.message),
+    expected: { flashcards: cardTotal, quiz: quizTotal },
+    salvaged: salvaged
+      ? { flashcards: salvaged.flashcards?.length ?? 0, quiz: salvaged.quiz?.length ?? 0 }
+      : null,
+  };
+}
+
+export async function writeLesson(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  plan: CurriculumLesson,
+  /** Lesson saved earlier whose cards/quiz never arrived: only fill those in. */
+  repairLessonId?: string,
+): Promise<string> {
+  const { messages, cardTotal, listenTotal, quizTotal, questionCards } =
+    lessonGenerationRequest(plan);
+  const raw = await callContentAi(messages, userId, "lesson_generation", true);
 
   const rawValue = jsonValue(raw);
   const parsedContent = generatedLessonSchema(cardTotal, listenTotal, quizTotal).safeParse(

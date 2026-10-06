@@ -462,3 +462,70 @@ export const getAiCostPerformance = createServerFn({ method: "GET" })
       ...aggregateCostPerformance(rows ?? [], cacheRows ?? []),
     };
   });
+
+/**
+ * Admin-only experiment: writes the same path lesson twice, with the current
+ * Gemini settings and with the thinking step off, and reports time and how the
+ * content validates. Nothing is saved and no student sees it; it exists to
+ * judge quality before turning the fast mode on for lessons.
+ */
+export const compareLessonGeneration = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ key: z.string().min(3).max(40) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { findCurriculumLesson } = await import("@/lib/curriculum");
+    const plan = findCurriculumLesson(data.key);
+    if (!plan) throw new Error("Unknown lesson key.");
+    const { lessonGenerationRequest, checkLessonContent, jsonValue } =
+      await import("@/lib/curriculumContent.server");
+    const { callGemini } = await import("@/lib/gemini.server");
+    const { messages } = lessonGenerationRequest(plan);
+
+    const run = async (fast: boolean) => {
+      const started = Date.now();
+      const measured: { outputTokens: number | null } = { outputTokens: null };
+      try {
+        const raw = await callGemini(
+          messages,
+          true,
+          (usage) => {
+            measured.outputTokens = usage.outputTokens ?? null;
+          },
+          AbortSignal.timeout(90_000),
+          fast ? { fast: true } : {},
+        );
+        const ms = Date.now() - started;
+        if (!raw)
+          return {
+            ms,
+            outputTokens: measured.outputTokens,
+            error: "Gemini connection missing",
+            check: null,
+            content: null,
+          };
+        return {
+          ms,
+          outputTokens: measured.outputTokens,
+          error: null,
+          check: checkLessonContent(raw, plan),
+          // Pretty JSON for side-by-side reading in the admin panel.
+          content: JSON.stringify(jsonValue(raw), null, 2).slice(0, 60_000),
+        };
+      } catch (error) {
+        return {
+          ms: Date.now() - started,
+          outputTokens: measured.outputTokens,
+          error: error instanceof Error ? error.message : "AI call failed",
+          check: null,
+          content: null,
+        };
+      }
+    };
+
+    // Both at once, so the comparison takes as long as the slower one.
+    const [normal, fast] = await Promise.all([run(false), run(true)]);
+    return { key: plan.key, title: plan.title, level: plan.level, normal, fast };
+  });
