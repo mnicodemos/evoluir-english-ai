@@ -253,7 +253,11 @@ function Dashboard() {
               placement="dashboard-header"
               desktopSubtitleTrailing={
                 <div className="flex items-center gap-1">
-                  <DashboardNotifications indicators={indicators} translate={t} placement="desktop" />
+                  <DashboardNotifications
+                    indicators={indicators}
+                    translate={t}
+                    placement="desktop"
+                  />
                   <WeatherTalk translate={t} placement="desktop" />
                 </div>
               }
