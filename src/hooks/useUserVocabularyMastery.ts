@@ -9,6 +9,8 @@ export type WordMastery = {
   word_id: string;
   mastery_level: number;
   last_reviewed_at: string | null;
+  /** When the spaced review is due (null = no review scheduled). */
+  next_review_at: string | null;
 };
 
 /**
@@ -26,13 +28,14 @@ export function fetchUserVocabularyMastery(queryClient: QueryClient): Promise<Wo
       if (!userId) return [];
       const { data, error } = await supabase
         .from("user_vocabulary")
-        .select("word_id, mastery_level, last_reviewed_at")
+        .select("word_id, mastery_level, last_reviewed_at, next_review_at")
         .eq("user_id", userId);
       if (error) throw error;
       return (data ?? []).map((row) => ({
         word_id: row.word_id,
         mastery_level: row.mastery_level ?? 0,
         last_reviewed_at: row.last_reviewed_at ?? null,
+        next_review_at: row.next_review_at ?? null,
       }));
     },
   });

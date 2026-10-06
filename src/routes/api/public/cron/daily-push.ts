@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { leagueLevelOf } from "@/lib/level";
+import { studyReminder, wordOfDayBody } from "@/lib/reviewReminder";
 import { studyToday } from "@/lib/today";
 import { weekStartOf } from "@/lib/streakFreeze";
 import {
@@ -137,6 +138,19 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           }
         }
 
+        // Vocabulary reviews whose date has arrived (same rule as isDue): they
+        // ride on the existing word and reminder pushes, never a push of their own.
+        const nowIso = new Date().toISOString();
+        const dueReviews = async (userId: string) => {
+          const { count } = await supabaseAdmin
+            .from("user_vocabulary")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", userId)
+            .lte("next_review_at", nowIso)
+            .lt("mastery_level", 100);
+          return count ?? 0;
+        };
+
         for (const p of profiles ?? []) {
           if (kind === "weekly") {
             const count = { count: "exact" as const, head: true };
@@ -184,21 +198,18 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           if (kind === "reminder") {
             // last_activity_date is set only when the day's goal is met (credit_study_day).
             if (p.last_activity_date === today) continue;
-            messages.set(p.id, {
-              title: "Hora de estudar inglês 📚",
-              body: "Você ainda não completou sua meta de hoje. Faça uma atividade rápida e mantenha seu Streak!",
-              path: "/dashboard",
-            });
+            messages.set(p.id, studyReminder(await dueReviews(p.id)));
             continue;
           }
           const level = (p.level ?? "a1").toLowerCase();
-          const [{ data: bank }, { data: known }] = await Promise.all([
+          const [{ data: bank }, { data: known }, due] = await Promise.all([
             supabaseAdmin
               .from("vocabulary")
               .select("id, word, translation, meaning")
               .eq("level", level)
               .limit(500),
             supabaseAdmin.from("user_vocabulary").select("word_id").eq("user_id", p.id),
+            dueReviews(p.id),
           ]);
           const knownIds = new Set((known ?? []).map((k) => k.word_id));
           const seen = new Set<string>();
@@ -214,7 +225,7 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
           const leagueLine = p.league_opt_in && isLeagueResetDay() ? ` · ${LEAGUE_RESET_LINE}` : "";
           messages.set(p.id, {
             title: `Palavra do dia: ${w.word}`,
-            body: `${w.translation} — ${w.meaning}${leagueLine}`.slice(0, 280),
+            body: wordOfDayBody(`${w.translation} — ${w.meaning}`, due, leagueLine),
             path: "/vocabulary",
           });
         }
