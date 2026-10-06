@@ -11,6 +11,9 @@ const graphiteVars = {
   "--normal-bg": GRAPHITE.background,
   "--normal-text": GRAPHITE.text,
   "--normal-border": GRAPHITE.border,
+  // Sonner's fixed 356px made desktop alerts narrower than the full-width phone
+  // ones; desktop gets a wider card (phones below 600px keep Sonner's full width).
+  "--width": "min(480px, calc(100vw - 2rem))",
 } as CSSProperties;
 
 const Toaster = ({ className, style, ...props }: ToasterProps) => {
