@@ -11,6 +11,7 @@ import { PathProgressCard } from "@/components/PathProgressCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useDueReviewCount } from "@/hooks/useDueReviewCount";
 import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import { NEXT_STEP_SKILL_TEXT } from "@/lib/pedagogy/nextStep";
@@ -44,6 +45,8 @@ export function SmartReviewCard({
     queryFn: () => loadNextStep({ data: undefined }),
     staleTime: 60 * 1000,
   });
+  // Vocabulary words whose spaced review date has arrived (same count as the bell).
+  const reviewCount = useDueReviewCount(profile?.id);
 
   if (isLoading) {
     return (
@@ -61,10 +64,14 @@ export function SmartReviewCard({
   // An error here must never break the dashboard: the section simply steps out.
   if (isError || !data) return null;
 
-  const items = (data.reviews ?? []).filter((item) =>
+  const allItems = (data.reviews ?? []).filter((item) =>
     dashboardActionAvailable(item.resource.to, indicators),
   );
-  if (items.length === 0) {
+  // Due word reviews take the first row on the compact card and replace the
+  // generic Vocabulary suggestion, so the same skill never shows twice.
+  const showWordReviews = compact && reviewCount > 0;
+  const items = showWordReviews ? allItems.filter((item) => item.skill !== "vocabulary") : allItems;
+  if (items.length === 0 && !showWordReviews) {
     // Compact Dashboard slot keeps its place: everything to review is done.
     if (!compact) return null;
     return (
@@ -110,7 +117,30 @@ export function SmartReviewCard({
           </h2>
         </div>
         <ul className="mt-3 grid flex-1 grid-rows-2 gap-2 overflow-hidden xl:mt-4 xl:gap-2">
-          {items.slice(0, 2).map((item, index) => {
+          {showWordReviews && (
+            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-brand-green/35 bg-brand-green/[0.07] pr-2">
+              <span className="grid h-full min-h-0 w-16 place-items-center bg-brand-green/15">
+                <RotateCcw className="size-6 text-brand-green" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground">{t("Vocabulary")}</p>
+                <p className="truncate text-sm font-semibold">
+                  {reviewCount === 1
+                    ? t("Review 1 word")
+                    : t("Review {n} words").replace("{n}", String(reviewCount))}
+                </p>
+                <p className="line-clamp-2 text-[10px] leading-tight text-muted-foreground">
+                  {t("Their review date has arrived: a quick review keeps them in memory.")}
+                </p>
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/vocabulary" aria-label={`${t("Review now")}: ${t("Vocabulary")}`}>
+                  {t("Review")}
+                </Link>
+              </Button>
+            </li>
+          )}
+          {items.slice(0, showWordReviews ? 1 : 2).map((item, index) => {
             const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
             return (
               <li
