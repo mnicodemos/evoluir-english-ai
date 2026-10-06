@@ -15,6 +15,7 @@ import {
   MessageSquareText,
   Mic,
   PenLine,
+  RefreshCw,
   Sparkles,
 } from "lucide-react";
 
@@ -58,7 +59,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
   const activityIndicators = useActivityIndicators();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
     queryFn: () => loadNextStep({ data: undefined }),
     staleTime: 60 * 1000,
@@ -74,7 +75,33 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     );
   }
 
-  if (isError || !data) return null;
+  // A failed load keeps the card's place with a retry, instead of leaving a
+  // hole in the Dashboard.
+  if (isError || !data) {
+    return (
+      <section
+        className={
+          compact
+            ? "card-soft flex h-full flex-col items-center justify-center gap-3 p-4 text-center"
+            : "card-soft flex flex-col items-center gap-3 p-5 text-center"
+        }
+        aria-label={t("Your next step")}
+      >
+        <p className="text-sm text-muted-foreground">{t("We could not load your next step.")}</p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={isFetching}
+          onClick={() => void refetch()}
+          className="gap-2"
+        >
+          <RefreshCw className={isFetching ? "size-4 animate-spin" : "size-4"} aria-hidden="true" />
+          {t("Try again")}
+        </Button>
+      </section>
+    );
+  }
 
   const skillLabel = data.prioritySkill
     ? t(NEXT_STEP_SKILL_TEXT[data.prioritySkill] ?? data.prioritySkill)
