@@ -3,11 +3,7 @@ import { z } from "zod";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
 import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
-import {
-  LOVABLE_TALKING_MODEL,
-  openLovableTalkingStream,
-  parseLovableEvent,
-} from "@/lib/lovable-chat.server";
+import { GEMINI_TEXT_MODEL, openGeminiStream, parseGeminiStreamEvent } from "@/lib/gemini.server";
 
 const requestSchema = z.object({
   messages: z
@@ -53,7 +49,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           ticket = await reserveAiUsage({
             userId,
             operation: "talking",
-            model: LOVABLE_TALKING_MODEL,
+            model: GEMINI_TEXT_MODEL,
             requestHash: await hashAiRequest(parsed.data),
           });
         } catch (error) {
@@ -108,11 +104,16 @@ export const Route = createFileRoute("/api/coach-stream")({
         arm(FIRST_CHUNK_MS);
         let upstream: Response | null;
         try {
-          upstream = await openLovableTalkingStream(parsed.data.messages, upstreamAbort.signal);
+          // AI Speaking runs on the workspace's own Gemini key (owner request,
+          // 2026-10-04), with the thinking step off so the first words come fast.
+          upstream = await openGeminiStream(parsed.data.messages, upstreamAbort.signal, {
+            fast: true,
+            maxOutputTokens: 600,
+          });
         } catch (error) {
           await settle(
             false,
-            timedOut ? "timeout" : "lovable_network",
+            timedOut ? "timeout" : "gemini_network",
             error instanceof Error ? error.message : "Network failure",
           );
           return Response.json(
@@ -121,7 +122,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           );
         }
         if (!upstream) {
-          await settle(false, "not_configured", "LOVABLE_API_KEY missing");
+          await settle(false, "not_configured", "Gemini connection missing");
           return Response.json(
             { message: "AI Speaking is temporarily unavailable." },
             { status: 500 },
@@ -129,15 +130,15 @@ export const Route = createFileRoute("/api/coach-stream")({
         }
         if (!upstream.ok || !upstream.body) {
           const raw = await upstream.text().catch(() => "");
-          console.error(`Lovable AI talking failed [${upstream.status}]: ${raw.slice(0, 300)}`);
+          console.error(`Gemini talking failed [${upstream.status}]: ${raw.slice(0, 300)}`);
           const message =
-            upstream.status === 402
-              ? "AI credits are exhausted. Please try again later."
+            upstream.status === 429
+              ? "Your Google Gemini limit is temporarily busy. Please try again in a moment."
               : "AI Speaking could not answer right now. Please try again.";
           const headers = new Headers();
           if (upstream.status === 429)
             headers.set("Retry-After", upstream.headers.get("Retry-After") ?? "60");
-          await settle(false, `lovable_${upstream.status}`, raw.slice(0, 240) || message);
+          await settle(false, `gemini_${upstream.status}`, raw.slice(0, 240) || message);
           return Response.json({ message }, { status: upstream.status, headers });
         }
 
@@ -152,7 +153,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           controller: ReadableStreamDefaultController<Uint8Array>,
           event: string,
         ) => {
-          const parsedEvent = parseLovableEvent(event);
+          const parsedEvent = parseGeminiStreamEvent(event);
           if (parsedEvent.usage) usage = parsedEvent.usage;
           if (parsedEvent.delta) {
             emittedText = true;

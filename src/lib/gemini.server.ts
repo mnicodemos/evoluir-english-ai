@@ -87,22 +87,80 @@ function connectorCredentials() {
   return lovableKey && connectionKey ? { lovableKey, connectionKey } : null;
 }
 
+/**
+ * Opens a streaming answer (SSE). Tries the main model and, when it is busy
+ * (429/5xx), the fallback model once. With `speed.fast` the thinking step is
+ * off; a model that answers 400 to that is retried with the plain request and
+ * remembered. Returns null when the Gemini connection is not configured.
+ */
 export async function openGeminiStream(
   messages: GeminiMessage[],
   signal?: AbortSignal,
+  speed: GeminiSpeed = {},
 ): Promise<Response | null> {
   const credentials = connectorCredentials();
   if (!credentials) return null;
-  return fetch(`${GATEWAY_URL}/v1beta/models/${MODELS[0]}:streamGenerateContent?alt=sse`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${credentials.lovableKey}`,
-      "X-Connection-Api-Key": credentials.connectionKey,
-      "Content-Type": "application/json",
-    },
-    body: requestBody(messages),
-    ...(signal ? { signal } : {}),
-  });
+  const plainBody = requestBody(messages);
+  const fastBody = speed.fast ? requestBody(messages, false, speed) : plainBody;
+  const open = (model: string, body: string) =>
+    fetch(`${GATEWAY_URL}/v1beta/models/${model}:streamGenerateContent?alt=sse`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${credentials.lovableKey}`,
+        "X-Connection-Api-Key": credentials.connectionKey,
+        "Content-Type": "application/json",
+      },
+      body,
+      ...(signal ? { signal } : {}),
+    });
+  let res: Response | null = null;
+  for (const model of MODELS) {
+    const tryFast = speed.fast && !modelsWithoutThinkingConfig.has(model);
+    res = await open(model, tryFast ? fastBody : plainBody);
+    if (tryFast && res.status === 400) {
+      const retry = await open(model, plainBody);
+      if (retry.ok) modelsWithoutThinkingConfig.add(model);
+      res = retry;
+    }
+    if (res.ok || !isTemporaryGeminiStatus(res.status)) return res;
+  }
+  return res;
+}
+
+/** Parses one Gemini SSE event block into text delta, usage and error. */
+export function parseGeminiStreamEvent(event: string): {
+  delta: string;
+  error?: string;
+  usage?: GeminiUsage;
+} {
+  let delta = "";
+  let error: string | undefined;
+  let usage: GeminiUsage | undefined;
+  for (const line of event.split(/\r?\n/)) {
+    if (!line.startsWith("data:")) continue;
+    const raw = line.slice(5).trim();
+    if (!raw || raw === "[DONE]") continue;
+    try {
+      const payload = JSON.parse(raw) as {
+        candidates?: Array<{ content?: { parts?: Array<{ text?: string; thought?: boolean }> } }>;
+        error?: { message?: string };
+        usageMetadata?: unknown;
+      };
+      for (const part of payload.candidates?.[0]?.content?.parts ?? []) {
+        if (part.thought) continue;
+        if (typeof part.text === "string") delta += part.text;
+      }
+      if (payload.error) error = payload.error.message ?? "AI reply failed";
+      if (payload.usageMetadata) {
+        const reported = extractGeminiUsage(payload);
+        if (reported.inputTokens !== undefined || reported.outputTokens !== undefined)
+          usage = reported;
+      }
+    } catch {
+      // keep-alive or partial line
+    }
+  }
+  return { delta, ...(error ? { error } : {}), ...(usage ? { usage } : {}) };
 }
 
 export type GeminiUsage = { inputTokens?: number; outputTokens?: number };
