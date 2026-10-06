@@ -165,9 +165,10 @@ export function AdminCostPerformance() {
             agora a partir dos tokens e da tabela de preços oficial (inclui chamadas antigas); "n/m"
             mostra quantas chamadas têm custo medido, e as projeções usam a média dessas. Taxa de
             erro: só falhas reais; bloqueios por limite (o app espera e tenta de novo) e
-            cancelamentos ficam à parte. N/D: first token/chunk/audio, streaming, retries, fallback,
-            créditos e economia do cache. O provider da Transcription histórica não é atribuível
-            porque o registro guardou o modelo de fallback.
+            cancelamentos ficam à parte. First chunk: tempo até a primeira palavra (AI Talking,
+            linha "reply") ou primeiro som (TTS), após a migração 0045. N/D: first token, streaming,
+            retries, fallback, créditos e economia do cache. O provider da Transcription histórica
+            não é atribuível porque o registro guardou o modelo de fallback.
           </p>
           {query.data.truncated && (
             <p className="mt-1 text-xs text-muted-foreground">
@@ -247,7 +248,12 @@ export function AdminCostPerformance() {
                     <td className="pr-3">{fmtMs(row.medianMs)}</td>
                     <td className="pr-3">{fmtMs(row.p95Ms)}</td>
                     <td className="pr-3">{ND}</td>
-                    <td className="pr-3">{ND}</td>
+                    <td className="pr-3">
+                      {fmtMs(row.firstChunkMs)}
+                      {row.firstChunkCount > 0 && (
+                        <div className="text-muted-foreground">mediana · {row.firstChunkCount}</div>
+                      )}
+                    </td>
                     <td className="pr-3">
                       {row.errors}
                       {row.blocked > 0 && (
