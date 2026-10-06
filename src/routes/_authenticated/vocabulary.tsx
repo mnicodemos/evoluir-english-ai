@@ -105,8 +105,9 @@ function Vocabulary() {
     },
   });
 
-  // Starting a new lesson unlocks a new set of ten words.
-  const { data: startedLessons } = useLessonRound();
+  // Each COMPLETED lesson unlocks a new set of ten words (same count the
+  // server uses for the batch key, lessonBatchKey).
+  const { data: completedLessons } = useLessonRound();
 
   const { data: mine } = useQuery({
     queryKey: ["user-vocabulary", profile?.id],
@@ -121,15 +122,15 @@ function Vocabulary() {
     },
   });
 
-  // Starting a new lesson means a new set of ten words.
+  // A newly completed lesson means a new set of ten words.
   const dailyKey = [
     "daily-words",
     profile?.id,
     profile?.level,
     studyToday(),
-    startedLessons ?? 0,
+    completedLessons ?? 0,
   ] as const;
-  const roundReady = !!profile && startedLessons !== undefined;
+  const roundReady = !!profile && completedLessons !== undefined;
 
   // 1) Words already saved for this batch: a plain read, shown right away.
   const { data: saved, isLoading: savedLoading } = useQuery({
@@ -146,7 +147,9 @@ function Vocabulary() {
   // 2) Missing words are generated in the background. A failed attempt is
   // remembered for this batch so reopening or refreshing the page does not
   // start a new generation by itself; the student can retry on purpose.
-  const failKey = profile ? vocabularyGenerationFailureKey(profile.id, startedLessons ?? 0) : null;
+  const failKey = profile
+    ? vocabularyGenerationFailureKey(profile.id, completedLessons ?? 0)
+    : null;
   const [genBlocked, setGenBlocked] = useState<boolean | null>(null);
   useEffect(() => {
     if (!failKey) return;

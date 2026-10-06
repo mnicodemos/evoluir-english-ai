@@ -1291,4 +1291,5 @@ export const uiPt: Record<string, string> = {
   "Practise the rule": "Praticar a regra",
   "Could not prepare a practice question. Please try again.":
     "Não foi possível preparar a questão de prática. Tente novamente.",
+  "We could not load your next step.": "Não foi possível carregar seu próximo passo.",
 };
