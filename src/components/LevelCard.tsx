@@ -58,113 +58,131 @@ export function LevelCard({
     }
   };
 
-  return (
-    <div
-      className={cn(
-        "flex h-full min-w-0 flex-col justify-center",
-        compact ? "px-3 py-2" : "card-soft p-4",
-      )}
+  const chips = (
+    <ol
+      className={cn("grid grid-cols-6", compact ? "mt-1 gap-1" : "mt-3 gap-2")}
+      aria-label={t("CEFR levels")}
     >
-      <div className="flex items-center gap-3">
-        {compact ? (
-          <ChartNoAxesColumnIncreasing
-            className="size-[1.925rem] shrink-0 text-dashboard-cyan"
-            strokeWidth={2.8}
-          />
-        ) : (
-          <span className="grid size-12 shrink-0 place-items-center rounded-md bg-dashboard-cyan/10">
-            <GraduationCap className="size-6 text-accent-foreground" />
-          </span>
-        )}
-        <div className="min-w-0 flex-1">
-          <p
-            className={cn(
-              "truncate font-bold",
-              compact ? "font-display text-sm" : "text-lg sm:text-base md:text-lg",
-            )}
-          >
-            {current.label}
-          </p>
-          <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-base sm:text-xs")}>
-            {compact ? (
-              <span>{current.cefr}</span>
-            ) : (
-              <>
-                <span>Your English level</span>
-                <span> · </span>
-                <span>{current.cefr}</span>
-              </>
-            )}
-          </p>
-        </div>
-        {belowHighest && (
-          <button
-            type="button"
-            onClick={() => void returnToHighest()}
-            disabled={returning}
-            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-green/40 px-2.5 py-1 text-xs font-semibold text-brand-green transition hover:bg-brand-green/10 disabled:opacity-60"
-          >
-            <Undo2 className="size-3.5" aria-hidden="true" />
-            {t("Back to")} {highest.value.toUpperCase()}
-          </button>
-        )}
-      </div>
+      {LEVELS.map((l, i) => {
+        const locked = i > highestIndex;
+        const active = i === currentIndex;
+        const conquered = !locked && !active;
+        const code = l.value.toUpperCase();
+        const chip = cn(
+          "flex w-full min-w-0 items-center justify-center gap-0.5 rounded-full border text-xs font-semibold tabular-nums transition",
+          compact ? "h-6 text-[10px] 2xl:text-[11px]" : "h-10 sm:text-sm",
+        );
 
-      <ol
-        className={cn("grid grid-cols-6", compact ? "mt-2 gap-1" : "mt-3 gap-2")}
-        aria-label={t("CEFR levels")}
-      >
-        {LEVELS.map((l, i) => {
-          const locked = i > highestIndex;
-          const active = i === currentIndex;
-          const conquered = !locked && !active;
-          const code = l.value.toUpperCase();
-          const chip = cn(
-            "flex w-full min-w-0 items-center justify-center gap-0.5 rounded-full border text-xs font-semibold tabular-nums transition",
-            compact ? "h-7" : "h-10 sm:text-sm",
-          );
-
-          if (conquered) {
-            return (
-              <li key={l.value}>
-                <Link
-                  to="/learning"
-                  search={{ review: l.value }}
-                  title={`${t("Review")} ${l.label}`}
-                  aria-label={`${t("Review")} ${l.label}`}
-                  className={cn(
-                    chip,
-                    "border-brand-green/25 bg-brand-green/[0.07] text-brand-green/90 hover:border-brand-green/60 hover:bg-brand-green/15 hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60",
-                  )}
-                >
-                  <Check className="size-3 shrink-0" strokeWidth={3} aria-hidden="true" />
-                  {code}
-                </Link>
-              </li>
-            );
-          }
-
+        if (conquered) {
           return (
             <li key={l.value}>
-              <span
-                aria-current={active ? "step" : undefined}
-                title={
-                  active ? `${l.label} · ${t("current level")}` : `${l.label} · ${t("locked")}`
-                }
+              <Link
+                to="/learning"
+                search={{ review: l.value }}
+                title={`${t("Review")} ${l.label}`}
+                aria-label={`${t("Review")} ${l.label}`}
                 className={cn(
                   chip,
-                  active &&
-                    "border-transparent bg-brand-green text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)]",
-                  locked && "border-border/50 text-muted-foreground/45",
+                  "border-brand-green/25 bg-brand-green/[0.07] text-brand-green/90 hover:border-brand-green/60 hover:bg-brand-green/15 hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60",
                 )}
               >
-                {locked && <Lock className="size-3 shrink-0" aria-hidden="true" />}
+                <Check
+                  className={cn("size-3 shrink-0", compact && "hidden 2xl:block")}
+                  strokeWidth={3}
+                  aria-hidden="true"
+                />
                 {code}
-              </span>
+              </Link>
             </li>
           );
-        })}
-      </ol>
+        }
+
+        return (
+          <li key={l.value}>
+            <span
+              aria-current={active ? "step" : undefined}
+              title={active ? `${l.label} · ${t("current level")}` : `${l.label} · ${t("locked")}`}
+              className={cn(
+                chip,
+                active &&
+                  "border-transparent bg-brand-green text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)]",
+                locked && "border-border/50 text-muted-foreground/45",
+              )}
+            >
+              {locked && (
+                <Lock
+                  className={cn("size-3 shrink-0", compact && "hidden 2xl:block")}
+                  aria-hidden="true"
+                />
+              )}
+              {code}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+
+  const backButton = belowHighest && (
+    <button
+      type="button"
+      onClick={() => void returnToHighest()}
+      disabled={returning}
+      className="inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-green/40 px-2.5 py-1 text-xs font-semibold text-brand-green transition hover:bg-brand-green/10 disabled:opacity-60"
+    >
+      <Undo2 className="size-3.5" aria-hidden="true" />
+      {t("Back to")} {highest.value.toUpperCase()}
+    </button>
+  );
+
+  if (compact) {
+    // Dashboard header: the same three lines as the other header cells
+    // (icon tile · level name · level chips · supporting line).
+    const next = LEVELS[highestIndex + 1];
+    return (
+      <div className="flex h-full min-w-0 items-center gap-3 px-4 py-3 2xl:gap-4 2xl:px-6">
+        <span
+          className="grid size-12 shrink-0 place-items-center rounded-2xl bg-dashboard-cyan/12 text-dashboard-cyan"
+          aria-hidden="true"
+        >
+          <ChartNoAxesColumnIncreasing className="size-6" strokeWidth={2.6} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            {current.label}
+          </p>
+          {chips}
+          {belowHighest ? (
+            <div className="mt-1">{backButton}</div>
+          ) : (
+            <p className="mt-1 truncate text-xs leading-tight text-muted-foreground">
+              {next
+                ? `${t("Next level")}: ${next.value.toUpperCase()} · ${t("Final Test")}`
+                : t("Highest level reached")}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card-soft flex h-full min-w-0 flex-col justify-center p-4">
+      <div className="flex items-center gap-3">
+        <span className="grid size-12 shrink-0 place-items-center rounded-md bg-dashboard-cyan/10">
+          <GraduationCap className="size-6 text-accent-foreground" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-lg font-bold sm:text-base md:text-lg">{current.label}</p>
+          <p className="text-base text-muted-foreground sm:text-xs">
+            <span>Your English level</span>
+            <span> · </span>
+            <span>{current.cefr}</span>
+          </p>
+        </div>
+        {backButton}
+      </div>
+      {chips}
     </div>
   );
 }

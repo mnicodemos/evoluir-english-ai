@@ -15,7 +15,7 @@ import {
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
-import evoProfile from "@/assets/evo-profile.jpg.asset.json";
+import evoVideoCall from "@/assets/evo-video-call.jpg";
 import { aiChat } from "@/lib/aiChat.functions";
 import { cn } from "@/lib/utils";
 
@@ -165,25 +165,37 @@ export function VideoCallStage({
       </header>
 
       {/* Stage: EVO with a ring that reacts to the conversation. */}
-      <main className="relative flex flex-1 flex-col items-center justify-center gap-5 px-4">
-        <div className="relative grid place-items-center">
+      <main className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 sm:gap-5">
+        {/* EVO's round video window: a green ring lights up while she speaks. */}
+        <div className="relative mb-2 grid place-items-center">
           {speaking && (
-            <>
-              <span className="absolute size-[min(62vw,19rem)] animate-ping rounded-full bg-brand-green/15" />
-              <span className="absolute size-[min(56vw,17.5rem)] rounded-full ring-4 ring-brand-green/60" />
-            </>
+            <span className="absolute inset-0 animate-ping rounded-full bg-brand-green/15 [animation-duration:1.8s]" />
           )}
-          {busy && (
-            <span className="absolute size-[min(56vw,17.5rem)] animate-spin rounded-full border-4 border-dashed border-white/25 [animation-duration:6s]" />
-          )}
-          <img
-            src={evoProfile.url}
-            alt="EVO"
+          <div
             className={cn(
-              "relative size-[min(50vw,16rem)] rounded-full object-cover shadow-2xl transition-transform duration-500",
-              speaking && "scale-[1.03]",
+              "relative aspect-square w-[min(76vw,calc(100dvh-26rem),22rem)] overflow-hidden rounded-full shadow-2xl ring-2 ring-white/10 transition-shadow duration-500",
+              speaking && "shadow-[0_0_0_4px_var(--brand-green),0_0_48px_-6px_var(--brand-green)]",
+              busy && "animate-pulse",
             )}
-          />
+          >
+            <img
+              src={evoVideoCall}
+              alt="EVO, your English teacher, on the call"
+              className="size-full scale-[1.3] object-cover [object-position:50%_30%] [transform-origin:50%_28%]"
+            />
+          </div>
+          <span className="absolute -bottom-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold ring-1 ring-white/10 backdrop-blur-sm">
+            {speaking ? (
+              <span className="flex h-3 items-end gap-0.5" aria-hidden="true">
+                <span className="w-0.5 animate-[pulse_0.8s_ease-in-out_infinite] rounded-full bg-brand-green [height:60%]" />
+                <span className="w-0.5 animate-[pulse_0.8s_ease-in-out_0.2s_infinite] rounded-full bg-brand-green [height:100%]" />
+                <span className="w-0.5 animate-[pulse_0.8s_ease-in-out_0.4s_infinite] rounded-full bg-brand-green [height:45%]" />
+              </span>
+            ) : (
+              <span className="size-2 rounded-full bg-brand-green" aria-hidden="true" />
+            )}
+            EVO
+          </span>
         </div>
 
         <p className="min-h-5 text-center text-sm text-white/75" aria-live="polite">

@@ -459,6 +459,8 @@ export const uiPt: Record<string, string> = {
   "AI Speaking": "Fala com AI",
   "Video call with EVO": "Videochamada com a EVO",
   "Video call": "Videochamada",
+  "Next level": "Próximo nível",
+  "Highest level reached": "Nível máximo alcançado",
   "EVO · English teacher": "EVO · Professora de inglês",
   "Free conversation": "Conversa livre",
   "EVO is joining the call…": "A EVO está entrando na chamada…",
