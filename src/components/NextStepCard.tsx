@@ -232,7 +232,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 max-sm:text-[10px] sm:text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+      className="h-8 min-w-0 rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green hover:bg-brand-green/25 max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
     >
       <Link to="/study-plan">
         <Map className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
@@ -265,7 +265,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 alt=""
                 width={1536}
                 height={1024}
-                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-contain sm:object-left"
+                className="hidden h-auto w-full sm:absolute sm:left-0 sm:top-1/2 sm:block sm:h-auto sm:w-auto sm:max-h-full sm:max-w-full sm:-translate-y-1/2 sm:rounded-lg sm:object-contain sm:object-left"
               />
             </div>
           </div>
