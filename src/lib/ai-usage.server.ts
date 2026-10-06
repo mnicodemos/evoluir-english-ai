@@ -203,16 +203,16 @@ export async function finishAiUsage(
     errorMessage?: string;
     inputTokens?: number;
     outputTokens?: number;
+    /** The model that actually answered (a fallback), replacing the reserved one. */
+    model?: string;
   },
 ) {
   const db = await admin();
   let estimatedCost: number | null = null;
   if (typeof result.inputTokens === "number" && typeof result.outputTokens === "number") {
-    const { data } = await db
-      .from("ai_usage_events")
-      .select("model")
-      .eq("id", ticket.eventId)
-      .maybeSingle();
+    const { data } = result.model
+      ? { data: { model: result.model } }
+      : await db.from("ai_usage_events").select("model").eq("id", ticket.eventId).maybeSingle();
     estimatedCost = estimateAiCost(data?.model, result.inputTokens, result.outputTokens);
   }
   await db
@@ -226,6 +226,7 @@ export async function finishAiUsage(
       estimated_cost: estimatedCost,
       error_code: result.errorCode ?? null,
       error_message: result.errorMessage?.slice(0, 500) ?? null,
+      ...(result.model ? { model: result.model } : {}),
       completed_at: new Date().toISOString(),
     })
     .eq("id", ticket.eventId);

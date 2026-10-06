@@ -64,7 +64,7 @@ const OPERATION_FACTS: Record<string, { label: string; streaming: string; path: 
   transcription: {
     label: "Transcription",
     streaming: "Yes",
-    path: "Primary: Lovable AI · Fallback: Gemini",
+    path: "Primary: Gemini (personal key) · Fallback: Lovable AI",
   },
   tts: { label: "TTS", streaming: "Yes", path: "Primary: Gemini (personal key)" },
   writing_correction: { label: "Writing / Correction", streaming: "No", path: "Primary: Gemini" },
@@ -79,6 +79,9 @@ function providerOf(model: string) {
   return model.includes("/") ? "Lovable AI" : "Gemini (personal key)";
 }
 
+// Older transcription rows stored a Lovable answer under the reserved Gemini
+// name, so a plain model name cannot name the provider; a Lovable fallback is
+// recorded as its own model from 2026-10-06 on.
 function benchmarkProviderOf(operation: string, model: string) {
   if (operation === "transcription" && !model.includes("/")) {
     return "N/D — provider não registrado";
