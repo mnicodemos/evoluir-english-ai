@@ -11,7 +11,6 @@ import {
   GraduationCap,
   Headphones,
   Lightbulb,
-  Map,
   MessageSquareText,
   Mic,
   PenLine,
@@ -253,17 +252,22 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         )}
       </Button>
     ) : null;
-  // Mobile-only companion chip: opens the Study Plan page ("Your trail").
+  // Mobile-only companion chip: opens the Study Plan page ("Your trail"). Same
+  // outline chip as Quick Win; the map renders in its native colors like ⚡.
   const mapButton = (
     <Button
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green hover:bg-brand-green/25 max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
+      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
     >
       <Link to="/study-plan">
-        <Map className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
-        {t("Your trail")}
+        <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal">
+          <span aria-hidden="true" className="text-[13px] leading-none">
+            🗺️
+          </span>
+          {t("Your trail")}
+        </span>
       </Link>
     </Button>
   );
