@@ -166,15 +166,15 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-9 sm:min-h-0 sm:flex-1 sm:rounded-lg sm:px-2.5 sm:py-0.5 sm:whitespace-normal sm:text-left"
+        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 sm:whitespace-normal sm:text-left"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1439.98px]:hidden!">
                 {t("A 10-minute speaking practice can already make a difference.")}
               </span>
             </span>
@@ -182,10 +182,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         ) : (
           <Link to={quickWin.activity.to}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1439.98px]:hidden!">
                 {t("A 10-minute speaking practice can already make a difference.")}
               </span>
             </span>
@@ -199,15 +199,15 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-9 sm:min-h-0 sm:flex-1 sm:rounded-lg sm:px-2.5 sm:py-0.5 sm:whitespace-normal sm:text-left"
+        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 sm:whitespace-normal sm:text-left"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1439.98px]:hidden!">
                 {t("Try a short conversation with EVO today.")}
               </span>
             </span>
@@ -215,10 +215,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         ) : (
           <Link to={data.quest.resource.to}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1439.98px]:hidden!">
                 {t("Try a short conversation with EVO today.")}
               </span>
             </span>
@@ -252,7 +252,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             className="relative aspect-[17/4] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
-            <div className="absolute inset-0 overflow-hidden sm:static sm:aspect-auto sm:overflow-visible">
+            <div className="absolute inset-0 overflow-hidden sm:inset-3 sm:flex sm:items-center sm:overflow-visible">
               <img
                 src={evoDashboardMobile.url}
                 alt=""
@@ -265,22 +265,22 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 alt=""
                 width={1536}
                 height={1024}
-                className="hidden h-auto w-full sm:absolute sm:left-0 sm:top-1/2 sm:block sm:h-auto sm:w-auto sm:max-h-full sm:max-w-full sm:-translate-y-1/2 sm:rounded-lg sm:object-contain sm:object-left"
+                className="hidden h-auto w-full sm:block sm:h-auto sm:w-auto sm:max-h-full sm:max-w-full sm:rounded-lg sm:object-contain"
               />
             </div>
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:items-center sm:justify-center sm:px-4 sm:py-2 sm:text-center xl:order-2 xl:justify-center xl:px-3 xl:py-2">
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:justify-center sm:py-4 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-bold uppercase text-brand-green sm:inline-flex sm:items-center sm:rounded-full sm:bg-brand-green/15 sm:px-2.5 sm:py-[5px] sm:text-[12px] sm:font-semibold sm:normal-case">
+                <p className="text-[11px] font-bold uppercase text-brand-green sm:hidden">
                   EVO · {t("Your AI Learning Coach")}
                 </p>
-                <div className="mt-2">
+                <div className="mt-2 sm:mt-0">
                   {/* Mobile-only level badge next to the priority label; the bell
                       and weather moved back to the top row. Desktop unchanged. */}
-                  <div className="flex items-center gap-2 sm:justify-center">
-                    <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:whitespace-normal sm:text-sm sm:leading-normal">
+                  <div className="flex items-center gap-2">
+                    <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:text-xs sm:font-bold sm:tracking-[0.08em] sm:text-brand-green">
                       {t("TODAY'S PRIORITY")}
                     </p>
                     {profile?.level && (
@@ -289,9 +289,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                       </span>
                     )}
                   </div>
-                  <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:justify-center sm:text-2xl sm:leading-normal xl:text-3xl">
+                  <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-2 sm:text-2xl xl:text-3xl">
                     <PriorityIcon
-                      className="size-5 shrink-0 text-warning sm:size-6"
+                      className="size-5 shrink-0 text-warning sm:size-[1.375rem]"
                       aria-hidden="true"
                     />
                     <span>{skillLabel}</span>
@@ -364,16 +364,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </li>
               </ul>
             </div>
-            <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:block sm:mt-2 sm:text-sm xl:mt-1 xl:text-xs">
+            <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:mt-3 sm:block sm:text-sm">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
-            <p className="mt-2 hidden line-clamp-1 text-sm text-sidebar-foreground/85 sm:block xl:mt-1 xl:text-xs">
-              {t("How to practise")}: <span className="font-semibold">{data.activity.title}</span>
+            <p className="mt-2 hidden line-clamp-1 text-sm text-sidebar-foreground/85 sm:mt-1 sm:block">
+              {t("How to practice")}: <span className="font-semibold">{data.activity.title}</span>
             </p>
             {mainAvailable && (
               <Button
                 asChild
-                className="mt-4 hidden w-full bg-brand-green text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:flex sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold xl:mt-2 xl:h-9"
+                className="mt-4 hidden w-full bg-brand-green text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-5 sm:flex sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold"
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
@@ -390,14 +390,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 m-3 mt-0 hidden min-w-0 rounded-lg border border-border bg-background/35 p-2.5 sm:col-span-2 sm:block sm:border-border sm:bg-card sm:p-3 xl:order-3 xl:col-span-1 xl:m-1.5 xl:flex xl:flex-col xl:self-stretch">
+          <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-l xl:border-t-0">
             <div className="flex items-center gap-2">
-              <Lightbulb className="size-[1.65rem] text-warning" aria-hidden="true" />
-              <h3 className="font-semibold text-sidebar-foreground">
-                {t("Why this matters now?")}
-              </h3>
+              <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
+              <h3 className="font-semibold text-sidebar-foreground">{t("Why this matters now")}</h3>
             </div>
-            <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-2 xl:mb-5 xl:mt-2.5 xl:gap-1.5 xl:text-xs xl:leading-snug">
+            <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-3 sm:text-[13px] sm:leading-snug xl:mb-4 xl:gap-1.5">
               {/* Mobile: short summary + evidence item — never clamped, never cut. */}
               <li className="flex items-start gap-2 sm:hidden">
                 <span
@@ -437,7 +435,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </li>
             </ul>
             {(quickWinButton || challengeButton) && (
-              <div className="mt-3 hidden items-stretch gap-2 border-t border-sidebar-foreground/15 pt-5 sm:flex xl:mb-2 xl:mt-auto xl:pt-5">
+              <div className="mt-3 hidden items-stretch gap-2 border-t border-border pt-3 sm:flex xl:mt-auto">
                 {quickWinButton}
                 {quickWinButton && challengeButton && (
                   <div
@@ -476,7 +474,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {t(NEXT_STEP_REASON_TEXT[data.reason])}
               </p>
               <p className="mt-2 text-sm">
-                {t("How to practise")}: <span className="font-medium">{data.activity.title}</span>
+                {t("How to practice")}: <span className="font-medium">{data.activity.title}</span>
               </p>
               {!mainAvailable ? null : data.activity.params ? (
                 <Button asChild className="mt-3">

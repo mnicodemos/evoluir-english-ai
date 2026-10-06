@@ -185,7 +185,7 @@ export function SmartReviewCard({
                       {t(SMART_REVIEW_REASON_TEXT[item.category])}
                     </p>
                     <p className="mt-1 break-words text-sm">
-                      {t("How to practise")}:{" "}
+                      {t("How to practice")}:{" "}
                       <span className="font-medium">{t(item.resource.title)}</span>
                     </p>
                     {item.resource.params ? (
