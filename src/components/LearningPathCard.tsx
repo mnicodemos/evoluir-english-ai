@@ -26,10 +26,16 @@ function errorMessage(error: unknown) {
 }
 
 /** The 30-lesson core path plus its optional 3-lesson review unit. */
-export function CurriculumPath() {
+/**
+ * The learning path of the student's level, or, with `reviewLevel`, of an
+ * earlier level opened for review: every lesson open and no unit or final
+ * tests, since those move the student's own level.
+ */
+export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } = {}) {
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
-  const path = useLearningPath();
+  const path = useLearningPath(reviewLevel);
+  const review = path.review;
   const open = useOpenPathLesson();
   const navigate = useNavigate();
   const [busyKey, setBusyKey] = useState<string | null>(null);
@@ -105,6 +111,12 @@ export function CurriculumPath() {
               <BookOpen className="size-5 text-[oklch(0.72_0.13_185)]" />
             </span>
             <h2 id="path-heading" className="min-w-0 flex-1 truncate text-sm font-semibold">
+              {review && (
+                <>
+                  <span>Review</span>
+                  <span> · </span>
+                </>
+              )}
               <span>{findLevel(path.level).label}</span>
             </h2>
             <p className="shrink-0 text-xs font-semibold text-muted-foreground">
@@ -135,7 +147,7 @@ export function CurriculumPath() {
             return (
               <section className="card-soft p-4" aria-label="All lessons completed">
                 <p className="text-sm font-semibold">{t("All lessons completed")}</p>
-                {path.finalTest.unlocked && (
+                {!review && path.finalTest.unlocked && (
                   <Button
                     className="mt-3 min-h-12 w-full bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
                     onClick={() => navigate({ to: "/learning/final-test" })}
@@ -153,7 +165,8 @@ export function CurriculumPath() {
               aria-label="Next lesson"
             >
               <p className="text-[11px] font-semibold tracking-wider text-[oklch(0.72_0.13_185)] uppercase">
-                {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
+                {review ? t("Review") : t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")}{" "}
+                {next.position}
               </p>
               <h3 className="mt-1 truncate text-sm font-semibold">{next.title}</h3>
               <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{next.objective}</p>
@@ -163,7 +176,7 @@ export function CurriculumPath() {
                 disabled={busy || open.isPending}
               >
                 {busy ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
-                <span>{t("Continue lesson")}</span>
+                <span>{review && !next.started ? t("Start lesson") : t("Continue lesson")}</span>
               </Button>
             </section>
           );
@@ -282,45 +295,46 @@ export function CurriculumPath() {
             </ul>
           );
 
-          const testButton = test ? (
-            <Button
-              variant={test.unlocked && !test.passed ? "default" : "outline"}
-              size="sm"
-              className={`mt-4 w-full lg:mt-2.5 ${
-                test.unlocked && !test.passed
-                  ? "bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
-                  : "text-muted-foreground"
-              }`}
-              disabled={!test.unlocked}
-              onClick={() => navigate({ to: "/learning/unit-test", search: { unit: unit.unit } })}
-            >
-              {test.unlocked ? (
-                <>
-                  {test.passed ? (
-                    <CheckCircle2 className="size-4" />
-                  ) : (
-                    <Trophy className="size-4" />
-                  )}
-                  <span>
-                    {test.passed
-                      ? t("Unit test passed")
-                      : lang === "pt"
-                        ? "Teste Final da Unidade"
-                        : "Unit Final Test"}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Lock className="size-4" />
-                  <span>
-                    {lang === "pt"
-                      ? "Conclua as 6 lições para liberar"
-                      : "Finish the 6 lessons to unlock"}
-                  </span>
-                </>
-              )}
-            </Button>
-          ) : null;
+          const testButton =
+            test && !review ? (
+              <Button
+                variant={test.unlocked && !test.passed ? "default" : "outline"}
+                size="sm"
+                className={`mt-4 w-full lg:mt-2.5 ${
+                  test.unlocked && !test.passed
+                    ? "bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
+                    : "text-muted-foreground"
+                }`}
+                disabled={!test.unlocked}
+                onClick={() => navigate({ to: "/learning/unit-test", search: { unit: unit.unit } })}
+              >
+                {test.unlocked ? (
+                  <>
+                    {test.passed ? (
+                      <CheckCircle2 className="size-4" />
+                    ) : (
+                      <Trophy className="size-4" />
+                    )}
+                    <span>
+                      {test.passed
+                        ? t("Unit test passed")
+                        : lang === "pt"
+                          ? "Teste Final da Unidade"
+                          : "Unit Final Test"}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="size-4" />
+                    <span>
+                      {lang === "pt"
+                        ? "Conclua as 6 lições para liberar"
+                        : "Finish the 6 lessons to unlock"}
+                    </span>
+                  </>
+                )}
+              </Button>
+            ) : null;
 
           return (
             <section
@@ -338,13 +352,15 @@ export function CurriculumPath() {
                 >
                   {allDone ? (
                     <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
+                  ) : review ? (
+                    <BookOpen className="size-4 shrink-0 text-muted-foreground" />
                   ) : (
                     <Lock className="size-4 shrink-0 text-muted-foreground" />
                   )}
                   <span className="min-w-0 w-0 flex-1 truncate text-sm font-medium text-muted-foreground">
                     {unit.title}
                   </span>
-                  {!allDone ? (
+                  {!allDone || review ? (
                     <span className="shrink-0 text-xs text-muted-foreground">
                       {unit.completed}/{unit.lessons.length}
                     </span>
@@ -388,43 +404,45 @@ export function CurriculumPath() {
           );
         })}
 
-        <section
-          className={`card-soft p-5 lg:p-4 ${nextLesson ? "md:col-start-2" : "md:col-span-2"}`}
-          aria-label="Final Test"
-        >
-          <div className="flex items-center gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent">
-              <Trophy className="size-5 text-accent-foreground" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold">
-                <span>Final Test</span>
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                <span>30 questions. Score 70% or more to move up to the next level.</span>
-              </p>
-            </div>
-            {path.finalTest.passed && (
-              <CheckCircle2 className="size-5 shrink-0 text-[oklch(0.55_0.15_150)]" />
-            )}
-          </div>
-          <Button
-            className="mt-4 w-full whitespace-normal lg:mt-3"
-            disabled={!path.finalTest.unlocked}
-            onClick={() => navigate({ to: "/learning/final-test" })}
+        {!review && (
+          <section
+            className={`card-soft p-5 lg:p-4 ${nextLesson ? "md:col-start-2" : "md:col-span-2"}`}
+            aria-label="Final Test"
           >
-            {path.finalTest.unlocked ? (
-              <>
-                <Trophy className="size-4" /> <span>Take the final test</span>
-              </>
-            ) : (
-              <>
-                <Lock className="size-4" />{" "}
-                <span>Finish the 30 lessons in Units 1–5 to unlock</span>
-              </>
-            )}
-          </Button>
-        </section>
+            <div className="flex items-center gap-3">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent">
+                <Trophy className="size-5 text-accent-foreground" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold">
+                  <span>Final Test</span>
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  <span>30 questions. Score 70% or more to move up to the next level.</span>
+                </p>
+              </div>
+              {path.finalTest.passed && (
+                <CheckCircle2 className="size-5 shrink-0 text-[oklch(0.55_0.15_150)]" />
+              )}
+            </div>
+            <Button
+              className="mt-4 w-full whitespace-normal lg:mt-3"
+              disabled={!path.finalTest.unlocked}
+              onClick={() => navigate({ to: "/learning/final-test" })}
+            >
+              {path.finalTest.unlocked ? (
+                <>
+                  <Trophy className="size-4" /> <span>Take the final test</span>
+                </>
+              ) : (
+                <>
+                  <Lock className="size-4" />{" "}
+                  <span>Finish the 30 lessons in Units 1–5 to unlock</span>
+                </>
+              )}
+            </Button>
+          </section>
+        )}
       </div>
     </div>
   );

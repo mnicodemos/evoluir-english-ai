@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { leagueLevelOf } from "@/lib/level";
 import { studyToday } from "@/lib/today";
 import { weekStartOf } from "@/lib/streakFreeze";
 import {
@@ -88,7 +89,7 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
 
         const { data: profiles } = await supabaseAdmin
           .from("profiles")
-          .select("id, level, last_activity_date, streak_days, league_opt_in")
+          .select("id, level, max_level, last_activity_date, streak_days, league_opt_in")
           .in("id", userIds);
         // Same study day as credit_study_day (America/Sao_Paulo).
         const today = studyToday();
@@ -96,22 +97,30 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
         const messages = new Map<string, { title: string; body: string; path: string }>();
         const weekStart = weekStartIso();
 
-        // Weekly league: final positions per level, from the same XP rule the
+        // Weekly league: final positions per league level (the highest level
+        // reached, as weekly_league groups it), from the same XP rule the
         // ranking uses (league_week_xp), for the levels of students who joined.
         const leagueByUser = new Map<string, { position: number; total: number; level: string }>();
         if (kind === "weekly") {
           const leagueWeek = weekStartOf(today);
           const levels = [
-            ...new Set((profiles ?? []).filter((p) => p.league_opt_in).map((p) => p.level)),
+            ...new Set(
+              (profiles ?? [])
+                .filter((p) => p.league_opt_in)
+                .map(leagueLevelOf)
+                .filter((level): level is string => !!level),
+            ),
           ];
+          const { data: joined } = levels.length
+            ? await supabaseAdmin
+                .from("profiles")
+                .select("id, level, max_level")
+                .eq("league_opt_in", true)
+            : { data: [] };
           for (const level of levels) {
-            const { data: members } = await supabaseAdmin
-              .from("profiles")
-              .select("id")
-              .eq("level", level)
-              .eq("league_opt_in", true);
+            const members = (joined ?? []).filter((member) => leagueLevelOf(member) === level);
             const entries = await Promise.all(
-              (members ?? []).map(async (member) => {
+              members.map(async (member) => {
                 const { data: xp, error: xpError } = await supabaseAdmin.rpc("league_week_xp", {
                   p_user_id: member.id,
                   p_week_start: leagueWeek,

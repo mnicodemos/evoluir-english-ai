@@ -31,13 +31,18 @@ export type UnitTestState = {
   passed: boolean;
 };
 
-/** The student's 30 core lessons and optional review unit, with lock state. */
-export function useLearningPath() {
+/**
+ * The student's 30 core lessons and optional review unit, with lock state.
+ * With `reviewLevel` (a level below the highest one reached) it returns that
+ * level's path for review: every lesson open, the student's level unchanged.
+ */
+export function useLearningPath(reviewLevel?: string | null) {
   const { data: profile } = useProfile();
   const { data: lessons } = useLessons();
   const { data: mine } = useUserLessons();
 
-  const level = getLevelState(profile?.level).current.value;
+  const review = !!reviewLevel;
+  const level = getLevelState(reviewLevel ?? profile?.level).current.value;
 
   return useMemo(() => {
     const byKey = new Map(
@@ -63,7 +68,7 @@ export function useLearningPath() {
           progress: completed
             ? 100
             : Math.round(((state?.video_progress ?? 0) + (state?.progress ?? 0)) / 2),
-          locked: !previousDone,
+          locked: !review && !previousDone,
         };
         previousDone = completed;
         return item;
@@ -100,6 +105,7 @@ export function useLearningPath() {
 
     return {
       level,
+      review,
       units,
       lessons: all,
       completed,
@@ -112,7 +118,7 @@ export function useLearningPath() {
         passed: !!testState?.completed_at,
       },
     };
-  }, [lessons, mine, level]);
+  }, [lessons, mine, level, review]);
 }
 
 /** Opens a path lesson, asking the AI to write it the first time. */

@@ -93,6 +93,27 @@ export function findLevel(value: string | null | undefined): LevelInfo {
 }
 
 /** The CEFR step above the given level, or null at C2. */
+/** True when `level` is below the highest level reached: open for review. */
+export function isReviewLevel(
+  level: string | null | undefined,
+  highest: string | null | undefined,
+): boolean {
+  if (!level || !highest) return false;
+  return LEVELS.indexOf(findLevel(level)) < LEVELS.indexOf(findLevel(highest));
+}
+
+/**
+ * The level whose weekly league a student plays in: the highest level reached
+ * (max_level), so reviewing an earlier level never moves them to an easier
+ * league. Mirrors coalesce(max_level, level) in weekly_league().
+ */
+export function leagueLevelOf(profile: {
+  level?: string | null;
+  max_level?: string | null;
+}): string | null {
+  return profile.max_level ?? profile.level ?? null;
+}
+
 export function nextLevel(value: string | null | undefined): LevelInfo | null {
   const index = LEVELS.indexOf(findLevel(value));
   return index >= LEVELS.length - 1 ? null : LEVELS[index + 1]!;
