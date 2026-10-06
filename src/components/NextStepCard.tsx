@@ -202,7 +202,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {quickWinIcon} {t("Quick Win")}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
-                {t("A 10-minute speaking practice can already make a difference.")}
+                {t(quickWin.cta)} · {t(quickWin.activity.title)}
               </span>
             </span>
           </Link>
@@ -213,7 +213,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {quickWinIcon} {t("Quick Win")}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
-                {t("A 10-minute speaking practice can already make a difference.")}
+                {t(quickWin.cta)} · {t(quickWin.activity.title)}
               </span>
             </span>
           </Link>
@@ -235,7 +235,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {challengeIcon} {t("Take the challenge")}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
-                {t("Try a short conversation with EVO today.")}
+                {t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)} ·{" "}
+                {t(data.quest.resource.title)}
               </span>
             </span>
           </Link>
@@ -246,7 +247,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {challengeIcon} {t("Take the challenge")}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
-                {t("Try a short conversation with EVO today.")}
+                {t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)} ·{" "}
+                {t(data.quest.resource.title)}
               </span>
             </span>
           </Link>

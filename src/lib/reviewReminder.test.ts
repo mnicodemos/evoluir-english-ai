@@ -34,4 +34,15 @@ describe("vocabulary review reminder", () => {
     expect(withReviews.path).toBe("/vocabulary");
     expect(withReviews.body).toContain("3 palavras para revisar");
   });
+
+  it("puts the study plan's day in the pushes and opens the plan", () => {
+    const task = { title: "Listening Lab", status: "today" as const };
+    expect(wordOfDayBody("melhorar — to make better", 0, "", task)).toBe(
+      "melhorar — to make better · 📅 Hoje no plano: Listening Lab",
+    );
+    const reminder = studyReminder(2, { title: "Unit 2 Final Test", status: "missed" });
+    expect(reminder.path).toBe("/study-plan");
+    expect(reminder.body).toContain("Recupere no plano: Unit 2 Final Test");
+    expect(reminder.body).toContain("2 palavras para revisar");
+  });
 });

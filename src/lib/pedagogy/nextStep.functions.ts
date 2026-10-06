@@ -15,7 +15,7 @@ import {
   type NextStep,
   type SkillSnapshot,
 } from "./nextStep";
-import { selectPrioritySkillQuest } from "./skillQuest";
+import { deriveSkillQuests } from "./skillQuest";
 import { buildSmartReviewList } from "./smartReviewUx";
 
 const RECENT_DAYS = 7;
@@ -149,11 +149,20 @@ export const loadNextStep = createServerFn({ method: "POST" })
       transferredSkills: transferred,
     });
 
-    const quest = selectPrioritySkillQuest({
-      gaps: deriveInvisibleGaps({ evidence }),
-      lessonBySkill,
-      transferredSkills: transferred,
-    });
+    // "Take the challenge" works a DIFFERENT skill than "Practice now" and opens
+    // a different screen, so the Dashboard's three buttons never lead to the
+    // same place.
+    const quest =
+      deriveSkillQuests({
+        gaps: deriveInvisibleGaps({ evidence }),
+        lessonBySkill,
+        transferredSkills: transferred,
+      }).find(
+        (candidate) =>
+          candidate.skill !== step.prioritySkill &&
+          candidate.resource.to !== step.activity.to &&
+          candidate.resource.to !== step.quickWin?.activity.to,
+      ) ?? null;
 
     // Phase 33: the review recommendations, decided here on the server from the
     // very same rows already read above (no extra query, no per-skill lookup).

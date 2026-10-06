@@ -73,8 +73,9 @@ const dashboardSidebarNav = [
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
 ] as const;
 
+// My Progress opens from the Dashboard's Today's Progress card (desktop) and the
+// bottom bar (mobile), so it no longer repeats in the sidebar.
 const dashboardAccountNav = [
-  { to: "/progress", label: "My Progress", icon: LineChart },
   { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
   { to: "/league", label: "Weekly league", icon: Trophy },
   { to: "/premium", label: "My Subscription", icon: Crown },
