@@ -124,7 +124,12 @@ export function AdminCostPerformance() {
               ["Chamadas analisadas", query.data.calls.toLocaleString()],
               ["Operações", query.data.operations.toLocaleString()],
               ["Créditos Lovable", ND],
-              ["Custo Google", fmtCost(query.data.estimatedCost)],
+              [
+                "Custo Google",
+                query.data.estimatedCost === null
+                  ? ND
+                  : `${fmtCost(query.data.estimatedCost)} · ${query.data.costCoverage}/${query.data.calls}`,
+              ],
               ["Latência média", fmtMs(query.data.avgMs)],
               ["Taxa de erro", fmtPct(query.data.errorRate)],
               ["Cache HIT", query.data.cacheHits.toLocaleString()],
@@ -145,7 +150,7 @@ export function AdminCostPerformance() {
             ].map(([label, value]) => (
               <div key={String(label)} className="rounded-md border border-border p-3">
                 <p className="text-xs text-muted-foreground">
-                  Projeção · baseada no custo registrado
+                  Projeção · média das chamadas com custo medido
                 </p>
                 <p className="font-medium">
                   {label}: {fmtCost(value as number | null)}
@@ -156,10 +161,13 @@ export function AdminCostPerformance() {
 
           <p className="mt-3 text-xs text-muted-foreground">
             Observado: chamadas, tokens, duração, erros e HITs cumulativos do cache. Calculado:
-            totais, médias, mediana e p95 com pelo menos 10 durações. Estimado: custo e projeções
-            somente quando todos os registros possuem custo. N/D: first token/chunk/audio,
-            streaming, retries, fallback, créditos e economia do cache. O provider da Transcription
-            histórica não é atribuível porque o registro guardou o modelo de fallback.
+            totais, médias, mediana e p95 com pelo menos 10 durações. Estimado: custo calculado
+            agora a partir dos tokens e da tabela de preços oficial (inclui chamadas antigas); "n/m"
+            mostra quantas chamadas têm custo medido, e as projeções usam a média dessas. Taxa de
+            erro: só falhas reais; bloqueios por limite (o app espera e tenta de novo) e
+            cancelamentos ficam à parte. N/D: first token/chunk/audio, streaming, retries, fallback,
+            créditos e economia do cache. O provider da Transcription histórica não é atribuível
+            porque o registro guardou o modelo de fallback.
           </p>
           {query.data.truncated && (
             <p className="mt-1 text-xs text-muted-foreground">
@@ -200,7 +208,14 @@ export function AdminCostPerformance() {
                     "10k",
                     "100k",
                   ].map((heading) => (
-                    <th key={heading} className="py-2 pr-3">
+                    <th
+                      key={heading}
+                      className={
+                        heading === "Operação"
+                          ? "sticky left-0 z-10 bg-background py-2 pr-3"
+                          : "py-2 pr-3"
+                      }
+                    >
                       {heading}
                     </th>
                   ))}
@@ -212,7 +227,10 @@ export function AdminCostPerformance() {
                     key={`${row.operation}-${row.model}`}
                     className="border-b border-border/60 align-top"
                   >
-                    <td className="py-2 pr-3 font-medium">{row.label}</td>
+                    {/* Operation stays visible while the wide table scrolls sideways. */}
+                    <td className="sticky left-0 bg-background py-2 pr-3 font-medium">
+                      {row.label}
+                    </td>
                     <td className="pr-3">{row.provider}</td>
                     <td className="pr-3">{row.model}</td>
                     <td className="pr-3">{row.calls}</td>
@@ -230,7 +248,12 @@ export function AdminCostPerformance() {
                     <td className="pr-3">{fmtMs(row.p95Ms)}</td>
                     <td className="pr-3">{ND}</td>
                     <td className="pr-3">{ND}</td>
-                    <td className="pr-3">{row.errors}</td>
+                    <td className="pr-3">
+                      {row.errors}
+                      {row.blocked > 0 && (
+                        <div className="text-muted-foreground">+{row.blocked} bloqueadas</div>
+                      )}
+                    </td>
                     <td className="pr-3">{fmtPct(row.errorRate)}</td>
                     <td className="pr-3">{row.timeouts}</td>
                     <td className="pr-3">{row.cancellations}</td>
@@ -245,7 +268,14 @@ export function AdminCostPerformance() {
                     </td>
                     <td className="pr-3">{ND}</td>
                     <td className="pr-3">{ND}</td>
-                    <td className="pr-3">{fmtCost(row.estimatedCost)}</td>
+                    <td className="pr-3">
+                      {fmtCost(row.estimatedCost)}
+                      {row.estimatedCost !== null && row.costCoverage < row.calls && (
+                        <div className="text-muted-foreground">
+                          {row.costCoverage}/{row.calls} medidas
+                        </div>
+                      )}
+                    </td>
                     <td className="pr-3">{fmtCost(row.projectedCost1k)}</td>
                     <td className="pr-3">{fmtCost(row.projectedCost10k)}</td>
                     <td className="pr-3">{fmtCost(row.projectedCost100k)}</td>

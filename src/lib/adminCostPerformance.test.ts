@@ -116,4 +116,50 @@ describe("aggregateCostPerformance", () => {
     );
     expect(result.comparisons[0]?.provider).toBe("N/D — provider não registrado");
   });
+
+  it("prices calls from their tokens and shows partial coverage", () => {
+    const row = (input: number | null, output: number | null) => ({
+      operation: "teacher",
+      model: "gemini-3.6-flash",
+      success: true,
+      duration_ms: 1000,
+      input_tokens: input,
+      output_tokens: output,
+      estimated_cost: null,
+      error_code: null,
+    });
+    const result = aggregateCostPerformance(
+      [row(1_000_000, 1_000_000), row(1_000_000, 1_000_000), row(null, null)],
+      [],
+    );
+    // 1M in + 1M out at US$ 1.50 / 7.50 = US$ 9 per measured call.
+    expect(result.estimatedCost).toBeCloseTo(18);
+    expect(result.costCoverage).toBe(2);
+    expect(result.projectedCost1k).toBeCloseTo(9000);
+    expect(result.comparisons[0]).toMatchObject({ costCoverage: 2, calls: 3 });
+  });
+
+  it("counts only real failures in the error rate", () => {
+    const row = (error_code: string | null, success: boolean) => ({
+      operation: "lesson_generation",
+      model: "gemini-3.6-flash",
+      success,
+      duration_ms: 1000,
+      input_tokens: null,
+      output_tokens: null,
+      estimated_cost: null,
+      error_code,
+    });
+    const result = aggregateCostPerformance(
+      [
+        row(null, true),
+        row("concurrent_limit", false),
+        row("abandoned", false),
+        row("gemini_500", false),
+      ],
+      [],
+    );
+    expect(result.errorRate).toBe(25);
+    expect(result.comparisons[0]).toMatchObject({ errors: 1, blocked: 1, cancellations: 1 });
+  });
 });

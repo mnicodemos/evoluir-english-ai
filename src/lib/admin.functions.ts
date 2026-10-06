@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { latencyByDay } from "@/lib/aiLatencyTrend";
+import { estimateAiCost } from "@/lib/aiPricing";
 import { studyToday } from "@/lib/today";
 
 async function hasAdminRole(
@@ -107,11 +108,37 @@ type BenchmarkCacheRow = {
   expires_at: string;
 };
 
-function sumOrNull(values: Array<number | null>): number | null {
-  const measured = values.filter((value): value is number => typeof value === "number");
-  return measured.length === values.length && measured.length > 0
-    ? measured.reduce((sum, value) => sum + value, 0)
-    : null;
+/**
+ * Cost of one call: the stored estimate, or one computed now from its tokens,
+ * so a price added to the table later also prices earlier calls.
+ */
+function rowCost(row: BenchmarkUsageRow): number | null {
+  return row.estimated_cost ?? estimateAiCost(row.model, row.input_tokens, row.output_tokens);
+}
+
+function isCancellation(row: BenchmarkUsageRow): boolean {
+  return row.error_code === "cancelled" || row.error_code === "abandoned";
+}
+
+/** Same rule as the AI Usage tab: limits and cancellations are not failures. */
+function isRealError(row: BenchmarkUsageRow): boolean {
+  if (row.success !== false || isCancellation(row)) return false;
+  const code = row.error_code ?? "";
+  return !(code === "concurrent_limit" || code === "rate_limit" || code.endsWith("_limit"));
+}
+
+/** Measured cost, how many calls it covers, and the average per measured call. */
+function costSummary(rows: BenchmarkUsageRow[]) {
+  const costs = rows.map(rowCost).filter((cost): cost is number => cost !== null);
+  const estimatedCost = costs.length ? costs.reduce((sum, cost) => sum + cost, 0) : null;
+  const costPerCall = estimatedCost === null ? null : estimatedCost / costs.length;
+  return {
+    estimatedCost,
+    costCoverage: costs.length,
+    projectedCost1k: costPerCall === null ? null : costPerCall * 1_000,
+    projectedCost10k: costPerCall === null ? null : costPerCall * 10_000,
+    projectedCost100k: costPerCall === null ? null : costPerCall * 100_000,
+  };
 }
 
 function sumMeasured(values: Array<number | null>): number | null {
@@ -161,9 +188,9 @@ export function aggregateCostPerformance(
         .sort((a, b) => a - b);
       const inputTokens = sumMeasured(groupRows.map((row) => row.input_tokens));
       const outputTokens = sumMeasured(groupRows.map((row) => row.output_tokens));
-      const estimatedCost = sumOrNull(groupRows.map((row) => row.estimated_cost));
+      const cost = costSummary(groupRows);
       const cache = cacheByGroup.get(key) ?? { hits: 0, activeEntries: 0 };
-      const costPerCall = estimatedCost === null ? null : estimatedCost / groupRows.length;
+      const realErrors = groupRows.filter(isRealError).length;
       return {
         operation,
         label: OPERATION_FACTS[operation]?.label ?? operation,
@@ -183,10 +210,11 @@ export function aggregateCostPerformance(
         totalDurationMs: durations.length ? durations.reduce((sum, value) => sum + value, 0) : null,
         medianMs: percentile(durations, 0.5),
         p95Ms: percentile(durations, 0.95),
-        errors: groupRows.filter((row) => row.success === false).length,
-        errorRate: groupRows.length
-          ? (groupRows.filter((row) => row.success === false).length / groupRows.length) * 100
-          : null,
+        errors: realErrors,
+        errorRate: groupRows.length ? (realErrors / groupRows.length) * 100 : null,
+        blocked: groupRows.filter(
+          (row) => row.success === false && !isRealError(row) && !isCancellation(row),
+        ).length,
         timeouts: groupRows.filter((row) => row.error_code === "timeout").length,
         cancellations: groupRows.filter(
           (row) => row.error_code === "cancelled" || row.error_code === "abandoned",
@@ -212,10 +240,7 @@ export function aggregateCostPerformance(
         cacheHitRate: null,
         cacheSavings: null,
         lovableCredits: null,
-        estimatedCost,
-        projectedCost1k: costPerCall === null ? null : costPerCall * 1_000,
-        projectedCost10k: costPerCall === null ? null : costPerCall * 10_000,
-        projectedCost100k: costPerCall === null ? null : costPerCall * 100_000,
+        ...cost,
       };
     })
     .sort((a, b) => b.calls - a.calls);
@@ -223,9 +248,7 @@ export function aggregateCostPerformance(
   const measuredDurations = rows
     .map((row) => row.duration_ms)
     .filter((value): value is number => typeof value === "number");
-  const estimatedCost = sumOrNull(rows.map((row) => row.estimated_cost));
-  const costPerCall =
-    estimatedCost === null || rows.length === 0 ? null : estimatedCost / rows.length;
+  const cost = costSummary(rows);
   return {
     calls: rows.length,
     operations: new Set(rows.map((row) => row.operation)).size,
@@ -234,16 +257,11 @@ export function aggregateCostPerformance(
           measuredDurations.reduce((sum, value) => sum + value, 0) / measuredDurations.length,
         )
       : null,
-    errorRate: rows.length
-      ? (rows.filter((row) => row.success === false).length / rows.length) * 100
-      : null,
+    errorRate: rows.length ? (rows.filter(isRealError).length / rows.length) * 100 : null,
     cacheHits: cacheRows.reduce((sum, row) => sum + row.hit_count, 0),
     activeCacheEntries: cacheRows.filter((row) => Date.parse(row.expires_at) > now).length,
     lovableCredits: null,
-    estimatedCost,
-    projectedCost1k: costPerCall === null ? null : costPerCall * 1_000,
-    projectedCost10k: costPerCall === null ? null : costPerCall * 10_000,
-    projectedCost100k: costPerCall === null ? null : costPerCall * 100_000,
+    ...cost,
     comparisons,
   };
 }
