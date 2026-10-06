@@ -108,20 +108,30 @@ function AdminPage() {
           </p>
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-5">
-              <TabsTrigger value="users" className="min-w-0 px-2 text-xs sm:text-sm">
+            <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-5">
+              <TabsTrigger
+                value="users"
+                className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
+              >
                 {t("Users")}
               </TabsTrigger>
-              <TabsTrigger value="usage" className="min-w-0 px-2 text-xs sm:text-sm">
+              <TabsTrigger
+                value="usage"
+                className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
+              >
                 {t("AI Usage")}
               </TabsTrigger>
-              <TabsTrigger value="cost" className="min-w-0 px-2 text-xs sm:text-sm">
-                {t("Cost & Performance")}
+              <TabsTrigger value="cost" className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm">
+                <span className="sm:hidden">{t("Cost")}</span>
+                <span className="hidden sm:inline">{t("Cost & Performance")}</span>
               </TabsTrigger>
-              <TabsTrigger value="lesson-test" className="min-w-0 px-2 text-xs sm:text-sm">
+              <TabsTrigger
+                value="lesson-test"
+                className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
+              >
                 {t("Lesson test")}
               </TabsTrigger>
-              <TabsTrigger value="push" className="min-w-0 px-2 text-xs sm:text-sm">
+              <TabsTrigger value="push" className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm">
                 {t("Push")}
               </TabsTrigger>
             </TabsList>

@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
+import { deleteToken, getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
 
 import { firebaseConfig, serviceWorkerUrl } from "@/lib/firebaseConfig";
 
@@ -76,6 +76,24 @@ async function attachDevice(): Promise<string | null> {
       data: { path: payload.data?.["path"] ?? "/dashboard" },
     });
   });
+  return (
+    (await getToken(messaging, { vapidKey: config.vapidKey, serviceWorkerRegistration })) || null
+  );
+}
+
+/**
+ * Replaces this device's token when FCM says it is no longer registered: the
+ * old push subscription is dropped and a new one created. Returns the new
+ * token, or null when the browser cannot give one (permission or settings).
+ */
+export async function renewPushToken(): Promise<string | null> {
+  const config = firebaseConfig();
+  if (!config || !("Notification" in window) || Notification.permission !== "granted") {
+    return null;
+  }
+  if (window.top !== window.self || !(await isSupported())) return null;
+  const { messaging, serviceWorkerRegistration } = await messagingForDevice(config);
+  await deleteToken(messaging).catch(() => false);
   return (
     (await getToken(messaging, { vapidKey: config.vapidKey, serviceWorkerRegistration })) || null
   );
