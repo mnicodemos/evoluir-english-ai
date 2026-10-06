@@ -126,8 +126,75 @@ export function AdminAiUsage() {
           <p className="mt-2 text-xs text-muted-foreground">
             Retries: {ND} (retries inside one call are not recorded separately).
           </p>
+          <LatencyByDay trend={q.data.latencyTrend} />
         </>
       )}
     </section>
+  );
+}
+
+type Trend = Awaited<ReturnType<typeof getAiUsageSummary>>["latencyTrend"];
+
+/** Median answer time per day (successful calls only), to confirm speed changes reach students. */
+function LatencyByDay({ trend }: { trend: Trend }) {
+  if (!trend.days.length) return null;
+  return (
+    <div className="mt-5">
+      <h4 className="text-sm font-semibold">Answer time by day (median)</h4>
+      <p className="mb-2 text-xs text-muted-foreground">
+        Successful calls only, São Paulo days. Green = faster than the day before, red = slower
+        (changes under 10% stay neutral).
+      </p>
+      <div className="max-h-[40vh] overflow-auto">
+        <table className="w-full text-left text-xs">
+          <thead className="sticky top-0 bg-background">
+            <tr className="border-b border-border font-semibold uppercase text-muted-foreground">
+              <th className="py-2 pr-3">Operation</th>
+              {trend.days.map((day) => (
+                <th key={day} className="whitespace-nowrap pr-3">
+                  {day.slice(5).replace("-", "/")}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {trend.operations.map((entry) => {
+              let previous: number | null = null;
+              return (
+                <tr key={entry.operation} className="border-b border-border/60">
+                  <td className="py-2 pr-3 font-medium">{entry.label}</td>
+                  {trend.days.map((day) => {
+                    const cell = entry.cells[day];
+                    const median = cell?.medianMs ?? null;
+                    const change =
+                      median !== null && previous !== null && previous > 0
+                        ? (median - previous) / previous
+                        : 0;
+                    if (median !== null) previous = median;
+                    return (
+                      <td
+                        key={day}
+                        className={`whitespace-nowrap pr-3 tabular-nums ${
+                          change <= -0.1 ? "text-emerald-400" : change >= 0.1 ? "text-red-400" : ""
+                        }`}
+                      >
+                        {cell ? (
+                          <>
+                            {fmtMs(median)}
+                            <span className="text-muted-foreground"> · {cell.calls}</span>
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

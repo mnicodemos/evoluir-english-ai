@@ -5,6 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { latencyByDay } from "@/lib/aiLatencyTrend";
 
 async function hasAdminRole(
   supabase: {
@@ -252,7 +253,7 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
     const { data: rows, error } = await supabaseAdmin
       .from("ai_usage_events")
       .select(
-        "operation, model, success, status, duration_ms, input_tokens, output_tokens, error_code",
+        "operation, model, success, status, duration_ms, input_tokens, output_tokens, error_code, created_at",
       )
       .gte("created_at", since)
       .order("created_at", { ascending: false })
@@ -355,11 +356,19 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
       })
       .sort((x, y) => y.calls - x.calls);
 
+    const trend = latencyByDay(rows ?? []);
     return {
       days: data.days,
       totalCalls: (rows ?? []).length,
       truncated: (rows ?? []).length >= 10000,
       operations,
+      latencyTrend: {
+        days: trend.days,
+        operations: trend.operations.map((entry) => ({
+          ...entry,
+          label: OPERATION_FACTS[entry.operation]?.label ?? entry.operation,
+        })),
+      },
     };
   });
 
