@@ -232,7 +232,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 max-sm:text-[10px] sm:text-[11px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-9 sm:text-sm"
+      className="h-8 min-w-0 rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green hover:bg-brand-green/25 max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
     >
       <Link to="/study-plan">
         <Map className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
@@ -265,21 +265,21 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 alt=""
                 width={1536}
                 height={1024}
-                className="hidden h-auto w-full sm:absolute sm:inset-0 sm:block sm:h-full sm:object-contain sm:object-left"
+                className="hidden h-auto w-full sm:absolute sm:left-0 sm:top-1/2 sm:block sm:h-auto sm:w-auto sm:max-h-full sm:max-w-full sm:-translate-y-1/2 sm:rounded-lg sm:object-contain sm:object-left"
               />
             </div>
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:px-4 sm:py-2 xl:order-2 xl:justify-center xl:px-3 xl:py-2">
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:items-center sm:justify-center sm:px-4 sm:py-2 sm:text-center xl:order-2 xl:justify-center xl:px-3 xl:py-2">
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-bold uppercase text-brand-green">
+                <p className="text-[11px] font-bold uppercase text-brand-green sm:inline-flex sm:items-center sm:rounded-full sm:bg-brand-green/15 sm:px-2.5 sm:py-[5px] sm:text-[12px] sm:font-semibold sm:normal-case">
                   EVO · {t("Your AI Learning Coach")}
                 </p>
                 <div className="mt-2">
                   {/* Mobile-only level badge next to the priority label; the bell
                       and weather moved back to the top row. Desktop unchanged. */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 sm:justify-center">
                     <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:whitespace-normal sm:text-sm sm:leading-normal">
                       {t("TODAY'S PRIORITY")}
                     </p>
@@ -289,7 +289,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                       </span>
                     )}
                   </div>
-                  <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:text-2xl sm:leading-normal xl:text-3xl">
+                  <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-0.5 sm:justify-center sm:text-2xl sm:leading-normal xl:text-3xl">
                     <PriorityIcon
                       className="size-5 shrink-0 text-warning sm:size-6"
                       aria-hidden="true"

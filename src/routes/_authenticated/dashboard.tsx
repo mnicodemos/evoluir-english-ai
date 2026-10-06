@@ -472,13 +472,12 @@ function Dashboard() {
                   />
                 </div>
               </div>
-              {/* Desktop-only "Your trail" badge: same pill formatting as the
-                  Priority label (Your English Skills), 20% larger, opening the
-                  Study Plan page — above the closing line. */}
+              {/* Desktop-only "Your trail" badge matches the B2 level pill and
+                  opens the Study Plan above the closing line. */}
               <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-2 2xl:gap-1.5 2xl:pt-3">
                 <Link
                   to="/study-plan"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-brand-green/15 px-2.5 py-[5px] text-[12px] font-semibold text-brand-green transition-colors hover:bg-brand-green/25"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green transition-colors hover:bg-brand-green/25"
                 >
                   <Map className="size-4 shrink-0" aria-hidden="true" />
                   {t("Your trail")}
