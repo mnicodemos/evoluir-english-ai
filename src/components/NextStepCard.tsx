@@ -271,12 +271,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5 sm:border-t sm:border-border sm:bg-evo-block"
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5 sm:border-t sm:border-border"
         aria-label={t("Your next step")}
       >
         <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)]">
           <div
-            className="relative aspect-[17/4] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-evo-block lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative aspect-[17/4] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-transparent lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
             <div className="absolute inset-0 overflow-hidden sm:inset-3 sm:flex sm:items-center sm:overflow-visible">
