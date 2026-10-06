@@ -81,6 +81,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           }, ms);
         };
         let settled = false;
+        let firstChunkAt = 0;
         // Token usage reported by the final "response.completed" event (observability only).
         let usage: { inputTokens?: number; outputTokens?: number } | undefined;
         // Closes the usage record exactly once so the one-request-at-a-time
@@ -92,6 +93,7 @@ export const Route = createFileRoute("/api/coach-stream")({
           await finishAiUsage(ticket, {
             success,
             ...(usage ?? {}),
+            ...(firstChunkAt ? { firstChunkAt } : {}),
             ...(errorCode ? { errorCode, errorMessage: errorMessage ?? errorCode } : {}),
           });
         };
@@ -156,6 +158,8 @@ export const Route = createFileRoute("/api/coach-stream")({
           const parsedEvent = parseGeminiStreamEvent(event);
           if (parsedEvent.usage) usage = parsedEvent.usage;
           if (parsedEvent.delta) {
+            // Time to the first word: what the student actually waits for.
+            if (!emittedText) firstChunkAt = Date.now();
             emittedText = true;
             send(controller, { type: "coach.text.delta", delta: parsedEvent.delta });
           }

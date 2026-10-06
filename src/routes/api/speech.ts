@@ -167,6 +167,7 @@ export const Route = createFileRoute("/api/speech")({
         const encoder = new TextEncoder();
         let pending = "";
         let sentAudio = false;
+        let firstAudioAt = 0;
         const audioChunks: string[] = [];
         let settled = false;
         // Closing the usage record exactly once keeps the "one request at a
@@ -176,6 +177,7 @@ export const Route = createFileRoute("/api/speech")({
           settled = true;
           await finishAiUsage(ticket, {
             success,
+            ...(firstAudioAt ? { firstChunkAt: firstAudioAt } : {}),
             ...(errorCode ? { errorCode, errorMessage: errorMessage ?? errorCode } : {}),
           });
         };
@@ -201,6 +203,8 @@ export const Route = createFileRoute("/api/speech")({
                     for (const part of candidate.content?.parts ?? []) {
                       const audio = part.inlineData?.data;
                       if (!audio) continue;
+                      // Time to the first sound: what the listener actually waits for.
+                      if (!sentAudio) firstAudioAt = Date.now();
                       sentAudio = true;
                       audioChunks.push(audio);
                       controller.enqueue(

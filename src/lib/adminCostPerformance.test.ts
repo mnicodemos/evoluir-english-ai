@@ -162,4 +162,26 @@ describe("aggregateCostPerformance", () => {
     expect(result.errorRate).toBe(25);
     expect(result.comparisons[0]).toMatchObject({ errors: 1, blocked: 1, cancellations: 1 });
   });
+
+  it("gives streamed AI Talking replies their own line with the first-word time", () => {
+    const talking = (first_chunk_ms: number | null) => ({
+      operation: "talking",
+      model: "gemini-3.6-flash",
+      success: true,
+      duration_ms: 4000,
+      input_tokens: null,
+      output_tokens: null,
+      estimated_cost: null,
+      error_code: null,
+      first_chunk_ms,
+    });
+    const result = aggregateCostPerformance(
+      [talking(null), talking(900), talking(700), talking(1500)],
+      [],
+    );
+    const reply = result.comparisons.find((row) => row.label.includes("reply"));
+    const opener = result.comparisons.find((row) => !row.label.includes("reply"));
+    expect(reply).toMatchObject({ calls: 3, firstChunkMs: 900, firstChunkCount: 3 });
+    expect(opener).toMatchObject({ calls: 1, firstChunkMs: null, firstChunkCount: 0 });
+  });
 });

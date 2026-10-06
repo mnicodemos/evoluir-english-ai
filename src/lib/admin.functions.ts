@@ -99,6 +99,8 @@ type BenchmarkUsageRow = {
   output_tokens: number | null;
   estimated_cost: number | null;
   error_code?: string | null;
+  /** Time to the first word / sound (streaming calls; migration 0045). */
+  first_chunk_ms?: number | null;
 };
 
 type BenchmarkCacheRow = {
@@ -173,15 +175,20 @@ export function aggregateCostPerformance(
 
   const groups = new Map<string, BenchmarkUsageRow[]>();
   for (const row of rows) {
-    const key = `${row.operation}\u0000${row.model}`;
+    // AI Talking mixes the opener (one plain call) and the streamed replies;
+    // replies carry a first-word time, so they get their own line.
+    const phase = row.operation === "talking" && row.first_chunk_ms != null ? "reply" : "";
+    const key = `${row.operation}\u0000${row.model}\u0000${phase}`;
     groups.set(key, [...(groups.get(key) ?? []), row]);
   }
 
   const comparisons = [...groups.entries()]
     .map(([key, groupRows]) => {
-      const separator = key.indexOf("\u0000");
-      const operation = key.slice(0, separator);
-      const model = key.slice(separator + 1);
+      const [operation = "", model = "", phase = ""] = key.split("\u0000");
+      const firstChunks = groupRows
+        .map((row) => row.first_chunk_ms)
+        .filter((value): value is number => typeof value === "number")
+        .sort((a, b) => a - b);
       const durations = groupRows
         .map((row) => row.duration_ms)
         .filter((value): value is number => typeof value === "number")
@@ -189,11 +196,14 @@ export function aggregateCostPerformance(
       const inputTokens = sumMeasured(groupRows.map((row) => row.input_tokens));
       const outputTokens = sumMeasured(groupRows.map((row) => row.output_tokens));
       const cost = costSummary(groupRows);
-      const cache = cacheByGroup.get(key) ?? { hits: 0, activeEntries: 0 };
+      const cache = cacheByGroup.get(`${operation}\u0000${model}`) ?? {
+        hits: 0,
+        activeEntries: 0,
+      };
       const realErrors = groupRows.filter(isRealError).length;
       return {
         operation,
-        label: OPERATION_FACTS[operation]?.label ?? operation,
+        label: `${OPERATION_FACTS[operation]?.label ?? operation}${phase ? " · reply (streaming)" : ""}`,
         provider: benchmarkProviderOf(operation, model),
         model,
         calls: groupRows.length,
@@ -231,7 +241,11 @@ export function aggregateCostPerformance(
           .sort((a, b) => b[1] - a[1])
           .map(([code, count]) => `${code} (${count})`),
         firstTokenMs: null,
-        firstChunkMs: null,
+        // Median time to the first word / sound, and how many calls measured it.
+        firstChunkMs: firstChunks.length
+          ? Math.round(firstChunks[Math.floor((firstChunks.length - 1) / 2)]!)
+          : null,
+        firstChunkCount: firstChunks.length,
         retries: null,
         fallback: null,
         cacheHits: cache.hits,
@@ -421,21 +435,26 @@ export const getAiCostPerformance = createServerFn({ method: "GET" })
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const since = new Date(Date.now() - data.days * 86_400_000).toISOString();
-    const [{ data: rows, error }, { data: cacheRows, error: cacheError }] = await Promise.all([
+    const usageColumns =
+      "operation, model, success, duration_ms, input_tokens, output_tokens, estimated_cost, error_code";
+    const readUsage = (columns: string) =>
       supabaseAdmin
         .from("ai_usage_events")
-        .select(
-          "operation, model, success, duration_ms, input_tokens, output_tokens, estimated_cost, error_code",
-        )
+        .select(columns)
         .gte("created_at", since)
         .order("created_at", { ascending: false })
-        .limit(10000),
+        .limit(10000);
+    const [withFirstChunk, { data: cacheRows, error: cacheError }] = await Promise.all([
+      readUsage(`${usageColumns}, first_chunk_ms`),
       supabaseAdmin
         .from("ai_response_cache")
         .select("operation, model, hit_count, expires_at")
         .limit(10000),
     ]);
-    if (error) throw error;
+    // first_chunk_ms arrives with migration 0045; until it is applied, read without it.
+    const usage = withFirstChunk.error ? await readUsage(usageColumns) : withFirstChunk;
+    if (usage.error) throw usage.error;
+    const rows = (usage.data ?? []) as unknown as BenchmarkUsageRow[];
     if (cacheError) throw cacheError;
     return {
       days: data.days,

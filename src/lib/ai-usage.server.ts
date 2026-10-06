@@ -183,6 +183,8 @@ export async function finishAiUsage(
     outputTokens?: number;
     /** The model that actually answered (a fallback), replacing the reserved one. */
     model?: string;
+    /** When the first text or audio reached the student (streaming calls). */
+    firstChunkAt?: number;
   },
 ) {
   const db = await admin();
@@ -208,6 +210,20 @@ export async function finishAiUsage(
       completed_at: new Date().toISOString(),
     })
     .eq("id", ticket.eventId);
+  if (result.firstChunkAt) {
+    // Separate write: first_chunk_ms comes from migration 0045, which Lovable
+    // applies on request. Until it exists this update fails on its own and is
+    // ignored, so the usage record above is never affected.
+    const firstChunkMs = Math.max(0, result.firstChunkAt - ticket.startedAt);
+    await db
+      .from("ai_usage_events")
+      .update({ first_chunk_ms: firstChunkMs } as never)
+      .eq("id", ticket.eventId)
+      .then(
+        () => undefined,
+        () => undefined,
+      );
+  }
 }
 
 export async function readAiCache(cacheKey: string): Promise<string | null> {
