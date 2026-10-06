@@ -14,7 +14,8 @@
 - Dashboard-only density and navigation styling must use opt-in presentation props on existing components, preserving their shared data and behavior.
 - Dashboard Today's Focus uses the complete approved EVO image on desktop and the supplied wide EVO banner on mobile through CDN pointers; mobile media stays flush to the top and sides. Other EVO placements remain unchanged.
 - `dashboard-shell` dark tokens are applied by AppShell to every authenticated page (user request: one visual identity); portaled surfaces like the Admin dialog opt in with their own `dashboard-shell dark` class.
-- Dashboard desktop height uses dynamic viewport units with a `vh` fallback and a 50px safety budget; this prevents browser-specific vertical scroll.
+- Dashboard desktop height uses dynamic viewport units with a `vh` fallback as a minimum (min-height), and its card rows have content-based minimums; a row whose cards need more room grows instead of letting cards overlap the next row.
+- Skill scores everywhere (Dashboard card, My Progress, league PDF) come from the evidence layer (current_skill_profile via loadNextStep `skills`), never from the legacy best-ever `progress` table; reading-lesson quizzes also record reading evidence.
 - Weather is an English practice ("Weather talk" popover in the Dashboard header → AI Speaking ?weather=); location is requested only on tap or when already granted, never on page load, and sun/moon by the hour is the fallback.
 - Public home and auth opt into Dashboard tokens through `brand-dashboard-theme`; this shares visual identity without changing shared authenticated screens.
 - AI Teacher, My History, and lesson openings share the complete horizontal EVO image with contain-fit; this preserves all artwork without cropping.

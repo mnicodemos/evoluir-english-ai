@@ -18,6 +18,7 @@ import {
 } from "./contracts";
 import {
   classifyQuizEvidence,
+  readingQuizEvidence,
   parseQuizDetails,
   QUIZ_RUBRIC_VERSION,
   writingEvidence,
@@ -153,10 +154,17 @@ export async function loadAdmin() {
   return supabaseAdmin as unknown as AdminClient;
 }
 
-async function lessonItemLevel(admin: AdminClient, lessonId: string | null) {
-  if (!lessonId) return null;
-  const { data } = await admin.from("lessons").select("level").eq("id", lessonId).maybeSingle();
-  return data?.level ? itemLevelFromStoredLevel(data.level) : null;
+async function lessonSkillAndLevel(admin: AdminClient, lessonId: string | null) {
+  if (!lessonId) return { skill: null, itemCefr: null };
+  const { data } = await admin
+    .from("lessons")
+    .select("level, skill")
+    .eq("id", lessonId)
+    .maybeSingle();
+  return {
+    skill: (data?.skill as string | null | undefined) ?? null,
+    itemCefr: data?.level ? itemLevelFromStoredLevel(data.level) : null,
+  };
 }
 
 async function profileItemLevel(admin: AdminClient, userId: string) {
@@ -337,12 +345,14 @@ export async function processQuiz(
       .map((question) => [question.id, question.pedagogical_skill as "grammar" | "vocabulary"]),
   );
   // The item level comes from the lesson the quiz belongs to, server-side only.
-  const classified = classifyQuizEvidence(
-    details,
-    skills,
-    await lessonItemLevel(admin, result.lesson_id),
-  );
-  const persisted = classified.evidence.length
+  const lesson = await lessonSkillAndLevel(admin, result.lesson_id);
+  const classified = classifyQuizEvidence(details, skills, lesson.itemCefr);
+  // A reading lesson's quiz is also reading-comprehension evidence.
+  const evidence = [
+    ...classified.evidence,
+    ...readingQuizEvidence(details, lesson.skill, lesson.itemCefr),
+  ];
+  const persisted = evidence.length
     ? await persistEvidenceAndResults({
         admin,
         userId,
@@ -350,7 +360,7 @@ export async function processQuiz(
         sourceId: result.id,
         idempotencyKey: key,
         rubricVersion: QUIZ_RUBRIC_VERSION,
-        evidence: classified.evidence,
+        evidence,
         ...(claimedAt ? { claimedAt } : {}),
       })
     : { duplicate: false, evidenceCount: 0 };

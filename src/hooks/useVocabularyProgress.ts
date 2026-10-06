@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { currentUserId } from "@/lib/currentUserId";
 
@@ -21,35 +20,6 @@ export function useVocabularyProgress() {
         totalWords,
         percent: totalWords > 0 ? Math.round((learned / totalWords) * 100) : 0,
       };
-    },
-  });
-}
-
-/**
- * Overall average = rounded mean of the four skill scores
- * (Listening, Reading, Talking, Writing).
- */
-export function useOverallAverage() {
-  const { data: profile } = useProfile();
-  return useQuery({
-    queryKey: ["overall-average", profile?.id, profile?.level],
-    enabled: !!profile,
-    queryFn: async () => {
-      const { data: latest } = await supabase
-        .from("progress")
-        .select("listening_score, reading_score, speaking_score, writing_score")
-        .eq("user_id", profile!.id)
-        .eq("level", profile!.level)
-        .order("recorded_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      const skills = [
-        latest?.listening_score ?? 0,
-        latest?.reading_score ?? 0,
-        latest?.speaking_score ?? 0,
-        latest?.writing_score ?? 0,
-      ];
-      return Math.round(skills.reduce((sum, s) => sum + s, 0) / skills.length);
     },
   });
 }
