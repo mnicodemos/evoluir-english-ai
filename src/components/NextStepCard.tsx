@@ -12,6 +12,7 @@ import {
   Headphones,
   Lightbulb,
   Map,
+  Medal,
   MessageSquareText,
   Mic,
   PenLine,
@@ -26,6 +27,7 @@ import { EvoGuide } from "@/components/EvoGuide";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
+import { useWeeklyLeagueStanding } from "@/components/WeeklyLeagueSummary";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import {
   NEXT_STEP_ACTION_TEXT,
@@ -58,6 +60,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // Key the cache by the current CEFR level: when the level changes, the
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
+  const league = useWeeklyLeagueStanding(profile);
   const activityIndicators = useActivityIndicators();
   const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
@@ -273,6 +276,28 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     </Button>
   );
 
+  // Mobile-only league chip (in place of the challenge, which stays on desktop):
+  // the header strip with the league is hidden on phones.
+  const leagueButton = (
+    <Button
+      asChild
+      variant="ghost"
+      size="sm"
+      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:rounded-full max-sm:border max-sm:border-sidebar-foreground/40 max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
+    >
+      <Link to="/league">
+        <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal">
+          <Medal className="size-3.5 shrink-0 text-amber-400" aria-hidden="true" />
+          {league.joined
+            ? league.total > 1 && league.rank
+              ? `#${league.rank} · ${league.xp} XP`
+              : `${league.xp} XP`
+            : t("Weekly league")}
+        </span>
+      </Link>
+    </Button>
+  );
+
   if (compact) {
     return (
       <section
@@ -349,10 +374,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </Button>
               )}
             </div>
-            {/* Mobile-only action row: Quick Win + challenge + Your trail. */}
+            {/* Mobile-only action row: Quick Win + weekly league + Your trail. */}
             <div className="mt-2.5 flex flex-nowrap items-center gap-1.5 sm:hidden">
               {quickWinButton}
-              {challengeButton}
+              {leagueButton}
               {mapButton}
             </div>
             {/* Mobile-only "Why this matters now": short versions of the same

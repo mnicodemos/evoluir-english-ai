@@ -11,15 +11,13 @@ import { leagueLevelOf } from "@/lib/level";
  * join. Uses a medal (ranking) icon: the trophy already marks the weekly goal in
  * "Your learning rhythm", and the league artwork stays on the league page.
  */
-export function WeeklyLeagueSummary({
-  profile,
-  translate,
-}: {
-  profile: { id: string; level: string | null; max_level?: string | null };
-  translate: (label: string) => string;
-}) {
+type LeagueProfile = { id: string; level: string | null; max_level?: string | null };
+
+/** This week's league standing, from the same weekly_league query as the league page. */
+export function useWeeklyLeagueStanding(profile: LeagueProfile | null | undefined) {
   const { data: rows } = useQuery({
-    queryKey: ["weekly-league", profile.id, leagueLevelOf(profile)],
+    queryKey: ["weekly-league", profile?.id, profile ? leagueLevelOf(profile) : null],
+    enabled: !!profile?.id,
     queryFn: async () => {
       const { data, error } = await supabase.rpc("weekly_league");
       if (error) throw error;
@@ -27,10 +25,24 @@ export function WeeklyLeagueSummary({
     },
     staleTime: 5 * 60 * 1000,
   });
-
   const me = rows?.find((row) => row.is_me);
-  const joined = !!me?.joined;
-  const total = rows?.filter((row) => row.joined).length ?? 0;
+  return {
+    loaded: !!rows,
+    joined: !!me?.joined,
+    rank: me?.rank_position ?? null,
+    xp: me?.xp ?? 0,
+    total: rows?.filter((row) => row.joined).length ?? 0,
+  };
+}
+
+export function WeeklyLeagueSummary({
+  profile,
+  translate,
+}: {
+  profile: LeagueProfile;
+  translate: (label: string) => string;
+}) {
+  const { joined, total, rank, xp } = useWeeklyLeagueStanding(profile);
 
   return (
     <DashboardHeaderStat
@@ -40,14 +52,14 @@ export function WeeklyLeagueSummary({
       value={
         joined
           ? total > 1
-            ? `#${me?.rank_position ?? "–"} ${translate("of")} ${total}`
-            : `${me?.xp ?? 0} XP`
+            ? `#${rank ?? "–"} ${translate("of")} ${total}`
+            : `${xp} XP`
           : translate("Join the league")
       }
       detail={
         joined
           ? total > 1
-            ? `${me?.xp ?? 0} XP ${translate("this week")}`
+            ? `${xp} XP ${translate("this week")}`
             : translate("Leading this week")
           : translate("Compete with students at your level")
       }
