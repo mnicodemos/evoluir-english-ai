@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
+import { AdminLessonCompare } from "@/components/AdminLessonCompare";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isAdminUser, listRegisteredUsers } from "@/lib/admin.functions";
@@ -106,7 +107,7 @@ function AdminPage() {
           </p>
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-3">
+            <TabsList className="grid h-auto w-full grid-cols-4">
               <TabsTrigger value="users" className="min-w-0 px-2 text-xs sm:text-sm">
                 {t("Users")}
               </TabsTrigger>
@@ -115,6 +116,9 @@ function AdminPage() {
               </TabsTrigger>
               <TabsTrigger value="cost" className="min-w-0 px-2 text-xs sm:text-sm">
                 {t("Cost & Performance")}
+              </TabsTrigger>
+              <TabsTrigger value="lesson-test" className="min-w-0 px-2 text-xs sm:text-sm">
+                {t("Lesson test")}
               </TabsTrigger>
             </TabsList>
 
@@ -154,6 +158,9 @@ function AdminPage() {
             </TabsContent>
             <TabsContent value="cost">
               <AdminCostPerformance />
+            </TabsContent>
+            <TabsContent value="lesson-test">
+              <AdminLessonCompare />
             </TabsContent>
           </Tabs>
         </section>
