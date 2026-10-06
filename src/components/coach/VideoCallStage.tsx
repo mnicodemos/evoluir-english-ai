@@ -166,20 +166,25 @@ export function VideoCallStage({
 
       {/* Stage: EVO with a ring that reacts to the conversation. */}
       <main className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 sm:gap-5">
-        {/* EVO's video tile: a green frame lights up while she speaks. */}
-        <div
-          className={cn(
-            "relative aspect-[1057/1008] w-[min(88vw,calc(100dvh-25rem),32rem)] overflow-hidden rounded-3xl shadow-2xl ring-2 ring-white/10 transition-shadow duration-500",
-            speaking && "shadow-[0_0_0_4px_var(--brand-green),0_0_48px_-6px_var(--brand-green)]",
-            busy && "animate-pulse",
+        {/* EVO's round video window: a green ring lights up while she speaks. */}
+        <div className="relative mb-2 grid place-items-center">
+          {speaking && (
+            <span className="absolute inset-0 animate-ping rounded-full bg-brand-green/15 [animation-duration:1.8s]" />
           )}
-        >
-          <img
-            src={evoVideoCall}
-            alt="EVO, your English teacher, on the call"
-            className="size-full object-cover object-top"
-          />
-          <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm">
+          <div
+            className={cn(
+              "relative aspect-square w-[min(76vw,calc(100dvh-26rem),22rem)] overflow-hidden rounded-full shadow-2xl ring-2 ring-white/10 transition-shadow duration-500",
+              speaking && "shadow-[0_0_0_4px_var(--brand-green),0_0_48px_-6px_var(--brand-green)]",
+              busy && "animate-pulse",
+            )}
+          >
+            <img
+              src={evoVideoCall}
+              alt="EVO, your English teacher, on the call"
+              className="size-full scale-[1.3] object-cover [object-position:50%_30%] [transform-origin:50%_28%]"
+            />
+          </div>
+          <span className="absolute -bottom-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold ring-1 ring-white/10 backdrop-blur-sm">
             {speaking ? (
               <span className="flex h-3 items-end gap-0.5" aria-hidden="true">
                 <span className="w-0.5 animate-[pulse_0.8s_ease-in-out_infinite] rounded-full bg-brand-green [height:60%]" />
