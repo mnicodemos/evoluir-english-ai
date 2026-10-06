@@ -12,6 +12,7 @@ import {
   unitTestKey,
 } from "@/lib/curriculum";
 import { unitTestQuestionCount } from "@/lib/lessonPlanSizing";
+import { isReviewLevel } from "@/lib/level";
 
 import {
   callContentAi,
@@ -50,7 +51,16 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
       return { lessonId: existing.id as string };
     }
 
-    if (plan.index > 0) {
+    // Levels below the highest one reached are open for review in any order
+    // (a student placed at B2 never took the A2 lessons one by one).
+    const { data: owner } = await supabase
+      .from("profiles")
+      .select("level, max_level")
+      .eq("id", userId)
+      .maybeSingle();
+    const reviewLevel = isReviewLevel(plan.level, owner?.max_level ?? owner?.level);
+
+    if (plan.index > 0 && !reviewLevel) {
       const previous = getCurriculum(plan.level)[plan.index - 1]!;
       const { data: prevLesson } = await supabase
         .from("lessons")

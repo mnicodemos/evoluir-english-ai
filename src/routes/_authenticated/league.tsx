@@ -9,7 +9,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
-import { findLevel } from "@/lib/level";
+import { findLevel, leagueLevelOf } from "@/lib/level";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/league")({
@@ -41,7 +41,7 @@ function League() {
     isLoading,
     error: loadError,
   } = useQuery({
-    queryKey: ["weekly-league", profile?.id, profile?.level],
+    queryKey: ["weekly-league", profile?.id, profile ? leagueLevelOf(profile) : null],
     enabled: !!profile?.id,
     queryFn: async () => {
       const { data, error } = await supabase.rpc("weekly_league");
@@ -87,7 +87,7 @@ function League() {
           <div className="min-w-0">
             <h1 className="text-lg font-bold lg:text-3xl">Weekly league</h1>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              <span>{profile ? findLevel(profile.level).label : ""}</span> ·{" "}
+              <span>{profile ? findLevel(leagueLevelOf(profile)).label : ""}</span> ·{" "}
               <span>Monday to Sunday · resets every Monday</span>
             </p>
           </div>

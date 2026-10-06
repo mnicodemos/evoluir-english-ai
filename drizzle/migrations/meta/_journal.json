@@ -309,6 +309,13 @@
       "when": 1791222664735,
       "tag": "0043_weekly_league",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1791309064735,
+      "tag": "0044_league_by_max_level",
+      "breakpoints": true
     }
   ]
 }

@@ -1269,4 +1269,17 @@ export const uiPt: Record<string, string> = {
   "The audio did not play. Read the sentence instead:": "O áudio não tocou. Leia a frase:",
   "Your answer": "Sua resposta",
   "Type the missing words": "Digite as palavras que faltam",
+  "Back to": "Voltar ao",
+  "CEFR levels": "Níveis CEFR",
+  "current level": "nível atual",
+  locked: "bloqueado",
+  "Review an earlier level": "Revisar um nível anterior",
+  "Your level stays": "Seu nível continua",
+  ": AI practice, words and the weekly league are not affected.":
+    ": a prática com IA, as palavras e a liga semanal não mudam.",
+  "My level": "Meu nível",
+  "Start lesson": "Começar lição",
+  Levels: "Níveis",
+  "Could not change your level. Please try again.":
+    "Não foi possível mudar seu nível. Tente novamente.",
 };
