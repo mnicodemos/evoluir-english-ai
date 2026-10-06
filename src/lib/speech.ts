@@ -204,7 +204,16 @@ async function requestSpeech(
 
     const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
     while (true) {
-      const { value: chunk, done } = await reader.read();
+      let stallTimer: ReturnType<typeof setTimeout> | undefined;
+      const stalled = new Promise<never>((_, reject) => {
+        stallTimer = setTimeout(() => {
+          void reader.cancel().catch(() => undefined);
+          reject(new Error("Audio stopped arriving."));
+        }, SPEECH_STALL_MS);
+      });
+      const { value: chunk, done } = await Promise.race([reader.read(), stalled]).finally(() =>
+        clearTimeout(stallTimer),
+      );
       if (done) break;
       buffer += chunk;
       const events = buffer.split(/\r?\n\r?\n/);
@@ -216,7 +225,8 @@ async function requestSpeech(
 
     const samples = mergePcmChunks(chunks);
     audioCache.set(cacheKey, samples);
-    if (cacheMode === "persistent") await writePersistentSpeech(value, chunks);
+    // Saved in the background so playback never waits on storage.
+    if (cacheMode === "persistent") void writePersistentSpeech(value, chunks);
     return samples;
   })();
 
@@ -226,6 +236,37 @@ async function requestSpeech(
   } finally {
     pendingAudio.delete(cacheKey);
   }
+}
+
+/** Extra time allowed after the expected end before the voice is treated as finished. */
+export const PLAYBACK_END_GRACE_MS = 2_500;
+/** A stalled audio stream is dropped after this long without new sound. */
+export const SPEECH_STALL_MS = 20_000;
+
+/**
+ * Resolves once the scheduled sound has played. Waiting only for `onended`
+ * froze AI Speaking: that event never fires again for a sound that already
+ * ended while its block was being saved, and some phones skip it after the
+ * audio is suspended. Polling plus a deadline always lets the next phrase play.
+ */
+export function waitForPlaybackEnd(
+  isDone: () => boolean,
+  maxMs: number,
+  intervalMs = 200,
+): Promise<void> {
+  return new Promise((resolve) => {
+    if (isDone()) {
+      resolve();
+      return;
+    }
+    const startedAt = Date.now();
+    const timer = setInterval(() => {
+      if (isDone() || Date.now() - startedAt >= maxMs) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, intervalMs);
+  });
 }
 
 /** Keeps the playback speed inside a natural, intelligible range. */
@@ -419,12 +460,14 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
     if (context.state === "suspended") await context.resume();
     const finalSource: AudioBufferSourceNode | undefined = lastSource;
     if (!finalSource) throw new Error("Audio could not start on this device. Please tap again.");
-    await new Promise<void>((resolve) => {
-      finalSource.onended = () => {
-        activeSources.delete(finalSource);
-        resolve();
-      };
-    });
+    const remainingMs = Math.max(0, playhead - context.currentTime) * 1000;
+    await waitForPlaybackEnd(
+      () =>
+        requestId !== playRequest ||
+        !activeSources.has(finalSource) ||
+        context.currentTime >= playhead + 0.25,
+      remainingMs + PLAYBACK_END_GRACE_MS,
+    );
   } finally {
     abortControllers.delete(controller);
   }
