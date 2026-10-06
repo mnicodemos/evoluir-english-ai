@@ -1283,4 +1283,9 @@ export const uiPt: Record<string, string> = {
   "Could not change your level. Please try again.":
     "Não foi possível mudar seu nível. Tente novamente.",
   "View your trail": "Ver sua trilha",
+  Strong: "Forte",
+  Good: "Bom",
+  "Needs work": "Reforçar",
+  "No data": "Sem dados",
+  "Practise this skill to measure it.": "Pratique esta habilidade para medi-la.",
 };

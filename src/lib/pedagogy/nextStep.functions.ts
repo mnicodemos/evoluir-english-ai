@@ -33,7 +33,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       supabaseAdmin.from("profiles").select("level").eq("id", userId).maybeSingle(),
       supabaseAdmin
         .from("current_skill_profile")
-        .select("skill, score, cefr_level, confidence_score")
+        .select("skill, score, cefr_level, confidence_score, evidence_count")
         .eq("user_id", userId),
       // Full per-level history (completed sessions only). Nothing is ever
       // deleted: each CEFR level keeps its own evidence, so when the student
@@ -42,7 +42,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       supabaseAdmin
         .from("assessment_skill_results")
         .select(
-          "skill, score, cefr_level, confidence_score, assessed_at, assessment_sessions!inner(status)",
+          "skill, score, cefr_level, confidence_score, evidence_count, assessed_at, assessment_sessions!inner(status)",
         )
         .eq("user_id", userId)
         .eq("assessment_sessions.status", "completed")
@@ -175,5 +175,19 @@ export const loadNextStep = createServerFn({ method: "POST" })
       },
     );
 
-    return { ...step, quest, reviews };
+    // Dashboard skills card: the same snapshots, plus how much evidence each
+    // one rests on (current level first, as above).
+    const skillMeter = (skills.data ?? [])
+      .filter((row) => row.skill)
+      .map((row) => {
+        const source = atLevelBySkill.get(row.skill as string) ?? row;
+        return {
+          skill: row.skill as string,
+          score: source.score === null ? null : Number(source.score),
+          cefrLevel: source.cefr_level ?? "insufficient_evidence",
+          evidenceCount: source.evidence_count === null ? null : Number(source.evidence_count),
+        };
+      });
+
+    return { ...step, quest, reviews, skills: skillMeter };
   });
