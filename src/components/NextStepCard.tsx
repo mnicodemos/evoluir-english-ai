@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Headphones,
   Lightbulb,
+  Map,
   MessageSquareText,
   Mic,
   PenLine,
@@ -253,7 +254,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       </Button>
     ) : null;
   // Mobile-only companion chip: opens the Study Plan page ("Your trail"). Same
-  // outline chip as Quick Win; the map renders in its native colors like ⚡.
+  // outline chip as Quick Win; the map icon matches the desktop "View your trail" button.
   const mapButton = (
     <Button
       asChild
@@ -263,9 +264,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       <Link to="/study-plan">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal">
-          <span aria-hidden="true" className="text-[13px] leading-none">
-            🗺️
-          </span>
+          <Map className="size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
           {t("Your trail")}
         </span>
       </Link>
