@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
+import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -107,7 +108,7 @@ function AdminPage() {
           </p>
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-4">
+            <TabsList className="grid h-auto w-full grid-cols-5">
               <TabsTrigger value="users" className="min-w-0 px-2 text-xs sm:text-sm">
                 {t("Users")}
               </TabsTrigger>
@@ -119,6 +120,9 @@ function AdminPage() {
               </TabsTrigger>
               <TabsTrigger value="lesson-test" className="min-w-0 px-2 text-xs sm:text-sm">
                 {t("Lesson test")}
+              </TabsTrigger>
+              <TabsTrigger value="push" className="min-w-0 px-2 text-xs sm:text-sm">
+                {t("Push")}
               </TabsTrigger>
             </TabsList>
 
@@ -161,6 +165,9 @@ function AdminPage() {
             </TabsContent>
             <TabsContent value="lesson-test">
               <AdminLessonCompare />
+            </TabsContent>
+            <TabsContent value="push">
+              <AdminPushTest />
             </TabsContent>
           </Tabs>
         </section>
