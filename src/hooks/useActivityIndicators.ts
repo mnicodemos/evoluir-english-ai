@@ -20,7 +20,7 @@ import {
   writeText,
   writingHasNewActivity,
 } from "@/lib/activityIndicators";
-import { lessonBatchKey } from "@/lib/vocabularyBatch";
+import { lessonBatchKey, VOCABULARY_BATCH_SIZE } from "@/lib/vocabularyBatch";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { roundPrompts, WRITING_CATEGORIES, writingLevelConfig } from "@/lib/writingLevels";
@@ -103,7 +103,9 @@ export function useActivityIndicators(): ActivityIndicators {
   const [retryTick, setRetryTick] = useState(0);
   useEffect(() => {
     if (!profile || round < 1 || !vocabularyBatch || vocabularyFetching || vocabularyError) return;
-    if (vocabularyBatch.batchWordIds.length > 0) return;
+    // A full batch has ten words; a partial one (the model repeated known
+    // words) is completed once, the same way an empty one is.
+    if (vocabularyBatch.batchWordIds.length >= VOCABULARY_BATCH_SIZE) return;
     const failureKey = vocabularyGenerationFailureKey(profile.id, round);
     const attemptKey = `${profile.id}:${round}`;
     const scheduleRetry = (ms: number) => {
@@ -124,7 +126,9 @@ export function useActivityIndicators(): ActivityIndicators {
     recoveryAttempts.add(attemptKey);
     vocabularySingleFlight(profile.id, () => generateVocabulary({ data: { level: profile.level } }))
       .then((words) => {
-        writeText(failureKey, "");
+        // Still short of ten (the model ran out of new words): wait before the
+        // next attempt instead of calling the AI on every Dashboard visit.
+        writeText(failureKey, words.length < VOCABULARY_BATCH_SIZE ? String(Date.now()) : "");
         if (words.length > 0)
           void queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
       })
