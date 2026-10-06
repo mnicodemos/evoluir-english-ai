@@ -18,7 +18,20 @@ export const registerPushToken = createServerFn({ method: "POST" })
       { onConflict: "user_id,token" },
     );
     if (error) throw new Error(error.message);
-    return { ok: true };
+    // A token FCM no longer knows (e.g. the browser dropped its push
+    // subscription) would look registered but never deliver: check it now, drop
+    // it, and tell the device to create a fresh one.
+    const { fcmCredentials, validateFcmToken } = await import("./fcm.server");
+    const credentials = fcmCredentials();
+    if (credentials && !(await validateFcmToken(credentials, data.token)).valid) {
+      await context.supabase
+        .from("push_tokens")
+        .delete()
+        .eq("user_id", context.userId)
+        .eq("token", data.token);
+      return { ok: true, valid: false };
+    }
+    return { ok: true, valid: true };
   });
 
 /** Removes this device's push token (user turned notifications off). */
