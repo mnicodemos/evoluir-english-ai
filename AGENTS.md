@@ -33,4 +33,4 @@
 - Daily push (word of the day, study reminder) runs from pg_cron calling /api/public/cron/daily-push, authenticated by the service-only push_cron_key row; the app need not be open.
 - Public legal documents share one bilingual presentation component while keeping independent routes and metadata; this prevents copy and layout drift.
 - Lovable Publish does not apply new files in drizzle/migrations; each new migration must be applied by asking the Lovable chat to run it (it re-registers the SQL under the next number), followed by `NOTIFY pgrst, 'reload schema'`, so every migration must stay idempotent.
-- The weekly league mascot is EVO in anime style, taken from the owner's Gemini video (src/assets/evo-liga-avatar.webp and evo-liga-portrait.webp, cropped to leave out subtitles and the generator mark); it appears only on the league screen.
+- The weekly league image is the owner's artwork of EVO with the "More than English" trophy (src/assets/evo-liga-simbolo.webp, cut to a transparent circle); it appears only on the league page (header symbol and empty ranking). Other screens, like the First week guide, use the standard EVO profile image.

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Check, ChevronRight } from "lucide-react";
 
-import evoAvatar from "@/assets/evo-liga-avatar.webp";
+import evoProfile from "@/assets/evo-profile.jpg.asset.json";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useFirstWeek } from "@/hooks/useFirstWeek";
@@ -31,7 +31,7 @@ export function FirstWeekGuide({
             className="relative size-8 shrink-0 rounded-full ring-2 ring-brand-green/60"
           >
             <img
-              src={evoAvatar}
+              src={evoProfile.url}
               alt=""
               width={32}
               height={32}
@@ -49,7 +49,7 @@ export function FirstWeekGuide({
             className="h-7 shrink-0 gap-1.5 rounded-full border border-brand-green/50 bg-brand-green/10 px-2 text-xs font-semibold text-brand-green hover:bg-brand-green/20"
           >
             <img
-              src={evoAvatar}
+              src={evoProfile.url}
               alt=""
               width={20}
               height={20}
@@ -68,7 +68,7 @@ export function FirstWeekGuide({
       >
         <div className="flex items-center gap-3">
           <img
-            src={evoAvatar}
+            src={evoProfile.url}
             alt="EVO"
             width={44}
             height={44}
