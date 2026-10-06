@@ -36,6 +36,7 @@ import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { WeatherTalk } from "@/components/WeatherTalk";
+import { FirstWeekGuide } from "@/components/FirstWeekGuide";
 import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -259,10 +260,12 @@ function Dashboard() {
                     placement="desktop"
                   />
                   <WeatherTalk translate={t} placement="desktop" />
+                  <FirstWeekGuide profile={profile} placement="desktop" />
                 </div>
               }
               mobileTrailing={
                 <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+                  <FirstWeekGuide profile={profile} placement="mobile" />
                   <span className="flex items-center gap-1">
                     <Flame
                       className="size-5 shrink-0 fill-current text-current"
