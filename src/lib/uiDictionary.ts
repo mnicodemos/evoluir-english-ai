@@ -24,7 +24,7 @@ export const uiPt: Record<string, string> = {
   Focus: "Foco",
   "Your next step": "Seu próximo passo",
   "Your focus is here. Get started now!": "Seu foco está aqui. Comece agora!",
-  "How to practise": "Como praticar",
+  "How to practice": "Como praticar",
   "EVO Daily Reflection": "Reflexão diária da EVO",
   "Daily reflection": "Reflexão do dia",
   "Share reflection": "Compartilhar reflexão",
@@ -279,7 +279,7 @@ export const uiPt: Record<string, string> = {
   "This is your lowest skill score right now.":
     "Esta é a sua menor pontuação por habilidade agora.",
   "You have not practised this recently.": "Você não praticou isso recentemente.",
-  "You have not practised this skill yet.": "Você ainda não praticou essa habilidade.",
+  "You have not practiced this skill yet.": "Você ainda não praticou essa habilidade.",
   "Start anywhere and we will personalise your next step.":
     "Comece por onde quiser e personalizamos seu próximo passo.",
   "Your recent practice shows opportunities to improve in this area.":
