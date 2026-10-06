@@ -193,6 +193,20 @@ export function WeeklyFrequency({
           <h2 id="weekly-rhythm-title" className="font-display text-sm font-semibold">
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
           </h2>
+          {/* Weekly trophy: gold once the student's own weekly plan is reached. */}
+          <GoldTrophy
+            unlocked={studiedCount >= weeklyGoal}
+            className="ml-auto size-9 shrink-0"
+            label={
+              studiedCount >= weeklyGoal
+                ? lang === "pt"
+                  ? "Troféu da semana desbloqueado"
+                  : "Weekly trophy unlocked"
+                : lang === "pt"
+                  ? "Troféu da semana bloqueado"
+                  : "Weekly trophy locked"
+            }
+          />
         </div>
         <div className="mt-2 grid flex-1 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3">
           <div className="relative grid size-[5.75rem] place-items-center text-brand-green">

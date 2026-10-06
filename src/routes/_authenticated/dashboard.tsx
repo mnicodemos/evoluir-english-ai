@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
   Bolt,
+  CalendarCheck2,
   BookOpen,
   Check,
   ChevronRight,
@@ -37,6 +38,7 @@ import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useDueReviewCount } from "@/hooks/useDueReviewCount";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
+import type { StudyPlanDay } from "@/lib/studyPlan";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { WeatherTalk } from "@/components/WeatherTalk";
@@ -160,6 +162,53 @@ function DashboardNotifications({
         )}
       </PopoverContent>
     </Popover>
+  );
+}
+
+/** Header slot: the study plan's day to do now (today, catch up or next). */
+function PlanTodaySummary({
+  next,
+  weekDone,
+  translate,
+}: {
+  next: StudyPlanDay | null | undefined;
+  weekDone: boolean;
+  translate: (label: string) => string;
+}) {
+  const label = weekDone
+    ? translate("Week plan complete")
+    : !next
+      ? translate("Your study plan")
+      : next.status === "today"
+        ? translate("Today in your plan")
+        : next.status === "missed"
+          ? translate("Catch up")
+          : translate("Next in your plan");
+  return (
+    <Link
+      to="/study-plan"
+      className="group flex h-full min-w-0 items-center gap-3 px-3 py-2 transition-colors hover:bg-brand-green/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+    >
+      <CalendarCheck2
+        className="size-[2.31rem] shrink-0 text-brand-green"
+        strokeWidth={2.2}
+        aria-hidden="true"
+      />
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-green sm:text-[11px]">
+          {label}
+        </p>
+        <p className="truncate font-display text-sm font-bold leading-tight sm:text-base">
+          {weekDone
+            ? translate("Every planned day is done")
+            : (next?.title ?? translate("See your week"))}
+        </p>
+      </div>
+      <ChevronRight
+        className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+        aria-hidden="true"
+      />
+    </Link>
   );
 }
 
@@ -366,10 +415,12 @@ function Dashboard() {
               />
             </div>
             <div className="hidden min-w-0 border-l border-border sm:block">
-              <WeeklyFrequency
-                userId={profile.id}
-                daysPerWeek={profile.study_days_per_week ?? 7}
-                presentation="summary"
+              {/* The week count already lives in "Your learning rhythm"; this slot
+                  shows what to do now in the study plan instead. */}
+              <PlanTodaySummary
+                next={planNext}
+                weekDone={!!studyPlan && studyPlan.plan.nextIndex === null}
+                translate={t}
               />
             </div>
           </div>
@@ -527,19 +578,8 @@ function Dashboard() {
                   />
                 </Link>
                 {/* The closing line only shows where the row has height to spare. */}
-                <p className="max-w-full truncate text-center text-xs text-muted-foreground xl:max-[1679.98px]:hidden!">
-                  {planNext ? (
-                    <>
-                      {planNext.status === "today"
-                        ? t("Today in your plan")
-                        : planNext.status === "missed"
-                          ? t("Catch up")
-                          : t("Next in your plan")}
-                      : <span className="font-medium text-foreground">{planNext.title}</span>
-                    </>
-                  ) : (
-                    t("Small steps create progress.")
-                  )}
+                <p className="text-center text-xs text-muted-foreground xl:max-[1679.98px]:hidden!">
+                  {t("Small steps create progress.")}
                 </p>
               </div>
               <WeeklyFrequency
