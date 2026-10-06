@@ -96,29 +96,59 @@ export type PlanReasonCode =
 
 export type PlanReason = { code: PlanReasonCode; skill?: string };
 
+/**
+ * Something the student practised this week (São Paulo date), from activities
+ * or lessons completed this week. A completed lesson brings its id and title so
+ * the day can show what was actually done.
+ */
+export type PlanPractice = {
+  skill: string;
+  date: string;
+  lessonId?: string;
+  title?: string;
+};
+
 export type StudyPlanInput = {
   goal: string;
   dailyMinutes: number;
   daysPerWeek: number;
   focus: StudyFocus;
   level: string | null;
+  /** Lessons of the level; `completed` = ever completed, so they are not planned again. */
   lessons: PlanLesson[];
   minutesThisWeek: number;
   /** Existing skill evidence used only to order the non-focus days. */
   needs?: PlanSkillNeed[];
+  /** Today's study date (YYYY-MM-DD, São Paulo); the plan covers its Monday–Sunday week. */
+  today?: string;
+  /** Practice done this week; it marks the plan days of the same skill as done. */
+  practice?: PlanPractice[];
 };
+
+/** done = practised this week · today · missed = earlier this week, not done · upcoming. */
+export type PlanDayStatus = "done" | "today" | "missed" | "upcoming";
 
 export type StudyPlanDay = {
   day: string;
+  /** Real date of this plan day in the current week (YYYY-MM-DD). */
+  date: string;
   skill: string;
   title: string;
   to: string;
   lessonId: string | null;
   level: string | null;
+  /** Done this week (not "ever completed"). */
   completed: boolean;
+  status: PlanDayStatus;
 };
 
 export type StudyPlan = {
+  /** Monday and Sunday of the plan week (YYYY-MM-DD). */
+  weekStart: string;
+  weekEnd: string;
+  today: string;
+  /** The day to do now: today's, else the next one not done, else null (week done). */
+  nextIndex: number | null;
   days: StudyPlanDay[];
   weeklyMinutesTarget: number;
   minutesThisWeek: number;
@@ -210,35 +240,110 @@ function buildReasons(
   return reasons;
 }
 
+/** Adds days to a YYYY-MM-DD date (calendar arithmetic, no time zone involved). */
+export function addDays(date: string, days: number): string {
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
+}
+
+/** Monday of the week that contains `date` (YYYY-MM-DD). */
+export function mondayOf(date: string): string {
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
+  const weekday = (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7; // Monday = 0
+  return addDays(date, -weekday);
+}
+
 export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
   const days = DAYS_BY_FREQUENCY[input.daysPerWeek] ?? DAYS_BY_FREQUENCY[3]!;
   const needs = input.needs ?? [];
   const skills = skillSequence(input.goal, input.focus, days.length, needs);
+  const today = input.today ?? new Date().toISOString().slice(0, 10);
+  const weekStart = mondayOf(today);
   const used = new Set<string>();
+
+  // This week's practice per skill: how many distinct days, and the lessons
+  // completed this week (in order), so done days show what was really done.
+  const practisedDates = new Map<string, Set<string>>();
+  const lessonsDone = new Map<string, PlanPractice[]>();
+  for (const event of input.practice ?? []) {
+    if (event.date < weekStart || event.date > addDays(weekStart, 6)) continue;
+    const dates = practisedDates.get(event.skill) ?? new Set<string>();
+    dates.add(event.date);
+    practisedDates.set(event.skill, dates);
+    if (event.lessonId && event.title) {
+      lessonsDone.set(event.skill, [...(lessonsDone.get(event.skill) ?? []), event]);
+    }
+  }
+  const doneSoFar = new Map<string, number>();
 
   const items: StudyPlanDay[] = days.map((day, i) => {
     const skill = skills[i]!;
-    const dbSkill = lessonSkillOf(skill);
-    const candidates = input.lessons.filter((lesson) => lesson.skill === dbSkill);
-    const lesson =
-      candidates.find((candidate) => !candidate.completed && !used.has(candidate.id)) ??
-      candidates.find((candidate) => !used.has(candidate.id)) ??
-      null;
-    if (lesson) used.add(lesson.id);
+    const date = addDays(weekStart, WEEK_DAYS.indexOf(day as (typeof WEEK_DAYS)[number]));
     const fallback = FALLBACK_BY_SKILL[skill] ?? FALLBACK_BY_SKILL["reading"]!;
+
+    // A day is done when its skill was practised this week, one practice day
+    // per plan day of that skill.
+    const doneCount = doneSoFar.get(skill) ?? 0;
+    const completed = doneCount < (practisedDates.get(skill)?.size ?? 0);
+    if (completed) {
+      doneSoFar.set(skill, doneCount + 1);
+      const doneLesson = lessonsDone.get(skill)?.shift();
+      if (doneLesson?.lessonId) used.add(doneLesson.lessonId);
+      return {
+        day,
+        date,
+        skill,
+        title: doneLesson?.title ?? fallback.title,
+        to: doneLesson?.lessonId ? `/learning/${doneLesson.lessonId}` : fallback.to,
+        lessonId: doneLesson?.lessonId ?? null,
+        level: input.level,
+        completed: true,
+        status: "done",
+      };
+    }
+
+    // Not done yet: a lesson never completed, else the practice area. A lesson
+    // the student already finished is never planned again.
+    const dbSkill = lessonSkillOf(skill);
+    const lesson =
+      input.lessons.find(
+        (candidate) =>
+          candidate.skill === dbSkill && !candidate.completed && !used.has(candidate.id),
+      ) ?? null;
+    if (lesson) used.add(lesson.id);
     return {
       day,
+      date,
       skill,
       title: lesson ? lesson.title : fallback.title,
       to: lesson ? `/learning/${lesson.id}` : fallback.to,
       lessonId: lesson?.id ?? null,
       level: lesson ? lesson.level : input.level,
-      completed: lesson ? lesson.completed : false,
+      completed: false,
+      status: date === today ? "today" : date < today ? "missed" : "upcoming",
     };
   });
 
+  const todayIndex = items.findIndex((item) => item.status === "today");
+  const nextUpcoming = items.findIndex((item) => item.status === "upcoming");
+  const nextMissed = items.findIndex((item) => item.status === "missed");
+  // Today's day first; on a day off, catch up the earliest missed day; else the
+  // next planned day.
+  const nextIndex =
+    todayIndex >= 0
+      ? todayIndex
+      : nextMissed >= 0
+        ? nextMissed
+        : nextUpcoming >= 0
+          ? nextUpcoming
+          : null;
+
   const completedCount = items.filter((item) => item.completed).length;
   return {
+    weekStart,
+    weekEnd: addDays(weekStart, 6),
+    today,
+    nextIndex,
     days: items,
     weeklyMinutesTarget: input.dailyMinutes * days.length,
     minutesThisWeek: input.minutesThisWeek,

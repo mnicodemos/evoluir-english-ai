@@ -4,9 +4,10 @@ import {
   ArrowRight,
   CalendarCheck,
   Check,
+  ChevronDown,
   Clock,
   Loader2,
-  RefreshCw,
+  PartyPopper,
   Sparkles,
   Target,
 } from "lucide-react";
@@ -27,6 +28,7 @@ import {
   STUDY_PLAN_GOALS,
   STUDY_PLAN_MINUTES,
   type StudyFocus,
+  type StudyPlan,
   type StudyPlanDay,
 } from "@/lib/studyPlan";
 
@@ -110,157 +112,70 @@ function StudyPlanPage() {
 
   const plan = data?.plan;
   const levelLabel = data?.preferences.level ? findLevel(data.preferences.level).label : null;
-
-  // "Previous plan → Updated plan": the plan shown before the recalculation is
-  // kept in memory only, so nothing new is stored.
-  const [previous, setPrevious] = useState<StudyPlanDay[] | null>(null);
-
-  const recalculate = () => {
-    if (!plan) return;
-    setPrevious(plan.days);
-    void queryClient
-      .invalidateQueries({ queryKey: ["study-plan"] })
-      .then(() => toast.success("Plan updated with your recent progress"));
-  };
-
-  const changed =
-    !!previous &&
-    !!plan &&
-    (previous.length !== plan.days.length ||
-      previous.some((day, i) => {
-        const current = plan.days[i];
-        return (
-          !current ||
-          day.day !== current.day ||
-          day.skill !== current.skill ||
-          day.title !== current.title ||
-          day.completed !== current.completed
-        );
-      }));
-
-  // Same two buttons under the settings (phones/tablets) or in the settings
-  // title row (wide desktop), where they free a full row of height.
-  const planActions = (
-    <>
-      <Button
-        className="h-9 flex-1 sm:flex-none"
-        disabled={save.isPending}
-        onClick={() => {
-          if (plan) setPrevious(plan.days);
-          save.mutate();
-        }}
-      >
-        {save.isPending && <Loader2 className="size-4 animate-spin" />}
-        Save my plan
-      </Button>
-      <Button
-        variant="outline"
-        className="h-9 flex-1 sm:flex-none"
-        disabled={isFetching || !plan}
-        onClick={recalculate}
-      >
-        {isFetching ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <RefreshCw className="size-4" />
-        )}
-        Update my plan
-      </Button>
-    </>
-  );
+  // Settings stay folded once the plan is set up, so the week comes first.
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  useEffect(() => {
+    if (data && !data.configured) setSettingsOpen(true);
+  }, [data]);
+  const next = plan && plan.nextIndex !== null ? (plan.days[plan.nextIndex] ?? null) : null;
 
   return (
     <AppShell mobileOneScreen>
-      {/* Wide desktop: settings across the top, then the week as compact rows on
-          the left and progress with the reasons on the right (one screen). */}
-      <div className="space-y-2 lg:space-y-4 xl:grid xl:grid-cols-[minmax(0,1.8fr)_minmax(19rem,1fr)] xl:items-start xl:gap-3 xl:space-y-0">
+      <div className="space-y-3 lg:space-y-4 xl:grid xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,1fr)] xl:items-start xl:gap-4 xl:space-y-0">
         <header className="animate-rise xl:col-span-2">
-          <p className="hidden text-xs text-muted-foreground sm:block sm:text-sm xl:hidden">
-            My Study Plan
-          </p>
-          <h1 className="text-lg font-bold lg:text-3xl">Your weekly study plan</h1>
-          <p className="mt-0.5 hidden max-w-2xl text-xs text-muted-foreground sm:mt-1 sm:block sm:text-sm xl:hidden">
-            Choose your goal, your available time and your focus area. Your plan uses the lessons
-            and practice already available for your level.
-          </p>
+          <h1 className="text-lg font-bold lg:text-3xl">Your study plan</h1>
+          {plan && (
+            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+              This week · {formatRange(plan.weekStart, plan.weekEnd)}
+            </p>
+          )}
         </header>
-
-        <section className="card-soft space-y-2 p-2.5 sm:space-y-2.5 sm:p-4 xl:col-span-2 xl:row-start-2 xl:space-y-1.5">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
-              <Target className="size-4 text-primary sm:size-5" />
-              Plan settings
-            </h2>
-            <div className="hidden gap-2 xl:flex">{planActions}</div>
-          </div>
-
-          <Choice
-            label="Main goal"
-            options={STUDY_PLAN_GOALS.map((g) => ({ value: g.value, label: g.label }))}
-            value={goal}
-            onChange={setGoal}
-          />
-          <Choice
-            label="Daily time"
-            options={STUDY_PLAN_MINUTES.map((m) => ({
-              value: String(m),
-              label: `${m} minutes`,
-            }))}
-            value={String(minutes)}
-            onChange={(v) => setMinutes(Number(v))}
-          />
-          <Choice
-            label="Weekly frequency"
-            options={STUDY_PLAN_DAYS_PER_WEEK.map((d) => ({
-              value: String(d),
-              label: `${d} days`,
-            }))}
-            value={String(daysPerWeek)}
-            onChange={(v) => setDaysPerWeek(Number(v))}
-          />
-          <Choice
-            label="Focus area"
-            options={STUDY_PLAN_FOCUS_AREAS.map((f) => ({ value: f.value, label: f.label }))}
-            value={focus}
-            onChange={(v) => setFocus(v as StudyFocus)}
-          />
-
-          <div className="flex flex-row gap-2 xl:hidden">{planActions}</div>
-        </section>
 
         {isLoading || !plan ? (
           <div className="space-y-4 xl:col-span-2">
-            <Skeleton className="h-28 w-full" />
-            <Skeleton className="h-28 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-48 w-full" />
           </div>
         ) : (
           <>
-            <div className="space-y-2 lg:space-y-4 xl:col-start-2 xl:row-start-3">
+            <div className="min-w-0 space-y-3 xl:col-start-1">
+              <TodayCard plan={plan} next={next} />
+
+              <section className="space-y-2" aria-labelledby="plan-week-title">
+                <h2
+                  id="plan-week-title"
+                  className="flex items-center gap-2 text-base font-semibold sm:text-lg"
+                >
+                  <CalendarCheck className="size-4 text-primary sm:size-5" />
+                  Your week
+                </h2>
+                <ul className="grid gap-2">
+                  {plan.days.map((day, index) => (
+                    <PlanDayRow key={day.date} day={day} isNext={index === plan.nextIndex} />
+                  ))}
+                </ul>
+                <p className="text-xs text-muted-foreground">
+                  A day is done when you practise its skill this week. When there is no new lesson
+                  of that skill, the plan sends you to its practice area.
+                </p>
+              </section>
+            </div>
+
+            <div className="min-w-0 space-y-3 xl:col-start-2 xl:row-start-2">
               <section className="card-soft p-3 sm:p-4">
                 <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
                   <Clock className="size-4 text-primary sm:size-5" />
-                  Weekly progress
+                  This week
                 </h2>
-                <dl className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2 xl:hidden">
+                <dl className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
+                  <Stat label="Days done" value={`${plan.completedCount} / ${plan.totalCount}`} />
+                  <Stat label="Progress" value={`${plan.progressPercent}%`} />
                   <Stat
-                    label="Completed activities"
-                    value={`${plan.completedCount} / ${plan.totalCount}`}
-                  />
-                  <Stat label="Weekly progress" value={`${plan.progressPercent}%`} />
-                  <Stat
-                    label="Minutes studied"
+                    label="Minutes"
                     value={`${plan.minutesThisWeek} / ${plan.weeklyMinutesTarget}`}
                   />
                 </dl>
-                {/* Wide desktop: the same three numbers on one line, above the bar. */}
-                <p className="mt-2 hidden items-baseline justify-between gap-3 text-sm xl:flex">
-                  <span className="text-2xl font-bold">{plan.progressPercent}%</span>
-                  <span className="text-muted-foreground">
-                    {plan.completedCount} / {plan.totalCount} <span>activities</span> ·{" "}
-                    {plan.minutesThisWeek} / {plan.weeklyMinutesTarget} min
-                  </span>
-                </p>
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted xl:mt-2">
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-primary transition-all"
                     style={{ width: `${plan.progressPercent}%` }}
@@ -278,9 +193,6 @@ function StudyPlanPage() {
                   <Sparkles className="size-4 text-primary sm:size-5" />
                   Why this plan?
                 </h2>
-                <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm xl:hidden">
-                  Based on your progress:
-                </p>
                 <ul className="mt-1.5 space-y-1 sm:mt-2 sm:space-y-1.5">
                   {plan.reasons.map((reason) => (
                     <li
@@ -293,113 +205,215 @@ function StudyPlanPage() {
                   ))}
                 </ul>
               </section>
-            </div>
 
-            {changed && previous && (
-              <section className="card-soft p-5 xl:col-span-2 xl:row-start-4">
-                <h2 className="flex items-center gap-2 text-lg font-semibold">
-                  <RefreshCw className="size-5 text-primary" />
-                  Previous plan → Updated plan
-                </h2>
-                <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                      Previous plan
-                    </p>
-                    <ul className="mt-2 space-y-2">
-                      {previous.map((day) => (
-                        <li
-                          key={`prev-${day.day}`}
-                          className="rounded-lg border border-border p-3 text-sm"
-                        >
-                          <span className="font-medium">{day.day}</span> ·{" "}
-                          {SKILL_LABELS[day.skill] ?? day.skill}
-                          <p className="text-muted-foreground break-words">{day.title}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="flex items-center gap-1 text-xs uppercase tracking-wide text-primary">
-                      <ArrowRight className="size-3.5" />
-                      Updated plan
-                    </p>
-                    <ul className="mt-2 space-y-2">
-                      {plan.days.map((day) => (
-                        <li
-                          key={`next-${day.day}`}
-                          className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm"
-                        >
-                          <span className="font-medium">{day.day}</span> ·{" "}
-                          {SKILL_LABELS[day.skill] ?? day.skill}
-                          <p className="text-muted-foreground break-words">{day.title}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </section>
-            )}
-
-            <section className="space-y-2 sm:space-y-3 xl:col-start-1 xl:row-start-3 xl:space-y-2">
-              <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
-                <CalendarCheck className="size-4 text-primary sm:size-5" />
-                Week 1
-              </h2>
-              <ul className="grid grid-cols-2 gap-2 xl:grid-cols-1 xl:gap-1.5">
-                {plan.days.map((day) => (
-                  <li
-                    key={day.day}
-                    className="card-soft p-2 sm:p-3 xl:flex xl:items-center xl:gap-4 xl:py-1.5"
-                  >
-                    <div className="flex items-start justify-between gap-2 xl:w-56 xl:shrink-0 xl:items-center xl:justify-start">
-                      <div className="min-w-0 xl:flex xl:items-baseline xl:gap-2">
-                        <p className="text-xs font-semibold sm:text-sm">{day.day}</p>
-                        <p className="text-[10px] uppercase tracking-wide text-muted-foreground sm:text-xs">
-                          {SKILL_LABELS[day.skill] ?? day.skill}
-                        </p>
-                      </div>
-                      {day.completed && (
-                        <span className="flex shrink-0 items-center gap-1 text-[10px] font-medium text-primary sm:text-xs">
-                          <Check className="size-3.5 sm:size-4" />
-                          <span className="xl:sr-only">Completed</span>
-                        </span>
-                      )}
-                    </div>
-                    <p
-                      className="mt-1 text-xs font-medium break-words sm:mt-2 sm:text-base xl:mt-0 xl:min-w-0 xl:flex-1 xl:truncate xl:text-sm"
-                      title={day.title}
+              <section className="card-soft p-3 sm:p-4">
+                <button
+                  type="button"
+                  onClick={() => setSettingsOpen((open) => !open)}
+                  aria-expanded={settingsOpen}
+                  className="flex w-full items-center justify-between gap-3 text-left"
+                >
+                  <span className="flex items-center gap-2 text-base font-semibold sm:text-lg">
+                    <Target className="size-4 text-primary sm:size-5" />
+                    Adjust my plan
+                  </span>
+                  <ChevronDown
+                    className={`size-4 shrink-0 text-muted-foreground transition-transform ${settingsOpen ? "rotate-180" : ""}`}
+                    aria-hidden="true"
+                  />
+                </button>
+                {settingsOpen && (
+                  <div className="mt-3 space-y-2.5">
+                    <Choice
+                      label="Main goal"
+                      options={STUDY_PLAN_GOALS.map((g) => ({ value: g.value, label: g.label }))}
+                      value={goal}
+                      onChange={setGoal}
+                    />
+                    <Choice
+                      label="Daily time"
+                      options={STUDY_PLAN_MINUTES.map((m) => ({
+                        value: String(m),
+                        label: `${m} minutes`,
+                      }))}
+                      value={String(minutes)}
+                      onChange={(v) => setMinutes(Number(v))}
+                    />
+                    <Choice
+                      label="Days per week"
+                      options={STUDY_PLAN_DAYS_PER_WEEK.map((d) => ({
+                        value: String(d),
+                        label: `${d} days`,
+                      }))}
+                      value={String(daysPerWeek)}
+                      onChange={(v) => setDaysPerWeek(Number(v))}
+                    />
+                    <Choice
+                      label="Focus area"
+                      options={STUDY_PLAN_FOCUS_AREAS.map((f) => ({
+                        value: f.value,
+                        label: f.label,
+                      }))}
+                      value={focus}
+                      onChange={(v) => setFocus(v as StudyFocus)}
+                    />
+                    <Button
+                      className="h-9 w-full sm:w-auto"
+                      disabled={save.isPending || isFetching}
+                      onClick={() => save.mutate()}
                     >
-                      {day.title}
-                    </p>
-                    {day.lessonId ? (
-                      <Link
-                        to="/learning/$lessonId"
-                        params={{ lessonId: day.lessonId }}
-                        className="mt-1.5 inline-flex h-7 shrink-0 items-center rounded-lg border border-border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:py-1 sm:text-sm xl:mt-0 xl:h-8"
-                      >
-                        Start activity
-                      </Link>
-                    ) : (
-                      <Link
-                        to={day.to as "/listening"}
-                        className="mt-1.5 inline-flex h-7 shrink-0 items-center rounded-lg border border-border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-accent sm:mt-2 sm:h-9 sm:px-3 sm:py-1 sm:text-sm xl:mt-0 xl:h-8"
-                      >
-                        Start activity
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <p className="hidden text-xs text-muted-foreground sm:block xl:hidden">
-                The plan reuses your existing lessons and practice areas. When no lesson of that
-                skill is available for your level, we point you to the matching practice area.
-              </p>
-            </section>
+                      {save.isPending && <Loader2 className="size-4 animate-spin" />}
+                      Save and rebuild my week
+                    </Button>
+                  </div>
+                )}
+              </section>
+            </div>
           </>
         )}
       </div>
     </AppShell>
+  );
+}
+
+const STATUS_TEXT: Record<StudyPlanDay["status"], string> = {
+  done: "Done",
+  today: "Today",
+  missed: "Missed",
+  upcoming: "Upcoming",
+};
+
+/** "Oct 5 – Oct 11" from two YYYY-MM-DD dates (calendar dates, no time zone shift). */
+function formatRange(start: string, end: string) {
+  const fmt = (date: string) =>
+    new Date(`${date}T12:00:00Z`).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+  return `${fmt(start)} – ${fmt(end)}`;
+}
+
+function shortDate(date: string) {
+  return new Date(`${date}T12:00:00Z`).toLocaleDateString("en-US", {
+    weekday: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+function DayLink({
+  day,
+  className,
+  children,
+}: {
+  day: StudyPlanDay;
+  className: string;
+  children: React.ReactNode;
+}) {
+  return day.lessonId ? (
+    <Link to="/learning/$lessonId" params={{ lessonId: day.lessonId }} className={className}>
+      {children}
+    </Link>
+  ) : (
+    <Link to={day.to as "/listening"} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+/** What to do now: today's plan day, a missed day to catch up, or the next one. */
+function TodayCard({ plan, next }: { plan: StudyPlan; next: StudyPlanDay | null }) {
+  if (!next) {
+    return (
+      <section className="card-soft flex items-center gap-3 border-primary/40 p-4">
+        <PartyPopper className="size-8 shrink-0 text-primary" aria-hidden="true" />
+        <div>
+          <p className="font-semibold">Week complete!</p>
+          <p className="text-sm text-muted-foreground">
+            You did every day of this week&apos;s plan. A new week starts on Monday.
+          </p>
+        </div>
+      </section>
+    );
+  }
+  const heading =
+    next.status === "today"
+      ? "Today in your plan"
+      : next.status === "missed"
+        ? `Catch up · ${next.day}`
+        : `Next · ${next.day}`;
+  return (
+    <section className="card-soft border-primary/50 bg-primary/[0.06] p-4" aria-live="polite">
+      <p className="text-xs font-semibold uppercase tracking-wide text-primary">{heading}</p>
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+            {SKILL_LABELS[next.skill] ?? next.skill}
+          </p>
+          <p className="break-words text-lg font-bold">{next.title}</p>
+          {next.status === "upcoming" && plan.days.every((d) => d.status !== "missed") && (
+            <p className="text-xs text-muted-foreground">
+              Free today. You can start early if you want.
+            </p>
+          )}
+        </div>
+        <DayLink
+          day={next}
+          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          Start <ArrowRight className="size-4" aria-hidden="true" />
+        </DayLink>
+      </div>
+    </section>
+  );
+}
+
+function PlanDayRow({ day, isNext }: { day: StudyPlanDay; isNext: boolean }) {
+  const done = day.status === "done";
+  return (
+    <li
+      className={`card-soft flex items-center gap-3 p-2.5 sm:p-3 ${
+        isNext ? "border-primary/50" : ""
+      } ${done ? "opacity-80" : ""}`}
+    >
+      <div className="w-12 shrink-0 text-center">
+        <p className="text-[11px] uppercase text-muted-foreground">
+          {shortDate(day.date).split(" ")[0]}
+        </p>
+        <p className="text-lg font-bold leading-none">{shortDate(day.date).split(" ")[1]}</p>
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="flex flex-wrap items-center gap-x-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+          {SKILL_LABELS[day.skill] ?? day.skill}
+          <span
+            className={`rounded-full px-1.5 py-px text-[10px] font-semibold normal-case tracking-normal ${
+              done
+                ? "bg-primary/15 text-primary"
+                : day.status === "today"
+                  ? "bg-primary text-primary-foreground"
+                  : day.status === "missed"
+                    ? "bg-amber-400/15 text-amber-400"
+                    : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {done && <Check className="mr-0.5 inline size-3" aria-hidden="true" />}
+            {STATUS_TEXT[day.status]}
+          </span>
+        </p>
+        <p className="break-words text-sm font-medium sm:text-base">{day.title}</p>
+      </div>
+      <DayLink
+        day={day}
+        className={`inline-flex h-8 shrink-0 items-center rounded-lg border px-3 text-xs font-medium transition-colors sm:text-sm ${
+          done
+            ? "border-border text-muted-foreground hover:bg-accent"
+            : "border-primary/50 hover:bg-primary/10"
+        }`}
+      >
+        {done ? "Review" : day.status === "missed" ? "Catch up" : "Start"}
+      </DayLink>
+    </li>
   );
 }
 
