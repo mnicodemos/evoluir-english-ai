@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Trophy } from "lucide-react";
+import { Medal } from "lucide-react";
 
 import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,8 @@ import { leagueLevelOf } from "@/lib/level";
 /**
  * Dashboard header cell: the student's place in this week's league (same
  * weekly_league ranking and query key as the league page), or an invitation to
- * join. Uses the trophy icon; the league artwork stays on the league page.
+ * join. Uses a medal (ranking) icon: the trophy already marks the weekly goal in
+ * "Your learning rhythm", and the league artwork stays on the league page.
  */
 export function WeeklyLeagueSummary({
   profile,
@@ -33,7 +34,7 @@ export function WeeklyLeagueSummary({
 
   return (
     <DashboardHeaderStat
-      icon={<Trophy className="size-6" strokeWidth={2.2} />}
+      icon={<Medal className="size-6" strokeWidth={2.2} />}
       tone="amber"
       label={translate("Weekly league")}
       value={
