@@ -17,6 +17,7 @@ import {
   Sparkles,
   TriangleAlert,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
@@ -35,6 +36,7 @@ import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useDueReviewCount } from "@/hooks/useDueReviewCount";
+import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { WeatherTalk } from "@/components/WeatherTalk";
@@ -169,6 +171,15 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const reviewCount = useDueReviewCount(profile?.id);
+  // Same query as the Study Plan page, so opening the plan reuses it.
+  const { data: studyPlan } = useQuery({
+    queryKey: ["study-plan", profile?.id],
+    queryFn: () => loadStudyPlan(),
+    enabled: !!profile?.id,
+    staleTime: 5 * 60 * 1000,
+  });
+  const planNext =
+    studyPlan?.plan.nextIndex != null ? studyPlan.plan.days[studyPlan.plan.nextIndex] : null;
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const nextLeague = profile ? getNextLeague(streakDays) : null;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
@@ -516,8 +527,19 @@ function Dashboard() {
                   />
                 </Link>
                 {/* The closing line only shows where the row has height to spare. */}
-                <p className="text-center text-xs text-muted-foreground xl:max-[1679.98px]:hidden!">
-                  {t("Small steps create progress.")}
+                <p className="max-w-full truncate text-center text-xs text-muted-foreground xl:max-[1679.98px]:hidden!">
+                  {planNext ? (
+                    <>
+                      {planNext.status === "today"
+                        ? t("Today in your plan")
+                        : planNext.status === "missed"
+                          ? t("Catch up")
+                          : t("Next in your plan")}
+                      : <span className="font-medium text-foreground">{planNext.title}</span>
+                    </>
+                  ) : (
+                    t("Small steps create progress.")
+                  )}
                 </p>
               </div>
               <WeeklyFrequency

@@ -6,11 +6,12 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
-import { STUDY_TIME_ZONE } from "@/lib/today";
+import { STUDY_TIME_ZONE, studyToday } from "@/lib/today";
 
 import {
   buildStudyPlan,
   type PlanLesson,
+  type PlanPractice,
   type PlanSkillNeed,
   type StudyFocus,
   type StudyPlan,
@@ -56,7 +57,12 @@ export const loadStudyPlan = createServerFn({ method: "POST" })
     const daysPerWeek = profile?.study_days_per_week ?? 3;
     const focus = (profile?.study_focus ?? "balanced") as StudyFocus;
 
-    let lessonQuery = supabaseAdmin.from("lessons").select("id, title, skill, level, sort_order");
+    // Shared lessons and the student's own path lessons only (never another
+    // student's generated lessons, which this admin read could otherwise see).
+    let lessonQuery = supabaseAdmin
+      .from("lessons")
+      .select("id, title, skill, level, sort_order")
+      .or(`created_by.is.null,created_by.eq.${userId}`);
     if (level) lessonQuery = lessonQuery.eq("level", level);
     const recentSince = new Date(Date.now() - 7 * 86_400_000).toISOString();
     const [
@@ -74,9 +80,8 @@ export const loadStudyPlan = createServerFn({ method: "POST" })
         .not("completed_at", "is", null),
       supabaseAdmin
         .from("activities")
-        .select("duration_minutes, activity_type")
+        .select("duration_minutes, activity_type, created_at")
         .eq("user_id", userId)
-        .in("activity_type", [...LEARNING_ACTIVITY_TYPES])
         .gte("created_at", since),
       supabaseAdmin
         .from("current_skill_profile")
@@ -100,10 +105,11 @@ export const loadStudyPlan = createServerFn({ method: "POST" })
         completed: done.has(row.id),
       }));
 
-    const minutesThisWeek = (activityRows ?? []).reduce(
-      (total, row) => total + (row.duration_minutes ?? 0),
-      0,
-    );
+    const minutesThisWeek = (activityRows ?? [])
+      .filter((row) =>
+        (LEARNING_ACTIVITY_TYPES as readonly string[]).includes(row.activity_type ?? ""),
+      )
+      .reduce((total, row) => total + (row.duration_minutes ?? 0), 0);
 
     // Existing activity types mapped onto the skill names already used by the
     // skill profile. Read-only: nothing is written and no score is recomputed.
@@ -116,6 +122,7 @@ export const loadStudyPlan = createServerFn({ method: "POST" })
       conversation_practice: "speaking",
       vocabulary: "vocabulary",
       flashcards: "vocabulary",
+      teacher: "grammar",
       lesson: "reading",
       lesson_practice: "reading",
       final_test: "reading",
@@ -125,6 +132,30 @@ export const loadStudyPlan = createServerFn({ method: "POST" })
         .map((row) => ACTIVITY_TO_SKILL[row.activity_type ?? ""])
         .filter((skill): skill is string => !!skill),
     );
+
+    // What was practised this week, by São Paulo date: activities mapped to a
+    // skill, and lessons completed this week (they keep their own title).
+    const byLessonId = new Map((lessonRows ?? []).map((row) => [row.id, row]));
+    const practice: PlanPractice[] = [
+      ...(activityRows ?? []).flatMap((row) => {
+        const skill = ACTIVITY_TO_SKILL[row.activity_type ?? ""];
+        return skill && row.created_at
+          ? [{ skill, date: studyToday(new Date(row.created_at)) }]
+          : [];
+      }),
+      ...(doneRows ?? []).flatMap((row) => {
+        const lesson = byLessonId.get(row.lesson_id);
+        if (!lesson?.skill || !row.completed_at || row.completed_at < since) return [];
+        return [
+          {
+            skill: lesson.skill === "talking" ? "speaking" : lesson.skill,
+            date: studyToday(new Date(row.completed_at)),
+            lessonId: lesson.id,
+            title: lesson.title,
+          },
+        ];
+      }),
+    ];
 
     const needs: PlanSkillNeed[] = (skillRows ?? [])
       .filter((row) => row.skill)
@@ -147,6 +178,8 @@ export const loadStudyPlan = createServerFn({ method: "POST" })
         lessons,
         minutesThisWeek,
         needs,
+        today: studyToday(),
+        practice,
       }),
     };
   });

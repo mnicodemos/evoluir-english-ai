@@ -68,6 +68,9 @@ export const uiPt: Record<string, string> = {
   "New writing activity": "Nova atividade de escrita",
   "New vocabulary activity": "Nova atividade de vocabulário",
   "Words to review": "Palavras para revisar",
+  "Today in your plan": "Hoje no seu plano",
+  "Catch up": "Recuperar",
+  "Next in your plan": "Próximo no seu plano",
   "Review 1 word": "Revisar 1 palavra",
   "Review {n} words": "Revisar {n} palavras",
   "Their review date has arrived: a quick review keeps them in memory.":
