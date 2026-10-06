@@ -21,7 +21,7 @@ export async function sendFcm(
   token: string,
   message: PushMessage,
   logPrefix = "FCM",
-): Promise<{ ok: true } | { ok: false; stale: boolean }> {
+): Promise<{ ok: true } | { ok: false; stale: boolean; status: number; detail: string }> {
   const res = await fetch(`${GATEWAY_URL}/v1/projects/_/messages:send`, {
     method: "POST",
     headers: {
@@ -40,5 +40,10 @@ export async function sendFcm(
   if (res.ok) return { ok: true };
   const errorBody = await res.text();
   console.error(`${logPrefix} send failed [${res.status}]: ${errorBody}`);
-  return { ok: false, stale: isStaleTokenResponse(res.status, errorBody) };
+  return {
+    ok: false,
+    stale: isStaleTokenResponse(res.status, errorBody),
+    status: res.status,
+    detail: errorBody.slice(0, 200),
+  };
 }

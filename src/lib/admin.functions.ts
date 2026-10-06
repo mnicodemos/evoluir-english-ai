@@ -529,3 +529,62 @@ export const compareLessonGeneration = createServerFn({ method: "POST" })
     const [normal, fast] = await Promise.all([run(false), run(true)]);
     return { key: plan.key, title: plan.title, level: plan.level, normal, fast };
   });
+
+/**
+ * Admin-only push check: how many devices are registered (the admin's own and
+ * everyone's), and a test notification sent to the admin's own devices with
+ * each device's result, to tell a device that never registered from a send
+ * that fails or a daily job that does not run.
+ */
+export const pushDiagnostics = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ send: z.boolean() }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { fcmCredentials, sendFcm } = await import("@/lib/fcm.server");
+    const [{ data: mine }, { count: allDevices }, { data: everyone }] = await Promise.all([
+      supabaseAdmin
+        .from("push_tokens")
+        .select("token, last_seen_at, created_at")
+        .eq("user_id", context.userId)
+        .order("last_seen_at", { ascending: false }),
+      supabaseAdmin.from("push_tokens").select("id", { count: "exact", head: true }),
+      supabaseAdmin.from("push_tokens").select("user_id"),
+    ]);
+    const configured = !!fcmCredentials();
+    const devices = (mine ?? []).map((row) => ({
+      token: `…${row.token.slice(-8)}`,
+      lastSeenAt: row.last_seen_at,
+      createdAt: row.created_at,
+      result: null as null | { ok: boolean; status?: number; detail?: string; stale?: boolean },
+    }));
+    const credentials = fcmCredentials();
+    if (data.send && credentials) {
+      await Promise.all(
+        (mine ?? []).map(async (row, index) => {
+          const result = await sendFcm(
+            credentials,
+            row.token,
+            {
+              title: "Teste de notificação ✅",
+              body: "Se você está vendo isto, as notificações chegam neste aparelho.",
+              path: "/dashboard",
+            },
+            "admin push test",
+          );
+          devices[index]!.result = result.ok
+            ? { ok: true }
+            : { ok: false, status: result.status, detail: result.detail, stale: result.stale };
+        }),
+      );
+    }
+    return {
+      configured,
+      myDevices: devices,
+      allDevices: allDevices ?? 0,
+      usersWithPush: new Set((everyone ?? []).map((row) => row.user_id)).size,
+    };
+  });
