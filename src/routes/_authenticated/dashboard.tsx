@@ -483,6 +483,16 @@ function Dashboard() {
                 <h2 id="today-progress-title" className="font-display text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
+                {/* Mobile: My Progress left the bottom navigation; it opens from the
+                    title line, so the card keeps its height. Desktop has its button below. */}
+                <Link
+                  to="/progress"
+                  className="ml-auto inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 lg:hidden"
+                >
+                  <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
+                  {t("My progress")}
+                  <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+                </Link>
               </div>
               <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
                 <div className="ml-2 flex flex-col items-center lg:mx-auto lg:ml-0 xl:mx-0">

@@ -10,7 +10,6 @@ import {
   Headphones,
   Languages,
   LayoutDashboard,
-  LineChart,
   LogOut,
   Menu,
   MessageSquareText,
@@ -19,6 +18,7 @@ import {
   Sparkles,
   SpellCheck,
   Trophy,
+  Video,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
@@ -388,7 +388,8 @@ function AppShellContent({
   const dashboardMobileNav = [
     { to: "/dashboard", label: lang === "pt" ? "Início" : "Home", icon: LayoutDashboard },
     { to: "/teacher", label: "AI Teacher", icon: Sparkles },
-    { to: "/progress", label: lang === "pt" ? "Progresso" : "Progress", icon: LineChart },
+    // My Progress opens from the Today's Progress card, as on desktop.
+    { to: "/call", label: lang === "pt" ? "Videochamada" : "Video call", icon: Video },
     { to: "/coach", label: "AI Speaking", icon: Mic },
   ] as const;
 
