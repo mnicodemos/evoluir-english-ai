@@ -13,6 +13,7 @@ import {
   MessageSquareText,
   Minus,
   PenLine,
+  RotateCcw,
   Sparkles,
   TriangleAlert,
 } from "lucide-react";
@@ -33,6 +34,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useDueReviewCount } from "@/hooks/useDueReviewCount";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { WeatherTalk } from "@/components/WeatherTalk";
@@ -60,25 +62,42 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 type DashboardNotificationsProps = {
   indicators: ReturnType<typeof useActivityIndicators>;
+  /** Vocabulary reviews due today (already capped at the daily review limit). */
+  reviewCount: number;
   translate: (label: string) => string;
   placement: "mobile" | "desktop";
 };
 
-function DashboardNotifications({ indicators, translate, placement }: DashboardNotificationsProps) {
+function DashboardNotifications({
+  indicators,
+  reviewCount,
+  translate,
+  placement,
+}: DashboardNotificationsProps) {
   const items = [
     {
+      id: "review",
+      to: "/vocabulary",
+      label: `${translate("Words to review")}: ${reviewCount}`,
+      icon: RotateCcw,
+      visible: reviewCount > 0,
+    },
+    {
+      id: "listening",
       to: "/listening",
       label: "New listening activity",
       icon: Headphones,
       visible: indicators.listening,
     },
     {
+      id: "writing",
       to: "/writing",
       label: "New writing activity",
       icon: PenLine,
       visible: indicators.writing,
     },
     {
+      id: "vocabulary",
       to: "/vocabulary",
       label: "New vocabulary activity",
       icon: BookOpen,
@@ -121,7 +140,7 @@ function DashboardNotifications({ indicators, translate, placement }: DashboardN
           <div className="grid gap-1">
             {activeItems.map((item) => (
               <Link
-                key={item.to}
+                key={item.id}
                 to={item.to}
                 className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
               >
@@ -149,6 +168,7 @@ function Dashboard() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
+  const reviewCount = useDueReviewCount(profile?.id);
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const nextLeague = profile ? getNextLeague(streakDays) : null;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
@@ -256,6 +276,7 @@ function Dashboard() {
                 <div className="flex items-center gap-1">
                   <DashboardNotifications
                     indicators={indicators}
+                    reviewCount={reviewCount}
                     translate={t}
                     placement="desktop"
                   />
@@ -280,6 +301,7 @@ function Dashboard() {
                   <WeatherTalk translate={t} placement="mobile" />
                   <DashboardNotifications
                     indicators={indicators}
+                    reviewCount={reviewCount}
                     translate={t}
                     placement="mobile"
                   />
