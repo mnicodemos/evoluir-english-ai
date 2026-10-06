@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-import { Loader2, Mic, MicOff, Sparkles, Star, Volume2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Loader2, Mic, MicOff, Sparkles, Star, Video, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -39,6 +40,7 @@ import {
   type RolePlay,
 } from "@/components/coach/coachScenarios";
 import { SpeakingReport } from "@/components/coach/SpeakingReport";
+import { VideoCallStage } from "@/components/coach/VideoCallStage";
 import { isWeatherCondition, weatherRolePlay } from "@/lib/weatherTalk";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -47,10 +49,13 @@ type VoiceState = "idle" | "recording" | "sending" | "transcribing" | "thinking"
 export function VoiceCoach({
   lessonTopic,
   weather,
+  presentation = "chat",
 }: {
   lessonTopic?: string | undefined;
   /** Opens a "Weather talk" conversation about today's weather. */
   weather?: string | undefined;
+  /** "call" shows the same conversation as a video call with EVO. */
+  presentation?: "chat" | "call";
 }) {
   const { data: profile } = useProfile();
   const { data: snapshot } = useStudySnapshot();
@@ -315,20 +320,6 @@ export function VoiceCoach({
     }
   }
 
-  if (!scenario) {
-    return (
-      <>
-        <h1 className="text-3xl font-bold">AI Speaking</h1>
-        <p className="mt-2 text-muted-foreground">
-          Starting a new conversation… the AI is choosing today's subject.
-        </p>
-        <div className="mt-7 flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="size-5 animate-spin" /> <Shimmer>Preparing your topic…</Shimmer>
-        </div>
-      </>
-    );
-  }
-
   const userAnswers = messages.filter((message) => message.role === "user").length;
   const lastAssistantIndex = messages.reduce(
     (last, message, index) => (message.role === "assistant" ? index : last),
@@ -354,6 +345,42 @@ export function VoiceCoach({
               ? "EVO is speaking… tap the microphone to answer now"
               : "Tap the microphone and speak in English";
 
+  if (presentation === "call") {
+    const lastAssistant = [...messages].reverse().find((message) => message.role === "assistant");
+    return (
+      <VideoCallStage
+        preparing={!scenario}
+        topicLabel={rolePlay ? rolePlay.label : "Free conversation"}
+        lastAssistantText={lastAssistant?.content ?? ""}
+        voiceState={voiceState}
+        statusText={statusText}
+        userAnswers={userAnswers}
+        canFinish={canFinish}
+        finishing={finishing}
+        report={report ? <SpeakingReport report={report} /> : null}
+        onToggleMic={() => void toggleRecording()}
+        onReplay={() => {
+          if (lastAssistant) void playResponse(lastAssistant.content);
+        }}
+        onFinish={() => void finish()}
+      />
+    );
+  }
+
+  if (!scenario) {
+    return (
+      <>
+        <h1 className="text-3xl font-bold">AI Speaking</h1>
+        <p className="mt-2 text-muted-foreground">
+          Starting a new conversation… the AI is choosing today's subject.
+        </p>
+        <div className="mt-7 flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="size-5 animate-spin" /> <Shimmer>Preparing your topic…</Shimmer>
+        </div>
+      </>
+    );
+  }
+
   const newTopic = () => {
     cancelVoiceRecording();
     topicOffset.current += 1;
@@ -362,7 +389,7 @@ export function VoiceCoach({
 
   return (
     <div className="space-y-5">
-      <div>
+      <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">AI Speaking</h1>
           <p className="max-w-full text-sm leading-snug text-muted-foreground">
@@ -375,6 +402,13 @@ export function VoiceCoach({
             )}
           </p>
         </div>
+        <Button asChild size="sm" variant="outline" className="shrink-0 gap-1.5">
+          <Link to="/call">
+            <Video className="size-4" />
+            <span className="hidden sm:inline">Video call with EVO</span>
+            <span className="sm:hidden">Video call</span>
+          </Link>
+        </Button>
       </div>
 
       {userAnswers === 0 && (
