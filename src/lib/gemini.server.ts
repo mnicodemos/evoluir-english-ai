@@ -45,7 +45,19 @@ export class GeminiError extends Error {
   }
 }
 
-function requestBody(messages: GeminiMessage[], jsonMode = false) {
+/**
+ * Per-call speed settings. `fast` turns off the model's "thinking" step, which
+ * is most of the wait on short, simple answers (chat replies, dictionary,
+ * word lists); `maxOutputTokens` caps the answer length. Calls that benefit
+ * from reasoning (writing correction, lessons, reports, Teacher) omit both.
+ */
+export type GeminiSpeed = { fast?: boolean; maxOutputTokens?: number };
+
+// Models that answered 400 to thinkingConfig and accepted the plain request.
+// Remembered per server instance so later calls skip the doomed first try.
+const modelsWithoutThinkingConfig = new Set<string>();
+
+function requestBody(messages: GeminiMessage[], jsonMode = false, speed: GeminiSpeed = {}) {
   const systemParts = messages
     .filter((message) => message.role === "system")
     .map((message) => message.content);
@@ -63,6 +75,8 @@ function requestBody(messages: GeminiMessage[], jsonMode = false) {
       : {}),
     generationConfig: {
       ...(jsonMode ? { responseMimeType: "application/json" } : {}),
+      ...(speed.maxOutputTokens ? { maxOutputTokens: speed.maxOutputTokens } : {}),
+      ...(speed.fast ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
     },
   });
 }
@@ -119,10 +133,15 @@ export async function callGemini(
   jsonMode = false,
   onUsage?: (usage: GeminiUsage) => void,
   signal?: AbortSignal,
+  speed: GeminiSpeed = {},
 ): Promise<string | null> {
   const credentials = connectorCredentials();
   if (!credentials) return null;
-  const body = requestBody(messages, jsonMode);
+  // The plain request is exactly the previous one (no length cap either): if a
+  // model refuses thinkingConfig, its thinking tokens would count against the
+  // cap and could cut the answer short.
+  const plainBody = requestBody(messages, jsonMode);
+  const fastBody = speed.fast ? requestBody(messages, jsonMode, speed) : plainBody;
 
   let lastStatus = 503;
   let retryAfter = 0;
@@ -131,16 +150,26 @@ export async function callGemini(
     // small number of attempts and backoff. Terminal errors stop immediately.
     for (let attempt = 1; attempt <= GEMINI_ATTEMPTS_PER_MODEL; attempt++) {
       const started = Date.now();
-      const res = await fetch(`${GATEWAY_URL}/v1beta/models/${model}:generateContent`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${credentials.lovableKey}`,
-          "X-Connection-Api-Key": credentials.connectionKey,
-          "Content-Type": "application/json",
-        },
-        body,
-        ...(signal ? { signal } : {}),
-      });
+      const send = (body: string) =>
+        fetch(`${GATEWAY_URL}/v1beta/models/${model}:generateContent`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${credentials.lovableKey}`,
+            "X-Connection-Api-Key": credentials.connectionKey,
+            "Content-Type": "application/json",
+          },
+          body,
+          ...(signal ? { signal } : {}),
+        });
+      const tryFast = speed.fast && !modelsWithoutThinkingConfig.has(model);
+      let res = await send(tryFast ? fastBody : plainBody);
+      // A 400 here can mean this model version does not accept thinkingConfig:
+      // repeat once without it and remember the model (same as transcription).
+      if (tryFast && res.status === 400) {
+        const retry = await send(plainBody);
+        if (retry.ok) modelsWithoutThinkingConfig.add(model);
+        res = retry;
+      }
 
       if (!res.ok) {
         lastStatus = res.status;
