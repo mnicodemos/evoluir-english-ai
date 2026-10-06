@@ -77,6 +77,16 @@ export type NextStep = {
    */
   reviews?: SmartReviewItem[];
 
+  /**
+   * The per-skill snapshots this step was decided from (current level first),
+   * for the Dashboard skills card only, so the card and the priority agree.
+   */
+  skills?: {
+    skill: string;
+    score: number | null;
+    cefrLevel: string;
+    evidenceCount: number | null;
+  }[];
   /** Existing evidence for the chosen skill, exposed for contextual display only. */
   insight?: {
     cefrLevel: string | null;

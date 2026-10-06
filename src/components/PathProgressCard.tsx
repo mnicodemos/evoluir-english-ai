@@ -1,5 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, BarChart3, Download, Headphones, Loader2, Mic, PenLine } from "lucide-react";
+import {
+  BookOpen,
+  BarChart3,
+  Download,
+  GraduationCap,
+  Headphones,
+  Loader2,
+  Mic,
+  PenLine,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +18,8 @@ import { useLearningPath } from "@/hooks/useCurriculum";
 import { useUserLessons } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
+import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
+import { skillMeterRows, type SkillMeterStatus } from "@/lib/pedagogy/skillMeter";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 
@@ -35,7 +46,8 @@ export function PathProgressCard({
 
   const { data: latest } = useQuery({
     queryKey: ["progress-latest", profile?.id, profile?.level],
-    enabled: !!profile,
+    // The compact Dashboard card reads the evidence-based skills instead.
+    enabled: !compact && !!profile,
     queryFn: async () => {
       const { data } = await supabase
         .from("progress")
@@ -48,6 +60,17 @@ export function PathProgressCard({
       return data;
     },
   });
+
+  // Dashboard card: the same per-skill evidence "Today's priority" is decided
+  // from (shared cache with the EVO card), never the old best-ever scores.
+  const { data: nextStep, isLoading: skillsLoading } = useQuery({
+    queryKey: ["next-step", profile?.level ?? null],
+    queryFn: () => loadNextStep({ data: undefined }),
+    staleTime: 60 * 1000,
+    enabled: compact && !!profile,
+  });
+  const meterRows = skillMeterRows(nextStep?.skills, nextStep?.prioritySkill);
+  const anyMeasured = meterRows.some((row) => row.value !== null);
 
   const skills = [
     {
@@ -182,55 +205,51 @@ export function PathProgressCard({
           </h2>
         </div>
         <div className="mt-2 grid flex-1 content-between gap-2 lg:mt-3 lg:gap-3 xl:mt-4 xl:gap-2">
-          {skills.map((skill) => {
-            const statusTone =
-              skill.value >= 95
-                ? {
-                    text: "text-success",
-                    bar: "[&>div]:bg-success",
-                    badge: "bg-success/15 text-success",
-                  }
-                : skill.value >= 80
-                  ? {
-                      text: "text-dashboard-blue",
-                      bar: "[&>div]:bg-dashboard-blue",
-                      badge: "bg-dashboard-blue/15 text-dashboard-blue",
-                    }
-                  : {
-                      text: "text-warning",
-                      bar: "[&>div]:bg-warning",
-                      badge: "bg-warning/15 text-warning",
-                    };
+          {meterRows.map((row) => {
+            const meta = SKILL_META[row.skill as keyof typeof SKILL_META];
+            const tone = STATUS_TONE[row.status];
+            const Icon = meta.icon;
+            const basis =
+              row.evidenceCount > 0
+                ? lang === "pt"
+                  ? `Com base em ${row.evidenceCount} ${row.evidenceCount === 1 ? "evidência" : "evidências"}`
+                  : `Based on ${row.evidenceCount} ${row.evidenceCount === 1 ? "piece" : "pieces"} of evidence`
+                : t("Practise this skill to measure it.");
             return (
               <div
-                key={skill.label}
-                className="grid min-w-0 grid-cols-[1.5rem_4.25rem_minmax(0,1fr)_2.25rem_4rem] items-center gap-2 text-xs sm:grid-cols-[1.75rem_5rem_minmax(0,1fr)_2.5rem_4.5rem] sm:gap-2.5"
+                key={row.skill}
+                title={basis}
+                className="grid min-w-0 grid-cols-[1.5rem_4.25rem_minmax(0,1fr)_2.25rem_4.75rem] items-center gap-2 text-xs sm:grid-cols-[1.75rem_5rem_minmax(0,1fr)_2.5rem_5.25rem] sm:gap-2.5"
               >
-                <skill.icon
-                  className={`size-[1.65rem] ${statusTone.text}`}
+                <Icon
+                  className={`size-[1.65rem] ${tone.text}`}
                   strokeWidth={2.5}
                   aria-hidden="true"
                 />
-                <span className="truncate font-medium">{t(skill.label)}</span>
-                <Progress
-                  value={skill.value}
-                  className={`h-2.5 bg-secondary/80 ${statusTone.bar}`}
-                />
-                <span className="text-right font-semibold text-foreground">{skill.value}%</span>
+                <span className="truncate font-medium">{t(meta.label)}</span>
+                {row.value === null ? (
+                  <span
+                    className="h-2.5 rounded-full border border-dashed border-border"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Progress value={row.value} className={`h-2.5 bg-secondary/80 ${tone.bar}`} />
+                )}
                 <span
-                  className={`rounded-full px-2 py-1 text-center text-[10px] font-semibold ${statusTone.badge}`}
+                  className={`text-right font-semibold ${row.value === null ? "text-muted-foreground" : "text-foreground"}`}
                 >
-                  {skill.value >= 95
-                    ? t("Advanced")
-                    : skill.value >= 80
-                      ? t("Strong")
-                      : t("Priority")}
+                  {skillsLoading ? "…" : row.value === null ? "—" : `${row.value}%`}
+                </span>
+                <span
+                  className={`truncate rounded-full px-1.5 py-1 text-center text-[10px] font-semibold ${tone.badge}`}
+                >
+                  {t(STATUS_LABEL[row.status])}
                 </span>
               </div>
             );
           })}
         </div>
-        {!latest && (
+        {!skillsLoading && !anyMeasured && (
           <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
             {t("Finish your first conversation or writing task to unlock your scores.")}
           </p>
@@ -256,3 +275,42 @@ export function PathProgressCard({
     </section>
   );
 }
+
+const SKILL_META = {
+  listening: { label: "Listening", icon: Headphones },
+  speaking: { label: "Speaking", icon: Mic },
+  writing: { label: "Writing", icon: PenLine },
+  grammar: { label: "Grammar", icon: GraduationCap },
+} as const;
+
+const STATUS_LABEL: Record<SkillMeterStatus, string> = {
+  priority: "Priority",
+  strong: "Strong",
+  on_track: "Good",
+  needs_work: "Needs work",
+  not_measured: "No data",
+};
+
+const STATUS_TONE: Record<SkillMeterStatus, { text: string; bar: string; badge: string }> = {
+  priority: {
+    text: "text-warning",
+    bar: "[&>div]:bg-warning",
+    badge: "bg-warning/15 text-warning ring-1 ring-warning/40",
+  },
+  strong: { text: "text-success", bar: "[&>div]:bg-success", badge: "bg-success/15 text-success" },
+  on_track: {
+    text: "text-dashboard-blue",
+    bar: "[&>div]:bg-dashboard-blue",
+    badge: "bg-dashboard-blue/15 text-dashboard-blue",
+  },
+  needs_work: {
+    text: "text-warning/80",
+    bar: "[&>div]:bg-warning/70",
+    badge: "bg-warning/10 text-warning/90",
+  },
+  not_measured: {
+    text: "text-muted-foreground",
+    bar: "",
+    badge: "bg-secondary text-muted-foreground",
+  },
+};
