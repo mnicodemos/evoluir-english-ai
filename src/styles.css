@@ -251,7 +251,7 @@
     color: oklch(0.35 0.01 240) !important;
   }
 
-/* The bell popup follows the phone theme too: a light-mode phone gets a
+  /* The bell popup follows the phone theme too: a light-mode phone gets a
      light notification, still translucent over the dark dashboard. */
   .notification-popover.dashboard-shell.dark {
     --popover: oklch(0.97 0.004 240);
@@ -456,12 +456,26 @@
   }
 }
 
-/* EVO card: between 1280px and 1439px the approved 25rem image column does not
-   fit next to the "Why this matters" aside, so the image and aside columns
-   shrink and the priority text keeps room for its button. The image itself is
-   object-contain, so nothing is cropped or distorted. */
-@media (min-width: 1280px) and (max-width: 1439.98px) {
+/* EVO card (desktop): the image column is as wide as the complete 3:2 image
+   needs to be exactly as tall as the card (100cqh; 1.5rem = the 0.75rem inset
+   on both sides), so it lines up with the "Why this matters now" column. It
+   never takes the minimum room of the priority text and that column (100cqw);
+   when there is not enough width the image stays complete and centered.
+   Nothing is cropped or distorted. */
+@media (min-width: 1280px) {
+  .dashboard-focus {
+    container-type: size;
+  }
   .dashboard-evo-grid {
-    grid-template-columns: 15.5rem minmax(12.5rem, 1fr) minmax(18rem, 1.16fr);
+    grid-template-columns:
+      min(calc((100cqh - 1.5rem) * 1.5 + 1.5rem), calc(100cqw - 12.5rem - 18rem))
+      minmax(12.5rem, 1fr) minmax(18rem, 1.16fr);
+  }
+}
+@media (min-width: 1440px) {
+  .dashboard-evo-grid {
+    grid-template-columns:
+      min(calc((100cqh - 1.5rem) * 1.5 + 1.5rem), calc(100cqw - 12.5rem - 19.66rem))
+      minmax(12.5rem, 1fr) minmax(19.66rem, 1.16fr);
   }
 }
