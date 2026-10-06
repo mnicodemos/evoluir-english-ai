@@ -59,7 +59,7 @@ authenticated("authenticated smoke", () => {
       await expect(nav).toBeVisible();
       await expect(nav.locator("a")).toHaveCount(4);
       await expect(nav.locator("a").nth(1)).toContainText("AI Teacher");
-      await expect(nav.locator("a").nth(2)).toContainText(/Progresso|Progress/);
+      await expect(nav.locator("a").nth(2)).toContainText(/Videochamada|Video call/);
       await expect(nav.locator("a").nth(3)).toContainText("AI Speaking");
     }
   });
