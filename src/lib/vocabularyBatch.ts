@@ -10,6 +10,9 @@ export type SuggestedWord = {
 };
 
 /** A new batch is unlocked by each completed lesson, so retaking one never creates a new batch. */
+/** Words unlocked by each completed lesson. */
+export const VOCABULARY_BATCH_SIZE = 10;
+
 export function lessonBatchKey(completedLessons: number) {
   return `completed-${completedLessons}`;
 }

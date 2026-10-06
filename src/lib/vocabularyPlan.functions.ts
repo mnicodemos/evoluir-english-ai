@@ -8,7 +8,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { callGateway } from "./ai-gateway.server";
 import { studyToday } from "./today";
-import { lessonBatchKey, ownedWordSet, selectNewWords } from "./vocabularyBatch";
+import {
+  lessonBatchKey,
+  ownedWordSet,
+  selectNewWords,
+  VOCABULARY_BATCH_SIZE,
+} from "./vocabularyBatch";
 
 export type DailyWord = {
   id: string;
@@ -24,7 +29,7 @@ export type DailyWord = {
 
 const SELECT =
   "id, word, translation, meaning, pronunciation, example, category, difficulty, lesson_id";
-const DAILY_COUNT = 10;
+const DAILY_COUNT = VOCABULARY_BATCH_SIZE;
 
 type AiWord = {
   word?: string;
@@ -214,10 +219,12 @@ async function buildDailyWords(
   // Saving fewer than ten words is fine; the batch is never padded with existing words.
   let fresh = selectNewWords(first, usedWords, missing);
 
-  // The model sometimes repeats known words: one retry with those repeats added to the
-  // exclusion list, instead of failing the whole batch. The pause respects the usage
-  // limiter, which would otherwise reject a second call fired immediately.
-  if (!fresh.length) {
+  // The model sometimes repeats known words: when the first answer does not fill
+  // the batch, one retry asks for the rest, with every word already seen
+  // (owned, repeated or just picked) excluded, so a completed lesson leaves ten
+  // words instead of a partial batch. The pause respects the usage limiter,
+  // which would otherwise reject a second call fired immediately.
+  if (fresh.length < missing) {
     for (const w of first)
       exclude.add(
         String(w.word ?? "")
@@ -226,10 +233,14 @@ async function buildDailyWords(
       );
     try {
       await new Promise((resolve) => setTimeout(resolve, 6_000));
-      fresh = selectNewWords(await askAi(exclude, true), usedWords, missing);
+      const taken = new Set([
+        ...usedWords,
+        ...fresh.map((w) => String(w.word).trim().toLowerCase()),
+      ]);
+      const more = selectNewWords(await askAi(exclude, true), taken, missing - fresh.length);
+      fresh = [...fresh, ...more];
     } catch (error) {
       console.error("[vocabulary] widened generation attempt failed", (error as Error).message);
-      fresh = [];
     }
   }
 
