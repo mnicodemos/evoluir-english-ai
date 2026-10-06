@@ -4,6 +4,7 @@ import {
   Bolt,
   BookOpen,
   Check,
+  ChevronRight,
   Clock,
   Flame,
   GraduationCap,
@@ -13,7 +14,6 @@ import {
   Minus,
   PenLine,
   Sparkles,
-  Star,
   TriangleAlert,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -401,7 +401,7 @@ function Dashboard() {
                   )}
                 </div>
                 <div className="grid min-w-0 gap-2 xl:gap-1 2xl:gap-2">
-                  <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-warning lg:block xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
+                  <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-muted-foreground lg:block xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
                     {t("KEEPING LEARNING")}
                   </p>
                   {!hasProgressToday && (
@@ -476,19 +476,21 @@ function Dashboard() {
                   />
                 </div>
               </div>
-              {/* Desktop-only "Your trail" badge matches the B2 level pill and
-                  opens the Study Plan above the closing line. */}
+              {/* Desktop-only secondary action to the Study Plan, styled like the
+                  app's other buttons (not a status pill), above a quiet closing line. */}
               <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-2 2xl:gap-1.5 2xl:pt-3">
                 <Link
                   to="/study-plan"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green transition-colors hover:bg-brand-green/25"
+                  className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-sidebar-foreground/[0.04] px-3.5 text-[13px] font-semibold text-sidebar-foreground transition-colors hover:border-brand-green/50 hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
                 >
-                  <Map className="size-4 shrink-0" aria-hidden="true" />
-                  {t("Your trail")}
+                  <Map className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+                  {t("View your trail")}
+                  <ChevronRight
+                    className="size-4 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                 </Link>
-                <p className="flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold uppercase tracking-wide text-warning">
-                  <Star className="size-3.5 shrink-0" aria-hidden="true" />
-                  <span className="sr-only">Star.</span>
+                <p className="text-center text-xs text-muted-foreground">
                   {t("Small steps create progress.")}
                 </p>
               </div>

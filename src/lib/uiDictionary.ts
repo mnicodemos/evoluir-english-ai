@@ -1282,4 +1282,5 @@ export const uiPt: Record<string, string> = {
   Levels: "Níveis",
   "Could not change your level. Please try again.":
     "Não foi possível mudar seu nível. Tente novamente.",
+  "View your trail": "Ver sua trilha",
 };
