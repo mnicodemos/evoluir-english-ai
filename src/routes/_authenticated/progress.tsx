@@ -1,12 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, TriangleAlert } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
-import { EvolutionChart, useSkillHistory } from "@/components/EvolutionChart";
 import { FrequencyCalendar } from "@/components/FrequencyCalendar";
-import { MinutesByDayChart } from "@/components/MinutesByDayChart";
 import { LearningJourneyCard } from "@/components/LearningJourneyCard";
 
 import { Progress as Bar } from "@/components/ui/progress";
@@ -14,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { useProfile } from "@/hooks/useProfile";
+import { useSkillHistory } from "@/hooks/useSkillHistory";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { useVocabularyProgress } from "@/hooks/useVocabularyProgress";
@@ -30,6 +29,15 @@ interface RecentActivity {
   duration_minutes: number;
   score: number | null;
 }
+
+// The charts (and their ~230 KB chart library) load only when the History tab
+// is opened, not with the rest of My Progress.
+const EvolutionChart = lazy(() =>
+  import("@/components/EvolutionChart").then((m) => ({ default: m.EvolutionChart })),
+);
+const MinutesByDayChart = lazy(() =>
+  import("@/components/MinutesByDayChart").then((m) => ({ default: m.MinutesByDayChart })),
+);
 
 export const Route = createFileRoute("/_authenticated/progress")({
   head: () => ({
@@ -247,10 +255,18 @@ function ProgressPage() {
               </div>
               <div className="grid gap-4 xl:grid-cols-2 xl:gap-8">
                 <div className={`min-w-0 ${chartView === "scores" ? "" : "hidden xl:block"}`}>
-                  {profile && <EvolutionChart userId={profile.id} level={profile.level} />}
+                  {profile && (
+                    <Suspense fallback={<Skeleton className="mt-3 h-56 w-full sm:h-72" />}>
+                      <EvolutionChart userId={profile.id} level={profile.level} />
+                    </Suspense>
+                  )}
                 </div>
                 <div className={`min-w-0 ${chartView === "minutes" ? "" : "hidden xl:block"}`}>
-                  {profile && <MinutesByDayChart userId={profile.id} level={profile.level} />}
+                  {profile && (
+                    <Suspense fallback={<Skeleton className="mt-3 h-48 w-full sm:h-56" />}>
+                      <MinutesByDayChart userId={profile.id} level={profile.level} />
+                    </Suspense>
+                  )}
                 </div>
               </div>
             </section>
