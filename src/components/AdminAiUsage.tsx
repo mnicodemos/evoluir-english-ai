@@ -69,10 +69,17 @@ export function AdminAiUsage() {
                   <th className="py-2 pr-2">Operation</th>
                   <th className="pr-2">Calls</th>
                   <th className="pr-2">OK</th>
-                  <th className="pr-2">Errors</th>
+                  <th className="pr-2" title="Real failures (not blocked, not cancelled)">
+                    Errors
+                  </th>
                   <th className="pr-2">Timeouts</th>
                   <th className="pr-2">Cancelled</th>
-                  <th className="pr-2">Blocked</th>
+                  <th
+                    className="pr-2"
+                    title="Refused by a limit before calling the AI; the app waits and retries"
+                  >
+                    Blocked
+                  </th>
                   <th className="pr-2">Avg</th>
                   <th className="pr-2">P95</th>
                   <th className="pr-2">Max</th>
@@ -124,7 +131,10 @@ export function AdminAiUsage() {
             </table>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            Retries: {ND} (retries inside one call are not recorded separately).
+            Calls = OK + Errors + Cancelled + Blocked. Errors are real failures; Blocked are
+            requests refused by a limit (another one was running) that the app waits on and retries;
+            Cancelled includes abandoned. Retries: {ND} (retries inside one call are not recorded
+            separately).
           </p>
           <LatencyByDay trend={q.data.latencyTrend} />
         </>
@@ -132,6 +142,9 @@ export function AdminAiUsage() {
     </section>
   );
 }
+
+/** Below this many calls a day's median is noise, so it is never colored. */
+const MIN_TREND_CALLS = 5;
 
 type Trend = Awaited<ReturnType<typeof getAiUsageSummary>>["latencyTrend"];
 
@@ -142,8 +155,9 @@ function LatencyByDay({ trend }: { trend: Trend }) {
     <div className="mt-5">
       <h4 className="text-sm font-semibold">Answer time by day (median)</h4>
       <p className="mb-2 text-xs text-muted-foreground">
-        Successful calls only, São Paulo days. Green = faster than the day before, red = slower
-        (changes under 10% stay neutral).
+        Successful calls only, São Paulo days. Green = faster than the previous day with enough
+        calls, red = slower (changes under 10% stay neutral). Days with fewer than {MIN_TREND_CALLS}{" "}
+        calls are greyed out and never colored: too few to compare.
       </p>
       <div className="max-h-[40vh] overflow-auto">
         <table className="w-full text-left text-xs">
@@ -166,16 +180,23 @@ function LatencyByDay({ trend }: { trend: Trend }) {
                   {trend.days.map((day) => {
                     const cell = entry.cells[day];
                     const median = cell?.medianMs ?? null;
+                    const enough = (cell?.calls ?? 0) >= MIN_TREND_CALLS;
                     const change =
-                      median !== null && previous !== null && previous > 0
+                      enough && median !== null && previous !== null && previous > 0
                         ? (median - previous) / previous
                         : 0;
-                    if (median !== null) previous = median;
+                    if (enough && median !== null) previous = median;
                     return (
                       <td
                         key={day}
                         className={`whitespace-nowrap pr-3 tabular-nums ${
-                          change <= -0.1 ? "text-emerald-400" : change >= 0.1 ? "text-red-400" : ""
+                          !enough
+                            ? "text-muted-foreground"
+                            : change <= -0.1
+                              ? "text-emerald-400"
+                              : change >= 0.1
+                                ? "text-red-400"
+                                : ""
                         }`}
                       >
                         {cell ? (

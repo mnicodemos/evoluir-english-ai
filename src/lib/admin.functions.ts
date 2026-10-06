@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { latencyByDay } from "@/lib/aiLatencyTrend";
+import { studyToday } from "@/lib/today";
 
 async function hasAdminRole(
   supabase: {
@@ -54,7 +55,11 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
 // Static facts read from the current code (not from the database), so the panel
 // can show them next to the measured numbers. "primary" = main path in code.
 const OPERATION_FACTS: Record<string, { label: string; streaming: string; path: string }> = {
-  talking: { label: "AI Talking", streaming: "Yes", path: "Primary: Lovable AI" },
+  talking: {
+    label: "AI Talking",
+    streaming: "Yes",
+    path: "Primary: Gemini (personal key) · opener and streamed reply",
+  },
   teacher: { label: "AI Teacher", streaming: "No", path: "Primary: Gemini (personal key)" },
   transcription: {
     label: "Transcription",
@@ -280,6 +285,8 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
       outputTokens: number;
       models: Set<string>;
       errorCodes: Record<string, number>;
+      /** Latest occurrence of each error code (ISO), to tell old from current problems. */
+      errorLastSeen: Record<string, string>;
     };
     const map = new Map<string, Agg>();
     for (const r of rows ?? []) {
@@ -299,6 +306,7 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
           outputTokens: 0,
           models: new Set(),
           errorCodes: {},
+          errorLastSeen: {},
         };
         map.set(r.operation, a);
       }
@@ -306,13 +314,18 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
       a.models.add(r.model);
       if (r.success) a.ok++;
       else if (r.success === false) {
-        a.errors++;
         const code = r.error_code ?? "unknown";
         a.errorCodes[code] = (a.errorCodes[code] ?? 0) + 1;
+        if (!a.errorLastSeen[code] || r.created_at > a.errorLastSeen[code]!)
+          a.errorLastSeen[code] = r.created_at;
         if (code === "timeout") a.timeouts++;
+        // Three separate outcomes, so Calls = OK + Errors + Cancelled + Blocked:
+        // blocked = refused before calling the AI (the app waits and retries),
+        // cancelled = the student left or the request was cut, errors = real failures.
         if (code === "cancelled" || code === "abandoned") a.cancelled++;
-        if (code === "concurrent_limit" || code === "rate_limit" || code.endsWith("_limit"))
+        else if (code === "concurrent_limit" || code === "rate_limit" || code.endsWith("_limit"))
           a.blocked++;
+        else a.errors++;
       }
       if (typeof r.duration_ms === "number") a.durations.push(r.duration_ms);
       if (typeof r.input_tokens === "number" || typeof r.output_tokens === "number") {
@@ -339,7 +352,12 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
           topErrors: Object.entries(a.errorCodes)
             .sort((x, y) => y[1] - x[1])
             .slice(0, 3)
-            .map(([code, n]) => `${code} (${n})`),
+            .map(([code, n]) => {
+              const last = a.errorLastSeen[code];
+              return last
+                ? `${code} (${n}, last ${studyToday(new Date(last)).slice(5)})`
+                : `${code} (${n})`;
+            }),
           avgMs: d.length ? Math.round(d.reduce((s, v) => s + v, 0) / d.length) : null,
           p95Ms: d.length ? d[Math.min(d.length - 1, Math.floor(d.length * 0.95))] : null,
           maxMs: d.length ? d[d.length - 1] : null,
