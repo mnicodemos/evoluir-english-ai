@@ -204,7 +204,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(quickWin.cta)} · {t(quickWin.activity.title)}
               </span>
             </span>
@@ -215,7 +215,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(quickWin.cta)} · {t(quickWin.activity.title)}
               </span>
             </span>
@@ -237,7 +237,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)} ·{" "}
                 {t(data.quest.resource.title)}
               </span>
@@ -249,7 +249,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal xl:max-[1799.98px]:hidden!">
+              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)} ·{" "}
                 {t(data.quest.resource.title)}
               </span>
@@ -492,15 +492,24 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </li>
             </ul>
             {(quickWinButton || challengeButton) && (
-              <div className="mt-3 hidden items-stretch gap-2 border-t border-border pt-3 sm:flex xl:mt-auto xl:pt-2">
-                {quickWinButton}
-                {quickWinButton && challengeButton && (
-                  <div
-                    aria-hidden="true"
-                    className="w-px shrink-0 self-stretch bg-sidebar-foreground/15"
-                  />
-                )}
-                {challengeButton}
+              <div className="mt-3 hidden border-t border-border pt-3 sm:block xl:mt-auto">
+                {/* A short heading tells the student what these two extras are. */}
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
+                  {t("Extra practice")}
+                </p>
+                <p className="mt-0.5 text-xs text-sidebar-foreground/70">
+                  {t("Two short options beyond today's priority.")}
+                </p>
+                <div className="mt-2 flex items-stretch gap-2">
+                  {quickWinButton}
+                  {quickWinButton && challengeButton && (
+                    <div
+                      aria-hidden="true"
+                      className="w-px shrink-0 self-stretch bg-sidebar-foreground/15"
+                    />
+                  )}
+                  {challengeButton}
+                </div>
               </div>
             )}
           </aside>
