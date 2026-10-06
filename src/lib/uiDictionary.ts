@@ -1288,4 +1288,7 @@ export const uiPt: Record<string, string> = {
   "Needs work": "Reforçar",
   "No data": "Sem dados",
   "Practise this skill to measure it.": "Pratique esta habilidade para medi-la.",
+  "Practise the rule": "Praticar a regra",
+  "Could not prepare a practice question. Please try again.":
+    "Não foi possível preparar a questão de prática. Tente novamente.",
 };

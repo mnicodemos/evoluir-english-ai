@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Loader2, RotateCcw, Target, XCircle } from "lucide-react";
+import { CheckCircle2, Dumbbell, Loader2, RotateCcw, Target, XCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { isMistakeDue, MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
-import { reviewMistake } from "@/lib/mistakes.functions";
+import { practiceMistake, reviewMistake } from "@/lib/mistakes.functions";
+import type { MistakePractice } from "@/lib/mistakePractice";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mistakes")({
@@ -164,6 +165,7 @@ function Mistakes() {
                   {outcome.explanation && (
                     <p className="text-sm text-muted-foreground">{outcome.explanation}</p>
                   )}
+                  <RulePractice key={current.id} mistakeId={current.id} />
                   <Button onClick={next} className="w-full sm:w-auto">
                     Next
                   </Button>
@@ -229,5 +231,102 @@ function Mistakes() {
         </aside>
       </div>
     </AppShell>
+  );
+}
+
+/**
+ * "Practise the rule": after a review, one new multiple-choice question on the
+ * same rule in a different sentence. Practice only; the review step is kept.
+ */
+function RulePractice({ mistakeId }: { mistakeId: string }) {
+  const load = useServerFn(practiceMistake);
+  const [practice, setPractice] = useState<MistakePractice | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [picked, setPicked] = useState<number | null>(null);
+
+  async function start() {
+    setLoading(true);
+    try {
+      setPractice(await load({ data: { id: mistakeId } }));
+    } catch {
+      toast.error("Could not prepare a practice question. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!practice) {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => void start()}
+        disabled={loading}
+        className="w-full gap-2 sm:w-auto"
+      >
+        {loading ? (
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        ) : (
+          <Dumbbell className="size-4" aria-hidden="true" />
+        )}
+        Practise the rule
+      </Button>
+    );
+  }
+
+  const answered = picked !== null;
+  return (
+    <div className="space-y-2 rounded-lg border border-border p-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Practise the rule
+      </p>
+      <p className="font-medium" lang="en">
+        {practice.question}
+      </p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {practice.options.map((option, index) => {
+          const isAnswer = index === practice.answerIndex;
+          return (
+            <button
+              key={option}
+              type="button"
+              lang="en"
+              disabled={answered}
+              onClick={() => setPicked(index)}
+              className={cn(
+                "rounded-lg border p-2.5 text-left text-sm transition-colors",
+                !answered && "border-border hover:bg-secondary",
+                answered && isAnswer && "border-primary/60 bg-primary/10 text-primary",
+                answered &&
+                  !isAnswer &&
+                  index === picked &&
+                  "border-destructive/50 bg-destructive/5 text-destructive",
+                answered && !isAnswer && index !== picked && "border-border opacity-60",
+              )}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+      {answered && (
+        <div className="space-y-1">
+          <p
+            className={cn(
+              "flex items-center gap-2 text-sm font-semibold",
+              picked === practice.answerIndex ? "text-primary" : "text-destructive",
+            )}
+          >
+            {picked === practice.answerIndex ? (
+              <CheckCircle2 className="size-4" aria-hidden="true" />
+            ) : (
+              <XCircle className="size-4" aria-hidden="true" />
+            )}
+            {picked === practice.answerIndex ? "Correct!" : "Not quite."}
+          </p>
+          <p className="text-sm text-muted-foreground">{practice.explanation}</p>
+        </div>
+      )}
+    </div>
   );
 }
