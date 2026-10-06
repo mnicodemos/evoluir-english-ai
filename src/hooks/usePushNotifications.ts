@@ -1,7 +1,9 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useState } from "react";
 
-import { enablePush, resumePush } from "@/lib/pushNotifications";
+// Firebase Messaging is loaded only when push is actually used, so it stays
+// out of the code every page downloads on app open.
+const loadPush = () => import("@/lib/pushNotifications");
 import { registerPushToken, unregisterPushToken } from "@/lib/push.functions";
 import { readStorage, removeStorage, writeStorage } from "@/lib/safeStorage";
 
@@ -32,33 +34,35 @@ export function usePushNotifications() {
       // step (this also refreshes last_seen_at), so the device keeps receiving.
       if (tokenSynced) return;
       tokenSynced = true;
-      void resumePush().then(async (current) => {
-        if (!current || readStorage(TOKEN_KEY) !== saved) return;
-        try {
-          await register({ data: { token: current } });
-          if (current !== saved) {
-            await unregister({ data: { token: saved } });
-            writeStorage(TOKEN_KEY, current);
-            setToken(current);
+      void loadPush()
+        .then(({ resumePush }) => resumePush())
+        .then(async (current) => {
+          if (!current || readStorage(TOKEN_KEY) !== saved) return;
+          try {
+            await register({ data: { token: current } });
+            if (current !== saved) {
+              await unregister({ data: { token: saved } });
+              writeStorage(TOKEN_KEY, current);
+              setToken(current);
+            }
+          } catch {
+            // Next app start tries again.
           }
-        } catch {
-          // Next app start tries again.
-        }
-      });
+        });
     } else {
       setState("disabled");
     }
   }, [register, unregister]);
 
   const enable = useCallback(async (): Promise<PushState> => {
-    const result = await enablePush();
+    const result = await (await loadPush()).enablePush();
     if (result.status === "registered") {
       await register({ data: { token: result.token } });
       writeStorage(TOKEN_KEY, result.token);
       setToken(result.token);
       setState("enabled");
       // Show messages that arrive while the app is open, from now on.
-      void resumePush();
+      void loadPush().then(({ resumePush }) => resumePush());
       return "enabled";
     }
     if (result.status === "not-configured") {

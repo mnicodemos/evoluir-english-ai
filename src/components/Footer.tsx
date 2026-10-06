@@ -59,18 +59,16 @@ export function Footer({
     return (
       <footer className="bg-background text-foreground dark:bg-[#0B0B0C] dark:text-[#E4E4E7]">
         <div className="border-t border-border dark:border-white/10">
+          {/* One compact footer on every page: rights on the left, links and
+              social icons on the right, on one line just under the divider. */}
           <div
             className={cn(
-              "flex max-w-6xl flex-col gap-3 py-5 text-xs text-muted-foreground dark:text-[#A1A1AA]",
-              leftAligned
-                ? "items-start justify-start sm:flex-row sm:items-start"
-                : "items-center justify-between sm:flex-row",
-              containerBase,
+              "flex w-full max-w-none flex-col items-start gap-1.5 px-4 py-2.5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8 xl:px-10 dark:text-[#A1A1AA]",
               containerClassName,
             )}
           >
             <p>{t.rights}</p>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-0">
               <Link
                 to="/terms"
                 className="transition-colors hover:text-foreground dark:hover:text-white"
@@ -97,7 +95,7 @@ export function Footer({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    className="grid size-11 place-items-center transition-colors hover:text-foreground dark:hover:text-white"
+                    className="grid size-11 place-items-center transition-colors hover:text-foreground sm:size-8 dark:hover:text-white"
                   >
                     <social.icon className="size-4" />
                   </a>
