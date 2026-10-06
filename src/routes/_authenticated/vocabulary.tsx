@@ -2,10 +2,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Loader2, RotateCcw, Search, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { OfflineVocabulary } from "@/components/vocabulary/OfflineVocabulary";
 import {
   VocabularyWordList,
   type VocabularyListContext,
@@ -56,6 +57,8 @@ import {
   markPronounced,
 } from "@/lib/vocabularyReview";
 import { readStorage, removeStorage, writeStorage } from "@/lib/safeStorage";
+import { loadOfflineVocabulary, saveOfflineVocabulary } from "@/lib/offlineVocabulary";
+import { useOnline } from "@/hooks/useOnline";
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
@@ -77,7 +80,21 @@ export const Route = createFileRoute("/_authenticated/vocabulary")({
   component: Vocabulary,
 });
 
+/** Without a connection, the words saved on this device are shown read-only. */
 function Vocabulary() {
+  const { user } = Route.useRouteContext();
+  const online = useOnline();
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const saved = useMemo(
+    () => (online ? null : loadOfflineVocabulary(window.localStorage, user.id)),
+    [online, user.id],
+  );
+  if (saved) return <OfflineVocabulary saved={saved} t={t} />;
+  return <VocabularyOnline />;
+}
+
+function VocabularyOnline() {
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data: profile } = useProfile();
@@ -513,6 +530,20 @@ function Vocabulary() {
       ),
     )
     .slice(0, DAILY_REVIEW_LIMIT);
+
+  // Keep what is on screen (today's words, then due reviews) for offline use.
+  const offlineWords = [...today, ...reviewItems];
+  const offlineSignature = offlineWords.map((w) => w.id).join(",");
+  useEffect(() => {
+    if (!profile?.id || !offlineSignature) return;
+    try {
+      saveOfflineVocabulary(window.localStorage, profile.id, offlineWords);
+    } catch {
+      // storage unavailable: offline words are a convenience
+    }
+    // offlineWords is rebuilt every render; its ids decide when to save.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id, offlineSignature]);
 
   // Shared state and actions for the three word lists (review, today, learned).
   const listProps: VocabularyListContext = {

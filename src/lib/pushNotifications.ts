@@ -1,28 +1,17 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
 
-const env = import.meta.env;
-const appId = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_APP_ID"] as string | undefined;
-const vapidKey = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_VAPID_KEY"] as string | undefined;
-const apiKey = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_WEB_API_KEY"] as string | undefined;
-const projectId = env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_PROJECT_ID"] as string | undefined;
+import { firebaseConfig, serviceWorkerUrl } from "@/lib/firebaseConfig";
 
 export type PushResult =
   | { status: "registered"; token: string }
   | { status: "not-configured" | "unsupported" | "open-in-new-tab" | "denied" };
 
-function firebaseConfig() {
-  const messagingSenderId = appId?.split(":")[1] ?? "";
-  if (!apiKey || !projectId || !appId || !vapidKey || !messagingSenderId) return null;
-  return { apiKey, projectId, appId, messagingSenderId, vapidKey };
-}
-
 /** Same service worker and Firebase app for every call (a second initializeApp throws). */
 async function messagingForDevice(config: NonNullable<ReturnType<typeof firebaseConfig>>) {
   const { vapidKey: _vapidKey, ...appConfig } = config;
-  const query = new URLSearchParams(appConfig).toString();
   const serviceWorkerRegistration = await navigator.serviceWorker.register(
-    `/firebase-messaging-sw.js?${query}`,
+    serviceWorkerUrl(config),
   );
   const app = getApps().length ? getApp() : initializeApp(appConfig);
   return { messaging: getMessaging(app), serviceWorkerRegistration };

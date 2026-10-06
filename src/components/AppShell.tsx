@@ -38,6 +38,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import { registerAppServiceWorker } from "@/lib/firebaseConfig";
 import { stopSpeaking } from "@/lib/speech";
 import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.functions";
 import { sendActivityPush } from "@/lib/push.functions";
@@ -316,6 +317,13 @@ function AppShellContent({
   useEffect(() => {
     stopSpeaking();
   }, [location.pathname]);
+
+  // Offline support: the service worker keeps the app and saved words available
+  // without a connection. Installed after the first screen, never blocking it.
+  useEffect(() => {
+    const timer = window.setTimeout(registerAppServiceWorker, 3000);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const retryKey = "pedagogical-retry-checked";
