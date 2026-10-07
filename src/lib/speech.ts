@@ -18,6 +18,8 @@ export type SpeechOptions = {
    * audio provider or the cached audio itself.
    */
   rate?: number;
+  /** Called once, when the first sound of this text is scheduled to play. */
+  onStart?: () => void;
 };
 
 let audioContext: AudioContext | null = null;
@@ -356,6 +358,27 @@ async function speakWithBrowser(value: string, rate = 1): Promise<void> {
   });
 }
 
+/** Audio being prepared ahead of playback, one request at a time. */
+let prepareChain: Promise<unknown> = Promise.resolve();
+
+/**
+ * Starts generating the audio for `text` before it is played, so a reply's
+ * next block is ready when the previous one ends instead of being requested
+ * only then. Requests run one after another (the audio service allows one per
+ * student) and share the cache, so speakEnglish later finds them ready or
+ * already in flight. Failures are ignored: playback simply requests again.
+ */
+export function prepareSpeech(text: string, options: Pick<SpeechOptions, "cache"> = {}) {
+  const value = text?.trim();
+  if (!value || typeof window === "undefined" || !window.AudioContext) return;
+  const blocks = splitForFirstAudio(value);
+  prepareChain = prepareChain.then(async () => {
+    for (const block of blocks) {
+      await requestSpeech(block, undefined, options.cache ?? "memory").catch(() => undefined);
+    }
+  });
+}
+
 /**
  * Streams clear English pronunciation from the app's authenticated audio route,
  * falling back to the built-in browser voice when the service is unavailable.
@@ -402,6 +425,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
     source.start(playhead);
     playhead += decoded.duration / rate;
     activeSources.add(source);
+    if (!scheduledAny) options.onStart?.();
     scheduledAny = true;
     lastSource = source;
   };

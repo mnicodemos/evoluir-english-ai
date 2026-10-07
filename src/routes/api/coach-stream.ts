@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
-import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
+import {
+  AiUsageError,
+  finishAiUsage,
+  hashAiRequest,
+  loadAiLimit,
+  releaseAbandonedAiUsage,
+  reserveAiUsage,
+} from "@/lib/ai-usage.server";
 import { GEMINI_TEXT_MODEL, openGeminiStream, parseGeminiStreamEvent } from "@/lib/gemini.server";
 
 const requestSchema = z.object({
@@ -21,10 +28,17 @@ export const Route = createFileRoute("/api/coach-stream")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        let userId: string;
-        try {
-          userId = await authenticateApiRequest(request);
-        } catch (error) {
+        // Checking the session and reading the body do not depend on each
+        // other, so they run together: less waiting before EVO starts.
+        const [auth, body] = await Promise.all([
+          authenticateApiRequest(request).then(
+            (id) => ({ id, error: null }),
+            (error: unknown) => ({ id: null, error }),
+          ),
+          request.json().catch(() => null),
+        ]);
+        if (auth.id === null) {
+          const error = auth.error;
           return Response.json(
             {
               message:
@@ -35,7 +49,7 @@ export const Route = createFileRoute("/api/coach-stream")({
             { status: error instanceof Response ? error.status : 500 },
           );
         }
-        const body = await request.json().catch(() => null);
+        const userId = auth.id;
 
         const parsed = requestSchema.safeParse(body);
         if (!parsed.success)
@@ -46,11 +60,20 @@ export const Route = createFileRoute("/api/coach-stream")({
 
         let ticket;
         try {
+          // The limits row, the request hash and the closing of abandoned
+          // records are independent reads; only the reservation needs them all.
+          const [limit, requestHash] = await Promise.all([
+            loadAiLimit("talking"),
+            hashAiRequest(parsed.data),
+            releaseAbandonedAiUsage(userId, "talking"),
+          ]);
           ticket = await reserveAiUsage({
             userId,
             operation: "talking",
             model: GEMINI_TEXT_MODEL,
-            requestHash: await hashAiRequest(parsed.data),
+            requestHash,
+            limit,
+            abandonedReleased: true,
           });
         } catch (error) {
           const status = error instanceof AiUsageError ? error.status : 503;

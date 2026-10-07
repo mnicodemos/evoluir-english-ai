@@ -19,8 +19,10 @@ import { buildStudyContext, useStudySnapshot } from "@/hooks/useStudyContext";
 import { coachOpenerMessages, coachReplyMessages, type ConversationReport } from "@/lib/ai-prompts";
 import { aiChat } from "@/lib/aiChat.functions";
 import { getLevelState } from "@/lib/level";
-import { speakEnglish, stopSpeaking } from "@/lib/speech";
-import { takeSpeechBlocks } from "@/lib/speechChunks";
+import { supabase } from "@/integrations/supabase/client";
+import { turnTimingRow, type TurnMarks } from "@/lib/speakingTiming";
+import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
+import { takeStreamBlocks } from "@/lib/speechChunks";
 import { COACH_TIMEOUT_MESSAGE, streamCoachReply } from "@/lib/coach-stream";
 import { talkingTurn } from "@/lib/talkingQueue";
 
@@ -85,6 +87,8 @@ export function VoiceCoach({
   const replyAbort = useRef<AbortController | null>(null);
   // Set synchronously: a second tap before React re-renders cannot send twice.
   const answering = useRef(false);
+  // Stages of the current answer, saved once EVO's first sound plays.
+  const turnMarks = useRef<TurnMarks | null>(null);
 
   useEffect(() => {
     mounted.current = true;
@@ -127,13 +131,26 @@ export function VoiceCoach({
     }
   }
 
+  /** Saves how long the student waited for EVO's first sound (Admin metric). */
+  function recordFirstSound() {
+    const marks = turnMarks.current;
+    if (!marks || marks.firstAudioAt !== undefined) return;
+    marks.firstAudioAt = performance.now();
+    const row = turnTimingRow(marks);
+    // Before migration 0050 the table does not exist; the insert just fails.
+    if (row) void supabase.from("speaking_turn_timings" as never).insert(row as never);
+  }
+
   function queueSpeech(text: string) {
+    // The audio starts generating now, while earlier blocks are still playing,
+    // instead of only when its turn to play comes.
+    prepareSpeech(text, { cache: "persistent" });
     speechQueue.current = speechQueue.current
       .then(async () => {
         if (!mounted.current) return;
         setVoiceState("speaking");
         // Persistent cache: the same sentence is never generated twice, even after a reload.
-        await speakEnglish(text, { cache: "persistent" });
+        await speakEnglish(text, { cache: "persistent", onStart: recordFirstSound });
       })
       .catch((error: unknown) => {
         toast.error(error instanceof Error ? error.message : "The response could not be played.");
@@ -238,15 +255,19 @@ export function VoiceCoach({
     if (answering.current) return;
     answering.current = true;
     setVoiceState("sending");
+    const marks: TurnMarks = { stoppedAt: performance.now() };
+    turnMarks.current = marks;
     try {
       const audio = await stopVoiceRecording();
       if (mounted.current) setVoiceState("transcribing");
       const text = await transcribeAudio(audio);
+      marks.transcribedAt = performance.now();
       const next: ChatMessage[] = [...messages, { role: "user", content: text }];
       setMessages(next);
       setVoiceState("thinking");
       let streamedReply = "";
       let phraseBuffer = "";
+      let firstBlockQueued = false;
       const replyIndex = next.length;
       setMessages([...next, { role: "assistant", content: "" }]);
       replyAbort.current?.abort();
@@ -264,6 +285,7 @@ export function VoiceCoach({
               rolePlay?.role,
             ),
             (delta) => {
+              marks.firstTextAt ??= performance.now();
               streamedReply += delta;
               phraseBuffer += delta;
               if (mounted.current) {
@@ -273,9 +295,11 @@ export function VoiceCoach({
                   ),
                 );
               }
-              // Short phrases are merged into one audio request; long replies still split.
-              const split = takeSpeechBlocks(phraseBuffer);
+              // The first sentence is spoken as soon as it is written; after
+              // that, short phrases are merged into one audio request.
+              const split = takeStreamBlocks(phraseBuffer, firstBlockQueued);
               phraseBuffer = split.rest;
+              if (split.blocks.length) firstBlockQueued = true;
               split.blocks.forEach(queueSpeech);
             },
             abort.signal,

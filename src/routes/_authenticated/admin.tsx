@@ -11,6 +11,7 @@ import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminAlerts } from "@/components/AdminAlerts";
 import { AdminRetention } from "@/components/AdminRetention";
+import { AdminSpeakingWait } from "@/components/AdminSpeakingWait";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
@@ -181,6 +182,7 @@ function AdminPage() {
               <AdminAiUsage />
             </TabsContent>
             <TabsContent value="cost">
+              <AdminSpeakingWait />
               <AdminCostPerformance />
             </TabsContent>
             <TabsContent value="lesson-test">

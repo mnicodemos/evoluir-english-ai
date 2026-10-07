@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
-import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
+import {
+  AiUsageError,
+  finishAiUsage,
+  hashAiRequest,
+  loadAiLimit,
+  releaseAbandonedAiUsage,
+  reserveAiUsage,
+} from "@/lib/ai-usage.server";
 import {
   attemptTimeout,
   canWaitForRetry,
@@ -167,14 +174,19 @@ export const Route = createFileRoute("/api/transcribe")({
         const audioBase64 = Buffer.from(await audio.arrayBuffer()).toString("base64");
         let ticket;
         try {
+          // Independent reads run together; only the reservation needs them all.
+          const [limit, requestHash] = await Promise.all([
+            loadAiLimit("transcription"),
+            hashAiRequest({ size: audio.size, sample: audioBase64.slice(0, 1024) }),
+            releaseAbandonedAiUsage(userId, "transcription"),
+          ]);
           ticket = await reserveAiUsage({
             userId,
             operation: "transcription",
             model: GEMINI_TRANSCRIPTION_MODELS[0],
-            requestHash: await hashAiRequest({
-              size: audio.size,
-              sample: audioBase64.slice(0, 1024),
-            }),
+            requestHash,
+            limit,
+            abandonedReleased: true,
           });
         } catch (error) {
           const headers = new Headers();

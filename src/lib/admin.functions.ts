@@ -711,3 +711,28 @@ export const getRetention = createServerFn({ method: "GET" })
         : null,
     };
   });
+
+/**
+ * How long students wait for EVO in AI Speaking (last 7 days), measured in the
+ * browser from the end of each answer. Null until migration 0050 is applied.
+ */
+export const getSpeakingWait = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { speakingWaitSummary } = await import("@/lib/speakingTiming");
+    const since = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    const { data, error } = await supabaseAdmin
+      .from("speaking_turn_timings" as never)
+      .select("transcribe_ms, first_text_ms, first_audio_ms")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (error) return null;
+    return speakingWaitSummary(
+      (data ?? []) as unknown as Parameters<typeof speakingWaitSummary>[0],
+    );
+  });
