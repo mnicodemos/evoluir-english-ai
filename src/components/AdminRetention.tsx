@@ -76,6 +76,29 @@ export function AdminRetention() {
         ))}
       </div>
 
+      {report.firstConversation && (
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-xl border border-border p-3">
+            <p className="text-xs text-muted-foreground">Falaram com a EVO no 1º dia</p>
+            <p className="mt-1 font-display text-2xl font-bold">
+              {percent(report.firstConversation.firstDay)}
+            </p>
+            <p className="text-[11px] text-muted-foreground">
+              {detail(report.firstConversation.firstDay)}
+            </p>
+          </div>
+          <div className="rounded-xl border border-border p-3">
+            <p className="text-xs text-muted-foreground">Do cadastro à 1ª resposta falada</p>
+            <p className="mt-1 font-display text-2xl font-bold">
+              {report.firstConversation.medianMinutes === null
+                ? "—"
+                : `${report.firstConversation.medianMinutes} min`}
+            </p>
+            <p className="text-[11px] text-muted-foreground">mediana · meta: poucos minutos</p>
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>

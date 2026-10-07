@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Mic } from "lucide-react";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { useEffect, useState } from "react";
@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { PlacementTest } from "@/components/onboarding/PlacementTest";
-import { PLACEMENT_QUESTIONS, isAnswered, scorePlacement } from "@/lib/placementTest";
+import { placementComplete, scorePlacement } from "@/lib/placementTest";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -54,18 +54,20 @@ function Onboarding() {
   const [name, setName] = useState("");
   const [goal, setGoal] = useState("conversation");
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [minutes, setMinutes] = useState(15);
+  // One of the offered options, so a choice is visibly selected from the start.
+  const [minutes, setMinutes] = useState(20);
   const [saving, setSaving] = useState(false);
 
   const result = scorePlacement(answers);
   const level = result.level.value;
-  const answeredAll = PLACEMENT_QUESTIONS.every((q) => isAnswered(answers[q.id]));
+  const testDone = placementComplete(answers);
 
   useEffect(() => {
     if (profile?.name) setName(profile.name);
   }, [profile?.name]);
 
-  async function finish() {
+  /** Saves the plan; new students go straight into their first conversation. */
+  async function finish(to: "/coach" | "/dashboard") {
     if (!profile) return;
     setSaving(true);
     try {
@@ -82,7 +84,7 @@ function Onboarding() {
         .eq("id", profile.id);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
-      navigate({ to: "/dashboard", replace: true });
+      navigate({ to, replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save your plan");
     } finally {
@@ -90,9 +92,12 @@ function Onboarding() {
     }
   }
 
+  // Three steps (user request: first conversation with EVO in under 2 minutes):
+  // about you, the placement test, then the level with the daily time and the
+  // way straight into AI Speaking.
   const steps = [
     {
-      title: "What should we call you?",
+      title: "Tell EVO about you",
       body: (
         <div className="space-y-5">
           <EvoGuide
@@ -112,13 +117,12 @@ function Onboarding() {
               placeholder="Marcelo"
             />
           </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">{t("What is your main goal?")}</p>
+            <Options options={goals} value={goal} onChange={setGoal} compact />
+          </div>
         </div>
       ),
-      canContinue: true,
-    },
-    {
-      title: "What is your main goal?",
-      body: <Options options={goals} value={goal} onChange={setGoal} />,
       canContinue: true,
     },
     {
@@ -130,18 +134,12 @@ function Onboarding() {
           t={t}
         />
       ),
-      canContinue: answeredAll,
+      canContinue: testDone,
     },
     {
       title: "Your CEFR level",
       body: (
         <div className="space-y-4">
-          <EvoGuide
-            title={t("Now we have a clearer view of where you are.")}
-            description={t("Let's turn this result into your next step.")}
-            imageSize="diagnosis"
-            className="card-soft p-4"
-          />
           <div className="card-soft p-5">
             <p className="text-sm text-muted-foreground">Your starting level</p>
             <p className="mt-1 text-2xl font-bold">{result.level.label}</p>
@@ -150,45 +148,46 @@ function Onboarding() {
               {result.correct} of {result.total} correct answers
             </p>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-center text-xs">
-            {result.byBand.map((b) => (
-              <div key={b.band} className="rounded-lg border border-border p-2">
-                <p className="font-semibold uppercase">{b.band}</p>
-                <p className="text-muted-foreground">
-                  {b.correct}/{b.total}
-                </p>
-              </div>
-            ))}
+          <div className="space-y-2">
+            <p className="text-sm font-medium">{t("How much time do you have per day?")}</p>
+            <div className="grid grid-cols-3 gap-2">
+              {times.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={minutes === option}
+                  onClick={() => setMinutes(option)}
+                  className={`rounded-xl border p-3 text-center transition-colors ${
+                    minutes === option
+                      ? "border-brand-green bg-brand-green/10 text-brand-green"
+                      : "border-border bg-card hover:bg-secondary"
+                  }`}
+                >
+                  <span className="block font-display text-lg font-bold">{option}</span>
+                  <span className="block text-xs text-muted-foreground">min</span>
+                </button>
+              ))}
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Your lessons will start at this level and move up when you close the Diamond league with
-            an overall average of 70% or more.
-          </p>
+          <EvoGuide
+            title={t("Now let's talk.")}
+            description={t(
+              "Your first conversation takes about 2 minutes: I speak first, you answer by voice.",
+            )}
+            imageSize="diagnosis"
+            className="card-soft p-4"
+          />
           <Button
-            variant="outline"
+            variant="link"
+            className="h-auto p-0 text-muted-foreground"
             onClick={() => {
               setAnswers({});
-              setStep(2);
+              setStep(1);
             }}
           >
             Retake the test
           </Button>
         </div>
-      ),
-      canContinue: true,
-    },
-    {
-      title: "How much time do you have per day?",
-      body: (
-        <Options
-          options={times.map((t) => ({
-            value: String(t),
-            label: `${t} minutes/day`,
-            hint: t === 10 ? "Quick daily habit" : t === 20 ? "Steady progress" : "Fast track",
-          }))}
-          value={String(minutes)}
-          onChange={(v) => setMinutes(Number(v))}
-        />
       ),
       canContinue: true,
     },
@@ -221,23 +220,50 @@ function Onboarding() {
           <div className="mt-7">{current.body}</div>
         </div>
 
-        <div className="mt-10 flex gap-3">
-          {step > 0 && (
-            <Button variant="outline" size="lg" onClick={() => setStep(step - 1)}>
-              Back
+        {step === steps.length - 1 ? (
+          <div className="mt-10 space-y-2">
+            <Button
+              size="lg"
+              className="w-full"
+              disabled={saving}
+              onClick={() => void finish("/coach")}
+            >
+              {saving ? <Loader2 className="size-4 animate-spin" /> : <Mic className="size-4" />}
+              Talk to EVO now
             </Button>
-          )}
-          <Button
-            size="lg"
-            className="flex-1"
-            disabled={saving || !current.canContinue}
-            onClick={() => (step === steps.length - 1 ? finish() : setStep(step + 1))}
-          >
-            {saving && <Loader2 className="size-4 animate-spin" />}
-            {step === steps.length - 1 ? "Create my plan" : "Continue"}
-            {!saving && <ArrowRight className="size-4" />}
-          </Button>
-        </div>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="lg" onClick={() => setStep(step - 1)}>
+                Back
+              </Button>
+              <Button
+                variant="ghost"
+                size="lg"
+                className="flex-1"
+                disabled={saving}
+                onClick={() => void finish("/dashboard")}
+              >
+                Go to my Dashboard
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-10 flex gap-3">
+            {step > 0 && (
+              <Button variant="outline" size="lg" onClick={() => setStep(step - 1)}>
+                Back
+              </Button>
+            )}
+            <Button
+              size="lg"
+              className="flex-1"
+              disabled={!current.canContinue}
+              onClick={() => setStep(step + 1)}
+            >
+              {step === 1 ? "See my level" : "Continue"}
+              <ArrowRight className="size-4" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -247,19 +273,22 @@ function Options({
   options,
   value,
   onChange,
+  compact = false,
 }: {
   options: { value: string; label: string; hint: string }[];
   value: string;
   onChange: (v: string) => void;
+  /** Tighter cards, so several questions fit on one phone screen. */
+  compact?: boolean;
 }) {
   return (
-    <div className="grid gap-3">
+    <div className={compact ? "grid gap-2" : "grid gap-3"}>
       {options.map((o) => (
         <button
           key={o.value}
           type="button"
           onClick={() => onChange(o.value)}
-          className={`card-soft flex items-center justify-between p-4 text-left transition-all ${
+          className={`card-soft flex items-center justify-between text-left transition-all ${compact ? "px-4 py-2.5" : "p-4"} ${
             value === o.value ? "ring-2 ring-ring" : "hover:shadow-[var(--shadow-lift)]"
           }`}
         >

@@ -613,7 +613,7 @@ export const getRetention = createServerFn({ method: "GET" })
       throw new Error("Forbidden");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { addDays, retentionReport } = await import("@/lib/retention");
+    const { addDays, firstConversationStats, retentionReport } = await import("@/lib/retention");
     const today = studyToday();
     // 8 weekly cohorts plus the 2 weeks they need to be measured.
     const since = new Date(`${addDays(today, -7 * 8 - 15)}T00:00:00-03:00`).toISOString();
@@ -681,5 +681,33 @@ export const getRetention = createServerFn({ method: "GET" })
     const students = profiles
       .filter((row) => !adminIds.has(row.id))
       .map((row) => ({ id: row.id, joined: studyToday(new Date(row.created_at)) }));
-    return { today, ...retentionReport(students, activeDays, today) };
+    // First spoken answer to EVO: an AI Speaking reply (the opener has no
+    // first_chunk_ms). Older databases without the column just show no data.
+    const replies = await readAll((from, to) =>
+      supabaseAdmin
+        .from("ai_usage_events")
+        .select("user_id, created_at")
+        .eq("operation", "talking")
+        .eq("status", "completed")
+        .not("first_chunk_ms", "is", null)
+        .gte("created_at", since)
+        .order("id")
+        .range(from, to),
+    ).catch(() => null);
+    const firstAnswerAt = new Map<string, string>();
+    for (const row of replies ?? []) {
+      const known = firstAnswerAt.get(row.user_id);
+      if (!known || row.created_at < known) firstAnswerAt.set(row.user_id, row.created_at);
+    }
+    const recentJoiners = profiles
+      .filter((row) => !adminIds.has(row.id) && row.created_at >= since)
+      .map((row) => ({ id: row.id, joinedAt: row.created_at }));
+
+    return {
+      today,
+      ...retentionReport(students, activeDays, today),
+      firstConversation: replies
+        ? firstConversationStats(recentJoiners, firstAnswerAt, new Date())
+        : null,
+    };
   });

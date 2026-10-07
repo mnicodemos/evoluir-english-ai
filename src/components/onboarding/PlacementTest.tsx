@@ -1,15 +1,31 @@
-import { ChevronLeft, ChevronRight, Headphones, Loader2, PenLine, Volume2 } from "lucide-react";
+import {
+  CircleCheck,
+  ChevronLeft,
+  ChevronRight,
+  Headphones,
+  Loader2,
+  PenLine,
+  Volume2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PLACEMENT_QUESTIONS, isAnswered, type PlacementQuestion } from "@/lib/placementTest";
+import {
+  DONT_KNOW,
+  PLACEMENT_QUESTIONS,
+  isAnswered,
+  placementComplete,
+  type PlacementQuestion,
+} from "@/lib/placementTest";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 
 /**
  * Placement test, one question at a time: for each CEFR band the student hears a
  * sentence and picks its meaning, then types the missing words of another one.
  * If the audio cannot play, the sentence is shown so the test can still be finished.
+ * "I don't know" skips a question, and the test ends as soon as the harder
+ * questions can no longer change the level.
  */
 export function PlacementTest({
   answers,
@@ -25,6 +41,7 @@ export function PlacementTest({
   const [index, setIndex] = useState(firstOpen === -1 ? 0 : firstOpen);
   const question = PLACEMENT_QUESTIONS[index]!;
   const answered = PLACEMENT_QUESTIONS.filter((q) => isAnswered(answers[q.id])).length;
+  const complete = placementComplete(answers);
 
   useEffect(() => () => stopSpeaking(), []);
 
@@ -55,14 +72,26 @@ export function PlacementTest({
         ))}
       </div>
 
-      <QuestionCard
-        key={question.id}
-        question={question}
-        value={answers[question.id] ?? ""}
-        onAnswer={(value) => onAnswer(question.id, value)}
-        onSubmit={() => index < total - 1 && setIndex(index + 1)}
-        t={t}
-      />
+      {complete && !isAnswered(answers[question.id]) ? (
+        <div className="card-soft flex items-start gap-3 p-4" role="status">
+          <CircleCheck className="mt-0.5 size-5 shrink-0 text-brand-green" aria-hidden="true" />
+          <p className="text-sm">
+            <span className="block font-semibold">{t("That's enough to find your level.")}</span>
+            <span className="block text-muted-foreground">
+              {t("The next questions are harder than your level, so you can skip them.")}
+            </span>
+          </p>
+        </div>
+      ) : (
+        <QuestionCard
+          key={question.id}
+          question={question}
+          value={answers[question.id] === DONT_KNOW ? "" : (answers[question.id] ?? "")}
+          onAnswer={(value) => onAnswer(question.id, value)}
+          onSubmit={() => index < total - 1 && setIndex(index + 1)}
+          t={t}
+        />
+      )}
 
       <div className="flex justify-between gap-3">
         <Button
@@ -75,6 +104,19 @@ export function PlacementTest({
           <ChevronLeft className="size-4" aria-hidden="true" />
           {t("Previous")}
         </Button>
+        {!complete && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              onAnswer(question.id, DONT_KNOW);
+              if (index < total - 1) setIndex(index + 1);
+            }}
+          >
+            {t("I don't know")}
+          </Button>
+        )}
         <Button
           type="button"
           variant="outline"
