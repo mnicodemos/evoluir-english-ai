@@ -12,7 +12,7 @@
 <!-- LOVABLE:END -->
 
 - Dashboard-only density and navigation styling must use opt-in presentation props on existing components, preserving their shared data and behavior.
-- Dashboard Today's Focus uses the complete approved EVO image on desktop and the supplied wide EVO banner on mobile through CDN pointers; mobile media stays flush to the top and sides. Other EVO placements remain unchanged.
+- Dashboard Today's Focus uses the complete approved EVO image on desktop (CDN pointer) and, on mobile, the owner's full "More than English" banner uncropped (src/assets/evo-banner-mobile-full.webp), inset from the card edges with rounded corners like the desktop image (user request); the content below is centred in the card's free height. Other EVO placements remain unchanged.
 - `dashboard-shell` dark tokens are applied by AppShell to every authenticated page (user request: one visual identity); portaled surfaces like the Admin dialog opt in with their own `dashboard-shell dark` class.
 - Dashboard desktop height uses dynamic viewport units with a `vh` fallback as a minimum (min-height), and its card rows have content-based minimums; a row whose cards need more room grows instead of letting cards overlap the next row.
 - Skill scores everywhere (Dashboard card, My Progress, league PDF) come from the evidence layer (current_skill_profile via loadNextStep `skills`), never from the legacy best-ever `progress` table; reading-lesson quizzes also record reading evidence.

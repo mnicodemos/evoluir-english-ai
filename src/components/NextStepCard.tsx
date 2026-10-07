@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import evoDashboardApproved from "@/assets/evo-dashboard-more-than-english.png.asset.json";
-import evoDashboardMobile from "@/assets/evo-banner-mobile-2026-10-05.png.asset.json";
+import evoDashboardMobileFull from "@/assets/evo-banner-mobile-full.webp";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -284,22 +284,24 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border-x border-b border-border border-t-0 bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5 sm:border-t sm:border-border"
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-border bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5"
         aria-label={t("Your next step")}
       >
         <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)]">
           <div
-            className="relative aspect-[17/4] h-auto w-full flex-none self-stretch overflow-hidden bg-sidebar sm:aspect-auto sm:min-h-[13.5rem] sm:h-auto sm:bg-transparent lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative h-auto w-full flex-none self-stretch overflow-hidden bg-transparent p-2.5 pb-0 sm:min-h-[13.5rem] sm:h-auto sm:p-0 lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
-            <div className="absolute inset-0 overflow-hidden sm:inset-3 sm:flex sm:items-center sm:overflow-visible">
-              <img
-                src={evoDashboardMobile.url}
-                alt=""
-                width={1920}
-                height={709}
-                className="absolute inset-x-0 top-0 block h-auto w-full -translate-y-[14.245%] sm:hidden"
-              />
+            {/* Mobile: the owner's whole banner, uncropped, inset from the card
+                edges with rounded corners — the same look as the desktop image. */}
+            <img
+              src={evoDashboardMobileFull}
+              alt=""
+              width={1400}
+              height={415}
+              className="block h-auto w-full rounded-lg sm:hidden"
+            />
+            <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:items-center sm:overflow-visible">
               <img
                 src={evoDashboardApproved.url}
                 alt=""
@@ -310,7 +312,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
 
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 sm:justify-center sm:py-4 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+          {/* Mobile: the content sits centred in the card's free height instead
+              of pressed against the banner. */}
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-4 sm:justify-center sm:py-4 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-bold uppercase text-brand-green sm:hidden">
