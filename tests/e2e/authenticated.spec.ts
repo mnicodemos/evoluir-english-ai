@@ -32,14 +32,27 @@ authenticated("authenticated smoke", () => {
   });
 
   test("learning path opens a lesson with activity tabs", async ({ page }) => {
+    test.setTimeout(60_000);
     await page.goto("/learning", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: /Your learning path/i })).toBeVisible();
-    const lessonLink = page.locator('a[href^="/learning/"]').first();
-    const directHref = await lessonLink.getAttribute("href").catch(() => null);
-    if (directHref) await page.goto(directHref, { waitUntil: "domcontentloaded" });
-    // Lessons are buttons named after the lesson; the next one is marked current.
-    else await page.locator('button[aria-current="true"]').first().click();
-    await expect(page).toHaveURL(/\/learning\//, { timeout: 20_000 });
+    // The student's own entry: the "Next lesson" card's button.
+    await page.getByRole("region", { name: "Next lesson" }).getByRole("button").first().click();
+    // A lesson opened for the first time is written by the AI on the server,
+    // which CI runs without AI keys; an error toast then names the cause
+    // instead of a silent timeout.
+    const errorToast = page.locator('[data-sonner-toast][data-type="error"]').first();
+    const failure = await Promise.race([
+      page.waitForURL(/\/learning\/[^/?#]+/, { timeout: 30_000 }).then(() => null),
+      errorToast
+        .waitFor({ timeout: 30_000 })
+        .then(() => errorToast.textContent())
+        .catch(() => null),
+    ]);
+    if (failure) {
+      throw new Error(
+        `Opening the next lesson failed: ${failure.trim()}. A lesson opened for the first time is generated on the server, which CI runs without AI keys: open the test account's first lesson once in the published app.`,
+      );
+    }
     await expect(page.getByRole("tab", { name: "Summary" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Flashcards" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Quiz" })).toBeVisible();
