@@ -77,7 +77,7 @@ const TYPE_PRIORITY: Record<InvisibleGapType, number> = {
  * that exist today, taken from the real evidence producers: comprehension
  * skills only ever receive recognition evidence (listening, reading, quiz),
  * pronunciation only real recordings, and grammar, vocabulary, writing and
- * speaking can reach spontaneous use through AI Teacher, Coach and AI Talking.
+ * speaking can reach spontaneous use through AI Teacher, Coach and AI Speaking.
  * A gap is never declared for something the app cannot demonstrate at all.
  */
 const SKILL_DEMONSTRABLE_CEILING: Record<PedagogicalSkill, LearningState> = {

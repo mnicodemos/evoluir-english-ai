@@ -21,11 +21,11 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
     meta: [
       { title: "Evoluir+ English AI · Set up your plan" },
-      { name: "description", content: "Tell AI Talking your level, goal and daily study time." },
+      { name: "description", content: "Tell EVO your level, goal and daily study time." },
       { property: "og:title", content: "Evoluir+ English AI · Set up your plan" },
       {
         property: "og:description",
-        content: "Tell AI Talking your level, goal and daily study time.",
+        content: "Tell EVO your level, goal and daily study time.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -1,4 +1,4 @@
-// AI Talking text generation on the standard Lovable AI service.
+// AI Speaking text generation on the standard Lovable AI service.
 // Receives exactly the same system/user/assistant messages the Gemini path used.
 export const LOVABLE_TALKING_MODEL = "openai/gpt-6-astra";
 /** Vocabulary word lists: a faster model, so a batch finishes well inside the call time limit. */

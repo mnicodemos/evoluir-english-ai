@@ -142,11 +142,11 @@ const FALLBACK_BY_SKILL: Record<string, { action: NextStepAction; activity: Next
   },
   speaking: {
     action: "practise_speaking",
-    activity: { type: "speaking", title: "AI Talking", to: "/coach" },
+    activity: { type: "speaking", title: "AI Speaking", to: "/coach" },
   },
   pronunciation: {
     action: "practise_speaking",
-    activity: { type: "speaking", title: "AI Talking", to: "/coach" },
+    activity: { type: "speaking", title: "AI Speaking", to: "/coach" },
   },
   vocabulary: {
     action: "practise_vocabulary",

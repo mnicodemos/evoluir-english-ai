@@ -348,11 +348,6 @@ function Dashboard() {
       state: (snapshot?.todayLessonsCompleted ?? 0) > 0 ? "done" : "empty",
     },
     {
-      label: "Videos watched",
-      value: `${snapshot?.todayVideosWatched ?? 0}`,
-      state: (snapshot?.todayVideosWatched ?? 0) > 0 ? "done" : "empty",
-    },
-    {
       label: "Words mastered",
       value: `${snapshot?.todayVocabularyMastered ?? 0}`,
       state: (snapshot?.todayVocabularyMastered ?? 0) > 0 ? "done" : "empty",
@@ -601,8 +596,10 @@ function Dashboard() {
                           <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
                             <span className={`font-display text-sm font-bold ${valueClass}`}>
                               {card.value}
-                            </span>{" "}
-                            {t(card.label)}
+                            </span>
+                            {/* Margin, not a space character: the value and its label
+                                never touch, whatever the font. */}
+                            <span className="ml-1.5">{t(card.label)}</span>
                           </p>
                           <span className="sr-only">{sr}</span>
                         </div>

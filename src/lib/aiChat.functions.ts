@@ -28,7 +28,7 @@ export const aiChat = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    // AI Talking must never wait indefinitely: the upstream call is really
+    // AI Speaking must never wait indefinitely: the upstream call is really
     // aborted after 20 s so the usage slot is released at once.
     const signal = data.operation === "talking" ? AbortSignal.timeout(20_000) : undefined;
     const text = await callGateway(
