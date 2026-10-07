@@ -102,8 +102,8 @@ d("cross-user data isolation", () => {
   });
 
   it("A cannot insert progress rows that claim B's user_id", async () => {
-    // `progress` has a per-user SELECT policy and no INSERT policy: the payload
-    // is well-formed, so a rejection can only come from RLS.
+    // `progress` is written only by the server (0014 revoked browser writes);
+    // the payload is well-formed, so the rejection can only come from access rules.
     const inserted = await a.from("progress").insert({
       user_id: idB,
       speaking_score: 10,
@@ -117,7 +117,7 @@ d("cross-user data isolation", () => {
     expect(inserted.error).not.toBeNull();
   });
 
-  it("A can insert its own progress row (valid payload, RLS allows own user)", async () => {
+  it("A cannot write progress even for itself (server-only since 0014)", async () => {
     const inserted = await a.from("progress").insert({
       user_id: idA,
       speaking_score: 10,
@@ -128,7 +128,9 @@ d("cross-user data isolation", () => {
       reading_score: 10,
       recorded_at: new Date().toISOString(),
     });
-    expect(inserted.error).toBeNull();
+    // Skill scores come from the evidence layer; students never write this
+    // legacy table directly, not even their own row.
+    expect(inserted.error?.code).toBe("42501");
   });
 
   it("A cannot read B's quiz results or activities", async () => {
