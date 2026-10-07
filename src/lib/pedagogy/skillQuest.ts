@@ -74,7 +74,7 @@ const WRITING: SkillQuestResource = {
 };
 const COACH: SkillQuestResource = {
   type: "coach",
-  title: "AI Talking",
+  title: "AI Speaking",
   to: "/coach",
   ceiling: "SPONTANEOUS_USE",
 };

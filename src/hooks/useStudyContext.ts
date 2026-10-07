@@ -13,7 +13,7 @@ export type StudySnapshot = {
   quizAverage: number;
   // Today's Progress metrics: same sources and thresholds as above, but only
   // rows with a completion timestamp from today count. The cumulative fields
-  // stay untouched for AI context (VoiceCoach / AI Talking).
+  // stay untouched for AI context (VoiceCoach / AI Speaking).
   todayLessonsCompleted: number;
   todayVideosWatched: number;
   todayVocabularyMastered: number;
@@ -23,7 +23,7 @@ export type StudySnapshot = {
   commonErrors: string[];
 };
 
-/** Aggregates lessons, videos, flashcards and quizzes for the current level — used by the dashboard and AI Talking. */
+/** Aggregates lessons, videos, flashcards and quizzes for the current level — used by the dashboard and AI Speaking. */
 export function useStudySnapshot() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
@@ -165,7 +165,7 @@ export function useStudySnapshot() {
   });
 }
 
-/** Short text summary of the study history sent to AI Talking. */
+/** Short text summary of the study history sent to AI Speaking. */
 export function buildStudyContext(s?: StudySnapshot | null) {
   if (!s) return undefined;
   const lines = [

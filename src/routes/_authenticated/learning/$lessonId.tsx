@@ -156,7 +156,7 @@ function LessonPage() {
     const result = await finalizeLessonQuiz(score, {
       persistLegacy: async () => {
         // Lessons do not feed the Your progress bars: each bar comes from its own
-        // module (Listening Lab, Vocabulary, AI Talking, Writing AI Corrector).
+        // module (Listening Lab, Vocabulary, AI Speaking, Writing AI Corrector).
         await saveQuizLegacy({
           data: { attemptKey, activityType: "lesson", minutes: minutesSpent(1) },
         });
@@ -458,7 +458,7 @@ function LessonPage() {
         </Tabs>
 
         <section className="card-soft bg-primary p-6 text-foreground">
-          <p className="text-sm text-foreground/75">Practice with AI Talking</p>
+          <p className="text-sm text-foreground/75">Practice with AI Speaking</p>
           <h2 className="mt-1 text-xl font-semibold">
             Use what you just learned in a real conversation
           </h2>

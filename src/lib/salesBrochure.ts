@@ -67,7 +67,7 @@ const COPY: Record<LandingLang, Brochure> = {
       {
         title: "O que você pratica todos os dias",
         bullets: [
-          "AI Talking: conversa por voz com feedback no seu nível, sem medo de errar.",
+          "AI Speaking: conversa por voz com feedback no seu nível, sem medo de errar.",
           "Writing AI Corrector: texto corrigido, versão natural de nativo e explicação do erro.",
           "Listening Lab: escuta guiada com reprodução palavra a palavra.",
           "Vocabulary: 10 palavras novas por dia, com teste de pronúncia pelo microfone.",
@@ -95,9 +95,9 @@ const COPY: Record<LandingLang, Brochure> = {
     ],
     offerTitle: "Investimento",
     offerLines: [
-      "Plano Gratuito — comece hoje, sem cartão de crédito: AI Talking, correção de textos, vocabulário e acompanhamento de progresso.",
+      "Plano Gratuito — comece hoje, sem cartão de crédito: AI Speaking, correção de textos, vocabulário e acompanhamento de progresso.",
       "Premium — R$ 79,90/mês ou R$ 799,90/ano (2 meses grátis).",
-      "Premium inclui: sessões ilimitadas de AI Talking, correções ilimitadas, relatórios avançados de evolução e acesso prioritário a pronúncia e áudio.",
+      "Premium inclui: sessões ilimitadas de AI Speaking, correções ilimitadas, relatórios avançados de evolução e acesso prioritário a pronúncia e áudio.",
       "Compare: uma única aula particular de inglês costuma custar mais do que um mês inteiro de Premium — com prática todos os dias.",
     ],
     guarantee: "Sem fidelidade e sem cartão para começar. Você testa, evolui e decide depois.",
@@ -140,7 +140,7 @@ const COPY: Record<LandingLang, Brochure> = {
       {
         title: "What you practise every day",
         bullets: [
-          "AI Talking: voice conversation with feedback at your level, with no fear of mistakes.",
+          "AI Speaking: voice conversation with feedback at your level, with no fear of mistakes.",
           "Writing AI Corrector: corrected text, the natural native version and clear explanations.",
           "Listening Lab: guided listening with word-by-word playback.",
           "Vocabulary: 10 new words a day with a microphone pronunciation check.",
@@ -168,9 +168,9 @@ const COPY: Record<LandingLang, Brochure> = {
     ],
     offerTitle: "Investment",
     offerLines: [
-      "Free plan — start today, no credit card: AI Talking, writing correction, vocabulary and progress tracking.",
+      "Free plan — start today, no credit card: AI Speaking, writing correction, vocabulary and progress tracking.",
       "Premium — R$ 79.90/month or R$ 799.90/year (2 months free).",
-      "Premium includes: unlimited AI Talking sessions, unlimited corrections, advanced progress reports and priority access to pronunciation & audio.",
+      "Premium includes: unlimited AI Speaking sessions, unlimited corrections, advanced progress reports and priority access to pronunciation & audio.",
       "Compare: a single private English lesson usually costs more than a whole month of Premium — with practice every single day.",
     ],
     guarantee: "No lock-in and no card to start. Try it, grow, and decide later.",

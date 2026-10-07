@@ -22,12 +22,12 @@ export const Route = createFileRoute("/_authenticated/premium")({
       {
         name: "description",
         content:
-          "Unlock unlimited AI Talking, pronunciation and audio lessons with Evoluir+ English AI Premium.",
+          "Unlock unlimited AI Speaking, pronunciation and audio lessons with Evoluir+ English AI Premium.",
       },
       { property: "og:title", content: "Evoluir+ English AI · Premium" },
       {
         property: "og:description",
-        content: "Unlimited AI Talking, pronunciation and audio lessons.",
+        content: "Unlimited AI Speaking, pronunciation and audio lessons.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/premium")({
 });
 
 const premiumPerks = [
-  "Unlimited AI Talking sessions, every day",
+  "Unlimited AI Speaking sessions, every day",
   "Unlimited writing corrections",
   "Advanced weekly progress reports",
   "Personalised study plan for your goal",
@@ -46,7 +46,7 @@ const premiumPerks = [
 ];
 
 const freePerks = [
-  "3 AI Talking sessions per day",
+  "3 AI Speaking sessions per day",
   "3 writing corrections per day",
   "Vocabulary builder",
   "Basic progress",

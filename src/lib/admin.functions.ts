@@ -57,7 +57,7 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
 // can show them next to the measured numbers. "primary" = main path in code.
 const OPERATION_FACTS: Record<string, { label: string; streaming: string; path: string }> = {
   talking: {
-    label: "AI Talking",
+    label: "AI Speaking",
     streaming: "Yes",
     path: "Primary: Gemini (personal key) · opener and streamed reply",
   },
@@ -175,7 +175,7 @@ export function aggregateCostPerformance(
 
   const groups = new Map<string, BenchmarkUsageRow[]>();
   for (const row of rows) {
-    // AI Talking mixes the opener (one plain call) and the streamed replies;
+    // AI Speaking mixes the opener (one plain call) and the streamed replies;
     // replies carry a first-word time, so they get their own line.
     const phase = row.operation === "talking" && row.first_chunk_ms != null ? "reply" : "";
     const key = `${row.operation}\u0000${row.model}\u0000${phase}`;

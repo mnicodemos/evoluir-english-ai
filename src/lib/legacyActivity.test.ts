@@ -65,7 +65,7 @@ describe("legacy authoritative contracts", () => {
     ).toThrow();
   });
 
-  it("rejects a fabricated AI Talking report", () => {
+  it("rejects a fabricated AI Speaking report", () => {
     expect(() =>
       talkingLegacyInputSchema.parse({
         operationKey: key,

@@ -163,7 +163,7 @@ describe("aggregateCostPerformance", () => {
     expect(result.comparisons[0]).toMatchObject({ errors: 1, blocked: 1, cancellations: 1 });
   });
 
-  it("gives streamed AI Talking replies their own line with the first-word time", () => {
+  it("gives streamed AI Speaking replies their own line with the first-word time", () => {
     const talking = (first_chunk_ms: number | null) => ({
       operation: "talking",
       model: "gemini-3.6-flash",

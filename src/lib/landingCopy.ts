@@ -57,7 +57,7 @@ export const landingCopy = {
     insideTitle: "Inside your coach",
     features: [
       {
-        title: "AI Talking",
+        title: "AI Speaking",
         text: "Everyday, Professional and Travel English scenarios with a scored report after each session.",
       },
       {
@@ -72,12 +72,12 @@ export const landingCopy = {
     plansTitle: "Plans",
     plansText: "Start free and upgrade whenever you want more practice.",
     free: "Free",
-    freeItems: ["AI Talking", "Writing correction", "Vocabulary builder", "Progress tracking"],
+    freeItems: ["AI Speaking", "Writing correction", "Vocabulary builder", "Progress tracking"],
     premium: "Premium",
     perMonth: "/month",
     yearly: "or R$ 799,90/year — 2 months free",
     premiumItems: [
-      "Unlimited AI Talking sessions",
+      "Unlimited AI Speaking sessions",
       "Unlimited writing corrections",
       "Advanced progress reports",
       "Priority access to pronunciation & audio",
@@ -156,7 +156,7 @@ export const landingCopy = {
     insideTitle: "Dentro do seu professor",
     features: [
       {
-        title: "AI Talking",
+        title: "AI Speaking",
         text: "Cenários do dia a dia, profissionais e de viagem, com relatório e nota ao final de cada sessão.",
       },
       {
@@ -172,7 +172,7 @@ export const landingCopy = {
     plansText: "Comece grátis e assine quando quiser praticar mais.",
     free: "Grátis",
     freeItems: [
-      "AI Talking",
+      "AI Speaking",
       "Correção de textos",
       "Construtor de vocabulário",
       "Acompanhamento de progresso",
@@ -181,7 +181,7 @@ export const landingCopy = {
     perMonth: "/mês",
     yearly: "ou R$ 799,90/ano — 2 meses grátis",
     premiumItems: [
-      "Sessões ilimitadas de AI Talking",
+      "Sessões ilimitadas de AI Speaking",
       "Correções de texto ilimitadas",
       "Relatórios avançados de evolução",
       "Acesso prioritário a pronúncia e áudio",

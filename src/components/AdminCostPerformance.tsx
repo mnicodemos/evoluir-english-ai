@@ -165,7 +165,7 @@ export function AdminCostPerformance() {
             agora a partir dos tokens e da tabela de preços oficial (inclui chamadas antigas); "n/m"
             mostra quantas chamadas têm custo medido, e as projeções usam a média dessas. Taxa de
             erro: só falhas reais; bloqueios por limite (o app espera e tenta de novo) e
-            cancelamentos ficam à parte. First chunk: tempo até a primeira palavra (AI Talking,
+            cancelamentos ficam à parte. First chunk: tempo até a primeira palavra (AI Speaking,
             linha "reply") ou primeiro som (TTS), após a migração 0045. N/D: first token, streaming,
             retries, fallback, créditos e economia do cache. O provider da Transcription histórica
             não é atribuível porque o registro guardou o modelo de fallback.
