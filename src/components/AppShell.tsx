@@ -62,24 +62,26 @@ const mobileSheetNav = [
   { to: "/premium", label: "Premium", icon: Crown },
 ] as const;
 
+// Study order: plan, lessons, then receptive skills before productive ones
+// (writing, speaking, the live call), with the AI Teacher as support.
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/listening", label: "Listening", icon: Headphones },
+  { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
   { to: "/call", label: "Video call", icon: Video },
-  { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
 ] as const;
 
 // My Progress opens from the Dashboard's Today's Progress card (desktop and
-// mobile), so it no longer repeats in the sidebar.
+// mobile), so it no longer repeats in the sidebar. My Subscription lives with
+// the settings rows at the bottom.
 const dashboardAccountNav = [
   { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
   { to: "/league", label: "Weekly league", icon: Trophy },
-  { to: "/premium", label: "My Subscription", icon: Crown },
 ] as const;
 
 // Translation and notification controls moved here from the dashboard reflection
@@ -461,6 +463,15 @@ function AppShellContent({
           <div className="flex flex-col items-stretch gap-1">
             <div className="flex flex-col items-stretch gap-0.5 border-t border-sidebar-border pb-1 pt-2">
               <UtilityButtons variant="sidebar" />
+              <Link
+                to="/premium"
+                className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                activeProps={{ className: "text-brand-green" }}
+                inactiveProps={{ className: "text-sidebar-foreground/70" }}
+              >
+                <Crown className="size-5 shrink-0" />
+                <span className="min-w-0 truncate text-left">{translate("My Subscription")}</span>
+              </Link>
               <Button
                 variant="ghost"
                 aria-label={translate("Sign out")}
