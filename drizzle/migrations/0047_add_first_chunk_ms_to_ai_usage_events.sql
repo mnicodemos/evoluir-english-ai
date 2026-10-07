@@ -1,0 +1,1 @@
+ALTER TABLE public.ai_usage_events ADD COLUMN IF NOT EXISTS first_chunk_ms integer;
