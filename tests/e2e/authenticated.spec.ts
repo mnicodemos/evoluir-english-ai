@@ -10,21 +10,22 @@ authenticated("authenticated smoke", () => {
   test.beforeEach(async ({ page }) => signIn(page));
 
   test("dashboard, progress, practice, teacher and Premium render", async ({ page }) => {
+    // Each page is checked by its own main title (h1), which renders without
+    // waiting for data; loose text matches were slow or hit hidden copies.
     const routes = [
-      ["/dashboard", /Today's Progress|Today's Priority/i],
+      ["/dashboard", /Good (morning|afternoon|evening)|Hello/i],
       ["/progress", /My Progress/i],
-      ["/vocabulary", /Vocabulary|Vocabulário/i],
-      ["/listening", /Listening/i],
+      ["/vocabulary", /Vocabulary/i],
+      ["/listening", /Train your ear/i],
       ["/writing", /Writing/i],
       ["/teacher", /AI Teacher/i],
       ["/coach", /AI Speaking/i],
       ["/premium", /Premium/i],
     ] as const;
-    for (const [route, heading] of routes) {
+    for (const [route, title] of routes) {
       await page.goto(route, { waitUntil: "domcontentloaded" });
       await expect(page).toHaveURL(new RegExp(route));
-      // Responsive screens keep hidden copies of some labels (mobile vs desktop).
-      await expect(page.getByText(heading).filter({ visible: true }).first()).toBeVisible({
+      await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible({
         timeout: 20_000,
       });
     }
