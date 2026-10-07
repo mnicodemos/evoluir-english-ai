@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Clock,
   Flame,
+  Gem,
   GraduationCap,
   Headphones,
   MessageSquareText,
@@ -400,8 +401,8 @@ function Dashboard() {
                 <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                   <FirstWeekGuide profile={profile} placement="mobile" />
                   <span className="flex items-center gap-1">
-                    <Flame
-                      className="size-5 shrink-0 fill-current text-current"
+                    <Gem
+                      className="size-5 shrink-0"
                       style={{ color: getLeague(streakDays).from }}
                       strokeWidth={2.4}
                       aria-hidden="true"
@@ -431,18 +432,20 @@ function Dashboard() {
             </div>
 
             <div className="hidden min-w-0 border-l border-border sm:block lg:border-l-0">
-              {/* One badge per cell: the streak keeps its flame; the streak league
-                  name moves to the supporting line instead of a second shield. */}
+              {/* The streak climbs a ladder of jewels (Bronze, Silver, Gold...); the
+                  gem takes the current jewel's colour, so it is not mistaken for
+                  the weekly league. */}
               <DashboardHeaderStat
-                icon={<Flame className="size-6 fill-current" strokeWidth={2.2} />}
+                icon={<Gem className="size-6" strokeWidth={2.2} />}
                 tone="coral"
+                iconColor={getLeague(streakDays).from}
                 label={t("Study streak")}
                 value={`${streakDays} ${t("days")}`}
                 detail={
                   nextLeague
                     ? lang === "pt"
-                      ? `Próxima liga: ${nextLeague.namePt}`
-                      : `Next league: ${nextLeague.name}`
+                      ? `Próxima joia: ${nextLeague.namePt}`
+                      : `Next jewel: ${nextLeague.name}`
                     : null
                 }
                 detailStyle={nextLeague ? { color: nextLeague.from } : undefined}
@@ -489,8 +492,8 @@ function Dashboard() {
                   <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
                 </Link>
               </div>
-              <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
-                <div className="ml-2 flex flex-col items-center lg:mx-auto lg:ml-0 xl:mx-0">
+              <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_auto] items-center justify-center gap-x-5 gap-y-1.5 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
+                <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                   <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:size-24 2xl:size-30">
                     <svg
                       className="absolute inset-0 size-full -rotate-90"

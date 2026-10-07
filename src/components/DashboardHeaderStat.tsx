@@ -13,8 +13,9 @@ const TONES = {
 /**
  * One cell of the Dashboard header strip. Every cell shares the same anatomy
  * (icon tile · small label · value · supporting line), so the row reads as one
- * calm set instead of mixed badges. A cell with `to` opens a page; its chevron
- * only appears on hover to keep the row quiet.
+ * calm set instead of mixed badges. A cell with `to` opens a page and always
+ * shows its chevron, so students know it can be opened. `iconColor` replaces
+ * the tone's colour (the streak jewel follows the current jewel phase).
  */
 export function DashboardHeaderStat({
   icon,
@@ -23,6 +24,7 @@ export function DashboardHeaderStat({
   value,
   detail,
   detailStyle,
+  iconColor,
   to,
 }: {
   icon: ReactNode;
@@ -31,12 +33,21 @@ export function DashboardHeaderStat({
   value: string;
   detail?: string | null;
   detailStyle?: CSSProperties | undefined;
+  iconColor?: string | undefined;
   to?: "/league" | "/study-plan";
 }) {
   const body = (
     <>
       <span
         className={cn("grid size-12 shrink-0 place-items-center rounded-2xl", TONES[tone])}
+        style={
+          iconColor
+            ? {
+                color: iconColor,
+                backgroundColor: `color-mix(in oklab, ${iconColor} 14%, transparent)`,
+              }
+            : undefined
+        }
         aria-hidden="true"
       >
         {icon}
@@ -70,10 +81,12 @@ export function DashboardHeaderStat({
       )}
     >
       {body}
-      <ChevronRight
-        className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+      <span
+        className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition-colors group-hover:border-brand-green/50 group-hover:text-brand-green group-focus-visible:text-brand-green"
         aria-hidden="true"
-      />
+      >
+        <ChevronRight className="size-4" strokeWidth={2.4} />
+      </span>
     </Link>
   );
 }
