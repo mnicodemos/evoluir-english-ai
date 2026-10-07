@@ -70,9 +70,10 @@ async function attachDevice(): Promise<string | null> {
   onMessage(messaging, (payload) => {
     const title = payload.notification?.title;
     if (!title) return;
+    // No large "icon": Android already shows the app's icon beside every
+    // notification, so a second copy on the right only repeated it.
     void serviceWorkerRegistration.showNotification(title, {
       body: payload.notification?.body ?? "",
-      icon: "/icon-192.png",
       data: { path: payload.data?.["path"] ?? "/dashboard" },
     });
   });
