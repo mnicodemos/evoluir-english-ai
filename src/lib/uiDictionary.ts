@@ -1431,4 +1431,8 @@ export const uiPt: Record<string, string> = {
   "Next task (": "Próxima tarefa (",
   "done)": "feitas)",
   "Grammar with AI Teacher": "Gramática com o AI Teacher",
+  "Review 1 mistake": "Revisar 1 erro",
+  "Review {n} mistakes": "Revisar {n} erros",
+  "Fix them now so they do not become habits.": "Corrija agora para não virarem hábito.",
+  "Nothing else to review right now.": "Nada mais para revisar agora.",
 };

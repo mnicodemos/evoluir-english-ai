@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, CheckCircle2, RotateCcw } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCircle2, RotateCcw, SpellCheck } from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
 import reviewWriting from "@/assets/review-writing.jpg.asset.json";
@@ -29,9 +29,12 @@ import { useUiLang } from "@/lib/uiLang";
 export function SmartReviewCard({
   streakDays,
   compact = false,
+  mistakesDue = 0,
 }: {
   streakDays: number;
   compact?: boolean;
+  /** "My mistakes" corrections whose review date has arrived (compact card only). */
+  mistakesDue?: number;
 }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -71,7 +74,12 @@ export function SmartReviewCard({
   // generic Vocabulary suggestion, so the same skill never shows twice.
   const showWordReviews = compact && reviewCount > 0;
   const items = showWordReviews ? allItems.filter((item) => item.skill !== "vocabulary") : allItems;
-  if (items.length === 0 && !showWordReviews) {
+  const showMistakes = compact && mistakesDue > 0;
+  // Up to three rows: due words, due mistakes, then the server's suggestions.
+  const suggestionSlots = 3 - Number(showWordReviews) - Number(showMistakes);
+  const rows =
+    Number(showWordReviews) + Number(showMistakes) + Math.min(items.length, suggestionSlots);
+  if (items.length === 0 && !showWordReviews && !showMistakes) {
     // Compact Dashboard slot keeps its place: everything to review is done.
     if (!compact) return null;
     return (
@@ -116,7 +124,11 @@ export function SmartReviewCard({
             {t("Keep improving")}
           </h2>
         </div>
-        <ul className="mt-3 grid flex-1 grid-rows-2 gap-2 overflow-hidden xl:mt-4 xl:gap-2">
+        <ul
+          className={`mt-3 grid flex-1 gap-2 overflow-hidden xl:mt-4 xl:gap-2 ${
+            rows >= 3 ? "grid-rows-3" : "grid-rows-2"
+          }`}
+        >
           {showWordReviews && (
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-brand-green/35 bg-brand-green/[0.07] pr-2">
               <span className="grid h-full min-h-0 w-16 place-items-center bg-brand-green/15">
@@ -129,7 +141,9 @@ export function SmartReviewCard({
                     ? t("Review 1 word")
                     : t("Review {n} words").replace("{n}", String(reviewCount))}
                 </p>
-                <p className="line-clamp-2 text-[10px] leading-tight text-muted-foreground">
+                <p
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                >
                   {t("Their review date has arrived: a quick review keeps them in memory.")}
                 </p>
               </div>
@@ -140,7 +154,32 @@ export function SmartReviewCard({
               </Button>
             </li>
           )}
-          {items.slice(0, showWordReviews ? 1 : 2).map((item, index) => {
+          {showMistakes && (
+            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-warning/35 bg-warning/[0.07] pr-2">
+              <span className="grid h-full min-h-0 w-16 place-items-center bg-warning/15">
+                <SpellCheck className="size-6 text-warning" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground">{t("My mistakes")}</p>
+                <p className="truncate text-sm font-semibold">
+                  {mistakesDue === 1
+                    ? t("Review 1 mistake")
+                    : t("Review {n} mistakes").replace("{n}", String(mistakesDue))}
+                </p>
+                <p
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                >
+                  {t("Fix them now so they do not become habits.")}
+                </p>
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/mistakes" aria-label={`${t("Review now")}: ${t("My mistakes")}`}>
+                  {t("Review")}
+                </Link>
+              </Button>
+            </li>
+          )}
+          {items.slice(0, Math.max(suggestionSlots, 0)).map((item) => {
             const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
             return (
               <li
@@ -148,14 +187,16 @@ export function SmartReviewCard({
                 className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/45 pr-2"
               >
                 <img
-                  src={(index === 0 ? reviewWriting : reviewListening).url}
+                  src={(item.skill === "listening" ? reviewListening : reviewWriting).url}
                   alt=""
                   className="h-full min-h-0 w-16 object-cover"
                 />
                 <div className="min-w-0">
                   <p className="text-[10px] text-muted-foreground">{skillLabel}</p>
                   <p className="truncate text-sm font-semibold">{t(item.resource.title)}</p>
-                  <p className="line-clamp-2 text-[10px] leading-tight text-muted-foreground">
+                  <p
+                    className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                  >
                     {t(SMART_REVIEW_REASON_TEXT[item.category])}
                   </p>
                 </div>
@@ -177,6 +218,13 @@ export function SmartReviewCard({
               </li>
             );
           })}
+          {rows === 1 && (
+            // A single review would leave half the card empty: say the rest is done.
+            <li className="flex min-h-0 items-center justify-center gap-2 rounded-md border border-dashed border-border text-xs text-muted-foreground">
+              <CheckCircle2 className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+              {t("Nothing else to review right now.")}
+            </li>
+          )}
         </ul>
       </section>
     );
