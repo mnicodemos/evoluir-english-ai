@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addDays, retentionReport, weekStart } from "./retention";
+import { addDays, firstConversationStats, retentionReport, weekStart } from "./retention";
 
 const today = "2026-10-07"; // a Wednesday
 
@@ -78,5 +78,40 @@ describe("retentionReport", () => {
   it("reports no percentage when nobody is old enough yet", () => {
     const report = retentionReport([{ id: "a", joined: today }], new Map(), today);
     expect(report.week2).toEqual({ eligible: 0, returned: 0, percent: null });
+  });
+});
+
+describe("firstConversationStats", () => {
+  const now = new Date("2026-10-07T12:00:00Z");
+  it("counts who spoke on the first day and the median time to the first answer", () => {
+    const stats = firstConversationStats(
+      [
+        { id: "fast", joinedAt: "2026-10-05T10:00:00Z" },
+        { id: "slow", joinedAt: "2026-10-05T10:00:00Z" },
+        { id: "never", joinedAt: "2026-10-05T10:00:00Z" },
+        { id: "today", joinedAt: "2026-10-07T11:00:00Z" },
+      ],
+      new Map([
+        ["fast", "2026-10-05T10:03:00Z"],
+        ["slow", "2026-10-06T20:00:00Z"],
+        ["today", "2026-10-07T11:05:00Z"],
+      ]),
+      now,
+    );
+    // "today" joined under 24 h ago: not judged yet, but its time still counts.
+    expect(stats.firstDay).toEqual({ eligible: 3, returned: 1, percent: 33 });
+    expect(stats.medianMinutes).toBe(5);
+  });
+
+  it("has no median before anyone spoke", () => {
+    const stats = firstConversationStats(
+      [{ id: "a", joinedAt: "2026-10-01T10:00:00Z" }],
+      new Map(),
+      now,
+    );
+    expect(stats).toEqual({
+      firstDay: { eligible: 1, returned: 0, percent: 0 },
+      medianMinutes: null,
+    });
   });
 });

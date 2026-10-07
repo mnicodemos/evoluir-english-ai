@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  DONT_KNOW,
   PLACEMENT_QUESTIONS,
   isAnswered,
   isCorrectAnswer,
   normalizeWritten,
+  placementComplete,
   scorePlacement,
 } from "./placementTest";
 
@@ -63,5 +65,24 @@ describe("placement test", () => {
   it("blank typing does not count as answered", () => {
     expect(isAnswered("   ")).toBe(false);
     expect(isAnswered("went")).toBe(true);
+  });
+
+  it("ends once a band is fully answered with nothing right", () => {
+    const passedA1 = allCorrectUpTo("a1");
+    expect(placementComplete(passedA1)).toBe(false);
+    const stopped = { ...passedA1, "a2-listen": DONT_KNOW, "a2-write": DONT_KNOW };
+    expect(placementComplete(stopped)).toBe(true);
+    expect(scorePlacement(stopped).level.value).toBe("a1");
+  });
+
+  it("goes on while the current band still has an open or a right answer", () => {
+    expect(placementComplete({ ...allCorrectUpTo("a1"), "a2-listen": DONT_KNOW })).toBe(false);
+    expect(placementComplete(allCorrectUpTo("b2"))).toBe(false);
+    expect(placementComplete(allCorrectUpTo("c2"))).toBe(true);
+  });
+
+  it("'I don't know' counts as answered but never as right", () => {
+    expect(isAnswered(DONT_KNOW)).toBe(true);
+    for (const q of PLACEMENT_QUESTIONS) expect(isCorrectAnswer(q, DONT_KNOW)).toBe(false);
   });
 });

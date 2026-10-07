@@ -1033,6 +1033,17 @@ export const uiPt: Record<string, string> = {
   "Let's turn this result into your next step.":
     "Vamos transformar esse resultado no seu próximo passo.",
   "Placement test": "Teste de nivelamento",
+  "Tell EVO about you": "Conte para a EVO sobre você",
+  "See my level": "Ver meu nível",
+  "I don't know": "Não sei",
+  "That's enough to find your level.": "Já dá para encontrar o seu nível.",
+  "The next questions are harder than your level, so you can skip them.":
+    "As próximas perguntas estão acima do seu nível, então você pode pular.",
+  "Now let's talk.": "Agora vamos conversar.",
+  "Your first conversation takes about 2 minutes: I speak first, you answer by voice.":
+    "Sua primeira conversa leva uns 2 minutos: eu falo primeiro e você responde por voz.",
+  "Talk to EVO now": "Falar com a EVO agora",
+  "Go to my Dashboard": "Ir para o início",
   "Retake the test": "Refazer o teste",
   "What should we call you?": "Como podemos te chamar?",
   "Your name": "Seu nome",

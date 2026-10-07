@@ -162,3 +162,45 @@ export function retentionReport(
       })),
   };
 }
+
+export type FirstConversation = {
+  /** Spoke to EVO within 24 h of signing up (among students who joined over 24 h ago). */
+  firstDay: Rate;
+  /** Median minutes from signing up to the first spoken answer, among those who spoke. */
+  medianMinutes: number | null;
+};
+
+/**
+ * How fast new students reach their first conversation with EVO: the goal of
+ * the onboarding is under 2 minutes after the plan is created.
+ */
+export function firstConversationStats(
+  students: { id: string; joinedAt: string }[],
+  firstAnswerAt: Map<string, string>,
+  now: Date,
+): FirstConversation {
+  const DAY = 24 * 60 * 60 * 1000;
+  let eligible = 0;
+  let spoke = 0;
+  const minutes: number[] = [];
+  for (const student of students) {
+    const joined = Date.parse(student.joinedAt);
+    const first = firstAnswerAt.get(student.id);
+    const elapsed = first ? Date.parse(first) - joined : null;
+    if (elapsed !== null && elapsed >= 0) minutes.push(elapsed / 60_000);
+    if (now.getTime() - joined < DAY) continue;
+    eligible += 1;
+    if (elapsed !== null && elapsed >= 0 && elapsed <= DAY) spoke += 1;
+  }
+  minutes.sort((a, b) => a - b);
+  const middle = minutes.length / 2;
+  const median = minutes.length
+    ? minutes.length % 2
+      ? minutes[Math.floor(middle)]!
+      : (minutes[middle - 1]! + minutes[middle]!) / 2
+    : null;
+  return {
+    firstDay: rate(eligible, spoke),
+    medianMinutes: median === null ? null : Math.round(median),
+  };
+}

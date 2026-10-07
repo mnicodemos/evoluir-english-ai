@@ -164,11 +164,14 @@ export function normalizeWritten(value: string): string {
 }
 
 export function isCorrectAnswer(question: PlacementQuestion, answer: string | undefined): boolean {
-  if (!answer) return false;
+  if (!answer || answer === DONT_KNOW) return false;
   if (question.kind === "listen") return answer === question.answer;
   const typed = normalizeWritten(answer);
   return question.accepted.some((accepted) => normalizeWritten(accepted) === typed);
 }
+
+/** Stored when the student taps "I don't know": answered, and never correct. */
+export const DONT_KNOW = "__dont_know__";
 
 /** A question counts as answered once a choice is made or something was typed. */
 export function isAnswered(answer: string | undefined): boolean {
@@ -211,4 +214,19 @@ export function scorePlacement(answers: Record<string, string>): PlacementResult
     total: PLACEMENT_QUESTIONS.length,
     byBand,
   };
+}
+
+/**
+ * The test can end before the last question: the level is the highest band
+ * passed without skipping one, so once a band has both questions answered and
+ * none right, the harder bands can no longer change the result. A beginner
+ * is not made to type C2 answers.
+ */
+export function placementComplete(answers: Record<string, string>): boolean {
+  for (const band of LEVELS.map((l) => l.value)) {
+    const questions = PLACEMENT_QUESTIONS.filter((q) => q.band === band);
+    if (!questions.every((q) => isAnswered(answers[q.id]))) return false;
+    if (!questions.some((q) => isCorrectAnswer(q, answers[q.id]))) return true;
+  }
+  return true;
 }
