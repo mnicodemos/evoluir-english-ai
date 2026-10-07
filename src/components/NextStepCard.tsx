@@ -596,7 +596,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                         <span className="font-medium">{t("Track")}</span>
                         <span className="text-muted-foreground">
                           {" "}
-                          — {t("Mark Error or Correct")}
+                          — {t("Mark Correct or Incorrect")}
                         </span>
                       </span>
                     </li>

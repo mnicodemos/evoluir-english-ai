@@ -5,10 +5,12 @@ import evoProfile from "@/assets/evo-profile.jpg.asset.json";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useFirstWeek } from "@/hooks/useFirstWeek";
+import { uiPt } from "@/lib/uiDictionary";
+import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 /**
- * "Primeira semana" guide for new students: a compact pill in the Dashboard
+ * "First week" guide for new students: a compact pill in the Dashboard
  * header (no layout change) that opens the seven steps with EVO.
  */
 export function FirstWeekGuide({
@@ -19,6 +21,8 @@ export function FirstWeekGuide({
   placement: "desktop" | "mobile";
 }) {
   const progress = useFirstWeek(profile);
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   if (!progress) return null;
 
   return (
@@ -27,7 +31,7 @@ export function FirstWeekGuide({
         {placement === "mobile" ? (
           <button
             type="button"
-            aria-label={`Primeira semana: ${progress.doneCount} de ${progress.total}`}
+            aria-label={`${t("First week")}: ${progress.doneCount}/${progress.total}`}
             className="relative size-8 shrink-0 rounded-full ring-2 ring-brand-green/60"
           >
             <img
@@ -45,7 +49,7 @@ export function FirstWeekGuide({
           <Button
             variant="ghost"
             size="sm"
-            aria-label={`Primeira semana: ${progress.doneCount} de ${progress.total}`}
+            aria-label={`${t("First week")}: ${progress.doneCount}/${progress.total}`}
             className="h-7 shrink-0 gap-1.5 rounded-full border border-brand-green/50 bg-brand-green/10 px-2 text-xs font-semibold text-brand-green hover:bg-brand-green/20"
           >
             <img
@@ -55,7 +59,7 @@ export function FirstWeekGuide({
               height={20}
               className="size-5 rounded-full object-cover"
             />
-            <span>Primeira semana</span>
+            <span>First week</span>
             <span>
               {progress.doneCount}/{progress.total}
             </span>
@@ -75,9 +79,13 @@ export function FirstWeekGuide({
             className="size-11 rounded-full object-cover ring-2 ring-brand-green/60"
           />
           <div className="min-w-0">
-            <p className="text-sm font-semibold">Sua primeira semana com a EVO</p>
+            <p className="text-sm font-semibold">Your first week with EVO</p>
             <p className="text-xs text-muted-foreground">
-              Um passo por dia para conhecer tudo. {progress.doneCount} de {progress.total} feitos.
+              <span>One step a day to get to know everything.</span>{" "}
+              <span>
+                {progress.doneCount}/{progress.total}
+              </span>{" "}
+              <span>done</span>
             </p>
           </div>
         </div>

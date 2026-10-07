@@ -204,7 +204,9 @@ export function VideoCallStage({
 
         {captionsOn && lastAssistantText && (
           <div className="w-full max-w-2xl rounded-2xl bg-black/35 px-4 py-3 text-center backdrop-blur-sm">
-            <p className="text-base leading-relaxed sm:text-lg">{lastAssistantText}</p>
+            <p className="text-base leading-relaxed sm:text-lg" translate="no">
+              {lastAssistantText}
+            </p>
             {showTranslation && (
               <p className="mt-2 border-t border-white/15 pt-2 text-sm text-white/75">
                 {showTranslation}
