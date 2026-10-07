@@ -187,6 +187,7 @@ export type Database = {
           error_code: string | null
           error_message: string | null
           estimated_cost: number | null
+          first_chunk_ms: number | null
           id: string
           input_tokens: number | null
           model: string
@@ -204,6 +205,7 @@ export type Database = {
           error_code?: string | null
           error_message?: string | null
           estimated_cost?: number | null
+          first_chunk_ms?: number | null
           id?: string
           input_tokens?: number | null
           model?: string
@@ -221,6 +223,7 @@ export type Database = {
           error_code?: string | null
           error_message?: string | null
           estimated_cost?: number | null
+          first_chunk_ms?: number | null
           id?: string
           input_tokens?: number | null
           model?: string
