@@ -123,7 +123,11 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
               {path.completed}/{path.total} · {Math.round((path.completed / path.total) * 100)}%
             </p>
           </div>
-          <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-3 h-2" />
+          <Progress
+            value={Math.round((path.completed / path.total) * 100)}
+            className="mt-3 h-2"
+            aria-label={t("Course progress")}
+          />
 
           <Button
             variant="outline"
@@ -184,7 +188,9 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
       </div>
 
       {/* The open unit fills the left column; the collapsed ones stack on the right. */}
-      <div className="grid items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3 lg:gap-x-4 lg:gap-y-2.5">
+      {/* grid-cols-1 caps the column at the screen width: without it a long
+          button label widened the open unit past 360 px phones. */}
+      <div className="grid grid-cols-1 items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3 lg:gap-x-4 lg:gap-y-2.5">
         {path.units.map((unit) => {
           const allDone = unit.lessons.length > 0 && unit.completed === unit.lessons.length;
           const containsNext = nextLesson?.unit === unit.unit;
@@ -206,7 +212,7 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
             return (
               <section
                 key={unit.unit}
-                className={`card-soft p-4 opacity-70 lg:flex lg:items-center lg:gap-3 ${placement}`}
+                className={`card-soft p-4 opacity-80 lg:flex lg:items-center lg:gap-3 ${placement}`}
                 aria-label={unit.title}
               >
                 <div className="flex min-h-12 items-center gap-3 lg:min-h-10 lg:shrink-0">
@@ -244,7 +250,7 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
                         isCurrent
                           ? "border-[rgb(0_245_206)]/45 bg-[rgb(0_245_206)]/10"
                           : "border-border"
-                      } ${lesson.locked && !isCurrent ? "opacity-60" : ""}`}
+                      } ${lesson.locked && !isCurrent ? "opacity-80" : ""}`}
                     >
                       <span
                         className={`grid size-8 shrink-0 place-items-center rounded-lg text-xs font-semibold ${
@@ -300,7 +306,7 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
               <Button
                 variant={test.unlocked && !test.passed ? "default" : "outline"}
                 size="sm"
-                className={`mt-4 w-full lg:mt-2.5 ${
+                className={`mt-4 h-auto min-h-11 w-full whitespace-normal py-2 lg:mt-2.5 ${
                   test.unlocked && !test.passed
                     ? "bg-[rgb(0_245_206)] text-[#03231f] hover:bg-[rgb(0_220_186)]"
                     : "text-muted-foreground"

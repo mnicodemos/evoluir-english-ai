@@ -583,6 +583,7 @@ function ListeningPage() {
                   the words heard after a check, the full text when revealed. */}
               <div
                 className="flex min-h-12 flex-wrap items-end justify-center gap-x-2 gap-y-3 rounded-xl bg-secondary/40 px-4 py-4"
+                role="group"
                 aria-label="Sentence words"
               >
                 {checked !== null

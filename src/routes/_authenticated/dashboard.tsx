@@ -404,6 +404,7 @@ function Dashboard() {
                       out of the row. Screen readers still hear "20 days". */}
                   <span
                     className="flex items-center gap-1"
+                    role="img"
                     title={`${streakDays} ${t("days")}`}
                     aria-label={`${t("Study streak")}: ${streakDays} ${t("days")}`}
                   >

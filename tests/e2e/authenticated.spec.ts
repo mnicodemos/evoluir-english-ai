@@ -12,7 +12,7 @@ authenticated("authenticated smoke", () => {
   test("dashboard, progress, practice, teacher and Premium render", async ({ page }) => {
     const routes = [
       ["/dashboard", /Today's Progress|Today's Priority/i],
-      ["/progress", /My history|Histórico/i],
+      ["/progress", /My Progress/i],
       ["/vocabulary", /Vocabulary|Vocabulário/i],
       ["/listening", /Listening/i],
       ["/writing", /Writing/i],
@@ -36,11 +36,8 @@ authenticated("authenticated smoke", () => {
     const lessonLink = page.locator('a[href^="/learning/"]').first();
     const directHref = await lessonLink.getAttribute("href").catch(() => null);
     if (directHref) await page.goto(directHref, { waitUntil: "domcontentloaded" });
-    else
-      await page
-        .getByRole("button", { name: /lesson|start|continue/i })
-        .first()
-        .click();
+    // Lessons are buttons named after the lesson; the next one is marked current.
+    else await page.locator('button[aria-current="true"]').first().click();
     await expect(page).toHaveURL(/\/learning\//, { timeout: 20_000 });
     await expect(page.getByRole("tab", { name: "Summary" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Flashcards" })).toBeVisible();
