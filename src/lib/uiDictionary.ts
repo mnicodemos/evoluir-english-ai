@@ -1044,6 +1044,7 @@ export const uiPt: Record<string, string> = {
     "Sua primeira conversa leva uns 2 minutos: eu falo primeiro e você responde por voz.",
   "Talk to EVO now": "Falar com a EVO agora",
   "Go to my Dashboard": "Ir para o início",
+  "Course progress": "Progresso do curso",
   "Retake the test": "Refazer o teste",
   "What should we call you?": "Como podemos te chamar?",
   "Your name": "Seu nome",

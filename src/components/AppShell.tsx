@@ -205,7 +205,7 @@ export function MobileNavigationMenu({
             variant="ghost"
             aria-label={translate("Open menu")}
             className={cn(
-              "h-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-none px-1 [&_svg]:size-6",
+              "h-full min-w-0 flex-col items-center justify-start gap-0.5 rounded-none px-0 pt-2.5 [&_svg]:size-6",
               moreActive ? "text-brand-green" : "text-muted-foreground",
               className,
             )}
@@ -269,7 +269,7 @@ export function MobileNavigationMenu({
           <SheetClose asChild>
             <Button
               variant="ghost"
-              className="mt-1 w-full justify-start gap-2 text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              className="h-11 w-full justify-start gap-2 rounded-lg px-2 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               onClick={signOut}
             >
               <LogOut className="size-5" />
@@ -485,20 +485,22 @@ function AppShellContent({
         </main>
 
         <nav
-          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-1 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-0.5 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
           aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
         >
           {dashboardMobileNav.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="grid min-w-0 place-items-center transition-colors"
+              className="flex min-w-0 flex-col items-center pt-2.5 transition-colors"
               activeProps={{ className: "text-brand-green" }}
               inactiveProps={{ className: "text-muted-foreground" }}
             >
               <span className="grid justify-items-center gap-0.5">
                 <item.icon className="size-6" />
-                <span className="max-w-full truncate pb-0.5 text-[10px] font-medium leading-none">
+                {/* Two short lines instead of a cut label on 360 px phones
+                    ("Professor de IA", "Videochamada"). */}
+                <span className="line-clamp-2 max-w-full pb-0.5 text-center text-[10px] font-medium leading-[1.1] tracking-tight">
                   {item.label}
                 </span>
               </span>
