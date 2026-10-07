@@ -1430,4 +1430,5 @@ export const uiPt: Record<string, string> = {
   "Your text": "Seu texto",
   "Next task (": "Próxima tarefa (",
   "done)": "feitas)",
+  "Grammar with AI Teacher": "Gramática com o AI Teacher",
 };

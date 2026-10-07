@@ -61,7 +61,8 @@ const FALLBACK_BY_SKILL: Record<string, { title: string; to: string }> = {
   speaking: { title: "AI Speaking", to: "/coach" },
   writing: { title: "Writing", to: "/writing" },
   vocabulary: { title: "Vocabulary", to: "/vocabulary" },
-  grammar: { title: "AI Teacher", to: "/teacher" },
+  // Named after the task, not the tool: "AI Teacher" alone read as the subject.
+  grammar: { title: "Grammar with AI Teacher", to: "/teacher" },
   reading: { title: "Learning Center", to: "/learning" },
 };
 

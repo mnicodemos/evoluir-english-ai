@@ -166,6 +166,15 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           .replaceAll("{level}", cefrLevel ?? t("your current level"))
       : t(NEXT_STEP_PROGRESS_TEXT.neutral);
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
+  // "Writing · Writing" when the skill and the place share a name: say it once.
+  const questSkillLabel = data.quest
+    ? t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)
+    : "";
+  const questPlaceLabel = data.quest ? t(data.quest.resource.title) : "";
+  const questDetail =
+    questSkillLabel === questPlaceLabel
+      ? questSkillLabel
+      : `${questSkillLabel} · ${questPlaceLabel}`;
   const quickWin = data.quickWin;
   const mainAvailable = dashboardActionAvailable(data.activity.to, activityIndicators);
   const quickWinAvailable = quickWin
@@ -238,8 +247,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {challengeIcon} {t("Take the challenge")}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
-                {t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)} ·{" "}
-                {t(data.quest.resource.title)}
+                {questDetail}
               </span>
             </span>
           </Link>
@@ -250,8 +258,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {challengeIcon} {t("Take the challenge")}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
-                {t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)} ·{" "}
-                {t(data.quest.resource.title)}
+                {questDetail}
               </span>
             </span>
           </Link>
