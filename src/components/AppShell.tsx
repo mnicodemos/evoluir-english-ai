@@ -69,12 +69,13 @@ const dashboardSidebarNav = [
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
+  { to: "/call", label: "Video call", icon: Video },
   { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
 ] as const;
 
-// My Progress opens from the Dashboard's Today's Progress card (desktop) and the
-// bottom bar (mobile), so it no longer repeats in the sidebar.
+// My Progress opens from the Dashboard's Today's Progress card (desktop and
+// mobile), so it no longer repeats in the sidebar.
 const dashboardAccountNav = [
   { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
   { to: "/league", label: "Weekly league", icon: Trophy },
