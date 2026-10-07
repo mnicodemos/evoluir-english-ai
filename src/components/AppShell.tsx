@@ -52,6 +52,7 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { studyToday } from "@/lib/today";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
+// My Subscription sits with the settings rows at the bottom, as on desktop.
 const mobileSheetNav = [
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/listening", label: "Listening", icon: Headphones },
@@ -59,7 +60,6 @@ const mobileSheetNav = [
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
   { to: "/league", label: "Weekly league", icon: Trophy },
-  { to: "/premium", label: "Premium", icon: Crown },
 ] as const;
 
 // One list in study order: plan, lessons, receptive skills, writing, reviewing
@@ -188,7 +188,8 @@ export function MobileNavigationMenu({
   const pathname = useLocation().pathname;
   // The More button lights up when the current route belongs to one of its
   // own sections (the four bottom tabs stay responsible for themselves).
-  const moreActive = mobileSheetNav.some((item) => pathname.startsWith(item.to));
+  const moreActive =
+    pathname.startsWith("/premium") || mobileSheetNav.some((item) => pathname.startsWith(item.to));
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -234,16 +235,9 @@ export function MobileNavigationMenu({
           </SheetTitle>
         </SheetHeader>
         <nav className="grid gap-1 overflow-y-auto py-3">
-          {mobileSheetNav.map((item, index) => {
+          {mobileSheetNav.map((item) => {
             return (
-              <div
-                key={item.to}
-                className={
-                  index > 0 && item.to === "/premium"
-                    ? "border-t border-sidebar-border pt-2"
-                    : undefined
-                }
-              >
+              <div key={item.to}>
                 <SheetClose asChild>
                   <Link
                     to={item.to}
@@ -261,6 +255,17 @@ export function MobileNavigationMenu({
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
           <UtilityButtons variant="sheet" />
+          <SheetClose asChild>
+            <Link
+              to="/premium"
+              className="flex h-11 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              activeProps={{ className: "text-brand-green" }}
+              inactiveProps={{ className: "text-sidebar-foreground/70" }}
+            >
+              <Crown className="size-5 shrink-0" />
+              <span className="min-w-0 truncate text-left">{translate("My Subscription")}</span>
+            </Link>
+          </SheetClose>
           <SheetClose asChild>
             <Button
               variant="ghost"
@@ -388,8 +393,8 @@ function AppShellContent({
     { to: "/dashboard", label: lang === "pt" ? "Início" : "Home", icon: LayoutDashboard },
     { to: "/teacher", label: "AI Teacher", icon: Sparkles },
     // My Progress opens from the Today's Progress card, as on desktop.
-    { to: "/call", label: lang === "pt" ? "Videochamada" : "Video call", icon: Video },
     { to: "/coach", label: "AI Speaking", icon: Mic },
+    { to: "/call", label: lang === "pt" ? "Videochamada" : "Video call", icon: Video },
   ] as const;
 
   return (
