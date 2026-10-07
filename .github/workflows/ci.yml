@@ -137,3 +137,15 @@ jobs:
           E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD || '' }}
           SECURITY_USER_B_EMAIL: ${{ secrets.SECURITY_USER_B_EMAIL || '' }}
           SECURITY_USER_B_PASSWORD: ${{ secrets.SECURITY_USER_B_PASSWORD || '' }}
+
+      - name: Show signed-in E2E page snapshots
+        # The page as the test saw it (accessibility tree) when a signed-in
+        # check fails, so the cause is visible in the log. Secrets stay masked.
+        if: failure()
+        run: |
+          for f in $(find test-results -name error-context.md 2>/dev/null | head -6); do
+            echo "::group::$f"
+            head -c 6000 "$f"
+            echo
+            echo "::endgroup::"
+          done
