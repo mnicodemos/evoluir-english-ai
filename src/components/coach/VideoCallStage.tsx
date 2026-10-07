@@ -142,8 +142,13 @@ export function VideoCallStage({
   const showTranslation = translation?.source === lastAssistantText ? translation.text : null;
 
   const endCall = () => {
-    if (canFinish) onFinish();
-    else void navigate({ to: "/coach" });
+    if (canFinish) {
+      onFinish();
+      return;
+    }
+    // On phones, ending the call goes straight back to the Dashboard.
+    const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+    void navigate({ to: isMobile ? "/dashboard" : "/coach" });
   };
 
   return (
