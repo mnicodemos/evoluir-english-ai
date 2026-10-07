@@ -1,0 +1,63 @@
+// Loads the data behind the failure alerts and notifies the admins. Admins are
+// decided by user_roles (role "admin"), never by email.
+
+import type { supabaseAdmin as SupabaseAdminClient } from "@/integrations/supabase/client.server";
+import { adminAlertPush, opsAlerts } from "@/lib/opsAlerts";
+
+type SupabaseAdmin = typeof SupabaseAdminClient;
+
+export async function loadOpsAlerts(supabaseAdmin: SupabaseAdmin, now = new Date()) {
+  const since = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+  const [runs, calls] = await Promise.all([
+    supabaseAdmin
+      .from("push_runs")
+      .select("kind, created_at, devices, sent, failed, removed, error, duration_ms")
+      .order("created_at", { ascending: false })
+      .limit(20),
+    supabaseAdmin
+      .from("ai_usage_events")
+      .select("operation, created_at, success, status, error_code, error_message")
+      .gte("created_at", since)
+      .limit(5000),
+  ]);
+  // A missing table (migration not applied yet) must not break the Admin.
+  const pushRuns = runs.error ? [] : (runs.data ?? []);
+  const alerts = opsAlerts({ pushRuns, aiCalls: calls.data ?? [], now });
+  if (runs.error) {
+    alerts.unshift({
+      level: "warning",
+      area: "push",
+      title: "Registro de pushes indisponível",
+      detail: "Aplique a migração 0049_push_runs pelo chat do Lovable.",
+    });
+  }
+  return { alerts, recentRuns: pushRuns.slice(0, 6) };
+}
+
+/** Sends the admins one push when an alert needs attention. */
+export async function alertAdmins(supabaseAdmin: SupabaseAdmin) {
+  const { alerts } = await loadOpsAlerts(supabaseAdmin);
+  const message = adminAlertPush(alerts);
+  if (!message) return { sent: 0 };
+
+  const { data: admins } = await supabaseAdmin
+    .from("user_roles")
+    .select("user_id")
+    .eq("role", "admin");
+  const adminIds = (admins ?? []).map((row) => row.user_id);
+  if (adminIds.length === 0) return { sent: 0 };
+
+  const { fcmCredentials, sendFcm } = await import("@/lib/fcm.server");
+  const credentials = fcmCredentials();
+  if (!credentials) return { sent: 0 };
+  const { data: tokens } = await supabaseAdmin
+    .from("push_tokens")
+    .select("token")
+    .in("user_id", adminIds);
+  let sent = 0;
+  for (const { token } of tokens ?? []) {
+    const result = await sendFcm(credentials, token, message, "admin alert FCM");
+    if (result.ok) sent += 1;
+  }
+  return { sent };
+}
