@@ -489,7 +489,7 @@ function Dashboard() {
                   <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
                 </Link>
               </div>
-              <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)_5.5rem] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
+              <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_minmax(0,1fr)] items-center gap-1.5 lg:mt-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
                 <div className="ml-2 flex flex-col items-center lg:mx-auto lg:ml-0 xl:mx-0">
                   <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:size-24 2xl:size-30">
                     <svg
@@ -607,13 +607,6 @@ function Dashboard() {
                     })}
                   </div>
                 </div>
-                <div className="border-l border-border pl-1.5 lg:border-0 lg:pl-0">
-                  <WeeklyFrequency
-                    userId={profile.id}
-                    daysPerWeek={profile.study_days_per_week ?? 7}
-                    presentation="mobile-progress-summary"
-                  />
-                </div>
               </div>
               {/* Desktop-only secondary action to the Study Plan, styled like the
                   app's other buttons (not a status pill), above a quiet closing line. */}
@@ -649,7 +642,7 @@ function Dashboard() {
               <PathProgressCard compact />
             </div>
             <div className="hidden min-w-0 lg:col-span-4 lg:block xl:h-full">
-              <SmartReviewCard streakDays={streakDays} compact />
+              <SmartReviewCard streakDays={streakDays} compact mistakesDue={mistakesDue} />
             </div>
             <div className="hidden min-w-0 lg:col-span-3 lg:block xl:h-full">
               <WeeklyFrequency

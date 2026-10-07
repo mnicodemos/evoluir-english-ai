@@ -60,6 +60,13 @@ export function WeeklyFrequency({
   if (presentation === "mobile-strip") {
     return (
       <div className="mt-2 grid grid-cols-7 gap-1 border-t border-border pt-2 lg:hidden">
+        {/* The week count lives with its dots (it used to repeat in a box above). */}
+        <p className="col-span-7 mb-0.5 text-[11px] text-muted-foreground">
+          {lang === "pt" ? "Esta semana" : "This week"} ·{" "}
+          <span className="font-display font-bold text-foreground">
+            {studiedCount} / {weeklyGoal} {daysLabel}
+          </span>
+        </p>
         {weekKeys.map((key, i) => {
           const studied = studyDays?.has(key) ?? false;
           const isToday = key === todayKey;

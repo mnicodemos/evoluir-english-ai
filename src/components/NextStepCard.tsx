@@ -17,6 +17,7 @@ import {
   Mic,
   PenLine,
   RefreshCw,
+  RotateCcw,
   Sparkles,
 } from "lucide-react";
 
@@ -26,17 +27,13 @@ import { EvoGuide } from "@/components/EvoGuide";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useDueReviewCount } from "@/hooks/useDueReviewCount";
 import { useProfile } from "@/hooks/useProfile";
 import { useWeeklyLeagueStanding } from "@/components/WeeklyLeagueSummary";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import {
   NEXT_STEP_ACTION_TEXT,
-  NEXT_STEP_EVIDENCE_TEXT,
-  NEXT_STEP_EVIDENCE_TEXT_SHORT,
   NEXT_STEP_PRIORITY_TEXT,
-  NEXT_STEP_PRIORITY_TEXT_SHORT,
-  NEXT_STEP_PROGRESS_TEXT,
-  NEXT_STEP_PROGRESS_TEXT_SHORT,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
   NEXT_STEP_SKILL_TEXT,
@@ -61,6 +58,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
   const league = useWeeklyLeagueStanding(profile);
+  // Vocabulary words whose review date has arrived (same count as the bell).
+  const dueWordReviews = useDueReviewCount(profile?.id);
   const activityIndicators = useActivityIndicators();
   const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
@@ -137,34 +136,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const whyNowText = t(NEXT_STEP_WHY_NOW_TEXT[data.reason])
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
-  // "Why this matters now?" reuses the SAME server-side decision: priority line
-  // filled only with the resolved skill/level, evidence line from the real
-  // reason, and an evolution-context line backed by existing insight data.
+  // "Why this matters now": one sentence from the SAME server-side decision,
+  // filled only with the resolved skill and level.
   const priorityText = t(NEXT_STEP_PRIORITY_TEXT)
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
-  const evidenceText = t(NEXT_STEP_EVIDENCE_TEXT[data.reason])
-    .replaceAll("{skill}", skillLabel)
-    .replaceAll("{level}", cefrLevel ?? t("your current level"));
-  // Mobile-only one-line versions of the same sentences: summarized, never cut.
-  const shortPriorityText = t(NEXT_STEP_PRIORITY_TEXT_SHORT)
-    .replaceAll("{skill}", skillLabel)
-    .replaceAll("{level}", cefrLevel ?? t("your current level"));
-  const shortEvidenceText = t(NEXT_STEP_EVIDENCE_TEXT_SHORT[data.reason])
-    .replaceAll("{skill}", skillLabel)
-    .replaceAll("{level}", cefrLevel ?? t("your current level"));
-  const shortProgressText =
-    data.insight?.situation === "strong_elsewhere" && strongestLabel
-      ? t(NEXT_STEP_PROGRESS_TEXT_SHORT.withStrongSkill)
-          .replaceAll("{strongest}", strongestLabel)
-          .replaceAll("{level}", cefrLevel ?? t("your current level"))
-      : t(NEXT_STEP_PROGRESS_TEXT_SHORT.neutral);
-  const progressText =
-    data.insight?.situation === "strong_elsewhere" && strongestLabel
-      ? t(NEXT_STEP_PROGRESS_TEXT.withStrongSkill)
-          .replaceAll("{strongest}", strongestLabel)
-          .replaceAll("{level}", cefrLevel ?? t("your current level"))
-      : t(NEXT_STEP_PROGRESS_TEXT.neutral);
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   // "Writing · Writing" when the skill and the place share a name: say it once.
   const questSkillLabel = data.quest
@@ -341,18 +317,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   EVO · {t("Your AI Learning Coach")}
                 </p>
                 <div className="mt-2 sm:mt-0">
-                  {/* Mobile-only level badge next to the priority label; the bell
-                      and weather moved back to the top row. Desktop unchanged. */}
-                  <div className="flex items-center gap-2">
-                    <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:text-xs sm:font-bold sm:tracking-[0.08em] sm:text-brand-green">
-                      {t("TODAY'S PRIORITY")}
-                    </p>
-                    {profile?.level && (
-                      <span className="shrink-0 rounded-full border border-brand-green/40 bg-brand-green/15 px-2.5 py-1 font-display text-xs font-bold uppercase text-brand-green sm:hidden">
-                        {profile.level}
-                      </span>
-                    )}
-                  </div>
+                  {/* No level badge here: next to the priority it read as part of it,
+                      and the level already shows in the reason line. */}
+                  <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:text-xs sm:font-bold sm:tracking-[0.08em] sm:text-brand-green">
+                    {t("TODAY'S PRIORITY")}
+                  </p>
                   <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-2 sm:text-2xl xl:text-3xl">
                     <PriorityIcon
                       className="size-5 shrink-0 text-warning sm:size-[1.375rem]"
@@ -387,47 +356,33 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {leagueButton}
               {mapButton}
             </div>
-            {/* Mobile-only "Why this matters now": short versions of the same
-                three desktop sentences, each kept to one complete line. */}
-            <div className="mt-2 pb-1.5 sm:hidden">
-              <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <Lightbulb
-                  className="size-[1.375rem] shrink-0 text-warning"
-                  strokeWidth={2.5}
+            {/* Mobile-only: one line with the real reason for today's priority,
+                then the word reviews that are due (otherwise only in the bell). */}
+            <p className="mt-2.5 flex items-start gap-2 text-xs leading-snug text-sidebar-foreground/85 sm:hidden">
+              <Lightbulb
+                className="size-4 shrink-0 text-warning"
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
+              <span className="min-w-0">{priorityText}</span>
+            </p>
+            {dueWordReviews > 0 && (
+              <Link
+                to="/vocabulary"
+                className="mt-2 flex items-center gap-2 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-2.5 py-2 text-xs font-semibold text-sidebar-foreground sm:hidden"
+              >
+                <RotateCcw className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+                <span className="min-w-0 flex-1 truncate">
+                  {dueWordReviews === 1
+                    ? t("Review 1 word")
+                    : t("Review {n} words").replace("{n}", String(dueWordReviews))}
+                </span>
+                <ChevronRight
+                  className="size-4 shrink-0 text-muted-foreground"
                   aria-hidden="true"
                 />
-                {t("Why this matters now?")}
-              </p>
-              <ul className="mt-1 grid gap-1.5">
-                <li className="flex items-start gap-2 pl-2">
-                  <span
-                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
-                    aria-hidden="true"
-                  />
-                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
-                    {shortPriorityText}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 pl-2">
-                  <span
-                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
-                    aria-hidden="true"
-                  />
-                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
-                    {shortEvidenceText}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 pl-2">
-                  <span
-                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-current text-sidebar-foreground/80"
-                    aria-hidden="true"
-                  />
-                  <span className="min-w-0 whitespace-nowrap text-[11px] leading-snug text-sidebar-foreground/80">
-                    {shortProgressText}
-                  </span>
-                </li>
-              </ul>
-            </div>
+              </Link>
+            )}
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:mt-3 sm:block sm:text-sm">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
@@ -459,45 +414,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why this matters now")}</h3>
             </div>
-            <ul className="mt-1 grid gap-2 text-xs text-sidebar-foreground/80 sm:mt-3 sm:text-[13px] sm:leading-snug xl:mb-2 xl:mt-2 xl:gap-1.5">
-              {/* Mobile: short summary + evidence item — never clamped, never cut. */}
-              <li className="flex items-start gap-2 sm:hidden">
-                <span
-                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
-                  aria-hidden="true"
-                />
-                <span className="leading-tight">{priorityText}</span>
-              </li>
-              <li className="flex items-start gap-2 sm:hidden">
-                <span
-                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
-                  aria-hidden="true"
-                />
-                <span className="leading-tight">{evidenceText}</span>
-              </li>
-              {/* Desktop/tablet: the complete three-line explanation. */}
-              <li className="hidden items-start gap-2 sm:flex">
-                <span
-                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
-                  aria-hidden="true"
-                />
-                <span>{progressText}</span>
-              </li>
-              <li className="hidden items-start gap-2 sm:flex">
-                <span
-                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
-                  aria-hidden="true"
-                />
-                <span>{priorityText}</span>
-              </li>
-              <li className="hidden items-start gap-2 sm:flex">
-                <span
-                  className="mt-1 size-1.5 shrink-0 rounded-full bg-current"
-                  aria-hidden="true"
-                />
-                <span>{evidenceText}</span>
-              </li>
-            </ul>
+            {/* One sentence with the reason; the main column already says what
+                happened ("You have not practiced this skill yet"). */}
+            <p className="mt-2 text-[13px] leading-snug text-sidebar-foreground/80">
+              {priorityText}
+            </p>
             {(quickWinButton || challengeButton) && (
               <div className="mt-3 hidden border-t border-border pt-3 sm:block xl:mt-auto">
                 {/* A short heading tells the student what these two extras are. */}
@@ -507,14 +428,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <p className="mt-0.5 text-xs text-sidebar-foreground/70">
                   {t("Two short options beyond today's priority.")}
                 </p>
-                <div className="mt-2 flex items-stretch gap-2">
+                {/* Stacked, one full-width option per row, each with its description. */}
+                <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5">
                   {quickWinButton}
-                  {quickWinButton && challengeButton && (
-                    <div
-                      aria-hidden="true"
-                      className="w-px shrink-0 self-stretch bg-sidebar-foreground/15"
-                    />
-                  )}
                   {challengeButton}
                 </div>
               </div>
