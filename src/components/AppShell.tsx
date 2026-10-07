@@ -62,8 +62,10 @@ const mobileSheetNav = [
   { to: "/premium", label: "Premium", icon: Crown },
 ] as const;
 
-// Study order: plan, lessons, then receptive skills before productive ones
-// (writing, speaking, the live call), with the AI Teacher as support.
+// One list in study order: plan, lessons, receptive skills, writing, reviewing
+// mistakes, then speaking and the live call, the AI Teacher as support and the
+// weekly league as the reward. My Progress opens from the Dashboard's Today's
+// Progress card; My Subscription lives with the settings rows at the bottom.
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
@@ -71,16 +73,10 @@ const dashboardSidebarNav = [
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/writing", label: "Writing", icon: PenLine },
+  { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
   { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
   { to: "/call", label: "Video call", icon: Video },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
-] as const;
-
-// My Progress opens from the Dashboard's Today's Progress card (desktop and
-// mobile), so it no longer repeats in the sidebar. My Subscription lives with
-// the settings rows at the bottom.
-const dashboardAccountNav = [
-  { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
   { to: "/league", label: "Weekly league", icon: Trophy },
 ] as const;
 
@@ -426,23 +422,6 @@ function AppShellContent({
 
           <nav className="mt-4 flex flex-1 flex-col gap-1">
             {dashboardSidebarNav.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                aria-label={translate(item.label)}
-                className="grid h-12 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                activeProps={{
-                  className:
-                    "border border-brand-green/35 bg-sidebar-accent text-brand-green shadow-[inset_3px_0_0_var(--brand-green)]",
-                }}
-                inactiveProps={{ className: "text-sidebar-foreground/70" }}
-              >
-                <item.icon className="size-6" />
-                <span className="truncate text-left">{translate(item.label)}</span>
-              </Link>
-            ))}
-            <div className="my-2 border-t border-sidebar-border" />
-            {dashboardAccountNav.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
