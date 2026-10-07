@@ -1185,6 +1185,7 @@ export const uiPt: Record<string, string> = {
   Users: "Usuários",
   "AI Usage": "Consumo IA",
   "Cost & Performance": "Custo & Performance",
+  Retention: "Retenção",
   Loading: "Carregando",
   "Could not load the users right now.": "Não foi possível carregar os usuários agora.",
   "Send test error to Sentry": "Enviar erro de teste ao Sentry",

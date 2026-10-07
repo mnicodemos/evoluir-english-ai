@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminAlerts } from "@/components/AdminAlerts";
+import { AdminRetention } from "@/components/AdminRetention";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
@@ -111,7 +112,7 @@ function AdminPage() {
           <AdminAlerts />
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-5">
+            <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-6">
               <TabsTrigger
                 value="users"
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
@@ -136,6 +137,12 @@ function AdminPage() {
               </TabsTrigger>
               <TabsTrigger value="push" className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm">
                 {t("Push")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="retention"
+                className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
+              >
+                {t("Retention")}
               </TabsTrigger>
             </TabsList>
 
@@ -181,6 +188,9 @@ function AdminPage() {
             </TabsContent>
             <TabsContent value="push">
               <AdminPushTest />
+            </TabsContent>
+            <TabsContent value="retention">
+              <AdminRetention />
             </TabsContent>
           </Tabs>
         </section>

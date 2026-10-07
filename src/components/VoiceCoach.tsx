@@ -22,6 +22,7 @@ import { getLevelState } from "@/lib/level";
 import { speakEnglish, stopSpeaking } from "@/lib/speech";
 import { takeSpeechBlocks } from "@/lib/speechChunks";
 import { COACH_TIMEOUT_MESSAGE, streamCoachReply } from "@/lib/coach-stream";
+import { talkingTurn } from "@/lib/talkingQueue";
 
 import {
   cancelVoiceRecording,
@@ -82,6 +83,8 @@ export function VoiceCoach({
   const topicOffset = useRef(0);
   const speechQueue = useRef<Promise<void>>(Promise.resolve());
   const replyAbort = useRef<AbortController | null>(null);
+  // Set synchronously: a second tap before React re-renders cannot send twice.
+  const answering = useRef(false);
 
   useEffect(() => {
     mounted.current = true;
@@ -167,19 +170,24 @@ export function VoiceCoach({
         openerTimer = setTimeout(() => reject(new Error("opener_timeout")), 22_000);
       });
       const text = await Promise.race([
-        aiChat({
-          data: {
-            messages: coachOpenerMessages(
-              selected.id,
-              cefrLevel,
-              profile?.goal ?? "conversation",
-              buildStudyContext(snapshot),
-              used,
-            ),
-            jsonMode: false,
-            operation: "talking",
-          },
-        }),
+        // Queued behind any AI Speaking request still running in this tab
+        // (e.g. the opener of the screen just left), so the server never
+        // refuses it as "already running".
+        talkingTurn(() =>
+          aiChat({
+            data: {
+              messages: coachOpenerMessages(
+                selected.id,
+                cefrLevel,
+                profile?.goal ?? "conversation",
+                buildStudyContext(snapshot),
+                used,
+              ),
+              jsonMode: false,
+              operation: "talking",
+            },
+          }),
+        ),
         deadline,
       ]);
       opener = text.trim();
@@ -227,6 +235,8 @@ export function VoiceCoach({
       return;
     }
 
+    if (answering.current) return;
+    answering.current = true;
     setVoiceState("sending");
     try {
       const audio = await stopVoiceRecording();
@@ -242,31 +252,35 @@ export function VoiceCoach({
       replyAbort.current?.abort();
       const abort = new AbortController();
       replyAbort.current = abort;
-      const raw = await streamCoachReply(
-        coachReplyMessages(
-          scenario,
-          cefrLevel,
-          profile?.goal ?? "conversation",
-          buildStudyContext(snapshot),
-          next.slice(-8),
-          rolePlay?.role,
-        ),
-        (delta) => {
-          streamedReply += delta;
-          phraseBuffer += delta;
-          if (mounted.current) {
-            setMessages((current) =>
-              current.map((message, index) =>
-                index === replyIndex ? { ...message, content: streamedReply } : message,
-              ),
-            );
-          }
-          // Short phrases are merged into one audio request; long replies still split.
-          const split = takeSpeechBlocks(phraseBuffer);
-          phraseBuffer = split.rest;
-          split.blocks.forEach(queueSpeech);
-        },
-        abort.signal,
+      const raw = await talkingTurn(
+        () =>
+          streamCoachReply(
+            coachReplyMessages(
+              scenario,
+              cefrLevel,
+              profile?.goal ?? "conversation",
+              buildStudyContext(snapshot),
+              next.slice(-8),
+              rolePlay?.role,
+            ),
+            (delta) => {
+              streamedReply += delta;
+              phraseBuffer += delta;
+              if (mounted.current) {
+                setMessages((current) =>
+                  current.map((message, index) =>
+                    index === replyIndex ? { ...message, content: streamedReply } : message,
+                  ),
+                );
+              }
+              // Short phrases are merged into one audio request; long replies still split.
+              const split = takeSpeechBlocks(phraseBuffer);
+              phraseBuffer = split.rest;
+              split.blocks.forEach(queueSpeech);
+            },
+            abort.signal,
+          ),
+        { signal: abort.signal },
       );
       const reply = raw.trim();
       if (phraseBuffer.trim()) queueSpeech(phraseBuffer.trim());
@@ -287,6 +301,8 @@ export function VoiceCoach({
       toast.error(
         error instanceof Error ? error.message : "AI Speaking could not hear or answer you.",
       );
+    } finally {
+      answering.current = false;
     }
   }
 
