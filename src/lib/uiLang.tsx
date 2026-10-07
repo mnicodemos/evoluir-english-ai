@@ -19,8 +19,9 @@ const ATTRS = ["placeholder", "aria-label", "title"] as const;
 
 /**
  * Translates only known interface strings (exact match). Lesson content,
- * practice sentences and AI generated text are never in the dictionary,
- * so they always stay in English.
+ * practice sentences and AI generated text stay as written: they are not in
+ * the dictionary, and content containers carry translate="no" so a lesson
+ * word that equals an interface label ("Good", "Review") is never changed.
  */
 export function UiLangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<UiLang>("pt");
@@ -49,6 +50,7 @@ export function UiLangProvider({ children }: { children: ReactNode }) {
     let applying = false;
 
     function translateText(node: Text) {
+      if (node.parentElement?.closest('[translate="no"]')) return;
       const current = node.nodeValue ?? "";
       const key = current.trim();
       if (!key) return;
@@ -65,6 +67,7 @@ export function UiLangProvider({ children }: { children: ReactNode }) {
     }
 
     function translateAttrs(el: Element) {
+      if (el.closest('[translate="no"]')) return;
       for (const attr of ATTRS) {
         const current = el.getAttribute(attr);
         if (!current) continue;
@@ -96,6 +99,7 @@ export function UiLangProvider({ children }: { children: ReactNode }) {
       if (node.nodeType !== Node.ELEMENT_NODE) return;
       const el = node as Element;
       if (el.tagName === "SCRIPT" || el.tagName === "STYLE") return;
+      if (el.getAttribute("translate") === "no") return;
       translateAttrs(el);
       el.childNodes.forEach(walk);
     }

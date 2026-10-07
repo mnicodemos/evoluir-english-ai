@@ -167,7 +167,9 @@ export function LessonQuiz({
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Question {i + 1}
             </p>
-            <p className="mt-1 font-medium">{q.question}</p>
+            <p className="mt-1 font-medium" translate="no">
+              {q.question}
+            </p>
             <div className="mt-3 grid gap-2">
               {stableShuffle(q.options, q.id).map((opt) => {
                 const selected = chosen === opt;
@@ -186,6 +188,7 @@ export function LessonQuiz({
                   <button
                     key={opt}
                     type="button"
+                    translate="no"
                     disabled={submitted}
                     onClick={() => setAnswers((a) => ({ ...a, [q.id]: opt }))}
                     className={`min-h-11 rounded-lg border px-4 py-3 text-left text-sm font-medium transition-colors ${style} ${textColor}`}
@@ -202,7 +205,7 @@ export function LessonQuiz({
                 ) : (
                   <XCircle className="mt-0.5 size-4 shrink-0 text-[oklch(0.6_0.16_25)]" />
                 )}
-                <span>{q.explanation}</span>
+                <span translate="no">{q.explanation}</span>
               </p>
             )}
           </div>

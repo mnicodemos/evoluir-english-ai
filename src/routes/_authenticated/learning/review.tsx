@@ -97,8 +97,8 @@ function ReviewPage() {
           <p className="text-sm text-muted-foreground">Smart review</p>
           <h1 className="text-3xl font-bold">Your hardest words first</h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            Cards marked as <strong>Erro</strong> come back sooner. Cards marked as{" "}
-            <strong>Acerto</strong> move forward.
+            Cards marked as <strong>Incorrect</strong> come back sooner. Cards marked as{" "}
+            <strong>Correct</strong> move forward.
           </p>
         </header>
 

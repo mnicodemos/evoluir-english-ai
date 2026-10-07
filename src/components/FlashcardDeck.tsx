@@ -149,7 +149,10 @@ export function FlashcardDeck({
               {isListenCard ? "Listen card" : "Question card"}
             </span>
 
-            <p className="max-w-xs text-xl font-black uppercase leading-tight sm:text-2xl">
+            <p
+              className="max-w-xs text-xl font-black uppercase leading-tight sm:text-2xl"
+              translate="no"
+            >
               {prompt}
             </p>
             <p className="text-xs font-medium uppercase text-black/60">Tap to see the answer</p>
@@ -169,9 +172,13 @@ export function FlashcardDeck({
             </span>
 
             <div className="flex min-h-72 w-full flex-col items-center justify-center gap-4 overflow-y-auto px-6 pb-6 pt-14 sm:min-h-full">
-              <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl">{answerText}</p>
+              <p className="max-w-sm text-lg font-bold leading-snug sm:text-xl" translate="no">
+                {answerText}
+              </p>
               {card.example && card.example !== answerText && (
-                <p className="max-w-sm text-sm italic text-black/70">“{card.example}”</p>
+                <p className="max-w-sm text-sm italic text-black/70" translate="no">
+                  “{card.example}”
+                </p>
               )}
               {card.pronunciation && <p className="text-xs text-black/60">{card.pronunciation}</p>}
               {isListenCard && listenText && (
