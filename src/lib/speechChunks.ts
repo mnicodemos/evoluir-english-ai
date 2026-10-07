@@ -6,6 +6,12 @@
  * always happens on a natural pause, so the voice never breaks mid-clause.
  */
 export const MIN_SPEECH_BLOCK_CHARS = 140;
+/**
+ * The first block of a streamed reply is cut at the first natural pause after
+ * this many characters, so the voice starts after the first sentence instead
+ * of waiting for most of the reply to be written.
+ */
+export const FIRST_STREAM_BLOCK_CHARS = 40;
 
 const PAUSE = /[.!?,;](?:\s|$)/g;
 
@@ -34,6 +40,25 @@ export function takeSpeechBlocks(
   }
 
   return { blocks, rest };
+}
+
+/**
+ * Blocks of a reply that is still streaming: until the first block is out it
+ * is cut at the first pause after FIRST_STREAM_BLOCK_CHARS (the voice starts
+ * after the first sentence), and everything after it uses the regular size, so
+ * a burst of text never turns into many small audio requests.
+ */
+export function takeStreamBlocks(
+  value: string,
+  firstQueued: boolean,
+): { blocks: string[]; rest: string } {
+  if (firstQueued) return takeSpeechBlocks(value);
+  const first = takeSpeechBlocks(value, FIRST_STREAM_BLOCK_CHARS);
+  const [opening] = first.blocks;
+  if (!opening) return first;
+  const remaining = value.slice(value.indexOf(opening) + opening.length);
+  const following = takeSpeechBlocks(remaining);
+  return { blocks: [opening, ...following.blocks], rest: following.rest };
 }
 
 /**

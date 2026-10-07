@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
-import { AiUsageError, finishAiUsage, hashAiRequest, reserveAiUsage } from "@/lib/ai-usage.server";
+import {
+  AiUsageError,
+  finishAiUsage,
+  hashAiRequest,
+  loadAiLimit,
+  releaseAbandonedAiUsage,
+  reserveAiUsage,
+} from "@/lib/ai-usage.server";
 import { readTtsCache, writeTtsCache } from "@/lib/tts-cache.server";
 import { ttsCacheKey } from "@/lib/ttsCacheKey";
 
@@ -91,11 +98,19 @@ export const Route = createFileRoute("/api/speech")({
 
         let ticket;
         try {
+          // Independent reads run together; only the reservation needs them all.
+          const [limit, requestHash] = await Promise.all([
+            loadAiLimit("tts"),
+            hashAiRequest(parsed.data.text),
+            releaseAbandonedAiUsage(userId, "tts"),
+          ]);
           ticket = await reserveAiUsage({
             userId,
             operation: "tts",
             model: GEMINI_TTS_MODEL,
-            requestHash: await hashAiRequest(parsed.data.text),
+            requestHash,
+            limit,
+            abandonedReleased: true,
           });
         } catch (error) {
           const headers = new Headers();
