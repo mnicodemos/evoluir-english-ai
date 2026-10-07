@@ -32,6 +32,9 @@ const MISSED_RUN_MS = 26 * 60 * 60 * 1000;
 const AI_WINDOW_MS = 24 * 60 * 60 * 1000;
 /** The student's side, not a system failure: page closed, or silence recorded. */
 const NOT_SYSTEM_FAILURES = new Set(["abandoned", "empty_transcript"]);
+/** Refused by the usage guards (one request at a time, rate, daily limit) before
+ *  reaching the AI: the guard working, not a failure. */
+const GUARD_REFUSED = "denied";
 
 const PUSH_JOBS = [
   { label: "Palavra do dia (9h)", kinds: ["word"] },
@@ -96,7 +99,8 @@ export function aiAlerts(calls: AiCall[], now: Date): OpsAlert[] {
   const since = now.getTime() - AI_WINDOW_MS;
   const byOperation = new Map<string, { total: number; failed: AiCall[] }>();
   for (const call of calls) {
-    if (new Date(call.created_at).getTime() < since || call.status === "pending") continue;
+    if (new Date(call.created_at).getTime() < since) continue;
+    if (call.status === "pending" || call.status === GUARD_REFUSED) continue;
     const entry = byOperation.get(call.operation) ?? { total: 0, failed: [] };
     entry.total += 1;
     if (call.success === false && !NOT_SYSTEM_FAILURES.has(call.error_code ?? "")) {

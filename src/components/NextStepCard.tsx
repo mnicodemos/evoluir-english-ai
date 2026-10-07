@@ -17,7 +17,6 @@ import {
   Mic,
   PenLine,
   RefreshCw,
-  RotateCcw,
   Sparkles,
 } from "lucide-react";
 
@@ -27,7 +26,6 @@ import { EvoGuide } from "@/components/EvoGuide";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
-import { useDueReviewCount } from "@/hooks/useDueReviewCount";
 import { useProfile } from "@/hooks/useProfile";
 import { useWeeklyLeagueStanding } from "@/components/WeeklyLeagueSummary";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
@@ -59,7 +57,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { data: profile } = useProfile();
   const league = useWeeklyLeagueStanding(profile);
   // Vocabulary words whose review date has arrived (same count as the bell).
-  const dueWordReviews = useDueReviewCount(profile?.id);
   const activityIndicators = useActivityIndicators();
   const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
@@ -360,8 +357,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {leagueButton}
               {mapButton}
             </div>
-            {/* Mobile-only: one line with the real reason for today's priority,
-                then the word reviews that are due (otherwise only in the bell). */}
+            {/* Mobile-only: one line with the real reason for today's priority.
+                Due word reviews live in the bell; a box here was clipped by the
+                card and showed only as a green line. */}
             <p className="mt-2.5 flex items-start gap-2 text-xs leading-snug text-sidebar-foreground/85 sm:hidden">
               <Lightbulb
                 className="size-4 shrink-0 text-warning"
@@ -370,23 +368,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               />
               <span className="min-w-0">{priorityText}</span>
             </p>
-            {dueWordReviews > 0 && (
-              <Link
-                to="/vocabulary"
-                className="mt-2 flex items-center gap-2 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-2.5 py-2 text-xs font-semibold text-sidebar-foreground sm:hidden"
-              >
-                <RotateCcw className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
-                <span className="min-w-0 flex-1 truncate">
-                  {dueWordReviews === 1
-                    ? t("Review 1 word")
-                    : t("Review {n} words").replace("{n}", String(dueWordReviews))}
-                </span>
-                <ChevronRight
-                  className="size-4 shrink-0 text-muted-foreground"
-                  aria-hidden="true"
-                />
-              </Link>
-            )}
             <p className="mt-1 hidden line-clamp-2 text-xs text-sidebar-foreground/70 sm:mt-3 sm:block sm:text-sm">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>

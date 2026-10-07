@@ -73,6 +73,13 @@ describe("aiAlerts", () => {
       call({ success: false, status: "error", error_code: "abandoned" }),
       call({ success: false, status: "error", error_code: "empty_transcript" }),
       call({ success: false, status: "error", created_at: "2026-10-05T10:00:00Z" }),
+      // Refused by the one-request-at-a-time guard before reaching the AI.
+      call({
+        success: false,
+        status: "denied",
+        error_code: "concurrent_limit",
+        error_message: "Another AI request is already running",
+      }),
     ];
     expect(aiAlerts(calls, now)).toEqual([]);
   });
