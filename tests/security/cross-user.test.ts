@@ -72,8 +72,8 @@ d("cross-user data isolation", () => {
   let idB = "";
 
   it("signs in both dedicated test users", async () => {
-    a = await signIn(emailA!, passwordA!);
-    b = await signIn(emailB!, passwordB!);
+    a = await signIn("A", emailA!, passwordA!);
+    b = await signIn("B", emailB!, passwordB!);
     idA = await userIdOf(a);
     idB = await userIdOf(b);
     expect(idA).not.toBe(idB);
