@@ -11,7 +11,7 @@ authenticated("authenticated smoke", () => {
 
   test("dashboard, progress, practice, teacher and Premium render", async ({ page }) => {
     const routes = [
-      ["/dashboard", /Dashboard|Today's Priority|Prioridade/i],
+      ["/dashboard", /Today's Progress|Today's Priority/i],
       ["/progress", /My history|Histórico/i],
       ["/vocabulary", /Vocabulary|Vocabulário/i],
       ["/listening", /Listening/i],
@@ -23,7 +23,10 @@ authenticated("authenticated smoke", () => {
     for (const [route, heading] of routes) {
       await page.goto(route, { waitUntil: "domcontentloaded" });
       await expect(page).toHaveURL(new RegExp(route));
-      await expect(page.getByText(heading).first()).toBeVisible({ timeout: 20_000 });
+      // Responsive screens keep hidden copies of some labels (mobile vs desktop).
+      await expect(page.getByText(heading).filter({ visible: true }).first()).toBeVisible({
+        timeout: 20_000,
+      });
     }
   });
 
@@ -79,10 +82,18 @@ authenticated("authenticated smoke", () => {
     await expect(page.getByText(/Admin panel|Painel admin/i)).toHaveCount(0);
   });
 
-  test("logout ends the authenticated session", async ({ page }) => {
+  test("logout ends the authenticated session", async ({ page }, testInfo) => {
     await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    // On phones, Sign out lives in the "More" menu of the bottom navigation.
+    if (testInfo.project.name === "pixel-7") {
+      await page
+        .getByRole("button", { name: /Open menu|Abrir menu/i })
+        .first()
+        .click();
+    }
     await page
       .getByRole("button", { name: /Sign out|Sair/i })
+      .filter({ visible: true })
       .first()
       .click();
     await expect(page).toHaveURL(/\/auth/, { timeout: 20_000 });
