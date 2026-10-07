@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
+import { AdminAlerts } from "@/components/AdminAlerts";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
@@ -106,6 +107,8 @@ function AdminPage() {
             {t("Registered users")}
             {usersQuery.data ? `: ${usersQuery.data.total}` : ""}
           </p>
+
+          <AdminAlerts />
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
             <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-5">

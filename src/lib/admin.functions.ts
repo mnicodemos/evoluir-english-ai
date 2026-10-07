@@ -31,6 +31,18 @@ export const isAdminUser = createServerFn({ method: "GET" })
     isAdmin: await hasAdminRole(context.supabase, context.userId),
   }));
 
+/** Failure alerts (scheduled pushes and AI calls) for the Admin "Alerts" box. */
+export const getOpsAlerts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { loadOpsAlerts } = await import("@/lib/opsAlerts.server");
+    return loadOpsAlerts(supabaseAdmin);
+  });
+
 export const listRegisteredUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

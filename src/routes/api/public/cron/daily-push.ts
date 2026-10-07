@@ -80,16 +80,67 @@ export const Route = createFileRoute("/api/public/cron/daily-push")({
         // The scheduler (pg_net) may stop waiting before the pushes are out; the
         // host keeps the work running so every student still gets the push.
         const { keepAlive } = await import("@/lib/keepAlive.server");
-        return keepAlive(sendDailyPush(body.kind, supabaseAdmin));
+        return keepAlive(runDailyPush(body.kind, supabaseAdmin));
       },
     },
   },
 });
 
+type SupabaseAdmin = typeof import("@/integrations/supabase/client.server").supabaseAdmin;
+
+type RunReport = {
+  kind: string;
+  devices: number;
+  sent: number;
+  failed: number;
+  removed: number;
+  error: string | null;
+};
+
+/**
+ * Runs the daily push and records the run in push_runs, so the Admin can tell
+ * when a scheduled push failed or did not run. The morning run (and any run
+ * that fails) also sends the admins a push when something needs attention.
+ */
+async function runDailyPush(requestedKind: string | undefined, supabaseAdmin: SupabaseAdmin) {
+  const started = Date.now();
+  const report: RunReport = {
+    kind: requestedKind ?? "word",
+    devices: 0,
+    sent: 0,
+    failed: 0,
+    removed: 0,
+    error: null,
+  };
+  let response: Response;
+  try {
+    response = await sendDailyPush(requestedKind, supabaseAdmin, report);
+  } catch (error) {
+    report.error = error instanceof Error ? error.message : String(error);
+    response = Response.json({ kind: report.kind, error: report.error }, { status: 500 });
+  }
+  const { error: recordError } = await supabaseAdmin.from("push_runs").insert({
+    ...report,
+    error: report.error?.slice(0, 500) ?? null,
+    duration_ms: Date.now() - started,
+  });
+  if (recordError) console.error(`daily-push: run not recorded: ${recordError.message}`);
+  if (report.kind === "word" || report.error) {
+    try {
+      const { alertAdmins } = await import("@/lib/opsAlerts.server");
+      await alertAdmins(supabaseAdmin);
+    } catch (error) {
+      console.error("daily-push: admin alert failed", error);
+    }
+  }
+  return response;
+}
+
 /** Builds and sends the daily push for every registered device. */
 async function sendDailyPush(
   requestedKind: string | undefined,
-  supabaseAdmin: typeof import("@/integrations/supabase/client.server").supabaseAdmin,
+  supabaseAdmin: SupabaseAdmin,
+  report: RunReport,
 ): Promise<Response> {
   // Sunday's evening reminder becomes the weekly EVO report (one push, same schedule).
   const kind =
@@ -98,14 +149,19 @@ async function sendDailyPush(
       : requestedKind === "reminder"
         ? "reminder"
         : "word";
+  report.kind = kind;
 
   const { fcmCredentials, sendFcm } = await import("@/lib/fcm.server");
   const credentials = fcmCredentials();
   if (!credentials) {
-    return Response.json({ error: "Push not configured" }, { status: 500 });
+    report.error = "Push not configured";
+    return Response.json({ error: report.error }, { status: 500 });
   }
   const { data: tokens, error } = await supabaseAdmin.from("push_tokens").select("user_id, token");
-  if (error) return Response.json({ error: error.message }, { status: 500 });
+  if (error) {
+    report.error = error.message;
+    return Response.json({ error: error.message }, { status: 500 });
+  }
   const userIds = [...new Set((tokens ?? []).map((t) => t.user_id))];
   if (userIds.length === 0) return Response.json({ sent: 0 });
 
@@ -272,10 +328,14 @@ async function sendDailyPush(
   await forEachLimited(tokens ?? [], 6, async (t) => {
     const msg = messages.get(t.user_id);
     if (!msg) return;
+    report.devices += 1;
     const result = await sendFcm(credentials, t.token, msg, "daily-push FCM");
     if (result.ok) sent += 1;
     else if (result.stale) stale.push(t.token);
+    else report.failed += 1;
   });
+  report.sent = sent;
+  report.removed = stale.length;
   if (stale.length) await supabaseAdmin.from("push_tokens").delete().in("token", stale);
 
   console.info(`daily-push ${kind}: sent ${sent}, removed ${stale.length}`);
