@@ -94,10 +94,9 @@ jobs:
         run: bun run typecheck
 
       - name: Unit tests (Vitest)
-        # cross-user.test.ts is temporarily excluded until the dedicated test
-        # accounts authenticate in CI (currently HTTP 401). The file stays in
-        # the repo and still runs locally with `bun run test`.
-        run: bun run test --exclude tests/security/cross-user.test.ts
+        # Includes tests/security/cross-user.test.ts: student A must never read
+        # student B's data (both test accounts live in the repository secrets).
+        run: bun run test
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL || '' }}
           SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY || '' }}
@@ -125,11 +124,9 @@ jobs:
           SECURITY_USER_B_EMAIL: ${{ secrets.SECURITY_USER_B_EMAIL || '' }}
           SECURITY_USER_B_PASSWORD: ${{ secrets.SECURITY_USER_B_PASSWORD || '' }}
 
-      - name: E2E signed-in tests (warning only until the test account works)
-        # The test account in E2E_USER_EMAIL / E2E_USER_PASSWORD currently fails
-        # to sign in, so these specs report a warning instead of failing CI.
-        # Remove continue-on-error once the secrets hold a valid account.
-        continue-on-error: true
+      - name: E2E signed-in tests
+        # Signs in with the test account and walks the student screens; a
+        # broken screen now fails the build.
         run: bun run e2e --grep "authenticated smoke"
         env:
           # Publishable backend values; CI relies on the tracked .env for now —
