@@ -400,15 +400,21 @@ function Dashboard() {
               mobileTrailing={
                 <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                   <FirstWeekGuide profile={profile} placement="mobile" />
-                  <span className="flex items-center gap-1">
+                  {/* Gem + number only: the word "days" pushed the greeting's name
+                      out of the row. Screen readers still hear "20 days". */}
+                  <span
+                    className="flex items-center gap-1"
+                    title={`${streakDays} ${t("days")}`}
+                    aria-label={`${t("Study streak")}: ${streakDays} ${t("days")}`}
+                  >
                     <Gem
                       className="size-5 shrink-0"
                       style={{ color: getLeague(streakDays).from }}
                       strokeWidth={2.4}
                       aria-hidden="true"
                     />
-                    <span className="font-display text-sm font-bold">
-                      {streakDays} {t("days")}
+                    <span className="font-display text-sm font-bold" aria-hidden="true">
+                      {streakDays}
                     </span>
                   </span>
                   <WeatherTalk translate={t} placement="mobile" />
