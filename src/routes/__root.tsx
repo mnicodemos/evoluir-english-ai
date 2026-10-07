@@ -92,6 +92,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
+      // Fallback title: the signed-in area renders in the browser only
+      // (ssr: false), so its HTML would otherwise arrive without any title.
+      { title: "Evoluir+ English AI" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Evoluir+ English AI" },

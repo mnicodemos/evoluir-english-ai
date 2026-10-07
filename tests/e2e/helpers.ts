@@ -8,6 +8,9 @@ export async function signIn(page: Page) {
   if (!email || !password) {
     throw new Error("Authenticated E2E requires E2E_USER_EMAIL and E2E_USER_PASSWORD.");
   }
+  // The app opens in Portuguese by default; the checks are written against the
+  // English interface, so every test page starts in English.
+  await page.addInitScript(() => window.localStorage.setItem("evoluir-ui-lang", "en"));
   await page.goto("/auth", { waitUntil: "domcontentloaded" });
   // Wait for React to take over the form: a click before hydration submits the
   // plain HTML form (GET /auth?) and the sign-in never runs.
@@ -35,6 +38,18 @@ export async function signIn(page: Page) {
   ]);
   if (failure) throw new Error(`Sign-in failed for the E2E account: ${failure.trim()}`);
   await expect(page).toHaveURL(/\/(dashboard|onboarding)/);
+  // A fresh test account lands on the onboarding, and every app page sends it
+  // back there until the plan exists: finish it the quickest way.
+  if (/\/onboarding/.test(page.url())) await completeOnboarding(page);
+}
+
+async function completeOnboarding(page: Page) {
+  await page.getByRole("button", { name: "Continue" }).click();
+  // Missing both A1 questions ends the adaptive placement test at once.
+  for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "I don't know" }).click();
+  await page.getByRole("button", { name: "See my level" }).click();
+  await page.getByRole("button", { name: "Go to my Dashboard" }).click();
+  await page.waitForURL(/\/dashboard/, { timeout: 20_000 });
 }
 
 export function requireCiAccount() {
