@@ -337,6 +337,13 @@
       "when": 1791331908043,
       "tag": "0047_add_first_chunk_ms_to_ai_usage_events",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1791332460752,
+      "tag": "0048_cron_push_timeout_60s",
+      "breakpoints": true
     }
   ]
 }
