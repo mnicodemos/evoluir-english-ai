@@ -44,17 +44,14 @@ export function ProofOfProgressEvoBanner() {
   if (!data) return null;
 
   return (
-    <section className="card-soft overflow-hidden bg-primary" aria-label={t("EVO")}>
+    <section className="card-soft p-4 sm:p-5" aria-label={t("EVO")}>
       <EvoGuide
         title={
           data.highlights.length > 0
             ? t("We already have evidence of development in your skills.")
             : t("We are still building evidence about your evolution.")
         }
-        image="wide"
-        imageSize="lesson"
-        contrast="inverse"
-        className="pr-4 sm:pr-5"
+        image="avatar"
       />
     </section>
   );

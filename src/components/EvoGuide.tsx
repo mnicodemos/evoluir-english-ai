@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import evoBannerWide from "@/assets/evo-ai-teacher-history-lessons.jpg.asset.json";
+import { EvoAvatar } from "@/components/EvoAvatar";
 import evoGuideOfficial from "@/assets/evo-dashboard-final.jpg.asset.json";
 import { cn } from "@/lib/utils";
 
@@ -10,8 +10,8 @@ type EvoGuideProps = {
   children?: ReactNode;
   className?: string;
   imageSize?: "default" | "dashboard" | "diagnosis" | "diagnosisIntro" | "lesson";
-  /** Opt-in image variant: "wide" uses the complete horizontal EVO image. */
-  image?: "official" | "wide";
+  /** Opt-in image variant: "avatar" shows EVO's round portrait beside the text. */
+  image?: "official" | "avatar";
   contrast?: "default" | "inverse";
 };
 
@@ -24,10 +24,42 @@ export function EvoGuide({
   image = "official",
   contrast = "default",
 }: EvoGuideProps) {
-  const isWide = image === "wide";
-  const imageSrc = isWide ? evoBannerWide : evoGuideOfficial;
-  const imageWidth = isWide ? 1600 : 1536;
-  const imageHeight = isWide ? 400 : 1024;
+  if (image === "avatar") {
+    return (
+      <div className={cn("flex min-w-0 items-center gap-3 sm:gap-4", className)}>
+        <EvoAvatar />
+        <div className="min-w-0">
+          <p
+            className={cn(
+              "text-xs font-semibold uppercase",
+              contrast === "inverse" ? "text-white/80" : "text-primary",
+            )}
+          >
+            EVO
+          </p>
+          <h2
+            className={cn(
+              "mt-0.5 text-sm font-semibold sm:text-base",
+              contrast === "inverse" ? "text-white" : "text-card-foreground",
+            )}
+          >
+            {title}
+          </h2>
+          {description ? (
+            <p
+              className={cn(
+                "mt-1 text-sm",
+                contrast === "inverse" ? "text-white/80" : "text-muted-foreground",
+              )}
+            >
+              {description}
+            </p>
+          ) : null}
+          {children ? <div className="mt-3">{children}</div> : null}
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className={cn(
@@ -39,9 +71,6 @@ export function EvoGuide({
         imageSize === "diagnosisIntro" && "sm:grid-cols-[minmax(0,1fr)_7rem]",
         imageSize === "lesson" &&
           "grid-cols-[5.5rem_minmax(0,1fr)] items-stretch gap-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-5",
-        isWide &&
-          imageSize === "lesson" &&
-          "grid-cols-[10.5rem_minmax(0,1fr)] gap-4 sm:grid-cols-[19rem_minmax(0,1fr)] sm:gap-6",
         className,
       )}
     >
@@ -51,18 +80,16 @@ export function EvoGuide({
           imageSize === "diagnosis" && "w-28 sm:order-2 sm:w-full",
           imageSize === "diagnosisIntro" && "w-24 sm:order-2 sm:w-full",
           imageSize === "lesson" && "h-full",
-          isWide && "aspect-[1600/400]",
         )}
       >
         <img
-          src={imageSrc.url}
+          src={evoGuideOfficial.url}
           alt="EVO, sua companheira de evolução em inglês"
-          width={imageWidth}
-          height={imageHeight}
+          width={1536}
+          height={1024}
           className={cn(
             "h-full w-full object-contain object-center",
             imageSize === "lesson" && "object-cover",
-            isWide && imageSize === "lesson" && "object-contain object-center",
           )}
         />
       </div>
@@ -85,7 +112,6 @@ export function EvoGuide({
           className={cn(
             "mt-1 text-base font-semibold sm:text-lg",
             contrast === "inverse" ? "text-white" : "text-card-foreground",
-            isWide && "hidden sm:block",
           )}
         >
           {title}
@@ -95,21 +121,9 @@ export function EvoGuide({
             className={cn(
               "mt-1 text-sm",
               contrast === "inverse" ? "text-white/80" : "text-muted-foreground",
-              isWide && "hidden sm:block",
             )}
           >
             {description}
-          </p>
-        ) : null}
-        {isWide ? (
-          <p
-            className={cn(
-              "mt-1 text-sm",
-              contrast === "inverse" ? "text-white/80" : "text-muted-foreground",
-              "sm:hidden",
-            )}
-          >
-            Let's practice!
           </p>
         ) : null}
         {children ? <div className="mt-3">{children}</div> : null}
