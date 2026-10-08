@@ -432,10 +432,8 @@ function AppShellContent({
                 to={item.to}
                 aria-label={translate(item.label)}
                 className="grid h-12 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                activeProps={{
-                  className:
-                    "border border-brand-green/35 bg-sidebar-accent text-brand-green shadow-[inset_3px_0_0_var(--brand-green)]",
-                }}
+                // Just a soft background and green text: no border or side bar.
+                activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
                 inactiveProps={{ className: "text-sidebar-foreground/70" }}
               >
                 <item.icon className="size-6" />
