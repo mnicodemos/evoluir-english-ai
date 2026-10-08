@@ -241,7 +241,7 @@ export function PathProgressCard({
                 className="grid min-w-0 grid-cols-[1.5rem_4.25rem_minmax(0,1fr)_2.25rem_4.75rem] items-center gap-2 text-xs sm:grid-cols-[1.75rem_5rem_minmax(0,1fr)_2.5rem_5.25rem] sm:gap-2.5"
               >
                 <Icon
-                  className={`size-[1.65rem] ${tone.text}`}
+                  className="size-[1.65rem] text-foreground/70"
                   strokeWidth={2.5}
                   aria-hidden="true"
                 />
@@ -252,7 +252,11 @@ export function PathProgressCard({
                     aria-hidden="true"
                   />
                 ) : (
-                  <Progress value={row.value} className={`h-2.5 bg-secondary/80 ${tone.bar}`} />
+                  <Progress
+                    value={row.value}
+                    aria-label={t(meta.label)}
+                    className={`h-2.5 bg-secondary/80 ${tone.bar}`}
+                  />
                 )}
                 <span
                   className={`text-right font-semibold ${row.value === null ? "text-muted-foreground" : "text-foreground"}`}
@@ -310,25 +314,23 @@ const STATUS_LABEL: Record<SkillMeterStatus, string> = {
   not_measured: "No data",
 };
 
-const STATUS_TONE: Record<SkillMeterStatus, { text: string; bar: string; badge: string }> = {
+const STATUS_TONE: Record<SkillMeterStatus, { bar: string; badge: string }> = {
+  // One hue per status, and only on the bar and badge: the priority skill is
+  // the single solid warm badge, so it stands apart from "Needs work".
   priority: {
-    text: "text-warning",
-    bar: "[&>div]:bg-warning",
-    badge: "bg-warning/15 text-warning ring-1 ring-warning/40",
+    bar: "[&>div]:bg-dashboard-coral",
+    badge: "bg-dashboard-coral text-[oklch(0.2_0.05_40)]",
   },
-  strong: { text: "text-success", bar: "[&>div]:bg-success", badge: "bg-success/15 text-success" },
+  strong: { bar: "[&>div]:bg-success", badge: "bg-success/15 text-success" },
   on_track: {
-    text: "text-dashboard-blue",
     bar: "[&>div]:bg-dashboard-blue",
     badge: "bg-dashboard-blue/15 text-dashboard-blue",
   },
   needs_work: {
-    text: "text-warning/80",
-    bar: "[&>div]:bg-warning/70",
-    badge: "bg-warning/10 text-warning/90",
+    bar: "[&>div]:bg-warning",
+    badge: "bg-warning/15 text-warning",
   },
   not_measured: {
-    text: "text-muted-foreground",
     bar: "",
     badge: "bg-secondary text-muted-foreground",
   },
