@@ -605,6 +605,14 @@ export function getCoreCurriculum(level: string | null | undefined) {
   return getCurriculum(level).filter((lesson) => lesson.unit <= CORE_UNITS_PER_LEVEL);
 }
 
+/** Share of the core lessons a student must finish to take the Final Test. */
+export const FINAL_TEST_LESSON_SHARE = 0.7;
+
+/** Core lessons needed for the Final Test: 70% of them (21 of 30). */
+export function finalTestLessonsRequired(coreTotal: number = CORE_LESSONS_PER_LEVEL) {
+  return Math.ceil(coreTotal * FINAL_TEST_LESSON_SHARE);
+}
+
 /** Key of the Final Test that closes a level (30 questions, 70% to move up). */
 export function finalTestKey(level: string | null | undefined) {
   return `${normalizeLevel(level)}-final`;

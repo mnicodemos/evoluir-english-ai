@@ -664,10 +664,11 @@ export const uiPt: Record<string, string> = {
   "30 questions. Score 70% or more to move up to the next level.":
     "30 questões. Alcance 70% ou mais para avançar ao próximo nível.",
   "Take the final test": "Fazer o teste final",
-  "Finish the 30 lessons in Units 1–5 to unlock":
-    "Conclua as 30 lições das Unidades 1–5 para liberar",
-  "Finish the 30 core lessons in Units 1–5 to unlock the Final Test. Unit 6 is optional.":
-    "Conclua as 30 lições principais das Unidades 1–5 para liberar o Teste Final. A Unidade 6 é opcional.",
+  "Finish at least 70% of the lessons of this level (21 of 30) to unlock the Final Test.":
+    "Conclua pelo menos 70% das lições deste nível (21 de 30) para liberar o Teste Final.",
+  "Finish 21 of the 30 lessons (70%) to unlock": "Conclua 21 das 30 lições (70%) para liberar",
+  "Finish at least 21 of the 30 core lessons (70%) in Units 1–5 to unlock the Final Test. Unit 6 is optional.":
+    "Conclua pelo menos 21 das 30 lições principais (70%) das Unidades 1–5 para liberar o Teste Final. A Unidade 6 é opcional.",
   "The AI will write your test now. Take it in one sitting.":
     "A IA criará seu teste agora. Faça-o de uma só vez.",
   "Start final test": "Iniciar teste final",

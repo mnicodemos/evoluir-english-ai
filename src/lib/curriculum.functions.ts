@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   finalTestKey,
+  finalTestLessonsRequired,
   findCurriculumLesson,
   getCoreCurriculum,
   getCurriculum,
@@ -119,7 +120,7 @@ export const openFinalTest = createServerFn({ method: "POST" })
       .maybeSingle();
     if (existing?.id) return { lessonId: existing.id as string };
 
-    // Only the 30 core lessons in Units 1-5 are required. Unit 6 is optional.
+    // 70% of the 30 core lessons in Units 1-5 are required. Unit 6 is optional.
     const plan = getCoreCurriculum(level);
     const { data: rows } = await supabase
       .from("lessons")
@@ -142,8 +143,10 @@ export const openFinalTest = createServerFn({ method: "POST" })
         (s) => s.completed_at,
       ).length;
     }
-    if (done < plan.length) {
-      throw new Error("Finish all 30 lessons of this level to unlock the Final Test.");
+    if (done < finalTestLessonsRequired(plan.length)) {
+      throw new Error(
+        "Finish at least 70% of the lessons of this level (21 of 30) to unlock the Final Test.",
+      );
     }
 
     const descriptor = CEFR[level] ?? CEFR["b1"]!;

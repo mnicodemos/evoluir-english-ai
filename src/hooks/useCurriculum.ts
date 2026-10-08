@@ -7,6 +7,7 @@ import { useProfile } from "@/hooks/useProfile";
 import {
   CORE_UNITS_PER_LEVEL,
   finalTestKey,
+  finalTestLessonsRequired,
   getUnits,
   unitTestKey,
   type CurriculumLesson,
@@ -114,7 +115,10 @@ export function useLearningPath(reviewLevel?: string | null) {
       unitTests,
       finalTest: {
         lessonId: testId,
-        unlocked: coreLessons.every((lesson) => lesson.completed),
+        // 70% of the core lessons (21 of 30) open the Final Test.
+        unlocked:
+          coreLessons.filter((lesson) => lesson.completed).length >=
+          finalTestLessonsRequired(coreLessons.length),
         passed: !!testState?.completed_at,
       },
     };

@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { checkPromotion } from "./levelPromotion";
 
-const base = { userId: "u1", profileLevel: "b1", lessonKey: "b1-final" };
+const base = {
+  userId: "u1",
+  profileLevel: "b1",
+  lessonKey: "b1-final",
+  coreLessons: { done: 21, required: 21 },
+};
 
 describe("checkPromotion", () => {
   it("promotes one level after a passed Final Test of the current level", () => {
@@ -33,8 +38,20 @@ describe("checkPromotion", () => {
         userId: "u1",
         profileLevel: "c2",
         lessonKey: "c2-final",
+        coreLessons: { done: 30, required: 21 },
         result: { user_id: "u1", score: 100 },
       }),
     ).toEqual({ ok: false, reason: "top_level" });
+  });
+
+  it("needs 70% of the core lessons (21 of 30) finished", () => {
+    const result = { user_id: "u1", score: 90 };
+    expect(checkPromotion({ ...base, result, coreLessons: { done: 20, required: 21 } })).toEqual({
+      ok: false,
+      reason: "lessons_missing",
+    });
+    expect(checkPromotion({ ...base, result, coreLessons: { done: 21, required: 21 } }).ok).toBe(
+      true,
+    );
   });
 });
