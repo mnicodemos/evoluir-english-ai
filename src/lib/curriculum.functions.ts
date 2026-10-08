@@ -21,9 +21,11 @@ import {
   type GeneratedQuizItem,
   insertQuizQuestions,
   jsonValue,
+  prepareLessonContent,
   quizItemSchema,
   writeLesson,
 } from "./curriculumContent.server";
+import { keepAlive } from "./keepAlive.server";
 
 export const openCurriculumLesson = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -40,6 +42,14 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
       .eq("created_by", userId)
       .eq("curriculum_key", plan.key)
       .maybeSingle();
+    // Once this lesson is ready, the next one of the path is prepared in the
+    // background (shared per level) while the student studies, so opening it
+    // later is quick. Started after this lesson's own AI call, never with it.
+    const nextPlan = getCurriculum(plan.level)[plan.index + 1];
+    const prepareNext = () => {
+      if (nextPlan) void keepAlive(prepareLessonContent(nextPlan, userId));
+    };
+
     if (existing?.id) {
       // A lesson saved without its quiz (interrupted generation) is repaired once.
       if (!plan.isReviewTest) {
@@ -49,6 +59,7 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
           .eq("lesson_id", existing.id);
         if (!count) await writeLesson(supabase, userId, plan, existing.id as string);
       }
+      prepareNext();
       return { lessonId: existing.id as string };
     }
 
@@ -86,6 +97,7 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
     }
 
     const lessonId = await writeLesson(supabase, userId, plan);
+    prepareNext();
     return { lessonId };
   });
 
