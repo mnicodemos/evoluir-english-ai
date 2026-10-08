@@ -31,6 +31,7 @@ const SAME_IN_BOTH = new Set([
   "Evoluir",
   "English AI",
   "Evoluir+",
+  "Evoluir+ Plus",
   "XP",
   "min",
   "US /",

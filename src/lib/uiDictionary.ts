@@ -1,6 +1,37 @@
 // Portuguese translations for the app interface (course area).
 // Lesson content, practice sentences and any AI generated text stay in English.
 export const uiPt: Record<string, string> = {
+  // Evoluir+ Plus
+  "Evoluir+ Plus · My goals": "Evoluir+ Plus · Minhas metas",
+  "Choose up to 3 goals and get one small step a day from EVO.":
+    "Escolha até 3 metas e receba da EVO um pequeno passo por dia.",
+  "Your goals, one small step a day.": "Suas metas, um pequeno passo por dia.",
+  "Evolution score": "Nota de evolução",
+  "Your English and your goals, together.": "Seu inglês e suas metas, juntos.",
+  English: "Inglês",
+  Goals: "Metas",
+  Streak: "Sequência",
+  "Finishing all of today's steps also counts for your streak.":
+    "Concluir todos os passos de hoje também conta para sua sequência.",
+  "Today's steps": "Passos de hoje",
+  "EVO is preparing today's steps…": "A EVO está preparando os passos de hoje…",
+  "Your goals could not be loaded.": "Não foi possível carregar suas metas.",
+  "Choose 1 to 3 goals and I will give you one small step a day.":
+    "Escolha de 1 a 3 metas e eu te dou um pequeno passo por dia.",
+  "Remove goal": "Remover meta",
+  "Remove this goal?": "Remover esta meta?",
+  "All of today's steps are done. Today counts for your streak!":
+    "Todos os passos de hoje concluídos. Hoje conta para sua sequência!",
+  "New goal": "Nova meta",
+  "Your goal": "Sua meta",
+  Add: "Adicionar",
+  "Speak English in meetings": "Falar inglês em reuniões",
+  "Save R$ 300 a month": "Guardar R$ 300 por mês",
+  "Walk 3 times a week": "Caminhar 3 vezes por semana",
+  "You can have up to 3 goals at a time.": "Você pode ter até 3 metas ao mesmo tempo.",
+  "The goal could not be saved.": "Não foi possível salvar a meta.",
+  "The goal could not be removed.": "Não foi possível remover a meta.",
+  "The step could not be saved.": "Não foi possível salvar o passo.",
   "We could not prepare this quiz. Please try again.":
     "Não foi possível preparar este quiz. Tente novamente.",
   "Preparing this lesson's quiz… this can take about a minute.":

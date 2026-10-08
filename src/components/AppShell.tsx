@@ -17,6 +17,7 @@ import {
   PenLine,
   Sparkles,
   SpellCheck,
+  Target,
   Trophy,
   Video,
 } from "lucide-react";
@@ -54,6 +55,7 @@ import { studyToday } from "@/lib/today";
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 // My Subscription sits with the settings rows at the bottom, as on desktop.
 const mobileSheetNav = [
+  { to: "/plus", label: "Evoluir+ Plus", icon: Target },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/writing", label: "Writing", icon: PenLine },
@@ -68,6 +70,7 @@ const mobileSheetNav = [
 // Progress card; My Subscription lives with the settings rows at the bottom.
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/plus", label: "Evoluir+ Plus", icon: Target },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },

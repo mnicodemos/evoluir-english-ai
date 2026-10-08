@@ -25,6 +25,7 @@ import { Route as AuthenticatedLeagueRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedListeningRouteImport } from './routes/_authenticated/listening'
 import { Route as AuthenticatedMistakesRouteImport } from './routes/_authenticated/mistakes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedPlusRouteImport } from './routes/_authenticated/plus'
 import { Route as AuthenticatedPremiumRouteImport } from './routes/_authenticated/premium'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedStudyPlanRouteImport } from './routes/_authenticated/study-plan'
@@ -121,6 +122,11 @@ const AuthenticatedMistakesRoute = AuthenticatedMistakesRouteImport.update({
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlusRoute = AuthenticatedPlusRouteImport.update({
+  id: '/plus',
+  path: '/plus',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPremiumRoute = AuthenticatedPremiumRouteImport.update({
@@ -231,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/listening': typeof AuthenticatedListeningRoute
   '/mistakes': typeof AuthenticatedMistakesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/plus': typeof AuthenticatedPlusRoute
   '/premium': typeof AuthenticatedPremiumRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/study-plan': typeof AuthenticatedStudyPlanRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/listening': typeof AuthenticatedListeningRoute
   '/mistakes': typeof AuthenticatedMistakesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/plus': typeof AuthenticatedPlusRoute
   '/premium': typeof AuthenticatedPremiumRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/study-plan': typeof AuthenticatedStudyPlanRoute
@@ -301,6 +309,7 @@ export interface FileRoutesById {
   '/_authenticated/listening': typeof AuthenticatedListeningRoute
   '/_authenticated/mistakes': typeof AuthenticatedMistakesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/plus': typeof AuthenticatedPlusRoute
   '/_authenticated/premium': typeof AuthenticatedPremiumRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/study-plan': typeof AuthenticatedStudyPlanRoute
@@ -337,6 +346,7 @@ export interface FileRouteTypes {
     | '/listening'
     | '/mistakes'
     | '/onboarding'
+    | '/plus'
     | '/premium'
     | '/progress'
     | '/study-plan'
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/listening'
     | '/mistakes'
     | '/onboarding'
+    | '/plus'
     | '/premium'
     | '/progress'
     | '/study-plan'
@@ -406,6 +417,7 @@ export interface FileRouteTypes {
     | '/_authenticated/listening'
     | '/_authenticated/mistakes'
     | '/_authenticated/onboarding'
+    | '/_authenticated/plus'
     | '/_authenticated/premium'
     | '/_authenticated/progress'
     | '/_authenticated/study-plan'
@@ -555,6 +567,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/plus': {
+      id: '/_authenticated/plus'
+      path: '/plus'
+      fullPath: '/plus'
+      preLoaderRoute: typeof AuthenticatedPlusRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/premium': {
       id: '/_authenticated/premium'
       path: '/premium'
@@ -687,6 +706,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedListeningRoute: typeof AuthenticatedListeningRoute
   AuthenticatedMistakesRoute: typeof AuthenticatedMistakesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPlusRoute: typeof AuthenticatedPlusRoute
   AuthenticatedPremiumRoute: typeof AuthenticatedPremiumRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
   AuthenticatedStudyPlanRoute: typeof AuthenticatedStudyPlanRoute
@@ -710,6 +730,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedListeningRoute: AuthenticatedListeningRoute,
   AuthenticatedMistakesRoute: AuthenticatedMistakesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPlusRoute: AuthenticatedPlusRoute,
   AuthenticatedPremiumRoute: AuthenticatedPremiumRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
   AuthenticatedStudyPlanRoute: AuthenticatedStudyPlanRoute,
