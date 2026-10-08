@@ -44,7 +44,9 @@ export function UiLangProvider({ children }: { children: ReactNode }) {
   }, [lang]);
 
   useEffect(() => {
-    const root = rootRef.current;
+    // The whole page, not only the app container: popovers, dialogs and toasts
+    // are portaled to <body>, outside it, and stayed in English.
+    const root = rootRef.current ? document.body : null;
     if (!root) return;
 
     let applying = false;
