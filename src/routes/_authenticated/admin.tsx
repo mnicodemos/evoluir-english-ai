@@ -164,14 +164,41 @@ function AdminPage() {
                     <thead className="sticky top-0 bg-background">
                       <tr className="border-b border-border text-xs font-semibold uppercase text-muted-foreground">
                         <th className="py-2 pr-3">{t("Name")}</th>
-                        <th className="py-2">{t("Email")}</th>
+                        <th className="py-2 pr-3">{t("Email")}</th>
+                        <th className="py-2 pr-3">{t("Plan")}</th>
+                        <th className="py-2 pr-3">{t("Signed up")}</th>
+                        <th className="py-2">{t("Member for")}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {usersQuery.data?.users.map((user, index) => (
                         <tr key={`${user.email}-${index}`} className="border-b border-border/60">
                           <td className="py-2 pr-3 font-medium">{user.name}</td>
-                          <td className="py-2 text-muted-foreground">{user.email}</td>
+                          <td className="py-2 pr-3 text-muted-foreground">{user.email}</td>
+                          <td className="py-2 pr-3">
+                            <span
+                              className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${user.plan === "premium" ? "bg-warning/15 text-warning" : "bg-secondary text-muted-foreground"}`}
+                            >
+                              {user.plan === "premium" ? "Premium" : "Free"}
+                            </span>
+                            {user.campaign ? (
+                              <span className="ml-1.5 text-[11px] text-muted-foreground">
+                                {t("launch campaign")}
+                              </span>
+                            ) : null}
+                            {user.premiumUntil ? (
+                              <span className="block text-[11px] text-muted-foreground">
+                                {t("until")}{" "}
+                                {new Date(user.premiumUntil).toLocaleDateString("pt-BR")}
+                              </span>
+                            ) : null}
+                          </td>
+                          <td className="py-2 pr-3 whitespace-nowrap text-muted-foreground">
+                            {new Date(user.createdAt).toLocaleDateString("pt-BR")}
+                          </td>
+                          <td className="py-2 whitespace-nowrap text-muted-foreground">
+                            {memberFor(user.createdAt, lang)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -201,4 +228,25 @@ function AdminPage() {
       </div>
     </AppShell>
   );
+}
+
+/** "Today", "3 days", "2 months", "1 year" since signing up. */
+function memberFor(createdAt: string, lang: string, now = new Date()) {
+  const days = Math.max(
+    0,
+    Math.floor((now.getTime() - new Date(createdAt).getTime()) / 86_400_000),
+  );
+  const pt = lang === "pt";
+  if (days === 0) return pt ? "Hoje" : "Today";
+  if (days < 30)
+    return pt ? `${days} ${days === 1 ? "dia" : "dias"}` : `${days} ${days === 1 ? "day" : "days"}`;
+  const months = Math.floor(days / 30);
+  if (months < 12)
+    return pt
+      ? `${months} ${months === 1 ? "mês" : "meses"}`
+      : `${months} ${months === 1 ? "month" : "months"}`;
+  const years = Math.floor(days / 365);
+  return pt
+    ? `${years} ${years === 1 ? "ano" : "anos"}`
+    : `${years} ${years === 1 ? "year" : "years"}`;
 }

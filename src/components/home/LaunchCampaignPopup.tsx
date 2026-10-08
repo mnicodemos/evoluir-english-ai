@@ -52,7 +52,7 @@ export function LaunchCampaignPopup() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="dashboard-shell brand-dashboard-theme dark max-w-md border-brand-green/40 bg-card text-foreground">
+      <DialogContent className="dashboard-shell brand-dashboard-theme dark w-[calc(100%-2rem)] max-w-md rounded-2xl border-brand-green/40 bg-card text-foreground">
         <div className="flex items-center gap-3">
           <img
             src={evoProfile.url}

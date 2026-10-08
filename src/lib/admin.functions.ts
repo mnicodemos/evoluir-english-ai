@@ -53,15 +53,63 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error, count } = await supabaseAdmin
       .from("profiles")
-      .select("name, email", { count: "exact" })
+      .select("id, name, email, created_at, plan, plan_expires_at", { count: "exact" })
       .order("created_at", { ascending: false })
       .limit(500);
 
     if (error) throw error;
 
+    // Premium = a valid entitlement (the commercial authority), else a profile
+    // plan that has not ended; the launch campaign's places are marked.
+    const ids = (data ?? []).map((row) => row.id);
+    const now = new Date();
+    const [{ data: entitlements }, { data: grants }] = await Promise.all([
+      ids.length
+        ? supabaseAdmin
+            .from("entitlements")
+            .select("user_id, expires_at, revoked_at")
+            .in("user_id", ids)
+            .eq("plan", "premium")
+        : Promise.resolve({
+            data: [] as { user_id: string; expires_at: string | null; revoked_at: string | null }[],
+          }),
+      ids.length
+        ? supabaseAdmin
+            .from("premium_campaign_grants" as never)
+            .select("user_id, expires_at")
+            .in("user_id" as never, ids as never)
+        : Promise.resolve({ data: [] }),
+    ]);
+    const premiumUntil = new Map<string, string | null>();
+    for (const row of entitlements ?? []) {
+      if (row.revoked_at) continue;
+      if (row.expires_at && new Date(row.expires_at) <= now) continue;
+      const current = premiumUntil.get(row.user_id);
+      if (current === null) continue;
+      premiumUntil.set(
+        row.user_id,
+        !row.expires_at ? null : current && current > row.expires_at ? current : row.expires_at,
+      );
+    }
+    const campaign = new Set(((grants ?? []) as { user_id: string }[]).map((row) => row.user_id));
+
     return {
       total: count ?? data.length,
-      users: (data ?? []).map((row) => ({ name: row.name, email: row.email ?? "" })),
+      users: (data ?? []).map((row) => {
+        const profilePremium =
+          row.plan === "premium" && (!row.plan_expires_at || new Date(row.plan_expires_at) > now);
+        const premium = premiumUntil.has(row.id) || profilePremium;
+        return {
+          name: row.name,
+          email: row.email ?? "",
+          createdAt: row.created_at,
+          plan: premium ? ("premium" as const) : ("free" as const),
+          premiumUntil: premium
+            ? (premiumUntil.get(row.id) ?? (profilePremium ? row.plan_expires_at : null))
+            : null,
+          campaign: campaign.has(row.id),
+        };
+      }),
     };
   });
 
