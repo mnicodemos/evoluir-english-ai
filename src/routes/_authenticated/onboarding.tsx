@@ -1,12 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Loader2, Mic } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { EvoAvatar } from "@/components/EvoAvatar";
 import { EvoGuide } from "@/components/EvoGuide";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -228,7 +229,11 @@ function Onboarding() {
               disabled={saving}
               onClick={() => void finish("/coach")}
             >
-              {saving ? <Loader2 className="size-4 animate-spin" /> : <Mic className="size-4" />}
+              {saving ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <EvoAvatar decorative className="size-7 ring-1 sm:size-7" />
+              )}
               Talk to EVO now
             </Button>
             <div className="flex gap-2">

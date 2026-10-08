@@ -1,3 +1,4 @@
+import { EvoAvatar } from "@/components/EvoAvatar";
 import { Progress } from "@/components/ui/progress";
 import type { ConversationReport } from "@/lib/ai-prompts";
 
@@ -21,7 +22,13 @@ export function SpeakingReport({ report }: { report: ConversationReport }) {
           </div>
         ))}
       </div>
-      <p className="mt-5 text-sm text-muted-foreground">{report.summary}</p>
+      <div className="mt-5 flex items-start gap-3">
+        <EvoAvatar decorative className="size-10 sm:size-12" />
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase text-primary">EVO</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">{report.summary}</p>
+        </div>
+      </div>
       {report.suggestions.length > 0 && (
         <>
           <h3 className="mt-6 font-semibold">Improvement suggestions</h3>

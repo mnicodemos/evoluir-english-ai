@@ -9,6 +9,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { EvoAvatar } from "@/components/EvoAvatar";
 import { useSkillHistory } from "@/hooks/useSkillHistory";
 import { buildSkillHistory } from "@/lib/skillHistory";
 import { useUiLang } from "@/lib/uiLang";
@@ -59,9 +60,12 @@ export function EvolutionChart({ userId }: Props) {
 
   if (!series.length) {
     return (
-      <p className="mt-3 text-sm text-muted-foreground">
-        {t("No assessed history yet. Complete an activity to start your evolution chart.")}
-      </p>
+      <div className="mt-3 flex items-center gap-3">
+        <EvoAvatar decorative className="size-10 sm:size-12" />
+        <p className="text-sm text-muted-foreground">
+          {t("No assessed history yet. Complete an activity to start your evolution chart.")}
+        </p>
+      </div>
     );
   }
 

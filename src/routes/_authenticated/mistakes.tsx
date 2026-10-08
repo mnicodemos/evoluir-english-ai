@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useProfile } from "@/hooks/useProfile";
@@ -123,7 +124,11 @@ function Mistakes() {
             </div>
           ) : !current ? (
             <div className="space-y-3 py-4 text-center">
-              <CheckCircle2 className="mx-auto size-8 text-primary" />
+              {rows.length === 0 ? (
+                <EvoAvatar decorative className="mx-auto size-14" />
+              ) : (
+                <CheckCircle2 className="mx-auto size-8 text-primary" />
+              )}
               <p className="font-medium">
                 {rows.length === 0 ? "No mistakes saved yet." : "All caught up for today!"}
               </p>

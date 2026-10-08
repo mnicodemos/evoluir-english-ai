@@ -2,11 +2,18 @@ import evoGuide from "@/assets/evo-guide.webp";
 import { cn } from "@/lib/utils";
 
 /** The owner's round EVO portrait, shared wherever EVO speaks to the student. */
-export function EvoAvatar({ className }: { className?: string }) {
+export function EvoAvatar({
+  className,
+  decorative = false,
+}: {
+  className?: string;
+  /** True when a visible label beside it already names EVO. */
+  decorative?: boolean;
+}) {
   return (
     <img
       src={evoGuide}
-      alt="EVO"
+      alt={decorative ? "" : "EVO"}
       width={192}
       height={192}
       className={cn(
