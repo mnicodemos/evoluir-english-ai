@@ -207,15 +207,20 @@ function ProgressPage() {
                           <span className="font-medium">
                             {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
                           </span>
-                          <span className="text-muted-foreground">
-                            {s.value === null ? t("No data") : `${s.value}%`}
-                          </span>
+                          {s.value !== null && (
+                            <span className="text-muted-foreground">{s.value}%</span>
+                          )}
                         </div>
                         {s.value === null ? (
-                          <div
-                            className="mt-1.5 h-2 rounded-full border border-dashed border-border sm:mt-2"
-                            aria-hidden="true"
-                          />
+                          // Same words as the Dashboard card: a skill without a
+                          // measurement at this level says so, instead of an empty bar.
+                          <p className="mt-1 truncate text-[11px] leading-tight text-muted-foreground sm:mt-1.5 sm:text-xs">
+                            {t(
+                              shownLevel === currentLevel
+                                ? "Not measured at {level} yet"
+                                : "Not measured at {level}",
+                            ).replace("{level}", shownLevel)}
+                          </p>
                         ) : (
                           <Bar
                             value={s.value}

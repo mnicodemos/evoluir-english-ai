@@ -857,6 +857,10 @@ export const uiPt: Record<string, string> = {
   "My subscription": "Minha assinatura",
   Plan: "Plano",
   "Not measured at {level} yet": "Ainda não medido no {level}",
+  "Not measured at {level}": "Não medido no {level}",
+  "No reviews yet": "Nenhuma revisão ainda",
+  "Your reviews appear here once EVO measures your skills in lessons and practice.":
+    "Suas revisões aparecem aqui quando a EVO medir suas habilidades nas lições e práticas.",
   closed: "concluído",
   "Measurements by level": "Medições por nível",
   until: "até",

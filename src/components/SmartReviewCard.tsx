@@ -4,6 +4,7 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
+  Clock,
   GraduationCap,
   Mic,
   RotateCcw,
@@ -88,6 +89,8 @@ export function SmartReviewCard({
   const suggestionSlots = 3 - Number(showWordReviews) - Number(showMistakes);
   const rows =
     Number(showWordReviews) + Number(showMistakes) + Math.min(items.length, suggestionSlots);
+  // Reviews use the whole history (every level), so any measured skill counts.
+  const measured = (data.skills ?? []).some((skill) => skill.score !== null);
   if (items.length === 0 && !showWordReviews && !showMistakes) {
     // Compact Dashboard slot keeps its place: everything to review is done.
     if (!compact) return null;
@@ -106,13 +109,24 @@ export function SmartReviewCard({
             {t("Keep improving")}
           </h2>
         </div>
-        <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
-          <CheckCircle2 className="size-8 text-brand-green" aria-hidden="true" />
-          <p className="text-sm font-semibold">{t("All reviews done for now")}</p>
-          <p className="text-[11px] text-muted-foreground">
-            {t("New reviews appear after your next lesson.")}
-          </p>
-        </div>
+        {measured ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
+            <CheckCircle2 className="size-8 text-brand-green" aria-hidden="true" />
+            <p className="text-sm font-semibold">{t("All reviews done for now")}</p>
+            <p className="text-[11px] text-muted-foreground">
+              {t("New reviews appear after your next lesson.")}
+            </p>
+          </div>
+        ) : (
+          // Nothing measured yet: "all done" would be untrue, so it says what fills it.
+          <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
+            <Clock className="size-8 text-brand-green" strokeWidth={1.8} aria-hidden="true" />
+            <p className="text-sm font-semibold">{t("No reviews yet")}</p>
+            <p className="text-[11px] text-muted-foreground">
+              {t("Your reviews appear here once EVO measures your skills in lessons and practice.")}
+            </p>
+          </div>
+        )}
       </section>
     );
   }
