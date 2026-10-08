@@ -6,7 +6,12 @@ import { adminAlertPush, opsAlerts } from "@/lib/opsAlerts";
 
 type SupabaseAdmin = typeof SupabaseAdminClient;
 
-export async function loadOpsAlerts(supabaseAdmin: SupabaseAdmin, now = new Date()) {
+export async function loadOpsAlerts(
+  supabaseAdmin: SupabaseAdmin,
+  now = new Date(),
+  /** The Admin view also checks the product goals; the morning push does not. */
+  options: { includeProduct?: boolean } = {},
+) {
   const since = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const [runs, calls] = await Promise.all([
     supabaseAdmin
@@ -30,6 +35,23 @@ export async function loadOpsAlerts(supabaseAdmin: SupabaseAdmin, now = new Date
       title: "Registro de pushes indisponível",
       detail: "Aplique a migração 0049_push_runs pelo chat do Lovable.",
     });
+  }
+  if (options.includeProduct) {
+    const { loadRetention, loadSpeakingWait } = await import("@/lib/productMetrics.server");
+    const { productAlerts } = await import("@/lib/productAlerts");
+    // A failed read must not hide the push and AI alerts above.
+    const [retention, speakingWait] = await Promise.all([
+      loadRetention(supabaseAdmin).catch(() => null),
+      loadSpeakingWait(supabaseAdmin).catch(() => null),
+    ]);
+    alerts.push(
+      ...productAlerts({
+        speakingWait,
+        ...(retention
+          ? { d1: retention.d1, firstDayTalk: retention.firstConversation?.firstDay ?? null }
+          : {}),
+      }),
+    );
   }
   return { alerts, recentRuns: pushRuns.slice(0, 6) };
 }
