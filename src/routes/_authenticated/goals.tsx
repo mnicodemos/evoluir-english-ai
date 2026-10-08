@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/goals")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ Goals" },
+      { title: "Goals - Evoluir+ English AI" },
       {
         name: "description",
         content: "Choose up to 3 goals and get one small step a day from EVO.",

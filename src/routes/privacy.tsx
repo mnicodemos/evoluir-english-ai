@@ -5,12 +5,12 @@ import { LegalDocumentPage } from "@/components/LegalDocumentPage";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Política de Privacidade — Evoluir+ English AI" },
+      { title: "Política de Privacidade - Evoluir+ English AI" },
       {
         name: "description",
         content: "Política de Privacidade do serviço Evoluir+ English AI.",
       },
-      { property: "og:title", content: "Política de Privacidade — Evoluir+ English AI" },
+      { property: "og:title", content: "Política de Privacidade - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Política de Privacidade do serviço Evoluir+ English AI.",

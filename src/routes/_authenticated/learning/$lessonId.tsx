@@ -49,12 +49,12 @@ import { removeStorage, writeStorage } from "@/lib/safeStorage";
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Lesson" },
+      { title: "Lesson - Evoluir+ English AI" },
       {
         name: "description",
         content: "Watch the video, review the flashcards and take the quiz of this lesson.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Lesson" },
+      { property: "og:title", content: "Lesson - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Video, summary, flashcards and quiz in one English lesson.",

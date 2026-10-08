@@ -37,12 +37,12 @@ import { studyDayStartIso, studyToday } from "@/lib/today";
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Writing corrector" },
+      { title: "Writing corrector - Evoluir+ English AI" },
       {
         name: "description",
         content: "Get your English text corrected, rewritten naturally and scored.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Writing corrector" },
+      { property: "og:title", content: "Writing corrector - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Get your English text corrected and scored instantly.",

@@ -6,12 +6,12 @@ import { VoiceCoach } from "@/components/VoiceCoach";
 export const Route = createFileRoute("/_authenticated/call")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Video call with EVO" },
+      { title: "Video call with EVO - Evoluir+ English AI" },
       {
         name: "description",
         content: "A spoken English call with EVO, your AI teacher, with live captions.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Video call with EVO" },
+      { property: "og:title", content: "Video call with EVO - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Practice English in a call with your AI teacher.",

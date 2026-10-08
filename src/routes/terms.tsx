@@ -5,12 +5,12 @@ import { LegalDocumentPage } from "@/components/LegalDocumentPage";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Termos de Uso — Evoluir+ English AI" },
+      { title: "Termos de Uso - Evoluir+ English AI" },
       {
         name: "description",
         content: "Termos de Uso do serviço Evoluir+ English AI.",
       },
-      { property: "og:title", content: "Termos de Uso — Evoluir+ English AI" },
+      { property: "og:title", content: "Termos de Uso - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Termos de Uso do serviço Evoluir+ English AI.",

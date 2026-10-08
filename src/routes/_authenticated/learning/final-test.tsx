@@ -23,13 +23,13 @@ import { promoteAfterFinalTest } from "@/lib/levelPromotion.functions";
 export const Route = createFileRoute("/_authenticated/learning/final-test")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Final Test" },
+      { title: "Final Test - Evoluir+ English AI" },
       {
         name: "description",
         content:
           "Take the 30-question final test of your level and move up to the next CEFR level with 70% or more.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Final Test" },
+      { property: "og:title", content: "Final Test - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "30 questions to close your level and unlock the next one.",

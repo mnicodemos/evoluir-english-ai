@@ -26,13 +26,13 @@ export const Route = createFileRoute("/_authenticated/learning/unit-test")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Unit Final Test" },
+      { title: "Unit Final Test - Evoluir+ English AI" },
       {
         name: "description",
         content:
           "Take the integrated Final Test of the unit and show you can use every lesson together.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Unit Final Test" },
+      { property: "og:title", content: "Unit Final Test - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "One integrated test that combines the six lessons of the unit.",

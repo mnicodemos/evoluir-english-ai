@@ -11,12 +11,12 @@ export const Route = createFileRoute("/_authenticated/coach")({
   }),
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · AI Speaking" },
+      { title: "AI Speaking - Evoluir+ English AI" },
       {
         name: "description",
         content: "Practice everyday, professional and travel English with your AI teacher.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · AI Speaking" },
+      { property: "og:title", content: "AI Speaking - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Practice English conversation with instant feedback.",

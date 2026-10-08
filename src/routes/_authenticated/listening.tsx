@@ -45,13 +45,13 @@ import { listeningAnswerScore } from "@/lib/legacyScores";
 export const Route = createFileRoute("/_authenticated/listening")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Listening Lab" },
+      { title: "Listening Lab - Evoluir+ English AI" },
       {
         name: "description",
         content:
           "Train your English listening with dictation drills for everyday, work and travel.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Listening Lab" },
+      { property: "og:title", content: "Listening Lab - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Listen to natural English sentences and repeat them out loud.",

@@ -26,12 +26,12 @@ import { useUiLang } from "@/lib/uiLang";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Admin panel" },
+      { title: "Admin panel - Evoluir+ English AI" },
       {
         name: "description",
         content: "Registered users, AI usage and cost performance.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Admin panel" },
+      { property: "og:title", content: "Admin panel - Evoluir+ English AI" },
       { property: "og:description", content: "Registered users, AI usage and cost performance." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
