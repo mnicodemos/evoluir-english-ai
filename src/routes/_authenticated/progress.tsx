@@ -18,6 +18,7 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useVocabularyProgress } from "@/hooks/useVocabularyProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/formatDate";
+import { findLevel, LEVELS } from "@/lib/level";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { PROGRESS_SKILLS, SKILL_STRONG_AT, skillMeterRows } from "@/lib/pedagogy/skillMeter";
 
@@ -63,6 +64,7 @@ function ProgressPage() {
   // Inline pt/en for the few new strings, so the shared dictionary stays untouched.
   const L = (en: string, pt: string) => (lang === "pt" ? pt : en);
   const [showAllMistakes, setShowAllMistakes] = useState(false);
+  const [viewLevel, setViewLevel] = useState<string | null>(null);
   const [tab, setTab] = usePersistentState<string>("progress-tab", "overview");
   const { data: vocabProgress } = useVocabularyProgress();
 
@@ -107,12 +109,25 @@ function ProgressPage() {
     },
   });
 
-  const skills = skillMeterRows(
-    nextStep?.skills,
-    null,
-    PROGRESS_SKILLS,
-    profile?.level ?? null,
-  ).map((row) => ({
+  // Each level keeps its own measurements; the student can look back at the
+  // levels already closed (up to the highest reached) without changing level.
+  const currentLevel = findLevel(profile?.level).value.toUpperCase();
+  const maxIndex = LEVELS.findIndex(
+    (level) => level.value === findLevel(profile?.max_level ?? profile?.level).value,
+  );
+  const levelOptions = LEVELS.filter((level, index) => {
+    const code = level.value.toUpperCase();
+    return (
+      code === currentLevel ||
+      (index <= maxIndex && nextStep?.skillsByLevel?.some((entry) => entry.level === code))
+    );
+  }).map((level) => level.value.toUpperCase());
+  const shownLevel = viewLevel && levelOptions.includes(viewLevel) ? viewLevel : currentLevel;
+  const shownSnapshots =
+    shownLevel === currentLevel
+      ? nextStep?.skills
+      : nextStep?.skillsByLevel?.find((entry) => entry.level === shownLevel)?.skills;
+  const skills = skillMeterRows(shownSnapshots, null, PROGRESS_SKILLS, shownLevel).map((row) => ({
     label: row.skill.charAt(0).toUpperCase() + row.skill.slice(1),
     value: row.value,
   }));
@@ -155,7 +170,36 @@ function ProgressPage() {
                 </section>
 
                 <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
-                  <h2 className="text-base font-semibold sm:text-lg">{t("Current level")}</h2>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="text-base font-semibold sm:text-lg">
+                      {shownLevel === currentLevel
+                        ? t("Current level")
+                        : `${t("Level")} ${shownLevel} · ${t("closed")}`}
+                    </h2>
+                    {levelOptions.length > 1 ? (
+                      <div
+                        className="flex flex-wrap gap-1"
+                        role="group"
+                        aria-label={t("Measurements by level")}
+                      >
+                        {levelOptions.map((code) => (
+                          <button
+                            key={code}
+                            type="button"
+                            aria-pressed={shownLevel === code}
+                            onClick={() => setViewLevel(code)}
+                            className={`min-h-7 rounded-full px-2.5 text-xs font-semibold transition-colors ${
+                              shownLevel === code
+                                ? "bg-brand-green text-[oklch(0.2_0.04_160)]"
+                                : "bg-secondary text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {code}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
                   <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4">
                     {skills.map((s) => (
                       <div key={s.label}>
@@ -173,7 +217,11 @@ function ProgressPage() {
                             aria-hidden="true"
                           />
                         ) : (
-                          <Bar value={s.value} className="mt-1.5 h-2 sm:mt-2" />
+                          <Bar
+                            value={s.value}
+                            aria-label={s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
+                            className="mt-1.5 h-2 sm:mt-2"
+                          />
                         )}
                       </div>
                     ))}
