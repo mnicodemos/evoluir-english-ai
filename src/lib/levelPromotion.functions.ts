@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+import { finalTestLessonsRequired, getCoreCurriculum } from "./curriculum";
 import { checkPromotion } from "./levelPromotion";
 
 /**
@@ -32,7 +33,32 @@ export const promoteAfterFinalTest = createServerFn({ method: "POST" })
           .maybeSingle()
       : { data: null };
 
+    // The same 70% of core lessons that opens the Final Test is checked
+    // again here, so a result alone can never move the student up.
+    const core = getCoreCurriculum(profile.level);
+    const { data: coreRows } = await admin
+      .from("lessons")
+      .select("id")
+      .eq("created_by", context.userId)
+      .in(
+        "curriculum_key",
+        core.map((lesson) => lesson.key),
+      );
+    const coreIds = (coreRows ?? []).map((row) => row.id as string);
+    const { data: coreDone } = coreIds.length
+      ? await admin
+          .from("user_lessons")
+          .select("lesson_id")
+          .eq("user_id", context.userId)
+          .in("lesson_id", coreIds)
+          .not("completed_at", "is", null)
+      : { data: [] };
+
     const check = checkPromotion({
+      coreLessons: {
+        done: (coreDone ?? []).length,
+        required: finalTestLessonsRequired(core.length),
+      },
       userId: context.userId,
       profileLevel: profile.level,
       result: result ? { user_id: result.user_id, score: result.score } : null,

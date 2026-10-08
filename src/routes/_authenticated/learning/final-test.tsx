@@ -154,7 +154,8 @@ function FinalTestPage() {
         {!path.finalTest.unlocked ? (
           <div className="card-soft p-6 text-sm text-muted-foreground">
             <span>
-              Finish the 30 core lessons in Units 1–5 to unlock the Final Test. Unit 6 is optional.
+              Finish at least 21 of the 30 core lessons (70%) in Units 1–5 to unlock the Final Test.
+              Unit 6 is optional.
             </span>
           </div>
         ) : !id ? (

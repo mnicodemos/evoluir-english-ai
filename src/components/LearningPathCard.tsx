@@ -443,7 +443,7 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
               ) : (
                 <>
                   <Lock className="size-4" />{" "}
-                  <span>Finish the 30 lessons in Units 1–5 to unlock</span>
+                  <span>Finish 21 of the 30 lessons (70%) to unlock</span>
                 </>
               )}
             </Button>
