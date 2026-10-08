@@ -12,6 +12,7 @@ import { flashcardCount, listenCardCount, quizQuestionCount } from "@/lib/lesson
 import { resolveQuizEvidenceSkill, type QuizEvidenceSkill } from "@/lib/pedagogy/quizSkill";
 
 import { callGateway } from "./ai-gateway.server";
+import { hashAiRequest } from "./ai-usage.server";
 import { findLessonVideo, type LessonVideo } from "./lessonVideo.server";
 
 export async function callContentAi(
@@ -297,6 +298,121 @@ export function checkLessonContent(raw: string, plan: CurriculumLesson) {
   };
 }
 
+type LessonContent = z.infer<ReturnType<typeof generatedLessonSchema>>;
+
+/**
+ * The shared, validated content of one curriculum lesson (migration 0053):
+ * written by the AI the first time any student of the level needs it, then
+ * copied for everyone else with no AI call. Null when there is none yet or
+ * the table is not there (migration not applied): the AI writes it as before.
+ */
+async function readLessonTemplate(plan: CurriculumLesson, promptHash: string) {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("lesson_content_templates" as never)
+      .select("content")
+      .eq("curriculum_key" as never, plan.key as never)
+      .eq("prompt_hash" as never, promptHash as never)
+      .maybeSingle();
+    const { cardTotal, listenTotal, quizTotal } = lessonGenerationRequest(plan);
+    const parsed = generatedLessonSchema(cardTotal, listenTotal, quizTotal).safeParse(
+      (data as { content?: unknown } | null)?.content,
+    );
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+async function saveLessonTemplate(
+  plan: CurriculumLesson,
+  promptHash: string,
+  content: LessonContent,
+) {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("lesson_content_templates" as never)
+      .upsert({ curriculum_key: plan.key, prompt_hash: promptHash, content } as never, {
+        onConflict: "curriculum_key,prompt_hash",
+        ignoreDuplicates: true,
+      });
+  } catch {
+    /* sharing is an optimisation: the student's own lesson is already saved */
+  }
+}
+
+/**
+ * The lesson's content: the shared copy when one exists, otherwise written by
+ * the AI (no "thinking" step, which only added wait and cost to this
+ * structured reply). Only a reply that passes strict validation becomes the
+ * shared copy; a salvaged one serves this student alone.
+ */
+async function lessonContentFor(plan: CurriculumLesson, userId: string): Promise<LessonContent> {
+  const { messages, cardTotal, listenTotal, quizTotal } = lessonGenerationRequest(plan);
+  const promptHash = await hashAiRequest({ messages, jsonMode: true });
+  const shared = await readLessonTemplate(plan, promptHash);
+  if (shared) return shared;
+
+  let raw: string;
+  try {
+    raw = await callGateway(messages, true, {
+      userId,
+      operation: "lesson_generation",
+      fast: true,
+    });
+  } catch (error) {
+    // The background preparation of this very lesson may be running (one AI
+    // call at a time per student): wait for its shared copy instead of failing.
+    const code = (error as { code?: string } | null)?.code;
+    if (code !== "concurrent_limit" && code !== "rate_limit") throw error;
+    for (let waited = 0; waited < 60_000; waited += 3_000) {
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+      const ready = await readLessonTemplate(plan, promptHash);
+      if (ready) return ready;
+    }
+    throw error;
+  }
+  const rawValue = jsonValue(raw);
+  const parsedContent = generatedLessonSchema(cardTotal, listenTotal, quizTotal).safeParse(
+    rawValue,
+  );
+  if (parsedContent.success) {
+    await saveLessonTemplate(plan, promptHash, parsedContent.data);
+    return parsedContent.data;
+  }
+  // One imperfect item (an extra field, a wrong count, an answer that does not
+  // match its options) must not throw the whole lesson away: keep every item
+  // that is valid on its own, and only fail when too few remain.
+  console.error(
+    "Lesson content failed strict validation",
+    plan.key,
+    parsedContent.error.issues.slice(0, 5),
+  );
+  const salvaged = salvageLessonContent(rawValue, cardTotal, quizTotal);
+  const minimumQuiz = plan.isReviewTest
+    ? quizTotal
+    : Math.min(quizTotal, Math.max(5, Math.ceil(quizTotal * 0.7)));
+  if (!salvaged || salvaged.quiz.length < minimumQuiz) {
+    throw new Error("The AI could not write this lesson. Please try again.");
+  }
+  return salvaged;
+}
+
+/**
+ * Prepares a lesson's shared content in the background (the next lesson of
+ * the path, while the student studies the current one), so opening it later
+ * needs no AI wait. Never throws.
+ */
+export async function prepareLessonContent(plan: CurriculumLesson, userId: string) {
+  try {
+    await lessonContentFor(plan, userId);
+  } catch (error) {
+    console.warn("Preparing the next lesson failed", plan.key, error);
+  }
+}
+
 export async function writeLesson(
   supabase: SupabaseClient<Database>,
   userId: string,
@@ -304,35 +420,8 @@ export async function writeLesson(
   /** Lesson saved earlier whose cards/quiz never arrived: only fill those in. */
   repairLessonId?: string,
 ): Promise<string> {
-  const { messages, cardTotal, listenTotal, quizTotal, questionCards } =
-    lessonGenerationRequest(plan);
-  const raw = await callContentAi(messages, userId, "lesson_generation", true);
-
-  const rawValue = jsonValue(raw);
-  const parsedContent = generatedLessonSchema(cardTotal, listenTotal, quizTotal).safeParse(
-    rawValue,
-  );
-  let content: z.infer<ReturnType<typeof generatedLessonSchema>>;
-  if (parsedContent.success) {
-    content = parsedContent.data;
-  } else {
-    // One imperfect item (an extra field, a wrong count, an answer that does not
-    // match its options) must not throw the whole lesson away: keep every item
-    // that is valid on its own, and only fail when too few remain.
-    console.error(
-      "Lesson content failed strict validation",
-      plan.key,
-      parsedContent.error.issues.slice(0, 5),
-    );
-    const salvaged = salvageLessonContent(rawValue, cardTotal, quizTotal);
-    const minimumQuiz = plan.isReviewTest
-      ? quizTotal
-      : Math.min(quizTotal, Math.max(5, Math.ceil(quizTotal * 0.7)));
-    if (!salvaged || salvaged.quiz.length < minimumQuiz) {
-      throw new Error("The AI could not write this lesson. Please try again.");
-    }
-    content = salvaged;
-  }
+  const { listenTotal, quizTotal, questionCards } = lessonGenerationRequest(plan);
+  const content = await lessonContentFor(plan, userId);
 
   if (!plan.isReviewTest) {
     const usable = (content.quiz ?? []).filter(
