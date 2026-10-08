@@ -87,6 +87,16 @@ export type NextStep = {
     cefrLevel: string;
     evidenceCount: number | null;
   }[];
+  /** My Progress: the latest measurements of each level, so closed levels stay viewable. */
+  skillsByLevel?: {
+    level: string;
+    skills: {
+      skill: string;
+      score: number | null;
+      cefrLevel: string;
+      evidenceCount: number | null;
+    }[];
+  }[];
   /** Existing evidence for the chosen skill, exposed for contextual display only. */
   insight?: {
     cefrLevel: string | null;

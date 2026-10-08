@@ -198,5 +198,26 @@ export const loadNextStep = createServerFn({ method: "POST" })
         };
       });
 
-    return { ...step, quest, reviews, skills: skillMeter };
+    // My Progress: each level keeps its own measurements, so the levels the
+    // student already closed can be looked at again. Latest completed result
+    // per skill within each level (rows are newest first).
+    const byLevel = new Map<string, Map<string, HistoryRow>>();
+    for (const row of history.data ?? []) {
+      if (!row.skill || !row.cefr_level || row.cefr_level === "insufficient_evidence") continue;
+      const key = row.cefr_level.toUpperCase();
+      const skillsAtLevel = byLevel.get(key) ?? new Map<string, HistoryRow>();
+      if (!skillsAtLevel.has(row.skill)) skillsAtLevel.set(row.skill, row);
+      byLevel.set(key, skillsAtLevel);
+    }
+    const skillsByLevel = [...byLevel.entries()].map(([cefr, rows]) => ({
+      level: cefr,
+      skills: [...rows.values()].map((row) => ({
+        skill: row.skill as string,
+        score: row.score === null ? null : Number(row.score),
+        cefrLevel: cefr,
+        evidenceCount: row.evidence_count === null ? null : Number(row.evidence_count),
+      })),
+    }));
+
+    return { ...step, quest, reviews, skills: skillMeter, skillsByLevel };
   });
