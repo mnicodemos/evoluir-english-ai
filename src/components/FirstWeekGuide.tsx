@@ -33,7 +33,9 @@ export function FirstWeekGuide({
           <button
             type="button"
             aria-label={`${t("First week")}: ${progress.doneCount}/${progress.total}`}
-            className="relative size-8 shrink-0 rounded-full ring-2 ring-brand-green/60"
+            // The 1/7 badge hangs 6 px past the circle; the margin keeps it
+            // off the streak gem next to it.
+            className="relative mr-1.5 size-8 shrink-0 rounded-full ring-2 ring-brand-green/60"
           >
             <img
               src={evoGuide}
