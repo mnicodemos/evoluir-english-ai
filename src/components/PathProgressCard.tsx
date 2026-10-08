@@ -72,6 +72,7 @@ export function PathProgressCard({
     staleTime: 60 * 1000,
     enabled: compact && !!profile,
   });
+  const levelCode = profile?.level ? findLevel(profile.level).value.toUpperCase() : "";
   const meterRows = skillMeterRows(
     nextStep?.skills,
     nextStep?.prioritySkill,
@@ -251,23 +252,31 @@ export function PathProgressCard({
                   aria-hidden="true"
                 />
                 <span className="truncate font-medium">{t(meta.label)}</span>
-                {row.value === null ? (
-                  <span
-                    className="h-2.5 rounded-full border border-dashed border-border"
-                    aria-hidden="true"
-                  />
+                {row.value === null && !skillsLoading ? (
+                  // Each level has its own measurements: say so plainly instead
+                  // of an empty bar and a dash.
+                  <span className="col-span-2 truncate text-[11px] text-muted-foreground">
+                    {t("Not measured at {level} yet").replace("{level}", levelCode)}
+                  </span>
                 ) : (
-                  <Progress
-                    value={row.value}
-                    aria-label={t(meta.label)}
-                    className={`h-2.5 bg-secondary/80 ${tone.bar}`}
-                  />
+                  <>
+                    {row.value === null ? (
+                      <span
+                        className="h-2.5 rounded-full border border-dashed border-border"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Progress
+                        value={row.value}
+                        aria-label={t(meta.label)}
+                        className={`h-2.5 bg-secondary/80 ${tone.bar}`}
+                      />
+                    )}
+                    <span className="text-right font-semibold text-foreground">
+                      {skillsLoading ? "…" : `${row.value}%`}
+                    </span>
+                  </>
                 )}
-                <span
-                  className={`text-right font-semibold ${row.value === null ? "text-muted-foreground" : "text-foreground"}`}
-                >
-                  {skillsLoading ? "…" : row.value === null ? "—" : `${row.value}%`}
-                </span>
                 <span
                   className={`truncate rounded-full px-1.5 py-1 text-center text-[10px] font-semibold ${tone.badge}`}
                 >
