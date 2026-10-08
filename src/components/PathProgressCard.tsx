@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   BookOpen,
   BarChart3,
+  ChevronRight,
   Download,
   GraduationCap,
   Headphones,
@@ -211,12 +212,14 @@ export function PathProgressCard({
             <Link
               to="/learning"
               aria-label={`${t("Level")} ${t(findLevel(profile.level).label)}`}
-              className="inline-flex h-7 items-center gap-1 rounded-full border border-brand-green/40 bg-brand-green/10 px-2.5 text-xs font-bold text-brand-green transition-colors hover:bg-brand-green/20 lg:hidden"
+              className="inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 lg:hidden"
             >
-              <GraduationCap className="size-3.5" aria-hidden="true" />
+              {/* Same look as Today's Progress "My progress" link beside it. */}
+              <GraduationCap className="size-3.5 shrink-0" aria-hidden="true" />
               {/* Just the code on the narrowest phones, so the title keeps one line. */}
               <span className="max-[380px]:hidden">{t("Level")}</span>
               {findLevel(profile.level).value.toUpperCase()}
+              <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
             </Link>
           )}
         </div>
