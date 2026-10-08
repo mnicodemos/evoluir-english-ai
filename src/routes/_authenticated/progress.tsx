@@ -107,7 +107,12 @@ function ProgressPage() {
     },
   });
 
-  const skills = skillMeterRows(nextStep?.skills, null, PROGRESS_SKILLS).map((row) => ({
+  const skills = skillMeterRows(
+    nextStep?.skills,
+    null,
+    PROGRESS_SKILLS,
+    profile?.level ?? null,
+  ).map((row) => ({
     label: row.skill.charAt(0).toUpperCase() + row.skill.slice(1),
     value: row.value,
   }));

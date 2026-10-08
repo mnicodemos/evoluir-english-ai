@@ -89,7 +89,9 @@ function GoalsPage() {
   const todaySteps = data?.todaySteps ?? [];
   const allDone = plusDayComplete(todaySteps);
   const score = evolutionScore({
-    englishSkills: skillMeterRows(nextStep?.skills, null).map((row) => row.value),
+    englishSkills: skillMeterRows(nextStep?.skills, null, undefined, profile?.level ?? null).map(
+      (row) => row.value,
+    ),
     stepsGiven: data?.stepsGiven ?? 0,
     stepsDone: data?.stepsDone ?? 0,
   });

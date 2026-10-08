@@ -10,14 +10,7 @@ export type SkillMeterSnapshot = {
   evidenceCount?: number | null;
 };
 
-export type SkillMeterStatus =
-  | "priority"
-  | "strong"
-  | "on_track"
-  | "needs_work"
-  | "not_measured"
-  /** Measured, but at another level than the student's current one. */
-  | "other_level";
+export type SkillMeterStatus = "priority" | "strong" | "on_track" | "needs_work" | "not_measured";
 
 export type SkillMeterRow = {
   skill: string;
@@ -25,11 +18,6 @@ export type SkillMeterRow = {
   value: number | null;
   status: SkillMeterStatus;
   evidenceCount: number;
-  /**
-   * The CEFR level the score was measured at, when it is not the student's
-   * current level (e.g. "B2" after moving up to C1); null otherwise.
-   */
-  otherLevel: string | null;
 };
 
 /**
@@ -60,32 +48,32 @@ export function skillMeterRows(
 ): SkillMeterRow[] {
   return skills.map((skill) => {
     const snapshot = (snapshots ?? []).find((item) => item.skill === skill);
+    // Each level has its own measurements (user decision): a score measured
+    // at another level than the student's current one does not count here,
+    // like in EVO's choice of the priority, until it is measured again.
+    const atCurrentLevel =
+      !currentLevel || snapshot?.cefrLevel.toUpperCase() === currentLevel.toUpperCase();
     const measured =
       !!snapshot &&
+      atCurrentLevel &&
       snapshot.score !== null &&
       Number.isFinite(snapshot.score) &&
       snapshot.cefrLevel !== "insufficient_evidence";
     const value = measured ? Math.round(Math.min(100, Math.max(0, snapshot!.score!))) : null;
-    const evidenceCount = Math.max(0, Math.round(snapshot?.evidenceCount ?? 0));
-    // After a level change the last score stays visible, tagged with the
-    // level it came from: EVO decides the priority from the current level
-    // only, so an old 82% can be the priority until it is measured again.
-    const measuredAt = measured ? snapshot!.cefrLevel.toUpperCase() : null;
-    const otherLevel =
-      measuredAt && currentLevel && measuredAt !== currentLevel.toUpperCase() ? measuredAt : null;
+    const evidenceCount = atCurrentLevel
+      ? Math.max(0, Math.round(snapshot?.evidenceCount ?? 0))
+      : 0;
     // "Priority" belongs only to the skill EVO chose, one at a time.
     const status: SkillMeterStatus =
       skill === prioritySkill
         ? "priority"
         : value === null
           ? "not_measured"
-          : otherLevel
-            ? "other_level"
-            : value >= SKILL_STRONG_AT
-              ? "strong"
-              : value >= SKILL_ON_TRACK_AT
-                ? "on_track"
-                : "needs_work";
-    return { skill, value, status, evidenceCount, otherLevel };
+          : value >= SKILL_STRONG_AT
+            ? "strong"
+            : value >= SKILL_ON_TRACK_AT
+              ? "on_track"
+              : "needs_work";
+    return { skill, value, status, evidenceCount };
   });
 }

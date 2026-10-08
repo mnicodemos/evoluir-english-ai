@@ -45,7 +45,7 @@ describe("skill meter", () => {
 });
 
 describe("skillMeterRows after a level change", () => {
-  it("keeps the last score but tags the level it came from", () => {
+  it("counts only the measurements of the current level", () => {
     const rows = skillMeterRows(
       [
         { skill: "listening", score: 82, cefrLevel: "b2", evidenceCount: 6 },
@@ -57,9 +57,8 @@ describe("skillMeterRows after a level change", () => {
       "c1",
     );
     const [listening, speaking, writing] = rows;
-    // EVO's priority is decided at C1, where listening has no evidence yet.
-    expect(listening).toMatchObject({ value: 82, status: "priority", otherLevel: "B2" });
-    expect(speaking).toMatchObject({ value: 45, status: "other_level", otherLevel: "B2" });
-    expect(writing).toMatchObject({ value: 81, status: "on_track", otherLevel: null });
+    expect(listening).toMatchObject({ value: null, status: "priority", evidenceCount: 0 });
+    expect(speaking).toMatchObject({ value: null, status: "not_measured" });
+    expect(writing).toMatchObject({ value: 81, status: "on_track", evidenceCount: 3 });
   });
 });
