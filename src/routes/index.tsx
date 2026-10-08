@@ -7,6 +7,7 @@ import appMistakes from "@/assets/home/app-mistakes.jpg";
 import evoImage from "@/assets/evo-landing.webp";
 import evoProfile from "@/assets/evo-profile.jpg.asset.json";
 import { Footer } from "@/components/Footer";
+import { LaunchCampaignPopup } from "@/components/home/LaunchCampaignPopup";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -90,6 +91,7 @@ const productScreens = [
 function CommercialLanding() {
   return (
     <div className="dashboard-shell brand-dashboard-theme dark min-h-screen overflow-x-clip bg-background text-foreground">
+      <LaunchCampaignPopup />
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Link
