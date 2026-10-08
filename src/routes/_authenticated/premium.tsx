@@ -14,6 +14,7 @@ import { createStripeCheckoutSession } from "@/lib/billing/checkout.functions";
 import { getMyAccess } from "@/lib/billing/entitlements.functions";
 import { createStripePortalSession } from "@/lib/billing/portal.functions";
 import { buildSubscriptionView } from "@/lib/billing/subscriptionView";
+import { profileIsPremium } from "@/lib/billing/subscriptionView";
 
 export const Route = createFileRoute("/_authenticated/premium")({
   head: () => ({
@@ -106,7 +107,7 @@ function Premium() {
 
   // Server/database authority: Premium comes from valid entitlements only.
   const view = access ? buildSubscriptionView(access) : null;
-  const isPremium = view ? view.plan === "premium" : profile?.plan === "premium";
+  const isPremium = view ? view.plan === "premium" : profileIsPremium(profile);
 
   async function goToCheckout() {
     if (starting) return;

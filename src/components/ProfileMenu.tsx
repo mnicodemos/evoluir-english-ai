@@ -23,6 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { cn } from "@/lib/utils";
+import { profileIsPremium } from "@/lib/billing/subscriptionView";
 
 const AVATAR_BUCKET = "avatars";
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
@@ -201,10 +202,10 @@ export function ProfileMenu({
                 </span>
                 {presentation === "dashboard-sidebar" && (
                   <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
-                    {profile?.plan === "premium" ? "Premium" : translate("Profile", lang)}
+                    {profileIsPremium(profile) ? "Premium" : translate("Profile", lang)}
                   </span>
                 )}
-                {presentation === "mobile-menu" && profile?.plan === "premium" && (
+                {presentation === "mobile-menu" && profileIsPremium(profile) && (
                   <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
                     Premium
                   </span>

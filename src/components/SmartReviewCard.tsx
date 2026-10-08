@@ -1,8 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, CheckCircle2, RotateCcw, SpellCheck } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  GraduationCap,
+  Mic,
+  RotateCcw,
+  SpellCheck,
+} from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
+import reviewReading from "@/assets/review-reading.webp";
 import reviewWriting from "@/assets/review-writing.jpg.asset.json";
 
 import { EvoGuide } from "@/components/EvoGuide";
@@ -186,11 +195,17 @@ export function SmartReviewCard({
                 key={item.skill}
                 className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/45 pr-2"
               >
-                <img
-                  src={(item.skill === "listening" ? reviewListening : reviewWriting).url}
-                  alt=""
-                  className="h-full min-h-0 w-16 object-cover"
-                />
+                {SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO] ? (
+                  <img
+                    src={SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO]}
+                    alt=""
+                    className="h-full min-h-0 w-16 object-cover"
+                  />
+                ) : (
+                  // Skills without their own photo get their icon, so one skill
+                  // never borrows another skill's picture.
+                  <SkillTile skill={item.skill} />
+                )}
                 <div className="min-w-0">
                   <p className="text-[10px] text-muted-foreground">{skillLabel}</p>
                   <p className="truncate text-sm font-semibold">{t(item.resource.title)}</p>
@@ -300,5 +315,29 @@ export function SmartReviewCard({
         </div>
       </div>
     </section>
+  );
+}
+
+const SKILL_PHOTO = {
+  listening: reviewListening.url,
+  reading: reviewReading,
+  writing: reviewWriting.url,
+} as const;
+
+const SKILL_TILE = {
+  speaking: { icon: Mic, tone: "bg-dashboard-coral/15 text-dashboard-coral" },
+  grammar: { icon: GraduationCap, tone: "bg-dashboard-purple/15 text-dashboard-purple" },
+} as const;
+
+function SkillTile({ skill }: { skill: string }) {
+  const tile = SKILL_TILE[skill as keyof typeof SKILL_TILE] ?? {
+    icon: BookOpen,
+    tone: "bg-brand-green/15 text-brand-green",
+  };
+  const Icon = tile.icon;
+  return (
+    <span className={`grid h-full min-h-0 w-16 place-items-center ${tile.tone}`} aria-hidden="true">
+      <Icon className="size-6" />
+    </span>
   );
 }
