@@ -1,4 +1,4 @@
-// Evoluir+ Plus: 1 to 3 personal goals, one small daily step per goal from
+// Evoluir+ Goals (first called Plus, hence the names): 1 to 3 personal goals, one small daily step per goal from
 // EVO, one shared streak and one evolution score. Pure rules here, so the
 // server, the page and the tests agree.
 

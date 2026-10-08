@@ -56,7 +56,7 @@ export function useQualifiedStudyDays({
           .not("last_reviewed_at", "is", null)
           .gte("last_reviewed_at", startIso)
           .lt("last_reviewed_at", endIso),
-        // Evoluir+ Plus steps (migration 0051): a day with every step done counts.
+        // Evoluir+ Goals steps (migration 0051): a day with every step done counts.
         supabase
           .from("plus_goal_steps" as never)
           .select("day, done_at")
