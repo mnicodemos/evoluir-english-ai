@@ -43,3 +43,23 @@ describe("skill meter", () => {
     });
   });
 });
+
+describe("skillMeterRows after a level change", () => {
+  it("keeps the last score but tags the level it came from", () => {
+    const rows = skillMeterRows(
+      [
+        { skill: "listening", score: 82, cefrLevel: "b2", evidenceCount: 6 },
+        { skill: "writing", score: 81, cefrLevel: "c1", evidenceCount: 3 },
+        { skill: "speaking", score: 45, cefrLevel: "b2", evidenceCount: 2 },
+      ],
+      "listening",
+      undefined,
+      "c1",
+    );
+    const [listening, speaking, writing] = rows;
+    // EVO's priority is decided at C1, where listening has no evidence yet.
+    expect(listening).toMatchObject({ value: 82, status: "priority", otherLevel: "B2" });
+    expect(speaking).toMatchObject({ value: 45, status: "other_level", otherLevel: "B2" });
+    expect(writing).toMatchObject({ value: 81, status: "on_track", otherLevel: null });
+  });
+});

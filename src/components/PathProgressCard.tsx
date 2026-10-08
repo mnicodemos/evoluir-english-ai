@@ -72,7 +72,12 @@ export function PathProgressCard({
     staleTime: 60 * 1000,
     enabled: compact && !!profile,
   });
-  const meterRows = skillMeterRows(nextStep?.skills, nextStep?.prioritySkill);
+  const meterRows = skillMeterRows(
+    nextStep?.skills,
+    nextStep?.prioritySkill,
+    undefined,
+    profile?.level ? findLevel(profile.level).value : null,
+  );
   const anyMeasured = meterRows.some((row) => row.value !== null);
 
   const skills = [
@@ -234,10 +239,13 @@ export function PathProgressCard({
                   ? `Com base em ${row.evidenceCount} ${row.evidenceCount === 1 ? "evidência" : "evidências"}`
                   : `Based on ${row.evidenceCount} ${row.evidenceCount === 1 ? "piece" : "pieces"} of evidence`
                 : t("Practise this skill to measure it.");
+            const title = row.otherLevel
+              ? `${basis} · ${t("Measured at level")} ${row.otherLevel}`
+              : basis;
             return (
               <div
                 key={row.skill}
-                title={basis}
+                title={title}
                 className="grid min-w-0 grid-cols-[1.5rem_4.25rem_minmax(0,1fr)_2.25rem_4.75rem] items-center gap-2 text-xs sm:grid-cols-[1.75rem_5rem_minmax(0,1fr)_2.5rem_5.25rem] sm:gap-2.5"
               >
                 <Icon
@@ -259,14 +267,16 @@ export function PathProgressCard({
                   />
                 )}
                 <span
-                  className={`text-right font-semibold ${row.value === null ? "text-muted-foreground" : "text-foreground"}`}
+                  className={`text-right font-semibold ${row.value === null || row.otherLevel ? "text-muted-foreground" : "text-foreground"}`}
                 >
                   {skillsLoading ? "…" : row.value === null ? "—" : `${row.value}%`}
                 </span>
                 <span
                   className={`truncate rounded-full px-1.5 py-1 text-center text-[10px] font-semibold ${tone.badge}`}
                 >
-                  {t(STATUS_LABEL[row.status])}
+                  {row.status === "other_level" && row.otherLevel
+                    ? `${t("Level")} ${row.otherLevel}`
+                    : t(STATUS_LABEL[row.status])}
                 </span>
               </div>
             );
@@ -312,6 +322,7 @@ const STATUS_LABEL: Record<SkillMeterStatus, string> = {
   on_track: "Good",
   needs_work: "Needs work",
   not_measured: "No data",
+  other_level: "Level",
 };
 
 const STATUS_TONE: Record<SkillMeterStatus, { bar: string; badge: string }> = {
@@ -332,6 +343,11 @@ const STATUS_TONE: Record<SkillMeterStatus, { bar: string; badge: string }> = {
   },
   not_measured: {
     bar: "",
+    badge: "bg-secondary text-muted-foreground",
+  },
+  // A score from the previous level: kept, but quiet until measured again.
+  other_level: {
+    bar: "[&>div]:bg-muted-foreground/45",
     badge: "bg-secondary text-muted-foreground",
   },
 };
