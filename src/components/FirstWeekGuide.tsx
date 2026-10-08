@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Check, ChevronRight } from "lucide-react";
 
-import evoProfile from "@/assets/evo-profile.jpg.asset.json";
+// The owner's portrait of EVO, cropped to her face for the small round avatar.
+import evoGuide from "@/assets/evo-guide.webp";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useFirstWeek } from "@/hooks/useFirstWeek";
@@ -35,7 +36,7 @@ export function FirstWeekGuide({
             className="relative size-8 shrink-0 rounded-full ring-2 ring-brand-green/60"
           >
             <img
-              src={evoProfile.url}
+              src={evoGuide}
               alt=""
               width={32}
               height={32}
@@ -53,7 +54,7 @@ export function FirstWeekGuide({
             className="h-7 shrink-0 gap-1.5 rounded-full border border-brand-green/50 bg-brand-green/10 px-2 text-xs font-semibold text-brand-green hover:bg-brand-green/20"
           >
             <img
-              src={evoProfile.url}
+              src={evoGuide}
               alt=""
               width={20}
               height={20}
@@ -72,7 +73,7 @@ export function FirstWeekGuide({
       >
         <div className="flex items-center gap-3">
           <img
-            src={evoProfile.url}
+            src={evoGuide}
             alt="EVO"
             width={44}
             height={44}
