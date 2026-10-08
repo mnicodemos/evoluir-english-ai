@@ -358,6 +358,13 @@
       "when": 1791418095144,
       "tag": "0050_0050_speaking_turn_timings_apply",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1791457424074,
+      "tag": "0051_0051_plus_goals",
+      "breakpoints": true
     }
   ]
 }

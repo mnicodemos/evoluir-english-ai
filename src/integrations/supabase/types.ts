@@ -800,6 +800,71 @@ export type Database = {
           },
         ]
       }
+      plus_goal_steps: {
+        Row: {
+          created_at: string
+          day: string
+          done_at: string | null
+          goal_id: string
+          id: string
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          done_at?: string | null
+          goal_id: string
+          id?: string
+          text: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          done_at?: string | null
+          goal_id?: string
+          id?: string
+          text?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plus_goal_steps_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "plus_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plus_goals: {
+        Row: {
+          archived_at: string | null
+          area: string
+          created_at: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          area?: string
+          created_at?: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          area?: string
+          created_at?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_path: string | null
