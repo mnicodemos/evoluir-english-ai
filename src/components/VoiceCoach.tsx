@@ -76,6 +76,8 @@ export function VoiceCoach({
   const [scenario, setScenario] = useState<string | null>(null);
   // A real-life situation where EVO plays a role (null = free conversation).
   const [rolePlay, setRolePlay] = useState<RolePlay | null>(null);
+  // The video call is an informal chat with EVO; AI Speaking stays a lesson.
+  const callStyle = { casual: presentation === "call", name: profile?.name ?? undefined };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [report, setReport] = useState<ConversationReport | null>(null);
@@ -200,6 +202,7 @@ export function VoiceCoach({
                 profile?.goal ?? "conversation",
                 buildStudyContext(snapshot),
                 used,
+                callStyle,
               ),
               jsonMode: false,
               operation: "talking",
@@ -284,6 +287,7 @@ export function VoiceCoach({
               buildStudyContext(snapshot),
               next.slice(-8),
               rolePlay?.role,
+              callStyle,
             ),
             (delta) => {
               marks.firstTextAt ??= performance.now();
@@ -391,7 +395,7 @@ export function VoiceCoach({
     return (
       <VideoCallStage
         preparing={!scenario}
-        topicLabel={rolePlay ? rolePlay.label : "Free conversation"}
+        topicLabel={rolePlay ? rolePlay.label : "Casual chat"}
         lastAssistantText={lastAssistant?.content ?? ""}
         voiceState={voiceState}
         statusText={statusText}

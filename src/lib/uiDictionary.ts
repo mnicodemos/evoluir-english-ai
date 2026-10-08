@@ -494,6 +494,7 @@ export const uiPt: Record<string, string> = {
   "Highest level reached": "Nível máximo alcançado",
   "EVO · English teacher": "EVO · Professora de inglês",
   "Free conversation": "Conversa livre",
+  "Casual chat": "Papo informal",
   "EVO is joining the call…": "A EVO está entrando na chamada…",
   "End the call to get your report.": "Encerre a chamada para ver seu relatório.",
   "End call": "Encerrar",
