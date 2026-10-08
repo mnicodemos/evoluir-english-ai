@@ -1,14 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronRight, Loader2, Target } from "lucide-react";
+import { Check, ChevronRight, Loader2, Plus, Target } from "lucide-react";
 import { toast } from "sonner";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
-import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
-import { plusDayComplete } from "@/lib/plus";
-import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
+import { PLUS_GOAL_EXAMPLES, plusDayComplete } from "@/lib/plus";
+import { addPlusGoal, loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
@@ -25,6 +24,7 @@ export function GoalsTodayCard() {
   const queryClient = useQueryClient();
   const load = useServerFn(loadPlus);
   const setDone = useServerFn(setPlusStepDone);
+  const add = useServerFn(addPlusGoal);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["plus", profile?.id ?? null, lang],
@@ -32,13 +32,19 @@ export function GoalsTodayCard() {
     queryFn: () => load({ data: { lang } }),
     staleTime: 30 * 1000,
   });
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ["plus"] });
+    void queryClient.invalidateQueries({ queryKey: ["profile"] });
+    void queryClient.invalidateQueries({ queryKey: ["qualified-study-days"] });
+  };
+  const addGoal = useMutation({
+    mutationFn: (title: string) => add({ data: { title } }),
+    onSuccess: refresh,
+    onError: () => toast.error(t("The goal could not be saved.")),
+  });
   const toggle = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setDone({ data: input }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["plus"] });
-      void queryClient.invalidateQueries({ queryKey: ["profile"] });
-      void queryClient.invalidateQueries({ queryKey: ["qualified-study-days"] });
-    },
+    onSuccess: refresh,
     onError: () => toast.error(t("The step could not be saved.")),
   });
 
@@ -48,7 +54,7 @@ export function GoalsTodayCard() {
 
   return (
     <section
-      className="card-soft min-w-0 p-3 xl:flex xl:min-h-0 xl:flex-col xl:px-4 xl:py-3"
+      className="card-soft min-w-0 p-3 xl:flex xl:h-full xl:min-h-0 xl:flex-col xl:px-4 xl:py-3"
       aria-labelledby="goals-today-title"
     >
       <div className="flex items-center gap-2">
@@ -82,14 +88,32 @@ export function GoalsTodayCard() {
       ) : isError ? (
         <p className="mt-2 text-xs text-muted-foreground">{t("Your goals could not be loaded.")}</p>
       ) : goals.length === 0 ? (
-        <div className="mt-2 flex items-center gap-3">
-          <EvoAvatar decorative className="size-10 sm:size-10" />
-          <p className="min-w-0 flex-1 text-sm">
-            {t("Choose 1 to 3 goals and I will give you one small step a day.")}
-          </p>
-          <Button asChild size="sm" className="shrink-0">
-            <Link to="/goals">{t("Choose my goals")}</Link>
-          </Button>
+        // No goals yet: EVO's invitation beside the three example goals, each
+        // one tap away, so the row is filled with something to do.
+        <div className="mt-2 grid gap-2 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))]">
+          <div className="flex min-w-0 items-center gap-3">
+            <EvoAvatar decorative className="size-10 sm:size-11" />
+            <p className="min-w-0 text-sm">
+              {t("Choose 1 to 3 goals and I will give you one small step a day.")}
+            </p>
+          </div>
+          {PLUS_GOAL_EXAMPLES.map((example) => (
+            <button
+              key={example}
+              type="button"
+              disabled={addGoal.isPending}
+              onClick={() => addGoal.mutate(t(example))}
+              className="flex h-full min-h-11 min-w-0 items-center gap-2.5 rounded-lg bg-secondary/60 p-2 text-left text-xs font-medium transition-colors hover:bg-secondary"
+            >
+              <span
+                className="grid size-6 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green"
+                aria-hidden="true"
+              >
+                <Plus className="size-3.5" strokeWidth={3} />
+              </span>
+              <span className="min-w-0">{t(example)}</span>
+            </button>
+          ))}
         </div>
       ) : (
         <ul className="mt-2 grid gap-2 xl:min-h-0 xl:flex-1 xl:grid-cols-3">

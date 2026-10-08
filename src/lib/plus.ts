@@ -3,6 +3,12 @@
 // server, the page and the tests agree.
 
 export const PLUS_MAX_GOALS = 3;
+/** Example goals offered when a student has none yet (screen text, via uiPt). */
+export const PLUS_GOAL_EXAMPLES = [
+  "Speak English in meetings",
+  "Save R$ 300 a month",
+  "Walk 3 times a week",
+] as const;
 export const PLUS_AREAS = ["english", "money", "health", "other"] as const;
 export type PlusArea = (typeof PLUS_AREAS)[number];
 
