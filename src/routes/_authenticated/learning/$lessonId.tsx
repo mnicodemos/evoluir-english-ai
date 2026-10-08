@@ -98,6 +98,12 @@ function LessonPage() {
   const repairLesson = useOpenPathLesson();
   const repairTried = useRef<string | null>(null);
   const repairPlan = lesson?.curriculum_key ? findCurriculumLesson(lesson.curriculum_key) : null;
+  // A level's final test is only taken on its own page, where passing promotes
+  // the student; opening it as an ordinary lesson would skip the promotion.
+  const isFinalTest = !!lesson?.curriculum_key?.endsWith("-final");
+  useEffect(() => {
+    if (isFinalTest) navigate({ to: "/learning/final-test", replace: true });
+  }, [isFinalTest, navigate]);
   const needsQuizRepair =
     !!data && !!repairPlan && !repairPlan.isReviewTest && data.quiz.length === 0;
   useEffect(() => {
