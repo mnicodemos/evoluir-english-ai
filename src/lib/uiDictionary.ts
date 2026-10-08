@@ -856,6 +856,7 @@ export const uiPt: Record<string, string> = {
   // Subscription portal (Phase 7)
   "My subscription": "Minha assinatura",
   Plan: "Plano",
+  "Not measured at {level} yet": "Ainda não medido no {level}",
   closed: "concluído",
   "Measurements by level": "Medições por nível",
   until: "até",
