@@ -18,7 +18,7 @@
 - Skill scores everywhere (Dashboard card, My Progress, league PDF) come from the evidence layer (current_skill_profile via loadNextStep `skills`), never from the legacy best-ever `progress` table; reading-lesson quizzes also record reading evidence.
 - Weather is an English practice ("Weather talk" popover in the Dashboard header → AI Speaking ?weather=); location is requested only on tap or when already granted, never on page load, and sun/moon by the hour is the fallback.
 - Public home and auth opt into Dashboard tokens through `brand-dashboard-theme`; this shares visual identity without changing shared authenticated screens.
-- AI Teacher, My History, and lesson openings share the complete horizontal EVO image with contain-fit; this preserves all artwork without cropping.
+- AI Teacher, AI Speaking, the My Progress journey and lesson openings show EVO as the owner's round portrait (EvoAvatar, src/assets/evo-guide.webp, the same circle as the First week guide) instead of the old horizontal strip (user request).
 - Path lessons are repaired on open from the lesson page (any entry link) and AI lesson replies are salvaged item by item; an interrupted or imperfect generation must never leave a lesson without its quiz.
 - Study streak days are credited only in the database (credit_study_day, fired by triggers on activities, user_lessons and user_vocabulary); clients never write streak fields, so the daily rule has one home.
 - Streak protection (one missed day per week, Monday to Sunday in São Paulo) is applied only by credit_study_day into streak_freeze_used_on; src/lib/streakFreeze.ts mirrors it for display, so a protected streak never looks broken.

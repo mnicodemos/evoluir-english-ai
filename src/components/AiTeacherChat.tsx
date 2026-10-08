@@ -242,18 +242,19 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
         </div>
       )}
 
+      {/* Outside the scrolling chat, so the greeting never scrolls out of view. */}
+      {messages.length === 0 && (
+        <EvoGuide
+          title={t("Hi! I'm EVO. I'm here to help you practise and develop your English.")}
+          image="avatar"
+        />
+      )}
+
       <Card className="flex h-[min(47dvh,38rem)] min-h-[16rem] flex-col overflow-hidden p-0 sm:h-[min(62dvh,42rem)] sm:min-h-[22.5rem]">
         <Conversation className="flex-1">
           <ConversationContent className="gap-6 p-4">
             {messages.length === 0 && (
               <div className="flex flex-col gap-4">
-                <EvoGuide
-                  title={t("Hi! I'm EVO. I'm here to help you practise and develop your English.")}
-                  imageSize="lesson"
-                  image="wide"
-                  contrast="inverse"
-                  className="card-soft overflow-hidden bg-primary -mx-4 -mt-4 pr-4"
-                />
                 <div className="grid gap-2 sm:grid-cols-2">
                   {suggestions.map((suggestion) => (
                     <Button

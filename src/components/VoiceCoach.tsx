@@ -42,6 +42,7 @@ import {
   scenarioOfTheDay,
   type RolePlay,
 } from "@/components/coach/coachScenarios";
+import { EvoAvatar } from "@/components/EvoAvatar";
 import { SpeakingReport } from "@/components/coach/SpeakingReport";
 import { VideoCallStage } from "@/components/coach/VideoCallStage";
 import { isWeatherCondition, weatherRolePlay } from "@/lib/weatherTalk";
@@ -410,7 +411,10 @@ export function VoiceCoach({
   if (!scenario) {
     return (
       <>
-        <h1 className="text-3xl font-bold">AI Speaking</h1>
+        <div className="flex items-center gap-3">
+          <EvoAvatar className="size-11 sm:size-12" />
+          <h1 className="text-3xl font-bold">AI Speaking</h1>
+        </div>
         <p className="mt-2 text-muted-foreground">
           Starting a new conversation… the AI is choosing today's subject.
         </p>
@@ -430,6 +434,7 @@ export function VoiceCoach({
   return (
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-3">
+        <EvoAvatar className="size-11 sm:size-12" />
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">AI Speaking</h1>
           <p className="max-w-full text-sm leading-snug text-muted-foreground">
@@ -442,11 +447,16 @@ export function VoiceCoach({
             )}
           </p>
         </div>
-        <Button asChild size="sm" variant="outline" className="shrink-0 gap-1.5">
+        <Button
+          asChild
+          size="sm"
+          variant="outline"
+          className="size-11 shrink-0 gap-1.5 p-0 sm:h-9 sm:w-auto sm:px-3"
+        >
           <Link to="/call">
             <Video className="size-4" />
-            <span className="hidden sm:inline">Video call with EVO</span>
-            <span className="sm:hidden">Video call</span>
+            {/* Icon only on phones: the bottom navigation already names Video call. */}
+            <span className="sr-only sm:not-sr-only">Video call with EVO</span>
           </Link>
         </Button>
       </div>
