@@ -73,3 +73,15 @@ export function buildSubscriptionView(
     canceledButActive: active.length > 0 && subscription?.status === "canceled",
   };
 }
+
+/**
+ * The profile's plan for display (the "Premium" badge): a plan with an end
+ * date that has passed reads as free, e.g. after the launch campaign's days.
+ */
+export function profileIsPremium(
+  profile: { plan?: string | null; plan_expires_at?: string | null } | null | undefined,
+  now: Date = new Date(),
+) {
+  if (profile?.plan !== "premium") return false;
+  return !profile.plan_expires_at || new Date(profile.plan_expires_at) > now;
+}

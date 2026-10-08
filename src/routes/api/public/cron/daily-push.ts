@@ -125,6 +125,13 @@ async function runDailyPush(requestedKind: string | undefined, supabaseAdmin: Su
     duration_ms: Date.now() - started,
   });
   if (recordError) console.error(`daily-push: run not recorded: ${recordError.message}`);
+  // Launch campaign: plans whose 10 free Premium days are over go back to free.
+  try {
+    const { expireCampaignPremium } = await import("@/lib/premiumCampaign.server");
+    await expireCampaignPremium(supabaseAdmin);
+  } catch (error) {
+    console.error("daily-push: campaign expiry failed", error);
+  }
   if (report.kind === "word" || report.error) {
     try {
       const { alertAdmins } = await import("@/lib/opsAlerts.server");

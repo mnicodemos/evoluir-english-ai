@@ -9,7 +9,7 @@ import {
   GraduationCap,
   Headphones,
   Languages,
-  LayoutDashboard,
+  House,
   LogOut,
   Menu,
   MessageSquareText,
@@ -70,7 +70,7 @@ const mobileSheetNav = [
 // Subscription lives with the settings rows at the bottom.
 // `group` is the title above a group's first item ("" draws a plain divider).
 const dashboardSidebarNav = [
-  { to: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Home", icon: House },
   { to: "/goals", label: "Goals", icon: Target, group: "Plan" },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
@@ -394,7 +394,7 @@ function AppShellContent({
   }
 
   const dashboardMobileNav = [
-    { to: "/dashboard", label: lang === "pt" ? "Início" : "Home", icon: LayoutDashboard },
+    { to: "/dashboard", label: lang === "pt" ? "Início" : "Home", icon: House },
     { to: "/teacher", label: "AI Teacher", icon: Sparkles },
     // My Progress opens from the Today's Progress card, as on desktop.
     { to: "/coach", label: "AI Speaking", icon: Mic },
