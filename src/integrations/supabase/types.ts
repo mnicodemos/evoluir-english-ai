@@ -1089,6 +1089,33 @@ export type Database = {
           },
         ]
       }
+      speaking_turn_timings: {
+        Row: {
+          created_at: string
+          first_audio_ms: number | null
+          first_text_ms: number | null
+          id: string
+          transcribe_ms: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          first_audio_ms?: number | null
+          first_text_ms?: number | null
+          id?: string
+          transcribe_ms?: number | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          first_audio_ms?: number | null
+          first_text_ms?: number | null
+          id?: string
+          transcribe_ms?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       stripe_customers: {
         Row: {
           created_at: string
