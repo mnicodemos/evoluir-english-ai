@@ -617,7 +617,7 @@ function Dashboard() {
 
           {/* Desktop: the Quick Access row repeated the sidebar; today's goal
               steps took its place. */}
-          <div className="order-4 hidden min-w-0 lg:order-none lg:block xl:min-h-0">
+          <div className="order-4 hidden min-w-0 lg:order-none lg:block xl:h-full xl:min-h-0">
             <GoalsTodayCard />
           </div>
         </div>

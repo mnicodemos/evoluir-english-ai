@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useProfile } from "@/hooks/useProfile";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { skillMeterRows } from "@/lib/pedagogy/skillMeter";
-import { evolutionScore, PLUS_MAX_GOALS, plusDayComplete } from "@/lib/plus";
+import { evolutionScore, PLUS_GOAL_EXAMPLES, PLUS_MAX_GOALS, plusDayComplete } from "@/lib/plus";
 import { addPlusGoal, archivePlusGoal, loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -31,12 +31,6 @@ export const Route = createFileRoute("/_authenticated/goals")({
   }),
   component: GoalsPage,
 });
-
-const EXAMPLES = [
-  "Speak English in meetings",
-  "Save R$ 300 a month",
-  "Walk 3 times a week",
-] as const;
 
 function GoalsPage() {
   const { lang } = useUiLang();
@@ -270,7 +264,7 @@ function GoalsPage() {
               </div>
               {goals.length === 0 ? (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {EXAMPLES.map((example) => (
+                  {PLUS_GOAL_EXAMPLES.map((example) => (
                     <Button
                       key={example}
                       type="button"
