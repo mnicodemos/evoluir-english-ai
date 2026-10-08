@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import { plusDayComplete } from "@/lib/plus";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 
 const dayFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
@@ -33,7 +34,7 @@ export function useQualifiedStudyDays({
     queryKey: ["qualified-study-days", userId, queryKey],
     enabled: !!userId,
     queryFn: async () => {
-      const [activities, lessons, vocabulary] = await Promise.all([
+      const [activities, lessons, vocabulary, plusSteps] = await Promise.all([
         supabase
           .from("activities")
           .select("activity_type, created_at")
@@ -55,6 +56,13 @@ export function useQualifiedStudyDays({
           .not("last_reviewed_at", "is", null)
           .gte("last_reviewed_at", startIso)
           .lt("last_reviewed_at", endIso),
+        // Evoluir+ Plus steps (migration 0051): a day with every step done counts.
+        supabase
+          .from("plus_goal_steps" as never)
+          .select("day, done_at")
+          .eq("user_id" as never, userId as never)
+          .gte("day" as never, dayFormatter.format(start) as never)
+          .lte("day" as never, dayFormatter.format(end) as never),
       ]);
 
       if (activities.error) throw activities.error;
@@ -70,6 +78,17 @@ export function useQualifiedStudyDays({
         increment(row.activity_type === "writing" ? writing : listening, row.created_at);
       }
       for (const row of vocabulary.data ?? []) increment(words, row.last_reviewed_at);
+      // Before the Plus migration is applied the table is missing: no Plus days.
+      const plusByDay = new Map<string, { doneAt: string | null }[]>();
+      for (const row of (plusSteps.error ? [] : (plusSteps.data ?? [])) as {
+        day: string;
+        done_at: string | null;
+      }[]) {
+        plusByDay.set(row.day, [...(plusByDay.get(row.day) ?? []), { doneAt: row.done_at }]);
+      }
+      const plusDays = [...plusByDay.entries()]
+        .filter(([, steps]) => plusDayComplete(steps))
+        .map(([day]) => day);
       for (const row of lessons.data ?? []) {
         if (row.completed_at) completedLessons.add(dayFormatter.format(new Date(row.completed_at)));
       }
@@ -79,6 +98,7 @@ export function useQualifiedStudyDays({
         ...listening.keys(),
         ...words.keys(),
         ...completedLessons,
+        ...plusDays,
       ]);
       return new Set(
         [...candidates].filter(
@@ -86,7 +106,8 @@ export function useQualifiedStudyDays({
             (writing.get(day) ?? 0) >= 3 ||
             (listening.get(day) ?? 0) >= 3 ||
             (words.get(day) ?? 0) >= 10 ||
-            completedLessons.has(day),
+            completedLessons.has(day) ||
+            plusDays.includes(day),
         ),
       );
     },
