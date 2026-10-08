@@ -218,3 +218,68 @@ export function evolutionScore(input: {
     goals,
   };
 }
+
+export type GoalsReport = {
+  /** Students with at least one active goal. */
+  students: number;
+  activeGoals: number;
+  byArea: {
+    area: PlusArea;
+    goals: number;
+    /** Share of the active goals, 0–100. */
+    percent: number;
+    stepsGiven: number;
+    stepsDone: number;
+    /** Steps done / given in the window, 0–100, or null without steps. */
+    donePercent: number | null;
+  }[];
+  /** The goals students write most, normalised, most common first. */
+  topTitles: { title: string; count: number }[];
+};
+
+/**
+ * Admin "Students' goals": what students want to improve besides English,
+ * read from the goals they actually created, and which areas they keep up.
+ */
+export function goalsReport(
+  goals: readonly { id: string; userId: string; title: string; area: string; archived: boolean }[],
+  steps: readonly { goalId: string; done: boolean }[],
+  topLimit = 8,
+): GoalsReport {
+  const active = goals.filter((goal) => !goal.archived);
+  const areaOf = new Map(
+    goals.map((goal) => [
+      goal.id,
+      (PLUS_AREAS as readonly string[]).includes(goal.area) ? (goal.area as PlusArea) : "other",
+    ]),
+  );
+  const byArea = PLUS_AREAS.map((area) => {
+    const count = active.filter((goal) => areaOf.get(goal.id) === area).length;
+    const areaSteps = steps.filter((step) => areaOf.get(step.goalId) === area);
+    const done = areaSteps.filter((step) => step.done).length;
+    return {
+      area,
+      goals: count,
+      percent: active.length ? Math.round((count / active.length) * 100) : 0,
+      stepsGiven: areaSteps.length,
+      stepsDone: done,
+      donePercent: areaSteps.length ? Math.round((done / areaSteps.length) * 100) : null,
+    };
+  }).sort((a, b) => b.goals - a.goals || b.stepsGiven - a.stepsGiven);
+
+  const titles = new Map<string, { title: string; count: number }>();
+  for (const goal of goals) {
+    const key = goal.title.toLocaleLowerCase("pt-BR").replace(/\s+/g, " ").trim();
+    const entry = titles.get(key) ?? { title: goal.title.trim(), count: 0 };
+    entry.count += 1;
+    titles.set(key, entry);
+  }
+  return {
+    students: new Set(active.map((goal) => goal.userId)).size,
+    activeGoals: active.length,
+    byArea,
+    topTitles: [...titles.values()]
+      .sort((a, b) => b.count - a.count || a.title.localeCompare(b.title))
+      .slice(0, topLimit),
+  };
+}

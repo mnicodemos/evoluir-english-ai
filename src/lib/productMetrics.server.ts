@@ -3,6 +3,7 @@
 // always show the same figures. Callers pass the service-role client.
 
 import type { supabaseAdmin as SupabaseAdminClient } from "@/integrations/supabase/client.server";
+import { goalsReport } from "@/lib/plus";
 import { addDays, firstConversationStats, retentionReport } from "@/lib/retention";
 import { speakingWaitSummary } from "@/lib/speakingTiming";
 import { studyToday } from "@/lib/today";
@@ -127,4 +128,63 @@ export async function loadSpeakingWait(supabaseAdmin: SupabaseAdmin) {
     .limit(5000);
   if (error) return null;
   return speakingWaitSummary((data ?? []) as unknown as Parameters<typeof speakingWaitSummary>[0]);
+}
+
+/**
+ * Admin "Students' goals": every student goal (active and removed, for the
+ * most common titles) and the steps of the last 30 days; admins left out. Read in pages, so the
+ * report never stops at PostgREST's row cap.
+ */
+export async function loadGoalsReport(supabaseAdmin: SupabaseAdmin) {
+  const since = addDays(studyToday(), -29);
+  const PAGE = 1000;
+  const goals: {
+    id: string;
+    user_id: string;
+    title: string;
+    area: string;
+    archived_at: string | null;
+  }[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabaseAdmin
+      .from("plus_goals")
+      .select("id, user_id, title, area, archived_at")
+      .order("created_at", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error("Goals could not be loaded");
+    goals.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+  }
+  // Admins test the feature; like retention, their goals are left out.
+  const { data: admins } = await supabaseAdmin
+    .from("user_roles")
+    .select("user_id")
+    .eq("role", "admin");
+  const adminIds = new Set((admins ?? []).map((row) => row.user_id));
+  const studentGoals = goals.filter((goal) => !adminIds.has(goal.user_id));
+  const studentGoalIds = new Set(studentGoals.map((goal) => goal.id));
+  const steps: { goal_id: string; done_at: string | null }[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabaseAdmin
+      .from("plus_goal_steps")
+      .select("goal_id, done_at")
+      .gte("day", since)
+      .order("day", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error("Goal steps could not be loaded");
+    steps.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+  }
+  return goalsReport(
+    studentGoals.map((goal) => ({
+      id: goal.id,
+      userId: goal.user_id,
+      title: goal.title,
+      area: goal.area,
+      archived: goal.archived_at !== null,
+    })),
+    steps
+      .filter((step) => studentGoalIds.has(step.goal_id))
+      .map((step) => ({ goalId: step.goal_id, done: step.done_at !== null })),
+  );
 }

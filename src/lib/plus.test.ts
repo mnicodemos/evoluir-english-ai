@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   evolutionScore,
+  goalsReport,
   fallbackPlusStep,
   guessPlusArea,
   parsePlusSteps,
@@ -78,5 +79,36 @@ describe("evolutionScore", () => {
     expect(evolutionScore({ englishSkills: [null], stepsGiven: 4, stepsDone: 4 }).score).toBe(100);
     expect(evolutionScore({ englishSkills: [40], stepsGiven: 0, stepsDone: 0 }).score).toBe(40);
     expect(evolutionScore({ englishSkills: [], stepsGiven: 0, stepsDone: 0 }).score).toBeNull();
+  });
+});
+
+describe("goalsReport", () => {
+  it("counts active goals by area, step completion and the most common goals", () => {
+    const report = goalsReport(
+      [
+        { id: "a", userId: "u1", title: "Guardar R$ 300 por mês", area: "money", archived: false },
+        { id: "b", userId: "u2", title: "guardar r$ 300  por mês", area: "money", archived: false },
+        { id: "c", userId: "u2", title: "Caminhar", area: "health", archived: false },
+        { id: "d", userId: "u3", title: "Ler mais", area: "other", archived: true },
+      ],
+      [
+        { goalId: "a", done: true },
+        { goalId: "a", done: false },
+        { goalId: "c", done: true },
+        { goalId: "d", done: true },
+      ],
+    );
+    expect(report.students).toBe(2);
+    expect(report.activeGoals).toBe(3);
+    expect(report.byArea[0]).toEqual({
+      area: "money",
+      goals: 2,
+      percent: 67,
+      stepsGiven: 2,
+      stepsDone: 1,
+      donePercent: 50,
+    });
+    expect(report.byArea.find((row) => row.area === "english")?.donePercent).toBeNull();
+    expect(report.topTitles[0]).toEqual({ title: "Guardar R$ 300 por mês", count: 2 });
   });
 });
