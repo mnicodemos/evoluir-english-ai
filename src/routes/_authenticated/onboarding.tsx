@@ -21,9 +21,9 @@ import { useUiLang } from "@/lib/uiLang";
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Set up your plan" },
+      { title: "Set up your plan - Evoluir+ English AI" },
       { name: "description", content: "Tell EVO your level, goal and daily study time." },
-      { property: "og:title", content: "Evoluir+ English AI · Set up your plan" },
+      { property: "og:title", content: "Set up your plan - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Tell EVO your level, goal and daily study time.",

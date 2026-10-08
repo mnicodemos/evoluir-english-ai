@@ -42,12 +42,12 @@ const MinutesByDayChart = lazy(() =>
 export const Route = createFileRoute("/_authenticated/progress")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · My Progress" },
+      { title: "My Progress - Evoluir+ English AI" },
       {
         name: "description",
         content: "Track your speaking, grammar, listening and vocabulary evolution.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · My Progress" },
+      { property: "og:title", content: "My Progress - Evoluir+ English AI" },
       { property: "og:description", content: "Track your English evolution week by week." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

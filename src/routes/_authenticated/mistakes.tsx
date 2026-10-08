@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/mistakes")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · My mistakes" },
+      { title: "My mistakes - Evoluir+ English AI" },
       {
         name: "description",
         content: "Review the mistakes from your corrections until they stick.",

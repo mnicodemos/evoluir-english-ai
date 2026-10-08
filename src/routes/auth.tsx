@@ -24,9 +24,9 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Entrar" },
+      { title: "Entrar - Evoluir+ English AI" },
       { name: "description", content: "Entre ou crie sua conta na Evoluir+ English AI." },
-      { property: "og:title", content: "Evoluir+ English AI · Entrar" },
+      { property: "og:title", content: "Entrar - Evoluir+ English AI" },
       { property: "og:description", content: "Entre ou crie sua conta na Evoluir+ English AI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

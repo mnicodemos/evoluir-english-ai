@@ -63,12 +63,12 @@ import { useOnline } from "@/hooks/useOnline";
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Vocabulary builder" },
+      { title: "Vocabulary builder - Evoluir+ English AI" },
       {
         name: "description",
         content: "Learn new English words every day and test your pronunciation out loud.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Vocabulary builder" },
+      { property: "og:title", content: "Vocabulary builder - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Fresh English words every day, with pronunciation practice.",

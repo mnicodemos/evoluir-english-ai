@@ -17,9 +17,9 @@ export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Nova senha" },
+      { title: "Nova senha - Evoluir+ English AI" },
       { name: "description", content: "Defina uma nova senha para sua conta Evoluir+ English AI." },
-      { property: "og:title", content: "Evoluir+ English AI · Nova senha" },
+      { property: "og:title", content: "Nova senha - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Defina uma nova senha para sua conta Evoluir+ English AI.",

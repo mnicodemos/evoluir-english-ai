@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/league")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Weekly league" },
+      { title: "Weekly league - Evoluir+ English AI" },
       { name: "description", content: "Weekly ranking of the students at your level." },
     ],
   }),

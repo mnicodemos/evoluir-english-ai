@@ -18,13 +18,13 @@ import { buildSubscriptionView } from "@/lib/billing/subscriptionView";
 export const Route = createFileRoute("/_authenticated/premium")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Premium" },
+      { title: "Premium - Evoluir+ English AI" },
       {
         name: "description",
         content:
           "Unlock unlimited AI Speaking, pronunciation and audio lessons with Evoluir+ English AI Premium.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Premium" },
+      { property: "og:title", content: "Premium - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Unlimited AI Speaking, pronunciation and audio lessons.",

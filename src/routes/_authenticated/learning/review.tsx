@@ -16,12 +16,12 @@ import { studyToday } from "@/lib/today";
 export const Route = createFileRoute("/_authenticated/learning/review")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Smart review" },
+      { title: "Smart review - Evoluir+ English AI" },
       {
         name: "description",
         content: "Review your hardest English words first with spaced repetition.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Smart review" },
+      { property: "og:title", content: "Smart review - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "Spaced repetition review of your English flashcards.",

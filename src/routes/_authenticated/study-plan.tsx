@@ -35,13 +35,13 @@ import {
 export const Route = createFileRoute("/_authenticated/study-plan")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · My Study Plan" },
+      { title: "My Study Plan - Evoluir+ English AI" },
       {
         name: "description",
         content:
           "Set your goal, availability and focus area to see a weekly English study plan built from your own lessons.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · My Study Plan" },
+      { property: "og:title", content: "My Study Plan - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "A weekly English study plan based on your goal, your time and your CEFR level.",

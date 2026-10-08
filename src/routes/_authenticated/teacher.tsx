@@ -8,13 +8,13 @@ export const Route = createFileRoute("/_authenticated/teacher")({
     typeof search["lesson"] === "string" ? { lesson: search["lesson"] as string } : {},
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · AI Teacher" },
+      { title: "AI Teacher - Evoluir+ English AI" },
       {
         name: "description",
         content:
           "Chat with your personal AI English teacher: explanations, corrections and guided practice at your level.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · AI Teacher" },
+      { property: "og:title", content: "AI Teacher - Evoluir+ English AI" },
       {
         property: "og:description",
         content:

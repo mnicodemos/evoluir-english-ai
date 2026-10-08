@@ -15,12 +15,12 @@ export const Route = createFileRoute("/_authenticated/learning/")({
     typeof search["review"] === "string" ? { review: search["review"] } : {},
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Learning Center" },
+      { title: "Learning Center - Evoluir+ English AI" },
       {
         name: "description",
         content: "A structured English course of 33 lessons in 6 units for your CEFR level.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Learning Center" },
+      { property: "og:title", content: "Learning Center - Evoluir+ English AI" },
       {
         property: "og:description",
         content: "33 lessons in 6 units with videos, flashcards, quizzes and review.",

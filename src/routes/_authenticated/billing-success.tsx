@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/billing-success")({
   head: () => ({
     meta: [
-      { title: "Evoluir+ English AI · Payment received" },
+      { title: "Payment received - Evoluir+ English AI" },
       {
         name: "description",
         content: "Your payment was received and your Premium access is being confirmed.",
       },
-      { property: "og:title", content: "Evoluir+ English AI · Payment received" },
+      { property: "og:title", content: "Payment received - Evoluir+ English AI" },
       { property: "og:description", content: "Your Premium access is being confirmed." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
