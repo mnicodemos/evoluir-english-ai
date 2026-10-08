@@ -62,7 +62,6 @@ export const Route = createFileRoute("/")({
   component: CommercialLanding,
 });
 
-
 const journey = [
   ["01", "DESCUBRA", "Entenda seu nível e suas habilidades."],
   ["02", "PRIORIZE", "Saiba o que merece atenção agora."],
@@ -136,8 +135,8 @@ function CommercialLanding() {
               </h1>
 
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg">
-                O Evoluir+ entende sua evolução, acompanha suas habilidades e ajuda você a
-                descobrir onde concentrar sua prática.
+                O Evoluir+ entende sua evolução, acompanha suas habilidades e ajuda você a descobrir
+                onde concentrar sua prática.
               </p>
 
               <div className="mt-6 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:items-center">
@@ -198,7 +197,10 @@ function CommercialLanding() {
                 ["Seu próximo passo", "Praticar Speaking", "O que faz sentido agora"],
               ].map(([label, value, detail], index) => (
                 <div key={label} className="card-soft relative overflow-hidden p-5 sm:p-6">
-                  <div className="absolute left-0 top-0 h-full w-1 bg-success/70" aria-hidden="true" />
+                  <div
+                    className="absolute left-0 top-0 h-full w-1 bg-success/70"
+                    aria-hidden="true"
+                  />
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
@@ -245,10 +247,7 @@ function CommercialLanding() {
 
             <div className="mt-7 border-l-2 border-success pl-4 text-sm font-medium text-foreground sm:mt-10 sm:text-base">
               O objetivo não é colocar mais conteúdo na sua frente.
-              <span className="text-success">
-                {" "}
-                É ajudar você a saber o que fazer a seguir.
-              </span>
+              <span className="text-success"> É ajudar você a saber o que fazer a seguir.</span>
             </div>
           </div>
         </section>
@@ -345,4 +344,3 @@ function CommercialLanding() {
     </div>
   );
 }
-
