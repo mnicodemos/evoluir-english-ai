@@ -70,7 +70,7 @@ const mobileSheetNav = [
 // Subscription lives with the settings rows at the bottom.
 // `group` is the title above a group's first item ("" draws a plain divider).
 const dashboardSidebarNav = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/goals", label: "Goals", icon: Target, group: "Plan" },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
@@ -415,7 +415,7 @@ function AppShellContent({
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
           <Link
             to="/dashboard"
-            aria-label={translate("Dashboard")}
+            aria-label={translate("Home")}
             className="flex h-14 min-w-0 items-center gap-2 rounded-lg px-1 hover:bg-sidebar-accent"
           >
             <Logo className="size-[3.45rem] shrink-0" />

@@ -406,6 +406,7 @@ export const uiPt: Record<string, string> = {
   "The teacher is unavailable right now. Please try again.":
     "O professor está indisponível agora. Tente novamente.",
   Dashboard: "Início",
+  Home: "Início",
   Learning: "Aprendizado",
   Listening: "Escuta",
 
