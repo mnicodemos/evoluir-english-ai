@@ -932,6 +932,42 @@ export type Database = {
         }
         Relationships: []
       }
+      push_runs: {
+        Row: {
+          created_at: string
+          devices: number
+          duration_ms: number | null
+          error: string | null
+          failed: number
+          id: string
+          kind: string
+          removed: number
+          sent: number
+        }
+        Insert: {
+          created_at?: string
+          devices?: number
+          duration_ms?: number | null
+          error?: string | null
+          failed?: number
+          id?: string
+          kind: string
+          removed?: number
+          sent?: number
+        }
+        Update: {
+          created_at?: string
+          devices?: number
+          duration_ms?: number | null
+          error?: string | null
+          failed?: number
+          id?: string
+          kind?: string
+          removed?: number
+          sent?: number
+        }
+        Relationships: []
+      }
       push_tokens: {
         Row: {
           created_at: string
