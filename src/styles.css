@@ -282,36 +282,6 @@
   border-color: var(--border);
 }
 
-.dashboard-shell .dashboard-quick-link:nth-child(1) {
-  background-color: color-mix(in oklab, var(--dashboard-blue) 30%, var(--card));
-  border-color: color-mix(in oklab, var(--dashboard-blue) 55%, var(--border));
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(2) {
-  background-color: color-mix(in oklab, var(--dashboard-cyan) 24%, var(--card));
-  border-color: color-mix(in oklab, var(--dashboard-cyan) 48%, var(--border));
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(3) {
-  background-color: color-mix(in oklab, var(--dashboard-purple) 32%, var(--card));
-  border-color: color-mix(in oklab, var(--dashboard-purple) 55%, var(--border));
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(4) {
-  background-color: color-mix(in oklab, var(--dashboard-coral) 32%, var(--card));
-  border-color: color-mix(in oklab, var(--dashboard-coral) 55%, var(--border));
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(5) {
-  background-color: color-mix(in oklab, var(--dashboard-pink) 32%, var(--card));
-  border-color: color-mix(in oklab, var(--dashboard-pink) 55%, var(--border));
-}
-
-.dashboard-shell .dashboard-quick-link:nth-child(6) {
-  background-color: color-mix(in oklab, var(--dashboard-cyan) 26%, var(--card));
-  border-color: color-mix(in oklab, var(--dashboard-cyan) 50%, var(--border));
-}
-
 @media (max-width: 39.999rem) {
   .dashboard-one-screen h2 {
     letter-spacing: 0;

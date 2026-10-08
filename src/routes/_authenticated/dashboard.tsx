@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
-  Bolt,
   CalendarCheck2,
   ChartLine,
   BookOpen,
@@ -10,13 +9,10 @@ import {
   Clock,
   Flame,
   Gem,
-  GraduationCap,
   Headphones,
-  MessageSquareText,
   Minus,
   PenLine,
   RotateCcw,
-  Sparkles,
   SpellCheck,
   TriangleAlert,
 } from "lucide-react";
@@ -28,6 +24,7 @@ import { useMinutesToday } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
 import { getLeague, getNextLeague } from "@/components/LeagueBadge";
+import { GoalsTodayCard } from "@/components/GoalsTodayCard";
 import { PathProgressCard } from "@/components/PathProgressCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
@@ -291,51 +288,6 @@ function Dashboard() {
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
   }, [profile, navigate]);
-
-  const quickAccess = [
-    {
-      to: "/learning",
-      label: "Learning Center",
-      subtitle: "Continue your lessons",
-      icon: GraduationCap,
-      mobileOrder: "order-1 lg:order-1",
-    },
-    {
-      to: "/teacher",
-      label: "AI Teacher",
-      subtitle: "Ask questions anytime",
-      icon: Sparkles,
-      mobileOrder: "order-2 lg:order-2",
-    },
-    {
-      to: "/coach",
-      label: "AI Speaking",
-      subtitle: "Practice conversations",
-      icon: MessageSquareText,
-      mobileOrder: "order-3 lg:order-3",
-    },
-    {
-      to: "/vocabulary",
-      label: "Vocabulary",
-      subtitle: "Build your vocabulary",
-      icon: BookOpen,
-      mobileOrder: "order-6 lg:order-4",
-    },
-    {
-      to: "/listening",
-      label: "Listening",
-      subtitle: "Train your listening",
-      icon: Headphones,
-      mobileOrder: "order-5 lg:order-5",
-    },
-    {
-      to: "/writing",
-      label: "Writing",
-      subtitle: "Get AI feedback",
-      icon: PenLine,
-      mobileOrder: "order-4 lg:order-6",
-    },
-  ] as const;
 
   // Accuracy at or above this percentage shows the "done" icon; below it (but above 0) shows "attention".
   const ACCURACY_DONE_THRESHOLD = 70;
@@ -663,44 +615,11 @@ function Dashboard() {
             </div>
           </div>
 
-          <section
-            className="order-4 hidden card-soft min-w-0 p-3 lg:order-none lg:block xl:flex xl:min-h-0 xl:flex-col xl:px-4 xl:py-3"
-            aria-labelledby="quick-access-title"
-          >
-            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Bolt
-                  className="size-[1.925rem] shrink-0 text-warning"
-                  strokeWidth={2.6}
-                  aria-hidden="true"
-                />
-                <h2 id="quick-access-title" className="font-display text-sm font-semibold">
-                  {t("Quick Access")}
-                </h2>
-              </div>
-            </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-6 xl:gap-3">
-              {quickAccess.map((item) => {
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={`dashboard-quick-link group relative grid min-h-7 min-w-0 grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-0 px-2 py-1 text-foreground transition-[filter,transform] hover:brightness-110 active:scale-[0.97] active:brightness-125 lg:hover:-translate-y-0.5 xl:h-full xl:min-h-12 xl:grid-cols-[3rem_minmax(0,1fr)_auto] xl:px-3.5 xl:py-2 ${item.mobileOrder}`}
-                  >
-                    <span className="dashboard-quick-icon grid shrink-0 place-items-center">
-                      <item.icon className="size-4 xl:size-[1.65rem]" strokeWidth={2.4} />
-                    </span>
-                    <span className="flex min-w-0 flex-col justify-center gap-0.5">
-                      <span className="truncate text-xs font-medium">{t(item.label)}</span>
-                      <span className="hidden text-[10px] leading-tight text-foreground/65 xl:block">
-                        {t(item.subtitle)}
-                      </span>
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
+          {/* Desktop: the Quick Access row repeated the sidebar; today's goal
+              steps took its place. */}
+          <div className="order-4 hidden min-w-0 lg:order-none lg:block xl:min-h-0">
+            <GoalsTodayCard />
+          </div>
         </div>
       )}
     </AppShell>

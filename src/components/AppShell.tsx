@@ -21,7 +21,7 @@ import {
   Trophy,
   Video,
 } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { Fragment, useEffect, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -64,23 +64,24 @@ const mobileSheetNav = [
   { to: "/league", label: "Weekly league", icon: Trophy },
 ] as const;
 
-// One list in study order: plan, lessons, receptive skills, writing, reviewing
-// mistakes, then speaking and the live call, the AI Teacher as support and the
-// weekly league as the reward. My Progress opens from the Dashboard's Today's
-// Progress card; My Subscription lives with the settings rows at the bottom.
+// One list in study order, in small titled groups so 13 items read as 3
+// steps: plan, practise, talk with EVO; the weekly league is the reward.
+// My Progress opens from the Dashboard's Today's Progress card; My
+// Subscription lives with the settings rows at the bottom.
+// `group` is the title above a group's first item ("" draws a plain divider).
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/goals", label: "Goals", icon: Target },
+  { to: "/goals", label: "Goals", icon: Target, group: "Plan" },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
-  { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
+  { to: "/vocabulary", label: "Vocabulary", icon: BookOpen, group: "Practice" },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
-  { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
+  { to: "/coach", label: "AI Speaking", icon: MessageSquareText, group: "With EVO" },
   { to: "/call", label: "Video call", icon: Video },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
-  { to: "/league", label: "Weekly league", icon: Trophy },
+  { to: "/league", label: "Weekly league", icon: Trophy, group: "" },
 ] as const;
 
 // Translation and notification controls moved here from the dashboard reflection
@@ -428,20 +429,30 @@ function AppShellContent({
             </span>
           </Link>
 
-          <nav className="mt-4 flex flex-1 flex-col gap-1">
+          <nav className="mt-3 flex flex-1 flex-col gap-0.5">
             {dashboardSidebarNav.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                aria-label={translate(item.label)}
-                className="grid h-12 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                // Just a soft background and green text: no border or side bar.
-                activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
-                inactiveProps={{ className: "text-sidebar-foreground/70" }}
-              >
-                <item.icon className="size-6" />
-                <span className="truncate text-left">{translate(item.label)}</span>
-              </Link>
+              <Fragment key={item.to}>
+                {"group" in item ? (
+                  item.group ? (
+                    <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/45">
+                      {translate(item.group)}
+                    </p>
+                  ) : (
+                    <span className="mx-2 my-2 border-t border-sidebar-border" aria-hidden="true" />
+                  )
+                ) : null}
+                <Link
+                  to={item.to}
+                  aria-label={translate(item.label)}
+                  className="grid h-10 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  // Just a soft background and green text: no border or side bar.
+                  activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
+                  inactiveProps={{ className: "text-sidebar-foreground/70" }}
+                >
+                  <item.icon className="size-5" />
+                  <span className="truncate text-left">{translate(item.label)}</span>
+                </Link>
+              </Fragment>
             ))}
           </nav>
 

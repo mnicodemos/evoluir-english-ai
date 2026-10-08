@@ -3,6 +3,11 @@
 export const uiPt: Record<string, string> = {
   // Evoluir+ Goals (/goals)
   "Evoluir+ Goals": "Evoluir+ Metas",
+  "Goals today": "Metas de hoje",
+  "Open goals": "Abrir metas",
+  "Choose my goals": "Escolher minhas metas",
+  "All done": "Tudo feito",
+  "With EVO": "Com a EVO",
   "Choose up to 3 goals and get one small step a day from EVO.":
     "Escolha até 3 metas e receba da EVO um pequeno passo por dia.",
   "Your goals, one small step a day.": "Suas metas, um pequeno passo por dia.",
