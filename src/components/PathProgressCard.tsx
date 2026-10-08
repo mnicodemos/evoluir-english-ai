@@ -9,6 +9,7 @@ import {
   Mic,
   PenLine,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -20,6 +21,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { skillMeterRows, type SkillMeterStatus } from "@/lib/pedagogy/skillMeter";
+import { findLevel } from "@/lib/level";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 
@@ -203,6 +205,20 @@ export function PathProgressCard({
           <h2 id="skills-progress-heading" className="font-display text-sm font-semibold">
             {t("Your English Skills")}
           </h2>
+          {/* Phones hide the header's level card, so the level the scores
+              belong to sits here; it opens the learning path. */}
+          {profile?.level && (
+            <Link
+              to="/learning"
+              aria-label={`${t("Level")} ${t(findLevel(profile.level).label)}`}
+              className="inline-flex h-7 items-center gap-1 rounded-full border border-brand-green/40 bg-brand-green/10 px-2.5 text-xs font-bold text-brand-green transition-colors hover:bg-brand-green/20 lg:hidden"
+            >
+              <GraduationCap className="size-3.5" aria-hidden="true" />
+              {/* Just the code on the narrowest phones, so the title keeps one line. */}
+              <span className="max-[380px]:hidden">{t("Level")}</span>
+              {findLevel(profile.level).value.toUpperCase()}
+            </Link>
+          )}
         </div>
         <div className="mt-2 grid flex-1 content-between gap-2 lg:mt-3 lg:gap-3 xl:mt-4 xl:gap-2">
           {meterRows.map((row) => {
