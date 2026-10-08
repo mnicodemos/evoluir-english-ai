@@ -631,3 +631,15 @@ export const getSpeakingWait = createServerFn({ method: "GET" })
     const { loadSpeakingWait } = await import("@/lib/productMetrics.server");
     return loadSpeakingWait(supabaseAdmin);
   });
+
+/** What students want to improve besides English, from the goals they created. */
+export const getGoalsReport = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { loadGoalsReport } = await import("@/lib/productMetrics.server");
+    return loadGoalsReport(supabaseAdmin);
+  });

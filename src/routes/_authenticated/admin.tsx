@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminAlerts } from "@/components/AdminAlerts";
+import { AdminGoals } from "@/components/AdminGoals";
 import { AdminRetention } from "@/components/AdminRetention";
 import { AdminSpeakingWait } from "@/components/AdminSpeakingWait";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
@@ -193,6 +194,7 @@ function AdminPage() {
             </TabsContent>
             <TabsContent value="retention">
               <AdminRetention />
+              <AdminGoals />
             </TabsContent>
           </Tabs>
         </section>
