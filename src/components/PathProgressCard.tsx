@@ -6,6 +6,7 @@ import {
   Download,
   GraduationCap,
   Headphones,
+  Infinity as InfinityIcon,
   Loader2,
   Mic,
   PenLine,
@@ -72,13 +73,9 @@ export function PathProgressCard({
     staleTime: 60 * 1000,
     enabled: compact && !!profile,
   });
-  const levelCode = profile?.level ? findLevel(profile.level).value.toUpperCase() : "";
-  const meterRows = skillMeterRows(
-    nextStep?.skills,
-    nextStep?.prioritySkill,
-    undefined,
-    profile?.level ? findLevel(profile.level).value : null,
-  );
+  // Learning is continuous (user decision): the card keeps each skill's latest
+  // score across levels; one level's own numbers are looked up in My Progress.
+  const meterRows = skillMeterRows(nextStep?.skills, nextStep?.prioritySkill);
   const anyMeasured = meterRows.some((row) => row.value !== null);
 
   const skills = [
@@ -212,6 +209,15 @@ export function PathProgressCard({
           <h2 id="skills-progress-heading" className="font-display text-sm font-semibold">
             {t("Your English Skills")}
           </h2>
+          {/* Desktop: a reminder that the scores carry on across levels, in the
+              header so the card keeps its height. My Progress says it in full. */}
+          <span
+            title={t("Continuous learning: your scores carry on into every new level.")}
+            className="hidden items-center gap-1 text-[11px] font-semibold leading-none text-brand-green lg:inline-flex"
+          >
+            <InfinityIcon className="size-3.5 shrink-0" aria-hidden="true" />
+            {t("Continuous learning")}
+          </span>
           {/* Phones hide the header's level card, so the level the scores
               belong to sits here; it opens the learning path. */}
           {profile?.level && (
@@ -253,10 +259,9 @@ export function PathProgressCard({
                 />
                 <span className="truncate font-medium">{t(meta.label)}</span>
                 {row.value === null && !skillsLoading ? (
-                  // Each level has its own measurements: say so plainly instead
-                  // of an empty bar and a dash.
+                  // Never measured: say so plainly instead of an empty bar and a dash.
                   <span className="col-span-2 truncate text-[11px] text-muted-foreground">
-                    {t("Not measured at {level} yet").replace("{level}", levelCode)}
+                    {t("Not measured yet")}
                   </span>
                 ) : (
                   <>

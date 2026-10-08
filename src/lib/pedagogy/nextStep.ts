@@ -321,15 +321,10 @@ function rank(
  */
 export function buildNextStep(input: NextStepInput): NextStep {
   const currentLevel = input.currentLevel?.toUpperCase() ?? null;
-  const candidates = input.skills
-    .filter((item) => item.skill)
-    .map((item) => {
-      const evidenceLevel = item.cefrLevel.toUpperCase();
-      const matchesCurrentLevel = !currentLevel || evidenceLevel === currentLevel;
-      return matchesCurrentLevel
-        ? item
-        : { ...item, score: null, confidence: null, cefrLevel: "insufficient_evidence" };
-    });
+  // Learning is continuous (user decision): a skill keeps its latest score
+  // when the student changes level, so the priority follows the same numbers
+  // the Dashboard shows. The level only shapes the wording (situation below).
+  const candidates = input.skills.filter((item) => item.skill);
   if (candidates.length === 0) {
     return {
       prioritySkill: null,
@@ -361,6 +356,8 @@ export function buildNextStep(input: NextStepInput): NextStep {
     !currentLevel ||
     (best.skill.cefrLevel !== "insufficient_evidence" &&
       best.skill.cefrLevel.toUpperCase() === currentLevel);
+  // The whole journey counts: a skill measured at an earlier level is
+  // practised, not "new"; the level only names where the student is now.
   const hasEvidence = best.skill.score !== null || best.skill.confidence !== null;
   const recentlyPractised = input.recentlyPractised.includes(best.skill.skill);
   // Strongest OTHER skill with its own evidence at the selected level.
@@ -376,14 +373,13 @@ export function buildNextStep(input: NextStepInput): NextStep {
     strongest && (strongest.score ?? 0) >= 70 && (strongest.score ?? 0) > (best.skill.score ?? 0)
       ? strongest.skill
       : null;
-  const situation: NextStepSituation =
-    !hasEvidence || !matchesCurrentLevel
-      ? "no_evidence_at_level"
-      : strongestSkill
-        ? "strong_elsewhere"
-        : !recentlyPractised
-          ? "not_practised"
-          : "needs_practice";
+  const situation: NextStepSituation = !hasEvidence
+    ? "no_evidence_at_level"
+    : strongestSkill
+      ? "strong_elsewhere"
+      : !recentlyPractised
+        ? "not_practised"
+        : "needs_practice";
   const insight = {
     cefrLevel:
       input.currentLevel ??

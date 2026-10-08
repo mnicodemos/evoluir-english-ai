@@ -109,8 +109,9 @@ function ProgressPage() {
     },
   });
 
-  // Each level keeps its own measurements; the student can look back at the
-  // levels already closed (up to the highest reached) without changing level.
+  // Learning is continuous: "Overall" shows each skill's latest score (the
+  // same numbers as the Dashboard). A level chip shows only what was practised
+  // at that level, for the levels reached so far, without changing level.
   const currentLevel = findLevel(profile?.level).value.toUpperCase();
   const maxIndex = LEVELS.findIndex(
     (level) => level.value === findLevel(profile?.max_level ?? profile?.level).value,
@@ -122,12 +123,11 @@ function ProgressPage() {
       (index <= maxIndex && nextStep?.skillsByLevel?.some((entry) => entry.level === code))
     );
   }).map((level) => level.value.toUpperCase());
-  const shownLevel = viewLevel && levelOptions.includes(viewLevel) ? viewLevel : currentLevel;
-  const shownSnapshots =
-    shownLevel === currentLevel
-      ? nextStep?.skills
-      : nextStep?.skillsByLevel?.find((entry) => entry.level === shownLevel)?.skills;
-  const skills = skillMeterRows(shownSnapshots, null, PROGRESS_SKILLS, shownLevel).map((row) => ({
+  const shownLevel = viewLevel && levelOptions.includes(viewLevel) ? viewLevel : null;
+  const shownSnapshots = shownLevel
+    ? nextStep?.skillsByLevel?.find((entry) => entry.level === shownLevel)?.skills
+    : nextStep?.skills;
+  const skills = skillMeterRows(shownSnapshots, null, PROGRESS_SKILLS).map((row) => ({
     label: row.skill.charAt(0).toUpperCase() + row.skill.slice(1),
     value: row.value,
   }));
@@ -172,34 +172,42 @@ function ProgressPage() {
                 <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <h2 className="text-base font-semibold sm:text-lg">
-                      {shownLevel === currentLevel
-                        ? t("Current level")
-                        : `${t("Level")} ${shownLevel} · ${t("closed")}`}
+                      {shownLevel
+                        ? shownLevel === currentLevel
+                          ? `${t("Level")} ${shownLevel}`
+                          : `${t("Level")} ${shownLevel} · ${t("closed")}`
+                        : t("Your skills")}
                     </h2>
-                    {levelOptions.length > 1 ? (
-                      <div
-                        className="flex flex-wrap gap-1"
-                        role="group"
-                        aria-label={t("Measurements by level")}
-                      >
-                        {levelOptions.map((code) => (
-                          <button
-                            key={code}
-                            type="button"
-                            aria-pressed={shownLevel === code}
-                            onClick={() => setViewLevel(code)}
-                            className={`min-h-7 rounded-full px-2.5 text-xs font-semibold transition-colors ${
-                              shownLevel === code
-                                ? "bg-brand-green text-[oklch(0.2_0.04_160)]"
-                                : "bg-secondary text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            {code}
-                          </button>
-                        ))}
-                      </div>
-                    ) : null}
+                    <div
+                      className="flex flex-wrap gap-1"
+                      role="group"
+                      aria-label={t("Measurements by level")}
+                    >
+                      {[null, ...levelOptions].map((code) => (
+                        <button
+                          key={code ?? "overall"}
+                          type="button"
+                          aria-pressed={shownLevel === code}
+                          onClick={() => setViewLevel(code)}
+                          className={`min-h-7 rounded-full px-2.5 text-xs font-semibold transition-colors ${
+                            shownLevel === code
+                              ? "bg-brand-green text-[oklch(0.2_0.04_160)]"
+                              : "bg-secondary text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {code ?? t("Overall")}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {shownLevel
+                      ? t("Level {level}: only what you practised at this level.").replace(
+                          "{level}",
+                          shownLevel,
+                        )
+                      : t("Continuous learning: your scores carry on into every new level.")}
+                  </p>
                   <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4">
                     {skills.map((s) => (
                       <div key={s.label}>
@@ -213,13 +221,11 @@ function ProgressPage() {
                         </div>
                         {s.value === null ? (
                           // Same words as the Dashboard card: a skill without a
-                          // measurement at this level says so, instead of an empty bar.
+                          // measurement says so, instead of an empty bar.
                           <p className="mt-1 truncate text-[11px] leading-tight text-muted-foreground sm:mt-1.5 sm:text-xs">
-                            {t(
-                              shownLevel === currentLevel
-                                ? "Not measured at {level} yet"
-                                : "Not measured at {level}",
-                            ).replace("{level}", shownLevel)}
+                            {shownLevel
+                              ? t("Not measured at {level}").replace("{level}", shownLevel)
+                              : t("Not measured yet")}
                           </p>
                         ) : (
                           <Bar

@@ -147,16 +147,17 @@ describe("next step content", () => {
     });
   });
 
-  it("does not reuse confidence from a previous CEFR level", () => {
+  it("keeps a previous level's measurement: learning is continuous", () => {
     const step = buildNextStep({
       ...base,
       currentLevel: "b2",
       skills: [skill("grammar", 72)],
     });
     expect(step.insight?.cefrLevel).toBe("b2");
-    expect(step.insight?.confidence).toBeNull();
-    expect(step.insight?.hasEvidence).toBe(false);
+    expect(step.insight?.confidence).toBe(0.8);
+    expect(step.insight?.hasEvidence).toBe(true);
     expect(step.insight?.matchesCurrentLevel).toBe(false);
+    expect(step.insight?.situation).not.toBe("no_evidence_at_level");
   });
 
   it("keeps current confidence when the CEFR level has not changed", () => {
@@ -275,18 +276,23 @@ describe("quick win", () => {
   });
 });
 
-describe("insight is scoped to the selected level", () => {
+describe("the insight follows the whole journey", () => {
   const b1 = { skill: "vocabulary", score: 62, confidence: 0.8, cefrLevel: "B1" };
   const b2 = { skill: "grammar", score: 88, confidence: 0.77, cefrLevel: "B2" };
 
   it("uses only B1 evidence when B1 is selected", () => {
+    // Learning is continuous: grammar keeps its B2 score for the ranking, so
+    // the weaker vocabulary (B1 evidence) is the priority at B1.
     const step = buildNextStep({ ...base, currentLevel: "B1", skills: [b1, b2] });
-    // grammar only has B2 evidence, so at B1 it counts as not measured yet and
-    // its B2 score is never shown.
-    expect(step.prioritySkill).toBe("grammar");
+    expect(step.prioritySkill).toBe("vocabulary");
     expect(step.insight?.cefrLevel).toBe("B1");
-    expect(step.insight?.score).toBeNull();
-    expect(step.insight?.situation).toBe("no_evidence_at_level");
+    expect(step.insight?.score).toBe(62);
+
+    // A skill measured at another level is still practised, never "new".
+    const onlyB2 = buildNextStep({ ...base, currentLevel: "B1", skills: [b2] });
+    expect(onlyB2.prioritySkill).toBe("grammar");
+    expect(onlyB2.insight?.score).toBe(88);
+    expect(onlyB2.insight?.situation).not.toBe("no_evidence_at_level");
 
     const onlyB1 = buildNextStep({ ...base, currentLevel: "B1", skills: [b1] });
     expect(onlyB1.prioritySkill).toBe("vocabulary");
@@ -294,11 +300,11 @@ describe("insight is scoped to the selected level", () => {
     expect(onlyB1.insight?.score).toBe(62);
   });
 
-  it("does not fill a B2 insight with B1 evidence", () => {
+  it("carries B1 evidence into the B2 insight, naming B2 as the level", () => {
     const step = buildNextStep({ ...base, currentLevel: "B2", skills: [b1] });
-    expect(step.insight?.hasEvidence).toBe(false);
-    expect(step.insight?.situation).toBe("no_evidence_at_level");
-    expect(step.insight?.score).toBeNull();
+    expect(step.insight?.hasEvidence).toBe(true);
+    expect(step.insight?.cefrLevel).toBe("B2");
+    expect(step.insight?.score).toBe(62);
   });
 
   it("returns to the B1 context after B1 -> B2 -> B1 without changing the input", () => {

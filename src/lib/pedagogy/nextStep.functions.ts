@@ -6,7 +6,13 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-import type { AssessmentEvidence, PedagogicalSkill } from "./contracts";
+import { aggregateSkillEvidence } from "./aggregateSkill";
+import { measuredCefr } from "./cefr";
+import {
+  pedagogicalSkillSchema,
+  type AssessmentEvidence,
+  type PedagogicalSkill,
+} from "./contracts";
 import { deriveInvisibleGaps } from "./invisibleGaps";
 import { transferredSkills } from "./learningLoop";
 import {
@@ -21,6 +27,8 @@ import { buildSmartReviewList } from "./smartReviewUx";
 const RECENT_DAYS = 7;
 /** Existing evidence rows considered for the Skill Quest. Read-only. */
 const EVIDENCE_LIMIT = 400;
+/** Evidence rows read to rebuild each level's measurement for My Progress. */
+const LEVEL_HISTORY_LIMIT = 3000;
 
 export const loadNextStep = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -35,18 +43,18 @@ export const loadNextStep = createServerFn({ method: "POST" })
         .from("current_skill_profile")
         .select("skill, score, cefr_level, confidence_score, evidence_count")
         .eq("user_id", userId),
-      // Full per-level history (completed sessions only). Nothing is ever
-      // deleted: each CEFR level keeps its own evidence, so when the student
-      // returns to a level that already has results, those results are shown
-      // again instead of being borrowed from another level.
+      // Per-level history for My Progress: every evidence row keeps the level
+      // of the content it came from (item_cefr), so each level's measurement
+      // is rebuilt from what was practised at that level.
       supabaseAdmin
-        .from("assessment_skill_results")
+        .from("assessment_evidence")
         .select(
-          "skill, score, cefr_level, confidence_score, evidence_count, assessed_at, assessment_sessions!inner(status)",
+          "skill, source_type, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, rubric_version",
         )
         .eq("user_id", userId)
-        .eq("assessment_sessions.status", "completed")
-        .order("assessed_at", { ascending: false }),
+        .not("item_cefr", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(LEVEL_HISTORY_LIMIT),
       supabaseAdmin
         .from("learning_profile")
         .select("common_errors")
@@ -64,33 +72,18 @@ export const loadNextStep = createServerFn({ method: "POST" })
         .not("completed_at", "is", null),
     ]);
 
-    // Latest completed result per skill AT THE CURRENT LEVEL. Rows are
-    // ordered by assessed_at DESC, so the first match per skill wins.
     const level = profile.data?.level ?? null;
-    const current = level?.toUpperCase() ?? null;
-    type HistoryRow = NonNullable<typeof history.data>[number];
-    const atLevelBySkill = new Map<string, HistoryRow>();
-    for (const row of history.data ?? []) {
-      if (!row.skill || !row.cefr_level) continue;
-      if (current && row.cefr_level.toUpperCase() !== current) continue;
-      if (!atLevelBySkill.has(row.skill)) atLevelBySkill.set(row.skill, row);
-    }
 
+    // Learning is continuous (user decision): every skill keeps its latest
+    // measurement across levels, on the Dashboard and in EVO's priority.
     const snapshots: SkillSnapshot[] = (skills.data ?? [])
       .filter((row) => row.skill)
-      .map((row) => {
-        // Prefer the skill's own evidence at the current level; only when the
-        // level has no evidence of its own do we fall back to the latest
-        // snapshot, which buildNextStep flags as cross-level (not replicated).
-        const own = atLevelBySkill.get(row.skill as string);
-        const source = own ?? row;
-        return {
-          skill: row.skill as string,
-          score: source.score === null ? null : Number(source.score),
-          confidence: source.confidence_score === null ? null : Number(source.confidence_score),
-          cefrLevel: source.cefr_level ?? "insufficient_evidence",
-        };
-      });
+      .map((row) => ({
+        skill: row.skill as string,
+        score: row.score === null ? null : Number(row.score),
+        confidence: row.confidence_score === null ? null : Number(row.confidence_score),
+        cefrLevel: row.cefr_level ?? "insufficient_evidence",
+      }));
 
     // Existing lessons that match a skill at the student's own level and are
     // not completed yet. No new content, no ranking.
@@ -172,7 +165,8 @@ export const loadNextStep = createServerFn({ method: "POST" })
       {
         evidence,
         skills: snapshots,
-        currentLevel: level,
+        // The whole journey: a skill's latest measurement counts at any level.
+        currentLevel: null,
         recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
         recentlyPractised: [
           ...new Set((recent.data ?? []).map((row) => row.activity_type).filter(Boolean)),
@@ -184,39 +178,51 @@ export const loadNextStep = createServerFn({ method: "POST" })
       },
     );
 
-    // Dashboard skills card: the same snapshots, plus how much evidence each
-    // one rests on (current level first, as above).
+    // Dashboard skills card: the same latest snapshots, plus how much evidence
+    // each one rests on.
     const skillMeter = (skills.data ?? [])
       .filter((row) => row.skill)
-      .map((row) => {
-        const source = atLevelBySkill.get(row.skill as string) ?? row;
-        return {
-          skill: row.skill as string,
-          score: source.score === null ? null : Number(source.score),
-          cefrLevel: source.cefr_level ?? "insufficient_evidence",
-          evidenceCount: source.evidence_count === null ? null : Number(source.evidence_count),
-        };
-      });
+      .map((row) => ({
+        skill: row.skill as string,
+        score: row.score === null ? null : Number(row.score),
+        cefrLevel: row.cefr_level ?? "insufficient_evidence",
+        evidenceCount: row.evidence_count === null ? null : Number(row.evidence_count),
+      }));
 
-    // My Progress: each level keeps its own measurements, so the levels the
-    // student already closed can be looked at again. Latest completed result
-    // per skill within each level (rows are newest first).
-    const byLevel = new Map<string, Map<string, HistoryRow>>();
+    // My Progress: the measurement of each level the student studied, from the
+    // evidence of that level's content only (same aggregation as the results).
+    const byLevel = new Map<string, Map<string, AssessmentEvidence[]>>();
     for (const row of history.data ?? []) {
-      if (!row.skill || !row.cefr_level || row.cefr_level === "insufficient_evidence") continue;
-      const key = row.cefr_level.toUpperCase();
-      const skillsAtLevel = byLevel.get(key) ?? new Map<string, HistoryRow>();
-      if (!skillsAtLevel.has(row.skill)) skillsAtLevel.set(row.skill, row);
-      byLevel.set(key, skillsAtLevel);
+      const cefr = measuredCefr(row.item_cefr);
+      const skill = pedagogicalSkillSchema.safeParse(row.skill);
+      if (!cefr || !skill.success) continue;
+      const skillsAtLevel = byLevel.get(cefr) ?? new Map<string, AssessmentEvidence[]>();
+      const items = skillsAtLevel.get(skill.data) ?? [];
+      items.push({
+        skill: skill.data,
+        sourceType: row.source_type as AssessmentEvidence["sourceType"],
+        itemCefr: cefr,
+        rawScore: Number(row.raw_score),
+        sourceReliability: Number(row.source_reliability),
+        evidenceQuality: Number(row.evidence_quality),
+        sampleWeight: Number(row.sample_weight),
+        evaluatedBy: row.evaluated_by as AssessmentEvidence["evaluatedBy"],
+        rubricVersion: row.rubric_version,
+      });
+      skillsAtLevel.set(skill.data, items);
+      byLevel.set(cefr, skillsAtLevel);
     }
     const skillsByLevel = [...byLevel.entries()].map(([cefr, rows]) => ({
       level: cefr,
-      skills: [...rows.values()].map((row) => ({
-        skill: row.skill as string,
-        score: row.score === null ? null : Number(row.score),
-        cefrLevel: cefr,
-        evidenceCount: row.evidence_count === null ? null : Number(row.evidence_count),
-      })),
+      skills: [...rows.entries()].map(([skill, items]) => {
+        const result = aggregateSkillEvidence(skill as PedagogicalSkill, items);
+        return {
+          skill,
+          score: result.score,
+          cefrLevel: result.score === null ? "insufficient_evidence" : cefr,
+          evidenceCount: result.evidenceCount,
+        };
+      }),
     }));
 
     return { ...step, quest, reviews, skills: skillMeter, skillsByLevel };

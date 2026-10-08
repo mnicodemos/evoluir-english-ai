@@ -856,7 +856,13 @@ export const uiPt: Record<string, string> = {
   // Subscription portal (Phase 7)
   "My subscription": "Minha assinatura",
   Plan: "Plano",
-  "Not measured at {level} yet": "Ainda não medido no {level}",
+  "Not measured yet": "Ainda não medido",
+  "Continuous learning": "Aprendizado contínuo",
+  "Continuous learning: your scores carry on into every new level.":
+    "Aprendizado contínuo: suas notas seguem com você em cada novo nível.",
+  "Your skills": "Suas habilidades",
+  "Level {level}: only what you practised at this level.":
+    "Nível {level}: só o que você praticou neste nível.",
   "Not measured at {level}": "Não medido no {level}",
   "No reviews yet": "Nenhuma revisão ainda",
   "Your reviews appear here once EVO measures your skills in lessons and practice.":
