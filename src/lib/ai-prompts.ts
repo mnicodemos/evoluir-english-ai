@@ -23,6 +23,26 @@ export const scenarioPrompts: Record<string, string> = {
   travel: "Travel English: airport, hotel check-in, restaurants and asking for directions.",
 };
 
+/**
+ * The video call is a relaxed chat with EVO as a friend, unlike AI Speaking's
+ * short teacher turns: she reacts, shares a bit of her own day, does not
+ * always ask something back and recasts mistakes instead of giving tips.
+ */
+export type CoachStyle = { casual?: boolean; name?: string | undefined };
+
+function casualPersona(level: string, goal: string, name: string | undefined) {
+  const cefr = findLevel(level);
+  const firstName = name?.trim().split(/\s+/)[0];
+  return [
+    "You are EVO, a warm, upbeat friend on a video call with the student. This is a relaxed, informal chat between friends, not a lesson.",
+    `Student level: ${cefr.label}. ${cefr.descriptor} Their goal: "${goal}".`,
+    firstName
+      ? `The student's first name is ${firstName}; use it now and then, not every turn.`
+      : "",
+    "Talk about everyday things friends chat about: their day, weekend, food, music, series, plans, small news. Let the topic drift naturally.",
+  ];
+}
+
 export function coachReplyMessages(
   scenario: string,
   level: string,
@@ -30,8 +50,25 @@ export function coachReplyMessages(
   studyContext: string | undefined,
   messages: { role: "user" | "assistant"; content: string }[],
   rolePlay?: string,
+  style: CoachStyle = {},
 ): AiMsg[] {
   const cefr = findLevel(level);
+  if (style.casual && !rolePlay) {
+    const system = [
+      ...casualPersona(level, goal, style.name),
+      studyContext ? `What you know about the student:\n${studyContext.slice(0, 600)}` : "",
+      "Rules:",
+      `- Speak English only, at ${cefr.cefr}, with contractions and everyday expressions a friend would use ("Oh nice!", "No way!", "Same here").`,
+      "- React to what they said first, like a real person. Sometimes share a short line about your own day or opinion.",
+      "- Keep it short: 1 or 2 sentences, about 30 words.",
+      "- Do not always ask a question; when you do, ask only one, and make it casual.",
+      "- Never give tips, rules or explanations. If a mistake breaks the meaning, just repeat their idea correctly in your reply, naturally.",
+      "- No lists, no teacher talk, no emojis.",
+    ]
+      .filter(Boolean)
+      .join("\n");
+    return [{ role: "system", content: system }, ...messages];
+  }
   const system = [
     "You are a CELTA-certified English teacher.",
     `Student level: ${cefr.label}. ${cefr.descriptor} Goal: "${goal}".`,
@@ -58,11 +95,26 @@ export function coachOpenerMessages(
   goal: string,
   studyContext: string | undefined,
   avoid: string[],
+  style: CoachStyle = {},
 ): AiMsg[] {
   const avoidList = avoid.length
     ? `\nOpenings already used with this student (do NOT repeat or paraphrase them — pick a different sub-topic and question):\n${avoid.map((line) => `- ${line}`).join("\n")}`
     : "";
   const cefr = findLevel(level);
+  if (style.casual) {
+    const system = [
+      ...casualPersona(level, goal, style.name),
+      `Write how you open the call, at ${cefr.cefr}: like a friend picking up a video call. One or two short sentences, about 20 words.`,
+      "Say hi warmly, maybe mention something small about your day, and end with one easy, casual question (how they are, what they are up to, their day).",
+      "Reply with the words only, no quotes or labels." + avoidList,
+    ]
+      .filter(Boolean)
+      .join("\n");
+    return [
+      { role: "system", content: system },
+      { role: "user", content: "*video call connects*" },
+    ];
+  }
   const system = [
     "You are a CELTA-certified English teacher.",
     `Student level: ${cefr.label}. ${cefr.descriptor} Goal: "${goal}".`,
