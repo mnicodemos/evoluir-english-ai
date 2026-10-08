@@ -53,12 +53,12 @@ import { useUiLang } from "@/lib/uiLang";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard - Evoluir+ English AI" },
+      { title: "Home - Evoluir+ English AI" },
       {
         name: "description",
         content: "Your daily English plan, streak and skill scores in one place.",
       },
-      { property: "og:title", content: "Dashboard - Evoluir+ English AI" },
+      { property: "og:title", content: "Home - Evoluir+ English AI" },
       { property: "og:description", content: "Your daily English plan, streak and skill scores." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
