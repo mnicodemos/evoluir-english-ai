@@ -7,6 +7,7 @@ import {
   guessPlusArea,
   parsePlusSteps,
   plusDayComplete,
+  plusGoalWeek,
 } from "./plus";
 
 describe("guessPlusArea", () => {
@@ -110,5 +111,48 @@ describe("goalsReport", () => {
     });
     expect(report.byArea.find((row) => row.area === "english")?.donePercent).toBeNull();
     expect(report.topTitles[0]).toEqual({ title: "Guardar R$ 300 por mês", count: 2 });
+  });
+});
+
+describe("plusGoalWeek", () => {
+  const step = (goalId: string, day: string, done: boolean) => ({
+    goalId,
+    day,
+    doneAt: done ? `${day}T15:00:00Z` : null,
+  });
+
+  it("lists the last 7 days ending today and counts the days done", () => {
+    const week = plusGoalWeek(
+      [step("g", "2026-10-09", true), step("g", "2026-10-07", true), step("x", "2026-10-08", true)],
+      "g",
+      "2026-10-09",
+    );
+    expect(week.days.map((d) => d.day)).toEqual([
+      "2026-10-03",
+      "2026-10-04",
+      "2026-10-05",
+      "2026-10-06",
+      "2026-10-07",
+      "2026-10-08",
+      "2026-10-09",
+    ]);
+    expect(week.doneCount).toBe(2);
+    expect(week.streak).toBe(1);
+  });
+
+  it("keeps the run going while today's step is still open", () => {
+    const steps = [
+      step("g", "2026-10-07", true),
+      step("g", "2026-10-08", true),
+      step("g", "2026-10-09", false),
+    ];
+    expect(plusGoalWeek(steps, "g", "2026-10-09").streak).toBe(2);
+    expect(
+      plusGoalWeek([...steps.slice(0, 2), step("g", "2026-10-09", true)], "g", "2026-10-09").streak,
+    ).toBe(3);
+  });
+
+  it("starts at zero for a new goal", () => {
+    expect(plusGoalWeek([], "g", "2026-10-09")).toMatchObject({ doneCount: 0, streak: 0 });
   });
 });
