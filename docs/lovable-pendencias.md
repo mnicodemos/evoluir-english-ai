@@ -3,24 +3,26 @@
 Faça **nesta ordem**. Cada migration pode rodar mais de uma vez sem problema.
 
 ## 1. Publicar
+
 Clique em **Publish** na Lovable para colocar no ar a versão atual do `main`
 (PRs #166 e #167 em diante). **Faça isto antes das migrations 0058 e 0059**:
 sem a nova versão, abrir e concluir lições fica bloqueado.
 
 ## 2. Rodar as migrations no chat da Lovable
+
 Cole no chat da Lovable, uma de cada vez (ou todas juntas), pedindo:
 
 > Rode este SQL no banco, exatamente como está.
 
 Cada bloco já termina com `NOTIFY pgrst, 'reload schema';`.
 
-| Migration | O que faz |
-|---|---|
-| 0056 | Cada aluno tem suas próprias palavras de vocabulário (fim do erro "duplicate key vocabulary_word_key"). |
-| 0057 | Uma conversa concluída com a EVO também completa o dia de estudo. |
-| 0058 | Só o servidor grava lições, quizzes e cartões (ninguém forja um Teste Final). |
-| 0059 | Só o servidor marca lição como concluída (a partir do quiz corrigido). |
-| 0060 | A checagem de Premium só responde sobre a própria conta. |
+| Migration | O que faz                                                                                               |
+| --------- | ------------------------------------------------------------------------------------------------------- |
+| 0056      | Cada aluno tem suas próprias palavras de vocabulário (fim do erro "duplicate key vocabulary_word_key"). |
+| 0057      | Uma conversa concluída com a EVO também completa o dia de estudo.                                       |
+| 0058      | Só o servidor grava lições, quizzes e cartões (ninguém forja um Teste Final).                           |
+| 0059      | Só o servidor marca lição como concluída (a partir do quiz corrigido).                                  |
+| 0060      | A checagem de Premium só responde sobre a própria conta.                                                |
 
 ### 0056_vocabulary_word_per_student.sql
 
@@ -196,11 +198,13 @@ NOTIFY pgrst, 'reload schema';
 ```
 
 ## 3. Conferir
+
 - Abra uma lição nova e conclua o quiz com 70% ou mais: ela deve aparecer como concluída.
 - Gere as palavras do dia no Vocabulário: o lote deve vir completo.
 - Admin → Custo & Performance: em alguns dias, Transcrição e TTS passam a mostrar custo medido.
 
 ## 4. Fora do código (com você)
+
 - **Preço do TTS**: confirme no console do Google o preço de `gemini-2.5-flash-preview-tts`
   (cadastrado: US$ 0,50 por 1M de tokens de texto de entrada, US$ 10,00 por 1M de áudio de saída)
   e o preço do áudio de entrada de `gemini-3.5-flash-lite` (usado na transcrição).
