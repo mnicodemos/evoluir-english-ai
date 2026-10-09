@@ -66,8 +66,9 @@ const mobileSheetNav = [
   { to: "/league", label: "Weekly league", icon: Trophy },
 ] as const;
 
-// One list in study order, in small titled groups so 13 items read as 3
-// steps: plan, practise, talk with EVO; the weekly league is the reward.
+// One list in study order, in small titled groups: plan, practise, talk with
+// EVO. The weekly league opens from the Dashboard header (user request: not in
+// the desktop sidebar); the phone menu keeps it.
 // My Progress opens from the Dashboard's Today's Progress card; My
 // Subscription lives with the settings rows at the bottom.
 // `group` is the title above a group's first item ("" draws a plain divider).
@@ -84,7 +85,6 @@ const dashboardSidebarNav = [
   { to: "/coach", label: "AI Speaking", icon: MessageSquareText, group: "With EVO" },
   { to: "/call", label: "Video call", icon: Video },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
-  { to: "/league", label: "Weekly league", icon: Trophy, group: "" },
 ] as const;
 
 // Translation and notification controls moved here from the dashboard reflection
