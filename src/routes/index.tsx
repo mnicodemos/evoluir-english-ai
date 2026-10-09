@@ -17,6 +17,7 @@ import appLearning from "@/assets/home/app-learning.jpg";
 import appMistakes from "@/assets/home/app-mistakes.jpg";
 import evoImage from "@/assets/evo-landing.webp";
 import { Footer } from "@/components/Footer";
+import { ConversationDemo } from "@/components/home/ConversationDemo";
 import { LaunchCampaignBadge, LaunchCampaignPopup } from "@/components/home/LaunchCampaignPopup";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
@@ -244,6 +245,39 @@ function CommercialLanding() {
                 fetchPriority="high"
                 className="relative h-[30vh] max-h-[560px] w-full object-contain object-bottom drop-shadow-2xl sm:h-[42vh] lg:h-[64vh]"
               />
+            </div>
+          </div>
+        </section>
+
+        {/* DEMO — one conversation turn, animated */}
+        <section className="border-b border-border/70">
+          <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 lg:px-8 lg:py-14">
+            <div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
+                Veja na prática
+              </p>
+              <h2 className="text-2xl font-bold leading-tight sm:text-4xl">
+                Você fala. A EVO responde e corrige na hora.
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Sem julgamento e sem esperar a próxima aula: você erra, entende o porquê e já usa a
+                forma certa na frase seguinte.
+              </p>
+              <ul className="mt-5 grid gap-2 text-sm">
+                {[
+                  "Responda por voz, no seu ritmo",
+                  "Correção natural, dentro da conversa",
+                  "Você repete do jeito certo e fixa",
+                ].map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="mx-auto w-full max-w-md lg:max-w-lg">
+              <ConversationDemo />
             </div>
           </div>
         </section>
