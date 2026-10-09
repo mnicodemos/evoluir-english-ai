@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { geminiUsageTokens, type GeminiUsageMetadata } from "@/lib/aiPricing";
 import { authenticateApiRequest } from "@/lib/api-auth.server";
 import {
   AiUsageError,
@@ -31,6 +32,7 @@ const FAST_CONFIG = {
 
 type GeminiTranscription = {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  usageMetadata?: GeminiUsageMetadata;
 };
 
 // One spaced retry is enough for a brief provider interruption. More attempts
@@ -211,6 +213,8 @@ export const Route = createFileRoute("/api/transcribe")({
           errorMessage?: string;
           /** The model that actually answered, when it is not the reserved one. */
           model?: string;
+          inputTokens?: number;
+          outputTokens?: number;
         }) => {
           if (settled) return;
           settled = true;
@@ -222,6 +226,7 @@ export const Route = createFileRoute("/api/transcribe")({
           // like AI Speaking; the Lovable AI transcription service is only the
           // fallback, so an exhausted Lovable balance no longer costs a round trip.
           let result: GeminiTranscription | null = null;
+          let answeredModel: string = GEMINI_TRANSCRIPTION_MODELS[0];
           let failureStatus = 503;
 
           const requestBody = (fast: boolean) =>
@@ -269,6 +274,7 @@ export const Route = createFileRoute("/api/transcribe")({
 
               if (response.ok) {
                 result = (await response.json()) as GeminiTranscription;
+                answeredModel = model;
                 break;
               }
 
@@ -319,6 +325,13 @@ export const Route = createFileRoute("/api/transcribe")({
             return Response.json({ message }, { status: failureStatus });
           }
 
+          // Tokens are billed whether or not speech was recognized (user request:
+          // every transcription has a measured cost).
+          const tokens = geminiUsageTokens(result.usageMetadata);
+          const measured = {
+            ...(tokens ?? {}),
+            ...(answeredModel !== GEMINI_TRANSCRIPTION_MODELS[0] ? { model: answeredModel } : {}),
+          };
           const transcript = (result.candidates?.[0]?.content?.parts ?? [])
             .map((part) => part.text ?? "")
             .join("")
@@ -328,6 +341,7 @@ export const Route = createFileRoute("/api/transcribe")({
               success: false,
               errorCode: "empty_transcript",
               errorMessage: "No speech was recognized.",
+              ...measured,
             });
             return Response.json(
               { message: "I couldn't hear that clearly. Please try again." },
@@ -335,7 +349,7 @@ export const Route = createFileRoute("/api/transcribe")({
             );
           }
 
-          await settle({ success: true });
+          await settle({ success: true, ...measured });
 
           const streamEvent = `data: ${JSON.stringify({ type: "transcript.text.done", text: transcript })}\n\n`;
           return new Response(streamEvent, {

@@ -16,7 +16,36 @@ export const AI_MODEL_PRICING: Record<
   // Standard tier, effective through 2026-12-31 (Google doubles it on 2027-01-01);
   // output includes thinking tokens. Read 2026-10-06.
   "gemini-3.6-flash": { inputPricePerMillionTokens: 1.5, outputPricePerMillionTokens: 7.5 },
+  // TTS: text in, audio out. Google's published price for this preview model
+  // (text input $0.50, audio output $10.00 per 1M tokens); the pricing page
+  // could not be re-read on 2026-10-09, so confirm it in the Google console.
+  "gemini-2.5-flash-preview-tts": {
+    inputPricePerMillionTokens: 0.5,
+    outputPricePerMillionTokens: 10.0,
+  },
 };
+
+/** The token counts Gemini returns with every answer (generateContent and its stream). */
+export type GeminiUsageMetadata = {
+  promptTokenCount?: number;
+  candidatesTokenCount?: number;
+  thoughtsTokenCount?: number;
+};
+
+/**
+ * Billable tokens of one Gemini answer: the prompt (text or audio) in, the
+ * answer plus any thinking out. Null when the answer carried no counts, so a
+ * call without them stays "not measured" instead of costing zero.
+ */
+export function geminiUsageTokens(
+  usage: GeminiUsageMetadata | null | undefined,
+): { inputTokens: number; outputTokens: number } | null {
+  if (!usage || typeof usage.promptTokenCount !== "number") return null;
+  return {
+    inputTokens: usage.promptTokenCount,
+    outputTokens: (usage.candidatesTokenCount ?? 0) + (usage.thoughtsTokenCount ?? 0),
+  };
+}
 
 export function estimateAiCost(
   model: string | null | undefined,
