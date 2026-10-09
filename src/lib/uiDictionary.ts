@@ -1553,4 +1553,32 @@ export const uiPt: Record<string, string> = {
   "Review {n} mistakes": "Revisar {n} erros",
   "Fix them now so they do not become habits.": "Corrija agora para não virarem hábito.",
   "Nothing else to review right now.": "Nada mais para revisar agora.",
+  "Premium bonus": "Bônus Premium",
+  "Business English": "Inglês para Negócios",
+  "Meetings, e-mails, presentations, interviews and negotiation, written at your level.":
+    "Reuniões, e-mails, apresentações, entrevistas e negociação, no seu nível.",
+  "Business English opens at level B1.": "O Inglês para Negócios abre no nível B1.",
+  "You are at": "Você está no",
+  "Keep going in your learning path to unlock it.":
+    "Continue sua trilha de aprendizado para desbloquear.",
+  "Go to my learning path": "Ir para minha trilha",
+  "Practise with EVO": "Pratique com a EVO",
+  "Real work situations: EVO plays the other person.":
+    "Situações reais de trabalho: a EVO faz o papel da outra pessoa.",
+  Talk: "Conversar",
+  Call: "Ligar",
+  "The first lesson is free. Premium opens all 30 Business lessons.":
+    "A primeira lição é grátis. O Premium libera as 30 lições de Negócios.",
+  "Unit 1 — Meetings": "Unidade 1 — Reuniões",
+  "Unit 2 — E-mails and Messages": "Unidade 2 — E-mails e mensagens",
+  "Unit 3 — Presentations": "Unidade 3 — Apresentações",
+  "Unit 4 — Job Interviews": "Unidade 4 — Entrevistas de emprego",
+  "Unit 5 — Clients and Negotiation": "Unidade 5 — Clientes e negociação",
+  "Status meeting": "Reunião de status",
+  "Client call": "Ligação com cliente",
+  Negotiation: "Negociação",
+  "Presentation Q&A": "Perguntas da apresentação",
+  "Business English is part of Premium.": "O Inglês para Negócios faz parte do Premium.",
+  "This lesson is not part of Business English.":
+    "Esta lição não faz parte do Inglês para Negócios.",
 };

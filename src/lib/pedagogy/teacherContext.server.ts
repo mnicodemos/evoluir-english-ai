@@ -73,6 +73,7 @@ export async function loadTeacherContext(
         .select("title, skill")
         .eq("skill", weakest.skill)
         .eq("level", profile.data.level)
+        .neq("category", "business")
         .order("sort_order", { ascending: true })
         .limit(1)
         .maybeSingle();

@@ -18,6 +18,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedBillingSuccessRouteImport } from './routes/_authenticated/billing-success'
+import { Route as AuthenticatedBusinessRouteImport } from './routes/_authenticated/business'
 import { Route as AuthenticatedCallRouteImport } from './routes/_authenticated/call'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -90,6 +91,11 @@ const AuthenticatedBillingSuccessRoute =
     path: '/billing-success',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBusinessRoute = AuthenticatedBusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCallRoute = AuthenticatedCallRouteImport.update({
   id: '/call',
   path: '/call',
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
+  '/business': typeof AuthenticatedBusinessRoute
   '/call': typeof AuthenticatedCallRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -272,6 +279,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
+  '/business': typeof AuthenticatedBusinessRoute
   '/call': typeof AuthenticatedCallRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -310,6 +318,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/billing-success': typeof AuthenticatedBillingSuccessRoute
+  '/_authenticated/business': typeof AuthenticatedBusinessRoute
   '/_authenticated/call': typeof AuthenticatedCallRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -348,6 +357,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin'
     | '/billing-success'
+    | '/business'
     | '/call'
     | '/coach'
     | '/dashboard'
@@ -384,6 +394,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin'
     | '/billing-success'
+    | '/business'
     | '/call'
     | '/coach'
     | '/dashboard'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/billing-success'
+    | '/_authenticated/business'
     | '/_authenticated/call'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
@@ -528,6 +540,13 @@ declare module '@tanstack/react-router' {
       path: '/billing-success'
       fullPath: '/billing-success'
       preLoaderRoute: typeof AuthenticatedBillingSuccessRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/business': {
+      id: '/_authenticated/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof AuthenticatedBusinessRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/call': {
@@ -718,6 +737,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBillingSuccessRoute: typeof AuthenticatedBillingSuccessRoute
+  AuthenticatedBusinessRoute: typeof AuthenticatedBusinessRoute
   AuthenticatedCallRoute: typeof AuthenticatedCallRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -743,6 +763,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBillingSuccessRoute: AuthenticatedBillingSuccessRoute,
+  AuthenticatedBusinessRoute: AuthenticatedBusinessRoute,
   AuthenticatedCallRoute: AuthenticatedCallRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

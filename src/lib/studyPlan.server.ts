@@ -60,7 +60,9 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
   let lessonQuery = supabaseAdmin
     .from("lessons")
     .select("id, title, skill, level, sort_order")
-    .or(`created_by.is.null,created_by.eq.${userId}`);
+    .or(`created_by.is.null,created_by.eq.${userId}`)
+    // Business English lessons are a bonus track, never planned as level days.
+    .neq("category", "business");
   if (level) lessonQuery = lessonQuery.eq("level", level);
   const recentSince = new Date(Date.now() - 7 * 86_400_000).toISOString();
   const [

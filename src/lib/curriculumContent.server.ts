@@ -245,6 +245,11 @@ export function lessonGenerationRequest(plan: CurriculumLesson) {
     : plan.reviewUnits.length
       ? `This is a consolidation lesson. Summarize and practise only Units ${plan.reviewUnits.join(" and ")} from the supplied course outline. Connect their main grammar, vocabulary and communication skills without introducing new material.`
       : "";
+  // Business English track (businessCourse.ts): same format, work context.
+  const businessInstructions =
+    plan.category === "business"
+      ? "This lesson belongs to a Business English track for working adults: every example, dialogue, flashcard and quiz sentence takes place at work (meetings, e-mails, presentations, interviews, clients), in a professional but natural register. The quiz tests the language point of this lesson (grammar, functional phrases or work vocabulary) in work sentences."
+      : "";
 
   const messages: { role: "system" | "user" | "assistant"; content: string }[] = [
     {
@@ -254,6 +259,8 @@ export function lessonGenerationRequest(plan: CurriculumLesson) {
         `${descriptor} ` +
         `${SKILL_BRIEF[plan.skill] ?? ""} ` +
         `${reviewInstructions} ` +
+        // Empty for path lessons, so their prompt (and shared copy) is unchanged.
+        (businessInstructions ? `${businessInstructions} ` : "") +
         `Keep EVERY part of the lesson inside ${plan.level.toUpperCase()}: grammar, vocabulary, sentence length and idioms must match this level exactly. ` +
         'Reply with strict JSON: {"summary":"120-180 words explaining the language point with clear examples, in simple English",' +
         '"transcript":"a 450-600 word mini-lesson script in English, written in short paragraphs separated by blank lines",' +
@@ -266,7 +273,7 @@ export function lessonGenerationRequest(plan: CurriculumLesson) {
         "The flashcards must train recognition and recall of the lesson vocabulary and key expressions; they must NOT repeat the quiz questions or test the same items in the same way. " +
         "Every flashcard must use content from THIS lesson transcript, and every flashcard field must be in English only - never Portuguese, never a translation. " +
         "Every flashcard answer, definition and example must be SHORT: one brief sentence or phrase, maximum 15 words. " +
-        `${plan.reviewUnits.length ? "Every quiz question must review content from the supplied previous-unit outline, with balanced grammar, vocabulary and usage." : "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage)."} ` +
+        `${plan.reviewUnits.length ? "Every quiz question must review content from the supplied previous-unit outline, with balanced grammar, vocabulary and usage." : plan.category === "business" ? "EVERY quiz question must test the language point of this lesson in a work sentence." : "EVERY quiz question must test ONLY the grammar point of this lesson (form, structure, tense, word order, correct usage)."} ` +
         "The quiz must check understanding and use, not memorisation: move from recognising the form to applying it in a new sentence, and vary the structure of the questions. " +
         "Never ask about a dialogue, a video, a story, a character, a speaker or anything the student had to watch, listen to or read. " +
         "Each question must be self-contained: a sentence to complete or correct, or a direct grammar rule question.",

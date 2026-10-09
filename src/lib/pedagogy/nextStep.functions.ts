@@ -88,7 +88,11 @@ export const loadNextStep = createServerFn({ method: "POST" })
     // Existing lessons that match a skill at the student's own level and are
     // not completed yet. No new content, no ranking.
     const doneLessons = new Set((completed.data ?? []).map((row) => row.lesson_id));
-    let query = supabaseAdmin.from("lessons").select("id, title, skill, level, sort_order");
+    // Business English lessons are a bonus track, not the level's next step.
+    let query = supabaseAdmin
+      .from("lessons")
+      .select("id, title, skill, level, sort_order")
+      .neq("category", "business");
     if (level) query = query.eq("level", level);
     const { data: lessons } = await query.order("sort_order", { ascending: true });
 
