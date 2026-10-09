@@ -154,6 +154,14 @@ export const Route = createFileRoute("/api/transcribe")({
           );
         }
 
+        // Speed (user request): the limit reads start while the recording is
+        // still being received, instead of after it.
+        const limitReads = Promise.all([
+          loadAiLimit("transcription"),
+          releaseAbandonedAiUsage(userId, "transcription"),
+        ]);
+        // An invalid recording returns before the reads are used.
+        limitReads.catch(() => undefined);
         const form = await request.formData().catch(() => null);
 
         const audio = form?.get("file");
@@ -177,10 +185,9 @@ export const Route = createFileRoute("/api/transcribe")({
         let ticket;
         try {
           // Independent reads run together; only the reservation needs them all.
-          const [limit, requestHash] = await Promise.all([
-            loadAiLimit("transcription"),
+          const [[limit], requestHash] = await Promise.all([
+            limitReads,
             hashAiRequest({ size: audio.size, sample: audioBase64.slice(0, 1024) }),
-            releaseAbandonedAiUsage(userId, "transcription"),
           ]);
           ticket = await reserveAiUsage({
             userId,
