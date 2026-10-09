@@ -289,13 +289,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-border bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5"
         aria-label={t("Your next step")}
       >
-        {/* Same corner as the other cards' scope badge; white over EVO's card. */}
-        <ScopeBadge
-          kind="continuous"
-          tone="light"
-          translate={t}
-          className="absolute right-3 top-3 z-20 hidden sm:inline-flex"
-        />
         <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)]">
           <div
             className="relative h-auto w-full flex-none self-stretch overflow-hidden bg-transparent p-2.5 pb-0 sm:min-h-[13.5rem] sm:h-auto sm:p-0 lg:min-h-[10.5rem] xl:min-h-0"
@@ -323,7 +316,15 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
 
           {/* Mobile: the content sits centred in the card's free height instead
               of pressed against the banner. */}
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-4 sm:justify-center sm:py-4 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-4 sm:justify-center sm:pb-4 sm:pt-10 2xl:pt-11 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+            {/* Top-right of the priority column (user request), at the same height
+                as the "Today" badge of the card beside it (its header row centres a
+                22 px icon inside the card's padding). */}
+            <ScopeBadge
+              kind="continuous"
+              translate={t}
+              className="absolute right-4 top-3.5 hidden sm:inline-flex 2xl:top-[1.125rem]"
+            />
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-bold uppercase text-brand-green sm:hidden">
@@ -407,8 +408,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </div>
 
           <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-l xl:border-t-0">
-            {/* Room for the scope badge in the card's top-right corner. */}
-            <div className="flex items-center gap-2 xl:pr-24">
+            <div className="flex items-center gap-2">
               <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why this matters now")}</h3>
             </div>
@@ -418,7 +418,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {priorityText}
             </p>
             {(quickWinButton || challengeButton) && (
-              <div className="mt-3 hidden border-t border-border pt-3 sm:block xl:mt-auto">
+              <div className="mt-3 hidden sm:block xl:mt-auto">
                 {/* A short heading tells the student what these two extras are. */}
                 <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
                   {t("Extra practice")}

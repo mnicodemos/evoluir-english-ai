@@ -21,3 +21,12 @@ export function studyToday(date: Date = new Date()): string {
 export function studyDayStartIso(date: Date = new Date()): string {
   return new Date(`${studyToday(date)}T00:00:00-03:00`).toISOString();
 }
+
+/** Today's weekday in São Paulo, in the student's language ("Friday", "Sexta-feira"). */
+export function studyWeekday(lang: "en" | "pt", date: Date = new Date()) {
+  const name = new Intl.DateTimeFormat(lang === "pt" ? "pt-BR" : "en-US", {
+    weekday: "long",
+    timeZone: STUDY_TIME_ZONE,
+  }).format(date);
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
