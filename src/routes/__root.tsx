@@ -108,7 +108,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.png?v=13", type: "image/png" },
+      // Browser tab only (user request): the owner's symbol without a background,
+      // dark strokes on light tabs and light strokes on dark ones. The app icon
+      // (apple-touch-icon, manifest) stays as it is.
+      {
+        rel: "icon",
+        href: "/favicon-light.png?v=14",
+        type: "image/png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        rel: "icon",
+        href: "/favicon.png?v=14",
+        type: "image/png",
+        media: "(prefers-color-scheme: dark)",
+      },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=13" },
       { rel: "manifest", href: "/site.webmanifest?v=13" },
     ],
