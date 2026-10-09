@@ -692,6 +692,18 @@ export const getGoalsReport = createServerFn({ method: "GET" })
     return loadGoalsReport(supabaseAdmin);
   });
 
+/** Do corrections stick? My mistakes reviewed and answered right, by source. */
+export const getMistakeReviewReport = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { loadMistakeReviewReport } = await import("@/lib/productMetrics.server");
+    return loadMistakeReviewReport(supabaseAdmin);
+  });
+
 /** Public home funnel: visits, "Começar" clicks and signups (7 and 30 days). */
 export const getLandingFunnel = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

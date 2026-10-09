@@ -85,7 +85,27 @@ function Mistakes() {
         .eq("user_id", profile!.id)
         .order("created_at", { ascending: false })
         .limit(200);
-      const sources = (texts ?? []).map((row) => row.original_text ?? "");
+      // AI Teacher corrections come from the student's chat messages.
+      const { data: chats } = await supabase
+        .from("ai_conversations")
+        .select("messages")
+        .eq("user_id", profile!.id)
+        .eq("scenario", "teacher")
+        .order("updated_at", { ascending: false })
+        .limit(30);
+      const chatLines = (chats ?? []).flatMap((chat) =>
+        (Array.isArray(chat.messages) ? chat.messages : [])
+          .filter(
+            (message): message is { role: string; content: string } =>
+              !!message &&
+              typeof message === "object" &&
+              (message as { role?: unknown }).role === "user" &&
+              typeof (message as { content?: unknown }).content === "string",
+          )
+          .reverse()
+          .map((message) => message.content),
+      );
+      const sources = [...(texts ?? []).map((row) => row.original_text ?? ""), ...chatLines];
       return (data ?? []).map((row) => ({
         ...row,
         sentence: findMistakeSentence(row.original_text, sources),
@@ -126,8 +146,8 @@ function Mistakes() {
         <header className="animate-rise lg:col-span-2">
           <h1 className="text-lg font-bold lg:text-3xl">My mistakes</h1>
           <p className="mt-0.5 hidden max-w-2xl text-sm text-muted-foreground sm:block">
-            Mistakes from your Writing corrections come back for review until you get them right
-            five times in a row.
+            Mistakes from your Writing corrections and the AI Teacher come back for review until you
+            get them right five times in a row.
           </p>
         </header>
 

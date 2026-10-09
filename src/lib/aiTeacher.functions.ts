@@ -26,10 +26,12 @@ import {
   teacherEvidence,
   teacherEvidenceDecision,
   teacherTaskType,
+  TEACHER_EVIDENCE_SKILLS,
   TEACHER_RUBRIC_VERSION,
 } from "@/lib/pedagogy/teacherEvidence";
 
 import { parseTeacherTurn, teacherTurnMessages } from "@/lib/pedagogy/teacherPrompt";
+import { isTeacherRecapTurn, teacherMistakeInMessage } from "@/lib/pedagogy/teacherRecap";
 
 const historyMessageSchema = z.object({
   role: z.enum(["user", "assistant"]),
@@ -98,8 +100,13 @@ export const teacherTurn = createServerFn({ method: "POST" })
       coachPromptBlock = coachBlock(plan);
     }
 
+    // Free chat closes every few student turns with "Today you practised /
+    // To review" (the coach session has its own summary stage).
+    const recap = mode !== "COACH" && isTeacherRecapTurn(data.history);
+
     const raw = await callGateway(
       teacherTurnMessages({
+        recap,
         context: pedagogicalContext,
         objective: data.objective,
         studentMessage: data.message,
@@ -111,6 +118,19 @@ export const teacherTurn = createServerFn({ method: "POST" })
       { userId, operation: "teacher" },
     );
     const turn = parseTeacherTurn(raw);
+
+    // The main mistake goes to "My mistakes" for spaced review, like Writing
+    // corrections, only when it was really copied from the student's message.
+    const mistake = teacherMistakeInMessage(turn.mistake, data.message);
+    let mistakeSaved = false;
+    if (mistake) {
+      const { recordMistakes } = await import("@/lib/learningErrors.server");
+      await recordMistakes(await admin(), userId, [mistake], {
+        skill: turn.focusSkill ?? "grammar",
+        source: "teacher",
+      });
+      mistakeSaved = true;
+    }
 
     // Conversation storage reuses the existing ai_conversations table (RLS: owner only).
     const db = await admin();
@@ -212,6 +232,8 @@ export const teacherTurn = createServerFn({ method: "POST" })
       mode,
       reply: turn.reply,
       correction: turn.observedError,
+      mistakeSaved,
+      recap,
       evidencePersisted,
       evidenceSkill: decision.assess ? decision.skill : null,
       coach: coach
@@ -256,11 +278,16 @@ export const loadTeacherSession = createServerFn({ method: "POST" })
     const { data: rows } = await query;
     const conversation = rows?.[0] ?? null;
 
+    // The chat is written, so its focus is only a skill it can practise and
+    // assess (grammar, vocabulary, writing): "Focus: speaking" misled students.
+    const chatSkill = (skill: string | null | undefined) =>
+      (TEACHER_EVIDENCE_SKILLS as readonly string[]).includes(skill ?? "") ? skill! : null;
     const focus =
-      pedagogicalContext.currentActivity?.skill ??
-      [...pedagogicalContext.skills].sort((a, b) => (a.score ?? 100) - (b.score ?? 100))[0]
-        ?.skill ??
-      null;
+      chatSkill(pedagogicalContext.currentActivity?.skill) ??
+      [...pedagogicalContext.skills]
+        .filter((item) => chatSkill(item.skill))
+        .sort((a, b) => (a.score ?? 100) - (b.score ?? 100))[0]?.skill ??
+      "grammar";
 
     return {
       context: {

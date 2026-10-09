@@ -46,7 +46,18 @@ export function teacherEvidenceDecision(
   const message = candidate.studentMessage.trim();
   if (wordCount(message) < 4) return { assess: false, reason: "too_short" };
   if (/^[^.!]*\?$/.test(message)) return { assess: false, reason: "question_only" };
-  return { assess: true, skill, score: candidate.suggestedScore };
+  return { assess: true, skill, score: capTeacherScore(candidate.suggestedScore, message) };
+}
+
+/**
+ * The model's score is only a suggestion: a short sentence cannot show full
+ * command of a skill, so it never reaches the top of the scale ("Perfect!"
+ * on a 5-word sentence must not become 100 in the skill profile).
+ */
+export function capTeacherScore(score: number, message: string): number {
+  const words = wordCount(message);
+  const cap = words < 8 ? 75 : words < 15 ? 90 : 100;
+  return Math.round(Math.min(score, cap));
 }
 
 /**

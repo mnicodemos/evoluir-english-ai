@@ -4,6 +4,7 @@
 
 import type { supabaseAdmin as SupabaseAdminClient } from "@/integrations/supabase/client.server";
 import { landingFunnel, type LandingStatRow } from "@/lib/landingStats";
+import { mistakeReviewReport, type MistakeReviewRow } from "@/lib/mistakeReviewReport";
 import { goalsReport } from "@/lib/plus";
 import { addDays, firstConversationStats, retentionReport } from "@/lib/retention";
 import { speakingWaitSummary } from "@/lib/speakingTiming";
@@ -224,4 +225,30 @@ export async function loadLandingFunnel(supabaseAdmin: SupabaseAdmin) {
     ),
     month: landingFunnel(rows, joined.length, 30),
   };
+}
+
+/**
+ * Admin "Do corrections stick?": My mistakes by source (AI Teacher, Writing),
+ * reviewed and answered right at the last review; admins left out.
+ */
+export async function loadMistakeReviewReport(supabaseAdmin: SupabaseAdmin) {
+  const PAGE = 1000;
+  const rows: (MistakeReviewRow & { user_id: string })[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabaseAdmin
+      .from("learning_errors")
+      .select("user_id, source, review_step, last_reviewed_at")
+      .in("source", ["teacher", "writing"])
+      .order("first_detected", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error("Mistakes could not be loaded");
+    rows.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+  }
+  const { data: admins } = await supabaseAdmin
+    .from("user_roles")
+    .select("user_id")
+    .eq("role", "admin");
+  const adminIds = new Set((admins ?? []).map((row) => row.user_id));
+  return mistakeReviewReport(rows.filter((row) => !adminIds.has(row.user_id)));
 }

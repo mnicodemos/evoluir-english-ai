@@ -19,12 +19,14 @@ const EXPLAIN_RE =
   /\b(why|what is|what's|what are|how do|how does|explain|difference between|when do i|meaning of|grammar rule)\b|\b(por que|porque|o que (é|significa)|explica|explicar|qual a diferença|quando usar)\b/i;
 const EXAMPLE_RE =
   /\b(example|examples|for instance|show me|give me a sentence)\b|\b(exemplo|exemplos|me d[êe] (um|uma))\b/i;
+// Asks, not ordinary words: "I took the train", "see you again" or "the
+// correct answer was" are conversation, not a practice/review/correction ask.
 const PRACTICE_RE =
-  /\b(practi[cs]e|exercise|exercises|quiz me|test me|drill|let'?s practi[cs]e|train)\b|\b(praticar|pr[áa]tica|exerc[íi]cio|me teste|treinar)\b/i;
+  /\b(let'?s practi[cs]e|i want to practi[cs]e|can we practi[cs]e|practi[cs]e (with me|more|this|that)|give me (an? )?(exercise|exercises|task|drill)|quiz me|test me|train me)\b|\b(praticar|pr[áa]tica|exerc[íi]cio|me teste|treinar)\b/i;
 const CORRECT_RE =
-  /\b(correct|correction|is this right|is it right|check my|did i write|fix my)\b|\b(corrig[ei]|corre[çc][ãa]o|est[áa] certo|est[áa] correto|verifica)\b/i;
+  /\b(correct (this|my|me|it)|is (this|it|that) (right|correct)|check my|did i write (it )?(right|correctly)|fix my|any mistakes)\b|\b(corrig[ei]|corre[çc][ãa]o|est[áa] certo|est[áa] correto|verifica)\b/i;
 const REVIEW_RE =
-  /\b(review|revise|remind me|what did (we|i) (study|learn)|summari[sz]e|recap|again)\b|\b(revis(ar|[ãa]o)|relembrar|o que (eu|n[óo]s) estudei|resumo|de novo)\b/i;
+  /\b(let'?s review|review (what|this|that|the)|revise (what|this|that)|remind me|what did (we|i) (study|learn)|summari[sz]e|recap|explain (it )?again|say (it )?again)\b|\b(revis(ar|[ãa]o)|relembrar|o que (eu|n[óo]s) estudei|resumo|de novo)\b/i;
 
 /** Sentence-ish English production: enough words and no question mark. */
 function looksLikeProduction(message: string): boolean {

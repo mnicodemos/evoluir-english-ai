@@ -115,3 +115,17 @@ describe("teacher prompt v2", () => {
     expect(system).toContain("No measured skills yet");
   });
 });
+
+describe("classifyTeacherMode keeps ordinary words in conversation", () => {
+  it("does not read train, again or correct inside a sentence as an ask", () => {
+    expect(classifyTeacherMode({ message: "I took the train to work today" })).toBe("CONVERSATION");
+    expect(classifyTeacherMode({ message: "I hope to see my friends again soon" })).toBe(
+      "CONVERSATION",
+    );
+    expect(classifyTeacherMode({ message: "I think the correct answer was the second one" })).toBe(
+      "CONVERSATION",
+    );
+    expect(classifyTeacherMode({ message: "Is this correct? I goes to school" })).toBe("CORRECT");
+    expect(classifyTeacherMode({ message: "Can you explain it again?" })).toBe("REVIEW");
+  });
+});

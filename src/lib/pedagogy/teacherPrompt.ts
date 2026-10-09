@@ -29,12 +29,21 @@ export type TeacherContextForPrompt = {
   recurringErrors: string[];
 };
 
+/** The main mistake of the student's message, saved for "My mistakes". */
+export type TeacherMistake = {
+  original: string;
+  corrected: string;
+  explanation: string;
+  category: string;
+};
+
 export type TeacherTurn = {
   reply: string;
   assessable: boolean;
   focusSkill: TeacherEvidenceSkill | null;
   suggestedScore: number | null;
   observedError: string | null;
+  mistake: TeacherMistake | null;
 };
 
 const teacherTurnSchema = z
@@ -44,6 +53,15 @@ const teacherTurnSchema = z
     focus_skill: z.enum(TEACHER_EVIDENCE_SKILLS).nullable().optional(),
     suggested_score: z.number().finite().min(0).max(100).nullable().optional(),
     observed_error: z.string().trim().max(300).nullable().optional(),
+    mistake: z
+      .object({
+        original: z.string().trim().min(1).max(300),
+        corrected: z.string().trim().min(1).max(300),
+        explanation: z.string().trim().max(500).default(""),
+        category: z.string().trim().max(40).default("grammar"),
+      })
+      .nullable()
+      .optional(),
   })
   .strict();
 
@@ -91,6 +109,8 @@ export function teacherTurnMessages(input: {
   mode?: TeacherMode;
   /** Server-built coach session block (coach mode only). */
   coachBlock?: string;
+  /** Server-decided: this reply closes a stretch of free chat with a recap. */
+  recap?: boolean;
 }): AiMsg[] {
   const mode =
     input.mode ?? classifyTeacherMode({ message: input.studentMessage, history: input.history });
@@ -110,18 +130,37 @@ export function teacherTurnMessages(input: {
     ...(input.coachBlock ? [input.coachBlock, ""] : []),
     `LEVEL REGISTER: ${register}`,
     REGISTER_RULES[register],
+    ...(register === "beginner"
+      ? [
+          '- Portuguese support: when the student writes in Portuguese or repeats the same kind of mistake from the recent messages, add ONE short line in Brazilian Portuguese starting exactly with "Em português:" that explains the point. Everything else stays in English.',
+        ]
+      : []),
     "",
     "PEDAGOGICAL RULES",
     "- Teach: explain the point briefly, then ask ONE question or give ONE short practice task.",
     "- Adapt to the level in CONTEXT. Never assume knowledge the context does not support.",
     "- Correct the student's English when they produce language: name the mistake, explain it in one line, show the correct form, then ask them to try a similar sentence.",
     "- Make the student produce the answer. Do not simply hand over the finished answer when the goal is learning.",
-    `- Keep the whole reply under ${modeWordBudget(mode)} words. Plain English, no lists longer than 3 items, no emojis.`,
+    `- Keep the whole reply under ${modeWordBudget(mode) + (input.recap ? 30 : 0)} words. Plain English, no lists longer than 3 items, no emojis.`,
     "- When giving examples, model sentences, useful words, or asking the student to write something, put them in a new paragraph as bullet points (markdown list).",
     // The chat highlights these two exact line formats (see formatTeacherReply).
     '- When you correct the student, put the corrected sentence alone on its own line, starting exactly with "Correct form: ".',
     '- When you offer the student ideas or topics to write or talk about, put each on its own line as "Idea 1: ...", "Idea 2: ..." (at most 3).',
     "- Never mention scores, CEFR letters as a verdict, internal data, other students or system details.",
+    "",
+    "PRACTICE TASKS",
+    '- Every task starts with ONE line saying exactly what to do (for example "Fill the gap with the correct article:" or "Rewrite the sentence in the past:"), then shows ONE solved example, then the item(s) for the student.',
+    "- A gap is always shown as ___ and the student must know what kind of word goes there.",
+    "- Pitch every task at the student's CEFR level in CONTEXT: never practise a point clearly below it unless the student just got that point wrong.",
+    "- Connect the task to what the student just wrote or asked, not to a random topic.",
+    ...(input.recap
+      ? [
+          "",
+          "RECAP (this reply closes this part of the session)",
+          '- After answering, end with two short lines: "Today you practised: ..." (the point or points of the recent messages) and "To review: ..." (the student\'s main mistake in these messages and its correct form, or one useful expression when there was no mistake).',
+          "- Then invite the student to continue or to open My mistakes later.",
+        ]
+      : []),
     "",
     "CONTINUITY",
     "- Use the recent messages: do not repeat an explanation you already gave, and do not ask again something the student already answered.",
@@ -136,8 +175,11 @@ export function teacherTurnMessages(input: {
       '"assessable":true only when the student PRODUCED English that shows command (or lack of command) of a skill,' +
       `"focus_skill":one of ${TEACHER_EVIDENCE_SKILLS.join("|")} or null,` +
       '"suggested_score":0-100 quality of that production or null,' +
-      '"observed_error":"one short description of the main mistake" or null}',
+      '"observed_error":"one short description of the main mistake" or null,' +
+      '"mistake":{"original":"the exact wrong words copied from the student\'s LAST message","corrected":"the same words, corrected","explanation":"one short line","category":"grammar|vocabulary|spelling|word order"} or null}',
     "Set assessable=false for questions, greetings, requests for explanation, Portuguese-only messages or anything that is not the student's own English production. suggested_score is only a suggestion; it is not an official grade.",
+    "Set mistake only for a real mistake in the student's LAST message (never for style preferences); original must be copied exactly from that message, as short as possible (the wrong words plus 1-3 words around them).",
+    "SCORING (suggested_score): 90-100 accurate AND varied, natural language at or above the student's level; 75-89 accurate but simple or with one small slip; 55-74 understandable with clear mistakes; below 55 hard to understand. A short, very simple correct sentence is 60-75, never 100.",
   ].join("\n");
 
   return [
@@ -168,5 +210,6 @@ export function parseTeacherTurn(raw: string): TeacherTurn {
     focusSkill: parsed.data.focus_skill ?? null,
     suggestedScore: parsed.data.suggested_score ?? null,
     observedError: parsed.data.observed_error ?? null,
+    mistake: parsed.data.mistake ?? null,
   };
 }
