@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { geminiUsageTokens, type GeminiUsageMetadata } from "@/lib/aiPricing";
 import { authenticateApiRequest } from "@/lib/api-auth.server";
 import {
   AiUsageError,
@@ -184,6 +185,9 @@ export const Route = createFileRoute("/api/speech")({
         let sentAudio = false;
         let firstAudioAt = 0;
         const audioChunks: string[] = [];
+        // Gemini sends the token counts with the stream (the last event carries
+        // the totals); they price the call (user request: measure TTS cost).
+        let usage: GeminiUsageMetadata | undefined;
         let settled = false;
         // Closing the usage record exactly once keeps the "one request at a
         // time" guard from staying locked when the listener stops the audio.
@@ -192,6 +196,7 @@ export const Route = createFileRoute("/api/speech")({
           settled = true;
           await finishAiUsage(ticket, {
             success,
+            ...(geminiUsageTokens(usage) ?? {}),
             ...(firstAudioAt ? { firstChunkAt: firstAudioAt } : {}),
             ...(errorCode ? { errorCode, errorMessage: errorMessage ?? errorCode } : {}),
           });
@@ -213,7 +218,9 @@ export const Route = createFileRoute("/api/speech")({
                     candidates?: Array<{
                       content?: { parts?: Array<{ inlineData?: { data?: string } }> };
                     }>;
+                    usageMetadata?: GeminiUsageMetadata;
                   };
+                  if (payload.usageMetadata) usage = payload.usageMetadata;
                   for (const candidate of payload.candidates ?? []) {
                     for (const part of candidate.content?.parts ?? []) {
                       const audio = part.inlineData?.data;
