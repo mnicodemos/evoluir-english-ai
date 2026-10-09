@@ -12,8 +12,11 @@ import {
 } from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
+import reviewGrammar from "@/assets/review-grammar.webp";
 import reviewMistakes from "@/assets/review-mistakes.webp";
+import reviewPronunciation from "@/assets/review-pronunciation.webp";
 import reviewReading from "@/assets/review-reading.webp";
+import reviewSpeaking from "@/assets/review-speaking.webp";
 import reviewWords from "@/assets/review-words.webp";
 import reviewWriting from "@/assets/review-writing.jpg.asset.json";
 
@@ -371,9 +374,13 @@ export function SmartReviewCard({
   );
 }
 
+// The owner's photos (user request); a skill without one falls back to its icon.
 const SKILL_PHOTO = {
+  grammar: reviewGrammar,
   listening: reviewListening.url,
+  pronunciation: reviewPronunciation,
   reading: reviewReading,
+  speaking: reviewSpeaking,
   vocabulary: reviewWords,
   writing: reviewWriting.url,
 } as const;
