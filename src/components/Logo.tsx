@@ -4,7 +4,8 @@ import symbolLight from "@/assets/evoluir-symbol-light.webp";
 /**
  * The Evoluir+ symbol (owner's artwork: the flowing strokes with the
  * turquoise geometry above), cut tight on a transparent background. The size
- * class sets its height; the width follows the artwork (about 1:2), so it is
+ * class sets its slot height and the artwork fills 90% of it (user request:
+ * 10% smaller); the width follows the artwork (about 1:2), so it is
  * never stretched and sits right next to the app name. Dark screens get light
  * strokes; light screens dark strokes. The dark-screen image comes first,
  * since every screen of the app is dark (the first image is the visible one).
@@ -17,14 +18,14 @@ export function Logo({ className = "size-[2.2rem]" }: { className?: string }) {
         alt="Evoluir+ English AI logo"
         width={255}
         height={512}
-        className="hidden h-full w-auto dark:block"
+        className="hidden h-[90%] w-auto dark:block"
       />
       <img
         src={symbolDark}
         alt="Evoluir+ English AI logo"
         width={255}
         height={512}
-        className="block h-full w-auto dark:hidden"
+        className="block h-[90%] w-auto dark:hidden"
       />
     </span>
   );
