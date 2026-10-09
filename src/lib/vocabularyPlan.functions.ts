@@ -250,31 +250,45 @@ async function buildDailyWords(
   }
 
   const byTitle = new Map(lessonList.map((l) => [l.title.toLowerCase(), l]));
-  const { data: inserted, error } = await supabase
-    .from("vocabulary")
-    .insert(
-      fresh.map((w) => {
-        const lesson = byTitle.get(String(w.lesson_title ?? "").toLowerCase());
-        return {
-          word: String(w.word).slice(0, 120),
-          translation: String(w.translation).slice(0, 200),
-          meaning: String(w.meaning ?? "").slice(0, 400),
-          pronunciation: String(w.pronunciation ?? "").slice(0, 120),
-          example: String(w.example ?? "").slice(0, 400),
-          category: lesson?.category ?? "general",
-          difficulty: ["easy", "medium", "hard"].includes(String(w.difficulty))
-            ? String(w.difficulty)
-            : "medium",
-          lesson_id: lesson?.id ?? null,
-          level: data.level,
-          created_by: userId,
-          offered_for: today,
-          batch_key: batchKey,
-        };
-      }),
-    )
-    .select(SELECT);
+  const rows = fresh.map((w) => {
+    const lesson = byTitle.get(String(w.lesson_title ?? "").toLowerCase());
+    return {
+      word: String(w.word).slice(0, 120),
+      translation: String(w.translation).slice(0, 200),
+      meaning: String(w.meaning ?? "").slice(0, 400),
+      pronunciation: String(w.pronunciation ?? "").slice(0, 120),
+      example: String(w.example ?? "").slice(0, 400),
+      category: lesson?.category ?? "general",
+      difficulty: ["easy", "medium", "hard"].includes(String(w.difficulty))
+        ? String(w.difficulty)
+        : "medium",
+      lesson_id: lesson?.id ?? null,
+      level: data.level,
+      created_by: userId,
+      offered_for: today,
+      batch_key: batchKey,
+    };
+  });
+  const { data: inserted, error } = await supabase.from("vocabulary").insert(rows).select(SELECT);
 
-  if (error) throw new Error(error.message);
-  return [...todays, ...((inserted ?? []) as DailyWord[])].slice(0, DAILY_COUNT);
+  let saved = (inserted ?? []) as DailyWord[];
+  if (error) {
+    if (error.code !== "23505") throw new Error(error.message);
+    // A word that already exists elsewhere (another level, or the old global
+    // "one row per word" constraint until migration 0056 is applied) must not
+    // throw away the whole batch: the words are saved one by one and only the
+    // clashing ones are skipped.
+    saved = [];
+    for (const row of rows) {
+      const one = await supabase.from("vocabulary").insert(row).select(SELECT).maybeSingle();
+      if (one.error) {
+        if (one.error.code !== "23505") throw new Error(one.error.message);
+        continue;
+      }
+      if (one.data) saved.push(one.data as DailyWord);
+    }
+    if (!saved.length && !todays.length)
+      throw new Error("The AI could not pick today's words. Please try again in a moment.");
+  }
+  return [...todays, ...saved].slice(0, DAILY_COUNT);
 }

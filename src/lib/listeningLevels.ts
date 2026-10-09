@@ -166,6 +166,11 @@ export function listeningLevelConfig(level: string | null | undefined): Listenin
   return CONFIGS[info.value] ?? CONFIGS["b2"]!;
 }
 
+/** Every built-in drill of every level (the server accepts them as course content). */
+export function allListeningSentences(): string[] {
+  return Object.values(CONFIGS).flatMap((config) => config.sentences);
+}
+
 export function countWords(sentence: string) {
   return sentence.replace(/\s+/g, " ").trim().split(" ").filter(Boolean).length;
 }

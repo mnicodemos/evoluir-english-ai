@@ -13,6 +13,13 @@ export const telemetryInputSchema = z
       "writing_practice",
       "lesson_practice",
       "final_test_practice",
+      // Finished-by-leaving activities: the flashcard review, the AI Teacher
+      // chat and the My mistakes reviews have no "finish" button, so their
+      // time is saved when the student leaves the screen.
+      "flashcards",
+      "teacher",
+      "mistakes_review",
+      "video_call",
     ]),
     minutes: z.number().int().min(1).max(1440),
   })

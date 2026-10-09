@@ -10,8 +10,10 @@ import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useProfile } from "@/hooks/useProfile";
+import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { isMistakeDue, MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
+import { findMistakeSentence, type MistakeSentence } from "@/lib/mistakeSentence";
 import { practiceMistake, reviewMistake } from "@/lib/mistakes.functions";
 import type { MistakePractice } from "@/lib/mistakePractice";
 import { cn } from "@/lib/utils";
@@ -38,6 +40,8 @@ type MistakeRow = {
   frequency: number;
   review_step: number;
   next_review_at: string;
+  /** The whole sentence of the student's text, when it can be found. */
+  sentence: MistakeSentence | null;
 };
 
 type Outcome = { correct: boolean; corrected: string; explanation: string };
@@ -51,6 +55,14 @@ function Mistakes() {
   const [checking, setChecking] = useState(false);
   // Ids answered in this visit, so the queue moves on even before the refetch.
   const [answered, setAnswered] = useState<string[]>([]);
+  // Reviewing mistakes counts toward today's minutes once something was answered.
+  const minutesSpent = useTimeSpent();
+  useLogTimeOnExit({
+    timer: minutesSpent,
+    profile: answered.length > 0 ? profile : null,
+    type: "mistakes_review",
+    title: "My mistakes review",
+  });
 
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["mistakes", profile?.id],
@@ -65,7 +77,19 @@ function Mistakes() {
         .order("last_detected", { ascending: false })
         .limit(200);
       if (error) throw error;
-      return data ?? [];
+      // The student's own Writing texts give back the whole sentence of each
+      // mistake; without them the saved phrase is shown on its own.
+      const { data: texts } = await supabase
+        .from("writing_submissions")
+        .select("original_text")
+        .eq("user_id", profile!.id)
+        .order("created_at", { ascending: false })
+        .limit(200);
+      const sources = (texts ?? []).map((row) => row.original_text ?? "");
+      return (data ?? []).map((row) => ({
+        ...row,
+        sentence: findMistakeSentence(row.original_text, sources),
+      }));
     },
   });
 
@@ -145,9 +169,25 @@ function Mistakes() {
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">Correct this sentence:</p>
-              <p className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 font-medium">
-                {current.original_text}
+              <p className="text-sm text-muted-foreground">
+                {current.sentence ? "Correct the marked part:" : "Correct this sentence:"}
+              </p>
+              <p
+                translate="no"
+                lang="en"
+                className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 font-medium"
+              >
+                {current.sentence ? (
+                  <>
+                    {current.sentence.before}
+                    <mark className="rounded bg-destructive/20 px-0.5 text-destructive underline decoration-wavy underline-offset-4">
+                      {current.sentence.wrong}
+                    </mark>
+                    {current.sentence.after}
+                  </>
+                ) : (
+                  current.original_text
+                )}
               </p>
               {outcome ? (
                 <div className="space-y-2">
@@ -164,8 +204,22 @@ function Mistakes() {
                     )}
                     {outcome.correct ? "Correct!" : "Not quite."}
                   </p>
-                  <p className="rounded-lg border border-primary/30 bg-primary/5 p-3 font-medium">
-                    {outcome.corrected}
+                  <p
+                    translate="no"
+                    lang="en"
+                    className="rounded-lg border border-primary/30 bg-primary/5 p-3 font-medium"
+                  >
+                    {current.sentence ? (
+                      <>
+                        {current.sentence.before}
+                        <span className="rounded bg-primary/20 px-0.5 text-primary">
+                          {outcome.corrected}
+                        </span>
+                        {current.sentence.after}
+                      </>
+                    ) : (
+                      outcome.corrected
+                    )}
                   </p>
                   {outcome.explanation && (
                     <p className="text-sm text-muted-foreground">{outcome.explanation}</p>
@@ -183,14 +237,39 @@ function Mistakes() {
                     void check();
                   }}
                 >
-                  <Input
-                    value={answer}
-                    onChange={(event) => setAnswer(event.target.value)}
-                    placeholder="Type the corrected sentence"
-                    autoComplete="off"
-                    autoCapitalize="off"
-                    spellCheck={false}
-                  />
+                  {current.sentence ? (
+                    // The whole sentence again, with a space only where the
+                    // correction goes (user request).
+                    <p
+                      translate="no"
+                      lang="en"
+                      className="min-w-0 flex-1 rounded-lg border border-border p-3 font-medium leading-[2.4]"
+                    >
+                      {current.sentence.before}
+                      <input
+                        value={answer}
+                        onChange={(event) => setAnswer(event.target.value)}
+                        aria-label="Type the correction"
+                        autoComplete="off"
+                        autoCapitalize="off"
+                        spellCheck={false}
+                        style={{
+                          width: `${Math.min(Math.max(current.sentence.wrong.length, 6) + 3, 28)}ch`,
+                        }}
+                        className="mx-0.5 inline-block h-9 max-w-full rounded-md border border-primary/50 bg-background px-2 py-0 align-middle leading-normal text-primary outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                      />
+                      {current.sentence.after}
+                    </p>
+                  ) : (
+                    <Input
+                      value={answer}
+                      onChange={(event) => setAnswer(event.target.value)}
+                      placeholder="Type the corrected sentence"
+                      autoComplete="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                    />
+                  )}
                   <Button type="submit" disabled={checking || !answer.trim()}>
                     {checking ? <Loader2 className="size-4 animate-spin" /> : "Check"}
                   </Button>
@@ -216,8 +295,25 @@ function Mistakes() {
             <ul className="max-h-[50vh] space-y-1.5 overflow-y-auto pr-1 lg:max-h-[60vh]">
               {rows.map((row) => (
                 <li key={row.id} className="rounded-lg border border-border/60 p-2 text-sm">
-                  <p className="text-muted-foreground line-through">{row.original_text}</p>
-                  <p className="font-medium">{row.corrected_text}</p>
+                  {row.sentence ? (
+                    <p translate="no" lang="en">
+                      {row.sentence.before}
+                      <del className="text-destructive">{row.sentence.wrong}</del>{" "}
+                      <ins className="font-medium text-primary no-underline">
+                        {row.corrected_text}
+                      </ins>
+                      {row.sentence.after}
+                    </p>
+                  ) : (
+                    <>
+                      <p translate="no" className="text-muted-foreground line-through">
+                        {row.original_text}
+                      </p>
+                      <p translate="no" className="font-medium">
+                        {row.corrected_text}
+                      </p>
+                    </>
+                  )}
                   <div className="mt-1 flex gap-1" aria-hidden>
                     {Array.from({ length: MISTAKE_MASTERED_STEP }, (_, step) => (
                       <span

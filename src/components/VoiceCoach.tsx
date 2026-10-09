@@ -65,12 +65,6 @@ export function VoiceCoach({
   const { data: snapshot } = useStudySnapshot();
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
-  useLogTimeOnExit({
-    timer: minutesSpent,
-    profile,
-    type: "conversation_practice",
-    title: "Speaking practice",
-  });
   // The conversation always follows the CEFR level the student actually reached.
   const cefrLevel = getLevelState(profile?.level).current.value;
   const [scenario, setScenario] = useState<string | null>(null);
@@ -79,6 +73,18 @@ export function VoiceCoach({
   // The video call is an informal chat with EVO; AI Speaking stays a lesson.
   const callStyle = { casual: presentation === "call", name: profile?.name ?? undefined };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // Time left unsaved when the student leaves. On the video call (user
+  // request) it counts toward today's minutes once the student has spoken,
+  // even when the call ends before the report; AI Speaking keeps it as
+  // practice telemetry until the session is finished.
+  const spokeOnCall =
+    presentation === "call" && messages.some((message) => message.role === "user");
+  useLogTimeOnExit({
+    timer: minutesSpent,
+    profile: presentation === "call" && !spokeOnCall ? null : profile,
+    type: presentation === "call" ? "video_call" : "conversation_practice",
+    title: presentation === "call" ? "Video call with EVO" : "Speaking practice",
+  });
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [report, setReport] = useState<ConversationReport | null>(null);
   const [finishing, setFinishing] = useState(false);

@@ -182,6 +182,8 @@ function ListeningPage() {
   const [attempts, setAttempts] = useState(0);
   const [best, setBest] = useState(0);
   const [playing, setPlaying] = useState(false);
+  // Repeating is only possible after the sentence was heard (user request).
+  const [heard, setHeard] = useState(false);
   // "REVEAL" shows up for 5 seconds after the audio ends, in case the student didn't catch the sentence.
   const [canReveal, setCanReveal] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -206,6 +208,7 @@ function ListeningPage() {
     setCanReveal(false);
     setAttempts(0);
     setBest(0);
+    setHeard(false);
   }, [index]);
 
   // A new round of sentences is unlocked every time the student starts a new lesson.
@@ -309,6 +312,7 @@ function ListeningPage() {
       toast.error(error instanceof Error ? error.message : "Audio is unavailable right now.");
     } finally {
       setPlaying(false);
+      setHeard(true);
       setCanReveal(true);
       // REVEAL is available for 5s after audio; only stays fixed on the third attempt.
       window.setTimeout(
@@ -324,6 +328,7 @@ function ListeningPage() {
 
   useEffect(() => {
     setShadowResult(null);
+    setHeard(false);
   }, [index, sentence]);
 
   /** Plays the sentence while recording, so the student speaks along with it. */
@@ -653,7 +658,9 @@ function ListeningPage() {
                 </div>
               ) : (
                 <div className="space-y-1 text-center">
-                  <p className="text-sm font-medium">Now repeat the sentence out loud</p>
+                  <p className="text-sm font-medium">
+                    {heard ? "Now repeat the sentence out loud" : "Play the sentence first"}
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     Record your voice and the AI checks which words you understood and repeated.
                   </p>
@@ -667,7 +674,11 @@ function ListeningPage() {
                       <Square className="mr-2 size-4" /> Stop and check
                     </Button>
                   ) : (
-                    <Button size="lg" onClick={startRepeat} disabled={checking || playing}>
+                    <Button
+                      size="lg"
+                      onClick={startRepeat}
+                      disabled={checking || playing || !heard}
+                    >
                       <Mic className="mr-2 size-4" />{" "}
                       {checking
                         ? "Checking..."
