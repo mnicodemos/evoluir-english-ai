@@ -3,7 +3,7 @@ import { SKILL_ORDER, type CurriculumLesson } from "@/lib/curriculum";
 import { findLevel } from "@/lib/level";
 
 /**
- * Business English (user decision): a Premium bonus track from B1. Five
+ * Business English (user decision): a Premium bonus track from B1. Six
  * units of six lessons in the same lesson format as the learning path
  * (video, flashcards, quiz), written by the AI at the student's own level and
  * shared per level like path lessons. It never counts toward the level's
@@ -155,6 +155,35 @@ const UNITS: BusinessUnit[] = [
       ],
     ],
   },
+  {
+    title: "Unit 6 — Networking and Small Talk",
+    lessons: [
+      [
+        "Following Small Talk at Events",
+        "Understand introductions, small talk and follow-up offers at work events.",
+      ],
+      [
+        "Reading Professional Profiles",
+        "Read short professional profiles and find roles, experience and shared interests.",
+      ],
+      [
+        "Introducing Yourself Professionally",
+        "Introduce yourself, your role and your company, and keep a short conversation going.",
+      ],
+      [
+        "Writing a Networking Message",
+        "Write a short message to connect with someone you met and suggest a next step.",
+      ],
+      [
+        "Networking Expressions",
+        "Use expressions to start, keep and close a professional conversation.",
+      ],
+      [
+        "Questions and Question Tags",
+        "Use direct, indirect and tag questions to keep small talk polite and natural.",
+      ],
+    ],
+  },
 ];
 
 /** True when the student's level opens the Business track (B1 and above). */
@@ -167,7 +196,7 @@ export function isBusinessKey(key: string | null | undefined) {
   return !!key && key.startsWith(BUSINESS_KEY_PREFIX);
 }
 
-/** The 30 Business lessons, written at the student's level (B1 at least). */
+/** The 36 Business lessons, written at the student's level (B1 at least). */
 export function getBusinessCourse(level: string | null | undefined): CurriculumLesson[] {
   const value = findLevel(level).value;
   const cefr = businessLevelAllowed(value) ? value : BUSINESS_MIN_LEVEL;
