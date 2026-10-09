@@ -588,7 +588,7 @@ export const uiPt: Record<string, string> = {
   "Reactivate Premium": "Reativar o Premium",
   "Premium · day {day} of 10": "Premium · dia {day} de 10",
   "Today's Premium mission": "Missão Premium de hoje",
-  "Daily goal reached": "Meta diária atingida",
+  "Daily goal reached!": "Meta diária atingida!",
   "Goal OK": "Meta OK",
   "Your progress": "Sua evolução",
   "My Progress": "Meu progresso",
