@@ -13,9 +13,10 @@ export const AI_MODEL_PRICING: Record<
 > = {
   "gemini-3.5-flash-lite": { inputPricePerMillionTokens: 0.3, outputPricePerMillionTokens: 2.5 },
   "gemini-3.5-flash": { inputPricePerMillionTokens: 1.5, outputPricePerMillionTokens: 9.0 },
-  // Standard tier, effective through 2026-12-31 (Google doubles it on 2027-01-01);
-  // output includes thinking tokens. Read 2026-10-06.
-  "gemini-3.6-flash": { inputPricePerMillionTokens: 1.5, outputPricePerMillionTokens: 7.5 },
+  // What Google actually billed (owner's billing report, 1-9 Oct 2026, BRL at
+  // the report's USD 1 = 5.93): input 343,937 tokens R$ 1.53, output 232,140
+  // R$ 5.16. Half the list price read on 2026-10-06; output includes thinking.
+  "gemini-3.6-flash": { inputPricePerMillionTokens: 0.75, outputPricePerMillionTokens: 3.75 },
   // TTS: text in, audio out. Google's published price for this preview model
   // (text input $0.50, audio output $10.00 per 1M tokens); the pricing page
   // could not be re-read on 2026-10-09, so confirm it in the Google console.

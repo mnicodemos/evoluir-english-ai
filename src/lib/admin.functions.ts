@@ -171,11 +171,13 @@ type BenchmarkCacheRow = {
 };
 
 /**
- * Cost of one call: the stored estimate, or one computed now from its tokens,
- * so a price added to the table later also prices earlier calls.
+ * Cost of one call, computed now from its tokens with the current price table
+ * (a price added or corrected later, e.g. gemini-3.6-flash on 2026-10-09 from
+ * the owner's Google billing, re-prices earlier calls too); the stored estimate
+ * is only used when the model has no price in the table.
  */
 function rowCost(row: BenchmarkUsageRow): number | null {
-  return row.estimated_cost ?? estimateAiCost(row.model, row.input_tokens, row.output_tokens);
+  return estimateAiCost(row.model, row.input_tokens, row.output_tokens) ?? row.estimated_cost;
 }
 
 function isCancellation(row: BenchmarkUsageRow): boolean {
