@@ -10,8 +10,8 @@ export const GRAPHITE = {
 
 /** Tailwind classes for panels built on Radix/shadcn (Popover, Dropdown, etc.). */
 export const graphitePanelClass =
-  "border border-white/10 bg-[rgb(26_28_32/0.55)] text-slate-100 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.55)] backdrop-blur-xl backdrop-saturate-150";
+  "graphite-panel border border-white/10 bg-[rgb(26_28_32/0.4)] text-slate-100 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.55)] backdrop-blur-[8px] backdrop-saturate-150";
 
 /** Round icon buttons on the same graphite surface (mobile header: weather and bell). */
 export const graphiteIconButtonClass =
-  "border border-white/10 bg-[rgb(26_28_32/0.55)] text-slate-100 backdrop-blur-xl hover:bg-[rgb(40_42_48/0.85)] hover:text-white";
+  "border border-white/10 bg-[rgb(26_28_32/0.35)] text-slate-100 backdrop-blur-xl hover:bg-[rgb(40_42_48/0.85)] hover:text-white";

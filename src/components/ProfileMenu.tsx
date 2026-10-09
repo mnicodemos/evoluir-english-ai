@@ -216,7 +216,7 @@ export function ProfileMenu({
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="dashboard-shell dark max-w-md shadow-[var(--shadow-soft)]">
+      <DialogContent className="dashboard-shell dark max-w-md border-border shadow-[var(--shadow-soft)]">
         <DialogHeader>
           <DialogTitle>{translate("Profile", lang)}</DialogTitle>
           <DialogDescription>
