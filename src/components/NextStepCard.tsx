@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { EvoGuide } from "@/components/EvoGuide";
@@ -324,6 +325,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <div className="mt-2 sm:mt-0">
                   {/* No level badge here: next to the priority it read as part of it,
                       and the level already shows in the reason line. */}
+                  <ScopeBadge
+                    kind="continuous"
+                    translate={t}
+                    className="mb-2 hidden sm:inline-flex"
+                  />
                   <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:text-xs sm:font-bold sm:tracking-[0.08em] sm:text-brand-green">
                     {t("TODAY'S PRIORITY")}
                   </p>

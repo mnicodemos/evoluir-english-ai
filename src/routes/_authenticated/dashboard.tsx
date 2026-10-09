@@ -29,6 +29,7 @@ import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
 import { businessLevelAllowed } from "@/lib/businessCourse";
 import { PathProgressCard } from "@/components/PathProgressCard";
+import { ScopeBadge } from "@/components/ScopeBadge";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
 
@@ -460,6 +461,7 @@ function Dashboard() {
                 <h2 id="today-progress-title" className="font-display text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
+                <ScopeBadge kind="today" translate={t} className="ml-auto hidden lg:inline-flex" />
                 {/* Mobile: My Progress left the bottom navigation; it opens from the
                     title line, so the card keeps its height. Desktop has its button below. */}
                 <Link

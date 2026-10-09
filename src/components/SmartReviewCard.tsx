@@ -19,6 +19,7 @@ import reviewWriting from "@/assets/review-writing.jpg.asset.json";
 import { EvoGuide } from "@/components/EvoGuide";
 import { LearningMomentum } from "@/components/LearningMomentum";
 import { PathProgressCard } from "@/components/PathProgressCard";
+import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
@@ -100,7 +101,7 @@ export function SmartReviewCard({
         className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
         aria-labelledby="smart-review-title"
       >
-        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
           <BookOpen
             className="size-[1.65rem] text-dashboard-cyan"
             strokeWidth={2.5}
@@ -109,6 +110,7 @@ export function SmartReviewCard({
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
             {t("Keep improving")}
           </h2>
+          <ScopeBadge kind="continuous" translate={t} />
         </div>
         {measured ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
@@ -147,6 +149,7 @@ export function SmartReviewCard({
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
             {t("Keep improving")}
           </h2>
+          <ScopeBadge kind="continuous" translate={t} />
         </div>
         <ul
           className={`mt-3 grid flex-1 gap-2 overflow-hidden xl:mt-4 xl:gap-2 ${
