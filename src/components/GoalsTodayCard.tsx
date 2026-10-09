@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronRight, Flame, Loader2, Plus, Target } from "lucide-react";
+import { Check, ChevronRight, Flame, Loader2, MessageSquareText, Plus, Target } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -139,6 +139,7 @@ export function GoalsTodayCard() {
             return (
               <GoalTile
                 key={goal.id}
+                goalId={goal.id}
                 title={goal.title}
                 step={step}
                 week={plusGoalWeek(recent, goal.id, data?.today ?? "")}
@@ -182,6 +183,7 @@ export function GoalsTodayCard() {
  * celebration that says what the tick is worth.
  */
 function GoalTile({
+  goalId,
   title,
   step,
   week,
@@ -192,6 +194,7 @@ function GoalTile({
   onToggle,
   t,
 }: {
+  goalId: string;
   title: string;
   step: PlusStep | null;
   week: PlusGoalWeek;
@@ -235,6 +238,16 @@ function GoalTile({
           >
             {step?.text ?? "…"}
           </p>
+          {/* Secondary on purpose (user decision): the goal's English, with EVO. */}
+          <Link
+            to="/coach"
+            search={{ goal: goalId }}
+            className="mt-1 inline-flex items-center gap-1 rounded text-[11px] font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+          >
+            <MessageSquareText className="size-3.5 shrink-0" aria-hidden="true" />
+            {t("Practise it in English with EVO")}
+            <ChevronRight className="size-3 shrink-0" aria-hidden="true" />
+          </Link>
         </div>
       </div>
 
