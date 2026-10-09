@@ -69,9 +69,19 @@ export function useTimeSpent(options?: { manual?: boolean }): TimeSpent {
     const events = ["pointerdown", "keydown", "input", "scroll"] as const;
     for (const e of events) document.addEventListener(e, onActivity, { passive: true });
     onActivity();
+    // Watching or listening needs no touch: a lesson video that is playing,
+    // or an embedded (YouTube) player the student tapped into, keeps the
+    // clock running; otherwise a 10-minute video counted as one minute.
+    const watching = setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      const media = Array.from(document.querySelectorAll("video, audio")) as HTMLMediaElement[];
+      const playing = media.some((element) => !element.paused && !element.ended);
+      if (playing || document.activeElement?.tagName === "IFRAME") onActivity();
+    }, 15_000);
     return () => {
       for (const e of events) document.removeEventListener(e, onActivity);
       if (idle) clearTimeout(idle);
+      clearInterval(watching);
     };
   }, [manual, flush, resume]);
 
@@ -132,7 +142,10 @@ export function useLogTimeOnExit(params: {
               | "conversation_practice"
               | "writing_practice"
               | "lesson_practice"
-              | "final_test_practice",
+              | "final_test_practice"
+              | "flashcards"
+              | "teacher"
+              | "mistakes_review",
             minutes,
           },
         });

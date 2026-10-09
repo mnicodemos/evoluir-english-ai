@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { useProfile } from "@/hooks/useProfile";
+import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { loadTeacherSession, teacherTurn } from "@/lib/aiTeacher.functions";
 import {
   buildTeacherHistory,
@@ -88,6 +90,17 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   const [started, setStarted] = useState(false);
   const [mode, setMode] = useState<string | null>(null);
   const [coachActive, setCoachActive] = useState(false);
+
+  // Time with the AI Teacher counts toward today's minutes once the student
+  // has written at least one message (saved when leaving the screen).
+  const { data: profile } = useProfile();
+  const minutesSpent = useTimeSpent();
+  useLogTimeOnExit({
+    timer: minutesSpent,
+    profile: messages.some((message) => message.role === "user") ? profile : null,
+    type: "teacher",
+    title: "AI Teacher",
+  });
   const [coachState, setCoachState] = useState<{
     stage: string;
     turn: number;
@@ -180,7 +193,9 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   const ctx = session.data?.context;
 
   return (
-    <div className="flex w-full max-w-none flex-col gap-3 sm:gap-4">
+    // Phones: the page is exactly one screen tall (main padding and the bottom
+    // navigation taken out) and the conversation takes all the free height.
+    <div className="flex h-[calc(100dvh-7.5rem-env(safe-area-inset-bottom))] w-full max-w-none flex-col gap-3 sm:h-auto sm:gap-4">
       <header className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
@@ -251,7 +266,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
         />
       )}
 
-      <Card className="flex h-[min(47dvh,38rem)] min-h-[16rem] flex-col overflow-hidden p-0 sm:h-[min(62dvh,42rem)] sm:min-h-[22.5rem]">
+      <Card className="flex min-h-[16rem] flex-1 flex-col overflow-hidden p-0 sm:h-[min(62dvh,42rem)] sm:min-h-[22.5rem] sm:flex-none">
         <Conversation className="flex-1">
           <ConversationContent className="gap-6 p-4">
             {messages.length === 0 && (

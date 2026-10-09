@@ -12,6 +12,7 @@ import {
   telemetryInputSchema,
 } from "@/lib/legacyActivity.schemas";
 import { listeningAnswerScore, pronunciationSimilarity } from "@/lib/legacyScores";
+import { allListeningSentences } from "@/lib/listeningLevels";
 import { activityItemLevel, persistActivityEvidence } from "@/lib/pedagogy/dualWriteCore";
 import {
   LISTENING_RUBRIC_VERSION,
@@ -41,6 +42,14 @@ const writingLegacyInputSchema = z
     minutes: z.number().int().min(0).max(1440),
   })
   .strict();
+
+function normalizeListening(sentence: string) {
+  return sentence
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[.!?]$/, "")
+    .toLowerCase();
+}
 
 const STATIC_LISTENING = new Set([
   "I get up early every morning.",
@@ -186,12 +195,17 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
     const corpus = (lessons ?? [])
       .map((lesson) => `${lesson.summary} ${lesson.transcript}`)
       .join(" ")
+      .replace(/\s+/g, " ")
       .toLowerCase();
+    // The level drills (listeningLevels) are course content too: before they
+    // were accepted here, finishing a session with them failed with "Listening
+    // evidence is not part of the course".
+    const builtIn = new Set(
+      [...STATIC_LISTENING, ...allListeningSentences()].map(normalizeListening),
+    );
     for (const item of data.evidence) {
-      if (
-        !STATIC_LISTENING.has(item.expected) &&
-        !corpus.includes(item.expected.replace(/[.!?]$/, "").toLowerCase())
-      ) {
+      const expected = normalizeListening(item.expected);
+      if (!builtIn.has(expected) && !corpus.includes(expected)) {
         throw new Error("Listening evidence is not part of the course");
       }
     }

@@ -1328,6 +1328,8 @@ export const uiPt: Record<string, string> = {
   "Come back tomorrow for the next reviews.": "Volte amanhã para as próximas revisões.",
   "Go to Writing": "Ir para o Writing",
   "Correct this sentence:": "Corrija esta frase:",
+  "Correct the marked part:": "Corrija a parte marcada:",
+  "Type the correction": "Digite a correção",
   "Correct!": "Correto!",
   "Not quite.": "Quase.",
   "Type the corrected sentence": "Digite a frase corrigida",
@@ -1522,6 +1524,7 @@ export const uiPt: Record<string, string> = {
   Attempt: "Tentativa",
   "of 3 · Best result:": "de 3 · Melhor resultado:",
   "Now repeat the sentence out loud": "Agora repita a frase em voz alta",
+  "Play the sentence first": "Primeiro toque a frase",
   "Record your voice and the AI checks which words you understood and repeated.":
     "Grave sua voz e a IA confere quais palavras você entendeu e repetiu.",
   "You have full access,": "Você tem acesso completo,",
