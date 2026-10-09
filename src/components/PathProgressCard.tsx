@@ -235,7 +235,7 @@ export function PathProgressCard({
             </Link>
           )}
         </div>
-        <div className="mt-2 grid flex-1 content-between gap-2 lg:mt-3 lg:gap-3 xl:mt-4 xl:gap-2">
+        <div className="mt-1.5 grid flex-1 content-between gap-1.5 lg:mt-3 lg:gap-3 xl:mt-4 xl:gap-2">
           {meterRows.map((row) => {
             const meta = SKILL_META[row.skill as keyof typeof SKILL_META];
             const tone = STATUS_TONE[row.status];
