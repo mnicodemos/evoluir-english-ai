@@ -91,7 +91,7 @@ function FinalTestPage() {
       return;
     }
 
-    await completeLesson(profile.id, id);
+    await completeLesson(attemptKey);
 
     if (!upcoming) {
       toast.success(

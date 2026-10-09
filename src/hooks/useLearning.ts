@@ -190,7 +190,10 @@ export function useQuizResults() {
 
 /**
  * Saves how much of the video was watched (0-100). The video only counts as
- * watched when it reaches the end or the student marks it as watched.
+ * watched when it reaches the end or the student marks it as watched. Only the
+ * video columns are written here: completing a lesson is the server's job
+ * (completeLessonFromQuiz), and the browser may not touch completed_at
+ * (migration 0059), so this updates the row or inserts it, never an upsert.
  */
 export async function saveVideoProgress(
   userId: string,
@@ -203,40 +206,31 @@ export async function saveVideoProgress(
   const { data: existing } = await runProgressMutation(() =>
     supabase
       .from("user_lessons")
-      .select("video_completed_at")
+      .select("id, video_completed_at")
       .eq("user_id", userId)
       .eq("lesson_id", lessonId)
       .maybeSingle(),
   );
+  const video = {
+    video_progress: watched ? 100 : clamped,
+    video_completed_at: watched ? (existing?.video_completed_at ?? new Date().toISOString()) : null,
+  };
   await runProgressMutation(() =>
-    supabase.from("user_lessons").upsert(
-      {
-        user_id: userId,
-        lesson_id: lessonId,
-        video_progress: watched ? 100 : clamped,
-        video_completed_at: watched
-          ? (existing?.video_completed_at ?? new Date().toISOString())
-          : null,
-      },
-      { onConflict: "user_id,lesson_id" },
-    ),
+    existing
+      ? supabase.from("user_lessons").update(video).eq("id", existing.id)
+      : supabase.from("user_lessons").insert({ user_id: userId, lesson_id: lessonId, ...video }),
   );
 }
 
-/** Marks the whole lesson (flashcards + quiz) as finished. Video progress stays as watched. */
-export async function completeLesson(userId: string, lessonId: string) {
-  const now = new Date().toISOString();
-  await runProgressMutation(() =>
-    supabase.from("user_lessons").upsert(
-      {
-        user_id: userId,
-        lesson_id: lessonId,
-        progress: 100,
-        completed_at: now,
-      },
-      { onConflict: "user_id,lesson_id" },
-    ),
-  );
+/**
+ * Marks the whole lesson (flashcards + quiz) as finished, on the server, from
+ * the quiz attempt it graded. Video progress stays as watched.
+ */
+export async function completeLesson(attemptKey: string) {
+  const { completeLessonFromQuiz } = await import("@/lib/lessonCompletion.functions");
+  const result = await completeLessonFromQuiz({ data: { attemptKey } });
+  if (!result.completed) throw new Error("The lesson could not be saved as completed.");
+  return result;
 }
 
 const intervalByRating: Record<string, (prev: number) => number> = {
