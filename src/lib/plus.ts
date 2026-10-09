@@ -181,6 +181,48 @@ export function plusDayComplete(steps: readonly { doneAt: string | null }[]) {
   return steps.length > 0 && steps.every((step) => step.doneAt !== null);
 }
 
+/** Days of history the Dashboard shows per goal (today and the 6 before). */
+export const PLUS_WEEK_DAYS = 7;
+
+function shiftDay(day: string, days: number) {
+  const date = new Date(`${day}T12:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+export type PlusGoalWeek = {
+  /** Oldest first, ending today. */
+  days: { day: string; done: boolean }[];
+  doneCount: number;
+  /** Days in a row with the step done, up to today (or yesterday while today is open). */
+  streak: number;
+};
+
+/**
+ * One goal's last week (user request: show progress, not only the task), from
+ * the step history loadPlus already reads. Today still open never breaks the run.
+ */
+export function plusGoalWeek(
+  steps: readonly { goalId: string; day: string; doneAt: string | null }[],
+  goalId: string,
+  today: string,
+): PlusGoalWeek {
+  const doneDays = new Set(
+    steps.filter((step) => step.goalId === goalId && step.doneAt).map((step) => step.day),
+  );
+  const days = Array.from({ length: PLUS_WEEK_DAYS }, (_, i) => {
+    const day = shiftDay(today, i - (PLUS_WEEK_DAYS - 1));
+    return { day, done: doneDays.has(day) };
+  });
+  let streak = 0;
+  let cursor = doneDays.has(today) ? today : shiftDay(today, -1);
+  while (doneDays.has(cursor)) {
+    streak += 1;
+    cursor = shiftDay(cursor, -1);
+  }
+  return { days, doneCount: days.filter((item) => item.done).length, streak };
+}
+
 export type EvolutionScore = {
   /** 0–100, or null before there is anything to measure. */
   score: number | null;

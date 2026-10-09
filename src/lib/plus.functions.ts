@@ -11,6 +11,7 @@ import {
   PLUS_AREAS,
   PLUS_MAX_GOALS,
   PLUS_SCORE_DAYS,
+  PLUS_WEEK_DAYS,
   type PlusArea,
   type PlusGoal,
   type PlusLang,
@@ -73,6 +74,8 @@ export type PlusOverview = {
   /** Steps given and done in the last PLUS_SCORE_DAYS days, today included. */
   stepsGiven: number;
   stepsDone: number;
+  /** The active goals' steps of the last PLUS_WEEK_DAYS days, for their week on the Dashboard. */
+  recentSteps: PlusStep[];
 };
 
 /**
@@ -166,6 +169,9 @@ export const loadPlus = createServerFn({ method: "POST" })
       todaySteps: history.filter((step) => step.day === today && activeIds.has(step.goalId)),
       stepsGiven: window.length,
       stepsDone: window.filter((step) => step.doneAt !== null).length,
+      recentSteps: history.filter(
+        (step) => activeIds.has(step.goalId) && step.day >= addDays(today, -(PLUS_WEEK_DAYS - 1)),
+      ),
     };
   });
 
