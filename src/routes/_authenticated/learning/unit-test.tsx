@@ -91,7 +91,7 @@ function UnitTestPage() {
       return;
     }
 
-    await completeLesson(profile.id, id);
+    await completeLesson(attemptKey);
     await refreshAfterActivity(queryClient);
     toast.success(
       lang === "pt"

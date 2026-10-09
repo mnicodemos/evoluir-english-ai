@@ -173,7 +173,9 @@ function LessonPage() {
           data: { attemptKey, activityType: "lesson", minutes: minutesSpent(1) },
         });
       },
-      completeLesson: async () => completeLesson(profile.id, lessonId),
+      completeLesson: async () => {
+        await completeLesson(attemptKey);
+      },
     });
     // A lesson only counts as completed with a quiz score of 70% or more.
     if (!result.passed) {
