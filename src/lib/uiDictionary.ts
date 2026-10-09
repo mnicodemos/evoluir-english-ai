@@ -73,7 +73,7 @@ export const uiPt: Record<string, string> = {
   "Mark as read": "Marcar como lida",
   "Mark all as read": "Marcar todas como lidas",
   "Notifications on": "Notificações ativas",
-  "Notifications off": "Notificações desativadas",
+  "Notifications off": "Notificação off",
   "New activities available": "Novas atividades disponíveis",
   "New vocabulary words": "Novas palavras no Vocabulário",
   activities: "atividades",
