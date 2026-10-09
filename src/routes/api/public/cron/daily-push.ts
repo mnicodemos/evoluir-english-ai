@@ -330,6 +330,29 @@ async function sendDailyPush(
     });
   });
 
+  // Launch campaign journey: in the evening run, a student in the 10 free
+  // Premium days (or the soft-cut day 11) gets the day's journey message
+  // instead of the reminder or weekly report, studied today or not.
+  if (kind !== "word") {
+    try {
+      const { loadJourneyStates } = await import("@/lib/premiumJourney.server");
+      const { fillJourney, journeyMessage } = await import("@/lib/campaignJourney");
+      const { uiPt } = await import("@/lib/uiDictionary");
+      const states = await loadJourneyStates(supabaseAdmin, userIds);
+      for (const [userId, state] of states) {
+        const message = journeyMessage(state.day, state.conversations);
+        if (!message) continue;
+        messages.set(userId, {
+          title: uiPt[message.title] ?? message.title,
+          body: fillJourney(uiPt[message.body] ?? message.body, state.conversations),
+          path: message.to,
+        });
+      }
+    } catch (error) {
+      console.error("daily-push: campaign journey skipped", error);
+    }
+  }
+
   let sent = 0;
   const stale: string[] = [];
   await forEachLimited(tokens ?? [], 6, async (t) => {

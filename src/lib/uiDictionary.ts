@@ -543,6 +543,51 @@ export const uiPt: Record<string, string> = {
     "Não foi possível atualizar sua meta. Tente novamente.",
   "Custom (5–240 minutes)": "Personalizado (5–240 minutos)",
   "Goal reached today. Great work!": "Meta alcançada hoje. Ótimo trabalho!",
+  "Just 1 minute with EVO": "Só 1 minuto com a EVO",
+  "Say one sentence in English to EVO. That is how your Premium starts paying off.":
+    "Fale uma frase em inglês com a EVO. É assim que o seu Premium começa a render.",
+  "Talk to EVO": "Falar com a EVO",
+  "Your Premium is on: day 1 of 10": "Seu Premium está ativo: dia 1 de 10",
+  "Start with the most powerful part: 5 minutes talking with EVO.":
+    "Comece pelo mais poderoso: 5 minutos de conversa com a EVO.",
+  "Day 2: a real situation": "Dia 2: uma situação real",
+  "Practise a job interview, a trip or a meeting with EVO today.":
+    "Treine hoje com a EVO uma entrevista, uma viagem ou uma reunião.",
+  "Choose a situation": "Escolher situação",
+  "Day 3: see your writing corrected": "Dia 3: veja seu texto corrigido",
+  "Write 5 lines about your day and watch EVO correct them on the spot.":
+    "Escreva 5 linhas sobre o seu dia e veja a EVO corrigir na hora.",
+  "Day 4: no daily limit": "Dia 4: sem limite diário",
+  "You have had {n} conversations with EVO. On the free plan it would be 3 per day.":
+    "Você já fez {n} conversas com a EVO. No plano grátis seriam 3 por dia.",
+  "Day 5: your mistakes became reviews": "Dia 5: seus erros viraram revisão",
+  "Review your recent mistakes so they do not become habits.":
+    "Revise seus erros recentes para eles não virarem hábito.",
+  "Day 6: a video call with EVO": "Dia 6: videochamada com a EVO",
+  "An informal chat with EVO, like with a friend, to lose the fear of speaking.":
+    "Um papo informal com a EVO, como com uma amiga, para perder o medo de falar.",
+  "Call EVO": "Ligar para a EVO",
+  "Day 7: see how far you came": "Dia 7: veja quanto você evoluiu",
+  "Look at your skills after a week of Premium.":
+    "Veja suas habilidades depois de uma semana de Premium.",
+  "See my progress": "Ver minha evolução",
+  "48 hours left of your Premium": "Faltam 48 horas do seu Premium",
+  "From day 11: 3 conversations and 3 corrections per day. Your progress stays saved.":
+    "A partir do dia 11: 3 conversas e 3 correções por dia. Seu progresso continua salvo.",
+  "See plans": "Ver planos",
+  "Tomorrow is your last Premium day": "Amanhã é seu último dia de Premium",
+  "Subscribe to keep unlimited conversations and corrections with EVO.":
+    "Assine para continuar com conversas e correções ilimitadas com a EVO.",
+  "Last day of your Premium": "Último dia do seu Premium",
+  "Subscribe today to keep unlimited conversations and corrections.":
+    "Assine hoje para manter conversas e correções ilimitadas.",
+  "Keep Premium": "Continuar no Premium",
+  "Your account is now Free": "Sua conta agora é Grátis",
+  "Your progress stays saved. You now have 3 conversations and 3 corrections per day.":
+    "Seu progresso continua salvo. Agora você tem 3 conversas e 3 correções por dia.",
+  "Reactivate Premium": "Reativar o Premium",
+  "Premium · day {day} of 10": "Premium · dia {day} de 10",
+  "Today's Premium mission": "Missão Premium de hoje",
   "Daily goal reached": "Meta diária atingida",
   "Goal OK": "Meta OK",
   "Your progress": "Sua evolução",
