@@ -386,6 +386,13 @@
       "when": 1791541190600,
       "tag": "0054_premium_campaign_period",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1791542088471,
+      "tag": "0055_landing_daily_stats",
+      "breakpoints": true
     }
   ]
 }

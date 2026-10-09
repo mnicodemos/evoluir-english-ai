@@ -1,9 +1,3 @@
--- Public home funnel: anonymous daily counters of visits and "Começar" clicks,
--- read in Admin → Retenção next to signups. No cookie, no user id, no IP: one
--- number per day and event (São Paulo date), as the Privacy Policy promises.
--- The page bumps a counter through bump_landing_stat (anon may call it, only
--- for the two known events); only the service role reads the table. Idempotent.
-
 CREATE TABLE IF NOT EXISTS public.landing_daily_stats (
   day date NOT NULL,
   event text NOT NULL CHECK (event IN ('visit', 'signup_click')),
