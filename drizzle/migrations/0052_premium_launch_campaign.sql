@@ -1,14 +1,3 @@
--- Launch campaign: the first 10 students who sign up from 10/10/2026
--- (São Paulo time) get 10 days of Premium. The 11th signup gets nothing and
--- the campaign is over once its 10 places are taken.
---
--- Premium access is the entitlements rows (AI quotas read them through
--- has_active_entitlement), granted here with expires_at = signup + 10 days, so
--- access ends on its own. profiles.plan only drives the "Premium" badge; it is
--- set at signup and put back to 'free' by the daily push cron (service role,
--- expireCampaignPremium in src/lib/premiumCampaign.server.ts), unless the
--- student subscribed meanwhile. Idempotent.
-
 CREATE TABLE IF NOT EXISTS public.premium_campaigns (
   id text PRIMARY KEY,
   starts_at timestamptz NOT NULL,
@@ -35,8 +24,6 @@ REVOKE ALL ON public.premium_campaigns, public.premium_campaign_grants
   FROM PUBLIC, anon, authenticated;
 GRANT ALL ON public.premium_campaigns, public.premium_campaign_grants TO service_role;
 
--- BEFORE INSERT on profiles: claims a place (one at a time, under a lock) and
--- marks the new profile as Premium until the end of the campaign period.
 CREATE OR REPLACE FUNCTION public.claim_premium_campaign()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -69,7 +56,6 @@ BEGIN
   NEW.plan_expires_at := v_expires;
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
-  -- A campaign problem must never block a signup.
   RETURN NEW;
 END;
 $$;
@@ -81,8 +67,6 @@ CREATE TRIGGER profiles_claim_premium_campaign
 BEFORE INSERT ON public.profiles
 FOR EACH ROW EXECUTE FUNCTION public.claim_premium_campaign();
 
--- AFTER INSERT on profiles: the Premium access itself (entitlements reference
--- profiles, so they are written once the row exists).
 CREATE OR REPLACE FUNCTION public.grant_premium_campaign_access()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -115,7 +99,6 @@ CREATE TRIGGER profiles_grant_premium_campaign
 AFTER INSERT ON public.profiles
 FOR EACH ROW EXECUTE FUNCTION public.grant_premium_campaign_access();
 
--- Public status for the site popup: only counts, never who took a place.
 CREATE OR REPLACE FUNCTION public.premium_campaign_status()
 RETURNS jsonb
 LANGUAGE sql
