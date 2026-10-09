@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  capTeacherScore,
   teacherEvidence,
   teacherEvidenceDecision,
   TEACHER_RUBRIC_VERSION,
@@ -53,6 +54,7 @@ describe("teacher prompt", () => {
       focusSkill: "grammar",
       suggestedScore: 82,
       observedError: null,
+      mistake: null,
     });
     expect(() => parseTeacherTurn("not json")).toThrow();
     expect(() => parseTeacherTurn('{"reply":"hi"}')).toThrow();
@@ -122,5 +124,30 @@ describe("teacher evidence gate", () => {
     });
     expect(item?.sampleWeight).toBeLessThan(1);
     expect(item?.sourceReliability).toBeLessThan(1);
+  });
+});
+
+describe("teacher score cap", () => {
+  it("keeps short sentences away from the top of the scale", () => {
+    expect(capTeacherScore(100, "I want to go home")).toBe(75);
+    expect(capTeacherScore(100, "If I had more time, I would travel abroad.")).toBe(90);
+    expect(
+      capTeacherScore(
+        96,
+        "Although the deadline was tight, our team delivered the project on time and the client was happy.",
+      ),
+    ).toBe(96);
+  });
+
+  it("reads the mistake the teacher found in the student's message", () => {
+    const parsed = parseTeacherTurn(
+      '{"reply":"Almost!","assessable":true,"focus_skill":"grammar","suggested_score":60,"observed_error":"past tense","mistake":{"original":"I go yesterday","corrected":"I went yesterday","explanation":"Past simple for finished time.","category":"grammar"}}',
+    );
+    expect(parsed.mistake).toEqual({
+      original: "I go yesterday",
+      corrected: "I went yesterday",
+      explanation: "Past simple for finished time.",
+      category: "grammar",
+    });
   });
 });

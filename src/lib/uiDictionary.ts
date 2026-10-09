@@ -1319,8 +1319,9 @@ export const uiPt: Record<string, string> = {
 
   // My mistakes
   "My mistakes": "Meus erros",
-  "Mistakes from your Writing corrections come back for review until you get them right five times in a row.":
-    "Os erros das suas correções de Writing voltam para revisão até você acertá-los cinco vezes seguidas.",
+  "Mistakes from your Writing corrections and the AI Teacher come back for review until you get them right five times in a row.":
+    "Os erros das suas correções de Writing e do Professor de IA voltam para revisão até você acertá-los cinco vezes seguidas.",
+  "Saved to My mistakes for review": "Salvo em Meus erros para revisar",
   "No mistakes saved yet.": "Nenhum erro salvo ainda.",
   "All caught up for today!": "Tudo revisado por hoje!",
   "Correct a text in Writing and your mistakes will appear here.":

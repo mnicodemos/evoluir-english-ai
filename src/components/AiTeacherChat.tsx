@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { GraduationCap, Plus, Send } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { BookmarkCheck, GraduationCap, Plus, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -42,6 +43,11 @@ function formatTeacherReply(content: string): string {
       if (correct) return `> ✅ **Correct form:** ${correct[1]}`;
       const idea = trimmed.match(/^idea (\d+):\s*(.+)$/i);
       if (idea) return `- **Idea ${idea[1]}:** ${idea[2]}`;
+      // Session recap and the beginners' Portuguese line stand out too.
+      const recap = trimmed.match(/^(today you practised|to review):\s*(.+)$/i);
+      if (recap) return `> **${recap[1]}:** ${recap[2]}`;
+      const pt = trimmed.match(/^em português:\s*(.+)$/i);
+      if (pt) return `> 🇧🇷 _${pt[1]}_`;
       return line;
     })
     .join("\n");
@@ -89,6 +95,8 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   const [started, setStarted] = useState(false);
   const [mode, setMode] = useState<string | null>(null);
   const [coachActive, setCoachActive] = useState(false);
+  // The last reply's mistake went to "My mistakes" for spaced review.
+  const [mistakeSaved, setMistakeSaved] = useState(false);
 
   // Time with the AI Teacher counts toward today's minutes once the student
   // has written at least one message (saved when leaving the screen).
@@ -147,6 +155,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
       setCoachState(result.coach ?? null);
       if (result.coach?.finished) setCoachActive(false);
       setMessages((prev) => [...prev, { role: "assistant", content: result.reply }]);
+      setMistakeSaved(!!result.mistakeSaved);
       void queryClient.invalidateQueries({ queryKey: ["teacher-session"] });
     },
     onError: (err) => {
@@ -180,6 +189,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
 
   function newConversation() {
     setMessages([]);
+    setMistakeSaved(false);
     setConversationId(undefined);
     setInput("");
     setError(null);
@@ -309,6 +319,16 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
                 </MessageContent>
               </Message>
             ))}
+
+            {messages.at(-1)?.role === "assistant" && !turn.isPending && mistakeSaved && (
+              <Link
+                to="/mistakes"
+                className="inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/20"
+              >
+                <BookmarkCheck className="size-3.5" aria-hidden="true" />
+                {t("Saved to My mistakes for review")}
+              </Link>
+            )}
 
             {messages.at(-1)?.role === "assistant" && !turn.isPending && (
               <div className="flex flex-wrap gap-2">

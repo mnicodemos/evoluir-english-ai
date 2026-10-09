@@ -11,6 +11,7 @@ import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminAlerts } from "@/components/AdminAlerts";
 import { AdminGoals } from "@/components/AdminGoals";
+import { AdminMistakeReview } from "@/components/AdminMistakeReview";
 import { AdminRetention } from "@/components/AdminRetention";
 import { AdminSpeakingWait } from "@/components/AdminSpeakingWait";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
@@ -222,6 +223,7 @@ function AdminPage() {
             <TabsContent value="retention">
               <AdminRetention />
               <AdminGoals />
+              <AdminMistakeReview />
             </TabsContent>
           </Tabs>
         </section>
