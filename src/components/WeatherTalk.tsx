@@ -1,5 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Loader2, LocateFixed, MessageCircleMore, Volume2 } from "lucide-react";
+import {
+  CloudMoon,
+  CloudSun,
+  Loader2,
+  LocateFixed,
+  MessageCircleMore,
+  Volume2,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -26,6 +33,10 @@ export function WeatherTalk({
   const [speaking, setSpeaking] = useState(false);
   const talk = WEATHER_TALK[condition];
   const Icon = weatherIcons[condition];
+  // The button never shows a bare sun or moon, the usual light/dark theme
+  // symbol: clear skies get a cloud, and a small speech bubble says it is an
+  // English practice (user request: it was mistaken for a theme switch).
+  const TriggerIcon = condition === "sunny" ? CloudSun : condition === "night" ? CloudMoon : Icon;
 
   async function hear(text: string) {
     setSpeaking(true);
@@ -41,19 +52,32 @@ export function WeatherTalk({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label={translate("Weather talk")}
-          title={translate("Weather talk")}
-          className={
-            placement === "mobile"
-              ? `relative size-8 shrink-0 rounded-full ${graphiteIconButtonClass}`
-              : "size-7 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
-          }
-        >
-          <Icon className={placement === "mobile" ? "size-[1.15rem]" : "size-4"} />
-        </Button>
+        {placement === "desktop" ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={translate("Weather talk")}
+            title={translate("Weather talk")}
+            className="h-7 shrink-0 gap-1.5 rounded-full border border-border px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
+          >
+            <TriggerIcon className="size-4" aria-hidden="true" />
+            {translate("Weather talk")}
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={translate("Weather talk")}
+            title={translate("Weather talk")}
+            className={`relative size-8 shrink-0 rounded-full ${graphiteIconButtonClass}`}
+          >
+            <TriggerIcon className="size-[1.15rem]" aria-hidden="true" />
+            <MessageCircleMore
+              className="absolute -bottom-0.5 -right-0.5 size-3.5 rounded-full bg-background text-brand-green"
+              aria-hidden="true"
+            />
+          </Button>
+        )}
       </PopoverTrigger>
       <PopoverContent
         align={placement === "mobile" ? "end" : "start"}
