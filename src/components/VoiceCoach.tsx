@@ -45,6 +45,7 @@ import {
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { SpeakingReport } from "@/components/coach/SpeakingReport";
 import { VideoCallStage } from "@/components/coach/VideoCallStage";
+import { findBusinessRolePlay } from "@/lib/businessCourse";
 import { isWeatherCondition, weatherRolePlay } from "@/lib/weatherTalk";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -53,6 +54,7 @@ type VoiceState = "idle" | "recording" | "sending" | "transcribing" | "thinking"
 export function VoiceCoach({
   lessonTopic,
   weather,
+  business,
   presentation = "chat",
 }: {
   lessonTopic?: string | undefined;
@@ -60,6 +62,8 @@ export function VoiceCoach({
   weather?: string | undefined;
   /** "call" shows the same conversation as a video call with EVO. */
   presentation?: "chat" | "call";
+  /** Opens a Business English situation (businessCourse.ts) by its id. */
+  business?: string | undefined;
 }) {
   const { data: profile } = useProfile();
   const { data: snapshot } = useStudySnapshot();
@@ -122,7 +126,9 @@ export function VoiceCoach({
   useEffect(() => {
     if (lessonTopic || started.current) return;
     started.current = true;
-    if (isWeatherCondition(weather)) startRolePlay(weatherRolePlay(weather));
+    const businessPlay = findBusinessRolePlay(business);
+    if (businessPlay) startRolePlay(businessPlay);
+    else if (isWeatherCondition(weather)) startRolePlay(weatherRolePlay(weather));
     else void start(0);
     // Runs once per screen: `start` is recreated on every render, and the
     // `started` ref already guarantees a single opener.

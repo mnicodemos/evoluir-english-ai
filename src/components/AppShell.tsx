@@ -4,6 +4,7 @@ import {
   Bell,
   BellOff,
   BookOpen,
+  Briefcase,
   CalendarCheck,
   Crown,
   GraduationCap,
@@ -57,6 +58,7 @@ import { studyToday } from "@/lib/today";
 const mobileSheetNav = [
   { to: "/goals", label: "Goals", icon: Target },
   { to: "/learning", label: "Learning", icon: GraduationCap },
+  { to: "/business", label: "Business English", icon: Briefcase },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/writing", label: "Writing", icon: PenLine },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
@@ -74,6 +76,7 @@ const dashboardSidebarNav = [
   { to: "/goals", label: "Goals", icon: Target, group: "Plan" },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
+  { to: "/business", label: "Business English", icon: Briefcase },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen, group: "Practice" },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/writing", label: "Writing", icon: PenLine },

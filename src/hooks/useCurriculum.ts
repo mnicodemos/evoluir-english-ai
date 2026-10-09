@@ -12,6 +12,8 @@ import {
   unitTestKey,
   type CurriculumLesson,
 } from "@/lib/curriculum";
+import { isBusinessKey } from "@/lib/businessCourse";
+import { openBusinessLesson } from "@/lib/businessCourse.functions";
 import { openCurriculumLesson, openFinalTest, openUnitTest } from "@/lib/curriculum.functions";
 import { getLevelState } from "@/lib/level";
 
@@ -133,7 +135,11 @@ const BUSY_WAIT_MS = 7_500;
 const BUSY_WAIT_ATTEMPTS = 10;
 
 export function useOpenPathLesson() {
-  const open = useServerFn(openCurriculumLesson);
+  const openPath = useServerFn(openCurriculumLesson);
+  const openBusiness = useServerFn(openBusinessLesson);
+  // Business English lessons open (and are repaired) through their own track.
+  const open = (input: { data: { key: string } }) =>
+    isBusinessKey(input.data.key) ? openBusiness(input) : openPath(input);
   const queryClient = useQueryClient();
 
   const openOnce = (key: string) => {

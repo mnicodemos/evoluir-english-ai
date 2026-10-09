@@ -35,6 +35,7 @@ import { usePersistentState } from "@/hooks/usePersistentState";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { vocabularyGenerationFailureKey } from "@/lib/activityIndicators";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
+import { findBusinessLesson, isBusinessKey } from "@/lib/businessCourse";
 import { findCurriculumLesson } from "@/lib/curriculum";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
@@ -97,7 +98,12 @@ function LessonPage() {
   // missing quiz/cards into the same lesson, never a second lesson.
   const repairLesson = useOpenPathLesson();
   const repairTried = useRef<string | null>(null);
-  const repairPlan = lesson?.curriculum_key ? findCurriculumLesson(lesson.curriculum_key) : null;
+  const business = isBusinessKey(lesson?.curriculum_key);
+  const repairPlan = lesson?.curriculum_key
+    ? business
+      ? findBusinessLesson(lesson.curriculum_key, lesson.level)
+      : findCurriculumLesson(lesson.curriculum_key)
+    : null;
   // A level's final test is only taken on its own page, where passing promotes
   // the student; opening it as an ordinary lesson would skip the promotion.
   const isFinalTest = !!lesson?.curriculum_key?.endsWith("-final");
@@ -249,10 +255,10 @@ function LessonPage() {
     <AppShell>
       <div className="space-y-6">
         <Link
-          to="/learning"
+          to={business ? "/business" : "/learning"}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="size-4" /> Learning Center
+          <ArrowLeft className="size-4" /> {business ? "Business English" : "Learning Center"}
         </Link>
 
         <header className="animate-rise">
