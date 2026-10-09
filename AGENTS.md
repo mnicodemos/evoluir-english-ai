@@ -24,7 +24,7 @@
 - Streak protection (one missed day per week, Monday to Sunday in São Paulo) is applied only by credit_study_day into streak_freeze_used_on; src/lib/streakFreeze.ts mirrors it for display, so a protected streak never looks broken.
 - Weekly league XP is computed only in the database (league_week_xp / weekly_league); other students are exposed only by first name + initial and only after they opt in (profiles.league_opt_in).
 - Weekly and monthly frequency views read the same qualifying evidence as `credit_study_day`; this keeps presentation aligned while the database remains the sole streak writer.
-- Vocabulary word generation uses the faster Lovable AI model (LOVABLE_VOCABULARY_MODEL); the slower talking model exceeded the 60 s call limit and left batches empty.
+- All AI runs on the owner's Google Gemini key (through the Lovable connector gateway); the Lovable AI models and the transcription fallback were removed (user decision, 2026-10-09: no Lovable AI credits), so a Gemini failure asks the student to try again. Older Lovable AI rows still show in the Admin as "· reserva (Lovable)".
 - Vocabulary AI replies are salvaged word by word and the browser releases a stuck generation after 80 s; one bad item or a dropped connection must never leave a lesson's batch empty.
 - Vocabulary generation runs under the host's keep-alive (keepAlive in src/lib/keepAlive.server.ts, context set in src/server.ts); leaving the lesson screen mid-generation must not cancel the batch.
 - Dashboard mobile uses a fixed five-item bottom navigation on every authenticated page (bottom padding comes from the shell, not each page) and there are no top back-to-Dashboard buttons; desktop composition remains unchanged.

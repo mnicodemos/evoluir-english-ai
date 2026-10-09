@@ -37,20 +37,9 @@ export async function callGateway(
   // leave its usage record "running" (the record is always closed below).
   const timeoutSignal = AbortSignal.timeout(AI_CALL_TIMEOUT_MS);
   const signal = callerSignal ? AbortSignal.any([callerSignal, timeoutSignal]) : timeoutSignal;
-  const {
-    callGemini,
-    GEMINI_TEXT_MODEL: geminiModel,
-    GeminiError,
-  } = await import("./gemini.server");
-  // AI Speaking and Vocabulary generation run on Google Gemini like every
-  // other feature (user request, 2026-10-04: migrate both to the Gemini API).
-  const useLovable = false;
-  const lovable = useLovable ? await import("./lovable-chat.server") : null;
-  const GEMINI_TEXT_MODEL = lovable
-    ? usage?.operation === "vocabulary_generation"
-      ? lovable.LOVABLE_VOCABULARY_MODEL
-      : lovable.LOVABLE_TALKING_MODEL
-    : geminiModel;
+  // Every text feature runs on Google Gemini (user request, 2026-10-04); the
+  // Lovable AI path was removed on 2026-10-09 (user decision: no Lovable credits).
+  const { callGemini, GEMINI_TEXT_MODEL, GeminiError } = await import("./gemini.server");
   const usageTools = usage ? await import("./ai-usage.server") : null;
   const requestHash = usageTools ? await usageTools.hashAiRequest({ messages, jsonMode }) : "";
   const cacheKey = usage?.cacheKey ?? requestHash;
@@ -84,12 +73,10 @@ export async function callGateway(
     usageTokens = reported;
   };
   try {
-    text = lovable
-      ? await lovable.callLovableTalking(messages, onUsage, signal, GEMINI_TEXT_MODEL)
-      : await callGemini(messages, jsonMode, onUsage, signal, {
-          ...(usage?.fast ? { fast: true } : {}),
-          ...(usage?.maxOutputTokens ? { maxOutputTokens: usage.maxOutputTokens } : {}),
-        });
+    text = await callGemini(messages, jsonMode, onUsage, signal, {
+      ...(usage?.fast ? { fast: true } : {}),
+      ...(usage?.maxOutputTokens ? { maxOutputTokens: usage.maxOutputTokens } : {}),
+    });
   } catch (err) {
     if (ticket && usageTools) {
       await usageTools.finishAiUsage(ticket, {
@@ -98,9 +85,7 @@ export async function callGateway(
           ? "timeout"
           : err instanceof GeminiError
             ? `gemini_${err.status}`
-            : lovable && err instanceof lovable.LovableChatError
-              ? `lovable_${err.status}`
-              : "gemini_error",
+            : "gemini_error",
         errorMessage: err instanceof Error ? err.message : "Google Gemini failed",
       });
     }
@@ -116,10 +101,7 @@ export async function callGateway(
       );
     const message =
       err instanceof Error ? err.message : "Google Gemini could not answer right now.";
-    const status =
-      err instanceof GeminiError || (lovable && err instanceof lovable.LovableChatError)
-        ? (err as { status: number }).status
-        : 503;
+    const status = err instanceof GeminiError ? err.status : 503;
     throw new AiError(status, message);
   }
 

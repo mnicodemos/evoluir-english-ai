@@ -40,9 +40,6 @@ type GeminiTranscription = {
 // the recording itself.
 const MAX_TRANSCRIPTION_ATTEMPTS = 2;
 const TRANSCRIPTION_ATTEMPT_TIMEOUT_MS = 15_000;
-// A short word or sentence is transcribed in 1–3 s; a slower primary answer
-// hands over to the fallback instead of using most of the total budget.
-const LOVABLE_ATTEMPT_TIMEOUT_MS = 8_000;
 
 // Models that answered 400 to thinkingConfig and accepted the plain request.
 // Remembered per server instance so later checks skip the doomed first call.
@@ -95,35 +92,6 @@ async function sendWithDeadline(
     clearTimeout(timeout);
     requestSignal.removeEventListener("abort", abortFromRequest);
   }
-}
-
-const LOVABLE_TRANSCRIPTION_MODEL = "google/gemini-3.5-transcribe";
-
-/** Returns the transcript, or null so the existing fallback flow can take over. */
-async function transcribeWithLovable(
-  audio: File,
-  lovableKey: string,
-  requestSignal: AbortSignal,
-  deadline: number,
-): Promise<string | null> {
-  const form = new FormData();
-  form.append("model", LOVABLE_TRANSCRIPTION_MODEL);
-  form.append("file", audio, audio.name || "recording.wav");
-  form.append("response_format", "json");
-  form.append("language", "en");
-  const response = await sendWithDeadline(
-    "https://ai.gateway.lovable.dev/v1/audio/transcriptions",
-    { method: "POST", headers: { Authorization: `Bearer ${lovableKey}` }, body: form },
-    requestSignal,
-    attemptTimeout(deadline, LOVABLE_ATTEMPT_TIMEOUT_MS),
-  );
-  if (!response.ok) {
-    console.error(`Lovable transcription failed [${response.status}]`);
-    return null;
-  }
-  const data = (await response.json().catch(() => null)) as { text?: string } | null;
-  const text = data?.text?.trim();
-  return text ? text : null;
 }
 
 export const Route = createFileRoute("/api/transcribe")({
@@ -229,9 +197,8 @@ export const Route = createFileRoute("/api/transcribe")({
         };
 
         try {
-          // Primary: the workspace's own Gemini key (owner request, 2026-10-06),
-          // like AI Speaking; the Lovable AI transcription service is only the
-          // fallback, so an exhausted Lovable balance no longer costs a round trip.
+          // The workspace's own Gemini key (owner request, 2026-10-06), like AI
+          // Speaking; a quota error moves on to the next Gemini model.
           let result: GeminiTranscription | null = null;
           let answeredModel: string = GEMINI_TRANSCRIPTION_MODELS[0];
           let failureStatus = 503;
@@ -305,19 +272,8 @@ export const Route = createFileRoute("/api/transcribe")({
           }
 
           if (!result) {
-            const fallback = await transcribeWithLovable(
-              audio,
-              lovableKey,
-              request.signal,
-              deadline,
-            ).catch(() => null);
-            if (fallback) {
-              await settle({ success: true, model: LOVABLE_TRANSCRIPTION_MODEL });
-              return new Response(
-                `data: ${JSON.stringify({ type: "transcript.text.done", text: fallback })}\n\n`,
-                { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" } },
-              );
-            }
+            // No second provider (user decision, 2026-10-09: the Lovable AI
+            // fallback needed credits and was removed); the student retries.
             const message =
               failureStatus === 429
                 ? "Your Google AI voice limit is busy right now. Please wait about a minute and try again."

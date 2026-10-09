@@ -125,7 +125,7 @@ const OPERATION_FACTS: Record<string, { label: string; streaming: string; path: 
   transcription: {
     label: "Transcription",
     streaming: "Yes",
-    path: "Primary: Gemini (personal key) · Fallback: Lovable AI",
+    path: "Primary: Gemini (personal key)",
   },
   tts: { label: "TTS", streaming: "Yes", path: "Primary: Gemini (personal key)" },
   writing_correction: { label: "Writing / Correction", streaming: "No", path: "Primary: Gemini" },
