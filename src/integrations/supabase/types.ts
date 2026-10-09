@@ -558,6 +558,24 @@ export type Database = {
           },
         ]
       }
+      landing_daily_stats: {
+        Row: {
+          count: number
+          day: string
+          event: string
+        }
+        Insert: {
+          count?: number
+          day: string
+          event: string
+        }
+        Update: {
+          count?: number
+          day?: string
+          event?: string
+        }
+        Relationships: []
+      }
       learning_errors: {
         Row: {
           assessment_evidence_id: string | null
@@ -1760,6 +1778,7 @@ export type Database = {
       }
     }
     Functions: {
+      bump_landing_stat: { Args: { p_event: string }; Returns: undefined }
       cefr_rank: { Args: { p_level: string }; Returns: number }
       claim_pedagogical_retries: {
         Args: { p_limit?: number; p_stale_seconds?: number; p_user_id: string }
