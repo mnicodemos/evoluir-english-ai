@@ -216,6 +216,12 @@
   box-shadow: var(--shadow-soft);
 }
 
+/* Weather talk and the Dashboard bell (graphitePanelClass) are translucent
+   glass: .dashboard-shell's own background would otherwise make them opaque. */
+.graphite-panel.dashboard-shell.dark {
+  background-color: rgb(26 28 32 / 0.4);
+}
+
 /* The bell popup is translucent over the dashboard, dark like a phone's
    dark-mode notification shade. */
 .notification-popover.dashboard-shell.dark {
