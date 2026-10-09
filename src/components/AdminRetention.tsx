@@ -27,7 +27,22 @@ function rateText(value: number | null) {
 function LandingFunnelPanel() {
   const load = useServerFn(getLandingFunnel);
   const query = useQuery({ queryKey: ["admin", "landing-funnel"], queryFn: () => load() });
-  if (query.isPending || query.isError) return null;
+  // Never vanish silently: say when it is loading or why it failed.
+  if (query.isPending) {
+    return (
+      <p className="rounded-xl border border-border p-3 text-xs text-muted-foreground">
+        Funil da página inicial: carregando…
+      </p>
+    );
+  }
+  if (query.isError) {
+    return (
+      <p className="rounded-xl border border-border p-3 text-xs text-muted-foreground">
+        Funil da página inicial indisponível agora
+        {query.error instanceof Error && query.error.message ? ` (${query.error.message})` : ""}.
+      </p>
+    );
+  }
   if (!query.data) {
     return (
       <p className="rounded-xl border border-border p-3 text-xs text-muted-foreground">
