@@ -50,20 +50,20 @@ export function EvoDailyReflection({
 
   if (placement === "dashboard-header") {
     return (
-      <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:block">
+      <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-4">
         <div className="lg:hidden">{mobileLeading}</div>
         <div className="min-w-0 text-left">
           <h1 className="truncate font-display text-base font-bold text-foreground sm:text-2xl 2xl:text-3xl">
             {greeting}, {displayName}!
           </h1>
-          <div className="mt-0.5 hidden min-w-0 items-center gap-2 sm:mt-1 sm:flex">
-            <p className="min-w-0 truncate text-[11px] leading-tight text-muted-foreground sm:text-sm">
-              {t("Great to have you back. Let's keep building your fluency.")}
-            </p>
-            {desktopSubtitleTrailing}
-          </div>
+          <p className="mt-0.5 hidden min-w-0 truncate text-[11px] leading-tight text-muted-foreground sm:mt-1 sm:block sm:text-sm">
+            {t("Great to have you back. Let's keep building your fluency.")}
+          </p>
         </div>
         <div className="lg:hidden">{mobileTrailing}</div>
+        {/* Desktop: the header's shortcuts sit at the top-right corner, where
+            notifications are usually looked for, as on phones (user request). */}
+        <div className="hidden lg:flex">{desktopSubtitleTrailing}</div>
       </div>
     );
   }

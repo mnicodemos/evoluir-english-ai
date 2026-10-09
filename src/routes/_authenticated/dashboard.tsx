@@ -182,7 +182,7 @@ function DashboardNotifications({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        align={placement === "mobile" ? "end" : "start"}
+        align="end"
         sideOffset={8}
         className={`dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] p-2 ${graphitePanelClass}`}
       >
@@ -355,8 +355,9 @@ function Dashboard() {
               name={profile.name}
               placement="dashboard-header"
               desktopSubtitleTrailing={
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <CampaignJourneyChip translate={t} placement="desktop" />
+                  <WeatherTalk translate={t} placement="desktop" />
                   <DashboardNotifications
                     indicators={indicators}
                     reviewCount={reviewCount}
@@ -366,7 +367,6 @@ function Dashboard() {
                     translate={t}
                     placement="desktop"
                   />
-                  <WeatherTalk translate={t} placement="desktop" />
                   <FirstWeekGuide profile={profile} placement="desktop" />
                 </div>
               }
