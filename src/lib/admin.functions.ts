@@ -691,3 +691,15 @@ export const getGoalsReport = createServerFn({ method: "GET" })
     const { loadGoalsReport } = await import("@/lib/productMetrics.server");
     return loadGoalsReport(supabaseAdmin);
   });
+
+/** Public home funnel: visits, "Começar" clicks and signups (7 and 30 days). */
+export const getLandingFunnel = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { loadLandingFunnel } = await import("@/lib/productMetrics.server");
+    return loadLandingFunnel(supabaseAdmin);
+  });

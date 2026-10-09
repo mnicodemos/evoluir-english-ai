@@ -6,6 +6,7 @@ import evoProfile from "@/assets/evo-profile.jpg.asset.json";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { bumpLandingStat } from "@/lib/landingStats";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 
 type CampaignStatus = {
@@ -16,6 +17,38 @@ type CampaignStatus = {
 };
 
 const SEEN_KEY = "evoluir-launch-popup-seen";
+
+/**
+ * Hero badge for the same campaign: stays on the page after the popup is
+ * closed, and disappears once the database reports no places left.
+ */
+export function LaunchCampaignBadge({ className = "" }: { className?: string }) {
+  const [status, setStatus] = useState<CampaignStatus | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    void supabase.rpc("premium_campaign_status" as never).then(({ data, error }) => {
+      if (cancelled || error || !data) return;
+      setStatus(data as unknown as CampaignStatus);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  if (!status?.active || !status.slots_left) return null;
+  const left = status.slots_left;
+  return (
+    <Link
+      to="/auth"
+      search={{ mode: "signup" }}
+      onClick={() => bumpLandingStat("signup_click")}
+      className={`inline-flex items-center gap-2 rounded-full border border-warning/40 bg-warning/10 px-3 py-1.5 text-xs font-semibold text-warning transition-colors hover:bg-warning/20 ${className}`}
+    >
+      <Crown className="size-3.5 shrink-0" aria-hidden="true" />
+      Lançamento: {status.days ?? 10} dias de Premium grátis ·{" "}
+      {left === 1 ? "resta 1 vaga" : `restam ${left} vagas`}
+    </Link>
+  );
+}
 
 /**
  * Public site: announces the launch campaign (migration 0052) while it still
@@ -93,7 +126,14 @@ export function LaunchCampaignPopup() {
         </div>
 
         <Button asChild size="lg" className="w-full">
-          <Link to="/auth" search={{ mode: "signup" }} onClick={() => setOpen(false)}>
+          <Link
+            to="/auth"
+            search={{ mode: "signup" }}
+            onClick={() => {
+              bumpLandingStat("signup_click");
+              setOpen(false);
+            }}
+          >
             Quero minha vaga <ArrowRight aria-hidden="true" />
           </Link>
         </Button>

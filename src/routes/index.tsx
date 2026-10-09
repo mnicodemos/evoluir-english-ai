@@ -1,16 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { useEffect } from "react";
+import {
+  ArrowRight,
+  BookOpen,
+  Check,
+  Flag,
+  GraduationCap,
+  Mic,
+  PenLine,
+  SpellCheck,
+  Video,
+} from "lucide-react";
 
 import appCoach from "@/assets/home/app-coach.jpg";
 import appLearning from "@/assets/home/app-learning.jpg";
 import appMistakes from "@/assets/home/app-mistakes.jpg";
 import evoImage from "@/assets/evo-landing.webp";
-import evoProfile from "@/assets/evo-profile.jpg.asset.json";
 import { Footer } from "@/components/Footer";
-import { LaunchCampaignPopup } from "@/components/home/LaunchCampaignPopup";
+import { LaunchCampaignBadge, LaunchCampaignPopup } from "@/components/home/LaunchCampaignPopup";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { bumpLandingStat } from "@/lib/landingStats";
 
 const SITE_URL = "https://evoluirmaisenglishai.com/";
 const OG_IMAGE = `${SITE_URL}og-image.jpg`;
@@ -63,32 +74,87 @@ export const Route = createFileRoute("/")({
   component: CommercialLanding,
 });
 
-const journey = [
-  ["01", "DESCUBRA", "Entenda seu nível e suas habilidades."],
-  ["02", "PRIORIZE", "Saiba o que merece atenção agora."],
-  ["03", "PRATIQUE", "Use o inglês em situações reais."],
-  ["04", "EVOLUA", "Seu progresso orienta o próximo passo."],
+// What the app really does, each one a screen students already use.
+const strengths = [
+  {
+    icon: Mic,
+    title: "Conversa por voz com a EVO",
+    text: "Fale sobre o seu dia ou treine entrevista, reunião e viagem. Ela responde e ajusta seu inglês.",
+  },
+  {
+    icon: Video,
+    title: "Chamada de vídeo",
+    text: "Um papo informal com a EVO, como com uma amiga, para perder o medo de falar.",
+  },
+  {
+    icon: PenLine,
+    title: "Correção de textos na hora",
+    text: "Escreva e veja o que ajustar, com a explicação do porquê.",
+  },
+  {
+    icon: SpellCheck,
+    title: "Seus erros viram revisão",
+    text: "O que você errou volta no momento certo, até virar acerto.",
+  },
+  {
+    icon: GraduationCap,
+    title: "Trilha do A1 ao C2",
+    text: "Lições do seu nível, teste final e avanço de nível com o seu progresso guardado.",
+  },
+  {
+    icon: BookOpen,
+    title: "Vocabulário que não se perde",
+    text: "Revisão espaçada: cada palavra volta no dia certo para ficar na memória.",
+  },
+] as const;
+
+const steps = [
+  ["1", "Teste de nível rápido", "Descubra onde você está, do A1 ao C2."],
+  ["2", "Fale com a EVO no primeiro dia", "Sua primeira conversa começa logo após o teste."],
+  ["3", "Um próximo passo por dia", "A EVO mostra a habilidade que mais precisa de atenção agora."],
 ] as const;
 
 const productScreens = [
   {
-    image: appLearning,
-    title: "Sua trilha",
-    text: "Conteúdo adequado ao seu nível, do A1 ao C2.",
-  },
-  {
     image: appCoach,
     title: "Converse com a EVO",
-    text: "Pratique inglês em situações reais.",
+    text: "Situações reais, por voz.",
+  },
+  {
+    image: appLearning,
+    title: "Sua trilha",
+    text: "Conteúdo do seu nível, do A1 ao C2.",
   },
   {
     image: appMistakes,
-    title: "Transforme erros em evolução",
+    title: "Meus erros",
     text: "Revise o que precisa melhorar.",
   },
 ] as const;
 
+const faq = [
+  [
+    "Preciso de cartão para começar?",
+    "Não. Você cria sua conta e começa a usar o app sem cadastrar cartão.",
+  ],
+  [
+    "Serve para quem está começando do zero?",
+    "Sim. O teste de nível encontra o seu ponto de partida, e a trilha começa no A1 se for o caso.",
+  ],
+  [
+    "Quanto tempo preciso por dia?",
+    "Você escolhe sua meta diária no início. Poucos minutos por dia já contam para sua sequência.",
+  ],
+  [
+    "Funciona no celular?",
+    "Sim. O Evoluir+ funciona no navegador do celular e do computador, sem instalar nada.",
+  ],
+] as const;
+
+const countSignupClick = () => bumpLandingStat("signup_click");
+
 function CommercialLanding() {
+  useEffect(() => bumpLandingStat("visit"), []);
   return (
     <div className="dashboard-shell brand-dashboard-theme dark min-h-screen overflow-x-clip bg-background text-foreground">
       <LaunchCampaignPopup />
@@ -110,7 +176,7 @@ function CommercialLanding() {
               </Link>
             </Button>
             <Button asChild size="sm">
-              <Link to="/auth" search={{ mode: "signup" }}>
+              <Link to="/auth" search={{ mode: "signup" }} onClick={countSignupClick}>
                 Começar <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
@@ -118,156 +184,131 @@ function CommercialLanding() {
         </div>
       </header>
 
-      <main className="snap-y snap-mandatory overflow-y-auto scroll-smooth">
-        {/* TELA 1 — HOOK */}
-        <section className="relative min-h-[calc(100svh-4rem)] snap-start overflow-hidden border-b border-border/70">
+      <main>
+        {/* HERO — what it is, for whom, and the first step */}
+        <section className="relative overflow-hidden border-b border-border/70">
           <div className="absolute inset-0 surface-hero opacity-45" aria-hidden="true" />
-
-          <div className="relative mx-auto grid h-full min-h-[calc(100svh-4rem)] max-w-7xl items-center gap-4 px-4 py-8 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:px-8 lg:py-0">
-            <div className="z-10 max-w-2xl">
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-success sm:mb-5">
-                Evoluir+ English AI
-              </p>
-
-              <h1 className="text-[2.15rem] font-bold leading-[1.04] sm:text-5xl lg:text-[4.25rem]">
-                Você sabe seu nível de inglês.
+          <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:px-8 lg:pt-10">
+            <div className="z-10 max-w-2xl pb-2 lg:pb-12">
+              <LaunchCampaignBadge className="mb-4" />
+              <h1 className="text-[2.15rem] font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
+                Fale inglês sem travar.
                 <span className="mt-2 block text-gradient-growth">
-                  Mas sabe o que precisa melhorar agora?
+                  Pratique com a EVO, sua professora de IA.
                 </span>
               </h1>
-
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg">
-                O Evoluir+ entende sua evolução, acompanha suas habilidades e ajuda você a descobrir
-                onde concentrar sua prática.
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-lg">
+                Converse por voz a qualquer hora, tenha seus textos corrigidos na hora e siga uma
+                trilha do A1 ao C2 que mostra o que melhorar agora.
               </p>
 
-              <div className="mt-6 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:items-center">
+              <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
                 <Button asChild size="lg" className="min-h-12 w-full sm:w-auto">
-                  <Link to="/auth" search={{ mode: "signup" }}>
-                    Conhecer o Evoluir+ <ArrowRight aria-hidden="true" />
+                  <Link to="/auth" search={{ mode: "signup" }} onClick={countSignupClick}>
+                    Começar grátis <ArrowRight aria-hidden="true" />
                   </Link>
                 </Button>
                 <span className="text-center text-xs text-muted-foreground sm:px-2">
-                  Entre gratuitamente
+                  Teste de nível rápido · sem cartão
                 </span>
               </div>
+
+              <ul className="mt-6 flex flex-wrap gap-2 text-xs font-medium">
+                {[
+                  "Conversa por voz",
+                  "Correção na hora",
+                  "Do A1 ao C2",
+                  "Mais que inglês: Metas",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-3 py-1.5"
+                  >
+                    <Check className="size-3.5 text-success" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <div className="relative mx-auto flex h-full min-h-0 w-full max-w-[620px] items-end justify-center lg:self-end">
+            <div className="relative mx-auto flex w-full max-w-[460px] items-end justify-center self-end">
               <div
-                className="absolute bottom-[12%] left-1/2 h-24 w-2/3 -translate-x-1/2 rounded-full bg-success/10 blur-3xl"
+                className="absolute bottom-[10%] left-1/2 h-24 w-2/3 -translate-x-1/2 rounded-full bg-success/10 blur-3xl"
                 aria-hidden="true"
               />
               <img
                 src={evoImage}
-                alt="EVO, a companheira inteligente da sua evolução em inglês"
+                alt="EVO, a professora de inglês com IA do Evoluir+"
                 width={848}
                 height={1264}
                 fetchPriority="high"
-                className="relative h-[58vh] max-h-[690px] w-full object-contain object-bottom drop-shadow-2xl lg:h-[88vh]"
+                className="relative h-[30vh] max-h-[560px] w-full object-contain object-bottom drop-shadow-2xl sm:h-[42vh] lg:h-[64vh]"
               />
             </div>
           </div>
-
-          <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70 sm:block">
-            Role para descobrir
-          </div>
         </section>
 
-        {/* TELA 2 — DOR + DIREÇÃO */}
-        <section className="min-h-[calc(100svh-4rem)] snap-start border-b border-border/70 bg-secondary/25">
-          <div className="mx-auto grid h-full min-h-[calc(100svh-4rem)] max-w-6xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-            <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-success">
-                Talvez seja isso
-              </p>
-              <h2 className="text-3xl font-bold leading-tight sm:text-5xl">
-                Talvez você não precise estudar mais.
-                <span className="mt-2 block text-success">Precise de direção.</span>
-              </h2>
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-lg">
-                Você pode aprender conteúdo, praticar e ainda assim não saber onde concentrar seu
-                esforço. O Evoluir+ transforma seu momento de aprendizagem em um próximo passo
-                concreto.
-              </p>
-            </div>
-
-            <div className="grid gap-3">
-              {[
-                ["Seu nível", "B2", "Onde você está agora"],
-                ["Suas habilidades", "Grammar · Vocabulary · Speaking", "O que já foi demonstrado"],
-                ["Seu próximo passo", "Praticar Speaking", "O que faz sentido agora"],
-              ].map(([label, value, detail], index) => (
-                <div key={label} className="card-soft relative overflow-hidden p-5 sm:p-6">
-                  <div
-                    className="absolute left-0 top-0 h-full w-1 bg-success/70"
-                    aria-hidden="true"
-                  />
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                        {label}
-                      </p>
-                      <p className="mt-2 text-base font-bold sm:text-xl">{value}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
-                    </div>
-                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-success/10 text-xs font-bold text-success">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
+        {/* FORTALEZAS — the real features, side by side */}
+        <section className="border-b border-border/70 bg-secondary/25">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
+              O que você encontra no Evoluir+
+            </p>
+            <h2 className="max-w-3xl text-2xl font-bold leading-tight sm:text-4xl">
+              Tudo o que faltava para você usar o inglês de verdade.
+            </h2>
+            <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+              {strengths.map(({ icon: Icon, title, text }) => (
+                <li key={title} className="card-soft flex gap-3 p-4 sm:p-5">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-success/12 text-success">
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold sm:text-base">{title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                      {text}
+                    </p>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* TELA 3 — MECANISMO */}
-        <section className="min-h-[calc(100svh-4rem)] snap-start border-b border-border/70">
-          <div className="mx-auto flex h-full min-h-[calc(100svh-4rem)] max-w-7xl flex-col justify-center px-4 py-8 sm:px-6 lg:px-8">
-            <div className="max-w-3xl">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-success">
-                Como funciona
-              </p>
-              <h2 className="text-3xl font-bold leading-tight sm:text-5xl">
-                Seu aprendizado acompanha você.
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-lg">
-                A experiência começa no que você já sabe e continua a partir do que precisa
-                desenvolver.
-              </p>
-            </div>
-
-            <ol className="mt-8 grid gap-3 sm:grid-cols-2 lg:mt-12 lg:grid-cols-4 lg:gap-5">
-              {journey.map(([number, title, text]) => (
-                <li key={number} className="card-soft p-5 sm:p-6">
-                  <span className="text-3xl font-bold text-success">{number}</span>
-                  <h3 className="mt-4 text-sm font-bold tracking-wide">{title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p>
                 </li>
               ))}
-            </ol>
+            </ul>
 
-            <div className="mt-7 border-l-2 border-success pl-4 text-sm font-medium text-foreground sm:mt-10 sm:text-base">
-              O objetivo não é colocar mais conteúdo na sua frente.
-              <span className="text-success"> É ajudar você a saber o que fazer a seguir.</span>
+            {/* Metas: the "More than English" difference, in full width */}
+            <div className="card-soft mt-3 flex flex-col gap-3 border-success/40 p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5 lg:mt-4">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-warning/15 text-warning">
+                <Flag className="size-5" aria-hidden="true" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-warning">
+                  More than English
+                </p>
+                <h3 className="mt-0.5 text-base font-bold sm:text-lg">
+                  Metas além do inglês, na mesma rotina
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                  Escolha até 3 metas pessoais (carreira, saúde, finanças) e receba da EVO um
+                  pequeno passo por dia. Cada dia cumprido conta na sua sequência de estudo e na
+                  liga semanal.
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* TELA 4 — PRODUTO */}
-        <section className="min-h-[calc(100svh-4rem)] snap-start border-b border-border/70 bg-secondary/40">
-          <div className="mx-auto flex h-full min-h-[calc(100svh-4rem)] max-w-7xl flex-col justify-center px-4 py-8 sm:px-6 lg:px-8">
+        {/* PRODUTO + COMO FUNCIONA */}
+        <section className="border-b border-border/70">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-success">
+                <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
                   Por dentro do app
                 </p>
-                <h2 className="text-3xl font-bold leading-tight sm:text-5xl">
+                <h2 className="text-2xl font-bold leading-tight sm:text-4xl">
                   Não é promessa. É o produto.
                 </h2>
               </div>
-              <p className="max-w-md text-sm leading-relaxed text-muted-foreground sm:text-right">
-                Conheça algumas das experiências que transformam direção em prática.
+              <p className="max-w-md text-xs leading-relaxed text-muted-foreground sm:text-right sm:text-sm">
+                Telas reais do app, com dados de demonstração.
               </p>
             </div>
 
@@ -283,9 +324,9 @@ function CommercialLanding() {
                     decoding="async"
                     className="aspect-[1069/715] w-full border-b border-border bg-background object-cover object-top"
                   />
-                  <figcaption className="p-4 sm:p-5">
+                  <figcaption className="p-4">
                     <h3 className="text-sm font-bold sm:text-base">{screen.title}</h3>
-                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
                       {screen.text}
                     </p>
                   </figcaption>
@@ -293,51 +334,65 @@ function CommercialLanding() {
               ))}
             </div>
 
-            <p className="mt-3 text-[10px] text-muted-foreground">
-              Telas reais do app, com dados de demonstração.
-            </p>
+            <h2 className="mt-10 text-xl font-bold sm:text-2xl">Como funciona</h2>
+            <ol className="mt-4 grid gap-3 sm:grid-cols-3 lg:gap-4">
+              {steps.map(([number, title, text]) => (
+                <li key={number} className="card-soft flex gap-3 p-4">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-success/12 text-sm font-bold text-success">
+                    {number}
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-bold">{title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                      {text}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
-        {/* TELA 5 — CTA */}
-        <section className="relative min-h-[calc(100svh-4rem)] snap-start overflow-hidden">
+        {/* FAQ */}
+        <section className="border-b border-border/70 bg-secondary/25">
+          <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+            <h2 className="text-xl font-bold sm:text-2xl">Perguntas frequentes</h2>
+            <div className="mt-4 grid gap-2">
+              {faq.map(([question, answer]) => (
+                <details key={question} className="card-soft group p-4">
+                  <summary className="cursor-pointer list-none text-sm font-semibold marker:hidden">
+                    <span className="flex items-center justify-between gap-3">
+                      {question}
+                      <ArrowRight
+                        className="size-4 shrink-0 text-success transition-transform group-open:rotate-90"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </summary>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{answer}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA FINAL */}
+        <section className="relative overflow-hidden">
           <div className="absolute inset-0 surface-hero opacity-55" aria-hidden="true" />
-
-          <div className="relative mx-auto grid h-full min-h-[calc(100svh-4rem)] max-w-6xl items-center gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_0.7fr] lg:px-8">
-            <div className="max-w-2xl">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-success">
-                More than English
-              </p>
-              <h2 className="text-4xl font-bold leading-[1.06] sm:text-6xl">
-                Seu próximo passo
-                <span className="block text-gradient-growth">começa aqui.</span>
-              </h2>
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-lg">
-                Conheça uma experiência de aprendizagem que acompanha seu nível, sua prática e sua
-                evolução.
-              </p>
-              <Button asChild size="lg" className="mt-7 min-h-12 w-full sm:w-auto">
-                <Link to="/auth" search={{ mode: "signup" }}>
-                  Conhecer o Evoluir+ <ArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-              <p className="mt-3 text-xs text-muted-foreground">
-                Entre gratuitamente e conheça o app.
-              </p>
-            </div>
-
-            <div className="relative mx-auto hidden h-full w-full max-w-[390px] items-end justify-center sm:flex">
-              <img
-                src={evoImage}
-                alt=""
-                width={848}
-                height={1264}
-                loading="lazy"
-                decoding="async"
-                className="h-[68vh] max-h-[650px] w-full object-contain object-bottom drop-shadow-2xl"
-                aria-hidden="true"
-              />
-            </div>
+          <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 py-12 text-center sm:px-6 lg:py-16">
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
+              More than English
+            </p>
+            <h2 className="text-3xl font-bold leading-tight sm:text-5xl">
+              Sua primeira conversa com a EVO
+              <span className="block text-gradient-growth">começa hoje.</span>
+            </h2>
+            <Button asChild size="lg" className="mt-6 min-h-12 w-full sm:w-auto">
+              <Link to="/auth" search={{ mode: "signup" }} onClick={countSignupClick}>
+                Começar grátis <ArrowRight aria-hidden="true" />
+              </Link>
+            </Button>
+            <p className="mt-3 text-xs text-muted-foreground">Teste de nível rápido · sem cartão</p>
           </div>
         </section>
       </main>
