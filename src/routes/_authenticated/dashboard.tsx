@@ -522,7 +522,7 @@ function Dashboard() {
                   {minutesToday >= profile.daily_minutes && (
                     <p className="mt-1 inline-flex items-center justify-center gap-1 whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-brand-green">
                       <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
-                      {t("Daily goal reached")}
+                      {t("Daily goal reached!")}
                     </p>
                   )}
                 </div>
