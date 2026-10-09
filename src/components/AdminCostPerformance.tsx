@@ -132,7 +132,12 @@ export function AdminCostPerformance() {
               ],
               ["Latência média", fmtMs(query.data.avgMs)],
               ["Taxa de erro", fmtPct(query.data.errorRate)],
-              ["Cache HIT", query.data.cacheHits.toLocaleString()],
+              [
+                "Cache HIT (cumulativo)",
+                query.data.cacheHitsOutsideTable > 0
+                  ? `${query.data.cacheHits.toLocaleString()} · ${query.data.cacheHitsOutsideTable} fora da tabela`
+                  : query.data.cacheHits.toLocaleString(),
+              ],
               ["Economia do cache", ND],
             ].map(([label, value]) => (
               <div key={label} className="rounded-md border border-border bg-muted/30 p-3">

@@ -185,3 +185,47 @@ describe("aggregateCostPerformance", () => {
     expect(opener).toMatchObject({ calls: 1, firstChunkMs: null, firstChunkCount: 0 });
   });
 });
+
+describe("admin coherence (user request: the card and the table agree)", () => {
+  const row = (operation: string, model: string) => ({
+    operation,
+    model,
+    success: true,
+    duration_ms: 1000,
+    input_tokens: null,
+    output_tokens: null,
+    estimated_cost: null,
+    error_code: null,
+  });
+
+  it("counts cache hits of operations with no call in the period apart", () => {
+    const result = aggregateCostPerformance(
+      [row("teacher", "gemini-3.6-flash")],
+      [
+        {
+          operation: "teacher",
+          model: "gemini-3.6-flash",
+          hit_count: 1,
+          expires_at: "2999-01-01T00:00:00.000Z",
+        },
+        {
+          operation: "dictionary",
+          model: "gemini-3",
+          hit_count: 2,
+          expires_at: "2999-01-01T00:00:00.000Z",
+        },
+      ],
+    );
+    expect(result.cacheHits).toBe(3);
+    expect(result.cacheHitsOutsideTable).toBe(2);
+  });
+
+  it("names the Lovable AI rows as the fallback path", () => {
+    const result = aggregateCostPerformance(
+      [row("talking", "gemini-3.6-flash"), row("talking", "openai/gpt-6-astra")],
+      [],
+    );
+    const labels = result.comparisons.map((entry) => entry.label).sort();
+    expect(labels).toEqual(["AI Speaking", "AI Speaking · reserva (Lovable)"]);
+  });
+});

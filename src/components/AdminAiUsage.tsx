@@ -59,8 +59,11 @@ export function AdminAiUsage() {
         <>
           <p className="mb-2 text-sm text-muted-foreground">
             Total AI calls ({q.data.days}d): <strong>{q.data.totalCalls}</strong>
-            {q.data.truncated ? " (first 10,000)" : ""} · Cost: not determinable (no reliable price
-            data) · First chunk: {ND} (not recorded)
+            {q.data.truncated ? " (first 10,000)" : ""} · Measured cost:{" "}
+            {q.data.estimatedCost === null
+              ? ND
+              : `$${q.data.estimatedCost.toFixed(2)} (${q.data.costCoverage}/${q.data.totalCalls} calls with tokens)`}{" "}
+            · Cost per operation and time to the first word/sound: Cost &amp; Performance tab
           </p>
           <div className="max-h-[50vh] overflow-auto">
             <table className="w-full min-w-[900px] text-left text-xs">
@@ -200,10 +203,20 @@ function LatencyByDay({ trend }: { trend: Trend }) {
                         }`}
                       >
                         {cell ? (
-                          <>
-                            {fmtMs(median)}
-                            <span className="text-muted-foreground"> · {cell.calls}</span>
-                          </>
+                          median === null ? (
+                            // Every call of the day was cancelled, blocked or failed.
+                            <span
+                              className="text-muted-foreground"
+                              title="No call finished this day (cancelled, blocked or failed), so there is no answer time"
+                            >
+                              no OK · {cell.calls}
+                            </span>
+                          ) : (
+                            <>
+                              {fmtMs(median)}
+                              <span className="text-muted-foreground"> · {cell.calls}</span>
+                            </>
+                          )
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}

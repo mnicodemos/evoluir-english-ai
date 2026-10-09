@@ -263,7 +263,11 @@ export function aggregateCostPerformance(
       const realErrors = groupRows.filter(isRealError).length;
       return {
         operation,
-        label: `${OPERATION_FACTS[operation]?.label ?? operation}${phase ? " · reply (streaming)" : ""}`,
+        // The Lovable AI rows are the fallback path, so they read as such
+        // instead of a second, unexplained line for the same operation.
+        label: `${OPERATION_FACTS[operation]?.label ?? operation}${phase ? " · reply (streaming)" : ""}${
+          model.includes("/") ? " · reserva (Lovable)" : ""
+        }`,
         provider: benchmarkProviderOf(operation, model),
         model,
         calls: groupRows.length,
@@ -333,6 +337,11 @@ export function aggregateCostPerformance(
       : null,
     errorRate: rows.length ? (rows.filter(isRealError).length / rows.length) * 100 : null,
     cacheHits: cacheRows.reduce((sum, row) => sum + row.hit_count, 0),
+    // Hits of operations with no call in the period (a cached answer makes no
+    // call), so the card and the table add up (user request).
+    cacheHitsOutsideTable:
+      cacheRows.reduce((sum, row) => sum + row.hit_count, 0) -
+      comparisons.reduce((sum, row) => sum + row.cacheHits, 0),
     activeCacheEntries: cacheRows.filter((row) => Date.parse(row.expires_at) > now).length,
     lovableCredits: null,
     ...cost,
@@ -353,7 +362,7 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
     const { data: rows, error } = await supabaseAdmin
       .from("ai_usage_events")
       .select(
-        "operation, model, success, status, duration_ms, input_tokens, output_tokens, error_code, created_at",
+        "operation, model, success, status, duration_ms, input_tokens, output_tokens, estimated_cost, error_code, created_at",
       )
       .gte("created_at", since)
       .order("created_at", { ascending: false })
@@ -470,9 +479,14 @@ export const getAiUsageSummary = createServerFn({ method: "GET" })
       .sort((x, y) => y.calls - x.calls);
 
     const trend = latencyByDay(rows ?? []);
+    // Same measured cost as the Cost & Performance tab (user request: the two
+    // tabs must agree), instead of "not determinable".
+    const cost = costSummary((rows ?? []) as BenchmarkUsageRow[]);
     return {
       days: data.days,
       totalCalls: (rows ?? []).length,
+      estimatedCost: cost.estimatedCost,
+      costCoverage: cost.costCoverage,
       truncated: (rows ?? []).length >= 10000,
       operations,
       latencyTrend: {
