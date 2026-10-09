@@ -91,7 +91,7 @@ export function LaunchCampaignPopup() {
           src={launchArt}
           alt=""
           width={640}
-          height={837}
+          height={845}
           className="block max-h-[58svh] w-full bg-black object-contain"
         />
         <div className="space-y-3 p-4">
