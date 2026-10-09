@@ -77,7 +77,6 @@ const dashboardSidebarNav = [
   { to: "/goals", label: "Goals", icon: Target, group: "Plan" },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
-  { to: "/business", label: "Business English", icon: Briefcase },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen, group: "Practice" },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/writing", label: "Writing", icon: PenLine },
