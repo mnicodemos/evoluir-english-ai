@@ -19,6 +19,7 @@ export const telemetryInputSchema = z
       "flashcards",
       "teacher",
       "mistakes_review",
+      "video_call",
     ]),
     minutes: z.number().int().min(1).max(1440),
   })

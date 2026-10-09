@@ -118,6 +118,7 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
     writing_practice: "writing",
     conversation: "speaking",
     conversation_practice: "speaking",
+    video_call: "speaking",
     vocabulary: "vocabulary",
     flashcards: "vocabulary",
     teacher: "grammar",

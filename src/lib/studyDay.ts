@@ -24,6 +24,7 @@ export const LEARNING_ACTIVITY_TYPES = [
   "flashcards",
   "teacher",
   "mistakes_review",
+  "video_call",
 ] as const;
 
 export function countsAsLearningMinutes(activityType: string) {
@@ -102,6 +103,7 @@ export const ACTIVITY_SKILL_BUCKETS = {
   writing_practice: "Writing",
   teacher: "Writing",
   mistakes_review: "Writing",
+  video_call: "Talking",
 } as const satisfies Record<string, "Listening" | "Reading" | "Talking" | "Writing">;
 
 export type SkillBucket = (typeof ACTIVITY_SKILL_BUCKETS)[keyof typeof ACTIVITY_SKILL_BUCKETS];

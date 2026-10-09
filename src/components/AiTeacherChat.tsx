@@ -13,7 +13,6 @@ import { EvoAvatar } from "@/components/EvoAvatar";
 import { EvoGuide } from "@/components/EvoGuide";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
@@ -266,7 +265,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
         />
       )}
 
-      <Card className="flex min-h-[16rem] flex-1 flex-col overflow-hidden p-0 sm:h-[min(62dvh,42rem)] sm:min-h-[22.5rem] sm:flex-none">
+      <div className="card-soft flex min-h-[16rem] flex-1 flex-col overflow-hidden p-0 sm:h-[min(62dvh,42rem)] sm:min-h-[22.5rem] sm:flex-none">
         <Conversation className="flex-1">
           <ConversationContent className="gap-6 p-4">
             {messages.length === 0 && (
@@ -338,7 +337,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
         </Conversation>
 
         <form
-          className="flex items-end gap-2 border-t bg-card p-3"
+          className="flex items-end gap-2 border-t border-border bg-card p-3"
           onSubmit={(event) => {
             event.preventDefault();
             send(input);
@@ -378,7 +377,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             <Send className="size-4" aria-hidden="true" />
           </Button>
         </form>
-      </Card>
+      </div>
     </div>
   );
 }

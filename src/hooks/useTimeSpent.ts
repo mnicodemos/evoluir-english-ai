@@ -145,7 +145,8 @@ export function useLogTimeOnExit(params: {
               | "final_test_practice"
               | "flashcards"
               | "teacher"
-              | "mistakes_review",
+              | "mistakes_review"
+              | "video_call",
             minutes,
           },
         });
