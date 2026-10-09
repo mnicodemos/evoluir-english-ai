@@ -669,6 +669,27 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_content_templates: {
+        Row: {
+          content: Json
+          created_at: string
+          curriculum_key: string
+          prompt_hash: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          curriculum_key: string
+          prompt_hash: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          curriculum_key?: string
+          prompt_hash?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           category: string

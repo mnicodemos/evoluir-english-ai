@@ -372,6 +372,13 @@
       "when": 1791504113777,
       "tag": "0052_premium_launch_campaign",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1791504138019,
+      "tag": "0053_lesson_content_templates",
+      "breakpoints": true
     }
   ]
 }
