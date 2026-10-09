@@ -16,10 +16,10 @@ describe("Business English track", () => {
     expect(businessLevelAllowed("c2")).toBe(true);
   });
 
-  it("has 30 lessons written at the student's level, outside the CEFR path", () => {
+  it("has 36 lessons written at the student's level, outside the CEFR path", () => {
     const course = getBusinessCourse("b2");
-    expect(course).toHaveLength(30);
-    expect(new Set(course.map((lesson) => lesson.key)).size).toBe(30);
+    expect(course).toHaveLength(36);
+    expect(new Set(course.map((lesson) => lesson.key)).size).toBe(36);
     expect(course.every((lesson) => lesson.level === "b2" && lesson.category === "business")).toBe(
       true,
     );

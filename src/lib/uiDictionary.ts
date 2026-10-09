@@ -1556,8 +1556,8 @@ export const uiPt: Record<string, string> = {
   "Nothing else to review right now.": "Nada mais para revisar agora.",
   "Premium bonus": "Bônus Premium",
   "Business English": "Inglês para Negócios",
-  "Meetings, e-mails, presentations, interviews and negotiation, written at your level.":
-    "Reuniões, e-mails, apresentações, entrevistas e negociação, no seu nível.",
+  "Meetings, e-mails, presentations, interviews, negotiation and networking, written at your level.":
+    "Reuniões, e-mails, apresentações, entrevistas, negociação e networking, no seu nível.",
   "Business English opens at level B1.": "O Inglês para Negócios abre no nível B1.",
   "You are at": "Você está no",
   "Keep going in your learning path to unlock it.":
@@ -1568,13 +1568,14 @@ export const uiPt: Record<string, string> = {
     "Situações reais de trabalho: a EVO faz o papel da outra pessoa.",
   Talk: "Conversar",
   Call: "Ligar",
-  "The first lesson is free. Premium opens all 30 Business lessons.":
-    "A primeira lição é grátis. O Premium libera as 30 lições de Negócios.",
+  "The first lesson is free. Premium opens all 36 Business lessons.":
+    "A primeira lição é grátis. O Premium libera as 36 lições de Negócios.",
   "Unit 1 — Meetings": "Unidade 1 — Reuniões",
   "Unit 2 — E-mails and Messages": "Unidade 2 — E-mails e mensagens",
   "Unit 3 — Presentations": "Unidade 3 — Apresentações",
   "Unit 4 — Job Interviews": "Unidade 4 — Entrevistas de emprego",
   "Unit 5 — Clients and Negotiation": "Unidade 5 — Clientes e negociação",
+  "Unit 6 — Networking and Small Talk": "Unidade 6 — Networking e conversa informal",
   "Status meeting": "Reunião de status",
   "Client call": "Ligação com cliente",
   Negotiation: "Negociação",
@@ -1582,4 +1583,8 @@ export const uiPt: Record<string, string> = {
   "Business English is part of Premium.": "O Inglês para Negócios faz parte do Premium.",
   "This lesson is not part of Business English.":
     "Esta lição não faz parte do Inglês para Negócios.",
+  "Download all units (PDF)": "Baixar todas as unidades (PDF)",
+  "Download PDF": "Baixar PDF",
+  "Your PDF is downloading.": "Seu PDF está sendo baixado.",
+  "Could not build the PDF. Please try again.": "Não foi possível gerar o PDF. Tente novamente.",
 };

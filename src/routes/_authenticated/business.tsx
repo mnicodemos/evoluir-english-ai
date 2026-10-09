@@ -5,6 +5,7 @@ import {
   Briefcase,
   CheckCircle2,
   Crown,
+  Download,
   Loader2,
   Lock,
   MessageSquareText,
@@ -53,6 +54,8 @@ function BusinessPage() {
   const open = useServerFn(openBusinessLesson);
   const access = useServerFn(loadBusinessAccess);
   const [opening, setOpening] = useState<string | null>(null);
+  // "all" or the unit number whose PDF is being built.
+  const [downloading, setDownloading] = useState<number | "all" | null>(null);
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
@@ -91,6 +94,29 @@ function BusinessPage() {
   const all = units.flatMap((unit) => unit.lessons);
   const completedCount = all.filter((lesson) => lesson.completed).length;
 
+  async function downloadPdf(unit?: number) {
+    setDownloading(unit ?? "all");
+    try {
+      // The PDF library loads only when a download is requested.
+      const { downloadBusinessCourse } = await import("@/lib/businessCourseReport");
+      const saved = await downloadBusinessCourse({
+        level: level ?? "b1",
+        ...(unit ? { unit } : {}),
+      });
+      if (saved) toast.success(t("Your PDF is downloading."));
+      else
+        toast.info(
+          t(
+            "Downloads are blocked inside the editor preview. Open the app in its own browser tab and tap the button again.",
+          ),
+        );
+    } catch {
+      toast.error(t("Could not build the PDF. Please try again."));
+    } finally {
+      setDownloading(null);
+    }
+  }
+
   const openLesson = useMutation({
     mutationFn: async (key: string) => {
       setOpening(key);
@@ -118,7 +144,8 @@ function BusinessPage() {
             Business English
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Meetings, e-mails, presentations, interviews and negotiation, written at your level.
+            Meetings, e-mails, presentations, interviews, negotiation and networking, written at
+            your level.
           </p>
         </header>
 
@@ -172,7 +199,7 @@ function BusinessPage() {
             {!premium && (
               <section className="flex flex-col gap-3 rounded-2xl border border-warning/40 bg-warning/10 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm">
-                  The first lesson is free. Premium opens all 30 Business lessons.
+                  The first lesson is free. Premium opens all 36 Business lessons.
                 </p>
                 <Button asChild size="sm" className="shrink-0">
                   <Link to="/premium">See plans</Link>
@@ -180,14 +207,48 @@ function BusinessPage() {
               </section>
             )}
 
-            <p className="text-sm text-muted-foreground">
-              <span>{completedCount}</span>/<span>{all.length}</span> <span>lessons completed</span>
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm text-muted-foreground">
+                <span>{completedCount}</span>/<span>{all.length}</span>{" "}
+                <span>lessons completed</span>
+              </p>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="gap-1.5"
+                disabled={downloading !== null}
+                onClick={() => void downloadPdf()}
+              >
+                {downloading === "all" ? (
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Download className="size-4" aria-hidden="true" />
+                )}
+                {t("Download all units (PDF)")}
+              </Button>
+            </div>
 
-            <div className="grid gap-4 lg:grid-cols-2">
+            {/* Six units: three columns in two rows on wide screens. */}
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {units.map((unit) => (
-                <section key={unit.unit} className="card-soft space-y-2 p-4">
-                  <h2 className="text-sm font-semibold">{unit.title}</h2>
+                <section key={unit.unit} className="card-soft flex flex-col gap-2 p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <h2 className="text-sm font-semibold">{unit.title}</h2>
+                    <button
+                      type="button"
+                      onClick={() => void downloadPdf(unit.unit)}
+                      disabled={downloading !== null}
+                      aria-label={`${t("Download PDF")} · ${t(unit.title)}`}
+                      title={t("Download PDF")}
+                      className="grid size-8 shrink-0 place-items-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-brand-green/50 hover:text-brand-green disabled:opacity-50"
+                    >
+                      {downloading === unit.unit ? (
+                        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Download className="size-4" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
                   <ol className="space-y-1.5">
                     {unit.lessons.map((lesson) => {
                       const blocked = lesson.locked || lesson.premiumLocked;
