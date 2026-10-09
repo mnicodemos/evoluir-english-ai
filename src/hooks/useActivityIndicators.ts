@@ -180,11 +180,10 @@ export function useActivityIndicators(): ActivityIndicators {
     ];
 
     setIndicators({
-      ready:
-        savedPractice !== undefined &&
-        roundStart !== undefined &&
-        !vocabularyLoading &&
-        !vocabularyFetching,
+      // Only the first load counts as "not known": a background re-read (every
+      // 15 s while a batch is empty, or after a mastery change) keeps the last
+      // answer, so the Vocabulary row no longer blinks away and back (user request).
+      ready: savedPractice !== undefined && roundStart !== undefined && !vocabularyLoading,
       // Same rule as the Listening page: a listening saved after the round
       // began counts as done on every device of this account.
       listening:
@@ -203,7 +202,7 @@ export function useActivityIndicators(): ActivityIndicators {
       }),
       vocabulary: vocabularyIndicatorVisible({
         batch: vocabularyBatch,
-        isLoading: vocabularyLoading || vocabularyFetching,
+        isLoading: vocabularyLoading,
         isError: vocabularyError,
         generationFailed: vocabularyGenerationRecentlyFailed(
           readText(vocabularyGenerationFailureKey(profile.id, round)),
@@ -217,7 +216,6 @@ export function useActivityIndicators(): ActivityIndicators {
     savedPractice,
     vocabularyBatch,
     vocabularyError,
-    vocabularyFetching,
     vocabularyLoading,
   ]);
 
