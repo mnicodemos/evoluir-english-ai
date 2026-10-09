@@ -919,22 +919,25 @@ export type Database = {
         Row: {
           days: number
           enabled: boolean
+          ends_at: string | null
           id: string
-          slots: number
+          slots: number | null
           starts_at: string
         }
         Insert: {
           days: number
           enabled?: boolean
+          ends_at?: string | null
           id: string
-          slots: number
+          slots?: number | null
           starts_at: string
         }
         Update: {
           days?: number
           enabled?: boolean
+          ends_at?: string | null
           id?: string
-          slots?: number
+          slots?: number | null
           starts_at?: string
         }
         Relationships: []
