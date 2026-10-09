@@ -133,7 +133,7 @@ export function GoalsTodayCard() {
       ) : (
         // Three slots (user request): with one goal, EVO's step takes two of them;
         // a free slot invites the next goal instead of sitting empty.
-        <ul className="mt-2 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1">
+        <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1">
           {goals.map((goal) => {
             const step = steps.find((item) => item.goalId === goal.id) ?? null;
             return (
@@ -145,6 +145,7 @@ export function GoalsTodayCard() {
                 week={plusGoalWeek(recent, goal.id, data?.today ?? "")}
                 featured={goals.length === 1}
                 dayComplete={allDone}
+                stepsLeft={steps.filter((item) => !item.doneAt).length}
                 celebrate={!!step && justDone === step.id}
                 busy={toggle.isPending}
                 onToggle={(done) => step && toggle.mutate({ id: step.id, done })}
@@ -156,16 +157,18 @@ export function GoalsTodayCard() {
             <li className="min-w-0">
               <Link
                 to="/goals"
-                className="flex h-full min-h-20 flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-border p-3 text-center transition-colors hover:border-brand-green/50 hover:bg-secondary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                className="flex h-full min-w-0 flex-col justify-center gap-0.5 rounded-lg border border-dashed border-border px-3 py-1.5 transition-colors hover:border-brand-green/50 hover:bg-secondary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
               >
-                <span
-                  className="grid size-8 place-items-center rounded-full bg-brand-green/15 text-brand-green"
-                  aria-hidden="true"
-                >
-                  <Plus className="size-4" strokeWidth={3} />
+                <span className="flex items-center gap-1.5 text-xs font-semibold">
+                  <span
+                    className="grid size-5 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green"
+                    aria-hidden="true"
+                  >
+                    <Plus className="size-3" strokeWidth={3} />
+                  </span>
+                  {t("Add another goal")}
                 </span>
-                <span className="text-xs font-semibold">{t("Add another goal")}</span>
-                <span className="text-[11px] leading-snug text-muted-foreground">
+                <span className="line-clamp-2 text-[11px] leading-snug text-muted-foreground">
                   {t("Up to 3 goals, one small step a day.")}
                 </span>
               </Link>
@@ -178,9 +181,10 @@ export function GoalsTodayCard() {
 }
 
 /**
- * One goal's step (user request: a step that encourages, not a cramped to-do):
- * the whole step, the goal's last 7 days, a clear button and a short
- * celebration that says what the tick is worth.
+ * One goal's step (user request: a step that encourages, not a cramped to-do),
+ * kept as compact as the old row so the Dashboard still fits one screen: the
+ * step, the goal's last 7 days and the English practice link on the left, the
+ * button on the right, and a one-line note once the step is done.
  */
 function GoalTile({
   goalId,
@@ -189,6 +193,7 @@ function GoalTile({
   week,
   featured,
   dayComplete,
+  stepsLeft,
   celebrate,
   busy,
   onToggle,
@@ -200,133 +205,162 @@ function GoalTile({
   week: PlusGoalWeek;
   featured: boolean;
   dayComplete: boolean;
+  stepsLeft: number;
   celebrate: boolean;
   busy: boolean;
   onToggle: (done: boolean) => void;
   t: (label: string) => string;
 }) {
   const done = !!step?.doneAt;
+  const dots = (
+    <span
+      className="flex shrink-0 items-center gap-1"
+      title={`${t("Last 7 days")}: ${t("{n} of 7 days").replace("{n}", String(week.doneCount))}`}
+    >
+      {/* Narrow tiles on smaller screens keep the goal's name and only the 🔥 run. */}
+      <span
+        className={cn("flex gap-0.5", !featured && "hidden min-[1536px]:flex")}
+        aria-hidden="true"
+      >
+        {week.days.map((item, index) => (
+          <span
+            key={item.day}
+            className={cn(
+              "size-1.5 rounded-full",
+              item.done ? "bg-brand-green" : "bg-muted-foreground/25",
+              index === week.days.length - 1 && !item.done && "ring-1 ring-brand-green/60",
+            )}
+          />
+        ))}
+      </span>
+      <span className={cn("text-[10px] font-medium text-muted-foreground", !featured && "sr-only")}>
+        {t("{n} of 7 days").replace("{n}", String(week.doneCount))}
+      </span>
+      {week.streak >= 2 ? (
+        <span
+          className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-warning"
+          title={t("{n} days in a row").replace("{n}", String(week.streak))}
+        >
+          <Flame className="size-3" aria-hidden="true" />
+          {String(week.streak)}
+        </span>
+      ) : null}
+    </span>
+  );
+  const dayNote = dayComplete
+    ? t("Your study day counts!")
+    : stepsLeft === 1
+      ? t("1 more step to count your day")
+      : t("{n} more steps to count your day").replace("{n}", String(stepsLeft));
   return (
     <li
       className={cn(
-        "flex min-w-0 flex-col gap-2 rounded-lg p-3 transition-colors",
+        "flex min-w-0 items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition-colors",
         featured && "sm:col-span-2",
         done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
       )}
     >
-      <div className="flex min-w-0 items-start gap-3">
-        {featured ? <EvoAvatar decorative className="size-11 shrink-0" /> : null}
-        <div className="min-w-0 flex-1">
-          <div className="min-w-0">
-            <p className="min-w-0 break-words text-[11px] font-semibold leading-snug text-muted-foreground">
-              {featured ? (
-                <>
-                  <span className="text-brand-green">{t("Your step today")}</span>
-                  <span aria-hidden="true"> · </span>
-                </>
-              ) : null}
-              <span translate="no">{title}</span>
-            </p>
-          </div>
+      {featured ? <EvoAvatar decorative className="size-9 shrink-0" /> : null}
+      <div className="min-w-0 flex-1">
+        {/* Goal and its week on one line, so the step keeps two full lines. */}
+        <div className="flex min-w-0 items-center gap-2">
+          <p className="min-w-0 flex-1 truncate text-[11px] font-semibold leading-tight text-muted-foreground">
+            {featured ? (
+              <>
+                <span className="text-brand-green">{t("Your step today")}</span>
+                <span aria-hidden="true"> · </span>
+              </>
+            ) : null}
+            <span translate="no" title={title}>
+              {title}
+            </span>
+          </p>
+          {dots}
+        </div>
+        <p
+          className={cn(
+            "mt-0.5 text-xs leading-snug",
+            done ? "line-clamp-1 text-muted-foreground" : "line-clamp-2",
+          )}
+          title={step?.text}
+          translate="no"
+        >
+          {step?.text ?? "…"}
+        </p>
+        {done ? (
           <p
             className={cn(
-              "mt-1 leading-snug",
-              featured ? "text-sm" : "text-xs",
-              done && "text-muted-foreground",
+              "truncate text-[11px] font-semibold leading-snug",
+              dayComplete ? "text-brand-green" : "text-muted-foreground",
+              celebrate && "animate-in fade-in-0 slide-in-from-bottom-1 duration-500",
             )}
-            translate="no"
           >
-            {step?.text ?? "…"}
+            {dayNote}
           </p>
-          {/* Secondary on purpose (user decision): the goal's English, with EVO. */}
-          <Link
-            to="/coach"
-            search={{ goal: goalId }}
-            className="mt-1 inline-flex items-center gap-1 rounded text-[11px] font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-          >
-            <MessageSquareText className="size-3.5 shrink-0" aria-hidden="true" />
-            {t("Practise it in English with EVO")}
-            <ChevronRight className="size-3 shrink-0" aria-hidden="true" />
-          </Link>
-        </div>
+        ) : null}
       </div>
 
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-1.5" title={t("Last 7 days")}>
-          <span className="flex gap-1" aria-hidden="true">
-            {week.days.map((item, index) => (
-              <span
-                key={item.day}
-                className={cn(
-                  "size-2 rounded-full",
-                  item.done ? "bg-brand-green" : "bg-muted-foreground/25",
-                  index === week.days.length - 1 && !item.done && "ring-1 ring-brand-green/60",
-                )}
-              />
-            ))}
-          </span>
-          <span className="text-[10px] font-medium text-muted-foreground">
-            {t("{n} of 7 days").replace("{n}", String(week.doneCount))}
-          </span>
-          {week.streak >= 2 ? (
-            <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-semibold text-warning">
-              <Flame className="size-3" aria-hidden="true" />
-              {t("{n} days in a row").replace("{n}", String(week.streak))}
-            </span>
-          ) : null}
-        </div>
+      <div className="flex shrink-0 flex-col items-center gap-1">
         {done ? (
-          <span className="flex items-center gap-2">
+          <>
             <span
               className={cn(
-                "inline-flex items-center gap-1 text-xs font-semibold text-brand-green",
+                "grid size-8 place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
                 celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
               )}
+              title={t("Step done!")}
             >
-              <span className="grid size-5 place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]">
-                <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
-              </span>
-              {t("Step done!")}
+              <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+              <span className="sr-only">{t("Step done!")}</span>
             </span>
             <button
               type="button"
               disabled={busy}
               onClick={() => onToggle(false)}
-              className="rounded text-[10px] text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+              className="rounded text-[10px] leading-none text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
             >
               {t("Undo")}
             </button>
-          </span>
+          </>
         ) : (
-          <Button
-            size="sm"
-            className="h-8 gap-1 bg-brand-green px-3 text-xs font-semibold text-[oklch(0.2_0.04_160)] hover:bg-brand-green/90"
-            disabled={!step || busy}
-            onClick={() => onToggle(true)}
-          >
-            <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
-            {t("Complete step")}
-          </Button>
+          <>
+            {featured ? (
+              <Button
+                size="sm"
+                className="h-8 gap-1 bg-brand-green px-3 text-xs font-semibold text-[oklch(0.2_0.04_160)] hover:bg-brand-green/90"
+                disabled={!step || busy}
+                onClick={() => onToggle(true)}
+              >
+                <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+                {t("Complete step")}
+              </Button>
+            ) : (
+              // Narrow tiles: the same action as a round button, so the row stays low.
+              <button
+                type="button"
+                disabled={!step || busy}
+                onClick={() => onToggle(true)}
+                aria-label={t("Complete step")}
+                title={t("Complete step")}
+                className="grid size-8 place-items-center rounded-full border-2 border-brand-green text-brand-green transition-colors hover:bg-brand-green hover:text-[oklch(0.2_0.04_160)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
+              >
+                <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+              </button>
+            )}
+            {/* Secondary on purpose (user decision): the goal's English, with EVO. */}
+            <Link
+              to="/coach"
+              search={{ goal: goalId }}
+              aria-label={t("Practise it in English with EVO")}
+              title={t("Practise it in English with EVO")}
+              className="inline-flex items-center gap-0.5 rounded text-[10px] font-semibold leading-none text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+            >
+              <MessageSquareText className="size-3 shrink-0" aria-hidden="true" />
+              {featured ? t("Practise in English") : t("English")}
+            </Link>
+          </>
         )}
       </div>
-
-      {done ? (
-        <p
-          className={cn(
-            "text-[11px] leading-snug text-muted-foreground",
-            celebrate && "animate-in fade-in-0 slide-in-from-bottom-1 duration-500",
-          )}
-        >
-          {dayComplete ? (
-            <span className="font-semibold text-brand-green">
-              {t("Today's steps done: your study day counts.")}
-            </span>
-          ) : (
-            t("Finish the other steps to count your day.")
-          )}{" "}
-          {t("Tomorrow EVO gives you a new step.")}
-        </p>
-      ) : null}
     </li>
   );
 }
