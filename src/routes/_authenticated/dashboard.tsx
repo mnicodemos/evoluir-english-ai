@@ -6,6 +6,7 @@ import {
   BookOpen,
   ChevronRight,
   CircleCheck,
+  Crown,
   Clock,
   Flame,
   Gem,
@@ -34,7 +35,9 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
+import { CampaignJourneyChip } from "@/components/CampaignJourney";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useCampaignJourney } from "@/hooks/useCampaignJourney";
 import { useDueReviewCount } from "@/hooks/useDueReviewCount";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import type { StudyPlanDay } from "@/lib/studyPlan";
@@ -90,9 +93,18 @@ function DashboardNotifications({
   translate,
   placement,
 }: DashboardNotificationsProps) {
-  // Everything the student still has to do, most immediate first: the plan's
-  // day, today's goal, due reviews, then new content in each area.
+  // Everything the student still has to do, most immediate first: the launch
+  // campaign's mission of the day, the plan's day, today's goal, due reviews,
+  // then new content in each area.
+  const journey = useCampaignJourney();
   const items = [
+    {
+      id: "journey",
+      to: journey?.message.to ?? "/coach",
+      label: journey ? translate(journey.message.title) : "",
+      icon: Crown,
+      visible: !!journey,
+    },
     {
       id: "plan",
       to: "/study-plan",
@@ -344,6 +356,7 @@ function Dashboard() {
               placement="dashboard-header"
               desktopSubtitleTrailing={
                 <div className="flex items-center gap-1">
+                  <CampaignJourneyChip translate={t} placement="desktop" />
                   <DashboardNotifications
                     indicators={indicators}
                     reviewCount={reviewCount}
@@ -359,6 +372,7 @@ function Dashboard() {
               }
               mobileTrailing={
                 <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+                  <CampaignJourneyChip translate={t} placement="mobile" />
                   <FirstWeekGuide profile={profile} placement="mobile" />
                   {/* Gem + number only: the word "days" pushed the greeting's name
                       out of the row. Screen readers still hear "20 days". */}
