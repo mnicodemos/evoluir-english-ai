@@ -3,6 +3,7 @@
 // always show the same figures. Callers pass the service-role client.
 
 import type { supabaseAdmin as SupabaseAdminClient } from "@/integrations/supabase/client.server";
+import { landingFunnel, type LandingStatRow } from "@/lib/landingStats";
 import { goalsReport } from "@/lib/plus";
 import { addDays, firstConversationStats, retentionReport } from "@/lib/retention";
 import { speakingWaitSummary } from "@/lib/speakingTiming";
@@ -187,4 +188,40 @@ export async function loadGoalsReport(supabaseAdmin: SupabaseAdmin) {
       .filter((step) => studentGoalIds.has(step.goal_id))
       .map((step) => ({ goalId: step.goal_id, done: step.done_at !== null })),
   );
+}
+
+/**
+ * Public home funnel for the last 7 and 30 days: anonymous visits and
+ * "Começar" clicks (migration 0054) next to signups, admins left out. Null
+ * until the migration is applied.
+ */
+export async function loadLandingFunnel(supabaseAdmin: SupabaseAdmin) {
+  const today = studyToday();
+  const since30 = addDays(today, -29);
+  const since7 = addDays(today, -6);
+  const { data, error } = await supabaseAdmin
+    .from("landing_daily_stats" as never)
+    .select("day, event, count")
+    .gte("day" as never, since30 as never);
+  if (error) return null;
+  const rows = (data ?? []) as unknown as LandingStatRow[];
+  const [{ data: profiles }, { data: admins }] = await Promise.all([
+    supabaseAdmin
+      .from("profiles")
+      .select("id, created_at")
+      .gte("created_at", new Date(`${since30}T00:00:00-03:00`).toISOString()),
+    supabaseAdmin.from("user_roles").select("user_id").eq("role", "admin"),
+  ]);
+  const adminIds = new Set((admins ?? []).map((row) => row.user_id));
+  const joined = (profiles ?? [])
+    .filter((row) => !adminIds.has(row.id))
+    .map((row) => studyToday(new Date(row.created_at)));
+  return {
+    week: landingFunnel(
+      rows.filter((row) => row.day >= since7),
+      joined.filter((day) => day >= since7).length,
+      7,
+    ),
+    month: landingFunnel(rows, joined.length, 30),
+  };
 }

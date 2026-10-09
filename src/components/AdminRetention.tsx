@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 
-import { getRetention } from "@/lib/admin.functions";
+import { getLandingFunnel, getRetention } from "@/lib/admin.functions";
+import type { LandingFunnel } from "@/lib/landingStats";
 import type { Rate } from "@/lib/retention";
 
 function percent(rate: Rate) {
@@ -16,6 +17,69 @@ function detail(rate: Rate) {
 function shortDate(day: string) {
   const [, month, date] = day.split("-");
   return `${date}/${month}`;
+}
+
+function rateText(value: number | null) {
+  return value === null ? "—" : `${value}%`;
+}
+
+/** Public home funnel: anonymous visits and clicks next to signups. */
+function LandingFunnelPanel() {
+  const load = useServerFn(getLandingFunnel);
+  const query = useQuery({ queryKey: ["admin", "landing-funnel"], queryFn: () => load() });
+  if (query.isPending || query.isError) return null;
+  if (!query.data) {
+    return (
+      <p className="rounded-xl border border-border p-3 text-xs text-muted-foreground">
+        Funil da página inicial: aplique a migração 0054 para começar a contar.
+      </p>
+    );
+  }
+  const rows: [string, LandingFunnel][] = [
+    ["7 dias", query.data.week],
+    ["30 dias", query.data.month],
+  ];
+  return (
+    <section className="rounded-xl border border-border p-3">
+      <h3 className="text-sm font-semibold">Página inicial</h3>
+      <p className="text-xs text-muted-foreground">
+        Visitas e cliques em "Começar" contados sem cookies, ao lado dos cadastros.
+      </p>
+      <table className="mt-2 w-full text-sm">
+        <thead>
+          <tr className="border-b border-border text-left text-xs text-muted-foreground">
+            <th className="py-1.5 pr-3 font-medium">Período</th>
+            <th className="py-1.5 pr-3 text-right font-medium">Visitas</th>
+            <th className="py-1.5 pr-3 text-right font-medium">Cliques</th>
+            <th className="py-1.5 text-right font-medium">Cadastros</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([label, funnel]) => (
+            <tr key={label} className="border-b border-border/60">
+              <td className="py-2 pr-3 font-medium">{label}</td>
+              <td className="py-2 pr-3 text-right">{funnel.visits}</td>
+              <td className="py-2 pr-3 text-right">
+                {funnel.signupClicks}{" "}
+                <span className="text-xs text-muted-foreground">
+                  ({rateText(funnel.clickRate)})
+                </span>
+              </td>
+              <td className="py-2 text-right">
+                {funnel.signups}{" "}
+                <span className="text-xs text-muted-foreground">
+                  ({rateText(funnel.signupRate)})
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Entre parênteses: cliques por visita e cadastros por clique.
+      </p>
+    </section>
+  );
 }
 
 /**
@@ -51,6 +115,7 @@ export function AdminRetention() {
 
   return (
     <div className="mt-4 space-y-4">
+      <LandingFunnelPanel />
       <div className="grid grid-cols-3 gap-2 text-center">
         {[
           { label: "Ativos hoje", value: report.activeToday },
