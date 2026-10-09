@@ -70,7 +70,7 @@ export function FirstWeekGuide({
         )}
       </PopoverTrigger>
       <PopoverContent
-        align={placement === "mobile" ? "end" : "start"}
+        align="end"
         className="dashboard-shell dark w-[min(21rem,calc(100vw-1.5rem))] border-notification-border bg-popover/80 p-3 backdrop-blur-md backdrop-saturate-150"
       >
         <div className="flex items-center gap-3">

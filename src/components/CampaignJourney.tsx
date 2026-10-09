@@ -48,7 +48,7 @@ export function CampaignJourneyChip({
         )}
       </PopoverTrigger>
       <PopoverContent
-        align={placement === "mobile" ? "end" : "start"}
+        align="end"
         sideOffset={8}
         className="dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] p-4"
       >
