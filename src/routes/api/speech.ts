@@ -72,6 +72,15 @@ export const Route = createFileRoute("/api/speech")({
               prompt: TTS_PROMPT_PREFIX,
             })
           : null;
+        // Speed (user request: EVO starts speaking sooner): the limit reads start
+        // now, alongside the cache read, instead of after it.
+        const reads = Promise.all([
+          loadAiLimit("tts"),
+          hashAiRequest(parsed.data.text),
+          releaseAbandonedAiUsage(userId, "tts"),
+        ]);
+        // A cache hit returns before the reads are used; their failure is handled below.
+        reads.catch(() => undefined);
         if (cacheKey) {
           const startedAt = Date.now();
           const cached = await readTtsCache(cacheKey);
@@ -97,34 +106,6 @@ export const Route = createFileRoute("/api/speech")({
           console.log(`[tts-cache] miss ${cacheKey.slice(0, 12)}`);
         }
 
-        let ticket;
-        try {
-          // Independent reads run together; only the reservation needs them all.
-          const [limit, requestHash] = await Promise.all([
-            loadAiLimit("tts"),
-            hashAiRequest(parsed.data.text),
-            releaseAbandonedAiUsage(userId, "tts"),
-          ]);
-          ticket = await reserveAiUsage({
-            userId,
-            operation: "tts",
-            model: GEMINI_TTS_MODEL,
-            requestHash,
-            limit,
-            abandonedReleased: true,
-          });
-        } catch (error) {
-          const headers = new Headers();
-          if (error instanceof AiUsageError && error.retryAfter)
-            headers.set("Retry-After", String(error.retryAfter));
-          return Response.json(
-            {
-              message: error instanceof Error ? error.message : "Audio is temporarily unavailable.",
-            },
-            { status: error instanceof AiUsageError ? error.status : 503, headers },
-          );
-        }
-
         const body = JSON.stringify({
           contents: [
             {
@@ -138,7 +119,11 @@ export const Route = createFileRoute("/api/speech")({
           },
         });
 
-        const upstream = await fetch(
+        // The voice request starts while the reservation is checked (the voice
+        // model is the slow part, about 3 s to the first sound); a refused
+        // reservation cancels it before any audio is produced.
+        const upstreamController = new AbortController();
+        const upstreamRequest = fetch(
           `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${GEMINI_TTS_MODEL}:streamGenerateContent?alt=sse`,
           {
             method: "POST",
@@ -148,8 +133,47 @@ export const Route = createFileRoute("/api/speech")({
               "Content-Type": "application/json",
             },
             body,
+            signal: upstreamController.signal,
           },
-        );
+        ).catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
+
+        let ticket;
+        try {
+          const [limit, requestHash] = await reads;
+          ticket = await reserveAiUsage({
+            userId,
+            operation: "tts",
+            model: GEMINI_TTS_MODEL,
+            requestHash,
+            limit,
+            abandonedReleased: true,
+          });
+        } catch (error) {
+          upstreamController.abort();
+          const headers = new Headers();
+          if (error instanceof AiUsageError && error.retryAfter)
+            headers.set("Retry-After", String(error.retryAfter));
+          return Response.json(
+            {
+              message: error instanceof Error ? error.message : "Audio is temporarily unavailable.",
+            },
+            { status: error instanceof AiUsageError ? error.status : 503, headers },
+          );
+        }
+
+        const upstream = await upstreamRequest;
+        if (upstream instanceof Error) {
+          console.error(`[speech] tts upstream unreachable: ${upstream.message}`);
+          await finishAiUsage(ticket, {
+            success: false,
+            errorCode: "gemini_unreachable",
+            errorMessage: "TTS upstream unreachable",
+          });
+          return Response.json(
+            { message: "Audio generation failed. Please try again in a moment." },
+            { status: 503 },
+          );
+        }
 
         if (!upstream.ok || !upstream.body) {
           const raw = await upstream.text().catch(() => "");

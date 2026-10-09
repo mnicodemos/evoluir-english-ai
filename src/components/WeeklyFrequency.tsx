@@ -215,8 +215,9 @@ export function WeeklyFrequency({
             }
           />
         </div>
-        {/* Same ring as Today's Progress beside it (size, stroke and number). */}
-        <div className="mt-2 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 2xl:grid-cols-[7.5rem_minmax(0,1fr)]">
+        {/* Same ring as Today's Progress beside it (size, stroke and number).
+            The bottom padding lifts it off the days row (user request). */}
+        <div className="mt-1 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 pb-3 2xl:grid-cols-[7.5rem_minmax(0,1fr)] 2xl:pb-5">
           <div className="relative grid size-24 place-items-center text-brand-green 2xl:size-30">
             <svg
               className="absolute inset-0 size-full -rotate-90"
