@@ -119,7 +119,7 @@ export const uiPt: Record<string, string> = {
   "Warm up your speaking": "Aqueça sua fala",
   "Week plan complete": "Plano da semana completo",
   "Your study plan": "Seu plano de estudo",
-  "Every planned day is done": "Todos os dias do plano feitos",
+  "All days done": "Todos os dias feitos",
   "See your week": "Ver sua semana",
   "Today in your plan": "Hoje no seu plano",
   "Catch up": "Recuperar",

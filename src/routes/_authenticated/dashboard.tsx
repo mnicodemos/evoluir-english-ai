@@ -247,11 +247,7 @@ function PlanTodaySummary({
       icon={<CalendarCheck2 className="size-6" strokeWidth={2.2} />}
       tone="green"
       label={label}
-      value={
-        weekDone
-          ? translate("Every planned day is done")
-          : (next?.title ?? translate("See your week"))
-      }
+      value={weekDone ? translate("All days done") : (next?.title ?? translate("See your week"))}
       detail={
         next && !weekDone
           ? `${translate(PLAN_SKILL_LABELS[next.skill] ?? next.skill)} · ${translate(next.day)}`
