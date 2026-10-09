@@ -8,11 +8,12 @@ import {
   GraduationCap,
   Mic,
   RotateCcw,
-  SpellCheck,
 } from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
+import reviewMistakes from "@/assets/review-mistakes.webp";
 import reviewReading from "@/assets/review-reading.webp";
+import reviewWords from "@/assets/review-words.webp";
 import reviewWriting from "@/assets/review-writing.jpg.asset.json";
 
 import { EvoGuide } from "@/components/EvoGuide";
@@ -154,9 +155,7 @@ export function SmartReviewCard({
         >
           {showWordReviews && (
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-brand-green/35 bg-brand-green/[0.07] pr-2">
-              <span className="grid h-full min-h-0 w-16 place-items-center bg-brand-green/15">
-                <RotateCcw className="size-6 text-brand-green" aria-hidden="true" />
-              </span>
+              <img src={reviewWords} alt="" className="h-full min-h-0 w-16 object-cover" />
               <div className="min-w-0">
                 <p className="text-[10px] text-muted-foreground">{t("Vocabulary")}</p>
                 <p className="truncate text-sm font-semibold">
@@ -179,9 +178,7 @@ export function SmartReviewCard({
           )}
           {showMistakes && (
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-warning/35 bg-warning/[0.07] pr-2">
-              <span className="grid h-full min-h-0 w-16 place-items-center bg-warning/15">
-                <SpellCheck className="size-6 text-warning" aria-hidden="true" />
-              </span>
+              <img src={reviewMistakes} alt="" className="h-full min-h-0 w-16 object-cover" />
               <div className="min-w-0">
                 <p className="text-[10px] text-muted-foreground">{t("My mistakes")}</p>
                 <p className="truncate text-sm font-semibold">
@@ -335,6 +332,7 @@ export function SmartReviewCard({
 const SKILL_PHOTO = {
   listening: reviewListening.url,
   reading: reviewReading,
+  vocabulary: reviewWords,
   writing: reviewWriting.url,
 } as const;
 

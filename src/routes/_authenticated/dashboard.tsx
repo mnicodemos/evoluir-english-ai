@@ -4,17 +4,17 @@ import {
   CalendarCheck2,
   ChartLine,
   BookOpen,
-  Check,
   ChevronRight,
+  CircleCheck,
   Clock,
   Flame,
   Gem,
   Headphones,
-  Minus,
+  BookA,
   PenLine,
   RotateCcw,
   SpellCheck,
-  TriangleAlert,
+  Target,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -294,19 +294,27 @@ function Dashboard() {
 
   type ProgressState = "done" | "attention" | "empty";
   const accuracyToday = snapshot?.todayQuizAverage ?? 0;
-  const learningCards: { label: string; value: string; state: ProgressState }[] = [
+  const learningCards: {
+    label: string;
+    value: string;
+    state: ProgressState;
+    icon: typeof BookOpen;
+  }[] = [
     {
       label: "Lessons completed",
+      icon: BookOpen,
       value: `${snapshot?.todayLessonsCompleted ?? 0}`,
       state: (snapshot?.todayLessonsCompleted ?? 0) > 0 ? "done" : "empty",
     },
     {
       label: "Words mastered",
+      icon: BookA,
       value: `${snapshot?.todayVocabularyMastered ?? 0}`,
       state: (snapshot?.todayVocabularyMastered ?? 0) > 0 ? "done" : "empty",
     },
     {
       label: "Accuracy",
+      icon: Target,
       value: `${accuracyToday}%`,
       state:
         accuracyToday >= ACCURACY_DONE_THRESHOLD
@@ -494,15 +502,13 @@ function Dashboard() {
                     </span>
                   </div>
                   {minutesToday >= profile.daily_minutes && (
-                    <p className="mt-1 text-center text-[10px] font-semibold text-brand-green lg:text-[11px]">
-                      {t("Goal OK")}
+                    <p className="mt-1 inline-flex items-center justify-center gap-1 whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-brand-green">
+                      <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
+                      {t("Daily goal reached")}
                     </p>
                   )}
                 </div>
                 <div className="grid min-w-0 gap-2 xl:gap-1 2xl:gap-2">
-                  <p className="hidden text-[11px] font-semibold uppercase tracking-wide text-muted-foreground lg:block xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
-                    {t("KEEPING LEARNING")}
-                  </p>
                   {!hasProgressToday && (
                     <div className="flex min-h-[5.75rem] flex-col items-center justify-center gap-1 text-center text-muted-foreground">
                       <Clock
@@ -525,20 +531,17 @@ function Dashboard() {
                     className={`${hasProgressToday ? "grid" : "hidden"} gap-2 xl:gap-1 2xl:gap-2`}
                   >
                     {learningCards.map((card) => {
-                      const stateVisual = {
-                        done: { Icon: Check, iconClass: "text-brand-green", sr: "Done today." },
-                        attention: {
-                          Icon: TriangleAlert,
-                          iconClass: "text-warning",
-                          sr: "Needs attention.",
-                        },
-                        empty: {
-                          Icon: Minus,
-                          iconClass: "text-muted-foreground/60",
-                          sr: "Nothing yet.",
-                        },
-                      } as const;
-                      const { Icon, iconClass, sr } = stateVisual[card.state];
+                      // Each line has its own activity icon: grey until done today,
+                      // then lit in the ring's colour (accuracy from 70%).
+                      const Icon = card.icon;
+                      const iconClass =
+                        card.state === "done" ? "text-brand-green" : "text-muted-foreground/50";
+                      const sr =
+                        card.state === "done"
+                          ? "Done today."
+                          : card.state === "attention"
+                            ? "Needs attention."
+                            : "Nothing yet.";
                       const valueClass =
                         card.state === "attention"
                           ? "text-warning"
@@ -552,7 +555,7 @@ function Dashboard() {
                         >
                           <Icon
                             className={`size-4 shrink-0 justify-self-end lg:justify-self-auto ${iconClass}`}
-                            strokeWidth={3}
+                            strokeWidth={2.4}
                             aria-hidden="true"
                           />
                           <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
@@ -577,19 +580,12 @@ function Dashboard() {
                     which left the sidebar. */}
                 <Link
                   to="/progress"
-                  className="inline-flex h-9 items-center gap-2 rounded-lg border border-border xl:h-8 min-[1680px]:h-9 bg-sidebar-foreground/[0.04] px-3.5 text-[13px] font-semibold text-sidebar-foreground transition-colors hover:border-brand-green/50 hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                  className="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-green px-5 text-sm font-bold text-sidebar [word-spacing:0.1em] transition-colors hover:bg-brand-green/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
                 >
-                  <ChartLine className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+                  <ChartLine className="size-4 shrink-0" aria-hidden="true" />
                   {t("My progress")}
-                  <ChevronRight
-                    className="size-4 shrink-0 text-muted-foreground"
-                    aria-hidden="true"
-                  />
+                  <ChevronRight className="size-4 shrink-0" aria-hidden="true" />
                 </Link>
-                {/* The closing line only shows where the row has height to spare. */}
-                <p className="text-center text-xs text-muted-foreground xl:max-[1679.98px]:hidden!">
-                  {t("Small steps create progress.")}
-                </p>
               </div>
               <WeeklyFrequency
                 userId={profile.id}

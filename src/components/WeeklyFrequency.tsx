@@ -1,4 +1,4 @@
-import { CalendarDays, Check, Trophy } from "lucide-react";
+import { CalendarDays, Check, CircleCheck, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { GoldTrophy } from "@/components/GoldTrophy";
@@ -184,7 +184,7 @@ export function WeeklyFrequency({
   }
 
   if (presentation === "dashboard-panel") {
-    const radius = 34;
+    const radius = 39;
     const circumference = 2 * Math.PI * radius;
     const progress = weeklyGoal > 0 ? Math.min(1, studiedCount / weeklyGoal) : 0;
     return (
@@ -215,36 +215,37 @@ export function WeeklyFrequency({
             }
           />
         </div>
-        <div className="mt-2 grid flex-1 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3">
-          <div className="relative grid size-[5.75rem] place-items-center text-brand-green">
+        {/* Same ring as Today's Progress beside it (size, stroke and number). */}
+        <div className="mt-2 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 2xl:grid-cols-[7.5rem_minmax(0,1fr)]">
+          <div className="relative grid size-24 place-items-center text-brand-green 2xl:size-30">
             <svg
               className="absolute inset-0 size-full -rotate-90"
-              viewBox="0 0 80 80"
+              viewBox="0 0 96 96"
               aria-hidden="true"
             >
               <circle
-                cx="40"
-                cy="40"
+                cx="48"
+                cy="48"
                 r={radius}
                 fill="none"
                 stroke="var(--secondary)"
-                strokeWidth="9"
+                strokeWidth="11"
               />
               <circle
-                cx="40"
-                cy="40"
+                cx="48"
+                cy="48"
                 r={radius}
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="9"
+                strokeWidth="11"
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={circumference * (1 - progress)}
               />
             </svg>
-            <span className="relative text-center font-display text-xl font-bold leading-none text-foreground">
+            <span className="relative text-center font-display text-lg font-bold leading-none text-foreground">
               {studiedCount}/{weeklyGoal}
-              <span className="mt-1 block text-[9px] font-medium text-muted-foreground">
+              <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
                 {daysLabel}
               </span>
             </span>
@@ -260,15 +261,16 @@ export function WeeklyFrequency({
                   ? "day active this week"
                   : "days active this week"}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {allStudied
-                ? lang === "pt"
-                  ? "Ótima consistência!"
-                  : "Great consistency!"
-                : lang === "pt"
-                  ? "Continue construindo seu ritmo."
-                  : "Keep building your rhythm."}
-            </p>
+            {allStudied ? (
+              <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-brand-green">
+                <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
+                {lang === "pt" ? "Ótima consistência!" : "Great consistency!"}
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {lang === "pt" ? "Continue construindo seu ritmo." : "Keep building your rhythm."}
+              </p>
+            )}
           </div>
         </div>
         <div className="mt-2 grid grid-cols-7 gap-1">
