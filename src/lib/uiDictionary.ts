@@ -595,7 +595,7 @@ export const uiPt: Record<string, string> = {
   "{n} more steps to count your day": "Faltam {n} passos para contar seu dia",
   "My goal": "Minha meta",
   "Practise it in English with EVO": "Praticar em inglês com a EVO",
-  "Practise in English": "Praticar em inglês",
+  Practise: "Praticar",
   "Last 7 days": "Últimos 7 dias",
   "Complete step": "Concluir passo",
   "Step done!": "Passo feito!",
