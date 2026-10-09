@@ -46,6 +46,8 @@ import { EvoAvatar } from "@/components/EvoAvatar";
 import { SpeakingReport } from "@/components/coach/SpeakingReport";
 import { VideoCallStage } from "@/components/coach/VideoCallStage";
 import { findBusinessRolePlay } from "@/lib/businessCourse";
+import { goalRolePlay } from "@/lib/goalPractice";
+import { studyToday } from "@/lib/today";
 import { isWeatherCondition, weatherRolePlay } from "@/lib/weatherTalk";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -55,6 +57,7 @@ export function VoiceCoach({
   lessonTopic,
   weather,
   business,
+  goal,
   presentation = "chat",
 }: {
   lessonTopic?: string | undefined;
@@ -64,6 +67,8 @@ export function VoiceCoach({
   presentation?: "chat" | "call";
   /** Opens a Business English situation (businessCourse.ts) by its id. */
   business?: string | undefined;
+  /** Opens a conversation about one of the student's Goals by its id. */
+  goal?: string | undefined;
 }) {
   const { data: profile } = useProfile();
   const { data: snapshot } = useStudySnapshot();
@@ -129,7 +134,15 @@ export function VoiceCoach({
     const businessPlay = findBusinessRolePlay(business);
     if (businessPlay) startRolePlay(businessPlay);
     else if (isWeatherCondition(weather)) startRolePlay(weatherRolePlay(weather));
-    else void start(0);
+    else if (goal) {
+      setVoiceState("thinking");
+      // A goal that cannot be read (removed, another student's) falls back to a free chat.
+      void loadGoalRolePlay(goal).then((play) => {
+        if (!mounted.current) return;
+        if (play) startRolePlay(play);
+        else void start(0);
+      });
+    } else void start(0);
     // Runs once per screen: `start` is recreated on every render, and the
     // `started` ref already guarantees a single opener.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -647,4 +660,28 @@ export function VoiceCoach({
       {report && <SpeakingReport report={report} />}
     </div>
   );
+}
+
+/** The goal and today's step (students read their own rows), as a conversation for EVO. */
+async function loadGoalRolePlay(goalId: string) {
+  try {
+    const [{ data: goalRow }, { data: stepRow }] = await Promise.all([
+      supabase
+        .from("plus_goals")
+        .select("id, title")
+        .eq("id", goalId)
+        .is("archived_at", null)
+        .maybeSingle(),
+      supabase
+        .from("plus_goal_steps")
+        .select("text")
+        .eq("goal_id", goalId)
+        .eq("day", studyToday())
+        .maybeSingle(),
+    ]);
+    if (!goalRow) return null;
+    return goalRolePlay({ id: goalRow.id, title: goalRow.title, step: stepRow?.text ?? null });
+  } catch {
+    return null;
+  }
 }
