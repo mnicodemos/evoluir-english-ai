@@ -34,6 +34,8 @@ export type ActivityIndicators = {
   listening: boolean;
   writing: boolean;
   vocabulary: boolean;
+  /** False until today's practice (saved work, round, vocabulary batch) has loaded. */
+  ready: boolean;
 };
 
 /**
@@ -91,6 +93,7 @@ export function useActivityIndicators(): ActivityIndicators {
     listening: false,
     writing: false,
     vocabulary: false,
+    ready: false,
   });
 
   // A finished lesson whose words were never saved (e.g. the lesson screen was
@@ -177,6 +180,11 @@ export function useActivityIndicators(): ActivityIndicators {
     ];
 
     setIndicators({
+      ready:
+        savedPractice !== undefined &&
+        roundStart !== undefined &&
+        !vocabularyLoading &&
+        !vocabularyFetching,
       // Same rule as the Listening page: a listening saved after the round
       // began counts as done on every device of this account.
       listening:

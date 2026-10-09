@@ -1,4 +1,4 @@
-// Launch campaign (migration 0052): the first 10 signups from 10/10 get 10 days
+// Launch campaign (migrations 0052/0055): every signup from 10/10 to 20/10 gets 10 days
 // of Premium. Access itself ends with the entitlements' expires_at; this puts
 // the profile's plan (the "Premium" badge) back to free once the period is over,
 // unless the student subscribed meanwhile. Runs with the service role, the only

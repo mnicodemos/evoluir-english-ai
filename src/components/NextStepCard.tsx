@@ -58,6 +58,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const league = useWeeklyLeagueStanding(profile);
   // Vocabulary words whose review date has arrived (same count as the bell).
   const activityIndicators = useActivityIndicators();
+  // Until today's practice has loaded, the buttons show right away instead of
+  // popping in seconds later; they leave only once that activity is known done.
+  const actionAvailable = (to: string, indicators: typeof activityIndicators) =>
+    !indicators.ready || dashboardActionAvailable(to, indicators);
   const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
     queryFn: () => loadNextStep({ data: undefined }),
@@ -149,12 +153,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       ? questSkillLabel
       : `${questSkillLabel} · ${questPlaceLabel}`;
   const quickWin = data.quickWin;
-  const mainAvailable = dashboardActionAvailable(data.activity.to, activityIndicators);
+  const mainAvailable = actionAvailable(data.activity.to, activityIndicators);
   const quickWinAvailable = quickWin
-    ? dashboardActionAvailable(quickWin.activity.to, activityIndicators)
+    ? actionAvailable(quickWin.activity.to, activityIndicators)
     : false;
   const challengeAvailable = data.quest
-    ? dashboardActionAvailable(data.quest.resource.to, activityIndicators)
+    ? actionAvailable(data.quest.resource.to, activityIndicators)
     : false;
   // Shared action buttons: Quick Win sits next to "Today's focus" on mobile and
   // inside the "Why now?" card on larger screens; the challenge button sits
