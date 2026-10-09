@@ -1589,4 +1589,6 @@ export const uiPt: Record<string, string> = {
   "Could not build the PDF. Please try again.": "Não foi possível gerar o PDF. Tente novamente.",
   "All Business lessons completed": "Todas as lições de Negócios concluídas",
   "Open Business English": "Abrir Inglês para Negócios",
+  Continuous: "Contínuo",
+  "Today only: starts again tomorrow.": "Só de hoje: recomeça amanhã.",
 };

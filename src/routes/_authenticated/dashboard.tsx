@@ -29,6 +29,7 @@ import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
 import { businessLevelAllowed } from "@/lib/businessCourse";
 import { PathProgressCard } from "@/components/PathProgressCard";
+import { ScopeBadge } from "@/components/ScopeBadge";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
 
@@ -268,7 +269,11 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const reviewCount = useDueReviewCount(profile?.id);
-  const { data: mistakesDue = 0 } = useQuery({
+  const {
+    data: mistakesDue = 0,
+    isSuccess: mistakesKnown,
+    isError: mistakesFailed,
+  } = useQuery({
     queryKey: ["mistakes-due", profile?.id],
     enabled: !!profile?.id,
     staleTime: 60 * 1000,
@@ -460,6 +465,7 @@ function Dashboard() {
                 <h2 id="today-progress-title" className="font-display text-sm font-semibold">
                   {t("Today's Progress")}
                 </h2>
+                <ScopeBadge kind="today" translate={t} className="ml-auto hidden lg:inline-flex" />
                 {/* Mobile: My Progress left the bottom navigation; it opens from the
                     title line, so the card keeps its height. Desktop has its button below. */}
                 <Link
@@ -612,7 +618,12 @@ function Dashboard() {
               <PathProgressCard compact />
             </div>
             <div className="hidden min-w-0 lg:col-span-4 lg:block xl:h-full">
-              <SmartReviewCard streakDays={streakDays} compact mistakesDue={mistakesDue} />
+              <SmartReviewCard
+                streakDays={streakDays}
+                compact
+                mistakesDue={mistakesDue}
+                extrasReady={mistakesKnown || mistakesFailed}
+              />
             </div>
             <div className="hidden min-w-0 lg:col-span-3 lg:block xl:h-full">
               <WeeklyFrequency

@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { EvoGuide } from "@/components/EvoGuide";
@@ -288,6 +289,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-border bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5"
         aria-label={t("Your next step")}
       >
+        {/* Same corner as the other cards' scope badge; white over EVO's card. */}
+        <ScopeBadge
+          kind="continuous"
+          tone="light"
+          translate={t}
+          className="absolute right-3 top-3 z-20 hidden sm:inline-flex"
+        />
         <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)]">
           <div
             className="relative h-auto w-full flex-none self-stretch overflow-hidden bg-transparent p-2.5 pb-0 sm:min-h-[13.5rem] sm:h-auto sm:p-0 lg:min-h-[10.5rem] xl:min-h-0"
@@ -399,7 +407,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </div>
 
           <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-l xl:border-t-0">
-            <div className="flex items-center gap-2">
+            {/* Room for the scope badge in the card's top-right corner. */}
+            <div className="flex items-center gap-2 xl:pr-24">
               <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why this matters now")}</h3>
             </div>
