@@ -300,7 +300,13 @@ function GoalTile({
         ) : null}
       </div>
 
-      <div className="flex shrink-0 flex-col items-center gap-1">
+      {/* Featured: stacked; narrow tiles: side by side, so the row stays low. */}
+      <div
+        className={cn(
+          "flex shrink-0 items-center gap-1",
+          featured || done ? "flex-col" : "flex-row-reverse",
+        )}
+      >
         {done ? (
           <>
             <span
@@ -325,15 +331,16 @@ function GoalTile({
         ) : (
           <>
             {featured ? (
-              <Button
-                size="sm"
-                className="h-8 gap-1 bg-brand-green px-3 text-xs font-semibold text-[oklch(0.2_0.04_160)] hover:bg-brand-green/90"
+              // Same text-link style as "Open goals" (user request).
+              <button
+                type="button"
                 disabled={!step || busy}
                 onClick={() => onToggle(true)}
+                className="inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
               >
-                <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
                 {t("Complete step")}
-              </Button>
+                <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+              </button>
             ) : (
               // Narrow tiles: the same action as a round button, so the row stays low.
               <button
@@ -342,22 +349,27 @@ function GoalTile({
                 onClick={() => onToggle(true)}
                 aria-label={t("Complete step")}
                 title={t("Complete step")}
-                className="grid size-8 place-items-center rounded-full border-2 border-brand-green text-brand-green transition-colors hover:bg-brand-green hover:text-[oklch(0.2_0.04_160)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
+                className="grid size-7 place-items-center rounded-full border-2 border-brand-green text-brand-green transition-colors hover:bg-brand-green hover:text-[oklch(0.2_0.04_160)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
               >
                 <Check className="size-4" strokeWidth={3} aria-hidden="true" />
               </button>
             )}
-            {/* Secondary on purpose (user decision): the goal's English, with EVO. */}
-            <Link
-              to="/coach"
-              search={{ goal: goalId }}
-              aria-label={t("Practise it in English with EVO")}
-              title={t("Practise it in English with EVO")}
-              className="inline-flex items-center gap-0.5 rounded text-[10px] font-semibold leading-none text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+            {/* The goal's English with EVO, shaped like Keep improving's Review button (user request). */}
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className={cn("px-2.5 text-xs", featured ? "h-7" : "h-6 px-2 text-[11px]")}
             >
-              <MessageSquareText className="size-3 shrink-0" aria-hidden="true" />
-              {featured ? t("Practise in English") : t("English")}
-            </Link>
+              <Link
+                to="/coach"
+                search={{ goal: goalId }}
+                aria-label={t("Practise it in English with EVO")}
+                title={t("Practise it in English with EVO")}
+              >
+                {t("Practise")}
+              </Link>
+            </Button>
           </>
         )}
       </div>
