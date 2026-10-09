@@ -269,7 +269,11 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const reviewCount = useDueReviewCount(profile?.id);
-  const { data: mistakesDue = 0 } = useQuery({
+  const {
+    data: mistakesDue = 0,
+    isSuccess: mistakesKnown,
+    isError: mistakesFailed,
+  } = useQuery({
     queryKey: ["mistakes-due", profile?.id],
     enabled: !!profile?.id,
     staleTime: 60 * 1000,
@@ -614,7 +618,12 @@ function Dashboard() {
               <PathProgressCard compact />
             </div>
             <div className="hidden min-w-0 lg:col-span-4 lg:block xl:h-full">
-              <SmartReviewCard streakDays={streakDays} compact mistakesDue={mistakesDue} />
+              <SmartReviewCard
+                streakDays={streakDays}
+                compact
+                mistakesDue={mistakesDue}
+                extrasReady={mistakesKnown || mistakesFailed}
+              />
             </div>
             <div className="hidden min-w-0 lg:col-span-3 lg:block xl:h-full">
               <WeeklyFrequency

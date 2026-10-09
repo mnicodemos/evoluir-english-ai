@@ -10,10 +10,13 @@ import { cn } from "@/lib/utils";
  */
 export function ScopeBadge({
   kind,
+  tone = "default",
   translate,
   className,
 }: {
   kind: "continuous" | "today";
+  /** "light": white, for EVO's card. */
+  tone?: "default" | "light";
   translate: (label: string) => string;
   className?: string;
 }) {
@@ -28,9 +31,11 @@ export function ScopeBadge({
       )}
       className={cn(
         "inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none",
-        continuous
-          ? "border-brand-green/35 bg-brand-green/10 text-brand-green"
-          : "border-dashboard-cyan/35 bg-dashboard-cyan/10 text-dashboard-cyan",
+        tone === "light"
+          ? "border-white/35 bg-white/10 text-white"
+          : continuous
+            ? "border-brand-green/35 bg-brand-green/10 text-brand-green"
+            : "border-dashboard-cyan/35 bg-dashboard-cyan/10 text-dashboard-cyan",
         className,
       )}
     >

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -23,7 +24,7 @@ import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
-import { useDueReviewCount } from "@/hooks/useDueReviewCount";
+import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import { NEXT_STEP_SKILL_TEXT } from "@/lib/pedagogy/nextStep";
@@ -42,11 +43,14 @@ export function SmartReviewCard({
   streakDays,
   compact = false,
   mistakesDue = 0,
+  extrasReady = true,
 }: {
   streakDays: number;
   compact?: boolean;
   /** "My mistakes" corrections whose review date has arrived (compact card only). */
   mistakesDue?: number;
+  /** False while the caller is still counting due mistakes (compact card). */
+  extrasReady?: boolean;
 }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -61,7 +65,42 @@ export function SmartReviewCard({
     staleTime: 60 * 1000,
   });
   // Vocabulary words whose spaced review date has arrived (same count as the bell).
-  const reviewCount = useDueReviewCount(profile?.id);
+  const { count: reviewCount, ready: reviewsReady } = useDueReviewState(profile?.id);
+  // Never wait longer than this for the extra answers (a vocabulary batch being
+  // written can keep "today's practice" loading for a minute).
+  const [waited, setWaited] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setWaited(true), 4000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  // Compact card: the rows depend on four answers (suggestions, due words,
+  // due mistakes, what was done today). Drawing before all of them arrive made
+  // rows appear and vanish on load, so it waits, keeping the card's shape.
+  if (compact && (isLoading || (!waited && (!indicators.ready || !reviewsReady || !extrasReady)))) {
+    return (
+      <section
+        className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
+        aria-busy="true"
+        aria-label={t("Keep improving")}
+      >
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
+          <BookOpen
+            className="size-[1.65rem] text-dashboard-cyan"
+            strokeWidth={2.5}
+            aria-hidden="true"
+          />
+          <h2 className="font-display text-sm font-semibold">{t("Keep improving")}</h2>
+          <ScopeBadge kind="continuous" translate={t} />
+        </div>
+        <div className="mt-3 grid flex-1 grid-rows-3 gap-2 xl:mt-4">
+          <Skeleton className="h-full min-h-10 w-full rounded-md" />
+          <Skeleton className="h-full min-h-10 w-full rounded-md" />
+          <Skeleton className="h-full min-h-10 w-full rounded-md" />
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (
