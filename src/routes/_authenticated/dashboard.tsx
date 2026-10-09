@@ -473,7 +473,7 @@ function Dashboard() {
                   <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
                 </Link>
               </div>
-              <div className="mt-1.5 grid flex-1 grid-cols-[5.25rem_auto] items-center justify-center gap-x-5 gap-y-1.5 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
+              <div className="mb-2.5 mt-3 grid flex-1 grid-cols-[5.25rem_auto] items-center justify-center gap-x-5 gap-y-1.5 lg:mb-0 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
                 <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                   <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:size-24 2xl:size-30">
                     <svg
