@@ -18,6 +18,7 @@ import { isReviewLevel } from "@/lib/level";
 import {
   callContentAi,
   CEFR,
+  contentWriter,
   type GeneratedQuizItem,
   insertQuizQuestions,
   jsonValue,
@@ -197,7 +198,9 @@ export const openFinalTest = createServerFn({ method: "POST" })
     if (quiz.length < 10)
       throw new Error("The AI could not write the Final Test. Please try again.");
 
-    const { data: lesson, error } = await supabase
+    const { data: lesson, error } = await (
+      await contentWriter()
+    )
       .from("lessons")
       .insert({
         title: `Final Test — ${level.toUpperCase()}`,
@@ -320,7 +323,9 @@ export const openUnitTest = createServerFn({ method: "POST" })
     if (!parsed.success)
       throw new Error("The AI could not write this unit test. Please try again.");
 
-    const { data: lesson, error } = await supabase
+    const { data: lesson, error } = await (
+      await contentWriter()
+    )
       .from("lessons")
       .insert({
         title: `Unit ${data.unit} Final Test — ${level.toUpperCase()}`,

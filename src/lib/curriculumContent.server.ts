@@ -79,6 +79,18 @@ export const quizItemSchema = z
 export type GeneratedQuizItem = z.infer<typeof quizItemSchema>;
 
 /**
+ * Lessons, quizzes and flashcards are written with the service role (security
+ * audit, 2026-10-09): students only read them, so a student's own session can
+ * never create a lesson or a quiz whose answers it chose (migration 0058 takes
+ * those writes away from authenticated users). Every row still carries
+ * created_by = the student it belongs to.
+ */
+export async function contentWriter() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin;
+}
+
+/**
  * Persists generated quiz questions with a server-validated pedagogical skill.
  * The label produced during generation is only accepted when it is one of the
  * skills the evidence pipeline already supports. When it cannot be resolved the
@@ -104,7 +116,8 @@ export async function insertQuizQuestions(
     pedagogical_skill: resolveQuizEvidenceSkill(q.pedagogical_skill, structuralDefault),
   }));
 
-  const { error: quizError } = await supabase.from("quizzes").insert(rows);
+  const writer = await contentWriter();
+  const { error: quizError } = await writer.from("quizzes").insert(rows);
   if (quizError) throw new Error(quizError.message);
 
   const unmapped = rows.filter((row) => row.pedagogical_skill === null).length;
@@ -440,7 +453,9 @@ export async function writeLesson(
   let lesson: { id: string } | null = repairLessonId ? { id: repairLessonId } : null;
   if (!lesson) {
     const video = await pickVideo(supabase, plan);
-    const inserted = await supabase
+    const inserted = await (
+      await contentWriter()
+    )
       .from("lessons")
       .insert({
         title: plan.title,
@@ -491,7 +506,7 @@ export async function writeLesson(
       ).count ?? 0)
     : 0;
   if (cards.length && !existingCards) {
-    await supabase.from("flashcards").insert(
+    await (await contentWriter()).from("flashcards").insert(
       cards.map((c, index) => ({
         lesson_id: lesson.id,
         word: String(c.word).slice(0, 120),
