@@ -234,7 +234,7 @@ export function MobileNavigationMenu({
       >
         <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
           <SheetTitle className="flex items-center gap-2 text-sidebar-foreground">
-            <Logo className="size-[2.8rem] shrink-0" />
+            <Logo className="size-[3.32rem] shrink-0" />
             <BrandName className="text-base" />
           </SheetTitle>
         </SheetHeader>
@@ -418,15 +418,9 @@ function AppShellContent({
             aria-label={translate("Home")}
             className="flex h-14 min-w-0 items-center gap-2 rounded-lg px-1 hover:bg-sidebar-accent"
           >
-            <Logo className="size-[3.45rem] shrink-0" />
-            <span className="min-w-0 whitespace-nowrap leading-none">
-              <span className="block font-display text-lg font-semibold">
-                Evoluir<span className="text-brand-green">+</span>
-              </span>
-              <span className="mt-1 block text-xs font-semibold uppercase text-sidebar-foreground/70">
-                English AI
-              </span>
-            </span>
+            {/* One line, the same lockup as the public home header. */}
+            <Logo className="size-[3.32rem] shrink-0" />
+            <BrandName className="min-w-0 whitespace-nowrap text-base" />
           </Link>
 
           <nav className="mt-3 flex flex-1 flex-col gap-0.5">
