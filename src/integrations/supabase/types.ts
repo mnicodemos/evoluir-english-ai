@@ -865,6 +865,59 @@ export type Database = {
         }
         Relationships: []
       }
+      premium_campaign_grants: {
+        Row: {
+          campaign_id: string
+          expires_at: string
+          granted_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          expires_at: string
+          granted_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          expires_at?: string
+          granted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_campaign_grants_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "premium_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      premium_campaigns: {
+        Row: {
+          days: number
+          enabled: boolean
+          id: string
+          slots: number
+          starts_at: string
+        }
+        Insert: {
+          days: number
+          enabled?: boolean
+          id: string
+          slots: number
+          starts_at: string
+        }
+        Update: {
+          days?: number
+          enabled?: boolean
+          id?: string
+          slots?: number
+          starts_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_path: string | null
@@ -1739,6 +1792,7 @@ export type Database = {
         }
         Returns: Json
       }
+      premium_campaign_status: { Args: never; Returns: Json }
       record_claimed_pedagogical_failure: {
         Args: {
           p_claimed_at: string
