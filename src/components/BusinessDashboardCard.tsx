@@ -63,34 +63,39 @@ export function BusinessDashboardCard() {
         </span>
       </div>
       <div className="mt-2 flex min-w-0 flex-1 flex-col justify-center gap-1.5">
-        <p className="truncate text-xs text-muted-foreground">
-          {next ? (
-            <>
-              <span>{t("Next lesson")}:</span>{" "}
-              <span className="font-medium text-foreground" translate="no" lang="en">
-                {next.title}
-              </span>
-            </>
-          ) : (
-            t("All Business lessons completed")
-          )}
-        </p>
+        {next ? (
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
+              {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
+            </p>
+            <p
+              className="truncate text-sm font-semibold"
+              translate="no"
+              lang="en"
+              title={next.title}
+            >
+              {next.title}
+            </p>
+          </div>
+        ) : (
+          <p className="text-sm font-semibold">{t("All Business lessons completed")}</p>
+        )}
         <div className="flex items-center gap-2">
-          <div className="h-2 flex-1 rounded-full bg-secondary" aria-hidden="true">
+          <div className="h-1.5 flex-1 rounded-full bg-secondary" aria-hidden="true">
             <div className="h-full rounded-full bg-brand-green" style={{ width: `${percent}%` }} />
           </div>
           <span className="text-[11px] font-semibold text-muted-foreground">
             {completed}/{total}
           </span>
+          <Link
+            to="/business"
+            className="inline-flex shrink-0 items-center gap-0.5 rounded-md text-[11px] font-semibold text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+          >
+            {completed > 0 ? t("Continue") : t("Start")}
+            <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+          </Link>
         </div>
       </div>
-      <Link
-        to="/business"
-        className="mt-2 inline-flex items-center justify-center gap-1 self-start rounded-md text-[11px] font-semibold text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-      >
-        {completed > 0 ? t("Continue") : t("Open Business English")}
-        <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-      </Link>
     </section>
   );
 }
