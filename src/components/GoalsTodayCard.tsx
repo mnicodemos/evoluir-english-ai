@@ -1,11 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronRight, Flame, Loader2, Plus, Target } from "lucide-react";
+import { Check, ChevronRight, Flame, Loader2, Plus, Search, Target } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useProfile } from "@/hooks/useProfile";
 import {
   PLUS_GOAL_EXAMPLES,
@@ -180,8 +187,9 @@ export function GoalsTodayCard() {
 
 /**
  * One goal's step (user request: a step that encourages, not a cramped to-do).
- * Each goal takes one of the three slots and no text is cut: the goal and its
- * step wrap and the row grows with them.
+ * Each goal takes one of the three slots of the same size; the step itself
+ * opens in a popup from the magnifier, so no text is cut and the row keeps
+ * its height.
  */
 function GoalTile({
   goalId,
@@ -207,13 +215,15 @@ function GoalTile({
   t: (label: string) => string;
 }) {
   const done = !!step?.doneAt;
-  const dots = (
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  // The goal's last 7 days: dots in a slot wide enough for them (the count is
+  // read out and shown on hover), dots and count in the popup.
+  const week7 = (always: boolean) => (
     <span
-      className="flex shrink-0 items-center gap-1"
+      className={cn("shrink-0 items-center gap-1", always ? "flex" : "hidden @[18.5rem]:flex")}
       title={`${t("Last 7 days")}: ${t("{n} of 7 days").replace("{n}", String(week.doneCount))}`}
     >
-      {/* Narrow tiles on smaller screens keep the goal's name and only the 🔥 run. */}
-      <span className="hidden gap-0.5 min-[1536px]:flex" aria-hidden="true">
+      <span className="flex gap-0.5" aria-hidden="true">
         {week.days.map((item, index) => (
           <span
             key={item.day}
@@ -225,7 +235,7 @@ function GoalTile({
           />
         ))}
       </span>
-      <span className="sr-only text-[10px] font-medium text-muted-foreground min-[1536px]:not-sr-only">
+      <span className={cn("text-[10px] font-medium text-muted-foreground", !always && "sr-only")}>
         {t("{n} of 7 days").replace("{n}", String(week.doneCount))}
       </span>
       {week.streak >= 2 ? (
@@ -245,10 +255,18 @@ function GoalTile({
       type="button"
       disabled={!step || busy}
       onClick={() => onToggle(true)}
+      aria-label={t("Complete step")}
+      title={t("Complete step")}
       className="inline-flex shrink-0 items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
     >
-      {t("Complete step")}
-      <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+      {/* A narrow slot (under 18.5rem) shows the same action as a round check. */}
+      <span className="grid size-6 place-items-center rounded-full border-2 border-brand-green @[18.5rem]:hidden">
+        <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+      </span>
+      <span className="hidden items-center gap-1 @[18.5rem]:inline-flex">
+        {t("Complete step")}
+        <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+      </span>
     </button>
   );
   // The goal's English with EVO: a teal button with dark text (user request).
@@ -294,55 +312,80 @@ function GoalTile({
       </button>
     </>
   );
-  // No text is ever cut (user request): the goal and its step wrap, and the
-  // row grows with them.
-  const text = (
-    <>
-      <p className="text-[11px] font-semibold leading-tight text-muted-foreground">
-        <span translate="no">{title}</span>
-      </p>
-      <p
-        className={cn("mt-0.5 text-xs leading-snug", done && "text-muted-foreground")}
-        translate="no"
-      >
-        {step?.text ?? "…"}
-      </p>
-      {done ? (
-        <p
-          className={cn(
-            "text-[11px] font-semibold leading-snug",
-            dayComplete ? "text-brand-green" : "text-muted-foreground",
-            celebrate && "animate-in fade-in-0 slide-in-from-bottom-1 duration-500",
-          )}
-        >
-          {dayNote}
-        </p>
-      ) : null}
-    </>
+  const dayNoteLine = done ? (
+    <p
+      className={cn(
+        "text-[11px] font-semibold leading-snug",
+        dayComplete ? "text-brand-green" : "text-muted-foreground",
+        celebrate && "animate-in fade-in-0 slide-in-from-bottom-1 duration-500",
+      )}
+    >
+      {dayNote}
+    </p>
+  ) : null;
+  const actions = done ? (
+    <div className="flex items-center gap-2">{doneMark}</div>
+  ) : (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {completeButton}
+      {practiceLink}
+    </div>
   );
-  // Every goal takes one of the three slots (user request), with its actions
-  // stacked after a divider: the week, "Complete step" and "Practice now".
-  // Below 1536 px a slot is too narrow for a side column, so the actions sit on
-  // a row under the step and wrap.
+  // Every goal has a slot of the same size (user request): the goal's name, a
+  // magnifier that opens the step in a popup, and the week and actions on one
+  // row, so the row keeps its height whatever the step's length.
   return (
     <li
       className={cn(
-        "flex min-w-0 flex-col gap-1.5 rounded-lg px-2.5 py-1.5 transition-colors min-[1536px]:flex-row min-[1536px]:items-center min-[1536px]:gap-3",
+        "@container flex min-w-0 flex-col justify-between gap-1.5 rounded-lg px-2.5 py-2 transition-colors",
         done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
       )}
     >
-      <div className="min-w-0 flex-1">{text}</div>
-      <div className="mt-auto flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 whitespace-nowrap min-[1536px]:mt-0 min-[1536px]:flex-col min-[1536px]:justify-center min-[1536px]:gap-1.5 min-[1536px]:self-stretch min-[1536px]:border-l min-[1536px]:border-border/60 min-[1536px]:pl-3">
-        {dots}
-        {done ? (
-          <div className="flex items-center gap-2">{doneMark}</div>
-        ) : (
-          <>
-            {completeButton}
-            {practiceLink}
-          </>
-        )}
+      <div className="flex min-w-0 items-start gap-2">
+        <p className="min-w-0 flex-1 text-xs font-semibold leading-snug" translate="no">
+          {title}
+        </p>
+        <button
+          type="button"
+          onClick={() => setDetailsOpen(true)}
+          aria-label={t("See today's step")}
+          title={t("See today's step")}
+          className="-m-1 shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        >
+          <Search className="size-4" aria-hidden="true" />
+        </button>
       </div>
+      {/* One row (user request): the week on the left (or, once done, whether
+          the study day counts) and the actions on the right. */}
+      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1 whitespace-nowrap">
+        {done ? dayNoteLine : week7(false)}
+        {actions}
+      </div>
+
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="dashboard-shell dark max-w-md border-border shadow-[var(--shadow-soft)]">
+          <DialogHeader>
+            <DialogDescription className="text-xs font-semibold text-brand-green">
+              {t("Your step today")}
+            </DialogDescription>
+            <DialogTitle className="text-base leading-snug" translate="no">
+              {title}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm leading-relaxed" translate="no">
+            {step?.text ?? "…"}
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-muted-foreground">{t("Last 7 days")}</span>
+            {week7(true)}
+          </div>
+          {dayNoteLine}
+          {/* A container of its own, so "Complete step" shows its full label here. */}
+          <div className="@container flex flex-wrap items-center justify-end gap-3 whitespace-nowrap">
+            {actions}
+          </div>
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }
