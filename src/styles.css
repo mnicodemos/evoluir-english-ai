@@ -232,12 +232,6 @@
   }
 }
 
-/* The bell popup is translucent over the dashboard, dark like a phone's
-   dark-mode notification shade. */
-.notification-popover.dashboard-shell.dark {
-  background-color: oklch(0.115 0.016 238 / 78%);
-}
-
 /* Wider toasts (user request): a pronunciation tip fits in about two lines
    instead of a narrow block. Phones keep sonner's full-width layout. */
 [data-sonner-toaster].dashboard-shell {
@@ -271,20 +265,6 @@
   .dashboard-shell [data-sonner-toast] [data-description],
   .dashboard-shell [data-sonner-toast] [data-icon] {
     color: oklch(0.35 0.01 240) !important;
-  }
-
-  /* The bell popup follows the phone theme too: a light-mode phone gets a
-     light notification, still translucent over the dark dashboard. */
-  .notification-popover.dashboard-shell.dark {
-    --popover: oklch(0.97 0.004 240);
-    --popover-foreground: oklch(0.24 0.01 240);
-    --foreground: oklch(0.24 0.01 240);
-    --muted-foreground: oklch(0.45 0.012 240);
-    --accent: oklch(0.92 0.006 240);
-    --accent-foreground: oklch(0.24 0.01 240);
-    --brand-green: oklch(0.55 0.14 168);
-    background-color: oklch(0.97 0.004 240 / 78%);
-    color: oklch(0.24 0.01 240);
   }
 }
 
