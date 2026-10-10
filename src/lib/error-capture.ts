@@ -53,7 +53,15 @@ function isErrorLike(value: unknown): value is Error {
 // unhandled-error logging, which this file cannot hook directly — are both
 // recorded for consumeLastCapturedError and expanded before serialization.
 const originalConsoleError = console.error.bind(console);
+let errorSink: ((args: unknown[]) => void) | undefined;
+
+/** Also hands every server console.error to `sink` (server_errors, Admin alerts). */
+export function setServerErrorSink(sink: (args: unknown[]) => void) {
+  errorSink = sink;
+}
+
 console.error = (...args: unknown[]) => {
+  errorSink?.(args);
   const expanded = args.map((arg) => {
     if (!isErrorLike(arg)) return arg;
     record(arg);

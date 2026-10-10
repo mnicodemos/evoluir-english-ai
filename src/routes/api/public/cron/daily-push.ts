@@ -132,6 +132,11 @@ async function runDailyPush(requestedKind: string | undefined, supabaseAdmin: Su
   } catch (error) {
     console.error("daily-push: campaign expiry failed", error);
   }
+  // Server errors are kept for 30 days (migration 0062); a missing table is ignored.
+  await supabaseAdmin
+    .from("server_errors")
+    .delete()
+    .lt("created_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
   if (report.kind === "word" || report.error) {
     try {
       const { alertAdmins } = await import("@/lib/opsAlerts.server");
