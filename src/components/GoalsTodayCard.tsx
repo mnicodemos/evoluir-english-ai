@@ -25,6 +25,7 @@ import {
 import { addPlusGoal, loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 
 /**
@@ -359,7 +360,11 @@ function GoalTile({
       </div>
 
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="dashboard-shell dark max-w-md border-border shadow-[var(--shadow-soft)]">
+        <DialogContent
+          // Translucent graphite like Weather talk and the bell (user request).
+          overlayClassName="bg-black/30"
+          className={cn("dashboard-shell dark max-w-md", graphitePanelClass)}
+        >
           <DialogHeader>
             <DialogDescription className="text-xs font-semibold text-brand-green">
               {t("Your step today")}

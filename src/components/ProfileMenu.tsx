@@ -22,6 +22,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
+import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
 
@@ -216,7 +217,11 @@ export function ProfileMenu({
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="dashboard-shell dark max-w-md border-border shadow-[var(--shadow-soft)]">
+      <DialogContent
+        // Translucent graphite like Weather talk and the bell (user request).
+        overlayClassName="bg-black/30"
+        className={cn("dashboard-shell dark max-w-md", graphitePanelClass)}
+      >
         <DialogHeader>
           <DialogTitle>{translate("Profile", lang)}</DialogTitle>
           <DialogDescription>
