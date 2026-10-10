@@ -248,7 +248,7 @@ function PlanTodaySummary({
   return (
     <DashboardHeaderStat
       icon={<CalendarCheck2 className="size-6" strokeWidth={2.2} />}
-      tone="green"
+      tone="pink"
       label={label}
       value={weekDone ? translate("All days done") : (next?.title ?? translate("See your week"))}
       // Always three lines, like the other header cells (user request).
