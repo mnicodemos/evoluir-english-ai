@@ -260,7 +260,8 @@ function GoalTile({
       )}
     >
       {featured ? <EvoAvatar decorative className="size-9 shrink-0" /> : null}
-      <div className="min-w-0 flex-1">
+      {/* Featured: the step takes 3/5 of the tile and wraps before the actions column. */}
+      <div className={cn("min-w-0 flex-1", featured && "flex-[3]")}>
         {/* Goal and its week on one line, so the step keeps two full lines. */}
         <div className="flex min-w-0 items-center gap-2">
           <p className="min-w-0 flex-1 truncate text-[11px] font-semibold leading-tight text-muted-foreground">
@@ -305,7 +306,7 @@ function GoalTile({
         className={cn(
           "flex shrink-0 items-center gap-1",
           featured || done ? "flex-col" : "flex-row-reverse",
-          featured && "self-stretch justify-center gap-1 border-l border-border/60 pl-3",
+          featured && "flex-[2] self-stretch justify-center gap-1 border-l border-border/60 pl-3",
         )}
       >
         {featured ? dots : null}
