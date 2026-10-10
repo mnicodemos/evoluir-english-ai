@@ -1249,6 +1249,27 @@ export type Database = {
           },
         ]
       }
+      server_errors: {
+        Row: {
+          area: string
+          created_at: string
+          id: string
+          message: string
+        }
+        Insert: {
+          area: string
+          created_at?: string
+          id?: string
+          message: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          id?: string
+          message?: string
+        }
+        Relationships: []
+      }
       speaking_turn_timings: {
         Row: {
           created_at: string
