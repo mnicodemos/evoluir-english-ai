@@ -317,13 +317,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           {/* Mobile: the content sits centred in the card's free height instead
               of pressed against the banner. */}
           <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-4 sm:justify-center sm:pb-4 sm:pt-10 2xl:pt-11 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
-            {/* Top-right of the priority column (user request), at the same height
-                as the "Today" badge of the card beside it (its header row centres a
-                22 px icon inside the card's padding). */}
+            {/* Top-right of the priority column below xl; from xl it moves to the
+                "Why this matters now" column (see the aside). */}
             <ScopeBadge
               kind="continuous"
               translate={t}
-              className="absolute right-4 top-3.5 hidden sm:inline-flex 2xl:top-[1.125rem]"
+              className="absolute right-4 top-3.5 hidden sm:inline-flex xl:hidden"
             />
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
@@ -408,7 +407,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </div>
 
           <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-l xl:border-t-0">
-            <div className="flex items-center gap-2">
+            {/* Top-right corner of the card (user request): level with the weekday
+                badge of Today's Progress (its header centres a 22 px icon inside
+                the card's padding) and in line with Keep improving's badge below
+                (16 px from the card's right edge). */}
+            <ScopeBadge
+              kind="continuous"
+              translate={t}
+              className="absolute right-4 top-3.5 hidden xl:inline-flex 2xl:top-[1.125rem]"
+            />
+            <div className="flex items-center gap-2 xl:pr-24">
               <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why this matters now")}</h3>
             </div>
