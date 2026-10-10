@@ -6,6 +6,7 @@ import {
   isDue,
   markPronounced,
   stepFromMastery,
+  vocabularyReviewUpdate,
 } from "./vocabularyReview";
 
 const now = new Date("2026-10-04T12:00:00Z");
@@ -56,5 +57,42 @@ describe("vocabulary review ladder", () => {
     const next = markPronounced(now);
     expect(next.mastery_level).toBe(90);
     expect(days(next.next_review_at)).toBe(30);
+  });
+});
+
+describe("vocabularyReviewUpdate (applied by the server)", () => {
+  const now = new Date("2026-10-10T12:00:00Z");
+  const tomorrow = "2026-10-11T12:00:00.000Z";
+
+  it("moves a new word one step up and counts the review", () => {
+    expect(vocabularyReviewUpdate("known", null, { now })).toEqual({
+      mastery_level: 20,
+      next_review_at: tomorrow,
+      is_difficult: false,
+      times_reviewed: 1,
+      last_reviewed_at: now.toISOString(),
+    });
+  });
+
+  it("refuses a step that is not due yet", () => {
+    const scheduled = { mastery_level: 20, next_review_at: tomorrow, times_reviewed: 1 };
+    expect(vocabularyReviewUpdate("known", scheduled, { now })).toBeNull();
+    expect(vocabularyReviewUpdate("forgotten", scheduled, { now })).toBeNull();
+  });
+
+  it("marks a pronounced word learned only with a passed pronunciation", () => {
+    expect(vocabularyReviewUpdate("pronounced", null, { now })).toBeNull();
+    expect(
+      vocabularyReviewUpdate("pronounced", null, { now, pronouncedOk: true })?.mastery_level,
+    ).toBe(90);
+  });
+
+  it("sends a forgotten due word back without counting a review", () => {
+    const due = { mastery_level: 60, next_review_at: "2026-10-09T00:00:00Z", times_reviewed: 3 };
+    expect(vocabularyReviewUpdate("forgotten", due, { now })).toEqual({
+      mastery_level: 20,
+      next_review_at: tomorrow,
+      is_difficult: true,
+    });
   });
 });

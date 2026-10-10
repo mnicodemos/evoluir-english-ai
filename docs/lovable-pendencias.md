@@ -216,3 +216,14 @@ NOTIFY pgrst, 'reload schema';
 select tablename, policyname, cmd, roles, qual, with_check
 from pg_policies where schemaname = 'public' order by 1, 2;
 ```
+
+## 5. Migração 0061 (vocabulário pelo servidor)
+
+Depois de **publicar** a versão que grava as revisões do vocabulário pelo servidor,
+cole no chat da Lovable:
+
+> Rode a migração `drizzle/migrations/0061_vocabulary_review_by_server.sql` e depois
+> `NOTIFY pgrst, 'reload schema'`.
+
+Conferir: no Vocabulário, marque "Eu sei" numa palavra nova e pronuncie outra com 70% ou mais;
+as duas devem avançar sem mensagem de erro.

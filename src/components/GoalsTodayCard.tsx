@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronRight, Flame, Loader2, MessageSquareText, Plus, Target } from "lucide-react";
+import { Check, ChevronRight, Flame, Loader2, Plus, Target } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -274,7 +274,7 @@ function GoalTile({
               {title}
             </span>
           </p>
-          {dots}
+          {featured ? null : dots}
         </div>
         <p
           className={cn(
@@ -299,18 +299,23 @@ function GoalTile({
         ) : null}
       </div>
 
-      {/* Featured: stacked; narrow tiles: side by side, so the row stays low. */}
+      {/* Featured: its own column after a divider, stacked as week, Complete step,
+          Practice now (user request); narrow tiles: side by side, so the row stays low. */}
       <div
         className={cn(
           "flex shrink-0 items-center gap-1",
           featured || done ? "flex-col" : "flex-row-reverse",
+          featured && "self-stretch justify-center gap-1 border-l border-border/60 pl-3",
         )}
       >
+        {featured ? dots : null}
         {done ? (
           <>
             <span
               className={cn(
-                "grid size-8 place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
+                "grid place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
+                // Featured: smaller, since the week sits above it in the same column.
+                featured ? "size-6" : "size-8",
                 celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
               )}
               title={t("Step done!")}
@@ -353,16 +358,16 @@ function GoalTile({
                 <Check className="size-4" strokeWidth={3} aria-hidden="true" />
               </button>
             )}
-            {/* The goal's English with EVO: icon + text in white, no button box (user request). */}
+            {/* The goal's English with EVO: a teal button with dark text (user request). */}
             <Link
               to="/coach"
               search={{ goal: goalId }}
               aria-label={t("Practise it in English with EVO")}
               title={t("Practise it in English with EVO")}
-              className="inline-flex items-center gap-1 rounded text-[11px] font-semibold leading-none text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+              className="inline-flex h-5 items-center gap-0.5 rounded-full bg-brand-green px-2.5 text-[11px] font-semibold leading-none text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
             >
-              <MessageSquareText className="size-3.5 shrink-0" aria-hidden="true" />
               {t("Practice now")}
+              <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
             </Link>
           </>
         )}
