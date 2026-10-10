@@ -246,6 +246,46 @@ function GoalTile({
       ) : null}
     </span>
   );
+  const completeButton = featured ? (
+    // Same text-link style as "Open goals" (user request).
+    <button
+      type="button"
+      disabled={!step || busy}
+      onClick={() => onToggle(true)}
+      className="inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
+    >
+      {t("Complete step")}
+      <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+    </button>
+  ) : (
+    // Narrow tiles: the same action as a round button, so the row stays low.
+    <button
+      type="button"
+      disabled={!step || busy}
+      onClick={() => onToggle(true)}
+      aria-label={t("Complete step")}
+      title={t("Complete step")}
+      className="grid size-7 place-items-center rounded-full border-2 border-brand-green text-brand-green transition-colors hover:bg-brand-green hover:text-[oklch(0.2_0.04_160)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
+    >
+      <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+    </button>
+  );
+  // The goal's English with EVO: a teal button with dark text (user request).
+  const practiceLink = (
+    <Link
+      to="/coach"
+      search={{ goal: goalId }}
+      aria-label={t("Practise it in English with EVO")}
+      title={t("Practise it in English with EVO")}
+      className={cn(
+        "inline-flex shrink-0 items-center gap-0.5 rounded-full bg-brand-green px-2.5 text-[11px] font-semibold leading-none text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60",
+        featured ? "h-5 min-[1536px]:h-7 min-[1536px]:px-3" : "h-5",
+      )}
+    >
+      {t("Practice now")}
+      <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+    </Link>
+  );
   const dayNote = dayComplete
     ? t("Your study day counts!")
     : stepsLeft === 1
@@ -300,79 +340,58 @@ function GoalTile({
         ) : null}
       </div>
 
-      {/* Featured: its own column after a divider, stacked as week, Complete step,
-          Practice now (user request); narrow tiles: side by side, so the row stays low. */}
-      <div
-        className={cn(
-          "flex shrink-0 items-center gap-1",
-          featured || done ? "flex-col" : "flex-row-reverse",
-          featured && "flex-[2] self-stretch justify-center gap-1 border-l border-border/60 pl-3",
-        )}
-      >
-        {featured ? dots : null}
-        {done ? (
-          <>
-            <span
-              className={cn(
-                "grid place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
-                // Featured: smaller, since the week sits above it in the same column.
-                featured ? "size-6" : "size-8",
-                celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
-              )}
-              title={t("Step done!")}
-            >
-              <Check className="size-4" strokeWidth={3} aria-hidden="true" />
-              <span className="sr-only">{t("Step done!")}</span>
-            </span>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => onToggle(false)}
-              className="rounded text-[10px] leading-none text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-            >
-              {t("Undo")}
-            </button>
-          </>
-        ) : (
-          <>
-            {featured ? (
-              // Same text-link style as "Open goals" (user request).
-              <button
-                type="button"
-                disabled={!step || busy}
-                onClick={() => onToggle(true)}
-                className="inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
-              >
-                {t("Complete step")}
-                <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-              </button>
-            ) : (
-              // Narrow tiles: the same action as a round button, so the row stays low.
-              <button
-                type="button"
-                disabled={!step || busy}
-                onClick={() => onToggle(true)}
-                aria-label={t("Complete step")}
-                title={t("Complete step")}
-                className="grid size-7 place-items-center rounded-full border-2 border-brand-green text-brand-green transition-colors hover:bg-brand-green hover:text-[oklch(0.2_0.04_160)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
+      {featured && !done ? (
+        // Featured (user request): after a divider, the week above "Complete step"
+        // in one column and "Practice now" in a second one beside it; below 1536 px
+        // the tile is too narrow for two columns, so the three stack.
+        <div className="flex flex-[2] flex-col items-center justify-center gap-1 self-stretch whitespace-nowrap border-l border-border/60 pl-3 min-[1536px]:flex-row min-[1536px]:gap-4">
+          <div className="flex flex-col items-center gap-1 min-[1536px]:gap-1.5">
+            {dots}
+            {completeButton}
+          </div>
+          {practiceLink}
+        </div>
+      ) : (
+        /* Narrow tiles: side by side, so the row stays low; a done step shows its check. */
+        <div
+          className={cn(
+            "flex shrink-0 items-center gap-1",
+            done ? "flex-col" : "flex-row-reverse",
+            featured && "flex-[2] self-stretch justify-center border-l border-border/60 pl-3",
+          )}
+        >
+          {featured ? dots : null}
+          {done ? (
+            <>
+              <span
+                className={cn(
+                  "grid place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
+                  // Featured: smaller, since the week sits above it in the same column.
+                  featured ? "size-6" : "size-8",
+                  celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
+                )}
+                title={t("Step done!")}
               >
                 <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+                <span className="sr-only">{t("Step done!")}</span>
+              </span>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => onToggle(false)}
+                className="rounded text-[10px] leading-none text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+              >
+                {t("Undo")}
               </button>
-            )}
-            {/* The goal's English with EVO: a teal button with dark text (user request). */}
-            <Link
-              to="/coach"
-              search={{ goal: goalId }}
-              aria-label={t("Practise it in English with EVO")}
-              title={t("Practise it in English with EVO")}
-              className="inline-flex h-5 items-center gap-0.5 rounded-full bg-brand-green px-2.5 text-[11px] font-semibold leading-none text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-            >
-              {t("Practice now")}
-              <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-            </Link>
-          </>
-        )}
-      </div>
+            </>
+          ) : (
+            <>
+              {completeButton}
+              {practiceLink}
+            </>
+          )}
+        </div>
+      )}
     </li>
   );
 }
