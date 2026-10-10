@@ -132,10 +132,10 @@ describe("aggregateCostPerformance", () => {
       [row(1_000_000, 1_000_000), row(1_000_000, 1_000_000), row(null, null)],
       [],
     );
-    // 1M in + 1M out at US$ 1.50 / 7.50 = US$ 9 per measured call.
-    expect(result.estimatedCost).toBeCloseTo(18);
+    // 1M in + 1M out at US$ 0.75 / 3.75 = US$ 4.50 per measured call.
+    expect(result.estimatedCost).toBeCloseTo(9);
     expect(result.costCoverage).toBe(2);
-    expect(result.projectedCost1k).toBeCloseTo(9000);
+    expect(result.projectedCost1k).toBeCloseTo(4500);
     expect(result.comparisons[0]).toMatchObject({ costCoverage: 2, calls: 3 });
   });
 
@@ -227,5 +227,38 @@ describe("admin coherence (user request: the card and the table agree)", () => {
     );
     const labels = result.comparisons.map((entry) => entry.label).sort();
     expect(labels).toEqual(["AI Speaking", "AI Speaking · reserva (Lovable)"]);
+  });
+});
+
+describe("cost follows the current price table", () => {
+  it("re-prices a call from its tokens even when an older estimate was stored", () => {
+    const result = aggregateCostPerformance(
+      [
+        {
+          operation: "teacher",
+          model: "gemini-3.6-flash",
+          success: true,
+          duration_ms: 1000,
+          input_tokens: 1_000_000,
+          output_tokens: 1_000_000,
+          // Stored with the old (double) price.
+          estimated_cost: 9,
+          error_code: null,
+        },
+        {
+          operation: "teacher",
+          model: "unpriced-model",
+          success: true,
+          duration_ms: 1000,
+          input_tokens: 10,
+          output_tokens: 10,
+          estimated_cost: 0.5,
+          error_code: null,
+        },
+      ],
+      [],
+    );
+    // 4.50 from the current table + the stored 0.50 for the model without a price.
+    expect(result.estimatedCost).toBeCloseTo(5);
   });
 });

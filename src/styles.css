@@ -222,6 +222,14 @@
   background-color: rgb(26 28 32 / 0.4);
 }
 
+/* Phones (user request): a little less see-through, so Weather talk and the
+   bell read clearly over the busier mobile layout. Desktop keeps 40%. */
+@media (max-width: 1023.98px) {
+  .graphite-panel.dashboard-shell.dark {
+    background-color: rgb(26 28 32 / 0.62);
+  }
+}
+
 /* The bell popup is translucent over the dashboard, dark like a phone's
    dark-mode notification shade. */
 .notification-popover.dashboard-shell.dark {

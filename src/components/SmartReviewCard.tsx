@@ -9,6 +9,7 @@ import {
   GraduationCap,
   Mic,
   RotateCcw,
+  RefreshCw,
 } from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
@@ -214,9 +215,14 @@ export function SmartReviewCard({
                   {t("Their review date has arrived: a quick review keeps them in memory.")}
                 </p>
               </div>
-              <Button asChild variant="outline" size="sm">
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+              >
                 <Link to="/vocabulary" aria-label={`${t("Review now")}: ${t("Vocabulary")}`}>
-                  {t("Review")}
+                  <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
                 </Link>
               </Button>
             </li>
@@ -237,9 +243,14 @@ export function SmartReviewCard({
                   {t("Fix them now so they do not become habits.")}
                 </p>
               </div>
-              <Button asChild variant="outline" size="sm">
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+              >
                 <Link to="/mistakes" aria-label={`${t("Review now")}: ${t("My mistakes")}`}>
-                  {t("Review")}
+                  <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
                 </Link>
               </Button>
             </li>
@@ -271,18 +282,23 @@ export function SmartReviewCard({
                     {t(SMART_REVIEW_REASON_TEXT[item.category])}
                   </p>
                 </div>
-                <Button asChild variant="outline" size="sm">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="icon"
+                  className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+                >
                   {item.resource.params ? (
                     <Link
                       to="/learning/$lessonId"
                       params={item.resource.params}
                       aria-label={`${t("Review now")}: ${skillLabel}`}
                     >
-                      {t("Review")}
+                      <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
                     </Link>
                   ) : (
                     <Link to={item.resource.to} aria-label={`${t("Review now")}: ${skillLabel}`}>
-                      {t("Review")}
+                      <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
                     </Link>
                   )}
                 </Button>
