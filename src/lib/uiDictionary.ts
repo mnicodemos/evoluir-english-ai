@@ -1611,6 +1611,7 @@ export const uiPt: Record<string, string> = {
   "Download PDF": "Baixar PDF",
   "Your PDF is downloading.": "Seu PDF está sendo baixado.",
   "Could not build the PDF. Please try again.": "Não foi possível gerar o PDF. Tente novamente.",
+  BIZ: "BIZ",
   "All Business lessons completed": "Todas as lições de Negócios concluídas",
   "Open Business English": "Abrir Inglês para Negócios",
   Continuous: "Contínuo",

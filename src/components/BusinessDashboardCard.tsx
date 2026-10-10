@@ -63,23 +63,36 @@ export function BusinessDashboardCard() {
         </span>
       </div>
       <div className="mt-2 flex min-w-0 flex-1 flex-col justify-center gap-1.5">
-        {next ? (
-          <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
-              {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
+        <div className="flex min-w-0 items-center gap-3">
+          {next ? (
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
+                {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
+              </p>
+              <p
+                className="truncate text-sm font-semibold"
+                translate="no"
+                lang="en"
+                title={next.title}
+              >
+                {next.title}
+              </p>
+            </div>
+          ) : (
+            <p className="min-w-0 flex-1 text-sm font-semibold">
+              {t("All Business lessons completed")}
             </p>
-            <p
-              className="truncate text-sm font-semibold"
-              translate="no"
-              lang="en"
-              title={next.title}
-            >
-              {next.title}
-            </p>
-          </div>
-        ) : (
-          <p className="text-sm font-semibold">{t("All Business lessons completed")}</p>
-        )}
+          )}
+          {/* The track's own chip, the same shape as the current level chip in
+              the header (user request). */}
+          <span
+            className="inline-flex h-6 w-10 shrink-0 items-center justify-center rounded-full bg-brand-green text-[10px] font-semibold text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)] 2xl:text-[11px]"
+            translate="no"
+            title="Business English"
+          >
+            {t("BIZ")}
+          </span>
+        </div>
         <div className="flex items-center gap-2">
           <div className="h-1.5 flex-1 rounded-full bg-secondary" aria-hidden="true">
             <div className="h-full rounded-full bg-brand-green" style={{ width: `${percent}%` }} />
