@@ -237,7 +237,7 @@ export function MobileNavigationMenu({
         // a lighter dim so the page shows through.
         overlayClassName="bg-black/30"
         className={cn(
-          "dashboard-shell dark flex w-[min(19rem,86vw)] flex-col p-4 text-sidebar-foreground",
+          "dashboard-shell dark flex w-[min(16rem,78vw)] flex-col p-4 text-sidebar-foreground",
           graphitePanelClass,
           "border-y-0 border-l-0",
         )}
