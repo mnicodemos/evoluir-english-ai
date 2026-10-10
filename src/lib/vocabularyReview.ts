@@ -66,3 +66,32 @@ export function fallBack(state: ReviewState | undefined, now = new Date()) {
     next_review_at: new Date(now.getTime() + REVIEW_INTERVAL_DAYS[1]! * DAY_MS).toISOString(),
   };
 }
+
+export type VocabularyReviewAction = "known" | "forgotten" | "pronounced";
+
+/**
+ * The row a review writes, or null when the ladder does not allow it (the
+ * server applies this; the browser no longer writes user_vocabulary).
+ * "pronounced" needs a passed pronunciation the server recorded itself.
+ */
+export function vocabularyReviewUpdate(
+  action: VocabularyReviewAction,
+  existing: (ReviewState & { times_reviewed?: number | null }) | null | undefined,
+  { pronouncedOk = false, now = new Date() }: { pronouncedOk?: boolean; now?: Date } = {},
+) {
+  const reviewed = {
+    is_difficult: false,
+    times_reviewed: (existing?.times_reviewed ?? 0) + 1,
+    last_reviewed_at: now.toISOString(),
+  };
+  if (action === "known") {
+    if (!canAdvance(existing ?? undefined, now)) return null;
+    return { ...advance(existing ?? undefined, now), ...reviewed };
+  }
+  if (action === "pronounced") {
+    if (!pronouncedOk) return null;
+    return { ...markPronounced(now), ...reviewed };
+  }
+  if (!existing || !isDue(existing, now)) return null;
+  return { ...fallBack(existing, now), is_difficult: true };
+}

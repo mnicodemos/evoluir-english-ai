@@ -43,19 +43,12 @@ import {
   stopVoiceRecording,
 } from "@/lib/voice-recorder";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
+import { resetVocabularyWords, reviewVocabularyWord } from "@/lib/vocabularyReview.functions";
 import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { logPracticeTelemetry, persistPronunciationLegacy } from "@/lib/legacyActivity.functions";
-import {
-  DAILY_REVIEW_LIMIT,
-  LEARNED_MASTERY,
-  advance,
-  canAdvance,
-  fallBack,
-  isDue,
-  markPronounced,
-} from "@/lib/vocabularyReview";
+import { DAILY_REVIEW_LIMIT, LEARNED_MASTERY, canAdvance, isDue } from "@/lib/vocabularyReview";
 import { readStorage, removeStorage, writeStorage } from "@/lib/safeStorage";
 import { loadOfflineVocabulary, saveOfflineVocabulary } from "@/lib/offlineVocabulary";
 import { useOnline } from "@/hooks/useOnline";
@@ -101,6 +94,8 @@ function VocabularyOnline() {
   const loadDailyWords = useServerFn(dailyWords);
   const savePronunciation = useServerFn(persistPronunciationLegacy);
   const logTelemetry = useServerFn(logPracticeTelemetry);
+  const reviewWord = useServerFn(reviewVocabularyWord);
+  const resetWords = useServerFn(resetVocabularyWords);
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState<string | null>(null);
   const [recordingId, setRecordingId] = useState<string | null>(null);
@@ -217,90 +212,46 @@ function VocabularyOnline() {
     await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
   }
 
-  /** "I know it" moves the word one step up the spaced review ladder. */
-  async function markKnown(wordId: string) {
+  /**
+   * Saves a review through the server, which applies the spaced review ladder
+   * (the browser no longer writes user_vocabulary; security audit item 3).
+   */
+  async function saveReview(
+    wordId: string,
+    action: "known" | "forgotten" | "pronounced",
+    { timed = false }: { timed?: boolean } = {},
+  ) {
     if (!profile) return;
-    const existing = byWord.get(wordId);
-    // Not due yet: marking again must not skip steps of the ladder.
-    if (!canAdvance(existing)) return;
     setBusy(wordId);
-    minutesSpent.start();
+    if (timed) minutesSpent.start();
     try {
-      const next = advance(existing);
-      const { error } = await supabase.from("user_vocabulary").upsert(
-        {
-          user_id: profile.id,
-          word_id: wordId,
-          mastery_level: next.mastery_level,
-          next_review_at: next.next_review_at,
-          is_difficult: false,
-          times_reviewed: (existing?.times_reviewed ?? 0) + 1,
-          last_reviewed_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,word_id" },
-      );
-      if (error) throw error;
+      await reviewWord({ data: { wordId, action } });
       await invalidateVocabulary();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save this word");
     } finally {
-      minutesSpent.stop();
+      if (timed) minutesSpent.stop();
       setBusy(null);
     }
+  }
+
+  /** "I know it" moves the word one step up the spaced review ladder. */
+  async function markKnown(wordId: string) {
+    // Not due yet: marking again must not skip steps of the ladder.
+    if (!canAdvance(byWord.get(wordId))) return;
+    await saveReview(wordId, "known", { timed: true });
   }
 
   /** Passed pronunciation (>= 70%): the word goes straight to the Learned tab. */
   async function markPronouncedKnown(wordId: string) {
-    if (!profile) return;
-    const existing = byWord.get(wordId);
-    setBusy(wordId);
-    try {
-      const next = markPronounced();
-      const { error } = await supabase.from("user_vocabulary").upsert(
-        {
-          user_id: profile.id,
-          word_id: wordId,
-          mastery_level: next.mastery_level,
-          next_review_at: next.next_review_at,
-          is_difficult: false,
-          times_reviewed: (existing?.times_reviewed ?? 0) + 1,
-          last_reviewed_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,word_id" },
-      );
-      if (error) throw error;
-      await invalidateVocabulary();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save this word");
-    } finally {
-      setBusy(null);
-    }
+    await saveReview(wordId, "pronounced");
   }
 
   /** A failed review sends the word back two steps and due again tomorrow. */
   async function markForgotten(wordId: string) {
-    if (!profile) return;
     const existing = byWord.get(wordId);
     if (!existing || !isDue(existing)) return;
-    setBusy(wordId);
-    try {
-      const next = fallBack(existing);
-      const { error } = await supabase
-        .from("user_vocabulary")
-        .update({
-          mastery_level: next.mastery_level,
-          next_review_at: next.next_review_at,
-          is_difficult: true,
-        })
-        .eq("user_id", profile.id)
-        .eq("word_id", wordId);
-      if (error) throw error;
-      await invalidateVocabulary();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save this word");
-    } finally {
-      setBusy(null);
-    }
+    await saveReview(wordId, "forgotten");
   }
 
   /** Brings today's words back to the Today tab so the student can practise them again. */
@@ -310,12 +261,7 @@ function VocabularyOnline() {
     if (!ids.length) return;
     setBusy("redo");
     try {
-      const { error } = await supabase
-        .from("user_vocabulary")
-        .update({ mastery_level: 0, next_review_at: null })
-        .eq("user_id", profile.id)
-        .in("word_id", ids);
-      if (error) throw error;
+      await resetWords({ data: { wordIds: ids } });
       await queryClient.invalidateQueries({ queryKey: ["user-vocabulary"] });
       await queryClient.invalidateQueries({ queryKey: ["user-vocabulary-mastery"] });
       await queryClient.invalidateQueries({ queryKey: ["vocabulary-batch-progress"] });
