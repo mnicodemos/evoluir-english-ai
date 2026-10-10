@@ -113,13 +113,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // (apple-touch-icon, manifest) stays as it is.
       {
         rel: "icon",
-        href: "/favicon-light.png?v=15",
+        href: "/favicon-light.png?v=16",
         type: "image/png",
         media: "(prefers-color-scheme: light)",
       },
       {
         rel: "icon",
-        href: "/favicon.png?v=15",
+        href: "/favicon.png?v=16",
         type: "image/png",
         media: "(prefers-color-scheme: dark)",
       },
