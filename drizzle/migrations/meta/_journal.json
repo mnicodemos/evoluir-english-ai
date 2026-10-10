@@ -393,6 +393,13 @@
       "when": 1791542088471,
       "tag": "0055_landing_daily_stats",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1791590744979,
+      "tag": "0056_vocabulary_word_per_student",
+      "breakpoints": true
     }
   ]
 }
