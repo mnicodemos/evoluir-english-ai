@@ -10,12 +10,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useProfile } from "@/hooks/useProfile";
@@ -173,50 +173,157 @@ export function ProfileMenu({
   const displayName = profile?.name || profile?.email || "User";
   const photo = avatarPreview ?? avatarUrl ?? undefined;
 
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size={presentation === "icon" ? "icon" : "default"}
-          aria-label={translate("Edit profile", lang)}
-          className={cn(
-            presentation === "dashboard-sidebar"
-              ? "h-auto min-h-[4.5rem] w-full justify-start gap-2 rounded-none border-t border-sidebar-border px-1 pt-4 pb-4 text-sidebar-foreground hover:bg-transparent"
-              : presentation === "mobile-menu"
-                ? "h-11 w-full justify-start gap-2 rounded-lg px-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
-            className,
-          )}
-        >
-          <Avatar className="size-8 shrink-0 border border-border bg-muted">
+  // The button that opens the profile (sidebar row, phone menu row or icon).
+  const triggerButton = (
+    <Button
+      variant="ghost"
+      size={presentation === "icon" ? "icon" : "default"}
+      aria-label={translate("Edit profile", lang)}
+      className={cn(
+        presentation === "dashboard-sidebar"
+          ? "h-auto min-h-[4.5rem] w-full justify-start gap-2 rounded-none border-t border-sidebar-border px-1 pt-4 pb-4 text-sidebar-foreground hover:bg-transparent"
+          : presentation === "mobile-menu"
+            ? "h-11 w-full justify-start gap-2 rounded-lg px-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+            : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
+        className,
+      )}
+    >
+      <Avatar className="size-8 shrink-0 border border-border bg-muted">
+        <AvatarImage src={photo} alt={displayName} className="object-cover" />
+        <AvatarFallback className="bg-accent text-[11px] font-bold text-accent-foreground">
+          {profile ? initials(profile.name, profile.email) : <UserRound className="size-4" />}
+        </AvatarFallback>
+      </Avatar>
+      {presentation !== "icon" && (
+        <>
+          <span className="min-w-0 flex-1 text-left">
+            <span className="block truncate text-xs font-semibold text-sidebar-foreground">
+              {displayName.split(/\s+/)[0]}
+            </span>
+            {presentation === "dashboard-sidebar" && (
+              <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
+                {profileIsPremium(profile) ? "Premium" : translate("Profile", lang)}
+              </span>
+            )}
+            {presentation === "mobile-menu" && profileIsPremium(profile) && (
+              <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
+                Premium
+              </span>
+            )}
+          </span>
+          <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
+        </>
+      )}
+    </Button>
+  );
+
+  // The form itself, shared by the desktop popover and the phone dialog.
+  const form = (
+    <>
+      <div className="space-y-5">
+        <div className="flex items-center gap-4">
+          <Avatar className="size-16 border border-border bg-muted">
             <AvatarImage src={photo} alt={displayName} className="object-cover" />
-            <AvatarFallback className="bg-accent text-[11px] font-bold text-accent-foreground">
-              {profile ? initials(profile.name, profile.email) : <UserRound className="size-4" />}
+            <AvatarFallback className="bg-accent text-base font-bold text-accent-foreground">
+              {initials(name || profile?.name, profile?.email)}
             </AvatarFallback>
           </Avatar>
-          {presentation !== "icon" && (
-            <>
-              <span className="min-w-0 flex-1 text-left">
-                <span className="block truncate text-xs font-semibold text-sidebar-foreground">
-                  {displayName.split(/\s+/)[0]}
-                </span>
-                {presentation === "dashboard-sidebar" && (
-                  <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
-                    {profileIsPremium(profile) ? "Premium" : translate("Profile", lang)}
-                  </span>
-                )}
-                {presentation === "mobile-menu" && profileIsPremium(profile) && (
-                  <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
-                    Premium
-                  </span>
-                )}
-              </span>
-              <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
-            </>
-          )}
+          <div className="min-w-0 space-y-2">
+            <Button asChild variant="outline" size="sm">
+              <Label htmlFor="profile-photo" className="cursor-pointer">
+                <Camera className="size-4" />
+                {translate("Choose photo", lang)}
+              </Label>
+            </Button>
+            <Input
+              id="profile-photo"
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handleAvatarChange}
+            />
+            {avatarFile && (
+              <p className="truncate text-xs text-muted-foreground">{avatarFile.name}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="profile-name">{translate("Name", lang)}</Label>
+          <Input
+            id="profile-name"
+            value={name}
+            maxLength={80}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="profile-phone">{translate("Phone", lang)}</Label>
+          <Input
+            id="profile-phone"
+            type="tel"
+            value={phone}
+            placeholder="(99) 99999-9999"
+            maxLength={15}
+            onChange={(event) => setPhone(maskPhone(event.target.value))}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="profile-bio">{translate("Bio", lang)}</Label>
+          <Textarea
+            id="profile-bio"
+            value={bio}
+            maxLength={280}
+            rows={4}
+            onChange={(event) => setBio(event.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-row items-center justify-between gap-2">
+        <AdminPanelButton showLabel className="mr-auto" />
+        <Button onClick={() => save.mutate()} disabled={save.isPending}>
+          {save.isPending && <Loader2 className="size-4 animate-spin" />}
+          {save.isPending ? translate("Saving...", lang) : translate("Save profile", lang)}
         </Button>
-      </DialogTrigger>
+      </div>
+    </>
+  );
+
+  // Desktop sidebar (user request): opens beside its button like Weather talk,
+  // not centred on the screen.
+  if (presentation === "dashboard-sidebar") {
+    return (
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
+        <PopoverContent
+          side="right"
+          align="end"
+          sideOffset={12}
+          className={cn(
+            "dashboard-shell dark max-h-[calc(100dvh-2rem)] w-[min(26rem,calc(100vw-2rem))] space-y-4 overflow-y-auto p-5",
+            graphitePanelClass,
+          )}
+        >
+          <div className="space-y-1">
+            <h2 className="font-display text-lg font-semibold leading-none">
+              {translate("Profile", lang)}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {translate("Update your photo and personal details.", lang)}
+            </p>
+          </div>
+          {form}
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{triggerButton}</DialogTrigger>
       <DialogContent
         // Translucent graphite like Weather talk and the bell (user request).
         // Phones: inset from the edges with rounded corners and never taller than
@@ -233,76 +340,7 @@ export function ProfileMenu({
             {translate("Update your photo and personal details.", lang)}
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-5">
-          <div className="flex items-center gap-4">
-            <Avatar className="size-16 border border-border bg-muted">
-              <AvatarImage src={photo} alt={displayName} className="object-cover" />
-              <AvatarFallback className="bg-accent text-base font-bold text-accent-foreground">
-                {initials(name || profile?.name, profile?.email)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 space-y-2">
-              <Button asChild variant="outline" size="sm">
-                <Label htmlFor="profile-photo" className="cursor-pointer">
-                  <Camera className="size-4" />
-                  {translate("Choose photo", lang)}
-                </Label>
-              </Button>
-              <Input
-                id="profile-photo"
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={handleAvatarChange}
-              />
-              {avatarFile && (
-                <p className="truncate text-xs text-muted-foreground">{avatarFile.name}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="profile-name">{translate("Name", lang)}</Label>
-            <Input
-              id="profile-name"
-              value={name}
-              maxLength={80}
-              onChange={(event) => setName(event.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="profile-phone">{translate("Phone", lang)}</Label>
-            <Input
-              id="profile-phone"
-              type="tel"
-              value={phone}
-              placeholder="(99) 99999-9999"
-              maxLength={15}
-              onChange={(event) => setPhone(maskPhone(event.target.value))}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="profile-bio">{translate("Bio", lang)}</Label>
-            <Textarea
-              id="profile-bio"
-              value={bio}
-              maxLength={280}
-              rows={4}
-              onChange={(event) => setBio(event.target.value)}
-            />
-          </div>
-        </div>
-
-        <DialogFooter className="flex-row items-center justify-between sm:justify-between">
-          <AdminPanelButton showLabel className="mr-auto" />
-          <Button onClick={() => save.mutate()} disabled={save.isPending}>
-            {save.isPending && <Loader2 className="size-4 animate-spin" />}
-            {save.isPending ? translate("Saving...", lang) : translate("Save profile", lang)}
-          </Button>
-        </DialogFooter>
+        {form}
       </DialogContent>
     </Dialog>
   );
