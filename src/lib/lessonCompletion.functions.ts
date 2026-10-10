@@ -27,7 +27,12 @@ export const completeLessonFromQuiz = createServerFn({ method: "POST" })
           .maybeSingle()
       : { data: null };
     const check = lessonCompletionCheck({ userId: context.userId, result, lesson });
-    if (!check.ok) return { completed: false as const, reason: check.reason };
+    if (!check.ok) {
+      // Recorded in server_errors (Admin alerts), so a lesson that cannot be
+      // completed is seen instead of failing quietly.
+      console.error(`Lesson completion refused (${check.reason})`);
+      return { completed: false as const, reason: check.reason };
+    }
 
     const lessonId = result!.lesson_id as string;
     const { data: existing } = await admin
@@ -46,6 +51,9 @@ export const completeLessonFromQuiz = createServerFn({ method: "POST" })
       },
       { onConflict: "user_id,lesson_id" },
     );
-    if (error) throw new Error("The lesson could not be saved as completed.");
+    if (error) {
+      console.error(`Lesson completion not saved: ${error.message}`);
+      throw new Error("The lesson could not be saved as completed.");
+    }
     return { completed: true as const, wasAlreadyCompleted: !!existing?.completed_at };
   });
