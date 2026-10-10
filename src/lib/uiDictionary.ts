@@ -137,7 +137,8 @@ export const uiPt: Record<string, string> = {
   "Open the app in its own tab to enable notifications":
     "Abra o app em uma aba própria para ativar as notificações",
   "Notifications are not supported on this device": "Este dispositivo não aceita notificações",
-  "Notification permission was denied": "Permissão de notificação negada",
+  "Notifications are blocked in this browser. Allow them in the site settings (the icon next to the address) and try again.":
+    "As notificações estão bloqueadas neste navegador. Libere nas configurações do site (o ícone ao lado do endereço) e tente de novo.",
   Weather: "Previsão do tempo",
   Sunny: "Ensolarado",
   "Partly cloudy": "Parcialmente nublado",

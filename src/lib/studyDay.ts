@@ -30,12 +30,15 @@ export function qualifiesAsStudyDay(day: StudyDayEvidence): boolean {
 }
 
 /**
- * Activity types that represent completed learning outcomes. The daily goal card
- * only counts these, excluding residual timer/navigation records such as the
- * "*_practice" telemetry rows written while a session is still open.
+ * Activity types whose minutes count toward the daily goal: finished activities,
+ * plus the screens without a finish button and the lesson page itself. Other
+ * "*_practice" rows (a session left open) are kept out.
  */
 export const LEARNING_ACTIVITY_TYPES = [
   "lesson",
+  // Time on a lesson page (video, summary, flashcards) counts even before the
+  // quiz (user request); the activity clock already pauses when idle.
+  "lesson_practice",
   "final_test",
   "conversation",
   "listening",
