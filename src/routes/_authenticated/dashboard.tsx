@@ -301,6 +301,7 @@ function Dashboard() {
     studyPlan?.plan.nextIndex != null ? studyPlan.plan.days[studyPlan.plan.nextIndex] : null;
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const nextLeague = profile ? getNextLeague(streakDays) : null;
+  const jewelDaysLeft = getLeague(streakDays).nextIn;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
 
   useEffect(() => {
@@ -428,12 +429,19 @@ function Dashboard() {
                 iconColor={getLeague(streakDays).from}
                 label={t("Study streak")}
                 value={`${streakDays} ${t("days")}`}
+                // How many days in a row the next jewel needs, and the rule on
+                // hover (user request: make the rule clear, not change it).
                 detail={
                   nextLeague
                     ? lang === "pt"
-                      ? `Próxima joia: ${nextLeague.namePt}`
-                      : `Next jewel: ${nextLeague.name}`
+                      ? `${nextLeague.namePt} em ${jewelDaysLeft} ${jewelDaysLeft === 1 ? "dia seguido" : "dias seguidos"}`
+                      : `${nextLeague.name} in ${jewelDaysLeft} ${jewelDaysLeft === 1 ? "day" : "days"} in a row`
                     : null
+                }
+                hint={
+                  lang === "pt"
+                    ? "As joias sobem a cada 7 dias seguidos de estudo (1 falta por semana é protegida). Cumprir seu plano da semana vale as 3 estrelas douradas."
+                    : "Jewels climb every 7 study days in a row (one missed day a week is protected). Meeting your weekly plan earns the 3 gold stars."
                 }
                 detailStyle={nextLeague ? { color: nextLeague.from } : undefined}
               />
