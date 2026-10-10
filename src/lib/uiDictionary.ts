@@ -592,6 +592,7 @@ export const uiPt: Record<string, string> = {
   "Today's Premium mission": "Missão Premium de hoje",
   "Daily goal reached!": "Meta diária atingida!",
   "Your step today": "Seu passo de hoje",
+  "See today's step": "Ver o passo de hoje",
   "Your study day counts!": "Seu dia de estudo conta!",
   "1 more step to count your day": "Falta 1 passo para contar seu dia",
   "{n} more steps to count your day": "Faltam {n} passos para contar seu dia",

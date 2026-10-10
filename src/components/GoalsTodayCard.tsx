@@ -1,11 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronRight, Flame, Loader2, Plus, Target } from "lucide-react";
+import { Check, ChevronRight, Flame, Loader2, Plus, Search, Target } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useProfile } from "@/hooks/useProfile";
 import {
   PLUS_GOAL_EXAMPLES,
@@ -130,8 +137,8 @@ export function GoalsTodayCard() {
           ))}
         </div>
       ) : (
-        // Three slots (user request): with one goal, EVO's step takes two of them;
-        // a free slot invites the next goal instead of sitting empty.
+        // Three slots (user request): one per goal, and every free slot invites
+        // the next goal instead of sitting empty.
         <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1">
           {goals.map((goal) => {
             const step = steps.find((item) => item.goalId === goal.id) ?? null;
@@ -142,7 +149,6 @@ export function GoalsTodayCard() {
                 title={goal.title}
                 step={step}
                 week={plusGoalWeek(recent, goal.id, data?.today ?? "")}
-                featured={goals.length === 1}
                 dayComplete={allDone}
                 stepsLeft={steps.filter((item) => !item.doneAt).length}
                 celebrate={!!step && justDone === step.id}
@@ -152,8 +158,8 @@ export function GoalsTodayCard() {
               />
             );
           })}
-          {goals.length < PLUS_MAX_GOALS ? (
-            <li className="min-w-0">
+          {Array.from({ length: PLUS_MAX_GOALS - goals.length }, (_, index) => (
+            <li key={`free-${index}`} className="min-w-0">
               <Link
                 to="/goals"
                 className="flex h-full min-w-0 flex-col justify-center gap-0.5 rounded-lg border border-dashed border-border px-3 py-1.5 transition-colors hover:border-brand-green/50 hover:bg-secondary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
@@ -172,7 +178,7 @@ export function GoalsTodayCard() {
                 </span>
               </Link>
             </li>
-          ) : null}
+          ))}
         </ul>
       )}
     </section>
@@ -180,17 +186,16 @@ export function GoalsTodayCard() {
 }
 
 /**
- * One goal's step (user request: a step that encourages, not a cramped to-do),
- * kept as compact as the old row so the Dashboard still fits one screen: the
- * step, the goal's last 7 days and the English practice link on the left, the
- * button on the right, and a one-line note once the step is done.
+ * One goal's step (user request: a step that encourages, not a cramped to-do).
+ * Each goal takes one of the three slots of the same size; the step itself
+ * opens in a popup from the magnifier, so no text is cut and the row keeps
+ * its height.
  */
 function GoalTile({
   goalId,
   title,
   step,
   week,
-  featured,
   dayComplete,
   stepsLeft,
   celebrate,
@@ -202,7 +207,6 @@ function GoalTile({
   title: string;
   step: PlusStep | null;
   week: PlusGoalWeek;
-  featured: boolean;
   dayComplete: boolean;
   stepsLeft: number;
   celebrate: boolean;
@@ -211,16 +215,15 @@ function GoalTile({
   t: (label: string) => string;
 }) {
   const done = !!step?.doneAt;
-  const dots = (
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  // The goal's last 7 days: dots in a slot wide enough for them (the count is
+  // read out and shown on hover), dots and count in the popup.
+  const week7 = (always: boolean) => (
     <span
-      className="flex shrink-0 items-center gap-1"
+      className={cn("shrink-0 items-center gap-1", always ? "flex" : "hidden @[18.5rem]:flex")}
       title={`${t("Last 7 days")}: ${t("{n} of 7 days").replace("{n}", String(week.doneCount))}`}
     >
-      {/* Narrow tiles on smaller screens keep the goal's name and only the 🔥 run. */}
-      <span
-        className={cn("flex gap-0.5", !featured && "hidden min-[1536px]:flex")}
-        aria-hidden="true"
-      >
+      <span className="flex gap-0.5" aria-hidden="true">
         {week.days.map((item, index) => (
           <span
             key={item.day}
@@ -232,7 +235,7 @@ function GoalTile({
           />
         ))}
       </span>
-      <span className={cn("text-[10px] font-medium text-muted-foreground", !featured && "sr-only")}>
+      <span className={cn("text-[10px] font-medium text-muted-foreground", !always && "sr-only")}>
         {t("{n} of 7 days").replace("{n}", String(week.doneCount))}
       </span>
       {week.streak >= 2 ? (
@@ -246,132 +249,143 @@ function GoalTile({
       ) : null}
     </span>
   );
+  // Same text-link style as "Open goals" (user request).
+  const completeButton = (
+    <button
+      type="button"
+      disabled={!step || busy}
+      onClick={() => onToggle(true)}
+      aria-label={t("Complete step")}
+      title={t("Complete step")}
+      className="inline-flex shrink-0 items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
+    >
+      {/* A narrow slot (under 18.5rem) shows the same action as a round check. */}
+      <span className="grid size-6 place-items-center rounded-full border-2 border-brand-green @[18.5rem]:hidden">
+        <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+      </span>
+      <span className="hidden items-center gap-1 @[18.5rem]:inline-flex">
+        {t("Complete step")}
+        <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+      </span>
+    </button>
+  );
+  // The goal's English with EVO: a teal button with dark text (user request).
+  const practiceLink = (
+    <Link
+      to="/coach"
+      search={{ goal: goalId }}
+      aria-label={t("Practise it in English with EVO")}
+      title={t("Practise it in English with EVO")}
+      className={cn(
+        "inline-flex shrink-0 items-center gap-0.5 rounded-full bg-brand-green px-2.5 text-[11px] font-semibold leading-none text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60",
+        "h-6",
+      )}
+    >
+      {t("Practice now")}
+      <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+    </Link>
+  );
   const dayNote = dayComplete
     ? t("Your study day counts!")
     : stepsLeft === 1
       ? t("1 more step to count your day")
       : t("{n} more steps to count your day").replace("{n}", String(stepsLeft));
+  const doneMark = (
+    <>
+      <span
+        className={cn(
+          "grid size-6 shrink-0 place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
+          celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
+        )}
+        title={t("Step done!")}
+      >
+        <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+        <span className="sr-only">{t("Step done!")}</span>
+      </span>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => onToggle(false)}
+        className="rounded text-[10px] leading-none text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+      >
+        {t("Undo")}
+      </button>
+    </>
+  );
+  const dayNoteLine = done ? (
+    <p
+      className={cn(
+        "text-[11px] font-semibold leading-snug",
+        dayComplete ? "text-brand-green" : "text-muted-foreground",
+        celebrate && "animate-in fade-in-0 slide-in-from-bottom-1 duration-500",
+      )}
+    >
+      {dayNote}
+    </p>
+  ) : null;
+  const actions = done ? (
+    <div className="flex items-center gap-2">{doneMark}</div>
+  ) : (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {completeButton}
+      {practiceLink}
+    </div>
+  );
+  // Every goal has a slot of the same size (user request): the goal's name, a
+  // magnifier that opens the step in a popup, and the week and actions on one
+  // row, so the row keeps its height whatever the step's length.
   return (
     <li
       className={cn(
-        "flex min-w-0 items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition-colors",
-        featured && "sm:col-span-2",
+        "@container flex min-w-0 flex-col justify-between gap-1.5 rounded-lg px-2.5 py-2 transition-colors",
         done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
       )}
     >
-      {featured ? <EvoAvatar decorative className="size-9 shrink-0" /> : null}
-      <div className="min-w-0 flex-1">
-        {/* Goal and its week on one line, so the step keeps two full lines. */}
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="min-w-0 flex-1 truncate text-[11px] font-semibold leading-tight text-muted-foreground">
-            {featured ? (
-              <>
-                <span className="text-brand-green">{t("Your step today")}</span>
-                <span aria-hidden="true"> · </span>
-              </>
-            ) : null}
-            <span translate="no" title={title}>
-              {title}
-            </span>
-          </p>
-          {featured ? null : dots}
-        </div>
-        <p
-          className={cn(
-            "mt-0.5 text-xs leading-snug",
-            done ? "line-clamp-1 text-muted-foreground" : "line-clamp-2",
-          )}
-          title={step?.text}
-          translate="no"
-        >
-          {step?.text ?? "…"}
+      <div className="flex min-w-0 items-start gap-2">
+        <p className="min-w-0 flex-1 text-xs font-semibold leading-snug" translate="no">
+          {title}
         </p>
-        {done ? (
-          <p
-            className={cn(
-              "truncate text-[11px] font-semibold leading-snug",
-              dayComplete ? "text-brand-green" : "text-muted-foreground",
-              celebrate && "animate-in fade-in-0 slide-in-from-bottom-1 duration-500",
-            )}
-          >
-            {dayNote}
-          </p>
-        ) : null}
+        <button
+          type="button"
+          onClick={() => setDetailsOpen(true)}
+          aria-label={t("See today's step")}
+          title={t("See today's step")}
+          className="-m-1 shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        >
+          <Search className="size-4" aria-hidden="true" />
+        </button>
+      </div>
+      {/* One row (user request): the week on the left (or, once done, whether
+          the study day counts) and the actions on the right. */}
+      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1 whitespace-nowrap">
+        {done ? dayNoteLine : week7(false)}
+        {actions}
       </div>
 
-      {/* Featured: its own column after a divider, stacked as week, Complete step,
-          Practice now (user request); narrow tiles: side by side, so the row stays low. */}
-      <div
-        className={cn(
-          "flex shrink-0 items-center gap-1",
-          featured || done ? "flex-col" : "flex-row-reverse",
-          featured && "self-stretch justify-center gap-1 border-l border-border/60 pl-3",
-        )}
-      >
-        {featured ? dots : null}
-        {done ? (
-          <>
-            <span
-              className={cn(
-                "grid place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
-                // Featured: smaller, since the week sits above it in the same column.
-                featured ? "size-6" : "size-8",
-                celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
-              )}
-              title={t("Step done!")}
-            >
-              <Check className="size-4" strokeWidth={3} aria-hidden="true" />
-              <span className="sr-only">{t("Step done!")}</span>
-            </span>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => onToggle(false)}
-              className="rounded text-[10px] leading-none text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-            >
-              {t("Undo")}
-            </button>
-          </>
-        ) : (
-          <>
-            {featured ? (
-              // Same text-link style as "Open goals" (user request).
-              <button
-                type="button"
-                disabled={!step || busy}
-                onClick={() => onToggle(true)}
-                className="inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
-              >
-                {t("Complete step")}
-                <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-              </button>
-            ) : (
-              // Narrow tiles: the same action as a round button, so the row stays low.
-              <button
-                type="button"
-                disabled={!step || busy}
-                onClick={() => onToggle(true)}
-                aria-label={t("Complete step")}
-                title={t("Complete step")}
-                className="grid size-7 place-items-center rounded-full border-2 border-brand-green text-brand-green transition-colors hover:bg-brand-green hover:text-[oklch(0.2_0.04_160)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
-              >
-                <Check className="size-4" strokeWidth={3} aria-hidden="true" />
-              </button>
-            )}
-            {/* The goal's English with EVO: a teal button with dark text (user request). */}
-            <Link
-              to="/coach"
-              search={{ goal: goalId }}
-              aria-label={t("Practise it in English with EVO")}
-              title={t("Practise it in English with EVO")}
-              className="inline-flex h-5 items-center gap-0.5 rounded-full bg-brand-green px-2.5 text-[11px] font-semibold leading-none text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-            >
-              {t("Practice now")}
-              <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-            </Link>
-          </>
-        )}
-      </div>
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="dashboard-shell dark max-w-md border-border shadow-[var(--shadow-soft)]">
+          <DialogHeader>
+            <DialogDescription className="text-xs font-semibold text-brand-green">
+              {t("Your step today")}
+            </DialogDescription>
+            <DialogTitle className="text-base leading-snug" translate="no">
+              {title}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm leading-relaxed" translate="no">
+            {step?.text ?? "…"}
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-muted-foreground">{t("Last 7 days")}</span>
+            {week7(true)}
+          </div>
+          {dayNoteLine}
+          {/* A container of its own, so "Complete step" shows its full label here. */}
+          <div className="@container flex flex-wrap items-center justify-end gap-3 whitespace-nowrap">
+            {actions}
+          </div>
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }
