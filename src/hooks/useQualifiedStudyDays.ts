@@ -14,8 +14,11 @@ function increment(counts: Map<string, number>, timestamp: string | null) {
 }
 
 /**
- * Calendar days that satisfy the database's Study Streak rule. This hook only
- * reads the evidence; the database remains the sole authority that credits a streak.
+ * The study days the jewels counted (user request: jewels, Your learning
+ * rhythm and the My Progress calendar agree). credit_study_day stores every
+ * day it credits in study_days (migration 0063); this hook reads those rows.
+ * Until that migration is applied it falls back to recomputing the same rule
+ * from the evidence (qualifiesAsStudyDay).
  */
 export function useQualifiedStudyDays({
   userId,
@@ -35,6 +38,14 @@ export function useQualifiedStudyDays({
     queryKey: ["qualified-study-days", userId, queryKey],
     enabled: !!userId,
     queryFn: async () => {
+      const credited = await supabase
+        .from("study_days")
+        .select("day")
+        .eq("user_id", userId)
+        .gte("day", dayFormatter.format(start))
+        .lt("day", dayFormatter.format(end));
+      if (!credited.error) return new Set((credited.data ?? []).map((row) => row.day));
+
       const [activities, lessons, vocabulary, plusSteps] = await Promise.all([
         supabase
           .from("activities")

@@ -442,6 +442,13 @@
       "when": 1791591657582,
       "tag": "0062_server_errors",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1791591757582,
+      "tag": "0063_study_days",
+      "breakpoints": true
     }
   ]
 }
