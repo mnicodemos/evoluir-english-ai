@@ -421,6 +421,13 @@
       "when": 1791591318329,
       "tag": "0059_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1791591457582,
+      "tag": "0060_entitlement_check_own_account",
+      "breakpoints": true
     }
   ]
 }
