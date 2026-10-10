@@ -176,7 +176,11 @@ function LessonPage() {
       completeLesson: async () => {
         await completeLesson(attemptKey);
       },
-    });
+    }).catch(() => null);
+    if (!result) {
+      toast.error("The lesson could not be saved as completed. Open it again or redo the quiz.");
+      return;
+    }
     // A lesson only counts as completed with a quiz score of 70% or more.
     if (!result.passed) {
       queryClient.invalidateQueries({ queryKey: ["quiz-results"] });
@@ -464,6 +468,7 @@ function LessonPage() {
                 userId={profile?.id}
                 lessonId={lessonId}
                 onFinished={finishLesson}
+                lessonCompleted={!!data.userLesson?.completed_at}
               />
             )}
           </TabsContent>

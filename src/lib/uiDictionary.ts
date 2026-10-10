@@ -703,6 +703,8 @@ export const uiPt: Record<string, string> = {
     "Você precisa de pelo menos 70% para passar. Revise as explicações abaixo e refaça o quiz.",
   "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want.":
     "Muito bem — você passou! Suas respostas foram salvas e você pode refazer o quiz quando quiser.",
+  "The lesson could not be saved as completed. Open it again or redo the quiz.":
+    "Não foi possível marcar a lição como concluída. Abra de novo ou refaça o quiz.",
   "Score below 70%. Review the lesson and retake the quiz to complete it.":
     "Nota abaixo de 70%. Revise a lição e refaça o quiz para concluí-la.",
   "Lessons, videos, flashcards and quizzes": "Lições, vídeos, flashcards e quizzes",
