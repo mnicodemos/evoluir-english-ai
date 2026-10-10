@@ -205,9 +205,7 @@ NOTIFY pgrst, 'reload schema';
 
 ## 4. Fora do código (com você)
 
-- **Preço do TTS**: confirme no console do Google o preço de `gemini-2.5-flash-preview-tts`
-  (cadastrado: US$ 0,50 por 1M de tokens de texto de entrada, US$ 10,00 por 1M de áudio de saída)
-  e o preço do áudio de entrada de `gemini-3.5-flash-lite` (usado na transcrição).
+- **Preço do TTS e da transcrição**: conferidos no faturamento em 10/10 (batem com o app).
 - **Lovable AI**: o app não usa mais a IA da Lovable; não é preciso comprar créditos dela.
   As chamadas ao Gemini seguem pelo conector da Lovable com a sua chave.
 - **Regras do banco (opcional, para eu conferir)**: peça no chat da Lovable para rodar e me cole o resultado:

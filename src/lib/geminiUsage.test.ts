@@ -21,4 +21,17 @@ describe("extractGeminiUsage", () => {
       }),
     ).toEqual({});
   });
+
+  it("bills cached prompt tokens at a tenth and thinking as output", () => {
+    expect(
+      extractGeminiUsage({
+        usageMetadata: {
+          promptTokenCount: 1000,
+          cachedContentTokenCount: 800,
+          candidatesTokenCount: 40,
+          thoughtsTokenCount: 60,
+        },
+      }),
+    ).toEqual({ inputTokens: 280, outputTokens: 100 });
+  });
 });

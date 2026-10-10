@@ -1,3 +1,5 @@
+import { geminiUsageTokens } from "@/lib/aiPricing";
+
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key";
 // Use the lighter model for short tutoring exchanges and keep the larger
 // model as a quota fallback. This avoids exhausting the smaller free quota
@@ -172,11 +174,26 @@ export type GeminiUsage = { inputTokens?: number; outputTokens?: number };
 export function extractGeminiUsage(payload: unknown): GeminiUsage {
   const meta = (payload as { usageMetadata?: Record<string, unknown> } | null)?.usageMetadata;
   if (!meta) return {};
-  const input = meta["promptTokenCount"];
-  const output = meta["candidatesTokenCount"];
+  const count = (key: string) => {
+    const value = meta[key];
+    return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+  };
+  const input = count("promptTokenCount");
+  const output = count("candidatesTokenCount");
+  // Billed like Google bills them (aiPricing geminiUsageTokens): cached prompt
+  // tokens at a tenth, and thinking counted as output.
+  const billed =
+    input === undefined
+      ? null
+      : geminiUsageTokens({
+          promptTokenCount: input,
+          candidatesTokenCount: output ?? 0,
+          thoughtsTokenCount: count("thoughtsTokenCount") ?? 0,
+          cachedContentTokenCount: count("cachedContentTokenCount") ?? 0,
+        });
   return {
-    ...(typeof input === "number" && Number.isFinite(input) ? { inputTokens: input } : {}),
-    ...(typeof output === "number" && Number.isFinite(output) ? { outputTokens: output } : {}),
+    ...(billed ? { inputTokens: billed.inputTokens } : {}),
+    ...(output !== undefined ? { outputTokens: output + (count("thoughtsTokenCount") ?? 0) } : {}),
   };
 }
 
