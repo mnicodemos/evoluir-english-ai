@@ -192,7 +192,9 @@ export function WeeklyFrequency({
         className="card-soft flex h-full min-w-0 flex-col p-3"
         aria-labelledby="weekly-rhythm-title"
       >
-        <div className="flex items-center gap-2">
+        {/* Same header line as Keep improving and the skills card beside it
+            (their 1.65rem icon row and xl:p-4 top), so the pills line up (user request). */}
+        <div className="flex min-h-[1.65rem] items-center gap-2 xl:mt-1">
           <CalendarDays
             className="size-[1.375rem] shrink-0 text-dashboard-cyan"
             strokeWidth={2.4}
@@ -391,7 +393,9 @@ function WeeklyStars({ reached, lang }: { reached: boolean; lang: string }) {
       // Today's Progress has 4 px more side padding from xl; the margin keeps
       // both pills on the same right edge.
       className={cn(
-        "ml-auto inline-flex shrink-0 items-center gap-0.5 rounded-full border px-2 py-0.5 xl:mr-1 2xl:mr-1",
+        // Kept on the first header line (centred in its 1.65rem row) even when a
+        // narrow card wraps the title, so it stays level with the pills beside it.
+        "ml-auto mt-[0.26rem] inline-flex shrink-0 items-center gap-0.5 self-start rounded-full border px-2 py-0.5 xl:mr-1 2xl:mr-1",
         reached
           ? "border-[#F7BE45] bg-[#F7BE45]/10 shadow-[0_0_10px_rgba(245,184,61,0.3)]"
           : "border-white/35 bg-white/10",
