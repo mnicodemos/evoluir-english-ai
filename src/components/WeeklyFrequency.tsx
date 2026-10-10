@@ -1,4 +1,4 @@
-import { CalendarDays, Check, CircleCheck, Trophy } from "lucide-react";
+import { CalendarDays, Check, CircleCheck, Star, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { GoldTrophy } from "@/components/GoldTrophy";
@@ -200,20 +200,10 @@ export function WeeklyFrequency({
           <h2 id="weekly-rhythm-title" className="font-display text-sm font-semibold">
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
           </h2>
-          {/* Weekly trophy: gold once the student's own weekly plan is reached. */}
-          <GoldTrophy
-            unlocked={studiedCount >= weeklyGoal}
-            className="ml-auto size-9 shrink-0"
-            label={
-              studiedCount >= weeklyGoal
-                ? lang === "pt"
-                  ? "Troféu da semana desbloqueado"
-                  : "Weekly trophy unlocked"
-                : lang === "pt"
-                  ? "Troféu da semana bloqueado"
-                  : "Weekly trophy locked"
-            }
-          />
+          {/* Weekly goal (user request: same pill as Today's Progress' weekday,
+              right-aligned with it): three stars that turn gold, with a gold
+              border, once the student's own weekly plan is reached. */}
+          <WeeklyStars reached={studiedCount >= weeklyGoal} lang={lang} />
         </div>
         {/* Same ring as Today's Progress beside it (size, stroke and number).
             The bottom padding lifts it off the days row (user request). */}
@@ -381,6 +371,40 @@ function TrophyBadge({
       title={active ? unlockedText : lockedText}
     >
       <Trophy className={compact ? "size-4" : "size-5"} strokeWidth={2.5} />
+    </span>
+  );
+}
+
+function WeeklyStars({ reached, lang }: { reached: boolean; lang: string }) {
+  const label = reached
+    ? lang === "pt"
+      ? "Meta da semana alcançada"
+      : "Weekly goal reached"
+    : lang === "pt"
+      ? "Meta da semana ainda não alcançada"
+      : "Weekly goal not reached yet";
+  return (
+    <span
+      role="img"
+      aria-label={label}
+      title={label}
+      // Today's Progress has 4 px more side padding from xl; the margin keeps
+      // both pills on the same right edge.
+      className={cn(
+        "ml-auto inline-flex shrink-0 items-center gap-0.5 rounded-full border px-2 py-0.5 xl:mr-1 2xl:mr-1",
+        reached
+          ? "border-[#F7BE45] bg-[#F7BE45]/10 shadow-[0_0_10px_rgba(245,184,61,0.3)]"
+          : "border-white/35 bg-white/10",
+      )}
+    >
+      {[0, 1, 2].map((index) => (
+        <Star
+          key={index}
+          className={cn("size-3", reached ? "fill-[#F7BE45] text-[#F7BE45]" : "text-white/45")}
+          strokeWidth={2.2}
+          aria-hidden="true"
+        />
+      ))}
     </span>
   );
 }
