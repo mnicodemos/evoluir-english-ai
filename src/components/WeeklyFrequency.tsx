@@ -1,4 +1,4 @@
-import { CalendarDays, Check, CircleCheck, Star, Trophy } from "lucide-react";
+import { CalendarDays, Check, CircleCheck, Footprints, Star, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { GoldTrophy } from "@/components/GoldTrophy";
@@ -260,10 +260,17 @@ export function WeeklyFrequency({
                 {lang === "pt" ? "Ótima consistência!" : "Great consistency!"}
               </p>
             ) : (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {lang === "pt" ? "Continue construindo seu ritmo." : "Keep building your rhythm."}
+              // In progress (user request): footprints and a grey nudge, in the
+              // place the goal check takes once the week's plan is reached.
+              <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                <Footprints className="size-3.5 shrink-0" aria-hidden="true" />
+                {lang === "pt" ? "Mantenha o ritmo..." : "Keep the pace..."}
               </p>
             )}
+            {/* Third line (user request), in the header cells' supporting font. */}
+            <p className="mt-0.5 text-xs leading-tight text-muted-foreground">
+              {lang === "pt" ? "Continue aprendendo" : "Keep learning"}
+            </p>
           </div>
         </div>
         <div className="mt-2 grid grid-cols-7 gap-1">
