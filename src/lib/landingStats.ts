@@ -17,7 +17,7 @@ export function bumpLandingStat(event: LandingEvent) {
     }
   }
   // Never blocks the page: a failed count is simply lost.
-  void supabase.rpc("bump_landing_stat" as never, { p_event: event } as never).then(
+  void supabase.rpc("bump_landing_stat", { p_event: event }).then(
     () => undefined,
     () => undefined,
   );
