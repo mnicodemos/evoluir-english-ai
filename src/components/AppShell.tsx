@@ -114,7 +114,11 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
       if (window.top !== window.self) {
         toast(t("Open the app in its own tab to enable notifications"));
       } else {
-        toast(t("Notification permission was denied"));
+        toast(
+          t(
+            "Notifications are blocked in this browser. Allow them in the site settings (the icon next to the address) and try again.",
+          ),
+        );
       }
     } else if (result === "unsupported") {
       toast(t("Notifications are not supported on this device"));

@@ -301,6 +301,15 @@
   }
 }
 
+/* Shorter desktop screens (user report: the goals row made the page scroll):
+   the gaps between rows tighten from 20 px to 12 px, so the same cards fit. */
+@media (min-width: 80rem) and (max-height: 62rem) {
+  .dashboard-one-screen {
+    row-gap: 0.75rem;
+    padding-bottom: 0.25rem;
+  }
+}
+
 @keyframes weather-icon-change {
   from {
     opacity: 0;

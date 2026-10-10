@@ -137,7 +137,8 @@ export const uiPt: Record<string, string> = {
   "Open the app in its own tab to enable notifications":
     "Abra o app em uma aba própria para ativar as notificações",
   "Notifications are not supported on this device": "Este dispositivo não aceita notificações",
-  "Notification permission was denied": "Permissão de notificação negada",
+  "Notifications are blocked in this browser. Allow them in the site settings (the icon next to the address) and try again.":
+    "As notificações estão bloqueadas neste navegador. Libere nas configurações do site (o ícone ao lado do endereço) e tente de novo.",
   Weather: "Previsão do tempo",
   Sunny: "Ensolarado",
   "Partly cloudy": "Parcialmente nublado",
@@ -703,6 +704,8 @@ export const uiPt: Record<string, string> = {
     "Você precisa de pelo menos 70% para passar. Revise as explicações abaixo e refaça o quiz.",
   "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want.":
     "Muito bem — você passou! Suas respostas foram salvas e você pode refazer o quiz quando quiser.",
+  "The lesson could not be saved as completed. Open it again or redo the quiz.":
+    "Não foi possível marcar a lição como concluída. Abra de novo ou refaça o quiz.",
   "Score below 70%. Review the lesson and retake the quiz to complete it.":
     "Nota abaixo de 70%. Revise a lição e refaça o quiz para concluí-la.",
   "Lessons, videos, flashcards and quizzes": "Lições, vídeos, flashcards e quizzes",
@@ -1608,6 +1611,7 @@ export const uiPt: Record<string, string> = {
   "Download PDF": "Baixar PDF",
   "Your PDF is downloading.": "Seu PDF está sendo baixado.",
   "Could not build the PDF. Please try again.": "Não foi possível gerar o PDF. Tente novamente.",
+  BIZ: "BIZ",
   "All Business lessons completed": "Todas as lições de Negócios concluídas",
   "Open Business English": "Abrir Inglês para Negócios",
   Continuous: "Contínuo",
