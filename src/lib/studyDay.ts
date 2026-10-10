@@ -1,8 +1,9 @@
 /**
  * The study-day rule (user decisions; migrations 0027, 0051 and 0057). The
- * database's credit_study_day is the only writer of the streak; this mirror
- * decides which past days the Rhythm and frequency views mark, so both read
- * the same thresholds. Change them together with credit_study_day.
+ * database's credit_study_day is the only writer of the streak and stores the
+ * days it credits in study_days (migration 0063), which the Rhythm and
+ * frequency views read; this mirror is their fallback before that migration
+ * and keeps the thresholds tested. Change them together with credit_study_day.
  */
 export const STUDY_DAY_RULE = { writing: 3, listening: 3, reviewedWords: 10 } as const;
 

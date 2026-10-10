@@ -397,7 +397,7 @@ function GoalTile({
 
 /**
  * Three checks, one per goal slot, lit in teal as each goal's step of the day
- * is done (user request); level with Business English's "Premium bonus" pill.
+ * is done, the border lit from the first one (user request); level with Business English's "Premium bonus" pill.
  */
 function GoalChecks({
   done,
@@ -407,7 +407,8 @@ function GoalChecks({
   label: (count: number) => string;
 }) {
   const count = done.filter(Boolean).length;
-  const all = count === done.length;
+  // The border lights with the first goal done today (user request).
+  const anyDone = count > 0;
   return (
     <span
       role="img"
@@ -415,7 +416,7 @@ function GoalChecks({
       title={label(count)}
       className={cn(
         "ml-auto inline-flex -translate-y-0.5 items-center gap-1 rounded-full border px-2 py-0.5 transition-colors",
-        all ? "border-brand-green/50 bg-brand-green/10" : "border-white/15 bg-white/[0.03]",
+        anyDone ? "border-brand-green/50 bg-brand-green/10" : "border-white/15 bg-white/[0.03]",
       )}
     >
       {done.map((lit, index) => (
