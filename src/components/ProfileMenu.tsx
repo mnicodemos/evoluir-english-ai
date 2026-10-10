@@ -219,8 +219,13 @@ export function ProfileMenu({
       </DialogTrigger>
       <DialogContent
         // Translucent graphite like Weather talk and the bell (user request).
-        overlayClassName="bg-black/30"
-        className={cn("dashboard-shell dark max-w-md", graphitePanelClass)}
+        // Phones: inset from the edges with rounded corners and never taller than
+        // the screen; a darker dim there, since the side menu stays open behind.
+        overlayClassName="bg-black/60 lg:bg-black/30"
+        className={cn(
+          "dashboard-shell dark max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl",
+          graphitePanelClass,
+        )}
       >
         <DialogHeader>
           <DialogTitle>{translate("Profile", lang)}</DialogTitle>
