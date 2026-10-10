@@ -42,6 +42,24 @@ describe("lessonCompletionCheck (only a passed, owned quiz completes a lesson)",
     ).toEqual({ ok: false, reason: "not_owner" });
   });
 
+  it("completes a shared catalogue lesson, but never a shared Final Test", () => {
+    const result = { user_id: "u1", lesson_id: "l1", score: 75 };
+    expect(
+      lessonCompletionCheck({
+        userId: "u1",
+        result,
+        lesson: { created_by: null, category: "reading" },
+      }),
+    ).toEqual({ ok: true });
+    expect(
+      lessonCompletionCheck({
+        userId: "u1",
+        result: { ...result, score: 100 },
+        lesson: { created_by: null, category: "final-test" },
+      }),
+    ).toEqual({ ok: false, reason: "not_owner" });
+  });
+
   it("refuses a missing result or lesson", () => {
     expect(lessonCompletionCheck({ userId: "u1", result: null, lesson })).toEqual({
       ok: false,
