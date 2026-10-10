@@ -180,10 +180,10 @@ export function GoalsTodayCard() {
 }
 
 /**
- * One goal's step (user request: a step that encourages, not a cramped to-do),
- * kept as compact as the old row so the Dashboard still fits one screen: the
- * step, the goal's last 7 days and the English practice link on the left, the
- * button on the right, and a one-line note once the step is done.
+ * One goal's step (user request: a step that encourages, not a cramped to-do).
+ * No text is cut: the goal and its step wrap and the row grows. One goal uses
+ * the wide tile with its actions column; two or three goals put the actions on
+ * a row below the step.
  */
 function GoalTile({
   goalId,
@@ -246,28 +246,16 @@ function GoalTile({
       ) : null}
     </span>
   );
-  const completeButton = featured ? (
-    // Same text-link style as "Open goals" (user request).
+  // Same text-link style as "Open goals" (user request).
+  const completeButton = (
     <button
       type="button"
       disabled={!step || busy}
       onClick={() => onToggle(true)}
-      className="inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
+      className="inline-flex shrink-0 items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
     >
       {t("Complete step")}
       <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-    </button>
-  ) : (
-    // Narrow tiles: the same action as a round button, so the row stays low.
-    <button
-      type="button"
-      disabled={!step || busy}
-      onClick={() => onToggle(true)}
-      aria-label={t("Complete step")}
-      title={t("Complete step")}
-      className="grid size-7 place-items-center rounded-full border-2 border-brand-green text-brand-green transition-colors hover:bg-brand-green hover:text-[oklch(0.2_0.04_160)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
-    >
-      <Check className="size-4" strokeWidth={3} aria-hidden="true" />
     </button>
   );
   // The goal's English with EVO: a teal button with dark text (user request).
@@ -291,107 +279,103 @@ function GoalTile({
     : stepsLeft === 1
       ? t("1 more step to count your day")
       : t("{n} more steps to count your day").replace("{n}", String(stepsLeft));
-  return (
-    <li
-      className={cn(
-        "flex min-w-0 items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition-colors",
-        featured && "sm:col-span-2",
-        done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
-      )}
-    >
-      {featured ? <EvoAvatar decorative className="size-9 shrink-0" /> : null}
-      {/* Featured: the step takes 3/5 of the tile and wraps before the actions column. */}
-      <div className={cn("min-w-0 flex-1", featured && "flex-[3]")}>
-        {/* Goal and its week on one line, so the step keeps two full lines. */}
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="min-w-0 flex-1 truncate text-[11px] font-semibold leading-tight text-muted-foreground">
-            {featured ? (
-              <>
-                <span className="text-brand-green">{t("Your step today")}</span>
-                <span aria-hidden="true"> · </span>
-              </>
-            ) : null}
-            <span translate="no" title={title}>
-              {title}
-            </span>
-          </p>
-          {featured ? null : dots}
-        </div>
+  const doneMark = (
+    <>
+      <span
+        className={cn(
+          "grid size-6 shrink-0 place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
+          celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
+        )}
+        title={t("Step done!")}
+      >
+        <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+        <span className="sr-only">{t("Step done!")}</span>
+      </span>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => onToggle(false)}
+        className="rounded text-[10px] leading-none text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+      >
+        {t("Undo")}
+      </button>
+    </>
+  );
+  // No text is ever cut (user request): the goal and its step wrap, and the
+  // row grows with them.
+  const text = (
+    <>
+      <p className="text-[11px] font-semibold leading-tight text-muted-foreground">
+        {featured ? (
+          <>
+            <span className="text-brand-green">{t("Your step today")}</span>
+            <span aria-hidden="true"> · </span>
+          </>
+        ) : null}
+        <span translate="no">{title}</span>
+      </p>
+      <p
+        className={cn("mt-0.5 text-xs leading-snug", done && "text-muted-foreground")}
+        translate="no"
+      >
+        {step?.text ?? "…"}
+      </p>
+      {done ? (
         <p
           className={cn(
-            "mt-0.5 text-xs leading-snug",
-            done ? "line-clamp-1 text-muted-foreground" : "line-clamp-2",
+            "text-[11px] font-semibold leading-snug",
+            dayComplete ? "text-brand-green" : "text-muted-foreground",
+            celebrate && "animate-in fade-in-0 slide-in-from-bottom-1 duration-500",
           )}
-          title={step?.text}
-          translate="no"
         >
-          {step?.text ?? "…"}
+          {dayNote}
         </p>
-        {done ? (
-          <p
-            className={cn(
-              "truncate text-[11px] font-semibold leading-snug",
-              dayComplete ? "text-brand-green" : "text-muted-foreground",
-              celebrate && "animate-in fade-in-0 slide-in-from-bottom-1 duration-500",
-            )}
-          >
-            {dayNote}
-          </p>
-        ) : null}
-      </div>
+      ) : null}
+    </>
+  );
+  const tileClass = cn(
+    "min-w-0 rounded-lg px-2.5 py-1.5 transition-colors",
+    done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
+  );
 
-      {featured && !done ? (
-        // Featured (user request): after a divider, the week above "Complete step"
-        // in one column and "Practice now" in a second one beside it; below 1536 px
-        // the tile is too narrow for two columns, so the three stack.
-        <div className="flex flex-[2] flex-col items-center justify-center gap-1 self-stretch whitespace-nowrap border-l border-border/60 pl-3 min-[1536px]:flex-row min-[1536px]:gap-4">
-          <div className="flex flex-col items-center gap-1 min-[1536px]:gap-1.5">
-            {dots}
-            {completeButton}
+  if (!featured) {
+    // Two or three goals (user request): each tile is narrow, so the goal and
+    // its step take the whole width and the actions sit on one row below them.
+    return (
+      <li className={cn(tileClass, "flex flex-col gap-1.5")}>
+        <div className="min-w-0">{text}</div>
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          {dots}
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+            {done ? (
+              doneMark
+            ) : (
+              <>
+                {completeButton}
+                {practiceLink}
+              </>
+            )}
           </div>
-          {practiceLink}
         </div>
-      ) : (
-        /* Narrow tiles: side by side, so the row stays low; a done step shows its check. */
-        <div
-          className={cn(
-            "flex shrink-0 items-center gap-1",
-            done ? "flex-col" : "flex-row-reverse",
-            featured && "flex-[2] self-stretch justify-center border-l border-border/60 pl-3",
-          )}
-        >
-          {featured ? dots : null}
-          {done ? (
-            <>
-              <span
-                className={cn(
-                  "grid place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
-                  // Featured: smaller, since the week sits above it in the same column.
-                  featured ? "size-6" : "size-8",
-                  celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
-                )}
-                title={t("Step done!")}
-              >
-                <Check className="size-4" strokeWidth={3} aria-hidden="true" />
-                <span className="sr-only">{t("Step done!")}</span>
-              </span>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => onToggle(false)}
-                className="rounded text-[10px] leading-none text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-              >
-                {t("Undo")}
-              </button>
-            </>
-          ) : (
-            <>
-              {completeButton}
-              {practiceLink}
-            </>
-          )}
+      </li>
+    );
+  }
+
+  return (
+    <li className={cn(tileClass, "flex items-center gap-2.5 sm:col-span-2")}>
+      <EvoAvatar decorative className="size-9 shrink-0" />
+      {/* The step takes 3/5 of the tile and wraps before the actions column. */}
+      <div className="min-w-0 flex-[3]">{text}</div>
+      {/* After a divider (user request): the week above "Complete step" in one
+          column and "Practice now" in a second one beside it; below 1536 px the
+          tile is too narrow for two columns, so the three stack. */}
+      <div className="flex flex-[2] flex-col items-center justify-center gap-1 self-stretch whitespace-nowrap border-l border-border/60 pl-3 min-[1536px]:flex-row min-[1536px]:gap-4">
+        <div className="flex flex-col items-center gap-1 min-[1536px]:gap-1.5">
+          {dots}
+          {done ? <div className="flex items-center gap-2">{doneMark}</div> : completeButton}
         </div>
-      )}
+        {done ? null : practiceLink}
+      </div>
     </li>
   );
 }
