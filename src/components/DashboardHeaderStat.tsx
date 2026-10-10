@@ -8,6 +8,8 @@ const TONES = {
   coral: "bg-dashboard-coral/12 text-dashboard-coral",
   amber: "bg-amber-400/12 text-amber-400",
   green: "bg-brand-green/12 text-brand-green",
+  // Not teal (user request): a teal tile read as a button, the menu's colour.
+  pink: "bg-pink-400/12 text-pink-400",
 } as const;
 
 /**
