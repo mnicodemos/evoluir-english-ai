@@ -422,7 +422,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             </div>
             {/* One sentence with the reason; the main column already says what
                 happened ("You have not practiced this skill yet"). */}
-            <p className="mt-2 text-[13px] leading-snug text-sidebar-foreground/80">
+            {/* Wraps before the Continuous badge's left edge (user request). */}
+            <p className="mt-2 text-[13px] leading-snug text-sidebar-foreground/80 xl:pr-24">
               {priorityText}
             </p>
             {(quickWinButton || challengeButton) && (
