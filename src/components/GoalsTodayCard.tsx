@@ -6,7 +6,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
-import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
 import {
   PLUS_GOAL_EXAMPLES,
@@ -354,22 +353,17 @@ function GoalTile({
                 <Check className="size-4" strokeWidth={3} aria-hidden="true" />
               </button>
             )}
-            {/* The goal's English with EVO, shaped like Keep improving's Review button (user request). */}
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className={cn("px-2.5 text-xs", featured ? "h-7" : "h-6 px-2 text-[11px]")}
+            {/* The goal's English with EVO: icon + text in white, no button box (user request). */}
+            <Link
+              to="/coach"
+              search={{ goal: goalId }}
+              aria-label={t("Practise it in English with EVO")}
+              title={t("Practise it in English with EVO")}
+              className="inline-flex items-center gap-1 rounded text-[11px] font-semibold leading-none text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
             >
-              <Link
-                to="/coach"
-                search={{ goal: goalId }}
-                aria-label={t("Practise it in English with EVO")}
-                title={t("Practise it in English with EVO")}
-              >
-                {t("Practise")}
-              </Link>
-            </Button>
+              <MessageSquareText className="size-3.5 shrink-0" aria-hidden="true" />
+              {featured ? t("Practise in English") : t("Practise")}
+            </Link>
           </>
         )}
       </div>
