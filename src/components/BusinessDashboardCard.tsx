@@ -45,7 +45,7 @@ export function BusinessDashboardCard() {
 
   return (
     <section
-      className="card-soft flex min-w-0 flex-col p-3 xl:h-full xl:min-h-0 xl:px-4 xl:py-3"
+      className="card-soft relative flex min-w-0 flex-col p-3 xl:h-full xl:min-h-0 xl:px-4 xl:py-3"
       aria-labelledby="business-card-title"
     >
       <div className="flex items-center gap-2">
@@ -63,7 +63,8 @@ export function BusinessDashboardCard() {
         </span>
       </div>
       <div className="mt-2 flex min-w-0 flex-1 flex-col justify-center gap-1.5">
-        <div className="flex min-w-0 items-center gap-3">
+        {/* Room on the right for the BIZ chip. */}
+        <div className="flex min-w-0 items-center gap-3 pr-14">
           {next ? (
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
@@ -83,15 +84,6 @@ export function BusinessDashboardCard() {
               {t("All Business lessons completed")}
             </p>
           )}
-          {/* The track's own chip, the same shape as the current level chip in
-              the header (user request). */}
-          <span
-            className="inline-flex h-6 w-10 shrink-0 items-center justify-center rounded-full bg-brand-green text-[10px] font-semibold text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)] 2xl:text-[11px]"
-            translate="no"
-            title="Business English"
-          >
-            {t("BIZ")}
-          </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-1.5 flex-1 rounded-full bg-secondary" aria-hidden="true">
@@ -109,6 +101,16 @@ export function BusinessDashboardCard() {
           </Link>
         </div>
       </div>
+      {/* The track's own chip, the same shape as the current level chip in the
+          header (user request), on the right edge and centred between the
+          Premium bonus pill above and the Continue link below. */}
+      <span
+        className="absolute right-3 top-1/2 inline-flex h-6 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-brand-green text-[10px] font-semibold text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)] xl:right-4 2xl:text-[11px]"
+        translate="no"
+        title="Business English"
+      >
+        {t("BIZ")}
+      </span>
     </section>
   );
 }
