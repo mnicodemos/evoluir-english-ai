@@ -292,16 +292,16 @@ export function ProfileMenu({
     </>
   );
 
-  // Desktop sidebar (user request): opens beside its button like Weather talk,
-  // not centred on the screen.
+  // Desktop sidebar (user request): opens right above its button, like a menu
+  // from the sidebar's footer, not centred on the screen.
   if (presentation === "dashboard-sidebar") {
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
         <PopoverContent
-          side="right"
-          align="end"
-          sideOffset={12}
+          side="top"
+          align="start"
+          sideOffset={8}
           className={cn(
             "dashboard-shell dark max-h-[calc(100dvh-2rem)] w-[min(26rem,calc(100vw-2rem))] space-y-4 overflow-y-auto p-5",
             graphitePanelClass,
