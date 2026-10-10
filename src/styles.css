@@ -216,14 +216,16 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* Weather talk and the Dashboard bell (graphitePanelClass) are translucent
-   glass: .dashboard-shell's own background would otherwise make them opaque. */
+/* Popovers and panels on graphitePanelClass are frosted glass:
+   .dashboard-shell's own background would otherwise make them opaque. 70% with
+   a strong blur (user request): still glass, but text behind never reads
+   through the panel's own text. */
 .graphite-panel.dashboard-shell.dark {
-  background-color: rgb(26 28 32 / 0.4);
+  background-color: rgb(26 28 32 / 0.7);
 }
 
-/* Phones (user request): a little less see-through, so Weather talk and the
-   bell read clearly over the busier mobile layout. Desktop keeps 40%. */
+/* Phones (user request): 62%, as before; the strong blur keeps text behind
+   from reading through. */
 @media (max-width: 1023.98px) {
   .graphite-panel.dashboard-shell.dark {
     background-color: rgb(26 28 32 / 0.62);
