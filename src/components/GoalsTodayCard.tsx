@@ -273,10 +273,8 @@ function GoalTile({
       search={{ goal: goalId }}
       aria-label={t("Practise it in English with EVO")}
       title={t("Practise it in English with EVO")}
-      className={cn(
-        "inline-flex shrink-0 items-center gap-0.5 rounded-full bg-brand-green px-2.5 text-[11px] font-semibold leading-none text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60",
-        "h-6",
-      )}
+      // The same teal text link as Business English's "Continue" (user request).
+      className="inline-flex h-6 shrink-0 items-center gap-0.5 rounded-md text-[11px] font-semibold text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
     >
       {t("Practice now")}
       <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
