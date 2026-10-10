@@ -82,11 +82,17 @@ export function GoalsTodayCard() {
         <h2 id="goals-today-title" className="font-display text-sm font-semibold">
           {t("Goals today")}
         </h2>
-        {allDone && goals.length > 0 ? (
-          <span className="rounded-full bg-brand-green/15 px-2 py-0.5 text-[11px] font-semibold text-brand-green">
-            {t("All done")}
-          </span>
-        ) : null}
+        <GoalChecks
+          done={Array.from({ length: PLUS_MAX_GOALS }, (_, index) => {
+            const goal = goals[index];
+            return Boolean(goal && steps.find((item) => item.goalId === goal.id)?.doneAt);
+          })}
+          label={(count) =>
+            lang === "pt"
+              ? `${count} de ${PLUS_MAX_GOALS} metas concluídas hoje`
+              : `${count} of ${PLUS_MAX_GOALS} goals done today`
+          }
+        />
         {/* No "Open goals" link here (user request): the sidebar and every free
             slot already open /goals. */}
       </div>
@@ -386,5 +392,43 @@ function GoalTile({
         {actions}
       </div>
     </li>
+  );
+}
+
+/**
+ * Three checks, one per goal slot, lit in teal as each goal's step of the day
+ * is done (user request); level with Business English's "Premium bonus" pill.
+ */
+function GoalChecks({
+  done,
+  label,
+}: {
+  done: readonly boolean[];
+  label: (count: number) => string;
+}) {
+  const count = done.filter(Boolean).length;
+  const all = count === done.length;
+  return (
+    <span
+      role="img"
+      aria-label={label(count)}
+      title={label(count)}
+      className={cn(
+        "ml-auto inline-flex -translate-y-0.5 items-center gap-1 rounded-full border px-2 py-0.5 transition-colors",
+        all ? "border-brand-green/50 bg-brand-green/10" : "border-white/15 bg-white/[0.03]",
+      )}
+    >
+      {done.map((lit, index) => (
+        <Check
+          key={index}
+          className={cn(
+            "size-[0.95rem] transition-colors",
+            lit ? "text-brand-green" : "text-muted-foreground/35",
+          )}
+          strokeWidth={3}
+          aria-hidden="true"
+        />
+      ))}
+    </span>
   );
 }
