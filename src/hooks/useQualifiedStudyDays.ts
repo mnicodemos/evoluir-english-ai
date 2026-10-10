@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import { plusDayComplete } from "@/lib/plus";
+import { qualifiesAsStudyDay } from "@/lib/studyDay";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 
 const dayFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
@@ -108,14 +109,15 @@ export function useQualifiedStudyDays({
         ...plusDays,
       ]);
       return new Set(
-        [...candidates].filter(
-          (day) =>
-            (writing.get(day) ?? 0) >= 3 ||
-            (listening.get(day) ?? 0) >= 3 ||
-            (words.get(day) ?? 0) >= 10 ||
-            completedLessons.has(day) ||
-            conversations.has(day) ||
-            plusDays.includes(day),
+        [...candidates].filter((day) =>
+          qualifiesAsStudyDay({
+            writing: writing.get(day) ?? 0,
+            listening: listening.get(day) ?? 0,
+            reviewedWords: words.get(day) ?? 0,
+            lessonCompleted: completedLessons.has(day),
+            conversation: conversations.has(day),
+            goalsDone: plusDays.includes(day),
+          }),
         ),
       );
     },
