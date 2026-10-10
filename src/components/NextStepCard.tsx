@@ -6,6 +6,7 @@ import {
   ArrowRight,
   BookOpen,
   Check,
+  CheckCircle2,
   ChevronRight,
   Compass,
   GraduationCap,
@@ -426,22 +427,45 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <p className="mt-2 text-[13px] leading-snug text-sidebar-foreground/80 xl:pr-24">
               {priorityText}
             </p>
-            {(quickWinButton || challengeButton) && (
-              <div className="mt-3 hidden sm:block xl:mt-auto">
-                {/* A short heading tells the student what these two extras are. */}
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
-                  {t("Extra practice")}
-                </p>
-                <p className="mt-0.5 text-xs text-sidebar-foreground/70">
-                  {t("Two short options beyond today's priority.")}
-                </p>
-                {/* Stacked, one full-width option per row, each with its description. */}
-                <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5">
-                  {quickWinButton}
-                  {challengeButton}
+            {/* Always there (user request): when today's extras are done the
+                block stays with a done state, like Keep improving, instead of
+                leaving a hole in the card. */}
+            <div className="mt-3 hidden sm:block xl:mt-auto">
+              {/* A short heading tells the student what these two extras are. */}
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
+                {t("Extra practice")}
+              </p>
+              {quickWinButton || challengeButton ? (
+                <>
+                  <p className="mt-0.5 text-xs text-sidebar-foreground/70">
+                    {t("Two short options beyond today's priority.")}
+                  </p>
+                  {/* Stacked, one full-width option per row, each with its description. */}
+                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5">
+                    {quickWinButton}
+                    {challengeButton}
+                    {!(quickWinButton && challengeButton) && (
+                      // One option left: the other row says it is done.
+                      <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !bg-transparent text-xs text-muted-foreground">
+                        <CheckCircle2
+                          className="size-4 shrink-0 text-brand-green"
+                          aria-hidden="true"
+                        />
+                        {t("Nothing else pending right now.")}
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="mt-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border px-3 text-center">
+                  <CheckCircle2 className="size-7 text-brand-green" aria-hidden="true" />
+                  <p className="text-sm font-semibold">{t("Extra practice done for today")}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {t("New options appear tomorrow.")}
+                  </p>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </aside>
         </div>
       </section>
