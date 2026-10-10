@@ -130,8 +130,8 @@ export function GoalsTodayCard() {
           ))}
         </div>
       ) : (
-        // Three slots (user request): with one goal, EVO's step takes two of them;
-        // a free slot invites the next goal instead of sitting empty.
+        // Three slots (user request): one per goal, and every free slot invites
+        // the next goal instead of sitting empty.
         <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1">
           {goals.map((goal) => {
             const step = steps.find((item) => item.goalId === goal.id) ?? null;
@@ -142,7 +142,6 @@ export function GoalsTodayCard() {
                 title={goal.title}
                 step={step}
                 week={plusGoalWeek(recent, goal.id, data?.today ?? "")}
-                featured={goals.length === 1}
                 dayComplete={allDone}
                 stepsLeft={steps.filter((item) => !item.doneAt).length}
                 celebrate={!!step && justDone === step.id}
@@ -152,8 +151,8 @@ export function GoalsTodayCard() {
               />
             );
           })}
-          {goals.length < PLUS_MAX_GOALS ? (
-            <li className="min-w-0">
+          {Array.from({ length: PLUS_MAX_GOALS - goals.length }, (_, index) => (
+            <li key={`free-${index}`} className="min-w-0">
               <Link
                 to="/goals"
                 className="flex h-full min-w-0 flex-col justify-center gap-0.5 rounded-lg border border-dashed border-border px-3 py-1.5 transition-colors hover:border-brand-green/50 hover:bg-secondary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
@@ -172,7 +171,7 @@ export function GoalsTodayCard() {
                 </span>
               </Link>
             </li>
-          ) : null}
+          ))}
         </ul>
       )}
     </section>
@@ -181,16 +180,14 @@ export function GoalsTodayCard() {
 
 /**
  * One goal's step (user request: a step that encourages, not a cramped to-do).
- * No text is cut: the goal and its step wrap and the row grows. One goal uses
- * the wide tile with its actions column; two or three goals put the actions on
- * a row below the step.
+ * Each goal takes one of the three slots and no text is cut: the goal and its
+ * step wrap and the row grows with them.
  */
 function GoalTile({
   goalId,
   title,
   step,
   week,
-  featured,
   dayComplete,
   stepsLeft,
   celebrate,
@@ -202,7 +199,6 @@ function GoalTile({
   title: string;
   step: PlusStep | null;
   week: PlusGoalWeek;
-  featured: boolean;
   dayComplete: boolean;
   stepsLeft: number;
   celebrate: boolean;
@@ -217,10 +213,7 @@ function GoalTile({
       title={`${t("Last 7 days")}: ${t("{n} of 7 days").replace("{n}", String(week.doneCount))}`}
     >
       {/* Narrow tiles on smaller screens keep the goal's name and only the 🔥 run. */}
-      <span
-        className={cn("flex gap-0.5", !featured && "hidden min-[1536px]:flex")}
-        aria-hidden="true"
-      >
+      <span className="hidden gap-0.5 min-[1536px]:flex" aria-hidden="true">
         {week.days.map((item, index) => (
           <span
             key={item.day}
@@ -232,7 +225,7 @@ function GoalTile({
           />
         ))}
       </span>
-      <span className={cn("text-[10px] font-medium text-muted-foreground", !featured && "sr-only")}>
+      <span className="sr-only text-[10px] font-medium text-muted-foreground min-[1536px]:not-sr-only">
         {t("{n} of 7 days").replace("{n}", String(week.doneCount))}
       </span>
       {week.streak >= 2 ? (
@@ -267,7 +260,7 @@ function GoalTile({
       title={t("Practise it in English with EVO")}
       className={cn(
         "inline-flex shrink-0 items-center gap-0.5 rounded-full bg-brand-green px-2.5 text-[11px] font-semibold leading-none text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60",
-        featured ? "h-5 min-[1536px]:h-7 min-[1536px]:px-3" : "h-5",
+        "h-6",
       )}
     >
       {t("Practice now")}
@@ -306,12 +299,6 @@ function GoalTile({
   const text = (
     <>
       <p className="text-[11px] font-semibold leading-tight text-muted-foreground">
-        {featured ? (
-          <>
-            <span className="text-brand-green">{t("Your step today")}</span>
-            <span aria-hidden="true"> · </span>
-          </>
-        ) : null}
         <span translate="no">{title}</span>
       </p>
       <p
@@ -333,48 +320,28 @@ function GoalTile({
       ) : null}
     </>
   );
-  const tileClass = cn(
-    "min-w-0 rounded-lg px-2.5 py-1.5 transition-colors",
-    done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
-  );
-
-  if (!featured) {
-    // Two or three goals (user request): each tile is narrow, so the goal and
-    // its step take the whole width and the actions sit on one row below them.
-    return (
-      <li className={cn(tileClass, "flex flex-col gap-1.5")}>
-        <div className="min-w-0">{text}</div>
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-          {dots}
-          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-            {done ? (
-              doneMark
-            ) : (
-              <>
-                {completeButton}
-                {practiceLink}
-              </>
-            )}
-          </div>
-        </div>
-      </li>
-    );
-  }
-
+  // Every goal takes one of the three slots (user request), with its actions
+  // stacked after a divider: the week, "Complete step" and "Practice now".
+  // Below 1536 px a slot is too narrow for a side column, so the actions sit on
+  // a row under the step and wrap.
   return (
-    <li className={cn(tileClass, "flex items-center gap-2.5 sm:col-span-2")}>
-      <EvoAvatar decorative className="size-9 shrink-0" />
-      {/* The step takes 3/5 of the tile and wraps before the actions column. */}
-      <div className="min-w-0 flex-[3]">{text}</div>
-      {/* After a divider (user request): the week above "Complete step" in one
-          column and "Practice now" in a second one beside it; below 1536 px the
-          tile is too narrow for two columns, so the three stack. */}
-      <div className="flex flex-[2] flex-col items-center justify-center gap-1 self-stretch whitespace-nowrap border-l border-border/60 pl-3 min-[1536px]:flex-row min-[1536px]:gap-4">
-        <div className="flex flex-col items-center gap-1 min-[1536px]:gap-1.5">
-          {dots}
-          {done ? <div className="flex items-center gap-2">{doneMark}</div> : completeButton}
-        </div>
-        {done ? null : practiceLink}
+    <li
+      className={cn(
+        "flex min-w-0 flex-col gap-1.5 rounded-lg px-2.5 py-1.5 transition-colors min-[1536px]:flex-row min-[1536px]:items-center min-[1536px]:gap-3",
+        done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
+      )}
+    >
+      <div className="min-w-0 flex-1">{text}</div>
+      <div className="mt-auto flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 whitespace-nowrap min-[1536px]:mt-0 min-[1536px]:flex-col min-[1536px]:justify-center min-[1536px]:gap-1.5 min-[1536px]:self-stretch min-[1536px]:border-l min-[1536px]:border-border/60 min-[1536px]:pl-3">
+        {dots}
+        {done ? (
+          <div className="flex items-center gap-2">{doneMark}</div>
+        ) : (
+          <>
+            {completeButton}
+            {practiceLink}
+          </>
+        )}
       </div>
     </li>
   );
