@@ -303,7 +303,7 @@ export function ProfileMenu({
           align="start"
           sideOffset={8}
           className={cn(
-            "dashboard-shell dark max-h-[calc(100dvh-2rem)] w-[min(26rem,calc(100vw-2rem))] space-y-4 overflow-y-auto p-5",
+            "dashboard-shell dark max-h-[calc(100dvh-2rem)] w-[min(21rem,calc(100vw-2rem))] space-y-4 overflow-y-auto p-5",
             graphitePanelClass,
           )}
         >
