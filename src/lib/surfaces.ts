@@ -3,7 +3,7 @@
  * (notifications, weather). Change it here to restyle all of them at once.
  */
 export const GRAPHITE = {
-  background: "rgb(26 28 32 / 0.55)",
+  background: "rgb(26 28 32 / 0.7)",
   text: "rgb(241 245 249)",
   border: "rgb(255 255 255 / 0.10)",
 } as const;

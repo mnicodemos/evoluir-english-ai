@@ -238,33 +238,25 @@
   --width: min(34rem, calc(100vw - 2rem)) !important;
 }
 
-/* Toasts (sonner) render in a portal with their own stylesheet; dark like a
-   phone's dark-mode notification shade (owner request), with light text. */
+/* Toasts (sonner) render in a portal with their own stylesheet: the same
+   frosted graphite glass as the popovers (user request: one material), always
+   dark, 70% on desktop and 62% on phones, with an 18 px blur. */
 .dashboard-shell [data-sonner-toast] {
-  /* Dark gray with transparency and a blur, like Android/iOS dark notifications. */
-  background-color: oklch(0.27 0.008 240 / 74%) !important;
-  backdrop-filter: blur(10px) saturate(140%);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  color: oklch(0.93 0.008 240) !important;
-  border: 1px solid oklch(0.45 0.01 240 / 70%) !important;
+  background-color: rgb(26 28 32 / 0.7) !important;
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  color: rgb(241 245 249) !important;
+  border: 1px solid rgb(255 255 255 / 0.1) !important;
+  box-shadow: 0 18px 48px -12px rgb(0 0 0 / 0.7) !important;
 }
 
-.dashboard-shell [data-sonner-toast] [data-description],
-.dashboard-shell [data-sonner-toast] [data-icon] {
-  color: oklch(0.82 0.008 240) !important;
+.dashboard-shell [data-sonner-toast] [data-description] {
+  color: rgb(203 213 225) !important;
 }
 
-/* Follow the user's system theme: light-mode phones get light toasts. */
-@media (prefers-color-scheme: light) {
+@media (max-width: 1023.98px) {
   .dashboard-shell [data-sonner-toast] {
-    background-color: oklch(0.97 0.004 240 / 78%) !important;
-    color: oklch(0.22 0.01 240) !important;
-    border: 1px solid oklch(0.7 0.01 240 / 60%) !important;
-  }
-
-  .dashboard-shell [data-sonner-toast] [data-description],
-  .dashboard-shell [data-sonner-toast] [data-icon] {
-    color: oklch(0.35 0.01 240) !important;
+    background-color: rgb(26 28 32 / 0.62) !important;
   }
 }
 
