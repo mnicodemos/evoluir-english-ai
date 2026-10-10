@@ -362,7 +362,7 @@ function GoalTile({
               className="inline-flex items-center gap-1 rounded text-[11px] font-semibold leading-none text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
             >
               <MessageSquareText className="size-3.5 shrink-0" aria-hidden="true" />
-              {featured ? t("Practise in English") : t("Practise")}
+              {t("Practice now")}
             </Link>
           </>
         )}

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   countsAsLearningMinutes,
+  qualifiesAsStudyDay,
   isTimestampToday,
   todayStudyMetrics,
   type StudyDayRows,
@@ -167,5 +168,32 @@ describe("minutes eligibility (existing principle)", () => {
     ]) {
       expect(countsAsLearningMinutes(type)).toBe(false);
     }
+  });
+});
+
+describe("qualifiesAsStudyDay (mirror of credit_study_day)", () => {
+  const empty = {
+    writing: 0,
+    listening: 0,
+    reviewedWords: 0,
+    lessonCompleted: false,
+    conversation: false,
+    goalsDone: false,
+  };
+
+  it("needs one full source, never a mix of partial ones", () => {
+    expect(qualifiesAsStudyDay(empty)).toBe(false);
+    expect(qualifiesAsStudyDay({ ...empty, writing: 2, listening: 2, reviewedWords: 9 })).toBe(
+      false,
+    );
+  });
+
+  it("counts each source on its own", () => {
+    expect(qualifiesAsStudyDay({ ...empty, writing: 3 })).toBe(true);
+    expect(qualifiesAsStudyDay({ ...empty, listening: 3 })).toBe(true);
+    expect(qualifiesAsStudyDay({ ...empty, reviewedWords: 10 })).toBe(true);
+    expect(qualifiesAsStudyDay({ ...empty, lessonCompleted: true })).toBe(true);
+    expect(qualifiesAsStudyDay({ ...empty, conversation: true })).toBe(true);
+    expect(qualifiesAsStudyDay({ ...empty, goalsDone: true })).toBe(true);
   });
 });

@@ -1,12 +1,31 @@
 /**
- * A day only counts as a study day when the student finishes a lesson (including the
- * final test) or completes an AI Speaking session. The streak and the frequency
- * calendar both use this single list so they can never disagree.
+ * The study-day rule (user decisions; migrations 0027, 0051 and 0057). The
+ * database's credit_study_day is the only writer of the streak; this mirror
+ * decides which past days the Rhythm and frequency views mark, so both read
+ * the same thresholds. Change them together with credit_study_day.
  */
-export const STUDY_DAY_ACTIVITY_TYPES = ["lesson", "final_test", "conversation"] as const;
+export const STUDY_DAY_RULE = { writing: 3, listening: 3, reviewedWords: 10 } as const;
 
-export function countsAsStudyDay(activityType: string) {
-  return (STUDY_DAY_ACTIVITY_TYPES as readonly string[]).includes(activityType);
+/** One study day's evidence, already grouped by São Paulo date. */
+export type StudyDayEvidence = {
+  writing: number;
+  listening: number;
+  reviewedWords: number;
+  lessonCompleted: boolean;
+  conversation: boolean;
+  /** Every goal step of that day done (a day with steps, none left open). */
+  goalsDone: boolean;
+};
+
+export function qualifiesAsStudyDay(day: StudyDayEvidence): boolean {
+  return (
+    day.writing >= STUDY_DAY_RULE.writing ||
+    day.listening >= STUDY_DAY_RULE.listening ||
+    day.reviewedWords >= STUDY_DAY_RULE.reviewedWords ||
+    day.lessonCompleted ||
+    day.conversation ||
+    day.goalsDone
+  );
 }
 
 /**

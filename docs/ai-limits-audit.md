@@ -47,17 +47,17 @@ operations have their own values. Confirmed live, not from constants.
 
 ## 4. AI consumption points
 
-| Feature                  | File                                                           | Operation                          | Reserve         | Finish  | Notes                               |
-| ------------------------ | -------------------------------------------------------------- | ---------------------------------- | --------------- | ------- | ----------------------------------- |
-| AI Teacher               | `src/lib/aiTeacher.functions.ts`                               | teacher                            | gateway         | gateway | concurrency 1                       |
-| AI Talking / Coach       | `src/lib/coach.functions.ts`, `src/routes/api/coach-stream.ts` | talking                            | gateway / route | yes     | streaming route authenticates first |
-| Writing correction       | `src/lib/coach.functions.ts`                                   | writing_correction                 | gateway         | gateway |                                     |
-| Listening / audio        | `src/routes/api/speech.ts`                                     | tts                                | route           | route   |                                     |
-| Speaking / pronunciation | `src/routes/api/transcribe.ts`                                 | transcription                      | route           | route   |                                     |
-| Dictionary               | `src/lib/dictionary.functions.ts`                              | dictionary                         | gateway         | gateway | 24h cache                           |
-| Lessons / quizzes        | `src/lib/curriculum.functions.ts`                              | lesson_generation, quiz_generation | gateway         | gateway |                                     |
-| Vocabulary plan          | `src/lib/vocabularyPlan.functions.ts`                          | vocabulary_generation              | gateway         | gateway |                                     |
-| Legacy activity          | `src/lib/legacyActivity.functions.ts`                          | talking                            | gateway         | gateway |                                     |
+| Feature                  | File                                      | Operation                          | Reserve | Finish  | Notes                               |
+| ------------------------ | ----------------------------------------- | ---------------------------------- | ------- | ------- | ----------------------------------- |
+| AI Teacher               | `src/lib/aiTeacher.functions.ts`          | teacher                            | gateway | gateway | concurrency 1                       |
+| AI Talking / Coach       | `src/routes/api/coach-stream.ts`          | talking                            | route   | yes     | streaming route authenticates first |
+| Writing correction       | `src/lib/pedagogy/dualWrite.functions.ts` | writing_correction                 | gateway | gateway |                                     |
+| Listening / audio        | `src/routes/api/speech.ts`                | tts                                | route   | route   |                                     |
+| Speaking / pronunciation | `src/routes/api/transcribe.ts`            | transcription                      | route   | route   |                                     |
+| Dictionary               | `src/lib/dictionary.functions.ts`         | dictionary                         | gateway | gateway | 24h cache                           |
+| Lessons / quizzes        | `src/lib/curriculum.functions.ts`         | lesson_generation, quiz_generation | gateway | gateway |                                     |
+| Vocabulary plan          | `src/lib/vocabularyPlan.functions.ts`     | vocabulary_generation              | gateway | gateway |                                     |
+| Legacy activity          | `src/lib/legacyActivity.functions.ts`     | talking                            | gateway | gateway |                                     |
 
 Double counting: not observed. One reservation per gateway call; denied events are excluded from the
 counters (`status IN ('pending','completed')` only); a cache hit returns before reserving.
