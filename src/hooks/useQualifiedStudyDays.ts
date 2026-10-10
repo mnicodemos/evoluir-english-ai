@@ -59,11 +59,11 @@ export function useQualifiedStudyDays({
           .lt("last_reviewed_at", endIso),
         // Evoluir+ Goals steps (migration 0051): a day with every step done counts.
         supabase
-          .from("plus_goal_steps" as never)
+          .from("plus_goal_steps")
           .select("day, done_at")
-          .eq("user_id" as never, userId as never)
-          .gte("day" as never, dayFormatter.format(start) as never)
-          .lte("day" as never, dayFormatter.format(end) as never),
+          .eq("user_id", userId)
+          .gte("day", dayFormatter.format(start))
+          .lte("day", dayFormatter.format(end)),
       ]);
 
       if (activities.error) throw activities.error;
