@@ -92,13 +92,8 @@ export function GoalsTodayCard() {
             {t("All done")}
           </span>
         ) : null}
-        <Link
-          to="/goals"
-          className="ml-auto inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-        >
-          {t("Open goals")}
-          <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-        </Link>
+        {/* No "Open goals" link here (user request): the sidebar and every free
+            slot already open /goals. */}
       </div>
 
       {isLoading ? (
@@ -249,7 +244,8 @@ function GoalTile({
       ) : null}
     </span>
   );
-  // Same text-link style as "Open goals" (user request).
+  // A teal text link; a narrow slot shows a grey round check that turns into
+  // the teal done mark once the step is completed (user request).
   const completeButton = (
     <button
       type="button"
@@ -260,7 +256,7 @@ function GoalTile({
       className="inline-flex shrink-0 items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
     >
       {/* A narrow slot (under 18.5rem) shows the same action as a round check. */}
-      <span className="grid size-6 place-items-center rounded-full border-2 border-brand-green @[18.5rem]:hidden">
+      <span className="grid size-6 place-items-center rounded-full border-2 border-muted-foreground/50 text-muted-foreground transition-colors hover:border-brand-green hover:text-brand-green @[18.5rem]:hidden">
         <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
       </span>
       <span className="hidden items-center gap-1 @[18.5rem]:inline-flex">
@@ -380,9 +376,10 @@ function GoalTile({
             {week7(true)}
           </div>
           {dayNoteLine}
-          {/* A container of its own, so "Complete step" shows its full label here. */}
+          {/* The popup keeps the week and "Complete step" only (user request); a
+              container of its own, so "Complete step" shows its full label. */}
           <div className="@container flex flex-wrap items-center justify-end gap-3 whitespace-nowrap">
-            {actions}
+            {done ? <div className="flex items-center gap-2">{doneMark}</div> : completeButton}
           </div>
         </DialogContent>
       </Dialog>
