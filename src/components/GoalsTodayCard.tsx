@@ -6,13 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useProfile } from "@/hooks/useProfile";
 import {
   PLUS_GOAL_EXAMPLES,
@@ -342,15 +336,48 @@ function GoalTile({
         <p className="min-w-0 flex-1 text-xs font-semibold leading-snug" translate="no">
           {title}
         </p>
-        <button
-          type="button"
-          onClick={() => setDetailsOpen(true)}
-          aria-label={t("See today's step")}
-          title={t("See today's step")}
-          className="-m-1 shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-        >
-          <Search className="size-4" aria-hidden="true" />
-        </button>
+        {/* The step opens right beside its magnifier (user request), not centred. */}
+        <Popover open={detailsOpen} onOpenChange={setDetailsOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-label={t("See today's step")}
+              title={t("See today's step")}
+              className="-m-1 shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+            >
+              <Search className="size-4" aria-hidden="true" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            side="top"
+            align="end"
+            sideOffset={8}
+            className={cn(
+              "dashboard-shell dark w-[min(22rem,calc(100vw-2rem))] space-y-3 p-4",
+              graphitePanelClass,
+            )}
+          >
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-brand-green">{t("Your step today")}</p>
+              <h3 className="text-base font-semibold leading-snug" translate="no">
+                {title}
+              </h3>
+            </div>
+            <p className="text-sm leading-relaxed" translate="no">
+              {step?.text ?? "…"}
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-muted-foreground">{t("Last 7 days")}</span>
+              {week7(true)}
+            </div>
+            {dayNoteLine}
+            {/* The popup keeps the week and "Complete step" only (user request); a
+                  container of its own, so "Complete step" shows its full label. */}
+            <div className="@container flex flex-wrap items-center justify-end gap-3 whitespace-nowrap">
+              {done ? <div className="flex items-center gap-2">{doneMark}</div> : completeButton}
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
       {/* One row (user request): the week on the left (or, once done, whether
           the study day counts) and the actions on the right. */}
@@ -358,36 +385,6 @@ function GoalTile({
         {done ? dayNoteLine : week7(false)}
         {actions}
       </div>
-
-      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent
-          // Translucent graphite like Weather talk and the bell (user request).
-          overlayClassName="bg-black/30"
-          className={cn("dashboard-shell dark max-w-md", graphitePanelClass)}
-        >
-          <DialogHeader>
-            <DialogDescription className="text-xs font-semibold text-brand-green">
-              {t("Your step today")}
-            </DialogDescription>
-            <DialogTitle className="text-base leading-snug" translate="no">
-              {title}
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm leading-relaxed" translate="no">
-            {step?.text ?? "…"}
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-muted-foreground">{t("Last 7 days")}</span>
-            {week7(true)}
-          </div>
-          {dayNoteLine}
-          {/* The popup keeps the week and "Complete step" only (user request); a
-              container of its own, so "Complete step" shows its full label. */}
-          <div className="@container flex flex-wrap items-center justify-end gap-3 whitespace-nowrap">
-            {done ? <div className="flex items-center gap-2">{doneMark}</div> : completeButton}
-          </div>
-        </DialogContent>
-      </Dialog>
     </li>
   );
 }
