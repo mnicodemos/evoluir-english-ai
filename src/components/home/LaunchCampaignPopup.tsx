@@ -25,7 +25,7 @@ export function LaunchCampaignBadge({ className = "" }: { className?: string }) 
   const [status, setStatus] = useState<CampaignStatus | null>(null);
   useEffect(() => {
     let cancelled = false;
-    void supabase.rpc("premium_campaign_status").then(({ data, error }) => {
+    void supabase.rpc("premium_campaign_status" as never).then(({ data, error }) => {
       if (cancelled || error || !data) return;
       setStatus(data as unknown as CampaignStatus);
     });
@@ -64,7 +64,7 @@ export function LaunchCampaignPopup() {
     if (readStorage(SEEN_KEY) === "1") return;
     let cancelled = false;
     // Opens as soon as the campaign status arrives (user request: right away).
-    void supabase.rpc("premium_campaign_status").then(({ data, error }) => {
+    void supabase.rpc("premium_campaign_status" as never).then(({ data, error }) => {
       if (cancelled || error || !data) return;
       const result = data as unknown as CampaignStatus;
       if (!campaignOpen(result)) return;

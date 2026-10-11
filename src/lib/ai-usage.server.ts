@@ -217,7 +217,7 @@ export async function finishAiUsage(
     const firstChunkMs = Math.max(0, result.firstChunkAt - ticket.startedAt);
     await db
       .from("ai_usage_events")
-      .update({ first_chunk_ms: firstChunkMs })
+      .update({ first_chunk_ms: firstChunkMs } as never)
       .eq("id", ticket.eventId)
       .then(
         () => undefined,

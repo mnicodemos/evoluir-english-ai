@@ -1,4 +1,4 @@
-import { CalendarDays, Check, CircleCheck, Footprints, Star, Trophy } from "lucide-react";
+import { CalendarDays, Check, CircleCheck, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { GoldTrophy } from "@/components/GoldTrophy";
@@ -192,9 +192,7 @@ export function WeeklyFrequency({
         className="card-soft flex h-full min-w-0 flex-col p-3"
         aria-labelledby="weekly-rhythm-title"
       >
-        {/* Same header line as Keep improving and the skills card beside it
-            (their 1.65rem icon row and xl:p-4 top), so the pills line up (user request). */}
-        <div className="flex min-h-[1.65rem] items-center gap-2 xl:mt-1">
+        <div className="flex items-center gap-2">
           <CalendarDays
             className="size-[1.375rem] shrink-0 text-dashboard-cyan"
             strokeWidth={2.4}
@@ -202,10 +200,20 @@ export function WeeklyFrequency({
           <h2 id="weekly-rhythm-title" className="font-display text-sm font-semibold">
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
           </h2>
-          {/* Weekly goal (user request: same pill as Today's Progress' weekday,
-              right-aligned with it): three stars that turn gold, with a gold
-              border, once the student's own weekly plan is reached. */}
-          <WeeklyStars reached={studiedCount >= weeklyGoal} lang={lang} />
+          {/* Weekly trophy: gold once the student's own weekly plan is reached. */}
+          <GoldTrophy
+            unlocked={studiedCount >= weeklyGoal}
+            className="ml-auto size-9 shrink-0"
+            label={
+              studiedCount >= weeklyGoal
+                ? lang === "pt"
+                  ? "Troféu da semana desbloqueado"
+                  : "Weekly trophy unlocked"
+                : lang === "pt"
+                  ? "Troféu da semana bloqueado"
+                  : "Weekly trophy locked"
+            }
+          />
         </div>
         {/* Same ring as Today's Progress beside it (size, stroke and number).
             The bottom padding lifts it off the days row (user request). */}
@@ -260,17 +268,10 @@ export function WeeklyFrequency({
                 {lang === "pt" ? "Ótima consistência!" : "Great consistency!"}
               </p>
             ) : (
-              // In progress (user request): footprints and a grey nudge, in the
-              // place the goal check takes once the week's plan is reached.
-              <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-                <Footprints className="size-3.5 shrink-0" aria-hidden="true" />
-                {lang === "pt" ? "Mantenha o ritmo..." : "Keep the pace..."}
+              <p className="mt-1 text-xs text-muted-foreground">
+                {lang === "pt" ? "Continue construindo seu ritmo." : "Keep building your rhythm."}
               </p>
             )}
-            {/* Third line (user request), in the header cells' supporting font. */}
-            <p className="mt-0.5 text-xs leading-tight text-muted-foreground">
-              {lang === "pt" ? "Continue aprendendo" : "Keep learning"}
-            </p>
           </div>
         </div>
         <div className="mt-2 grid grid-cols-7 gap-1">
@@ -380,42 +381,6 @@ function TrophyBadge({
       title={active ? unlockedText : lockedText}
     >
       <Trophy className={compact ? "size-4" : "size-5"} strokeWidth={2.5} />
-    </span>
-  );
-}
-
-function WeeklyStars({ reached, lang }: { reached: boolean; lang: string }) {
-  const label = reached
-    ? lang === "pt"
-      ? "Meta da semana alcançada"
-      : "Weekly goal reached"
-    : lang === "pt"
-      ? "Meta da semana ainda não alcançada"
-      : "Weekly goal not reached yet";
-  return (
-    <span
-      role="img"
-      aria-label={label}
-      title={label}
-      // Today's Progress has 4 px more side padding from xl; the margin keeps
-      // both pills on the same right edge.
-      className={cn(
-        // Kept on the first header line (centred in its 1.65rem row) even when a
-        // narrow card wraps the title, so it stays level with the pills beside it.
-        "ml-auto mt-[0.26rem] inline-flex shrink-0 items-center gap-0.5 self-start rounded-full border px-2 py-0.5 xl:mr-1 2xl:mr-1",
-        reached
-          ? "border-[#F7BE45] bg-[#F7BE45]/10 shadow-[0_0_10px_rgba(245,184,61,0.3)]"
-          : "border-white/35 bg-white/10",
-      )}
-    >
-      {[0, 1, 2].map((index) => (
-        <Star
-          key={index}
-          className={cn("size-3", reached ? "fill-[#F7BE45] text-[#F7BE45]" : "text-white/45")}
-          strokeWidth={2.2}
-          aria-hidden="true"
-        />
-      ))}
     </span>
   );
 }

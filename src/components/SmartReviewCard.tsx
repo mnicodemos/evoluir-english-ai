@@ -274,11 +274,7 @@ export function SmartReviewCard({
                   <SkillTile skill={item.skill} />
                 )}
                 <div className="min-w-0">
-                  {/* A lesson row opens the Learning path, so it says so before
-                      the skill it reinforces (user request). */}
-                  <p className="text-[10px] text-muted-foreground">
-                    {item.resource.params ? `${t("Learning")} · ${skillLabel}` : skillLabel}
-                  </p>
+                  <p className="text-[10px] text-muted-foreground">{skillLabel}</p>
                   <p className="truncate text-sm font-semibold">{t(item.resource.title)}</p>
                   <p
                     className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}

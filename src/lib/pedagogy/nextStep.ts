@@ -392,10 +392,7 @@ export function buildNextStep(input: NextStepInput): NextStep {
     situation,
     strongestSkill,
   };
-  // Speaking is practised by speaking (user request): its "Practice now"
-  // opens AI Speaking, never a lesson page, so the button matches the title.
-  const spoken = best.skill.skill === "speaking" || best.skill.skill === "pronunciation";
-  const lesson = spoken ? undefined : input.lessonBySkill[best.skill.skill];
+  const lesson = input.lessonBySkill[best.skill.skill];
   if (lesson) {
     const activity: NextStepActivity = {
       type: "lesson",

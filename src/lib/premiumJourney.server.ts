@@ -17,9 +17,9 @@ export async function loadJourneyStates(
   const states = new Map<string, JourneyState>();
   if (userIds.length === 0) return states;
   const { data: grants, error } = await supabaseAdmin
-    .from("premium_campaign_grants")
+    .from("premium_campaign_grants" as never)
     .select("user_id, granted_at, expires_at")
-    .in("user_id", userIds);
+    .in("user_id" as never, userIds as never);
   if (error) return states; // Campaign tables not there: no journey.
   const rows = (grants ?? []) as unknown as {
     user_id: string;

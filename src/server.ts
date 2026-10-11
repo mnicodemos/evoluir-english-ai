@@ -2,11 +2,8 @@ import "./lib/error-capture";
 
 import { requestContext } from "./lib/keepAlive.server";
 
-import { consumeLastCapturedError, setServerErrorSink } from "./lib/error-capture";
-import { recordServerError } from "./lib/serverErrors.server";
+import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-
-setServerErrorSink(recordServerError);
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;

@@ -8,8 +8,6 @@ const TONES = {
   coral: "bg-dashboard-coral/12 text-dashboard-coral",
   amber: "bg-amber-400/12 text-amber-400",
   green: "bg-brand-green/12 text-brand-green",
-  // Not teal (user request): a teal tile read as a button, the menu's colour.
-  pink: "bg-pink-400/12 text-pink-400",
 } as const;
 
 /**
@@ -29,7 +27,6 @@ export function DashboardHeaderStat({
   detailStyle,
   iconColor,
   to,
-  hint,
 }: {
   icon: ReactNode;
   tone: keyof typeof TONES;
@@ -39,8 +36,6 @@ export function DashboardHeaderStat({
   detailStyle?: CSSProperties | undefined;
   iconColor?: string | undefined;
   to?: "/league" | "/study-plan";
-  /** Shown on hover: how the number works (e.g. the jewels rule). */
-  hint?: string;
 }) {
   const body = (
     <>
@@ -77,16 +72,10 @@ export function DashboardHeaderStat({
     </>
   );
   const cell = "flex h-full min-w-0 items-center gap-3 px-4 py-3 2xl:gap-4 2xl:px-6";
-  if (!to)
-    return (
-      <div className={cell} title={hint}>
-        {body}
-      </div>
-    );
+  if (!to) return <div className={cell}>{body}</div>;
   return (
     <Link
       to={to}
-      title={hint}
       className={cn(
         cell,
         "group transition-colors hover:bg-foreground/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-green/60",

@@ -75,9 +75,9 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
           }),
       ids.length
         ? supabaseAdmin
-            .from("premium_campaign_grants")
+            .from("premium_campaign_grants" as never)
             .select("user_id, expires_at")
-            .in("user_id", ids)
+            .in("user_id" as never, ids as never)
         : Promise.resolve({ data: [] }),
     ]);
     const premiumUntil = new Map<string, string | null>();

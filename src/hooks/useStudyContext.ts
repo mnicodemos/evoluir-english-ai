@@ -120,19 +120,17 @@ export function useStudySnapshot() {
 
       const myLessons = (userLessons.data ?? []).filter((l) => lessonIds.has(l.lesson_id));
 
-      // Today's Progress: each metric needs a completion timestamp from today —
-      // opening a screen never counts. Unlike the level totals above, it counts
-      // every lesson done today, Business English and level reviews included
-      // (user request), since a timestamp from today never leaks another level.
+      // Today's Progress: same rows, but each metric needs a completion
+      // timestamp from today — opening a screen never counts.
       const dayStart = new Date();
       dayStart.setHours(0, 0, 0, 0);
       const today = todayStudyMetrics(
         {
-          lessons: (userLessons.data ?? []).map((l) => ({
+          lessons: myLessons.map((l) => ({
             completed_at: l.completed_at ?? null,
             video_completed_at: l.video_completed_at ?? null,
           })),
-          cards: (userCards.data ?? []).map((c) => ({
+          cards: cardsRows.map((c) => ({
             mastery_level: c.mastery_level ?? 0,
             times_reviewed: c.times_reviewed ?? 0,
             last_reviewed_at: c.last_reviewed_at ?? null,
@@ -141,10 +139,7 @@ export function useStudySnapshot() {
             mastery_level: w.mastery_level,
             last_reviewed_at: w.last_reviewed_at,
           })),
-          quizzes: (results.data ?? []).map((q) => ({
-            score: q.score,
-            created_at: q.created_at ?? null,
-          })),
+          quizzes: quizRows.map((q) => ({ score: q.score, created_at: q.created_at ?? null })),
         },
         dayStart,
       );

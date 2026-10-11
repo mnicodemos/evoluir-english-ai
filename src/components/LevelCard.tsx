@@ -142,7 +142,7 @@ export function LevelCard({
     return (
       <div className="flex h-full min-w-0 items-center gap-3 px-4 py-3 2xl:gap-4 2xl:px-6">
         <span
-          className="grid size-12 shrink-0 place-items-center rounded-2xl bg-violet-400/12 text-violet-400"
+          className="grid size-12 shrink-0 place-items-center rounded-2xl bg-dashboard-cyan/12 text-dashboard-cyan"
           aria-hidden="true"
         >
           <ChartNoAxesColumnIncreasing className="size-6" strokeWidth={2.6} />

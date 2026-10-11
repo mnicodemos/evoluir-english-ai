@@ -22,7 +22,7 @@ export type AiCall = {
 
 export type OpsAlert = {
   level: "error" | "warning";
-  area: "push" | "ai" | "product" | "server";
+  area: "push" | "ai" | "product";
   title: string;
   detail: string;
 };

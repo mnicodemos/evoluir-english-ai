@@ -6,7 +6,6 @@ import {
   ArrowRight,
   BookOpen,
   Check,
-  CheckCircle2,
   ChevronRight,
   Compass,
   GraduationCap,
@@ -318,12 +317,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           {/* Mobile: the content sits centred in the card's free height instead
               of pressed against the banner. */}
           <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-4 sm:justify-center sm:pb-4 sm:pt-10 2xl:pt-11 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
-            {/* Top-right of the priority column below xl; from xl it moves to the
-                "Why this matters now" column (see the aside). */}
+            {/* Top-right of the priority column (user request), at the same height
+                as the "Today" badge of the card beside it (its header row centres a
+                22 px icon inside the card's padding). */}
             <ScopeBadge
               kind="continuous"
               translate={t}
-              className="absolute right-4 top-3.5 hidden sm:inline-flex xl:hidden"
+              className="absolute right-4 top-3.5 hidden sm:inline-flex 2xl:top-[1.125rem]"
             />
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
@@ -408,64 +408,31 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </div>
 
           <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-l xl:border-t-0">
-            {/* Top-right corner of the card (user request): level with the weekday
-                badge of Today's Progress (its header centres a 22 px icon inside
-                the card's padding) and in line with Keep improving's badge below
-                (16 px from the card's right edge). */}
-            <ScopeBadge
-              kind="continuous"
-              translate={t}
-              className="absolute right-4 top-3.5 hidden xl:inline-flex 2xl:top-[1.125rem]"
-            />
-            <div className="flex items-center gap-2 xl:pr-24">
+            <div className="flex items-center gap-2">
               <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why this matters now")}</h3>
             </div>
             {/* One sentence with the reason; the main column already says what
                 happened ("You have not practiced this skill yet"). */}
-            {/* Wraps before the Continuous badge's left edge (user request). */}
-            <p className="mt-2 text-[13px] leading-snug text-sidebar-foreground/80 xl:pr-24">
+            <p className="mt-2 text-[13px] leading-snug text-sidebar-foreground/80">
               {priorityText}
             </p>
-            {/* Always there (user request): when today's extras are done the
-                block stays with a done state, like Keep improving, instead of
-                leaving a hole in the card. */}
-            <div className="mt-3 hidden sm:block xl:mt-auto">
-              {/* A short heading tells the student what these two extras are. */}
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
-                {t("Extra practice")}
-              </p>
-              {quickWinButton || challengeButton ? (
-                <>
-                  <p className="mt-0.5 text-xs text-sidebar-foreground/70">
-                    {t("Two short options beyond today's priority.")}
-                  </p>
-                  {/* Stacked, one full-width option per row, each with its description. */}
-                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5">
-                    {quickWinButton}
-                    {challengeButton}
-                    {!(quickWinButton && challengeButton) && (
-                      // One option left: the other row says it is done.
-                      <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !bg-transparent text-xs text-muted-foreground">
-                        <CheckCircle2
-                          className="size-4 shrink-0 text-brand-green"
-                          aria-hidden="true"
-                        />
-                        {t("Nothing else pending right now.")}
-                      </p>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <div className="mt-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border px-3 text-center">
-                  <CheckCircle2 className="size-7 text-brand-green" aria-hidden="true" />
-                  <p className="text-sm font-semibold">{t("Extra practice done for today")}</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {t("New options appear tomorrow.")}
-                  </p>
+            {(quickWinButton || challengeButton) && (
+              <div className="mt-3 hidden sm:block xl:mt-auto">
+                {/* A short heading tells the student what these two extras are. */}
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
+                  {t("Extra practice")}
+                </p>
+                <p className="mt-0.5 text-xs text-sidebar-foreground/70">
+                  {t("Two short options beyond today's priority.")}
+                </p>
+                {/* Stacked, one full-width option per row, each with its description. */}
+                <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5">
+                  {quickWinButton}
+                  {challengeButton}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </aside>
         </div>
       </section>

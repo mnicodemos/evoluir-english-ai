@@ -29,10 +29,7 @@ export function AdminPanelButton({
     queryKey: ["admin-access"],
     queryFn: () => checkAdmin(),
     staleTime: 5 * 60 * 1000,
-    // A passing failure (network, cold server) must not hide the gear for the
-    // whole session: try again, and again when the window regains focus.
-    retry: 2,
-    refetchOnWindowFocus: true,
+    retry: false,
   });
 
   if (adminQuery.data?.isAdmin !== true) return null;

@@ -330,10 +330,10 @@ async function readLessonTemplate(plan: CurriculumLesson, promptHash: string) {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
-      .from("lesson_content_templates")
+      .from("lesson_content_templates" as never)
       .select("content")
-      .eq("curriculum_key", plan.key)
-      .eq("prompt_hash", promptHash)
+      .eq("curriculum_key" as never, plan.key as never)
+      .eq("prompt_hash" as never, promptHash as never)
       .maybeSingle();
     const { cardTotal, listenTotal, quizTotal } = lessonGenerationRequest(plan);
     const parsed = generatedLessonSchema(cardTotal, listenTotal, quizTotal).safeParse(
@@ -352,13 +352,12 @@ async function saveLessonTemplate(
 ) {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("lesson_content_templates").upsert(
-      { curriculum_key: plan.key, prompt_hash: promptHash, content },
-      {
+    await supabaseAdmin
+      .from("lesson_content_templates" as never)
+      .upsert({ curriculum_key: plan.key, prompt_hash: promptHash, content } as never, {
         onConflict: "curriculum_key,prompt_hash",
         ignoreDuplicates: true,
-      },
-    );
+      });
   } catch {
     /* sharing is an optimisation: the student's own lesson is already saved */
   }

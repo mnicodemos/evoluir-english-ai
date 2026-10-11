@@ -485,7 +485,7 @@ describe("lesson catalogue skill labels", () => {
     expect(lessonSkillToProfileSkill("pronunciation")).toBe("pronunciation");
   });
 
-  it("opens AI Speaking for the speaking skill even when a spoken lesson exists", () => {
+  it("uses a spoken lesson for the speaking skill once the label is mapped", () => {
     const step = buildNextStep({
       skills: [{ skill: "speaking", score: 40, confidence: 0.9, cefrLevel: "B2" }],
       recurringErrors: [],
@@ -494,8 +494,7 @@ describe("lesson catalogue skill labels", () => {
         [lessonSkillToProfileSkill("talking")]: { id: "lesson-5", title: "Presenting Your Ideas" },
       },
     });
-    expect(step.action).toBe("practise_speaking");
-    expect(step.activity.to).toBe("/coach");
-    expect(step.activity.params).toBeUndefined();
+    expect(step.action).toBe("review_lesson");
+    expect(step.activity.params).toEqual({ lessonId: "lesson-5" });
   });
 });

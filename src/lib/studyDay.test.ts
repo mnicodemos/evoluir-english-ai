@@ -147,7 +147,7 @@ describe("todayStudyMetrics", () => {
 });
 
 describe("minutes eligibility (existing principle)", () => {
-  it("counts finished activities and lesson page time, never other open-session telemetry", () => {
+  it("counts only activities with a real learning result, never open-session telemetry", () => {
     for (const type of [
       "lesson",
       "final_test",
@@ -155,11 +155,11 @@ describe("minutes eligibility (existing principle)", () => {
       "listening",
       "writing",
       "vocabulary",
-      "lesson_practice",
     ]) {
       expect(countsAsLearningMinutes(type)).toBe(true);
     }
     for (const type of [
+      "lesson_practice",
       "final_test_practice",
       "conversation_practice",
       "writing_practice",
