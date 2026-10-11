@@ -435,6 +435,13 @@
       "when": 1791591557582,
       "tag": "0061_vocabulary_review_by_server",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1791677005662,
+      "tag": "0062_vocabulary_review_by_server_apply",
+      "breakpoints": true
     }
   ]
 }
