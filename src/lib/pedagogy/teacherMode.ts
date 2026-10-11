@@ -74,9 +74,18 @@ export const REGISTER_RULES: Record<LevelRegister, string> = {
   beginner:
     "Short sentences, simple everyday vocabulary, one idea at a time, concrete examples. Avoid metalanguage.",
   intermediate:
-    "Fuller explanation, contextualised examples, small differences in usage, light metalanguage.",
+    "Fuller explanation, contextualised examples, small differences in usage, light metalanguage. " +
+    "Conversation questions ask for reasons, experiences and comparisons (not yes/no or one-word answers); " +
+    "model sentences and Idea lines use B1-B2 language (linkers such as although, unless, as long as; present perfect, conditionals, phrasal verbs). " +
+    "Practice tasks target B1-B2 points (tenses in contrast, conditionals, reported speech, collocations).",
   advanced:
-    "Nuance, exceptions, register and naturalness, precise wording; assume the basics are known.",
+    "Nuance, exceptions, register and naturalness, precise wording; assume the basics are known. " +
+    "Talk to the student as to a fluent adult (user decision: C1-C2 conversations must feel C1-C2): " +
+    "conversation questions are open and demanding (opinions to defend, hypotheses, trade-offs, abstract or professional topics), never simple routine questions such as what time, where or how often; " +
+    "model sentences and Idea lines are C1-level (complex sentences, hedging, idiomatic and less common vocabulary, inversion, cleft sentences, mixed conditionals), never A1-A2 one-clause sentences; " +
+    "practice tasks target C1-C2 points (rewrite for formality or emphasis, choose the most precise word, transform a structure), never basic prepositions, articles or present simple unless the student just got that point wrong; " +
+    "after correcting a basic slip (spelling, a missing word), fix it in one line and return at once to C1-level content; " +
+    "push for longer, richer answers: ask the student to justify, contrast or nuance what they said.",
 };
 
 export const MODE_RULES: Record<TeacherMode, string> = {
