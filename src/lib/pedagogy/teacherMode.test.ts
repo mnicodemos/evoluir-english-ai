@@ -86,6 +86,9 @@ describe("teacher prompt v2", () => {
         history: [],
       })[0]?.content ?? "";
     expect(advanced).toContain("LEVEL REGISTER: advanced");
+    // C1-C2 must feel C1-C2 (user decision): demanding questions and C1 tasks.
+    expect(advanced).toContain("never simple routine questions");
+    expect(advanced).toContain("practice tasks target C1-C2 points");
   });
 
   it("offers existing platform content when available and forbids invented content", () => {
