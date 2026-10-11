@@ -3,6 +3,7 @@
 
 import type { supabaseAdmin as SupabaseAdminClient } from "@/integrations/supabase/client.server";
 import { adminAlertPush, opsAlerts } from "@/lib/opsAlerts";
+import { serverErrorAlerts } from "@/lib/serverErrors";
 
 type SupabaseAdmin = typeof SupabaseAdminClient;
 
@@ -13,7 +14,7 @@ export async function loadOpsAlerts(
   options: { includeProduct?: boolean } = {},
 ) {
   const since = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-  const [runs, calls] = await Promise.all([
+  const [runs, calls, serverErrors] = await Promise.all([
     supabaseAdmin
       .from("push_runs")
       .select("kind, created_at, devices, sent, failed, removed, error, duration_ms")
@@ -24,10 +25,20 @@ export async function loadOpsAlerts(
       .select("operation, created_at, success, status, error_code, error_message")
       .gte("created_at", since)
       .limit(5000),
+    supabaseAdmin
+      .from("server_errors")
+      .select("area, message, created_at")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(2000),
   ]);
   // A missing table (migration not applied yet) must not break the Admin.
   const pushRuns = runs.error ? [] : (runs.data ?? []);
-  const alerts = opsAlerts({ pushRuns, aiCalls: calls.data ?? [], now });
+  const alerts = [
+    ...opsAlerts({ pushRuns, aiCalls: calls.data ?? [], now }),
+    // Until migration 0062 is applied the read fails and this stays empty.
+    ...serverErrorAlerts(serverErrors.error ? [] : (serverErrors.data ?? []), now),
+  ].sort((a, b) => (a.level === b.level ? 0 : a.level === "error" ? -1 : 1));
   if (runs.error) {
     alerts.unshift({
       level: "warning",

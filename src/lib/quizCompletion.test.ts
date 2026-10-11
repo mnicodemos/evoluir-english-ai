@@ -37,6 +37,20 @@ describe("lesson Quiz completion", () => {
   });
 });
 
+describe("lesson Quiz completion when the activity record fails", () => {
+  it("still completes a passed lesson", async () => {
+    const completeLesson = vi.fn(async () => {});
+    const result = await finalizeLessonQuiz(75, {
+      persistLegacy: async () => {
+        throw new Error("activity not saved");
+      },
+      completeLesson,
+    });
+    expect(completeLesson).toHaveBeenCalledOnce();
+    expect(result).toEqual({ passed: true, legacyPersisted: false });
+  });
+});
+
 describe("vocabulary unlock after a lesson", () => {
   it("unlocks only when a lesson passes for the first time", () => {
     expect(lessonCompletionUnlocksVocabulary({ passed: true, wasAlreadyCompleted: false })).toBe(

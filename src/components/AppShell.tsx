@@ -46,6 +46,7 @@ import { retryPendingPedagogicalWrites } from "@/lib/pedagogy/dualWrite.function
 import { sendActivityPush } from "@/lib/push.functions";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
+import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useLessonRound } from "@/hooks/useLessonRound";
@@ -113,7 +114,11 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
       if (window.top !== window.self) {
         toast(t("Open the app in its own tab to enable notifications"));
       } else {
-        toast(t("Notification permission was denied"));
+        toast(
+          t(
+            "Notifications are blocked in this browser. Allow them in the site settings (the icon next to the address) and try again.",
+          ),
+        );
       }
     } else if (result === "unsupported") {
       toast(t("Notifications are not supported on this device"));
@@ -232,7 +237,14 @@ export function MobileNavigationMenu({
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="dashboard-shell dark flex w-[min(19rem,86vw)] flex-col border-sidebar-border bg-sidebar p-4 text-sidebar-foreground"
+        // Translucent graphite like Weather talk and the bell (user request), over
+        // a lighter dim so the page shows through.
+        overlayClassName="bg-black/30"
+        className={cn(
+          "dashboard-shell dark flex w-[min(16rem,78vw)] flex-col p-4 text-sidebar-foreground",
+          graphitePanelClass,
+          "border-y-0 border-l-0",
+        )}
       >
         <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
           <SheetTitle className="flex items-center gap-2 text-sidebar-foreground">

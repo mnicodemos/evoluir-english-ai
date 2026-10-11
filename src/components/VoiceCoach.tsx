@@ -166,7 +166,7 @@ export function VoiceCoach({
     marks.firstAudioAt = performance.now();
     const row = turnTimingRow(marks);
     // Before migration 0050 the table does not exist; the insert just fails.
-    if (row) void supabase.from("speaking_turn_timings" as never).insert(row as never);
+    if (row) void supabase.from("speaking_turn_timings").insert(row);
   }
 
   function queueSpeech(text: string) {

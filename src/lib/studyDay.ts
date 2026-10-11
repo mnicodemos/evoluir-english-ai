@@ -1,8 +1,9 @@
 /**
  * The study-day rule (user decisions; migrations 0027, 0051 and 0057). The
- * database's credit_study_day is the only writer of the streak; this mirror
- * decides which past days the Rhythm and frequency views mark, so both read
- * the same thresholds. Change them together with credit_study_day.
+ * database's credit_study_day is the only writer of the streak and stores the
+ * days it credits in study_days (migration 0063), which the Rhythm and
+ * frequency views read; this mirror is their fallback before that migration
+ * and keeps the thresholds tested. Change them together with credit_study_day.
  */
 export const STUDY_DAY_RULE = { writing: 3, listening: 3, reviewedWords: 10 } as const;
 
@@ -29,12 +30,15 @@ export function qualifiesAsStudyDay(day: StudyDayEvidence): boolean {
 }
 
 /**
- * Activity types that represent completed learning outcomes. The daily goal card
- * only counts these, excluding residual timer/navigation records such as the
- * "*_practice" telemetry rows written while a session is still open.
+ * Activity types whose minutes count toward the daily goal: finished activities,
+ * plus the screens without a finish button and the lesson page itself. Other
+ * "*_practice" rows (a session left open) are kept out.
  */
 export const LEARNING_ACTIVITY_TYPES = [
   "lesson",
+  // Time on a lesson page (video, summary, flashcards) counts even before the
+  // quiz (user request); the activity clock already pauses when idle.
+  "lesson_practice",
   "final_test",
   "conversation",
   "listening",

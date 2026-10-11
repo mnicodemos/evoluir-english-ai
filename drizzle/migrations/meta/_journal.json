@@ -439,6 +439,20 @@
     {
       "idx": 62,
       "version": "7",
+      "when": 1791591657582,
+      "tag": "0062_server_errors",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1791591757582,
+      "tag": "0063_study_days",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
       "when": 1791677005662,
       "tag": "0062_vocabulary_review_by_server_apply",
       "breakpoints": true

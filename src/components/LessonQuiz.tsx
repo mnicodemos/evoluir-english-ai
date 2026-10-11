@@ -1,6 +1,6 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -35,11 +35,14 @@ export function LessonQuiz({
   userId,
   lessonId,
   onFinished,
+  lessonCompleted,
 }: {
   questions: QuizQuestion[];
   userId?: string | undefined;
   lessonId: string;
   onFinished?: (score: number, attemptKey: string) => void;
+  /** When known false, a passed attempt saved here completes its lesson on open. */
+  lessonCompleted?: boolean | undefined;
 }) {
   const { lang } = useUiLang();
   // Answers are kept locally so leaving the lesson does not lose them.
@@ -66,6 +69,16 @@ export function LessonQuiz({
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const submitQuiz = useServerFn(submitAuthoritativeQuiz);
+
+  // A quiz passed here whose lesson never got completed (the completion call
+  // failed or ran before the server-side rule) is completed once on open.
+  const healTried = useRef(false);
+  useEffect(() => {
+    if (healTried.current || lessonCompleted !== false) return;
+    if (!submitted || !attemptKey || !submittedResult || submittedResult.score < 70) return;
+    healTried.current = true;
+    onFinished?.(submittedResult.score, attemptKey);
+  }, [lessonCompleted, submitted, attemptKey, submittedResult, onFinished]);
 
   const correct = submittedResult?.correct ?? 0;
   const score = submittedResult?.score ?? 0;
@@ -100,6 +113,7 @@ export function LessonQuiz({
               : [],
           ),
         });
+        healTried.current = true;
         setSubmitted(true);
         onFinished?.(saved.score, stableAttemptKey);
         return;

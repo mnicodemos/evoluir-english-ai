@@ -8,9 +8,9 @@ type SupabaseAdmin = typeof import("@/integrations/supabase/client.server").supa
 
 export async function expireCampaignPremium(supabaseAdmin: SupabaseAdmin, now = new Date()) {
   const { data: grants, error } = await supabaseAdmin
-    .from("premium_campaign_grants" as never)
+    .from("premium_campaign_grants")
     .select("user_id, expires_at")
-    .lte("expires_at" as never, now.toISOString() as never);
+    .lte("expires_at", now.toISOString());
   if (error) return 0; // Migration not applied yet: nothing to expire.
   const ended = ((grants ?? []) as { user_id: string }[]).map((row) => row.user_id);
   if (!ended.length) return 0;

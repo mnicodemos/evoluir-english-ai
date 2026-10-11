@@ -6,7 +6,6 @@ export const uiPt: Record<string, string> = {
   "Goals today": "Metas de hoje",
   "Open goals": "Abrir metas",
   "Choose my goals": "Escolher minhas metas",
-  "All done": "Tudo feito",
   "With EVO": "Com a EVO",
   "Choose up to 3 goals and get one small step a day from EVO.":
     "Escolha até 3 metas e receba da EVO um pequeno passo por dia.",
@@ -138,7 +137,8 @@ export const uiPt: Record<string, string> = {
   "Open the app in its own tab to enable notifications":
     "Abra o app em uma aba própria para ativar as notificações",
   "Notifications are not supported on this device": "Este dispositivo não aceita notificações",
-  "Notification permission was denied": "Permissão de notificação negada",
+  "Notifications are blocked in this browser. Allow them in the site settings (the icon next to the address) and try again.":
+    "As notificações estão bloqueadas neste navegador. Libere nas configurações do site (o ícone ao lado do endereço) e tente de novo.",
   Weather: "Previsão do tempo",
   Sunny: "Ensolarado",
   "Partly cloudy": "Parcialmente nublado",
@@ -592,6 +592,7 @@ export const uiPt: Record<string, string> = {
   "Today's Premium mission": "Missão Premium de hoje",
   "Daily goal reached!": "Meta diária atingida!",
   "Your step today": "Seu passo de hoje",
+  "See today's step": "Ver o passo de hoje",
   "Your study day counts!": "Seu dia de estudo conta!",
   "1 more step to count your day": "Falta 1 passo para contar seu dia",
   "{n} more steps to count your day": "Faltam {n} passos para contar seu dia",
@@ -703,6 +704,8 @@ export const uiPt: Record<string, string> = {
     "Você precisa de pelo menos 70% para passar. Revise as explicações abaixo e refaça o quiz.",
   "Great job — you passed! Your answers are saved, and you can redo the quiz whenever you want.":
     "Muito bem — você passou! Suas respostas foram salvas e você pode refazer o quiz quando quiser.",
+  "The lesson could not be saved as completed. Open it again or redo the quiz.":
+    "Não foi possível marcar a lição como concluída. Abra de novo ou refaça o quiz.",
   "Score below 70%. Review the lesson and retake the quiz to complete it.":
     "Nota abaixo de 70%. Revise a lição e refaça o quiz para concluí-la.",
   "Lessons, videos, flashcards and quizzes": "Lições, vídeos, flashcards e quizzes",
@@ -1556,6 +1559,9 @@ export const uiPt: Record<string, string> = {
     "Um dia fica concluído quando você pratica a habilidade dele nesta semana. Quando não há lição nova dessa habilidade, o plano leva você à área de prática dela.",
   "Adjust my plan": "Ajustar meu plano",
   "Save and rebuild my week": "Salvar e refazer minha semana",
+  "Days per week": "Dias por semana",
+  "Your weekly plan earns the 3 gold stars. Jewels need 7 study days in a row (one missed day a week is protected), so study more days to climb them.":
+    "Cumprir seu plano da semana vale as 3 estrelas douradas. As joias pedem 7 dias seguidos de estudo (1 falta por semana é protegida): estude mais dias para subir de joia.",
   "Week complete!": "Semana concluída!",
   "You did every day of this week's plan. A new week starts on Monday.":
     "Você fez todos os dias do plano desta semana. Uma nova semana começa na segunda-feira.",
@@ -1571,6 +1577,9 @@ export const uiPt: Record<string, string> = {
   "Review 1 mistake": "Revisar 1 erro",
   "Review {n} mistakes": "Revisar {n} erros",
   "Fix them now so they do not become habits.": "Corrija agora para não virarem hábito.",
+  "Nothing else pending right now.": "Nada mais pendente agora.",
+  "Extra practice done for today": "Prática extra concluída hoje",
+  "New options appear tomorrow.": "Novas opções aparecem amanhã.",
   "Nothing else to review right now.": "Nada mais para revisar agora.",
   "Premium bonus": "Bônus Premium",
   "Business English": "Inglês para Negócios",
@@ -1605,6 +1614,7 @@ export const uiPt: Record<string, string> = {
   "Download PDF": "Baixar PDF",
   "Your PDF is downloading.": "Seu PDF está sendo baixado.",
   "Could not build the PDF. Please try again.": "Não foi possível gerar o PDF. Tente novamente.",
+  BIZ: "BIZ",
   "All Business lessons completed": "Todas as lições de Negócios concluídas",
   "Open Business English": "Abrir Inglês para Negócios",
   Continuous: "Contínuo",

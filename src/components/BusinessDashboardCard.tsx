@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, ChevronRight, Crown } from "lucide-react";
+import { Briefcase, Check, ChevronRight, Crown } from "lucide-react";
 import { useMemo } from "react";
 
 import { useLessons, useUserLessons } from "@/hooks/useLearning";
@@ -7,6 +7,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { getBusinessCourse } from "@/lib/businessCourse";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { cn } from "@/lib/utils";
 
 /**
  * Dashboard (desktop): Business English beside today's goals (user request:
@@ -42,10 +43,11 @@ export function BusinessDashboardCard() {
     };
   }, [lessons, mine, profile?.level, profile?.max_level]);
   const percent = total ? Math.round((completed / total) * 100) : 0;
+  const trackDone = total > 0 && completed >= total;
 
   return (
     <section
-      className="card-soft flex min-w-0 flex-col p-3 xl:h-full xl:min-h-0 xl:px-4 xl:py-3"
+      className="card-soft relative flex min-w-0 flex-col p-3 xl:h-full xl:min-h-0 xl:px-4 xl:py-3"
       aria-labelledby="business-card-title"
     >
       <div className="flex items-center gap-2">
@@ -63,23 +65,28 @@ export function BusinessDashboardCard() {
         </span>
       </div>
       <div className="mt-2 flex min-w-0 flex-1 flex-col justify-center gap-1.5">
-        {next ? (
-          <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
-              {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
+        {/* Room on the right for the BIZ chip. */}
+        <div className="flex min-w-0 items-center gap-3 pr-14">
+          {next ? (
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
+                {t("Next lesson")} · {t("Unit")} {next.unit}, {t("Lesson")} {next.position}
+              </p>
+              <p
+                className="truncate text-sm font-semibold"
+                translate="no"
+                lang="en"
+                title={next.title}
+              >
+                {next.title}
+              </p>
+            </div>
+          ) : (
+            <p className="min-w-0 flex-1 text-sm font-semibold">
+              {t("All Business lessons completed")}
             </p>
-            <p
-              className="truncate text-sm font-semibold"
-              translate="no"
-              lang="en"
-              title={next.title}
-            >
-              {next.title}
-            </p>
-          </div>
-        ) : (
-          <p className="text-sm font-semibold">{t("All Business lessons completed")}</p>
-        )}
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <div className="h-1.5 flex-1 rounded-full bg-secondary" aria-hidden="true">
             <div className="h-full rounded-full bg-brand-green" style={{ width: `${percent}%` }} />
@@ -96,6 +103,25 @@ export function BusinessDashboardCard() {
           </Link>
         </div>
       </div>
+      {/* The track's own chip, the same shape as the current level chip in the
+          header (user request), on the right edge and centred between the
+          Premium bonus pill above and the Continue link below. */}
+      <span
+        className={cn(
+          "absolute right-3 top-1/2 inline-flex h-6 -translate-y-1/2 items-center justify-center gap-0.5 rounded-full border text-[10px] font-semibold xl:right-4 2xl:text-[11px]",
+          // Every lesson done: the same look as a conquered level chip (user request).
+          trackDone
+            ? "min-w-10 border-brand-green/25 bg-brand-green/[0.07] px-1.5 text-brand-green/90"
+            : "w-10 border-transparent bg-brand-green text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)]",
+        )}
+        translate="no"
+        title="Business English"
+      >
+        {trackDone && (
+          <Check className="hidden size-3 shrink-0 2xl:block" strokeWidth={3} aria-hidden="true" />
+        )}
+        {t("BIZ")}
+      </span>
     </section>
   );
 }
