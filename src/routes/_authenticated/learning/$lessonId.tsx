@@ -176,7 +176,11 @@ function LessonPage() {
       completeLesson: async () => {
         await completeLesson(attemptKey);
       },
-    });
+    }).catch(() => null);
+    if (!result) {
+      toast.error("The lesson could not be saved as completed. Open it again or redo the quiz.");
+      return;
+    }
     // A lesson only counts as completed with a quiz score of 70% or more.
     if (!result.passed) {
       queryClient.invalidateQueries({ queryKey: ["quiz-results"] });
@@ -363,7 +367,12 @@ function LessonPage() {
                 {videoLength ? ` About ${videoLength}.` : ""}
               </p>
             </div>
-            <LessonVideo url={lesson.video_url} progress={progress} onProgress={handleProgress} />
+            <LessonVideo
+              url={lesson.video_url}
+              progress={progress}
+              onProgress={handleProgress}
+              resumeKey={lessonId}
+            />
             <p className="text-xs text-muted-foreground">
               Turn on the video subtitles (CC) to follow along while you watch.
             </p>
@@ -464,6 +473,7 @@ function LessonPage() {
                 userId={profile?.id}
                 lessonId={lessonId}
                 onFinished={finishLesson}
+                lessonCompleted={!!data.userLesson?.completed_at}
               />
             )}
           </TabsContent>

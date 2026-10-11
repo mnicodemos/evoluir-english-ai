@@ -1249,6 +1249,27 @@ export type Database = {
           },
         ]
       }
+      server_errors: {
+        Row: {
+          area: string
+          created_at: string
+          id: string
+          message: string
+        }
+        Insert: {
+          area: string
+          created_at?: string
+          id?: string
+          message: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          id?: string
+          message?: string
+        }
+        Relationships: []
+      }
       speaking_turn_timings: {
         Row: {
           created_at: string
@@ -1332,6 +1353,24 @@ export type Database = {
           processed_at?: string | null
           received_at?: string
           status?: string
+        }
+        Relationships: []
+      }
+      study_days: {
+        Row: {
+          created_at: string
+          day: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          user_id?: string
         }
         Relationships: []
       }

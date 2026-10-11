@@ -123,7 +123,7 @@ export async function loadRetention(supabaseAdmin: SupabaseAdmin) {
 export async function loadSpeakingWait(supabaseAdmin: SupabaseAdmin) {
   const since = new Date(Date.now() - 7 * 86_400_000).toISOString();
   const { data, error } = await supabaseAdmin
-    .from("speaking_turn_timings" as never)
+    .from("speaking_turn_timings")
     .select("transcribe_ms, first_text_ms, first_audio_ms")
     .gte("created_at", since)
     .order("created_at", { ascending: false })
@@ -201,9 +201,9 @@ export async function loadLandingFunnel(supabaseAdmin: SupabaseAdmin) {
   const since30 = addDays(today, -29);
   const since7 = addDays(today, -6);
   const { data, error } = await supabaseAdmin
-    .from("landing_daily_stats" as never)
+    .from("landing_daily_stats")
     .select("day, event, count")
-    .gte("day" as never, since30 as never);
+    .gte("day", since30);
   if (error) return null;
   const rows = (data ?? []) as unknown as LandingStatRow[];
   const [{ data: profiles }, { data: admins }] = await Promise.all([
