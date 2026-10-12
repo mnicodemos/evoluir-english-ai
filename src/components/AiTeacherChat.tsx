@@ -80,6 +80,8 @@ const errorCopy: Record<string, string> = {
   auth: "Your session expired. Please sign in again.",
   network: "The teacher is unavailable right now. Please try again.",
   busy: "The AI service is very busy right now. Please wait a minute and send your message again.",
+  pending: "Your previous message is still being answered. Wait a few seconds and send it again.",
+  failed: "EVO could not answer this message. Please send it again.",
   unknown: "Something went wrong. Please try again.",
 };
 

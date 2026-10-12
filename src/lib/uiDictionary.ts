@@ -407,6 +407,12 @@ export const uiPt: Record<string, string> = {
   "Your session expired. Please sign in again.": "Sua sessão expirou. Entre novamente.",
   "The teacher is unavailable right now. Please try again.":
     "O professor está indisponível agora. Tente novamente.",
+  "The AI service is very busy right now. Please wait a minute and send your message again.":
+    "O serviço de IA está muito ocupado agora. Aguarde um minuto e envie sua mensagem de novo.",
+  "Your previous message is still being answered. Wait a few seconds and send it again.":
+    "Sua mensagem anterior ainda está sendo respondida. Aguarde alguns segundos e envie de novo.",
+  "EVO could not answer this message. Please send it again.":
+    "A EVO não conseguiu responder esta mensagem. Envie de novo.",
   Dashboard: "Início",
   Home: "Início",
   Learning: "Aprendizado",

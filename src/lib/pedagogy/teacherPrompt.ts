@@ -10,6 +10,7 @@ import { TEACHER_EVIDENCE_SKILLS, type TeacherEvidenceSkill } from "./teacherEvi
 import {
   classifyTeacherMode,
   levelRegister,
+  levelTarget,
   modeWordBudget,
   MODE_RULES,
   REGISTER_RULES,
@@ -130,6 +131,11 @@ export function teacherTurnMessages(input: {
     ...(input.coachBlock ? [input.coachBlock, ""] : []),
     `LEVEL REGISTER: ${register}`,
     REGISTER_RULES[register],
+    ...(levelTarget(input.context.cefrLevel)
+      ? [
+          `LEVEL TARGET (conversation topics, model sentences, Idea lines and practice tasks stay at this level): ${levelTarget(input.context.cefrLevel)}`,
+        ]
+      : []),
     ...(register === "beginner"
       ? [
           '- Portuguese support: when the student writes in Portuguese or repeats the same kind of mistake from the recent messages, add ONE short line in Brazilian Portuguese starting exactly with "Em português:" that explains the point. Everything else stays in English.',

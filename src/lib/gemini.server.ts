@@ -42,6 +42,8 @@ export class GeminiError extends Error {
     public status: number,
     message: string,
     public retryAfter = 0,
+    /** What the provider actually said (status, model, reason), for the Admin only. */
+    public detail = "",
   ) {
     super(message);
   }
@@ -220,6 +222,7 @@ export async function callGemini(
 
   let lastStatus = 503;
   let retryAfter = 0;
+  let lastDetail = "";
   for (const model of MODELS) {
     // Controlled retry for temporary provider errors only (429/5xx), with a fixed
     // small number of attempts and backoff. Terminal errors stop immediately.
@@ -251,6 +254,7 @@ export async function callGemini(
         retryAfter = Number(res.headers.get("Retry-After") ?? 0);
         const errorBody = await res.text();
         const temporary = isTemporaryGeminiStatus(res.status);
+        lastDetail = `${model} [${res.status}]: ${errorBody.replace(/\s+/g, " ").slice(0, 160)}`;
         console.error(
           `Gemini attempt ${attempt}/${GEMINI_ATTEMPTS_PER_MODEL} failed [${res.status}] on ${model} after ${Date.now() - started}ms (temporary=${temporary}): ${errorBody.slice(0, 300)}`,
         );
@@ -279,6 +283,7 @@ export async function callGemini(
         return text;
       }
       lastStatus = 502;
+      lastDetail = `${model}: empty answer (finishReason=${data.candidates?.[0]?.finishReason ?? "none"})`;
       console.error(
         `Gemini returned an empty answer on ${model} (finishReason=${data.candidates?.[0]?.finishReason ?? "none"})`,
       );
@@ -296,5 +301,6 @@ export async function callGemini(
         ? "The AI service is very busy right now (high demand). Please try again in a few minutes."
         : "Google Gemini could not answer right now. Please try again in a moment.",
     retryAfter,
+    lastDetail,
   );
 }

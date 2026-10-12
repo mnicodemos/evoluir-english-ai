@@ -23,6 +23,11 @@ describe("gemini retry policy", () => {
     expect(
       teacherErrorMessage(new Error("The AI service is very busy right now (high demand).")),
     ).toBe("busy");
-    expect(teacherErrorMessage(new Error("Another AI request is already running."))).toBe("busy");
+    expect(teacherErrorMessage(new Error("Another AI request is already running."))).toBe(
+      "pending",
+    );
+    expect(
+      teacherErrorMessage(new Error("Google Gemini could not answer right now. Please try again.")),
+    ).toBe("failed");
   });
 });

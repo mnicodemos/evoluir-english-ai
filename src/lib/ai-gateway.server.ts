@@ -86,7 +86,13 @@ export async function callGateway(
           : err instanceof GeminiError
             ? `gemini_${err.status}`
             : "gemini_error",
-        errorMessage: err instanceof Error ? err.message : "Google Gemini failed",
+        // The Admin sees what Google actually answered; the student keeps the friendly copy.
+        errorMessage:
+          err instanceof GeminiError && err.detail
+            ? err.detail
+            : err instanceof Error
+              ? err.message
+              : "Google Gemini failed",
       });
     }
     if (err instanceof AiError) throw err;
