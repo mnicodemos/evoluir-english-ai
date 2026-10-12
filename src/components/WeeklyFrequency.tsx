@@ -244,7 +244,12 @@ export function WeeklyFrequency({
             </span>
           </div>
           <div>
-            <p className="text-sm font-semibold">
+            {/* Third line (user request), moved above the day count and in
+                capitals, in the header cells' supporting font. */}
+            <p className="text-xs uppercase leading-tight tracking-[0.08em] text-muted-foreground">
+              {lang === "pt" ? "Continue aprendendo" : "Keep learning"}
+            </p>
+            <p className="mt-0.5 text-sm font-semibold">
               {studiedCount}{" "}
               {lang === "pt"
                 ? studiedCount === 1
@@ -267,10 +272,6 @@ export function WeeklyFrequency({
                 {lang === "pt" ? "Mantenha o ritmo..." : "Keep the pace..."}
               </p>
             )}
-            {/* Third line (user request), in the header cells' supporting font. */}
-            <p className="mt-0.5 text-xs leading-tight text-muted-foreground">
-              {lang === "pt" ? "Continue aprendendo" : "Keep learning"}
-            </p>
           </div>
         </div>
         <div className="mt-2 grid grid-cols-7 gap-1">
