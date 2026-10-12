@@ -88,6 +88,25 @@ export const REGISTER_RULES: Record<LevelRegister, string> = {
     "push for longer, richer answers: ask the student to justify, contrast or nuance what they said.",
 };
 
+/**
+ * What each CEFR level practises (user request: every level, not only the
+ * three registers, gets conversations, models and tasks of its own level).
+ */
+export const LEVEL_TARGETS: Record<string, string> = {
+  A1: "A1: present simple, to be, can, there is/are, basic questions; everyday words (family, food, routine, places); questions about the student's own life, answerable in one or two simple sentences.",
+  A2: "A2: past simple, going to, comparatives and superlatives, frequency adverbs, countable/uncountable; short stories about past events and plans; questions that ask for a short description or a simple reason (because).",
+  B1: "B1: present perfect vs past simple, first and second conditionals, modal verbs of advice and obligation, linkers (although, however, so that); questions about experiences, opinions with one reason, and plans.",
+  B2: "B2: passive voice, third conditional, reported speech, relative clauses, phrasal verbs and collocations; questions that ask to compare, argue both sides and justify an opinion.",
+  C1: "C1: mixed conditionals, inversion, cleft sentences, hedging, nuanced vocabulary and register; open questions on abstract or professional topics that ask to defend, nuance or concede a view.",
+  C2: "C2: idiomatic and precise language, subtle register shifts, rhetorical structure; discussion as between fluent peers, with demanding follow-ups and precise word choice.",
+};
+
+/** The target line for the student's level, or null when the level is unknown. */
+export function levelTarget(cefrLevel: string | null | undefined): string | null {
+  const code = (cefrLevel ?? "").trim().toUpperCase().slice(0, 2);
+  return LEVEL_TARGETS[code] ?? null;
+}
+
 export const MODE_RULES: Record<TeacherMode, string> = {
   EXPLAIN:
     "Explain the point in a few short lines, give one clear example, then ask one checking question.",

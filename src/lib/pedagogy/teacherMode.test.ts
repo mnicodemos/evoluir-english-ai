@@ -77,6 +77,10 @@ describe("teacher prompt v2", () => {
         history: [],
       })[0]?.content ?? "";
     expect(beginner).toContain("LEVEL REGISTER: beginner");
+    // Every level has its own target, not only the three registers.
+    expect(beginner).toContain("LEVEL TARGET");
+    expect(beginner).toContain("A1: present simple");
+    expect(beginner).not.toContain("A2: past simple");
 
     const advanced =
       teacherTurnMessages({
@@ -89,6 +93,7 @@ describe("teacher prompt v2", () => {
     // C1-C2 must feel C1-C2 (user decision): demanding questions and C1 tasks.
     expect(advanced).toContain("never simple routine questions");
     expect(advanced).toContain("practice tasks target C1-C2 points");
+    expect(advanced).toContain("C1: mixed conditionals");
   });
 
   it("offers existing platform content when available and forbids invented content", () => {
