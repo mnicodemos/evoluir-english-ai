@@ -246,7 +246,7 @@ export function WeeklyFrequency({
           <div>
             {/* Third line (user request), moved above the day count and in
                 capitals, in the header cells' supporting font. */}
-            <p className="text-[10.5px] uppercase leading-tight tracking-[0.08em] text-muted-foreground">
+            <p className="text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground">
               {lang === "pt" ? "Continue aprendendo" : "Keep learning"}
             </p>
             <p className="mt-0.5 text-sm font-semibold">
