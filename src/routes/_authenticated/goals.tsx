@@ -101,7 +101,7 @@ function GoalsPage() {
 
   return (
     <AppShell>
-      <h1 className="text-xl font-bold lg:text-3xl">{t("Evoluir+ Goals")}</h1>
+      <h1 className="text-xl font-bold lg:text-3xl">{t("Your Goals")}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{t("Your goals, one small step a day.")}</p>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-start">
