@@ -1,8 +1,8 @@
 // Portuguese translations for the app interface (course area).
 // Lesson content, practice sentences and any AI generated text stay in English.
 export const uiPt: Record<string, string> = {
-  // Evoluir+ Goals (/goals)
-  "Evoluir+ Goals": "Evoluir+ Metas",
+  // Your Goals (/goals)
+  "Your Goals": "Suas metas",
   "Goals today": "Metas de hoje",
   "Open goals": "Abrir metas",
   "Choose my goals": "Escolher minhas metas",
