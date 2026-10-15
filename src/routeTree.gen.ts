@@ -42,6 +42,10 @@ import { Route as AuthenticatedLearningLessonIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedLearningFinalTestRouteImport } from './routes/_authenticated/learning/final-test'
 import { Route as AuthenticatedLearningReviewRouteImport } from './routes/_authenticated/learning/review'
 import { Route as AuthenticatedLearningUnitTestRouteImport } from './routes/_authenticated/learning/unit-test'
+import { Route as AuthenticatedLifeIndexRouteImport } from './routes/_authenticated/life/index'
+import { Route as AuthenticatedLifeCoachRouteImport } from './routes/_authenticated/life/coach'
+import { Route as AuthenticatedLifeHabitsRouteImport } from './routes/_authenticated/life/habits'
+import { Route as AuthenticatedLifeRoutineRouteImport } from './routes/_authenticated/life/routine'
 import { Route as ApiPublicCronDailyPushRouteImport } from './routes/api/public/cron/daily-push'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -216,6 +220,27 @@ const AuthenticatedLearningUnitTestRoute =
     path: '/learning/unit-test',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLifeIndexRoute = AuthenticatedLifeIndexRouteImport.update({
+  id: '/life/',
+  path: '/life/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLifeCoachRoute = AuthenticatedLifeCoachRouteImport.update({
+  id: '/life/coach',
+  path: '/life/coach',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLifeHabitsRoute = AuthenticatedLifeHabitsRouteImport.update({
+  id: '/life/habits',
+  path: '/life/habits',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLifeRoutineRoute =
+  AuthenticatedLifeRoutineRouteImport.update({
+    id: '/life/routine',
+    path: '/life/routine',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicCronDailyPushRoute = ApiPublicCronDailyPushRouteImport.update({
   id: '/api/public/cron/daily-push',
   path: '/api/public/cron/daily-push',
@@ -265,7 +290,11 @@ export interface FileRoutesByFullPath {
   '/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/learning/review': typeof AuthenticatedLearningReviewRoute
   '/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
+  '/life/coach': typeof AuthenticatedLifeCoachRoute
+  '/life/habits': typeof AuthenticatedLifeHabitsRoute
+  '/life/routine': typeof AuthenticatedLifeRoutineRoute
   '/learning/': typeof AuthenticatedLearningIndexRoute
+  '/life/': typeof AuthenticatedLifeIndexRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -302,7 +331,11 @@ export interface FileRoutesByTo {
   '/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/learning/review': typeof AuthenticatedLearningReviewRoute
   '/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
+  '/life/coach': typeof AuthenticatedLifeCoachRoute
+  '/life/habits': typeof AuthenticatedLifeHabitsRoute
+  '/life/routine': typeof AuthenticatedLifeRoutineRoute
   '/learning': typeof AuthenticatedLearningIndexRoute
+  '/life': typeof AuthenticatedLifeIndexRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -341,7 +374,11 @@ export interface FileRoutesById {
   '/_authenticated/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/_authenticated/learning/review': typeof AuthenticatedLearningReviewRoute
   '/_authenticated/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
+  '/_authenticated/life/coach': typeof AuthenticatedLifeCoachRoute
+  '/_authenticated/life/habits': typeof AuthenticatedLifeHabitsRoute
+  '/_authenticated/life/routine': typeof AuthenticatedLifeRoutineRoute
   '/_authenticated/learning/': typeof AuthenticatedLearningIndexRoute
+  '/_authenticated/life/': typeof AuthenticatedLifeIndexRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -380,7 +417,11 @@ export interface FileRouteTypes {
     | '/learning/final-test'
     | '/learning/review'
     | '/learning/unit-test'
+    | '/life/coach'
+    | '/life/habits'
+    | '/life/routine'
     | '/learning/'
+    | '/life/'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
@@ -417,7 +458,11 @@ export interface FileRouteTypes {
     | '/learning/final-test'
     | '/learning/review'
     | '/learning/unit-test'
+    | '/life/coach'
+    | '/life/habits'
+    | '/life/routine'
     | '/learning'
+    | '/life'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
@@ -455,7 +500,11 @@ export interface FileRouteTypes {
     | '/_authenticated/learning/final-test'
     | '/_authenticated/learning/review'
     | '/_authenticated/learning/unit-test'
+    | '/_authenticated/life/coach'
+    | '/_authenticated/life/habits'
+    | '/_authenticated/life/routine'
     | '/_authenticated/learning/'
+    | '/_authenticated/life/'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/lovable/email/transactional/preview'
@@ -710,6 +759,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearningUnitTestRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/life/': {
+      id: '/_authenticated/life/'
+      path: '/life'
+      fullPath: '/life/'
+      preLoaderRoute: typeof AuthenticatedLifeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/life/coach': {
+      id: '/_authenticated/life/coach'
+      path: '/life/coach'
+      fullPath: '/life/coach'
+      preLoaderRoute: typeof AuthenticatedLifeCoachRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/life/habits': {
+      id: '/_authenticated/life/habits'
+      path: '/life/habits'
+      fullPath: '/life/habits'
+      preLoaderRoute: typeof AuthenticatedLifeHabitsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/life/routine': {
+      id: '/_authenticated/life/routine'
+      path: '/life/routine'
+      fullPath: '/life/routine'
+      preLoaderRoute: typeof AuthenticatedLifeRoutineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/cron/daily-push': {
       id: '/api/public/cron/daily-push'
       path: '/api/public/cron/daily-push'
@@ -757,7 +834,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLearningFinalTestRoute: typeof AuthenticatedLearningFinalTestRoute
   AuthenticatedLearningReviewRoute: typeof AuthenticatedLearningReviewRoute
   AuthenticatedLearningUnitTestRoute: typeof AuthenticatedLearningUnitTestRoute
+  AuthenticatedLifeCoachRoute: typeof AuthenticatedLifeCoachRoute
+  AuthenticatedLifeHabitsRoute: typeof AuthenticatedLifeHabitsRoute
+  AuthenticatedLifeRoutineRoute: typeof AuthenticatedLifeRoutineRoute
   AuthenticatedLearningIndexRoute: typeof AuthenticatedLearningIndexRoute
+  AuthenticatedLifeIndexRoute: typeof AuthenticatedLifeIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -783,7 +864,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLearningFinalTestRoute: AuthenticatedLearningFinalTestRoute,
   AuthenticatedLearningReviewRoute: AuthenticatedLearningReviewRoute,
   AuthenticatedLearningUnitTestRoute: AuthenticatedLearningUnitTestRoute,
+  AuthenticatedLifeCoachRoute: AuthenticatedLifeCoachRoute,
+  AuthenticatedLifeHabitsRoute: AuthenticatedLifeHabitsRoute,
+  AuthenticatedLifeRoutineRoute: AuthenticatedLifeRoutineRoute,
   AuthenticatedLearningIndexRoute: AuthenticatedLearningIndexRoute,
+  AuthenticatedLifeIndexRoute: AuthenticatedLifeIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

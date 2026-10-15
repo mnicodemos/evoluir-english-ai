@@ -6,10 +6,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { GoalPlan } from "@/components/life/GoalPlan";
+import { LifeNav } from "@/components/life/LifeNav";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { EvoGuide } from "@/components/EvoGuide";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { skillMeterRows } from "@/lib/pedagogy/skillMeter";
@@ -44,6 +47,7 @@ function GoalsPage() {
   const archive = useServerFn(archivePlusGoal);
   const setDone = useServerFn(setPlusStepDone);
 
+  const { data: life, refresh: refreshLife } = useLife();
   const plusKey = ["plus", profile?.id ?? null, lang] as const;
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: plusKey,
@@ -101,8 +105,12 @@ function GoalsPage() {
 
   return (
     <AppShell>
-      <h1 className="text-xl font-bold lg:text-3xl">{t("Your Goals")}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{t("Your goals, one small step a day.")}</p>
+      {/* Goals are the Goals tab of Life AI (user decision): they stay free and
+          keep counting toward the streak; Life AI adds a deadline and milestones. */}
+      <LifeNav active="goals" />
+      <p className="-mt-2 mb-1 text-sm text-muted-foreground">
+        {t("Your goals, one small step a day.")}
+      </p>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-start">
         <section className="card-soft p-4 sm:p-5" aria-labelledby="evolution-score-title">
@@ -211,6 +219,20 @@ function GoalsPage() {
                           {step.text}
                         </span>
                       </button>
+                    ) : null}
+                    {life ? (
+                      <GoalPlan
+                        goal={
+                          life.goals.find((item) => item.id === goal.id) ?? {
+                            ...goal,
+                            deadline: null,
+                            description: null,
+                          }
+                        }
+                        milestones={life.milestones.filter((item) => item.goalId === goal.id)}
+                        today={life.today}
+                        onChange={refreshLife}
+                      />
                     ) : null}
                   </li>
                 );
