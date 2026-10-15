@@ -331,7 +331,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 {/* Coach label (user request): white with a red priority icon.
                     Mobile matches Today's Progress (text-sm, 22 px icon);
                     desktop matches "Why this matters now" (base size). */}
-                <p className="flex items-center gap-2 font-display text-sm font-semibold uppercase leading-none text-sidebar-foreground max-sm:normal-case sm:text-base sm:leading-snug">
+                <p className="flex items-center gap-2 font-display text-sm font-semibold leading-none text-sidebar-foreground sm:text-base sm:leading-snug">
                   <CircleAlert
                     className="size-[1.375rem] shrink-0 text-destructive"
                     strokeWidth={2.5}
@@ -341,7 +341,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     EVO · {t("Your AI Learning Coach")}
                   </span>
                 </p>
-                <div className="mt-2 sm:mt-0">
+                <div className="mt-2 sm:mt-2">
                   {/* No level badge here: next to the priority it read as part of it,
                       and the level already shows in the reason line. */}
                   <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:text-xs sm:font-bold sm:tracking-[0.08em] sm:text-brand-green">
