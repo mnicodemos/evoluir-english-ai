@@ -8,6 +8,7 @@ import {
   Check,
   CheckCircle2,
   ChevronRight,
+  CircleAlert,
   Compass,
   GraduationCap,
   Headphones,
@@ -317,7 +318,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
 
           {/* Mobile: the content sits centred in the card's free height instead
               of pressed against the banner. */}
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-4 sm:justify-center sm:pb-4 sm:pt-10 2xl:pt-11 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:pt-4 max-sm:pb-5 sm:justify-center sm:pb-4 sm:pt-10 2xl:pt-11 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
             {/* Top-right of the priority column below xl; from xl it moves to the
                 "Why this matters now" column (see the aside). */}
             <ScopeBadge
@@ -327,8 +328,18 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             />
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-bold uppercase text-brand-green sm:hidden">
-                  EVO · {t("Your AI Learning Coach")}
+                {/* Coach label (user request): white with a red priority icon.
+                    Mobile matches Today's Progress (text-sm, 22 px icon);
+                    desktop matches "Why this matters now" (base size). */}
+                <p className="flex items-center gap-2 font-display text-sm font-semibold uppercase leading-none text-sidebar-foreground sm:text-base sm:leading-snug">
+                  <CircleAlert
+                    className="size-[1.375rem] shrink-0 text-destructive"
+                    strokeWidth={2.5}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate">
+                    EVO · {t("Your AI Learning Coach")}
+                  </span>
                 </p>
                 <div className="mt-2 sm:mt-0">
                   {/* No level badge here: next to the priority it read as part of it,
@@ -373,7 +384,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Mobile-only: one line with the real reason for today's priority.
                 Due word reviews live in the bell; a box here was clipped by the
                 card and showed only as a green line. */}
-            <p className="mt-2.5 flex items-start gap-2 text-xs leading-snug text-sidebar-foreground/85 sm:hidden">
+            <p className="mt-3 flex items-start gap-2 text-xs leading-snug text-sidebar-foreground/85 sm:hidden">
               <Lightbulb
                 className="size-4 shrink-0 text-warning"
                 strokeWidth={2.5}
