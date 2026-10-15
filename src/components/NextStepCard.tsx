@@ -8,6 +8,7 @@ import {
   Check,
   CheckCircle2,
   ChevronRight,
+  CircleAlert,
   Compass,
   GraduationCap,
   Headphones,
