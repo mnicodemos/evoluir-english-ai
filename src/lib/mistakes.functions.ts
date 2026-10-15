@@ -5,6 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { isCorrectAnswer, nextMistakeReview } from "./mistakeReview";
 import {
+  fallbackMistakePractice,
   mistakePracticePrompt,
   parseMistakePractice,
   type MistakePractice,
@@ -76,19 +77,30 @@ export const practiceMistake = createServerFn({ method: "POST" })
       level: profile?.level ?? "b1",
     });
     // One retry when the model's answer does not pass the checks: its own cache
-    // key (so a cached bad answer is not reused) and a pause the usage limiter
-    // accepts.
+    // key (so a cached bad answer is not reused). A refusal (another request
+    // running, a limit) or a provider failure goes straight to the question
+    // built from the mistake itself, so the button never ends in an error.
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 6_000));
-      const raw = await callGateway(messages, true, {
-        userId: context.userId,
-        operation: "quiz_generation",
-        cacheKey: `mistake-practice:${row.id}:${attempt}`,
-        fast: true,
-        maxOutputTokens: 800,
-      });
+      let raw: string;
+      try {
+        raw = await callGateway(messages, true, {
+          userId: context.userId,
+          operation: "quiz_generation",
+          cacheKey: `mistake-practice:${row.id}:${attempt}`,
+          fast: true,
+          maxOutputTokens: 800,
+        });
+      } catch {
+        break;
+      }
       const practice = parseMistakePractice(raw);
       if (practice) return practice;
     }
+    const fallback = fallbackMistakePractice({
+      original: row.original_text,
+      corrected: row.corrected_text,
+      explanation: row.explanation,
+    });
+    if (fallback) return fallback;
     throw new Error("Could not prepare a practice question. Please try again.");
   });

@@ -104,6 +104,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_credit_topups: {
+        Row: {
+          added_at: string
+          amount_usd: number
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+        }
+        Insert: {
+          added_at?: string
+          amount_usd: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+        }
+        Update: {
+          added_at?: string
+          amount_usd?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+        }
+        Relationships: []
+      }
       ai_limits: {
         Row: {
           cache_ttl_seconds: number

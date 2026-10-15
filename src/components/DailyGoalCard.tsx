@@ -6,8 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { countsAsLearningMinutes, LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
 import { cn } from "@/lib/utils";
 
-export function useMinutesToday(userId?: string) {
-  return useQuery({
+/** Today's counted activities (type and minutes); one query shared by the
+ *  minutes ring and the Today's Progress lines. */
+function todayActivitiesQuery(userId?: string) {
+  return {
     queryKey: ["minutes-today", userId],
     enabled: !!userId,
     queryFn: async () => {
@@ -20,12 +22,19 @@ export function useMinutesToday(userId?: string) {
         .in("activity_type", [...LEARNING_ACTIVITY_TYPES])
         .gte("created_at", start.toISOString());
       if (error) throw error;
-      return (data ?? []).reduce(
-        (sum, a) =>
-          sum + (countsAsLearningMinutes(a.activity_type) ? (a.duration_minutes ?? 0) : 0),
-        0,
-      );
+      return (data ?? []).filter((a) => countsAsLearningMinutes(a.activity_type));
     },
+  };
+}
+
+export function useTodayActivities(userId?: string) {
+  return useQuery(todayActivitiesQuery(userId));
+}
+
+export function useMinutesToday(userId?: string) {
+  return useQuery({
+    ...todayActivitiesQuery(userId),
+    select: (rows) => rows.reduce((sum, a) => sum + (a.duration_minutes ?? 0), 0),
   });
 }
 

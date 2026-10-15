@@ -35,6 +35,26 @@ export function useWeeklyLeagueStanding(profile: LeagueProfile | null | undefine
   };
 }
 
+export type LeagueMedal = "gold" | "silver" | "bronze" | "grey";
+
+/** The medal's colour follows the place (user request): 1st gold, 2nd silver,
+ *  3rd bronze, any other place (or not in the league yet) grey. */
+export function leagueMedal(standing: { joined: boolean; rank: number | null }): LeagueMedal {
+  if (!standing.joined) return "grey";
+  if (standing.rank === 1) return "gold";
+  if (standing.rank === 2) return "silver";
+  if (standing.rank === 3) return "bronze";
+  return "grey";
+}
+
+/** Text colour of the medal icon alone (the phone chip). */
+export const LEAGUE_MEDAL_TEXT: Record<LeagueMedal, string> = {
+  gold: "text-amber-400",
+  silver: "text-slate-300",
+  bronze: "text-[#cd7f32]",
+  grey: "text-muted-foreground",
+};
+
 export function WeeklyLeagueSummary({
   profile,
   translate,
@@ -47,7 +67,7 @@ export function WeeklyLeagueSummary({
   return (
     <DashboardHeaderStat
       icon={<Medal className="size-6" strokeWidth={2.2} />}
-      tone="amber"
+      tone={leagueMedal({ joined, rank })}
       label={translate("Weekly league")}
       value={
         joined

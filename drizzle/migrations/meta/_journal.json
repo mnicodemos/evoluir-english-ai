@@ -470,6 +470,13 @@
       "when": 1791679299845,
       "tag": "0066_0063_study_days_apply",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1792000000000,
+      "tag": "0067_ai_credit_topups",
+      "breakpoints": true
     }
   ]
 }

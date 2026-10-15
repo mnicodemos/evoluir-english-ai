@@ -731,3 +731,89 @@ export const getLandingFunnel = createServerFn({ method: "GET" })
     const { loadLandingFunnel } = await import("@/lib/productMetrics.server");
     return loadLandingFunnel(supabaseAdmin);
   });
+
+/**
+ * API credit balance (user request): the top-ups the owner recorded and the
+ * cost measured on every AI call since the first one (rowCost, the same as
+ * Cost & Performance). Missing table (migration 0067 not applied yet) reads
+ * as "not set up" instead of failing the tab.
+ */
+export const getAiCredit = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { creditBalance } = await import("@/lib/aiCredit");
+    const { data: topups, error } = await supabaseAdmin
+      .from("ai_credit_topups")
+      .select("id, added_at, amount_usd, note")
+      .order("added_at", { ascending: false });
+    if (error) return { ready: false as const };
+    const list = (topups ?? []).map((row) => ({ ...row, amount_usd: Number(row.amount_usd) }));
+    let spent = 0;
+    let measuredCalls = 0;
+    const since = list.length ? list[list.length - 1]!.added_at : null;
+    if (since) {
+      // Read in pages: every call since the first top-up counts.
+      const PAGE = 1000;
+      for (let from = 0; from < 500_000; from += PAGE) {
+        const { data: rows, error: usageError } = await supabaseAdmin
+          .from("ai_usage_events")
+          .select("model, input_tokens, output_tokens, estimated_cost")
+          .gte("created_at", since)
+          .order("created_at", { ascending: true })
+          .range(from, from + PAGE - 1);
+        if (usageError) break;
+        for (const row of rows ?? []) {
+          const cost = rowCost(row as BenchmarkUsageRow);
+          if (cost !== null) {
+            spent += cost;
+            measuredCalls += 1;
+          }
+        }
+        if (!rows || rows.length < PAGE) break;
+      }
+    }
+    return { ready: true as const, topups: list, measuredCalls, ...creditBalance(list, spent) };
+  });
+
+export const addAiCreditTopup = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        amountUsd: z.number().positive().max(100_000),
+        addedAt: z.string().datetime().optional(),
+        note: z.string().trim().max(200).optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("ai_credit_topups").insert({
+      amount_usd: data.amountUsd,
+      ...(data.addedAt ? { added_at: data.addedAt } : {}),
+      note: data.note || null,
+      created_by: context.userId,
+    });
+    if (error) throw new Error("The top-up could not be saved");
+    return { ok: true };
+  });
+
+export const deleteAiCreditTopup = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("ai_credit_topups").delete().eq("id", data.id);
+    if (error) throw new Error("The top-up could not be removed");
+    return { ok: true };
+  });

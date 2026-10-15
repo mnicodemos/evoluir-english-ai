@@ -15,7 +15,8 @@ export type MistakePractice = {
 const practiceSchema = z.object({
   question: z.string().trim().min(5).max(300),
   options: z.array(z.string().trim().min(1).max(160)).min(3).max(4),
-  answer_index: z.number().int().min(0).max(3),
+  // The model sometimes writes the index as a string ("1").
+  answer_index: z.coerce.number().int().min(0).max(3),
   explanation: z.string().trim().min(5).max(400),
 });
 
@@ -41,6 +42,32 @@ export function parseMistakePractice(raw: string): MistakePractice | null {
   const distinct = new Set(options.map((option) => option.toLowerCase()));
   if (distinct.size !== options.length || answer_index >= options.length) return null;
   return { question, options, answerIndex: answer_index, explanation };
+}
+
+/**
+ * Built from the saved mistake itself when the AI cannot write the question
+ * (busy, refused or an answer that fails the checks), so "Practise the rule"
+ * always opens a question: pick the correct form between the corrected text
+ * and the student's own wording.
+ */
+export function fallbackMistakePractice(input: {
+  original: string;
+  corrected: string;
+  explanation: string | null;
+}): MistakePractice | null {
+  const corrected = input.corrected.trim();
+  const original = input.original.trim();
+  if (!corrected || !original || corrected.toLowerCase() === original.toLowerCase()) return null;
+  // The correct option is not always first: its place follows the text length,
+  // stable for the same mistake.
+  const answerIndex = (corrected.length + original.length) % 2;
+  const options = answerIndex === 0 ? [corrected, original] : [original, corrected];
+  return {
+    question: "Which one is correct?",
+    options,
+    answerIndex,
+    explanation: input.explanation?.trim() || `A forma correta é: ${corrected}`,
+  };
 }
 
 export function mistakePracticePrompt(input: {
