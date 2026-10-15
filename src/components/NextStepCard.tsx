@@ -358,21 +358,21 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               translate={t}
               className="absolute right-4 top-3.5 hidden sm:inline-flex xl:hidden"
             />
-            <div className="flex items-center justify-between gap-3 sm:block">
+            {/* Coach label: white, with the AI icon in the brand colour (the
+                AI Teacher's sparkles; a red "!" read as an error, user
+                request). Its own full line on phones, with Practice now beside
+                the priority below; desktop matches "Why this matters now". */}
+            <p className="flex items-center gap-1.5 font-display text-sm font-semibold leading-tight text-sidebar-foreground sm:gap-2 sm:text-base sm:leading-snug">
+              <Sparkles
+                className="size-4 shrink-0 text-brand-green sm:size-[1.375rem]"
+                strokeWidth={2.4}
+                aria-hidden="true"
+              />
+              <span className="truncate">EVO · {t("Your AI Learning Coach")}</span>
+            </p>
+            <div className="mt-2 flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
-                {/* Coach label: white, with the AI icon in the brand colour (the
-                    AI Teacher's sparkles; a red "!" read as an error, user
-                    request). Phones use a smaller line so the label fits;
-                    desktop matches "Why this matters now". */}
-                <p className="flex items-center gap-1.5 font-display text-sm font-semibold leading-tight text-sidebar-foreground sm:gap-2 sm:text-base sm:leading-snug">
-                  <Sparkles
-                    className="size-4 shrink-0 text-brand-green sm:size-[1.375rem]"
-                    strokeWidth={2.4}
-                    aria-hidden="true"
-                  />
-                  <span className="truncate">EVO · {t("Your AI Learning Coach")}</span>
-                </p>
-                <div className="mt-2 sm:mt-2">
+                <div>
                   {/* No level badge here: next to the priority it read as part of it,
                       and the level already shows in the reason line. */}
                   <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:text-xs sm:font-bold sm:tracking-[0.08em] sm:text-brand-green">
@@ -387,10 +387,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   </h2>
                 </div>
               </div>
+              {/* Phones (user request): lower and wider, beside the priority, so
+                  the coach label above keeps its whole line. */}
               {mainAvailable && (
                 <Button
                   asChild
-                  className="h-11 min-w-[42%] shrink-0 self-center rounded-xl bg-brand-green px-4 text-sm font-bold text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:hidden"
+                  className="h-9 w-[54%] shrink-0 self-center rounded-xl bg-brand-green px-4 text-sm font-bold text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:hidden"
                 >
                   {data.activity.params ? (
                     <Link to="/learning/$lessonId" params={data.activity.params}>
