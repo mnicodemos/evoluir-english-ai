@@ -12,7 +12,7 @@ vi.mock("./ai-usage.server", () => ({
     const hit = store.get(key);
     return hit && hit.expiresAt > Date.now() ? hit.text : null;
   },
-  reserveAiUsage: async () => {
+  reserveAiUsageWithWait: async () => {
     spy.reserve++;
     return { eventId: "e", startedAt: Date.now() };
   },

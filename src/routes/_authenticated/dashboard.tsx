@@ -12,8 +12,13 @@ import {
   Gem,
   Headphones,
   BookA,
+  ClipboardCheck,
+  Layers,
+  MessageCircle,
+  Mic,
   PenLine,
   RotateCcw,
+  Sparkles,
   SpellCheck,
   Target,
 } from "lucide-react";
@@ -21,7 +26,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
-import { useMinutesToday } from "@/components/DailyGoalCard";
+import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
 import { getLeague, getNextLeague } from "@/components/LeagueBadge";
@@ -53,6 +58,7 @@ import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
 import { MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
 import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
+import { todayProgressLines, type TodayLineIcon } from "@/lib/todayProgressLines";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -72,6 +78,22 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   }),
   component: Dashboard,
 });
+
+/** Icons of the Today's Progress lines (todayProgressLines). */
+const TODAY_LINE_ICONS: Record<TodayLineIcon, typeof BookOpen> = {
+  lesson: BookOpen,
+  words: BookA,
+  accuracy: Target,
+  conversation: MessageCircle,
+  writing: PenLine,
+  listening: Headphones,
+  mistakes: RotateCcw,
+  teacher: Sparkles,
+  flashcards: Layers,
+  pronunciation: Mic,
+  test: ClipboardCheck,
+  time: Clock,
+};
 
 type DashboardNotificationsProps = {
   indicators: ReturnType<typeof useActivityIndicators>;
@@ -303,47 +325,21 @@ function Dashboard() {
   const nextLeague = profile ? getNextLeague(streakDays) : null;
   const jewelDaysLeft = getLeague(streakDays).nextIn;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
+  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
   }, [profile, navigate]);
 
-  // Accuracy at or above this percentage shows the "done" icon; below it (but above 0) shows "attention".
-  const ACCURACY_DONE_THRESHOLD = 70;
-
-  type ProgressState = "done" | "attention" | "empty";
-  const accuracyToday = snapshot?.todayQuizAverage ?? 0;
-  const learningCards: {
-    label: string;
-    value: string;
-    state: ProgressState;
-    icon: typeof BookOpen;
-  }[] = [
-    {
-      label: "Lessons completed",
-      icon: BookOpen,
-      value: `${snapshot?.todayLessonsCompleted ?? 0}`,
-      state: (snapshot?.todayLessonsCompleted ?? 0) > 0 ? "done" : "empty",
-    },
-    {
-      label: "Words mastered",
-      icon: BookA,
-      value: `${snapshot?.todayVocabularyMastered ?? 0}`,
-      state: (snapshot?.todayVocabularyMastered ?? 0) > 0 ? "done" : "empty",
-    },
-    {
-      label: "Accuracy",
-      icon: Target,
-      value: `${accuracyToday}%`,
-      state:
-        accuracyToday >= ACCURACY_DONE_THRESHOLD
-          ? "done"
-          : accuracyToday > 0
-            ? "attention"
-            : "empty",
-    },
-  ];
-  const hasProgressToday = learningCards.some((card) => card.state !== "empty");
+  // The three lines follow what the student did today (todayProgressLines).
+  const learningCards = todayProgressLines({
+    lessonsCompleted: snapshot?.todayLessonsCompleted ?? 0,
+    wordsMastered: snapshot?.todayVocabularyMastered ?? 0,
+    accuracy: snapshot?.todayQuizAverage ?? 0,
+    activities: todayActivities,
+  });
+  // Minutes in the ring always come with at least one line beside them.
+  const hasProgressToday = minutesToday > 0 || learningCards.some((card) => card.state !== "empty");
   const minutesToGoal = Math.max(profile?.daily_minutes ?? 0, 0) - minutesToday;
 
   return (
@@ -562,7 +558,7 @@ function Dashboard() {
                     {learningCards.map((card) => {
                       // Each line has its own activity icon: grey until done today,
                       // then lit in the ring's colour (accuracy from 70%).
-                      const Icon = card.icon;
+                      const Icon = TODAY_LINE_ICONS[card.icon];
                       const iconClass =
                         card.state === "done" ? "text-brand-green" : "text-muted-foreground/50";
                       const sr =
@@ -579,7 +575,7 @@ function Dashboard() {
                             : "text-foreground";
                       return (
                         <div
-                          key={card.label}
+                          key={card.key}
                           className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
                         >
                           <Icon

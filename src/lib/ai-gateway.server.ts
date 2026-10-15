@@ -59,7 +59,7 @@ export async function callGateway(
   if (cached !== null) return cached;
   const ticket =
     usage && usageTools
-      ? await usageTools.reserveAiUsage({
+      ? await usageTools.reserveAiUsageWithWait({
           ...usage,
           model: GEMINI_TEXT_MODEL,
           requestHash,

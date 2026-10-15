@@ -169,6 +169,35 @@ export async function reserveAiUsage(input: {
   return { eventId: reservation.event_id, startedAt: Date.now() };
 }
 
+/** Refusals worth a short wait instead of an error: the previous request of the
+ *  same kind is closing (its record is written in the background just after
+ *  the answer) or the minimum interval has not passed yet. */
+const WAITABLE_REFUSALS = new Set(["concurrent_limit", "rate_limit"]);
+const MAX_RESERVATION_WAIT_MS = 8_000;
+
+/**
+ * reserveAiUsage, but a "one request at a time" or "too quickly" refusal waits
+ * a few seconds and tries again (at most 8 s in all) before reaching the
+ * student, so a request that follows another never fails on the closing race.
+ */
+export async function reserveAiUsageWithWait(
+  input: Parameters<typeof reserveAiUsage>[0],
+): Promise<UsageTicket> {
+  const started = Date.now();
+  for (;;) {
+    try {
+      return await reserveAiUsage(input);
+    } catch (error) {
+      if (!(error instanceof AiUsageError) || !WAITABLE_REFUSALS.has(error.code)) throw error;
+      const waitMs = Math.max(1, error.retryAfter || 2) * 1000;
+      if (Date.now() - started + waitMs > MAX_RESERVATION_WAIT_MS) throw error;
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+      // Later attempts re-check abandoned records as well.
+      input = { ...input, abandonedReleased: false };
+    }
+  }
+}
+
 import { estimateAiCost } from "./aiPricing";
 
 export { AI_MODEL_PRICING, estimateAiCost } from "./aiPricing";

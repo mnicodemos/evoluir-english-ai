@@ -8,7 +8,6 @@ import {
   Check,
   CheckCircle2,
   ChevronRight,
-  CircleAlert,
   Compass,
   GraduationCap,
   Headphones,
@@ -30,7 +29,13 @@ import { EvoGuide } from "@/components/EvoGuide";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
-import { useWeeklyLeagueStanding } from "@/components/WeeklyLeagueSummary";
+import { useTodayActivities } from "@/components/DailyGoalCard";
+import { dailyChallengeGoal, practiceXpLabel } from "@/lib/dailyChallenge";
+import {
+  LEAGUE_MEDAL_TEXT,
+  leagueMedal,
+  useWeeklyLeagueStanding,
+} from "@/components/WeeklyLeagueSummary";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import {
   NEXT_STEP_ACTION_TEXT,
@@ -59,6 +64,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
   const league = useWeeklyLeagueStanding(profile);
+  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
   // Vocabulary words whose review date has arrived (same count as the bell).
   const activityIndicators = useActivityIndicators();
   // Until today's practice has loaded, the buttons show right away instead of
@@ -160,9 +166,27 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const quickWinAvailable = quickWin
     ? actionAvailable(quickWin.activity.to, activityIndicators)
     : false;
+  // The challenge has a goal for the day (user request): it shows the progress
+  // and leaves once the goal is reached (dailyChallengeGoal).
+  const challengeGoal = data.quest
+    ? dailyChallengeGoal(data.quest.resource.to, todayActivities)
+    : null;
   const challengeAvailable = data.quest
-    ? actionAvailable(data.quest.resource.to, activityIndicators)
+    ? actionAvailable(data.quest.resource.to, activityIndicators) && !challengeGoal?.reached
     : false;
+  const challengeProgress = challengeGoal
+    ? ` · ${challengeGoal.done}/${challengeGoal.target} ${t(challengeGoal.unit)}`
+    : "";
+  // Extra practice earns the weekly league's XP (user request): each option
+  // shows what its activity is worth.
+  const xpChip = (destination: string) => {
+    const label = practiceXpLabel(destination);
+    return label ? (
+      <span className="rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-400 max-sm:hidden">
+        {label}
+      </span>
+    ) : null;
+  };
   // Shared action buttons: Quick Win sits next to "Today's focus" on mobile and
   // inside the "Why now?" card on larger screens; the challenge button sits
   // next to the focus title on mobile and inside the card on larger screens.
@@ -191,7 +215,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
-                {quickWinIcon} {t("Quick Win")}
+                {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(quickWin.cta)} · {t(quickWin.activity.title)}
@@ -202,7 +226,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           <Link to={quickWin.activity.to}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
-                {quickWinIcon} {t("Quick Win")}
+                {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(quickWin.cta)} · {t(quickWin.activity.title)}
@@ -224,10 +248,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
-                {challengeIcon} {t("Take the challenge")}
+                {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {questDetail}
+                {challengeProgress}
               </span>
             </span>
           </Link>
@@ -235,10 +260,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           <Link to={data.quest.resource.to}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal sm:text-[13px]">
-                {challengeIcon} {t("Take the challenge")}
+                {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {questDetail}
+                {challengeProgress}
               </span>
             </span>
           </Link>
@@ -274,7 +300,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       <Link to="/league">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-normal">
-          <Medal className="size-3.5 shrink-0 text-amber-400" aria-hidden="true" />
+          <Medal
+            className={`size-3.5 shrink-0 ${LEAGUE_MEDAL_TEXT[leagueMedal(league)]}`}
+            aria-hidden="true"
+          />
           {league.joined
             ? league.total > 1 && league.rank
               ? `#${league.rank} · ${league.xp} XP`
@@ -318,7 +347,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
 
           {/* Mobile: the content sits centred in the card's free height instead
               of pressed against the banner. */}
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:pt-4 max-sm:pb-5 sm:justify-start sm:pb-4 sm:pt-3.5 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:pt-4 max-sm:pb-5 sm:justify-center sm:pb-4 sm:pt-10 xl:pt-4 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
             {/* Top-right of the priority column below xl; from xl it moves to the
                 "Why this matters now" column (see the aside). */}
             <ScopeBadge
@@ -328,18 +357,17 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             />
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
-                {/* Coach label (user request): white with a red priority icon.
-                    Mobile matches the bold skill heading ("Speaking is your ...",
-                    text-lg / size-5 icon); desktop matches "Why this matters now". */}
-                <p className="flex items-center gap-2 font-display text-lg font-bold leading-tight text-sidebar-foreground sm:text-base sm:font-semibold sm:leading-snug">
-                  <CircleAlert
-                    className="size-5 shrink-0 text-destructive sm:size-[1.375rem]"
-                    strokeWidth={2.5}
+                {/* Coach label: white, with the AI icon in the brand colour (the
+                    AI Teacher's sparkles; a red "!" read as an error, user
+                    request). Phones use a smaller line so the label fits;
+                    desktop matches "Why this matters now". */}
+                <p className="flex items-center gap-1.5 font-display text-sm font-semibold leading-tight text-sidebar-foreground sm:gap-2 sm:text-base sm:leading-snug">
+                  <Sparkles
+                    className="size-4 shrink-0 text-brand-green sm:size-[1.375rem]"
+                    strokeWidth={2.4}
                     aria-hidden="true"
                   />
-                  <span className="truncate">
-                    EVO · {t("Your AI Learning Coach")}
-                  </span>
+                  <span className="truncate">EVO · {t("Your AI Learning Coach")}</span>
                 </p>
                 <div className="mt-2 sm:mt-2">
                   {/* No level badge here: next to the priority it read as part of it,

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { mistakePracticePrompt, parseMistakePractice } from "./mistakePractice";
+import {
+  fallbackMistakePractice,
+  mistakePracticePrompt,
+  parseMistakePractice,
+} from "./mistakePractice";
 
 const valid = {
   question: "She ___ to work every day.",
@@ -40,5 +44,25 @@ describe("mistake practice", () => {
     expect(system!.content).toContain("DIFFERENT");
     expect(system!.content).toContain("B1");
     expect(user!.content).toContain("He go to school.");
+  });
+
+  it("accepts the answer index written as a string", () => {
+    expect(parseMistakePractice(JSON.stringify({ ...valid, answer_index: "1" }))?.answerIndex).toBe(
+      1,
+    );
+  });
+
+  it("builds a question from the mistake itself when the AI cannot", () => {
+    const practice = fallbackMistakePractice({
+      original: "critical technical defects",
+      corrected: "critical technical defects.",
+      explanation: "Sentences must end with a full stop.",
+    });
+    expect(practice?.options).toHaveLength(2);
+    expect(practice?.options[practice.answerIndex]).toBe("critical technical defects.");
+    expect(practice?.explanation).toBe("Sentences must end with a full stop.");
+    expect(
+      fallbackMistakePractice({ original: "Go", corrected: "go", explanation: null }),
+    ).toBeNull();
   });
 });
