@@ -327,8 +327,18 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             />
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-bold uppercase text-brand-green sm:hidden">
-                  EVO · {t("Your AI Learning Coach")}
+                {/* Coach label (user request): white with a red priority icon.
+                    Mobile matches Today's Progress (text-sm, 22 px icon);
+                    desktop matches "Why this matters now" (base size). */}
+                <p className="flex items-center gap-2 font-display text-sm font-semibold uppercase leading-none text-sidebar-foreground sm:text-base sm:leading-snug">
+                  <CircleAlert
+                    className="size-[1.375rem] shrink-0 text-destructive"
+                    strokeWidth={2.5}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate">
+                    EVO · {t("Your AI Learning Coach")}
+                  </span>
                 </p>
                 <div className="mt-2 sm:mt-0">
                   {/* No level badge here: next to the priority it read as part of it,
