@@ -383,7 +383,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Mobile-only: one line with the real reason for today's priority.
                 Due word reviews live in the bell; a box here was clipped by the
                 card and showed only as a green line. */}
-            <p className="mt-2.5 flex items-start gap-2 text-xs leading-snug text-sidebar-foreground/85 sm:hidden">
+            <p className="mt-3 flex items-start gap-2 text-xs leading-snug text-sidebar-foreground/85 sm:hidden">
               <Lightbulb
                 className="size-4 shrink-0 text-warning"
                 strokeWidth={2.5}
