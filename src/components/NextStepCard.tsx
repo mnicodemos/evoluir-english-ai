@@ -346,8 +346,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </div>
 
           {/* Mobile: the content sits centred in the card's free height instead
-              of pressed against the banner. */}
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:pt-4 max-sm:pb-5 sm:justify-center sm:pb-4 sm:pt-10 xl:pt-4 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+              of pressed against the banner. Below xl: centred beside the image,
+              with room for the scope badge. From xl: top-aligned, the EVO label
+              level with "Why this matters now" (same 12 px top padding and 22 px
+              icon row; user request). */}
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:pt-4 max-sm:pb-5 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
             {/* Top-right of the priority column below xl; from xl it moves to the
                 "Why this matters now" column (see the aside). */}
             <ScopeBadge
