@@ -329,11 +329,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <div className="flex items-center justify-between gap-3 sm:block">
               <div className="min-w-0 flex-1">
                 {/* Coach label (user request): white with a red priority icon.
-                    Mobile matches Today's Progress (text-sm, 22 px icon);
-                    desktop matches "Why this matters now" (base size). */}
-                <p className="flex items-center gap-2 font-display text-sm font-semibold leading-none text-sidebar-foreground sm:text-base sm:leading-snug">
+                    Mobile matches the bold skill heading ("Speaking is your ...",
+                    text-lg / size-5 icon); desktop matches "Why this matters now". */}
+                <p className="flex items-center gap-2 font-display text-lg font-bold leading-tight text-sidebar-foreground sm:text-base sm:font-semibold sm:leading-snug">
                   <CircleAlert
-                    className="size-[1.375rem] shrink-0 text-destructive"
+                    className="size-5 shrink-0 text-destructive sm:size-[1.375rem]"
                     strokeWidth={2.5}
                     aria-hidden="true"
                   />
