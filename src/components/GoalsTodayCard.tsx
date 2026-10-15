@@ -1,13 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronRight, Flame, Loader2, Plus, Search, Target } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  Flame,
+  ListChecks,
+  Loader2,
+  Plus,
+  Repeat,
+  Search,
+  Sprout,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
+import { lifeDayProgress } from "@/lib/life";
 import {
   PLUS_GOAL_EXAMPLES,
   PLUS_MAX_GOALS,
@@ -67,6 +79,16 @@ export function GoalsTodayCard() {
   const steps = data?.todaySteps ?? [];
   const recent = data?.recentSteps ?? [];
   const allDone = plusDayComplete(steps);
+  const { data: life } = useLife();
+  const lifeDay = life
+    ? lifeDayProgress({
+        today: life.today,
+        tasks: life.tasks,
+        habits: life.habits,
+        logs: life.logs,
+        goalSteps: steps,
+      })
+    : null;
 
   return (
     <section
@@ -74,14 +96,38 @@ export function GoalsTodayCard() {
       aria-labelledby="goals-today-title"
     >
       <div className="flex items-center gap-2">
-        <Target
+        {/* Life AI holds the goals (user decision): the title opens it, and
+            Premium students also see today's tasks and habits at a glance. */}
+        <Sprout
           className="size-[1.65rem] shrink-0 text-brand-green"
           strokeWidth={2.4}
           aria-hidden="true"
         />
         <h2 id="goals-today-title" className="font-display text-sm font-semibold">
-          {t("Goals today")}
+          <Link to="/life" className="hover:text-brand-green">
+            Life AI <span className="font-normal text-muted-foreground">· {t("Goals today")}</span>
+          </Link>
         </h2>
+        {life?.premium && lifeDay ? (
+          <span className="hidden items-center gap-2.5 text-[11px] text-muted-foreground 2xl:inline-flex">
+            <Link
+              to="/life/routine"
+              className="inline-flex items-center gap-1 hover:text-foreground"
+              title={t("Today's tasks")}
+            >
+              <ListChecks className="size-3.5" aria-hidden="true" />
+              {lifeDay.tasksDone}/{lifeDay.tasksTotal}
+            </Link>
+            <Link
+              to="/life/habits"
+              className="inline-flex items-center gap-1 hover:text-foreground"
+              title={t("Habits today")}
+            >
+              <Repeat className="size-3.5" aria-hidden="true" />
+              {lifeDay.habitsDone}/{lifeDay.habitsDue}
+            </Link>
+          </span>
+        ) : null}
         <GoalChecks
           done={Array.from({ length: PLUS_MAX_GOALS }, (_, index) => {
             const goal = goals[index];

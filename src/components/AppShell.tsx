@@ -18,6 +18,7 @@ import {
   PenLine,
   Sparkles,
   SpellCheck,
+  Sprout,
   Target,
   Trophy,
   Video,
@@ -57,7 +58,7 @@ import { studyToday } from "@/lib/today";
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 // My Subscription sits with the settings rows at the bottom, as on desktop.
 const mobileSheetNav = [
-  { to: "/goals", label: "Goals", icon: Target },
+  { to: "/life", label: "Life AI", icon: Sprout },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/business", label: "Business English", icon: Briefcase },
   { to: "/listening", label: "Listening", icon: Headphones },
@@ -75,7 +76,8 @@ const mobileSheetNav = [
 // `group` is the title above a group's first item ("" draws a plain divider).
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Home", icon: House },
-  { to: "/goals", label: "Goals", icon: Target, group: "Plan" },
+  // Life AI holds the goals (user decision): Today, Goals, Routine, Habits, Life Coach.
+  { to: "/life", label: "Life AI", icon: Sprout, group: "Plan" },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen, group: "Practice" },
@@ -86,6 +88,11 @@ const dashboardSidebarNav = [
   { to: "/call", label: "Video call", icon: Video },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
 ] as const;
+
+/** The Goals screen is a Life AI tab, so the Life AI menu item stays lit there. */
+function lifeTabOpen(pathname: string, to: string) {
+  return to === "/life" && pathname.startsWith("/goals");
+}
 
 // Translation and notification controls moved here from the dashboard reflection
 // block: one home in the sidebar (desktop) and the sheet menu (mobile).
@@ -200,7 +207,9 @@ export function MobileNavigationMenu({
   // The More button lights up when the current route belongs to one of its
   // own sections (the four bottom tabs stay responsible for themselves).
   const moreActive =
-    pathname.startsWith("/premium") || mobileSheetNav.some((item) => pathname.startsWith(item.to));
+    pathname.startsWith("/premium") ||
+    pathname.startsWith("/goals") ||
+    mobileSheetNav.some((item) => pathname.startsWith(item.to));
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -261,7 +270,11 @@ export function MobileNavigationMenu({
                     to={item.to}
                     className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
-                    inactiveProps={{ className: "text-sidebar-foreground/75" }}
+                    inactiveProps={{
+                      className: lifeTabOpen(pathname, item.to)
+                        ? "bg-sidebar-accent text-brand-green"
+                        : "text-sidebar-foreground/75",
+                    }}
                   >
                     <item.icon className="size-5 shrink-0" />
                     <span className="truncate">{translate(item.label)}</span>
@@ -455,7 +468,11 @@ function AppShellContent({
                   className="grid h-10 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                   // Just a soft background and green text: no border or side bar.
                   activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
-                  inactiveProps={{ className: "text-sidebar-foreground/70" }}
+                  inactiveProps={{
+                    className: lifeTabOpen(location.pathname, item.to)
+                      ? "bg-sidebar-accent text-brand-green"
+                      : "text-sidebar-foreground/70",
+                  }}
                 >
                   <item.icon className="size-5" />
                   <span className="truncate text-left">{translate(item.label)}</span>
