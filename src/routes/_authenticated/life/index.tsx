@@ -1,30 +1,23 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Check,
-  ChevronRight,
-  ListChecks,
-  Loader2,
-  Repeat,
-  Sparkles,
-  Star,
-  Target,
-} from "lucide-react";
-import { useState } from "react";
+import { Check, Loader2, Star } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
-import { LifeHabitsToday } from "@/components/life/LifeHabits";
-import { LifeNav, LifePremiumGate, useLifeT } from "@/components/life/LifeNav";
-import { LifeTaskForm, LifeTaskList } from "@/components/life/LifeTasks";
+import { CoachSection } from "@/components/life/CoachSection";
+import { GoalsSection } from "@/components/life/GoalsSection";
+import { HabitsSection } from "@/components/life/HabitsSection";
+import { LifeHeader, LifePremiumGate, useLifeT } from "@/components/life/LifeNav";
+import { RoutineSection } from "@/components/life/RoutineSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
-import { habitsDueToday, lifeDayProgress } from "@/lib/life";
+import { lifeDayProgress } from "@/lib/life";
 import { setLifePriority } from "@/lib/life.functions";
-import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
+import { loadPlus } from "@/lib/plus.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/life/")({
@@ -37,215 +30,99 @@ export const Route = createFileRoute("/_authenticated/life/")({
       },
     ],
   }),
-  component: LifeTodayPage,
+  component: LifePage,
 });
 
 /**
- * Life AI "Today": the priority of the day, the day's progress, today's goal
- * steps, tasks and habits, and a way into the Life Coach.
+ * Life AI on one page (user request: one page instead of tabs): the day and
+ * its priority on top, then Goals, Routine with Habits, and the Life Coach
+ * side by side on desktop, stacked on phones. Old tab addresses (/goals,
+ * /life/routine, /life/habits, /life/coach) open this page at their section.
  */
-function LifeTodayPage() {
+function LifePage() {
   const { t, lang } = useLifeT();
   const { data: profile } = useProfile();
   const { data, isLoading, refresh } = useLife();
   const loadSteps = useServerFn(loadPlus);
-  const tickStep = useServerFn(setPlusStepDone);
+  // Same query as the Goals section, for the day ring's goal steps.
   const { data: plus } = useQuery({
     queryKey: ["plus", profile?.id ?? null, lang],
     enabled: !!profile,
     queryFn: () => loadSteps({ data: { lang } }),
     staleTime: 30 * 1000,
   });
-  const toggleStep = useMutation({
-    mutationFn: (input: { id: string; done: boolean }) => tickStep({ data: input }),
-    onSuccess: refresh,
-    onError: () => toast.error(t("The step could not be saved.")),
-  });
+
+  // Old tab addresses arrive with #goals, #routine, #habits or #coach: scroll
+  // there once the sections exist (they render after the data loads).
+  const ready = !!data;
+  useEffect(() => {
+    if (!ready || typeof window === "undefined") return;
+    const id = window.location.hash.slice(1);
+    if (id) document.getElementById(id)?.scrollIntoView({ block: "start" });
+  }, [ready]);
 
   if (isLoading || !data) {
     return (
       <AppShell>
-        <LifeNav active="overview" />
+        <LifeHeader />
         <Loader2 className="size-5 animate-spin text-muted-foreground" aria-hidden="true" />
       </AppShell>
     );
   }
 
-  const steps = plus?.todaySteps ?? [];
-  const due = habitsDueToday(data.habits, data.logs, data.today);
   const progress = lifeDayProgress({
     today: data.today,
     tasks: data.tasks,
     habits: data.habits,
     logs: data.logs,
-    goalSteps: steps,
+    goalSteps: plus?.todaySteps ?? [],
   });
-  const todayTasks = data.tasks.filter((task) => task.day === data.today);
 
   return (
     <AppShell>
-      <LifeNav active="overview" />
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-start">
-        <div className="grid gap-4">
-          <section
-            className="card-soft flex items-center gap-4 p-4 sm:p-5"
-            aria-label={t("Your day")}
-          >
-            <DayRing percent={progress.percent} />
-            <div className="min-w-0 text-sm">
-              <h2 className="text-base font-semibold">{t("Your day")}</h2>
-              <p className="mt-1 text-muted-foreground">
-                {t("Goal steps")}: {progress.stepsDone}/{progress.stepsTotal}
-              </p>
-              {data.premium ? (
-                <>
-                  <p className="text-muted-foreground">
-                    {t("Tasks")}: {progress.tasksDone}/{progress.tasksTotal}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {t("Habits")}: {progress.habitsDone}/{progress.habitsDue}
-                  </p>
-                </>
-              ) : null}
-            </div>
-          </section>
-
-          {data.premium ? <PriorityCard data={data} onChange={refresh} /> : null}
-
-          <section className="card-soft p-4 sm:p-5" aria-labelledby="life-steps-title">
-            <h2 id="life-steps-title" className="flex items-center gap-2 text-base font-semibold">
-              <Target className="size-5 text-brand-green" aria-hidden="true" />
-              {t("Today's steps")}
-              <Link
-                to="/goals"
-                className="ml-auto inline-flex items-center gap-0.5 text-xs font-semibold text-brand-green"
-              >
-                {t("Goals")}
-                <ChevronRight className="size-3.5" aria-hidden="true" />
-              </Link>
-            </h2>
-            {plus && !plus.goals.length ? (
-              <p className="mt-3 text-sm text-muted-foreground">
-                {t("Choose 1 to 3 goals and I will give you one small step a day.")}
-              </p>
-            ) : (
-              <ul className="mt-3 space-y-2">
-                {steps.map((step) => {
-                  const done = !!step.doneAt;
-                  const goal = plus?.goals.find((item) => item.id === step.goalId);
-                  return (
-                    <li key={step.id}>
-                      <button
-                        type="button"
-                        aria-pressed={done}
-                        disabled={toggleStep.isPending}
-                        onClick={() => toggleStep.mutate({ id: step.id, done: !done })}
-                        className={cn(
-                          "flex w-full items-start gap-3 rounded-lg p-2 text-left text-sm",
-                          done ? "bg-brand-green/10" : "bg-secondary/60 hover:bg-secondary",
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border-2",
-                            done
-                              ? "border-brand-green bg-brand-green text-[oklch(0.2_0.04_160)]"
-                              : "border-muted-foreground/60",
-                          )}
-                          aria-hidden="true"
-                        >
-                          {done ? <Check className="size-3.5" strokeWidth={3} /> : null}
-                        </span>
-                        <span className="min-w-0">
-                          <span translate="no" className="block text-[11px] text-muted-foreground">
-                            {goal?.title}
-                          </span>
-                          <span
-                            translate="no"
-                            className={cn(done && "text-muted-foreground line-through")}
-                          >
-                            {step.text}
-                          </span>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
-        </div>
-
-        {data.premium ? (
-          <div className="grid gap-4">
-            <section className="card-soft p-4 sm:p-5" aria-labelledby="life-tasks-title">
-              <h2 id="life-tasks-title" className="flex items-center gap-2 text-base font-semibold">
-                <ListChecks className="size-5 text-brand-green" aria-hidden="true" />
-                {t("Today's tasks")}
-                <Link
-                  to="/life/routine"
-                  className="ml-auto inline-flex items-center gap-0.5 text-xs font-semibold text-brand-green"
-                >
-                  {t("Routine")}
-                  <ChevronRight className="size-3.5" aria-hidden="true" />
-                </Link>
-              </h2>
-              <div className="mt-3">
-                <LifeTaskForm day={data.today} goals={data.goals} onChange={refresh} />
-              </div>
-              <div className="mt-3">
-                <LifeTaskList
-                  tasks={todayTasks}
-                  goals={data.goals}
-                  onChange={refresh}
-                  emptyText="No tasks for today yet."
-                />
-              </div>
-            </section>
-
-            <section className="card-soft p-4 sm:p-5" aria-labelledby="life-habits-title">
-              <h2
-                id="life-habits-title"
-                className="flex items-center gap-2 text-base font-semibold"
-              >
-                <Repeat className="size-5 text-brand-green" aria-hidden="true" />
-                {t("Habits today")}
-                <Link
-                  to="/life/habits"
-                  className="ml-auto inline-flex items-center gap-0.5 text-xs font-semibold text-brand-green"
-                >
-                  {t("Habits")}
-                  <ChevronRight className="size-3.5" aria-hidden="true" />
-                </Link>
-              </h2>
-              <div className="mt-3">
-                <LifeHabitsToday
-                  habits={due}
-                  logs={data.logs}
-                  today={data.today}
-                  onChange={refresh}
-                />
-              </div>
-            </section>
-
-            <Link
-              to="/life/coach"
-              className="card-soft flex items-center gap-3 p-4 transition-colors hover:bg-secondary/40 sm:p-5"
-            >
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-green/12 text-brand-green">
-                <Sparkles className="size-5" aria-hidden="true" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold">{t("Life Coach")}</span>
-                <span className="block text-xs text-muted-foreground">
-                  {t("Plan a goal, choose your priorities or start a habit with EVO.")}
-                </span>
-              </span>
-              <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
-            </Link>
+      <LifeHeader />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section
+          className="card-soft flex items-center gap-4 p-4 sm:p-5"
+          aria-label={t("Your day")}
+        >
+          <DayRing percent={progress.percent} />
+          <div className="min-w-0 text-sm">
+            <h2 className="text-base font-semibold">{t("Your day")}</h2>
+            <p className="mt-1 text-muted-foreground">
+              {t("Goal steps")}: {progress.stepsDone}/{progress.stepsTotal}
+            </p>
+            {data.premium ? (
+              <>
+                <p className="text-muted-foreground">
+                  {t("Tasks")}: {progress.tasksDone}/{progress.tasksTotal}
+                </p>
+                <p className="text-muted-foreground">
+                  {t("Habits")}: {progress.habitsDone}/{progress.habitsDue}
+                </p>
+              </>
+            ) : null}
           </div>
+        </section>
+        {data.premium ? <PriorityCard data={data} onChange={refresh} /> : null}
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3 lg:items-start">
+        <GoalsSection />
+        {data.premium ? (
+          <>
+            <div className="grid gap-4">
+              <RoutineSection />
+              <HabitsSection />
+            </div>
+            <div className="lg:col-span-2 xl:col-span-1">
+              <CoachSection />
+            </div>
+          </>
         ) : (
-          <LifePremiumGate feature="Routine, habits and Life Coach" />
+          <div className="xl:col-span-2">
+            <LifePremiumGate feature="Routine, habits and Life Coach" />
+          </div>
         )}
       </div>
     </AppShell>
