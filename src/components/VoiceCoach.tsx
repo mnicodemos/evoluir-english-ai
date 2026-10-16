@@ -48,6 +48,7 @@ import { VideoCallStage } from "@/components/coach/VideoCallStage";
 import { findBusinessRolePlay } from "@/lib/businessCourse";
 import { goalRolePlay } from "@/lib/goalPractice";
 import { studyToday } from "@/lib/today";
+import { isPlaceKind, placeRolePlay } from "@/lib/aroundYou";
 import { isWeatherCondition, weatherRolePlay } from "@/lib/weatherTalk";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -58,6 +59,7 @@ export function VoiceCoach({
   weather,
   business,
   goal,
+  place,
   presentation = "chat",
 }: {
   lessonTopic?: string | undefined;
@@ -69,6 +71,8 @@ export function VoiceCoach({
   business?: string | undefined;
   /** Opens a conversation about one of the student's Goals by its id. */
   goal?: string | undefined;
+  /** Acts out a situation at a place near the student (aroundYou.ts). */
+  place?: string | undefined;
 }) {
   const { data: profile } = useProfile();
   const { data: snapshot } = useStudySnapshot();
@@ -134,6 +138,7 @@ export function VoiceCoach({
     const businessPlay = findBusinessRolePlay(business);
     if (businessPlay) startRolePlay(businessPlay);
     else if (isWeatherCondition(weather)) startRolePlay(weatherRolePlay(weather));
+    else if (isPlaceKind(place)) startRolePlay(placeRolePlay(place));
     else if (goal) {
       setVoiceState("thinking");
       // A goal that cannot be read (removed, another student's) falls back to a free chat.

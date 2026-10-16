@@ -124,6 +124,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Choose a free chat or a real situation, like a job interview or a restaurant.",
       "Finish the conversation to get your report; one finished conversation completes a study day.",
     ],
+    tip: "Use Around you in English, in the Weather talk button, to act out situations at places near you.",
     to: "/coach",
   },
   {

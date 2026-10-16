@@ -151,6 +151,39 @@ export const appGuidePt: Record<string, string> = {
     "Ative as notificações para a palavra do dia e o lembrete de estudo.",
   "Ask about the weather with Weather talk to practise small talk.":
     "Fale sobre o clima com o Weather talk para treinar conversa do dia a dia.",
+  // Around you in English (aroundYou.ts)
+  "Around you in English": "Inglês ao seu redor",
+  "Practise real situations at places near you, as if you lived abroad.":
+    "Pratique situações reais em lugares perto de você, como se morasse fora.",
+  "Find places near me": "Encontrar lugares perto de mim",
+  "No places found nearby. Choose a situation:":
+    "Nenhum lugar encontrado por perto. Escolha uma situação:",
+  Café: "Cafeteria",
+  "Order a drink and a snack": "Peça uma bebida e um lanche",
+  Restaurant: "Restaurante",
+  "Book a table and order a meal": "Reserve uma mesa e peça uma refeição",
+  Pharmacy: "Farmácia",
+  "Ask for something for a cold or a headache": "Peça algo para gripe ou dor de cabeça",
+  Supermarket: "Supermercado",
+  "Find products and pay at the checkout": "Encontre produtos e pague no caixa",
+  Bank: "Banco",
+  "Open an account or exchange money": "Abra uma conta ou troque dinheiro",
+  Hotel: "Hotel",
+  "Check in and ask about the hotel": "Faça o check-in e pergunte sobre o hotel",
+  Station: "Estação",
+  "Buy a ticket and ask for directions": "Compre uma passagem e peça informações",
+  Clinic: "Clínica",
+  "Make an appointment and describe how you feel": "Marque uma consulta e diga como se sente",
+  Park: "Parque",
+  "Small talk with someone in the park": "Bate-papo com alguém no parque",
+  Museum: "Museu",
+  "Buy tickets and ask about the exhibitions": "Compre ingressos e pergunte sobre as exposições",
+  Gym: "Academia",
+  "Sign up and talk about your training": "Faça a matrícula e fale sobre seu treino",
+  "Clothes shop": "Loja de roupas",
+  "Try clothes on and ask for another size": "Experimente roupas e peça outro tamanho",
+  "Use Around you in English, in the Weather talk button, to act out situations at places near you.":
+    "Use o Inglês ao seu redor, no botão Weather talk, para praticar situações em lugares perto de você.",
   // Page
   "App guide": "Diário de bordo",
   "How to use each part of Evoluir+, step by step.":
