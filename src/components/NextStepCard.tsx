@@ -128,9 +128,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       reading: BookOpen,
       grammar: GraduationCap,
     }[data.prioritySkill ?? ""] ?? MessageSquareText;
-  const cefrLevel = data.insight?.cefrLevel
-    ? findLevel(data.insight.cefrLevel).cefr.replace(/^CEFR /, "")
-    : null;
+  // No measured level yet (a new student): the profile's level names it, so
+  // "in your {level} journey" never reads "in your your current level journey".
+  const levelSource = data.insight?.cefrLevel ?? profile?.level ?? null;
+  const cefrLevel = levelSource ? findLevel(levelSource).cefr.replace(/^CEFR /, "") : null;
   const strongestLabel = data.insight?.strongestSkill
     ? t(NEXT_STEP_SKILL_TEXT[data.insight.strongestSkill] ?? data.insight.strongestSkill)
     : null;
@@ -476,7 +477,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* One sentence with the reason; the main column already says what
                 happened ("You have not practiced this skill yet"). */}
             {/* Wraps before the Continuous badge's left edge (user request). */}
-            <p className="mt-2 text-[13px] leading-snug text-sidebar-foreground/80 xl:pr-24">
+            {/* At most two lines, so it never runs into Extra practice (user request). */}
+            <p className="mt-2 line-clamp-2 text-[13px] leading-snug text-sidebar-foreground/80 xl:pr-24">
               {priorityText}
             </p>
             {/* Always there (user request): when today's extras are done the

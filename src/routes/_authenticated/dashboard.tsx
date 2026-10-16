@@ -34,6 +34,7 @@ import { getLeague, getNextLeague } from "@/components/LeagueBadge";
 import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
 import { businessLevelAllowed } from "@/lib/businessCourse";
+import { profileIsPremium } from "@/lib/billing/subscriptionView";
 import { PathProgressCard } from "@/components/PathProgressCard";
 import { ScopeBadge } from "@/components/ScopeBadge";
 import { NextStepCard } from "@/components/NextStepCard";
@@ -323,6 +324,11 @@ function Dashboard() {
   });
   const planNext =
     studyPlan?.plan.nextIndex != null ? studyPlan.plan.days[studyPlan.plan.nextIndex] : null;
+  // Business English: from B1 for Premium students; free students always see
+  // the card, disabled with the Premium badge (user request).
+  const showBusinessCard =
+    !!profile &&
+    (businessLevelAllowed(profile.max_level || profile.level) || !profileIsPremium(profile));
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const nextLeague = profile ? getNextLeague(streakDays) : null;
   const jewelDaysLeft = getLeague(streakDays).nextIn;
@@ -654,15 +660,13 @@ function Dashboard() {
               goals; below B1 the goals keep the whole row. */}
           <div
             className={`order-4 hidden min-w-0 gap-3 lg:order-none xl:h-full xl:min-h-0 ${
-              businessLevelAllowed(profile.max_level || profile.level)
-                ? "lg:grid lg:grid-cols-12"
-                : "lg:block"
+              showBusinessCard ? "lg:grid lg:grid-cols-12" : "lg:block"
             }`}
           >
             <div className="min-w-0 lg:col-span-8 xl:h-full xl:min-h-0">
               <GoalsTodayCard />
             </div>
-            {businessLevelAllowed(profile.max_level || profile.level) && (
+            {showBusinessCard && (
               <div className="min-w-0 lg:col-span-4 xl:h-full xl:min-h-0">
                 <BusinessDashboardCard />
               </div>
