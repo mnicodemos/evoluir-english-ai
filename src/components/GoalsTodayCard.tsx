@@ -20,6 +20,7 @@ import {
 } from "@/components/LifeHomeSlots";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
+import { haptic } from "@/lib/haptics";
 import { plusDayComplete, plusGoalWeek, type PlusGoalWeek, type PlusStep } from "@/lib/plus";
 import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
@@ -57,6 +58,9 @@ export function GoalsTodayCard() {
   const [justDone, setJustDone] = useState<string | null>(null);
   const toggle = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setDone({ data: input }),
+    onMutate: (input) => {
+      if (input.done) haptic("tap");
+    },
     onSuccess: (_result, input) => {
       setJustDone(input.done ? input.id : null);
       refresh();

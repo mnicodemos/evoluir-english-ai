@@ -1,7 +1,9 @@
 import { CalendarDays, Check, CircleCheck, Footprints, Star, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { GoldTrophy } from "@/components/GoldTrophy";
+import { useCelebrate } from "@/hooks/useCelebrate";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
@@ -53,6 +55,16 @@ export function WeeklyFrequency({
   });
 
   const allStudied = (studyDays?.size ?? 0) >= weeklyGoal;
+  // Only the desktop panel, the one on screen there, celebrates the week's plan
+  // (user request), so the hidden phone strip never fires it a second time.
+  const celebrateWeek = useCelebrate(
+    "week-plan",
+    presentation === "dashboard-panel" &&
+      !!studyDays &&
+      allStudied &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 1024px)").matches,
+  );
   const studiedCount = studyDays?.size ?? 0;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
@@ -210,7 +222,13 @@ export function WeeklyFrequency({
         {/* Same ring as Today's Progress beside it (size, stroke and number).
             The bottom padding lifts it off the days row (user request). */}
         <div className="mt-1 grid flex-1 grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 py-1 2xl:grid-cols-[7.5rem_minmax(0,1fr)]">
-          <div className="relative grid size-24 place-items-center text-brand-green 2xl:size-30">
+          <div
+            className={cn(
+              "relative grid size-24 place-items-center text-brand-green 2xl:size-30",
+              celebrateWeek && "animate-celebrate",
+            )}
+          >
+            <CelebrationBurst active={celebrateWeek} />
             <svg
               className="absolute inset-0 size-full -rotate-90"
               viewBox="0 0 96 96"

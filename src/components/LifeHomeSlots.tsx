@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useLife } from "@/hooks/useLife";
 import { habitsDueToday, type LifeHabit, type LifeTask } from "@/lib/life";
 import { setLifeHabitDone, setLifeTaskDone } from "@/lib/life.functions";
+import { haptic } from "@/lib/haptics";
 import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 
@@ -96,12 +97,18 @@ export function useLifeActions(t: T) {
   };
   const task = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setTask({ data: input }),
+    onMutate: (input) => {
+      if (input.done) haptic("tap");
+    },
     onSuccess: refresh,
     onError: () => toast.error(t("The task could not be saved.")),
   });
   const habit = useMutation({
     mutationFn: (input: { habitId: string; day: string; done: boolean }) =>
       setHabit({ data: input }),
+    onMutate: (input) => {
+      if (input.done) haptic("tap");
+    },
     onSuccess: refresh,
     onError: () => toast.error(t("The habit could not be saved.")),
   });

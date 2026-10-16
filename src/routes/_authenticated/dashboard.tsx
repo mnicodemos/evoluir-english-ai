@@ -28,8 +28,10 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
 import { studyToday } from "@/lib/today";
+import { useCelebrate } from "@/hooks/useCelebrate";
 import { useLife } from "@/hooks/useLife";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
@@ -67,6 +69,7 @@ import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
 import { todayProgressLines, type TodayLineIcon } from "@/lib/todayProgressLines";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -380,6 +383,11 @@ function Dashboard() {
   // Minutes in the ring always come with at least one line beside them.
   const hasProgressToday = minutesToday > 0 || learningCards.some((card) => card.state !== "empty");
   const minutesToGoal = Math.max(profile?.daily_minutes ?? 0, 0) - minutesToday;
+  // The first time today the student sees the daily goal reached (user request).
+  const celebrateGoal = useCelebrate(
+    "daily-goal",
+    !!profile && profile.daily_minutes > 0 && minutesToday >= profile.daily_minutes,
+  );
 
   return (
     <AppShell dashboardLayout>
@@ -540,7 +548,13 @@ function Dashboard() {
               </div>
               <div className="mb-2.5 mt-3 grid flex-1 grid-cols-[5.25rem_auto] items-center justify-center gap-x-5 gap-y-1.5 lg:mb-0 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
                 <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
-                  <div className="relative grid size-[5.25rem] place-items-center text-brand-green lg:size-24 2xl:size-30">
+                  <div
+                    className={cn(
+                      "relative grid size-[5.25rem] place-items-center text-brand-green lg:size-24 2xl:size-30",
+                      celebrateGoal && "animate-celebrate",
+                    )}
+                  >
+                    <CelebrationBurst active={celebrateGoal} />
                     <svg
                       className="absolute inset-0 size-full -rotate-90"
                       viewBox="0 0 96 96"

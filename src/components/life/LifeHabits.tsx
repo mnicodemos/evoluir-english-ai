@@ -23,6 +23,7 @@ import {
   type LifeHabitFrequency,
   type LifeHabitLog,
 } from "@/lib/life";
+import { haptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 
 const FREQUENCY_LABEL: Record<LifeHabitFrequency, string> = {
@@ -44,6 +45,9 @@ function useHabitToggle(onChange: () => void) {
   return useMutation({
     mutationFn: (input: { habitId: string; day: string; done: boolean }) =>
       setDone({ data: input }),
+    onMutate: (input) => {
+      if (input.done) haptic("tap");
+    },
     onSuccess: onChange,
     onError: () => toast.error(t("The habit could not be saved.")),
   });
