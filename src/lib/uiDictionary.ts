@@ -1582,6 +1582,8 @@ const baseUiPt: Record<string, string> = {
   "Weekly league": "Liga semanal",
   "Monday to Sunday · resets every Monday": "Segunda a domingo · recomeça toda segunda",
   Ranking: "Ranking",
+  "You are the only one in your level's league this week. Each level has its own league, so students at other levels compete in theirs.":
+    "Você é o único da liga do seu nível nesta semana. Cada nível tem a sua liga, então alunos de outros níveis competem na deles.",
   "No one at your level joined the league this week yet.":
     "Ninguém do seu nível entrou na liga nesta semana ainda.",
   "(you)": "(você)",

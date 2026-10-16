@@ -161,6 +161,14 @@ function League() {
               ))}
             </ol>
           )}
+          {/* Alone in the ranking: say why the others are not here (user report:
+              the league groups students by level). */}
+          {!isLoading && !loadError && ranking.length === 1 && ranking[0]?.is_me && (
+            <p className="pt-1 text-center text-xs text-muted-foreground">
+              You are the only one in your level&apos;s league this week. Each level has its own
+              league, so students at other levels compete in theirs.
+            </p>
+          )}
         </section>
 
         <aside className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
