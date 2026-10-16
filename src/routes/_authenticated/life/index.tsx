@@ -5,6 +5,7 @@ import { Check, Star, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
 import { CoachSection } from "@/components/life/CoachSection";
 import { GoalsSection } from "@/components/life/GoalsSection";
@@ -15,11 +16,13 @@ import { RoutineSection } from "@/components/life/RoutineSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCelebrate } from "@/hooks/useCelebrate";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { lifeDayProgress } from "@/lib/life";
 import { setLifePriority } from "@/lib/life.functions";
 import { loadPlus } from "@/lib/plus.functions";
+import { haptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/life/")({
@@ -206,6 +209,9 @@ function PriorityCard({
   const mutate = useMutation({
     mutationFn: (input: { text?: string; done?: boolean; clear?: boolean }) =>
       save({ data: input }),
+    onMutate: (input) => {
+      if (input.done) haptic("tap");
+    },
     onSuccess: () => {
       setEditing(false);
       setText("");
@@ -308,8 +314,16 @@ function PriorityCard({
 function DayRing({ percent }: { percent: number | null }) {
   const radius = 34;
   const circumference = 2 * Math.PI * radius;
+  // The whole day done: the ring pops once today (user request).
+  const celebrate = useCelebrate("life-day", percent === 100);
   return (
-    <div className="relative grid size-24 shrink-0 place-items-center sm:size-28">
+    <div
+      className={cn(
+        "relative grid size-24 shrink-0 place-items-center sm:size-28",
+        celebrate && "animate-celebrate",
+      )}
+    >
+      <CelebrationBurst active={celebrate} />
       <svg viewBox="0 0 80 80" className="absolute inset-0 -rotate-90" aria-hidden="true">
         <circle
           cx="40"

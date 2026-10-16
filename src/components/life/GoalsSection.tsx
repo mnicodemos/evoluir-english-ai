@@ -24,6 +24,7 @@ import {
 } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { haptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 
 /**
@@ -92,6 +93,9 @@ export function GoalsSection() {
   });
   const toggleStep = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setDone({ data: input }),
+    onMutate: (input) => {
+      if (input.done) haptic("tap");
+    },
     onSuccess: refresh,
     onError: () => toast.error(t("The step could not be saved.")),
   });

@@ -15,6 +15,7 @@ import {
 } from "@/lib/life.functions";
 import type { LifeGoal } from "@/lib/life.functions";
 import { LIFE_PRIORITIES, type LifePriorityLevel, type LifeTask } from "@/lib/life";
+import { haptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 
 const PRIORITY_LABEL: Record<LifePriorityLevel, string> = {
@@ -49,6 +50,9 @@ export function LifeTaskList({
   const [editingId, setEditingId] = useState<string | null>(null);
   const toggle = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setDone({ data: input }),
+    onMutate: (input) => {
+      if (input.done) haptic("tap");
+    },
     onSuccess: onChange,
     onError: () => toast.error(t("The task could not be saved.")),
   });

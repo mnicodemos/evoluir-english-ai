@@ -339,6 +339,12 @@
   stroke-width: 2.4;
 }
 
+@media (display-mode: standalone) {
+  body {
+    overscroll-behavior-y: none;
+  }
+}
+
 /* Touch screens: links and buttons give way slightly under the finger, like a
    native app (scale is its own property, so translate and rotate utilities on
    the same element keep working). */
@@ -364,6 +370,38 @@
   animation: page-in 0.22s ease-out;
 }
 
+/* A reached goal (useCelebrate): the ring pops and sparks fly out. */
+@keyframes celebrate-pop {
+  0% {
+    scale: 1;
+  }
+  35% {
+    scale: 1.08;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@utility animate-celebrate {
+  animation: celebrate-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes burst-dot {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--burst-angle)) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--burst-angle)) translateY(-3.4rem) scale(0.4);
+  }
+}
+
+@utility animate-burst-dot {
+  animation: burst-dot 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -385,7 +423,8 @@
   }
 
   /* App feel on phones (user request: a sophisticated app): no grey flash on
-     tap and no rubber-band bounce that shows the browser behind the page. */
+     tap; the installed app also loses the rubber-band bounce, while a browser
+     tab keeps it, since there it carries Chrome's pull-to-refresh. */
   html {
     -webkit-tap-highlight-color: transparent;
   }
@@ -395,7 +434,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    overscroll-behavior-y: none;
+    /* Digits of one width, so counters never shift as they change (5/10 → 6/10). */
+    font-variant-numeric: tabular-nums;
   }
 
   h1,
