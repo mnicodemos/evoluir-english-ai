@@ -8,7 +8,7 @@ import { getBusinessCourse } from "@/lib/businessCourse";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
-import { PremiumBadge } from "@/components/PremiumBadge";
+import { PremiumBadge, useIsPremium } from "@/components/PremiumBadge";
 
 /**
  * Dashboard (desktop): Business English beside today's goals (user request:
@@ -21,6 +21,9 @@ export function BusinessDashboardCard() {
   const { data: profile } = useProfile();
   const { data: lessons } = useLessons();
   const { data: mine } = useUserLessons();
+  // Free students see the card in its place, disabled, with the Premium badge
+  // (user request); it opens the plans instead of the track.
+  const locked = useIsPremium() === false;
 
   const { completed, total, next } = useMemo(() => {
     const course = getBusinessCourse(profile?.max_level || profile?.level);
@@ -48,7 +51,10 @@ export function BusinessDashboardCard() {
 
   return (
     <section
-      className="card-soft relative flex min-w-0 flex-col p-3 xl:h-full xl:min-h-0 xl:px-4 xl:py-3"
+      className={cn(
+        "card-soft relative flex min-w-0 flex-col p-3 xl:h-full xl:min-h-0 xl:px-4 xl:py-3",
+        locked && "[&>*:not(:first-child)]:opacity-50",
+      )}
       aria-labelledby="business-card-title"
     >
       <div className="flex items-center gap-2">
@@ -93,10 +99,10 @@ export function BusinessDashboardCard() {
             {completed}/{total}
           </span>
           <Link
-            to="/business"
+            to={locked ? "/premium" : "/business"}
             className="inline-flex shrink-0 items-center gap-0.5 rounded-md text-[11px] font-semibold text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
           >
-            {completed > 0 ? t("Continue") : t("Start")}
+            {locked ? t("See plans") : completed > 0 ? t("Continue") : t("Start")}
             <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
           </Link>
         </div>

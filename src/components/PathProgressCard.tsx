@@ -253,30 +253,16 @@ export function PathProgressCard({
                   aria-hidden="true"
                 />
                 <span className="truncate font-medium">{t(meta.label)}</span>
-                {row.value === null && !skillsLoading ? (
-                  // Never measured: say so plainly instead of an empty bar and a dash.
-                  <span className="col-span-2 truncate text-[11px] text-muted-foreground">
-                    {t("Not measured yet")}
-                  </span>
-                ) : (
-                  <>
-                    {row.value === null ? (
-                      <span
-                        className={`rounded-full border border-dashed border-border ${RING_STROKE_BAR}`}
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <Progress
-                        value={row.value}
-                        aria-label={t(meta.label)}
-                        className={`bg-secondary/80 ${RING_STROKE_BAR} ${tone.bar}`}
-                      />
-                    )}
-                    <span className="text-right font-semibold text-foreground">
-                      {skillsLoading ? "…" : `${row.value}%`}
-                    </span>
-                  </>
-                )}
+                {/* Never measured: an empty bar and no number (user request);
+                    the "No data" badge says why. */}
+                <Progress
+                  value={row.value ?? 0}
+                  aria-label={t(meta.label)}
+                  className={`bg-secondary/80 ${RING_STROKE_BAR} ${tone.bar}`}
+                />
+                <span className="text-right font-semibold text-foreground">
+                  {skillsLoading ? "…" : row.value === null ? "" : `${row.value}%`}
+                </span>
                 <span
                   className={`truncate rounded-full px-1.5 py-1 text-center text-[10px] font-semibold ${tone.badge}`}
                 >
