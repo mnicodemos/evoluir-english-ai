@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
   BellOff,
+  BookMarked,
   BookOpen,
   Briefcase,
   CalendarCheck,
@@ -286,6 +287,18 @@ export function MobileNavigationMenu({
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
           <UtilityButtons variant="sheet" />
+          {/* The app guide ("Diário de bordo", user request) sits with the settings rows. */}
+          <SheetClose asChild>
+            <Link
+              to="/guide"
+              className="flex h-11 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              activeProps={{ className: "text-brand-green" }}
+              inactiveProps={{ className: "text-sidebar-foreground/70" }}
+            >
+              <BookMarked className="size-5 shrink-0" />
+              <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
+            </Link>
+          </SheetClose>
           <SheetClose asChild>
             <Link
               to="/premium"
@@ -484,6 +497,16 @@ function AppShellContent({
           <div className="flex flex-col items-stretch gap-1">
             <div className="flex flex-col items-stretch gap-0.5 border-t border-sidebar-border pb-1 pt-2">
               <UtilityButtons variant="sidebar" />
+              {/* The app guide ("Diário de bordo", user request). */}
+              <Link
+                to="/guide"
+                className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                activeProps={{ className: "text-brand-green" }}
+                inactiveProps={{ className: "text-sidebar-foreground/70" }}
+              >
+                <BookMarked className="size-5 shrink-0" />
+                <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
+              </Link>
               <Link
                 to="/premium"
                 className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"

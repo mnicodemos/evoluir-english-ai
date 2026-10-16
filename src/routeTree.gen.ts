@@ -23,6 +23,7 @@ import { Route as AuthenticatedCallRouteImport } from './routes/_authenticated/c
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
+import { Route as AuthenticatedGuideRouteImport } from './routes/_authenticated/guide'
 import { Route as AuthenticatedLeagueRouteImport } from './routes/_authenticated/league'
 import { Route as AuthenticatedListeningRouteImport } from './routes/_authenticated/listening'
 import { Route as AuthenticatedMistakesRouteImport } from './routes/_authenticated/mistakes'
@@ -118,6 +119,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGuideRoute = AuthenticatedGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLeagueRoute = AuthenticatedLeagueRouteImport.update({
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/coach': typeof AuthenticatedCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/goals': typeof AuthenticatedGoalsRoute
+  '/guide': typeof AuthenticatedGuideRoute
   '/league': typeof AuthenticatedLeagueRoute
   '/listening': typeof AuthenticatedListeningRoute
   '/mistakes': typeof AuthenticatedMistakesRoute
@@ -313,6 +320,7 @@ export interface FileRoutesByTo {
   '/coach': typeof AuthenticatedCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/goals': typeof AuthenticatedGoalsRoute
+  '/guide': typeof AuthenticatedGuideRoute
   '/league': typeof AuthenticatedLeagueRoute
   '/listening': typeof AuthenticatedListeningRoute
   '/mistakes': typeof AuthenticatedMistakesRoute
@@ -356,6 +364,7 @@ export interface FileRoutesById {
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/goals': typeof AuthenticatedGoalsRoute
+  '/_authenticated/guide': typeof AuthenticatedGuideRoute
   '/_authenticated/league': typeof AuthenticatedLeagueRoute
   '/_authenticated/listening': typeof AuthenticatedListeningRoute
   '/_authenticated/mistakes': typeof AuthenticatedMistakesRoute
@@ -399,6 +408,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/dashboard'
     | '/goals'
+    | '/guide'
     | '/league'
     | '/listening'
     | '/mistakes'
@@ -440,6 +450,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/dashboard'
     | '/goals'
+    | '/guide'
     | '/league'
     | '/listening'
     | '/mistakes'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
     | '/_authenticated/goals'
+    | '/_authenticated/guide'
     | '/_authenticated/league'
     | '/_authenticated/listening'
     | '/_authenticated/mistakes'
@@ -624,6 +636,13 @@ declare module '@tanstack/react-router' {
       path: '/goals'
       fullPath: '/goals'
       preLoaderRoute: typeof AuthenticatedGoalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/guide': {
+      id: '/_authenticated/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof AuthenticatedGuideRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/league': {
@@ -819,6 +838,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
+  AuthenticatedGuideRoute: typeof AuthenticatedGuideRoute
   AuthenticatedLeagueRoute: typeof AuthenticatedLeagueRoute
   AuthenticatedListeningRoute: typeof AuthenticatedListeningRoute
   AuthenticatedMistakesRoute: typeof AuthenticatedMistakesRoute
@@ -849,6 +869,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
+  AuthenticatedGuideRoute: AuthenticatedGuideRoute,
   AuthenticatedLeagueRoute: AuthenticatedLeagueRoute,
   AuthenticatedListeningRoute: AuthenticatedListeningRoute,
   AuthenticatedMistakesRoute: AuthenticatedMistakesRoute,

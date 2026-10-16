@@ -139,6 +139,14 @@ export function FirstWeekGuide({
             );
           })}
         </ol>
+        {/* The whole app, step by step ("Diário de bordo", user request). */}
+        <Link
+          to="/guide"
+          className="mt-3 inline-flex items-center gap-0.5 text-xs font-semibold text-brand-green"
+        >
+          {t("Full guide")}
+          <ChevronRight className="size-3.5" aria-hidden="true" />
+        </Link>
       </PopoverContent>
     </Popover>
   );
