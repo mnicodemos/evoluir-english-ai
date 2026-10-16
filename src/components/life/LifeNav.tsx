@@ -4,6 +4,7 @@ import { BookMarked, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { PremiumBadge } from "@/components/PremiumBadge";
 
 export function useLifeT() {
   const { lang } = useUiLang();
@@ -24,10 +25,7 @@ export function LifeHeader() {
       <div className="min-w-0">
         <h1 className="flex items-center gap-2 text-xl font-bold lg:text-3xl">
           Life AI <span className="text-brand-green">+</span>
-          <span className="inline-flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
-            <Crown className="size-3" aria-hidden="true" />
-            {t("Premium bonus")}
-          </span>
+          <PremiumBadge />
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("Evolve one day at a time.")}</p>
       </div>

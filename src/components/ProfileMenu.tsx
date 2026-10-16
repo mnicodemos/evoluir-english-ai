@@ -185,7 +185,7 @@ export function ProfileMenu({
       aria-label={translate("Edit profile", lang)}
       className={cn(
         presentation === "dashboard-sidebar"
-          ? "h-auto w-full justify-start gap-2.5 rounded-lg px-1 pt-2 pb-4 text-sidebar-foreground hover:bg-transparent"
+          ? "h-auto w-full justify-start gap-3 rounded-lg px-1.5 py-1.5 text-sidebar-foreground hover:bg-sidebar-accent/60"
           : presentation === "mobile-menu"
             ? "h-11 w-full justify-start gap-2 rounded-lg px-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
@@ -206,12 +206,24 @@ export function ProfileMenu({
       {presentation !== "icon" && (
         <>
           <span className="min-w-0 flex-1 text-left">
-            <span className="block truncate text-xs font-semibold text-sidebar-foreground">
+            <span
+              className={cn(
+                "block truncate font-semibold text-sidebar-foreground",
+                presentation === "dashboard-sidebar" ? "text-sm" : "text-xs",
+              )}
+            >
               {displayName.split(/\s+/)[0]}
             </span>
             {presentation === "dashboard-sidebar" && (
-              <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
-                {profileIsPremium(profile) ? "Premium" : translate("Profile", lang)}
+              <span
+                className={cn(
+                  "mt-1 inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none",
+                  profileIsPremium(profile)
+                    ? "bg-warning text-warning-foreground"
+                    : "bg-sidebar-accent text-sidebar-foreground/70",
+                )}
+              >
+                {profileIsPremium(profile) ? "Premium" : "Free"}
               </span>
             )}
             {presentation === "mobile-menu" && profileIsPremium(profile) && (
@@ -308,24 +320,24 @@ export function ProfileMenu({
   if (presentation === "dashboard-sidebar") {
     return (
       <Popover open={open} onOpenChange={setOpen}>
-        {/* Two rows (user request): the icons on top (the profile's gear, then
-            the toolbar), the photo, name and plan below. */}
-        <div className="border-t border-sidebar-border pt-2">
-          <div className="flex items-center gap-1 px-1">
+        {/* One card (user request: the two loose rows looked cramped): the
+            photo, name and plan on top, then the gear, language and bell as
+            three equal buttons under a divider. */}
+        <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/25 p-1.5">
+          <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
+          <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-sidebar-border pt-1.5">
             <Button
               ref={gearRef}
               variant="ghost"
-              size="icon"
               aria-label={translate("Edit profile", lang)}
               title={translate("Edit profile", lang)}
-              className="size-9 rounded-full text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              className="h-9 w-full rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               onClick={() => setOpen((value) => !value)}
             >
               <Settings className="size-[1.15rem]" aria-hidden="true" />
             </Button>
             {toolbar}
           </div>
-          <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
         </div>
         <PopoverContent
           side="top"

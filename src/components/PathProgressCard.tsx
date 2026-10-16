@@ -262,14 +262,14 @@ export function PathProgressCard({
                   <>
                     {row.value === null ? (
                       <span
-                        className="h-2.5 rounded-full border border-dashed border-border"
+                        className={`rounded-full border border-dashed border-border ${RING_STROKE_BAR}`}
                         aria-hidden="true"
                       />
                     ) : (
                       <Progress
                         value={row.value}
                         aria-label={t(meta.label)}
-                        className={`h-2.5 bg-secondary/80 ${tone.bar}`}
+                        className={`bg-secondary/80 ${RING_STROKE_BAR} ${tone.bar}`}
                       />
                     )}
                     <span className="text-right font-semibold text-foreground">
@@ -327,6 +327,13 @@ const STATUS_LABEL: Record<SkillMeterStatus, string> = {
   needs_work: "Needs work",
   not_measured: "No data",
 };
+
+/**
+ * Desktop bars as thick as the Your learning rhythm ring (user request): its
+ * stroke is 11 of 96 units, so 11 px on the 96 px ring and 13.75 px on the
+ * 120 px ring from 2xl. Phones keep the thinner bar.
+ */
+const RING_STROKE_BAR = "h-2.5 lg:h-[11px] 2xl:h-[13.75px]";
 
 const STATUS_TONE: Record<SkillMeterStatus, { bar: string; badge: string }> = {
   // One hue per status, and only on the bar and badge: the priority skill is

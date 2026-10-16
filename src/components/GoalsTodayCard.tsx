@@ -34,6 +34,7 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
+import { PremiumBadge } from "@/components/PremiumBadge";
 
 /**
  * Dashboard (desktop): today's goal steps, ticked right here. It took the row
@@ -144,11 +145,9 @@ export function GoalsTodayCard() {
             </span>
           </Link>
         ) : null}
-        {/* The same Premium bonus pill as Business English (user request). */}
-        <span className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
-          <Crown className="size-3" aria-hidden="true" />
-          {t("Premium bonus")}
-        </span>
+        {/* Free students only: the same Premium badge as Business English. */}
+        <span className="ml-auto" aria-hidden="true" />
+        <PremiumBadge />
         <GoalChecks
           done={Array.from({ length: PLUS_MAX_GOALS }, (_, index) => {
             const goal = goals[index];

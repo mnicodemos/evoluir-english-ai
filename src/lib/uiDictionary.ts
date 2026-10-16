@@ -1767,7 +1767,6 @@ const baseUiPt: Record<string, string> = {
   "Extra practice done for today": "Prática extra concluída hoje",
   "New options appear tomorrow.": "Novas opções aparecem amanhã.",
   "Nothing else to review right now.": "Nada mais para revisar agora.",
-  "Premium bonus": "Bônus Premium",
   "Business English": "Inglês para Negócios",
   "Meetings, e-mails, presentations, interviews, negotiation and networking, written at your level.":
     "Reuniões, e-mails, apresentações, entrevistas, negociação e networking, no seu nível.",
