@@ -34,7 +34,6 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
-import { PremiumBadge } from "@/components/PremiumBadge";
 
 /**
  * Dashboard (desktop): today's goal steps, ticked right here. It took the row
@@ -145,9 +144,7 @@ export function GoalsTodayCard() {
             </span>
           </Link>
         ) : null}
-        {/* Free students only: the same Premium badge as Business English. */}
         <span className="ml-auto" aria-hidden="true" />
-        <PremiumBadge />
         <GoalChecks
           done={Array.from({ length: PLUS_MAX_GOALS }, (_, index) => {
             const goal = goals[index];
