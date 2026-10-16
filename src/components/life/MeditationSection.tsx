@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 type Phase = "list" | "playing" | "done";
 
 /**
- * Meditations in English inside Life AI (meditations.ts): EVO reads a short
+ * Meditations in English inside Life+ AI (meditations.ts): EVO reads a short
  * guided session line by line, slowly, with the text on screen (Portuguese
  * on request); the minutes count toward the day's goal (activity
  * "meditation"). Calm breathing is free; the other sessions are Premium.

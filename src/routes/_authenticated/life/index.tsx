@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/life/")({
   head: () => ({
     meta: [
-      { title: "Life AI - Evoluir+ English AI" },
+      { title: "Life+ AI - Evoluir+ English AI" },
       {
         name: "description",
         content: "Your goals, routine and habits in one place. Evolve one day at a time.",
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_authenticated/life/")({
 });
 
 /**
- * Life AI on one page (user request: one page instead of tabs): the day and
+ * Life+ AI on one page (user request: one page instead of tabs): the day and
  * its priority on top, then Goals, Routine with Habits, and the Life Coach
  * side by side on desktop, stacked on phones. Old tab addresses (/goals,
  * /life/routine, /life/habits, /life/coach) open this page at their section.

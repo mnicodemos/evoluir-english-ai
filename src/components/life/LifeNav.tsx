@@ -14,8 +14,8 @@ export function useLifeT() {
 }
 
 /**
- * Header of the one-page Life AI: name, slogan and the visual guide (user
- * request). No Premium badge: Life AI mixes free and Premium parts.
+ * Header of the one-page Life+ AI: name, slogan and the visual guide (user
+ * request). No Premium badge: Life+ AI mixes free and Premium parts.
  */
 export function LifeHeader() {
   const { t } = useLifeT();
@@ -23,21 +23,26 @@ export function LifeHeader() {
     <header className="mb-4 flex flex-wrap items-start gap-x-4 gap-y-2">
       <div className="min-w-0">
         <h1 className="flex items-center gap-2 text-xl font-bold lg:text-3xl">
-          Life AI <span className="text-brand-green">+</span>
+          {/* The name with its plus in the brand colour, like Evoluir+. */}
+          <span translate="no">
+            {"Life"}
+            <span className="text-brand-green">+</span>
+            {" AI"}
+          </span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("Evolve one day at a time.")}</p>
       </div>
       <Button asChild variant="outline" size="sm" className="ml-auto gap-1.5">
         <Link to="/life/guide">
           <BookMarked className="size-4" aria-hidden="true" />
-          {t("How Life AI works")}
+          {t("How Life+ AI works")}
         </Link>
       </Button>
     </header>
   );
 }
 
-/** What Premium adds to Life AI, each marked with a gold crown for free students. */
+/** What Premium adds to Life+ AI, each marked with a gold crown for free students. */
 const PREMIUM_ITEMS = [
   "Priority of the day",
   "Routine",
@@ -46,7 +51,7 @@ const PREMIUM_ITEMS = [
   "All meditations",
 ] as const;
 
-/** Shown to free students in place of the Premium parts of Life AI (Goals stay free). */
+/** Shown to free students in place of the Premium parts of Life+ AI (Goals stay free). */
 export function LifePremiumGate({ feature }: { feature: string }) {
   const { t } = useLifeT();
   return (

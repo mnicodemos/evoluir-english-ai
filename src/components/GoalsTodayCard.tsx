@@ -105,7 +105,7 @@ export function GoalsTodayCard() {
       aria-labelledby="goals-today-title"
     >
       <div className="flex items-center gap-2">
-        {/* Life AI holds the goals (user decision): the title opens it, and
+        {/* Life+ AI holds the goals (user decision): the title opens it, and
             Premium students also see today's tasks and habits at a glance. */}
         <Sprout
           className="size-[1.65rem] shrink-0 text-brand-green"
@@ -114,7 +114,7 @@ export function GoalsTodayCard() {
         />
         <h2 id="goals-today-title" className="font-display text-sm font-semibold">
           <Link to="/life" className="hover:text-brand-green">
-            Life AI <span className="font-normal text-muted-foreground">· {t("Goals today")}</span>
+            Life+ AI <span className="font-normal text-muted-foreground">· {t("Goals today")}</span>
           </Link>
         </h2>
         {life?.premium && lifeDay ? (

@@ -20,7 +20,7 @@ import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 /**
- * Goals inside the one-page Life AI (user request: one page instead of tabs):
+ * Goals inside the one-page Life+ AI (user request: one page instead of tabs):
  * the evolution score and each goal with EVO's step of the day, its deadline
  * and milestones. Goals stay free and keep counting toward the streak.
  */

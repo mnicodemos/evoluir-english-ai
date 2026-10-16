@@ -3,10 +3,10 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
-  // Life AI visual guide (/life/guide)
-  "How Life AI works": "Como funciona o Life AI",
+  // Life+ AI visual guide (/life/guide)
+  "How Life+ AI works": "Como funciona o Life+ AI",
   "Your daily cycle": "Seu ciclo diário",
-  "Open Life AI": "Abrir o Life AI",
+  "Open Life+ AI": "Abrir o Life+ AI",
   "Set your goals": "Defina suas metas",
   "Up to 3 goals, with a deadline and milestones.": "Até 3 metas, com prazo e etapas.",
   "EVO gives a step": "A EVO dá um passo",
@@ -60,7 +60,7 @@ const baseUiPt: Record<string, string> = {
     "Comece pequeno: guarde 10% do que receber esta semana.",
   "Save 10% this week": "Guardar 10% esta semana",
   "3 min": "3 min",
-  // Meditations in English (Life AI)
+  // Meditations in English (Life+ AI)
   "Meditations in English": "Meditações em inglês",
   "Relax and train your listening: EVO guides you slowly, with the text on screen.":
     "Relaxe e treine sua escuta: a EVO conduz devagar, com o texto na tela.",
@@ -83,8 +83,8 @@ const baseUiPt: Record<string, string> = {
   "In the middle of work or study": "No meio do trabalho ou do estudo",
   "Try a meditation in English to relax and train your listening.":
     "Experimente uma meditação em inglês para relaxar e treinar a escuta.",
-  // Life AI (phase 1)
-  "Life AI": "Life AI",
+  // Life+ AI (phase 1)
+  "Life+ AI": "Life+ AI",
   "Evolve one day at a time.": "Evolua um dia de cada vez.",
   Tomorrow: "Amanhã",
   Yesterday: "Ontem",
@@ -148,8 +148,8 @@ const baseUiPt: Record<string, string> = {
   "It could not be added.": "Não foi possível adicionar.",
   "You can keep up to 12 habits.": "Você pode manter até 12 hábitos.",
   "A goal keeps up to 12 milestones.": "Uma meta tem no máximo 12 etapas.",
-  "Life AI routine, habits and coach are Premium.":
-    "Rotina, hábitos e coach do Life AI são Premium.",
+  "Life+ AI routine, habits and coach are Premium.":
+    "Rotina, hábitos e coach do Life+ AI são Premium.",
   "Only this week's days can be marked.": "Só dá para marcar os dias desta semana.",
   "What matters most today?": "O que mais importa hoje?",
   "Write to your Life Coach": "Escreva para sua Life Coach",
@@ -1726,7 +1726,7 @@ const baseUiPt: Record<string, string> = {
   "All 3 listening tasks completed!": "As 3 tarefas de listening foram concluídas!",
   "Sessions today": "Sessões hoje",
   "Delete priority": "Apagar prioridade",
-  "Life AI tasks for today": "Tarefas do Life AI para hoje",
+  "Life+ AI tasks for today": "Tarefas do Life+ AI para hoje",
   "Add a goal": "Adicionar uma meta",
   "Task today": "Tarefa de hoje",
   "Habit today": "Hábito de hoje",

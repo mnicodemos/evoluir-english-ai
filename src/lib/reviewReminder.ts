@@ -69,24 +69,24 @@ export function studyReminder(
 }
 
 /**
- * Life AI's open tasks of the day (user request: notify them), as a line of
+ * Life+ AI's open tasks of the day (user request: notify them), as a line of
  * the morning push and the evening reminder.
  */
 export function lifeTasksLinePt(open: number): string {
   if (open <= 0) return "";
   return open === 1
-    ? "📝 1 tarefa do Life AI para hoje"
-    : `📝 ${open} tarefas do Life AI para hoje`;
+    ? "📝 1 tarefa do Life+ AI para hoje"
+    : `📝 ${open} tarefas do Life+ AI para hoje`;
 }
 
-/** Evening push for a student whose study day is done but whose Life AI tasks are still open. */
+/** Evening push for a student whose study day is done but whose Life+ AI tasks are still open. */
 export function lifeTasksReminder(open: number): { title: string; body: string; path: string } {
   return {
     title: "Suas tarefas de hoje 📝",
     body:
       open === 1
-        ? "Ainda falta 1 tarefa do Life AI para hoje. Marque quando concluir!"
-        : `Ainda faltam ${open} tarefas do Life AI para hoje. Marque quando concluir!`,
+        ? "Ainda falta 1 tarefa do Life+ AI para hoje. Marque quando concluir!"
+        : `Ainda faltam ${open} tarefas do Life+ AI para hoje. Marque quando concluir!`,
     path: "/life",
   };
 }

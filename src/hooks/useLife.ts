@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useProfile } from "@/hooks/useProfile";
 import { loadLife } from "@/lib/life.functions";
 
-/** Life AI data (goals' deadline and milestones, routine, habits, priority) in one cached read. */
+/** Life+ AI data (goals' deadline and milestones, routine, habits, priority) in one cached read. */
 export function useLife() {
   const { data: profile } = useProfile();
   const load = useServerFn(loadLife);

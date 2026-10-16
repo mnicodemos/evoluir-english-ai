@@ -261,7 +261,7 @@ async function sendDailyPush(
     }
   };
 
-  // Life AI tasks of the day still open (user request: notify them); a
+  // Life+ AI tasks of the day still open (user request: notify them); a
   // failure only leaves the line out.
   const openLifeTasks = async (userId: string) => {
     try {
@@ -341,7 +341,7 @@ async function sendDailyPush(
       // last_activity_date is set only when the day's goal is met (credit_study_day).
       const tasksOpen = await openLifeTasks(p.id);
       if (p.last_activity_date === today) {
-        // The study day is done, but the day's Life AI tasks are still open.
+        // The study day is done, but the day's Life+ AI tasks are still open.
         if (tasksOpen > 0) messages.set(p.id, lifeTasksReminder(tasksOpen));
         return;
       }

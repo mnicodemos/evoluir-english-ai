@@ -18,7 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * A goal's plan inside Life AI (from the owner's module): a deadline and
+ * A goal's plan inside Life+ AI (from the owner's module): a deadline and
  * milestones with their progress, next to EVO's step of the day.
  */
 export function GoalPlan({

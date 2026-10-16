@@ -20,7 +20,7 @@ export type HomeChoice = { goal?: string; task?: string; habit?: string };
 const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 } as const;
 
 /**
- * Which goal, task and habit the Dashboard's Life AI card shows (user request:
+ * Which goal, task and habit the Dashboard's Life+ AI card shows (user request:
  * one of each, the student picks which when there are more). Kept in this
  * browser per student; read after mount so server and client agree.
  */

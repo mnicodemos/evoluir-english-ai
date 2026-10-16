@@ -27,11 +27,11 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/life/guide")({
   head: () => ({
     meta: [
-      { title: "How Life AI works - Evoluir+ English AI" },
+      { title: "How Life+ AI works - Evoluir+ English AI" },
       {
         name: "description",
         content:
-          "A visual guide to Life AI: goals, routine, habits, the Life Coach and meditations.",
+          "A visual guide to Life+ AI: goals, routine, habits, the Life Coach and meditations.",
       },
     ],
   }),
@@ -62,9 +62,9 @@ type Feature = {
 };
 
 /**
- * Life AI's own guide (user request): the daily cycle as a diagram and one
+ * Life+ AI's own guide (user request): the daily cycle as a diagram and one
  * card per part with a small drawing of its screen, the steps and whether it
- * is free or Premium. Opens from the Life AI header.
+ * is free or Premium. Opens from the Life+ AI header.
  */
 function LifeGuidePage() {
   const { t } = useLifeT();
@@ -154,9 +154,9 @@ function LifeGuidePage() {
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
-        Life AI
+        Life+ AI
       </Link>
-      <h1 className="mt-2 text-xl font-bold lg:text-3xl">{t("How Life AI works")}</h1>
+      <h1 className="mt-2 text-xl font-bold lg:text-3xl">{t("How Life+ AI works")}</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {t("Your goals, routine and habits in one place, with EVO as your Life Coach.")}
       </p>
@@ -249,7 +249,7 @@ function LifeGuidePage() {
       <div className="mt-6 flex justify-center">
         <Button asChild className="gap-1 bg-brand-green text-sidebar hover:bg-brand-green/90">
           <Link to="/life">
-            {t("Open Life AI")}
+            {t("Open Life+ AI")}
             <ChevronRight className="size-4" aria-hidden="true" />
           </Link>
         </Button>

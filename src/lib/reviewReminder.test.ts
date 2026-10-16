@@ -49,11 +49,11 @@ describe("vocabulary review reminder", () => {
   });
 });
 
-describe("Life AI tasks in the pushes", () => {
+describe("Life+ AI tasks in the pushes", () => {
   it("counts the open tasks of the day", () => {
     expect(lifeTasksLinePt(0)).toBe("");
-    expect(lifeTasksLinePt(1)).toBe("📝 1 tarefa do Life AI para hoje");
-    expect(lifeTasksLinePt(3)).toBe("📝 3 tarefas do Life AI para hoje");
+    expect(lifeTasksLinePt(1)).toBe("📝 1 tarefa do Life+ AI para hoje");
+    expect(lifeTasksLinePt(3)).toBe("📝 3 tarefas do Life+ AI para hoje");
   });
 
   it("reminds the open tasks once the study day is done", () => {

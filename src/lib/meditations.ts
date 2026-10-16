@@ -1,5 +1,5 @@
 /**
- * Meditations in English (Life AI, user request): short guided sessions read
+ * Meditations in English (Life+ AI, user request): short guided sessions read
  * slowly by EVO's voice. They are listening practice in calm, clear English,
  * a daily habit and a light reason to open the app. Relaxation only, never
  * health or therapy claims. Scripts are fixed (not written by the AI each
