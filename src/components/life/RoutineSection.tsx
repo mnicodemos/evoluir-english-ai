@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
 import { useState } from "react";
 
-import { useLifeT } from "@/components/life/LifeNav";
+import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { LifeTaskForm, LifeTaskList } from "@/components/life/LifeTasks";
 import { Button } from "@/components/ui/button";
 import { useLife } from "@/hooks/useLife";
@@ -36,18 +36,19 @@ export function RoutineSection() {
   return (
     <section
       id="routine"
-      className="card-soft scroll-mt-4 p-4 sm:p-5"
+      className="card-soft scroll-mt-4 p-4 sm:p-5 xl:p-6"
       aria-labelledby="routine-title"
     >
-      <div className="flex items-center gap-2">
-        <ListChecks className="size-5 text-brand-green" aria-hidden="true" />
-        <h2 id="routine-title" className="text-base font-semibold capitalize">
-          {dayLabel(day, data.today, lang, t)}
-        </h2>
-        <span className="text-xs text-muted-foreground">
-          {done}/{tasks.length}
-        </span>
-        <div className="ml-auto flex gap-1">
+      <LifeSectionTitle
+        id="routine-title"
+        icon={ListChecks}
+        accent="sky"
+        title={dayLabel(day, data.today, lang, t)}
+        titleClassName="capitalize"
+        subtitle={t("Routine")}
+        meta={`${done}/${tasks.length}`}
+      >
+        <div className="flex gap-1">
           <Button
             variant="outline"
             size="icon"
@@ -74,7 +75,7 @@ export function RoutineSection() {
             <ChevronRight className="size-4" aria-hidden="true" />
           </Button>
         </div>
-      </div>
+      </LifeSectionTitle>
       <div className="mt-4">
         <LifeTaskForm key={day} day={day} goals={data.goals} onChange={refresh} />
       </div>

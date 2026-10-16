@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { GoalPlan } from "@/components/life/GoalPlan";
+import { LifeSectionTitle } from "@/components/life/LifeNav";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { EvoGuide } from "@/components/EvoGuide";
 import { Button } from "@/components/ui/button";
@@ -111,7 +112,7 @@ export function GoalsSection() {
 
   return (
     <div id="goals" className="grid h-full scroll-mt-4 grid-rows-[auto_1fr] gap-4">
-      <section className="card-soft p-4 sm:p-5" aria-labelledby="evolution-score-title">
+      <section className="card-soft p-4 sm:p-5 xl:p-6" aria-labelledby="evolution-score-title">
         <div className="flex items-center gap-4">
           <ScoreRing value={score.score} />
           <div className="min-w-0">
@@ -139,11 +140,19 @@ export function GoalsSection() {
         </p>
       </section>
 
-      <section className="card-soft p-4 sm:p-5" aria-labelledby="today-steps-title">
-        <h2 id="today-steps-title" className="flex items-center gap-2 text-base font-semibold">
-          <Target className="size-5 text-brand-green" aria-hidden="true" />
-          {t("Today's steps")}
-        </h2>
+      <section className="card-soft p-4 sm:p-5 xl:p-6" aria-labelledby="today-steps-title">
+        <LifeSectionTitle
+          id="today-steps-title"
+          icon={Target}
+          accent="green"
+          title={t("Today's steps")}
+          subtitle={t("One small step a day for each goal")}
+          meta={
+            goals.length
+              ? `${todaySteps.filter((step) => step.doneAt).length}/${todaySteps.length}`
+              : undefined
+          }
+        />
 
         {isLoading ? (
           <div className="mt-4 flex items-center gap-3 text-sm text-muted-foreground">

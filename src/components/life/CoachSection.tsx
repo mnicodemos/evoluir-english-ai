@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { EvoAvatar } from "@/components/EvoAvatar";
-import { useLifeT } from "@/components/life/LifeNav";
+import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLife } from "@/hooks/useLife";
@@ -121,13 +121,16 @@ export function CoachSection() {
   return (
     <section
       id="coach"
-      className="card-soft scroll-mt-4 flex flex-col gap-4 p-4 sm:p-5"
+      className="card-soft scroll-mt-4 flex flex-col gap-4 p-4 sm:p-5 xl:p-6"
       aria-labelledby="life-coach-title"
     >
-      <h2 id="life-coach-title" className="flex items-center gap-2 text-base font-semibold">
-        <Sparkles className="size-5 text-brand-green" aria-hidden="true" />
-        {t("Life Coach")}
-      </h2>
+      <LifeSectionTitle
+        id="life-coach-title"
+        icon={Sparkles}
+        accent="amber"
+        title={t("Life Coach")}
+        subtitle={t("Plan your day and goals with EVO")}
+      />
       {/* One page (user request): the conversation scrolls inside the card. */}
       <div className="flex max-h-[32rem] flex-col gap-4 overflow-y-auto pr-1">
         {messages.length === 0 ? (
