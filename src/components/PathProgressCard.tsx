@@ -248,7 +248,7 @@ export function PathProgressCard({
                 className="grid min-w-0 grid-cols-[1.5rem_4.25rem_minmax(0,1fr)_2.25rem_4.75rem] items-center gap-2 text-xs sm:grid-cols-[1.75rem_5rem_minmax(0,1fr)_2.5rem_5.25rem] sm:gap-2.5"
               >
                 <Icon
-                  className="size-[1.65rem] text-foreground/70"
+                  className="size-5 text-foreground/70 lg:size-[1.65rem]"
                   strokeWidth={2.5}
                   aria-hidden="true"
                 />
@@ -264,7 +264,8 @@ export function PathProgressCard({
                   {skillsLoading ? "…" : row.value === null ? "" : `${row.value}%`}
                 </span>
                 <span
-                  className={`truncate rounded-full px-1.5 py-1 text-center text-[10px] font-semibold ${tone.badge}`}
+                  // Phones: a lighter badge, so it never outweighs the bar (user request).
+                  className={`truncate rounded-full px-1.5 py-0.5 text-center text-[9.5px] font-medium lg:py-1 lg:text-[10px] lg:font-semibold ${tone.badge}`}
                 >
                   {t(STATUS_LABEL[row.status])}
                 </span>

@@ -398,7 +398,7 @@ function Dashboard() {
           <Skeleton className="h-56 w-full" />
         </div>
       ) : (
-        <div className="dashboard-one-screen flex h-full flex-col gap-[5px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(16.45rem,min-content)_minmax(min-content,1fr)_minmax(7.59rem,auto)] xl:gap-5 xl:pb-3">
+        <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(16.45rem,min-content)_minmax(min-content,1fr)_minmax(7.59rem,auto)] xl:gap-5 xl:pb-3">
           <header className="animate-rise min-w-0 xl:h-16">
             <EvoDailyReflection
               userId={profile.id}
@@ -652,7 +652,9 @@ function Dashboard() {
                             aria-hidden="true"
                           />
                           <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
-                            <span className={`font-display text-sm font-bold ${valueClass}`}>
+                            <span
+                              className={`font-display text-[13px] font-semibold lg:text-sm lg:font-bold ${valueClass}`}
+                            >
                               {card.value}
                             </span>
                             {/* Margin, not a space character: the value and its label
