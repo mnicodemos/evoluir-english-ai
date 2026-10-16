@@ -98,7 +98,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Evoluir+ English AI" },
-      { name: "theme-color", content: "#000000" },
+      // The app's own dark background, so the phone's status bar blends in.
+      { name: "theme-color", content: "#02060a" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -124,7 +125,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         media: "(prefers-color-scheme: dark)",
       },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=13" },
-      { rel: "manifest", href: "/site.webmanifest?v=13" },
+      { rel: "manifest", href: "/site.webmanifest?v=14" },
     ],
   }),
   shellComponent: RootShell,

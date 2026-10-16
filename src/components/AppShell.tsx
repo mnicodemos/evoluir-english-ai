@@ -512,7 +512,7 @@ function AppShellContent({
 
         <main
           className={cn(
-            "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
+            "animate-page-in w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
             !dashboardLayout && "flex-1",
             dashboardLayout &&
               "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-[5px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
