@@ -4,36 +4,47 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Check,
   ChevronRight,
-  Crown,
   Flame,
   ListChecks,
   Loader2,
-  Plus,
   Repeat,
   Search,
   Sprout,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
-import { EvoAvatar } from "@/components/EvoAvatar";
+import {
+  DayListPopover,
+  DoneCheck,
+  EmptySlot,
+  LifeSlot,
+  SLOT_ICONS,
+  SlotChooser,
+  habitDoneToday,
+  habitsToday,
+  pick,
+  tasksToday,
+  useHomeChoice,
+  useLifeActions,
+} from "@/components/LifeHomeSlots";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { lifeDayProgress } from "@/lib/life";
 import {
-  PLUS_GOAL_EXAMPLES,
-  PLUS_MAX_GOALS,
   plusDayComplete,
   plusGoalWeek,
   type PlusGoalWeek,
   type PlusStep,
 } from "@/lib/plus";
-import { addPlusGoal, loadPlus, setPlusStepDone } from "@/lib/plus.functions";
+import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
+
+const PRIORITY_TEXT = { high: "High", medium: "Medium", low: "Low" } as const;
 
 /**
  * Dashboard (desktop): today's goal steps, ticked right here. It took the row
@@ -47,7 +58,6 @@ export function GoalsTodayCard() {
   const queryClient = useQueryClient();
   const load = useServerFn(loadPlus);
   const setDone = useServerFn(setPlusStepDone);
-  const add = useServerFn(addPlusGoal);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["plus", profile?.id ?? null, lang],
@@ -60,11 +70,6 @@ export function GoalsTodayCard() {
     void queryClient.invalidateQueries({ queryKey: ["profile"] });
     void queryClient.invalidateQueries({ queryKey: ["qualified-study-days"] });
   };
-  const addGoal = useMutation({
-    mutationFn: (title: string) => add({ data: { title } }),
-    onSuccess: refresh,
-    onError: () => toast.error(t("The goal could not be saved.")),
-  });
   // The step just ticked gets the short celebration; a page load does not.
   const [justDone, setJustDone] = useState<string | null>(null);
   const toggle = useMutation({
@@ -90,6 +95,14 @@ export function GoalsTodayCard() {
         goalSteps: steps,
       })
     : null;
+  const actions = useLifeActions(t);
+  const { choice, choose } = useHomeChoice(profile?.id);
+  const todayTasks = life ? tasksToday(life) : [];
+  const dueHabits = life ? habitsToday(life) : [];
+  const shownGoal = pick(goals, choice.goal);
+  const shownStep = shownGoal ? (steps.find((item) => item.goalId === shownGoal.id) ?? null) : null;
+  const shownTask = pick(todayTasks, choice.task);
+  const shownHabit = pick(dueHabits, choice.habit);
 
   return (
     <section
@@ -110,54 +123,79 @@ export function GoalsTodayCard() {
           </Link>
         </h2>
         {life?.premium && lifeDay ? (
-          <span className="hidden items-center gap-2.5 text-[11px] text-muted-foreground 2xl:inline-flex">
-            <Link
-              to="/life/routine"
-              className="inline-flex items-center gap-1 hover:text-foreground"
-              title={t("Today's tasks")}
+          // The day's shortcuts open the whole list in a popup, ticked right
+          // here on the Dashboard (user request).
+          <span className="hidden items-center gap-2.5 xl:inline-flex">
+            <DayListPopover
+              icon={<ListChecks className="size-3.5" aria-hidden="true" />}
+              label={t("Today's tasks")}
+              count={`${lifeDay.tasksDone}/${lifeDay.tasksTotal}`}
             >
-              <ListChecks className="size-3.5" aria-hidden="true" />
-              {lifeDay.tasksDone}/{lifeDay.tasksTotal}
-            </Link>
-            <Link
-              to="/life/habits"
-              className="inline-flex items-center gap-1 hover:text-foreground"
-              title={t("Habits today")}
+              {todayTasks.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t("No tasks for this day yet.")}</p>
+              ) : (
+                <ul className="space-y-1.5">
+                  {todayTasks.map((task) => (
+                    <li key={task.id} className="flex items-center gap-2 text-sm">
+                      <DoneCheck
+                        done={!!task.doneAt}
+                        disabled={actions.task.isPending}
+                        label={task.doneAt ? t("Mark as not done") : t("Mark as done")}
+                        onToggle={() => actions.task.mutate({ id: task.id, done: !task.doneAt })}
+                      />
+                      <span
+                        translate="no"
+                        className={cn(
+                          "min-w-0",
+                          task.doneAt && "text-muted-foreground line-through",
+                        )}
+                      >
+                        {task.title}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </DayListPopover>
+            <DayListPopover
+              icon={<Repeat className="size-3.5" aria-hidden="true" />}
+              label={t("Habits today")}
+              count={`${lifeDay.habitsDone}/${lifeDay.habitsDue}`}
             >
-              <Repeat className="size-3.5" aria-hidden="true" />
-              {lifeDay.habitsDone}/{lifeDay.habitsDue}
-            </Link>
+              {dueHabits.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t("No habits due today.")}</p>
+              ) : (
+                <ul className="space-y-1.5">
+                  {dueHabits.map((habit) => {
+                    const checked = life ? habitDoneToday(life, habit.id) : false;
+                    return (
+                      <li key={habit.id} className="flex items-center gap-2 text-sm">
+                        <DoneCheck
+                          done={checked}
+                          disabled={actions.habit.isPending}
+                          label={checked ? t("Mark as not done") : t("Mark as done")}
+                          onToggle={() =>
+                            life &&
+                            actions.habit.mutate({
+                              habitId: habit.id,
+                              day: life.today,
+                              done: !checked,
+                            })
+                          }
+                        />
+                        <span translate="no" className="min-w-0">
+                          {habit.title}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </DayListPopover>
           </span>
-        ) : life && !life.premium ? (
-          // Free students see what Premium adds, each with a gold crown (user request).
-          <Link
-            to="/premium"
-            className="hidden items-center gap-2.5 text-[11px] text-muted-foreground hover:text-foreground 2xl:inline-flex"
-          >
-            <span className="inline-flex items-center gap-1">
-              <Crown className="size-3 text-amber-400" aria-hidden="true" />
-              {t("Routine")}
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Crown className="size-3 text-amber-400" aria-hidden="true" />
-              {t("Habits")}
-            </span>
-          </Link>
         ) : null}
-        <span className="ml-auto" aria-hidden="true" />
-        <GoalChecks
-          done={Array.from({ length: PLUS_MAX_GOALS }, (_, index) => {
-            const goal = goals[index];
-            return Boolean(goal && steps.find((item) => item.goalId === goal.id)?.doneAt);
-          })}
-          label={(count) =>
-            lang === "pt"
-              ? `${count} de ${PLUS_MAX_GOALS} metas concluídas hoje`
-              : `${count} of ${PLUS_MAX_GOALS} goals done today`
-          }
-        />
-        {/* No "Open goals" link here (user request): the sidebar and every free
-            slot already open /goals. */}
+        {/* No goal checks pill (user request: the card holds tasks and habits
+            too, so three goal checks read as the whole card). */}
       </div>
 
       {isLoading ? (
@@ -167,77 +205,142 @@ export function GoalsTodayCard() {
         </p>
       ) : isError ? (
         <p className="mt-2 text-xs text-muted-foreground">{t("Your goals could not be loaded.")}</p>
-      ) : goals.length === 0 ? (
-        // No goals yet: EVO's invitation beside the three example goals, each
-        // one tap away, so the row is filled with something to do.
-        <div className="mt-2 grid gap-2 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))]">
-          <div className="flex min-w-0 items-center gap-3">
-            <EvoAvatar decorative className="size-10 sm:size-11" />
-            <p className="min-w-0 text-sm">
-              {t("Choose 1 to 3 goals and I will give you one small step a day.")}
-            </p>
-          </div>
-          {PLUS_GOAL_EXAMPLES.map((example) => (
-            <button
-              key={example}
-              type="button"
-              disabled={addGoal.isPending}
-              onClick={() => addGoal.mutate(t(example))}
-              className="flex h-full min-h-11 min-w-0 items-center gap-2.5 rounded-lg bg-secondary/60 p-2 text-left text-xs font-medium transition-colors hover:bg-secondary"
-            >
-              <span
-                className="grid size-6 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green"
-                aria-hidden="true"
-              >
-                <Plus className="size-3.5" strokeWidth={3} />
-              </span>
-              <span className="min-w-0">{t(example)}</span>
-            </button>
-          ))}
-        </div>
       ) : (
-        // Three slots (user request): one per goal, and every free slot invites
-        // the next goal instead of sitting empty.
+        // One goal, one task and one habit (user request); when there are more,
+        // the student picks which one shows here.
         <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1">
-          {goals.map((goal) => {
-            const step = steps.find((item) => item.goalId === goal.id) ?? null;
-            return (
-              <GoalTile
-                key={goal.id}
-                goalId={goal.id}
-                title={goal.title}
-                step={step}
-                week={plusGoalWeek(recent, goal.id, data?.today ?? "")}
-                dayComplete={allDone}
-                stepsLeft={steps.filter((item) => !item.doneAt).length}
-                celebrate={!!step && justDone === step.id}
-                busy={toggle.isPending}
-                onToggle={(done) => step && toggle.mutate({ id: step.id, done })}
-                t={t}
-              />
-            );
-          })}
-          {Array.from({ length: PLUS_MAX_GOALS - goals.length }, (_, index) => (
-            <li key={`free-${index}`} className="min-w-0">
-              <Link
-                to="/goals"
-                className="flex h-full min-w-0 flex-col justify-center gap-0.5 rounded-lg border border-dashed border-border px-3 py-1.5 transition-colors hover:border-brand-green/50 hover:bg-secondary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-              >
-                <span className="flex items-center gap-1.5 text-xs font-semibold">
-                  <span
-                    className="grid size-5 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green"
-                    aria-hidden="true"
-                  >
-                    <Plus className="size-3" strokeWidth={3} />
-                  </span>
-                  {t("Add another goal")}
-                </span>
-                <span className="line-clamp-2 text-[11px] leading-snug text-muted-foreground">
-                  {t("Up to 3 goals, one small step a day.")}
-                </span>
-              </Link>
-            </li>
-          ))}
+          {shownGoal ? (
+            <GoalTile
+              key={shownGoal.id}
+              goalId={shownGoal.id}
+              title={shownGoal.title}
+              step={shownStep}
+              week={plusGoalWeek(recent, shownGoal.id, data?.today ?? "")}
+              dayComplete={allDone}
+              stepsLeft={steps.filter((item) => !item.doneAt).length}
+              celebrate={!!shownStep && justDone === shownStep.id}
+              busy={toggle.isPending}
+              onToggle={(done) => shownStep && toggle.mutate({ id: shownStep.id, done })}
+              chooser={
+                <SlotChooser
+                  items={goals}
+                  current={shownGoal.id}
+                  onChoose={(id) => choose("goal", id)}
+                  t={t}
+                />
+              }
+              t={t}
+            />
+          ) : (
+            <EmptySlot
+              kind={t("Add a goal")}
+              text={t("Choose 1 to 3 goals and I will give you one small step a day.")}
+              to="/life"
+              hash="goals"
+            />
+          )}
+          {!life ? (
+            <li className="rounded-lg bg-secondary/40" aria-hidden="true" />
+          ) : !life.premium ? (
+            <EmptySlot
+              kind={t("Routine")}
+              text={t("Plan the tasks of your day with Premium.")}
+              to="/premium"
+              premium
+            />
+          ) : shownTask ? (
+            <LifeSlot
+              kind={t("Task today")}
+              icon={SLOT_ICONS.task}
+              title={shownTask.title}
+              done={!!shownTask.doneAt}
+              details={
+                <p className="text-sm text-muted-foreground">
+                  {t("Priority")}: {t(PRIORITY_TEXT[shownTask.priority])}
+                </p>
+              }
+              chooser={
+                <SlotChooser
+                  items={todayTasks}
+                  current={shownTask.id}
+                  onChoose={(id) => choose("task", id)}
+                  t={t}
+                />
+              }
+              action={
+                <DoneCheck
+                  done={!!shownTask.doneAt}
+                  disabled={actions.task.isPending}
+                  label={shownTask.doneAt ? t("Mark as not done") : t("Mark as done")}
+                  onToggle={() =>
+                    actions.task.mutate({ id: shownTask.id, done: !shownTask.doneAt })
+                  }
+                />
+              }
+            />
+          ) : (
+            <EmptySlot
+              kind={t("Add a task")}
+              text={t("No tasks for this day yet.")}
+              to="/life"
+              hash="routine"
+            />
+          )}
+          {!life ? (
+            <li className="rounded-lg bg-secondary/40" aria-hidden="true" />
+          ) : !life.premium ? (
+            <EmptySlot
+              kind={t("Habits")}
+              text={t("Build habits one check-in a day with Premium.")}
+              to="/premium"
+              premium
+            />
+          ) : shownHabit ? (
+            <LifeSlot
+              kind={t("Habit today")}
+              icon={SLOT_ICONS.habit}
+              title={shownHabit.title}
+              done={habitDoneToday(life, shownHabit.id)}
+              details={
+                shownHabit.category ? (
+                  <p className="text-sm text-muted-foreground" translate="no">
+                    {shownHabit.category}
+                  </p>
+                ) : null
+              }
+              chooser={
+                <SlotChooser
+                  items={dueHabits}
+                  current={shownHabit.id}
+                  onChoose={(id) => choose("habit", id)}
+                  t={t}
+                />
+              }
+              action={
+                <DoneCheck
+                  done={habitDoneToday(life, shownHabit.id)}
+                  disabled={actions.habit.isPending}
+                  label={
+                    habitDoneToday(life, shownHabit.id) ? t("Mark as not done") : t("Mark as done")
+                  }
+                  onToggle={() =>
+                    actions.habit.mutate({
+                      habitId: shownHabit.id,
+                      day: life.today,
+                      done: !habitDoneToday(life, shownHabit.id),
+                    })
+                  }
+                />
+              }
+            />
+          ) : (
+            <EmptySlot
+              kind={t("Add a habit")}
+              text={t("No habits due today.")}
+              to="/life"
+              hash="habits"
+            />
+          )}
         </ul>
       )}
     </section>
@@ -260,8 +363,10 @@ function GoalTile({
   celebrate,
   busy,
   onToggle,
+  chooser,
   t,
 }: {
+  chooser?: ReactNode;
   goalId: string;
   title: string;
   step: PlusStep | null;
@@ -403,6 +508,7 @@ function GoalTile({
         <p className="min-w-0 flex-1 text-xs font-semibold leading-snug" translate="no">
           {title}
         </p>
+        {chooser}
         {/* The step opens right beside its magnifier (user request), not centred. */}
         <Popover open={detailsOpen} onOpenChange={setDetailsOpen}>
           <PopoverTrigger asChild>
@@ -453,44 +559,5 @@ function GoalTile({
         {actions}
       </div>
     </li>
-  );
-}
-
-/**
- * Three checks, one per goal slot, lit in teal as each goal's step of the day
- * is done, the border lit from the first one (user request); level with Business English's "Premium bonus" pill.
- */
-function GoalChecks({
-  done,
-  label,
-}: {
-  done: readonly boolean[];
-  label: (count: number) => string;
-}) {
-  const count = done.filter(Boolean).length;
-  // The border lights with the first goal done today (user request).
-  const anyDone = count > 0;
-  return (
-    <span
-      role="img"
-      aria-label={label(count)}
-      title={label(count)}
-      className={cn(
-        "inline-flex -translate-y-0.5 items-center gap-1 rounded-full border px-2 py-0.5 transition-colors",
-        anyDone ? "border-brand-green/50 bg-brand-green/10" : "border-white/15 bg-white/[0.03]",
-      )}
-    >
-      {done.map((lit, index) => (
-        <Check
-          key={index}
-          className={cn(
-            "size-[0.95rem] transition-colors",
-            lit ? "text-brand-green" : "text-muted-foreground/35",
-          )}
-          strokeWidth={3}
-          aria-hidden="true"
-        />
-      ))}
-    </span>
   );
 }
