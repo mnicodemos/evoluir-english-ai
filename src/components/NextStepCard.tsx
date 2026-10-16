@@ -350,7 +350,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               with room for the scope badge. From xl: top-aligned, the EVO label
               level with "Why this matters now" (same 12 px top padding and 22 px
               icon row; user request). */}
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:pt-4 max-sm:pb-5 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-4 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
             {/* Top-right of the priority column below xl; from xl it moves to the
                 "Why this matters now" column (see the aside). */}
             <ScopeBadge
@@ -375,7 +375,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 practice column (24 px from the card edge: the aside's 12 px
                 padding, the row border and its 10 px padding; user request);
                 the coach label stays at the top. */}
-            <div className="mt-2 flex items-center justify-between gap-3 sm:block xl:mt-auto">
+            {/* Phones: the same padding above the coach label and below the last
+                line, so EVO sits as far from the image as the reason line from the
+                card's bottom, with a little more room under the label (user request). */}
+            <div className="mt-3.5 flex items-center justify-between gap-3 sm:mt-2 sm:block xl:mt-auto">
               <div className="min-w-0 flex-1">
                 <div>
                   {/* No level badge here: next to the priority it read as part of it,
