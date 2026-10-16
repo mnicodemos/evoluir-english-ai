@@ -4,7 +4,6 @@ import { BookMarked, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
-import { PremiumBadge } from "@/components/PremiumBadge";
 
 export function useLifeT() {
   const { lang } = useUiLang();
@@ -15,8 +14,8 @@ export function useLifeT() {
 }
 
 /**
- * Header of the one-page Life AI: name, slogan, the Premium bonus pill (as
- * on Business English) and the visual guide (user request).
+ * Header of the one-page Life AI: name, slogan and the visual guide (user
+ * request). No Premium badge: Life AI mixes free and Premium parts.
  */
 export function LifeHeader() {
   const { t } = useLifeT();
@@ -25,7 +24,6 @@ export function LifeHeader() {
       <div className="min-w-0">
         <h1 className="flex items-center gap-2 text-xl font-bold lg:text-3xl">
           Life AI <span className="text-brand-green">+</span>
-          <PremiumBadge />
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("Evolve one day at a time.")}</p>
       </div>
