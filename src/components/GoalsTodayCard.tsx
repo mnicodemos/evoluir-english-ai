@@ -1,21 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Check,
-  ChevronRight,
-  Flame,
-  ListChecks,
-  Loader2,
-  Repeat,
-  Search,
-  Sprout,
-} from "lucide-react";
+import { Check, ChevronRight, Flame, Loader2, Search, Sprout } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import {
-  DayListPopover,
   DoneCheck,
   EmptySlot,
   LifeSlot,
@@ -31,7 +21,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
-import { lifeDayProgress } from "@/lib/life";
 import { plusDayComplete, plusGoalWeek, type PlusGoalWeek, type PlusStep } from "@/lib/plus";
 import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
@@ -81,15 +70,6 @@ export function GoalsTodayCard() {
   const recent = data?.recentSteps ?? [];
   const allDone = plusDayComplete(steps);
   const { data: life } = useLife();
-  const lifeDay = life
-    ? lifeDayProgress({
-        today: life.today,
-        tasks: life.tasks,
-        habits: life.habits,
-        logs: life.logs,
-        goalSteps: steps,
-      })
-    : null;
   const actions = useLifeActions(t);
   const { choice, choose } = useHomeChoice(profile?.id);
   const todayTasks = life ? tasksToday(life) : [];
@@ -114,81 +94,9 @@ export function GoalsTodayCard() {
         />
         <h2 id="goals-today-title" className="font-display text-sm font-semibold">
           <Link to="/life" className="hover:text-brand-green">
-            Life+ AI <span className="font-normal text-muted-foreground">· {t("Goals today")}</span>
+            Life+ AI
           </Link>
         </h2>
-        {life?.premium && lifeDay ? (
-          // The day's shortcuts open the whole list in a popup, ticked right
-          // here on the Dashboard (user request).
-          <span className="hidden items-center gap-2.5 xl:inline-flex">
-            <DayListPopover
-              icon={<ListChecks className="size-3.5" aria-hidden="true" />}
-              label={t("Today's tasks")}
-              count={`${lifeDay.tasksDone}/${lifeDay.tasksTotal}`}
-            >
-              {todayTasks.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("No tasks for this day yet.")}</p>
-              ) : (
-                <ul className="space-y-1.5">
-                  {todayTasks.map((task) => (
-                    <li key={task.id} className="flex items-center gap-2 text-sm">
-                      <DoneCheck
-                        done={!!task.doneAt}
-                        disabled={actions.task.isPending}
-                        label={task.doneAt ? t("Mark as not done") : t("Mark as done")}
-                        onToggle={() => actions.task.mutate({ id: task.id, done: !task.doneAt })}
-                      />
-                      <span
-                        translate="no"
-                        className={cn(
-                          "min-w-0",
-                          task.doneAt && "text-muted-foreground line-through",
-                        )}
-                      >
-                        {task.title}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </DayListPopover>
-            <DayListPopover
-              icon={<Repeat className="size-3.5" aria-hidden="true" />}
-              label={t("Habits today")}
-              count={`${lifeDay.habitsDone}/${lifeDay.habitsDue}`}
-            >
-              {dueHabits.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("No habits due today.")}</p>
-              ) : (
-                <ul className="space-y-1.5">
-                  {dueHabits.map((habit) => {
-                    const checked = life ? habitDoneToday(life, habit.id) : false;
-                    return (
-                      <li key={habit.id} className="flex items-center gap-2 text-sm">
-                        <DoneCheck
-                          done={checked}
-                          disabled={actions.habit.isPending}
-                          label={checked ? t("Mark as not done") : t("Mark as done")}
-                          onToggle={() =>
-                            life &&
-                            actions.habit.mutate({
-                              habitId: habit.id,
-                              day: life.today,
-                              done: !checked,
-                            })
-                          }
-                        />
-                        <span translate="no" className="min-w-0">
-                          {habit.title}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </DayListPopover>
-          </span>
-        ) : null}
         {/* No goal checks pill (user request: the card holds tasks and habits
             too, so three goal checks read as the whole card). */}
       </div>
@@ -495,7 +403,7 @@ function GoalTile({
   return (
     <li
       className={cn(
-        "@container flex min-w-0 flex-col justify-between gap-1.5 rounded-lg px-2.5 py-2 transition-colors",
+        "@container flex min-w-0 flex-col justify-between gap-1 rounded-lg px-2.5 py-1.5 transition-colors",
         done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
       )}
     >
