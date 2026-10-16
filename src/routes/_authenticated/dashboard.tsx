@@ -414,12 +414,13 @@ function Dashboard() {
 
           {/* The level selector has its own card, apart from the three
               indicators (user request), with the same gap as the cards below. */}
-          <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-4 xl:h-[7.59rem]">
-            <div className="card-soft min-w-0 overflow-hidden">
+          <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
+            {/* As wide as the Business English card (4 of 12 columns; user request). */}
+            <div className="card-soft min-w-0 overflow-hidden lg:col-span-4">
               <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
             </div>
 
-            <div className="card-soft grid min-w-0 grid-cols-3 overflow-hidden lg:col-span-3">
+            <div className="card-soft grid min-w-0 grid-cols-3 overflow-hidden lg:col-span-8">
               <div className="min-w-0">
                 {/* The streak climbs a ladder of jewels (Bronze, Silver, Gold...); the
                   gem takes the current jewel's colour, so it is not mistaken for
