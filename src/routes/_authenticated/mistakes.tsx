@@ -182,7 +182,7 @@ function Mistakes() {
 
         <section className="card-soft space-y-3 p-3 sm:p-5">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
+            <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
               <Target className="size-4 text-primary sm:size-5" />
               Review now
             </h2>
@@ -330,7 +330,7 @@ function Mistakes() {
 
         <aside className="card-soft space-y-2 p-3 sm:p-5">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="flex items-center gap-2 text-base font-semibold">
+            <h2 className="font-display flex items-center gap-2 text-base font-semibold">
               <RotateCcw className="size-4 text-primary" />
               All mistakes
             </h2>

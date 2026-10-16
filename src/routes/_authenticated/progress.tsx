@@ -161,7 +161,9 @@ function ProgressPage() {
             <>
               <div className="mt-3 grid gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto]">
                 <section className="card-soft p-3 sm:p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
-                  <h2 className="text-base font-semibold sm:text-lg">{t("Frequency")}</h2>
+                  <h2 className="font-display text-base font-semibold sm:text-lg">
+                    {t("Frequency")}
+                  </h2>
                   <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
                     {t("The days you studied this month.")}
                   </p>
@@ -172,7 +174,7 @@ function ProgressPage() {
 
                 <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="text-base font-semibold sm:text-lg">
+                    <h2 className="font-display text-base font-semibold sm:text-lg">
                       {shownLevel
                         ? shownLevel === currentLevel
                           ? `${t("Level")} ${shownLevel}`
@@ -242,7 +244,7 @@ function ProgressPage() {
 
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:col-start-2 xl:row-start-2">
                   <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
-                    <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
+                    <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
                       <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" />{" "}
                       {t("Strengths")}
                     </h2>
@@ -260,7 +262,7 @@ function ProgressPage() {
                     </ul>
                   </section>
                   <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
-                    <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
+                    <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
                       <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" />{" "}
                       {t("To improve")}
                     </h2>
@@ -289,7 +291,9 @@ function ProgressPage() {
           <div className="mt-3 grid items-start gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
             <section className="card-soft p-3 sm:p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-base font-semibold sm:text-lg">{t("Evolution")}</h2>
+                <h2 className="font-display text-base font-semibold sm:text-lg">
+                  {t("Evolution")}
+                </h2>
                 {/* Below xl one chart at a time keeps the tab on one screen. */}
                 <div
                   className="flex rounded-lg bg-secondary p-0.5 text-xs xl:hidden"
@@ -338,7 +342,9 @@ function ProgressPage() {
             <div className="grid content-start gap-3 sm:gap-5">
               {learning?.common_errors && learning.common_errors.length > 0 && (
                 <section className="card-soft p-3 sm:p-5">
-                  <h2 className="text-base font-semibold sm:text-lg">{t("Frequent mistakes")}</h2>
+                  <h2 className="font-display text-base font-semibold sm:text-lg">
+                    {t("Frequent mistakes")}
+                  </h2>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
                     {(showAllMistakes
                       ? learning.common_errors
@@ -367,7 +373,9 @@ function ProgressPage() {
 
               {recent && recent.length > 0 && (
                 <section className="card-soft p-3 sm:p-5">
-                  <h2 className="text-base font-semibold sm:text-lg">{t("Recent activity")}</h2>
+                  <h2 className="font-display text-base font-semibold sm:text-lg">
+                    {t("Recent activity")}
+                  </h2>
                   <ul className="mt-2 divide-y divide-border sm:mt-4">
                     {recent.map((a, index) => (
                       <li

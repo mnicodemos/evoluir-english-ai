@@ -157,7 +157,7 @@ function Premium() {
           <PageHeader icon={Crown} accent="amber" eyebrow={<>Your plan</>} title={<>Premium</>} />
 
           <section className="card-soft p-6">
-            <h2 className="text-lg font-semibold">My subscription</h2>
+            <h2 className="font-display text-lg font-semibold">My subscription</h2>
             {!view ? (
               <Skeleton className="mt-4 h-24 w-full" />
             ) : (
@@ -237,7 +237,7 @@ function Premium() {
               <span className="inline-flex items-center gap-2 rounded-full bg-foreground/10 px-3 py-1 text-xs font-medium">
                 <Sparkles className="size-3.5" /> Premium active
               </span>
-              <h2 className="mt-4 text-xl font-semibold">
+              <h2 className="font-display mt-4 text-xl font-semibold">
                 You have full access, {profile.name || "student"}.
               </h2>
               <p className="mt-2 text-sm text-foreground/75">Everything included in your plan:</p>
@@ -262,7 +262,7 @@ function Premium() {
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <h2 className="font-semibold">{p.name}</h2>
+                      <h2 className="font-display font-semibold">{p.name}</h2>
                       {p.highlight && (
                         <span className="rounded-full bg-accent px-2.5 py-1 text-[11px] font-medium text-accent-foreground">
                           Best value
@@ -281,7 +281,7 @@ function Premium() {
               </section>
 
               <section className="card-soft p-6">
-                <h2 className="text-lg font-semibold">What you get with Premium</h2>
+                <h2 className="font-display text-lg font-semibold">What you get with Premium</h2>
                 <div className="mt-5 grid gap-6 sm:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Free</p>

@@ -361,7 +361,7 @@ function LessonPage() {
 
           <TabsContent value="video" className="mt-5 space-y-4">
             <div>
-              <h2 className="text-lg font-semibold">Video reinforcement</h2>
+              <h2 className="font-display text-lg font-semibold">Video reinforcement</h2>
               <p className="text-sm text-muted-foreground">
                 Watch this short explanation before you practise.
                 {videoLength ? ` About ${videoLength}.` : ""}
@@ -401,7 +401,7 @@ function LessonPage() {
           <TabsContent value="summary" className="mt-5">
             <div className="card-soft space-y-5 p-6">
               <div>
-                <h2 className="text-lg font-semibold">
+                <h2 className="font-display text-lg font-semibold">
                   {lang === "pt" ? "Guia de Aprendizagem" : "Learning Guide"}
                 </h2>
                 <p className="text-sm text-muted-foreground">
@@ -481,7 +481,7 @@ function LessonPage() {
 
         <section className="card-soft bg-primary p-6 text-foreground">
           <p className="text-sm text-foreground/75">Practice with AI Speaking</p>
-          <h2 className="mt-1 text-xl font-semibold">
+          <h2 className="font-display mt-1 text-xl font-semibold">
             Use what you just learned in a real conversation
           </h2>
           <Button

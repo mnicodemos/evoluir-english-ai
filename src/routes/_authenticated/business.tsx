@@ -211,7 +211,7 @@ function BusinessPage() {
                   </span>
                   <h2
                     id="business-path-heading"
-                    className="min-w-0 flex-1 truncate text-sm font-semibold"
+                    className="font-display min-w-0 flex-1 truncate text-sm font-semibold"
                   >
                     <span>Business English</span> <span>·</span>{" "}
                     <span>{findLevel(level).label}</span>
@@ -433,7 +433,7 @@ function BusinessPage() {
 
             <section className="card-soft space-y-3 p-4 sm:p-5">
               <div className="flex items-center justify-between gap-2">
-                <h2 className="text-base font-semibold">Practise with EVO</h2>
+                <h2 className="font-display text-base font-semibold">Practise with EVO</h2>
               </div>
               <p className="text-sm text-muted-foreground">
                 Real work situations: EVO plays the other person.

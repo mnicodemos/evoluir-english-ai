@@ -358,7 +358,7 @@ function Writing() {
                 >
                   <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-tight tracking-wide text-muted-foreground sm:text-xs">
                     {isDone ? (
-                      <CheckCircle2 className="size-3.5 text-green-600" />
+                      <CheckCircle2 className="size-3.5 text-brand-green" />
                     ) : (
                       <PenLine className="size-3.5" />
                     )}
@@ -387,8 +387,8 @@ function Writing() {
             </div>
 
             {allDone ? (
-              <div className="mt-6 rounded-xl border border-green-500/40 bg-green-500/10 p-5 text-center">
-                <CheckCircle2 className="mx-auto size-8 text-green-600" />
+              <div className="mt-6 rounded-xl border border-brand-green/40 bg-brand-green/10 p-5 text-center">
+                <CheckCircle2 className="mx-auto size-8 text-brand-green" />
                 <p className="mt-2 font-semibold">All 3 writing tasks completed!</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   New writing tasks arrive tomorrow, or as soon as you start a new lesson in the
@@ -399,8 +399,8 @@ function Writing() {
                 </Button>
               </div>
             ) : currentDone ? (
-              <div className="mt-6 rounded-xl border border-green-500/40 bg-green-500/10 p-5 text-center">
-                <CheckCircle2 className="mx-auto size-8 text-green-600" />
+              <div className="mt-6 rounded-xl border border-brand-green/40 bg-brand-green/10 p-5 text-center">
+                <CheckCircle2 className="mx-auto size-8 text-brand-green" />
                 <p className="mt-2 font-semibold">This task is already checked.</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Want a better score? Redo it and submit a new version.
@@ -465,7 +465,7 @@ function Writing() {
             return entries.map(({ p, r }, i) => (
               <section key={p} className="mt-6 space-y-5 animate-rise">
                 {(entries.length > 1 || p !== prompt) && (
-                  <h2 className="text-sm font-semibold text-muted-foreground">{p}</h2>
+                  <h2 className="font-display text-sm font-semibold text-muted-foreground">{p}</h2>
                 )}
                 {answers[p] && (
                   <div className="card-soft p-6">
@@ -489,7 +489,7 @@ function Writing() {
         <aside className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
           {/* The task cards above already show this on smaller screens. */}
           <section className="card-soft hidden p-4 xl:block">
-            <h2 className="text-sm font-semibold">Today's tasks</h2>
+            <h2 className="font-display text-sm font-semibold">Today's tasks</h2>
             <ol className="mt-2.5 space-y-1.5">
               {prompts.map((p, index) => {
                 const isDone = done.includes(p);
@@ -536,7 +536,7 @@ function Writing() {
           </section>
 
           <section className="card-soft p-4">
-            <h2 className="text-sm font-semibold">
+            <h2 className="font-display text-sm font-semibold">
               <span>Writing focus</span> · {config.label}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">{config.focus}</p>
