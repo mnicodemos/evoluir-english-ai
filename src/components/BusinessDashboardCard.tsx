@@ -95,8 +95,12 @@ export function BusinessDashboardCard() {
           <div className="h-1.5 flex-1 rounded-full bg-secondary" aria-hidden="true">
             <div className="h-full rounded-full bg-brand-green" style={{ width: `${percent}%` }} />
           </div>
-          <span className="text-[11px] font-semibold text-muted-foreground">
-            {completed}/{total}
+          {/* The track's share done (user request: % instead of n/36). */}
+          <span
+            className="text-[11px] font-semibold text-muted-foreground"
+            title={`${completed}/${total}`}
+          >
+            {percent}%
           </span>
           <Link
             to={locked ? "/premium" : "/business"}
