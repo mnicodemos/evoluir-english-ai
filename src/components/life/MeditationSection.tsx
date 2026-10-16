@@ -233,7 +233,8 @@ export function MeditationSection() {
       <p className="mt-1 text-xs text-muted-foreground">
         {t("Relax and train your listening: EVO guides you slowly, with the text on screen.")}
       </p>
-      <ul className="mt-3 space-y-2">
+      {/* Side by side in the wide row under Routine and the Life Coach. */}
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {MEDITATIONS.map((item) => {
           const locked = !item.free && !premium;
           const minutes = meditationMinutes(item.lines[tier], rate);

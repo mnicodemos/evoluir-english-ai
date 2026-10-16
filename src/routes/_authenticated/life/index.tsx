@@ -108,28 +108,41 @@ function LifePage() {
         {data.premium ? <PriorityCard data={data} onChange={refresh} /> : null}
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3 lg:items-start">
-        {/* Goals with the meditations below (one free session for everyone). */}
-        <div className="grid gap-4">
-          <GoalsSection />
-          <MeditationSection />
+      {/* One page without holes (user request): Goals fill the first column;
+          Routine over Habits in the second, with Habits stretching down to the
+          end of the Life Coach in the third; the meditations take the row below,
+          under both. Phones stack everything in this order. */}
+      {data.premium ? (
+        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:grid-rows-[auto_1fr_auto]">
+          <div className="lg:row-span-2 xl:row-span-3">
+            <GoalsSection />
+          </div>
+          <div className="lg:col-start-2 xl:row-start-1">
+            <RoutineSection />
+          </div>
+          <div className="flex flex-col lg:col-start-2 xl:row-start-2 [&>section]:flex-1">
+            <HabitsSection />
+          </div>
+          <div className="flex flex-col lg:col-span-2 xl:col-span-1 xl:col-start-3 xl:row-span-2 xl:row-start-1 [&>section]:flex-1">
+            <CoachSection />
+          </div>
+          <div className="lg:col-span-2 xl:col-start-2 xl:row-start-3">
+            <MeditationSection />
+          </div>
         </div>
-        {data.premium ? (
-          <>
-            <div className="grid gap-4">
-              <RoutineSection />
-              <HabitsSection />
-            </div>
-            <div className="lg:col-span-2 xl:col-span-1">
-              <CoachSection />
-            </div>
-          </>
-        ) : (
+      ) : (
+        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="lg:row-span-2">
+            <GoalsSection />
+          </div>
           <div className="xl:col-span-2">
             <LifePremiumGate feature="Routine, habits and Life Coach" />
           </div>
-        )}
-      </div>
+          <div className="xl:col-span-2">
+            <MeditationSection />
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
