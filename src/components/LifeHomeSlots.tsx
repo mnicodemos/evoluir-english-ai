@@ -198,47 +198,6 @@ export function SlotChooser<Item extends { id: string; title: string }>({
   );
 }
 
-/** The whole day's list in a popup, ticked right there (the header shortcuts). */
-export function DayListPopover({
-  icon,
-  label,
-  count,
-  children,
-}: {
-  icon: ReactNode;
-  label: string;
-  count: string;
-  children: ReactNode;
-}) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          title={label}
-          aria-label={`${label}: ${count}`}
-          className="inline-flex items-center gap-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-        >
-          {icon}
-          {count}
-        </button>
-      </PopoverTrigger>
-      <PopoverContent
-        side="top"
-        align="start"
-        sideOffset={8}
-        className={cn(
-          "dashboard-shell dark w-[min(22rem,calc(100vw-2rem))] space-y-2 p-4",
-          graphitePanelClass,
-        )}
-      >
-        <p className="text-xs font-semibold text-brand-green">{label}</p>
-        {children}
-      </PopoverContent>
-    </Popover>
-  );
-}
-
 /** One slot of the card: a kind label, the item and its action row. */
 export function LifeSlot({
   kind,
@@ -258,29 +217,20 @@ export function LifeSlot({
   action: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  // Two rows (user request: the card as tall as the level card): the kind with
+  // the chooser and magnifier, then the item with its check on the same line.
   return (
     <li
       className={cn(
-        "flex min-w-0 flex-col justify-between gap-1.5 rounded-lg px-2.5 py-2 transition-colors",
+        "flex min-w-0 flex-col justify-between gap-0.5 rounded-lg px-2.5 py-1.5 transition-colors",
         done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
       )}
     >
-      <div className="flex min-w-0 items-start gap-2">
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            {icon}
-            {kind}
-          </p>
-          <p
-            className={cn(
-              "mt-0.5 line-clamp-2 text-xs font-semibold leading-snug",
-              done && "text-muted-foreground line-through",
-            )}
-            translate="no"
-          >
-            {title}
-          </p>
-        </div>
+      <div className="flex min-w-0 items-center gap-2">
+        <p className="flex min-w-0 flex-1 items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {icon}
+          {kind}
+        </p>
         {chooser}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
@@ -313,7 +263,18 @@ export function LifeSlot({
           </PopoverContent>
         </Popover>
       </div>
-      <div className="flex items-center justify-end">{action}</div>
+      <div className="flex min-w-0 items-center gap-2">
+        <p
+          className={cn(
+            "min-w-0 flex-1 line-clamp-2 text-xs font-semibold leading-snug",
+            done && "text-muted-foreground line-through",
+          )}
+          translate="no"
+        >
+          {title}
+        </p>
+        {action}
+      </div>
     </li>
   );
 }
