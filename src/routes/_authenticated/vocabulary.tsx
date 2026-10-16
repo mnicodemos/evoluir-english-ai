@@ -640,7 +640,7 @@ function VocabularyOnline() {
                 ) : null}
                 {reviewItems.length > 0 && (
                   <section aria-label={t("Review due")} className="mt-4">
-                    <h2 className="text-sm font-semibold">
+                    <h2 className="font-display text-sm font-semibold">
                       {t("Review due")} ({reviewItems.filter((w) => !knownNow(w.id)).length})
                     </h2>
                     <VocabularyWordList items={reviewItems} highlightKnown {...listProps} />

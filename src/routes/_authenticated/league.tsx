@@ -94,7 +94,7 @@ function League() {
         </header>
 
         <section className="card-soft space-y-2 p-3 sm:p-5">
-          <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
+          <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
             <Trophy className="size-4 text-amber-400 sm:size-5" />
             Ranking
           </h2>
@@ -173,7 +173,7 @@ function League() {
 
         <aside className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
           <section className="card-soft space-y-2 p-4">
-            <h2 className="flex items-center gap-2 text-sm font-semibold">
+            <h2 className="font-display flex items-center gap-2 text-sm font-semibold">
               <Users className="size-4 text-brand-green" />
               Your participation
             </h2>
@@ -197,7 +197,7 @@ function League() {
           </section>
 
           <section className="card-soft p-4">
-            <h2 className="text-sm font-semibold">How to earn XP</h2>
+            <h2 className="font-display text-sm font-semibold">How to earn XP</h2>
             <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
               {XP_RULES.map((rule) => (
                 <li key={rule.label} className="flex justify-between gap-3">

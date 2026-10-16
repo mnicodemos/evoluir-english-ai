@@ -147,7 +147,7 @@ function StudyPlanPage() {
               <section className="space-y-2" aria-labelledby="plan-week-title">
                 <h2
                   id="plan-week-title"
-                  className="flex items-center gap-2 text-base font-semibold sm:text-lg"
+                  className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg"
                 >
                   <CalendarCheck className="size-4 text-primary sm:size-5" />
                   Your week
@@ -166,7 +166,7 @@ function StudyPlanPage() {
 
             <div className="min-w-0 space-y-3 xl:col-start-2 xl:row-start-2">
               <section className="card-soft p-3 sm:p-4">
-                <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
+                <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
                   <Clock className="size-4 text-primary sm:size-5" />
                   This week
                 </h2>
@@ -192,7 +192,7 @@ function StudyPlanPage() {
               </section>
 
               <section className="card-soft p-3 sm:p-4">
-                <h2 className="flex items-center gap-2 text-base font-semibold sm:text-lg">
+                <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
                   <Sparkles className="size-4 text-primary sm:size-5" />
                   Why this plan?
                 </h2>

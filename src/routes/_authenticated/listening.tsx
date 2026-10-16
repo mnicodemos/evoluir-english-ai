@@ -530,8 +530,8 @@ function ListeningPage() {
                 <span>sentences</span>
               </span>
             </div>
-            <div className="rounded-xl border border-green-500/40 bg-green-500/10 p-5 text-center">
-              <CheckCircle2 className="mx-auto size-8 text-green-600" />
+            <div className="rounded-xl border border-brand-green/40 bg-brand-green/10 p-5 text-center">
+              <CheckCircle2 className="mx-auto size-8 text-brand-green" />
               <p className="mt-2 font-semibold">Session complete: all 3 sentences done!</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 New listening tasks arrive as soon as you start a new lesson in the Learning Center.
@@ -635,7 +635,7 @@ function ListeningPage() {
                         key={`${item.word}-${i}`}
                         className={
                           item.hit
-                            ? "rounded bg-green-500/15 px-1.5 py-0.5 text-sm text-green-700 dark:text-green-400"
+                            ? "rounded bg-brand-green/15 px-1.5 py-0.5 text-sm text-brand-green"
                             : "rounded bg-destructive/15 px-1.5 py-0.5 text-sm text-destructive"
                         }
                       >
@@ -736,7 +736,7 @@ function ListeningPage() {
 
             <aside className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
               <section className="card-soft p-4">
-                <h2 className="text-sm font-semibold">Today's session</h2>
+                <h2 className="font-display text-sm font-semibold">Today's session</h2>
                 <ol className="mt-2.5 space-y-1.5">
                   {sentences.map((_, i) => {
                     const done = i < index || (i === index && passed);
@@ -784,7 +784,7 @@ function ListeningPage() {
               </section>
 
               <section className="card-soft p-4">
-                <h2 className="text-sm font-semibold">
+                <h2 className="font-display text-sm font-semibold">
                   <span>Pronunciation focus</span> · {config.label}
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">{config.focus}</p>

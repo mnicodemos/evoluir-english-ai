@@ -162,7 +162,7 @@ function LifeGuidePage() {
       </p>
 
       <section className="card-soft mt-4 p-4 sm:p-5" aria-labelledby="cycle-title">
-        <h2 id="cycle-title" className="text-base font-semibold">
+        <h2 id="cycle-title" className="font-display text-base font-semibold">
           {t("Your daily cycle")}
         </h2>
         <ol className="mt-4 flex flex-col items-stretch gap-2 lg:flex-row lg:items-center">
@@ -205,7 +205,7 @@ function LifeGuidePage() {
             >
               <div className="flex items-center gap-2">
                 <Icon className="size-5 text-brand-green" aria-hidden="true" />
-                <h2 id={`guide-${feature.id}`} className="text-base font-semibold">
+                <h2 id={`guide-${feature.id}`} className="font-display text-base font-semibold">
                   {t(feature.title)}
                 </h2>
                 {/* Free or Premium marks only for free students (user request). */}
