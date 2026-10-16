@@ -3,7 +3,6 @@ import { Camera, Loader2, Settings, UserRound } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AdminPanelButton } from "@/components/AdminPanelButton";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,20 +57,112 @@ function maskPhone(value: string) {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
 }
 
+// The photo's signed link lasts a day and is kept in the browser, so a page
+// change or a reload shows the same, already cached image at once instead of
+// asking Storage for a new link (a new link means a new download and a blink;
+// user report). It is renewed an hour before it expires.
+const AVATAR_LINK_SECONDS = 24 * 60 * 60;
+const AVATAR_RENEW_MS = 60 * 60 * 1000;
+const AVATAR_STORE_KEY = "evoluir-avatar-link";
+
+type StoredAvatarLink = { path: string; url: string; expiresAt: number };
+
+function readStoredAvatarLink(): StoredAvatarLink | null {
+  try {
+    const raw = window.localStorage.getItem(AVATAR_STORE_KEY);
+    const link = raw ? (JSON.parse(raw) as StoredAvatarLink) : null;
+    return link && link.expiresAt - AVATAR_RENEW_MS > Date.now() ? link : null;
+  } catch {
+    return null;
+  }
+}
+
+function storeAvatarLink(link: StoredAvatarLink) {
+  try {
+    window.localStorage.setItem(AVATAR_STORE_KEY, JSON.stringify(link));
+  } catch {
+    // Private mode or blocked storage: the photo still loads, only not cached.
+  }
+}
+
 function useAvatarUrl(path?: string | null) {
-  return useQuery({
+  // Read after mount, so the server's HTML and the first client render agree.
+  const [stored, setStored] = useState<StoredAvatarLink | null>(null);
+  useEffect(() => setStored(readStoredAvatarLink()), []);
+  const query = useQuery<string | null>({
     queryKey: ["avatar-url", path],
     enabled: !!path,
-    staleTime: 45 * 60 * 1000,
+    staleTime: AVATAR_LINK_SECONDS * 1000 - AVATAR_RENEW_MS,
+    refetchOnWindowFocus: false,
+    // A stored link for this same photo shows it at once, aged by when it was made.
+    initialData: () => (stored?.path === path ? stored?.url : undefined),
+    initialDataUpdatedAt: () =>
+      stored?.path === path && stored ? stored.expiresAt - AVATAR_LINK_SECONDS * 1000 : undefined,
     queryFn: async () => {
       if (!path) return null;
       const { data, error } = await supabase.storage
         .from(AVATAR_BUCKET)
-        .createSignedUrl(path, 60 * 60);
+        .createSignedUrl(path, AVATAR_LINK_SECONDS);
       if (error) throw error;
+      storeAvatarLink({
+        path,
+        url: data.signedUrl,
+        expiresAt: Date.now() + AVATAR_LINK_SECONDS * 1000,
+      });
       return data.signedUrl;
     },
   });
+  // While the profile is still loading, the last photo already shows.
+  return { data: query.data ?? (path === undefined ? stored?.url : undefined) };
+}
+
+/**
+ * The round photo with the initials underneath. A plain image over the
+ * initials, not Radix's Avatar: that one shows the initials until the image
+ * fires its load event again on every mount, so the photo blinked on each page
+ * change even when the browser already had it (user report).
+ */
+function ProfilePhoto({
+  src,
+  alt,
+  className,
+  fallbackClassName,
+  children,
+}: {
+  src?: string | undefined;
+  alt: string;
+  className?: string;
+  fallbackClassName?: string;
+  children: ReactNode;
+}) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [src]);
+  return (
+    <span
+      className={cn(
+        "relative flex shrink-0 overflow-hidden rounded-full border border-border bg-muted",
+        className,
+      )}
+    >
+      <span
+        className={cn(
+          "flex size-full items-center justify-center rounded-full bg-accent font-bold text-accent-foreground",
+          fallbackClassName,
+        )}
+      >
+        {children}
+      </span>
+      {src && !failed ? (
+        <img
+          src={src}
+          alt={alt}
+          decoding="async"
+          onError={() => setFailed(true)}
+          className="absolute inset-0 size-full object-cover"
+        />
+      ) : null}
+    </span>
+  );
 }
 
 export function ProfileMenu({
@@ -193,14 +284,14 @@ export function ProfileMenu({
         className,
       )}
     >
-      <Avatar
-        className={cn("shrink-0 border border-border bg-muted", inCard ? "size-10" : "size-8")}
+      <ProfilePhoto
+        src={photo}
+        alt={displayName}
+        className={inCard ? "size-10" : "size-8"}
+        fallbackClassName="text-[11px]"
       >
-        <AvatarImage src={photo} alt={displayName} className="object-cover" />
-        <AvatarFallback className="bg-accent text-[11px] font-bold text-accent-foreground">
-          {profile ? initials(profile.name, profile.email) : <UserRound className="size-4" />}
-        </AvatarFallback>
-      </Avatar>
+        {profile ? initials(profile.name, profile.email) : <UserRound className="size-4" />}
+      </ProfilePhoto>
       {presentation !== "icon" && (
         <>
           <span className="min-w-0 flex-1 text-left">
@@ -235,12 +326,14 @@ export function ProfileMenu({
     <>
       <div className="space-y-5">
         <div className="flex items-center gap-4">
-          <Avatar className="size-16 border border-border bg-muted">
-            <AvatarImage src={photo} alt={displayName} className="object-cover" />
-            <AvatarFallback className="bg-accent text-base font-bold text-accent-foreground">
-              {initials(name || profile?.name, profile?.email)}
-            </AvatarFallback>
-          </Avatar>
+          <ProfilePhoto
+            src={photo}
+            alt={displayName}
+            className="size-16"
+            fallbackClassName="text-base"
+          >
+            {initials(name || profile?.name, profile?.email)}
+          </ProfilePhoto>
           <div className="min-w-0 space-y-2">
             <Button asChild variant="outline" size="sm">
               <Label htmlFor="profile-photo" className="cursor-pointer">
