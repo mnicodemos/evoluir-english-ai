@@ -93,7 +93,7 @@ export function GoalsSection() {
   };
 
   return (
-    <div id="goals" className="grid scroll-mt-4 gap-4">
+    <div id="goals" className="grid h-full scroll-mt-4 grid-rows-[auto_1fr] gap-4">
       <section className="card-soft p-4 sm:p-5" aria-labelledby="evolution-score-title">
         <div className="flex items-center gap-4">
           <ScoreRing value={score.score} />
