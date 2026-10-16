@@ -512,7 +512,7 @@ function AppShellContent({
 
         <main
           className={cn(
-            "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
+            "animate-page-in w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
             !dashboardLayout && "flex-1",
             dashboardLayout &&
               "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-[5px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
@@ -522,19 +522,23 @@ function AppShellContent({
         </main>
 
         <nav
-          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-sidebar-border bg-sidebar/98 px-0.5 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-white/10 bg-sidebar/80 px-0.5 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur-xl lg:hidden"
           aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
         >
           {dashboardMobileNav.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="flex min-w-0 flex-col items-center pt-2.5 transition-colors"
+              className="group flex min-w-0 flex-col items-center pt-1.5 transition-colors"
               activeProps={{ className: "text-brand-green" }}
               inactiveProps={{ className: "text-muted-foreground" }}
             >
               <span className="grid justify-items-center gap-0.5">
-                <item.icon className="size-6" />
+                {/* The active tab sits in a soft pill (user request: a
+                    sophisticated app), like native tab bars. */}
+                <span className="grid h-7 w-14 place-items-center rounded-full transition-colors group-data-[status=active]:bg-brand-green/15">
+                  <item.icon className="size-6" />
+                </span>
                 {/* Two short lines instead of a cut label on 360 px phones
                     ("Professor de IA", "Videochamada"). */}
                 <span className="line-clamp-2 max-w-full pb-0.5 text-center text-[10px] font-medium leading-[1.1] tracking-tight">

@@ -339,6 +339,31 @@
   stroke-width: 2.4;
 }
 
+/* Touch screens: links and buttons give way slightly under the finger, like a
+   native app (scale is its own property, so translate and rotate utilities on
+   the same element keep working). */
+@media (hover: none) and (pointer: coarse) {
+  .dashboard-shell :is(a, button, [role="button"], [role="tab"]):not(:disabled):active {
+    scale: 0.97;
+  }
+}
+
+/* Each page arrives with a short fade (user request: app feel). Opacity only:
+   a transform on <main> would pin fixed-position children, like the video
+   call screen, to the page instead of the screen. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility animate-page-in {
+  animation: page-in 0.22s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -359,11 +384,18 @@
     border-color: var(--color-border);
   }
 
+  /* App feel on phones (user request: a sophisticated app): no grey flash on
+     tap and no rubber-band bounce that shows the browser behind the page. */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
   }
 
   h1,
