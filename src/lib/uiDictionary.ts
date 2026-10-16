@@ -1724,6 +1724,12 @@ const baseUiPt: Record<string, string> = {
     "Ouça a frase e repita em voz alta. Conclua as 3 frases para terminar a atividade — um novo conjunto chega sempre que você começa uma nova lição no Learning Center.",
   "Redo today's activity": "Refazer a atividade de hoje",
   "All 3 listening tasks completed!": "As 3 tarefas de listening foram concluídas!",
+  "Sessions today": "Sessões hoje",
+  "Study day counted": "Dia de estudo contado",
+  "3 sessions complete your study day.": "3 sessões completam seu dia de estudo.",
+  "This session": "Esta sessão",
+  "Session complete: all 3 sentences done!": "Sessão concluída: as 3 frases feitas!",
+  "Do another session": "Fazer outra sessão",
   "New listening tasks arrive as soon as you start a new lesson in the Learning Center.":
     "Novas tarefas de listening chegam assim que você começa uma nova lição no Learning Center.",
   "Redo activity to improve your score": "Refazer a atividade para melhorar sua nota",
