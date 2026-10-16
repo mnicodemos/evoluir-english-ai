@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import evoLeagueSymbol from "@/assets/evo-liga-simbolo.webp";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
@@ -106,8 +107,10 @@ function League() {
               </span>
             </p>
           ) : isLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+            <div className="space-y-2 py-1" aria-busy="true">
+              {[0, 1, 2, 3, 4].map((row) => (
+                <Skeleton key={row} className="h-12 w-full rounded-lg" />
+              ))}
             </div>
           ) : ranking.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-4 text-center">

@@ -4,7 +4,7 @@ import { Check, Flame, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useLifeT } from "@/components/life/LifeNav";
+import { LifeEmpty, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -138,9 +138,9 @@ export function LifeHabitBoard({
 
   if (!habits.length)
     return (
-      <p className="text-sm text-muted-foreground">
+      <LifeEmpty>
         {t("No habits yet. Start with one small habit you can keep every day.")}
-      </p>
+      </LifeEmpty>
     );
 
   return (

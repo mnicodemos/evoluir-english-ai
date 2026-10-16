@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { BookMarked, Crown, Sprout, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { EvoAvatar } from "@/components/EvoAvatar";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { uiPt } from "@/lib/uiDictionary";
@@ -138,6 +139,16 @@ export function LifeSectionTitle({
         </span>
       ) : null}
       {children}
+    </div>
+  );
+}
+
+/** An empty list with EVO and a nudge, instead of a grey line (user request). */
+export function LifeEmpty({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-white/[0.02] p-3">
+      <EvoAvatar decorative className="size-9 shrink-0" />
+      <p className="text-sm text-muted-foreground">{children}</p>
     </div>
   );
 }

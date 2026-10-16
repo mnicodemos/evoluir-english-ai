@@ -14,6 +14,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AppShell } from "@/components/AppShell";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
@@ -192,8 +193,10 @@ function Mistakes() {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+            <div className="space-y-3 py-2" aria-busy="true">
+              <Skeleton className="h-5 w-2/3" />
+              <Skeleton className="h-20 w-full rounded-xl" />
+              <Skeleton className="h-10 w-full rounded-lg" />
             </div>
           ) : !current ? (
             <div className="space-y-3 py-4 text-center">
