@@ -389,14 +389,6 @@ function GoalTile({
       {dayNote}
     </p>
   ) : null;
-  const actions = done ? (
-    <div className="flex items-center gap-2">{doneMark}</div>
-  ) : (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-      {completeButton}
-      {practiceLink}
-    </div>
-  );
   // Every goal has a slot of the same size (user request): the goal's name, a
   // magnifier that opens the step in a popup, and the week and actions on one
   // row, so the row keeps its height whatever the step's length.
@@ -455,11 +447,24 @@ function GoalTile({
           </PopoverContent>
         </Popover>
       </div>
-      {/* One row (user request): the week on the left (or, once done, whether
-          the study day counts) and the actions on the right. */}
-      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1 whitespace-nowrap">
-        {done ? dayNoteLine : week7(false)}
-        {actions}
+      {/* One row (user request): the week (or, once done, whether the study
+          day counts) and Practice now on the left, and the same round check as
+          the task and habit slots in the bottom-right corner (user request). */}
+      <div className="flex items-center justify-between gap-2 whitespace-nowrap">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+          {done ? dayNoteLine : week7(false)}
+          {done ? null : practiceLink}
+        </div>
+        <span
+          className={cn("shrink-0", celebrate && "animate-in zoom-in-50 fade-in-0 duration-500")}
+        >
+          <DoneCheck
+            done={done}
+            disabled={busy || !step}
+            label={done ? t("Mark as not done") : t("Complete step")}
+            onToggle={() => onToggle(!done)}
+          />
+        </span>
       </div>
     </li>
   );
