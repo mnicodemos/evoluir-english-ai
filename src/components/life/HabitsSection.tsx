@@ -1,7 +1,7 @@
 import { Repeat } from "lucide-react";
 
 import { LifeHabitBoard, LifeHabitForm } from "@/components/life/LifeHabits";
-import { useLifeT } from "@/components/life/LifeNav";
+import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { useLife } from "@/hooks/useLife";
 import { LIFE_MAX_HABITS } from "@/lib/life";
 
@@ -17,18 +17,17 @@ export function HabitsSection() {
   return (
     <section
       id="habits"
-      className="card-soft scroll-mt-4 p-4 sm:p-5"
+      className="card-soft scroll-mt-4 p-4 sm:p-5 xl:p-6"
       aria-labelledby="habits-title"
     >
-      <div className="flex items-center gap-2">
-        <Repeat className="size-5 text-brand-green" aria-hidden="true" />
-        <h2 id="habits-title" className="text-base font-semibold">
-          {t("Your habits")}
-        </h2>
-        <span className="text-xs text-muted-foreground">
-          {data.habits.length}/{LIFE_MAX_HABITS}
-        </span>
-      </div>
+      <LifeSectionTitle
+        id="habits-title"
+        icon={Repeat}
+        accent="violet"
+        title={t("Your habits")}
+        subtitle={t("One check-in a day")}
+        meta={`${data.habits.length}/${LIFE_MAX_HABITS}`}
+      />
       {data.habits.length < LIFE_MAX_HABITS ? (
         <div className="mt-4">
           <LifeHabitForm onChange={refresh} />

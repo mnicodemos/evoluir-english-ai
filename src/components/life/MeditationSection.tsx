@@ -13,7 +13,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { useLifeT } from "@/components/life/LifeNav";
+import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
@@ -131,17 +131,18 @@ export function MeditationSection() {
     return (
       <section
         id="meditation"
-        className="card-soft scroll-mt-4 p-4 sm:p-5"
+        className="card-soft scroll-mt-4 p-4 sm:p-5 xl:p-6"
         aria-labelledby="meditation-title"
       >
         {/* Stop sits on top and the text scrolls inside the block (user
             request), so a session never makes the one page grow. */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Flower2 className="size-5 text-brand-green" aria-hidden="true" />
-          <h2 id="meditation-title" className="min-w-0 text-base font-semibold">
-            {t(session.title)}
-          </h2>
-          <div className="ml-auto flex items-center gap-1.5">
+        <LifeSectionTitle
+          id="meditation-title"
+          icon={Flower2}
+          accent="rose"
+          title={t(session.title)}
+        >
+          <div className="flex items-center gap-1.5">
             <Button
               variant="ghost"
               size="sm"
@@ -163,7 +164,7 @@ export function MeditationSection() {
               </Button>
             )}
           </div>
-        </div>
+        </LifeSectionTitle>
 
         <div ref={scroller} className="relative mt-3 max-h-56 overflow-y-auto pr-1">
           <ol className="space-y-2" translate="no">
@@ -246,18 +247,20 @@ export function MeditationSection() {
   return (
     <section
       id="meditation"
-      className="card-soft scroll-mt-4 p-4 sm:p-5"
+      className="card-soft scroll-mt-4 p-4 sm:p-5 xl:p-6"
       aria-labelledby="meditation-title"
     >
-      <h2 id="meditation-title" className="flex items-center gap-2 text-base font-semibold">
-        <Flower2 className="size-5 text-brand-green" aria-hidden="true" />
-        {t("Meditations in English")}
-      </h2>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {t("Relax and train your listening: EVO guides you slowly, with the text on screen.")}
-      </p>
+      <LifeSectionTitle
+        id="meditation-title"
+        icon={Flower2}
+        accent="rose"
+        title={t("Meditations in English")}
+        subtitle={t(
+          "Relax and train your listening: EVO guides you slowly, with the text on screen.",
+        )}
+      />
       {/* Side by side in the wide row under Routine and the Life Coach. */}
-      <ul className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {MEDITATIONS.map((item) => {
           const locked = !item.free && !premium;
           const minutes = meditationMinutes(item.lines[tier], rate);
