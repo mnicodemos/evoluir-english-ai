@@ -484,6 +484,13 @@
       "when": 1792000100000,
       "tag": "0068_life_ai",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1792108923373,
+      "tag": "0069_ai_credit_topups",
+      "breakpoints": true
     }
   ]
 }
