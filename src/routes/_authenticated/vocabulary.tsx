@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, RotateCcw, Search, X } from "lucide-react";
+import { Check, CheckCircle2, Loader2, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -52,6 +52,9 @@ import { DAILY_REVIEW_LIMIT, LEARNED_MASTERY, canAdvance, isDue } from "@/lib/vo
 import { readStorage, removeStorage, writeStorage } from "@/lib/safeStorage";
 import { loadOfflineVocabulary, saveOfflineVocabulary } from "@/lib/offlineVocabulary";
 import { useOnline } from "@/hooks/useOnline";
+import { STUDY_DAY_RULE } from "@/lib/studyDay";
+import { cn } from "@/lib/utils";
+import { studyDayStartIso } from "@/lib/today";
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
@@ -200,6 +203,13 @@ function VocabularyOnline() {
   const genFailed = genBlocked === true || !!genError;
 
   const byWord = new Map((mine ?? []).map((m) => [m.word_id, m]));
+  // Words reviewed today (São Paulo day), the same count the study day uses:
+  // 10 complete it (user request: show how many are left).
+  const dayStart = new Date(studyDayStartIso()).getTime();
+  const reviewedToday = (mine ?? []).filter(
+    (m) => m.last_reviewed_at && new Date(m.last_reviewed_at).getTime() >= dayStart,
+  ).length;
+  const reviewGoal = STUDY_DAY_RULE.reviewedWords;
 
   // Opening this page is not doing the practice: the dashboard dot is driven by
   // real reviews (user_vocabulary), so nothing is marked here.
@@ -512,6 +522,27 @@ function VocabularyOnline() {
       <p className="mt-1 text-sm text-muted-foreground lg:mt-2">
         Ten new words every time you start a new lesson, chosen from your learning path, with
         meaning, examples and a microphone to test your pronunciation.
+      </p>
+      <p
+        className={cn(
+          "mt-3 flex w-fit flex-wrap items-center gap-x-2 gap-y-1 rounded-full border px-3 py-1 text-xs font-semibold",
+          reviewedToday >= reviewGoal
+            ? "border-brand-green/50 bg-brand-green/10 text-brand-green"
+            : "border-border text-muted-foreground",
+        )}
+      >
+        <span>
+          <span>{t("Words reviewed today")}</span>
+          <span>{`: ${Math.min(reviewedToday, reviewGoal)}/${reviewGoal}`}</span>
+        </span>
+        {reviewedToday >= reviewGoal ? (
+          <span className="inline-flex items-center gap-1">
+            <CheckCircle2 className="size-3.5" aria-hidden="true" />
+            <span>{t("Study day counted")}</span>
+          </span>
+        ) : (
+          <span className="font-normal">{t("10 reviewed words complete your study day.")}</span>
+        )}
       </p>
       {(daily?.length ?? 0) > 0 && (
         <Button

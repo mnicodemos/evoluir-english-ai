@@ -1725,6 +1725,13 @@ const baseUiPt: Record<string, string> = {
   "Redo today's activity": "Refazer a atividade de hoje",
   "All 3 listening tasks completed!": "As 3 tarefas de listening foram concluídas!",
   "Sessions today": "Sessões hoje",
+  "Words reviewed today": "Palavras revisadas hoje",
+  "10 reviewed words complete your study day.":
+    "10 palavras revisadas completam seu dia de estudo.",
+  "Ending now gives your report, and the call counts as your study day.":
+    "Encerrando agora você recebe o relatório, e a chamada conta como seu dia de estudo.",
+  "Speak 3 answers: the call then ends with your report and counts as your study day.":
+    "Fale 3 respostas: a chamada termina com o relatório e conta como seu dia de estudo.",
   "What will you do? e.g. Call the bank": "O que você vai fazer? Ex.: Ligar para o banco",
   "Which habit? e.g. Read 10 pages": "Qual hábito? Ex.: Ler 10 páginas",
   "Study day counted": "Dia de estudo contado",

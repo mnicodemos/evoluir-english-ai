@@ -328,6 +328,13 @@ export function VideoCallStage({
             {canFinish ? "End call and see report" : "End call"}
           </button>
         </div>
+        {/* Only a call that ends with its report counts as the study day
+            (user request: say so before the student hangs up). */}
+        <p className="mt-2 text-center text-[11px] text-white/60">
+          {canFinish
+            ? "Ending now gives your report, and the call counts as your study day."
+            : "Speak 3 answers: the call then ends with your report and counts as your study day."}
+        </p>
       </footer>
     </div>
   );
