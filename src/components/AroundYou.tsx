@@ -26,7 +26,13 @@ const SUGGESTED: PlaceKind[] = [
  * situations to act out with EVO, as if living abroad. Location only on tap,
  * sent from the browser straight to OpenStreetMap, never to our servers.
  */
-export function AroundYou({ translate: t }: { translate: (label: string) => string }) {
+export function AroundYou({
+  translate: t,
+  className = "border-t border-white/10 pt-3",
+}: {
+  translate: (label: string) => string;
+  className?: string;
+}) {
   const [state, setState] = useState<"idle" | "locating" | "ready" | "fallback">("idle");
   const [places, setPlaces] = useState<NearbyPlace[]>([]);
 
@@ -73,7 +79,7 @@ export function AroundYou({ translate: t }: { translate: (label: string) => stri
         : [];
 
   return (
-    <div className="space-y-2 border-t border-white/10 pt-3">
+    <div className={`space-y-2 ${className}`}>
       <p className="flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground">
         <MapPin className="size-3.5 text-brand-green" aria-hidden="true" />
         {t("Around you in English")}
