@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AroundYou } from "@/components/AroundYou";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useWeatherCondition, weatherIcons } from "@/hooks/useWeatherCondition";
@@ -132,6 +133,9 @@ export function WeatherTalk({
             <MessageCircleMore className="size-4" /> {translate("Talk about the weather")}
           </Link>
         </Button>
+
+        {/* The location also opens real situations nearby (user request). */}
+        <AroundYou translate={translate} />
 
         {!live && (
           <div className="border-t border-white/10 pt-2.5">

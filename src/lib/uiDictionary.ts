@@ -1,6 +1,8 @@
 // Portuguese translations for the app interface (course area).
 // Lesson content, practice sentences and any AI generated text stay in English.
-export const uiPt: Record<string, string> = {
+import { appGuidePt } from "./appGuidePt";
+
+const baseUiPt: Record<string, string> = {
   // Life AI (phase 1)
   "Life AI": "Life AI",
   "Evolve one day at a time.": "Evolua um dia de cada vez.",
@@ -1724,3 +1726,6 @@ export const uiPt: Record<string, string> = {
   Continuous: "Contínuo",
   "Today only: starts again tomorrow.": "Só de hoje: recomeça amanhã.",
 };
+
+// The app guide's lines live in their own file; the app's own terms win on a clash.
+export const uiPt: Record<string, string> = { ...appGuidePt, ...baseUiPt };
