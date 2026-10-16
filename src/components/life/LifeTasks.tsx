@@ -153,7 +153,9 @@ export function LifeTaskForm({
 
   return (
     <form
-      className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
+      // The task's text takes its own full line (user report: squeezed beside
+      // the selects it showed no placeholder); priority, goal and Add below.
+      className="flex flex-wrap gap-2"
       onSubmit={(event) => {
         event.preventDefault();
         if (title.trim() && !add.isPending) add.mutate();
@@ -163,14 +165,15 @@ export function LifeTaskForm({
         value={title}
         maxLength={160}
         onChange={(event) => setTitle(event.target.value)}
-        placeholder={t("New task")}
+        placeholder={t("What will you do? e.g. Call the bank")}
         aria-label={t("New task")}
+        className="w-full"
       />
       <select
         value={priority}
         onChange={(event) => setPriority(event.target.value as LifePriorityLevel)}
         aria-label={t("Priority")}
-        className="h-9 rounded-md border border-input bg-transparent px-2 text-sm"
+        className="h-9 shrink-0 rounded-md border border-input bg-transparent px-2 text-sm"
       >
         {LIFE_PRIORITIES.map((item) => (
           <option key={item} value={item}>
@@ -183,7 +186,7 @@ export function LifeTaskForm({
           value={goalId}
           onChange={(event) => setGoalId(event.target.value)}
           aria-label={t("Goal")}
-          className="h-9 max-w-48 rounded-md border border-input bg-transparent px-2 text-sm"
+          className="h-9 min-w-0 flex-1 rounded-md border border-input bg-transparent px-2 text-sm"
         >
           <option value="">{t("No goal")}</option>
           {goals.map((goal) => (
@@ -193,7 +196,11 @@ export function LifeTaskForm({
           ))}
         </select>
       ) : null}
-      <Button type="submit" disabled={!title.trim() || add.isPending} className="gap-1.5">
+      <Button
+        type="submit"
+        disabled={!title.trim() || add.isPending}
+        className="ml-auto shrink-0 gap-1.5"
+      >
         {add.isPending ? (
           <Loader2 className="size-4 animate-spin" aria-hidden="true" />
         ) : (

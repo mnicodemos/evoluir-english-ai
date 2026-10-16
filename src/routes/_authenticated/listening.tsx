@@ -17,6 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { useTodayActivities } from "@/components/DailyGoalCard";
 import { Button } from "@/components/ui/button";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
 import { useLessonRound } from "@/hooks/useLessonRound";
@@ -24,6 +25,8 @@ import { useRoundStart, useSavedPractice } from "@/hooks/usePracticeSync";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { findLevel } from "@/lib/level";
+import { STUDY_DAY_RULE } from "@/lib/studyDay";
+import { cn } from "@/lib/utils";
 import {
   listeningLevelConfig,
   pickListeningSentences,
@@ -161,6 +164,11 @@ function ListeningPage() {
   const { data: lessons } = useLessons();
   const queryClient = useQueryClient();
   const saveListening = useServerFn(persistListeningLegacy);
+  // Finished sessions today: 3 of them complete the study day (user report:
+  // "3/3 done" after one session of 3 sentences read as three sessions).
+  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
+  const sessionsToday = todayActivities.filter((row) => row.activity_type === "listening").length;
+  const sessionsGoal = STUDY_DAY_RULE.listening;
   const minutesSpent = useTimeSpent();
   useLogTimeOnExit({
     timer: minutesSpent,
@@ -478,6 +486,27 @@ function ListeningPage() {
             Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
             activity — a new set arrives every time you start a new lesson in the Learning Center.
           </p>
+          <p
+            className={cn(
+              "mt-3 flex w-fit flex-wrap items-center gap-x-2 gap-y-1 rounded-full border px-3 py-1 text-xs font-semibold",
+              sessionsToday >= sessionsGoal
+                ? "border-brand-green/50 bg-brand-green/10 text-brand-green"
+                : "border-border text-muted-foreground",
+            )}
+          >
+            <span>
+              <span>Sessions today</span>
+              <span>{`: ${Math.min(sessionsToday, sessionsGoal)}/${sessionsGoal}`}</span>
+            </span>
+            {sessionsToday >= sessionsGoal ? (
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                <span>Study day counted</span>
+              </span>
+            ) : (
+              <span className="font-normal">3 sessions complete your study day.</span>
+            )}
+          </p>
           <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
             <RotateCcw className="mr-2 size-4" /> Redo today's activity
           </Button>
@@ -486,20 +515,20 @@ function ListeningPage() {
         {trackDone ? (
           <section className="card-soft space-y-5 p-6">
             <div className="flex items-center justify-between gap-3">
-              <label className="text-sm font-medium">Today's tasks</label>
+              <label className="text-sm font-medium">This session</label>
               <span className="text-sm text-muted-foreground">
                 <span>3/3 </span>
-                <span>done</span>
+                <span>sentences</span>
               </span>
             </div>
             <div className="rounded-xl border border-green-500/40 bg-green-500/10 p-5 text-center">
               <CheckCircle2 className="mx-auto size-8 text-green-600" />
-              <p className="mt-2 font-semibold">All 3 listening tasks completed!</p>
+              <p className="mt-2 font-semibold">Session complete: all 3 sentences done!</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 New listening tasks arrive as soon as you start a new lesson in the Learning Center.
               </p>
               <Button variant="outline" className="mt-4" onClick={redoActivity}>
-                <RotateCcw className="mr-2 size-4" /> Redo activity to improve your score
+                <RotateCcw className="mr-2 size-4" /> Do another session
               </Button>
             </div>
           </section>
