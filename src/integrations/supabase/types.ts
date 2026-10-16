@@ -801,6 +801,136 @@ export type Database = {
         }
         Relationships: []
       }
+      life_habit_logs: {
+        Row: {
+          created_at: string
+          day: string
+          habit_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          habit_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          habit_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "life_habit_logs_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "life_habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      life_habits: {
+        Row: {
+          archived_at: string | null
+          category: string | null
+          created_at: string
+          frequency: string
+          id: string
+          times_per_week: number | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          category?: string | null
+          created_at?: string
+          frequency?: string
+          id?: string
+          times_per_week?: number | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          category?: string | null
+          created_at?: string
+          frequency?: string
+          id?: string
+          times_per_week?: number | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      life_priorities: {
+        Row: {
+          day: string
+          done_at: string | null
+          text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          day: string
+          done_at?: string | null
+          text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          day?: string
+          done_at?: string | null
+          text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      life_tasks: {
+        Row: {
+          created_at: string
+          day: string
+          done_at: string | null
+          goal_id: string | null
+          id: string
+          priority: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          done_at?: string | null
+          goal_id?: string | null
+          id?: string
+          priority?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          done_at?: string | null
+          goal_id?: string | null
+          id?: string
+          priority?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "life_tasks_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "plus_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pedagogical_dual_write_failures: {
         Row: {
           attempt_count: number
@@ -866,6 +996,44 @@ export type Database = {
           },
         ]
       }
+      plus_goal_milestones: {
+        Row: {
+          created_at: string
+          done_at: string | null
+          goal_id: string
+          id: string
+          position: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          done_at?: string | null
+          goal_id: string
+          id?: string
+          position?: number
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          done_at?: string | null
+          goal_id?: string
+          id?: string
+          position?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plus_goal_milestones_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "plus_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plus_goal_steps: {
         Row: {
           created_at: string
@@ -909,6 +1077,8 @@ export type Database = {
           archived_at: string | null
           area: string
           created_at: string
+          deadline: string | null
+          description: string | null
           id: string
           title: string
           user_id: string
@@ -917,6 +1087,8 @@ export type Database = {
           archived_at?: string | null
           area?: string
           created_at?: string
+          deadline?: string | null
+          description?: string | null
           id?: string
           title: string
           user_id: string
@@ -925,6 +1097,8 @@ export type Database = {
           archived_at?: string | null
           area?: string
           created_at?: string
+          deadline?: string | null
+          description?: string | null
           id?: string
           title?: string
           user_id?: string
