@@ -24,12 +24,15 @@ const AREAS: Array<[RegExp, string]> = [
 ];
 
 /** Already measured elsewhere or expected: AI retries and failures are in
- *  ai_usage_events (AI alerts), a salvaged lesson keeps its valid items, and a
- *  phone that uninstalled the app answers 404 to its push. */
+ *  ai_usage_events (AI alerts), a salvaged lesson keeps its valid items, a
+ *  phone that uninstalled the app answers 404 to its push, and "aborted" is
+ *  the browser giving up on a request (the student changed screen or closed
+ *  the app mid-request; 27 a day in the Admin, user report), not a failure. */
 const IGNORED = [
   /^Gemini (attempt|transcription failed|returned an empty answer)/i,
   /^Lesson content failed strict validation/i,
   /send failed \[404\]/i,
+  /^(Error|AbortError): (aborted|The operation was aborted\.?|This operation was aborted)$/i,
 ];
 
 /** The first line of every text and Error argument: a prefix plus its detail. */

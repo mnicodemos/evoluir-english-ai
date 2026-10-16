@@ -31,6 +31,16 @@ describe("describeServerError", () => {
     expect(describeServerError(["FCM send failed [404]: UNREGISTERED"])).toBeNull();
     expect(describeServerError([])).toBeNull();
   });
+
+  it("skips a request the browser gave up on, but not a timeout", () => {
+    expect(describeServerError([new Error("aborted")])).toBeNull();
+    const abort = new Error("This operation was aborted");
+    abort.name = "AbortError";
+    expect(describeServerError([abort])).toBeNull();
+    const timeout = new Error("The operation was aborted due to timeout");
+    timeout.name = "TimeoutError";
+    expect(describeServerError([timeout])).not.toBeNull();
+  });
 });
 
 describe("scrubErrorText", () => {
