@@ -63,7 +63,7 @@ export function WeatherTalk({
           <button
             type="button"
             aria-label={`${translate("Weather talk")} · ${translate("Around you in English")}`}
-            className="group flex h-11 shrink-0 items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-3 text-left transition-colors hover:border-brand-green/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 data-[state=open]:border-brand-green/50"
+            className="group flex h-9 shrink-0 items-center gap-2.5 rounded-full pr-3 text-left transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 data-[state=open]:bg-white/[0.06]"
           >
             <span className="relative grid size-9 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
               <TriggerIcon className="size-[1.15rem]" aria-hidden="true" />

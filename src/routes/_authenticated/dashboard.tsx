@@ -214,12 +214,15 @@ function DashboardNotifications({
           className={
             placement === "mobile"
               ? `relative size-8 shrink-0 rounded-full ${graphiteIconButtonClass}`
-              : "relative size-7 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+              : // A grey circle closing the Weather talk capsule (user request).
+                "relative size-9 shrink-0 rounded-full bg-white/10 text-muted-foreground hover:bg-white/15 hover:text-foreground"
           }
         >
           <Bell className={placement === "mobile" ? "size-[1.15rem]" : "size-4"} />
           {hasNotifications && (
-            <span className="absolute right-0.5 top-0.5 size-2 rounded-full bg-brand-green ring-2 ring-background">
+            <span
+              className={`absolute size-2 rounded-full bg-brand-green ring-2 ring-background ${placement === "mobile" ? "right-0.5 top-0.5" : "right-2 top-2"}`}
+            >
               <span className="sr-only">{translate("New activities available")}</span>
             </span>
           )}
@@ -396,16 +399,20 @@ function Dashboard() {
               desktopSubtitleTrailing={
                 <div className="flex items-center gap-1.5">
                   <CampaignJourneyChip translate={t} placement="desktop" />
-                  <WeatherTalk translate={t} placement="desktop" />
-                  <DashboardNotifications
-                    indicators={indicators}
-                    reviewCount={reviewCount}
-                    planTask={planNext}
-                    mistakesDue={mistakesDue}
-                    goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
-                    translate={t}
-                    placement="desktop"
-                  />
+                  {/* One capsule for Weather talk and the bell, the bell in its own
+                      grey circle at the end (user request). */}
+                  <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
+                    <WeatherTalk translate={t} placement="desktop" />
+                    <DashboardNotifications
+                      indicators={indicators}
+                      reviewCount={reviewCount}
+                      planTask={planNext}
+                      mistakesDue={mistakesDue}
+                      goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
+                      translate={t}
+                      placement="desktop"
+                    />
+                  </div>
                   <FirstWeekGuide profile={profile} placement="desktop" />
                 </div>
               }
