@@ -18,7 +18,7 @@ const PRIORITY_LABEL: Record<LifePriorityLevel, string> = {
   low: "Low",
 };
 
-const PRIORITY_DOT: Record<LifePriorityLevel, string> = {
+export const PRIORITY_DOT: Record<LifePriorityLevel, string> = {
   high: "bg-destructive",
   medium: "bg-amber-400",
   low: "bg-sky-400",

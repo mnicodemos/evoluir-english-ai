@@ -204,6 +204,7 @@ export function LifeSlot({
   icon,
   title,
   done,
+  badge,
   details,
   chooser,
   action,
@@ -212,6 +213,7 @@ export function LifeSlot({
   icon: ReactNode;
   title: string;
   done: boolean;
+  badge?: ReactNode;
   details: ReactNode;
   chooser: ReactNode;
   action: ReactNode;
@@ -231,6 +233,7 @@ export function LifeSlot({
           {icon}
           {kind}
         </p>
+        {badge}
         {chooser}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
