@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Camera, Loader2, Settings, UserRound } from "lucide-react";
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -77,10 +77,14 @@ function useAvatarUrl(path?: string | null) {
 export function ProfileMenu({
   className,
   presentation = "icon",
+  toolbar,
 }: {
   className?: string;
   presentation?: "icon" | "dashboard-sidebar" | "mobile-menu";
+  /** Desktop sidebar: icon buttons shown on the row above the profile, with its gear. */
+  toolbar?: ReactNode;
 }) {
+  const gearRef = useRef<HTMLButtonElement>(null);
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
   const { data: profile } = useProfile();
@@ -181,7 +185,7 @@ export function ProfileMenu({
       aria-label={translate("Edit profile", lang)}
       className={cn(
         presentation === "dashboard-sidebar"
-          ? "h-auto min-h-[5.25rem] w-full justify-start gap-2.5 rounded-none border-t border-sidebar-border px-1 pt-5 pb-5 text-sidebar-foreground hover:bg-transparent"
+          ? "h-auto w-full justify-start gap-2.5 rounded-lg px-1 pt-2 pb-4 text-sidebar-foreground hover:bg-transparent"
           : presentation === "mobile-menu"
             ? "h-11 w-full justify-start gap-2 rounded-lg px-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
@@ -216,7 +220,9 @@ export function ProfileMenu({
               </span>
             )}
           </span>
-          <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
+          {presentation !== "dashboard-sidebar" && (
+            <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
+          )}
         </>
       )}
     </Button>
@@ -302,11 +308,33 @@ export function ProfileMenu({
   if (presentation === "dashboard-sidebar") {
     return (
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
+        {/* Two rows (user request): the icons on top (the profile's gear, then
+            the toolbar), the photo, name and plan below. */}
+        <div className="border-t border-sidebar-border pt-2">
+          <div className="flex items-center gap-1 px-1">
+            <Button
+              ref={gearRef}
+              variant="ghost"
+              size="icon"
+              aria-label={translate("Edit profile", lang)}
+              title={translate("Edit profile", lang)}
+              className="size-9 rounded-full text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              onClick={() => setOpen((value) => !value)}
+            >
+              <Settings className="size-[1.15rem]" aria-hidden="true" />
+            </Button>
+            {toolbar}
+          </div>
+          <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
+        </div>
         <PopoverContent
           side="top"
           align="start"
           sideOffset={8}
+          // The gear toggles the popover itself; its click is not "outside".
+          onInteractOutside={(event) => {
+            if (gearRef.current?.contains(event.target as Node)) event.preventDefault();
+          }}
           className={cn(
             "dashboard-shell dark max-h-[calc(100dvh-2rem)] w-[min(21rem,calc(100vw-2rem))] space-y-4 overflow-y-auto p-5",
             graphitePanelClass,

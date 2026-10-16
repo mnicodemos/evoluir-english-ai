@@ -533,15 +533,13 @@ function AppShellContent({
                 <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
               </Button>
             </div>
-            {/* The profile with the language and notification icons beside its
-                gear (user request), in a taller row. */}
-            <div className="flex items-center gap-1 border-t border-sidebar-border">
-              <ProfileMenu
-                presentation="dashboard-sidebar"
-                className="min-w-0 flex-1 border-t-0 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              />
-              <UtilityButtons variant="sidebar" />
-            </div>
+            {/* The profile: icons on top (gear, language, notifications), the
+                photo, name and plan below (user request). */}
+            <ProfileMenu
+              presentation="dashboard-sidebar"
+              className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              toolbar={<UtilityButtons variant="sidebar" />}
+            />
           </div>
         </aside>
 
