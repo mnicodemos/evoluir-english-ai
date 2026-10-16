@@ -17,6 +17,7 @@ export type TodayLineIcon =
   | "flashcards"
   | "pronunciation"
   | "test"
+  | "meditation"
   | "time";
 
 export type TodayLineState = "done" | "attention" | "empty";
@@ -162,6 +163,14 @@ export function todayProgressLines(input: {
         active: count > 0,
       };
     })(),
+    {
+      key: "meditation",
+      icon: "meditation",
+      label: "min of meditation",
+      value: String(minutesOf(rows, ["meditation"])),
+      state: minutesOf(rows, ["meditation"]) > 0 ? "done" : "empty",
+      active: minutesOf(rows, ["meditation"]) > 0,
+    },
     {
       key: "accuracy",
       icon: "accuracy",

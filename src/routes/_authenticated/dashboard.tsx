@@ -13,6 +13,7 @@ import {
   Headphones,
   BookA,
   ClipboardCheck,
+  Flower2,
   Layers,
   MessageCircle,
   Mic,
@@ -92,6 +93,7 @@ const TODAY_LINE_ICONS: Record<TodayLineIcon, typeof BookOpen> = {
   flashcards: Layers,
   pronunciation: Mic,
   test: ClipboardCheck,
+  meditation: Flower2,
   time: Clock,
 };
 

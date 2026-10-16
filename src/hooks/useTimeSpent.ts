@@ -146,7 +146,8 @@ export function useLogTimeOnExit(params: {
               | "flashcards"
               | "teacher"
               | "mistakes_review"
-              | "video_call",
+              | "video_call"
+              | "meditation",
             minutes,
           },
         });

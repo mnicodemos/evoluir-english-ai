@@ -3,6 +3,29 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  // Meditations in English (Life AI)
+  "Meditations in English": "Meditações em inglês",
+  "Relax and train your listening: EVO guides you slowly, with the text on screen.":
+    "Relaxe e treine sua escuta: a EVO conduz devagar, com o texto na tela.",
+  "Show translation": "Ver tradução",
+  "Hide translation": "Ocultar tradução",
+  "Key words": "Palavras-chave",
+  "Think about it": "Para pensar",
+  "Answer it with the AI Teacher": "Responda com o AI Teacher",
+  "Back to meditations": "Voltar às meditações",
+  "min of meditation": "min de meditação",
+  "Calm breathing": "Respiração calma",
+  "Any time you need a pause": "Sempre que precisar de uma pausa",
+  "Focus before studying": "Foco antes de estudar",
+  "Before a lesson or a task": "Antes de uma lição ou tarefa",
+  Gratitude: "Gratidão",
+  "In the morning or at night": "De manhã ou à noite",
+  "Relax before sleep": "Relaxar antes de dormir",
+  "At night, in bed": "À noite, na cama",
+  "Two-minute break": "Pausa de dois minutos",
+  "In the middle of work or study": "No meio do trabalho ou do estudo",
+  "Try a meditation in English to relax and train your listening.":
+    "Experimente uma meditação em inglês para relaxar e treinar a escuta.",
   // Life AI (phase 1)
   "Life AI": "Life AI",
   "Evolve one day at a time.": "Evolua um dia de cada vez.",
