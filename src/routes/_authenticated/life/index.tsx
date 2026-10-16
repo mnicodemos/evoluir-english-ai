@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Star, Trash2 } from "lucide-react";
+import { Check, Star, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -14,6 +14,7 @@ import { LifeHeader, LifePremiumGate, LifeSectionTitle, useLifeT } from "@/compo
 import { RoutineSection } from "@/components/life/RoutineSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { lifeDayProgress } from "@/lib/life";
@@ -66,7 +67,15 @@ function LifePage() {
     return (
       <AppShell>
         <LifeHeader />
-        <Loader2 className="size-5 animate-spin text-muted-foreground" aria-hidden="true" />
+        {/* Same shapes as the page (user request: no spinner, no jump). */}
+        <div className="space-y-4" aria-busy="true">
+          <Skeleton className="h-40 w-full rounded-xl" />
+          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+            <Skeleton className="h-96 rounded-xl" />
+            <Skeleton className="h-96 rounded-xl" />
+            <Skeleton className="hidden h-96 rounded-xl xl:block" />
+          </div>
+        </div>
       </AppShell>
     );
   }

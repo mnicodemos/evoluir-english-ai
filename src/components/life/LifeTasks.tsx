@@ -4,7 +4,7 @@ import { Check, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useLifeT } from "@/components/life/LifeNav";
+import { LifeEmpty, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -63,7 +63,7 @@ export function LifeTaskList({
       Number(!!a.doneAt) - Number(!!b.doneAt) ||
       PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority],
   );
-  if (!sorted.length) return <p className="text-sm text-muted-foreground">{t(emptyText)}</p>;
+  if (!sorted.length) return <LifeEmpty>{t(emptyText)}</LifeEmpty>;
 
   return (
     <ul className="space-y-2">
