@@ -26,6 +26,7 @@ import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { graphitePanelClass } from "@/lib/surfaces";
+import { PRIORITY_DOT } from "@/components/life/LifeTasks";
 import { cn } from "@/lib/utils";
 
 const PRIORITY_TEXT = { high: "High", medium: "Medium", low: "Low" } as const;
@@ -157,6 +158,16 @@ export function GoalsTodayCard() {
               icon={SLOT_ICONS.task}
               title={shownTask.title}
               done={!!shownTask.doneAt}
+              // The task's urgency right on the Home (user request), as on /life.
+              badge={
+                <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-semibold text-muted-foreground">
+                  <span
+                    className={cn("size-1.5 rounded-full", PRIORITY_DOT[shownTask.priority])}
+                    aria-hidden="true"
+                  />
+                  {t(PRIORITY_TEXT[shownTask.priority])}
+                </span>
+              }
               details={
                 <p className="text-sm text-muted-foreground">
                   {t("Priority")}: {t(PRIORITY_TEXT[shownTask.priority])}
