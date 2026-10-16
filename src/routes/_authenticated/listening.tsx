@@ -17,6 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
+import { StudyDayCounter } from "@/components/StudyDayCounter";
 import { AppShell } from "@/components/AppShell";
 import { useTodayActivities } from "@/components/DailyGoalCard";
 import { Button } from "@/components/ui/button";
@@ -495,27 +496,13 @@ function ListeningPage() {
             </>
           }
         >
-          <p
-            className={cn(
-              "mt-3 flex w-fit flex-wrap items-center gap-x-2 gap-y-1 rounded-full border px-3 py-1 text-xs font-semibold",
-              sessionsToday >= sessionsGoal
-                ? "border-brand-green/50 bg-brand-green/10 text-brand-green"
-                : "border-border text-muted-foreground",
-            )}
-          >
-            <span>
-              <span>Sessions today</span>
-              <span>{`: ${Math.min(sessionsToday, sessionsGoal)}/${sessionsGoal}`}</span>
-            </span>
-            {sessionsToday >= sessionsGoal ? (
-              <span className="inline-flex items-center gap-1">
-                <CheckCircle2 className="size-3.5" aria-hidden="true" />
-                <span>Study day counted</span>
-              </span>
-            ) : (
-              <span className="font-normal">3 sessions complete your study day.</span>
-            )}
-          </p>
+          <StudyDayCounter
+            label={<span>Sessions today</span>}
+            value={sessionsToday}
+            goal={sessionsGoal}
+            doneText={<span>Study day counted</span>}
+            hint={<span>3 sessions complete your study day.</span>}
+          />
           <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
             <RotateCcw className="mr-2 size-4" /> Redo today's activity
           </Button>

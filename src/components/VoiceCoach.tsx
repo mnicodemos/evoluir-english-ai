@@ -604,7 +604,9 @@ export function VoiceCoach({
                 voiceState === "transcribing"
               }
               style={{ width: "4.8rem", height: "4.8rem" }}
-              className={`rounded-full ${
+              // [&_svg]:size-8 overrides the button's 16 px icon rule, which kept
+              // the microphone tiny in its big circle (user report).
+              className={`rounded-full [&_svg]:size-8 ${
                 voiceState === "recording"
                   ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   : voiceState === "speaking"
@@ -622,7 +624,9 @@ export function VoiceCoach({
                 <Mic className="size-[2.1rem]" />
               )}
             </Button>
-            <span className="size-9" aria-hidden="true" />
+            {/* As wide as the replay button on the left, so the microphone
+                sits in the middle (user report: the group was off-centre). */}
+            <span className="size-11 shrink-0 lg:size-9" aria-hidden="true" />
           </div>
         </div>
       </section>
