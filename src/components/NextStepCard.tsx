@@ -407,7 +407,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Phones: the same padding above the coach label and below the last
                 line, so EVO sits as far from the image as the reason line from the
                 card's bottom, with a little more room under the label (user request). */}
-            <div className="mt-3.5 flex items-center justify-between gap-3 sm:mt-2 sm:block xl:mt-auto">
+            <div className="mt-5 flex items-center justify-between gap-3 sm:mt-2 sm:block xl:mt-auto">
               <div className="min-w-0 flex-1">
                 <div>
                   {/* No level badge here: next to the priority it read as part of it,
@@ -446,9 +446,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               )}
             </div>
             {/* Mobile-only action row: Quick Win + weekly league + Your trail. */}
-            {/* Glass pills (user request: more sophisticated than outlined ones),
-                a little lower, so the reason line below always fits the card. */}
-            <div className="mt-2 flex flex-nowrap items-center gap-1.5 sm:hidden">
+            {/* Glass pills (user request: more sophisticated than outlined ones).
+                The priority, pills and reason line breathe evenly through the
+                card's free height instead of crowding under the EVO label
+                (user report). */}
+            <div className="mt-4 flex flex-nowrap items-center gap-1.5 sm:hidden">
               {quickWinButton}
               {leagueButton}
               {mapButton}
@@ -456,7 +458,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Mobile-only: one line with the real reason for today's priority.
                 Due word reviews live in the bell; a box here was clipped by the
                 card and showed only as a green line. */}
-            <p className="mt-2 flex items-center gap-1.5 text-[11px] leading-snug text-sidebar-foreground/75 sm:hidden">
+            <p className="mt-3.5 flex items-center gap-1.5 text-[11px] leading-snug text-sidebar-foreground/75 sm:hidden">
               <Lightbulb
                 className="size-3.5 shrink-0 text-warning"
                 strokeWidth={2.5}
