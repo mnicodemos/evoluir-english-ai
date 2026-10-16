@@ -97,7 +97,7 @@ function lifeTabOpen(pathname: string, to: string) {
 
 // Translation and notification controls moved here from the dashboard reflection
 // block: one home in the sidebar (desktop) and the sheet menu (mobile).
-function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
+function UtilityButtons() {
   const { lang, setLang } = useUiLang();
   const push = usePushNotifications();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -133,65 +133,35 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
     }
   }
 
-  // Desktop sidebar: two round icon buttons beside the profile's gear (user
-  // request), the language showing its short code.
-  if (variant === "sidebar") {
-    // Two equal cells of the profile card's icon row (ProfileMenu), the
-    // language with its short code beside the icon, not over it.
-    return (
-      <>
-        <Button
-          variant="ghost"
-          aria-label={`${t("Change language")}: ${lang === "pt" ? "Português" : "English"}`}
-          title={lang === "pt" ? "Português" : "English"}
-          className="h-9 w-full gap-1 rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-          onClick={toggleLang}
-        >
-          <Languages className="size-[1.15rem]" />
-          <span className="text-[10px] font-bold">{lang === "pt" ? "PT" : "EN"}</span>
-        </Button>
-        <Button
-          variant="ghost"
-          aria-label={pushLabel}
-          title={pushLabel}
-          aria-pressed={pushOn}
-          className={cn(
-            "h-9 w-full rounded-lg px-0 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-            pushOn ? "text-brand-green" : "text-sidebar-foreground/70",
-          )}
-          onClick={() => void togglePush()}
-        >
-          {pushOn ? <Bell className="size-[1.15rem]" /> : <BellOff className="size-[1.15rem]" />}
-        </Button>
-      </>
-    );
-  }
-
-  // Mobile sheet matches the desktop sidebar: full-width icon + text rows,
-  // no borders.
+  // Two equal cells of the profile card's icon row (ProfileMenu, desktop
+  // sidebar and phone menu), the language with its short code beside the
+  // icon, not over it.
   return (
-    <div className="flex flex-col items-stretch gap-0.5">
+    <>
       <Button
         variant="ghost"
-        aria-label={t("Change language")}
-        className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        aria-label={`${t("Change language")}: ${lang === "pt" ? "Português" : "English"}`}
+        title={lang === "pt" ? "Português" : "English"}
+        className="h-9 w-full gap-1 rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
         onClick={toggleLang}
       >
-        <Languages className="size-5 shrink-0" />
-        <span className="min-w-0 truncate text-left">
-          {lang === "pt" ? "Português" : "English"}
-        </span>
+        <Languages className="size-[1.15rem]" />
+        <span className="text-[10px] font-bold">{lang === "pt" ? "PT" : "EN"}</span>
       </Button>
       <Button
         variant="ghost"
-        aria-label={t("Notifications")}
-        className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        aria-label={pushLabel}
+        title={pushLabel}
+        aria-pressed={pushOn}
+        className={cn(
+          "h-9 w-full rounded-lg px-0 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+          pushOn ? "text-brand-green" : "text-sidebar-foreground/70",
+        )}
         onClick={() => void togglePush()}
       >
-        {pushOn ? <Bell className="size-5 shrink-0" /> : <BellOff className="size-5 shrink-0" />}
-        <span className="min-w-0 truncate text-left">{pushLabel}</span>
+        {pushOn ? <Bell className="size-[1.15rem]" /> : <BellOff className="size-[1.15rem]" />}
       </Button>
-    </div>
+    </>
   );
 }
 
@@ -292,7 +262,6 @@ export function MobileNavigationMenu({
           })}
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
-          <UtilityButtons variant="sheet" />
           {/* The app guide ("Diário de bordo", user request) sits with the settings rows. */}
           <SheetClose asChild>
             <Link
@@ -326,9 +295,9 @@ export function MobileNavigationMenu({
               {translate("Sign out")}
             </Button>
           </SheetClose>
-          <SheetClose asChild>
-            <ProfileMenu presentation="mobile-menu" />
-          </SheetClose>
+          {/* The same profile card as the desktop sidebar (user request); the
+              menu stays open behind the profile dialog. */}
+          <ProfileMenu className="mt-2" presentation="mobile-menu" toolbar={<UtilityButtons />} />
         </div>
       </SheetContent>
     </Sheet>
@@ -536,7 +505,7 @@ function AppShellContent({
             <ProfileMenu
               presentation="dashboard-sidebar"
               className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              toolbar={<UtilityButtons variant="sidebar" />}
+              toolbar={<UtilityButtons />}
             />
           </div>
         </aside>

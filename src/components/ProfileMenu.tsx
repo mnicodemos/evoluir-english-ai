@@ -81,7 +81,7 @@ export function ProfileMenu({
 }: {
   className?: string;
   presentation?: "icon" | "dashboard-sidebar" | "mobile-menu";
-  /** Desktop sidebar: icon buttons shown on the row above the profile, with its gear. */
+  /** Desktop sidebar and phone menu: the icon buttons beside the gear in the profile card. */
   toolbar?: ReactNode;
 }) {
   const gearRef = useRef<HTMLButtonElement>(null);
@@ -177,26 +177,24 @@ export function ProfileMenu({
   const displayName = profile?.name || profile?.email || "User";
   const photo = avatarPreview ?? avatarUrl ?? undefined;
 
-  // The button that opens the profile (sidebar row, phone menu row or icon).
+  // Desktop sidebar and phone menu share one profile card (user request).
+  const inCard = presentation !== "icon";
+
+  // The button that opens the profile (the card's top row, or an icon).
   const triggerButton = (
     <Button
       variant="ghost"
       size={presentation === "icon" ? "icon" : "default"}
       aria-label={translate("Edit profile", lang)}
       className={cn(
-        presentation === "dashboard-sidebar"
+        inCard
           ? "h-auto w-full justify-start gap-3 rounded-lg px-1.5 py-1.5 text-sidebar-foreground hover:bg-sidebar-accent/60"
-          : presentation === "mobile-menu"
-            ? "h-11 w-full justify-start gap-2 rounded-lg px-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-            : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
+          : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
         className,
       )}
     >
       <Avatar
-        className={cn(
-          "shrink-0 border border-border bg-muted",
-          presentation === "dashboard-sidebar" ? "size-10" : "size-8",
-        )}
+        className={cn("shrink-0 border border-border bg-muted", inCard ? "size-10" : "size-8")}
       >
         <AvatarImage src={photo} alt={displayName} className="object-cover" />
         <AvatarFallback className="bg-accent text-[11px] font-bold text-accent-foreground">
@@ -209,12 +207,12 @@ export function ProfileMenu({
             <span
               className={cn(
                 "block truncate font-semibold text-sidebar-foreground",
-                presentation === "dashboard-sidebar" ? "text-sm" : "text-xs",
+                inCard ? "text-sm" : "text-xs",
               )}
             >
               {displayName.split(/\s+/)[0]}
             </span>
-            {presentation === "dashboard-sidebar" && (
+            {inCard && (
               <span
                 className={cn(
                   "mt-1 inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none",
@@ -226,15 +224,7 @@ export function ProfileMenu({
                 {profileIsPremium(profile) ? "Premium" : "Free"}
               </span>
             )}
-            {presentation === "mobile-menu" && profileIsPremium(profile) && (
-              <span className="mt-0.5 inline-flex rounded-full bg-warning px-1.5 py-0.5 text-[8px] font-bold leading-none text-warning-foreground">
-                Premium
-              </span>
-            )}
           </span>
-          {presentation !== "dashboard-sidebar" && (
-            <Settings className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden="true" />
-          )}
         </>
       )}
     </Button>
@@ -315,30 +305,34 @@ export function ProfileMenu({
     </>
   );
 
+  // One card (user request: the loose rows looked cramped), in the desktop
+  // sidebar and the phone menu alike: the photo, name and plan on top, then
+  // the gear, language and bell as three equal buttons under a divider.
+  const profileCard = (trigger: ReactNode) => (
+    <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/25 p-1.5">
+      {trigger}
+      <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-sidebar-border pt-1.5">
+        <Button
+          ref={gearRef}
+          variant="ghost"
+          aria-label={translate("Edit profile", lang)}
+          title={translate("Edit profile", lang)}
+          className="h-9 w-full rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          onClick={() => setOpen((value) => !value)}
+        >
+          <Settings className="size-[1.15rem]" aria-hidden="true" />
+        </Button>
+        {toolbar}
+      </div>
+    </div>
+  );
+
   // Desktop sidebar (user request): opens right above its button, like a menu
   // from the sidebar's footer, not centred on the screen.
   if (presentation === "dashboard-sidebar") {
     return (
       <Popover open={open} onOpenChange={setOpen}>
-        {/* One card (user request: the two loose rows looked cramped): the
-            photo, name and plan on top, then the gear, language and bell as
-            three equal buttons under a divider. */}
-        <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/25 p-1.5">
-          <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
-          <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-sidebar-border pt-1.5">
-            <Button
-              ref={gearRef}
-              variant="ghost"
-              aria-label={translate("Edit profile", lang)}
-              title={translate("Edit profile", lang)}
-              className="h-9 w-full rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              onClick={() => setOpen((value) => !value)}
-            >
-              <Settings className="size-[1.15rem]" aria-hidden="true" />
-            </Button>
-            {toolbar}
-          </div>
-        </div>
+        {profileCard(<PopoverTrigger asChild>{triggerButton}</PopoverTrigger>)}
         <PopoverContent
           side="top"
           align="start"
@@ -368,7 +362,11 @@ export function ProfileMenu({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{triggerButton}</DialogTrigger>
+      {presentation === "mobile-menu" ? (
+        profileCard(<DialogTrigger asChild>{triggerButton}</DialogTrigger>)
+      ) : (
+        <DialogTrigger asChild>{triggerButton}</DialogTrigger>
+      )}
       <DialogContent
         // Translucent graphite like Weather talk and the bell (user request).
         // Phones: inset from the edges with rounded corners and never taller than
