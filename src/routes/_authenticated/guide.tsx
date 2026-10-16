@@ -21,6 +21,7 @@ import {
   Video,
 } from "lucide-react";
 
+import { useIsPremium } from "@/components/PremiumBadge";
 import { AppShell } from "@/components/AppShell";
 import {
   Accordion,
@@ -67,6 +68,8 @@ const ICONS: Record<GuideIcon, typeof House> = {
  * button to open it. Content in src/lib/appGuide.ts.
  */
 function GuidePage() {
+  // Premium students see no Premium marks (user request).
+  const premium = useIsPremium() !== false;
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
@@ -95,7 +98,7 @@ function GuidePage() {
                   <span className="min-w-0">
                     <span className="flex items-center gap-1.5 text-sm font-semibold">
                       {t(section.title)}
-                      {section.premium ? (
+                      {section.premium && !premium ? (
                         <Crown className="size-3.5 text-amber-400" aria-label="Premium" />
                       ) : null}
                     </span>

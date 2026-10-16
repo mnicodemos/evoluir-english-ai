@@ -51,6 +51,19 @@ export function MeditationSection() {
   const run = useRef(0);
   const startedAt = useRef(0);
   const logged = useRef(false);
+  const scroller = useRef<HTMLDivElement>(null);
+  const donePanel = useRef<HTMLDivElement>(null);
+
+  // Keep the line being read in view inside the block, without moving the page.
+  useEffect(() => {
+    const box = scroller.current;
+    if (!box) return;
+    const target =
+      phase === "done"
+        ? donePanel.current
+        : box.querySelector<HTMLElement>(`[data-line="${current}"]`);
+    if (target) box.scrollTo({ top: Math.max(0, target.offsetTop - 8), behavior: "smooth" });
+  }, [current, phase]);
 
   const saveMinutes = () => {
     if (logged.current || !startedAt.current) return;
@@ -121,88 +134,101 @@ export function MeditationSection() {
         className="card-soft scroll-mt-4 p-4 sm:p-5"
         aria-labelledby="meditation-title"
       >
-        <div className="flex items-center gap-2">
+        {/* Stop sits on top and the text scrolls inside the block (user
+            request), so a session never makes the one page grow. */}
+        <div className="flex flex-wrap items-center gap-2">
           <Flower2 className="size-5 text-brand-green" aria-hidden="true" />
-          <h2 id="meditation-title" className="text-base font-semibold">
+          <h2 id="meditation-title" className="min-w-0 text-base font-semibold">
             {t(session.title)}
           </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="ml-auto h-7 gap-1 text-xs"
-            aria-pressed={showPt}
-            onClick={() => setShowPt((value) => !value)}
-          >
-            <Languages className="size-3.5" aria-hidden="true" />
-            {showPt ? t("Hide translation") : t("Show translation")}
-          </Button>
+          <div className="ml-auto flex items-center gap-1.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 gap-1 text-xs"
+              aria-pressed={showPt}
+              onClick={() => setShowPt((value) => !value)}
+            >
+              <Languages className="size-3.5" aria-hidden="true" />
+              {showPt ? t("Hide translation") : t("Show translation")}
+            </Button>
+            {phase === "playing" ? (
+              <Button variant="outline" size="sm" className="h-7 gap-1.5 text-xs" onClick={stop}>
+                <Square className="size-3.5" aria-hidden="true" />
+                {t("Stop")}
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" className="h-7 text-xs" onClick={stop}>
+                {t("Back to meditations")}
+              </Button>
+            )}
+          </div>
         </div>
 
-        <ol className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1" translate="no">
-          {lines.map((line, index) => (
-            <li
-              key={line.en}
-              className={cn(
-                "rounded-lg p-2 text-sm transition-colors",
-                index === current && phase === "playing"
-                  ? "bg-brand-green/12 text-foreground"
-                  : index < current || phase === "done"
-                    ? "text-muted-foreground"
-                    : "text-muted-foreground/60",
-              )}
-            >
-              <span className="flex items-start gap-2">
-                {index === current && phase === "playing" ? (
-                  <Volume2 className="mt-0.5 size-4 shrink-0 text-brand-green" aria-hidden="true" />
-                ) : null}
-                <span>{line.en}</span>
-              </span>
-              {showPt ? <span className="mt-0.5 block text-xs italic">{line.pt}</span> : null}
-            </li>
-          ))}
-        </ol>
+        <div ref={scroller} className="relative mt-3 max-h-56 overflow-y-auto pr-1">
+          <ol className="space-y-2" translate="no">
+            {lines.map((line, index) => (
+              <li
+                key={line.en}
+                data-line={index}
+                className={cn(
+                  "rounded-lg p-2 text-sm transition-colors",
+                  index === current && phase === "playing"
+                    ? "bg-brand-green/12 text-foreground"
+                    : index < current || phase === "done"
+                      ? "text-muted-foreground"
+                      : "text-muted-foreground/60",
+                )}
+              >
+                <span className="flex items-start gap-2">
+                  {index === current && phase === "playing" ? (
+                    <Volume2
+                      className="mt-0.5 size-4 shrink-0 text-brand-green"
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  <span>{line.en}</span>
+                </span>
+                {showPt ? <span className="mt-0.5 block text-xs italic">{line.pt}</span> : null}
+              </li>
+            ))}
+          </ol>
 
-        {phase === "playing" ? (
-          <Button variant="outline" size="sm" className="mt-3 gap-1.5" onClick={stop}>
-            <Square className="size-3.5" aria-hidden="true" />
-            {t("Stop")}
-          </Button>
-        ) : (
-          <div className="mt-3 space-y-3 rounded-lg border border-border p-3">
-            <p className="flex items-center gap-2 text-sm font-semibold text-brand-green">
-              <CheckCircle2 className="size-4" aria-hidden="true" />
-              {t("Session complete")}
-            </p>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("Key words")}
+          {phase === "done" ? (
+            <div ref={donePanel} className="mt-3 space-y-3 rounded-lg border border-border p-3">
+              <p className="flex items-center gap-2 text-sm font-semibold text-brand-green">
+                <CheckCircle2 className="size-4" aria-hidden="true" />
+                {t("Session complete")}
               </p>
-              <ul className="mt-1 flex flex-wrap gap-1.5" translate="no">
-                {session.words.map(([word, meaning]) => (
-                  <li key={word}>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        void speakEnglish(word, { cache: "persistent" }).catch(() => undefined)
-                      }
-                      className="rounded-full border border-border px-2 py-0.5 text-xs hover:bg-secondary"
-                    >
-                      <span className="font-medium">{word}</span>{" "}
-                      <span className="text-muted-foreground">· {meaning}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("Think about it")}
-              </p>
-              <p className="mt-1 text-sm" translate="no">
-                {session.reflection}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {t("Key words")}
+                </p>
+                <ul className="mt-1 flex flex-wrap gap-1.5" translate="no">
+                  {session.words.map(([word, meaning]) => (
+                    <li key={word}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void speakEnglish(word, { cache: "persistent" }).catch(() => undefined)
+                        }
+                        className="rounded-full border border-border px-2 py-0.5 text-xs hover:bg-secondary"
+                      >
+                        <span className="font-medium">{word}</span>{" "}
+                        <span className="text-muted-foreground">· {meaning}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {t("Think about it")}
+                </p>
+                <p className="mt-1 text-sm" translate="no">
+                  {session.reflection}
+                </p>
+              </div>
               <Button
                 asChild
                 size="sm"
@@ -210,12 +236,9 @@ export function MeditationSection() {
               >
                 <Link to="/teacher">{t("Answer it with the AI Teacher")}</Link>
               </Button>
-              <Button variant="outline" size="sm" onClick={stop}>
-                {t("Back to meditations")}
-              </Button>
             </div>
-          </div>
-        )}
+          ) : null}
+        </div>
       </section>
     );
   }
@@ -243,13 +266,14 @@ export function MeditationSection() {
               {locked ? (
                 <Link
                   to="/premium"
-                  className="flex items-center gap-3 rounded-lg bg-secondary/40 p-2.5 text-sm hover:bg-secondary/70"
+                  aria-label={`${t(item.title)} · Premium`}
+                  className="flex items-center gap-3 rounded-lg bg-secondary/30 p-2.5 text-sm opacity-60 hover:opacity-80"
                 >
                   <Crown className="size-4 shrink-0 text-amber-400" aria-hidden="true" />
                   <span className="min-w-0 flex-1">
                     <span className="block font-medium">{t(item.title)}</span>
                     <span className="block text-xs text-muted-foreground">
-                      {`${t(item.when)} · ${minutes} min · Premium`}
+                      {`${t(item.when)} · ${minutes} min`}
                     </span>
                   </span>
                 </Link>

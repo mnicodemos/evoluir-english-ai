@@ -33,6 +33,7 @@ import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
+import { PremiumBadge } from "@/components/PremiumBadge";
 
 export const Route = createFileRoute("/_authenticated/business")({
   head: () => ({
@@ -162,10 +163,7 @@ function BusinessPage() {
     <AppShell>
       <div className="space-y-4">
         <header className="animate-rise">
-          <p className="inline-flex items-center gap-1.5 rounded-full border border-warning/40 bg-warning/10 px-2.5 py-0.5 text-[11px] font-semibold text-warning">
-            <Crown className="size-3.5" aria-hidden="true" />
-            <span>Premium bonus</span>
-          </p>
+          <PremiumBadge className="text-[11px]" />
           <h1 className="mt-2 flex items-center gap-2 text-2xl font-bold lg:text-3xl">
             <Briefcase className="size-6 text-brand-green" aria-hidden="true" />
             Business English

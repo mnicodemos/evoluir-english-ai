@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 
+import { useIsPremium } from "@/components/PremiumBadge";
 import { AppShell } from "@/components/AppShell";
 import { useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,7 @@ type Feature = {
  */
 function LifeGuidePage() {
   const { t } = useLifeT();
+  const showPlans = useIsPremium() === false;
 
   const features: Feature[] = [
     {
@@ -206,17 +208,20 @@ function LifeGuidePage() {
                 <h2 id={`guide-${feature.id}`} className="text-base font-semibold">
                   {t(feature.title)}
                 </h2>
-                <span
-                  className={cn(
-                    "ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold",
-                    feature.premium
-                      ? "border-warning/40 bg-warning/10 text-warning"
-                      : "border-brand-green/40 bg-brand-green/10 text-brand-green",
-                  )}
-                >
-                  {feature.premium ? <Crown className="size-3" aria-hidden="true" /> : null}
-                  {feature.premium ? "Premium" : t("Free")}
-                </span>
+                {/* Free or Premium marks only for free students (user request). */}
+                {showPlans ? (
+                  <span
+                    className={cn(
+                      "ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold",
+                      feature.premium
+                        ? "border-warning/40 bg-warning/10 text-warning"
+                        : "border-brand-green/40 bg-brand-green/10 text-brand-green",
+                    )}
+                  >
+                    {feature.premium ? <Crown className="size-3" aria-hidden="true" /> : null}
+                    {feature.premium ? "Premium" : t("Free")}
+                  </span>
+                ) : null}
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{t(feature.what)}</p>
               {/* A small drawing of the screen: what the student will see. */}

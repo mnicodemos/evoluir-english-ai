@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, Check, ChevronRight, Crown } from "lucide-react";
+import { Briefcase, Check, ChevronRight } from "lucide-react";
 import { useMemo } from "react";
 
 import { useLessons, useUserLessons } from "@/hooks/useLearning";
@@ -8,6 +8,7 @@ import { getBusinessCourse } from "@/lib/businessCourse";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
+import { PremiumBadge } from "@/components/PremiumBadge";
 
 /**
  * Dashboard (desktop): Business English beside today's goals (user request:
@@ -59,10 +60,7 @@ export function BusinessDashboardCard() {
         <h2 id="business-card-title" className="font-display text-sm font-semibold">
           {t("Business English")}
         </h2>
-        <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
-          <Crown className="size-3" aria-hidden="true" />
-          {t("Premium bonus")}
-        </span>
+        <PremiumBadge className="ml-auto" />
       </div>
       <div className="mt-2 flex min-w-0 flex-1 flex-col justify-center gap-1.5">
         {/* Room on the right for the BIZ chip. */}

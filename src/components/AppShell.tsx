@@ -136,36 +136,34 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
   // Desktop sidebar: two round icon buttons beside the profile's gear (user
   // request), the language showing its short code.
   if (variant === "sidebar") {
+    // Two equal cells of the profile card's icon row (ProfileMenu), the
+    // language with its short code beside the icon, not over it.
     return (
-      <div className="flex shrink-0 items-center gap-0.5">
+      <>
         <Button
           variant="ghost"
-          size="icon"
           aria-label={`${t("Change language")}: ${lang === "pt" ? "Português" : "English"}`}
           title={lang === "pt" ? "Português" : "English"}
-          className="relative size-9 rounded-full text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          className="h-9 w-full gap-1 rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
           onClick={toggleLang}
         >
           <Languages className="size-[1.15rem]" />
-          <span className="absolute -bottom-0.5 -right-0.5 rounded bg-sidebar-accent px-0.5 text-[8px] font-bold leading-tight text-sidebar-foreground">
-            {lang === "pt" ? "PT" : "EN"}
-          </span>
+          <span className="text-[10px] font-bold">{lang === "pt" ? "PT" : "EN"}</span>
         </Button>
         <Button
           variant="ghost"
-          size="icon"
           aria-label={pushLabel}
           title={pushLabel}
           aria-pressed={pushOn}
           className={cn(
-            "size-9 rounded-full hover:bg-sidebar-accent hover:text-sidebar-foreground",
+            "h-9 w-full rounded-lg px-0 hover:bg-sidebar-accent hover:text-sidebar-foreground",
             pushOn ? "text-brand-green" : "text-sidebar-foreground/70",
           )}
           onClick={() => void togglePush()}
         >
           {pushOn ? <Bell className="size-[1.15rem]" /> : <BellOff className="size-[1.15rem]" />}
         </Button>
-      </div>
+      </>
     );
   }
 

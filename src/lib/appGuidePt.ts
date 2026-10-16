@@ -126,8 +126,8 @@ export const appGuidePt: Record<string, string> = {
   "Your medal shows your place: gold, silver or bronze for the top three.":
     "Sua medalha mostra sua posição: ouro, prata ou bronze para os três primeiros.",
   "Business English": "Business English",
-  "A Premium bonus from level B1: 6 units of English for work.":
-    "Um bônus Premium a partir do nível B1: 6 unidades de inglês para o trabalho.",
+  "Premium, from level B1: 6 units of English for work.":
+    "Premium, a partir do nível B1: 6 unidades de inglês para o trabalho.",
   "Start with the first lesson, which is free to try.":
     "Comece pela primeira lição, que é grátis para experimentar.",
   "Lessons open in order and count as study like any lesson.":

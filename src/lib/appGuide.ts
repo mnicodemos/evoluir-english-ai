@@ -206,7 +206,7 @@ export const APP_GUIDE: GuideSection[] = [
     id: "business",
     icon: "business",
     title: "Business English",
-    what: "A Premium bonus from level B1: 6 units of English for work.",
+    what: "Premium, from level B1: 6 units of English for work.",
     steps: [
       "Start with the first lesson, which is free to try.",
       "Lessons open in order and count as study like any lesson.",
