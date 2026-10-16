@@ -160,6 +160,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Add 1 to 3 goals: EVO gives you one small step for each goal every day.",
       "Give a goal a deadline and milestones to see how far you are.",
       "Plan the day's tasks, check in your habits and set the priority of the day.",
+      "Change a goal, task, habit or the priority with its pencil (Edit).",
       "Ask the Life Coach for a plan; add its suggestions with one tap.",
       "Try a meditation in English to relax and train your listening.",
     ],

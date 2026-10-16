@@ -244,6 +244,11 @@ function PriorityCard({
             placeholder={t("What matters most today?")}
             aria-label={t("Priority of the day")}
           />
+          {editing ? (
+            <Button type="button" variant="ghost" onClick={() => setEditing(false)}>
+              {t("Cancel")}
+            </Button>
+          ) : null}
           <Button type="submit" disabled={!text.trim() || mutate.isPending}>
             {t("Save")}
           </Button>

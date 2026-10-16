@@ -246,6 +246,37 @@ export const saveLifeTask = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Edits a task's text, day, priority and goal (user request: edit tasks). */
+export const updateLifeTask = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: uuid,
+        title: z.string().trim().min(1).max(160),
+        day,
+        priority: z.enum(["high", "medium", "low"]),
+        goalId: uuid.nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requirePremium(context.userId);
+    const { error } = await (
+      await table("life_tasks")
+    )
+      .update({
+        title: data.title,
+        day: data.day,
+        priority: data.priority,
+        goal_id: data.goalId ?? null,
+      })
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
+    if (error) throw new Error("The task could not be saved.");
+    return { ok: true };
+  });
+
 export const setLifeTaskDone = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: uuid, done: z.boolean() }).parse(input))
@@ -307,6 +338,38 @@ export const addLifeHabit = createServerFn({ method: "POST" })
       times_per_week: data.frequency === "times_per_week" ? (data.timesPerWeek ?? 3) : null,
       category: data.category || null,
     });
+    if (error) throw new Error("The habit could not be saved.");
+    return { ok: true };
+  });
+
+/** Edits a habit's text, frequency and category; its check-ins stay (user request). */
+export const updateLifeHabit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: uuid,
+        title: z.string().trim().min(1).max(120),
+        frequency: z.enum(["daily", "weekdays", "times_per_week"]),
+        timesPerWeek: z.number().int().min(1).max(7).nullable().optional(),
+        category: z.string().trim().max(40).nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requirePremium(context.userId);
+    const { error } = await (
+      await table("life_habits")
+    )
+      .update({
+        title: data.title,
+        frequency: data.frequency,
+        times_per_week: data.frequency === "times_per_week" ? (data.timesPerWeek ?? 3) : null,
+        category: data.category || null,
+      })
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .is("archived_at", null);
     if (error) throw new Error("The habit could not be saved.");
     return { ok: true };
   });

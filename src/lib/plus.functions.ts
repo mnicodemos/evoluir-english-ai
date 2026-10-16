@@ -204,6 +204,23 @@ export const addPlusGoal = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Renames a goal (user request: edit goals); its past steps stay. */
+export const renamePlusGoal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), title: z.string().trim().min(3).max(120) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { goals } = await tables();
+    const { error } = await goals()
+      .update({ title: data.title, area: guessPlusArea(data.title) })
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .is("archived_at", null);
+    if (error) throw new Error("The goal could not be saved.");
+    return { ok: true };
+  });
+
 export const archivePlusGoal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))

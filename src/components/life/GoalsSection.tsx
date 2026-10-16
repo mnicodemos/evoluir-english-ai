@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Flame, Loader2, Plus, Target, X } from "lucide-react";
+import { Check, Flame, Loader2, Pencil, Plus, Target, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -14,7 +14,13 @@ import { useProfile } from "@/hooks/useProfile";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { skillMeterRows } from "@/lib/pedagogy/skillMeter";
 import { evolutionScore, PLUS_GOAL_EXAMPLES, PLUS_MAX_GOALS, plusDayComplete } from "@/lib/plus";
-import { addPlusGoal, archivePlusGoal, loadPlus, setPlusStepDone } from "@/lib/plus.functions";
+import {
+  addPlusGoal,
+  archivePlusGoal,
+  loadPlus,
+  renamePlusGoal,
+  setPlusStepDone,
+} from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
@@ -35,6 +41,8 @@ export function GoalsSection() {
   const add = useServerFn(addPlusGoal);
   const archive = useServerFn(archivePlusGoal);
   const setDone = useServerFn(setPlusStepDone);
+  const rename = useServerFn(renamePlusGoal);
+  const [editing, setEditing] = useState<{ id: string; title: string } | null>(null);
 
   const { data: life, refresh: refreshLife } = useLife();
   const plusKey = ["plus", profile?.id ?? null, lang] as const;
@@ -71,6 +79,15 @@ export function GoalsSection() {
     mutationFn: (id: string) => archive({ data: { id } }),
     onSuccess: refresh,
     onError: () => toast.error(t("The goal could not be removed.")),
+  });
+  const renameGoal = useMutation({
+    mutationFn: (input: { id: string; title: string }) => rename({ data: input }),
+    onSuccess: () => {
+      setEditing(null);
+      refresh();
+      refreshLife();
+    },
+    onError: () => toast.error(t("The goal could not be saved.")),
   });
   const toggleStep = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setDone({ data: input }),
@@ -154,23 +171,74 @@ export function GoalsSection() {
               const done = !!step?.doneAt;
               return (
                 <li key={goal.id} className="rounded-xl border border-border p-3">
-                  <div className="flex items-start gap-2">
-                    <p className="min-w-0 flex-1 text-sm font-semibold" translate="no">
-                      {goal.title}
-                    </p>
-                    <button
-                      type="button"
-                      aria-label={t("Remove goal")}
-                      title={t("Remove goal")}
-                      disabled={removeGoal.isPending}
-                      onClick={() => {
-                        if (window.confirm(t("Remove this goal?"))) removeGoal.mutate(goal.id);
+                  {editing?.id === goal.id ? (
+                    // The goal's name edited in place (user request: edit goals).
+                    <form
+                      className="flex flex-wrap gap-2"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const clean = editing.title.trim();
+                        if (clean.length >= 3 && !renameGoal.isPending)
+                          renameGoal.mutate({ id: goal.id, title: clean });
                       }}
-                      className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
                     >
-                      <X className="size-4" aria-hidden="true" />
-                    </button>
-                  </div>
+                      <Input
+                        value={editing.title}
+                        maxLength={120}
+                        autoFocus
+                        onChange={(event) => setEditing({ id: goal.id, title: event.target.value })}
+                        aria-label={t("Edit goal")}
+                        className="w-full"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="ml-auto"
+                        onClick={() => setEditing(null)}
+                      >
+                        {t("Cancel")}
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={editing.title.trim().length < 3 || renameGoal.isPending}
+                        className="gap-1.5"
+                      >
+                        {renameGoal.isPending ? (
+                          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                        ) : (
+                          <Check className="size-4" aria-hidden="true" />
+                        )}
+                        {t("Save")}
+                      </Button>
+                    </form>
+                  ) : (
+                    <div className="flex items-start gap-2">
+                      <p className="min-w-0 flex-1 text-sm font-semibold" translate="no">
+                        {goal.title}
+                      </p>
+                      <button
+                        type="button"
+                        aria-label={t("Edit goal")}
+                        title={t("Edit goal")}
+                        onClick={() => setEditing({ id: goal.id, title: goal.title })}
+                        className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      >
+                        <Pencil className="size-4" aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={t("Remove goal")}
+                        title={t("Remove goal")}
+                        disabled={removeGoal.isPending}
+                        onClick={() => {
+                          if (window.confirm(t("Remove this goal?"))) removeGoal.mutate(goal.id);
+                        }}
+                        className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      >
+                        <X className="size-4" aria-hidden="true" />
+                      </button>
+                    </div>
+                  )}
                   {step ? (
                     <button
                       type="button"
