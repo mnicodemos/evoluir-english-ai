@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * The same page header on every student page (user request: a professional,
- * elegant look across the app): the page's icon in a tinted tile (from sm),
+ * elegant look across the app): the page's icon in a tinted tile (smaller on
+ * phones, so the one-screen pages keep their room),
  * a small brand-coloured eyebrow, the title and its line, actions on the right
  * and anything else (pills, level chips) under the line.
  */
@@ -32,15 +33,15 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <header className={cn("animate-rise flex items-start gap-4", className)}>
+    <header className={cn("animate-rise flex items-start gap-3 sm:gap-4", className)}>
       <span
         className={cn(
-          "hidden size-12 shrink-0 place-items-center rounded-2xl ring-1 sm:grid lg:size-14",
+          "grid size-9 shrink-0 place-items-center rounded-xl ring-1 sm:size-12 sm:rounded-2xl lg:size-14",
           ACCENTS[accent],
         )}
         aria-hidden="true"
       >
-        <Icon className="size-6 lg:size-7" />
+        <Icon className="size-5 sm:size-6 lg:size-7" />
       </span>
       <div className="min-w-0 flex-1">
         {eyebrow ? (
