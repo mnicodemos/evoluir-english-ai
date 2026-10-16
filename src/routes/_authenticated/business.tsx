@@ -17,6 +17,7 @@ import {
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -162,17 +163,17 @@ function BusinessPage() {
   return (
     <AppShell>
       <div className="space-y-4">
-        <header className="animate-rise">
-          <PremiumBadge className="text-[11px]" />
-          <h1 className="mt-2 flex items-center gap-2 text-2xl font-bold lg:text-3xl">
-            <Briefcase className="size-6 text-brand-green" aria-hidden="true" />
-            Business English
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Meetings, e-mails, presentations, interviews, negotiation and networking, written at
-            your level.
-          </p>
-        </header>
+        <PageHeader
+          icon={Briefcase}
+          title={<>Business English</>}
+          description={
+            <>
+              Meetings, e-mails, presentations, interviews, negotiation and networking, written at
+              your level.
+            </>
+          }
+          actions={<PremiumBadge className="text-[11px]" />}
+        />
 
         {!profile ? null : !allowed ? (
           <section className="card-soft space-y-3 p-5 text-center">

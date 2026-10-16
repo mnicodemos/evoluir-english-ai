@@ -16,6 +16,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { useTodayActivities } from "@/components/DailyGoalCard";
 import { Button } from "@/components/ui/button";
@@ -476,16 +477,24 @@ function ListeningPage() {
   return (
     <AppShell mobileOneScreen>
       <div className="space-y-6">
-        <header>
-          <p className="text-sm text-muted-foreground">
-            <span>Listening Practice</span>
-            <span> • {config.label}</span>
-          </p>
-          <h1 className="text-2xl font-semibold">Train your ear with real English</h1>
-          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-            Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
-            activity — a new set arrives every time you start a new lesson in the Learning Center.
-          </p>
+        <PageHeader
+          icon={Headphones}
+          accent="sky"
+          eyebrow={
+            <>
+              <span>Listening Practice</span>
+              <span> • {config.label}</span>
+            </>
+          }
+          title={<>Train your ear with real English</>}
+          descriptionClassName="max-w-3xl"
+          description={
+            <>
+              Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
+              activity — a new set arrives every time you start a new lesson in the Learning Center.
+            </>
+          }
+        >
           <p
             className={cn(
               "mt-3 flex w-fit flex-wrap items-center gap-x-2 gap-y-1 rounded-full border px-3 py-1 text-xs font-semibold",
@@ -510,7 +519,7 @@ function ListeningPage() {
           <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
             <RotateCcw className="mr-2 size-4" /> Redo today's activity
           </Button>
-        </header>
+        </PageHeader>
 
         {trackDone ? (
           <section className="card-soft space-y-5 p-6">

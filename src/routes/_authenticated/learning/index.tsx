@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, RotateCcw } from "lucide-react";
+import { Check, GraduationCap, RotateCcw } from "lucide-react";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { CurriculumPath } from "@/components/LearningPathCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -52,11 +53,13 @@ function LearningCenter() {
   return (
     <AppShell>
       <div className="space-y-5 lg:space-y-4">
-        <header className="animate-rise">
-          <p className="text-sm text-muted-foreground">Learning Center</p>
-          <h1 className="text-3xl font-bold">
-            {reviewLevel ? <span>Review an earlier level</span> : <span>Your learning path</span>}
-          </h1>
+        <PageHeader
+          icon={GraduationCap}
+          eyebrow={<>Learning Center</>}
+          title={
+            reviewLevel ? <span>Review an earlier level</span> : <span>Your learning path</span>
+          }
+        >
           {reviewLevel ? (
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
               <span>Reviewing</span> <span>{reviewLevel.label}</span>. <span>Your level stays</span>{" "}
@@ -112,7 +115,7 @@ function LearningCenter() {
               })}
             </nav>
           )}
-        </header>
+        </PageHeader>
 
         {isLoading ? (
           <div className="space-y-4">

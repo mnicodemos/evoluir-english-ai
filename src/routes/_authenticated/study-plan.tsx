@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   CalendarCheck,
+  CalendarDays,
   Check,
   ChevronDown,
   Clock,
@@ -14,6 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -122,14 +124,15 @@ function StudyPlanPage() {
   return (
     <AppShell mobileOneScreen>
       <div className="space-y-3 lg:space-y-4 xl:grid xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,1fr)] xl:items-start xl:gap-4 xl:space-y-0">
-        <header className="animate-rise xl:col-span-2">
-          <h1 className="text-lg font-bold lg:text-3xl">Your study plan</h1>
-          {plan && (
-            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-              This week · {formatRange(plan.weekStart, plan.weekEnd)}
-            </p>
-          )}
-        </header>
+        <PageHeader
+          icon={CalendarDays}
+          accent="pink"
+          className="xl:col-span-2"
+          title={<>Your study plan</>}
+          description={
+            plan ? <>This week · {formatRange(plan.weekStart, plan.weekEnd)}</> : undefined
+          }
+        />
 
         {isLoading || !plan ? (
           <div className="space-y-4 xl:col-span-2">

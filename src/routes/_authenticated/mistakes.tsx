@@ -1,10 +1,19 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Dumbbell, Loader2, RotateCcw, Target, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  Dumbbell,
+  Loader2,
+  RotateCcw,
+  SpellCheck,
+  Target,
+  XCircle,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
@@ -157,13 +166,19 @@ function Mistakes() {
   return (
     <AppShell mobileOneScreen>
       <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,1fr)] lg:items-start lg:gap-4 lg:space-y-0">
-        <header className="animate-rise lg:col-span-2">
-          <h1 className="text-lg font-bold lg:text-3xl">My mistakes</h1>
-          <p className="mt-0.5 hidden max-w-2xl text-sm text-muted-foreground sm:block">
-            Mistakes from your Writing corrections and the AI Teacher come back for review until you
-            get them right five times in a row.
-          </p>
-        </header>
+        <PageHeader
+          icon={SpellCheck}
+          accent="amber"
+          className="lg:col-span-2"
+          title={<>My mistakes</>}
+          descriptionClassName="hidden sm:block"
+          description={
+            <>
+              Mistakes from your Writing corrections and the AI Teacher come back for review until
+              you get them right five times in a row.
+            </>
+          }
+        />
 
         <section className="card-soft space-y-3 p-3 sm:p-5">
           <div className="flex items-center justify-between gap-2">
