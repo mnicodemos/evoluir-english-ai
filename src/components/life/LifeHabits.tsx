@@ -1,13 +1,18 @@
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Flame, Loader2, Plus, Trash2 } from "lucide-react";
+import { Check, Flame, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { addLifeHabit, archiveLifeHabit, setLifeHabitDone } from "@/lib/life.functions";
+import {
+  addLifeHabit,
+  archiveLifeHabit,
+  setLifeHabitDone,
+  updateLifeHabit,
+} from "@/lib/life.functions";
 import {
   addDays,
   habitDueOn,
@@ -123,6 +128,7 @@ export function LifeHabitBoard({
   const { t, lang } = useLifeT();
   const toggle = useHabitToggle(onChange);
   const archive = useServerFn(archiveLifeHabit);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const remove = useMutation({
     mutationFn: (id: string) => archive({ data: { id } }),
     onSuccess: onChange,
@@ -142,6 +148,20 @@ export function LifeHabitBoard({
       {habits.map((habit) => {
         const streak = habitStreak(habit, logs, today);
         const weekly = habit.frequency === "times_per_week";
+        if (habit.id === editingId) {
+          return (
+            <li key={habit.id} className="rounded-xl border border-border p-3">
+              <LifeHabitForm
+                habit={habit}
+                onChange={() => {
+                  setEditingId(null);
+                  onChange();
+                }}
+                onCancel={() => setEditingId(null)}
+              />
+            </li>
+          );
+        }
         return (
           <li key={habit.id} className="rounded-xl border border-border p-3">
             <div className="flex items-start gap-2">
@@ -168,6 +188,15 @@ export function LifeHabitBoard({
                 <Flame className="size-4" aria-hidden="true" />
                 {streak}
               </span>
+              <button
+                type="button"
+                aria-label={t("Edit habit")}
+                title={t("Edit habit")}
+                onClick={() => setEditingId(habit.id)}
+                className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+              >
+                <Pencil className="size-3.5" aria-hidden="true" />
+              </button>
               <button
                 type="button"
                 aria-label={t("Remove habit")}
@@ -226,29 +255,35 @@ export function LifeHabitBoard({
   );
 }
 
+/** Adds a habit; given one, edits it in place (user request: edit habits). */
 export function LifeHabitForm({
   onChange,
   initialTitle = "",
+  habit,
+  onCancel,
 }: {
   onChange: () => void;
   initialTitle?: string;
+  habit?: LifeHabit;
+  onCancel?: () => void;
 }) {
   const { t } = useLifeT();
   const save = useServerFn(addLifeHabit);
-  const [title, setTitle] = useState(initialTitle);
-  const [frequency, setFrequency] = useState<LifeHabitFrequency>("daily");
-  const [times, setTimes] = useState(3);
-  const [category, setCategory] = useState("");
+  const update = useServerFn(updateLifeHabit);
+  const [title, setTitle] = useState(habit?.title ?? initialTitle);
+  const [frequency, setFrequency] = useState<LifeHabitFrequency>(habit?.frequency ?? "daily");
+  const [times, setTimes] = useState(habit?.timesPerWeek ?? 3);
+  const [category, setCategory] = useState(habit?.category ?? "");
   const add = useMutation({
-    mutationFn: () =>
-      save({
-        data: {
-          title: title.trim(),
-          frequency,
-          timesPerWeek: frequency === "times_per_week" ? times : null,
-          category: category.trim() || null,
-        },
-      }),
+    mutationFn: () => {
+      const input = {
+        title: title.trim(),
+        frequency,
+        timesPerWeek: frequency === "times_per_week" ? times : null,
+        category: category.trim() || null,
+      };
+      return habit ? update({ data: { ...input, id: habit.id } }) : save({ data: input });
+    },
     onSuccess: () => {
       setTitle("");
       setCategory("");
@@ -272,7 +307,7 @@ export function LifeHabitForm({
         maxLength={120}
         onChange={(event) => setTitle(event.target.value)}
         placeholder={t("Which habit? e.g. Read 10 pages")}
-        aria-label={t("New habit")}
+        aria-label={habit ? t("Edit habit") : t("New habit")}
         className="w-full"
       />
       <div className="flex min-w-0 flex-1 gap-2">
@@ -311,17 +346,24 @@ export function LifeHabitForm({
           className="min-w-0 flex-1"
         />
       </div>
+      {onCancel ? (
+        <Button type="button" variant="ghost" className="ml-auto shrink-0" onClick={onCancel}>
+          {t("Cancel")}
+        </Button>
+      ) : null}
       <Button
         type="submit"
         disabled={!title.trim() || add.isPending}
-        className="ml-auto shrink-0 gap-1.5"
+        className={cn("shrink-0 gap-1.5", !onCancel && "ml-auto")}
       >
         {add.isPending ? (
           <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        ) : habit ? (
+          <Check className="size-4" aria-hidden="true" />
         ) : (
           <Plus className="size-4" aria-hidden="true" />
         )}
-        {t("Add")}
+        {habit ? t("Save") : t("Add")}
       </Button>
     </form>
   );

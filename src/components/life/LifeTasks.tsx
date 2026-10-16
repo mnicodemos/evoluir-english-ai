@@ -1,13 +1,18 @@
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Plus, Trash2 } from "lucide-react";
+import { Check, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { deleteLifeTask, saveLifeTask, setLifeTaskDone } from "@/lib/life.functions";
+import {
+  deleteLifeTask,
+  saveLifeTask,
+  setLifeTaskDone,
+  updateLifeTask,
+} from "@/lib/life.functions";
 import type { LifeGoal } from "@/lib/life.functions";
 import { LIFE_PRIORITIES, type LifePriorityLevel, type LifeTask } from "@/lib/life";
 import { cn } from "@/lib/utils";
@@ -41,6 +46,7 @@ export function LifeTaskList({
   const { t } = useLifeT();
   const setDone = useServerFn(setLifeTaskDone);
   const remove = useServerFn(deleteLifeTask);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const toggle = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setDone({ data: input }),
     onSuccess: onChange,
@@ -64,6 +70,22 @@ export function LifeTaskList({
       {sorted.map((task) => {
         const done = !!task.doneAt;
         const goal = goals.find((item) => item.id === task.goalId);
+        if (task.id === editingId) {
+          return (
+            <li key={task.id} className="rounded-lg bg-secondary/60 p-2">
+              <LifeTaskForm
+                day={task.day}
+                goals={goals}
+                task={task}
+                onChange={() => {
+                  setEditingId(null);
+                  onChange();
+                }}
+                onCancel={() => setEditingId(null)}
+              />
+            </li>
+          );
+        }
         return (
           <li
             key={task.id}
@@ -109,6 +131,15 @@ export function LifeTaskList({
             </div>
             <button
               type="button"
+              aria-label={t("Edit task")}
+              title={t("Edit task")}
+              onClick={() => setEditingId(task.id)}
+              className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              <Pencil className="size-3.5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
               aria-label={t("Remove task")}
               title={t("Remove task")}
               disabled={drop.isPending}
@@ -124,26 +155,36 @@ export function LifeTaskList({
   );
 }
 
-/** Adds a task to a day, with a priority and, optionally, the goal it serves. */
+/**
+ * Adds a task to a day, with a priority and, optionally, the goal it serves;
+ * given a task, edits it in place (user request: edit tasks and priority).
+ */
 export function LifeTaskForm({
   day,
   goals,
   onChange,
   initialTitle = "",
+  task,
+  onCancel,
 }: {
   day: string;
   goals: LifeGoal[];
   onChange: () => void;
   initialTitle?: string;
+  task?: LifeTask;
+  onCancel?: () => void;
 }) {
   const { t } = useLifeT();
   const save = useServerFn(saveLifeTask);
-  const [title, setTitle] = useState(initialTitle);
-  const [priority, setPriority] = useState<LifePriorityLevel>("medium");
-  const [goalId, setGoalId] = useState("");
+  const update = useServerFn(updateLifeTask);
+  const [title, setTitle] = useState(task?.title ?? initialTitle);
+  const [priority, setPriority] = useState<LifePriorityLevel>(task?.priority ?? "medium");
+  const [goalId, setGoalId] = useState(task?.goalId ?? "");
   const add = useMutation({
-    mutationFn: () =>
-      save({ data: { title: title.trim(), day, priority, goalId: goalId || null } }),
+    mutationFn: () => {
+      const input = { title: title.trim(), day, priority, goalId: goalId || null };
+      return task ? update({ data: { ...input, id: task.id } }) : save({ data: input });
+    },
     onSuccess: () => {
       setTitle("");
       onChange();
@@ -166,7 +207,7 @@ export function LifeTaskForm({
         maxLength={160}
         onChange={(event) => setTitle(event.target.value)}
         placeholder={t("What will you do? e.g. Call the bank")}
-        aria-label={t("New task")}
+        aria-label={task ? t("Edit task") : t("New task")}
         className="w-full"
       />
       <select
@@ -196,17 +237,24 @@ export function LifeTaskForm({
           ))}
         </select>
       ) : null}
+      {onCancel ? (
+        <Button type="button" variant="ghost" className="ml-auto shrink-0" onClick={onCancel}>
+          {t("Cancel")}
+        </Button>
+      ) : null}
       <Button
         type="submit"
         disabled={!title.trim() || add.isPending}
-        className="ml-auto shrink-0 gap-1.5"
+        className={cn("shrink-0 gap-1.5", !onCancel && "ml-auto")}
       >
         {add.isPending ? (
           <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        ) : task ? (
+          <Check className="size-4" aria-hidden="true" />
         ) : (
           <Plus className="size-4" aria-hidden="true" />
         )}
-        {t("Add")}
+        {task ? t("Save") : t("Add")}
       </Button>
     </form>
   );
