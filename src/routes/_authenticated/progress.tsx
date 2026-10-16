@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { lazy, Suspense, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, TriangleAlert } from "lucide-react";
+import { CheckCircle2, TrendingUp, TriangleAlert } from "lucide-react";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { FrequencyCalendar } from "@/components/FrequencyCalendar";
 import { LearningJourneyCard } from "@/components/LearningJourneyCard";
@@ -143,7 +144,7 @@ function ProgressPage() {
 
   return (
     <AppShell mobileOneScreen>
-      <h1 className="text-xl font-bold lg:text-3xl">{t("My Progress")}</h1>
+      <PageHeader icon={TrendingUp} title={t("My Progress")} />
 
       {/* Three tabs keep each view on one screen: the overview first, the EVO
           journey and the history one tap away. The chosen tab is remembered. */}

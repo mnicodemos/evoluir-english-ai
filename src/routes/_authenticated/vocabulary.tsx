@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, CheckCircle2, Loader2, RotateCcw, Search, X } from "lucide-react";
+import { BookOpen, Check, CheckCircle2, Loader2, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { OfflineVocabulary } from "@/components/vocabulary/OfflineVocabulary";
 import {
@@ -518,11 +519,17 @@ function VocabularyOnline() {
 
   return (
     <AppShell mobileOneScreen>
-      <h1 className="text-2xl font-bold lg:text-3xl">Vocabulary Builder</h1>
-      <p className="mt-1 text-sm text-muted-foreground lg:mt-2">
-        Ten new words every time you start a new lesson, chosen from your learning path, with
-        meaning, examples and a microphone to test your pronunciation.
-      </p>
+      <PageHeader
+        icon={BookOpen}
+        accent="violet"
+        title={<>Vocabulary Builder</>}
+        description={
+          <>
+            Ten new words every time you start a new lesson, chosen from your learning path, with
+            meaning, examples and a microphone to test your pronunciation.
+          </>
+        }
+      />
       <p
         className={cn(
           "mt-3 flex w-fit flex-wrap items-center gap-x-2 gap-y-1 rounded-full border px-3 py-1 text-xs font-semibold",

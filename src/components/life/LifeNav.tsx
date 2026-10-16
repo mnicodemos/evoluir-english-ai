@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { BookMarked, Crown, type LucideIcon } from "lucide-react";
+import { BookMarked, Crown, Sprout, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { ACCENTS } from "@/lib/accents";
 import { cn } from "@/lib/utils";
 
 export function useLifeT() {
@@ -22,25 +24,27 @@ export function useLifeT() {
 export function LifeHeader() {
   const { t } = useLifeT();
   return (
-    <header className="mb-4 flex flex-wrap items-start gap-x-4 gap-y-2">
-      <div className="min-w-0">
-        <h1 className="flex items-center gap-2 text-xl font-bold lg:text-3xl">
-          {/* The name with its plus in the brand colour, like Evoluir+. */}
-          <span translate="no">
-            {"Life"}
-            <span className="text-brand-green">+</span>
-            {" AI"}
-          </span>
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("Evolve one day at a time.")}</p>
-      </div>
-      <Button asChild variant="outline" size="sm" className="ml-auto gap-1.5">
-        <Link to="/life/guide">
-          <BookMarked className="size-4" aria-hidden="true" />
-          {t("How Life+ AI works")}
-        </Link>
-      </Button>
-    </header>
+    <PageHeader
+      icon={Sprout}
+      className="mb-4"
+      title={
+        // The name with its plus in the brand colour, like Evoluir+.
+        <span translate="no">
+          {"Life"}
+          <span className="text-brand-green">+</span>
+          {" AI"}
+        </span>
+      }
+      description={t("Evolve one day at a time.")}
+      actions={
+        <Button asChild variant="outline" size="sm" className="gap-1.5">
+          <Link to="/life/guide" aria-label={t("How Life+ AI works")}>
+            <BookMarked className="size-4" aria-hidden="true" />
+            <span className="hidden sm:inline">{t("How Life+ AI works")}</span>
+          </Link>
+        </Button>
+      }
+    />
   );
 }
 
@@ -80,14 +84,8 @@ export function LifePremiumGate({ feature }: { feature: string }) {
   );
 }
 
-/** One accent per Life+ AI part, used on its icon tile (user request: a modern, sophisticated page). */
-export const LIFE_ACCENTS = {
-  green: "bg-brand-green/12 text-brand-green ring-brand-green/25",
-  sky: "bg-sky-400/12 text-sky-400 ring-sky-400/25",
-  violet: "bg-violet-400/12 text-violet-400 ring-violet-400/25",
-  amber: "bg-amber-400/12 text-amber-400 ring-amber-400/25",
-  rose: "bg-rose-400/12 text-rose-400 ring-rose-400/25",
-} as const;
+/** Life+ AI blocks use the app-wide accents (src/lib/accents.ts). */
+export const LIFE_ACCENTS = ACCENTS;
 
 /**
  * The same header on every Life+ AI block: the icon in a tinted tile, the

@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowLeft, Repeat, RotateCcw, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -93,14 +94,18 @@ function ReviewPage() {
           <ArrowLeft className="size-4" /> Learning Center
         </Link>
 
-        <header>
-          <p className="text-sm text-muted-foreground">Smart review</p>
-          <h1 className="text-3xl font-bold">Your hardest words first</h1>
-          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            Cards marked as <strong>Incorrect</strong> come back sooner. Cards marked as{" "}
-            <strong>Correct</strong> move forward.
-          </p>
-        </header>
+        <PageHeader
+          icon={Repeat}
+          accent="violet"
+          eyebrow={<>Smart review</>}
+          title={<>Your hardest words first</>}
+          description={
+            <>
+              Cards marked as <strong>Incorrect</strong> come back sooner. Cards marked as{" "}
+              <strong>Correct</strong> move forward.
+            </>
+          }
+        />
 
         {isLoading ? (
           <Skeleton className="h-64 w-full" />

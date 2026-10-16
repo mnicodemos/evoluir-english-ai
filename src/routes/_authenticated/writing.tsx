@@ -14,6 +14,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -312,10 +313,17 @@ function Writing() {
 
   return (
     <AppShell mobileOneScreen>
-      <h1 className="text-2xl font-bold sm:text-3xl">Writing AI Corrector</h1>
-      <p className="mt-1 text-sm font-medium text-muted-foreground">
-        Writing Practice • {config.label} — {config.focus}
-      </p>
+      <PageHeader
+        icon={PenLine}
+        accent="sky"
+        eyebrow={<>Writing Practice</>}
+        title={<>Writing AI Corrector</>}
+        description={
+          <>
+            {config.label} — {config.focus}
+          </>
+        }
+      />
       <p className="mt-2 hidden text-muted-foreground sm:block xl:hidden">
         One task for Everyday, Professional and Travel English, at your level. New tasks every day
         and every time you start a new lesson — nothing repeats.

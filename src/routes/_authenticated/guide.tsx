@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+  BookMarked,
   BookOpen,
   Briefcase,
   CalendarCheck,
@@ -11,9 +12,9 @@ import {
   Headphones,
   House,
   Lightbulb,
-  Search,
   MessageSquareText,
   PenLine,
+  Search,
   Settings,
   Sparkles,
   SpellCheck,
@@ -27,6 +28,7 @@ import { useEffect, useState } from "react";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import {
   Accordion,
@@ -105,10 +107,12 @@ function GuidePage() {
 
   return (
     <AppShell>
-      <h1 className="text-xl font-bold lg:text-3xl">{t("App guide")}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {t("How to use each part of Evoluir+, step by step.")}
-      </p>
+      <PageHeader
+        icon={BookMarked}
+        accent="sky"
+        title={t("App guide")}
+        description={t("How to use each part of Evoluir+, step by step.")}
+      />
 
       <div className="relative mt-4">
         <Search

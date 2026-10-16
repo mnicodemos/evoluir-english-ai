@@ -5,6 +5,7 @@ import { Check, Crown, ExternalLink, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -153,12 +154,7 @@ function Premium() {
         </div>
       ) : (
         <div className="space-y-8">
-          <header className="animate-rise">
-            <p className="text-sm text-muted-foreground">Your plan</p>
-            <h1 className="flex items-center gap-2 text-3xl font-bold">
-              <Crown className="size-7 text-[oklch(0.78_0.18_82)]" /> Premium
-            </h1>
-          </header>
+          <PageHeader icon={Crown} accent="amber" eyebrow={<>Your plan</>} title={<>Premium</>} />
 
           <section className="card-soft p-6">
             <h2 className="text-lg font-semibold">My subscription</h2>
