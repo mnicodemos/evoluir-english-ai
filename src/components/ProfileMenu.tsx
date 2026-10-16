@@ -181,14 +181,19 @@ export function ProfileMenu({
       aria-label={translate("Edit profile", lang)}
       className={cn(
         presentation === "dashboard-sidebar"
-          ? "h-auto min-h-[4.5rem] w-full justify-start gap-2 rounded-none border-t border-sidebar-border px-1 pt-4 pb-4 text-sidebar-foreground hover:bg-transparent"
+          ? "h-auto min-h-[5.25rem] w-full justify-start gap-2.5 rounded-none border-t border-sidebar-border px-1 pt-5 pb-5 text-sidebar-foreground hover:bg-transparent"
           : presentation === "mobile-menu"
             ? "h-11 w-full justify-start gap-2 rounded-lg px-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
         className,
       )}
     >
-      <Avatar className="size-8 shrink-0 border border-border bg-muted">
+      <Avatar
+        className={cn(
+          "shrink-0 border border-border bg-muted",
+          presentation === "dashboard-sidebar" ? "size-10" : "size-8",
+        )}
+      >
         <AvatarImage src={photo} alt={displayName} className="object-cover" />
         <AvatarFallback className="bg-accent text-[11px] font-bold text-accent-foreground">
           {profile ? initials(profile.name, profile.email) : <UserRound className="size-4" />}

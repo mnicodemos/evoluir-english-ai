@@ -133,29 +133,37 @@ function UtilityButtons({ variant }: { variant: "sidebar" | "sheet" }) {
     }
   }
 
-  // Desktop sidebar and mobile sheet share the same full-width icon + text rows.
+  // Desktop sidebar: two round icon buttons beside the profile's gear (user
+  // request), the language showing its short code.
   if (variant === "sidebar") {
     return (
-      <div className="flex flex-col items-stretch gap-0.5">
+      <div className="flex shrink-0 items-center gap-0.5">
         <Button
           variant="ghost"
-          aria-label={t("Change language")}
-          className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          size="icon"
+          aria-label={`${t("Change language")}: ${lang === "pt" ? "Português" : "English"}`}
+          title={lang === "pt" ? "Português" : "English"}
+          className="relative size-9 rounded-full text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
           onClick={toggleLang}
         >
-          <Languages className="size-5 shrink-0" />
-          <span className="min-w-0 truncate text-left">
-            {lang === "pt" ? "Português" : "English"}
+          <Languages className="size-[1.15rem]" />
+          <span className="absolute -bottom-0.5 -right-0.5 rounded bg-sidebar-accent px-0.5 text-[8px] font-bold leading-tight text-sidebar-foreground">
+            {lang === "pt" ? "PT" : "EN"}
           </span>
         </Button>
         <Button
           variant="ghost"
-          aria-label={t("Notifications")}
-          className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          size="icon"
+          aria-label={pushLabel}
+          title={pushLabel}
+          aria-pressed={pushOn}
+          className={cn(
+            "size-9 rounded-full hover:bg-sidebar-accent hover:text-sidebar-foreground",
+            pushOn ? "text-brand-green" : "text-sidebar-foreground/70",
+          )}
           onClick={() => void togglePush()}
         >
-          {pushOn ? <Bell className="size-5 shrink-0" /> : <BellOff className="size-5 shrink-0" />}
-          <span className="min-w-0 truncate text-left">{pushLabel}</span>
+          {pushOn ? <Bell className="size-[1.15rem]" /> : <BellOff className="size-[1.15rem]" />}
         </Button>
       </div>
     );
@@ -496,7 +504,6 @@ function AppShellContent({
 
           <div className="flex flex-col items-stretch gap-1">
             <div className="flex flex-col items-stretch gap-0.5 border-t border-sidebar-border pb-1 pt-2">
-              <UtilityButtons variant="sidebar" />
               {/* The app guide ("Diário de bordo", user request). */}
               <Link
                 to="/guide"
@@ -526,10 +533,15 @@ function AppShellContent({
                 <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
               </Button>
             </div>
-            <ProfileMenu
-              presentation="dashboard-sidebar"
-              className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
-            />
+            {/* The profile with the language and notification icons beside its
+                gear (user request), in a taller row. */}
+            <div className="flex items-center gap-1 border-t border-sidebar-border">
+              <ProfileMenu
+                presentation="dashboard-sidebar"
+                className="min-w-0 flex-1 border-t-0 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              />
+              <UtilityButtons variant="sidebar" />
+            </div>
           </div>
         </aside>
 
