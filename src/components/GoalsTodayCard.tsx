@@ -32,12 +32,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { lifeDayProgress } from "@/lib/life";
-import {
-  plusDayComplete,
-  plusGoalWeek,
-  type PlusGoalWeek,
-  type PlusStep,
-} from "@/lib/plus";
+import { plusDayComplete, plusGoalWeek, type PlusGoalWeek, type PlusStep } from "@/lib/plus";
 import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";

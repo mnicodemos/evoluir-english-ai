@@ -16,6 +16,7 @@ import {
   ClipboardCheck,
   Flower2,
   Layers,
+  ListChecks,
   MessageCircle,
   Mic,
   PenLine,
@@ -29,6 +30,7 @@ import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { studyToday } from "@/lib/today";
+import { useLife } from "@/hooks/useLife";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
@@ -127,6 +129,11 @@ function DashboardNotifications({
   // campaign's mission of the day, the plan's day, today's goal, due reviews,
   // then new content in each area.
   const journey = useCampaignJourney();
+  // Life AI's tasks of the day still open (user request: notify them).
+  const { data: life } = useLife();
+  const openLifeTasks = life
+    ? life.tasks.filter((task) => task.day === life.today && !task.doneAt).length
+    : 0;
   const items = [
     {
       id: "journey",
@@ -143,6 +150,13 @@ function DashboardNotifications({
         : "",
       icon: CalendarCheck2,
       visible: !!planTask && (planTask.status === "today" || planTask.status === "missed"),
+    },
+    {
+      id: "life-tasks",
+      to: "/life",
+      label: `${translate("Life AI tasks for today")}: ${openLifeTasks}`,
+      icon: ListChecks,
+      visible: openLifeTasks > 0,
     },
     {
       id: "goal",

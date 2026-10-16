@@ -1726,6 +1726,7 @@ const baseUiPt: Record<string, string> = {
   "All 3 listening tasks completed!": "As 3 tarefas de listening foram concluídas!",
   "Sessions today": "Sessões hoje",
   "Delete priority": "Apagar prioridade",
+  "Life AI tasks for today": "Tarefas do Life AI para hoje",
   "Add a goal": "Adicionar uma meta",
   "Task today": "Tarefa de hoje",
   "Habit today": "Hábito de hoje",
@@ -1733,7 +1734,8 @@ const baseUiPt: Record<string, string> = {
   "Add a habit": "Adicionar um hábito",
   "Choose what shows here": "Escolha o que aparece aqui",
   "Plan the tasks of your day with Premium.": "Planeje as tarefas do seu dia com o Premium.",
-  "Build habits one check-in a day with Premium.": "Crie hábitos com um check-in por dia no Premium.",
+  "Build habits one check-in a day with Premium.":
+    "Crie hábitos com um check-in por dia no Premium.",
   Spelling: "Ortografia",
   Punctuation: "Pontuação",
   "Word order": "Ordem das palavras",

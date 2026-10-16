@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { leagueLevelOf } from "@/lib/level";
-import { studyReminder, wordOfDayBody, type PlanTaskForPush } from "@/lib/reviewReminder";
+import {
+  lifeTasksLinePt,
+  lifeTasksReminder,
+  studyReminder,
+  wordOfDayBody,
+  type PlanTaskForPush,
+} from "@/lib/reviewReminder";
 import { studyToday } from "@/lib/today";
 import { weekStartOf } from "@/lib/streakFreeze";
 import {
@@ -255,6 +261,39 @@ async function sendDailyPush(
     }
   };
 
+  // Life AI tasks of the day still open (user request: notify them); a
+  // failure only leaves the line out.
+  const openLifeTasks = async (userId: string) => {
+    try {
+      const from = supabaseAdmin.from as unknown as (name: string) => {
+        select: (
+          columns: string,
+          options: { count: "exact"; head: true },
+        ) => {
+          eq: (
+            column: string,
+            value: string,
+          ) => {
+            eq: (
+              column: string,
+              value: string,
+            ) => {
+              is: (column: string, value: null) => Promise<{ count: number | null }>;
+            };
+          };
+        };
+      };
+      const { count } = await from("life_tasks")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("day", today)
+        .is("done_at", null);
+      return count ?? 0;
+    } catch {
+      return 0;
+    }
+  };
+
   // Students are prepared a few at a time, so the run stays short as the
   // class grows.
   await forEachLimited(profiles ?? [], 6, async (p) => {
@@ -300,13 +339,22 @@ async function sendDailyPush(
     }
     if (kind === "reminder") {
       // last_activity_date is set only when the day's goal is met (credit_study_day).
-      if (p.last_activity_date === today) return;
+      const tasksOpen = await openLifeTasks(p.id);
+      if (p.last_activity_date === today) {
+        // The study day is done, but the day's Life AI tasks are still open.
+        if (tasksOpen > 0) messages.set(p.id, lifeTasksReminder(tasksOpen));
+        return;
+      }
       const [due, task] = await Promise.all([dueReviews(p.id), planTask(p.id)]);
-      messages.set(p.id, studyReminder(due, task));
+      const reminder = studyReminder(due, task);
+      if (tasksOpen > 0) {
+        reminder.body = `${reminder.body} ${lifeTasksLinePt(tasksOpen)}.`.slice(0, 280);
+      }
+      messages.set(p.id, reminder);
       return;
     }
     const level = (p.level ?? "a1").toLowerCase();
-    const [{ data: bank }, { data: known }, due, task] = await Promise.all([
+    const [{ data: bank }, { data: known }, due, task, tasksOpen] = await Promise.all([
       supabaseAdmin
         .from("vocabulary")
         .select("id, word, translation, meaning")
@@ -315,6 +363,7 @@ async function sendDailyPush(
       supabaseAdmin.from("user_vocabulary").select("word_id").eq("user_id", p.id),
       dueReviews(p.id),
       planTask(p.id),
+      openLifeTasks(p.id),
     ]);
     const knownIds = new Set((known ?? []).map((k) => k.word_id));
     const seen = new Set<string>();
@@ -328,9 +377,15 @@ async function sendDailyPush(
     const w = pool[hashIndex(`${p.id}:${today}`, pool.length)]!;
     // Monday: students in the league also hear that the ranking restarted.
     const leagueLine = p.league_opt_in && isLeagueResetDay() ? ` · ${LEAGUE_RESET_LINE}` : "";
+    const tasksLine = tasksOpen > 0 ? ` · ${lifeTasksLinePt(tasksOpen)}` : "";
     messages.set(p.id, {
       title: `Palavra do dia: ${w.word}`,
-      body: wordOfDayBody(`${w.translation} — ${w.meaning}`, due, leagueLine, task),
+      body: wordOfDayBody(
+        `${w.translation} — ${w.meaning}`,
+        due,
+        `${tasksLine}${leagueLine}`,
+        task,
+      ),
       path: "/vocabulary",
     });
   });
