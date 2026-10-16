@@ -339,8 +339,8 @@ function GoalTile({
       className="inline-flex shrink-0 items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
     >
       {/* A narrow slot (under 18.5rem) shows the same action as a round check. */}
-      <span className="grid size-6 place-items-center rounded-full border-2 border-muted-foreground/50 text-muted-foreground transition-colors hover:border-brand-green hover:text-brand-green @[18.5rem]:hidden">
-        <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+      <span className="grid size-5 place-items-center rounded-full border border-muted-foreground text-muted-foreground transition-colors hover:border-brand-green hover:text-brand-green @[18.5rem]:hidden">
+        <Check className="size-3" strokeWidth={3} aria-hidden="true" />
       </span>
       <span className="hidden items-center gap-1 @[18.5rem]:inline-flex">
         {t("Complete step")}
@@ -371,12 +371,12 @@ function GoalTile({
     <>
       <span
         className={cn(
-          "grid size-6 shrink-0 place-items-center rounded-full bg-brand-green text-[oklch(0.2_0.04_160)]",
+          "grid size-5 shrink-0 place-items-center rounded-full bg-brand-green text-primary-foreground",
           celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
         )}
         title={t("Step done!")}
       >
-        <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+        <Check className="size-3" strokeWidth={3} aria-hidden="true" />
         <span className="sr-only">{t("Step done!")}</span>
       </span>
       <button

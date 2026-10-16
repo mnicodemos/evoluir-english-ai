@@ -99,7 +99,7 @@ export function useLifeActions(t: T) {
   return { task, habit };
 }
 
-/** A round check: grey and empty while open, teal with its check once done. */
+/** A round check, sized like the Rhythm card's day marks: grey and empty while open, teal with its check once done. */
 export function DoneCheck({
   done,
   disabled,
@@ -120,13 +120,14 @@ export function DoneCheck({
       disabled={disabled}
       onClick={onToggle}
       className={cn(
-        "grid size-6 shrink-0 place-items-center rounded-full border-2 transition-colors disabled:opacity-50",
+        // The same size as the day marks of Your learning rhythm (user request).
+        "grid size-5 shrink-0 place-items-center rounded-full border transition-colors disabled:opacity-50",
         done
-          ? "border-brand-green bg-brand-green text-[oklch(0.2_0.04_160)]"
-          : "border-muted-foreground/50 text-muted-foreground hover:border-brand-green hover:text-brand-green",
+          ? "border-brand-green bg-brand-green text-primary-foreground"
+          : "border-muted-foreground text-muted-foreground hover:border-brand-green hover:text-brand-green",
       )}
     >
-      <Check className={cn("size-3.5", !done && "opacity-0")} strokeWidth={3} aria-hidden="true" />
+      <Check className={cn("size-3", !done && "opacity-0")} strokeWidth={3} aria-hidden="true" />
     </button>
   );
 }
