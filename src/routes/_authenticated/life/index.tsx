@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Star } from "lucide-react";
+import { Check, Loader2, Star, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -160,7 +160,8 @@ function PriorityCard({
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
   const mutate = useMutation({
-    mutationFn: (input: { text?: string; done?: boolean }) => save({ data: input }),
+    mutationFn: (input: { text?: string; done?: boolean; clear?: boolean }) =>
+      save({ data: input }),
     onSuccess: () => {
       setEditing(false);
       setText("");
@@ -213,6 +214,19 @@ function PriorityCard({
             }}
           >
             {t("Edit")}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground hover:text-destructive"
+            aria-label={t("Delete priority")}
+            title={t("Delete priority")}
+            disabled={mutate.isPending}
+            onClick={() => {
+              if (window.confirm(t("Delete today's priority?"))) mutate.mutate({ clear: true });
+            }}
+          >
+            <Trash2 className="size-3.5" aria-hidden="true" />
           </Button>
         </div>
       ) : (

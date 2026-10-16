@@ -1725,6 +1725,18 @@ const baseUiPt: Record<string, string> = {
   "Redo today's activity": "Refazer a atividade de hoje",
   "All 3 listening tasks completed!": "As 3 tarefas de listening foram concluídas!",
   "Sessions today": "Sessões hoje",
+  "Delete priority": "Apagar prioridade",
+  Spelling: "Ortografia",
+  Punctuation: "Pontuação",
+  "Word order": "Ordem das palavras",
+  Other: "Outros",
+  "All types": "Todos",
+  "Type of mistake": "Tipo de erro",
+  "Search the guide, e.g. streak, writing, league":
+    "Pesquise no guia, ex.: sequência, writing, liga",
+  "Search the guide": "Pesquisar no guia",
+  "Nothing found. Try another word.": "Nada encontrado. Tente outra palavra.",
+  "Delete today's priority?": "Apagar a prioridade de hoje?",
   "Words reviewed today": "Palavras revisadas hoje",
   "10 reviewed words complete your study day.":
     "10 palavras revisadas completam seu dia de estudo.",

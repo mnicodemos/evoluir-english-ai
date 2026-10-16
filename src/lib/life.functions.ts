@@ -363,15 +363,21 @@ export const setLifePriority = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z
-      .object({ text: z.string().trim().min(1).max(200).optional(), done: z.boolean().optional() })
+      .object({
+        text: z.string().trim().min(1).max(200).optional(),
+        done: z.boolean().optional(),
+        // Removes today's priority altogether (user request: let me delete it).
+        clear: z.boolean().optional(),
+      })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     await requirePremium(context.userId);
     const priorities = await table("life_priorities");
     const today = studyToday();
-    const { error } =
-      data.text !== undefined
+    const { error } = data.clear
+      ? await priorities.delete().eq("user_id", context.userId)
+      : data.text !== undefined
         ? await priorities.upsert(
             {
               user_id: context.userId,

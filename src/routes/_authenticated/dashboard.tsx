@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
   CalendarCheck2,
+  CalendarDays,
   ChartLine,
   BookOpen,
   ChevronRight,
@@ -27,6 +28,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { studyToday } from "@/lib/today";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
@@ -255,12 +257,18 @@ const PLAN_SKILL_LABELS: Record<string, string> = {
 function PlanTodaySummary({
   next,
   weekDone,
+  todayDone,
   translate,
 }: {
   next: StudyPlanDay | null | undefined;
   weekDone: boolean;
+  /** Today's plan day is already done. */
+  todayDone: boolean;
   translate: (label: string) => string;
 }) {
+  // Done (the week, or today's plan day): a green calendar with its check;
+  // still pending: the plain calendar in the plan's pink (user request).
+  const ok = weekDone || todayDone;
   const label = weekDone
     ? translate("Week plan complete")
     : !next
@@ -272,8 +280,14 @@ function PlanTodaySummary({
           : translate("Next in your plan");
   return (
     <DashboardHeaderStat
-      icon={<CalendarCheck2 className="size-6" strokeWidth={2.2} />}
-      tone="pink"
+      icon={
+        ok ? (
+          <CalendarCheck2 className="size-6" strokeWidth={2.2} />
+        ) : (
+          <CalendarDays className="size-6" strokeWidth={2.2} />
+        )
+      }
+      tone={ok ? "green" : "pink"}
       label={label}
       value={weekDone ? translate("All days done") : (next?.title ?? translate("See your week"))}
       // Always three lines, like the other header cells (user request).
@@ -466,6 +480,12 @@ function Dashboard() {
                 <PlanTodaySummary
                   next={planNext}
                   weekDone={!!studyPlan && studyPlan.plan.nextIndex === null}
+                  todayDone={
+                    !!studyPlan &&
+                    studyPlan.plan.days.some(
+                      (day) => day.date === studyToday() && day.status === "done",
+                    )
+                  }
                   translate={t}
                 />
               </div>
