@@ -260,7 +260,8 @@ export function LifeHabitForm({
 
   return (
     <form
-      className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto]"
+      // Like the task form: the habit's text on its own full line.
+      className="flex flex-wrap gap-2"
       onSubmit={(event) => {
         event.preventDefault();
         if (title.trim() && !add.isPending) add.mutate();
@@ -270,10 +271,11 @@ export function LifeHabitForm({
         value={title}
         maxLength={120}
         onChange={(event) => setTitle(event.target.value)}
-        placeholder={t("New habit")}
+        placeholder={t("Which habit? e.g. Read 10 pages")}
         aria-label={t("New habit")}
+        className="w-full"
       />
-      <div className="flex gap-2">
+      <div className="flex min-w-0 flex-1 gap-2">
         <select
           value={frequency}
           onChange={(event) => setFrequency(event.target.value as LifeHabitFrequency)}
@@ -306,10 +308,14 @@ export function LifeHabitForm({
           onChange={(event) => setCategory(event.target.value)}
           placeholder={t("Category")}
           aria-label={t("Category")}
-          className="w-28"
+          className="min-w-0 flex-1"
         />
       </div>
-      <Button type="submit" disabled={!title.trim() || add.isPending} className="gap-1.5">
+      <Button
+        type="submit"
+        disabled={!title.trim() || add.isPending}
+        className="ml-auto shrink-0 gap-1.5"
+      >
         {add.isPending ? (
           <Loader2 className="size-4 animate-spin" aria-hidden="true" />
         ) : (
