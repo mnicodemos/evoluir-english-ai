@@ -64,7 +64,7 @@ export function BusinessDashboardCard() {
       </div>
       <div className="mt-2 flex min-w-0 flex-1 flex-col justify-center gap-1.5">
         {/* Room on the right for the BIZ chip. */}
-        <div className="flex min-w-0 items-center gap-3 pr-14">
+        <div className="flex min-w-0 items-center gap-3 pr-[calc((100%_-_112px)/6_+_1rem)] 2xl:pr-[calc((100%_-_132px)/6_+_1rem)]">
           {next ? (
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
@@ -101,16 +101,18 @@ export function BusinessDashboardCard() {
           </Link>
         </div>
       </div>
-      {/* The track's own chip, the same shape as the current level chip in the
+      {/* The track's own chip, the same shape and width as a level chip in the
           header (user request), on the right edge and centred between the
-          Premium bonus pill above and the Continue link below. */}
+          Premium badge above and the Continue link below. Both cards are 4 of
+          12 columns, so a level chip is (card - 112 px) / 6: 32 px padding,
+          48 px icon, 12 px gap and 5 x 4 px between chips (132 px from 2xl). */}
       <span
         className={cn(
-          "absolute right-3 top-1/2 inline-flex h-6 -translate-y-1/2 items-center justify-center gap-0.5 rounded-full border text-[10px] font-semibold xl:right-4 2xl:text-[11px]",
+          "absolute right-3 top-1/2 inline-flex h-6 w-[calc((100%_-_112px)/6)] -translate-y-1/2 items-center justify-center gap-0.5 rounded-full border text-[10px] font-semibold xl:right-4 2xl:w-[calc((100%_-_132px)/6)] 2xl:text-[11px]",
           // Every lesson done: the same look as a conquered level chip (user request).
           trackDone
-            ? "min-w-10 border-brand-green/25 bg-brand-green/[0.07] px-1.5 text-brand-green/90"
-            : "w-10 border-transparent bg-brand-green text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)]",
+            ? "border-brand-green/25 bg-brand-green/[0.07] text-brand-green/90"
+            : "border-transparent bg-brand-green text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)]",
         )}
         translate="no"
         title="Business English"
