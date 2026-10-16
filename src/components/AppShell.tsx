@@ -59,7 +59,7 @@ import { studyToday } from "@/lib/today";
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
 // My Subscription sits with the settings rows at the bottom, as on desktop.
 const mobileSheetNav = [
-  { to: "/life", label: "Life AI", icon: Sprout },
+  { to: "/life", label: "Life+ AI", icon: Sprout },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/business", label: "Business English", icon: Briefcase },
   { to: "/listening", label: "Listening", icon: Headphones },
@@ -77,8 +77,8 @@ const mobileSheetNav = [
 // `group` is the title above a group's first item ("" draws a plain divider).
 const dashboardSidebarNav = [
   { to: "/dashboard", label: "Home", icon: House },
-  // Life AI holds the goals (user decision): Today, Goals, Routine, Habits, Life Coach.
-  { to: "/life", label: "Life AI", icon: Sprout, group: "Plan" },
+  // Life+ AI holds the goals (user decision): Today, Goals, Routine, Habits, Life Coach.
+  { to: "/life", label: "Life+ AI", icon: Sprout, group: "Plan" },
   { to: "/study-plan", label: "Study Plan", icon: CalendarCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen, group: "Practice" },
@@ -90,7 +90,7 @@ const dashboardSidebarNav = [
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
 ] as const;
 
-/** The Goals screen is a Life AI tab, so the Life AI menu item stays lit there. */
+/** The Goals screen is a Life+ AI tab, so the Life+ AI menu item stays lit there. */
 function lifeTabOpen(pathname: string, to: string) {
   return to === "/life" && pathname.startsWith("/goals");
 }

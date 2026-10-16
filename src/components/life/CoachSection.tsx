@@ -34,7 +34,7 @@ function readChat(): ChatEntry[] {
 }
 
 /**
- * Life Coach (the owner's Life AI coach): practical help with goals, the day's
+ * Life Coach (the owner's Life+ AI coach): practical help with goals, the day's
  * routine and habits, in the student's language; each reply may suggest up to
  * three actions added with one tap. The chat stays on this device.
  */

@@ -20,7 +20,7 @@ export const telemetryInputSchema = z
       "teacher",
       "mistakes_review",
       "video_call",
-      // Life AI meditations in English (meditations.ts): minutes only.
+      // Life+ AI meditations in English (meditations.ts): minutes only.
       "meditation",
     ]),
     minutes: z.number().int().min(1).max(1440),

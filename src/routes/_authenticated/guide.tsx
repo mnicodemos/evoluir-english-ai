@@ -11,6 +11,7 @@ import {
   Headphones,
   House,
   Lightbulb,
+  Search,
   MessageSquareText,
   PenLine,
   Settings,
@@ -21,7 +22,11 @@ import {
   Video,
 } from "lucide-react";
 
+import { useEffect, useState } from "react";
+
 import { useIsPremium } from "@/components/PremiumBadge";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { AppShell } from "@/components/AppShell";
 import {
   Accordion,
@@ -72,6 +77,31 @@ function GuidePage() {
   const premium = useIsPremium() !== false;
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  // Search by word (user request): matches the section's title, what it is,
+  // its steps and tip, in the language on screen, ignoring accents and case.
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState<string[]>([]);
+  const fold = (text: string) =>
+    text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  const needle = fold(query.trim());
+  const sections = needle
+    ? APP_GUIDE.filter((section) =>
+        fold(
+          [section.title, section.what, ...section.steps, section.tip ?? ""]
+            .map((text) => t(text))
+            .join(" "),
+        ).includes(needle),
+      )
+    : APP_GUIDE;
+  // A search opens every section it found, so the matching steps show at once.
+  useEffect(() => {
+    if (needle) setOpen(sections.map((section) => section.id));
+    // sections follows needle; listing it would reopen on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needle]);
 
   return (
     <AppShell>
@@ -80,8 +110,33 @@ function GuidePage() {
         {t("How to use each part of Evoluir+, step by step.")}
       </p>
 
-      <Accordion type="multiple" className="card-soft mt-4 px-4 sm:px-5">
-        {APP_GUIDE.map((section) => {
+      <div className="relative mt-4">
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <Input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={t("Search the guide, e.g. streak, writing, league")}
+          aria-label={t("Search the guide")}
+          className="pl-9"
+        />
+      </div>
+      {needle && sections.length === 0 ? (
+        <p className="card-soft mt-4 p-4 text-sm text-muted-foreground">
+          {t("Nothing found. Try another word.")}
+        </p>
+      ) : null}
+
+      <Accordion
+        type="multiple"
+        value={open}
+        onValueChange={setOpen}
+        className={cn("card-soft mt-4 px-4 sm:px-5", sections.length === 0 && "hidden")}
+      >
+        {sections.map((section) => {
           const Icon = ICONS[section.icon];
           return (
             <AccordionItem

@@ -1,5 +1,5 @@
 /**
- * Life AI (the owner's Evoluir+ Life AI module, phase 1; migration 0068):
+ * Life+ AI (the owner's Evoluir+ Life+ AI module, phase 1; migration 0068):
  * pure rules shared by the server and the screens. Goals are the existing
  * plus_goals (with a deadline and milestones); Routine is the tasks of a day;
  * Habits have one check-in per day. Days are São Paulo calendar days
@@ -216,7 +216,7 @@ export function lifeCoachPrompt(input: {
 }) {
   const language = input.lang === "pt" ? "Brazilian Portuguese" : "English";
   const system = [
-    'You are the Life Coach of "Evoluir+ Life AI" (slogan: "Evolve one day at a time").',
+    'You are the Life Coach of "Evoluir+ Life+ AI" (slogan: "Evolve one day at a time").',
     "Goal: help the student with clarity, empathy, practical focus and an immediate next action: break big goals into small steps, prioritise the day's routine and keep habits consistent.",
     "Rules:",
     "1. Short, well-structured answers: short paragraphs or bullet lists (markdown), at most about 150 words.",

@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Star } from "lucide-react";
+import { Check, Loader2, Star, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/life/")({
   head: () => ({
     meta: [
-      { title: "Life AI - Evoluir+ English AI" },
+      { title: "Life+ AI - Evoluir+ English AI" },
       {
         name: "description",
         content: "Your goals, routine and habits in one place. Evolve one day at a time.",
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_authenticated/life/")({
 });
 
 /**
- * Life AI on one page (user request: one page instead of tabs): the day and
+ * Life+ AI on one page (user request: one page instead of tabs): the day and
  * its priority on top, then Goals, Routine with Habits, and the Life Coach
  * side by side on desktop, stacked on phones. Old tab addresses (/goals,
  * /life/routine, /life/habits, /life/coach) open this page at their section.
@@ -160,7 +160,8 @@ function PriorityCard({
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
   const mutate = useMutation({
-    mutationFn: (input: { text?: string; done?: boolean }) => save({ data: input }),
+    mutationFn: (input: { text?: string; done?: boolean; clear?: boolean }) =>
+      save({ data: input }),
     onSuccess: () => {
       setEditing(false);
       setText("");
@@ -213,6 +214,19 @@ function PriorityCard({
             }}
           >
             {t("Edit")}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground hover:text-destructive"
+            aria-label={t("Delete priority")}
+            title={t("Delete priority")}
+            disabled={mutate.isPending}
+            onClick={() => {
+              if (window.confirm(t("Delete today's priority?"))) mutate.mutate({ clear: true });
+            }}
+          >
+            <Trash2 className="size-3.5" aria-hidden="true" />
           </Button>
         </div>
       ) : (

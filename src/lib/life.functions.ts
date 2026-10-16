@@ -25,7 +25,7 @@ import {
 import { hasPremium } from "./premium.server";
 import { studyToday } from "./today";
 
-// The Life AI tables (migration 0068) are not in the generated Supabase types
+// The Life+ AI tables (migration 0068) are not in the generated Supabase types
 // until Lovable regenerates them, like plus_goals in plus.functions.ts.
 type LooseQuery = PromiseLike<{ data: unknown; error: { message: string } | null }> & {
   select: (columns: string) => LooseQuery;
@@ -52,7 +52,7 @@ async function table(name: string) {
 
 async function requirePremium(userId: string) {
   if (!(await hasPremium(userId)))
-    throw new Error("Life AI routine, habits and coach are Premium.");
+    throw new Error("Life+ AI routine, habits and coach are Premium.");
 }
 
 const uuid = z.string().uuid();
@@ -212,7 +212,7 @@ async function readOverview(userId: string): Promise<LifeOverview> {
   };
 }
 
-/** Everything the Life AI screens show, in one read. */
+/** Everything the Life+ AI screens show, in one read. */
 export const loadLife = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => readOverview(context.userId));
@@ -363,15 +363,21 @@ export const setLifePriority = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z
-      .object({ text: z.string().trim().min(1).max(200).optional(), done: z.boolean().optional() })
+      .object({
+        text: z.string().trim().min(1).max(200).optional(),
+        done: z.boolean().optional(),
+        // Removes today's priority altogether (user request: let me delete it).
+        clear: z.boolean().optional(),
+      })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     await requirePremium(context.userId);
     const priorities = await table("life_priorities");
     const today = studyToday();
-    const { error } =
-      data.text !== undefined
+    const { error } = data.clear
+      ? await priorities.delete().eq("user_id", context.userId)
+      : data.text !== undefined
         ? await priorities.upsert(
             {
               user_id: context.userId,

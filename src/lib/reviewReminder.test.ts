@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   countDueReviews,
+  lifeTasksLinePt,
+  lifeTasksReminder,
   shownReviewCount,
   studyReminder,
   wordOfDayBody,
@@ -44,5 +46,18 @@ describe("vocabulary review reminder", () => {
     expect(reminder.path).toBe("/study-plan");
     expect(reminder.body).toContain("Recupere no plano: Unit 2 Final Test");
     expect(reminder.body).toContain("2 palavras para revisar");
+  });
+});
+
+describe("Life+ AI tasks in the pushes", () => {
+  it("counts the open tasks of the day", () => {
+    expect(lifeTasksLinePt(0)).toBe("");
+    expect(lifeTasksLinePt(1)).toBe("📝 1 tarefa do Life+ AI para hoje");
+    expect(lifeTasksLinePt(3)).toBe("📝 3 tarefas do Life+ AI para hoje");
+  });
+
+  it("reminds the open tasks once the study day is done", () => {
+    expect(lifeTasksReminder(2)).toMatchObject({ path: "/life" });
+    expect(lifeTasksReminder(2).body).toContain("2 tarefas");
   });
 });

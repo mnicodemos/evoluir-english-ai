@@ -86,7 +86,7 @@ export const appGuidePt: Record<string, string> = {
     "Escreva suas respostas: o professor corrige seu principal erro e salva em Meus erros.",
   "Every few messages you get a summary of what you practised.":
     "A cada algumas mensagens você recebe um resumo do que praticou.",
-  "Life AI": "Life AI",
+  "Life+ AI": "Life+ AI",
   "Your goals, routine and habits in one place, with EVO as your Life Coach.":
     "Suas metas, rotina e hábitos em um só lugar, com a EVO como sua Life Coach.",
   "Add 1 to 3 goals: EVO gives you one small step for each goal every day.":

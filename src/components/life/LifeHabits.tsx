@@ -44,7 +44,7 @@ function useHabitToggle(onChange: () => void) {
   });
 }
 
-/** Today's check-in for each habit due today (the Life AI overview). */
+/** Today's check-in for each habit due today (the Life+ AI overview). */
 export function LifeHabitsToday({
   habits,
   logs,

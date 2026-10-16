@@ -17,6 +17,12 @@ import { findMistakeSentence, type MistakeSentence } from "@/lib/mistakeSentence
 import { practiceMistake, reviewMistake } from "@/lib/mistakes.functions";
 import type { MistakePractice } from "@/lib/mistakePractice";
 import { cn } from "@/lib/utils";
+import {
+  MISTAKE_TYPE_LABEL,
+  MISTAKE_TYPES,
+  mistakeTypeOf,
+  type MistakeType,
+} from "@/lib/mistakeType";
 
 export const Route = createFileRoute("/_authenticated/mistakes")({
   head: () => ({
@@ -119,6 +125,14 @@ function Mistakes() {
   );
   const current = outcome ? rows.find((row) => row.id === answered.at(-1)) : due[0];
   const mastered = rows.filter((row) => row.review_step >= MISTAKE_MASTERED_STEP).length;
+  // The saved phrases in tabs by type of mistake (user request); a tab shows
+  // only when it has phrases.
+  const [tab, setTab] = useState<MistakeType | "all">("all");
+  const typeCounts = MISTAKE_TYPES.map((type) => ({
+    type,
+    count: rows.filter((row) => mistakeTypeOf(row.category) === type).length,
+  })).filter((item) => item.count > 0);
+  const listed = tab === "all" ? rows : rows.filter((row) => mistakeTypeOf(row.category) === tab);
 
   async function check() {
     if (!current || !answer.trim()) return;
@@ -309,11 +323,33 @@ function Mistakes() {
               {mastered}/{rows.length}
             </span>
           </div>
+          {typeCounts.length > 1 ? (
+            <div role="tablist" aria-label="Type of mistake" className="flex flex-wrap gap-1.5">
+              {[{ type: "all" as const, count: rows.length }, ...typeCounts].map((item) => (
+                <button
+                  key={item.type}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === item.type}
+                  onClick={() => setTab(item.type)}
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors",
+                    tab === item.type
+                      ? "border-primary/60 bg-primary/15 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <span>{item.type === "all" ? "All types" : MISTAKE_TYPE_LABEL[item.type]}</span>
+                  <span>{` ${item.count}`}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
           {rows.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nothing here yet.</p>
           ) : (
             <ul className="max-h-[50vh] space-y-1.5 overflow-y-auto pr-1 lg:max-h-[60vh]">
-              {rows.map((row) => (
+              {listed.map((row) => (
                 <li key={row.id} className="rounded-lg border border-border/60 p-2 text-sm">
                   {row.sentence ? (
                     <p translate="no" lang="en">

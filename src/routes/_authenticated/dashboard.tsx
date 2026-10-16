@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
   CalendarCheck2,
+  CalendarDays,
   ChartLine,
   BookOpen,
   ChevronRight,
@@ -15,6 +16,7 @@ import {
   ClipboardCheck,
   Flower2,
   Layers,
+  ListChecks,
   MessageCircle,
   Mic,
   PenLine,
@@ -27,6 +29,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { studyToday } from "@/lib/today";
+import { useLife } from "@/hooks/useLife";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
@@ -125,6 +129,11 @@ function DashboardNotifications({
   // campaign's mission of the day, the plan's day, today's goal, due reviews,
   // then new content in each area.
   const journey = useCampaignJourney();
+  // Life+ AI's tasks of the day still open (user request: notify them).
+  const { data: life } = useLife();
+  const openLifeTasks = life
+    ? life.tasks.filter((task) => task.day === life.today && !task.doneAt).length
+    : 0;
   const items = [
     {
       id: "journey",
@@ -141,6 +150,13 @@ function DashboardNotifications({
         : "",
       icon: CalendarCheck2,
       visible: !!planTask && (planTask.status === "today" || planTask.status === "missed"),
+    },
+    {
+      id: "life-tasks",
+      to: "/life",
+      label: `${translate("Life+ AI tasks for today")}: ${openLifeTasks}`,
+      icon: ListChecks,
+      visible: openLifeTasks > 0,
     },
     {
       id: "goal",
@@ -255,12 +271,18 @@ const PLAN_SKILL_LABELS: Record<string, string> = {
 function PlanTodaySummary({
   next,
   weekDone,
+  todayDone,
   translate,
 }: {
   next: StudyPlanDay | null | undefined;
   weekDone: boolean;
+  /** Today's plan day is already done. */
+  todayDone: boolean;
   translate: (label: string) => string;
 }) {
+  // Done (the week, or today's plan day): a green calendar with its check;
+  // still pending: the plain calendar in the plan's pink (user request).
+  const ok = weekDone || todayDone;
   const label = weekDone
     ? translate("Week plan complete")
     : !next
@@ -272,8 +294,14 @@ function PlanTodaySummary({
           : translate("Next in your plan");
   return (
     <DashboardHeaderStat
-      icon={<CalendarCheck2 className="size-6" strokeWidth={2.2} />}
-      tone="pink"
+      icon={
+        ok ? (
+          <CalendarCheck2 className="size-6" strokeWidth={2.2} />
+        ) : (
+          <CalendarDays className="size-6" strokeWidth={2.2} />
+        )
+      }
+      tone={ok ? "green" : "pink"}
       label={label}
       value={weekDone ? translate("All days done") : (next?.title ?? translate("See your week"))}
       // Always three lines, like the other header cells (user request).
@@ -466,6 +494,12 @@ function Dashboard() {
                 <PlanTodaySummary
                   next={planNext}
                   weekDone={!!studyPlan && studyPlan.plan.nextIndex === null}
+                  todayDone={
+                    !!studyPlan &&
+                    studyPlan.plan.days.some(
+                      (day) => day.date === studyToday() && day.status === "done",
+                    )
+                  }
                   translate={t}
                 />
               </div>

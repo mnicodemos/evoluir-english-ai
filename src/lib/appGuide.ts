@@ -154,7 +154,7 @@ export const APP_GUIDE: GuideSection[] = [
   {
     id: "life",
     icon: "life",
-    title: "Life AI",
+    title: "Life+ AI",
     what: "Your goals, routine and habits in one place, with EVO as your Life Coach.",
     steps: [
       "Add 1 to 3 goals: EVO gives you one small step for each goal every day.",
