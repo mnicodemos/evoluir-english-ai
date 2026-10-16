@@ -243,7 +243,6 @@ export function LifeSlot({
           {icon}
           {kind}
         </p>
-        {badge}
         {chooser}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
@@ -286,6 +285,8 @@ export function LifeSlot({
         >
           {title}
         </p>
+        {/* The task's urgency sits beside its check (user request). */}
+        {badge}
         {action}
       </div>
     </li>
