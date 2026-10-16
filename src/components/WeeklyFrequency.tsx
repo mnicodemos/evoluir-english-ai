@@ -73,11 +73,21 @@ export function WeeklyFrequency({
     return (
       <div className="mt-2 grid grid-cols-7 gap-1 border-t border-border pt-2 lg:hidden">
         {/* The week count lives with its dots (it used to repeat in a box above). */}
-        <p className="col-span-7 mb-0.5 text-[11px] text-muted-foreground">
-          {lang === "pt" ? "Esta semana" : "This week"} ·{" "}
-          <span className="font-display font-bold text-foreground">
-            {studiedCount} / {weeklyGoal} {daysLabel}
+        {/* The days studied and the plan beside them (user request: "6 / 5 days"
+            read as a mistake once the plan was passed). */}
+        <p className="col-span-7 mb-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-muted-foreground">
+          <span>{lang === "pt" ? "Esta semana" : "This week"} ·</span>
+          <span className="font-display font-semibold text-foreground">
+            {studiedCount} {studiedCount === 1 ? (lang === "pt" ? "dia" : "day") : daysLabel}
           </span>
+          {allStudied ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-semibold text-brand-green">
+              <Check className="size-3" strokeWidth={3} aria-hidden="true" />
+              {lang === "pt" ? `Plano de ${weeklyGoal} batido` : `Plan of ${weeklyGoal} reached`}
+            </span>
+          ) : (
+            <span>{lang === "pt" ? `de ${weeklyGoal} no plano` : `of ${weeklyGoal} planned`}</span>
+          )}
         </p>
         {weekKeys.map((key, i) => {
           const studied = studyDays?.has(key) ?? false;
