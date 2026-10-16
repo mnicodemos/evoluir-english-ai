@@ -155,7 +155,10 @@ async function requestSpeech(
   const existing = pendingAudio.get(cacheKey);
   if (existing) return existing;
 
-  const request = (async () => {
+  // One stream from /api/speech. The voice model now and then answers with no
+  // sound at all (about 1 in 10 in the Admin alerts); that answer is asked
+  // again once, before the student sees an error.
+  const fetchOnce = async () => {
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
     if (!token) throw new Error("Please sign in again to use audio.");
@@ -223,6 +226,16 @@ async function requestSpeech(
       events.forEach(consumeEvent);
     }
     if (buffer.trim()) consumeEvent(buffer);
+    return { chunks, streamError };
+  };
+
+  const request = (async () => {
+    let { chunks, streamError } = await fetchOnce();
+    if (streamError && chunks.length === 0 && !signal?.aborted) {
+      // A short pause first, so the voice service's "too quickly" guard lets it through.
+      await new Promise((resolve) => setTimeout(resolve, 1_500));
+      if (!signal?.aborted) ({ chunks, streamError } = await fetchOnce());
+    }
     if (streamError) throw new Error(streamError);
 
     const samples = mergePcmChunks(chunks);

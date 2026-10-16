@@ -37,6 +37,9 @@ describe("describeServerError", () => {
     const abort = new Error("This operation was aborted");
     abort.name = "AbortError";
     expect(describeServerError([abort])).toBeNull();
+    const httpAbort = new Error("aborted");
+    httpAbort.name = "HTTPError";
+    expect(describeServerError([httpAbort])).toBeNull();
     const timeout = new Error("The operation was aborted due to timeout");
     timeout.name = "TimeoutError";
     expect(describeServerError([timeout])).not.toBeNull();
