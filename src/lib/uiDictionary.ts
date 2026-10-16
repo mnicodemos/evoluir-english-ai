@@ -3,6 +3,86 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  // Life AI visual guide (/life/guide)
+  "How Life AI works": "Como funciona o Life AI",
+  "Your daily cycle": "Seu ciclo diário",
+  "Open Life AI": "Abrir o Life AI",
+  "Set your goals": "Defina suas metas",
+  "Up to 3 goals, with a deadline and milestones.": "Até 3 metas, com prazo e etapas.",
+  "EVO gives a step": "A EVO dá um passo",
+  "One small step for each goal, every day.": "Um pequeno passo para cada meta, todo dia.",
+  "Plan your day": "Planeje seu dia",
+  "Your priority and the day's tasks.": "Sua prioridade e as tarefas do dia.",
+  "Keep your habits": "Mantenha seus hábitos",
+  "One check-in a day builds a run.": "Um registro por dia forma uma sequência.",
+  "Your day fills up": "Seu dia se completa",
+  "The ring grows, and the goal steps count for your streak.":
+    "O anel cresce, e os passos das metas contam para a sua sequência.",
+  "What you want beyond English, one step a day.":
+    "O que você quer além do inglês, um passo por dia.",
+  "Write up to 3 goals.": "Escreva até 3 metas.",
+  "Tick EVO's step of the day.": "Marque o passo do dia da EVO.",
+  "Add milestones and a deadline to see how far you are.":
+    "Adicione etapas e um prazo para ver quanto já avançou.",
+  "The one thing that matters most today.": "A coisa que mais importa hoje.",
+  "Write it in the morning.": "Escreva de manhã.",
+  "Tick it when it is done.": "Marque quando estiver feita.",
+  "The tasks of each day, by priority.": "As tarefas de cada dia, por prioridade.",
+  "Add tasks for today or any day ahead.": "Adicione tarefas para hoje ou para os próximos dias.",
+  "Choose high, medium or low and link a goal.": "Escolha alta, média ou baixa e ligue a uma meta.",
+  "Tick them as you go.": "Marque conforme for fazendo.",
+  "Small actions repeated until they stick.": "Pequenas ações repetidas até virarem rotina.",
+  "Choose every day, weekdays or times a week.":
+    "Escolha todo dia, dias úteis ou vezes por semana.",
+  "Check in once a day; the last 7 days can be fixed.":
+    "Marque uma vez por dia; os últimos 7 dias podem ser corrigidos.",
+  "Watch the flame: days or weeks in a row.": "Acompanhe a chama: dias ou semanas seguidas.",
+  "EVO helps you plan, in your language.": "A EVO ajuda você a planejar, no seu idioma.",
+  "Ask for a plan or for today's priorities.": "Peça um plano ou as prioridades de hoje.",
+  "EVO answers with your goals and habits in mind.":
+    "A EVO responde pensando nas suas metas e hábitos.",
+  "Add its suggestions with one tap.": "Adicione as sugestões com um toque.",
+  "Relax and train your listening.": "Relaxe e treine sua escuta.",
+  "Choose a session; EVO reads it slowly.": "Escolha uma sessão; a EVO lê devagar.",
+  "Follow the text and see the translation if you need it.":
+    "Acompanhe o texto e veja a tradução se precisar.",
+  "Finish with five key words and one question.":
+    "Termine com cinco palavras-chave e uma pergunta.",
+  "All meditations": "Todas as meditações",
+  "Run 5 km": "Correr 5 km",
+  "Walk for 15 minutes": "Caminhar 15 minutos",
+  "Finish the report before lunch": "Terminar o relatório antes do almoço",
+  "Call the bank": "Ligar para o banco",
+  "Read 10 pages": "Ler 10 páginas",
+  "Tidy the desk": "Arrumar a mesa",
+  "How do I start saving money?": "Como começo a guardar dinheiro?",
+  "Start small: save 10% of what you get this week.":
+    "Comece pequeno: guarde 10% do que receber esta semana.",
+  "Save 10% this week": "Guardar 10% esta semana",
+  "3 min": "3 min",
+  // Meditations in English (Life AI)
+  "Meditations in English": "Meditações em inglês",
+  "Relax and train your listening: EVO guides you slowly, with the text on screen.":
+    "Relaxe e treine sua escuta: a EVO conduz devagar, com o texto na tela.",
+  "Show translation": "Ver tradução",
+  "Hide translation": "Ocultar tradução",
+  "Key words": "Palavras-chave",
+  "Think about it": "Para pensar",
+  "Answer it with the AI Teacher": "Responda com o AI Teacher",
+  "Back to meditations": "Voltar às meditações",
+  "min of meditation": "min de meditação",
+  "Calm breathing": "Respiração calma",
+  "Any time you need a pause": "Sempre que precisar de uma pausa",
+  "Focus before studying": "Foco antes de estudar",
+  "Before a lesson or a task": "Antes de uma lição ou tarefa",
+  Gratitude: "Gratidão",
+  "In the morning or at night": "De manhã ou à noite",
+  "Relax before sleep": "Relaxar antes de dormir",
+  "At night, in bed": "À noite, na cama",
+  "Two-minute break": "Pausa de dois minutos",
+  "In the middle of work or study": "No meio do trabalho ou do estudo",
+  "Try a meditation in English to relax and train your listening.":
+    "Experimente uma meditação em inglês para relaxar e treinar a escuta.",
   // Life AI (phase 1)
   "Life AI": "Life AI",
   "Evolve one day at a time.": "Evolua um dia de cada vez.",

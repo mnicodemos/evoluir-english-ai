@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Check,
   ChevronRight,
+  Crown,
   Flame,
   ListChecks,
   Loader2,
@@ -127,7 +128,27 @@ export function GoalsTodayCard() {
               {lifeDay.habitsDone}/{lifeDay.habitsDue}
             </Link>
           </span>
+        ) : life && !life.premium ? (
+          // Free students see what Premium adds, each with a gold crown (user request).
+          <Link
+            to="/premium"
+            className="hidden items-center gap-2.5 text-[11px] text-muted-foreground hover:text-foreground 2xl:inline-flex"
+          >
+            <span className="inline-flex items-center gap-1">
+              <Crown className="size-3 text-amber-400" aria-hidden="true" />
+              {t("Routine")}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Crown className="size-3 text-amber-400" aria-hidden="true" />
+              {t("Habits")}
+            </span>
+          </Link>
         ) : null}
+        {/* The same Premium bonus pill as Business English (user request). */}
+        <span className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
+          <Crown className="size-3" aria-hidden="true" />
+          {t("Premium bonus")}
+        </span>
         <GoalChecks
           done={Array.from({ length: PLUS_MAX_GOALS }, (_, index) => {
             const goal = goals[index];
@@ -459,7 +480,7 @@ function GoalChecks({
       aria-label={label(count)}
       title={label(count)}
       className={cn(
-        "ml-auto inline-flex -translate-y-0.5 items-center gap-1 rounded-full border px-2 py-0.5 transition-colors",
+        "inline-flex -translate-y-0.5 items-center gap-1 rounded-full border px-2 py-0.5 transition-colors",
         anyDone ? "border-brand-green/50 bg-brand-green/10" : "border-white/15 bg-white/[0.03]",
       )}
     >

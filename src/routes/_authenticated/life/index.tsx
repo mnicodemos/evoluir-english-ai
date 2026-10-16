@@ -9,6 +9,7 @@ import { AppShell } from "@/components/AppShell";
 import { CoachSection } from "@/components/life/CoachSection";
 import { GoalsSection } from "@/components/life/GoalsSection";
 import { HabitsSection } from "@/components/life/HabitsSection";
+import { MeditationSection } from "@/components/life/MeditationSection";
 import { LifeHeader, LifePremiumGate, useLifeT } from "@/components/life/LifeNav";
 import { RoutineSection } from "@/components/life/RoutineSection";
 import { Button } from "@/components/ui/button";
@@ -108,7 +109,11 @@ function LifePage() {
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3 lg:items-start">
-        <GoalsSection />
+        {/* Goals with the meditations below (one free session for everyone). */}
+        <div className="grid gap-4">
+          <GoalsSection />
+          <MeditationSection />
+        </div>
         {data.premium ? (
           <>
             <div className="grid gap-4">
