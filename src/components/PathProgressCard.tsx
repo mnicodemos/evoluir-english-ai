@@ -332,8 +332,9 @@ const STATUS_TONE: Record<SkillMeterStatus, { bar: string; badge: string }> = {
   strong: { bar: "[&>div]:bg-success", badge: "bg-success/15 text-success" },
   on_track: {
     bar: "[&>div]:bg-dashboard-blue",
-    // A lighter blue on the badge, so "Good" reads on the dark card (user request).
-    badge: "bg-dashboard-blue/20 text-sky-300",
+    // Light blue with a thin outline, so "Good" reads on the dark card without
+    // looking like a navy pill or competing with Priority (user request).
+    badge: "bg-sky-400/10 text-sky-300 ring-1 ring-inset ring-sky-400/45",
   },
   needs_work: {
     bar: "[&>div]:bg-warning",
