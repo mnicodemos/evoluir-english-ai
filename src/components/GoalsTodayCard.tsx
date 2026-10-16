@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronRight, Flame, Loader2, Search, Sprout } from "lucide-react";
+import { Flame, Loader2, Sprout } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -18,14 +18,12 @@ import {
   useHomeChoice,
   useLifeActions,
 } from "@/components/LifeHomeSlots";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { plusDayComplete, plusGoalWeek, type PlusGoalWeek, type PlusStep } from "@/lib/plus";
 import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
-import { graphitePanelClass } from "@/lib/surfaces";
 import { PRIORITY_DOT } from "@/components/life/LifeTasks";
 import { cn } from "@/lib/utils";
 
@@ -116,7 +114,6 @@ export function GoalsTodayCard() {
           {shownGoal ? (
             <GoalTile
               key={shownGoal.id}
-              goalId={shownGoal.id}
               title={shownGoal.title}
               step={shownStep}
               week={plusGoalWeek(recent, shownGoal.id, data?.today ?? "")}
@@ -268,7 +265,6 @@ export function GoalsTodayCard() {
  * its height.
  */
 function GoalTile({
-  goalId,
   title,
   step,
   week,
@@ -281,7 +277,6 @@ function GoalTile({
   t,
 }: {
   chooser?: ReactNode;
-  goalId: string;
   title: string;
   step: PlusStep | null;
   week: PlusGoalWeek;
@@ -293,7 +288,6 @@ function GoalTile({
   t: (label: string) => string;
 }) {
   const done = !!step?.doneAt;
-  const [detailsOpen, setDetailsOpen] = useState(false);
   // The goal's last 7 days: dots in a slot wide enough for them (the count is
   // read out and shown on hover), dots and count in the popup.
   const week7 = (always: boolean) => (
@@ -327,68 +321,11 @@ function GoalTile({
       ) : null}
     </span>
   );
-  // A teal text link; a narrow slot shows a grey round check that turns into
-  // the teal done mark once the step is completed (user request).
-  const completeButton = (
-    <button
-      type="button"
-      disabled={!step || busy}
-      onClick={() => onToggle(true)}
-      aria-label={t("Complete step")}
-      title={t("Complete step")}
-      className="inline-flex shrink-0 items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 disabled:opacity-50"
-    >
-      {/* A narrow slot (under 18.5rem) shows the same action as a round check. */}
-      <span className="grid size-5 place-items-center rounded-full border border-muted-foreground text-muted-foreground transition-colors hover:border-brand-green hover:text-brand-green @[18.5rem]:hidden">
-        <Check className="size-3" strokeWidth={3} aria-hidden="true" />
-      </span>
-      <span className="hidden items-center gap-1 @[18.5rem]:inline-flex">
-        {t("Complete step")}
-        <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-      </span>
-    </button>
-  );
-  // The goal's English with EVO: a teal button with dark text (user request).
-  const practiceLink = (
-    <Link
-      to="/coach"
-      search={{ goal: goalId }}
-      aria-label={t("Practise it in English with EVO")}
-      title={t("Practise it in English with EVO")}
-      // The same teal text link as Business English's "Continue" (user request).
-      className="inline-flex h-6 shrink-0 items-center gap-0.5 rounded-md text-[11px] font-semibold text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-    >
-      {t("Practice now")}
-      <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-    </Link>
-  );
   const dayNote = dayComplete
     ? t("Your study day counts!")
     : stepsLeft === 1
       ? t("1 more step to count your day")
       : t("{n} more steps to count your day").replace("{n}", String(stepsLeft));
-  const doneMark = (
-    <>
-      <span
-        className={cn(
-          "grid size-5 shrink-0 place-items-center rounded-full bg-brand-green text-primary-foreground",
-          celebrate && "animate-in zoom-in-50 fade-in-0 duration-500",
-        )}
-        title={t("Step done!")}
-      >
-        <Check className="size-3" strokeWidth={3} aria-hidden="true" />
-        <span className="sr-only">{t("Step done!")}</span>
-      </span>
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => onToggle(false)}
-        className="rounded text-[10px] leading-none text-muted-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-      >
-        {t("Undo")}
-      </button>
-    </>
-  );
   const dayNoteLine = done ? (
     <p
       className={cn(
@@ -400,72 +337,29 @@ function GoalTile({
       {dayNote}
     </p>
   ) : null;
-  // Every goal has a slot of the same size (user request): the goal's name, a
-  // magnifier that opens the step in a popup, and the week and actions on one
-  // row, so the row keeps its height whatever the step's length.
+  // The same two rows as the task and habit slots (user request: one pattern):
+  // the kind "Step today" with the chooser and magnifier, then the goal's name
+  // with its check; the step, its last 7 days and the day note in the popup.
   return (
-    <li
-      className={cn(
-        "@container flex min-w-0 flex-col justify-between gap-1 rounded-lg px-2.5 py-1.5 transition-colors",
-        done ? "bg-brand-green/10 ring-1 ring-brand-green/30" : "bg-secondary/60",
-      )}
-    >
-      <div className="flex min-w-0 items-start gap-2">
-        <p className="min-w-0 flex-1 text-xs font-semibold leading-snug" translate="no">
-          {title}
-        </p>
-        {chooser}
-        {/* The step opens right beside its magnifier (user request), not centred. */}
-        <Popover open={detailsOpen} onOpenChange={setDetailsOpen}>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              aria-label={t("See today's step")}
-              title={t("See today's step")}
-              className="-m-1 shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-            >
-              <Search className="size-4" aria-hidden="true" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            side="top"
-            align="end"
-            sideOffset={8}
-            className={cn(
-              "dashboard-shell dark w-[min(22rem,calc(100vw-2rem))] space-y-3 p-4",
-              graphitePanelClass,
-            )}
-          >
-            <div className="space-y-1">
-              <p className="text-xs font-semibold text-brand-green">{t("Your step today")}</p>
-              <h3 className="text-base font-semibold leading-snug" translate="no">
-                {title}
-              </h3>
-            </div>
-            <p className="text-sm leading-relaxed" translate="no">
-              {step?.text ?? "…"}
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-muted-foreground">{t("Last 7 days")}</span>
-              {week7(true)}
-            </div>
-            {dayNoteLine}
-            {/* The popup keeps the week and "Complete step" only (user request); a
-                  container of its own, so "Complete step" shows its full label. */}
-            <div className="@container flex flex-wrap items-center justify-end gap-3 whitespace-nowrap">
-              {done ? <div className="flex items-center gap-2">{doneMark}</div> : completeButton}
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-      {/* One row (user request): the week (or, once done, whether the study
-          day counts) and Practice now on the left, and the same round check as
-          the task and habit slots in the bottom-right corner (user request). */}
-      <div className="flex items-center justify-between gap-2 whitespace-nowrap">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-          {done ? dayNoteLine : week7(false)}
-          {done ? null : practiceLink}
-        </div>
+    <LifeSlot
+      kind={t("Step today")}
+      icon={SLOT_ICONS.goal}
+      title={title}
+      done={done}
+      chooser={chooser}
+      details={
+        <>
+          <p className="text-sm leading-relaxed" translate="no">
+            {step?.text ?? "…"}
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-muted-foreground">{t("Last 7 days")}</span>
+            {week7(true)}
+          </div>
+          {dayNoteLine}
+        </>
+      }
+      action={
         <span
           className={cn("shrink-0", celebrate && "animate-in zoom-in-50 fade-in-0 duration-500")}
         >
@@ -476,7 +370,7 @@ function GoalTile({
             onToggle={() => onToggle(!done)}
           />
         </span>
-      </div>
-    </li>
+      }
+    />
   );
 }

@@ -1734,6 +1734,7 @@ const baseUiPt: Record<string, string> = {
   "Add a goal": "Adicionar uma meta",
   "Task today": "Tarefa de hoje",
   "Habit today": "Hábito de hoje",
+  "Step today": "Passo de hoje",
   "Add a task": "Adicionar uma tarefa",
   "Add a habit": "Adicionar um hábito",
   "Choose what shows here": "Escolha o que aparece aqui",

@@ -1,7 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeftRight, Check, Crown, ListChecks, Plus, Repeat, Search } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Check,
+  Crown,
+  ListChecks,
+  Plus,
+  Repeat,
+  Search,
+  Target,
+} from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -327,6 +336,7 @@ export function EmptySlot({
 }
 
 export const SLOT_ICONS = {
+  goal: <Target className="size-3" aria-hidden="true" />,
   task: <ListChecks className="size-3" aria-hidden="true" />,
   habit: <Repeat className="size-3" aria-hidden="true" />,
 };
