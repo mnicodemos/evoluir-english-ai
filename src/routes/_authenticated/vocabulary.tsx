@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
+import { StudyDayCounter } from "@/components/StudyDayCounter";
 import { AppShell } from "@/components/AppShell";
 import { OfflineVocabulary } from "@/components/vocabulary/OfflineVocabulary";
 import {
@@ -530,27 +531,13 @@ function VocabularyOnline() {
           </>
         }
       />
-      <p
-        className={cn(
-          "mt-3 flex w-fit flex-wrap items-center gap-x-2 gap-y-1 rounded-full border px-3 py-1 text-xs font-semibold",
-          reviewedToday >= reviewGoal
-            ? "border-brand-green/50 bg-brand-green/10 text-brand-green"
-            : "border-border text-muted-foreground",
-        )}
-      >
-        <span>
-          <span>{t("Words reviewed today")}</span>
-          <span>{`: ${Math.min(reviewedToday, reviewGoal)}/${reviewGoal}`}</span>
-        </span>
-        {reviewedToday >= reviewGoal ? (
-          <span className="inline-flex items-center gap-1">
-            <CheckCircle2 className="size-3.5" aria-hidden="true" />
-            <span>{t("Study day counted")}</span>
-          </span>
-        ) : (
-          <span className="font-normal">{t("10 reviewed words complete your study day.")}</span>
-        )}
-      </p>
+      <StudyDayCounter
+        label={t("Words reviewed today")}
+        value={reviewedToday}
+        goal={reviewGoal}
+        doneText={t("Study day counted")}
+        hint={t("10 reviewed words complete your study day.")}
+      />
       {(daily?.length ?? 0) > 0 && (
         <Button
           variant="ghost"
@@ -605,13 +592,17 @@ function VocabularyOnline() {
       ) : (
         <Tabs defaultValue="today" className="mt-4">
           <TabsList>
-            <TabsTrigger value="today">
+            {/* A real gap: the triggers are flex boxes, which drop a leading space
+                ("Today(7)", user report). */}
+            <TabsTrigger value="today" className="gap-1">
               <span>Today</span>
-              <span> ({todayOpen.length})</span>
+              <span>({todayOpen.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="learned">
+            {/* A real gap: the triggers are flex boxes, which drop a leading space
+                ("Today(7)", user report). */}
+            <TabsTrigger value="learned" className="gap-1">
               <span>Learned</span>
-              <span> ({learned.length})</span>
+              <span>({learned.length})</span>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="today">

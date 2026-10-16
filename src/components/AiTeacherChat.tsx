@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { BookmarkCheck, GraduationCap, Plus, Send } from "lucide-react";
+import { BookmarkCheck, GraduationCap, Plus, Send, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -12,6 +12,7 @@ import { Message, MessageContent, MessageResponse } from "@/components/ai-elemen
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { EvoGuide } from "@/components/EvoGuide";
+import { PageHeader } from "@/components/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -207,13 +208,15 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     // Phones: the page is exactly one screen tall (main padding and the bottom
     // navigation taken out) and the conversation takes all the free height.
     <div className="flex h-[calc(100dvh-7.5rem-env(safe-area-inset-bottom))] w-full max-w-none flex-col gap-3 sm:h-auto sm:gap-4">
-      <header className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-3">
-        <div className="min-w-0">
-          <h1 className="text-lg font-semibold tracking-tight sm:text-2xl">{t("AI Teacher")}</h1>
-          <p className="text-xs text-muted-foreground sm:text-sm">
-            {t("Practice English with your personal AI teacher")}
-          </p>
-        </div>
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-3">
+        {/* The same page header as the other pages (user request). */}
+        <PageHeader
+          icon={Sparkles}
+          className="min-w-0"
+          title={t("AI Teacher")}
+          description={t("Practice English with your personal AI teacher")}
+          descriptionClassName="mt-0.5 text-xs sm:text-sm"
+        />
         <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <Button
             variant="secondary"
@@ -229,7 +232,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             {t("New conversation")}
           </Button>
         </div>
-      </header>
+      </div>
 
       {(ctx?.cefrLevel || ctx?.focusSkill || ctx?.lessonTitle || coachState) && (
         <div className="flex flex-wrap items-center gap-2" aria-label={t("Your context")}>

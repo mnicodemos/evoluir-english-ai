@@ -295,7 +295,7 @@ function Mistakes() {
                     <p
                       translate="no"
                       lang="en"
-                      className="min-w-0 flex-1 rounded-lg border border-border p-3 font-medium leading-[2.4]"
+                      className="min-w-0 flex-1 rounded-lg border border-border p-3 font-medium leading-[2.1]"
                     >
                       {current.sentence.before}
                       <input
@@ -308,7 +308,9 @@ function Mistakes() {
                         style={{
                           width: `${Math.min(Math.max(current.sentence.wrong.length, 6) + 3, 28)}ch`,
                         }}
-                        className="mx-0.5 inline-block h-9 max-w-full rounded-md border border-primary/50 bg-background px-2 py-0 align-middle leading-normal text-primary outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                        // A written blank, not a box (user report: the tall box pushed the
+                        // sentence's lines apart): a teal underline in the text's own line.
+                        className="mx-1 inline-block h-7 max-w-full rounded-t-md border-0 border-b-2 border-primary/60 bg-primary/[0.06] px-1.5 py-0 align-baseline leading-normal text-primary outline-none focus:border-primary focus:bg-primary/10"
                       />
                       {current.sentence.after}
                     </p>

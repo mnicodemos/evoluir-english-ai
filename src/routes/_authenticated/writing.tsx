@@ -356,11 +356,13 @@ function Writing() {
                         : "hover:bg-accent/50"
                   }`}
                 >
-                  <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-tight tracking-wide text-muted-foreground sm:text-xs">
+                  {/* Sentence case and a fixed icon (user report: the capitals broke
+                      into two cramped lines and one icon shrank). */}
+                  <span className="flex items-center gap-1.5 text-xs font-semibold leading-tight text-muted-foreground">
                     {isDone ? (
-                      <CheckCircle2 className="size-3.5 text-brand-green" />
+                      <CheckCircle2 className="size-3.5 shrink-0 text-brand-green" />
                     ) : (
-                      <PenLine className="size-3.5" />
+                      <PenLine className="size-3.5 shrink-0" />
                     )}
                     {category.label}
                   </span>
