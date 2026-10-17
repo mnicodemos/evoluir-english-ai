@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  addDays,
   coachShareText,
   focusBreakMinutes,
   focusClock,
@@ -13,6 +14,7 @@ import {
   lifeDayProgress,
   parseLifeCoach,
   weekStart,
+  withStudyDayLogs,
   type LifeHabit,
 } from "./life";
 
@@ -175,5 +177,44 @@ describe("focus", () => {
     expect(focusClock(25 * 60_000)).toBe("25:00");
     expect(focusClock(61_001)).toBe("01:02");
     expect(focusClock(-5)).toBe("00:00");
+  });
+});
+
+describe("habit linked to the English study day (migration 0071)", () => {
+  const study = {
+    id: "h-study",
+    title: "Study English",
+    frequency: "daily" as const,
+    timesPerWeek: null,
+    category: null,
+    linked: "study_day" as const,
+  };
+  const read = { ...study, id: "h-read", title: "Read 10 pages", linked: null };
+
+  it("takes its check-ins from the study days and ignores manual ticks", () => {
+    const logs = withStudyDayLogs(
+      [study, read],
+      [
+        { habitId: "h-study", day: "2026-10-10" },
+        { habitId: "h-read", day: "2026-10-16" },
+      ],
+      ["2026-10-16", "2026-10-17", "2026-10-16"],
+    );
+    expect(logs).toEqual([
+      { habitId: "h-read", day: "2026-10-16" },
+      { habitId: "h-study", day: "2026-10-16" },
+      { habitId: "h-study", day: "2026-10-17" },
+    ]);
+  });
+
+  it("gives the linked habit the same run as the study streak", () => {
+    const days = Array.from({ length: 30 }, (_, i) => addDays("2026-10-17", -i));
+    const logs = withStudyDayLogs([study], [], days);
+    expect(habitStreak(study, logs, "2026-10-17")).toBe(30);
+  });
+
+  it("leaves logs alone when no habit is linked", () => {
+    const logs = [{ habitId: "h-read", day: "2026-10-16" }];
+    expect(withStudyDayLogs([read], logs, ["2026-10-17"])).toEqual(logs);
   });
 });

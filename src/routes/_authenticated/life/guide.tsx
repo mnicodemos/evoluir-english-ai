@@ -116,6 +116,7 @@ function LifeGuidePage() {
         "Choose every day, weekdays or times a week.",
         "Check in once a day; the last 7 days can be fixed.",
         "Watch the flame: days or weeks in a row.",
+        "A habit like Study English can tick itself on your English study days.",
       ],
       premium: true,
       art: <HabitsArt />,

@@ -234,7 +234,7 @@ export function GoalsTodayCard() {
               action={
                 <DoneCheck
                   done={habitDoneToday(life, shownHabit.id)}
-                  disabled={actions.habit.isPending}
+                  disabled={actions.habit.isPending || shownHabit.linked === "study_day"}
                   label={
                     habitDoneToday(life, shownHabit.id) ? t("Mark as not done") : t("Mark as done")
                   }
