@@ -647,7 +647,7 @@ function VocabularyOnline() {
                     ) : (
                       <div className="mt-4">
                         <p className="text-sm text-muted-foreground">
-                          {t("{n} of {total} words known")
+                          {t("This lesson's words: {n} of {total} known")
                             .replace("{n}", String(todayKnownCount))
                             .replace("{total}", String(today.length))}
                         </p>
