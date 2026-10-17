@@ -36,6 +36,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { refreshAfterActivity } from "@/lib/refreshKeys";
 import { transcribeAudio } from "@/lib/transcribe";
 import {
+  fallbackOpenersFor,
   loadUsedOpeners,
   rememberOpener,
   rolePlaysForGoal,
@@ -250,8 +251,10 @@ export function VoiceCoach({
         (error.message === "opener_timeout" || error.message === COACH_TIMEOUT_MESSAGE)
       )
         toast.error(COACH_TIMEOUT_MESSAGE);
-      const fresh = selected.fallbackOpeners.filter((line) => !used.includes(line));
-      const pool = fresh.length ? fresh : selected.fallbackOpeners;
+      // Level-aware fixed openers: A1-A2 get short personal questions.
+      const fallbacks = fallbackOpenersFor(selected.id, cefrLevel);
+      const fresh = fallbacks.filter((line) => !used.includes(line));
+      const pool = fresh.length ? fresh : fallbacks;
       opener =
         pool[Math.floor(Math.random() * pool.length)] ??
         "Hi! Let's chat in English. How are you today?";

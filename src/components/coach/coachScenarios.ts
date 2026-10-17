@@ -46,6 +46,49 @@ export const scenarios = [
   },
 ] as const;
 
+/**
+ * Fixed openers for A1-A2, used when the AI opener does not arrive in time
+ * (user report, 2026-10-17: most openers came from these fixed lists, and a
+ * beginner got "Imagine I'm interviewing you for your dream job"). Short,
+ * personal and answerable in a few words, like beginnerOpenerRule asks the AI.
+ */
+const BEGINNER_FALLBACK_OPENERS: Record<(typeof scenarios)[number]["id"], readonly string[]> = {
+  everyday: [
+    "Hi! How are you today?",
+    "Hello! Where do you live?",
+    "Hi! Do you have a big family?",
+    "Hello! What do you like to eat?",
+    "Hi! What time do you get up?",
+    "Hello! What do you do on Sundays?",
+  ],
+  professional: [
+    "Hi! What is your job?",
+    "Hello! Do you work or study?",
+    "Hi! Do you like your job?",
+    "Hello! Where do you work?",
+    "Hi! Do you work from home?",
+    "Hello! What time do you start work?",
+  ],
+  travel: [
+    "Hi! Do you like to travel?",
+    "Hello! Which country do you want to visit?",
+    "Hi! Do you like the beach?",
+    "Hello! What is your favourite city?",
+    "Hi! Do you travel by car or by bus?",
+    "Hello! Where do you go on holiday?",
+  ],
+};
+
+/** The fixed openers that fit the student's level: simple ones for A1-A2. */
+export function fallbackOpenersFor(
+  scenarioId: (typeof scenarios)[number]["id"],
+  level: string | null | undefined,
+): readonly string[] {
+  const beginner = level === "a1" || level === "a2";
+  const scenario = scenarios.find((item) => item.id === scenarioId) ?? scenarios[0];
+  return beginner ? BEGINNER_FALLBACK_OPENERS[scenario.id] : scenario.fallbackOpeners;
+}
+
 export const OPENERS_STORAGE_KEY = "ai-talking-openers-v2";
 
 /** Every topic already used, so the AI never opens with the same subject twice. */
