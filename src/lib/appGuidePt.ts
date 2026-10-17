@@ -97,8 +97,8 @@ export const appGuidePt: Record<string, string> = {
     "Planeje as tarefas do dia, marque seus hábitos e defina a prioridade do dia.",
   "Change a goal, task, habit or the priority with its pencil (Edit).":
     "Altere uma meta, tarefa, hábito ou a prioridade pelo lápis (Editar).",
-  "Ask the Life Coach for a plan; add its suggestions with one tap.":
-    "Peça um plano à Life Coach; adicione as sugestões com um toque.",
+  "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.":
+    "Peça um plano à Life Coach; adicione as sugestões com um toque, ou copie uma resposta e envie pelo WhatsApp.",
   "Finishing every goal step of the day also counts for your streak.":
     "Concluir todos os passos das metas do dia também conta para a sua sequência.",
   "Study plan": "Plano de estudo",
