@@ -171,8 +171,17 @@ export function VoiceCoach({
     if (!marks || marks.firstAudioAt !== undefined) return;
     marks.firstAudioAt = performance.now();
     const row = turnTimingRow(marks);
-    // Before migration 0050 the table does not exist; the insert just fails.
-    if (row) void supabase.from("speaking_turn_timings").insert(row);
+    // A Supabase query is only sent when awaited or .then() is called: a bare
+    // `void ...insert(row)` never left the browser, so the Admin showed
+    // "0 answers measured" (user report, 2026-10-17). Failures stay silent.
+    if (row)
+      void supabase
+        .from("speaking_turn_timings")
+        .insert(row)
+        .then(
+          () => undefined,
+          () => undefined,
+        );
   }
 
   function queueSpeech(text: string) {
