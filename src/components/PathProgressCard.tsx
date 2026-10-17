@@ -138,8 +138,8 @@ export function PathProgressCard({
         <span> · </span>
         <span className="uppercase">{path.level}</span>
         <span> · </span>
-        <span>Lesson</span> <span>{path.coreCompleted}</span> <span>of</span> <span>{path.coreTotal}</span>{" "}
-        <span>completed</span>
+        <span>Lesson</span> <span>{path.coreCompleted}</span> <span>of</span>{" "}
+        <span>{path.coreTotal}</span> <span>completed</span>
       </p>
       {path.next ? (
         <p className="mt-3 text-sm">
@@ -153,9 +153,7 @@ export function PathProgressCard({
       <div className="mt-4">
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium">Completed</span>
-          <span className="text-muted-foreground">
-            {corePct}%
-          </span>
+          <span className="text-muted-foreground">{corePct}%</span>
         </div>
         <Progress value={corePct} className="mt-2 h-2" />
       </div>
