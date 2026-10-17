@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   coachShareText,
+  focusBreakMinutes,
+  focusClock,
+  focusSummary,
   daysUntil,
   habitDueOn,
   habitStreak,
@@ -141,5 +144,36 @@ describe("coachShareText", () => {
     expect(text).toBe(
       "*Plan*\n\n• *Walk* 10 min\n• Read this (https://x.y)\n\nGo!\n\n— Life Coach · Evoluir+",
     );
+  });
+});
+
+describe("focus", () => {
+  it("gives a long break after every fourth block", () => {
+    expect(focusBreakMinutes("classic", 1)).toBe(5);
+    expect(focusBreakMinutes("classic", 4)).toBe(15);
+    expect(focusBreakMinutes("deep", 8)).toBe(20);
+    expect(focusBreakMinutes("short", 3)).toBe(3);
+  });
+
+  it("sums today and the last seven days", () => {
+    const summary = focusSummary(
+      [
+        { day: "2026-10-17", minutes: 25 },
+        { day: "2026-10-17", minutes: 25 },
+        { day: "2026-10-11", minutes: 50 },
+        { day: "2026-10-10", minutes: 15 },
+      ],
+      "2026-10-17",
+    );
+    expect(summary.todayCount).toBe(2);
+    expect(summary.todayMinutes).toBe(50);
+    expect(summary.week[0]).toEqual({ day: "2026-10-11", count: 1, minutes: 50 });
+    expect(summary.weekMinutes).toBe(100);
+  });
+
+  it("shows the countdown as mm:ss", () => {
+    expect(focusClock(25 * 60_000)).toBe("25:00");
+    expect(focusClock(61_001)).toBe("01:02");
+    expect(focusClock(-5)).toBe("00:00");
   });
 });

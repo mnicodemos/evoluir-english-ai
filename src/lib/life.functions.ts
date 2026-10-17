@@ -5,6 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import {
   addDays,
+  FOCUS_PRESETS,
   LIFE_HABIT_FREQUENCIES,
   LIFE_HABIT_HISTORY_DAYS,
   LIFE_MAX_HABITS,
@@ -13,6 +14,7 @@ import {
   lifeCoachContext,
   lifeCoachPrompt,
   parseLifeCoach,
+  type FocusSessionLog,
   type LifeCoachReply,
   type LifeHabit,
   type LifeHabitFrequency,
@@ -75,6 +77,8 @@ export type LifeOverview = {
   habits: LifeHabit[];
   logs: LifeHabitLog[];
   priority: LifePriority | null;
+  /** Focus blocks of the last seven days (free; empty before migration 0071). */
+  focus: FocusSessionLog[];
 };
 
 type TaskRow = {
@@ -165,8 +169,32 @@ async function readOverview(userId: string): Promise<LifeOverview> {
     ? []
     : ((milestoneRead.data ?? []) as MilestoneRow[]).map(toMilestone);
 
+  // Focus is free (user decision); before migration 0071 the table is missing.
+  const focusRead = await (
+    await table("life_focus_sessions")
+  )
+    .select("day, focus_minutes")
+    .eq("user_id", userId)
+    .gte("day", addDays(today, -6));
+  const focus = focusRead.error
+    ? []
+    : ((focusRead.data ?? []) as { day: string; focus_minutes: number }[]).map((row) => ({
+        day: row.day,
+        minutes: row.focus_minutes,
+      }));
+
   if (!premium) {
-    return { today, premium, goals, milestones, tasks: [], habits: [], logs: [], priority: null };
+    return {
+      today,
+      premium,
+      goals,
+      milestones,
+      tasks: [],
+      habits: [],
+      logs: [],
+      priority: null,
+      focus,
+    };
   }
 
   const [taskRead, habitRead, logRead, priorityRead] = await Promise.all([
@@ -209,6 +237,7 @@ async function readOverview(userId: string): Promise<LifeOverview> {
     priority: priorityRow
       ? { text: priorityRow.text, day: priorityRow.day, doneAt: priorityRow.done_at }
       : null,
+    focus,
   };
 }
 
@@ -304,6 +333,63 @@ export const deleteLifeTask = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("user_id", context.userId);
     if (error) throw new Error("The task could not be removed.");
+    return { ok: true };
+  });
+
+// -------------------------------------------------------------------- Focus
+
+/**
+ * Records one finished focus block (free). The browser runs the timer, so the
+ * server only accepts the presets' lengths, at most 24 blocks a day, and a task
+ * the student owns; the operation key makes a repeated save harmless.
+ */
+export const recordFocusSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        operationKey: uuid,
+        minutes: z
+          .number()
+          .int()
+          .refine((value) => Object.values(FOCUS_PRESETS).some((preset) => preset.focus === value)),
+        taskId: uuid.nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const today = studyToday();
+    const sessions = await table("life_focus_sessions");
+    const { data: todayRows, error: readError } = await sessions
+      .select("id, operation_key")
+      .eq("user_id", context.userId)
+      .eq("day", today);
+    if (readError) throw new Error("The focus session could not be saved.");
+    const rows = (todayRows ?? []) as { id: string; operation_key: string }[];
+    if (rows.some((row) => row.operation_key === data.operationKey)) return { ok: true };
+    if (rows.length >= 24) return { ok: true };
+
+    let taskId: string | null = null;
+    if (data.taskId) {
+      const { data: task } = await (
+        await table("life_tasks")
+      )
+        .select("id")
+        .eq("id", data.taskId)
+        .eq("user_id", context.userId)
+        .maybeSingle();
+      taskId = task ? data.taskId : null;
+    }
+    const { error } = await sessions.insert({
+      user_id: context.userId,
+      day: today,
+      focus_minutes: data.minutes,
+      task_id: taskId,
+      operation_key: data.operationKey,
+    });
+    // A save repeated at the same moment hits the unique key: already recorded.
+    if (error && !/duplicate|unique/i.test(error.message))
+      throw new Error("The focus session could not be saved.");
     return { ok: true };
   });
 

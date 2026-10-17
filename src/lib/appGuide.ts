@@ -155,7 +155,7 @@ export const APP_GUIDE: GuideSection[] = [
     id: "life",
     icon: "life",
     title: "Life+ AI",
-    what: "Your goals, routine and habits in one place, with EVO as your Life Coach.",
+    what: "Your goals, routine, habits and focus in one place, with EVO as your Life Coach.",
     steps: [
       "Add 1 to 3 goals: EVO gives you one small step for each goal every day.",
       "Give a goal a deadline and milestones to see how far you are.",
@@ -163,6 +163,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Change a goal, task, habit or the priority with its pencil (Edit).",
       "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.",
       "Try a meditation in English to relax and train your listening.",
+      "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.",
     ],
     tip: "Finishing every goal step of the day also counts for your streak.",
     to: "/life",

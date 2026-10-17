@@ -44,6 +44,14 @@ const baseUiPt: Record<string, string> = {
   "Add its suggestions with one tap.": "Adicione as sugestões com um toque.",
   "Relax and train your listening.": "Relaxe e treine sua escuta.",
   "Choose a session; EVO reads it slowly.": "Escolha uma sessão; a EVO lê devagar.",
+  "Focus blocks with short breaks, Pomodoro style.":
+    "Blocos de foco com pausas curtas, no estilo Pomodoro.",
+  "Choose 15, 25 or 50 minutes and start; a long break comes after every fourth block.":
+    "Escolha 15, 25 ou 50 minutos e comece; a cada quatro blocos vem uma pausa longa.",
+  "Premium: tie the block to one of today's tasks and tick it in the break.":
+    "Premium: ligue o bloco a uma tarefa de hoje e marque-a na pausa.",
+  "Use the break for two minutes of English; your week shows in bars.":
+    "Use a pausa para dois minutos de inglês; sua semana aparece em barras.",
   "Follow the text and see the translation if you need it.":
     "Acompanhe o texto e veja a tradução se precisar.",
   "Finish with five key words and one question.":
@@ -91,6 +99,27 @@ const baseUiPt: Record<string, string> = {
   Routine: "Rotina",
   Habits: "Hábitos",
   "Life Coach": "Life Coach",
+  "Focus blocks with short breaks; use the breaks to practise English.":
+    "Blocos de foco com pausas curtas; use as pausas para praticar inglês.",
+  Break: "Pausa",
+  Ready: "Pronto",
+  "Block length": "Duração do bloco",
+  "Task for this block": "Tarefa deste bloco",
+  "No task": "Sem tarefa",
+  "Start focus": "Iniciar foco",
+  Resume: "Continuar",
+  Pause: "Pausar",
+  "Skip break": "Pular pausa",
+  "Stopping drops this block; it only counts when the time is up.":
+    "Parar descarta este bloco; ele só conta quando o tempo acabar.",
+  "Did you finish this task?": "Você terminou esta tarefa?",
+  "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
+  "Review words": "Revisar palavras",
+  "Focus this week": "Foco nesta semana",
+  "in 7 days": "em 7 dias",
+  "Focus block done! Time for a break.": "Bloco de foco concluído! Hora da pausa.",
+  "Break over. Ready for the next focus block?": "Fim da pausa. Pronto para o próximo bloco?",
+  "The focus session could not be saved.": "Não foi possível salvar o bloco de foco.",
   "The text could not be copied.": "Não foi possível copiar o texto.",
   "Share achievement": "Compartilhar conquista",
   "Send on WhatsApp": "Enviar pelo WhatsApp",
