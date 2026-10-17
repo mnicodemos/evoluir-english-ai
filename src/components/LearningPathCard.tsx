@@ -102,6 +102,8 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
     }
   };
 
+  const corePct = path.coreTotal ? Math.round((path.coreCompleted / path.coreTotal) * 100) : 0;
+
   return (
     <div className="space-y-5 lg:space-y-3">
       <div className="grid gap-5 lg:grid-cols-2 lg:gap-4">
@@ -120,11 +122,11 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
               <span>{findLevel(path.level).label}</span>
             </h2>
             <p className="shrink-0 text-xs font-semibold text-muted-foreground">
-              {path.completed}/{path.total} · {Math.round((path.completed / path.total) * 100)}%
+              {path.coreCompleted}/{path.coreTotal} · {corePct}%
             </p>
           </div>
           <Progress
-            value={Math.round((path.completed / path.total) * 100)}
+            value={corePct}
             className="mt-3 h-2"
             aria-label={t("Course progress")}
           />

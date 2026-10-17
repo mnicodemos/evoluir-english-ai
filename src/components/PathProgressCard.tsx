@@ -126,6 +126,8 @@ export function PathProgressCard({
     }
   };
 
+  const corePct = path.coreTotal ? Math.round((path.coreCompleted / path.coreTotal) * 100) : 0;
+
   const content = (
     <>
       <h2 id="path-progress-heading" className="text-xl font-semibold">
@@ -136,7 +138,7 @@ export function PathProgressCard({
         <span> · </span>
         <span className="uppercase">{path.level}</span>
         <span> · </span>
-        <span>Lesson</span> <span>{path.completed}</span> <span>of</span> <span>{path.total}</span>{" "}
+        <span>Lesson</span> <span>{path.coreCompleted}</span> <span>of</span> <span>{path.coreTotal}</span>{" "}
         <span>completed</span>
       </p>
       {path.next ? (
@@ -152,10 +154,10 @@ export function PathProgressCard({
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium">Completed</span>
           <span className="text-muted-foreground">
-            {Math.round((path.completed / path.total) * 100)}%
+            {corePct}%
           </span>
         </div>
-        <Progress value={Math.round((path.completed / path.total) * 100)} className="mt-2 h-2" />
+        <Progress value={corePct} className="mt-2 h-2" />
       </div>
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
