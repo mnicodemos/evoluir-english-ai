@@ -12,6 +12,9 @@ describe("video call style", () => {
     expect(call?.content).toContain("first name is Marcelo;");
     expect(call?.content).not.toContain("'Tip:'");
     expect(call?.content).not.toContain("CELTA");
+    // Honest about being an AI: no invented human life, says so when asked.
+    expect(call?.content).toContain("You are an AI.");
+    expect(call?.content).toContain("never invent a body or a human life");
   });
 
   it("leaves AI Speaking as the short teacher turns", () => {
@@ -38,6 +41,8 @@ describe("video call style", () => {
       casual: true,
     });
     expect(system?.content).toContain("picking up a video call");
+    expect(system?.content).toContain("You are an AI.");
+    expect(system?.content).not.toContain("something small about your day");
     expect(start?.content).toBe("*video call connects*");
   });
 });

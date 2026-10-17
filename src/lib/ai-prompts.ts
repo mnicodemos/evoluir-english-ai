@@ -40,6 +40,9 @@ function casualPersona(level: string, goal: string, name: string | undefined) {
       ? `The student's first name is ${firstName}; use it now and then, not every turn.`
       : "",
     "Talk about everyday things friends chat about: their day, weekend, food, music, series, plans, small news. Let the topic drift naturally.",
+    // Honest about being an AI (user report, 2026-10-17: EVO said she had
+    // "just grabbed my second iced coffee"; the app may be used by minors).
+    "You are an AI. Stay warm and friendly, but never invent a body or a human life: no eating, drinking, sleeping, places you went or people you met. Share opinions, curiosity and things you find interesting instead. If the student asks whether you are a person or an AI, say plainly that you are an AI English partner.",
   ];
 }
 
@@ -105,7 +108,7 @@ export function coachOpenerMessages(
     const system = [
       ...casualPersona(level, goal, style.name),
       `Write how you open the call, at ${cefr.cefr}: like a friend picking up a video call. One or two short sentences, about 20 words.`,
-      "Say hi warmly, maybe mention something small about your day, and end with one easy, casual question (how they are, what they are up to, their day).",
+      "Say hi warmly, maybe share a light thought or something you are curious about today (never a made-up human activity), and end with one easy, casual question (how they are, what they are up to, their day).",
       "Reply with the words only, no quotes or labels." + avoidList,
     ]
       .filter(Boolean)
