@@ -218,7 +218,7 @@ function DashboardNotifications({
           className={
             placement === "mobile"
               ? // Borderless like the other icons of the phone header capsule (user request).
-                "relative size-8 shrink-0 rounded-full text-slate-100 hover:bg-white/10 hover:text-white"
+                "relative h-8 w-7 shrink-0 rounded-full text-slate-100 hover:bg-white/10 hover:text-white"
               : // A grey circle closing the Weather talk capsule (user request).
                 "relative size-9 shrink-0 rounded-full bg-white/10 text-muted-foreground hover:bg-white/15 hover:text-foreground"
           }
@@ -226,7 +226,7 @@ function DashboardNotifications({
           <Bell className={placement === "mobile" ? "size-[1.15rem]" : "size-4"} />
           {hasNotifications && (
             <span
-              className={`absolute size-2 rounded-full bg-brand-green ring-2 ring-background ${placement === "mobile" ? "right-1 top-1" : "right-2 top-2"}`}
+              className={`absolute size-2 rounded-full bg-brand-green ring-2 ring-background ${placement === "mobile" ? "right-0.5 top-1" : "right-2 top-2"}`}
             >
               <span className="sr-only">{translate("New activities available")}</span>
             </span>
@@ -436,9 +436,9 @@ function Dashboard() {
                   {/* One glass capsule holds the streak, Weather talk and the bell,
                       like the desktop one (user request); the bell closes it in
                       its own grey circle. */}
-                  <div className="flex h-10 items-center gap-0.5 rounded-full border border-white/10 bg-white/[0.04] p-1 backdrop-blur-xl">
+                  <div className="flex h-10 items-center gap-0 rounded-full border border-white/10 bg-white/[0.04] p-1 backdrop-blur-xl">
                     <span
-                      className="flex items-center gap-1 pl-1.5 pr-1"
+                      className="flex items-center gap-1 pl-1.5 pr-0.5"
                       role="img"
                       title={`${streakDays} ${t("days")}`}
                       aria-label={`${t("Study streak")}: ${streakDays} ${t("days")}`}
