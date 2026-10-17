@@ -453,8 +453,9 @@ function Dashboard() {
                         {streakDays}
                       </span>
                     </span>
-                    <WeatherTalk translate={t} placement="mobile" />
+                    {/* Tomato before the weather on phones (user request). */}
                     <FocusHeaderButton translate={t} placement="mobile" />
+                    <WeatherTalk translate={t} placement="mobile" />
                     <DashboardNotifications
                       indicators={indicators}
                       reviewCount={reviewCount}
