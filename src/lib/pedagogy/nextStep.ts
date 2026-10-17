@@ -322,7 +322,7 @@ const ACTIVITY_SKILLS: Record<string, readonly string[]> = {
  */
 export function practisedSkills(
   activityTypes: readonly (string | null | undefined)[],
-  evidence: readonly { skill: string | null | undefined; createdAt: string }[],
+  evidence: readonly { skill: string | null | undefined; createdAt?: string | null }[],
   sinceIso: string,
 ): string[] {
   const since = new Date(sinceIso).getTime();
@@ -331,7 +331,8 @@ export function practisedSkills(
     for (const skill of ACTIVITY_SKILLS[type ?? ""] ?? []) skills.add(skill);
   }
   for (const row of evidence) {
-    if (row.skill && new Date(row.createdAt).getTime() >= since) skills.add(row.skill);
+    if (row.skill && row.createdAt && new Date(row.createdAt).getTime() >= since)
+      skills.add(row.skill);
   }
   return [...skills].sort();
 }
