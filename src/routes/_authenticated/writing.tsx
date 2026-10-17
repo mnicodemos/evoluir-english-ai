@@ -29,10 +29,10 @@ import { analyseAuthoritativeWriting } from "@/lib/pedagogy/dualWrite.functions"
 import { persistWritingLegacy } from "@/lib/legacyActivity.functions";
 import { refreshAfterActivity } from "@/lib/refreshKeys";
 import {
-  expectedLengthLabel,
   roundPrompts,
   WRITING_CATEGORIES,
   writingLevelConfig,
+  type WritingLevelConfig,
 } from "@/lib/writingLevels";
 import { studyDayStartIso, studyToday } from "@/lib/today";
 
@@ -439,8 +439,8 @@ function Writing() {
                 />
                 <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-sm text-muted-foreground">
-                    {text.trim().split(/\s+/).filter(Boolean).length} words · <span>target</span>{" "}
-                    {expectedLengthLabel(config)}
+                    {text.trim().split(/\s+/).filter(Boolean).length} <span>words</span> ·{" "}
+                    <span>target</span> <WordRange config={config} />
                   </span>
                   <Button className="w-full sm:w-auto" onClick={analyse} disabled={loading}>
                     {loading ? (
@@ -552,7 +552,7 @@ function Writing() {
               ))}
             </ul>
             <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
-              <span>Target length</span> · {expectedLengthLabel(config)}
+              <span>Target length</span> · <WordRange config={config} />
             </p>
           </section>
 
@@ -631,6 +631,20 @@ function WritingResultView({ result }: { result: WritingFeedback }) {
           </ul>
         </div>
       )}
+    </>
+  );
+}
+
+/**
+ * "30–50 words" for the screen, with "words" as its own text node so the
+ * Portuguese screen translates it (expectedLengthLabel stays English for the
+ * correction prompt).
+ */
+function WordRange({ config }: { config: WritingLevelConfig }) {
+  return (
+    <>
+      {config.maxWords === null ? `${config.minWords}+` : `${config.minWords}–${config.maxWords}`}{" "}
+      <span>words</span>
     </>
   );
 }
