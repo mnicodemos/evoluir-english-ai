@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Flame, Loader2, Sprout } from "lucide-react";
+import { Flame, Loader2, Sprout, Timer } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -18,9 +18,12 @@ import {
   useHomeChoice,
   useLifeActions,
 } from "@/components/LifeHomeSlots";
+import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
+import { openFocusWidget } from "@/lib/focusTimer";
 import { haptic } from "@/lib/haptics";
+import { focusClock } from "@/lib/life";
 import { plusDayComplete, plusGoalWeek, type PlusGoalWeek, type PlusStep } from "@/lib/plus";
 import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
@@ -102,6 +105,7 @@ export function GoalsTodayCard() {
         </h2>
         {/* No goal checks pill (user request: the card holds tasks and habits
             too, so three goal checks read as the whole card). */}
+        <FocusButton />
       </div>
 
       {isLoading ? (
@@ -376,5 +380,34 @@ function GoalTile({
         </span>
       }
     />
+  );
+}
+
+/**
+ * Opens the floating Focus timer (user request: start and stop the counter
+ * from the Life+ AI card and keep studying); while a phase runs it shows the
+ * time left.
+ */
+function FocusButton() {
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const { state, view } = useFocusTimer();
+  const active = state.phase !== "idle";
+  return (
+    <button
+      type="button"
+      onClick={openFocusWidget}
+      aria-label={t("Floating timer")}
+      title={t("Floating timer")}
+      className={cn(
+        "ml-auto inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-semibold transition-colors",
+        active
+          ? "border-pink-400/40 bg-pink-400/10 text-pink-300 hover:bg-pink-400/15"
+          : "border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground",
+      )}
+    >
+      <Timer className="size-3.5" aria-hidden="true" />
+      <span className="tabular-nums">{active ? focusClock(view.leftMs) : t("Focus")}</span>
+    </button>
   );
 }

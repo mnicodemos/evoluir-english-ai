@@ -91,6 +91,8 @@ export const appGuidePt: Record<string, string> = {
     "Suas metas, rotina e hábitos em um só lugar, com a EVO como sua Life Coach.",
   "Your goals, routine, habits and focus in one place, with EVO as your Life Coach.":
     "Suas metas, rotina, hábitos e foco em um só lugar, com a EVO como sua Life Coach.",
+  "Open the floating timer from the Life+ AI card or Focus to keep it at hand on any page; minimize, move or close it.":
+    "Abra o cronômetro flutuante pelo card Life+ AI ou pelo Foco para tê-lo à mão em qualquer página; minimize, mova ou feche.",
   "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.":
     "Use o Foco em blocos de 15, 25 ou 50 minutos, com dois minutos de inglês em cada pausa.",
   "Add 1 to 3 goals: EVO gives you one small step for each goal every day.":

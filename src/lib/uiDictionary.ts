@@ -110,6 +110,11 @@ const baseUiPt: Record<string, string> = {
   Resume: "Continuar",
   Pause: "Pausar",
   "Skip break": "Pular pausa",
+  "Floating timer": "Cronômetro flutuante",
+  "Focus timer": "Cronômetro de foco",
+  Minimize: "Minimizar",
+  Expand: "Expandir",
+  "Open Focus in Life+ AI": "Abrir o Foco no Life+ AI",
   "Stopping drops this block; it only counts when the time is up.":
     "Parar descarta este bloco; ele só conta quando o tempo acabar.",
   "Did you finish this task?": "Você terminou esta tarefa?",
