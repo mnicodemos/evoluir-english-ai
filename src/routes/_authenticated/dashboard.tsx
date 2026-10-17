@@ -28,6 +28,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
 import { studyToday } from "@/lib/today";
@@ -408,10 +409,11 @@ function Dashboard() {
               desktopSubtitleTrailing={
                 <div className="flex items-center gap-1.5">
                   <CampaignJourneyChip translate={t} placement="desktop" />
-                  {/* One capsule for Weather talk and the bell, the bell in its own
-                      grey circle at the end (user request). */}
+                  {/* One capsule for Weather talk, the Focus timer and the bell, the
+                      bell in its own grey circle at the end (user request). */}
                   <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
                     <WeatherTalk translate={t} placement="desktop" />
+                    <FocusHeaderButton translate={t} placement="desktop" />
                     <DashboardNotifications
                       indicators={indicators}
                       reviewCount={reviewCount}
@@ -452,6 +454,7 @@ function Dashboard() {
                       </span>
                     </span>
                     <WeatherTalk translate={t} placement="mobile" />
+                    <FocusHeaderButton translate={t} placement="mobile" />
                     <DashboardNotifications
                       indicators={indicators}
                       reviewCount={reviewCount}
