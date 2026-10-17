@@ -1,5 +1,4 @@
-import { Timer } from "lucide-react";
-
+import { TomatoIcon } from "@/components/focus/TomatoIcon";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { openFocusWidget } from "@/lib/focusTimer";
 import { focusClock } from "@/lib/life";
@@ -7,8 +6,10 @@ import { cn } from "@/lib/utils";
 
 /**
  * Opens the floating Focus timer from the Dashboard header capsule, beside
- * Weather talk (user request: the same pill pattern, phones included). While a
- * phase runs the icon turns pink; on desktop the time left shows beside it.
+ * Weather talk (user request: the same pill pattern, phones included), marked
+ * with a red tomato, the Pomodoro symbol (user request). While a phase runs a
+ * dot shows on phones (pink while focusing, green in the break) and the time
+ * left shows beside it on desktop.
  */
 export function FocusHeaderButton({
   translate: t,
@@ -33,7 +34,7 @@ export function FocusHeaderButton({
         title={label}
         className="relative grid size-8 shrink-0 place-items-center rounded-full text-slate-100 transition-colors hover:bg-white/10 hover:text-white"
       >
-        <Timer className={cn("size-[1.15rem]", active && tone)} aria-hidden="true" />
+        <TomatoIcon className="size-5" />
         {active ? (
           <span
             className={cn(
@@ -58,7 +59,7 @@ export function FocusHeaderButton({
         active ? tone : "text-muted-foreground hover:text-foreground",
       )}
     >
-      <Timer className="size-4" aria-hidden="true" />
+      <TomatoIcon className="size-[1.15rem]" />
       {active ? (
         <span className="font-display text-sm font-semibold tabular-nums">
           {focusClock(view.leftMs)}
