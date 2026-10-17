@@ -164,13 +164,14 @@ describe("focus", () => {
         { day: "2026-10-17", minutes: 25 },
         { day: "2026-10-11", minutes: 50 },
         { day: "2026-10-10", minutes: 15 },
+        { day: "2026-10-17", minutes: 12, partial: true },
       ],
       "2026-10-17",
     );
     expect(summary.todayCount).toBe(2);
-    expect(summary.todayMinutes).toBe(50);
+    expect(summary.todayMinutes).toBe(62);
     expect(summary.week[0]).toEqual({ day: "2026-10-11", count: 1, minutes: 50 });
-    expect(summary.weekMinutes).toBe(100);
+    expect(summary.weekMinutes).toBe(112);
   });
 
   it("shows the countdown as mm:ss", () => {

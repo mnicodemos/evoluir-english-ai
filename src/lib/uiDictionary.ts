@@ -117,8 +117,10 @@ const baseUiPt: Record<string, string> = {
   Minimize: "Minimizar",
   Expand: "Expandir",
   "Open Focus in Life+ AI": "Abrir o Foco no Life+ AI",
-  "Stopping drops this block; it only counts when the time is up.":
-    "Parar descarta este bloco; ele só conta quando o tempo acabar.",
+  "Stopping keeps the minutes done; only a finished block counts as a 🍅.":
+    "Parar guarda os minutos feitos; só o bloco completo conta como 🍅.",
+  "min saved; a stopped block does not count as a 🍅.":
+    "min salvos; um bloco interrompido não conta como 🍅.",
   "Did you finish this task?": "Você terminou esta tarefa?",
   "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
   "Review words": "Revisar palavras",

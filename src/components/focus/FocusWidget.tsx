@@ -3,6 +3,7 @@ import { GripHorizontal, Maximize2, Minus, Pause, Play, Square, X } from "lucide
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { toast } from "sonner";
 
+import { stopFocusSaving } from "@/components/focus/stopFocus";
 import { TomatoIcon } from "@/components/focus/TomatoIcon";
 import { useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,6 @@ import {
   focusSetPreset,
   focusSkipBreak,
   focusStart,
-  focusStop,
   minimizeFocusWidget,
   moveFocusWidget,
   tuckIdleFocusWidget,
@@ -341,7 +341,11 @@ function FocusWidget() {
                       {t("Skip break")}
                     </Button>
                   ) : (
-                    <Button variant="ghost" onClick={focusStop} className="h-9 gap-1.5">
+                    <Button
+                      variant="ghost"
+                      onClick={() => stopFocusSaving(t)}
+                      className="h-9 gap-1.5"
+                    >
                       <Square aria-hidden="true" />
                       {t("Stop")}
                     </Button>

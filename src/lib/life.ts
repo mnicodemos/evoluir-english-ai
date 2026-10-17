@@ -396,7 +396,9 @@ export const FOCUS_LONG_BREAK_EVERY = 4;
 /** The day's focus bar on /life fills at four blocks, one classic Pomodoro set. */
 export const FOCUS_DAILY_TARGET = 4;
 
-export type FocusSessionLog = { day: string; minutes: number };
+/** A finished block, or (partial) the minutes of a block stopped early: they add to
+ * the minutes but never to the day's 🍅 count (user decision). */
+export type FocusSessionLog = { day: string; minutes: number; partial?: boolean };
 
 /** The break after the n-th focus block of a run (1-based): long after every fourth. */
 export function focusBreakMinutes(preset: FocusPresetId, blocksInRun: number): number {
@@ -411,7 +413,7 @@ export function focusSummary(sessions: FocusSessionLog[], today: string) {
     const ofDay = sessions.filter((session) => session.day === day);
     return {
       day,
-      count: ofDay.length,
+      count: ofDay.filter((session) => !session.partial).length,
       minutes: ofDay.reduce((sum, session) => sum + session.minutes, 0),
     };
   });

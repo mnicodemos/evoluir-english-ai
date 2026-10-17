@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { stopFocusSaving } from "@/components/focus/stopFocus";
 import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { useFocusLog } from "@/hooks/useFocusLog";
@@ -26,7 +27,6 @@ import {
   focusSetTask,
   focusSkipBreak,
   focusStart,
-  focusStop,
   openFocusWidget,
 } from "@/lib/focusTimer";
 import { haptic } from "@/lib/haptics";
@@ -72,14 +72,15 @@ export function FocusSection() {
   };
   const pause = focusPause;
   const resume = focusResume;
-  const stop = focusStop;
+  const stop = () => stopFocusSaving(t);
   const skipBreak = focusSkipBreak;
 
   const weekday = (day: string) =>
     new Date(`${day}T12:00:00`).toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", {
       weekday: "narrow",
     });
-  const weekMax = Math.max(1, ...summary.week.map((row) => row.count));
+  // Bars follow the minutes, so a day with only stopped blocks still shows.
+  const weekMax = Math.max(1, ...summary.week.map((row) => row.minutes));
 
   return (
     <section
@@ -225,7 +226,7 @@ export function FocusSection() {
           </div>
           {state.phase === "focus" ? (
             <p className="text-xs text-muted-foreground">
-              {t("Stopping drops this block; it only counts when the time is up.")}
+              {t("Stopping keeps the minutes done; only a finished block counts as a 🍅.")}
             </p>
           ) : null}
         </div>
@@ -300,10 +301,10 @@ export function FocusSection() {
                 <span
                   className={cn(
                     "w-full max-w-6 rounded-sm",
-                    row.count ? "bg-pink-400/70" : "bg-white/[0.08]",
+                    row.minutes ? "bg-pink-400/70" : "bg-white/[0.08]",
                   )}
-                  style={{ height: `${Math.max(3, (row.count / weekMax) * 28)}px` }}
-                  title={`${row.count} · ${row.minutes} min`}
+                  style={{ height: `${Math.max(3, (row.minutes / weekMax) * 28)}px` }}
+                  title={`🍅 ${row.count} · ${row.minutes} min`}
                 />
                 <span className="text-[10px] uppercase text-muted-foreground">
                   {weekday(row.day)}

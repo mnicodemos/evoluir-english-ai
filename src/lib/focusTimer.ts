@@ -159,10 +159,18 @@ export function focusResume() {
   setState({ ...state, endsAt: Date.now() + (state.left ?? 0), left: null });
 }
 
-/** Stopping drops the running block unsaved; the run starts over. */
-export function focusStop() {
+/**
+ * Stopping ends the run. A focus block stopped early returns the whole minutes
+ * it ran (at least 1), so the caller saves them as a partial block: they count
+ * in the minutes but not as a 🍅 (user decision); a break returns null.
+ */
+export function focusStop(now: number = Date.now()): { minutes: number; key: string } | null {
   const { state } = snapshot;
   setState({ ...FOCUS_IDLE, preset: state.preset, taskId: state.taskId });
+  if (state.phase !== "focus") return null;
+  const left = state.endsAt !== null ? Math.max(0, state.endsAt - now) : (state.left ?? 0);
+  const minutes = Math.floor((FOCUS_PRESETS[state.preset].focus * 60_000 - left) / 60_000);
+  return minutes >= 1 ? { minutes, key: state.key ?? String(now) } : null;
 }
 
 export function focusSkipBreak() {
