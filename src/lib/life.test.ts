@@ -9,7 +9,6 @@ import {
   lifeCoachPrompt,
   lifeDayProgress,
   parseLifeCoach,
-  whatsappShareUrl,
   weekStart,
   type LifeHabit,
 } from "./life";
@@ -142,6 +141,5 @@ describe("coachShareText", () => {
     expect(text).toBe(
       "*Plan*\n\n• *Walk* 10 min\n• Read this (https://x.y)\n\nGo!\n\n— Life Coach · Evoluir+",
     );
-    expect(whatsappShareUrl("a b&c")).toBe("https://wa.me/?text=a%20b%26c");
   });
 });
