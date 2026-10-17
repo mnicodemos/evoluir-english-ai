@@ -164,6 +164,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.",
       "Try a meditation in English to relax and train your listening.",
       "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.",
+      "Open the floating timer from the Life+ AI card or Focus to keep it at hand on any page; minimize, move or close it.",
     ],
     tip: "Finishing every goal step of the day also counts for your streak.",
     to: "/life",

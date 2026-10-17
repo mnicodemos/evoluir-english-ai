@@ -1,92 +1,49 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Check, Flower2, Headphones, Pause, Play, Square, Timer } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {
+  BookOpen,
+  Check,
+  Flower2,
+  Headphones,
+  Pause,
+  PictureInPicture2,
+  Play,
+  Square,
+  Timer,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
-import { addFocusLog, useFocusLog } from "@/hooks/useFocusLog";
+import { useFocusLog } from "@/hooks/useFocusLog";
+import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { useLife } from "@/hooks/useLife";
+import {
+  focusClearLastTask,
+  focusPause,
+  focusResume,
+  focusSetPreset,
+  focusSetTask,
+  focusSkipBreak,
+  focusStart,
+  focusStop,
+  openFocusWidget,
+} from "@/lib/focusTimer";
 import { haptic } from "@/lib/haptics";
 import {
   FOCUS_DAILY_TARGET,
   FOCUS_PRESET_IDS,
   FOCUS_PRESETS,
-  focusBreakMinutes,
   focusClock,
   focusSummary,
-  type FocusPresetId,
 } from "@/lib/life";
 import { setLifeTaskDone } from "@/lib/life.functions";
-import { readStorage, writeStorage } from "@/lib/safeStorage";
-import { studyToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
-
-type FocusState = {
-  preset: FocusPresetId;
-  phase: "idle" | "focus" | "break";
-  /** When the running phase ends (ms since epoch); null while paused or idle. */
-  endsAt: number | null;
-  /** Time left of a paused phase. */
-  left: number | null;
-  /** Focus blocks finished in this run (a long break after every fourth). */
-  blocks: number;
-  taskId: string | null;
-  /** Operation key of the focus block running now, so it is saved once. */
-  key: string | null;
-  /** The task of the block just finished, asked about during the break. */
-  lastTaskId: string | null;
-};
-
-const STORAGE_KEY = "evoluir-focus";
-const IDLE: FocusState = {
-  preset: "classic",
-  phase: "idle",
-  endsAt: null,
-  left: null,
-  blocks: 0,
-  taskId: null,
-  key: null,
-  lastTaskId: null,
-};
-
-function readState(): FocusState {
-  try {
-    const raw = readStorage(STORAGE_KEY);
-    const parsed = raw ? (JSON.parse(raw) as Partial<FocusState>) : null;
-    if (!parsed || !FOCUS_PRESET_IDS.includes(parsed.preset as FocusPresetId)) return IDLE;
-    return { ...IDLE, ...parsed };
-  } catch {
-    return IDLE;
-  }
-}
-
-/** A soft two-note chime when a phase ends; silent where audio is blocked. */
-function chime() {
-  try {
-    const context = new AudioContext();
-    [660, 880].forEach((frequency, index) => {
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      const start = context.currentTime + index * 0.22;
-      oscillator.frequency.value = frequency;
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.18, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.5);
-      oscillator.connect(gain).connect(context.destination);
-      oscillator.start(start);
-      oscillator.stop(start + 0.55);
-    });
-    window.setTimeout(() => void context.close().catch(() => undefined), 1500);
-  } catch {
-    // No audio: the vibration and the toast are enough.
-  }
-}
 
 /**
  * Focus (user decision, 2026-10-17: a Pomodoro-style timer, free, kept on this
- * device): focus blocks with a short break after each and a long one after
+ * device; the timer itself is the shared store in src/lib/focusTimer.ts, also
+ * shown by the floating window): focus blocks with a short break after each and a long one after
  * every fourth. The timer keeps its end time in localStorage, so leaving the
  * page or locking the phone never loses it; each finished block joins the
  * device's log once. Premium students can tie a block to one of today's tasks
@@ -97,65 +54,7 @@ export function FocusSection() {
   const { data, refresh } = useLife();
   const focusLog = useFocusLog();
   const markDone = useServerFn(setLifeTaskDone);
-  const [state, setState] = useState<FocusState>(IDLE);
-  const [now, setNow] = useState(() => Date.now());
-  const handling = useRef(false);
-
-  // The saved timer is read after mount (localStorage is not on the server).
-  useEffect(() => setState(readState()), []);
-
-  const save = (next: FocusState) => {
-    setState(next);
-    writeStorage(STORAGE_KEY, JSON.stringify(next));
-  };
-
-  useEffect(() => {
-    if (!state.endsAt) return;
-    const timer = window.setInterval(() => setNow(Date.now()), 500);
-    return () => window.clearInterval(timer);
-  }, [state.endsAt]);
-
-  // The countdown in the tab title while a block runs.
-  useEffect(() => {
-    if (state.phase === "idle" || !state.endsAt) return;
-    const original = document.title;
-    document.title = `${state.phase === "focus" ? "🍅" : "☕"} ${focusClock(state.endsAt - now)} · Evoluir+`;
-    return () => {
-      document.title = original;
-    };
-  }, [state.phase, state.endsAt, now]);
-
-  // A phase that reached its end time: save the block and start the break, or
-  // end the break. Also runs on return after the page was closed.
-  useEffect(() => {
-    if (!state.endsAt || now < state.endsAt || handling.current) return;
-    handling.current = true;
-    const ended = state.endsAt;
-    if (state.phase === "focus") {
-      const blocks = state.blocks + 1;
-      const minutes = FOCUS_PRESETS[state.preset].focus;
-      addFocusLog({ day: studyToday(new Date(ended)), minutes, key: state.key ?? String(ended) });
-      chime();
-      haptic("success");
-      toast.success(t("Focus block done! Time for a break."));
-      save({
-        ...state,
-        phase: "break",
-        blocks,
-        endsAt: ended + focusBreakMinutes(state.preset, blocks) * 60_000,
-        left: null,
-        key: null,
-        lastTaskId: state.taskId,
-      });
-    } else {
-      chime();
-      haptic("tap");
-      toast(t("Break over. Ready for the next focus block?"));
-      save({ ...state, phase: "idle", endsAt: null, left: null });
-    }
-    handling.current = false;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [now, state]);
+  const { state, view } = useFocusTimer();
 
   if (!data) return null;
 
@@ -166,39 +65,15 @@ export function FocusSection() {
   const lastTask = state.lastTaskId
     ? openTasks.find((task) => task.id === state.lastTaskId)
     : undefined;
-  const preset = FOCUS_PRESETS[state.preset];
-  const running = !!state.endsAt;
-  const totalMs =
-    (state.phase === "break" ? focusBreakMinutes(state.preset, state.blocks) : preset.focus) *
-    60_000;
-  const leftMs =
-    state.phase === "idle"
-      ? preset.focus * 60_000
-      : running
-        ? Math.max(0, state.endsAt! - now)
-        : (state.left ?? totalMs);
-  const share = state.phase === "idle" ? 0 : 1 - leftMs / totalMs;
-
+  const { leftMs, share, running } = view;
   const start = () => {
     haptic("tap");
-    setNow(Date.now());
-    save({
-      ...state,
-      phase: "focus",
-      endsAt: Date.now() + preset.focus * 60_000,
-      left: null,
-      key: crypto.randomUUID(),
-    });
+    focusStart();
   };
-  const pause = () =>
-    save({ ...state, endsAt: null, left: Math.max(0, (state.endsAt ?? now) - Date.now()) });
-  const resume = () => {
-    setNow(Date.now());
-    save({ ...state, endsAt: Date.now() + (state.left ?? 0), left: null });
-  };
-  // Stopping drops the running block unsaved; the run starts over.
-  const stop = () => save({ ...IDLE, preset: state.preset, taskId: state.taskId });
-  const skipBreak = () => save({ ...state, phase: "idle", endsAt: null, left: null });
+  const pause = focusPause;
+  const resume = focusResume;
+  const stop = focusStop;
+  const skipBreak = focusSkipBreak;
 
   const weekday = (day: string) =>
     new Date(`${day}T12:00:00`).toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", {
@@ -219,7 +94,18 @@ export function FocusSection() {
         title={t("Focus")}
         subtitle={t("Focus blocks with short breaks; use the breaks to practise English.")}
         meta={`🍅 ${summary.todayCount}/${FOCUS_DAILY_TARGET}`}
-      />
+      >
+        {/* The floating window keeps the timer at hand on any page (user request). */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 gap-1.5 text-xs"
+          onClick={openFocusWidget}
+        >
+          <PictureInPicture2 aria-hidden="true" />
+          {t("Floating timer")}
+        </Button>
+      </LifeSectionTitle>
 
       <div className="mt-4 grid items-center gap-5 sm:grid-cols-[auto_minmax(0,1fr)]">
         {/* The countdown ring: pink while focusing, green during the break. */}
@@ -269,7 +155,7 @@ export function FocusSection() {
                 type="button"
                 disabled={state.phase !== "idle"}
                 aria-pressed={state.preset === id}
-                onClick={() => save({ ...state, preset: id, blocks: 0 })}
+                onClick={() => focusSetPreset(id)}
                 className={cn(
                   "h-8 rounded-full border px-3 text-xs font-medium tabular-nums transition-colors disabled:opacity-50",
                   state.preset === id
@@ -286,7 +172,7 @@ export function FocusSection() {
             <select
               value={state.taskId ?? ""}
               disabled={state.phase === "focus"}
-              onChange={(event) => save({ ...state, taskId: event.target.value || null })}
+              onChange={(event) => focusSetTask(event.target.value || null)}
               aria-label={t("Task for this block")}
               className="h-9 w-full rounded-md border border-input bg-transparent px-2 text-sm"
             >
@@ -363,7 +249,7 @@ export function FocusSection() {
                   void markDone({ data: { id: lastTask.id, done: true } })
                     .then(() => {
                       haptic("tap");
-                      save({ ...state, lastTaskId: null, taskId: null });
+                      focusClearLastTask();
                       refresh();
                     })
                     .catch(() => toast.error(t("The task could not be saved.")))

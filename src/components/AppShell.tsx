@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { Fragment, useEffect, type ReactNode } from "react";
 
+import { FocusController } from "@/components/focus/FocusWidget";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -520,6 +521,9 @@ function AppShellContent({
         >
           {children}
         </main>
+
+        {/* The Focus timer ends its phases and floats over every page. */}
+        <FocusController />
 
         <nav
           className="fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-white/10 bg-sidebar/80 px-0.5 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur-xl lg:hidden"
