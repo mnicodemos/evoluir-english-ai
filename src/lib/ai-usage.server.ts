@@ -48,6 +48,21 @@ export async function hashAiRequest(value: unknown): Promise<string> {
  */
 export const ABANDONED_USAGE_SECONDS = 90;
 
+/**
+ * AI Speaking is cut by the server after 20 s (aiChat) and its stream after
+ * 20 s without a first chunk, so a "talking" record still open after 30 s is
+ * abandoned. Releasing it sooner than the general 90 s stops one lost record
+ * from blocking the student's next opener or reply (user report, 2026-10-17:
+ * every talking record of 48 h stayed pending and the next calls were refused
+ * with "Another AI request is already running").
+ */
+export const TALKING_ABANDONED_SECONDS = 30;
+
+/** Seconds after which an open record of this operation counts as abandoned. */
+export function abandonedAfterSeconds(operation: string): number {
+  return operation === "talking" ? TALKING_ABANDONED_SECONDS : ABANDONED_USAGE_SECONDS;
+}
+
 export function isAbandonedUsage(createdAt: string, now = Date.now()): boolean {
   const started = Date.parse(createdAt);
   if (!Number.isFinite(started)) return false;
@@ -58,20 +73,34 @@ export function isAbandonedUsage(createdAt: string, now = Date.now()): boolean {
  * Closes every abandoned record (any user, any operation) older than the
  * limit, so nothing stays "running" indefinitely in the usage queue.
  */
-export async function releaseAbandonedAiUsage(_userId: string, _operation: AiOperation) {
+export async function releaseAbandonedAiUsage(userId: string, operation: AiOperation) {
   const db = await admin();
+  const closed = {
+    status: "error",
+    success: false,
+    error_code: "abandoned",
+    error_message: "Request ended without completing",
+    completed_at: new Date().toISOString(),
+  };
   const cutoff = new Date(Date.now() - ABANDONED_USAGE_SECONDS * 1000).toISOString();
-  await db
+  const everyone = db
     .from("ai_usage_events")
-    .update({
-      status: "error",
-      success: false,
-      error_code: "abandoned",
-      error_message: "Request ended without completing",
-      completed_at: new Date().toISOString(),
-    })
+    .update(closed)
     .eq("status", "pending")
     .lt("created_at", cutoff);
+  // The student's own AI Speaking records are released sooner (see above).
+  const talkingCutoff = new Date(Date.now() - TALKING_ABANDONED_SECONDS * 1000).toISOString();
+  const talking =
+    operation === "talking"
+      ? db
+          .from("ai_usage_events")
+          .update(closed)
+          .eq("status", "pending")
+          .eq("user_id", userId)
+          .eq("operation", "talking")
+          .lt("created_at", talkingCutoff)
+      : null;
+  await Promise.all([everyone, talking]);
 }
 
 export type AiLimitRow = {
@@ -224,7 +253,7 @@ export async function finishAiUsage(
       : await db.from("ai_usage_events").select("model").eq("id", ticket.eventId).maybeSingle();
     estimatedCost = estimateAiCost(data?.model, result.inputTokens, result.outputTokens);
   }
-  await db
+  const { error: closeError } = await db
     .from("ai_usage_events")
     .update({
       status: result.success ? "completed" : "error",
@@ -239,6 +268,10 @@ export async function finishAiUsage(
       completed_at: new Date().toISOString(),
     })
     .eq("id", ticket.eventId);
+  // A failed close used to be silent and left the record "pending", which
+  // blocks the student's next request; now it reaches the Admin's server
+  // errors (scrubbed by the error-capture sink).
+  if (closeError) console.error(`AI usage record could not be closed: ${closeError.message}`);
   if (result.firstChunkAt) {
     // Separate write: first_chunk_ms comes from migration 0045, which Lovable
     // applies on request. Until it exists this update fails on its own and is

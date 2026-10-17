@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createAttemptGate } from "@/lib/attemptGate";
-import { isAbandonedUsage } from "@/lib/ai-usage.server";
+import { abandonedAfterSeconds, isAbandonedUsage } from "@/lib/ai-usage.server";
 
 describe("createAttemptGate", () => {
   it("starts idle and allows an attempt", () => {
@@ -69,5 +69,13 @@ describe("isAbandonedUsage", () => {
 
   it("ignores an unreadable timestamp", () => {
     expect(isAbandonedUsage("not-a-date", at(600))).toBe(false);
+  });
+});
+
+describe("abandonedAfterSeconds", () => {
+  it("releases AI Speaking records after 30 s and the rest after 90 s", () => {
+    expect(abandonedAfterSeconds("talking")).toBe(30);
+    expect(abandonedAfterSeconds("teacher")).toBe(90);
+    expect(abandonedAfterSeconds("tts")).toBe(90);
   });
 });
