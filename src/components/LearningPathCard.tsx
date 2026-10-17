@@ -125,11 +125,7 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
               {path.coreCompleted}/{path.coreTotal} · {corePct}%
             </p>
           </div>
-          <Progress
-            value={corePct}
-            className="mt-3 h-2"
-            aria-label={t("Course progress")}
-          />
+          <Progress value={corePct} className="mt-3 h-2" aria-label={t("Course progress")} />
 
           <Button
             variant="outline"
