@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useWeatherCondition, weatherIcons } from "@/hooks/useWeatherCondition";
 import { speakEnglish } from "@/lib/speech";
-import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
+import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 import { WEATHER_TALK } from "@/lib/weatherTalk";
 
@@ -91,7 +91,8 @@ export function WeatherTalk({
             size="icon-sm"
             aria-label={translate("Weather talk")}
             title={translate("Weather talk")}
-            className={`relative size-8 shrink-0 rounded-full ${graphiteIconButtonClass}`}
+            /* Borderless inside the phone header capsule (dashboard). */
+            className="relative size-8 shrink-0 rounded-full text-slate-100 hover:bg-white/10 hover:text-white"
           >
             <TriggerIcon className="size-[1.15rem]" aria-hidden="true" />
             <MessageCircleMore

@@ -65,7 +65,7 @@ import { WeeklyLeagueSummary } from "@/components/WeeklyLeagueSummary";
 import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
 import { MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
-import { graphiteIconButtonClass, graphitePanelClass } from "@/lib/surfaces";
+import { graphitePanelClass } from "@/lib/surfaces";
 import { todayProgressLines, type TodayLineIcon } from "@/lib/todayProgressLines";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -216,7 +216,8 @@ function DashboardNotifications({
           aria-label={translate("Open notifications")}
           className={
             placement === "mobile"
-              ? `relative size-8 shrink-0 rounded-full ${graphiteIconButtonClass}`
+              ? // Closes the phone header capsule in a grey circle, as on desktop.
+                "relative size-8 shrink-0 rounded-full bg-white/10 text-slate-100 hover:bg-white/15 hover:text-white"
               : // A grey circle closing the Weather talk capsule (user request).
                 "relative size-9 shrink-0 rounded-full bg-white/10 text-muted-foreground hover:bg-white/15 hover:text-foreground"
           }
@@ -224,7 +225,7 @@ function DashboardNotifications({
           <Bell className={placement === "mobile" ? "size-[1.15rem]" : "size-4"} />
           {hasNotifications && (
             <span
-              className={`absolute size-2 rounded-full bg-brand-green ring-2 ring-background ${placement === "mobile" ? "right-0.5 top-0.5" : "right-2 top-2"}`}
+              className={`absolute size-2 rounded-full bg-brand-green ring-2 ring-background ${placement === "mobile" ? "right-1 top-1" : "right-2 top-2"}`}
             >
               <span className="sr-only">{translate("New activities available")}</span>
             </span>
@@ -430,32 +431,37 @@ function Dashboard() {
                   <FirstWeekGuide profile={profile} placement="mobile" />
                   {/* Gem + number only: the word "days" pushed the greeting's name
                       out of the row. Screen readers still hear "20 days". */}
-                  <span
-                    className="flex items-center gap-1"
-                    role="img"
-                    title={`${streakDays} ${t("days")}`}
-                    aria-label={`${t("Study streak")}: ${streakDays} ${t("days")}`}
-                  >
-                    <Gem
-                      className="size-5 shrink-0"
-                      style={{ color: getLeague(streakDays).from }}
-                      strokeWidth={2.4}
-                      aria-hidden="true"
-                    />
-                    <span className="font-display text-sm font-bold" aria-hidden="true">
-                      {streakDays}
+                  {/* One glass capsule holds the streak, Weather talk and the bell,
+                      like the desktop one (user request); the bell closes it in
+                      its own grey circle. */}
+                  <div className="flex h-10 items-center gap-0.5 rounded-full border border-white/10 bg-white/[0.04] p-1 backdrop-blur-xl">
+                    <span
+                      className="flex items-center gap-1 pl-1.5 pr-1"
+                      role="img"
+                      title={`${streakDays} ${t("days")}`}
+                      aria-label={`${t("Study streak")}: ${streakDays} ${t("days")}`}
+                    >
+                      <Gem
+                        className="size-5 shrink-0"
+                        style={{ color: getLeague(streakDays).from }}
+                        strokeWidth={2.4}
+                        aria-hidden="true"
+                      />
+                      <span className="font-display text-sm font-bold" aria-hidden="true">
+                        {streakDays}
+                      </span>
                     </span>
-                  </span>
-                  <WeatherTalk translate={t} placement="mobile" />
-                  <DashboardNotifications
-                    indicators={indicators}
-                    reviewCount={reviewCount}
-                    planTask={planNext}
-                    mistakesDue={mistakesDue}
-                    goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
-                    translate={t}
-                    placement="mobile"
-                  />
+                    <WeatherTalk translate={t} placement="mobile" />
+                    <DashboardNotifications
+                      indicators={indicators}
+                      reviewCount={reviewCount}
+                      planTask={planNext}
+                      mistakesDue={mistakesDue}
+                      goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
+                      translate={t}
+                      placement="mobile"
+                    />
+                  </div>
                 </div>
               }
             />
