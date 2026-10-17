@@ -1,15 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  CheckCircle2,
-  Crown,
-  Flower2,
-  Languages,
-  Loader2,
-  Play,
-  Square,
-  Volume2,
-} from "lucide-react";
+import { CheckCircle2, Crown, Flower2, Languages, Play, Square, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -97,8 +88,6 @@ export function MeditationSection() {
     for (let index = 0; index < lines.length; index += 1) {
       if (run.current !== id) return;
       setCurrent(index);
-      const next = lines[index + 1];
-      if (next) prepareSpeech(next.en, { cache: "persistent" });
       try {
         await speakEnglish(lines[index]!.en, { cache: "persistent", rate });
       } catch {
@@ -108,6 +97,12 @@ export function MeditationSection() {
         return;
       }
       if (run.current !== id) return;
+      // The next line is prepared during the pause, once this line's voice
+      // request is over: the audio service takes one request per student at a
+      // time, and a refused overlap made the next lines fall back to the
+      // robotic browser voice for up to a minute (audit, user request).
+      const next = lines[index + 1];
+      if (next) prepareSpeech(next.en, { cache: "persistent" });
       await new Promise((resolve) => setTimeout(resolve, lines[index]!.pause * 1000));
     }
     if (run.current !== id) return;
@@ -287,11 +282,7 @@ export function MeditationSection() {
                   className="flex w-full items-center gap-3 rounded-lg bg-secondary/60 p-2.5 text-left text-sm hover:bg-secondary"
                 >
                   <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
-                    {phase === "playing" ? (
-                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                    ) : (
-                      <Play className="size-4" aria-hidden="true" />
-                    )}
+                    <Play className="size-4" aria-hidden="true" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-medium">{t(item.title)}</span>
