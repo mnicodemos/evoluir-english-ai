@@ -704,7 +704,7 @@ const baseUiPt: Record<string, string> = {
   "No assessed history yet. Complete an activity to start your evolution chart.":
     "Ainda não há histórico avaliado. Conclua uma atividade para iniciar seu gráfico de evolução.",
 
-  "AI Speaking": "Fala com AI",
+  "AI Speaking": "Fala com IA",
   "Video call with EVO": "Videochamada com a EVO",
   "Video call": "Videochamada",
   "Next level": "Próximo nível",
@@ -1092,6 +1092,60 @@ const baseUiPt: Record<string, string> = {
     "Este hábito é marcado pelos seus dias de estudo de inglês.",
   "Linking to study days is not available yet. Please try again later.":
     "A ligação com os dias de estudo ainda não está disponível. Tente de novo mais tarde.",
+  // Premium page (only real features; 2026-10-17)
+  "5x more AI practice every day: conversations, video calls and corrections":
+    "5x mais prática com IA todo dia: conversas, videochamadas e correções",
+  "Business English from B1: 36 lessons for meetings, emails and interviews":
+    "Inglês para Negócios a partir do B1: 36 lições para reuniões, e-mails e entrevistas",
+  "Full Life+ AI: priority of the day, routine, habits and Life Coach":
+    "Life+ AI completo: prioridade do dia, rotina, hábitos e Life Coach",
+  "Every meditation in English": "Todas as meditações em inglês",
+  "Every lesson of your level, with video, flashcards and quiz":
+    "Todas as lições do seu nível, com vídeo, flashcards e quiz",
+  "AI Teacher, AI Speaking and video calls, with a daily limit":
+    "Professor de IA, Fala com IA e videochamadas, com limite diário",
+  "Writing corrections, with a daily limit": "Correções de escrita, com limite diário",
+  "Vocabulary, Listening and My mistakes": "Vocabulário, Escuta e Meus erros",
+  "Goals and the calm breathing meditation": "Metas e a meditação de respiração calma",
+  "Opening secure checkout…": "Abrindo o pagamento seguro…",
+  "/year": "/ano",
+  "/month": "/mês",
+  // AI Speaking and video call states
+  "Listening… tap again when you finish": "Ouvindo… toque de novo quando terminar",
+  "Sending your recording…": "Enviando sua gravação…",
+  "Understanding your English…": "Entendendo seu inglês…",
+  "Preparing a reply…": "Preparando a resposta…",
+  "more answer to unlock your report.": "resposta a mais para liberar seu relatório.",
+  "more answers to unlock your report.": "respostas a mais para liberar seu relatório.",
+  // AI Teacher focus chip
+  "focus:grammar": "gramática",
+  "focus:vocabulary": "vocabulário",
+  "focus:writing": "escrita",
+  // Writing focus priorities (src/lib/writingLevels.ts; the AI prompt keeps the English)
+  "understandability first": "ser entendido em primeiro lugar",
+  "basic sentence structure (subject + verb + object)":
+    "estrutura básica da frase (sujeito + verbo + complemento)",
+  "essential everyday vocabulary": "vocabulário essencial do dia a dia",
+  "clarity of the message": "clareza da mensagem",
+  "clear simple and past tenses": "presente e passado simples bem usados",
+  "linking sentences with and, but, because": "ligar frases com and, but, because",
+  "wider everyday vocabulary": "vocabulário do dia a dia mais amplo",
+  "grammar accuracy in the tenses you use": "precisão gramatical nos tempos verbais que você usa",
+  "paragraph organisation": "organização dos parágrafos",
+  "some variety in vocabulary": "alguma variedade de vocabulário",
+  "text organisation and cohesion": "organização e coesão do texto",
+  "grammar range and accuracy": "variedade e precisão gramatical",
+  "vocabulary variety": "variedade de vocabulário",
+  "clarity and precision": "clareza e precisão",
+  "quality of argumentation and supporting detail":
+    "qualidade da argumentação e dos detalhes de apoio",
+  "precision of grammar and word choice": "precisão da gramática e da escolha de palavras",
+  "register appropriate to a professional reader": "registro adequado a um leitor profissional",
+  "cohesion across paragraphs": "coesão entre os parágrafos",
+  "nuance and critical positioning": "nuance e posicionamento crítico",
+  "advanced formal register": "registro formal avançado",
+  "stylistic control and natural idiomatic range": "controle de estilo e uso natural de expressões",
+  "sustained, tightly reasoned argument": "argumentação sustentada e bem encadeada",
   "Mastered: answered right 5 times in a row": "Dominado: acertou 5 vezes seguidas",
   "All words known today. Nice work!": "Todas as palavras sabidas hoje. Muito bem!",
   "Test your pronunciation": "Teste sua pronúncia",
@@ -1158,7 +1212,7 @@ const baseUiPt: Record<string, string> = {
     "Não foi possível montar seu relatório. Tente novamente.",
   "Use what you just learned in a real conversation":
     "Use o que você acabou de aprender em uma conversa real",
-  "Practice with AI Speaking": "Praticar na Fala com AI",
+  "Practice with AI Speaking": "Praticar na Fala com IA",
   "Speak and get a scored report": "Fale e receba um relatório com nota",
 
   // Subscription portal (Phase 7)
@@ -1252,7 +1306,7 @@ const baseUiPt: Record<string, string> = {
   "One task for Everyday, Professional and Travel English. New tasks every day — nothing repeats.":
     "Uma tarefa de Everyday, Professional e Travel English. Novas tarefas todos os dias — nada se repete.",
   "Each lesson gives you a short video, a summary, the key vocabulary in flashcards, a quiz and a guided practice with AI Speaking.":
-    "Cada lição traz um vídeo curto, um resumo, o vocabulário-chave em flashcards, um quiz e uma prática guiada na Fala com AI.",
+    "Cada lição traz um vídeo curto, um resumo, o vocabulário-chave em flashcards, um quiz e uma prática guiada na Fala com IA.",
   "come back tomorrow,": "voltam amanhã,",
   "in a few days and": "em alguns dias e",
   "much later.": "bem mais tarde.",
@@ -1289,10 +1343,10 @@ const baseUiPt: Record<string, string> = {
   "Basic progress": "Evolução básica",
   "Priority support": "Suporte prioritário",
   "Unlimited writing corrections": "Correções de escrita ilimitadas",
-  "Unlimited AI Speaking sessions, every day": "Sessões ilimitadas de Fala com AI, todos os dias",
-  "3 AI Speaking sessions per day": "3 sessões de Fala com AI por dia",
+  "Unlimited AI Speaking sessions, every day": "Sessões ilimitadas de Fala com IA, todos os dias",
+  "3 AI Speaking sessions per day": "3 sessões de Fala com IA por dia",
   "Unlimited AI Speaking, pronunciation and audio lessons.":
-    "Fala com AI, pronúncia e aulas em áudio ilimitados.",
+    "Fala com IA, pronúncia e aulas em áudio ilimitados.",
   "Personalised study plan for your goal": "Plano de estudos personalizado para o seu objetivo",
   "Advanced weekly progress reports": "Relatórios semanais avançados de evolução",
   "Secure payment is being finalised. You will be able to pay by card or Pix.":
@@ -1776,7 +1830,7 @@ const baseUiPt: Record<string, string> = {
   "come back sooner. Cards marked as": "voltam antes. Cartões marcados como",
   "move forward.": "avançam.",
   "Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the activity — a new set arrives every time you start a new lesson in the Learning Center.":
-    "Ouça a frase e repita em voz alta. Conclua as 3 frases para terminar a atividade — um novo conjunto chega sempre que você começa uma nova lição no Learning Center.",
+    "Ouça a frase e repita em voz alta. Conclua as 3 frases para terminar a atividade — um novo conjunto chega sempre que você começa uma nova lição no Centro de Aprendizado.",
   "Redo today's activity": "Refazer a atividade de hoje",
   "All 3 listening tasks completed!": "As 3 tarefas de listening foram concluídas!",
   "Sessions today": "Sessões hoje",
@@ -1824,7 +1878,7 @@ const baseUiPt: Record<string, string> = {
   "Session complete: all 3 sentences done!": "Sessão concluída: as 3 frases feitas!",
   "Do another session": "Fazer outra sessão",
   "New listening tasks arrive as soon as you start a new lesson in the Learning Center.":
-    "Novas tarefas de listening chegam assim que você começa uma nova lição no Learning Center.",
+    "Novas tarefas de listening chegam assim que você começa uma nova lição no Centro de Aprendizado.",
   "Redo activity to improve your score": "Refazer a atividade para melhorar sua nota",
   "Sentence words": "Palavras da frase",
   "You repeated": "Você repetiu",

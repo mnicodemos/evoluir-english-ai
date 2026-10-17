@@ -243,7 +243,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
           )}
           {ctx?.focusSkill && (
             <Badge variant="secondary">
-              {t("Focus")}: {ctx.focusSkill}
+              {t("Focus")}: {t(`focus:${ctx.focusSkill}`)}
             </Badge>
           )}
           {ctx?.lessonTitle && <Badge variant="outline">{ctx.lessonTitle}</Badge>}

@@ -24,12 +24,12 @@ export const Route = createFileRoute("/_authenticated/premium")({
       {
         name: "description",
         content:
-          "Unlock unlimited AI Speaking, pronunciation and audio lessons with Evoluir+ English AI Premium.",
+          "Evoluir+ English AI Premium: 5x more AI practice every day, Business English and the full Life+ AI.",
       },
       { property: "og:title", content: "Premium - Evoluir+ English AI" },
       {
         property: "og:description",
-        content: "Unlimited AI Speaking, pronunciation and audio lessons.",
+        content: "5x more AI practice every day, Business English and the full Life+ AI.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -38,20 +38,24 @@ export const Route = createFileRoute("/_authenticated/premium")({
   component: Premium,
 });
 
+// Only what the app really gives (user report, 2026-10-17: the list promised
+// reports, priority lessons and support that do not exist, and "3 per day"
+// limits that are not the real ones). Premium: 5x the daily AI limits
+// (ai_limits premium_daily_limit), Business English (businessCourse.functions),
+// the Premium parts of Life+ AI (life.functions) and every meditation.
 const premiumPerks = [
-  "Unlimited AI Speaking sessions, every day",
-  "Unlimited writing corrections",
-  "Advanced weekly progress reports",
-  "Personalised study plan for your goal",
-  "Priority access to pronunciation & audio lessons",
-  "Priority support",
+  "5x more AI practice every day: conversations, video calls and corrections",
+  "Business English from B1: 36 lessons for meetings, emails and interviews",
+  "Full Life+ AI: priority of the day, routine, habits and Life Coach",
+  "Every meditation in English",
 ];
 
 const freePerks = [
-  "3 AI Speaking sessions per day",
-  "3 writing corrections per day",
-  "Vocabulary builder",
-  "Basic progress",
+  "Every lesson of your level, with video, flashcards and quiz",
+  "AI Teacher, AI Speaking and video calls, with a daily limit",
+  "Writing corrections, with a daily limit",
+  "Vocabulary, Listening and My mistakes",
+  "Goals and the calm breathing meditation",
 ];
 
 const plans = [
@@ -312,9 +316,15 @@ function Premium() {
                   onClick={goToCheckout}
                 >
                   {starting && <Loader2 className="mr-2 size-4 animate-spin" />}
-                  {starting
-                    ? "Opening secure checkout…"
-                    : `Go Premium — ${selected === "yearly" ? "R$ 799,90/year" : "R$ 79,90/month"}`}
+                  {starting ? (
+                    <span>Opening secure checkout…</span>
+                  ) : (
+                    // Separate text nodes so the Portuguese screen translates them.
+                    <>
+                      <span>Go Premium</span> — {selected === "yearly" ? "R$ 799,90" : "R$ 79,90"}
+                      <span>{selected === "yearly" ? "/year" : "/month"}</span>
+                    </>
+                  )}
                 </Button>
                 <p className="mt-3 text-xs text-muted-foreground">
                   Secure payment is processed by Stripe. Your card details never reach Evoluir+.

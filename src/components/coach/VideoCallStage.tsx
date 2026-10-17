@@ -255,9 +255,19 @@ export function VideoCallStage({
       {/* Controls. */}
       <footer className="px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3">
         <p className="mb-3 text-center text-xs text-white/60">
-          {userAnswers >= 3
-            ? "End the call to get your report."
-            : `Answer ${3 - Math.min(userAnswers, 3)} more time${3 - userAnswers === 1 ? "" : "s"} to unlock your report.`}
+          {userAnswers >= 3 ? (
+            "End the call to get your report."
+          ) : (
+            // Separate text nodes so the Portuguese screen translates them.
+            <>
+              {3 - Math.min(userAnswers, 3)}{" "}
+              <span>
+                {3 - userAnswers === 1
+                  ? "more answer to unlock your report."
+                  : "more answers to unlock your report."}
+              </span>
+            </>
+          )}
         </p>
         <div className="flex items-center justify-center gap-3 sm:gap-4">
           <RoundButton
