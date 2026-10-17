@@ -18,6 +18,7 @@ import { transferredSkills } from "./learningLoop";
 import {
   buildNextStep,
   lessonSkillToProfileSkill,
+  practisedSkills,
   type NextStep,
   type SkillSnapshot,
 } from "./nextStep";
@@ -135,13 +136,19 @@ export const loadNextStep = createServerFn({ method: "POST" })
     // whose transfer the existing Phase 30 layer already demonstrated.
     const transferred = transferredSkills(evidence);
 
+    // Skills worked in the last RECENT_DAYS: activity types mapped to skills
+    // plus the skills of recent evidence (never the raw activity types).
+    const recentlyPractised = practisedSkills(
+      (recent.data ?? []).map((row) => row.activity_type),
+      evidence,
+      since,
+    );
+
     const step = buildNextStep({
       skills: snapshots,
       currentLevel: level,
       recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
-      recentlyPractised: [
-        ...new Set((recent.data ?? []).map((row) => row.activity_type).filter(Boolean)),
-      ] as string[],
+      recentlyPractised,
       lessonBySkill,
       transferredSkills: transferred,
     });
@@ -172,9 +179,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
         // The whole journey: a skill's latest measurement counts at any level.
         currentLevel: null,
         recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
-        recentlyPractised: [
-          ...new Set((recent.data ?? []).map((row) => row.activity_type).filter(Boolean)),
-        ] as string[],
+        recentlyPractised,
         lessonBySkill,
       },
       {
