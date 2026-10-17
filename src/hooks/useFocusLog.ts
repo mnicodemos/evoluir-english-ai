@@ -4,9 +4,10 @@ import { addDays, type FocusSessionLog } from "@/lib/life";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { studyToday } from "@/lib/today";
 
-// The finished blocks of the last 14 days, kept on this device only (user
-// decision, 2026-10-17: simpler than the database). Each block carries the key
-// of its run, so it is never counted twice.
+// The focus blocks of the last 14 days, kept on this device only (user
+// decision, 2026-10-17: simpler than the database), finished or stopped early
+// (partial: minutes only). Each block carries the key of its run, so it is
+// never counted twice.
 const LOG_KEY = "evoluir-focus-log";
 const LOG_EVENT = "evoluir-focus-log";
 export type FocusLogEntry = FocusSessionLog & { key: string };

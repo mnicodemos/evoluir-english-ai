@@ -69,4 +69,17 @@ describe("floating window on Ready", () => {
     );
     expect(shouldTuckFocusWidget(getFocusSnapshot().state, { ...open, open: false })).toBe(false);
   });
+
+  it("returns the whole minutes of a focus block stopped early", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-17T12:00:00Z"));
+    focusStart();
+    const key = getFocusSnapshot().state.key;
+    vi.setSystemTime(new Date("2026-10-17T12:18:40Z"));
+    expect(focusStop()).toEqual({ minutes: 18, key });
+    expect(getFocusSnapshot().state.phase).toBe("idle");
+    focusStart();
+    vi.setSystemTime(new Date("2026-10-17T12:19:20Z"));
+    expect(focusStop()).toBeNull();
+  });
 });
