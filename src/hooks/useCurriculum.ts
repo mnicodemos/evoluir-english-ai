@@ -113,6 +113,11 @@ export function useLearningPath(reviewLevel?: string | null) {
       lessons: all,
       completed,
       total: all.length,
+      // The level's progress counts only the 30 core lessons, the same base as
+      // the Final Test rule (21 of 30); the optional review unit stays apart
+      // (user report: "5/33" beside "21 of the 30 lessons" read as a mistake).
+      coreCompleted: coreLessons.filter((lesson) => lesson.completed).length,
+      coreTotal: coreLessons.length,
       next: all.find((l) => !l.completed) ?? null,
       unitTests,
       finalTest: {
