@@ -345,3 +345,61 @@ export function coachShareText(reply: string): string {
     .trim();
   return `${body}\n\n— Life Coach · Evoluir+`;
 }
+
+// -------------------------------------------------------------------- Focus
+
+/**
+ * Focus (user decision, 2026-10-17: a Pomodoro-style timer in Life+ AI, free):
+ * blocks of focus with a short break after each and a long one after every
+ * fourth. Only the focus blocks are recorded (life_focus_sessions); the breaks
+ * suggest a two-minute English practice, which counts on its own screen.
+ */
+export type FocusPresetId = "short" | "classic" | "deep";
+export const FOCUS_PRESETS: Record<
+  FocusPresetId,
+  { focus: number; shortBreak: number; longBreak: number }
+> = {
+  short: { focus: 15, shortBreak: 3, longBreak: 10 },
+  classic: { focus: 25, shortBreak: 5, longBreak: 15 },
+  deep: { focus: 50, shortBreak: 10, longBreak: 20 },
+};
+export const FOCUS_PRESET_IDS = Object.keys(FOCUS_PRESETS) as FocusPresetId[];
+export const FOCUS_LONG_BREAK_EVERY = 4;
+/** The day's focus bar on /life fills at four blocks, one classic Pomodoro set. */
+export const FOCUS_DAILY_TARGET = 4;
+
+export type FocusSessionLog = { day: string; minutes: number };
+
+/** The break after the n-th focus block of a run (1-based): long after every fourth. */
+export function focusBreakMinutes(preset: FocusPresetId, blocksInRun: number): number {
+  const { shortBreak, longBreak } = FOCUS_PRESETS[preset];
+  return blocksInRun > 0 && blocksInRun % FOCUS_LONG_BREAK_EVERY === 0 ? longBreak : shortBreak;
+}
+
+/** Today's blocks and minutes, and the last seven days (oldest first) for the week strip. */
+export function focusSummary(sessions: FocusSessionLog[], today: string) {
+  const week = Array.from({ length: 7 }, (_, index) => {
+    const day = addDays(today, index - 6);
+    const ofDay = sessions.filter((session) => session.day === day);
+    return {
+      day,
+      count: ofDay.length,
+      minutes: ofDay.reduce((sum, session) => sum + session.minutes, 0),
+    };
+  });
+  const todayRow = week[6]!;
+  return {
+    todayCount: todayRow.count,
+    todayMinutes: todayRow.minutes,
+    week,
+    weekMinutes: week.reduce((sum, row) => sum + row.minutes, 0),
+  };
+}
+
+/** "mm:ss" for the countdown (never negative). */
+export function focusClock(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const minutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}

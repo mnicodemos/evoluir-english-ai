@@ -15,6 +15,7 @@ import {
   Sparkles,
   Star,
   Target,
+  Timer,
 } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/life/guide")({
       {
         name: "description",
         content:
-          "A visual guide to Life+ AI: goals, routine, habits, the Life Coach and meditations.",
+          "A visual guide to Life+ AI: goals, routine, habits, the Life Coach, meditations and focus.",
       },
     ],
   }),
@@ -144,6 +145,19 @@ function LifeGuidePage() {
       ],
       premium: false,
       art: <MeditationArt />,
+    },
+    {
+      id: "focus",
+      icon: Timer,
+      title: "Focus",
+      what: "Focus blocks with short breaks, Pomodoro style.",
+      steps: [
+        "Choose 15, 25 or 50 minutes and start; a long break comes after every fourth block.",
+        "Premium: tie the block to one of today's tasks and tick it in the break.",
+        "Use the break for two minutes of English; your week shows in bars.",
+      ],
+      premium: false,
+      art: <FocusArt />,
     },
   ];
 
@@ -379,6 +393,33 @@ function MeditationArt() {
         ))}
       </div>
       <span className="text-xs text-muted-foreground">{"3 min"}</span>
+    </div>
+  );
+}
+
+function FocusArt() {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="relative grid size-10 shrink-0 place-items-center">
+        <svg viewBox="0 0 40 40" className="absolute inset-0 -rotate-90" aria-hidden="true">
+          <circle cx="20" cy="20" r="17" fill="none" strokeWidth="3" className="stroke-white/10" />
+          <circle
+            cx="20"
+            cy="20"
+            r="17"
+            fill="none"
+            strokeWidth="3"
+            strokeLinecap="round"
+            pathLength={100}
+            strokeDasharray="100"
+            strokeDashoffset={35}
+            className="stroke-pink-400"
+          />
+        </svg>
+        <Timer className="size-4 text-pink-400" />
+      </span>
+      <span className="font-display text-lg font-bold tabular-nums">{"16:12"}</span>
+      <span className="ml-auto text-xs text-muted-foreground">{"🍅 2/4"}</span>
     </div>
   );
 }

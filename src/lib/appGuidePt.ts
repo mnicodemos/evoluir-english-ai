@@ -89,6 +89,10 @@ export const appGuidePt: Record<string, string> = {
   "Life+ AI": "Life+ AI",
   "Your goals, routine and habits in one place, with EVO as your Life Coach.":
     "Suas metas, rotina e hábitos em um só lugar, com a EVO como sua Life Coach.",
+  "Your goals, routine, habits and focus in one place, with EVO as your Life Coach.":
+    "Suas metas, rotina, hábitos e foco em um só lugar, com a EVO como sua Life Coach.",
+  "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.":
+    "Use o Foco em blocos de 15, 25 ou 50 minutos, com dois minutos de inglês em cada pausa.",
   "Add 1 to 3 goals: EVO gives you one small step for each goal every day.":
     "Adicione de 1 a 3 metas: a EVO dá um pequeno passo para cada meta todo dia.",
   "Give a goal a deadline and milestones to see how far you are.":

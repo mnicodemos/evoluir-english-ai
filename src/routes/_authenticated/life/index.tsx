@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
 import { CoachSection } from "@/components/life/CoachSection";
+import { FocusSection } from "@/components/life/FocusSection";
 import { GoalsSection } from "@/components/life/GoalsSection";
 import { HabitsSection } from "@/components/life/HabitsSection";
 import { MeditationSection } from "@/components/life/MeditationSection";
@@ -17,9 +18,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCelebrate } from "@/hooks/useCelebrate";
+import { useFocusLog } from "@/hooks/useFocusLog";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
-import { lifeDayProgress } from "@/lib/life";
+import { FOCUS_DAILY_TARGET, focusSummary, lifeDayProgress } from "@/lib/life";
 import { setLifePriority } from "@/lib/life.functions";
 import { loadPlus } from "@/lib/plus.functions";
 import { haptic } from "@/lib/haptics";
@@ -48,6 +50,7 @@ function LifePage() {
   const { t, lang } = useLifeT();
   const { data: profile } = useProfile();
   const { data, isLoading, refresh } = useLife();
+  const focusLog = useFocusLog();
   const loadSteps = useServerFn(loadPlus);
   // Same query as the Goals section, for the day ring's goal steps.
   const { data: plus } = useQuery({
@@ -83,6 +86,7 @@ function LifePage() {
     );
   }
 
+  const focusToday = focusSummary(focusLog, data.today).todayCount;
   const progress = lifeDayProgress({
     today: data.today,
     tasks: data.tasks,
@@ -144,6 +148,13 @@ function LifePage() {
                     />
                   </>
                 ) : null}
+                {/* Focus blocks of today (free): the bar fills at four. */}
+                <DayStat
+                  label={t("Focus")}
+                  done={focusToday}
+                  total={FOCUS_DAILY_TARGET}
+                  tone="bg-pink-400"
+                />
               </dl>
             </div>
           </div>
@@ -160,8 +171,8 @@ function LifePage() {
           end of the Life Coach in the third; the meditations take the row below,
           under both. Phones stack everything in this order. */}
       {data.premium ? (
-        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:grid-rows-[auto_1fr_auto] xl:gap-5">
-          <div className="lg:row-span-2 xl:row-span-3">
+        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:grid-rows-[auto_1fr_auto_auto] xl:gap-5">
+          <div className="lg:row-span-2 xl:row-span-4">
             <GoalsSection />
           </div>
           <div className="lg:col-start-2 xl:row-start-1">
@@ -176,6 +187,9 @@ function LifePage() {
           <div className="lg:col-span-2 xl:col-start-2 xl:row-start-3">
             <MeditationSection />
           </div>
+          <div className="lg:col-span-2 xl:col-start-2 xl:row-start-4">
+            <FocusSection />
+          </div>
         </div>
       ) : (
         <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
@@ -187,6 +201,9 @@ function LifePage() {
           </div>
           <div className="xl:col-span-2">
             <MeditationSection />
+          </div>
+          <div className="lg:col-span-2 xl:col-start-2">
+            <FocusSection />
           </div>
         </div>
       )}
