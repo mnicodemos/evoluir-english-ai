@@ -191,7 +191,10 @@ export function MobileNavigationMenu({
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
+    // Only this device (user report, 2026-10-17): Supabase's default "global"
+    // scope also ended the student's sessions on every other phone or computer,
+    // and made the signed-in CI tests of parallel runs log each other out.
+    await supabase.auth.signOut({ scope: "local" });
     navigate({ to: "/auth", replace: true });
   }
 
@@ -405,7 +408,10 @@ function AppShellContent({
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
+    // Only this device (user report, 2026-10-17): Supabase's default "global"
+    // scope also ended the student's sessions on every other phone or computer,
+    // and made the signed-in CI tests of parallel runs log each other out.
+    await supabase.auth.signOut({ scope: "local" });
     navigate({ to: "/auth", replace: true });
   }
 
