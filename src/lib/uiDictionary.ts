@@ -37,6 +37,8 @@ const baseUiPt: Record<string, string> = {
   "Check in once a day; the last 7 days can be fixed.":
     "Marque uma vez por dia; os últimos 7 dias podem ser corrigidos.",
   "Watch the flame: days or weeks in a row.": "Acompanhe a chama: dias ou semanas seguidas.",
+  "A habit like Study English can tick itself on your English study days.":
+    "Um hábito como Estudar inglês pode se marcar sozinho nos seus dias de estudo de inglês.",
   "EVO helps you plan, in your language.": "A EVO ajuda você a planejar, no seu idioma.",
   "Ask for a plan or for today's priorities.": "Peça um plano ou as prioridades de hoje.",
   "EVO answers with your goals and habits in mind.":
@@ -1081,6 +1083,15 @@ const baseUiPt: Record<string, string> = {
   Known: "Sabida",
   "This lesson's words: {n} of {total} known": "Palavras desta lição: {n} de {total} sabidas",
   mastered: "dominados",
+  "Ticked automatically on your English study days":
+    "Marcado automaticamente nos seus dias de estudo de inglês",
+  "Automatic: English study days": "Automático: dias de estudo de inglês",
+  "Tick it automatically on my English study days":
+    "Marcar automaticamente nos meus dias de estudo de inglês",
+  "This habit is ticked by your English study days.":
+    "Este hábito é marcado pelos seus dias de estudo de inglês.",
+  "Linking to study days is not available yet. Please try again later.":
+    "A ligação com os dias de estudo ainda não está disponível. Tente de novo mais tarde.",
   // Premium page (only real features; 2026-10-17)
   "5x more AI practice every day: conversations, video calls and corrections":
     "5x mais prática com IA todo dia: conversas, videochamadas e correções",

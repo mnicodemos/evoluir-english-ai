@@ -498,6 +498,13 @@
       "when": 1792108957683,
       "tag": "0070_life_ai",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1792195357683,
+      "tag": "0071_life_habit_study_day",
+      "breakpoints": true
     }
   ]
 }

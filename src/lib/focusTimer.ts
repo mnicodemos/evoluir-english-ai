@@ -229,6 +229,20 @@ export function minimizeFocusWidget(minimized: boolean) {
   setWidget({ ...snapshot.widget, minimized });
 }
 
+/**
+ * A window left open on "Ready" shrinks to its pill when the student changes
+ * page or reloads (user report, 2026-10-17: the idle window covered the
+ * Dashboard cards). A running or paused timer, or a window the student just
+ * opened on this page, stays as it is.
+ */
+export function shouldTuckFocusWidget(state: FocusState, widget: FocusWidget) {
+  return state.phase === "idle" && widget.open && !widget.minimized;
+}
+
+export function tuckIdleFocusWidget() {
+  if (shouldTuckFocusWidget(snapshot.state, snapshot.widget)) minimizeFocusWidget(true);
+}
+
 export function moveFocusWidget(x: number, y: number) {
   setWidget({ ...snapshot.widget, x, y });
 }

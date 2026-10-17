@@ -91,8 +91,10 @@ export const appGuidePt: Record<string, string> = {
     "Suas metas, rotina e hábitos em um só lugar, com a EVO como sua Life Coach.",
   "Your goals, routine, habits and focus in one place, with EVO as your Life Coach.":
     "Suas metas, rotina, hábitos e foco em um só lugar, com a EVO como sua Life Coach.",
-  "Open the floating timer from the Dashboard header, beside Weather talk, or from Focus to keep it at hand on any page; minimize, move or close it.":
-    "Abra o cronômetro flutuante pelo topo do Painel, ao lado do Weather talk, ou pelo Foco para tê-lo à mão em qualquer página; minimize, mova ou feche.",
+  "Open the floating timer from the Dashboard header, beside Weather talk, or from Focus to keep it at hand on any page; minimize, move or close it. Left on Ready, it shrinks to a small pill when you change page.":
+    "Abra o cronômetro flutuante pelo topo do Painel, ao lado do Weather talk, ou pelo Foco para tê-lo à mão em qualquer página; minimize, mova ou feche. Parado em Pronto, ele vira uma pílula pequena quando você muda de página.",
+  "Tick a habit like Study English automatically on your English study days, so it keeps the same run as your streak.":
+    "Marque um hábito como Estudar inglês automaticamente nos seus dias de estudo de inglês, para ele ter a mesma sequência do seu streak.",
   "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.":
     "Use o Foco em blocos de 15, 25 ou 50 minutos, com dois minutos de inglês em cada pausa.",
   "Add 1 to 3 goals: EVO gives you one small step for each goal every day.":

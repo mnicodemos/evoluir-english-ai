@@ -21,6 +21,7 @@ import {
   type LifePriority,
   type LifePriorityLevel,
   type LifeTask,
+  withStudyDayLogs,
 } from "./life";
 import { hasPremium } from "./premium.server";
 import { studyToday } from "./today";
@@ -48,6 +49,30 @@ type LooseTable = {
 async function table(name: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return (supabaseAdmin.from as unknown as (n: string) => LooseTable)(name);
+}
+
+/** The save error; linking needs migration 0071 (life_habits.linked). */
+function linkError(linked: boolean | undefined) {
+  return linked
+    ? "Linking to study days is not available yet. Please try again later."
+    : "The habit could not be saved.";
+}
+
+/** A student's habits; before migration 0071 adds `linked`, read without it. */
+async function readHabits(userId: string) {
+  const habitsTable = await table("life_habits");
+  const withLink = await habitsTable
+    .select("id, title, frequency, times_per_week, category, linked")
+    .eq("user_id", userId)
+    .is("archived_at", null)
+    .order("created_at", { ascending: true });
+  if (!withLink.error) return withLink;
+  const legacyTable = await table("life_habits");
+  return legacyTable
+    .select("id, title, frequency, times_per_week, category")
+    .eq("user_id", userId)
+    .is("archived_at", null)
+    .order("created_at", { ascending: true });
 }
 
 async function requirePremium(userId: string) {
@@ -91,6 +116,7 @@ type HabitRow = {
   frequency: string;
   times_per_week: number | null;
   category: string | null;
+  linked?: string | null;
 };
 type MilestoneRow = {
   id: string;
@@ -118,6 +144,7 @@ const toHabit = (row: HabitRow): LifeHabit => ({
     : "daily",
   timesPerWeek: row.times_per_week,
   category: row.category,
+  linked: row.linked === "study_day" ? "study_day" : null,
 });
 const toMilestone = (row: MilestoneRow): LifeMilestone => ({
   id: row.id,
@@ -169,18 +196,14 @@ async function readOverview(userId: string): Promise<LifeOverview> {
     return { today, premium, goals, milestones, tasks: [], habits: [], logs: [], priority: null };
   }
 
-  const [taskRead, habitRead, logRead, priorityRead] = await Promise.all([
+  const [taskRead, habitRead, logRead, priorityRead, studyDayRead] = await Promise.all([
     (await table("life_tasks"))
       .select("id, title, day, priority, goal_id, done_at")
       .eq("user_id", userId)
       .gte("day", addDays(today, -7))
       .lte("day", addDays(today, 30))
       .order("created_at", { ascending: true }),
-    (await table("life_habits"))
-      .select("id, title, frequency, times_per_week, category")
-      .eq("user_id", userId)
-      .is("archived_at", null)
-      .order("created_at", { ascending: true }),
+    readHabits(userId),
     (await table("life_habit_logs"))
       .select("habit_id, day")
       .eq("user_id", userId)
@@ -189,7 +212,16 @@ async function readOverview(userId: string): Promise<LifeOverview> {
       .select("text, day, done_at")
       .eq("user_id", userId)
       .maybeSingle(),
+    // Linked habits take their check-ins from the study days (migration 0071).
+    (await table("study_days"))
+      .select("day")
+      .eq("user_id", userId)
+      .gte("day", addDays(today, -LIFE_HABIT_HISTORY_DAYS)),
   ]);
+  const habits = ((habitRead.data ?? []) as HabitRow[]).map(toHabit);
+  const studyDays = studyDayRead.error
+    ? []
+    : ((studyDayRead.data ?? []) as { day: string }[]).map((row) => row.day);
   const priorityRow = priorityRead.data as {
     text: string;
     day: string;
@@ -201,11 +233,15 @@ async function readOverview(userId: string): Promise<LifeOverview> {
     goals,
     milestones,
     tasks: ((taskRead.data ?? []) as TaskRow[]).map(toTask),
-    habits: ((habitRead.data ?? []) as HabitRow[]).map(toHabit),
-    logs: ((logRead.data ?? []) as { habit_id: string; day: string }[]).map((row) => ({
-      habitId: row.habit_id,
-      day: row.day,
-    })),
+    habits,
+    logs: withStudyDayLogs(
+      habits,
+      ((logRead.data ?? []) as { habit_id: string; day: string }[]).map((row) => ({
+        habitId: row.habit_id,
+        day: row.day,
+      })),
+      studyDays,
+    ),
     priority: priorityRow
       ? { text: priorityRow.text, day: priorityRow.day, doneAt: priorityRow.done_at }
       : null,
@@ -318,6 +354,7 @@ export const addLifeHabit = createServerFn({ method: "POST" })
         frequency: z.enum(["daily", "weekdays", "times_per_week"]),
         timesPerWeek: z.number().int().min(1).max(7).nullable().optional(),
         category: z.string().trim().max(40).nullable().optional(),
+        linkedToStudyDay: z.boolean().optional(),
       })
       .parse(input),
   )
@@ -337,8 +374,10 @@ export const addLifeHabit = createServerFn({ method: "POST" })
       frequency: data.frequency,
       times_per_week: data.frequency === "times_per_week" ? (data.timesPerWeek ?? 3) : null,
       category: data.category || null,
+      // Sent only when chosen, so habits still save before migration 0071.
+      ...(data.linkedToStudyDay ? { linked: "study_day" } : {}),
     });
-    if (error) throw new Error("The habit could not be saved.");
+    if (error) throw new Error(linkError(data.linkedToStudyDay));
     return { ok: true };
   });
 
@@ -353,6 +392,7 @@ export const updateLifeHabit = createServerFn({ method: "POST" })
         frequency: z.enum(["daily", "weekdays", "times_per_week"]),
         timesPerWeek: z.number().int().min(1).max(7).nullable().optional(),
         category: z.string().trim().max(40).nullable().optional(),
+        linkedToStudyDay: z.boolean().optional(),
       })
       .parse(input),
   )
@@ -366,11 +406,14 @@ export const updateLifeHabit = createServerFn({ method: "POST" })
         frequency: data.frequency,
         times_per_week: data.frequency === "times_per_week" ? (data.timesPerWeek ?? 3) : null,
         category: data.category || null,
+        ...(data.linkedToStudyDay === undefined
+          ? {}
+          : { linked: data.linkedToStudyDay ? "study_day" : null }),
       })
       .eq("id", data.id)
       .eq("user_id", context.userId)
       .is("archived_at", null);
-    if (error) throw new Error("The habit could not be saved.");
+    if (error) throw new Error(linkError(data.linkedToStudyDay));
     return { ok: true };
   });
 
@@ -409,6 +452,16 @@ export const setLifeHabitDone = createServerFn({ method: "POST" })
       .eq("user_id", context.userId)
       .maybeSingle();
     if (!habit) throw new Error("Habit not found.");
+    // A habit linked to the study day is ticked only by studying (0071).
+    const habitsTable = await table("life_habits");
+    const link = await habitsTable
+      .select("linked")
+      .eq("id", data.habitId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!link.error && (link.data as { linked?: string | null } | null)?.linked === "study_day") {
+      throw new Error("This habit is ticked by your English study days.");
+    }
     const logs = await table("life_habit_logs");
     const { error } = data.done
       ? await logs.upsert(
