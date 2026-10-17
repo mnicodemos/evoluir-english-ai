@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
+import { addFocusLog, useFocusLog } from "@/hooks/useFocusLog";
 import { useLife } from "@/hooks/useLife";
 import { haptic } from "@/lib/haptics";
 import {
@@ -17,8 +18,9 @@ import {
   focusSummary,
   type FocusPresetId,
 } from "@/lib/life";
-import { recordFocusSession, setLifeTaskDone } from "@/lib/life.functions";
+import { setLifeTaskDone } from "@/lib/life.functions";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
+import { studyToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 type FocusState = {
@@ -83,17 +85,17 @@ function chime() {
 }
 
 /**
- * Focus (user decision, 2026-10-17: a Pomodoro-style timer, free, history in
- * the database): focus blocks with a short break after each and a long one
- * after every fourth. The timer keeps its end time on this device, so leaving
- * the page or locking the phone never loses it; each finished block is saved
- * once (recordFocusSession). Premium students can tie a block to one of
- * today's tasks and tick it in the break, which suggests two minutes of English.
+ * Focus (user decision, 2026-10-17: a Pomodoro-style timer, free, kept on this
+ * device): focus blocks with a short break after each and a long one after
+ * every fourth. The timer keeps its end time in localStorage, so leaving the
+ * page or locking the phone never loses it; each finished block joins the
+ * device's log once. Premium students can tie a block to one of today's tasks
+ * and tick it in the break, which suggests two minutes of English.
  */
 export function FocusSection() {
   const { t, lang } = useLifeT();
   const { data, refresh } = useLife();
-  const record = useServerFn(recordFocusSession);
+  const focusLog = useFocusLog();
   const markDone = useServerFn(setLifeTaskDone);
   const [state, setState] = useState<FocusState>(IDLE);
   const [now, setNow] = useState(() => Date.now());
@@ -132,11 +134,7 @@ export function FocusSection() {
     if (state.phase === "focus") {
       const blocks = state.blocks + 1;
       const minutes = FOCUS_PRESETS[state.preset].focus;
-      if (state.key) {
-        void record({ data: { operationKey: state.key, minutes, taskId: state.taskId } })
-          .then(() => refresh())
-          .catch(() => toast.error(t("The focus session could not be saved.")));
-      }
+      addFocusLog({ day: studyToday(new Date(ended)), minutes, key: state.key ?? String(ended) });
       chime();
       haptic("success");
       toast.success(t("Focus block done! Time for a break."));
@@ -161,7 +159,7 @@ export function FocusSection() {
 
   if (!data) return null;
 
-  const summary = focusSummary(data.focus ?? [], data.today);
+  const summary = focusSummary(focusLog, data.today);
   const openTasks = data.premium
     ? data.tasks.filter((task) => task.day === data.today && !task.doneAt)
     : [];

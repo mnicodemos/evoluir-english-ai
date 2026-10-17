@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCelebrate } from "@/hooks/useCelebrate";
+import { useFocusLog } from "@/hooks/useFocusLog";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { FOCUS_DAILY_TARGET, focusSummary, lifeDayProgress } from "@/lib/life";
@@ -49,6 +50,7 @@ function LifePage() {
   const { t, lang } = useLifeT();
   const { data: profile } = useProfile();
   const { data, isLoading, refresh } = useLife();
+  const focusLog = useFocusLog();
   const loadSteps = useServerFn(loadPlus);
   // Same query as the Goals section, for the day ring's goal steps.
   const { data: plus } = useQuery({
@@ -84,7 +86,7 @@ function LifePage() {
     );
   }
 
-  const focusToday = focusSummary(data.focus ?? [], data.today).todayCount;
+  const focusToday = focusSummary(focusLog, data.today).todayCount;
   const progress = lifeDayProgress({
     today: data.today,
     tasks: data.tasks,

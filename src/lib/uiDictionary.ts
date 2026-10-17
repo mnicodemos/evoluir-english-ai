@@ -119,7 +119,6 @@ const baseUiPt: Record<string, string> = {
   "in 7 days": "em 7 dias",
   "Focus block done! Time for a break.": "Bloco de foco concluído! Hora da pausa.",
   "Break over. Ready for the next focus block?": "Fim da pausa. Pronto para o próximo bloco?",
-  "The focus session could not be saved.": "Não foi possível salvar o bloco de foco.",
   "The text could not be copied.": "Não foi possível copiar o texto.",
   "Share achievement": "Compartilhar conquista",
   "Send on WhatsApp": "Enviar pelo WhatsApp",
