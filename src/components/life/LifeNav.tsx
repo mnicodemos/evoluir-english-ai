@@ -122,7 +122,10 @@ export function LifeSectionTitle({
       >
         <Icon className="size-5" />
       </span>
-      <div className="min-w-0 flex-1">
+      {/* min-w keeps the title readable on phones: the count pill and buttons
+          wrap below instead of squeezing the text to one word per line
+          (user report, 2026-10-17: Focus on a phone). */}
+      <div className="min-w-[11rem] flex-1">
         <h2
           id={id}
           className={cn("font-display text-base font-semibold leading-tight", titleClassName)}

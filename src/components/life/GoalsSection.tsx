@@ -11,7 +11,7 @@ import { EvoGuide } from "@/components/EvoGuide";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLife } from "@/hooks/useLife";
-import { useProfile } from "@/hooks/useProfile";
+import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { skillMeterRows } from "@/lib/pedagogy/skillMeter";
 import { evolutionScore, PLUS_GOAL_EXAMPLES, PLUS_MAX_GOALS, plusDayComplete } from "@/lib/plus";
@@ -135,7 +135,7 @@ export function GoalsSection() {
             <dt className="text-[11px] text-muted-foreground">{t("Streak")}</dt>
             <dd className="mt-0.5 flex items-center justify-center gap-1 text-lg font-bold">
               <Flame className="size-4 text-dashboard-cyan" aria-hidden="true" />
-              {profile?.streak_days ?? 0}
+              {profile ? effectiveStreak(profile) : 0}
             </dd>
           </div>
         </dl>

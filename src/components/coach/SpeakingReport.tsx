@@ -1,7 +1,7 @@
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { WhatsAppButton } from "@/components/ShareActions";
 import { Progress } from "@/components/ui/progress";
-import { useProfile } from "@/hooks/useProfile";
+import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import type { ConversationReport } from "@/lib/ai-prompts";
 import { speakingShareText } from "@/lib/share";
 import { useUiLang } from "@/lib/uiLang";
@@ -14,7 +14,7 @@ export function SpeakingReport({ report }: { report: ConversationReport }) {
   const shareText = speakingShareText(report, {
     lang,
     level: profile?.level,
-    streakDays: profile?.streak_days,
+    streakDays: profile ? effectiveStreak(profile) : undefined,
   });
   return (
     <section className="card-soft animate-rise p-6">
