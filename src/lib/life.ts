@@ -345,8 +345,3 @@ export function coachShareText(reply: string): string {
     .trim();
   return `${body}\n\n— Life Coach · Evoluir+`;
 }
-
-/** WhatsApp's share link: the student picks the contact in WhatsApp itself. */
-export function whatsappShareUrl(text: string): string {
-  return `https://wa.me/?text=${encodeURIComponent(text)}`;
-}

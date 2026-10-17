@@ -15,6 +15,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
+import { CopyButton } from "@/components/ShareActions";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -593,13 +594,21 @@ function WritingResultView({ result }: { result: WritingFeedback }) {
         ))}
       </div>
       <div className="card-soft p-6">
-        <h3 className="flex items-center gap-2 font-semibold">
-          <PenLine className="size-4" /> Corrected text
-        </h3>
+        {/* Copy (user request): the student pastes the corrected text where
+            it will be used, such as an email or a message. */}
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="flex items-center gap-2 font-semibold">
+            <PenLine className="size-4" /> Corrected text
+          </h3>
+          <CopyButton text={result.corrected} className="-my-1.5 -mr-2" />
+        </div>
         <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{result.corrected}</p>
       </div>
       <div className="card-soft p-6">
-        <h3 className="font-semibold">Natural version</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="font-semibold">Natural version</h3>
+          <CopyButton text={result.natural} className="-my-1.5 -mr-2" />
+        </div>
         <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{result.natural}</p>
       </div>
       {result.explanations.length > 0 && (

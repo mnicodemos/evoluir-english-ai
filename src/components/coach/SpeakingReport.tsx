@@ -1,12 +1,27 @@
 import { EvoAvatar } from "@/components/EvoAvatar";
+import { WhatsAppButton } from "@/components/ShareActions";
 import { Progress } from "@/components/ui/progress";
+import { useProfile } from "@/hooks/useProfile";
 import type { ConversationReport } from "@/lib/ai-prompts";
+import { speakingShareText } from "@/lib/share";
+import { useUiLang } from "@/lib/uiLang";
 
 /** Scores, summary, suggestions and new words at the end of a speaking session. */
 export function SpeakingReport({ report }: { report: ConversationReport }) {
+  const { lang } = useUiLang();
+  const { data: profile } = useProfile();
+  // Only the achievement goes out (user request), never the mistakes.
+  const shareText = speakingShareText(report, {
+    lang,
+    level: profile?.level,
+    streakDays: profile?.streak_days,
+  });
   return (
     <section className="card-soft animate-rise p-6">
-      <h2 className="text-lg font-semibold">Speaking report</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">Speaking report</h2>
+        <WhatsAppButton text={shareText} label="Share achievement" className="-my-1.5 -mr-2" />
+      </div>
       <div className="mt-5 grid gap-5 sm:grid-cols-3">
         {[
           { label: "Fluency", value: report.fluency },

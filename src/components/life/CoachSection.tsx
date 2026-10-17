@@ -1,32 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Check,
-  Copy,
-  Flag,
-  ListChecks,
-  Loader2,
-  MessageCircle,
-  Plus,
-  Repeat,
-  Send,
-  Sparkles,
-} from "lucide-react";
+import { Check, Flag, ListChecks, Loader2, Plus, Repeat, Send, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { EvoAvatar } from "@/components/EvoAvatar";
+import { CopyButton, WhatsAppButton } from "@/components/ShareActions";
 import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLife } from "@/hooks/useLife";
-import {
-  coachShareText,
-  whatsappShareUrl,
-  type LifeCoachAction,
-  type LifeCoachMessage,
-} from "@/lib/life";
+import { coachShareText, type LifeCoachAction, type LifeCoachMessage } from "@/lib/life";
 import { addGoalMilestone, addLifeHabit, askLifeCoach, saveLifeTask } from "@/lib/life.functions";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 
@@ -64,18 +49,6 @@ export function CoachSection() {
   const [messages, setMessages] = useState<ChatEntry[]>(readChat);
   const [input, setInput] = useState("");
   const [added, setAdded] = useState<Set<string>>(new Set());
-  const [copied, setCopied] = useState<number | null>(null);
-
-  const copyReply = async (index: number, reply: string) => {
-    try {
-      await navigator.clipboard.writeText(coachShareText(reply));
-      setCopied(index);
-      window.setTimeout(() => setCopied((current) => (current === index ? null : current)), 2000);
-    } catch {
-      toast.error(t("The answer could not be copied."));
-    }
-  };
-
   const keep = (next: ChatEntry[]) => {
     setMessages(next);
     writeStorage(STORAGE_KEY, JSON.stringify(next.slice(-20)));
@@ -201,36 +174,8 @@ export function CoachSection() {
                 student picks the contact in WhatsApp itself. */}
             {message.role === "assistant" ? (
               <div className="flex items-center gap-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyReply(index, message.content)}
-                  className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
-                >
-                  {copied === index ? (
-                    <Check className="text-brand-green" aria-hidden="true" />
-                  ) : (
-                    <Copy aria-hidden="true" />
-                  )}
-                  {copied === index ? t("Copied") : t("Copy")}
-                </Button>
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
-                >
-                  <a
-                    href={whatsappShareUrl(coachShareText(message.content))}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={t("Send on WhatsApp")}
-                  >
-                    <MessageCircle className="text-[#25D366]" aria-hidden="true" />
-                    {"WhatsApp"}
-                  </a>
-                </Button>
+                <CopyButton text={coachShareText(message.content)} />
+                <WhatsAppButton text={coachShareText(message.content)} />
               </div>
             ) : null}
             {message.actions?.length ? (
