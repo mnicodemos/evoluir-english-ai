@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildQuickWin,
   buildNextStep,
+  practisedSkills,
   lessonSkillToProfileSkill,
   NEXT_STEP_EVIDENCE_TEXT,
   NEXT_STEP_PRIORITY_TEXT,
@@ -497,5 +498,38 @@ describe("lesson catalogue skill labels", () => {
     expect(step.action).toBe("practise_speaking");
     expect(step.activity.to).toBe("/coach");
     expect(step.activity.params).toBeUndefined();
+  });
+});
+
+describe("practisedSkills (activities → skills)", () => {
+  const since = "2026-10-10T03:00:00.000Z";
+
+  it("turns conversations and video calls into speaking, never the raw type", () => {
+    const skills = practisedSkills(["conversation", "video_call", "teacher"], [], since);
+    expect(skills).toEqual(["grammar", "speaking", "writing"]);
+    expect(skills).not.toContain("conversation");
+  });
+
+  it("adds skills from evidence inside the window only", () => {
+    const skills = practisedSkills(
+      [],
+      [
+        { skill: "pronunciation", createdAt: "2026-10-16T12:00:00.000Z" },
+        { skill: "reading", createdAt: "2026-10-01T12:00:00.000Z" },
+      ],
+      since,
+    );
+    expect(skills).toEqual(["pronunciation"]);
+  });
+
+  it("a speaking session yesterday stops the 'not practised recently' reason", () => {
+    const step = buildNextStep({
+      ...base,
+      skills: [skill("speaking", 43), skill("grammar", 54)],
+      recentlyPractised: practisedSkills(["conversation", "teacher"], [], since),
+    });
+    expect(step.prioritySkill).toBe("speaking");
+    expect(step.insight?.recentlyPractised).toBe(true);
+    expect(step.reason).toBe("lowest_score");
   });
 });

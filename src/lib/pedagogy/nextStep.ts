@@ -296,6 +296,46 @@ export function buildQuickWin(
   return { skill: prioritySkill, ...copy, activity };
 }
 
+/**
+ * activities.activity_type → the profile skills that practice works. The
+ * activities table names what the student DID (a conversation, a video call,
+ * an AI Teacher chat), while buildNextStep compares skill names, so the raw
+ * types must never be passed as "recently practised" (user report: EVO said
+ * Speaking was not practised the day after an AI Speaking session).
+ * Lessons and final tests are left out: the skill they work is read from
+ * their evidence rows instead.
+ */
+const ACTIVITY_SKILLS: Record<string, readonly string[]> = {
+  conversation: ["speaking"],
+  video_call: ["speaking"],
+  teacher: ["grammar", "writing"],
+  writing: ["writing"],
+  listening: ["listening"],
+  vocabulary: ["vocabulary", "pronunciation"],
+  vocabulary_reading: ["vocabulary"],
+};
+
+/**
+ * Skills the student practised since `sinceIso`: the skills of their recent
+ * activities plus every skill with assessment evidence in the window. Pure,
+ * so the Dashboard's "not practised recently" can be tested.
+ */
+export function practisedSkills(
+  activityTypes: readonly (string | null | undefined)[],
+  evidence: readonly { skill: string | null | undefined; createdAt: string }[],
+  sinceIso: string,
+): string[] {
+  const since = new Date(sinceIso).getTime();
+  const skills = new Set<string>();
+  for (const type of activityTypes) {
+    for (const skill of ACTIVITY_SKILLS[type ?? ""] ?? []) skills.add(skill);
+  }
+  for (const row of evidence) {
+    if (row.skill && new Date(row.createdAt).getTime() >= since) skills.add(row.skill);
+  }
+  return [...skills].sort();
+}
+
 /** True when a recurring error text mentions the skill. Simple and explainable. */
 function skillHasRecentError(skill: string, errors: string[]): boolean {
   return errors.some((error) => error.toLowerCase().includes(skill.toLowerCase()));
