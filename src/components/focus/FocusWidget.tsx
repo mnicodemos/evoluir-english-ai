@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { GripHorizontal, Maximize2, Minus, Pause, Play, Square, Timer, X } from "lucide-react";
+import { GripHorizontal, Maximize2, Minus, Pause, Play, Square, X } from "lucide-react";
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { toast } from "sonner";
 
+import { TomatoIcon } from "@/components/focus/TomatoIcon";
 import { useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { addFocusLog } from "@/hooks/useFocusLog";
@@ -233,7 +234,7 @@ function FocusWidget() {
               "flex items-center gap-2 border-b border-white/10 py-1.5 pl-3 pr-1.5",
             )}
           >
-            <Timer className="size-4 shrink-0 text-pink-400" aria-hidden="true" />
+            <TomatoIcon className="size-[1.15rem] shrink-0" />
             <span className="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
               {t(focusPhaseLabel(state))}
             </span>

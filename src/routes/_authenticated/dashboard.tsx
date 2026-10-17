@@ -217,8 +217,8 @@ function DashboardNotifications({
           aria-label={translate("Open notifications")}
           className={
             placement === "mobile"
-              ? // Closes the phone header capsule in a grey circle, as on desktop.
-                "relative size-8 shrink-0 rounded-full bg-white/10 text-slate-100 hover:bg-white/15 hover:text-white"
+              ? // Borderless like the other icons of the phone header capsule (user request).
+                "relative size-8 shrink-0 rounded-full text-slate-100 hover:bg-white/10 hover:text-white"
               : // A grey circle closing the Weather talk capsule (user request).
                 "relative size-9 shrink-0 rounded-full bg-white/10 text-muted-foreground hover:bg-white/15 hover:text-foreground"
           }
