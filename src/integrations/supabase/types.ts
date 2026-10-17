@@ -840,6 +840,7 @@ export type Database = {
           created_at: string
           frequency: string
           id: string
+          linked: string | null
           times_per_week: number | null
           title: string
           user_id: string
@@ -850,6 +851,7 @@ export type Database = {
           created_at?: string
           frequency?: string
           id?: string
+          linked?: string | null
           times_per_week?: number | null
           title: string
           user_id: string
@@ -860,6 +862,7 @@ export type Database = {
           created_at?: string
           frequency?: string
           id?: string
+          linked?: string | null
           times_per_week?: number | null
           title?: string
           user_id?: string
