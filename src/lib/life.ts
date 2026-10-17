@@ -327,3 +327,26 @@ export function lifeCoachContext(input: {
   if (!input.habits.length) lines.push("- none");
   return lines.join("\n");
 }
+
+/**
+ * A Life Coach reply as plain text to copy or forward on WhatsApp: markdown
+ * bold becomes WhatsApp's *bold*, headings and links lose their markup, and
+ * the app's name closes it so whoever receives it knows where it came from.
+ */
+export function coachShareText(reply: string): string {
+  const body = reply
+    .replace(/\r\n/g, "\n")
+    .replace(/^#{1,6}\s+(.*)$/gm, "*$1*")
+    .replace(/\*\*(.+?)\*\*/g, "*$1*")
+    .replace(/__(.+?)__/g, "*$1*")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1 ($2)")
+    .replace(/^[ \t]*[-*][ \t]+/gm, "• ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return `${body}\n\n— Life Coach · Evoluir+`;
+}
+
+/** WhatsApp's share link: the student picks the contact in WhatsApp itself. */
+export function whatsappShareUrl(text: string): string {
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}

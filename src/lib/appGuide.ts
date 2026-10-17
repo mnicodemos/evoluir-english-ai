@@ -161,7 +161,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Give a goal a deadline and milestones to see how far you are.",
       "Plan the day's tasks, check in your habits and set the priority of the day.",
       "Change a goal, task, habit or the priority with its pencil (Edit).",
-      "Ask the Life Coach for a plan; add its suggestions with one tap.",
+      "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.",
       "Try a meditation in English to relax and train your listening.",
     ],
     tip: "Finishing every goal step of the day also counts for your streak.",

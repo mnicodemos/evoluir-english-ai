@@ -91,6 +91,10 @@ const baseUiPt: Record<string, string> = {
   Routine: "Rotina",
   Habits: "Hábitos",
   "Life Coach": "Life Coach",
+  "The answer could not be copied.": "Não foi possível copiar a resposta.",
+  "Send on WhatsApp": "Enviar pelo WhatsApp",
+  Copy: "Copiar",
+  Copied: "Copiado",
   "Routine, habits and the Life Coach are part of Premium. Your goals stay free.":
     "Rotina, hábitos e o Life Coach fazem parte do Premium. Suas metas continuam grátis.",
   "Routine, habits and Life Coach": "Rotina, hábitos e Life Coach",
