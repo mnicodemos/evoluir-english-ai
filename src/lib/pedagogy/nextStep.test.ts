@@ -101,11 +101,12 @@ describe("next step priority", () => {
     expect(buildNextStep(input)).toEqual(buildNextStep(input));
   });
 
-  it("guides the student to the AI Teacher when there is no data", () => {
+  it("guides a new student to the first conversation with EVO", () => {
     const step = buildNextStep(base);
     expect(step.prioritySkill).toBeNull();
     expect(step.reason).toBe("no_data");
-    expect(step.activity.to).toBe("/teacher");
+    expect(step.action).toBe("practise_speaking");
+    expect(step.activity.to).toBe("/coach");
   });
 });
 

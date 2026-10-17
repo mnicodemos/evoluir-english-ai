@@ -143,9 +143,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     );
   }
 
+  // A new student's priority is the first conversation with EVO (buildNextStep).
   const skillLabel = data.prioritySkill
     ? t(NEXT_STEP_SKILL_TEXT[data.prioritySkill] ?? data.prioritySkill)
-    : t("Free practice");
+    : data.reason === "no_data"
+      ? t("First conversation with EVO")
+      : t("Free practice");
   const PriorityIcon =
     {
       speaking: Mic,

@@ -558,7 +558,8 @@ function ListeningPage() {
                 </div>
                 <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold">
                   <span>Accuracy</span>
-                  <span> {average}%</span>
+                  {/* "—" until the first try (user report: "0%" read as a failure). */}
+                  <span> {scores.length ? `${average}%` : "—"}</span>
                 </span>
               </div>
 
