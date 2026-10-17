@@ -234,7 +234,7 @@ function FocusWidget() {
               "flex items-center gap-2 border-b border-white/10 py-1.5 pl-3 pr-1.5",
             )}
           >
-            <TomatoIcon className="size-[1.15rem] shrink-0" />
+            <TomatoIcon className="size-4 shrink-0 text-red-400" />
             <span className="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
               {t(focusPhaseLabel(state))}
             </span>

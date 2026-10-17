@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 /**
  * Opens the floating Focus timer from the Dashboard header capsule, beside
  * Weather talk (user request: the same pill pattern, phones included), marked
- * with a red tomato, the Pomodoro symbol (user request). While a phase runs a
+ * with a red tomato drawn like the app's line icons, the Pomodoro symbol (user
+ * request). While a phase runs a
  * dot shows on phones (pink while focusing, green in the break) and the time
  * left shows beside it on desktop.
  */
@@ -32,13 +33,13 @@ export function FocusHeaderButton({
         onClick={openFocusWidget}
         aria-label={label}
         title={label}
-        className="relative grid size-8 shrink-0 place-items-center rounded-full text-slate-100 transition-colors hover:bg-white/10 hover:text-white"
+        className="relative grid h-8 w-7 shrink-0 place-items-center rounded-full text-slate-100 transition-colors hover:bg-white/10 hover:text-white"
       >
-        <TomatoIcon className="size-5" />
+        <TomatoIcon className="size-[1.15rem] text-red-400" />
         {active ? (
           <span
             className={cn(
-              "absolute right-1 top-1 size-2 rounded-full ring-2 ring-background",
+              "absolute right-0.5 top-1 size-2 rounded-full ring-2 ring-background",
               state.phase === "break" ? "bg-brand-green" : "bg-pink-400",
             )}
             aria-hidden="true"
@@ -59,7 +60,7 @@ export function FocusHeaderButton({
         active ? tone : "text-muted-foreground hover:text-foreground",
       )}
     >
-      <TomatoIcon className="size-[1.15rem]" />
+      <TomatoIcon className="size-[1.15rem] text-red-400" />
       {active ? (
         <span className="font-display text-sm font-semibold tabular-nums">
           {focusClock(view.leftMs)}
