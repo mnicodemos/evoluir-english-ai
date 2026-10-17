@@ -8,6 +8,7 @@ import {
   focusStop,
   focusView,
   getFocusSnapshot,
+  shouldTuckFocusWidget,
 } from "./focusTimer";
 
 describe("focus timer store", () => {
@@ -49,5 +50,23 @@ describe("focus timer store", () => {
     vi.setSystemTime(new Date("2026-10-17T13:00:00Z"));
     focusResume();
     expect(getFocusSnapshot().state.endsAt).toBe(Date.now() + 15 * 60_000);
+  });
+});
+
+describe("floating window on Ready", () => {
+  const open = { open: true, minimized: false, x: null, y: null };
+
+  it("tucks an idle open window into its pill", () => {
+    expect(shouldTuckFocusWidget(getFocusSnapshot().state, open)).toBe(true);
+  });
+
+  it("leaves a running timer, a pill and a closed window alone", () => {
+    focusStart();
+    expect(shouldTuckFocusWidget(getFocusSnapshot().state, open)).toBe(false);
+    focusStop();
+    expect(shouldTuckFocusWidget(getFocusSnapshot().state, { ...open, minimized: true })).toBe(
+      false,
+    );
+    expect(shouldTuckFocusWidget(getFocusSnapshot().state, { ...open, open: false })).toBe(false);
   });
 });

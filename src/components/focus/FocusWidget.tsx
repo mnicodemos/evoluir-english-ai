@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { GripHorizontal, Maximize2, Minus, Pause, Play, Square, X } from "lucide-react";
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ import {
   focusStop,
   minimizeFocusWidget,
   moveFocusWidget,
+  tuckIdleFocusWidget,
   type FocusState,
 } from "@/lib/focusTimer";
 import { haptic } from "@/lib/haptics";
@@ -63,6 +64,13 @@ function focusPhaseLabel(state: FocusState) {
 export function FocusController() {
   const { t } = useLifeT();
   const { state, widget, now } = useFocusTimer();
+  const pathname = useLocation().pathname;
+
+  // Changing page (or loading one) tucks a window left open on "Ready" into
+  // its pill, so it never covers the page's cards (tuckIdleFocusWidget).
+  useEffect(() => {
+    tuckIdleFocusWidget();
+  }, [pathname]);
 
   useEffect(() => {
     const ended = focusCompleteDue(Date.now());

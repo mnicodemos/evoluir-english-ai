@@ -25,15 +25,43 @@ export type LifeTask = {
   doneAt: string | null;
 };
 
+/**
+ * A habit linked to the English study day (migration 0071; user report,
+ * 2026-10-17: a "Study English" habit showed a run of 1 beside a 30-day
+ * streak). Its check-ins are the student's study days, never manual ticks.
+ */
+export type LifeHabitLink = "study_day";
+
 export type LifeHabit = {
   id: string;
   title: string;
   frequency: LifeHabitFrequency;
   timesPerWeek: number | null;
   category: string | null;
+  linked?: LifeHabitLink | null;
 };
 
 export type LifeHabitLog = { habitId: string; day: string };
+
+/**
+ * The check-ins of habits linked to the study day come from the study days
+ * credit_study_day recorded (study_days); their manual logs are ignored, so
+ * the habit and the streak always tell the same story. Other habits keep
+ * their own logs.
+ */
+export function withStudyDayLogs(
+  habits: readonly LifeHabit[],
+  logs: readonly LifeHabitLog[],
+  studyDays: readonly string[],
+): LifeHabitLog[] {
+  const linked = new Set(habits.filter((habit) => habit.linked === "study_day").map((h) => h.id));
+  if (!linked.size) return [...logs];
+  const days = [...new Set(studyDays)].sort();
+  return [
+    ...logs.filter((log) => !linked.has(log.habitId)),
+    ...[...linked].flatMap((habitId) => days.map((day) => ({ habitId, day }))),
+  ];
+}
 
 export type LifeMilestone = {
   id: string;

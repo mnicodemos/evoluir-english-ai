@@ -39,6 +39,9 @@ function weekdayShort(day: string, lang: "pt" | "en") {
   }).format(new Date(`${day}T00:00:00Z`));
 }
 
+/** Shown on a habit linked to the study day, whose days cannot be ticked by hand. */
+const AUTO_HINT = "Ticked automatically on your English study days";
+
 function useHabitToggle(onChange: () => void) {
   const { t } = useLifeT();
   const setDone = useServerFn(setLifeHabitDone);
@@ -74,12 +77,14 @@ export function LifeHabitsToday({
       {habits.map((habit) => {
         const done = logs.some((log) => log.habitId === habit.id && log.day === today);
         const streak = habitStreak(habit, logs, today);
+        const auto = habit.linked === "study_day";
         return (
           <li key={habit.id}>
             <button
               type="button"
               aria-pressed={done}
-              disabled={toggle.isPending}
+              disabled={toggle.isPending || auto}
+              title={auto ? t(AUTO_HINT) : undefined}
               onClick={() => toggle.mutate({ habitId: habit.id, day: today, done: !done })}
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg p-2 text-left text-sm transition-colors",
@@ -177,6 +182,7 @@ export function LifeHabitBoard({
                   {weekly
                     ? `${t("This week")}: ${habitWeekCount(habit.id, logs, today)}/${habit.timesPerWeek ?? 1}`
                     : t(FREQUENCY_LABEL[habit.frequency])}
+                  {habit.linked === "study_day" ? ` · ${t("Automatic: English study days")}` : null}
                   {habit.category ? (
                     <>
                       {" · "}
@@ -218,13 +224,15 @@ export function LifeHabitBoard({
               {days.map((day) => {
                 const done = logs.some((log) => log.habitId === habit.id && log.day === day);
                 const expected = habitDueOn(habit, day);
+                const auto = habit.linked === "study_day";
                 return (
                   <button
                     key={day}
                     type="button"
                     aria-pressed={done}
                     aria-label={day}
-                    disabled={toggle.isPending}
+                    disabled={toggle.isPending || auto}
+                    title={auto ? t(AUTO_HINT) : undefined}
                     onClick={() => toggle.mutate({ habitId: habit.id, day, done: !done })}
                     className={cn(
                       "flex flex-col items-center gap-1 rounded-lg py-1.5 text-[10px] transition-colors",
@@ -278,6 +286,7 @@ export function LifeHabitForm({
   const [frequency, setFrequency] = useState<LifeHabitFrequency>(habit?.frequency ?? "daily");
   const [times, setTimes] = useState(habit?.timesPerWeek ?? 3);
   const [category, setCategory] = useState(habit?.category ?? "");
+  const [linked, setLinked] = useState(habit?.linked === "study_day");
   const add = useMutation({
     mutationFn: () => {
       const input = {
@@ -285,12 +294,15 @@ export function LifeHabitForm({
         frequency,
         timesPerWeek: frequency === "times_per_week" ? times : null,
         category: category.trim() || null,
+        // Sent when on, or when an edit changes it (works before migration 0071).
+        ...(linked || habit?.linked === "study_day" ? { linkedToStudyDay: linked } : {}),
       };
       return habit ? update({ data: { ...input, id: habit.id } }) : save({ data: input });
     },
     onSuccess: () => {
       setTitle("");
       setCategory("");
+      setLinked(false);
       onChange();
     },
     onError: (error) =>
@@ -350,6 +362,15 @@ export function LifeHabitForm({
           className="min-w-0 flex-1"
         />
       </div>
+      <label className="flex w-full items-center gap-2 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={linked}
+          onChange={(event) => setLinked(event.target.checked)}
+          className="size-4 accent-brand-green"
+        />
+        {t("Tick it automatically on my English study days")}
+      </label>
       {onCancel ? (
         <Button type="button" variant="ghost" className="ml-auto shrink-0" onClick={onCancel}>
           {t("Cancel")}
