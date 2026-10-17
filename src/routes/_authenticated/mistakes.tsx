@@ -339,8 +339,15 @@ function Mistakes() {
               <RotateCcw className="size-4 text-primary" />
               All mistakes
             </h2>
-            <span className="text-xs text-muted-foreground">
-              {mastered}/{rows.length}
+            {/* Labelled (user report: a bare "0/56" read as a mistake count). */}
+            <span
+              className="text-xs text-muted-foreground"
+              title="Mastered: answered right 5 times in a row"
+            >
+              <span>
+                {mastered}/{rows.length}
+              </span>{" "}
+              <span>mastered</span>
             </span>
           </div>
           {typeCounts.length > 1 ? (
