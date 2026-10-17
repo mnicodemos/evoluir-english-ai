@@ -4,7 +4,9 @@
 // (days 8-10), with a soft cut on day 11. Texts are written in English and
 // translated through uiPt, like every student screen; the push uses the
 // Portuguese text. Only real features are promised (no offer yet: it comes
-// when the owner defines the discount).
+// when the owner defines the discount): Premium is 5x the daily AI limits,
+// not unlimited, and the free plan keeps lessons and practice with a daily
+// limit (user report, 2026-10-17; same rule as the Premium page).
 
 export type JourneyMessage = {
   /** 1-10 while Premium lasts, 11 for the two days after it ends. */
@@ -77,8 +79,8 @@ export function journeyMessage(day: number, conversations: number): JourneyMessa
     case 4:
       return {
         day,
-        title: "Day 4: no daily limit",
-        body: "You have had {n} conversations with EVO. On the free plan it would be 3 per day.",
+        title: "Day 4: 5x more practice",
+        body: "You have had {n} conversations with EVO. Premium gives you 5x more AI practice every day than the free plan.",
         cta: "Keep practising",
         to: "/coach",
       };
@@ -110,7 +112,7 @@ export function journeyMessage(day: number, conversations: number): JourneyMessa
       return {
         day,
         title: "48 hours left of your Premium",
-        body: "From day 11: 3 conversations and 3 corrections per day. Your progress stays saved.",
+        body: "From day 11 you keep your lessons and practice, with a daily limit. Your progress stays saved.",
         cta: "See plans",
         to: "/premium",
       };
@@ -118,7 +120,7 @@ export function journeyMessage(day: number, conversations: number): JourneyMessa
       return {
         day,
         title: "Tomorrow is your last Premium day",
-        body: "Subscribe to keep unlimited conversations and corrections with EVO.",
+        body: "Subscribe to keep 5x more practice every day and the full Life+ AI.",
         cta: "See plans",
         to: "/premium",
       };
@@ -126,7 +128,7 @@ export function journeyMessage(day: number, conversations: number): JourneyMessa
       return {
         day,
         title: "Last day of your Premium",
-        body: "Subscribe today to keep unlimited conversations and corrections.",
+        body: "Subscribe today to keep 5x more practice and the full Life+ AI.",
         cta: "Keep Premium",
         to: "/premium",
       };
@@ -134,7 +136,7 @@ export function journeyMessage(day: number, conversations: number): JourneyMessa
       return {
         day,
         title: "Your account is now Free",
-        body: "Your progress stays saved. You now have 3 conversations and 3 corrections per day.",
+        body: "Your progress stays saved. You keep your lessons and practice with EVO, with a daily limit.",
         cta: "Reactivate Premium",
         to: "/premium",
       };

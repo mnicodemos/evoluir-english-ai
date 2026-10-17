@@ -768,9 +768,9 @@ const baseUiPt: Record<string, string> = {
   "Day 3: see your writing corrected": "Dia 3: veja seu texto corrigido",
   "Write 5 lines about your day and watch EVO correct them on the spot.":
     "Escreva 5 linhas sobre o seu dia e veja a EVO corrigir na hora.",
-  "Day 4: no daily limit": "Dia 4: sem limite diário",
-  "You have had {n} conversations with EVO. On the free plan it would be 3 per day.":
-    "Você já fez {n} conversas com a EVO. No plano grátis seriam 3 por dia.",
+  "Day 4: 5x more practice": "Dia 4: 5x mais prática",
+  "You have had {n} conversations with EVO. Premium gives you 5x more AI practice every day than the free plan.":
+    "Você já fez {n} conversas com a EVO. O Premium dá 5x mais prática com IA por dia do que o plano grátis.",
   "Day 5: your mistakes became reviews": "Dia 5: seus erros viraram revisão",
   "Review your recent mistakes so they do not become habits.":
     "Revise seus erros recentes para eles não virarem hábito.",
@@ -783,19 +783,19 @@ const baseUiPt: Record<string, string> = {
     "Veja suas habilidades depois de uma semana de Premium.",
   "See my progress": "Ver minha evolução",
   "48 hours left of your Premium": "Faltam 48 horas do seu Premium",
-  "From day 11: 3 conversations and 3 corrections per day. Your progress stays saved.":
-    "A partir do dia 11: 3 conversas e 3 correções por dia. Seu progresso continua salvo.",
+  "From day 11 you keep your lessons and practice, with a daily limit. Your progress stays saved.":
+    "A partir do dia 11, você continua com as lições e a prática, com limite diário. Seu progresso continua salvo.",
   "See plans": "Ver planos",
   "Tomorrow is your last Premium day": "Amanhã é seu último dia de Premium",
-  "Subscribe to keep unlimited conversations and corrections with EVO.":
-    "Assine para continuar com conversas e correções ilimitadas com a EVO.",
+  "Subscribe to keep 5x more practice every day and the full Life+ AI.":
+    "Assine para manter 5x mais prática por dia e o Life+ AI completo.",
   "Last day of your Premium": "Último dia do seu Premium",
-  "Subscribe today to keep unlimited conversations and corrections.":
-    "Assine hoje para manter conversas e correções ilimitadas.",
+  "Subscribe today to keep 5x more practice and the full Life+ AI.":
+    "Assine hoje para manter 5x mais prática e o Life+ AI completo.",
   "Keep Premium": "Continuar no Premium",
   "Your account is now Free": "Sua conta agora é Grátis",
-  "Your progress stays saved. You now have 3 conversations and 3 corrections per day.":
-    "Seu progresso continua salvo. Agora você tem 3 conversas e 3 correções por dia.",
+  "Your progress stays saved. You keep your lessons and practice with EVO, with a daily limit.":
+    "Seu progresso continua salvo. Você continua com as lições e a prática com a EVO, com limite diário.",
   "Reactivate Premium": "Reativar o Premium",
   "Premium · day {day} of 10": "Premium · dia {day} de 10",
   "Today's Premium mission": "Missão Premium de hoje",
