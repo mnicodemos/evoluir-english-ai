@@ -122,10 +122,16 @@ export async function callGateway(
   if (usage && usageTools) {
     const tools = usageTools;
     const answer = text;
+    // AI Speaking closes its record before answering (user report,
+    // 2026-10-17: its background closes were lost and every talking record
+    // stayed pending, blocking the next turn). Other operations keep the
+    // background close, so the student does not wait on it.
+    const closeNow = usage.operation === "talking" ? ticket : null;
+    if (closeNow) await tools.finishAiUsage(closeNow, { success: true, ...usageTokens });
     const { keepAlive } = await import("./keepAlive.server");
     void keepAlive(
       Promise.all([
-        ticket ? tools.finishAiUsage(ticket, { success: true, ...usageTokens }) : null,
+        ticket && !closeNow ? tools.finishAiUsage(ticket, { success: true, ...usageTokens }) : null,
         ttl > 0
           ? tools.writeAiCache({
               cacheKey,
