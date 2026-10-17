@@ -25,10 +25,26 @@ export const scenarioPrompts: Record<string, string> = {
 
 /**
  * The video call is a relaxed chat with EVO as a friend, unlike AI Speaking's
- * short teacher turns: she reacts, shares a bit of her own day, does not
- * always ask something back and recasts mistakes instead of giving tips.
+ * short teacher turns: she reacts, shares light thoughts (never an invented
+ * human life), does not always ask something back and recasts mistakes
+ * instead of giving tips.
  */
 export type CoachStyle = { casual?: boolean; name?: string | undefined };
+
+/**
+ * A1-A2 openers (user report, 2026-10-17: a new A1 student was asked "A new
+ * colleague joins your team at work today. What do you say to welcome them?").
+ * Whatever the day's scenario, a beginner gets a short personal question about
+ * it, answerable in a few words.
+ */
+export function beginnerOpenerRule(level: string) {
+  const cefr = findLevel(level).value;
+  if (cefr !== "a1" && cefr !== "a2") return "";
+  return [
+    `The student is a ${cefr.toUpperCase()} beginner. Ask a personal question about their own life inside the scenario (for work: "Do you work in an office?"; for travel: "Do you like to travel?"), never a situation to act out.`,
+    "Use only very common words and the present simple. The whole message has at most 12 words, and the question can be answered in a few words.",
+  ].join(" ");
+}
 
 function casualPersona(level: string, goal: string, name: string | undefined) {
   const cefr = findLevel(level);
@@ -108,6 +124,7 @@ export function coachOpenerMessages(
     const system = [
       ...casualPersona(level, goal, style.name),
       `Write how you open the call, at ${cefr.cefr}: like a friend picking up a video call. One or two short sentences, about 20 words.`,
+      beginnerOpenerRule(level),
       "Say hi warmly, maybe share a light thought or something you are curious about today (never a made-up human activity), and end with one easy, casual question (how they are, what they are up to, their day).",
       "Reply with the words only, no quotes or labels." + avoidList,
     ]
@@ -124,6 +141,7 @@ export function coachOpenerMessages(
     `Practice scenario — ${scenarioPrompts[scenario] ?? scenarioPrompts["everyday"]}`,
     studyContext ? `Student history:\n${studyContext.slice(0, 700)}` : "",
     `Write ONE opening message at ${cefr.cefr}: maximum 2 short sentences, about 25 words.`,
+    beginnerOpenerRule(level),
     "Greet in a few words and end with exactly ONE short, direct question the student can answer by speaking.",
     "Vary the sub-topic every time. Reply with the opening message only, no quotes or labels." +
       avoidList,

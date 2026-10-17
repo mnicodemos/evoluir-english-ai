@@ -367,11 +367,14 @@ export function buildNextStep(input: NextStepInput): NextStep {
   // the Dashboard shows. The level only shapes the wording (situation below).
   const candidates = input.skills.filter((item) => item.skill);
   if (candidates.length === 0) {
+    // A new student (user report, 2026-10-17: "Free practice" told a new A1
+    // student nothing): the first step is the first conversation with EVO,
+    // like day 1 of the First week guide and the end of onboarding.
     return {
       prioritySkill: null,
       reason: "no_data",
-      action: TEACHER_FALLBACK.action,
-      activity: TEACHER_FALLBACK.activity,
+      action: FALLBACK_BY_SKILL["speaking"]!.action,
+      activity: FALLBACK_BY_SKILL["speaking"]!.activity,
       quickWin: null,
     };
   }
