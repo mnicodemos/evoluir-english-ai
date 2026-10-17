@@ -104,7 +104,9 @@ function Premium() {
     queryKey: ["my-access"],
     queryFn: () => fetchAccess(),
   });
-  const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
+  // Monthly opens selected (user decision, 2026-10-17: a lower first step for
+  // new students); the yearly card stays highlighted with its saving.
+  const [selected, setSelected] = useState<"monthly" | "yearly">("monthly");
   const [starting, setStarting] = useState(false);
   const [opening, setOpening] = useState(false);
   const startCheckout = useServerFn(createStripeCheckoutSession);
