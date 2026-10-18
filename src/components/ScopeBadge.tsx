@@ -21,7 +21,8 @@ export function ScopeBadge({
 }) {
   const { lang } = useUiLang();
   const continuous = kind === "continuous";
-  const Icon = continuous ? InfinityIcon : CalendarDays;
+  if (continuous) return null;
+  const Icon = CalendarDays;
   return (
     <span
       title={translate(
