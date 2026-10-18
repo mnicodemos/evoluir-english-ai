@@ -194,180 +194,181 @@ function Mistakes() {
           }
         />
 
-        <section className="card-soft space-y-3 p-3 sm:p-5">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
-              <Target className="size-4 text-primary sm:size-5" />
-              Review now
-            </h2>
-            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-              {due.length + (outcome ? 1 : 0)}
-            </span>
-          </div>
-
-          {isLoading ? (
-            <div className="space-y-3 py-2" aria-busy="true">
-              <Skeleton className="h-5 w-2/3" />
-              <Skeleton className="h-20 w-full rounded-xl" />
-              <Skeleton className="h-10 w-full rounded-lg" />
+        <div className="space-y-3 lg:col-start-1 lg:row-start-2">
+          <section className="card-soft space-y-3 p-3 sm:p-5">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
+                <Target className="size-4 text-primary sm:size-5" />
+                Review now
+              </h2>
+              <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                {due.length + (outcome ? 1 : 0)}
+              </span>
             </div>
-          ) : !current ? (
-            <div className="space-y-3 py-4 text-center">
-              {rows.length === 0 ? (
-                <EvoAvatar decorative className="mx-auto size-14" />
-              ) : (
-                <CheckCircle2 className="mx-auto size-8 text-primary" />
-              )}
-              <p className="font-medium">
-                {rows.length === 0 ? "No mistakes saved yet." : "All caught up for today!"}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {rows.length === 0
-                  ? "Correct a text in Writing and your mistakes will appear here."
-                  : "Come back tomorrow for the next reviews."}
-              </p>
-              {rows.length === 0 && (
-                <Button asChild variant="outline">
-                  <Link to="/writing">Go to Writing</Link>
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                {current.sentence ? "Correct the marked part:" : "Correct this sentence:"}
-              </p>
-              <p
-                translate="no"
-                lang="en"
-                className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 font-medium"
-              >
-                {current.sentence ? (
-                  <>
-                    {current.sentence.before}
-                    <mark className="rounded bg-destructive/20 px-0.5 text-destructive underline decoration-wavy underline-offset-4">
-                      {current.sentence.wrong}
-                    </mark>
-                    {current.sentence.after}
-                  </>
+  
+            {isLoading ? (
+              <div className="space-y-3 py-2" aria-busy="true">
+                <Skeleton className="h-5 w-2/3" />
+                <Skeleton className="h-20 w-full rounded-xl" />
+                <Skeleton className="h-10 w-full rounded-lg" />
+              </div>
+            ) : !current ? (
+              <div className="space-y-3 py-4 text-center">
+                {rows.length === 0 ? (
+                  <EvoAvatar decorative className="mx-auto size-14" />
                 ) : (
-                  current.original_text
+                  <CheckCircle2 className="mx-auto size-8 text-primary" />
                 )}
-              </p>
-              {outcome ? (
-                <div className="space-y-2">
-                  <p
-                    className={cn(
-                      "flex items-center gap-2 font-semibold",
-                      outcome.correct ? "text-primary" : "text-destructive",
-                    )}
-                  >
-                    {outcome.correct ? (
-                      <CheckCircle2 className="size-4" />
-                    ) : (
-                      <XCircle className="size-4" />
-                    )}
-                    {outcome.correct ? "Correct!" : "Not quite."}
-                  </p>
-                  <p
-                    translate="no"
-                    lang="en"
-                    className="rounded-lg border border-primary/30 bg-primary/5 p-3 font-medium"
-                  >
-                    {current.sentence ? (
-                      <>
-                        {current.sentence.before}
-                        <span className="rounded bg-primary/20 px-0.5 text-primary">
-                          {outcome.corrected}
-                        </span>
-                        {current.sentence.after}
-                      </>
-                    ) : (
-                      outcome.corrected
-                    )}
-                  </p>
-                  {outcome.explanation && (
-                    <p className="text-sm text-muted-foreground">{outcome.explanation}</p>
-                  )}
-                  <RulePractice key={current.id} mistakeId={current.id} />
-                  <Button onClick={next} className="w-full sm:w-auto">
-                    Next
+                <p className="font-medium">
+                  {rows.length === 0 ? "No mistakes saved yet." : "All caught up for today!"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {rows.length === 0
+                    ? "Correct a text in Writing and your mistakes will appear here."
+                    : "Come back tomorrow for the next reviews."}
+                </p>
+                {rows.length === 0 && (
+                  <Button asChild variant="outline">
+                    <Link to="/writing">Go to Writing</Link>
                   </Button>
-                </div>
-              ) : (
-                <form
-                  className="flex flex-col gap-2 sm:flex-row"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    void check();
-                  }}
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  {current.sentence ? "Correct the marked part:" : "Correct this sentence:"}
+                </p>
+                <p
+                  translate="no"
+                  lang="en"
+                  className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 font-medium"
                 >
                   {current.sentence ? (
-                    // The whole sentence again, with a space only where the
-                    // correction goes (user request).
+                    <>
+                      {current.sentence.before}
+                      <mark className="rounded bg-destructive/20 px-0.5 text-destructive underline decoration-wavy underline-offset-4">
+                        {current.sentence.wrong}
+                      </mark>
+                      {current.sentence.after}
+                    </>
+                  ) : (
+                    current.original_text
+                  )}
+                </p>
+                {outcome ? (
+                  <div className="space-y-2">
+                    <p
+                      className={cn(
+                        "flex items-center gap-2 font-semibold",
+                        outcome.correct ? "text-primary" : "text-destructive",
+                      )}
+                    >
+                      {outcome.correct ? (
+                        <CheckCircle2 className="size-4" />
+                      ) : (
+                        <XCircle className="size-4" />
+                      )}
+                      {outcome.correct ? "Correct!" : "Not quite."}
+                    </p>
                     <p
                       translate="no"
                       lang="en"
-                      className="min-w-0 flex-1 rounded-lg border border-border p-3 font-medium leading-[2.1]"
+                      className="rounded-lg border border-primary/30 bg-primary/5 p-3 font-medium"
                     >
-                      {current.sentence.before}
-                      <input
+                      {current.sentence ? (
+                        <>
+                          {current.sentence.before}
+                          <span className="rounded bg-primary/20 px-0.5 text-primary">
+                            {outcome.corrected}
+                          </span>
+                          {current.sentence.after}
+                        </>
+                      ) : (
+                        outcome.corrected
+                      )}
+                    </p>
+                    {outcome.explanation && (
+                      <p className="text-sm text-muted-foreground">{outcome.explanation}</p>
+                    )}
+                    <RulePractice key={current.id} mistakeId={current.id} />
+                    <Button onClick={next} className="w-full sm:w-auto">
+                      Next
+                    </Button>
+                  </div>
+                ) : (
+                  <form
+                    className="flex flex-col gap-2 sm:flex-row"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      void check();
+                    }}
+                  >
+                    {current.sentence ? (
+                      // The whole sentence again, with a space only where the
+                      // correction goes (user request).
+                      <p
+                        translate="no"
+                        lang="en"
+                        className="min-w-0 flex-1 rounded-lg border border-border p-3 font-medium leading-[2.1]"
+                      >
+                        {current.sentence.before}
+                        <input
+                          value={answer}
+                          onChange={(event) => setAnswer(event.target.value)}
+                          aria-label="Type the correction"
+                          autoComplete="off"
+                          autoCapitalize="off"
+                          spellCheck={false}
+                          style={{
+                            width: `${Math.min(Math.max(current.sentence.wrong.length, 6) + 3, 28)}ch`,
+                          }}
+                          // A written blank, not a box (user report: the tall box pushed the
+                          // sentence's lines apart): a teal underline in the text's own line.
+                          className="mx-1 inline-block h-7 max-w-full rounded-t-md border-0 border-b-2 border-primary/60 bg-primary/[0.06] px-1.5 py-0 align-baseline leading-normal text-primary outline-none focus:border-primary focus:bg-primary/10"
+                        />
+                        {current.sentence.after}
+                      </p>
+                    ) : (
+                      <Input
                         value={answer}
                         onChange={(event) => setAnswer(event.target.value)}
-                        aria-label="Type the correction"
+                        placeholder="Type the corrected sentence"
                         autoComplete="off"
                         autoCapitalize="off"
                         spellCheck={false}
-                        style={{
-                          width: `${Math.min(Math.max(current.sentence.wrong.length, 6) + 3, 28)}ch`,
-                        }}
-                        // A written blank, not a box (user report: the tall box pushed the
-                        // sentence's lines apart): a teal underline in the text's own line.
-                        className="mx-1 inline-block h-7 max-w-full rounded-t-md border-0 border-b-2 border-primary/60 bg-primary/[0.06] px-1.5 py-0 align-baseline leading-normal text-primary outline-none focus:border-primary focus:bg-primary/10"
                       />
-                      {current.sentence.after}
-                    </p>
-                  ) : (
-                    <Input
-                      value={answer}
-                      onChange={(event) => setAnswer(event.target.value)}
-                      placeholder="Type the corrected sentence"
-                      autoComplete="off"
-                      autoCapitalize="off"
-                      spellCheck={false}
-                    />
-                  )}
-                  <Button type="submit" disabled={checking || !answer.trim()}>
-                    {checking ? <Loader2 className="size-4 animate-spin" /> : "Check"}
-                  </Button>
-                </form>
-              )}
-            </div>
-          )}
-        </section>
-
-        {learning?.common_errors && learning.common_errors.length > 0 && (
-          <section className="card-soft p-3 sm:p-5 lg:col-start-1 lg:row-start-3">
-            <h2 className="font-display text-base font-semibold sm:text-lg">Frequent mistakes</h2>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-              {(showAllMistakes ? learning.common_errors : learning.common_errors.slice(0, 5)).map(
-                (error: string, i: number) => (
-                  <li key={i}>{error}</li>
-                ),
-              )}
-            </ul>
-            {learning.common_errors.length > 5 && (
-              <button
-                type="button"
-                onClick={() => setShowAllMistakes((value) => !value)}
-                aria-expanded={showAllMistakes}
-                className="mt-2 min-h-11 text-xs font-medium text-brand-green hover:underline sm:text-sm"
-              >
-                {showAllMistakes ? "Show less" : `Show all (${learning.common_errors.length})`}
-              </button>
+                    )}
+                    <Button type="submit" disabled={checking || !answer.trim()}>
+                      {checking ? <Loader2 className="size-4 animate-spin" /> : "Check"}
+                    </Button>
+                  </form>
+                )}
+              </div>
             )}
           </section>
-        )}
+          {learning?.common_errors && learning.common_errors.length > 0 && (
+            <section className="card-soft p-3 sm:p-5">
+              <h2 className="font-display text-base font-semibold sm:text-lg">Frequent mistakes</h2>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
+                {(showAllMistakes ? learning.common_errors : learning.common_errors.slice(0, 5)).map(
+                  (error: string, i: number) => (
+                    <li key={i}>{error}</li>
+                  ),
+                )}
+              </ul>
+              {learning.common_errors.length > 5 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllMistakes((value) => !value)}
+                  aria-expanded={showAllMistakes}
+                  className="mt-2 min-h-11 text-xs font-medium text-brand-green hover:underline sm:text-sm"
+                >
+                  {showAllMistakes ? "Show less" : `Show all (${learning.common_errors.length})`}
+                </button>
+              )}
+            </section>
+          )}
+        </div>
 
         <aside className="card-soft space-y-2 p-3 sm:p-5 lg:col-start-2 lg:row-start-2">
           <div className="flex items-center justify-between gap-2">
