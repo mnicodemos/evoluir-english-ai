@@ -46,8 +46,8 @@ export const appGuidePt: Record<string, string> = {
     "Leia o texto; ele fica mais longo e mais rico conforme seu nível sobe.",
   "Tap Listen to EVO to hear it read aloud.":
     "Toque em Ouvir a EVO para escutar o texto em voz alta.",
-  "Tap an underlined word to see its meaning, or show the full translation.":
-    "Toque numa palavra sublinhada para ver o significado, ou mostre a tradução completa.",
+  "Tap any word you don't understand to see its translation; the words you tap stay marked for the day.":
+    "Toque em qualquer palavra que você não entendeu para ver a tradução; as palavras tocadas ficam marcadas no dia.",
   "Answer the questions to check what you understood.":
     "Responda às perguntas para conferir o que você entendeu.",
   "When EVO's priority is Reading, Practice now opens the daily reading.":

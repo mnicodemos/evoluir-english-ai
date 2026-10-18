@@ -1094,8 +1094,12 @@ const baseUiPt: Record<string, string> = {
   Motivation: "Motivação",
   "Everyday story": "História do cotidiano",
   "Listen to EVO": "Ouvir a EVO",
-  "Tap an underlined word to see its meaning.":
-    "Toque numa palavra sublinhada para ver o significado.",
+  "Tap any word you don't understand to see its translation.":
+    "Toque em qualquer palavra que você não entendeu para ver a tradução.",
+  "Words you marked": "Palavras que você marcou",
+  "Looking up…": "Buscando…",
+  "No translation found for this word.": "Nenhuma tradução encontrada para esta palavra.",
+  Remove: "Remover",
   "Did you understand?": "Você entendeu?",
   "You got": "Você acertou",
   "right.": "das perguntas.",

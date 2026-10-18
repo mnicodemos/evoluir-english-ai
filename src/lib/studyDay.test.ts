@@ -156,6 +156,7 @@ describe("minutes eligibility (existing principle)", () => {
       "writing",
       "vocabulary",
       "lesson_practice",
+      "reading",
     ]) {
       expect(countsAsLearningMinutes(type)).toBe(true);
     }

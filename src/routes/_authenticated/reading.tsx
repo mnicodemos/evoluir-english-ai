@@ -10,8 +10,15 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
-import { gradeReading, readingParagraphs, readingSpeechChunks } from "@/lib/dailyReading";
+import {
+  gradeReading,
+  lookupTerm,
+  readingParagraphs,
+  readingSpeechChunks,
+  readingTokens,
+} from "@/lib/dailyReading";
 import { loadDailyReading, type DailyReading } from "@/lib/dailyReading.functions";
+import { lookupWord } from "@/lib/dictionary.functions";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -30,45 +37,114 @@ export const Route = createFileRoute("/_authenticated/reading")({
   component: ReadingPage,
 });
 
-const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-/** A paragraph with its glossary words as tappable spans (longest words first). */
-function GlossaryParagraph({
+/**
+ * A paragraph where every word can be tapped. Key words from the glossary are
+ * underlined; words the student marked stay highlighted.
+ */
+function ReadingParagraph({
   text,
-  words,
+  glossary,
+  marked,
   selected,
   onSelect,
 }: {
   text: string;
-  words: string[];
+  glossary: ReadonlySet<string>;
+  marked: readonly string[];
   selected: string | null;
-  onSelect: (word: string) => void;
+  onSelect: (term: string) => void;
 }) {
-  const sorted = [...words].sort((a, b) => b.length - a.length).filter(Boolean);
-  if (!sorted.length) return <p>{text}</p>;
-  const pattern = new RegExp(`\\b(${sorted.map(escapeRegExp).join("|")})\\b`, "gi");
-  const parts = text.split(pattern);
   return (
     <p>
-      {parts.map((part, index) => {
-        const match = sorted.find((word) => word.toLowerCase() === part.toLowerCase());
-        if (!match) return <span key={index}>{part}</span>;
+      {readingTokens(text).map((token, index) => {
+        if (!token.word) return <span key={index}>{token.text}</span>;
+        const term = lookupTerm(token.text);
         return (
           <button
             key={index}
             type="button"
-            onClick={() => onSelect(match)}
+            onClick={() => onSelect(term)}
             className={cn(
-              "rounded-sm underline decoration-brand-green/60 decoration-dotted underline-offset-4",
-              selected === match && "bg-brand-green/15 text-brand-green",
+              "rounded-sm transition-colors hover:bg-secondary",
+              glossary.has(term) &&
+                "underline decoration-brand-green/60 decoration-dotted underline-offset-4",
+              marked.includes(term) && "bg-amber-400/20",
+              selected === term && "bg-brand-green/15 text-brand-green",
             )}
           >
-            {part}
+            {token.text}
           </button>
         );
       })}
     </p>
   );
+}
+
+/** The meaning of the tapped word: the glossary's, or the app dictionary's. */
+function WordMeaning({ term, glossaryPt }: { term: string; glossaryPt: string | null }) {
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const searchDictionary = useServerFn(lookupWord);
+  // Same query key as the Vocabulary dictionary, so a word looked up there
+  // (or by any student, in the server cache) comes back with no new AI call.
+  const { data: entry, isFetching } = useQuery({
+    queryKey: ["dictionary-v2", term],
+    queryFn: () => searchDictionary({ data: { term } }),
+    enabled: !glossaryPt && term.length >= 2,
+    staleTime: 1000 * 60 * 60,
+  });
+  const translations = [
+    ...new Set(entry?.meanings.flatMap((meaning) => meaning.translations) ?? []),
+  ].slice(0, 4);
+  const definition = entry?.meanings.find((meaning) => meaning.definition)?.definition ?? null;
+
+  return (
+    <div className="mt-4 rounded-lg bg-brand-green/10 px-3 py-2 text-sm">
+      <span translate="no" lang="en" className="font-semibold">
+        {term}
+      </span>
+      <span> · </span>
+      {glossaryPt ? (
+        <span translate="no">{glossaryPt}</span>
+      ) : isFetching ? (
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+          <span>{t("Looking up…")}</span>
+        </span>
+      ) : translations.length ? (
+        <>
+          <span translate="no">{translations.join(", ")}</span>
+          {definition ? (
+            <span translate="no" lang="en" className="mt-0.5 block text-xs text-muted-foreground">
+              {definition}
+            </span>
+          ) : null}
+        </>
+      ) : (
+        <span className="text-muted-foreground">{t("No translation found for this word.")}</span>
+      )}
+    </div>
+  );
+}
+
+const markedKey = (reading: DailyReading) => `reading-marked:${reading.day}:${reading.level}`;
+
+function readMarked(reading: DailyReading): string[] {
+  try {
+    const raw = window.localStorage.getItem(markedKey(reading));
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMarked(reading: DailyReading, words: string[]) {
+  try {
+    window.localStorage.setItem(markedKey(reading), JSON.stringify(words));
+  } catch {
+    // Private window or blocked storage: the marks last until the page closes.
+  }
 }
 
 function ReadingPage() {
@@ -84,6 +160,9 @@ function ReadingPage() {
   });
 
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
+  // Words the student tapped because they did not understand them, kept for
+  // the day on this device.
+  const [marked, setMarked] = useState<string[]>([]);
   const [showPt, setShowPt] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [chosen, setChosen] = useState<(number | null)[]>([]);
@@ -112,7 +191,30 @@ function ReadingPage() {
   useEffect(() => {
     setChosen(reading ? reading.questions.map(() => null) : []);
     setChecked(false);
+    setMarked(reading ? readMarked(reading) : []);
+    setSelectedWord(null);
   }, [reading]);
+
+  function selectWord(term: string) {
+    setEngaged(true);
+    if (selectedWord === term) {
+      setSelectedWord(null);
+      return;
+    }
+    setSelectedWord(term);
+    if (!reading || marked.includes(term)) return;
+    const next = [...marked, term];
+    setMarked(next);
+    saveMarked(reading, next);
+  }
+
+  function unmark(term: string) {
+    if (!reading) return;
+    const next = marked.filter((word) => word !== term);
+    setMarked(next);
+    saveMarked(reading, next);
+    if (selectedWord === term) setSelectedWord(null);
+  }
 
   async function listen(current: DailyReading) {
     playRun.current += 1;
@@ -142,8 +244,10 @@ function ReadingPage() {
     }
   }
 
-  const glossaryWords = reading?.glossary.map((item) => item.word) ?? [];
-  const selectedMeaning = reading?.glossary.find((item) => item.word === selectedWord) ?? null;
+  const glossaryPt = new Map(
+    (reading?.glossary ?? []).map((item) => [lookupTerm(item.word), item.pt] as const),
+  );
+  const glossaryTerms = new Set(glossaryPt.keys());
   const result = reading && checked ? gradeReading(reading.questions, chosen) : null;
   const allAnswered = chosen.length > 0 && chosen.every((value) => value !== null);
 
@@ -224,31 +328,58 @@ function ReadingPage() {
               className="mt-4 space-y-3 text-base leading-relaxed sm:text-[1.05rem]"
             >
               {readingParagraphs(reading.text).map((paragraph, index) => (
-                <GlossaryParagraph
+                <ReadingParagraph
                   key={index}
                   text={paragraph}
-                  words={glossaryWords}
+                  glossary={glossaryTerms}
+                  marked={marked}
                   selected={selectedWord}
-                  onSelect={(word) => {
-                    setEngaged(true);
-                    setSelectedWord((current) => (current === word ? null : word));
-                  }}
+                  onSelect={selectWord}
                 />
               ))}
             </div>
 
-            {selectedMeaning ? (
-              <p className="mt-4 rounded-lg bg-brand-green/10 px-3 py-2 text-sm">
-                <span translate="no" lang="en" className="font-semibold">
-                  {selectedMeaning.word}
-                </span>
-                <span> · </span>
-                <span translate="no">{selectedMeaning.pt}</span>
-              </p>
-            ) : glossaryWords.length ? (
+            {selectedWord ? (
+              <WordMeaning term={selectedWord} glossaryPt={glossaryPt.get(selectedWord) ?? null} />
+            ) : (
               <p className="mt-4 text-xs text-muted-foreground">
-                {t("Tap an underlined word to see its meaning.")}
+                {t("Tap any word you don't understand to see its translation.")}
               </p>
+            )}
+
+            {marked.length ? (
+              <div className="mt-4">
+                <p className="text-xs font-medium text-muted-foreground">{t("Words you marked")}</p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {marked.map((term) => (
+                    <span
+                      key={term}
+                      className={cn(
+                        "inline-flex items-center rounded-full bg-amber-400/15 text-xs",
+                        selectedWord === term && "ring-1 ring-brand-green",
+                      )}
+                    >
+                      <button
+                        type="button"
+                        translate="no"
+                        lang="en"
+                        className="py-1 pl-2.5 pr-1 font-medium"
+                        onClick={() => setSelectedWord(term)}
+                      >
+                        {term}
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-full p-1 pr-2 text-muted-foreground hover:text-foreground"
+                        aria-label={`${t("Remove")} ${term}`}
+                        onClick={() => unmark(term)}
+                      >
+                        <X className="size-3" aria-hidden="true" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
             ) : null}
 
             {showPt && reading.textPt ? (

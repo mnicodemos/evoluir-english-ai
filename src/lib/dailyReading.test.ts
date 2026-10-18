@@ -4,11 +4,13 @@ import {
   READING_SPECS,
   fallbackReading,
   gradeReading,
+  lookupTerm,
   parseDailyReading,
   readingLevel,
   readingParagraphs,
   readingSpeechChunks,
   readingThemeForDay,
+  readingTokens,
   wordCount,
 } from "./dailyReading";
 
@@ -86,5 +88,23 @@ describe("daily reading rules", () => {
       expect(reading.questions).toHaveLength(READING_SPECS[level].questions);
       expect(wordCount(reading.text)).toBeGreaterThan(40);
     }
+  });
+
+  it("makes every word tappable and keeps the text between them", () => {
+    const tokens = readingTokens("Maria's well-known café, don't stop!");
+    expect(tokens.filter((token) => token.word).map((token) => token.text)).toEqual([
+      "Maria's",
+      "well-known",
+      "café",
+      "don't",
+      "stop",
+    ]);
+    expect(tokens.map((token) => token.text).join("")).toBe("Maria's well-known café, don't stop!");
+  });
+
+  it("looks words up without capitals or a possessive", () => {
+    expect(lookupTerm("Maria’s")).toBe("maria");
+    expect(lookupTerm("Habits")).toBe("habits");
+    expect(lookupTerm("don't")).toBe("don't");
   });
 });

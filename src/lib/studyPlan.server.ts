@@ -127,6 +127,7 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
     lesson: "reading",
     lesson_practice: "reading",
     final_test: "reading",
+    reading: "reading",
   };
   const practised = new Set(
     (recentRows ?? [])

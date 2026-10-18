@@ -99,7 +99,7 @@ export const APP_GUIDE: GuideSection[] = [
     steps: [
       "Read the text; it gets longer and richer as your level goes up.",
       "Tap Listen to EVO to hear it read aloud.",
-      "Tap an underlined word to see its meaning, or show the full translation.",
+      "Tap any word you don't understand to see its translation; the words you tap stay marked for the day.",
       "Answer the questions to check what you understood.",
     ],
     tip: "When EVO's priority is Reading, Practice now opens the daily reading.",
