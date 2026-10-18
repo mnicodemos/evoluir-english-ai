@@ -2,6 +2,10 @@
 // existing tables (profiles, lessons, user_lessons, activities). No new content,
 // no AI call, no change to the recommendation engine.
 
+import {
+  hasDailyReadingEvidence,
+  withoutUnmeasuredReading,
+} from "@/lib/pedagogy/readingSource.server";
 import { LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
 import { STUDY_TIME_ZONE, studyToday } from "@/lib/today";
 
@@ -128,6 +132,7 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
     lesson_practice: "reading",
     final_test: "reading",
     reading: "reading",
+    daily_reading: "reading",
   };
   const practised = new Set(
     (recentRows ?? [])
@@ -157,7 +162,10 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
     }),
   ];
 
-  const needs: PlanSkillNeed[] = (skillRows ?? [])
+  // Reading only once a daily reading measured it (readingSource.server.ts).
+  const readingMeasured = await hasDailyReadingEvidence(supabaseAdmin, userId);
+  const skillProfile = withoutUnmeasuredReading(skillRows ?? [], readingMeasured);
+  const needs: PlanSkillNeed[] = skillProfile
     .filter((row) => row.skill)
     .map((row) => ({
       skill: row.skill as string,
