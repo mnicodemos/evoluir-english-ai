@@ -225,6 +225,7 @@ export function LifeSlot({
   details,
   chooser,
   action,
+  hideActionInPopup = false,
 }: {
   kind: string;
   icon: ReactNode;
@@ -234,6 +235,7 @@ export function LifeSlot({
   details: ReactNode;
   chooser: ReactNode;
   action: ReactNode;
+  hideActionInPopup?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   // Two rows (user request: the card as tall as the level card): the kind with
@@ -278,7 +280,7 @@ export function LifeSlot({
               </h3>
             </div>
             {details}
-            <div className="flex justify-end">{action}</div>
+            {!hideActionInPopup ? <div className="flex justify-end">{action}</div> : null}
           </PopoverContent>
         </Popover>
       </div>
