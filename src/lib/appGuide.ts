@@ -33,6 +33,8 @@ export type GuideSection = {
   what: string;
   /** How to use it, in order. */
   steps: string[];
+  /** The steps are alternatives (any one is enough), shown as a list, not in order. */
+  anyOf?: boolean;
   tip?: string;
   /** Where the "Open" button goes; none for settings spread across the app. */
   to?: string;
@@ -198,12 +200,30 @@ export const APP_GUIDE: GuideSection[] = [
     to: "/study-plan",
   },
   {
+    id: "study-day",
+    icon: "streak",
+    title: "What counts as a study day",
+    what: "Any one of these on the same day (Brasília time) closes your study day and keeps your streak.",
+    anyOf: true,
+    steps: [
+      "Finish 1 lesson (the quiz at the end).",
+      "Send 3 texts in Writing.",
+      "Do 3 Listening sessions.",
+      "Review 10 words in Vocabulary.",
+      "Finish 1 conversation with EVO in AI Speaking.",
+      "Answer every question of the Daily reading.",
+      "Do every goal step of the day in Life+ AI.",
+    ],
+    tip: "Opening a screen or only spending minutes does not close the day; the minutes still count toward your daily goal.",
+    to: "/dashboard",
+  },
+  {
     id: "streak",
     icon: "streak",
     title: "Streak, jewels and stars",
     what: "How your consistency is counted.",
     steps: [
-      "A study day is 1 lesson, 3 texts, 3 Listening sessions, 10 reviewed words, 1 finished conversation with EVO or every goal step of the day.",
+      "Close your study day with any one of the activities in What counts as a study day.",
       "Days in a row raise your streak and change its jewel; one missed day a week is protected.",
       "The stars in Your learning rhythm light up when you reach your own weekly plan.",
     ],

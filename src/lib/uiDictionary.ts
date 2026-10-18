@@ -1097,6 +1097,8 @@ const baseUiPt: Record<string, string> = {
   "Tap any word you don't understand to see its translation.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução.",
   "Words you marked": "Palavras que você marcou",
+  "Reading done: today counts as a study day.": "Leitura feita: hoje conta como dia de estudo.",
+  "Your answers could not be saved.": "Não foi possível salvar as suas respostas.",
   "Looking up…": "Buscando…",
   "No translation found for this word.": "Nenhuma tradução encontrada para esta palavra.",
   Remove: "Remover",

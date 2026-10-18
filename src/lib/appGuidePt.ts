@@ -130,10 +130,24 @@ export const appGuidePt: Record<string, string> = {
     "Siga a atividade de cada dia; os dias feitos ficam marcados.",
   "Reaching your weekly plan lights the three gold stars.":
     "Cumprir seu plano semanal acende as três estrelas douradas.",
+  "What counts as a study day": "O que conta como dia de estudo",
+  "Any one of these on the same day (Brasília time) closes your study day and keeps your streak.":
+    "Qualquer uma destas no mesmo dia (horário de Brasília) fecha o seu dia de estudo e mantém a sua sequência.",
+  "Finish 1 lesson (the quiz at the end).": "Concluir 1 lição (o quiz do final).",
+  "Send 3 texts in Writing.": "Enviar 3 textos no Writing.",
+  "Do 3 Listening sessions.": "Fazer 3 sessões de Listening.",
+  "Review 10 words in Vocabulary.": "Revisar 10 palavras no Vocabulary.",
+  "Finish 1 conversation with EVO in AI Speaking.": "Concluir 1 conversa com a EVO no AI Speaking.",
+  "Answer every question of the Daily reading.": "Responder todas as perguntas da Leitura do dia.",
+  "Do every goal step of the day in Life+ AI.":
+    "Fazer todos os passos das metas do dia no Life+ AI.",
+  "Opening a screen or only spending minutes does not close the day; the minutes still count toward your daily goal.":
+    "Abrir uma tela ou só passar minutos nela não fecha o dia; os minutos continuam contando na sua meta diária.",
+  "Any one of these": "Qualquer uma destas",
   "Streak, jewels and stars": "Sequência, joias e estrelas",
   "How your consistency is counted.": "Como a sua constância é contada.",
-  "A study day is 1 lesson, 3 texts, 3 Listening sessions, 10 reviewed words, 1 finished conversation with EVO or every goal step of the day.":
-    "Um dia de estudo é 1 lição, 3 textos, 3 sessões de Listening, 10 palavras revisadas, 1 conversa finalizada com a EVO ou todos os passos das metas do dia.",
+  "Close your study day with any one of the activities in What counts as a study day.":
+    "Feche o seu dia de estudo com qualquer uma das atividades de O que conta como dia de estudo.",
   "Days in a row raise your streak and change its jewel; one missed day a week is protected.":
     "Dias seguidos aumentam sua sequência e mudam a joia; um dia perdido por semana fica protegido.",
   "The stars in Your learning rhythm light up when you reach your own weekly plan.":

@@ -1,5 +1,5 @@
 /**
- * The study-day rule (user decisions; migrations 0027, 0051 and 0057). The
+ * The study-day rule (user decisions; migrations 0027, 0051, 0057 and 0073). The
  * database's credit_study_day is the only writer of the streak and stores the
  * days it credits in study_days (migration 0063), which the Rhythm and
  * frequency views read; this mirror is their fallback before that migration
@@ -14,6 +14,8 @@ export type StudyDayEvidence = {
   reviewedWords: number;
   lessonCompleted: boolean;
   conversation: boolean;
+  /** Today's daily reading with every question answered (migration 0073). */
+  readingDone: boolean;
   /** Every goal step of that day done (a day with steps, none left open). */
   goalsDone: boolean;
 };
@@ -25,6 +27,7 @@ export function qualifiesAsStudyDay(day: StudyDayEvidence): boolean {
     day.reviewedWords >= STUDY_DAY_RULE.reviewedWords ||
     day.lessonCompleted ||
     day.conversation ||
+    day.readingDone ||
     day.goalsDone
   );
 }

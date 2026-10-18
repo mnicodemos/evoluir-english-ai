@@ -512,6 +512,13 @@
       "when": 1792282633278,
       "tag": "0072_daily_readings",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1792369033278,
+      "tag": "0073_daily_reading_study_day",
+      "breakpoints": true
     }
   ]
 }
