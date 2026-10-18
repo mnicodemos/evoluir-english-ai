@@ -9,6 +9,7 @@ import { studyToday } from "@/lib/today";
 
 import { aggregateSkillEvidence, countsForSkill } from "./aggregateSkill";
 import { measuredCefr } from "./cefr";
+import { hasDailyReadingEvidence, withoutUnmeasuredReading } from "./readingSource.server";
 import {
   pedagogicalSkillSchema,
   type AssessmentEvidence,
@@ -79,14 +80,9 @@ export const loadNextStep = createServerFn({ method: "POST" })
     // Reading is measured by the daily reading only (countsForSkill): until the
     // student has finished one, an older Reading result built from lesson
     // quizzes is not shown and does not drive the priority.
-    const { count: readingMeasured } = await supabaseAdmin
-      .from("assessment_evidence")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .eq("skill", "reading")
-      .eq("source_type", "reading");
-    const currentSkills = (skills.data ?? []).filter(
-      (row) => row.skill !== "reading" || (readingMeasured ?? 0) > 0,
+    const currentSkills = withoutUnmeasuredReading(
+      skills.data ?? [],
+      await hasDailyReadingEvidence(supabaseAdmin, userId),
     );
 
     // Learning is continuous (user decision): every skill keeps its latest

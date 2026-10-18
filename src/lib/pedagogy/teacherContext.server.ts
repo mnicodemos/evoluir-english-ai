@@ -5,6 +5,7 @@
 
 import { findLevel } from "@/lib/level";
 
+import { hasDailyReadingEvidence, withoutUnmeasuredReading } from "./readingSource.server";
 import type { TeacherContextForPrompt } from "./teacherPrompt";
 
 export type TeacherPedagogicalContext = TeacherContextForPrompt & { userId: string };
@@ -41,7 +42,10 @@ export async function loadTeacherContext(
         .maybeSingle()
     : null;
 
-  const measured = (skills.data ?? [])
+  // Reading only once a daily reading measured it (readingSource.server.ts).
+  const readingMeasured = await hasDailyReadingEvidence(db, userId);
+  const skillProfile = withoutUnmeasuredReading(skills.data ?? [], readingMeasured);
+  const measured = skillProfile
     .filter((row) => row.skill)
     .map((row) => ({
       skill: row.skill as string,

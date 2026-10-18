@@ -253,7 +253,7 @@ describe("quick win", () => {
     });
   });
 
-  it("keeps a selected grammar or reading lesson for Practice now and points the quick win elsewhere", () => {
+  it("keeps a selected grammar lesson for Practice now; Reading always opens the daily reading", () => {
     const grammar = buildNextStep({
       ...base,
       skills: [skill("grammar", 30)],
@@ -266,7 +266,7 @@ describe("quick win", () => {
     });
     expect(grammar.activity).toMatchObject({ params: { lessonId: "lesson-grammar" } });
     expect(grammar.quickWin?.activity).toMatchObject({ to: "/teacher" });
-    expect(reading.activity).toMatchObject({ params: { lessonId: "lesson-reading" } });
+    expect(reading.activity).toMatchObject({ to: "/reading" });
     expect(reading.quickWin?.activity).toMatchObject({ to: "/learning" });
   });
 
