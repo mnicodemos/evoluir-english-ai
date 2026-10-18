@@ -16,7 +16,6 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useLearningPath } from "@/hooks/useCurriculum";
