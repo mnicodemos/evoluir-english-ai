@@ -64,7 +64,8 @@ const FALLBACK_BY_SKILL: Record<string, { title: string; to: string }> = {
   // Named after the task, not the tool (it opens the AI Teacher); short enough
   // for the Dashboard header cell.
   grammar: { title: "Grammar practice", to: "/teacher" },
-  reading: { title: "Learning Center", to: "/learning" },
+  // Reading is practised and measured by the daily reading (2026-10-17).
+  reading: { title: "Daily reading", to: "/reading" },
 };
 
 export type PlanLesson = {
@@ -306,12 +307,16 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
 
     // Not done yet: a lesson never completed, else the practice area. A lesson
     // the student already finished is never planned again.
+    // A Reading day opens the daily reading, never a reading lesson: lessons
+    // count for Grammar and Vocabulary only (user decision, 2026-10-17).
     const dbSkill = lessonSkillOf(skill);
     const lesson =
-      input.lessons.find(
-        (candidate) =>
-          candidate.skill === dbSkill && !candidate.completed && !used.has(candidate.id),
-      ) ?? null;
+      skill === "reading"
+        ? null
+        : (input.lessons.find(
+            (candidate) =>
+              candidate.skill === dbSkill && !candidate.completed && !used.has(candidate.id),
+          ) ?? null);
     if (lesson) used.add(lesson.id);
     return {
       day,

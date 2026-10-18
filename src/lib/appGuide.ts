@@ -103,6 +103,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Tap Listen to EVO to hear it read aloud.",
       "Tap any word you don't understand to see its translation; the words you tap stay marked for the day.",
       "Answer the questions to check what you understood.",
+      "Your answers are your Reading score and close your study day.",
     ],
     tip: "When EVO's priority is Reading, Practice now opens the daily reading.",
     to: "/reading",
@@ -260,7 +261,7 @@ export const APP_GUIDE: GuideSection[] = [
     title: "My progress",
     what: "Your skills, your history and your study calendar.",
     steps: [
-      "See your scores in listening, speaking, writing and grammar.",
+      "See your scores in listening, speaking, reading, writing, grammar and vocabulary.",
       "Choose a level to see what you practised there.",
       "Check the calendar: every marked day is a study day.",
     ],

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { dailyReadingEvidence } from "./activityEvidence";
 import { aggregateSkillEvidence, countsForSkill } from "./aggregateSkill";
 import type { AssessmentEvidence } from "./contracts";
+import { withoutUnmeasuredReading } from "./readingSource.server";
 
 const quizReading = (rawScore: number): AssessmentEvidence => ({
   skill: "reading",
@@ -28,5 +29,11 @@ describe("Reading comes from the daily reading only", () => {
     expect(aggregateSkillEvidence("reading", old).score).toBeNull();
     const reading = dailyReadingEvidence({ correct: [true, true, false, true], day: "2026-10-18" });
     expect(aggregateSkillEvidence("reading", [...old, ...reading]).score).toBe(75);
+  });
+
+  it("hides the old quiz-based Reading result until a daily reading measured it", () => {
+    const rows = [{ skill: "reading" }, { skill: "grammar" }];
+    expect(withoutUnmeasuredReading(rows, false).map((row) => row.skill)).toEqual(["grammar"]);
+    expect(withoutUnmeasuredReading(rows, true)).toHaveLength(2);
   });
 });
