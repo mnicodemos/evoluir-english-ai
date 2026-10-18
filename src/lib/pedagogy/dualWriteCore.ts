@@ -172,6 +172,9 @@ async function profileItemLevel(admin: AdminClient, userId: string) {
   return data?.level ? itemLevelFromStoredLevel(data.level) : null;
 }
 
+/** Rows per request when reading a skill's evidence history (the API maximum). */
+const EVIDENCE_PAGE_SIZE = 1000;
+
 async function persistEvidenceAndResults(params: {
   admin: AdminClient;
   userId: string;
@@ -187,22 +190,31 @@ async function persistEvidenceAndResults(params: {
   const skills = [...new Set(params.evidence.map((item) => item.skill))];
   const results = [];
   for (const skill of skills) {
-    const { data, error } = await admin
-      .from("assessment_evidence")
-      .select(
-        "id, skill, subskill, source_type, source_id, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, model_version, rubric_version",
-      )
-      .eq("user_id", userId)
-      .eq("skill", skill)
-      .order("created_at", { ascending: true });
-    if (error) {
-      throw new PedagogicalWriteError(
-        "aggregation",
-        "AGGREGATION_FAILED",
-        "Could not load evidence history",
-      );
+    // The whole history, page by page: a request returns at most 1,000 rows,
+    // and a long-time student has more than that in a skill.
+    const data = [];
+    for (let from = 0; ; from += EVIDENCE_PAGE_SIZE) {
+      const page = await admin
+        .from("assessment_evidence")
+        .select(
+          "id, skill, subskill, source_type, source_id, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, model_version, rubric_version, created_at",
+        )
+        .eq("user_id", userId)
+        .eq("skill", skill)
+        .order("created_at", { ascending: true })
+        .order("id", { ascending: true })
+        .range(from, from + EVIDENCE_PAGE_SIZE - 1);
+      if (page.error) {
+        throw new PedagogicalWriteError(
+          "aggregation",
+          "AGGREGATION_FAILED",
+          "Could not load evidence history",
+        );
+      }
+      data.push(...(page.data ?? []));
+      if ((page.data ?? []).length < EVIDENCE_PAGE_SIZE) break;
     }
-    const history: AssessmentEvidence[] = (data ?? []).map((row) => ({
+    const history: AssessmentEvidence[] = data.map((row) => ({
       id: row.id,
       skill: pedagogicalSkillSchema.parse(row.skill),
       subskill: row.subskill,
@@ -216,6 +228,7 @@ async function persistEvidenceAndResults(params: {
       evaluatedBy: evaluatorSchema.parse(row.evaluated_by),
       modelVersion: row.model_version,
       rubricVersion: row.rubric_version,
+      createdAt: row.created_at,
     }));
     let result;
     try {

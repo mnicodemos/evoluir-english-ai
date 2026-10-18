@@ -52,7 +52,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       supabaseAdmin
         .from("assessment_evidence")
         .select(
-          "skill, source_type, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, rubric_version",
+          "skill, source_type, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, rubric_version, created_at",
         )
         .eq("user_id", userId)
         .not("item_cefr", "is", null)
@@ -241,6 +241,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
         sampleWeight: Number(row.sample_weight),
         evaluatedBy: row.evaluated_by as AssessmentEvidence["evaluatedBy"],
         rubricVersion: row.rubric_version,
+        createdAt: row.created_at,
       });
       skillsAtLevel.set(skill.data, items);
       byLevel.set(cefr, skillsAtLevel);
