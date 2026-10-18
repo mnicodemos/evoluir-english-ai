@@ -597,14 +597,24 @@ function Dashboard() {
                         }
                       />
                     </svg>
-                    <span className="relative text-center font-display text-sm font-bold leading-none text-foreground lg:text-lg">
-                      <span className="block whitespace-nowrap">
-                        {minutesToday}/{profile.daily_minutes}
+                    {/* Goal reached: the ring fills with a Check in its own colour
+                        instead of the minutes (user request). */}
+                    {minutesToday >= profile.daily_minutes ? (
+                      <Check
+                        className="relative size-8 text-brand-green lg:size-10"
+                        strokeWidth={3}
+                        aria-label={`${minutesToday} of ${profile.daily_minutes} minutes, goal reached`}
+                      />
+                    ) : (
+                      <span className="relative text-center font-display text-sm font-bold leading-none text-foreground lg:text-lg">
+                        <span className="block whitespace-nowrap">
+                          {minutesToday}/{profile.daily_minutes}
+                        </span>
+                        <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
+                          min
+                        </span>
                       </span>
-                      <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
-                        min
-                      </span>
-                    </span>
+                    )}
                   </div>
                   {minutesToday >= profile.daily_minutes && (
                     <p className="mt-1 inline-flex items-center justify-center gap-1 whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-brand-green">
