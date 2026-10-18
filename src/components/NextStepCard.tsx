@@ -22,7 +22,6 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { EvoGuide } from "@/components/EvoGuide";
@@ -385,12 +384,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-4 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
             {/* Top-right of the priority column below xl; from xl it moves to the
                 "Why this matters now" column (see the aside). */}
-            <ScopeBadge
-              kind="continuous"
-              translate={t}
-              className="absolute right-4 top-3.5 hidden sm:inline-flex xl:hidden"
-            />
-            {/* Coach label: white, with the AI icon in the brand colour (the
+{/* Coach label: white, with the AI icon in the brand colour (the
                 AI Teacher's sparkles; a red "!" read as an error, user
                 request). Its own full line on phones, with Practice now beside
                 the priority below; desktop matches "Why this matters now". */}
@@ -500,12 +494,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 badge of Today's Progress (its header centres a 22 px icon inside
                 the card's padding) and in line with Keep improving's badge below
                 (16 px from the card's right edge). */}
-            <ScopeBadge
-              kind="continuous"
-              translate={t}
-              className="absolute right-4 top-3.5 hidden xl:inline-flex 2xl:top-[1.125rem]"
-            />
-            <div className="flex items-center gap-2 xl:pr-24">
+<div className="flex items-center gap-2 xl:pr-24">
               <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
               <h3 className="font-semibold text-sidebar-foreground">{t("Why this matters now")}</h3>
             </div>
