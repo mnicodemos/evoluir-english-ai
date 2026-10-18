@@ -534,3 +534,12 @@ describe("practisedSkills (activities → skills)", () => {
     expect(step.reason).toBe("lowest_score");
   });
 });
+
+describe("reading priority", () => {
+  it("opens the Learning Center when there is no reading lesson to open", () => {
+    const step = buildNextStep({ ...base, skills: [skill("reading", 30)] });
+    expect(step.prioritySkill).toBe("reading");
+    expect(step.activity.to).toBe("/learning");
+    expect(step.activity.to).not.toBe("/teacher");
+  });
+});
