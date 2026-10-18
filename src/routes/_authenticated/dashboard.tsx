@@ -7,6 +7,7 @@ import {
   CalendarCheck2,
   CalendarDays,
   ChartLine,
+  Check,
   ChevronRight,
   CircleCheck,
   ClipboardCheck,
