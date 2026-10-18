@@ -27,6 +27,13 @@ import {
 export type SkillAggregationConfig = {
   minimumEvidenceCount: number;
   minimumEffectiveWeight: number;
+  /**
+   * Recent work counts more (user decision, 2026-10-17): an answer's weight in
+   * the score halves every this many days, so a student who improves sees it.
+   * The minimum-evidence checks and the confidence still use the full weights,
+   * so old evidence never makes a skill "not measured". null turns it off.
+   */
+  recencyHalfLifeDays: number | null;
   ruleset: CefrRuleset;
   confidence: ConfidenceConfig;
 };
@@ -34,6 +41,7 @@ export type SkillAggregationConfig = {
 export const INITIAL_SKILL_AGGREGATION_CONFIG: SkillAggregationConfig = {
   minimumEvidenceCount: 2,
   minimumEffectiveWeight: 0.5,
+  recencyHalfLifeDays: 30,
   ruleset: INITIAL_CEFR_RULESET,
   confidence: INITIAL_CONFIDENCE_CONFIG,
 };
@@ -83,10 +91,24 @@ function practisedLevel(
   return MEASURED_CEFR_LEVELS[Math.min(Math.max(index, 0), MEASURED_CEFR_LEVELS.length - 1)]!;
 }
 
+/** How much an answer counts in the score by its age (1 = new or undated). */
+export function recencyFactor(
+  createdAt: string | null | undefined,
+  halfLifeDays: number | null,
+  asOfMs: number,
+): number {
+  if (!halfLifeDays || !createdAt) return 1;
+  const time = new Date(createdAt).getTime();
+  if (Number.isNaN(time)) return 1;
+  const ageDays = Math.max(0, (asOfMs - time) / 86_400_000);
+  return Math.pow(0.5, ageDays / halfLifeDays);
+}
+
 export function aggregateSkillEvidence(
   skill: PedagogicalSkill,
   evidence: readonly AssessmentEvidence[],
   config: SkillAggregationConfig = INITIAL_SKILL_AGGREGATION_CONFIG,
+  asOfMs: number = Date.now(),
 ): SkillAssessmentResult {
   const validSkill = pedagogicalSkillSchema.parse(skill);
   const validEvidence = evidence.filter((item) => isValidEvidence(item, validSkill));
@@ -113,9 +135,16 @@ export function aggregateSkillEvidence(
     };
   }
 
+  // The score and the practised level weigh recent answers more.
+  const recentEvidence = weightedEvidence.map((item) => ({
+    ...item,
+    effectiveWeight:
+      item.effectiveWeight * recencyFactor(item.createdAt, config.recencyHalfLifeDays, asOfMs),
+  }));
+  const recentWeight = recentEvidence.reduce((sum, item) => sum + item.effectiveWeight, 0);
   const score = Math.round(
-    weightedEvidence.reduce((sum, item) => sum + item.rawScore * item.effectiveWeight, 0) /
-      totalEffectiveWeight,
+    recentEvidence.reduce((sum, item) => sum + item.rawScore * item.effectiveWeight, 0) /
+      recentWeight,
   );
   const confidence = calculateConfidence(
     validEvidence.map((item) => ({
@@ -133,7 +162,7 @@ export function aggregateSkillEvidence(
     score,
     cefr: calibrateCefrToItemLevel(
       cefrForScore(score, config.ruleset),
-      practisedLevel(weightedEvidence),
+      practisedLevel(recentEvidence),
     ),
     confidence,
     evidenceCount: validEvidence.length,

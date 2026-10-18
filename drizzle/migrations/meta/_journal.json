@@ -530,8 +530,8 @@
     {
       "idx": 75,
       "version": "7",
-      "when": 1792370720318,
-      "tag": "0075_league_study_days_reading",
+      "when": 1792286166199,
+      "tag": "0075_league_week_xp_study_days",
       "breakpoints": true
     }
   ]
