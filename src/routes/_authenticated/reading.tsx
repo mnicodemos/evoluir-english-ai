@@ -188,10 +188,10 @@ function ReadingPage() {
   const finish = useMutation({
     mutationFn: (input: { answers: number[]; fallback: boolean }) => finishReading({ data: input }),
     onSuccess: () =>
-      // Streak, rhythm, today's progress and goals read the new activity.
+      // Streak, rhythm, today's progress, goals and this page (now done)
+      // read the new activity.
       queryClient.invalidateQueries({
-        predicate: (query) =>
-          !["daily-reading", "dictionary-v2"].includes(String(query.queryKey[0])),
+        predicate: (query) => String(query.queryKey[0]) !== "dictionary-v2",
       }),
   });
 
@@ -216,8 +216,14 @@ function ReadingPage() {
     [],
   );
   useEffect(() => {
-    setChosen(reading ? reading.questions.map(() => null) : []);
-    setChecked(false);
+    // Already finished today: the page shows it done, with the answers given.
+    const done = reading?.completed ?? null;
+    const given =
+      done?.answers && reading && done.answers.length === reading.questions.length
+        ? done.answers
+        : null;
+    setChosen(reading ? (given ?? reading.questions.map(() => null)) : []);
+    setChecked(!!done);
     setMarked(reading ? readMarked(reading) : []);
     setSelectedWord(null);
   }, [reading]);
@@ -275,7 +281,11 @@ function ReadingPage() {
     (reading?.glossary ?? []).map((item) => [lookupTerm(item.word), item.pt] as const),
   );
   const glossaryTerms = new Set(glossaryPt.keys());
-  const result = reading && checked ? gradeReading(reading.questions, chosen) : null;
+  // No result line for a reading finished before the answers were recorded.
+  const result =
+    reading && checked && chosen.every((value) => value !== null)
+      ? gradeReading(reading.questions, chosen)
+      : null;
   const allAnswered = chosen.length > 0 && chosen.every((value) => value !== null);
 
   return (
@@ -481,7 +491,7 @@ function ReadingPage() {
               <p className="mt-4 rounded-lg bg-secondary/60 px-3 py-2 text-sm font-medium">
                 <span>{t("You got")}</span> {result.right}/{result.total} <span>{t("right.")}</span>
               </p>
-            ) : (
+            ) : checked ? null : (
               <Button
                 type="button"
                 className="mt-4 w-full"
@@ -498,7 +508,7 @@ function ReadingPage() {
                 {t("Check answers")}
               </Button>
             )}
-            {finish.isSuccess ? (
+            {finish.isSuccess || reading.completed ? (
               <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-brand-green">
                 <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
                 {t("Reading done: today counts as a study day.")}

@@ -21,7 +21,7 @@ import {
   type ReadingLevel,
   type ReadingTheme,
 } from "./dailyReading";
-import { studyToday } from "./today";
+import { studyDayStartIso, studyToday } from "./today";
 
 export type DailyReading = {
   day: string;
@@ -29,7 +29,33 @@ export type DailyReading = {
   theme: ReadingTheme;
   /** True when the AI could not write today's text and a fixed one is shown. */
   fallback: boolean;
+  /**
+   * The student already finished today's reading: their answers (when
+   * recorded) and score, so the page shows it done instead of asking again.
+   */
+  completed: { score: number | null; answers: number[] | null } | null;
 } & DailyReadingContent;
+
+/** Today's reading of the student, if they finished it (one per day). */
+async function readCompletion(userId: string): Promise<DailyReading["completed"]> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("activities")
+    .select("score, result")
+    .eq("user_id", userId)
+    .eq("activity_type", "daily_reading")
+    .gte("created_at", studyDayStartIso())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return null;
+  const result = (data.result ?? {}) as { answers?: unknown };
+  const answers =
+    Array.isArray(result.answers) && result.answers.every((value) => Number.isInteger(value))
+      ? (result.answers as number[])
+      : null;
+  return { score: data.score ?? null, answers };
+}
 
 // daily_readings (migration 0072) is read through a loose table type, like the
 // Life+ AI tables in life.functions.ts.
@@ -70,63 +96,72 @@ async function readStored(day: string, level: ReadingLevel) {
 export const loadDailyReading = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<DailyReading> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("level")
-      .eq("id", context.userId)
-      .maybeSingle();
-    const level = readingLevel(profile?.level);
-    const day = studyToday();
-    const theme = readingThemeForDay(day);
-
-    const stored = await readStored(day, level);
-    if (stored?.content) {
-      return {
-        day,
-        level,
-        theme: stored.theme as ReadingTheme,
-        fallback: false,
-        ...stored.content,
-      };
-    }
-
-    let content: DailyReadingContent | null = null;
-    try {
-      const { callGateway } = await import("./ai-gateway.server");
-      const raw = await callGateway(dailyReadingMessages(level, theme, day), true, {
-        userId: context.userId,
-        operation: "lesson_generation",
-        // One shared text per level and day.
-        cacheKey: `daily-reading:${day}:${level}`,
-      });
-      content = parseDailyReading(raw, level);
-      if (!content) console.error("Daily reading: the AI reply did not fit the level");
-    } catch (error) {
-      console.error(
-        `Daily reading could not be written: ${error instanceof Error ? error.message : "unknown"}`,
-      );
-    }
-    if (!content) return { day, level, theme, fallback: true, ...fallbackReading(level) };
-
-    // Another student of this level may have stored it meanwhile: keep theirs.
-    const table = await readings();
-    await table.upsert(
-      { day, level, theme, content },
-      { onConflict: "day,level", ignoreDuplicates: true },
-    );
-    const winner = await readStored(day, level);
-    if (winner?.content) {
-      return {
-        day,
-        level,
-        theme: winner.theme as ReadingTheme,
-        fallback: false,
-        ...winner.content,
-      };
-    }
-    return { day, level, theme, fallback: false, ...content };
+    const [reading, completed] = await Promise.all([
+      todaysReading(context.userId),
+      readCompletion(context.userId),
+    ]);
+    return { ...reading, completed };
   });
+
+/** Today's text for the student's level (the AI writes it once per level). */
+async function todaysReading(userId: string): Promise<Omit<DailyReading, "completed">> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("level")
+    .eq("id", userId)
+    .maybeSingle();
+  const level = readingLevel(profile?.level);
+  const day = studyToday();
+  const theme = readingThemeForDay(day);
+
+  const stored = await readStored(day, level);
+  if (stored?.content) {
+    return {
+      day,
+      level,
+      theme: stored.theme as ReadingTheme,
+      fallback: false,
+      ...stored.content,
+    };
+  }
+
+  let content: DailyReadingContent | null = null;
+  try {
+    const { callGateway } = await import("./ai-gateway.server");
+    const raw = await callGateway(dailyReadingMessages(level, theme, day), true, {
+      userId: userId,
+      operation: "lesson_generation",
+      // One shared text per level and day.
+      cacheKey: `daily-reading:${day}:${level}`,
+    });
+    content = parseDailyReading(raw, level);
+    if (!content) console.error("Daily reading: the AI reply did not fit the level");
+  } catch (error) {
+    console.error(
+      `Daily reading could not be written: ${error instanceof Error ? error.message : "unknown"}`,
+    );
+  }
+  if (!content) return { day, level, theme, fallback: true, ...fallbackReading(level) };
+
+  // Another student of this level may have stored it meanwhile: keep theirs.
+  const table = await readings();
+  await table.upsert(
+    { day, level, theme, content },
+    { onConflict: "day,level", ignoreDuplicates: true },
+  );
+  const winner = await readStored(day, level);
+  if (winner?.content) {
+    return {
+      day,
+      level,
+      theme: winner.theme as ReadingTheme,
+      fallback: false,
+      ...winner.content,
+    };
+  }
+  return { day, level, theme, fallback: false, ...content };
+}
 
 /** The same operation key for a student's reading of a given day (UUID shape). */
 async function readingOperationKey(userId: string, day: string) {
@@ -185,7 +220,7 @@ export const completeDailyReading = createServerFn({ method: "POST" })
       p_duration_minutes: 0,
       p_score: score,
       p_scores: {},
-      p_result: { level, day },
+      p_result: { level, day, answers: data.answers },
     });
     if (error) {
       console.error(`Daily reading could not be recorded: ${error.message}`);
