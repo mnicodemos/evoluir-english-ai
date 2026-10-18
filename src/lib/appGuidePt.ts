@@ -159,8 +159,8 @@ export const appGuidePt: Record<string, string> = {
     "Um ranking amigável com alunos do seu nível, que recomeça toda segunda-feira.",
   "Join the league; other students only see your first name and initial.":
     "Entre na liga; os outros alunos só veem seu primeiro nome e a inicial.",
-  "Earn XP with lessons, texts, Listening, conversations, words and mistakes.":
-    "Ganhe XP com lições, textos, Listening, conversas, palavras e erros revisados.",
+  "Earn XP with lessons, texts, Listening, conversations, the daily reading, words and mistakes, plus a bonus for each study day.":
+    "Ganhe XP com lições, textos, Listening, conversas, a leitura do dia, palavras e erros revisados, mais um bônus por dia de estudo.",
   "Your medal shows your place: gold, silver or bronze for the top three.":
     "Sua medalha mostra sua posição: ouro, prata ou bronze para os três primeiros.",
   "Business English": "Business English",

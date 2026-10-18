@@ -11,7 +11,7 @@ import {
 } from "recharts";
 
 import { supabase } from "@/integrations/supabase/client";
-import { skillBucketOf } from "@/lib/studyDay";
+import { skillBucketOf, type SkillBucket } from "@/lib/studyDay";
 import { useUiLang } from "@/lib/uiLang";
 
 type Props = {
@@ -38,8 +38,15 @@ export function MinutesByDayChart({ userId, level }: Props) {
         day: "2-digit",
         month: "short",
       });
-      type Buckets = { Listening: number; Reading: number; Talking: number; Writing: number };
-      const empty = (): Buckets => ({ Listening: 0, Reading: 0, Talking: 0, Writing: 0 });
+      type Buckets = Record<SkillBucket, number>;
+      const empty = (): Buckets => ({
+        Lessons: 0,
+        Vocabulary: 0,
+        Listening: 0,
+        Reading: 0,
+        Talking: 0,
+        Writing: 0,
+      });
       const totals = new Map<string, Buckets>();
       for (const row of data ?? []) {
         const bucket = skillBucketOf(row.activity_type) as keyof Buckets | null;
@@ -60,7 +67,7 @@ export function MinutesByDayChart({ userId, level }: Props) {
   });
 
   const hasMinutes = (minutesByDay ?? []).some(
-    (d) => d.Listening + d.Reading + d.Talking + d.Writing > 0,
+    (d) => d.Lessons + d.Vocabulary + d.Listening + d.Reading + d.Talking + d.Writing > 0,
   );
 
   if (!hasMinutes) return null;
@@ -97,6 +104,8 @@ export function MinutesByDayChart({ userId, level }: Props) {
               labelClassName="text-foreground"
             />
             <Legend wrapperStyle={{ fontSize: "12px" }} iconSize={10} />
+            <Bar dataKey="Lessons" stackId="min" fill="var(--color-chart-5)" />
+            <Bar dataKey="Vocabulary" stackId="min" fill="oklch(0.68 0.13 25)" />
             <Bar dataKey="Listening" stackId="min" fill="var(--color-chart-1)" />
             <Bar dataKey="Reading" stackId="min" fill="var(--color-chart-2)" />
             <Bar dataKey="Talking" stackId="min" fill="var(--color-chart-3)" />

@@ -121,12 +121,14 @@ export function todayStudyMetrics(rows: StudyDayRows, dayStart: Date) {
 export const ACTIVITY_SKILL_BUCKETS = {
   listening: "Listening",
   listening_practice: "Listening",
-  vocabulary: "Reading",
-  flashcards: "Reading",
-  lesson: "Reading",
-  lesson_practice: "Reading",
-  final_test: "Reading",
-  final_test_practice: "Reading",
+  // Reading is the daily reading only (user decision, 2026-10-17); lessons and
+  // words have their own colours.
+  vocabulary: "Vocabulary",
+  flashcards: "Vocabulary",
+  lesson: "Lessons",
+  lesson_practice: "Lessons",
+  final_test: "Lessons",
+  final_test_practice: "Lessons",
   reading: "Reading",
   conversation: "Talking",
   conversation_practice: "Talking",
@@ -135,7 +137,10 @@ export const ACTIVITY_SKILL_BUCKETS = {
   teacher: "Writing",
   mistakes_review: "Writing",
   video_call: "Talking",
-} as const satisfies Record<string, "Listening" | "Reading" | "Talking" | "Writing">;
+} as const satisfies Record<
+  string,
+  "Listening" | "Reading" | "Talking" | "Writing" | "Lessons" | "Vocabulary"
+>;
 
 export type SkillBucket = (typeof ACTIVITY_SKILL_BUCKETS)[keyof typeof ACTIVITY_SKILL_BUCKETS];
 
