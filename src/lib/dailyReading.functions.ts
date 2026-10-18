@@ -22,8 +22,8 @@ export type DailyReading = {
   fallback: boolean;
 } & DailyReadingContent;
 
-// daily_readings (migration 0073) is not in the generated types until Lovable
-// regenerates them, like the Life+ AI tables in life.functions.ts.
+// daily_readings (migration 0072) is read through a loose table type, like the
+// Life+ AI tables in life.functions.ts.
 type LooseQuery = PromiseLike<{ data: unknown; error: { message: string } | null }> & {
   select: (columns: string) => LooseQuery;
   eq: (column: string, value: unknown) => LooseQuery;
