@@ -205,7 +205,7 @@ function Mistakes() {
                 {due.length + (outcome ? 1 : 0)}
               </span>
             </div>
-  
+
             {isLoading ? (
               <div className="space-y-3 py-2" aria-busy="true">
                 <Skeleton className="h-5 w-2/3" />
@@ -350,11 +350,12 @@ function Mistakes() {
             <section className="card-soft p-3 sm:p-5">
               <h2 className="font-display text-base font-semibold sm:text-lg">Frequent mistakes</h2>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-                {(showAllMistakes ? learning.common_errors : learning.common_errors.slice(0, 5)).map(
-                  (error: string, i: number) => (
-                    <li key={i}>{error}</li>
-                  ),
-                )}
+                {(showAllMistakes
+                  ? learning.common_errors
+                  : learning.common_errors.slice(0, 5)
+                ).map((error: string, i: number) => (
+                  <li key={i}>{error}</li>
+                ))}
               </ul>
               {learning.common_errors.length > 5 && (
                 <button
