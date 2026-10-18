@@ -348,9 +348,7 @@ function Mistakes() {
 
         {learning?.common_errors && learning.common_errors.length > 0 && (
           <section className="card-soft p-3 sm:p-5 lg:col-start-1">
-            <h2 className="font-display text-base font-semibold sm:text-lg">
-              Frequent mistakes
-            </h2>
+            <h2 className="font-display text-base font-semibold sm:text-lg">Frequent mistakes</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
               {(showAllMistakes
                 ? learning.common_errors
@@ -366,9 +364,7 @@ function Mistakes() {
                 aria-expanded={showAllMistakes}
                 className="mt-2 min-h-11 text-xs font-medium text-brand-green hover:underline sm:text-sm"
               >
-                {showAllMistakes
-                  ? "Show less"
-                  : `Show all (${learning.common_errors.length})`}
+                {showAllMistakes ? "Show less" : `Show all (${learning.common_errors.length})`}
               </button>
             )}
           </section>
