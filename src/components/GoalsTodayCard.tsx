@@ -345,14 +345,14 @@ function GoalTile({
           <span
             key={item.day}
             className={cn(
-              "size-1.5 rounded-full",
+              "size-2.5 rounded-full",
               item.done ? "bg-brand-green" : "bg-muted-foreground/25",
               index === week.days.length - 1 && !item.done && "ring-1 ring-brand-green/60",
             )}
           />
         ))}
       </span>
-      <span className={cn("text-[10px] font-medium text-muted-foreground", !always && "sr-only")}>
+      <span className={cn("text-xs font-medium text-muted-foreground", !always && "sr-only")}>
         {t("{n} of 7 days").replace("{n}", String(week.doneCount))}
       </span>
       {week.streak >= 2 ? (
@@ -398,7 +398,7 @@ function GoalTile({
             {step?.text ?? "…"}
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-muted-foreground">{t("Last 7 days")}</span>
+            <span className="text-xs text-muted-foreground">{t("Last 7 days")}</span>
             {week7(true)}
           </div>
           {dayNoteLine}
