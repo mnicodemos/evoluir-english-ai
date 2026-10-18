@@ -194,7 +194,8 @@ function Mistakes() {
           }
         />
 
-        <section className="card-soft space-y-3 p-3 sm:p-5">
+        <div className="space-y-3 lg:col-start-1 lg:row-start-2">
+          <section className="card-soft space-y-3 p-3 sm:p-5">
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
               <Target className="size-4 text-primary sm:size-5" />
@@ -346,8 +347,8 @@ function Mistakes() {
           )}
         </section>
 
-        {learning?.common_errors && learning.common_errors.length > 0 && (
-          <section className="card-soft p-3 sm:p-5 lg:col-start-1 lg:row-start-3">
+          {learning?.common_errors && learning.common_errors.length > 0 && (
+          <section className="card-soft p-3 sm:p-5">
             <h2 className="font-display text-base font-semibold sm:text-lg">Frequent mistakes</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
               {(showAllMistakes ? learning.common_errors : learning.common_errors.slice(0, 5)).map(
@@ -368,6 +369,8 @@ function Mistakes() {
             )}
           </section>
         )}
+
+        </div>
 
         <aside className="card-soft space-y-2 p-3 sm:p-5 lg:col-start-2 lg:row-start-2">
           <div className="flex items-center justify-between gap-2">
