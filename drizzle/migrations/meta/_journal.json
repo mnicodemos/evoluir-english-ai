@@ -505,6 +505,13 @@
       "when": 1792195357683,
       "tag": "0071_life_habit_study_day",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1792282633278,
+      "tag": "0072_daily_readings",
+      "breakpoints": true
     }
   ]
 }

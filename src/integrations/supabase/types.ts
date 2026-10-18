@@ -469,6 +469,30 @@ export type Database = {
           },
         ]
       }
+      daily_readings: {
+        Row: {
+          content: Json
+          created_at: string
+          day: string
+          level: string
+          theme: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          day: string
+          level: string
+          theme: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          day?: string
+          level?: string
+          theme?: string
+        }
+        Relationships: []
+      }
       entitlements: {
         Row: {
           created_at: string
