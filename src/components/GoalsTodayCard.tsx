@@ -232,6 +232,7 @@ export function GoalsTodayCard() {
               icon={SLOT_ICONS.habit}
               title={shownHabit.title}
               done={habitDoneToday(life, shownHabit.id)}
+              hideActionInPopup
               details={
                 <div className="space-y-3">
                   {shownHabit.category ? (
