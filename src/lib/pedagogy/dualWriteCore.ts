@@ -26,7 +26,14 @@ import {
 } from "./dualWrite";
 
 type AdminClient = SupabaseClient<Database>;
-type SourceType = "quiz" | "writing" | "teacher" | "listening" | "speaking" | "pronunciation";
+type SourceType =
+  | "quiz"
+  | "writing"
+  | "teacher"
+  | "listening"
+  | "speaking"
+  | "pronunciation"
+  | "reading";
 type FailureStage =
   | "source"
   | "authorization"
@@ -484,7 +491,7 @@ export async function persistTeacherEvidence(params: {
  */
 export async function persistActivityEvidence(params: {
   userId: string;
-  sourceType: "listening" | "speaking" | "pronunciation";
+  sourceType: "listening" | "speaking" | "pronunciation" | "reading";
   operationKey: string;
   evidence: AssessmentEvidence[];
   rubricVersion: string;

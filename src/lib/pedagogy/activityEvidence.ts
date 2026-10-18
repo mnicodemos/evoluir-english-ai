@@ -10,6 +10,7 @@ import type { AssessmentEvidence } from "./contracts";
 export const LISTENING_RUBRIC_VERSION = "listening-answer-v1";
 export const SPEAKING_RUBRIC_VERSION = "speaking-conversation-v1";
 export const PRONUNCIATION_RUBRIC_VERSION = "pronunciation-similarity-v1";
+export const DAILY_READING_RUBRIC_VERSION = "daily-reading-answer-v1";
 export const SPEAKING_MODEL_VERSION = "gemini-conversation-report-v1";
 
 const score = (value: number) => Math.min(100, Math.max(0, Math.round(value)));
@@ -148,4 +149,32 @@ export function pronunciationEvidence(input: {
       metadata: { criterion: "word_pronunciation" },
     },
   ];
+}
+
+/**
+ * Daily reading: one piece of reading evidence per comprehension question,
+ * right or wrong, like a quiz answer. The questions follow the student's level
+ * (READING_SPECS), so the item level is the reading's level.
+ */
+export function dailyReadingEvidence(input: {
+  correct: readonly boolean[];
+  day: string;
+  itemCefr?: MeasuredCefrLevel | null;
+}): AssessmentEvidence[] {
+  return input.correct.map((isCorrect, index) => ({
+    skill: "reading" as const,
+    subskill: "reading_comprehension",
+    sourceType: "reading" as const,
+    evidenceType: "answer" as const,
+    polarity: isCorrect ? ("positive" as const) : ("negative" as const),
+    itemCefr: input.itemCefr ?? null,
+    rawScore: isCorrect ? 100 : 0,
+    // Same weights as a lesson quiz answer: a deterministic, item-level signal.
+    sourceReliability: 1,
+    evidenceQuality: 0.9,
+    sampleWeight: 1,
+    evaluatedBy: "deterministic" as const,
+    rubricVersion: DAILY_READING_RUBRIC_VERSION,
+    metadata: { day: input.day, question: index + 1, isCorrect },
+  }));
 }

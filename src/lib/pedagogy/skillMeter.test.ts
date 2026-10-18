@@ -3,9 +3,15 @@ import { describe, expect, it } from "vitest";
 import { skillMeterRows } from "./skillMeter";
 
 describe("skill meter", () => {
-  it("shows the four card skills in order, unmeasured when there is no evidence", () => {
+  it("shows the five card skills in order, unmeasured when there is no evidence", () => {
     const rows = skillMeterRows([], null);
-    expect(rows.map((row) => row.skill)).toEqual(["listening", "speaking", "writing", "grammar"]);
+    expect(rows.map((row) => row.skill)).toEqual([
+      "listening",
+      "speaking",
+      "reading",
+      "writing",
+      "grammar",
+    ]);
     expect(rows.every((row) => row.value === null && row.status === "not_measured")).toBe(true);
   });
 
@@ -22,6 +28,7 @@ describe("skill meter", () => {
       [
         { skill: "listening", score: 91.4, cefrLevel: "B2", evidenceCount: 12 },
         { skill: "speaking", score: 58, cefrLevel: "B1", evidenceCount: 3 },
+        { skill: "reading", score: 67, cefrLevel: "B1", evidenceCount: 3 },
         { skill: "writing", score: 70, cefrLevel: "B2", evidenceCount: 4 },
         { skill: "grammar", score: 40, cefrLevel: "A2", evidenceCount: 6 },
       ],
@@ -30,6 +37,7 @@ describe("skill meter", () => {
     expect(rows.map((row) => [row.skill, row.value, row.status])).toEqual([
       ["listening", 91, "strong"],
       ["speaking", 58, "priority"],
+      ["reading", 67, "on_track"],
       ["writing", 70, "on_track"],
       ["grammar", 40, "needs_work"],
     ]);
@@ -56,7 +64,8 @@ describe("skillMeterRows after a level change", () => {
       undefined,
       "c1",
     );
-    const [listening, speaking, writing] = rows;
+    const pick = (skill: string) => rows.find((row) => row.skill === skill);
+    const [listening, speaking, writing] = [pick("listening"), pick("speaking"), pick("writing")];
     expect(listening).toMatchObject({ value: null, status: "priority", evidenceCount: 0 });
     expect(speaking).toMatchObject({ value: null, status: "not_measured" });
     expect(writing).toMatchObject({ value: 81, status: "on_track", evidenceCount: 3 });
