@@ -163,11 +163,10 @@ const FALLBACK_BY_SKILL: Record<string, { action: NextStepAction; activity: Next
     activity: { type: "vocabulary", title: "Vocabulary", to: "/vocabulary" },
   },
   // Reading had no practice surface, so a Reading priority opened the AI
-  // Teacher (user report, 2026-10-17). Its lessons live in the Learning
-  // Center until the daily reading exists.
+  // Teacher (user report, 2026-10-17); it now opens the daily reading.
   reading: {
     action: "review_lesson",
-    activity: { type: "learning", title: "Learning Center", to: "/learning" },
+    activity: { type: "learning", title: "Daily reading", to: "/reading" },
   },
 };
 

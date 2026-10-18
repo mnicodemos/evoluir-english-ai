@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BookMarked,
   BookOpen,
+  BookOpenText,
   Briefcase,
   CalendarCheck,
   ChartLine,
@@ -55,6 +56,7 @@ const ICONS: Record<GuideIcon, typeof House> = {
   path: GraduationCap,
   vocabulary: BookOpen,
   listening: Headphones,
+  reading: BookOpenText,
   writing: PenLine,
   mistakes: SpellCheck,
   speaking: MessageSquareText,

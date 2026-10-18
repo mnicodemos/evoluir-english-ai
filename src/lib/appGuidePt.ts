@@ -40,6 +40,18 @@ export const appGuidePt: Record<string, string> = {
     "Toque a frase; você pode ouvir de novo quantas vezes precisar.",
   "Repeat it out loud and see how close you were.":
     "Repita em voz alta e veja o quanto chegou perto.",
+  "A short text at your level every day: a motivational text one day, an everyday story the next.":
+    "Um texto curto no seu nível todos os dias: um dia, um texto motivacional; no outro, uma história do cotidiano.",
+  "Read the text; it gets longer and richer as your level goes up.":
+    "Leia o texto; ele fica mais longo e mais rico conforme seu nível sobe.",
+  "Tap Listen to EVO to hear it read aloud.":
+    "Toque em Ouvir a EVO para escutar o texto em voz alta.",
+  "Tap an underlined word to see its meaning, or show the full translation.":
+    "Toque numa palavra sublinhada para ver o significado, ou mostre a tradução completa.",
+  "Answer the questions to check what you understood.":
+    "Responda às perguntas para conferir o que você entendeu.",
+  "When EVO's priority is Reading, Practice now opens the daily reading.":
+    "Quando a prioridade da EVO é Reading, Praticar agora abre a leitura do dia.",
   "Three Listening sessions complete a study day.":
     "Três sessões de Listening completam um dia de estudo.",
   Writing: "Escrita",

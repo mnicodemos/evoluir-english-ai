@@ -11,6 +11,7 @@ export type GuideIcon =
   | "path"
   | "vocabulary"
   | "listening"
+  | "reading"
   | "writing"
   | "mistakes"
   | "speaking"
@@ -89,6 +90,20 @@ export const APP_GUIDE: GuideSection[] = [
       "Three Listening sessions complete a study day.",
     ],
     to: "/listening",
+  },
+  {
+    id: "reading",
+    icon: "reading",
+    title: "Daily reading",
+    what: "A short text at your level every day: a motivational text one day, an everyday story the next.",
+    steps: [
+      "Read the text; it gets longer and richer as your level goes up.",
+      "Tap Listen to EVO to hear it read aloud.",
+      "Tap an underlined word to see its meaning, or show the full translation.",
+      "Answer the questions to check what you understood.",
+    ],
+    tip: "When EVO's priority is Reading, Practice now opens the daily reading.",
+    to: "/reading",
   },
   {
     id: "writing",
