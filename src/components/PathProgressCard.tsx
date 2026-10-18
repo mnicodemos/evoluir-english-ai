@@ -213,7 +213,6 @@ export function PathProgressCard({
           </h2>
           {/* Desktop: a reminder that the scores carry on across levels, in the
               header so the card keeps its height. My Progress says it in full. */}
-          <ScopeBadge kind="continuous" translate={t} className="hidden lg:inline-flex" />
           {/* Phones hide the header's level card, so the level the scores
               belong to sits here; it opens the learning path. */}
           {profile?.level && (
