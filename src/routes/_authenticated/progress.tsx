@@ -31,7 +31,7 @@ interface RecentActivity {
   score: number | null;
 }
 
-// Keep chart code lazy-loaded; it mounts when the Overview tab is opened.
+// Keep chart code lazy-loaded; it mounts with the Overview content.
 const EvolutionChart = lazy(() =>
   import("@/components/EvolutionChart").then((m) => ({ default: m.EvolutionChart })),
 );
@@ -60,14 +60,12 @@ function ProgressPage() {
   const { data: profile } = useProfile();
   const { lang } = useUiLang();
   const t = (s: string) => (lang === "pt" ? ((uiPt as Record<string, string>)[s] ?? s) : s);
-  // Inline pt/en for the few new strings, so the shared dictionary stays untouched.
   const L = (en: string, pt: string) => (lang === "pt" ? pt : en);
   const [viewLevel, setViewLevel] = useState<string | null>(null);
   const [tab, setTab] = usePersistentState<string>("progress-tab", "overview");
+  // Existing browsers may still have History stored as the last selected tab.
   const visibleTab = tab === "history" ? "overview" : tab;
 
-  // Same evidence-based skills as the Dashboard card (shared next-step cache),
-  // never the old best-ever scores; the chart below reads the assessed history.
   const { data: nextStep, isLoading } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
     queryFn: () => loadNextStep({ data: undefined }),
@@ -76,7 +74,6 @@ function ProgressPage() {
   });
   const { data: history } = useSkillHistory(profile?.id);
   const [chosenChart, setChartView] = useState<"scores" | "minutes" | null>(null);
-  // Scores first when there is assessed history; otherwise the minutes chart.
   const chartView = chosenChart ?? (history && history.length > 0 ? "scores" : "minutes");
 
   const { data: recent } = useQuery({
@@ -94,9 +91,6 @@ function ProgressPage() {
     },
   });
 
-  // Learning is continuous: "Overall" shows each skill's latest score (the
-  // same numbers as the Dashboard). A level chip shows only what was practised
-  // at that level, for the levels reached so far, without changing level.
   const currentLevel = findLevel(profile?.level).value.toUpperCase();
   const maxIndex = LEVELS.findIndex(
     (level) => level.value === findLevel(profile?.max_level ?? profile?.level).value,
@@ -130,12 +124,12 @@ function ProgressPage() {
     <AppShell mobileOneScreen>
       <PageHeader icon={TrendingUp} title={t("My Progress")} />
 
-      {/* Overview groups progress insights together; the learning journey remains separate. */}
       <Tabs value={visibleTab} onValueChange={setTab} className="mt-3 sm:mt-4">
         <TabsList>
           <TabsTrigger value="overview">{L("Overview", "Visão geral")}</TabsTrigger>
           <TabsTrigger value="journey">{L("Journey", "Jornada")}</TabsTrigger>
         </TabsList>
+
         <TabsContent value="overview">
           {isLoading ? (
             <Skeleton className="mt-4 h-72 w-full sm:mt-7" />
@@ -205,8 +199,6 @@ function ProgressPage() {
                           )}
                         </div>
                         {s.value === null ? (
-                          // Same words as the Dashboard card: a skill without a
-                          // measurement says so, instead of an empty bar.
                           <p className="mt-1 truncate text-[11px] leading-tight text-muted-foreground sm:mt-1.5 sm:text-xs">
                             {shownLevel
                               ? t("Not measured at {level}").replace("{level}", shownLevel)
@@ -316,6 +308,7 @@ function ProgressPage() {
                 </div>
               </div>
             </section>
+
             {recent && recent.length > 0 && (
               <section className="card-soft p-3 sm:p-5">
                 <h2 className="font-display text-base font-semibold sm:text-lg">
@@ -341,12 +334,43 @@ function ProgressPage() {
                               return label.charAt(0).toUpperCase() + label.slice(1);
                             })()
                           )}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {formatDate(a.created_at, lang)} · {a.duration_minutes} min
+                        </span>
+                      </span>
+                      {a.score == null && (
+                        <span
+                          className="shrink-0 text-muted-foreground"
+                          aria-label={L("No score", "Sem nota")}
+                        >
+                          —
+                        </span>
+                      )}
+                      {a.score != null && (
+                        <span
+                          className={`shrink-0 font-semibold ${
+                            a.score >= 70
+                              ? "text-[oklch(0.55_0.14_158)]"
+                              : a.score >= 50
+                                ? "text-warning"
+                                : "text-destructive"
+                          }`}
+                        >
+                          {a.score}%
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </div>
         </TabsContent>
+
         <TabsContent value="journey">
           <LearningJourneyCard />
         </TabsContent>
-
       </Tabs>
     </AppShell>
   );
