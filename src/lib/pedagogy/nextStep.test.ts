@@ -543,3 +543,15 @@ describe("reading priority", () => {
     expect(step.activity.to).not.toBe("/teacher");
   });
 });
+
+describe("daily activity already done today", () => {
+  it("lets the next skill lead while today's reading is done", () => {
+    const skills = [skill("reading", 55), skill("speaking", 43)];
+    expect(buildNextStep({ ...base, skills }).prioritySkill).toBe("speaking");
+    const lowEvidence = [{ ...skill("reading", 55), confidence: 0.2 }, skill("speaking", 43)];
+    expect(buildNextStep({ ...base, skills: lowEvidence }).prioritySkill).toBe("reading");
+    expect(
+      buildNextStep({ ...base, skills: lowEvidence, doneForToday: ["reading"] }).prioritySkill,
+    ).toBe("speaking");
+  });
+});
