@@ -6,12 +6,9 @@ import { CheckCircle2, TrendingUp, TriangleAlert } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { FrequencyCalendar } from "@/components/FrequencyCalendar";
-import { LearningJourneyCard } from "@/components/LearningJourneyCard";
 
 import { Progress as Bar } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { usePersistentState } from "@/hooks/usePersistentState";
 import { useProfile } from "@/hooks/useProfile";
 import { useSkillHistory } from "@/hooks/useSkillHistory";
 import { useUiLang } from "@/lib/uiLang";
@@ -62,9 +59,6 @@ function ProgressPage() {
   const t = (s: string) => (lang === "pt" ? ((uiPt as Record<string, string>)[s] ?? s) : s);
   const L = (en: string, pt: string) => (lang === "pt" ? pt : en);
   const [viewLevel, setViewLevel] = useState<string | null>(null);
-  const [tab, setTab] = usePersistentState<string>("progress-tab", "overview");
-  // Existing browsers may still have History stored as the last selected tab.
-  const visibleTab = tab === "history" ? "overview" : tab;
 
   const { data: nextStep, isLoading } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
@@ -124,13 +118,7 @@ function ProgressPage() {
     <AppShell mobileOneScreen>
       <PageHeader icon={TrendingUp} title={t("My Progress")} />
 
-      <Tabs value={visibleTab} onValueChange={setTab} className="mt-3 sm:mt-4">
-        <TabsList>
-          <TabsTrigger value="overview">{L("Overview", "Visão geral")}</TabsTrigger>
-          <TabsTrigger value="journey">{L("Journey", "Jornada")}</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview">
+      <div className="mt-3 sm:mt-4">
           {isLoading ? (
             <Skeleton className="mt-4 h-72 w-full sm:mt-7" />
           ) : (
@@ -366,12 +354,7 @@ function ProgressPage() {
               </section>
             )}
           </div>
-        </TabsContent>
-
-        <TabsContent value="journey">
-          <LearningJourneyCard />
-        </TabsContent>
-      </Tabs>
+      </div>
     </AppShell>
   );
 }
