@@ -812,6 +812,7 @@ const baseUiPt: Record<string, string> = {
   Practise: "Praticar",
   "Practise in English": "Praticar em inglês",
   "Last 7 days": "Últimos 7 dias",
+  "Not completed": "Não concluído",
   "Complete step": "Concluir passo",
   "Step done!": "Passo feito!",
   Undo: "Desfazer",
