@@ -240,27 +240,26 @@ export function GoalsTodayCard() {
                     </p>
                   ) : null}
                   <div className="space-y-2">
-                    <p className="text-xs font-semibold text-brand-green">{t("Last 7 days")}</p>
-                    <div className="grid grid-cols-7 gap-1.5">
-                      {habitHistory.map((item) => (
-                        <div key={item.day} className="flex min-w-0 flex-col items-center gap-1">
-                          <span className="text-[10px] text-muted-foreground">
-                            {item.label.replace(".", "")}
-                          </span>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <span>{t("Last 7 days")}</span>
+                      <div className="flex items-center gap-1" aria-label={t("Last 7 days")}>
+                        {habitHistory.map((item) => (
                           <span
+                            key={item.day}
                             className={cn(
-                              "grid size-6 place-items-center rounded-full text-[10px] font-semibold",
+                              "size-2.5 rounded-full border",
                               item.done
-                                ? "bg-brand-green text-sidebar"
-                                : "bg-secondary text-muted-foreground",
+                                ? "border-brand-green bg-brand-green"
+                                : "border-transparent bg-muted-foreground/30",
                             )}
                             title={`${item.day}: ${item.done ? t("Completed") : t("Not completed")}`}
                             aria-label={`${item.day}: ${item.done ? t("Completed") : t("Not completed")}`}
-                          >
-                            {item.done ? "✓" : "—"}
-                          </span>
-                        </div>
-                      ))}
+                          />
+                        ))}
+                      </div>
+                      <span>
+                        {habitHistory.filter((item) => item.done).length} {t("of")} 7 {t("days")}
+                      </span>
                     </div>
                   </div>
                 </div>
