@@ -224,7 +224,7 @@ function ProgressPage() {
                 </section>
                 <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
                   <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
-                    <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" />{" "}
+                    <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" />
                     {t("To improve")}
                   </h2>
                   <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
@@ -247,8 +247,7 @@ function ProgressPage() {
         <div className="mt-3 grid items-start gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-2">
           <section className="card-soft min-w-0 p-3 sm:p-5">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-display text-base font-semibold sm:text-lg">
-                {t("Evolution")}</h2>
+              <h2 className="font-display text-base font-semibold sm:text-lg">{t("Evolution")}</h2>
               <div
                 className="flex rounded-lg bg-secondary p-0.5 text-xs xl:hidden"
                 role="group"
