@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
@@ -14,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { PlacementTest } from "@/components/onboarding/PlacementTest";
+import { recordPlacementEvidence } from "@/lib/placementEvidence.functions";
 import { placementComplete, scorePlacement } from "@/lib/placementTest";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -58,6 +60,7 @@ function Onboarding() {
   // One of the offered options, so a choice is visibly selected from the start.
   const [minutes, setMinutes] = useState(20);
   const [saving, setSaving] = useState(false);
+  const recordPlacement = useServerFn(recordPlacementEvidence);
 
   const result = scorePlacement(answers);
   const level = result.level.value;
@@ -84,6 +87,11 @@ function Onboarding() {
         })
         .eq("id", profile.id);
       if (error) throw error;
+      // The test's answers become the first Listening and Grammar evidence
+      // (audit item 12); never blocks the start.
+      if (testDone) {
+        await recordPlacement({ data: { answers } }).catch(() => undefined);
+      }
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
       navigate({ to, replace: true });
     } catch (err) {
