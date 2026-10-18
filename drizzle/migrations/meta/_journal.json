@@ -509,8 +509,8 @@
     {
       "idx": 72,
       "version": "7",
-      "when": 1792281757683,
-      "tag": "0073_daily_readings",
+      "when": 1792282633278,
+      "tag": "0072_daily_readings",
       "breakpoints": true
     }
   ]
