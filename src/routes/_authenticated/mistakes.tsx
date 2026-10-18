@@ -369,7 +369,7 @@ function Mistakes() {
           </section>
         )}
 
-        <aside className="card-soft space-y-2 p-3 sm:p-5">
+        <aside className="card-soft space-y-2 p-3 sm:p-5 lg:col-start-2 lg:row-start-2">
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-display flex items-center gap-2 text-base font-semibold">
               <RotateCcw className="size-4 text-primary" />
