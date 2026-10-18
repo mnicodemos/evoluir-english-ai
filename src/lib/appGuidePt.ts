@@ -48,6 +48,8 @@ export const appGuidePt: Record<string, string> = {
     "Toque em Ouvir a EVO para escutar o texto em voz alta.",
   "Tap any word you don't understand to see its translation; the words you tap stay marked for the day.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução; as palavras tocadas ficam marcadas no dia.",
+  "Your answers are your Reading score and close your study day.":
+    "Suas respostas formam a sua nota de Reading e fecham o seu dia de estudo.",
   "Answer the questions to check what you understood.":
     "Responda às perguntas para conferir o que você entendeu.",
   "When EVO's priority is Reading, Practice now opens the daily reading.":
@@ -173,8 +175,8 @@ export const appGuidePt: Record<string, string> = {
   "My progress": "Meu progresso",
   "Your skills, your history and your study calendar.":
     "Suas habilidades, seu histórico e seu calendário de estudo.",
-  "See your scores in listening, speaking, writing and grammar.":
-    "Veja suas notas em listening, speaking, writing e gramática.",
+  "See your scores in listening, speaking, reading, writing, grammar and vocabulary.":
+    "Veja suas notas de listening, speaking, reading, writing, gramática e vocabulário.",
   "Choose a level to see what you practised there.":
     "Escolha um nível para ver o que você praticou nele.",
   "Check the calendar: every marked day is a study day.":
