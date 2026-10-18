@@ -24,7 +24,6 @@ import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
 import { Route as AuthenticatedGuideRouteImport } from './routes/_authenticated/guide'
-import { Route as AuthenticatedReadingRouteImport } from './routes/_authenticated/reading'
 import { Route as AuthenticatedLeagueRouteImport } from './routes/_authenticated/league'
 import { Route as AuthenticatedListeningRouteImport } from './routes/_authenticated/listening'
 import { Route as AuthenticatedMistakesRouteImport } from './routes/_authenticated/mistakes'
@@ -32,6 +31,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPlusRouteImport } from './routes/_authenticated/plus'
 import { Route as AuthenticatedPremiumRouteImport } from './routes/_authenticated/premium'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
+import { Route as AuthenticatedReadingRouteImport } from './routes/_authenticated/reading'
 import { Route as AuthenticatedStudyPlanRouteImport } from './routes/_authenticated/study-plan'
 import { Route as AuthenticatedTeacherRouteImport } from './routes/_authenticated/teacher'
 import { Route as AuthenticatedVocabularyRouteImport } from './routes/_authenticated/vocabulary'
@@ -128,11 +128,6 @@ const AuthenticatedGuideRoute = AuthenticatedGuideRouteImport.update({
   path: '/guide',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedReadingRoute = AuthenticatedReadingRouteImport.update({
-  id: '/reading',
-  path: '/reading',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedLeagueRoute = AuthenticatedLeagueRouteImport.update({
   id: '/league',
   path: '/league',
@@ -166,6 +161,11 @@ const AuthenticatedPremiumRoute = AuthenticatedPremiumRouteImport.update({
 const AuthenticatedProgressRoute = AuthenticatedProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReadingRoute = AuthenticatedReadingRouteImport.update({
+  id: '/reading',
+  path: '/reading',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedStudyPlanRoute = AuthenticatedStudyPlanRouteImport.update({
@@ -291,7 +291,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/goals': typeof AuthenticatedGoalsRoute
   '/guide': typeof AuthenticatedGuideRoute
-  '/reading': typeof AuthenticatedReadingRoute
   '/league': typeof AuthenticatedLeagueRoute
   '/listening': typeof AuthenticatedListeningRoute
   '/mistakes': typeof AuthenticatedMistakesRoute
@@ -299,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/plus': typeof AuthenticatedPlusRoute
   '/premium': typeof AuthenticatedPremiumRoute
   '/progress': typeof AuthenticatedProgressRoute
+  '/reading': typeof AuthenticatedReadingRoute
   '/study-plan': typeof AuthenticatedStudyPlanRoute
   '/teacher': typeof AuthenticatedTeacherRoute
   '/vocabulary': typeof AuthenticatedVocabularyRoute
@@ -335,7 +335,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/goals': typeof AuthenticatedGoalsRoute
   '/guide': typeof AuthenticatedGuideRoute
-  '/reading': typeof AuthenticatedReadingRoute
   '/league': typeof AuthenticatedLeagueRoute
   '/listening': typeof AuthenticatedListeningRoute
   '/mistakes': typeof AuthenticatedMistakesRoute
@@ -343,6 +342,7 @@ export interface FileRoutesByTo {
   '/plus': typeof AuthenticatedPlusRoute
   '/premium': typeof AuthenticatedPremiumRoute
   '/progress': typeof AuthenticatedProgressRoute
+  '/reading': typeof AuthenticatedReadingRoute
   '/study-plan': typeof AuthenticatedStudyPlanRoute
   '/teacher': typeof AuthenticatedTeacherRoute
   '/vocabulary': typeof AuthenticatedVocabularyRoute
@@ -381,7 +381,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/goals': typeof AuthenticatedGoalsRoute
   '/_authenticated/guide': typeof AuthenticatedGuideRoute
-  '/_authenticated/reading': typeof AuthenticatedReadingRoute
   '/_authenticated/league': typeof AuthenticatedLeagueRoute
   '/_authenticated/listening': typeof AuthenticatedListeningRoute
   '/_authenticated/mistakes': typeof AuthenticatedMistakesRoute
@@ -389,6 +388,7 @@ export interface FileRoutesById {
   '/_authenticated/plus': typeof AuthenticatedPlusRoute
   '/_authenticated/premium': typeof AuthenticatedPremiumRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
+  '/_authenticated/reading': typeof AuthenticatedReadingRoute
   '/_authenticated/study-plan': typeof AuthenticatedStudyPlanRoute
   '/_authenticated/teacher': typeof AuthenticatedTeacherRoute
   '/_authenticated/vocabulary': typeof AuthenticatedVocabularyRoute
@@ -427,7 +427,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/goals'
     | '/guide'
-    | '/reading'
     | '/league'
     | '/listening'
     | '/mistakes'
@@ -435,6 +434,7 @@ export interface FileRouteTypes {
     | '/plus'
     | '/premium'
     | '/progress'
+    | '/reading'
     | '/study-plan'
     | '/teacher'
     | '/vocabulary'
@@ -471,7 +471,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/goals'
     | '/guide'
-    | '/reading'
     | '/league'
     | '/listening'
     | '/mistakes'
@@ -479,6 +478,7 @@ export interface FileRouteTypes {
     | '/plus'
     | '/premium'
     | '/progress'
+    | '/reading'
     | '/study-plan'
     | '/teacher'
     | '/vocabulary'
@@ -516,7 +516,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/goals'
     | '/_authenticated/guide'
-    | '/_authenticated/reading'
     | '/_authenticated/league'
     | '/_authenticated/listening'
     | '/_authenticated/mistakes'
@@ -524,6 +523,7 @@ export interface FileRouteTypes {
     | '/_authenticated/plus'
     | '/_authenticated/premium'
     | '/_authenticated/progress'
+    | '/_authenticated/reading'
     | '/_authenticated/study-plan'
     | '/_authenticated/teacher'
     | '/_authenticated/vocabulary'
@@ -669,13 +669,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGuideRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/reading': {
-      id: '/_authenticated/reading'
-      path: '/reading'
-      fullPath: '/reading'
-      preLoaderRoute: typeof AuthenticatedReadingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/league': {
       id: '/_authenticated/league'
       path: '/league'
@@ -723,6 +716,13 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/progress'
       preLoaderRoute: typeof AuthenticatedProgressRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reading': {
+      id: '/_authenticated/reading'
+      path: '/reading'
+      fullPath: '/reading'
+      preLoaderRoute: typeof AuthenticatedReadingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/study-plan': {
@@ -877,7 +877,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
   AuthenticatedGuideRoute: typeof AuthenticatedGuideRoute
-  AuthenticatedReadingRoute: typeof AuthenticatedReadingRoute
   AuthenticatedLeagueRoute: typeof AuthenticatedLeagueRoute
   AuthenticatedListeningRoute: typeof AuthenticatedListeningRoute
   AuthenticatedMistakesRoute: typeof AuthenticatedMistakesRoute
@@ -885,6 +884,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPlusRoute: typeof AuthenticatedPlusRoute
   AuthenticatedPremiumRoute: typeof AuthenticatedPremiumRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
+  AuthenticatedReadingRoute: typeof AuthenticatedReadingRoute
   AuthenticatedStudyPlanRoute: typeof AuthenticatedStudyPlanRoute
   AuthenticatedTeacherRoute: typeof AuthenticatedTeacherRoute
   AuthenticatedVocabularyRoute: typeof AuthenticatedVocabularyRoute
@@ -910,7 +910,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
   AuthenticatedGuideRoute: AuthenticatedGuideRoute,
-  AuthenticatedReadingRoute: AuthenticatedReadingRoute,
   AuthenticatedLeagueRoute: AuthenticatedLeagueRoute,
   AuthenticatedListeningRoute: AuthenticatedListeningRoute,
   AuthenticatedMistakesRoute: AuthenticatedMistakesRoute,
@@ -918,6 +917,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPlusRoute: AuthenticatedPlusRoute,
   AuthenticatedPremiumRoute: AuthenticatedPremiumRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
+  AuthenticatedReadingRoute: AuthenticatedReadingRoute,
   AuthenticatedStudyPlanRoute: AuthenticatedStudyPlanRoute,
   AuthenticatedTeacherRoute: AuthenticatedTeacherRoute,
   AuthenticatedVocabularyRoute: AuthenticatedVocabularyRoute,
