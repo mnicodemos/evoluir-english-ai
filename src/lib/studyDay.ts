@@ -50,6 +50,8 @@ export const LEARNING_ACTIVITY_TYPES = [
   "video_call",
   // Life+ AI meditations in English: guided listening, minutes only.
   "meditation",
+  // Daily reading (/reading): minutes only, until it records evidence.
+  "reading",
 ] as const;
 
 export function countsAsLearningMinutes(activityType: string) {
@@ -122,6 +124,7 @@ export const ACTIVITY_SKILL_BUCKETS = {
   lesson_practice: "Reading",
   final_test: "Reading",
   final_test_practice: "Reading",
+  reading: "Reading",
   conversation: "Talking",
   conversation_practice: "Talking",
   writing: "Writing",
