@@ -526,6 +526,13 @@
       "when": 1792284320318,
       "tag": "0074_reading_pedagogical_source_apply",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1792370720318,
+      "tag": "0075_league_study_days_reading",
+      "breakpoints": true
     }
   ]
 }

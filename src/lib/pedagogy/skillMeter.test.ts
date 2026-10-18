@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { skillMeterRows } from "./skillMeter";
+import { onCardSkills, skillMeterRows } from "./skillMeter";
 
 describe("skill meter", () => {
   it("shows the five card skills in order, unmeasured when there is no evidence", () => {
@@ -69,5 +69,18 @@ describe("skillMeterRows after a level change", () => {
     expect(listening).toMatchObject({ value: null, status: "priority", evidenceCount: 0 });
     expect(speaking).toMatchObject({ value: null, status: "not_measured" });
     expect(writing).toMatchObject({ value: 81, status: "on_track", evidenceCount: 3 });
+  });
+});
+
+describe("priority candidates", () => {
+  it("keeps only the skills shown on the card", () => {
+    const skills = ["listening", "vocabulary", "pronunciation", "reading", "grammar"].map(
+      (skill) => ({ skill }),
+    );
+    expect(onCardSkills(skills).map((item) => item.skill)).toEqual([
+      "listening",
+      "reading",
+      "grammar",
+    ]);
   });
 });

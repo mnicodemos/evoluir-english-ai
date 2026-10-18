@@ -29,6 +29,7 @@ describe("daily challenge goal", () => {
 
   it("labels the league XP each practice earns", () => {
     expect(practiceXpLabel("/writing")).toBe("+20 XP");
+    expect(practiceXpLabel("/reading")).toBe("+20 XP");
     expect(practiceXpLabel("/learning/$lessonId")).toBe("+50 XP");
     expect(practiceXpLabel("/teacher")).toBeNull();
   });

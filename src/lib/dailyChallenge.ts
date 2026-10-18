@@ -4,8 +4,8 @@
  * minutes with the AI Teacher, 1 lesson), shows the progress from today's
  * activities and leaves the Dashboard once the goal is reached. The XP shown
  * is what the weekly league already gives each activity (league_week_xp:
- * lesson 50, writing/listening/conversation 20, reviewed word 2, reviewed
- * mistake 5); the AI Teacher earns no league XP.
+ * lesson 50, writing/listening/conversation/daily reading 20, reviewed word 2,
+ * reviewed mistake 5, plus 30 per study day); the AI Teacher earns no league XP.
  */
 
 export type ChallengeActivityRow = { activity_type: string; duration_minutes: number | null };
@@ -64,7 +64,13 @@ export function dailyChallengeGoal(
 export function practiceXpLabel(destination: string): string | null {
   const path = destination.split("?")[0]!;
   if (path === "/learning/$lessonId") return "+50 XP";
-  if (path === "/writing" || path === "/listening" || path === "/coach" || path === "/call")
+  if (
+    path === "/writing" ||
+    path === "/listening" ||
+    path === "/coach" ||
+    path === "/call" ||
+    path === "/reading"
+  )
     return "+20 XP";
   if (path === "/mistakes") return "+5 XP";
   if (path === "/vocabulary") return "+2 XP";

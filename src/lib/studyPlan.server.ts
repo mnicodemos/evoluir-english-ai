@@ -128,9 +128,8 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
     vocabulary: "vocabulary",
     flashcards: "vocabulary",
     teacher: "grammar",
-    lesson: "reading",
-    lesson_practice: "reading",
-    final_test: "reading",
+    // Reading is the daily reading only (user decision, 2026-10-17): lessons
+    // count through their own skill below, never as Reading.
     reading: "reading",
     daily_reading: "reading",
   };
@@ -151,6 +150,9 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
     ...(doneRows ?? []).flatMap((row) => {
       const lesson = byLessonId.get(row.lesson_id);
       if (!lesson?.skill || !row.completed_at || row.completed_at < since) return [];
+      // A reading lesson's answers count for Grammar and Vocabulary, so it
+      // does not complete a Reading day; the daily reading does.
+      if (lesson.skill === "reading") return [];
       return [
         {
           skill: lesson.skill === "talking" ? "speaking" : lesson.skill,
