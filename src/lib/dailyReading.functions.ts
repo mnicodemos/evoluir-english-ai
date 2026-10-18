@@ -2,6 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  dailyReadingEvidence,
+  DAILY_READING_RUBRIC_VERSION,
+} from "@/lib/pedagogy/activityEvidence";
+import { measuredCefr } from "@/lib/pedagogy/cefr";
+import { toleratePedagogicalFailure } from "@/lib/pedagogy/dualWrite";
+import { persistActivityEvidence } from "@/lib/pedagogy/dualWriteCore";
 
 import {
   dailyReadingMessages,
@@ -137,7 +144,8 @@ async function readingOperationKey(userId: string, day: string) {
  * Today's reading finished: every question answered (any score). Graded here
  * against the stored text, recorded once a day as an activities row of type
  * "daily_reading", which closes the study day in credit_study_day (migration
- * 0073). Its minutes stay in the "reading" telemetry rows.
+ * 0073). Its minutes stay in the "reading" telemetry rows. Each answer is also
+ * Reading evidence (migration 0074), the source of the Reading score.
  */
 export const completeDailyReading = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -165,11 +173,12 @@ export const completeDailyReading = createServerFn({ method: "POST" })
       throw new Error("Answer every question of today's reading.");
     }
     const { score } = gradeReading(reading.questions, data.answers);
+    const operationKey = await readingOperationKey(context.userId, day);
 
     const { error } = await supabaseAdmin.rpc("persist_authoritative_legacy_activity", {
       p_user_id: context.userId,
       p_source_type: "telemetry",
-      p_operation_key: await readingOperationKey(context.userId, day),
+      p_operation_key: operationKey,
       p_source_id: null as unknown as string,
       p_activity_type: "daily_reading",
       p_title: `Daily reading: ${reading.title}`,
@@ -182,5 +191,22 @@ export const completeDailyReading = createServerFn({ method: "POST" })
       console.error(`Daily reading could not be recorded: ${error.message}`);
       throw new Error("Your reading could not be saved.");
     }
+    // Once a day per student (same operation key); a failure is recorded and
+    // never breaks the reading the student just finished.
+    await toleratePedagogicalFailure(async () =>
+      persistActivityEvidence({
+        userId: context.userId,
+        sourceType: "reading",
+        operationKey,
+        rubricVersion: DAILY_READING_RUBRIC_VERSION,
+        evidence: dailyReadingEvidence({
+          correct: reading.questions.map(
+            (question, index) => data.answers[index] === question.answer,
+          ),
+          day,
+          itemCefr: measuredCefr(level.toUpperCase()),
+        }),
+      }),
+    );
     return { score };
   });

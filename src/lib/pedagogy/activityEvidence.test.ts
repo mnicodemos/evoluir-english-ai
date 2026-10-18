@@ -5,6 +5,7 @@ import {
   LISTENING_RUBRIC_VERSION,
   PRONUNCIATION_RUBRIC_VERSION,
   SPEAKING_RUBRIC_VERSION,
+  dailyReadingEvidence,
   listeningEvidence,
   pronunciationEvidence,
   speakingEvidence,
@@ -96,5 +97,21 @@ describe("pronunciationEvidence", () => {
         score: 0,
       }),
     ).toEqual([]);
+  });
+});
+
+describe("daily reading evidence", () => {
+  it("adds one reading-comprehension answer per question, right or wrong", () => {
+    const evidence = dailyReadingEvidence({
+      correct: [true, false, true],
+      day: "2026-10-17",
+      itemCefr: "A2",
+    });
+    expect(evidence.map((item) => [item.skill, item.sourceType, item.rawScore])).toEqual([
+      ["reading", "reading", 100],
+      ["reading", "reading", 0],
+      ["reading", "reading", 100],
+    ]);
+    expect(evidence[1]).toMatchObject({ polarity: "negative", itemCefr: "A2" });
   });
 });

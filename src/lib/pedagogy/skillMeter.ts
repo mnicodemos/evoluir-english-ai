@@ -21,11 +21,17 @@ export type SkillMeterRow = {
 };
 
 /**
- * Skills shown on the card. Reading has no evidence source in the app, so
- * Grammar (fed by lesson quizzes and writing) takes its place: finishing
- * lessons now moves a bar.
+ * Skills shown on the card (user decision, 2026-10-17: five bars): the four
+ * skills, Reading measured by the daily reading, plus Grammar (lesson quizzes
+ * and writing), so finishing lessons still moves a bar.
  */
-export const SKILL_METER_SKILLS = ["listening", "speaking", "writing", "grammar"] as const;
+export const SKILL_METER_SKILLS = [
+  "listening",
+  "speaking",
+  "reading",
+  "writing",
+  "grammar",
+] as const;
 
 export const SKILL_STRONG_AT = 85;
 export const SKILL_ON_TRACK_AT = 65;

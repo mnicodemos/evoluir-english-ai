@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   BookOpen,
+  BookOpenText,
   BarChart3,
   ChevronRight,
   Download,
@@ -303,6 +304,7 @@ export function PathProgressCard({
 const SKILL_META = {
   listening: { label: "Listening", icon: Headphones },
   speaking: { label: "Speaking", icon: Mic },
+  reading: { label: "Reading", icon: BookOpenText },
   writing: { label: "Writing", icon: PenLine },
   grammar: { label: "Grammar", icon: GraduationCap },
 } as const;

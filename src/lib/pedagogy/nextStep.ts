@@ -319,6 +319,9 @@ const ACTIVITY_SKILLS: Record<string, readonly string[]> = {
   listening: ["listening"],
   vocabulary: ["vocabulary", "pronunciation"],
   vocabulary_reading: ["vocabulary"],
+  // Daily reading: minutes ("reading") and the finished reading ("daily_reading").
+  reading: ["reading"],
+  daily_reading: ["reading"],
 };
 
 /**
