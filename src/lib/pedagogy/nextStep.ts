@@ -129,6 +129,12 @@ export type NextStepInput = {
    * yields to a skill with the same kind of need that has not transferred yet.
    */
   transferredSkills?: readonly string[];
+  /**
+   * Skills whose daily activity is already done today (the daily reading:
+   * one a day). They step back behind every other skill until tomorrow, so
+   * "Practice now" never opens something the student cannot do again today.
+   */
+  doneForToday?: readonly string[];
 };
 
 /**
@@ -389,14 +395,17 @@ export function buildNextStep(input: NextStepInput): NextStep {
   }
 
   const transferred = new Set(input.transferredSkills ?? []);
+  const doneForToday = new Set(input.doneForToday ?? []);
   const ordered = candidates
     .map((skill) => ({
       skill,
       ...rank(skill, input),
       transferred: transferred.has(skill.skill) ? 1 : 0,
+      doneToday: doneForToday.has(skill.skill) ? 1 : 0,
     }))
     .sort(
       (a, b) =>
+        a.doneToday - b.doneToday ||
         a.weight - b.weight ||
         // Same kind of need: the skill already used across contexts goes last.
         a.transferred - b.transferred ||

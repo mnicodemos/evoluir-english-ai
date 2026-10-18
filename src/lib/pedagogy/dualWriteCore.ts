@@ -18,7 +18,6 @@ import {
 } from "./contracts";
 import {
   classifyQuizEvidence,
-  readingQuizEvidence,
   parseQuizDetails,
   QUIZ_RUBRIC_VERSION,
   writingEvidence,
@@ -348,11 +347,9 @@ export async function processQuiz(
   // The item level comes from the lesson the quiz belongs to, server-side only.
   const lesson = await lessonSkillAndLevel(admin, result.lesson_id);
   const classified = classifyQuizEvidence(details, skills, lesson.itemCefr);
-  // A reading lesson's quiz is also reading-comprehension evidence.
-  const evidence = [
-    ...classified.evidence,
-    ...readingQuizEvidence(details, lesson.skill, lesson.itemCefr),
-  ];
+  // Each answer counts for its own label (Grammar or Vocabulary). Reading is
+  // measured by the daily reading only (countsForSkill in aggregateSkill.ts).
+  const evidence = classified.evidence;
   const persisted = evidence.length
     ? await persistEvidenceAndResults({
         admin,

@@ -38,9 +38,20 @@ export const INITIAL_SKILL_AGGREGATION_CONFIG: SkillAggregationConfig = {
   confidence: INITIAL_CONFIDENCE_CONFIG,
 };
 
+/**
+ * Reading is measured only by reading real texts (user decision, 2026-10-17):
+ * the daily reading. The Reading evidence that reading lessons' quizzes wrote
+ * before is kept in the database but no longer counts; those answers already
+ * count for Grammar or Vocabulary, the label of each question.
+ */
+export function countsForSkill(evidence: Pick<AssessmentEvidence, "skill" | "sourceType">) {
+  return !(evidence.skill === "reading" && evidence.sourceType === "quiz");
+}
+
 function isValidEvidence(evidence: AssessmentEvidence, skill: PedagogicalSkill) {
   return (
     evidence.skill === skill &&
+    countsForSkill(evidence) &&
     pedagogicalSkillSchema.safeParse(evidence.skill).success &&
     evidenceSourceTypeSchema.safeParse(evidence.sourceType).success &&
     evaluatorSchema.safeParse(evidence.evaluatedBy).success &&

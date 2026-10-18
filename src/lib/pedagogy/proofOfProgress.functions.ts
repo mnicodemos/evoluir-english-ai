@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+import { countsForSkill } from "./aggregateSkill";
 import type { AssessmentEvidence, PedagogicalSkill } from "./contracts";
 import { deriveProofOfProgress, type ProofOfProgress } from "./proofOfProgress";
 
@@ -44,7 +45,7 @@ export const loadProofOfProgress = createServerFn({ method: "POST" })
         .limit(EVIDENCE_LIMIT),
     ]);
 
-    const evidence: AssessmentEvidence[] = (evidenceRows.data ?? []).map((row) => ({
+    const allEvidence: AssessmentEvidence[] = (evidenceRows.data ?? []).map((row) => ({
       id: row.id,
       skill: row.skill as PedagogicalSkill,
       subskill: row.subskill,
@@ -60,6 +61,8 @@ export const loadProofOfProgress = createServerFn({ method: "POST" })
       metadata: (row.metadata ?? {}) as NonNullable<AssessmentEvidence["metadata"]>,
       createdAt: row.created_at,
     }));
+    // Lesson quizzes no longer count as Reading (countsForSkill).
+    const evidence = allEvidence.filter(countsForSkill);
 
     return deriveProofOfProgress({
       evidence,
