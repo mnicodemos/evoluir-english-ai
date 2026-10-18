@@ -81,6 +81,22 @@ export function GoalsTodayCard() {
   const shownStep = shownGoal ? (steps.find((item) => item.goalId === shownGoal.id) ?? null) : null;
   const shownTask = pick(todayTasks, choice.task);
   const shownHabit = pick(dueHabits, choice.habit);
+  const habitHistory =
+    life && shownHabit
+      ? Array.from({ length: 7 }, (_, index) => {
+          const date = new Date(`${life.today}T12:00:00Z`);
+          date.setUTCDate(date.getUTCDate() - (6 - index));
+          const day = date.toISOString().slice(0, 10);
+          return {
+            day,
+            label: new Intl.DateTimeFormat(lang === "pt" ? "pt-BR" : "en-US", {
+              weekday: "short",
+              timeZone: "UTC",
+            }).format(date),
+            done: life.logs.some((log) => log.habitId === shownHabit.id && log.day === day),
+          };
+        })
+      : [];
 
   return (
     <section
@@ -217,11 +233,37 @@ export function GoalsTodayCard() {
               title={shownHabit.title}
               done={habitDoneToday(life, shownHabit.id)}
               details={
-                shownHabit.category ? (
-                  <p className="text-sm text-muted-foreground" translate="no">
-                    {shownHabit.category}
-                  </p>
-                ) : null
+                <div className="space-y-3">
+                  {shownHabit.category ? (
+                    <p className="text-sm text-muted-foreground" translate="no">
+                      {shownHabit.category}
+                    </p>
+                  ) : null}
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-brand-green">{t("Last 7 days")}</p>
+                    <div className="grid grid-cols-7 gap-1.5">
+                      {habitHistory.map((item) => (
+                        <div key={item.day} className="flex min-w-0 flex-col items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">
+                            {item.label.replace(".", "")}
+                          </span>
+                          <span
+                            className={cn(
+                              "grid size-6 place-items-center rounded-full text-[10px] font-semibold",
+                              item.done
+                                ? "bg-brand-green text-sidebar"
+                                : "bg-secondary text-muted-foreground",
+                            )}
+                            title={`${item.day}: ${item.done ? t("Completed") : t("Not completed")}`}
+                            aria-label={`${item.day}: ${item.done ? t("Completed") : t("Not completed")}`}
+                          >
+                            {item.done ? "✓" : "—"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               }
               chooser={
                 <SlotChooser
