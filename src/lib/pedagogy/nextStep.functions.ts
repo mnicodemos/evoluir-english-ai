@@ -6,7 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-import { aggregateSkillEvidence } from "./aggregateSkill";
+import { aggregateSkillEvidence, countsForSkill } from "./aggregateSkill";
 import { measuredCefr } from "./cefr";
 import {
   pedagogicalSkillSchema,
@@ -75,9 +75,22 @@ export const loadNextStep = createServerFn({ method: "POST" })
 
     const level = profile.data?.level ?? null;
 
+    // Reading is measured by the daily reading only (countsForSkill): until the
+    // student has finished one, an older Reading result built from lesson
+    // quizzes is not shown and does not drive the priority.
+    const { count: readingMeasured } = await supabaseAdmin
+      .from("assessment_evidence")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("skill", "reading")
+      .eq("source_type", "reading");
+    const currentSkills = (skills.data ?? []).filter(
+      (row) => row.skill !== "reading" || (readingMeasured ?? 0) > 0,
+    );
+
     // Learning is continuous (user decision): every skill keeps its latest
     // measurement across levels, on the Dashboard and in EVO's priority.
-    const snapshots: SkillSnapshot[] = (skills.data ?? [])
+    const snapshots: SkillSnapshot[] = currentSkills
       .filter((row) => row.skill)
       .map((row) => ({
         skill: row.skill as string,
@@ -115,7 +128,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(EVIDENCE_LIMIT);
 
-    const evidence: AssessmentEvidence[] = (evidenceRows ?? []).map((row) => ({
+    const allEvidence: AssessmentEvidence[] = (evidenceRows ?? []).map((row) => ({
       id: row.id,
       skill: row.skill as PedagogicalSkill,
       subskill: row.subskill,
@@ -131,6 +144,8 @@ export const loadNextStep = createServerFn({ method: "POST" })
       metadata: (row.metadata ?? {}) as NonNullable<AssessmentEvidence["metadata"]>,
       createdAt: row.created_at,
     }));
+    // Lesson quizzes no longer count as Reading (countsForSkill).
+    const evidence = allEvidence.filter(countsForSkill);
 
     // Phase 31: the only signal the loop hands over — a plain list of skills
     // whose transfer the existing Phase 30 layer already demonstrated.
@@ -189,7 +204,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
 
     // Dashboard skills card: the same latest snapshots, plus how much evidence
     // each one rests on.
-    const skillMeter = (skills.data ?? [])
+    const skillMeter = currentSkills
       .filter((row) => row.skill)
       .map((row) => ({
         skill: row.skill as string,
