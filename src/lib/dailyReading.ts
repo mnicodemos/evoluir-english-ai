@@ -359,3 +359,27 @@ export function fallbackReading(level: ReadingLevel): DailyReadingContent {
   const base = easy ? FALLBACK_EASY : FALLBACK_RICH;
   return { ...base, questions: base.questions.slice(0, READING_SPECS[level].questions) };
 }
+
+export type ReadingToken = { text: string; word: boolean };
+
+/**
+ * The paragraph as words and the text between them (spaces, punctuation), so
+ * every word can be tapped. Contractions and hyphenated words stay whole.
+ */
+export function readingTokens(paragraph: string): ReadingToken[] {
+  const tokens: ReadingToken[] = [];
+  let last = 0;
+  for (const match of paragraph.matchAll(/\p{L}+(?:['’-]\p{L}+)*/gu)) {
+    const at = match.index ?? 0;
+    if (at > last) tokens.push({ text: paragraph.slice(last, at), word: false });
+    tokens.push({ text: match[0], word: true });
+    last = at + match[0].length;
+  }
+  if (last < paragraph.length) tokens.push({ text: paragraph.slice(last), word: false });
+  return tokens;
+}
+
+/** The dictionary term for a tapped word: lower case, without a possessive 's. */
+export function lookupTerm(word: string): string {
+  return word.toLowerCase().replace(/’/g, "'").replace(/'s$/, "");
+}
