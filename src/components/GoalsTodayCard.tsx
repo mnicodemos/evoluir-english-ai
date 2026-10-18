@@ -240,7 +240,7 @@ export function GoalsTodayCard() {
                     </p>
                   ) : null}
                   <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                       <span>{t("Last 7 days")}</span>
                       <div className="flex items-center gap-1" aria-label={t("Last 7 days")}>
                         {habitHistory.map((item) => (
