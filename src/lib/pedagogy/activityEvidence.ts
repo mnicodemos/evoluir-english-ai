@@ -11,7 +11,9 @@ export const LISTENING_RUBRIC_VERSION = "listening-answer-v1";
 export const SPEAKING_RUBRIC_VERSION = "speaking-conversation-v1";
 export const PRONUNCIATION_RUBRIC_VERSION = "pronunciation-similarity-v1";
 export const DAILY_READING_RUBRIC_VERSION = "daily-reading-answer-v1";
+export const PLACEMENT_RUBRIC_VERSION = "placement-answer-v1";
 export const SPEAKING_MODEL_VERSION = "gemini-conversation-report-v1";
+export const SPEAKING_CONVERSATION_WEIGHT = 3;
 
 const score = (value: number) => Math.min(100, Math.max(0, Math.round(value)));
 
@@ -108,10 +110,14 @@ export function speakingEvidence(
       polarity: "neutral" as const,
       itemCefr: itemCefr ?? null,
       rawScore: score(item.raw),
-      // Same weights as the writing subscores: one AI-graded production.
+      // Same reliability and quality as the writing subscores: one AI-graded
+      // production.
       sourceReliability: 0.8,
       evidenceQuality: 0.85,
-      sampleWeight: 1,
+      // A whole conversation is one Speaking measurement, while a Listening
+      // session gives one per sentence: its fluency weighs like three answers
+      // (audit item 11, 2026-10-17), so Speaking moves at a similar pace.
+      sampleWeight: item.skill === "speaking" ? SPEAKING_CONVERSATION_WEIGHT : 1,
       evaluatedBy: "gemini" as const,
       modelVersion: SPEAKING_MODEL_VERSION,
       rubricVersion: SPEAKING_RUBRIC_VERSION,
@@ -176,5 +182,37 @@ export function dailyReadingEvidence(input: {
     evaluatedBy: "deterministic" as const,
     rubricVersion: DAILY_READING_RUBRIC_VERSION,
     metadata: { day: input.day, question: index + 1, isCorrect },
+  }));
+}
+
+/**
+ * The placement test's answers as a first estimate (audit item 12,
+ * 2026-10-17): Listening questions for Listening, the written gap-fills for
+ * Grammar, at the level of each question's band. Only bands up to the level
+ * the test gave count, so questions far above the student never pull a score
+ * down. A light weight: the first real practice soon outweighs it.
+ */
+export function placementEvidence(
+  answers: readonly {
+    questionId: string;
+    kind: "listen" | "write";
+    band: MeasuredCefrLevel;
+    correct: boolean;
+  }[],
+): AssessmentEvidence[] {
+  return answers.map((answer) => ({
+    skill: answer.kind === "listen" ? ("listening" as const) : ("grammar" as const),
+    subskill: answer.kind === "listen" ? "listening_comprehension" : "placement_gap_fill",
+    sourceType: "placement" as const,
+    evidenceType: "answer" as const,
+    polarity: answer.correct ? ("positive" as const) : ("negative" as const),
+    itemCefr: answer.band,
+    rawScore: answer.correct ? 100 : 0,
+    sourceReliability: 0.7,
+    evidenceQuality: 0.6,
+    sampleWeight: 0.5,
+    evaluatedBy: "deterministic" as const,
+    rubricVersion: PLACEMENT_RUBRIC_VERSION,
+    metadata: { question: answer.questionId },
   }));
 }

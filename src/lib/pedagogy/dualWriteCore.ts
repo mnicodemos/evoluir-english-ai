@@ -26,7 +26,14 @@ import {
 
 type AdminClient = SupabaseClient<Database>;
 type SourceType =
-  "quiz" | "writing" | "teacher" | "listening" | "speaking" | "pronunciation" | "reading";
+  | "quiz"
+  | "writing"
+  | "teacher"
+  | "listening"
+  | "speaking"
+  | "pronunciation"
+  | "reading"
+  | "placement";
 type FailureStage =
   | "source"
   | "authorization"
@@ -504,7 +511,7 @@ export async function persistTeacherEvidence(params: {
  */
 export async function persistActivityEvidence(params: {
   userId: string;
-  sourceType: "listening" | "speaking" | "pronunciation" | "reading";
+  sourceType: "listening" | "speaking" | "pronunciation" | "reading" | "placement";
   operationKey: string;
   evidence: AssessmentEvidence[];
   rubricVersion: string;
