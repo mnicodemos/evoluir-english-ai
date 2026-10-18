@@ -352,7 +352,7 @@ function GoalTile({
           />
         ))}
       </span>
-      <span className={cn("text-[10px] font-medium text-muted-foreground", !always && "sr-only")}>
+      <span className={cn("text-xs font-medium text-muted-foreground", !always && "sr-only")}>
         {t("{n} of 7 days").replace("{n}", String(week.doneCount))}
       </span>
       {week.streak >= 2 ? (
