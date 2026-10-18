@@ -33,6 +33,15 @@ export const SKILL_METER_SKILLS = [
   "grammar",
 ] as const;
 
+/**
+ * EVO's priority is chosen among the skills the card shows (user decision,
+ * 2026-10-17, audit item 10), so "Priority" always sits on a visible bar.
+ * Vocabulary and Pronunciation still appear in the review list and My Progress.
+ */
+export function onCardSkills<T extends { skill: string }>(skills: readonly T[]): T[] {
+  return skills.filter((item) => (SKILL_METER_SKILLS as readonly string[]).includes(item.skill));
+}
+
 export const SKILL_STRONG_AT = 85;
 export const SKILL_ON_TRACK_AT = 65;
 

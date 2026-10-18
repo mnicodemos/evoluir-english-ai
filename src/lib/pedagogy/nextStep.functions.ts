@@ -24,6 +24,7 @@ import {
   type NextStep,
   type SkillSnapshot,
 } from "./nextStep";
+import { onCardSkills } from "./skillMeter";
 import { deriveSkillQuests } from "./skillQuest";
 import { buildSmartReviewList } from "./smartReviewUx";
 
@@ -168,7 +169,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       : [];
 
     const step = buildNextStep({
-      skills: snapshots,
+      skills: onCardSkills(snapshots),
       currentLevel: level,
       recurringErrors: (learning.data?.common_errors ?? []).slice(-5),
       recentlyPractised,

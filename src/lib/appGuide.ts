@@ -237,7 +237,7 @@ export const APP_GUIDE: GuideSection[] = [
     what: "A friendly ranking with students of your level, reset every Monday.",
     steps: [
       "Join the league; other students only see your first name and initial.",
-      "Earn XP with lessons, texts, Listening, conversations, words and mistakes.",
+      "Earn XP with lessons, texts, Listening, conversations, the daily reading, words and mistakes, plus a bonus for each study day.",
       "Your medal shows your place: gold, silver or bronze for the top three.",
     ],
     to: "/league",
