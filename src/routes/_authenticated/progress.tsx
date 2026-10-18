@@ -207,15 +207,14 @@ function ProgressPage() {
               <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:col-start-2 xl:row-start-2">
                 <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
                   <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
-                    <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" />{" "}
+                    <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" />
                     {t("Strengths")}
                   </h2>
                   <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
                     {strengths.length ? (
                       strengths.map((s) => (
                         <li key={s.label}>
-                          {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} —{" "}
-                          {s.value}%
+                          {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} — {s.value}%
                         </li>
                       ))
                     ) : (
@@ -232,8 +231,7 @@ function ProgressPage() {
                     {gaps.length ? (
                       gaps.map((s) => (
                         <li key={s.label}>
-                          {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} —{" "}
-                          {s.value}%
+                          {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} — {s.value}%
                         </li>
                       ))
                     ) : (
@@ -250,8 +248,7 @@ function ProgressPage() {
           <section className="card-soft min-w-0 p-3 sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <h2 className="font-display text-base font-semibold sm:text-lg">
-                {t("Evolution")}
-              </h2>
+                {t("Evolution")}</h2>
               <div
                 className="flex rounded-lg bg-secondary p-0.5 text-xs xl:hidden"
                 role="group"
