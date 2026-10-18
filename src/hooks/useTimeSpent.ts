@@ -147,7 +147,8 @@ export function useLogTimeOnExit(params: {
               | "teacher"
               | "mistakes_review"
               | "video_call"
-              | "meditation",
+              | "meditation"
+              | "reading",
             minutes,
           },
         });

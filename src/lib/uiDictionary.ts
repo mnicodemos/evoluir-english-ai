@@ -1085,6 +1085,24 @@ const baseUiPt: Record<string, string> = {
   Known: "Sabida",
   "This lesson's words: {n} of {total} known": "Palavras desta lição: {n} de {total} sabidas",
   mastered: "dominados",
+  // Daily reading (2026-10-17)
+  "Daily reading": "Leitura do dia",
+  "Reading practice": "Prática de leitura",
+  "A short text at your level every day, with audio, key words and questions.":
+    "Um texto curto no seu nível todos os dias, com áudio, palavras-chave e perguntas.",
+  "Preparing today's reading…": "Preparando a leitura de hoje…",
+  Motivation: "Motivação",
+  "Everyday story": "História do cotidiano",
+  "Listen to EVO": "Ouvir a EVO",
+  "Tap an underlined word to see its meaning.":
+    "Toque numa palavra sublinhada para ver o significado.",
+  "Did you understand?": "Você entendeu?",
+  "You got": "Você acertou",
+  "right.": "das perguntas.",
+  "Check answers": "Conferir respostas",
+  "A new reading arrives every day, matching your level.":
+    "Uma nova leitura chega todos os dias, no seu nível.",
+  "min of reading": "min de leitura",
   "Ticked automatically on your English study days":
     "Marcado automaticamente nos seus dias de estudo de inglês",
   "Automatic: English study days": "Automático: dias de estudo de inglês",
