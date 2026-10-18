@@ -15,7 +15,7 @@ const answer = (rawScore: number, createdAt?: string): AssessmentEvidence => ({
   sampleWeight: 1,
   evaluatedBy: "deterministic",
   rubricVersion: "quiz-answer-v1",
-  createdAt,
+  createdAt: createdAt ?? null,
 });
 
 describe("recent answers count more", () => {
