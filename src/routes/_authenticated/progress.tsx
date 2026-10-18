@@ -119,241 +119,241 @@ function ProgressPage() {
       <PageHeader icon={TrendingUp} title={t("My Progress")} />
 
       <div className="mt-3 sm:mt-4">
-          {isLoading ? (
-            <Skeleton className="mt-4 h-72 w-full sm:mt-7" />
-          ) : (
-            <>
-              <div className="mt-3 grid gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto]">
-                <section className="card-soft p-3 sm:p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
-                  <h2 className="font-display text-base font-semibold sm:text-lg">
-                    {t("Frequency")}
-                  </h2>
-                  <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
-                    {t("The days you studied this month.")}
-                  </p>
-                  <div className="mt-2 sm:mt-4">
-                    {profile && <FrequencyCalendar userId={profile.id} />}
-                  </div>
-                </section>
+        {isLoading ? (
+          <Skeleton className="mt-4 h-72 w-full sm:mt-7" />
+        ) : (
+          <>
+            <div className="mt-3 grid gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto]">
+              <section className="card-soft p-3 sm:p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
+                <h2 className="font-display text-base font-semibold sm:text-lg">
+                  {t("Frequency")}
+                </h2>
+                <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
+                  {t("The days you studied this month.")}
+                </p>
+                <div className="mt-2 sm:mt-4">
+                  {profile && <FrequencyCalendar userId={profile.id} />}
+                </div>
+              </section>
 
-                <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="font-display text-base font-semibold sm:text-lg">
-                      {shownLevel
-                        ? shownLevel === currentLevel
-                          ? `${t("Level")} ${shownLevel}`
-                          : `${t("Level")} ${shownLevel} · ${t("closed")}`
-                        : t("Your skills")}
-                    </h2>
-                    <div
-                      className="flex flex-wrap gap-1"
-                      role="group"
-                      aria-label={t("Measurements by level")}
-                    >
-                      {[null, ...levelOptions].map((code) => (
-                        <button
-                          key={code ?? "overall"}
-                          type="button"
-                          aria-pressed={shownLevel === code}
-                          onClick={() => setViewLevel(code)}
-                          className={`min-h-7 rounded-full px-2.5 text-xs font-semibold transition-colors ${
-                            shownLevel === code
-                              ? "bg-brand-green text-[oklch(0.2_0.04_160)]"
-                              : "bg-secondary text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {code ?? t("Overall")}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
+              <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="font-display text-base font-semibold sm:text-lg">
                     {shownLevel
-                      ? t("Level {level}: only what you practised at this level.").replace(
-                          "{level}",
-                          shownLevel,
-                        )
-                      : t("Continuous learning: your scores carry on into every new level.")}
-                  </p>
-                  <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4">
-                    {skills.map((s) => (
-                      <div key={s.label}>
-                        <div className="flex items-center justify-between text-xs sm:text-sm">
-                          <span className="font-medium">
-                            {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
-                          </span>
-                          {s.value !== null && (
-                            <span className="text-muted-foreground">{s.value}%</span>
-                          )}
-                        </div>
-                        {s.value === null ? (
-                          <p className="mt-1 truncate text-[11px] leading-tight text-muted-foreground sm:mt-1.5 sm:text-xs">
-                            {shownLevel
-                              ? t("Not measured at {level}").replace("{level}", shownLevel)
-                              : t("Not measured yet")}
-                          </p>
-                        ) : (
-                          <Bar
-                            value={s.value}
-                            aria-label={s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
-                            className="mt-1.5 h-2 sm:mt-2"
-                          />
-                        )}
-                      </div>
+                      ? shownLevel === currentLevel
+                        ? `${t("Level")} ${shownLevel}`
+                        : `${t("Level")} ${shownLevel} · ${t("closed")}`
+                      : t("Your skills")}
+                  </h2>
+                  <div
+                    className="flex flex-wrap gap-1"
+                    role="group"
+                    aria-label={t("Measurements by level")}
+                  >
+                    {[null, ...levelOptions].map((code) => (
+                      <button
+                        key={code ?? "overall"}
+                        type="button"
+                        aria-pressed={shownLevel === code}
+                        onClick={() => setViewLevel(code)}
+                        className={`min-h-7 rounded-full px-2.5 text-xs font-semibold transition-colors ${
+                          shownLevel === code
+                            ? "bg-brand-green text-[oklch(0.2_0.04_160)]"
+                            : "bg-secondary text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {code ?? t("Overall")}
+                      </button>
                     ))}
                   </div>
-                </section>
-
-                <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:col-start-2 xl:row-start-2">
-                  <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
-                    <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
-                      <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" />{" "}
-                      {t("Strengths")}
-                    </h2>
-                    <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-                      {strengths.length ? (
-                        strengths.map((s) => (
-                          <li key={s.label}>
-                            {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} —{" "}
-                            {s.value}%
-                          </li>
-                        ))
-                      ) : (
-                        <li>{t("Practice more to reveal your strengths.")}</li>
-                      )}
-                    </ul>
-                  </section>
-                  <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
-                    <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
-                      <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" />{" "}
-                      {t("To improve")}
-                    </h2>
-                    <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-                      {gaps.length ? (
-                        gaps.map((s) => (
-                          <li key={s.label}>
-                            {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} —{" "}
-                            {s.value}%
-                          </li>
-                        ))
-                      ) : (
-                        <li>{t("Keep going to find your weak spots.")}</li>
-                      )}
-                    </ul>
-                  </section>
                 </div>
-              </div>
-            </>
-          )}
-
-          <div className="mt-3 grid items-start gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-2">
-            <section className="card-soft min-w-0 p-3 sm:p-5">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="font-display text-base font-semibold sm:text-lg">
-                  {t("Evolution")}
-                </h2>
-                <div
-                  className="flex rounded-lg bg-secondary p-0.5 text-xs xl:hidden"
-                  role="group"
-                  aria-label={L("Chart", "Gráfico")}
-                >
-                  {(
-                    [
-                      ["scores", L("Scores", "Notas")],
-                      ["minutes", L("Minutes", "Minutos")],
-                    ] as const
-                  ).map(([value, label]) => (
-                    <button
-                      key={value}
-                      type="button"
-                      aria-pressed={chartView === value}
-                      onClick={() => setChartView(value)}
-                      className={`min-h-8 rounded-md px-3 font-medium transition-colors ${
-                        chartView === value
-                          ? "bg-background text-foreground shadow-sm"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {label}
-                    </button>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {shownLevel
+                    ? t("Level {level}: only what you practised at this level.").replace(
+                        "{level}",
+                        shownLevel,
+                      )
+                    : t("Continuous learning: your scores carry on into every new level.")}
+                </p>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4">
+                  {skills.map((s) => (
+                    <div key={s.label}>
+                      <div className="flex items-center justify-between text-xs sm:text-sm">
+                        <span className="font-medium">
+                          {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
+                        </span>
+                        {s.value !== null && (
+                          <span className="text-muted-foreground">{s.value}%</span>
+                        )}
+                      </div>
+                      {s.value === null ? (
+                        <p className="mt-1 truncate text-[11px] leading-tight text-muted-foreground sm:mt-1.5 sm:text-xs">
+                          {shownLevel
+                            ? t("Not measured at {level}").replace("{level}", shownLevel)
+                            : t("Not measured yet")}
+                        </p>
+                      ) : (
+                        <Bar
+                          value={s.value}
+                          aria-label={s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)}
+                          className="mt-1.5 h-2 sm:mt-2"
+                        />
+                      )}
+                    </div>
                   ))}
                 </div>
-              </div>
-              <div className="grid gap-4 xl:grid-cols-2 xl:gap-8">
-                <div className={`min-w-0 ${chartView === "scores" ? "" : "hidden xl:block"}`}>
-                  {profile && (
-                    <Suspense fallback={<Skeleton className="mt-3 h-56 w-full sm:h-72" />}>
-                      <EvolutionChart userId={profile.id} level={profile.level} />
-                    </Suspense>
-                  )}
-                </div>
-                <div className={`min-w-0 ${chartView === "minutes" ? "" : "hidden xl:block"}`}>
-                  {profile && (
-                    <Suspense fallback={<Skeleton className="mt-3 h-48 w-full sm:h-56" />}>
-                      <MinutesByDayChart userId={profile.id} level={profile.level} />
-                    </Suspense>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            {recent && recent.length > 0 && (
-              <section className="card-soft p-3 sm:p-5">
-                <h2 className="font-display text-base font-semibold sm:text-lg">
-                  {t("Recent activity")}
-                </h2>
-                <ul className="mt-2 divide-y divide-border sm:mt-4">
-                  {recent.map((a, index) => (
-                    <li
-                      key={a.id}
-                      className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm xl:py-2 ${
-                        index >= 3 ? "max-sm:hidden" : ""
-                      }`}
-                    >
-                      <span className="min-w-0">
-                        <span className="block break-words font-medium">
-                          {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
-                            <>
-                              <span>Lesson:</span> {(a.title as string).slice(8)}
-                            </>
-                          ) : (
-                            (() => {
-                              const label = a.title || a.activity_type || "";
-                              return label.charAt(0).toUpperCase() + label.slice(1);
-                            })()
-                          )}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {formatDate(a.created_at, lang)} · {a.duration_minutes} min
-                        </span>
-                      </span>
-                      {a.score == null && (
-                        <span
-                          className="shrink-0 text-muted-foreground"
-                          aria-label={L("No score", "Sem nota")}
-                        >
-                          —
-                        </span>
-                      )}
-                      {a.score != null && (
-                        <span
-                          className={`shrink-0 font-semibold ${
-                            a.score >= 70
-                              ? "text-[oklch(0.55_0.14_158)]"
-                              : a.score >= 50
-                                ? "text-warning"
-                                : "text-destructive"
-                          }`}
-                        >
-                          {a.score}%
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
               </section>
-            )}
-          </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:col-start-2 xl:row-start-2">
+                <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
+                  <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
+                    <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" />{" "}
+                    {t("Strengths")}
+                  </h2>
+                  <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
+                    {strengths.length ? (
+                      strengths.map((s) => (
+                        <li key={s.label}>
+                          {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} —{" "}
+                          {s.value}%
+                        </li>
+                      ))
+                    ) : (
+                      <li>{t("Practice more to reveal your strengths.")}</li>
+                    )}
+                  </ul>
+                </section>
+                <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
+                  <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
+                    <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" />{" "}
+                    {t("To improve")}
+                  </h2>
+                  <ul className="mt-2 space-y-1 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
+                    {gaps.length ? (
+                      gaps.map((s) => (
+                        <li key={s.label}>
+                          {s.label === "Speaking" ? L("Speaking", "Fala") : t(s.label)} —{" "}
+                          {s.value}%
+                        </li>
+                      ))
+                    ) : (
+                      <li>{t("Keep going to find your weak spots.")}</li>
+                    )}
+                  </ul>
+                </section>
+              </div>
+            </div>
+          </>
+        )}
+
+        <div className="mt-3 grid items-start gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-2">
+          <section className="card-soft min-w-0 p-3 sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-display text-base font-semibold sm:text-lg">
+                {t("Evolution")}
+              </h2>
+              <div
+                className="flex rounded-lg bg-secondary p-0.5 text-xs xl:hidden"
+                role="group"
+                aria-label={L("Chart", "Gráfico")}
+              >
+                {(
+                  [
+                    ["scores", L("Scores", "Notas")],
+                    ["minutes", L("Minutes", "Minutos")],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={chartView === value}
+                    onClick={() => setChartView(value)}
+                    className={`min-h-8 rounded-md px-3 font-medium transition-colors ${
+                      chartView === value
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="grid gap-4 xl:grid-cols-2 xl:gap-8">
+              <div className={`min-w-0 ${chartView === "scores" ? "" : "hidden xl:block"}`}>
+                {profile && (
+                  <Suspense fallback={<Skeleton className="mt-3 h-56 w-full sm:h-72" />}>
+                    <EvolutionChart userId={profile.id} level={profile.level} />
+                  </Suspense>
+                )}
+              </div>
+              <div className={`min-w-0 ${chartView === "minutes" ? "" : "hidden xl:block"}`}>
+                {profile && (
+                  <Suspense fallback={<Skeleton className="mt-3 h-48 w-full sm:h-56" />}>
+                    <MinutesByDayChart userId={profile.id} level={profile.level} />
+                  </Suspense>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {recent && recent.length > 0 && (
+            <section className="card-soft p-3 sm:p-5">
+              <h2 className="font-display text-base font-semibold sm:text-lg">
+                {t("Recent activity")}
+              </h2>
+              <ul className="mt-2 divide-y divide-border sm:mt-4">
+                {recent.map((a, index) => (
+                  <li
+                    key={a.id}
+                    className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm xl:py-2 ${
+                      index >= 3 ? "max-sm:hidden" : ""
+                    }`}
+                  >
+                    <span className="min-w-0">
+                      <span className="block break-words font-medium">
+                        {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
+                          <>
+                            <span>Lesson:</span> {(a.title as string).slice(8)}
+                          </>
+                        ) : (
+                          (() => {
+                            const label = a.title || a.activity_type || "";
+                            return label.charAt(0).toUpperCase() + label.slice(1);
+                          })()
+                        )}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {formatDate(a.created_at, lang)} · {a.duration_minutes} min
+                      </span>
+                    </span>
+                    {a.score == null && (
+                      <span
+                        className="shrink-0 text-muted-foreground"
+                        aria-label={L("No score", "Sem nota")}
+                      >
+                        —
+                      </span>
+                    )}
+                    {a.score != null && (
+                      <span
+                        className={`shrink-0 font-semibold ${
+                          a.score >= 70
+                            ? "text-[oklch(0.55_0.14_158)]"
+                            : a.score >= 50
+                              ? "text-warning"
+                              : "text-destructive"
+                        }`}
+                      >
+                        {a.score}%
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
       </div>
     </AppShell>
   );
