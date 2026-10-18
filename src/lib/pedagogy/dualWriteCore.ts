@@ -27,13 +27,7 @@ import {
 
 type AdminClient = SupabaseClient<Database>;
 type SourceType =
-  | "quiz"
-  | "writing"
-  | "teacher"
-  | "listening"
-  | "speaking"
-  | "pronunciation"
-  | "reading";
+  "quiz" | "writing" | "teacher" | "listening" | "speaking" | "pronunciation" | "reading";
 type FailureStage =
   | "source"
   | "authorization"
