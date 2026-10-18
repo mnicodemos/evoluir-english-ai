@@ -5,6 +5,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { studyToday } from "@/lib/today";
 
 import { aggregateSkillEvidence, countsForSkill } from "./aggregateSkill";
 import { measuredCefr } from "./cefr";
@@ -159,6 +160,17 @@ export const loadNextStep = createServerFn({ method: "POST" })
       since,
     );
 
+    // Today's daily reading is done: Reading waits until tomorrow's text.
+    const today = studyToday();
+    const doneForToday = (recent.data ?? []).some(
+      (row) =>
+        row.activity_type === "daily_reading" &&
+        !!row.created_at &&
+        studyToday(new Date(row.created_at)) === today,
+    )
+      ? ["reading"]
+      : [];
+
     const step = buildNextStep({
       skills: snapshots,
       currentLevel: level,
@@ -166,6 +178,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       recentlyPractised,
       lessonBySkill,
       transferredSkills: transferred,
+      doneForToday,
     });
 
     // "Take the challenge" works a DIFFERENT skill than "Practice now" and opens
