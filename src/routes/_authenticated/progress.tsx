@@ -16,7 +16,6 @@ import { useProfile } from "@/hooks/useProfile";
 import { useSkillHistory } from "@/hooks/useSkillHistory";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
-import { useVocabularyProgress } from "@/hooks/useVocabularyProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/formatDate";
 import { findLevel, LEVELS } from "@/lib/level";
@@ -32,8 +31,7 @@ interface RecentActivity {
   score: number | null;
 }
 
-// The charts (and their ~230 KB chart library) load only when the History tab
-// is opened, not with the rest of My Progress.
+// Keep chart code lazy-loaded; it mounts when the Overview tab is opened.
 const EvolutionChart = lazy(() =>
   import("@/components/EvolutionChart").then((m) => ({ default: m.EvolutionChart })),
 );
@@ -64,10 +62,9 @@ function ProgressPage() {
   const t = (s: string) => (lang === "pt" ? ((uiPt as Record<string, string>)[s] ?? s) : s);
   // Inline pt/en for the few new strings, so the shared dictionary stays untouched.
   const L = (en: string, pt: string) => (lang === "pt" ? pt : en);
-  const [showAllMistakes, setShowAllMistakes] = useState(false);
   const [viewLevel, setViewLevel] = useState<string | null>(null);
   const [tab, setTab] = usePersistentState<string>("progress-tab", "overview");
-  const { data: vocabProgress } = useVocabularyProgress();
+  const visibleTab = tab === "history" ? "overview" : tab;
 
   // Same evidence-based skills as the Dashboard card (shared next-step cache),
   // never the old best-ever scores; the chart below reads the assessed history.
@@ -81,19 +78,6 @@ function ProgressPage() {
   const [chosenChart, setChartView] = useState<"scores" | "minutes" | null>(null);
   // Scores first when there is assessed history; otherwise the minutes chart.
   const chartView = chosenChart ?? (history && history.length > 0 ? "scores" : "minutes");
-
-  const { data: learning } = useQuery({
-    queryKey: ["learning-profile", profile?.id],
-    enabled: !!profile,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("learning_profile")
-        .select("*")
-        .eq("user_id", profile!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
 
   const { data: recent } = useQuery({
     queryKey: ["activities-recent", profile?.id, profile?.level],
@@ -146,13 +130,11 @@ function ProgressPage() {
     <AppShell mobileOneScreen>
       <PageHeader icon={TrendingUp} title={t("My Progress")} />
 
-      {/* Three tabs keep each view on one screen: the overview first, the EVO
-          journey and the history one tap away. The chosen tab is remembered. */}
-      <Tabs value={tab} onValueChange={setTab} className="mt-3 sm:mt-4">
+      {/* Overview groups progress insights together; the learning journey remains separate. */}
+      <Tabs value={visibleTab} onValueChange={setTab} className="mt-3 sm:mt-4">
         <TabsList>
           <TabsTrigger value="overview">{L("Overview", "Visão geral")}</TabsTrigger>
           <TabsTrigger value="journey">{L("Journey", "Jornada")}</TabsTrigger>
-          <TabsTrigger value="history">{L("History", "Histórico")}</TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
           {isLoading ? (
@@ -283,18 +265,13 @@ function ProgressPage() {
               </div>
             </>
           )}
-        </TabsContent>
-        <TabsContent value="journey">
-          <LearningJourneyCard />
-        </TabsContent>
-        <TabsContent value="history">
-          <div className="mt-3 grid items-start gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-            <section className="card-soft p-3 sm:p-5">
+
+          <div className="mt-3 grid items-start gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-2">
+            <section className="card-soft min-w-0 p-3 sm:p-5">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="font-display text-base font-semibold sm:text-lg">
                   {t("Evolution")}
                 </h2>
-                {/* Below xl one chart at a time keeps the tab on one screen. */}
                 <div
                   className="flex rounded-lg bg-secondary p-0.5 text-xs xl:hidden"
                   role="group"
@@ -339,97 +316,37 @@ function ProgressPage() {
                 </div>
               </div>
             </section>
-            <div className="grid content-start gap-3 sm:gap-5">
-              {learning?.common_errors && learning.common_errors.length > 0 && (
-                <section className="card-soft p-3 sm:p-5">
-                  <h2 className="font-display text-base font-semibold sm:text-lg">
-                    {t("Frequent mistakes")}
-                  </h2>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
-                    {(showAllMistakes
-                      ? learning.common_errors
-                      : learning.common_errors.slice(0, 5)
-                    ).map((e: string, i: number) => (
-                      <li key={i}>{e}</li>
-                    ))}
-                  </ul>
-                  {learning.common_errors.length > 5 && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAllMistakes((v) => !v)}
-                      aria-expanded={showAllMistakes}
-                      className="mt-2 min-h-11 text-xs font-medium text-brand-green hover:underline sm:text-sm"
+            {recent && recent.length > 0 && (
+              <section className="card-soft p-3 sm:p-5">
+                <h2 className="font-display text-base font-semibold sm:text-lg">
+                  {t("Recent activity")}
+                </h2>
+                <ul className="mt-2 divide-y divide-border sm:mt-4">
+                  {recent.map((a, index) => (
+                    <li
+                      key={a.id}
+                      className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm xl:py-2 ${
+                        index >= 3 ? "max-sm:hidden" : ""
+                      }`}
                     >
-                      {showAllMistakes
-                        ? L("Show less", "Mostrar menos")
-                        : L(
-                            `Show all (${learning.common_errors.length})`,
-                            `Mostrar todos (${learning.common_errors.length})`,
+                      <span className="min-w-0">
+                        <span className="block break-words font-medium">
+                          {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
+                            <>
+                              <span>Lesson:</span> {(a.title as string).slice(8)}
+                            </>
+                          ) : (
+                            (() => {
+                              const label = a.title || a.activity_type || "";
+                              return label.charAt(0).toUpperCase() + label.slice(1);
+                            })()
                           )}
-                    </button>
-                  )}
-                </section>
-              )}
-
-              {recent && recent.length > 0 && (
-                <section className="card-soft p-3 sm:p-5">
-                  <h2 className="font-display text-base font-semibold sm:text-lg">
-                    {t("Recent activity")}
-                  </h2>
-                  <ul className="mt-2 divide-y divide-border sm:mt-4">
-                    {recent.map((a, index) => (
-                      <li
-                        key={a.id}
-                        className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-xs sm:py-3 sm:text-sm xl:py-2 ${
-                          index >= 3 ? "max-sm:hidden" : ""
-                        }`}
-                      >
-                        <span className="min-w-0">
-                          <span className="block break-words font-medium">
-                            {(a.title || a.activity_type || "").startsWith("Lesson: ") ? (
-                              <>
-                                <span>Lesson:</span> {(a.title as string).slice(8)}
-                              </>
-                            ) : (
-                              (() => {
-                                const label = a.title || a.activity_type || "";
-                                return label.charAt(0).toUpperCase() + label.slice(1);
-                              })()
-                            )}
-                          </span>
-                          <span className="text-muted-foreground">
-                            {formatDate(a.created_at, lang)} · {a.duration_minutes} min
-                          </span>
-                        </span>
-                        {a.score == null && (
-                          <span
-                            className="shrink-0 text-muted-foreground"
-                            aria-label={L("No score", "Sem nota")}
-                          >
-                            —
-                          </span>
-                        )}
-                        {a.score != null && (
-                          <span
-                            className={`shrink-0 font-semibold ${
-                              a.score >= 70
-                                ? "text-[oklch(0.55_0.14_158)]"
-                                : a.score >= 50
-                                  ? "text-warning"
-                                  : "text-destructive"
-                            }`}
-                          >
-                            {a.score}%
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-            </div>
           </div>
         </TabsContent>
+        <TabsContent value="journey">
+          <LearningJourneyCard />
+        </TabsContent>
+
       </Tabs>
     </AppShell>
   );
