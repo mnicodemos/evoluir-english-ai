@@ -65,10 +65,23 @@ type Outcome = { correct: boolean; corrected: string; explanation: string };
 function Mistakes() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
+  const { data: learning } = useQuery({
+    queryKey: ["learning-profile", profile?.id],
+    enabled: !!profile,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("learning_profile")
+        .select("*")
+        .eq("user_id", profile!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
   const review = useServerFn(reviewMistake);
   const [answer, setAnswer] = useState("");
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [checking, setChecking] = useState(false);
+  const [showAllMistakes, setShowAllMistakes] = useState(false);
   // Ids answered in this visit, so the queue moves on even before the refetch.
   const [answered, setAnswered] = useState<string[]>([]);
   // Reviewing mistakes counts toward today's minutes once something was answered.
@@ -332,6 +345,35 @@ function Mistakes() {
             </div>
           )}
         </section>
+
+        {learning?.common_errors && learning.common_errors.length > 0 && (
+          <section className="card-soft p-3 sm:p-5 lg:col-start-1">
+            <h2 className="font-display text-base font-semibold sm:text-lg">
+              Frequent mistakes
+            </h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground sm:mt-3 sm:text-sm">
+              {(showAllMistakes
+                ? learning.common_errors
+                : learning.common_errors.slice(0, 5)
+              ).map((error: string, i: number) => (
+                <li key={i}>{error}</li>
+              ))}
+            </ul>
+            {learning.common_errors.length > 5 && (
+              <button
+                type="button"
+                onClick={() => setShowAllMistakes((value) => !value)}
+                aria-expanded={showAllMistakes}
+                className="mt-2 min-h-11 text-xs font-medium text-brand-green hover:underline sm:text-sm"
+              >
+                {showAllMistakes
+                  ? "Show less"
+                  : `Show all (${learning.common_errors.length})`}
+              </button>
+            )}
+          </section>
+        )}
+
 
         <aside className="card-soft space-y-2 p-3 sm:p-5">
           <div className="flex items-center justify-between gap-2">
