@@ -7,6 +7,7 @@ import {
   SPEAKING_RUBRIC_VERSION,
   dailyReadingEvidence,
   listeningEvidence,
+  placementEvidence,
   pronunciationEvidence,
   speakingEvidence,
   speakingEvidenceDecision,
@@ -115,5 +116,35 @@ describe("daily reading evidence", () => {
       ["reading", "reading", 100],
     ]);
     expect(evidence[1]).toMatchObject({ polarity: "negative", itemCefr: "A2" });
+  });
+});
+
+describe("placement evidence", () => {
+  it("turns the test's answers into light Listening and Grammar evidence at each band", () => {
+    const evidence = placementEvidence([
+      { questionId: "l-a1", kind: "listen", band: "A1", correct: true },
+      { questionId: "w-a1", kind: "write", band: "A1", correct: false },
+    ]);
+    expect(
+      evidence.map((item) => [item.skill, item.sourceType, item.rawScore, item.itemCefr]),
+    ).toEqual([
+      ["listening", "placement", 100, "A1"],
+      ["grammar", "placement", 0, "A1"],
+    ]);
+    // Lighter than a lesson answer, so the first real practice soon outweighs it.
+    expect(evidence[0]!.sampleWeight * evidence[0]!.evidenceQuality).toBeLessThan(0.9);
+  });
+
+  it("gives a B1 student a first Grammar score from three bands", () => {
+    const bands = ["A1", "A2", "B1"] as const;
+    const evidence = placementEvidence(
+      bands.map((band, index) => ({
+        questionId: `w-${band}`,
+        kind: "write",
+        band,
+        correct: index < 2,
+      })),
+    );
+    expect(aggregateSkillEvidence("grammar", evidence).score).toBe(67);
   });
 });
