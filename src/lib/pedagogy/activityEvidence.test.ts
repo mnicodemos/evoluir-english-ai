@@ -67,6 +67,8 @@ describe("speaking evidence", () => {
     expect(evidence.every((item) => item.rubricVersion === SPEAKING_RUBRIC_VERSION)).toBe(true);
     expect(evidence.every((item) => item.itemCefr === "B2")).toBe(true);
     expect(evidence[0]?.rawScore).toBe(72);
+    // The conversation's fluency weighs like three answers; the subscores stay 1.
+    expect(evidence.map((item) => item.sampleWeight)).toEqual([3, 1, 1]);
   });
 });
 
