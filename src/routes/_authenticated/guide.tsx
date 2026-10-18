@@ -6,6 +6,7 @@ import {
   Briefcase,
   CalendarCheck,
   ChartLine,
+  Check,
   ChevronRight,
   Crown,
   Gem,
@@ -171,14 +172,21 @@ function GuidePage() {
               </AccordionTrigger>
               <AccordionContent className="pb-4">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-green">
-                  {t("How to use it")}
+                  {section.anyOf ? t("Any one of these") : t("How to use it")}
                 </p>
                 <ol className="mt-2 space-y-2 text-sm">
                   {section.steps.map((step, index) => (
                     <li key={step} className="flex gap-2.5">
-                      <span className="grid size-5 shrink-0 place-items-center rounded-full bg-secondary text-[11px] font-bold">
-                        {index + 1}
-                      </span>
+                      {section.anyOf ? (
+                        <Check
+                          className="mt-0.5 size-4 shrink-0 text-brand-green"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <span className="grid size-5 shrink-0 place-items-center rounded-full bg-secondary text-[11px] font-bold">
+                          {index + 1}
+                        </span>
+                      )}
                       <span>{t(step)}</span>
                     </li>
                   ))}

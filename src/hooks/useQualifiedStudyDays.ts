@@ -51,7 +51,7 @@ export function useQualifiedStudyDays({
           .from("activities")
           .select("activity_type, created_at")
           .eq("user_id", userId)
-          .in("activity_type", ["writing", "listening", "conversation"])
+          .in("activity_type", ["writing", "listening", "conversation", "daily_reading"])
           .gte("created_at", startIso)
           .lt("created_at", endIso),
         supabase
@@ -86,11 +86,17 @@ export function useQualifiedStudyDays({
       const words = new Map<string, number>();
       // One finished conversation with EVO completes the day (migration 0057).
       const conversations = new Set<string>();
+      // Today's reading with every question answered completes it too (0073).
+      const readings = new Set<string>();
       const completedLessons = new Set<string>();
 
       for (const row of activities.data ?? []) {
         if (row.activity_type === "conversation") {
           if (row.created_at) conversations.add(dayFormatter.format(new Date(row.created_at)));
+          continue;
+        }
+        if (row.activity_type === "daily_reading") {
+          if (row.created_at) readings.add(dayFormatter.format(new Date(row.created_at)));
           continue;
         }
         increment(row.activity_type === "writing" ? writing : listening, row.created_at);
@@ -117,6 +123,7 @@ export function useQualifiedStudyDays({
         ...words.keys(),
         ...completedLessons,
         ...conversations,
+        ...readings,
         ...plusDays,
       ]);
       return new Set(
@@ -127,6 +134,7 @@ export function useQualifiedStudyDays({
             reviewedWords: words.get(day) ?? 0,
             lessonCompleted: completedLessons.has(day),
             conversation: conversations.has(day),
+            readingDone: readings.has(day),
             goalsDone: plusDays.includes(day),
           }),
         ),

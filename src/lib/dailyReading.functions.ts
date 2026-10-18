@@ -1,10 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import {
   dailyReadingMessages,
   fallbackReading,
+  gradeReading,
   parseDailyReading,
   readingLevel,
   readingThemeForDay,
@@ -117,4 +119,68 @@ export const loadDailyReading = createServerFn({ method: "GET" })
       };
     }
     return { day, level, theme, fallback: false, ...content };
+  });
+
+/** The same operation key for a student's reading of a given day (UUID shape). */
+async function readingOperationKey(userId: string, day: string) {
+  const bytes = new Uint8Array(
+    await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(`daily-reading:${userId}:${day}`),
+    ),
+  );
+  const hex = [...bytes.slice(0, 16)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+}
+
+/**
+ * Today's reading finished: every question answered (any score). Graded here
+ * against the stored text, recorded once a day as an activities row of type
+ * "daily_reading", which closes the study day in credit_study_day (migration
+ * 0073). Its minutes stay in the "reading" telemetry rows.
+ */
+export const completeDailyReading = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        answers: z.array(z.number().int().min(0).max(3)).min(1).max(8),
+        /** The student saw the fixed text (the AI had failed). */
+        fallback: z.boolean(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("level")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const level = readingLevel(profile?.level);
+    const day = studyToday();
+    const stored = data.fallback ? null : await readStored(day, level);
+    const reading = stored?.content ?? fallbackReading(level);
+    if (data.answers.length !== reading.questions.length) {
+      throw new Error("Answer every question of today's reading.");
+    }
+    const { score } = gradeReading(reading.questions, data.answers);
+
+    const { error } = await supabaseAdmin.rpc("persist_authoritative_legacy_activity", {
+      p_user_id: context.userId,
+      p_source_type: "telemetry",
+      p_operation_key: await readingOperationKey(context.userId, day),
+      p_source_id: null as unknown as string,
+      p_activity_type: "daily_reading",
+      p_title: `Daily reading: ${reading.title}`,
+      p_duration_minutes: 0,
+      p_score: score,
+      p_scores: {},
+      p_result: { level, day },
+    });
+    if (error) {
+      console.error(`Daily reading could not be recorded: ${error.message}`);
+      throw new Error("Your reading could not be saved.");
+    }
+    return { score };
   });

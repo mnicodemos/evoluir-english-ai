@@ -179,6 +179,7 @@ describe("qualifiesAsStudyDay (mirror of credit_study_day)", () => {
     reviewedWords: 0,
     lessonCompleted: false,
     conversation: false,
+    readingDone: false,
     goalsDone: false,
   };
 
@@ -195,6 +196,7 @@ describe("qualifiesAsStudyDay (mirror of credit_study_day)", () => {
     expect(qualifiesAsStudyDay({ ...empty, reviewedWords: 10 })).toBe(true);
     expect(qualifiesAsStudyDay({ ...empty, lessonCompleted: true })).toBe(true);
     expect(qualifiesAsStudyDay({ ...empty, conversation: true })).toBe(true);
+    expect(qualifiesAsStudyDay({ ...empty, readingDone: true })).toBe(true);
     expect(qualifiesAsStudyDay({ ...empty, goalsDone: true })).toBe(true);
   });
 });

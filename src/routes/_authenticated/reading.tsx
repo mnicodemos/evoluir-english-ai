@@ -1,7 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpenText, Check, Languages, Loader2, Square, Volume2, X } from "lucide-react";
+import {
+  BookOpenText,
+  Check,
+  CircleCheck,
+  Languages,
+  Loader2,
+  Square,
+  Volume2,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
@@ -17,7 +26,11 @@ import {
   readingSpeechChunks,
   readingTokens,
 } from "@/lib/dailyReading";
-import { loadDailyReading, type DailyReading } from "@/lib/dailyReading.functions";
+import {
+  completeDailyReading,
+  loadDailyReading,
+  type DailyReading,
+} from "@/lib/dailyReading.functions";
 import { lookupWord } from "@/lib/dictionary.functions";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
 import { uiPt } from "@/lib/uiDictionary";
@@ -167,6 +180,20 @@ function ReadingPage() {
   const [playing, setPlaying] = useState(false);
   const [chosen, setChosen] = useState<(number | null)[]>([]);
   const [checked, setChecked] = useState(false);
+
+  // Answering every question finishes today's reading: the server grades it
+  // and records it once a day, which closes the study day (migration 0073).
+  const queryClient = useQueryClient();
+  const finishReading = useServerFn(completeDailyReading);
+  const finish = useMutation({
+    mutationFn: (input: { answers: number[]; fallback: boolean }) => finishReading({ data: input }),
+    onSuccess: () =>
+      // Streak, rhythm, today's progress and goals read the new activity.
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          !["daily-reading", "dictionary-v2"].includes(String(query.queryKey[0])),
+      }),
+  });
 
   // Reading time counts toward today's minutes once the student has engaged:
   // played the text or checked the answers.
@@ -462,11 +489,34 @@ function ReadingPage() {
                 onClick={() => {
                   setEngaged(true);
                   setChecked(true);
+                  finish.mutate({
+                    answers: chosen.map((value) => value ?? 0),
+                    fallback: reading.fallback,
+                  });
                 }}
               >
                 {t("Check answers")}
               </Button>
             )}
+            {finish.isSuccess ? (
+              <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-brand-green">
+                <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+                {t("Reading done: today counts as a study day.")}
+              </p>
+            ) : finish.isError ? (
+              <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-destructive">
+                <span>{t("Your answers could not be saved.")}</span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={finish.isPending}
+                  onClick={() => finish.variables && finish.mutate(finish.variables)}
+                >
+                  {t("Try again")}
+                </Button>
+              </p>
+            ) : null}
             <p className="mt-3 text-xs text-muted-foreground">
               {t("A new reading arrives every day, matching your level.")}
             </p>
