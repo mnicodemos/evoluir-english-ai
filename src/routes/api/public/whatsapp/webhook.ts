@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
-export const Route = createFileRoute("/api/public/whatsapp/webhook")({
+export const Route = createFileRoute("/api/public/whatsapp/webhook" as never)({
   server: {
     handlers: {
       GET: async ({ request }) => {
@@ -105,7 +105,7 @@ export const Route = createFileRoute("/api/public/whatsapp/webhook")({
               const { data: linkCode } = await db
                 .from("whatsapp_link_codes")
                 .select("id, user_id")
-                .eq("code_hash", hashWhatsAppLinkCode(connectMatch[1]))
+                .eq("code_hash", hashWhatsAppLinkCode(connectMatch[1] ?? ""))
                 .is("used_at", null)
                 .gt("expires_at", new Date().toISOString())
                 .maybeSingle();
