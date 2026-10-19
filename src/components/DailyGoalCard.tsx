@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { Check, CircleDotDashed, Hourglass } from "lucide-react";
 
 import { Progress } from "@/components/ui/progress";
@@ -12,6 +13,9 @@ function todayActivitiesQuery(userId?: string) {
   return {
     queryKey: ["minutes-today", userId],
     enabled: !!userId,
+    // Keep the displayed total fresh even if Realtime delivery is temporarily unavailable.
+    refetchInterval: 15_000,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const start = new Date();
       start.setHours(0, 0, 0, 0);
@@ -32,6 +36,33 @@ export function useTodayActivities(userId?: string) {
 }
 
 export function useMinutesToday(userId?: string) {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!userId) return;
+
+    // Refresh Today's Progress as soon as today's activity rows are inserted or updated.
+    const channel = supabase
+      .channel(`minutes-today-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "activities",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          void queryClient.invalidateQueries({ queryKey: ["minutes-today", userId] });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [queryClient, userId]);
+
   return useQuery({
     ...todayActivitiesQuery(userId),
     select: (rows) => rows.reduce((sum, a) => sum + (a.duration_minutes ?? 0), 0),
