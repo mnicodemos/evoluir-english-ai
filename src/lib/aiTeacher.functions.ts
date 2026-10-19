@@ -67,189 +67,189 @@ export const teacherTurn = createServerFn({ method: "POST" })
 type TeacherTurnInput = z.infer<typeof teacherTurnInputSchema>;
 
 async function runTeacherTurn(data: TeacherTurnInput, userId: string) {
-    const pedagogicalContext = await loadTeacherContext(userId, {
-      lessonId: data.lessonId ?? null,
+  const pedagogicalContext = await loadTeacherContext(userId, {
+    lessonId: data.lessonId ?? null,
+  });
+
+  // Mode is classified on the server from the student's own turn: the client
+  // cannot declare a mode, a level or a skill. The only client intent allowed
+  // is "I want a guided session" (coach).
+  const mode = data.coach
+    ? "COACH"
+    : classifyTeacherMode({ message: data.message, history: data.history });
+
+  // Coach session state is derived server-side: stage from the conversation
+  // shape, focus from the existing next-step priority logic, difficulty tier
+  // from the student's own production. The client never sends any of this.
+  let coach: {
+    stage: CoachStage;
+    focusSkill: string | null;
+    turns: number;
+    plannedTurns: number;
+    scenario: string;
+    finished: boolean;
+  } | null = null;
+  let coachPromptBlock: string | undefined;
+  if (mode === "COACH") {
+    const plan = coachPlan(pedagogicalContext, data.history, data.message);
+    coach = {
+      stage: plan.stage,
+      focusSkill: plan.focus.skill,
+      turns: plan.turns,
+      plannedTurns: plan.plannedTurns,
+      scenario: plan.scenario,
+      finished: plan.finished,
+    };
+    coachPromptBlock = coachBlock(plan);
+  }
+
+  // Free chat closes every few student turns with "Today you practised /
+  // To review" (the coach session has its own summary stage).
+  const recap = mode !== "COACH" && isTeacherRecapTurn(data.history);
+
+  const raw = await callGateway(
+    teacherTurnMessages({
+      recap,
+      context: pedagogicalContext,
+      objective: data.objective,
+      studentMessage: data.message,
+      history: data.history,
+      mode,
+      ...(coachPromptBlock ? { coachBlock: coachPromptBlock } : {}),
+    }),
+    true,
+    { userId, operation: "teacher" },
+  );
+  const turn = parseTeacherTurn(raw);
+
+  // The main mistake goes to "My mistakes" for spaced review, like Writing
+  // corrections, only when it was really copied from the student's message.
+  const mistake = teacherMistakeInMessage(turn.mistake, data.message);
+  let mistakeSaved = false;
+  if (mistake) {
+    const { recordMistakes } = await import("@/lib/learningErrors.server");
+    await recordMistakes(await admin(), userId, [mistake], {
+      skill: turn.focusSkill ?? "grammar",
+      source: "teacher",
     });
+    mistakeSaved = true;
+  }
 
-    // Mode is classified on the server from the student's own turn: the client
-    // cannot declare a mode, a level or a skill. The only client intent allowed
-    // is "I want a guided session" (coach).
-    const mode = data.coach
-      ? "COACH"
-      : classifyTeacherMode({ message: data.message, history: data.history });
-
-    // Coach session state is derived server-side: stage from the conversation
-    // shape, focus from the existing next-step priority logic, difficulty tier
-    // from the student's own production. The client never sends any of this.
-    let coach: {
-      stage: CoachStage;
-      focusSkill: string | null;
-      turns: number;
-      plannedTurns: number;
-      scenario: string;
-      finished: boolean;
-    } | null = null;
-    let coachPromptBlock: string | undefined;
-    if (mode === "COACH") {
-      const plan = coachPlan(pedagogicalContext, data.history, data.message);
-      coach = {
-        stage: plan.stage,
-        focusSkill: plan.focus.skill,
-        turns: plan.turns,
-        plannedTurns: plan.plannedTurns,
-        scenario: plan.scenario,
-        finished: plan.finished,
-      };
-      coachPromptBlock = coachBlock(plan);
-    }
-
-    // Free chat closes every few student turns with "Today you practised /
-    // To review" (the coach session has its own summary stage).
-    const recap = mode !== "COACH" && isTeacherRecapTurn(data.history);
-
-    const raw = await callGateway(
-      teacherTurnMessages({
-        recap,
-        context: pedagogicalContext,
-        objective: data.objective,
-        studentMessage: data.message,
-        history: data.history,
-        mode,
-        ...(coachPromptBlock ? { coachBlock: coachPromptBlock } : {}),
-      }),
-      true,
-      { userId, operation: "teacher" },
-    );
-    const turn = parseTeacherTurn(raw);
-
-    // The main mistake goes to "My mistakes" for spaced review, like Writing
-    // corrections, only when it was really copied from the student's message.
-    const mistake = teacherMistakeInMessage(turn.mistake, data.message);
-    let mistakeSaved = false;
-    if (mistake) {
-      const { recordMistakes } = await import("@/lib/learningErrors.server");
-      await recordMistakes(await admin(), userId, [mistake], {
-        skill: turn.focusSkill ?? "grammar",
-        source: "teacher",
-      });
-      mistakeSaved = true;
-    }
-
-    // Conversation storage reuses the existing ai_conversations table (RLS: owner only).
-    const db = await admin();
-    let conversationId = data.conversationId ?? null;
-    if (conversationId) {
-      const { data: owned } = await db
+  // Conversation storage reuses the existing ai_conversations table (RLS: owner only).
+  const db = await admin();
+  let conversationId = data.conversationId ?? null;
+  if (conversationId) {
+    const { data: owned } = await db
+      .from("ai_conversations")
+      .select("id, messages")
+      .eq("id", conversationId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!owned) conversationId = null;
+    else {
+      const previous = Array.isArray(owned.messages) ? owned.messages : [];
+      await db
         .from("ai_conversations")
-        .select("id, messages")
-        .eq("id", conversationId)
-        .eq("user_id", userId)
-        .maybeSingle();
-      if (!owned) conversationId = null;
-      else {
-        const previous = Array.isArray(owned.messages) ? owned.messages : [];
-        await db
-          .from("ai_conversations")
-          .update({
-            messages: [
-              ...previous.slice(-38),
-              { role: "user", content: data.message },
-              { role: "assistant", content: turn.reply },
-            ],
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", conversationId)
-          .eq("user_id", userId);
-      }
-    }
-    if (!conversationId) {
-      const { data: created } = await db
-        .from("ai_conversations")
-        .insert({
-          user_id: userId,
-          topic: "AI Teacher",
-          scenario: "teacher",
+        .update({
           messages: [
+            ...previous.slice(-38),
             { role: "user", content: data.message },
             { role: "assistant", content: turn.reply },
           ],
+          updated_at: new Date().toISOString(),
         })
-        .select("id")
-        .single();
-      conversationId = created?.id ?? null;
+        .eq("id", conversationId)
+        .eq("user_id", userId);
     }
+  }
+  if (!conversationId) {
+    const { data: created } = await db
+      .from("ai_conversations")
+      .insert({
+        user_id: userId,
+        topic: "AI Teacher",
+        scenario: "teacher",
+        messages: [
+          { role: "user", content: data.message },
+          { role: "assistant", content: turn.reply },
+        ],
+      })
+      .select("id")
+      .single();
+    conversationId = created?.id ?? null;
+  }
 
-    // Server-side gate: the model only SUGGESTS an assessment. Evidence is
-    // persisted through the existing pipeline, and only for real production.
-    const decision = teacherEvidenceDecision({
-      assessable: turn.assessable,
-      focusSkill: turn.focusSkill,
-      suggestedScore: turn.suggestedScore,
-      studentMessage: data.message,
-    });
-    // Coach mode adds a second, deterministic gate: only a turn with real
-    // production inside the session counts, and the evidence is keyed by session
-    // round, so a retry refines the round instead of duplicating evidence.
-    const coachGate = coach
-      ? coachEvidenceDecision({ stage: coach.stage, studentMessage: data.message })
-      : null;
-    const assess = decision.assess && (!coach || coachGate?.assess === true);
-    let evidencePersisted = false;
-    if (decision.assess && assess && conversationId) {
-      const turnId = coach
-        ? await deterministicUuid(
-            `coach-round:${userId}:${conversationId}:${decision.skill}:${coachEvidenceRound(coach.turns)}`,
-          )
-        : await deterministicUuid(`teacher-turn:${userId}:${conversationId}:${data.message}`);
-      const result = await persistTeacherEvidence({
-        userId,
+  // Server-side gate: the model only SUGGESTS an assessment. Evidence is
+  // persisted through the existing pipeline, and only for real production.
+  const decision = teacherEvidenceDecision({
+    assessable: turn.assessable,
+    focusSkill: turn.focusSkill,
+    suggestedScore: turn.suggestedScore,
+    studentMessage: data.message,
+  });
+  // Coach mode adds a second, deterministic gate: only a turn with real
+  // production inside the session counts, and the evidence is keyed by session
+  // round, so a retry refines the round instead of duplicating evidence.
+  const coachGate = coach
+    ? coachEvidenceDecision({ stage: coach.stage, studentMessage: data.message })
+    : null;
+  const assess = decision.assess && (!coach || coachGate?.assess === true);
+  let evidencePersisted = false;
+  if (decision.assess && assess && conversationId) {
+    const turnId = coach
+      ? await deterministicUuid(
+          `coach-round:${userId}:${conversationId}:${decision.skill}:${coachEvidenceRound(coach.turns)}`,
+        )
+      : await deterministicUuid(`teacher-turn:${userId}:${conversationId}:${data.message}`);
+    const result = await persistTeacherEvidence({
+      userId,
+      turnId,
+      rubricVersion: coach ? COACH_RUBRIC_VERSION : TEACHER_RUBRIC_VERSION,
+      evidence: teacherEvidence({
+        skill: decision.skill,
+        score: decision.score,
         turnId,
-        rubricVersion: coach ? COACH_RUBRIC_VERSION : TEACHER_RUBRIC_VERSION,
-        evidence: teacherEvidence({
-          skill: decision.skill,
-          score: decision.score,
-          turnId,
-          // Level of the interaction, taken from the server-owned context.
-          itemCefr: itemLevelFromStoredLevel(pedagogicalContext.cefrLevel),
-          // What kind of task this turn was, from the mode/stage already derived
-          // server-side. It only labels the evidence; no score changes.
-          taskType: coach ? coachTaskType(coach.stage) : teacherTaskType(mode),
-          // Phase 30: the real-life context of this production, kept in the
-          // existing metadata so transfer can be read deterministically later.
-          ...(coach
-            ? {
-                subskill: "coach_session",
-                rubricVersion: COACH_RUBRIC_VERSION,
-                context: coach.scenario,
-              }
-            : pedagogicalContext.currentActivity?.lessonTitle
-              ? { context: pedagogicalContext.currentActivity.lessonTitle }
-              : {}),
-        }),
-      });
-      evidencePersisted = result.ok && !result.duplicate;
-    }
+        // Level of the interaction, taken from the server-owned context.
+        itemCefr: itemLevelFromStoredLevel(pedagogicalContext.cefrLevel),
+        // What kind of task this turn was, from the mode/stage already derived
+        // server-side. It only labels the evidence; no score changes.
+        taskType: coach ? coachTaskType(coach.stage) : teacherTaskType(mode),
+        // Phase 30: the real-life context of this production, kept in the
+        // existing metadata so transfer can be read deterministically later.
+        ...(coach
+          ? {
+              subskill: "coach_session",
+              rubricVersion: COACH_RUBRIC_VERSION,
+              context: coach.scenario,
+            }
+          : pedagogicalContext.currentActivity?.lessonTitle
+            ? { context: pedagogicalContext.currentActivity.lessonTitle }
+            : {}),
+      }),
+    });
+    evidencePersisted = result.ok && !result.duplicate;
+  }
 
-    return {
-      conversationId,
-      mode,
-      reply: turn.reply,
-      correction: turn.observedError,
-      mistakeSaved,
-      recap,
-      evidencePersisted,
-      evidenceSkill: decision.assess ? decision.skill : null,
-      coach: coach
-        ? {
-            stage: coach.stage,
-            focusSkill: coach.focusSkill,
-            turn: coach.turns,
-            maxTurns: coach.plannedTurns,
-            scenario: coach.scenario,
-            finished: coach.finished,
-          }
-        : null,
-    };
+  return {
+    conversationId,
+    mode,
+    reply: turn.reply,
+    correction: turn.observedError,
+    mistakeSaved,
+    recap,
+    evidencePersisted,
+    evidenceSkill: decision.assess ? decision.skill : null,
+    coach: coach
+      ? {
+          stage: coach.stage,
+          focusSkill: coach.focusSkill,
+          turn: coach.turns,
+          maxTurns: coach.plannedTurns,
+          scenario: coach.scenario,
+          finished: coach.finished,
+        }
+      : null,
+  };
 }
 
 /** Server-only adapter for verified, linked WhatsApp senders. It reuses the exact AI Teacher turn pipeline. */
@@ -265,19 +265,30 @@ export async function teacherTurnFromWhatsApp(userId: string, message: string) {
   if (error) throw new Error("Could not load AI Teacher conversation.");
   const conversation = rows?.[0] ?? null;
   const history = Array.isArray(conversation?.messages)
-    ? conversation.messages.flatMap((item: unknown) => {
-        if (!item || typeof item !== "object") return [];
-        const row = item as { role?: unknown; content?: unknown };
-        if ((row.role !== "user" && row.role !== "assistant") || typeof row.content !== "string" || !row.content.trim()) return [];
-        return [{ role: row.role, content: row.content.slice(0, 2000) }];
-      }).slice(-20)
+    ? conversation.messages
+        .flatMap((item: unknown) => {
+          if (!item || typeof item !== "object") return [];
+          const row = item as { role?: unknown; content?: unknown };
+          if (
+            (row.role !== "user" && row.role !== "assistant") ||
+            typeof row.content !== "string" ||
+            !row.content.trim()
+          ) {
+            return [];
+          }
+          return [{ role: row.role, content: row.content.slice(0, 2000) }];
+        })
+        .slice(-20)
     : [];
-  return runTeacherTurn({
-    objective: "Help the student improve their English.",
-    message: message.trim().slice(0, 2000),
-    history,
-    ...(conversation?.id ? { conversationId: conversation.id as string } : {}),
-  }, userId);
+  return runTeacherTurn(
+    {
+      objective: "Help the student improve their English.",
+      message: message.trim().slice(0, 2000),
+      history,
+      ...(conversation?.id ? { conversationId: conversation.id as string } : {}),
+    },
+    userId,
+  );
 }
 
 // Read-only session bootstrap for the AI Teacher UI: the display context comes
