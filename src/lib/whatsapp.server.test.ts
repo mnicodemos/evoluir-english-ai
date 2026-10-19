@@ -24,20 +24,39 @@ describe("WhatsApp Cloud API helpers", () => {
 
   it("extracts only valid inbound message envelopes and bounds message text", () => {
     const payload = {
-      entry: [{
-        changes: [{
-          value: {
-            messages: [
-              { id: "wamid.1", from: "5511999998888", type: "text", text: { body: "Hello EVO" } },
-              { id: "wamid.2", from: "5511999998888", type: "image" },
-              { id: 3, from: "5511999998888", type: "text", text: { body: "invalid id" } },
-            ],
-          },
-        }],
-      }],
+      entry: [
+        {
+          changes: [
+            {
+              value: {
+                messages: [
+                  {
+                    id: "wamid.1",
+                    from: "5511999998888",
+                    type: "text",
+                    text: { body: "Hello EVO" },
+                  },
+                  { id: "wamid.2", from: "5511999998888", type: "image" },
+                  {
+                    id: 3,
+                    from: "5511999998888",
+                    type: "text",
+                    text: { body: "invalid id" },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
     };
     expect(parseWhatsAppInboundMessages(payload)).toEqual([
-      { id: "wamid.1", from: "5511999998888", type: "text", text: { body: "Hello EVO" } },
+      {
+        id: "wamid.1",
+        from: "5511999998888",
+        type: "text",
+        text: { body: "Hello EVO" },
+      },
       { id: "wamid.2", from: "5511999998888", type: "image" },
     ]);
   });
