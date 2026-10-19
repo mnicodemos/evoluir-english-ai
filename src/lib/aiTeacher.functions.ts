@@ -62,8 +62,13 @@ async function admin() {
 export const teacherTurn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => teacherTurnInputSchema.parse(input))
-  .handler(async ({ data, context }) => {
-    const userId = context.userId;
+  .handler(async ({ data, context }) => runTeacherTurn(data, context.userId));
+
+// Read-only session bootstrap
+
+type TeacherTurnInput = z.infer<typeof teacherTurnInputSchema>;
+
+async function runTeacherTurn(data: TeacherTurnInput, userId: string) {
     const pedagogicalContext = await loadTeacherContext(userId, {
       lessonId: data.lessonId ?? null,
     });
@@ -247,9 +252,36 @@ export const teacherTurn = createServerFn({ method: "POST" })
           }
         : null,
     };
-  });
+}
 
-// Read-only session bootstrap for the AI Teacher UI: the display context comes
+/** Server-only adapter for verified, linked WhatsApp senders. It reuses the exact AI Teacher turn pipeline. */
+export async function teacherTurnFromWhatsApp(userId: string, message: string) {
+  const db = await admin();
+  const { data: rows, error } = await db
+    .from("ai_conversations")
+    .select("id, messages")
+    .eq("user_id", userId)
+    .eq("scenario", "teacher")
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  if (error) throw new Error("Could not load AI Teacher conversation.");
+  const conversation = rows?.[0] ?? null;
+  const history = Array.isArray(conversation?.messages)
+    ? conversation.messages.flatMap((item: unknown) => {
+        if (!item || typeof item !== "object") return [];
+        const row = item as { role?: unknown; content?: unknown };
+        if ((row.role !== "user" && row.role !== "assistant") || typeof row.content !== "string" || !row.content.trim()) return [];
+        return [{ role: row.role, content: row.content.slice(0, 2000) }];
+      }).slice(-20)
+    : [];
+  return runTeacherTurn({
+    message: message.trim().slice(0, 2000),
+    history,
+    ...(conversation?.id ? { conversationId: conversation.id as string } : {}),
+  }, userId);
+}
+
+ for the AI Teacher UI: the display context comes
 // from the server (never computed on the client) plus the student's latest
 // teacher conversation, read with the user's own RLS-scoped client.
 export const loadTeacherSession = createServerFn({ method: "POST" })
