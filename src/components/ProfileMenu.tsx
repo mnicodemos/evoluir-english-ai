@@ -435,7 +435,7 @@ export function ProfileMenu({
         </div>
 
         {whatsAppStatus.isLoading ? (
-          <p className="text-xs text-muted-foreground">{translate("Loading…", lang)}</p>
+          <p className="text-xs text-muted-foreground">{translate("Loading", lang)}</p>
         ) : whatsAppStatus.data?.connectedPhone ? (
           <div className="space-y-2">
             <p className="flex items-center gap-2 text-sm font-medium text-brand-green">
