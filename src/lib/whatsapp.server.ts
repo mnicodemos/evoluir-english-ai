@@ -96,7 +96,9 @@ export function parseWhatsAppInboundMessages(payload: unknown): WhatsAppInboundM
           from: message.from,
           type: message.type,
           ...(typeof message.text?.body === "string"
-            ? { text: { body: message.text.body.slice(0, 2000) } }
+            ? {
+                text: { body: message.text.body.slice(0, 2000) },
+              }
             : {}),
         });
       }
