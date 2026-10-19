@@ -50,7 +50,12 @@ export const createWhatsAppStudyLinkCode = createServerFn({ method: "POST" })
 
 export const getWhatsAppStudyConnectionStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({}).strict().parse(input ?? {}))
+  .inputValidator((input: unknown) =>
+    z
+      .object({})
+      .strict()
+      .parse(input ?? {}),
+  )
   .handler(async ({ context }) => {
     const businessPhoneNumber = process.env["WHATSAPP_BUSINESS_PHONE_NUMBER"]?.trim() || null;
     const required = [
