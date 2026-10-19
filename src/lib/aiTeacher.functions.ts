@@ -276,7 +276,7 @@ export async function teacherTurnFromWhatsApp(userId: string, message: string) {
           ) {
             return [];
           }
-          return [{ role: row.role, content: row.content.slice(0, 2000) }];
+          return [{ role: row.role as "user" | "assistant", content: row.content.slice(0, 2000) }];
         })
         .slice(-20)
     : [];
