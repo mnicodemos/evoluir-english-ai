@@ -5,7 +5,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const createWhatsAppStudyLinkCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({}).strict().parse(input ?? {}))
+  .inputValidator((input: unknown) =>
+    z
+      .object({})
+      .strict()
+      .parse(input ?? {}),
+  )
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { createWhatsAppLinkCode, getWhatsAppConfig } = await import("@/lib/whatsapp.server");
