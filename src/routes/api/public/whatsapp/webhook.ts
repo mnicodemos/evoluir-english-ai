@@ -36,6 +36,14 @@ export const Route = createFileRoute("/api/public/whatsapp/webhook")({
       },
 
       POST: async ({ request }) => {
+        const {
+          getWhatsAppConfig,
+          hashWhatsAppLinkCode,
+          normalizeWhatsAppPhone,
+          parseWhatsAppInboundMessages,
+          sendWhatsAppText,
+          verifyWhatsAppSignature,
+        } = await import("@/lib/whatsapp.server");
         let config;
         try {
           config = getWhatsAppConfig();
