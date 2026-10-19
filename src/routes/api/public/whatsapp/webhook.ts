@@ -167,10 +167,24 @@ export const Route = createFileRoute("/api/public/whatsapp/webhook")({
                 .is("revoked_at", null)
                 .maybeSingle();
 
-              const reply = connection
-                ? "Sua conta Evoluir+ está conectada. A prática de inglês por aqui ainda não está ativada. Continue usando a AI Teacher no aplicativo enquanto finalizamos essa etapa."
-                : "Olá! Para conectar seu WhatsApp ao Evoluir+ English AI, entre na sua conta, gere um código de conexão e envie CONECTAR seguido do código para este número.";
-              await sendWhatsAppText(config, phone, reply);
+              if (!connection) {
+                await sendWhatsAppText(
+                  config,
+                  phone,
+                  "Olá! Para conectar seu WhatsApp ao Evoluir+ English AI, entre na sua conta, gere um código de conexão e envie CONECTAR seguido do código para este número.",
+                );
+              } else if (process.env["WHATSAPP_STUDY_ENABLED"] !== "true") {
+                await sendWhatsAppText(
+                  config,
+                  phone,
+                  "Sua conta Evoluir+ está conectada. A prática de inglês por aqui ainda não está ativada. Continue usando a AI Teacher no aplicativo enquanto finalizamos a ativação.",
+                );
+              } else {
+                // Opt-in only: the existing AI Teacher pipeline owns CEFR context, quotas, persistence and evidence.
+                const { teacherTurnFromWhatsApp } = await import("@/lib/aiTeacher.functions");
+                const result = await teacherTurnFromWhatsApp(connection.user_id, message.text.body);
+                await sendWhatsAppText(config, phone, result.reply);
+              }
             }
 
             await db
