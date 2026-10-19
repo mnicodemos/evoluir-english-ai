@@ -64,8 +64,6 @@ export const teacherTurn = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => teacherTurnInputSchema.parse(input))
   .handler(async ({ data, context }) => runTeacherTurn(data, context.userId));
 
-// Read-only session bootstrap
-
 type TeacherTurnInput = z.infer<typeof teacherTurnInputSchema>;
 
 async function runTeacherTurn(data: TeacherTurnInput, userId: string) {
@@ -282,7 +280,7 @@ export async function teacherTurnFromWhatsApp(userId: string, message: string) {
   }, userId);
 }
 
- for the AI Teacher UI: the display context comes
+// Read-only session bootstrap for the AI Teacher UI: the display context comes
 // from the server (never computed on the client) plus the student's latest
 // teacher conversation, read with the user's own RLS-scoped client.
 export const loadTeacherSession = createServerFn({ method: "POST" })
