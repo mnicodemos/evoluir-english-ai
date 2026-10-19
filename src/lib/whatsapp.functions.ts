@@ -2,15 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { createWhatsAppLinkCode as makeLinkCode } from "@/lib/whatsapp.server";
 
 export const createWhatsAppStudyLinkCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({}).strict().parse(input ?? {}))
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // The WhatsApp tables are intentionally service-role-only; keep the generated
-    // Supabase client types untouched until the next schema type regeneration.
+    const { createWhatsAppLinkCode } = await import("@/lib/whatsapp.server");
+    // These tables are service-role-only; generated Supabase types are unchanged.
     const db = supabaseAdmin as any;
     const userId = context.userId;
     const now = new Date();
@@ -26,7 +25,7 @@ export const createWhatsAppStudyLinkCode = createServerFn({ method: "POST" })
       throw new Error("Too many WhatsApp connection codes. Please try again in an hour.");
     }
 
-    const { code, codeHash } = makeLinkCode();
+    const { code, codeHash } = createWhatsAppLinkCode();
     const expiresAt = new Date(now.getTime() + 10 * 60 * 1000);
     const { error } = await db.from("whatsapp_link_codes").insert({
       user_id: userId,
