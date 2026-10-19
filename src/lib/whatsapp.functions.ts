@@ -10,6 +10,7 @@ export const createWhatsAppStudyLinkCode = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { createWhatsAppLinkCode } = await import("@/lib/whatsapp.server");
     // These tables are service-role-only; generated Supabase types are unchanged.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- tables are not yet in generated Supabase types
     const db = supabaseAdmin as any;
     const userId = context.userId;
     const now = new Date();
