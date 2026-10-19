@@ -105,7 +105,7 @@ export const Route = createFileRoute("/api/public/whatsapp/webhook")({
               const { data: linkCode } = await db
                 .from("whatsapp_link_codes")
                 .select("id, user_id")
-                .eq("code_hash", hashWhatsAppLinkCode(connectMatch[1]))
+                .eq("code_hash", hashWhatsAppLinkCode(connectMatch[1] ?? ""))
                 .is("used_at", null)
                 .gt("expires_at", new Date().toISOString())
                 .maybeSingle();
@@ -134,18 +134,16 @@ export const Route = createFileRoute("/api/public/whatsapp/webhook")({
                     "Esse código já foi utilizado. Gere um novo código na sua conta Evoluir+.",
                   );
                 } else {
-                  const { error: connectError } = await db
-                    .from("whatsapp_connections")
-                    .upsert(
-                      {
-                        user_id: linkCode.user_id,
-                        phone_number: phone,
-                        connected_at: new Date().toISOString(),
-                        revoked_at: null,
-                        updated_at: new Date().toISOString(),
-                      },
-                      { onConflict: "user_id" },
-                    );
+                  const { error: connectError } = await db.from("whatsapp_connections").upsert(
+                    {
+                      user_id: linkCode.user_id,
+                      phone_number: phone,
+                      connected_at: new Date().toISOString(),
+                      revoked_at: null,
+                      updated_at: new Date().toISOString(),
+                    },
+                    { onConflict: "user_id" },
+                  );
                   if (connectError) {
                     await sendWhatsAppText(
                       config,
