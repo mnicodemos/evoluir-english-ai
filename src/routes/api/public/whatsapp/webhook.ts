@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
-export const Route = createFileRoute("/api/public/whatsapp/webhook" as never)({
+export const Route = createFileRoute("/api/public/whatsapp/webhook")({
   server: {
     handlers: {
       GET: async ({ request }) => {
