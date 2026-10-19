@@ -51,6 +51,7 @@ import { Route as AuthenticatedLifeHabitsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedLifeRoutineRouteImport } from './routes/_authenticated/life/routine'
 import { Route as ApiPublicCronDailyPushRouteImport } from './routes/api/public/cron/daily-push'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
+import { Route as ApiPublicWhatsAppWebhookRouteImport } from './routes/api/public/whatsapp/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
@@ -269,6 +270,11 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   path: '/api/public/stripe/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWhatsAppWebhookRoute = ApiPublicWhatsAppWebhookRouteImport.update({
+  id: '/api/public/whatsapp/webhook',
+  path: '/api/public/whatsapp/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -318,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/life/': typeof AuthenticatedLifeIndexRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsAppWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
@@ -362,6 +369,7 @@ export interface FileRoutesByTo {
   '/life': typeof AuthenticatedLifeIndexRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsAppWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
@@ -408,6 +416,7 @@ export interface FileRoutesById {
   '/_authenticated/life/': typeof AuthenticatedLifeIndexRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsAppWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
@@ -454,6 +463,7 @@ export interface FileRouteTypes {
     | '/life/'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
+    | '/api/public/whatsapp/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -498,6 +508,7 @@ export interface FileRouteTypes {
     | '/life'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
+    | '/api/public/whatsapp/webhook'
     | '/lovable/email/transactional/preview'
   id:
     | '__root__'
@@ -543,6 +554,7 @@ export interface FileRouteTypes {
     | '/_authenticated/life/'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
+    | '/api/public/whatsapp/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
@@ -559,6 +571,7 @@ export interface RootRouteChildren {
   ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiPublicCronDailyPushRoute: typeof ApiPublicCronDailyPushRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
+  ApiPublicWhatsAppWebhookRoute: typeof ApiPublicWhatsAppWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
@@ -858,6 +871,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/whatsapp/webhook': {
+      id: '/api/public/whatsapp/webhook'
+      path: '/api/public/whatsapp/webhook'
+      fullPath: '/api/public/whatsapp/webhook'
+      preLoaderRoute: typeof ApiPublicWhatsAppWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -950,6 +970,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTranscribeRoute: ApiTranscribeRoute,
   ApiPublicCronDailyPushRoute: ApiPublicCronDailyPushRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
+  ApiPublicWhatsAppWebhookRoute: ApiPublicWhatsAppWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
