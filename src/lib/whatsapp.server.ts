@@ -92,7 +92,9 @@ export function parseWhatsAppInboundMessages(payload: unknown): WhatsAppInboundM
           typeof message.id !== "string" ||
           typeof message.from !== "string" ||
           typeof message.type !== "string"
-        ) continue;
+        ) {
+          continue;
+        }
         result.push({
           id: message.id,
           from: message.from,
