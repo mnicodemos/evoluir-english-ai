@@ -263,12 +263,22 @@ export function WeeklyFrequency({
                 strokeDashoffset={circumference * (1 - progress)}
               />
             </svg>
-            <span className="relative text-center font-display text-lg font-bold leading-none text-foreground">
-              {studiedCount}/{weeklyGoal}
-              <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
-                {daysLabel}
+            {/* Goal reached: the ring fills with a Check in its own colour
+                instead of the day count (user request, like Today's Progress). */}
+            {allStudied ? (
+              <Check
+                className="relative size-8 text-brand-green 2xl:size-10"
+                strokeWidth={3}
+                aria-label={`${studiedCount} of ${weeklyGoal} days, goal reached`}
+              />
+            ) : (
+              <span className="relative text-center font-display text-lg font-bold leading-none text-foreground">
+                {studiedCount}/{weeklyGoal}
+                <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
+                  {daysLabel}
+                </span>
               </span>
-            </span>
+            )}
           </div>
           <div>
             {/* Third line (user request), moved above the day count and in
