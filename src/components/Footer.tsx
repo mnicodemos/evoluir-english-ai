@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Mail } from "lucide-react";
+import { Instagram, Mail, Youtube } from "lucide-react";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Logo } from "@/components/Logo";
@@ -34,6 +34,7 @@ function XIcon({ className = "size-5" }: { className?: string }) {
 const socialLinks = [
   { label: "Instagram", href: "https://instagram.com/evoluirmaisenglishai", icon: Instagram },
   { label: "TikTok", href: "https://tiktok.com/@evoluirmaisenglishai", icon: TikTokIcon },
+  { label: "YouTube", href: "https://www.youtube.com/@evoluirmaisenglishai", icon: Youtube },
   { label: "Threads", href: "https://threads.net/@evoluirmaisenglishai", icon: ThreadsIcon },
   { label: "X", href: "https://x.com/evoluirmaisai", icon: XIcon },
 ];
