@@ -275,6 +275,7 @@ export async function teacherTurnFromWhatsApp(userId: string, message: string) {
       }).slice(-20)
     : [];
   return runTeacherTurn({
+    objective: "Help the student improve their English.",
     message: message.trim().slice(0, 2000),
     history,
     ...(conversation?.id ? { conversationId: conversation.id as string } : {}),
