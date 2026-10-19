@@ -1987,19 +1987,24 @@ const baseUiPt: Record<string, string> = {
   Continuous: "Contínuo",
   "Today only: starts again tomorrow.": "Só de hoje: recomeça amanhã.",
   "Study by WhatsApp": "Estude pelo WhatsApp",
-  "Connect your account to prepare for English practice with EVO on WhatsApp.": "Conecte sua conta para preparar a prática de inglês com a EVO pelo WhatsApp.",
+  "Connect your account to prepare for English practice with EVO on WhatsApp.":
+    "Conecte sua conta para preparar a prática de inglês com a EVO pelo WhatsApp.",
   "WhatsApp connection": "Conexão com WhatsApp",
   "Your WhatsApp is connected.": "Seu WhatsApp está conectado.",
   "Connected number": "Número conectado",
-  "The WhatsApp connection is not available yet. The official Meta setup is still being completed.": "A conexão com WhatsApp ainda não está disponível. A configuração oficial da Meta está sendo concluída.",
+  "The WhatsApp connection is not available yet. The official Meta setup is still being completed.":
+    "A conexão com WhatsApp ainda não está disponível. A configuração oficial da Meta está sendo concluída.",
   "Generate connection code": "Gerar código de conexão",
   "Generating…": "Gerando…",
-  "Send this code to the official Evoluir+ WhatsApp number:": "Envie este código para o número oficial do WhatsApp do Evoluir+:",
+  "Send this code to the official Evoluir+ WhatsApp number:":
+    "Envie este código para o número oficial do WhatsApp do Evoluir+:",
   "Code expires at": "O código expira às",
   "Copy code": "Copiar código",
   "Code copied.": "Código copiado.",
-  "Could not generate a connection code. Please try again.": "Não foi possível gerar o código de conexão. Tente novamente.",
-  "WhatsApp account linking is prepared, but English practice through WhatsApp is not active yet.": "A vinculação da conta ao WhatsApp está preparada, mas a prática de inglês pelo WhatsApp ainda não está ativa.",
+  "Could not generate a connection code. Please try again.":
+    "Não foi possível gerar o código de conexão. Tente novamente.",
+  "WhatsApp account linking is prepared, but English practice through WhatsApp is not active yet.":
+    "A vinculação da conta ao WhatsApp está preparada, mas a prática de inglês pelo WhatsApp ainda não está ativa.",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.
