@@ -8,6 +8,7 @@ export type WhatsAppConfig = {
   phoneNumberId: string;
   verifyToken: string;
   graphApiVersion: string;
+  businessPhoneNumber: string;
 };
 
 export function getWhatsAppConfig(): WhatsAppConfig {
@@ -17,6 +18,7 @@ export function getWhatsAppConfig(): WhatsAppConfig {
     phoneNumberId: process.env["WHATSAPP_PHONE_NUMBER_ID"],
     verifyToken: process.env["WHATSAPP_VERIFY_TOKEN"],
     graphApiVersion: process.env["WHATSAPP_GRAPH_API_VERSION"],
+    businessPhoneNumber: process.env["WHATSAPP_BUSINESS_PHONE_NUMBER"],
   };
   const missing = Object.entries(required)
     .filter(([, value]) => !value?.trim())
