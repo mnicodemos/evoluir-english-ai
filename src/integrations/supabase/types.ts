@@ -1873,6 +1873,84 @@ export type Database = {
           },
         ]
       }
+      whatsapp_connections: {
+        Row: {
+          connected_at: string
+          created_at: string
+          phone_number: string
+          revoked_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connected_at?: string
+          created_at?: string
+          phone_number: string
+          revoked_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connected_at?: string
+          created_at?: string
+          phone_number?: string
+          revoked_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      whatsapp_link_codes: {
+        Row: {
+          code_hash: string
+          created_at: string
+          expires_at: string
+          id: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      whatsapp_message_events: {
+        Row: {
+          phone_number: string | null
+          processed_at: string | null
+          provider_message_id: string
+          received_at: string
+          status: string
+        }
+        Insert: {
+          phone_number?: string | null
+          processed_at?: string | null
+          provider_message_id: string
+          received_at?: string
+          status?: string
+        }
+        Update: {
+          phone_number?: string | null
+          processed_at?: string | null
+          provider_message_id?: string
+          received_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       writing_submissions: {
         Row: {
           clarity_score: number
