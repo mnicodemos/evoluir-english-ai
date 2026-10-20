@@ -1,7 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 import { useProfile } from "@/hooks/useProfile";
-import { fetchUserVocabularyMastery } from "@/hooks/useUserVocabularyMastery";
+import {
+  fetchUserVocabularyMastery,
+  USER_VOCABULARY_MASTERY_KEY,
+} from "@/hooks/useUserVocabularyMastery";
 import { supabase } from "@/integrations/supabase/client";
 import { todayStudyMetrics } from "@/lib/studyDay";
 
@@ -28,9 +32,59 @@ export function useStudySnapshot() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
 
+  useEffect(() => {
+    const userId = profile?.id;
+    if (!userId) return;
+
+    // Today's Progress also depends on completion/mastery records, not only activities.
+    // Refresh the existing snapshot when any of its source tables changes.
+    const channel = supabase
+      .channel(`study-snapshot-${userId}`)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "user_lessons",
+        filter: `user_id=eq.${userId}`,
+      }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["study-snapshot", userId] });
+      })
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "user_flashcards",
+        filter: `user_id=eq.${userId}`,
+      }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["study-snapshot", userId] });
+      })
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "quiz_results",
+        filter: `user_id=eq.${userId}`,
+      }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["study-snapshot", userId] });
+      })
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "user_vocabulary",
+        filter: `user_id=eq.${userId}`,
+      }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["study-snapshot", userId] });
+        void queryClient.invalidateQueries({ queryKey: USER_VOCABULARY_MASTERY_KEY });
+      })
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [profile?.id, queryClient]);
+
   return useQuery({
     queryKey: ["study-snapshot", profile?.id, profile?.level],
     enabled: !!profile,
+    refetchOnWindowFocus: true,
+    refetchInterval: 30_000,
     queryFn: async (): Promise<StudySnapshot> => {
       const level = profile!.level;
       const { data: levelLessons } = await supabase
