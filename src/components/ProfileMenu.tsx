@@ -29,6 +29,14 @@ import {
   getWhatsAppStudyConnectionStatus,
 } from "@/lib/whatsapp.functions";
 
+/**
+ * WhatsApp study integration (Cloud API) — the whole implementation stays in
+ * place; only this section's display is hidden from students until the Meta
+ * setup is validated (WHATSAPP_STUDY_ENABLED stays off). Flip to true to show
+ * it again.
+ */
+const WHATSAPP_SECTION_VISIBLE = false;
+
 const AVATAR_BUCKET = "avatars";
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 
@@ -195,7 +203,7 @@ export function ProfileMenu({
 
   const whatsAppStatus = useQuery({
     queryKey: ["whatsapp-study-connection", profile?.id],
-    enabled: open && !!profile?.id,
+    enabled: WHATSAPP_SECTION_VISIBLE && open && !!profile?.id,
     queryFn: () => getWhatsAppStudyConnectionStatus({ data: {} }),
     retry: false,
   });
@@ -418,6 +426,7 @@ export function ProfileMenu({
         </div>
       </div>
 
+      {WHATSAPP_SECTION_VISIBLE ? (
       <section className="space-y-3 rounded-xl border border-border bg-background/40 p-3">
         <div className="flex items-start gap-2.5">
           <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#25D366]/10 text-[#25D366]">
@@ -531,6 +540,7 @@ export function ProfileMenu({
           </p>
         )}
       </section>
+      ) : null}
 
       <div className="flex flex-row items-center justify-between gap-2">
         <AdminPanelButton showLabel className="mr-auto" />
