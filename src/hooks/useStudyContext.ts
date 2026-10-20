@@ -38,41 +38,58 @@ export function useStudySnapshot() {
 
     // Today's Progress also depends on completion/mastery records, not only activities.
     // Refresh the existing snapshot when any of its source tables changes.
+    const refreshSnapshot = () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["study-snapshot", userId],
+      });
+    };
     const channel = supabase
       .channel(`study-snapshot-${userId}`)
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "user_lessons",
-        filter: `user_id=eq.${userId}`,
-      }, () => {
-        void queryClient.invalidateQueries({ queryKey: ["study-snapshot", userId] });
-      })
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "user_flashcards",
-        filter: `user_id=eq.${userId}`,
-      }, () => {
-        void queryClient.invalidateQueries({ queryKey: ["study-snapshot", userId] });
-      })
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "quiz_results",
-        filter: `user_id=eq.${userId}`,
-      }, () => {
-        void queryClient.invalidateQueries({ queryKey: ["study-snapshot", userId] });
-      })
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "user_vocabulary",
-        filter: `user_id=eq.${userId}`,
-      }, () => {
-        void queryClient.invalidateQueries({ queryKey: ["study-snapshot", userId] });
-        void queryClient.invalidateQueries({ queryKey: USER_VOCABULARY_MASTERY_KEY });
-      })
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_lessons",
+          filter: `user_id=eq.${userId}`,
+        },
+        refreshSnapshot,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_flashcards",
+          filter: `user_id=eq.${userId}`,
+        },
+        refreshSnapshot,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "quiz_results",
+          filter: `user_id=eq.${userId}`,
+        },
+        refreshSnapshot,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_vocabulary",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          refreshSnapshot();
+          void queryClient.invalidateQueries({
+            queryKey: USER_VOCABULARY_MASTERY_KEY,
+          });
+        },
+      )
       .subscribe();
 
     return () => {
