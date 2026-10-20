@@ -540,6 +540,13 @@
       "when": 1792286962106,
       "tag": "0076_placement_test_pedagogical_source",
       "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1792454439437,
+      "tag": "0077_0077_whatsapp_study_integration_apply",
+      "breakpoints": true
     }
   ]
 }
