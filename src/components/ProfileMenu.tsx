@@ -29,6 +29,14 @@ import {
   getWhatsAppStudyConnectionStatus,
 } from "@/lib/whatsapp.functions";
 
+/**
+ * WhatsApp study integration (Cloud API) — the whole implementation stays in
+ * place; only this section's display is hidden from students until the Meta
+ * setup is validated (WHATSAPP_STUDY_ENABLED stays off). Flip to true to show
+ * it again.
+ */
+const WHATSAPP_SECTION_VISIBLE = false;
+
 const AVATAR_BUCKET = "avatars";
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 
@@ -195,7 +203,7 @@ export function ProfileMenu({
 
   const whatsAppStatus = useQuery({
     queryKey: ["whatsapp-study-connection", profile?.id],
-    enabled: open && !!profile?.id,
+    enabled: WHATSAPP_SECTION_VISIBLE && open && !!profile?.id,
     queryFn: () => getWhatsAppStudyConnectionStatus({ data: {} }),
     retry: false,
   });
@@ -418,119 +426,121 @@ export function ProfileMenu({
         </div>
       </div>
 
-      <section className="space-y-3 rounded-xl border border-border bg-background/40 p-3">
-        <div className="flex items-start gap-2.5">
-          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#25D366]/10 text-[#25D366]">
-            <MessageCircle className="size-5" aria-hidden="true" />
-          </span>
-          <div className="min-w-0 space-y-1">
-            <h3 className="text-sm font-semibold">{translate("Study by WhatsApp", lang)}</h3>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              {translate(
-                "Connect your account to prepare for English practice with EVO on WhatsApp.",
-                lang,
-              )}
-            </p>
-          </div>
-        </div>
-
-        {whatsAppStatus.isLoading ? (
-          <p className="text-xs text-muted-foreground">{translate("Loading", lang)}</p>
-        ) : whatsAppStatus.data?.connectedPhone ? (
-          <div className="space-y-2">
-            <p className="flex items-center gap-2 text-sm font-medium text-brand-green">
-              <Check className="size-4" aria-hidden="true" />
-              {translate("Your WhatsApp is connected.", lang)}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {translate("Connected number", lang)}: {whatsAppStatus.data.connectedPhone}
-            </p>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              {translate(
-                "WhatsApp account linking is prepared, but English practice through WhatsApp is not active yet.",
-                lang,
-              )}
-            </p>
-          </div>
-        ) : whatsAppStatus.data?.ready ? (
-          <div className="space-y-3">
-            {whatsAppStatus.data.businessPhoneNumber ? (
-              <p className="text-xs text-muted-foreground">
-                {translate("Send this code to the official Evoluir+ WhatsApp number:", lang)}{" "}
-                <span className="font-semibold text-foreground">
-                  {whatsAppStatus.data.businessPhoneNumber}
-                </span>
+      {WHATSAPP_SECTION_VISIBLE ? (
+        <section className="space-y-3 rounded-xl border border-border bg-background/40 p-3">
+          <div className="flex items-start gap-2.5">
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#25D366]/10 text-[#25D366]">
+              <MessageCircle className="size-5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 space-y-1">
+              <h3 className="text-sm font-semibold">{translate("Study by WhatsApp", lang)}</h3>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {translate(
+                  "Connect your account to prepare for English practice with EVO on WhatsApp.",
+                  lang,
+                )}
               </p>
-            ) : null}
-            {whatsAppCode ? (
-              <div className="space-y-2 rounded-lg bg-muted/60 p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="font-mono text-2xl font-bold tracking-[0.2em]">{whatsAppCode}</p>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(whatsAppCode);
-                        setWhatsAppCodeCopied(true);
-                        toast.success(translate("Code copied.", lang));
-                      } catch {
-                        toast.error(translate("The text could not be copied.", lang));
-                      }
-                    }}
-                  >
-                    {whatsAppCodeCopied ? (
-                      <Check className="size-4" aria-hidden="true" />
-                    ) : (
-                      <Copy className="size-4" aria-hidden="true" />
-                    )}
-                    {translate("Copy code", lang)}
-                  </Button>
-                </div>
-                {whatsAppCodeExpiresAt ? (
-                  <p className="text-xs text-muted-foreground">
-                    {translate("Code expires at", lang)}{" "}
-                    {new Date(whatsAppCodeExpiresAt).toLocaleTimeString(
-                      lang === "pt" ? "pt-BR" : "en-US",
-                      { hour: "2-digit", minute: "2-digit" },
-                    )}
-                  </p>
-                ) : null}
+            </div>
+          </div>
+
+          {whatsAppStatus.isLoading ? (
+            <p className="text-xs text-muted-foreground">{translate("Loading", lang)}</p>
+          ) : whatsAppStatus.data?.connectedPhone ? (
+            <div className="space-y-2">
+              <p className="flex items-center gap-2 text-sm font-medium text-brand-green">
+                <Check className="size-4" aria-hidden="true" />
+                {translate("Your WhatsApp is connected.", lang)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {translate("Connected number", lang)}: {whatsAppStatus.data.connectedPhone}
+              </p>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {translate(
+                  "WhatsApp account linking is prepared, but English practice through WhatsApp is not active yet.",
+                  lang,
+                )}
+              </p>
+            </div>
+          ) : whatsAppStatus.data?.ready ? (
+            <div className="space-y-3">
+              {whatsAppStatus.data.businessPhoneNumber ? (
                 <p className="text-xs text-muted-foreground">
-                  {lang === "pt"
-                    ? "No WhatsApp, envie: CONECTAR " + whatsAppCode
-                    : "In WhatsApp, send: CONNECT " + whatsAppCode}
+                  {translate("Send this code to the official Evoluir+ WhatsApp number:", lang)}{" "}
+                  <span className="font-semibold text-foreground">
+                    {whatsAppStatus.data.businessPhoneNumber}
+                  </span>
                 </p>
-              </div>
-            ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              disabled={createWhatsAppCode.isPending}
-              onClick={() => createWhatsAppCode.mutate()}
-            >
-              {createWhatsAppCode.isPending ? (
-                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <MessageCircle className="size-4" aria-hidden="true" />
-              )}
+              ) : null}
+              {whatsAppCode ? (
+                <div className="space-y-2 rounded-lg bg-muted/60 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-mono text-2xl font-bold tracking-[0.2em]">{whatsAppCode}</p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(whatsAppCode);
+                          setWhatsAppCodeCopied(true);
+                          toast.success(translate("Code copied.", lang));
+                        } catch {
+                          toast.error(translate("The text could not be copied.", lang));
+                        }
+                      }}
+                    >
+                      {whatsAppCodeCopied ? (
+                        <Check className="size-4" aria-hidden="true" />
+                      ) : (
+                        <Copy className="size-4" aria-hidden="true" />
+                      )}
+                      {translate("Copy code", lang)}
+                    </Button>
+                  </div>
+                  {whatsAppCodeExpiresAt ? (
+                    <p className="text-xs text-muted-foreground">
+                      {translate("Code expires at", lang)}{" "}
+                      {new Date(whatsAppCodeExpiresAt).toLocaleTimeString(
+                        lang === "pt" ? "pt-BR" : "en-US",
+                        { hour: "2-digit", minute: "2-digit" },
+                      )}
+                    </p>
+                  ) : null}
+                  <p className="text-xs text-muted-foreground">
+                    {lang === "pt"
+                      ? "No WhatsApp, envie: CONECTAR " + whatsAppCode
+                      : "In WhatsApp, send: CONNECT " + whatsAppCode}
+                  </p>
+                </div>
+              ) : null}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={createWhatsAppCode.isPending}
+                onClick={() => createWhatsAppCode.mutate()}
+              >
+                {createWhatsAppCode.isPending ? (
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <MessageCircle className="size-4" aria-hidden="true" />
+                )}
+                {translate(
+                  createWhatsAppCode.isPending ? "Generating…" : "Generate connection code",
+                  lang,
+                )}
+              </Button>
+            </div>
+          ) : (
+            <p className="text-xs leading-relaxed text-muted-foreground">
               {translate(
-                createWhatsAppCode.isPending ? "Generating…" : "Generate connection code",
+                "The WhatsApp connection is not available yet. The official Meta setup is still being completed.",
                 lang,
               )}
-            </Button>
-          </div>
-        ) : (
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {translate(
-              "The WhatsApp connection is not available yet. The official Meta setup is still being completed.",
-              lang,
-            )}
-          </p>
-        )}
-      </section>
+            </p>
+          )}
+        </section>
+      ) : null}
 
       <div className="flex flex-row items-center justify-between gap-2">
         <AdminPanelButton showLabel className="mr-auto" />
