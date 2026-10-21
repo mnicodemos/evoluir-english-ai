@@ -21,7 +21,8 @@
     "js-yaml": "4.3.2",
     "nanoid": "3.3.19",
     "dompurify": "3.4.16",
-    "@grpc/grpc-js": "1.13.6"
+    "@grpc/grpc-js": "1.13.6",
+    "launch-editor": "2.14.2"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -116,7 +117,7 @@
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "8.1.5",
+    "vite": "8.1.6",
     "vitest": "^5.0.1"
   },
   "pnpm": {

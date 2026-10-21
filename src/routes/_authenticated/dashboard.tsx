@@ -315,13 +315,7 @@ function PlanTodaySummary({
       label={label}
       value={weekDone ? translate("All days done") : (next?.title ?? translate("See your week"))}
       // Always three lines, like the other header cells (user request).
-      detail={
-        weekDone
-          ? translate("New plan on Monday")
-          : next
-            ? `${translate(PLAN_SKILL_LABELS[next.skill] ?? next.skill)} · ${translate(next.day)}`
-            : translate("Open your study plan")
-      }
+      detail={translate("Your week")}
       to="/study-plan"
     />
   );

@@ -13,7 +13,7 @@ import {
   GraduationCap,
   Headphones,
   Lightbulb,
-  Map,
+  CalendarDays,
   Medal,
   MessageSquareText,
   Mic,
@@ -146,7 +146,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const skillLabel = data.prioritySkill
     ? t(NEXT_STEP_SKILL_TEXT[data.prioritySkill] ?? data.prioritySkill)
     : data.reason === "no_data"
-      ? t("First conversation")
+      ? t("Conversation")
       : t("Free practice");
   const PriorityIcon =
     {
@@ -313,8 +313,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       <Link to="/study-plan">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium">
-          <Map className="size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
-          {t("Your trail")}
+          <CalendarDays className="size-3.5 shrink-0 text-pink-400" aria-hidden="true" />
+          {t("Your week")}
         </span>
       </Link>
     </Button>
