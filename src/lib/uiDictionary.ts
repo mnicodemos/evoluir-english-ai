@@ -3,6 +3,7 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Next plan on Monday": "Próximo plano na segunda-feira",
   // Life+ AI visual guide (/life/guide)
   "How Life+ AI works": "Como funciona o Life+ AI",
   "Your daily cycle": "Seu ciclo diário",
