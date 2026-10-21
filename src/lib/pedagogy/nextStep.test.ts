@@ -398,7 +398,7 @@ describe("why now justification", () => {
     );
     expect(fill("not_practised_recently")).toBe("You haven't practised Vocabulary recently.");
     expect(fill("lowest_score")).toBe("Vocabulary is currently the area that needs more practice.");
-    expect(fill("no_data")).toBe("Start anywhere and we will personalise your next step.");
+    expect(fill("no_data")).toBe("Start and we will personalise your next step.");
   });
 
   it("never exposes score or confidence to justify the decision", () => {
