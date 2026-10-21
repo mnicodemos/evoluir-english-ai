@@ -560,7 +560,7 @@ function Dashboard() {
                 <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                   <div
                     className={cn(
-                      "relative grid size-[5.25rem] place-items-center text-brand-green lg:size-24 2xl:size-30",
+                      "relative grid size-[5.93rem] place-items-center text-brand-green lg:size-24 2xl:size-30",
                       celebrateGoal && "animate-celebrate",
                     )}
                   >
@@ -615,7 +615,7 @@ function Dashboard() {
                     )}
                   </div>
                   {minutesToday >= profile.daily_minutes && (
-                    <p className="mt-1 inline-flex items-center justify-center gap-1 whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-brand-green">
+                    <p className="mt-1 hidden items-center justify-center gap-1 whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-brand-green lg:inline-flex">
                       <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
                       {t("Daily goal reached!")}
                     </p>
@@ -686,6 +686,12 @@ function Dashboard() {
                       );
                     })}
                   </div>
+                  {minutesToday >= profile.daily_minutes && (
+                    <p className="mt-1 inline-flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green lg:hidden">
+                      <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
+                      {t("Daily goal reached!")}
+                    </p>
+                  )}
                 </div>
               </div>
               {/* Desktop-only secondary action to the Study Plan, styled like the
