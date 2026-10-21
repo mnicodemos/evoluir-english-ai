@@ -313,7 +313,7 @@ function PlanTodaySummary({
       }
       tone={ok ? "green" : "pink"}
       label={label}
-      value={weekDone ? translate("All days done") : (next?.title ?? translate("See your week"))}
+      value={weekDone ? translate("All days done") : translate("Your week")}
       // Always three lines, like the other header cells (user request).
       detail={translate("Your week")}
       to="/study-plan"
