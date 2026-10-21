@@ -641,7 +641,7 @@ function Dashboard() {
                     </div>
                   )}
                   <div
-                    className={`${hasProgressToday ? "grid" : "hidden"} gap-2 xl:gap-1 2xl:gap-2`}
+                    className={`${hasProgressToday ? "grid auto-rows-[2rem]" : "hidden"} gap-2 xl:gap-1 2xl:gap-2`}
                   >
                     {learningCards.map((card) => {
                       // Each line has its own activity icon: grey until done today,
@@ -664,7 +664,7 @@ function Dashboard() {
                       return (
                         <div
                           key={card.key}
-                          className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
+                          className="grid min-h-8 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
                         >
                           <Icon
                             className={`size-4 shrink-0 justify-self-end lg:justify-self-auto ${iconClass}`}
