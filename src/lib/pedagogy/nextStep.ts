@@ -529,7 +529,7 @@ export const NEXT_STEP_EVIDENCE_TEXT: Record<NextStepReason, string> = {
   not_measured_yet: "More {skill} evidence will help EVO understand your current level.",
   low_confidence: "More evidence is needed to better understand your {skill} progress.",
   not_practised_recently: "You haven't practised {skill} recently.",
-  lowest_score: "{skill} is currently the area that needs more practice.",
+  lowest_score: "This skill needs practice.",
   no_data: "More practice will help EVO understand your learning path.",
 };
 
