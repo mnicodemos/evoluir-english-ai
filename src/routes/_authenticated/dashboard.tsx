@@ -302,6 +302,11 @@ function PlanTodaySummary({
         : next.status === "missed"
           ? translate("Catch up")
           : translate("Next in your plan");
+  const detail = weekDone
+    ? translate("Next plan on Monday")
+    : next
+      ? `${translate(PLAN_SKILL_LABELS[next.skill] ?? next.title)} - ${translate(next.day)}`
+      : translate("Your week");
   return (
     <DashboardHeaderStat
       icon={
@@ -315,7 +320,7 @@ function PlanTodaySummary({
       label={label}
       value={weekDone ? translate("All days done") : translate("Your week")}
       // Always three lines, like the other header cells (user request).
-      detail={translate("Your week")}
+      detail={detail}
       to="/study-plan"
     />
   );
