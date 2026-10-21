@@ -290,9 +290,9 @@ function PlanTodaySummary({
   todayDone: boolean;
   translate: (label: string) => string;
 }) {
-  // Done (the week, or today's plan day): a green calendar with its check;
-  // still pending: the plain calendar in the plan's pink (user request).
-  const ok = weekDone || todayDone;
+  // Show the green checked calendar only when every planned day is done.
+  // Completing today's activity must not mark an unfinished week as complete.
+  const ok = weekDone;
   const label = weekDone
     ? translate("Week plan complete")
     : !next
