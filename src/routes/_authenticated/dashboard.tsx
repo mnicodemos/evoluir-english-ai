@@ -686,17 +686,21 @@ function Dashboard() {
                       );
                     })}
                   </div>
-                  {minutesToday >= profile.daily_minutes && (
-                    <div className="mt-1 grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:hidden">
-                      <CircleCheck
-                        className="size-3.5 shrink-0 justify-self-end text-brand-green"
-                        aria-hidden="true"
-                      />
-                      <p className="whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green">
-                        {t("Daily goal reached!")}
-                      </p>
-                    </div>
-                  )}
+                  <div
+                    className={cn(
+                      "mt-1 grid min-h-[1.25rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:hidden",
+                      minutesToday < profile.daily_minutes && "invisible",
+                    )}
+                    aria-hidden={minutesToday < profile.daily_minutes}
+                  >
+                    <CircleCheck
+                      className="size-3.5 shrink-0 justify-self-end text-brand-green"
+                      aria-hidden="true"
+                    />
+                    <p className="whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green">
+                      {t("Daily goal reached!")}
+                    </p>
+                  </div>
                 </div>
               </div>
               {/* Desktop-only secondary action to the Study Plan, styled like the
