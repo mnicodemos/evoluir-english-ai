@@ -570,8 +570,7 @@ const baseUiPt: Record<string, string> = {
   "You haven't practised {skill} recently.": "Você não praticou {skill} recentemente.",
   "{skill} is currently the area that needs more practice.":
     "{skill} é a área que mais precisa de prática no momento.",
-  "{skill} is your next area to strengthen in your {level} journey.":
-    "{skill} é sua próxima área a fortalecer na sua jornada {level}.",
+  "{skill} needs practice.": "{skill} precisa de prática.",
   "{skill} is next in your {level} journey.": "{skill} é o próximo passo da sua jornada {level}.",
   "Recent practice shows room to improve.": "Sua prática recente mostra onde melhorar.",
   "More {skill} evidence will guide EVO.": "Mais evidências de {skill} guiarão a EVO.",
