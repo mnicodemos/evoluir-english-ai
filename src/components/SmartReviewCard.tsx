@@ -86,7 +86,7 @@ export function SmartReviewCard({
       <section
         className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
         aria-busy="true"
-        aria-label={t("Keep improving")}
+        aria-label={t("Keep Improving")}
       >
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
           <BookOpen
@@ -94,7 +94,7 @@ export function SmartReviewCard({
             strokeWidth={2.5}
             aria-hidden="true"
           />
-          <h2 className="font-display text-sm font-semibold">{t("Keep improving")}</h2>
+          <h2 className="font-display text-sm font-semibold">{t("Keep Improving")}</h2>
           <ScopeBadge kind="continuous" translate={t} />
         </div>
         <div className="mt-3 grid flex-1 grid-rows-3 gap-2 xl:mt-4">
@@ -151,7 +151,7 @@ export function SmartReviewCard({
             aria-hidden="true"
           />
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
-            {t("Keep improving")}
+            {t("Keep Improving")}
           </h2>
           <ScopeBadge kind="continuous" translate={t} />
         </div>
@@ -190,7 +190,7 @@ export function SmartReviewCard({
             aria-hidden="true"
           />
           <h2 id="smart-review-title" className="font-display text-sm font-semibold">
-            {t("Keep improving")}
+            {t("Keep Improving")}
           </h2>
           <ScopeBadge kind="continuous" translate={t} />
         </div>
