@@ -517,8 +517,7 @@ export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
  * "Why this matters now?" priority line: reuses prioritySkill and the level
  * already resolved by buildNextStep — never a new decision.
  */
-export const NEXT_STEP_PRIORITY_TEXT =
-  "{skill} needs practice.";
+export const NEXT_STEP_PRIORITY_TEXT = "{skill} needs practice.";
 
 /**
  * Evidence line for the same block: the real cause that produced the priority,
