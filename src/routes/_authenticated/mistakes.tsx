@@ -7,6 +7,7 @@ import {
   Loader2,
   RotateCcw,
   SpellCheck,
+  Trash2,
   Target,
   XCircle,
 } from "lucide-react";
@@ -24,7 +25,7 @@ import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { isMistakeDue, MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
 import { findMistakeSentence, type MistakeSentence } from "@/lib/mistakeSentence";
-import { practiceMistake, reviewMistake } from "@/lib/mistakes.functions";
+import { deleteMistake, practiceMistake, reviewMistake } from "@/lib/mistakes.functions";
 import type { MistakePractice } from "@/lib/mistakePractice";
 import { cn } from "@/lib/utils";
 import {
@@ -78,6 +79,8 @@ function Mistakes() {
     },
   });
   const review = useServerFn(reviewMistake);
+  const removeMistake = useServerFn(deleteMistake);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [answer, setAnswer] = useState("");
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [checking, setChecking] = useState(false);
@@ -175,6 +178,25 @@ function Mistakes() {
     setOutcome(null);
     setAnswer("");
     void queryClient.invalidateQueries({ queryKey: ["mistakes"] });
+  }
+
+  async function deleteSavedMistake(id: string) {
+    if (!window.confirm("Delete this saved mistake? This cannot be undone.")) return;
+    setDeletingId(id);
+    try {
+      await removeMistake({ data: { id } });
+      setAnswered((ids) => ids.filter((item) => item !== id));
+      if (answered.includes(id)) {
+        setOutcome(null);
+        setAnswer("");
+      }
+      await queryClient.invalidateQueries({ queryKey: ["mistakes", profile?.id] });
+      toast.success("Mistake deleted.");
+    } catch {
+      toast.error("Could not delete this mistake. Please try again.");
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   return (
@@ -445,6 +467,24 @@ function Mistakes() {
                         )}
                       />
                     ))}
+                  </div>
+                  <div className="mt-2 flex justify-end">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 gap-1.5 px-2 text-xs text-destructive hover:text-destructive"
+                      disabled={deletingId === row.id}
+                      onClick={() => void deleteSavedMistake(row.id)}
+                      aria-label={`Delete mistake: ${row.corrected_text}`}
+                    >
+                      {deletingId === row.id ? (
+                        <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Trash2 className="size-3.5" aria-hidden="true" />
+                      )}
+                      Delete
+                    </Button>
                   </div>
                 </li>
               ))}
