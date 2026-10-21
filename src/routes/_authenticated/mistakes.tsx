@@ -57,6 +57,7 @@ type MistakeRow = {
   frequency: number;
   review_step: number;
   next_review_at: string;
+  last_detected: string;
   /** The whole sentence of the student's text, when it can be found. */
   sentence: MistakeSentence | null;
 };
@@ -103,7 +104,7 @@ function Mistakes() {
       const { data, error } = await supabase
         .from("learning_errors")
         .select(
-          "id, original_text, corrected_text, explanation, category, frequency, review_step, next_review_at",
+          "id, original_text, corrected_text, explanation, category, frequency, review_step, next_review_at, last_detected",
         )
         .eq("user_id", profile!.id)
         .order("last_detected", { ascending: false })
@@ -158,7 +159,9 @@ function Mistakes() {
     type,
     count: rows.filter((row) => mistakeTypeOf(row.category) === type).length,
   })).filter((item) => item.count > 0);
-  const listed = tab === "all" ? rows : rows.filter((row) => mistakeTypeOf(row.category) === tab);
+  const listed = (tab === "all" ? rows : rows.filter((row) => mistakeTypeOf(row.category) === tab))
+    .slice()
+    .sort((a, b) => new Date(b.last_detected).getTime() - new Date(a.last_detected).getTime());
 
   async function check() {
     if (!current || !answer.trim()) return;
@@ -438,6 +441,16 @@ function Mistakes() {
             <ul className="max-h-[50vh] space-y-1.5 overflow-y-auto pr-1 lg:max-h-[60vh]">
               {listed.map((row) => (
                 <li key={row.id} className="rounded-lg border border-border/60 p-2 text-sm">
+                  <p className="mb-1 text-[11px] font-medium text-muted-foreground">
+                    {(() => {
+                      const detectedAt = new Date(row.last_detected);
+                      const today = new Date();
+                      detectedAt.setHours(0, 0, 0, 0);
+                      today.setHours(0, 0, 0, 0);
+                      const days = Math.max(0, Math.floor((today.getTime() - detectedAt.getTime()) / 86_400_000));
+                      return days === 0 ? "Today" : days === 1 ? "1 day ago" : `${days} days ago`;
+                    })()}
+                  </p>
                   {row.sentence ? (
                     <p translate="no" lang="en">
                       {row.sentence.before}
