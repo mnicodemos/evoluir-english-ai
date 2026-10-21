@@ -4,6 +4,12 @@ import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
   "Next plan on Monday": "Próximo plano na segunda-feira",
+  "Delete this saved mistake? This cannot be undone.":
+    "Excluir este erro salvo? Esta ação não pode ser desfeita.",
+  "Mistake deleted.": "Erro excluído.",
+  "Could not delete this mistake. Please try again.":
+    "Não foi possível excluir este erro. Tente novamente.",
+  Delete: "Excluir",
   // Life+ AI visual guide (/life/guide)
   "How Life+ AI works": "Como funciona o Life+ AI",
   "Your daily cycle": "Seu ciclo diário",

@@ -104,3 +104,25 @@ export const practiceMistake = createServerFn({ method: "POST" })
     if (fallback) return fallback;
     throw new Error("Could not prepare a practice question. Please try again.");
   });
+/** Permanently deletes one saved mistake, restricted to the authenticated student. */
+export const deleteMistake = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin: admin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error: lookupError } = await admin
+      .from("learning_errors")
+      .select("id, user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (lookupError || !row || row.user_id !== context.userId) {
+      throw new Error("Mistake not found");
+    }
+    const { error } = await admin
+      .from("learning_errors")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
+    if (error) throw new Error("Mistake could not be deleted");
+    return { success: true };
+  });
