@@ -216,7 +216,7 @@ export function WeeklyFrequency({
       >
         {/* Same header line as Keep improving and the skills card beside it
             (their 1.65rem icon row and xl:p-4 top), so the pills line up (user request). */}
-        <div className="flex min-h-[1.65rem] items-center gap-2 xl:mt-1">
+        <div className="flex min-h-[1.65rem] items-center gap-2 pl-2 lg:pl-0 xl:mt-1">
           <CalendarDays
             className="size-[1.375rem] shrink-0 text-dashboard-cyan"
             strokeWidth={2.4}
