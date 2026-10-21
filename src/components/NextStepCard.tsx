@@ -348,7 +348,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <section
-        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-border bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:mt-1.5"
+        className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-border bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:-mt-1 max-sm:h-[calc(100%+0.25rem)]"
         aria-label={t("Your next step")}
       >
         <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)]">
@@ -381,7 +381,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               with room for the scope badge. From xl: top-aligned, the EVO label
               level with "Why this matters now" (same 12 px top padding and 22 px
               icon row; user request). */}
-          <div className="relative z-10 flex min-w-0 flex-col px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:py-2 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+          <div className="relative z-10 flex min-w-0 flex-col gap-2 px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:gap-2 max-sm:py-2 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
             {/* Top-right of the priority column below xl; from xl it moves to the
                 "Why this matters now" column (see the aside). */}
             {/* Coach label: white, with the AI icon in the brand colour (the
@@ -404,7 +404,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Phones: the same padding above the coach label and below the last
                 line, so EVO sits as far from the image as the reason line from the
                 card's bottom, with a little more room under the label (user request). */}
-            <div className="mt-3 flex items-center justify-between gap-3 sm:mt-2 sm:block xl:mt-auto">
+            <div className="mt-1 flex items-center justify-between gap-3 sm:mt-2 sm:block xl:mt-auto">
               <div className="min-w-0 flex-1">
                 <div>
                   {/* No level badge here: next to the priority it read as part of it,
@@ -447,7 +447,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 The priority, pills and reason line breathe evenly through the
                 card's free height instead of crowding under the EVO label
                 (user report). */}
-            <div className="mt-2 flex flex-nowrap items-center gap-1.5 sm:hidden">
+            <div className="mt-1 flex flex-nowrap items-center gap-1.5 sm:hidden">
               {quickWinButton}
               {leagueButton}
               {mapButton}
@@ -455,7 +455,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Mobile-only: one line with the real reason for today's priority.
                 Due word reviews live in the bell; a box here was clipped by the
                 card and showed only as a green line. */}
-            <p className="mt-2 flex items-center gap-1.5 text-[11px] leading-snug text-sidebar-foreground/75 sm:hidden">
+            <p className="mt-1 flex items-center gap-1.5 text-[11px] leading-snug text-sidebar-foreground/75 sm:hidden">
               <Lightbulb
                 className="size-3.5 shrink-0 text-warning"
                 strokeWidth={2.5}
