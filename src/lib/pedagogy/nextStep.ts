@@ -518,7 +518,7 @@ export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
  * already resolved by buildNextStep — never a new decision.
  */
 export const NEXT_STEP_PRIORITY_TEXT =
-  "{skill} is your next area to strengthen in your {level} journey.";
+  "{skill} needs practice.";
 
 /**
  * Evidence line for the same block: the real cause that produced the priority,
