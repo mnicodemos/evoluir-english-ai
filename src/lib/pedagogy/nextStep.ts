@@ -495,7 +495,7 @@ export const NEXT_STEP_REASON_TEXT: Record<NextStepReason, string> = {
   lowest_score: "This is your lowest skill score right now.",
   not_practised_recently: "You have not practised this recently.",
   not_measured_yet: "You have not practiced this skill yet.",
-  no_data: "Start anywhere and we will personalise your next step.",
+  no_data: "Start and we will personalise your next step.",
 };
 
 /**
@@ -510,7 +510,7 @@ export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
   low_confidence: "More evidence is needed to better understand your {skill} progress.",
   not_practised_recently: "You haven't practised {skill} recently.",
   lowest_score: "{skill} is currently the area that needs more practice.",
-  no_data: "Start anywhere and we will personalise your next step.",
+  no_data: "Start and we will personalise your next step.",
 };
 
 /**
