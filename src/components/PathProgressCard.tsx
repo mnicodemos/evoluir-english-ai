@@ -77,7 +77,6 @@ export function PathProgressCard({
   // Learning is continuous (user decision): the card keeps each skill's latest
   // score across levels; one level's own numbers are looked up in My Progress.
   const meterRows = skillMeterRows(nextStep?.skills, nextStep?.prioritySkill);
-  const anyMeasured = meterRows.some((row) => row.value !== null);
 
   const skills = [
     {
@@ -272,11 +271,6 @@ export function PathProgressCard({
             );
           })}
         </div>
-        {!skillsLoading && !anyMeasured && (
-          <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-            {t("Finish your first conversation or writing task to unlock your scores.")}
-          </p>
-        )}
       </section>
     );
   }
