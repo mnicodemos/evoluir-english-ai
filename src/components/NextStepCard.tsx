@@ -146,7 +146,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const skillLabel = data.prioritySkill
     ? t(NEXT_STEP_SKILL_TEXT[data.prioritySkill] ?? data.prioritySkill)
     : data.reason === "no_data"
-      ? t("First conversation with EVO")
+      ? t("First conversation")
       : t("Free practice");
   const PriorityIcon =
     {

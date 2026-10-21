@@ -1535,7 +1535,7 @@ const baseUiPt: Record<string, string> = {
   "Nothing yet today": "Nada ainda hoje",
   "{minutes} min to hit your goal": "{minutes} min para atingir sua meta",
   "Your English Skills": "Suas habilidades em inglês",
-  "Keep improving": "Continue evoluindo",
+  "Keep Improving": "Continue evoluindo",
   "All reviews done for now": "Revisões em dia por enquanto",
   "New reviews appear after your next lesson.": "Novas revisões aparecem após a próxima lição.",
   "Quick Access": "Acesso rápido",
@@ -1803,6 +1803,7 @@ const baseUiPt: Record<string, string> = {
   "First week": "Primeira semana",
   "Your first week with EVO": "Sua primeira semana com a EVO",
   "One step a day to get to know everything.": "Um passo por dia para conhecer tudo.",
+  "First conversation": "Primeira conversa",
   "First conversation with EVO": "Primeira conversa com a EVO",
   "Talk by voice for a few minutes in AI Speaking.":
     "Fale por voz por alguns minutos no AI Speaking.",

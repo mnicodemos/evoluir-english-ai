@@ -222,7 +222,7 @@ export function WeeklyFrequency({
             strokeWidth={2.4}
           />
           <h2 id="weekly-rhythm-title" className="font-display text-sm font-semibold">
-            {lang === "pt" ? "Seu ritmo de aprendizado" : "Your learning rhythm"}
+            {lang === "pt" ? "Seu ritmo de aprendizado" : "Your Learning Rhythm"}
           </h2>
           {/* Weekly goal (user request: same pill as Today's Progress' weekday,
               right-aligned with it): three stars that turn gold, with a gold
