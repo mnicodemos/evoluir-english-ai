@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Headphones,
   Lightbulb,
+  CalendarCheck2,
   CalendarDays,
   Medal,
   MessageSquareText,
@@ -46,6 +47,7 @@ import {
   NEXT_STEP_WHY_NOW_TEXT,
 } from "@/lib/pedagogy/nextStep";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
+import { loadStudyPlan } from "@/lib/studyPlan.functions";
 
 type NextStepData = Awaited<ReturnType<typeof loadNextStep>>;
 import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
@@ -67,6 +69,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { data: profile } = useProfile();
   const league = useWeeklyLeagueStanding(profile);
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
+  const { data: studyPlan } = useQuery({
+    queryKey: ["study-plan", profile?.id],
+    queryFn: () => loadStudyPlan({ data: undefined }),
+    enabled: !!profile?.id,
+    staleTime: 60 * 1000,
+  });
+  const weekDone = !!studyPlan && studyPlan.plan.nextIndex === null;
   // Vocabulary words whose review date has arrived (same count as the bell).
   const activityIndicators = useActivityIndicators();
   // Until today's practice has loaded, the buttons show right away instead of
@@ -313,7 +322,15 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       <Link to="/study-plan">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium">
-          <CalendarDays className="size-3.5 shrink-0 text-pink-400" aria-hidden="true" />
+          {weekDone ? (
+            <CalendarCheck2
+              className="size-3.5 shrink-0 text-emerald-400"
+              strokeWidth={2.2}
+              aria-hidden="true"
+            />
+          ) : (
+            <CalendarDays className="size-3.5 shrink-0 text-pink-400" aria-hidden="true" />
+          )}
           {t("Your week")}
         </span>
       </Link>
