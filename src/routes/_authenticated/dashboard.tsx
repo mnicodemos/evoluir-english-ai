@@ -687,10 +687,15 @@ function Dashboard() {
                     })}
                   </div>
                   {minutesToday >= profile.daily_minutes && (
-                    <p className="mt-1 inline-flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green lg:hidden">
-                      <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
-                      {t("Daily goal reached!")}
-                    </p>
+                    <div className="mt-1 grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:hidden">
+                      <CircleCheck
+                        className="size-3.5 shrink-0 justify-self-end text-brand-green"
+                        aria-hidden="true"
+                      />
+                      <p className="whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green">
+                        {t("Daily goal reached!")}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
