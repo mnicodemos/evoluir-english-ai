@@ -397,7 +397,7 @@ describe("why now justification", () => {
       "More evidence is needed to better understand your Vocabulary progress.",
     );
     expect(fill("not_practised_recently")).toBe("You haven't practised Vocabulary recently.");
-    expect(fill("lowest_score")).toBe("Vocabulary is currently the area that needs more practice.");
+    expect(fill("lowest_score")).toBe("This skill needs practice.");
     expect(fill("no_data")).toBe("Start and we will personalise your next step.");
   });
 
