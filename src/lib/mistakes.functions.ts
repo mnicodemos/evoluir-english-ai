@@ -104,8 +104,6 @@ export const practiceMistake = createServerFn({ method: "POST" })
     if (fallback) return fallback;
     throw new Error("Could not prepare a practice question. Please try again.");
   });
-
-
 /** Permanently deletes one saved mistake, restricted to the authenticated student. */
 export const deleteMistake = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
