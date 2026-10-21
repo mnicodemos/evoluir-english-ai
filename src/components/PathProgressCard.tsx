@@ -271,11 +271,6 @@ export function PathProgressCard({
             );
           })}
         </div>
-        {!skillsLoading && !anyMeasured && (
-          <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-            {t("Finish your first conversation or writing task to unlock your scores.")}
-          </p>
-        )}
       </section>
     );
   }
