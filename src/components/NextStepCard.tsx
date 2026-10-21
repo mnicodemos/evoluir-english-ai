@@ -513,7 +513,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 (16 px from the card's right edge). */}
             <div className="flex items-center gap-2 xl:pr-24">
               <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
-              <h3 className="font-semibold text-sidebar-foreground">{t("Why this matters now")}</h3>
+              <h3 className="whitespace-nowrap text-[13px] font-semibold tracking-tight text-sidebar-foreground">{t("Why this matters now")}</h3>
             </div>
             {/* One sentence with the reason; the main column already says what
                 happened ("You have not practiced this skill yet"). */}
