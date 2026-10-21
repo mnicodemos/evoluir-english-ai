@@ -447,7 +447,10 @@ function Mistakes() {
                       const today = new Date();
                       detectedAt.setHours(0, 0, 0, 0);
                       today.setHours(0, 0, 0, 0);
-                      const days = Math.max(0, Math.floor((today.getTime() - detectedAt.getTime()) / 86_400_000));
+                      const days = Math.max(
+                        0,
+                        Math.floor((today.getTime() - detectedAt.getTime()) / 86_400_000),
+                      );
                       return days === 0 ? "Today" : days === 1 ? "1 day ago" : `${days} days ago`;
                     })()}
                   </p>
