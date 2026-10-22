@@ -614,7 +614,6 @@ function Dashboard() {
                       </span>
                     )}
                   </div>
-
                 </div>
                 <div className="grid min-w-0 gap-2 xl:gap-1 2xl:gap-2">
                   {!hasProgressToday && (
