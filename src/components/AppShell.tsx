@@ -354,14 +354,19 @@ function AppShellContent({
       touchStart.current = null;
       return;
     }
+    const touch = event.touches[0];
+    if (!touch) {
+      touchStart.current = null;
+      return;
+    }
     touchStart.current = {
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY,
+      x: touch.clientX,
+      y: touch.clientY,
       target: event.target,
     };
   }
 
-  function handleMainTouchEnd(event: React.TouchEvent<HTMLElement>) {
+  function handleMainTouchEnd(event: TouchEvent<HTMLElement>) {
     const start = touchStart.current;
     touchStart.current = null;
     if (!start || window.matchMedia("(min-width: 1024px)").matches) return;
@@ -384,8 +389,9 @@ function AppShellContent({
     const currentIndex = mainSwipeTabs.indexOf(location.pathname as (typeof mainSwipeTabs)[number]);
     if (currentIndex < 0) return;
     const nextIndex = currentIndex + (dx < 0 ? 1 : -1);
-    if (nextIndex < 0 || nextIndex >= mainSwipeTabs.length) return;
-    void navigate({ to: mainSwipeTabs[nextIndex] });
+    const nextTab = mainSwipeTabs[nextIndex];
+    if (!nextTab) return;
+    void navigate({ to: nextTab });
   }
 
   // Stop any playing audio (flashcards, listening, vocabulary, AI voice) on page change.
