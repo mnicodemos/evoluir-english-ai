@@ -127,20 +127,31 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
           </div>
           <Progress value={corePct} className="mt-3 h-2" aria-label={t("Course progress")} />
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3"
-            onClick={() => void downloadPlan()}
-            disabled={planLoading}
-          >
-            {planLoading ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Download className="size-4" />
-            )}
-            Download course
-          </Button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void downloadPlan()}
+              disabled={planLoading}
+            >
+              {planLoading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Download className="size-4" />
+              )}
+              Download course
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href={`/study-books/Evoluir_Guia_de_Aprendizagem_e_Estudo_${path.level.toUpperCase()}.pdf`}
+                download
+                aria-label={`Download study guide ${path.level.toUpperCase()}`}
+              >
+                <Download className="size-4" />
+                Download study guide
+              </a>
+            </Button>
+          </div>
         </section>
 
         {(() => {
