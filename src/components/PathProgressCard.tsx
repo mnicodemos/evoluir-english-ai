@@ -200,7 +200,7 @@ export function PathProgressCard({
         className="card-soft flex h-full min-w-0 flex-col p-3 max-lg:py-2.5 xl:p-4"
         aria-labelledby="skills-progress-heading"
       >
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
+        <div className="flex min-h-[1.65rem] items-center gap-2 xl:mt-1">
           <BarChart3
             className="size-[1.65rem] text-dashboard-cyan"
             strokeWidth={2.6}

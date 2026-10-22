@@ -88,7 +88,7 @@ export function SmartReviewCard({
         aria-busy="true"
         aria-label={t("Keep Improving")}
       >
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
+        <div className="flex min-h-[1.65rem] items-center gap-2">
           <BookOpen
             className="size-[1.65rem] text-dashboard-cyan"
             strokeWidth={2.5}

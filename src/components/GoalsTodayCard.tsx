@@ -103,7 +103,7 @@ export function GoalsTodayCard() {
       className="card-soft min-w-0 p-3 xl:flex xl:h-full xl:min-h-0 xl:flex-col xl:px-4 xl:py-3"
       aria-labelledby="goals-today-title"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex min-h-[1.65rem] items-center gap-2 xl:mt-1">
         {/* Life+ AI holds the goals (user decision): the title opens it, and
             Premium students also see today's tasks and habits at a glance. */}
         <Sprout

@@ -57,7 +57,7 @@ export function BusinessDashboardCard() {
       )}
       aria-labelledby="business-card-title"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex min-h-[1.65rem] items-center gap-2 xl:mt-1">
         <Briefcase
           className="size-[1.4rem] shrink-0 text-brand-green"
           strokeWidth={2.3}
