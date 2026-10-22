@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import {
-  Check,
-  ChartNoAxesColumnIncreasing,
-  Download,
-  GraduationCap,
-  Lock,
-  Undo2,
-} from "lucide-react";
+import { Check, ChartNoAxesColumnIncreasing, GraduationCap, Lock, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -143,16 +136,18 @@ export function LevelCard({
     </button>
   );
 
-  const studyBookButton = (
-    <a
-      href={studyBookHref}
-      download
-      className="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-brand-green/40 px-3 py-1.5 text-xs font-semibold text-brand-green transition hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-      aria-label={`Download study book ${current.value.toUpperCase()}`}
-    >
-      <Download className="size-3.5 shrink-0" aria-hidden="true" />
-      Download study book
-    </a>
+  const studyBookLink = (
+    <p className="mt-1 text-xs text-muted-foreground">
+      {t("Download study book")}{" "}
+      <a
+        href={studyBookHref}
+        download
+        className="text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        aria-label={`Download study book ${current.value.toUpperCase()}`}
+      >
+        {t("click here")}
+      </a>
+    </p>
   );
 
   if (compact) {
@@ -169,7 +164,7 @@ export function LevelCard({
             {current.label}
           </p>
           {chips}
-          {belowHighest ? <div className="mt-1">{backButton}</div> : studyBookButton}
+          {belowHighest ? <div className="mt-1">{backButton}</div> : studyBookLink}
         </div>
       </div>
     );
@@ -192,7 +187,7 @@ export function LevelCard({
         {backButton}
       </div>
       {chips}
-      {studyBookButton}
+      {studyBookLink}
     </div>
   );
 }
