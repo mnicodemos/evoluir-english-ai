@@ -641,7 +641,7 @@ function Dashboard() {
                     </div>
                   )}
                   <div
-                    className={`${hasProgressToday ? "grid" : "hidden"} gap-1 xl:gap-1 2xl:gap-2`}
+                    className={cn(`${hasProgressToday ? "grid" : "hidden"} gap-1 xl:gap-1 2xl:gap-2`, minutesToday < profile.daily_minutes && "translate-y-6")}
                   >
                     {learningCards.map((card) => {
                       // Each line has its own activity icon: grey until done today,
