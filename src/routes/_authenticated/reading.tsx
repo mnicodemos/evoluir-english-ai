@@ -25,11 +25,17 @@ import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import {
   gradeReading,
   lookupTerm,
+  READING_CATEGORIES,
+  READING_CATEGORY_LABELS,
+  READING_STYLE_LABELS,
+  READING_STYLES,
+  readingChoiceKey,
   readingParagraphs,
   readingReference,
   readingShareText,
   readingSpeechChunks,
   readingTokens,
+  type ReadingChoice,
 } from "@/lib/dailyReading";
 import {
   completeDailyReading,
@@ -38,6 +44,7 @@ import {
 } from "@/lib/dailyReading.functions";
 import { lookupWord } from "@/lib/dictionary.functions";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
+import { studyToday } from "@/lib/today";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
@@ -145,7 +152,102 @@ function WordMeaning({ term, glossaryPt }: { term: string; glossaryPt: string | 
   );
 }
 
-const markedKey = (reading: DailyReading) => `reading-marked:${reading.day}:${reading.level}`;
+const markedKey = (reading: DailyReading) =>
+  `reading-marked:${reading.day}:${reading.level}${reading.choice ? `:${readingChoiceKey(reading.choice)}` : ""}`;
+
+// The text the student chose today (category and style), kept on this device
+// for the day; "Today's pick" (null) when there is none.
+const choiceKey = () => `reading-choice:${studyToday()}`;
+
+function readChoice(): ReadingChoice | null {
+  try {
+    const raw = window.localStorage.getItem(choiceKey());
+    const parsed = raw ? (JSON.parse(raw) as Partial<ReadingChoice>) : null;
+    return parsed &&
+      (READING_CATEGORIES as readonly string[]).includes(parsed.category ?? "") &&
+      (READING_STYLES as readonly string[]).includes(parsed.style ?? "")
+      ? (parsed as ReadingChoice)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveChoice(choice: ReadingChoice | null) {
+  try {
+    if (choice) window.localStorage.setItem(choiceKey(), JSON.stringify(choice));
+    else window.localStorage.removeItem(choiceKey());
+  } catch {
+    // Private window or blocked storage: the choice lasts until the page closes.
+  }
+}
+
+const chipClass = (active: boolean) =>
+  cn(
+    "h-8 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
+    active
+      ? "border-amber-400/60 bg-amber-400/12 text-amber-300"
+      : "border-border text-muted-foreground hover:text-foreground",
+  );
+
+/**
+ * What to read (user request, 2026-10-22): "Today's pick" (the theme of the
+ * day) or one of six categories in one of three styles. Each choice is a text
+ * written once per level and day and shared, like the daily text.
+ */
+function ReadingPicker({
+  choice,
+  onChange,
+  t,
+}: {
+  choice: ReadingChoice | null;
+  onChange: (choice: ReadingChoice | null) => void;
+  t: (label: string) => string;
+}) {
+  return (
+    <section className="card-soft mt-5 p-3 sm:p-4" aria-labelledby="reading-picker-title">
+      <h2 id="reading-picker-title" className="text-xs font-semibold text-muted-foreground">
+        {t("What do you want to read?")}
+      </h2>
+      <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label={t("Category")}>
+        <button
+          type="button"
+          aria-pressed={!choice}
+          className={chipClass(!choice)}
+          onClick={() => onChange(null)}
+        >
+          {t("Today's pick")}
+        </button>
+        {READING_CATEGORIES.map((category) => (
+          <button
+            key={category}
+            type="button"
+            aria-pressed={choice?.category === category}
+            className={chipClass(choice?.category === category)}
+            onClick={() => onChange({ category, style: choice?.style ?? "story" })}
+          >
+            {t(READING_CATEGORY_LABELS[category])}
+          </button>
+        ))}
+      </div>
+      {choice ? (
+        <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label={t("Text style")}>
+          {READING_STYLES.map((style) => (
+            <button
+              key={style}
+              type="button"
+              aria-pressed={choice.style === style}
+              className={chipClass(choice.style === style)}
+              onClick={() => onChange({ category: choice.category, style })}
+            >
+              {t(READING_STYLE_LABELS[style])}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
 
 function readMarked(reading: DailyReading): string[] {
   try {
@@ -170,10 +272,18 @@ function ReadingPage() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const { data: profile } = useProfile();
   const fetchReading = useServerFn(loadDailyReading);
+  // Read after mount (localStorage), so the server render and the first
+  // client render agree.
+  const [choice, setChoice] = useState<ReadingChoice | null>(null);
+  const [choiceReady, setChoiceReady] = useState(false);
+  useEffect(() => {
+    setChoice(readChoice());
+    setChoiceReady(true);
+  }, []);
   const { data: reading, isLoading } = useQuery({
-    queryKey: ["daily-reading", profile?.level],
-    queryFn: () => fetchReading(),
-    enabled: !!profile,
+    queryKey: ["daily-reading", profile?.level, readingChoiceKey(choice)],
+    queryFn: () => fetchReading({ data: { choice } }),
+    enabled: !!profile && choiceReady,
     staleTime: 1000 * 60 * 30,
   });
 
@@ -193,7 +303,8 @@ function ReadingPage() {
   const queryClient = useQueryClient();
   const finishReading = useServerFn(completeDailyReading);
   const finish = useMutation({
-    mutationFn: (input: { answers: number[]; fallback: boolean }) => finishReading({ data: input }),
+    mutationFn: (input: { answers: number[]; fallback: boolean; choice: ReadingChoice | null }) =>
+      finishReading({ data: input }),
     onSuccess: () =>
       // Streak, rhythm, today's progress, goals and this page (now done)
       // read the new activity.
@@ -222,9 +333,32 @@ function ReadingPage() {
     },
     [],
   );
+  // The study day closes once a day: the text finished today shows done; any
+  // other text of the day is practice, checked here on the device.
+  const completed = reading?.completed ?? null;
+  const doneHere =
+    !!reading &&
+    !!completed &&
+    readingChoiceKey(completed.choice) === readingChoiceKey(reading.choice);
+  const practice = !!completed && !doneHere;
+
+  function pick(next: ReadingChoice | null) {
+    playRun.current += 1;
+    stopSpeaking();
+    setPlaying(false);
+    setShowPt(false);
+    finish.reset();
+    setChoice(next);
+    saveChoice(next);
+  }
+
   useEffect(() => {
     // Already finished today: the page shows it done, with the answers given.
-    const done = reading?.completed ?? null;
+    const done =
+      reading?.completed &&
+      readingChoiceKey(reading.completed.choice) === readingChoiceKey(reading.choice)
+        ? reading.completed
+        : null;
     const given =
       done?.answers && reading && done.answers.length === reading.questions.length
         ? done.answers
@@ -308,13 +442,15 @@ function ReadingPage() {
         )}
       />
 
+      <ReadingPicker choice={choice} onChange={pick} t={t} />
+
       {isLoading || !reading ? (
         <div className="mt-5 space-y-3">
           <Skeleton className="h-8 w-2/3" />
           <Skeleton className="h-40 w-full" />
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-            {t("Preparing today's reading…")}
+            {choice ? t("EVO is writing your text…") : t("Preparing today's reading…")}
           </p>
         </div>
       ) : (
@@ -322,7 +458,11 @@ function ReadingPage() {
           <section className="card-soft p-4 sm:p-6" aria-labelledby="reading-title">
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="rounded-full bg-amber-400/12 px-2.5 py-1 font-medium text-amber-400">
-                {reading.theme === "motivational" ? t("Motivation") : t("Everyday story")}
+                {reading.choice
+                  ? `${t(READING_CATEGORY_LABELS[reading.choice.category])} · ${t(READING_STYLE_LABELS[reading.choice.style])}`
+                  : reading.theme === "motivational"
+                    ? t("Motivation")
+                    : t("Everyday story")}
               </span>
               <span className="rounded-full bg-secondary px-2.5 py-1 font-medium uppercase">
                 {reading.level}
@@ -594,16 +734,23 @@ function ReadingPage() {
                 onClick={() => {
                   setEngaged(true);
                   setChecked(true);
+                  // Today's study day already counts: this text is practice.
+                  if (practice) return;
                   finish.mutate({
                     answers: chosen.map((value) => value ?? 0),
                     fallback: reading.fallback,
+                    choice: reading.choice,
                   });
                 }}
               >
                 {t("Check answers")}
               </Button>
             )}
-            {finish.isSuccess || reading.completed ? (
+            {practice ? (
+              <p className="mt-3 text-xs text-muted-foreground">
+                {t("Extra practice: today's reading already counts as a study day.")}
+              </p>
+            ) : finish.isSuccess || doneHere ? (
               <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-brand-green">
                 <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
                 {t("Reading done: today counts as a study day.")}

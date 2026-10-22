@@ -48,6 +48,10 @@ export const appGuidePt: Record<string, string> = {
     "Toque em Ouvir a EVO para escutar o texto em voz alta.",
   "Tap any word you don't understand to see its translation; the words you tap stay marked for the day.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução; as palavras tocadas ficam marcadas no dia.",
+  "Keep Today's pick or choose what to read: a category (daily life, work, travel, technology, health, culture) and a style (story, article, dialogue).":
+    "Fique com o Texto do dia ou escolha o que ler: uma categoria (dia a dia, trabalho, viagem, tecnologia, saúde, cultura) e um estilo (história, artigo, diálogo).",
+  "The first text you finish each day counts; other texts that day are extra practice.":
+    "O primeiro texto que você termina no dia é o que conta; os outros textos do dia são prática extra.",
   "Your answers are your Reading score and close your study day.":
     "Suas respostas formam a sua nota de Reading e fecham o seu dia de estudo.",
   "Answer the questions to check what you understood.":

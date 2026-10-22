@@ -15,9 +15,12 @@ import {
   fallbackReading,
   gradeReading,
   parseDailyReading,
+  READING_CATEGORIES,
+  READING_STYLES,
   readingLevel,
   readingThemeForDay,
   type DailyReadingContent,
+  type ReadingChoice,
   type ReadingLevel,
   type ReadingTheme,
 } from "./dailyReading";
@@ -29,12 +32,24 @@ export type DailyReading = {
   theme: ReadingTheme;
   /** True when the AI could not write today's text and a fixed one is shown. */
   fallback: boolean;
+  /** The category and style the student chose; null for "Today's pick". */
+  choice: ReadingChoice | null;
   /**
    * The student already finished today's reading: their answers (when
-   * recorded) and score, so the page shows it done instead of asking again.
+   * recorded), score and the text they read (choice), so the page shows it
+   * done instead of asking again. Other texts of the day are practice only.
    */
-  completed: { score: number | null; answers: number[] | null } | null;
+  completed: {
+    score: number | null;
+    answers: number[] | null;
+    choice: ReadingChoice | null;
+  } | null;
 } & DailyReadingContent;
+
+const choiceSchema = z
+  .object({ category: z.enum(READING_CATEGORIES), style: z.enum(READING_STYLES) })
+  .strict()
+  .nullable();
 
 /** Today's reading of the student, if they finished it (one per day). */
 async function readCompletion(userId: string): Promise<DailyReading["completed"]> {
@@ -49,16 +64,17 @@ async function readCompletion(userId: string): Promise<DailyReading["completed"]
     .limit(1)
     .maybeSingle();
   if (!data) return null;
-  const result = (data.result ?? {}) as { answers?: unknown };
+  const result = (data.result ?? {}) as { answers?: unknown; choice?: unknown };
   const answers =
     Array.isArray(result.answers) && result.answers.every((value) => Number.isInteger(value))
       ? (result.answers as number[])
       : null;
-  return { score: data.score ?? null, answers };
+  const choice = choiceSchema.safeParse(result.choice ?? null);
+  return { score: data.score ?? null, answers, choice: choice.success ? choice.data : null };
 }
 
-// daily_readings (migration 0072) is read through a loose table type, like the
-// Life+ AI tables in life.functions.ts.
+// daily_readings (migration 0072) and daily_reading_variants (0079) are read
+// through a loose table type, like the Life+ AI tables in life.functions.ts.
 type LooseQuery = PromiseLike<{ data: unknown; error: { message: string } | null }> & {
   select: (columns: string) => LooseQuery;
   eq: (column: string, value: unknown) => LooseQuery;
@@ -69,20 +85,23 @@ type LooseTable = {
   upsert: (rows: object, options: object) => LooseQuery;
 };
 
-async function readings(): Promise<LooseTable> {
+async function readings(choice: ReadingChoice | null = null): Promise<LooseTable> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return (supabaseAdmin.from as unknown as (name: string) => LooseTable)("daily_readings");
+  return (supabaseAdmin.from as unknown as (name: string) => LooseTable)(
+    choice ? "daily_reading_variants" : "daily_readings",
+  );
 }
 
-type ReadingRow = { theme: string; content: DailyReadingContent };
+type ReadingRow = { theme?: string; content: DailyReadingContent };
 
-async function readStored(day: string, level: ReadingLevel) {
-  const table = await readings();
-  const { data, error } = await table
-    .select("theme, content")
+async function readStored(day: string, level: ReadingLevel, choice: ReadingChoice | null = null) {
+  const table = await readings(choice);
+  let query = table
+    .select(choice ? "content" : "theme, content")
     .eq("day", day)
-    .eq("level", level)
-    .maybeSingle();
+    .eq("level", level);
+  if (choice) query = query.eq("category", choice.category).eq("style", choice.style);
+  const { data, error } = await query.maybeSingle();
   if (error) return null;
   return (data as ReadingRow | null) ?? null;
 }
@@ -95,16 +114,29 @@ async function readStored(day: string, level: ReadingLevel) {
  */
 export const loadDailyReading = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<DailyReading> => {
+  .inputValidator((input: unknown) =>
+    z
+      .object({ choice: choiceSchema.optional() })
+      .strict()
+      .parse(input ?? {}),
+  )
+  .handler(async ({ data, context }): Promise<DailyReading> => {
     const [reading, completed] = await Promise.all([
-      todaysReading(context.userId),
+      todaysReading(context.userId, data.choice ?? null),
       readCompletion(context.userId),
     ]);
     return { ...reading, completed };
   });
 
-/** Today's text for the student's level (the AI writes it once per level). */
-async function todaysReading(userId: string): Promise<Omit<DailyReading, "completed">> {
+/**
+ * Today's text for the student's level (the AI writes it once per level), or
+ * the text of the category and style they chose (once per level, day,
+ * category and style, in daily_reading_variants).
+ */
+async function todaysReading(
+  userId: string,
+  choice: ReadingChoice | null,
+): Promise<Omit<DailyReading, "completed">> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: profile } = await supabaseAdmin
     .from("profiles")
@@ -115,25 +147,23 @@ async function todaysReading(userId: string): Promise<Omit<DailyReading, "comple
   const day = studyToday();
   const theme = readingThemeForDay(day);
 
-  const stored = await readStored(day, level);
+  const storedTheme = (row: ReadingRow) => (row.theme as ReadingTheme | undefined) ?? theme;
+
+  const stored = await readStored(day, level, choice);
   if (stored?.content) {
-    return {
-      day,
-      level,
-      theme: stored.theme as ReadingTheme,
-      fallback: false,
-      ...stored.content,
-    };
+    return { day, level, theme: storedTheme(stored), fallback: false, choice, ...stored.content };
   }
 
   let content: DailyReadingContent | null = null;
   try {
     const { callGateway } = await import("./ai-gateway.server");
-    const raw = await callGateway(dailyReadingMessages(level, theme, day), true, {
+    const raw = await callGateway(dailyReadingMessages(level, theme, day, choice), true, {
       userId: userId,
       operation: "lesson_generation",
-      // One shared text per level and day.
-      cacheKey: `daily-reading:${day}:${level}`,
+      // One shared text per level and day (and per category and style).
+      cacheKey: choice
+        ? `daily-reading:${day}:${level}:${choice.category}:${choice.style}`
+        : `daily-reading:${day}:${level}`,
     });
     content = parseDailyReading(raw, level);
     if (!content) console.error("Daily reading: the AI reply did not fit the level");
@@ -142,25 +172,24 @@ async function todaysReading(userId: string): Promise<Omit<DailyReading, "comple
       `Daily reading could not be written: ${error instanceof Error ? error.message : "unknown"}`,
     );
   }
-  if (!content) return { day, level, theme, fallback: true, ...fallbackReading(level) };
+  if (!content) return { day, level, theme, fallback: true, choice, ...fallbackReading(level) };
 
   // Another student of this level may have stored it meanwhile: keep theirs.
-  const table = await readings();
+  const table = await readings(choice);
   await table.upsert(
-    { day, level, theme, content },
-    { onConflict: "day,level", ignoreDuplicates: true },
+    choice
+      ? { day, level, category: choice.category, style: choice.style, content }
+      : { day, level, theme, content },
+    {
+      onConflict: choice ? "day,level,category,style" : "day,level",
+      ignoreDuplicates: true,
+    },
   );
-  const winner = await readStored(day, level);
+  const winner = await readStored(day, level, choice);
   if (winner?.content) {
-    return {
-      day,
-      level,
-      theme: winner.theme as ReadingTheme,
-      fallback: false,
-      ...winner.content,
-    };
+    return { day, level, theme: storedTheme(winner), fallback: false, choice, ...winner.content };
   }
-  return { day, level, theme, fallback: false, ...content };
+  return { day, level, theme, fallback: false, choice, ...content };
 }
 
 /** The same operation key for a student's reading of a given day (UUID shape). */
@@ -190,6 +219,8 @@ export const completeDailyReading = createServerFn({ method: "POST" })
         answers: z.array(z.number().int().min(0).max(3)).min(1).max(8),
         /** The student saw the fixed text (the AI had failed). */
         fallback: z.boolean(),
+        /** The category and style read; null or absent for "Today's pick". */
+        choice: choiceSchema.optional(),
       })
       .parse(input),
   )
@@ -202,7 +233,12 @@ export const completeDailyReading = createServerFn({ method: "POST" })
       .maybeSingle();
     const level = readingLevel(profile?.level);
     const day = studyToday();
-    const stored = data.fallback ? null : await readStored(day, level);
+    const choice = data.choice ?? null;
+    const stored = data.fallback ? null : await readStored(day, level, choice);
+    // A chosen text is graded only against its stored copy.
+    if (choice && !data.fallback && !stored?.content) {
+      throw new Error("Your reading could not be saved.");
+    }
     const reading = stored?.content ?? fallbackReading(level);
     if (data.answers.length !== reading.questions.length) {
       throw new Error("Answer every question of today's reading.");
@@ -220,7 +256,7 @@ export const completeDailyReading = createServerFn({ method: "POST" })
       p_duration_minutes: 0,
       p_score: score,
       p_scores: {},
-      p_result: { level, day, answers: data.answers },
+      p_result: { level, day, answers: data.answers, choice },
     });
     if (error) {
       console.error(`Daily reading could not be recorded: ${error.message}`);

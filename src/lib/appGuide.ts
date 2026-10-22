@@ -99,11 +99,13 @@ export const APP_GUIDE: GuideSection[] = [
     title: "Daily reading",
     what: "A short text at your level every day: a motivational text one day, an everyday story the next.",
     steps: [
+      "Keep Today's pick or choose what to read: a category (daily life, work, travel, technology, health, culture) and a style (story, article, dialogue).",
       "Read the text; it gets longer and richer as your level goes up.",
       "Tap Listen to EVO to hear it read aloud.",
       "Tap any word you don't understand to see its translation; the words you tap stay marked for the day.",
       "Answer the questions to check what you understood.",
       "Your answers are your Reading score and close your study day.",
+      "The first text you finish each day counts; other texts that day are extra practice.",
     ],
     tip: "When EVO's priority is Reading, Practice now opens the daily reading.",
     to: "/reading",
