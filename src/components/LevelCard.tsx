@@ -37,7 +37,7 @@ export function LevelCard({
   const highestIndex = LEVELS.indexOf(highest);
   // Left over from the old level switch: studying below the level reached.
   const belowHighest = currentIndex < highestIndex;
-  const studyBookHref = `/study-books/Evoluir_Guia_de_Aprendizagem_e_Estudo_${current.value.toUpperCase()}_Retrato.pdf`;
+  const studyBookHref = `/study-books/Evoluir_Guia_de_Aprendizagem_e_Estudo_${current.value.toUpperCase()}.pdf`;
 
   const returnToHighest = async () => {
     if (returning) return;
