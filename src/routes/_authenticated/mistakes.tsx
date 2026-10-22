@@ -147,7 +147,7 @@ function Mistakes() {
   });
 
   const due = useMemo(
-    () => rows.filter((row) => isMistakeDue(row) && !answered.includes(row.id)),
+    () => rows.filter((row) => row.review_step === 0 && isMistakeDue(row) && !answered.includes(row.id)),
     [rows, answered],
   );
   const current = outcome ? rows.find((row) => row.id === answered.at(-1)) : due[0];
@@ -472,6 +472,12 @@ function Mistakes() {
                         {row.corrected_text}
                       </p>
                     </>
+                  )}
+                  {row.review_step > 0 && (
+                    <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                      <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                      Corrected
+                    </span>
                   )}
                   <div className="mt-1 flex gap-1" aria-hidden>
                     {Array.from({ length: MISTAKE_MASTERED_STEP }, (_, step) => (
