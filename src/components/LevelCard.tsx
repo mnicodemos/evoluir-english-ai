@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Check, ChartNoAxesColumnIncreasing, Download, GraduationCap, Lock, Undo2 } from "lucide-react";
+import {
+  Check,
+  ChartNoAxesColumnIncreasing,
+  Download,
+  GraduationCap,
+  Lock,
+  Undo2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -162,11 +169,7 @@ export function LevelCard({
             {current.label}
           </p>
           {chips}
-          {belowHighest ? (
-            <div className="mt-1">{backButton}</div>
-          ) : (
-            studyBookButton
-          )}
+          {belowHighest ? <div className="mt-1">{backButton}</div> : studyBookButton}
         </div>
       </div>
     );
