@@ -346,6 +346,7 @@ function Dashboard() {
         .from("learning_errors")
         .select("id", { count: "exact", head: true })
         .eq("user_id", profile!.id)
+        .eq("review_step", 0)
         .lt("review_step", MISTAKE_MASTERED_STEP)
         .lte("next_review_at", new Date().toISOString());
       return count ?? 0;
