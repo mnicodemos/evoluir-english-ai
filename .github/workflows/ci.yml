@@ -79,8 +79,31 @@ jobs:
           # Full report is always printed; HIGH/CRITICAL fail the build.
           # Known moderate (documented): esbuild@0.18.20 via drizzle-kit ->
           # @esbuild-kit/core-utils (dev-only, pins ~0.18; GHSA-67mh-4wv8-2f99).
-          bun audit || true
-          bun audit --audit-level=high
+          # Retry transient registry failures. If npm's advisory endpoint remains
+          # unavailable (HTTP 503), report the audit as inconclusive but allow
+          # lint, typecheck, tests and build to run; real HIGH/CRITICAL findings fail.
+          audit_log="$(mktemp)"
+          audit_ok=false
+          for attempt in 1 2 3; do
+            if bun audit --audit-level=high >"$audit_log" 2>&1; then
+              cat "$audit_log"
+              audit_ok=true
+              break
+            fi
+            cat "$audit_log"
+            if grep -Eq 'HTTP 503| - 503|registry.npmjs.org/.*/security/advisories' "$audit_log"; then
+              if [ "$attempt" -lt 3 ]; then
+                echo "::warning::npm advisory endpoint unavailable; retrying audit ($attempt/3)."
+                sleep 10
+              else
+                echo "::warning::Dependency audit inconclusive because the npm advisory service returned HTTP 503. Continuing with lint, typecheck, tests and build."
+              fi
+            else
+              echo "::error::Dependency audit failed for a reason other than a confirmed npm HTTP 503."
+              exit 1
+            fi
+          done
+          rm -f "$audit_log"
 
 
 
