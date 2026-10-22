@@ -635,7 +635,7 @@ function Dashboard() {
                   )}
                   <div
                     className={cn(
-                      `${hasProgressToday ? "grid" : "hidden"} gap-1 self-center lg:translate-y-8 xl:gap-1 2xl:gap-2`,
+                      `${hasProgressToday ? "grid" : "hidden"} gap-1 self-center lg:translate-y-12 xl:gap-1 2xl:gap-2`,
                     )}
                   >
                     {learningCards.map((card) => {
