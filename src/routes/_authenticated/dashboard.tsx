@@ -694,7 +694,7 @@ function Dashboard() {
                       className="size-3.5 shrink-0 justify-self-end text-brand-green lg:justify-self-start"
                       aria-hidden="true"
                     />
-                    <p className="whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green lg:text-sm">
+                    <p className="whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green">
                       {t("Daily goal reached!")}
                     </p>
                   </div>
