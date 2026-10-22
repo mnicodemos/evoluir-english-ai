@@ -296,7 +296,6 @@ export function WeeklyFrequency({
                   ? "day active this week"
                   : "days active this week"}
             </p>
-
           </div>
         </div>
         <div className="mt-2 grid grid-cols-7 gap-1">
