@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, Check, ChevronRight } from "lucide-react";
+import { BookOpen, Briefcase, Check, ChevronRight } from "lucide-react";
 import { useMemo } from "react";
 
 import { useLessons, useUserLessons } from "@/hooks/useLearning";
@@ -106,6 +106,7 @@ export function BusinessDashboardCard() {
             to={locked ? "/premium" : "/business"}
             className="inline-flex shrink-0 items-center gap-0.5 rounded-md text-[11px] font-semibold text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
           >
+            {!locked && <BookOpen className="size-3.5 shrink-0" aria-hidden="true" />}
             {locked ? t("See plans") : completed > 0 ? t("Continue") : t("Start")}
             <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
           </Link>
