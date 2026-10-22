@@ -685,7 +685,7 @@ function Dashboard() {
                   </div>
                   <div
                     className={cn(
-                      "mt-1 grid min-h-[1.75rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:mt-2 lg:min-h-[1.75rem] lg:grid-cols-[1rem_minmax(0,1fr)] lg:gap-0",
+                      "mt-1 grid min-h-[1.75rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:mt-2 lg:min-h-[1.75rem] lg:grid-cols-[1.375rem_minmax(0,1fr)] lg:gap-1",
                       minutesToday < profile.daily_minutes && "invisible",
                     )}
                     aria-hidden={minutesToday < profile.daily_minutes}
