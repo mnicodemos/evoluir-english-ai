@@ -230,4 +230,6 @@ export const appGuidePt: Record<string, string> = {
   Tip: "Dica",
   Open: "Abrir",
   "Full guide": "Guia completo",
+  "Stuck? Open Ask EVO for help under the box: a way to start, useful words or a check of your last sentence.":
+    "Travou? Abra Pedir ajuda à EVO embaixo da caixa: um jeito de começar, palavras úteis ou a conferência da sua última frase.",
 };

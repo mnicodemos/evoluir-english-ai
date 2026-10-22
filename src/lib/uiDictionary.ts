@@ -111,6 +111,15 @@ const baseUiPt: Record<string, string> = {
   Routine: "Rotina",
   Habits: "Hábitos",
   "Life Coach": "Life Coach",
+  "Ask EVO for help": "Pedir ajuda à EVO",
+  "How do I start?": "Como eu começo?",
+  "Words I can use": "Palavras que posso usar",
+  "Check my last sentence": "Conferir minha última frase",
+  "Ask anything, in Portuguese or English": "Pergunte o que quiser, em português ou inglês",
+  "EVO gives hints, never your whole text. Uses your AI Teacher daily limit.":
+    "A EVO dá dicas, nunca o texto inteiro. Usa o limite diário do Professor de IA.",
+  "You reached today's AI Teacher limit. Please try again tomorrow.":
+    "Você atingiu o limite de hoje do Professor de IA. Tente novamente amanhã.",
   "Your history": "Seu histórico",
   "Best position": "Melhor posição",
   "Join the league to see your position each week.":
