@@ -31,7 +31,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useProfile } from "@/hooks/useProfile";
 import { useTodayActivities } from "@/components/DailyGoalCard";
-import { dailyChallengeGoal, practiceXpLabel } from "@/lib/dailyChallenge";
+import {
+  dailyChallengeGoal,
+  pronunciationQuickWinDone,
+  practiceXpLabel,
+} from "@/lib/dailyChallenge";
 import {
   LEAGUE_MEDAL_TEXT,
   leagueMedal,
@@ -204,7 +208,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const quickWin = data.quickWin;
   const mainAvailable = actionAvailable(data.activity.to, activityIndicators);
   const quickWinAvailable = quickWin
-    ? actionAvailable(quickWin.activity.to, activityIndicators)
+    ? actionAvailable(quickWin.activity.to, activityIndicators) &&
+      !(quickWin.cta === "Say 5 words out loud" && pronunciationQuickWinDone(todayActivities))
     : false;
   // The challenge has a goal for the day (user request): it shows the progress
   // and leaves once the goal is reached (dailyChallengeGoal).
