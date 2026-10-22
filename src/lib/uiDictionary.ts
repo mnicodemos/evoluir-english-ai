@@ -111,6 +111,10 @@ const baseUiPt: Record<string, string> = {
   Routine: "Rotina",
   Habits: "Hábitos",
   "Life Coach": "Life Coach",
+  "Original text by EVO": "Texto original da EVO",
+  "Send by email": "Enviar por e-mail",
+  Source: "Fonte",
+  Questions: "Perguntas",
   "Focus blocks with short breaks; use the breaks to practise English.":
     "Blocos de foco com pausas curtas; use as pausas para praticar inglês.",
   Break: "Pausa",

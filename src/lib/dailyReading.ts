@@ -383,3 +383,31 @@ export function readingTokens(paragraph: string): ReadingToken[] {
 export function lookupTerm(word: string): string {
   return word.toLowerCase().replace(/’/g, "'").replace(/'s$/, "");
 }
+
+/**
+ * Where the text comes from (user request: the reference of an article, book
+ * or magazine). Every daily reading is an original text written by EVO for the
+ * student's level, never copied from a publication, so the reference says so
+ * plainly instead of inventing an author or source.
+ */
+export function readingReference(
+  reading: { level: string; theme: ReadingTheme; day: string },
+  t: (label: string) => string = (label) => label,
+): string {
+  const theme = reading.theme === "motivational" ? "Motivation" : "Everyday story";
+  return `${t("Original text by EVO")} · Evoluir+ English AI · ${reading.level.toUpperCase()} · ${t(theme)} · ${reading.day}`;
+}
+
+/** The reading as plain text to copy or share: title, paragraphs and reference. */
+export function readingShareText(
+  reading: { title: string; text: string; level: string; theme: ReadingTheme; day: string },
+  t: (label: string) => string = (label) => label,
+): string {
+  return [
+    reading.title,
+    "",
+    readingParagraphs(reading.text).join("\n\n"),
+    "",
+    `— ${readingReference(reading, t)}`,
+  ].join("\n");
+}

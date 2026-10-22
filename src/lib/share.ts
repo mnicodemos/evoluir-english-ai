@@ -1,5 +1,10 @@
 import type { ConversationReport } from "@/lib/ai-prompts";
 
+/** A mailto link; the student picks the address in their email app. */
+export function emailShareUrl(subject: string, body: string): string {
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 /** WhatsApp's share link: the student picks the contact in WhatsApp itself. */
 export function whatsappShareUrl(text: string): string {
   return `https://wa.me/?text=${encodeURIComponent(text)}`;

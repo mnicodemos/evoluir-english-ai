@@ -1,9 +1,9 @@
-import { Check, Copy, MessageCircle } from "lucide-react";
+import { Check, Copy, Mail, MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { whatsappShareUrl } from "@/lib/share";
+import { emailShareUrl, whatsappShareUrl } from "@/lib/share";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
@@ -71,6 +71,27 @@ export function WhatsAppButton({
       >
         <MessageCircle className="text-[#25D366]" aria-hidden="true" />
         {label ? t(label) : "WhatsApp"}
+      </a>
+    </Button>
+  );
+}
+
+/** Opens the student's email app with the subject and text filled in. */
+export function EmailButton({
+  subject,
+  text,
+  className,
+}: {
+  subject: string;
+  text: string;
+  className?: string;
+}) {
+  const t = useT();
+  return (
+    <Button asChild variant="ghost" size="sm" className={cn(ghostClass, className)}>
+      <a href={emailShareUrl(subject, text)} aria-label={t("Send by email")}>
+        <Mail aria-hidden="true" />
+        {t("Email")}
       </a>
     </Button>
   );
