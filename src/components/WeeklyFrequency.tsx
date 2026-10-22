@@ -1,4 +1,4 @@
-import { CalendarDays, Check, CircleCheck, Footprints, Trophy } from "lucide-react";
+import { CalendarDays, Check, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
