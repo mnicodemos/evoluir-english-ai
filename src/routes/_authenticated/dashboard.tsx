@@ -9,7 +9,6 @@ import {
   ChartLine,
   Check,
   ChevronRight,
-  CircleCheck,
   ClipboardCheck,
   Clock,
   Crown,
@@ -682,21 +681,6 @@ function Dashboard() {
                         </div>
                       );
                     })}
-                  </div>
-                  <div
-                    className={cn(
-                      "grid min-h-[1.75rem] grid-cols-[1rem_minmax(0,1fr)] items-center gap-1 ml-[2.25rem] lg:ml-[1.75rem] lg:grid-cols-[1rem_minmax(0,1fr)] lg:gap-1",
-                      minutesToday < profile.daily_minutes && "invisible",
-                    )}
-                    aria-hidden={minutesToday < profile.daily_minutes}
-                  >
-                    <CircleCheck
-                      className="size-3.5 shrink-0 justify-self-end text-brand-green lg:justify-self-start"
-                      aria-hidden="true"
-                    />
-                    <p className="whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green">
-                      {t("Daily goal reached!")}
-                    </p>
                   </div>
                 </div>
               </div>
