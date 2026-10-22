@@ -547,6 +547,13 @@
       "when": 1792454439437,
       "tag": "0077_0077_whatsapp_study_integration_apply",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1792711885910,
+      "tag": "0078_weekly_league_history_apply",
+      "breakpoints": true
     }
   ]
 }

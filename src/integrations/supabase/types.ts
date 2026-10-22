@@ -2246,6 +2246,15 @@ export type Database = {
           xp: number
         }[]
       }
+      weekly_league_history: {
+        Args: { p_weeks?: number }
+        Returns: {
+          members: number
+          rank_position: number
+          week_start: string
+          xp: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
