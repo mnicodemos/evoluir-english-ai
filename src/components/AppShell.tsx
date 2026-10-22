@@ -25,7 +25,7 @@ import {
   Trophy,
   Video,
 } from "lucide-react";
-import { Fragment, useEffect, useRef, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, type ReactNode, type TouchEvent } from "react";
 
 import { FocusController } from "@/components/focus/FocusWidget";
 import { Button } from "@/components/ui/button";
@@ -349,7 +349,7 @@ function AppShellContent({
   const mainSwipeTabs = ["/dashboard", "/teacher", "/coach", "/call"] as const;
   const touchStart = useRef<{ x: number; y: number; target: EventTarget | null } | null>(null);
 
-  function handleMainTouchStart(event: React.TouchEvent<HTMLElement>) {
+  function handleMainTouchStart(event: TouchEvent<HTMLElement>) {
     if (window.matchMedia("(min-width: 1024px)").matches || event.touches.length !== 1) {
       touchStart.current = null;
       return;
