@@ -556,7 +556,7 @@ function Dashboard() {
                   <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
                 </Link>
               </div>
-              <div className="mb-2.5 mt-3 grid w-full flex-none grid-cols-[6.5rem_minmax(0,1fr)] items-center justify-center gap-x-0 gap-y-1.5 pl-7 lg:mb-0 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
+              <div className="mb-1 mt-1 grid w-full flex-none grid-cols-[6.5rem_minmax(0,1fr)] items-center justify-center gap-x-0 gap-y-1.5 pl-7 lg:mb-0 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
                 <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                   <div
                     className={cn(
@@ -623,7 +623,7 @@ function Dashboard() {
                 </div>
                 <div className="grid min-w-0 gap-2 xl:gap-1 2xl:gap-2">
                   {!hasProgressToday && (
-                    <div className="flex min-h-[5.75rem] flex-col items-center justify-center gap-1 text-center text-muted-foreground">
+                    <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground">
                       <Clock
                         className="size-5 text-brand-green"
                         strokeWidth={1.8}
