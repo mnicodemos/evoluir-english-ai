@@ -75,11 +75,15 @@ function LifePage() {
         <LifeHeader />
         {/* Same shapes as the page (user request: no spinner, no jump). */}
         <div className="space-y-4" aria-busy="true">
-          <Skeleton className="h-40 w-full rounded-xl" />
           <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            <Skeleton className="h-96 rounded-xl" />
-            <Skeleton className="h-96 rounded-xl" />
-            <Skeleton className="hidden h-96 rounded-xl xl:block" />
+            <Skeleton className="h-56 rounded-xl" />
+            <Skeleton className="h-56 rounded-xl" />
+            <Skeleton className="hidden h-56 rounded-xl xl:block" />
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+            <Skeleton className="h-80 rounded-xl" />
+            <Skeleton className="h-80 rounded-xl" />
+            <Skeleton className="hidden h-80 rounded-xl xl:block" />
           </div>
         </div>
       </AppShell>
@@ -98,23 +102,20 @@ function LifePage() {
   return (
     <AppShell>
       <LifeHeader />
-      {/* The day at a glance (user request: modern, sophisticated): one hero
-          card with the ring, a bar per part and, for Premium, the priority. */}
-      <section
-        className="card-soft relative overflow-hidden p-4 sm:p-5 xl:p-6"
-        aria-label={t("Your day")}
-      >
-        <div
-          className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
-          aria-hidden="true"
-        />
-        <div
-          className={cn(
-            "relative grid items-center gap-5",
-            data.premium && "lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8",
-          )}
+      {/* Four bands (user request, 2026-10-22): the measures on top (Your
+          day, Evolution score, Focus), then the day's plan (Priority, Today,
+          Habits), the meditations, and last the Life Coach beside Today's
+          steps. Phones stack everything in this order. */}
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-5">
+        <section
+          className="card-soft relative overflow-hidden p-4 sm:p-5 xl:p-6"
+          aria-label={t("Your day")}
         >
-          <div className="flex items-center gap-5">
+          <div
+            className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
+            aria-hidden="true"
+          />
+          <div className="relative flex items-center gap-5">
             <DayRing percent={progress.percent} />
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-green">
@@ -125,88 +126,80 @@ function LifePage() {
                   ? t("Everything done today!")
                   : t("Keep going, one step at a time.")}
               </h2>
-              <dl className="mt-3 grid gap-2">
-                <DayStat
-                  label={t("Goal steps")}
-                  done={progress.stepsDone}
-                  total={progress.stepsTotal}
-                  tone="bg-brand-green"
-                />
-                {data.premium ? (
-                  <>
-                    <DayStat
-                      label={t("Tasks")}
-                      done={progress.tasksDone}
-                      total={progress.tasksTotal}
-                      tone="bg-sky-400"
-                    />
-                    <DayStat
-                      label={t("Habits")}
-                      done={progress.habitsDone}
-                      total={progress.habitsDue}
-                      tone="bg-violet-400"
-                    />
-                  </>
-                ) : null}
-                {/* Focus blocks of today (free): the bar fills at four. */}
-                <DayStat
-                  label={t("Focus")}
-                  done={focusToday}
-                  total={FOCUS_DAILY_TARGET}
-                  tone="bg-pink-400"
-                />
-              </dl>
             </div>
           </div>
-          {data.premium ? (
-            <div className="border-t border-white/10 pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-              <PriorityCard data={data} onChange={refresh} />
-            </div>
-          ) : null}
+          <dl className="relative mt-4 grid gap-2">
+            <DayStat
+              label={t("Goal steps")}
+              done={progress.stepsDone}
+              total={progress.stepsTotal}
+              tone="bg-brand-green"
+            />
+            {data.premium ? (
+              <>
+                <DayStat
+                  label={t("Tasks")}
+                  done={progress.tasksDone}
+                  total={progress.tasksTotal}
+                  tone="bg-sky-400"
+                />
+                <DayStat
+                  label={t("Habits")}
+                  done={progress.habitsDone}
+                  total={progress.habitsDue}
+                  tone="bg-violet-400"
+                />
+              </>
+            ) : null}
+            {/* Focus blocks of today (free): the bar fills at four. */}
+            <DayStat
+              label={t("Focus")}
+              done={focusToday}
+              total={FOCUS_DAILY_TARGET}
+              tone="bg-pink-400"
+            />
+          </dl>
+        </section>
+        <div className="flex flex-col [&>div]:flex-1">
+          <GoalsSection part="score" />
         </div>
-      </section>
+        <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
+          <FocusSection />
+        </div>
+      </div>
 
-      {/* One page without holes (user request): Goals fill the first column;
-          Routine over Habits in the second, with Habits stretching down to the
-          end of the Life Coach in the third; the meditations take the row below,
-          under both. Phones stack everything in this order. */}
       {data.premium ? (
-        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:grid-rows-[auto_1fr_auto_auto] xl:gap-5">
-          <div className="lg:row-span-2 xl:row-span-4">
-            <GoalsSection />
-          </div>
-          <div className="lg:col-start-2 xl:row-start-1">
+        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:mt-5 xl:grid-cols-3 xl:gap-5">
+          <section className="card-soft p-4 sm:p-5 xl:p-6">
+            <PriorityCard data={data} onChange={refresh} />
+          </section>
+          <div className="flex flex-col [&>section]:flex-1">
             <RoutineSection />
           </div>
-          <div className="flex flex-col lg:col-start-2 xl:row-start-2 [&>section]:flex-1">
+          <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
             <HabitsSection />
-          </div>
-          <div className="flex flex-col lg:col-span-2 xl:col-span-1 xl:col-start-3 xl:row-span-2 xl:row-start-1 [&>section]:flex-1">
-            <CoachSection />
-          </div>
-          <div className="lg:col-span-2 xl:col-start-2 xl:row-start-3">
-            <MeditationSection />
-          </div>
-          <div className="lg:col-span-2 xl:col-start-2 xl:row-start-4">
-            <FocusSection />
           </div>
         </div>
       ) : (
-        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-          <div className="lg:row-span-2">
-            <GoalsSection />
-          </div>
-          <div className="xl:col-span-2">
-            <LifePremiumGate feature="Routine, habits and Life Coach" />
-          </div>
-          <div className="xl:col-span-2">
-            <MeditationSection />
-          </div>
-          <div className="lg:col-span-2 xl:col-start-2">
-            <FocusSection />
-          </div>
+        <div className="mt-4 xl:mt-5">
+          <LifePremiumGate feature="Routine, habits and Life Coach" />
         </div>
       )}
+
+      <div className="mt-4 xl:mt-5">
+        <MeditationSection />
+      </div>
+
+      <div className={cn("mt-4 grid gap-4 xl:mt-5 xl:gap-5", data.premium && "lg:grid-cols-2")}>
+        {data.premium ? (
+          <div className="flex flex-col [&>section]:flex-1">
+            <CoachSection />
+          </div>
+        ) : null}
+        <div className="flex flex-col [&>div]:flex-1">
+          <GoalsSection part="steps" />
+        </div>
+      </div>
     </AppShell>
   );
 }
