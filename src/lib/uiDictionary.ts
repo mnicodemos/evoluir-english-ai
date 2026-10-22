@@ -3,6 +3,7 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Corrected": "Corrigido",
   "Next plan on Monday": "Próximo plano na segunda",
   "Delete this saved mistake? This cannot be undone.":
     "Excluir este erro salvo? Esta ação não pode ser desfeita.",
