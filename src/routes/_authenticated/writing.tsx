@@ -20,6 +20,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { WritingHelp } from "@/components/WritingHelp";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useRoundStart, useSavedPractice } from "@/hooks/usePracticeSync";
 import { useProfile } from "@/hooks/useProfile";
@@ -451,6 +452,8 @@ function Writing() {
                     Correct my text
                   </Button>
                 </div>
+                {/* Help while composing (user request): hints from EVO, never the answer. */}
+                <WritingHelp task={prompt} draft={text} />
               </>
             )}
           </section>

@@ -115,6 +115,7 @@ export const APP_GUIDE: GuideSection[] = [
     what: "Write short texts and get them corrected with clear explanations.",
     steps: [
       "Answer today's writing task in English, close to the target length.",
+      "Stuck? Open Ask EVO for help under the box: a way to start, useful words or a check of your last sentence.",
       "Send it: EVO corrects it, shows a natural version and explains what to fix.",
       "There are three tasks a day; your mistakes go to My mistakes, and three texts complete a study day.",
     ],

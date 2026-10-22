@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { dailyChallengeGoal, practiceXpLabel } from "./dailyChallenge";
+import { dailyChallengeGoal, practiceXpLabel, pronunciationQuickWinDone } from "./dailyChallenge";
 
 describe("daily challenge goal", () => {
   it("counts today's texts toward a Writing challenge and is reached at three", () => {
@@ -32,5 +32,22 @@ describe("daily challenge goal", () => {
     expect(practiceXpLabel("/reading")).toBe("+20 XP");
     expect(practiceXpLabel("/learning/$lessonId")).toBe("+50 XP");
     expect(practiceXpLabel("/teacher")).toBeNull();
+  });
+});
+
+describe("pronunciation Quick Win", () => {
+  it("is done once five words were pronounced today", () => {
+    const say = { activity_type: "vocabulary", duration_minutes: 0 };
+    expect(pronunciationQuickWinDone([say, say, say, say])).toBe(false);
+    expect(pronunciationQuickWinDone([say, say, say, say, say, say])).toBe(true);
+    expect(
+      pronunciationQuickWinDone([
+        say,
+        say,
+        say,
+        say,
+        { activity_type: "writing", duration_minutes: 5 },
+      ]),
+    ).toBe(false);
   });
 });

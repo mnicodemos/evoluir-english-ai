@@ -4,6 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   BookOpenText,
   Check,
+  ChevronLeft,
+  ChevronRight,
   CircleCheck,
   Languages,
   Loader2,
@@ -15,6 +17,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/PageHeader";
+import { CopyButton, EmailButton, WhatsAppButton } from "@/components/ShareActions";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
@@ -23,6 +26,8 @@ import {
   gradeReading,
   lookupTerm,
   readingParagraphs,
+  readingReference,
+  readingShareText,
   readingSpeechChunks,
   readingTokens,
 } from "@/lib/dailyReading";
@@ -180,6 +185,8 @@ function ReadingPage() {
   const [playing, setPlaying] = useState(false);
   const [chosen, setChosen] = useState<(number | null)[]>([]);
   const [checked, setChecked] = useState(false);
+  // The question on screen: the five questions sit behind numbered tabs.
+  const [current, setCurrent] = useState(0);
 
   // Answering every question finishes today's reading: the server grades it
   // and records it once a day, which closes the study day (migration 0073).
@@ -224,6 +231,7 @@ function ReadingPage() {
         : null;
     setChosen(reading ? (given ?? reading.questions.map(() => null)) : []);
     setChecked(!!done);
+    setCurrent(0);
     setMarked(reading ? readMarked(reading) : []);
     setSelectedWord(null);
   }, [reading]);
@@ -376,6 +384,18 @@ function ReadingPage() {
               ))}
             </div>
 
+            {/* Where the text comes from (user request): every daily reading is
+                an original text by EVO, so the reference says so plainly. */}
+            <p className="mt-4 border-t border-border pt-3 text-[11px] leading-snug text-muted-foreground">
+              <span className="font-semibold uppercase tracking-wide">{t("Source")}</span>{" "}
+              {readingReference(reading, t)}
+            </p>
+            <div className="-ml-2 mt-1 flex flex-wrap items-center gap-1">
+              <CopyButton text={readingShareText(reading, t)} />
+              <EmailButton subject={reading.title} text={readingShareText(reading, t)} />
+              <WhatsAppButton text={readingShareText(reading, t)} />
+            </div>
+
             {selectedWord ? (
               <WordMeaning term={selectedWord} glossaryPt={glossaryPt.get(selectedWord) ?? null} />
             ) : (
@@ -435,9 +455,51 @@ function ReadingPage() {
             <h2 id="questions-title" className="font-display text-base font-semibold">
               {t("Did you understand?")}
             </h2>
-            <ol className="mt-3 space-y-4">
-              {reading.questions.map((question, qIndex) => (
-                <li key={qIndex}>
+            {/* One question at a time behind numbered tabs (user request: the
+                five questions made this block much taller than the text). */}
+            <div className="mt-3 flex flex-wrap gap-1.5" role="tablist" aria-label={t("Questions")}>
+              {reading.questions.map((question, qIndex) => {
+                const answered = chosen[qIndex] !== null && chosen[qIndex] !== undefined;
+                const right = checked && chosen[qIndex] === question.answer;
+                const wrong = checked && answered && chosen[qIndex] !== question.answer;
+                return (
+                  <button
+                    key={qIndex}
+                    type="button"
+                    role="tab"
+                    aria-selected={current === qIndex}
+                    aria-label={`${t("Question")} ${qIndex + 1}`}
+                    onClick={() => setCurrent(qIndex)}
+                    className={cn(
+                      "grid size-8 place-items-center rounded-full border text-xs font-semibold tabular-nums transition-colors",
+                      right
+                        ? "border-brand-green bg-brand-green/15 text-brand-green"
+                        : wrong
+                          ? "border-destructive/60 bg-destructive/10 text-destructive"
+                          : answered
+                            ? "border-brand-green/50 bg-brand-green/10 text-foreground"
+                            : "border-border text-muted-foreground",
+                      current === qIndex &&
+                        "ring-2 ring-brand-green/60 ring-offset-1 ring-offset-background",
+                    )}
+                  >
+                    {right ? (
+                      <Check className="size-3.5" aria-hidden="true" />
+                    ) : wrong ? (
+                      <X className="size-3.5" aria-hidden="true" />
+                    ) : (
+                      qIndex + 1
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {(() => {
+              const qIndex = Math.min(current, reading.questions.length - 1);
+              const question = reading.questions[qIndex];
+              if (!question) return null;
+              return (
+                <div className="mt-3" role="tabpanel">
                   <p translate="no" lang="en" className="text-sm font-medium">
                     {qIndex + 1}. {question.question}
                   </p>
@@ -452,11 +514,17 @@ function ReadingPage() {
                           type="button"
                           disabled={checked}
                           aria-pressed={picked}
-                          onClick={() =>
-                            setChosen((current) =>
-                              current.map((value, index) => (index === qIndex ? oIndex : value)),
-                            )
-                          }
+                          onClick={() => {
+                            const next = chosen.map((value, index) =>
+                              index === qIndex ? oIndex : value,
+                            );
+                            setChosen(next);
+                            // On to the next open question, so answering flows.
+                            const open = next.findIndex(
+                              (value, index) => index > qIndex && value === null,
+                            );
+                            if (open >= 0) window.setTimeout(() => setCurrent(open), 250);
+                          }}
                           className={cn(
                             "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
                             picked && !checked
@@ -483,9 +551,36 @@ function ReadingPage() {
                       {question.explanation_pt}
                     </p>
                   ) : null}
-                </li>
-              ))}
-            </ol>
+                  <div className="mt-3 flex items-center justify-between">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="gap-1"
+                      disabled={qIndex === 0}
+                      onClick={() => setCurrent(qIndex - 1)}
+                    >
+                      <ChevronLeft className="size-4" aria-hidden="true" />
+                      {t("Previous")}
+                    </Button>
+                    <span className="text-xs tabular-nums text-muted-foreground">
+                      {qIndex + 1}/{reading.questions.length}
+                    </span>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="gap-1"
+                      disabled={qIndex >= reading.questions.length - 1}
+                      onClick={() => setCurrent(qIndex + 1)}
+                    >
+                      {t("Next")}
+                      <ChevronRight className="size-4" aria-hidden="true" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
 
             {result ? (
               <p className="mt-4 rounded-lg bg-secondary/60 px-3 py-2 text-sm font-medium">

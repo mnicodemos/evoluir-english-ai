@@ -60,6 +60,17 @@ export function dailyChallengeGoal(
   };
 }
 
+/** "Say 5 words out loud" (the pronunciation Quick Win) is done once five
+ *  words were pronounced today (each pronunciation is one "vocabulary"
+ *  activity; user report: it stayed after six). */
+export const QUICK_WIN_PRONUNCIATIONS = 5;
+export function pronunciationQuickWinDone(activities: ChallengeActivityRow[]): boolean {
+  return (
+    activities.filter((row) => row.activity_type === "vocabulary").length >=
+    QUICK_WIN_PRONUNCIATIONS
+  );
+}
+
 /** League XP the destination's activity earns, as a short English label. */
 export function practiceXpLabel(destination: string): string | null {
   const path = destination.split("?")[0]!;
