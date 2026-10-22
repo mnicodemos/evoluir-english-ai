@@ -685,7 +685,7 @@ function Dashboard() {
                   </div>
                   <div
                     className={cn(
-                      "mt-1 grid min-h-[1.25rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5",
+                      "mt-1 grid min-h-[1.75rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:mt-2 lg:min-h-[1.75rem] lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-0",
                       minutesToday < profile.daily_minutes && "invisible",
                     )}
                     aria-hidden={minutesToday < profile.daily_minutes}
@@ -694,7 +694,7 @@ function Dashboard() {
                       className="size-3.5 shrink-0 justify-self-end text-brand-green lg:justify-self-start"
                       aria-hidden="true"
                     />
-                    <p className="whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green lg:text-sm">
+                    <p className="whitespace-nowrap text-[10px] font-semibold leading-tight text-brand-green">
                       {t("Daily goal reached!")}
                     </p>
                   </div>
