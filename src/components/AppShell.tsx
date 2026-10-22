@@ -25,7 +25,7 @@ import {
   Trophy,
   Video,
 } from "lucide-react";
-import { Fragment, useEffect, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, type ReactNode } from "react";
 
 import { FocusController } from "@/components/focus/FocusWidget";
 import { Button } from "@/components/ui/button";
@@ -344,6 +344,50 @@ function AppShellContent({
   const activityIndicators = useActivityIndicators();
   const translate = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
+  // Mobile swipe between the four destinations already shown in the bottom bar.
+  // Keep navigation route-driven so the bottom bar stays in sync.
+  const mainSwipeTabs = ["/dashboard", "/teacher", "/coach", "/call"] as const;
+  const touchStart = useRef<{ x: number; y: number; target: EventTarget | null } | null>(null);
+
+  function handleMainTouchStart(event: React.TouchEvent<HTMLElement>) {
+    if (window.matchMedia("(min-width: 1024px)").matches || event.touches.length !== 1) {
+      touchStart.current = null;
+      return;
+    }
+    touchStart.current = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+      target: event.target,
+    };
+  }
+
+  function handleMainTouchEnd(event: React.TouchEvent<HTMLElement>) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start || window.matchMedia("(min-width: 1024px)").matches) return;
+
+    const target = start.target instanceof Element ? start.target : null;
+    if (
+      target?.closest(
+        'a, button, input, textarea, select, [role="button"], [role="slider"], video, audio, [data-no-swipe]',
+      )
+    ) return;
+
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) < 72 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
+
+    const currentIndex = mainSwipeTabs.indexOf(
+      location.pathname as (typeof mainSwipeTabs)[number],
+    );
+    if (currentIndex < 0) return;
+    const nextIndex = currentIndex + (dx < 0 ? 1 : -1);
+    if (nextIndex < 0 || nextIndex >= mainSwipeTabs.length) return;
+    void navigate({ to: mainSwipeTabs[nextIndex] });
+  }
+
   // Stop any playing audio (flashcards, listening, vocabulary, AI voice) on page change.
   useEffect(() => {
     stopSpeaking();
@@ -521,6 +565,8 @@ function AppShellContent({
         </aside>
 
         <main
+          onTouchStart={handleMainTouchStart}
+          onTouchEnd={handleMainTouchEnd}
           className={cn(
             "animate-page-in w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
             !dashboardLayout && "flex-1",
