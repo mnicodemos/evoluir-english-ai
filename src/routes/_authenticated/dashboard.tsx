@@ -615,7 +615,7 @@ function Dashboard() {
                     )}
                   </div>
                 </div>
-                <div className="grid min-w-0 gap-2 xl:gap-1 2xl:gap-2">
+                <div className="grid min-w-0 gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                   {!hasProgressToday && (
                     <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground">
                       <Clock
