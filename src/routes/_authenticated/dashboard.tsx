@@ -560,7 +560,7 @@ function Dashboard() {
                 <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                   <div
                     className={cn(
-                      "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:size-24 lg:justify-self-start 2xl:size-30",
+                      "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:translate-y-5 lg:size-24 lg:justify-self-start 2xl:size-30 2xl:translate-y-0",
                       celebrateGoal && "animate-celebrate",
                     )}
                   >
