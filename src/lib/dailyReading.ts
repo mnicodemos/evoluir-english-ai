@@ -95,12 +95,75 @@ const THEME_BRIEF: Record<ReadingTheme, string> = {
     "A short everyday story or chronicle: a slice of ordinary life (work, family, a trip, a neighbour, a small surprise) with a clear beginning, middle and end. Invented characters only.",
 };
 
-export function dailyReadingMessages(level: ReadingLevel, theme: ReadingTheme, day: string) {
+/**
+ * What the student may choose to read (user request, 2026-10-22): six
+ * categories and three styles. With no choice the page shows "Today's pick"
+ * (the theme of the day). Each level, day, category and style is written once
+ * by the AI and shared, like the daily text.
+ */
+export const READING_CATEGORIES = [
+  "daily_life",
+  "work",
+  "travel",
+  "technology",
+  "wellbeing",
+  "culture",
+] as const;
+export type ReadingCategory = (typeof READING_CATEGORIES)[number];
+export const READING_STYLES = ["story", "article", "dialogue"] as const;
+export type ReadingStyle = (typeof READING_STYLES)[number];
+export type ReadingChoice = { category: ReadingCategory; style: ReadingStyle };
+
+/** English labels for the screen (translated through uiPt). */
+export const READING_CATEGORY_LABELS: Record<ReadingCategory, string> = {
+  daily_life: "Daily life",
+  work: "Work and career",
+  travel: "Travel",
+  technology: "Technology",
+  wellbeing: "Health and wellbeing",
+  culture: "Culture and entertainment",
+};
+export const READING_STYLE_LABELS: Record<ReadingStyle, string> = {
+  story: "Story",
+  article: "Article",
+  dialogue: "Dialogue",
+};
+
+const CATEGORY_BRIEF: Record<ReadingCategory, string> = {
+  daily_life: "everyday life: home, family, friends, shopping, neighbours, routines",
+  work: "work and career: the office, meetings, a new job, colleagues, small business, productivity",
+  travel: "travel: trips, airports, hotels, getting around a city, meeting people abroad",
+  technology: "technology: apps, phones, the internet, AI, gadgets and how people use them",
+  wellbeing:
+    "health and wellbeing: sleep, exercise, food, rest and balance, as everyday habits (no medical advice, diagnoses or therapy claims)",
+  culture:
+    "culture and entertainment: films, music, books, festivals, sport, food from other countries",
+};
+const STYLE_BRIEF: Record<ReadingStyle, string> = {
+  story: "A short story with invented characters and a clear beginning, middle and end.",
+  article:
+    "A short magazine-style article that explains or discusses the subject, with a clear opening and closing; no invented statistics, studies or real people's quotes.",
+  dialogue:
+    "A natural conversation between two or three invented people, one line per turn written as 'Name: line', with short narration only where needed.",
+};
+
+export function readingChoiceKey(choice: ReadingChoice | null): string {
+  return choice ? `${choice.category}:${choice.style}` : "today";
+}
+
+export function dailyReadingMessages(
+  level: ReadingLevel,
+  theme: ReadingTheme,
+  day: string,
+  choice: ReadingChoice | null = null,
+) {
   const spec = READING_SPECS[level];
   const system = [
     "You write original reading texts for Brazilian students learning English.",
     `Level: CEFR ${level.toUpperCase()}. ${spec.language}`,
-    `Theme: ${THEME_BRIEF[theme]}`,
+    choice
+      ? `Subject: ${CATEGORY_BRIEF[choice.category]}. Style: ${STYLE_BRIEF[choice.style]} Invented people only; no medical, religious or political content.`
+      : `Theme: ${THEME_BRIEF[theme]}`,
     `Length: between ${spec.minWords} and ${spec.maxWords} words, in 2 to 5 short paragraphs separated by a blank line.`,
     "Write a completely original text. Never copy or adapt a published book, article or song.",
     `Then write ${spec.questions} multiple-choice comprehension questions in English about ${spec.questionFocus} Each has 4 options and exactly one correct answer; the explanation is one short sentence in Brazilian Portuguese.`,
@@ -111,7 +174,9 @@ export function dailyReadingMessages(level: ReadingLevel, theme: ReadingTheme, d
     { role: "system" as const, content: system },
     {
       role: "user" as const,
-      content: `Write the daily reading for ${day}. Pick a fresh subject.`,
+      content: choice
+        ? `Write the ${choice.style} about ${choice.category.replace("_", " ")} for ${day}. Pick a fresh subject within it.`
+        : `Write the daily reading for ${day}. Pick a fresh subject.`,
     },
   ];
 }
@@ -391,16 +456,25 @@ export function lookupTerm(word: string): string {
  * plainly instead of inventing an author or source.
  */
 export function readingReference(
-  reading: { level: string; theme: ReadingTheme; day: string },
+  reading: { level: string; theme: ReadingTheme; day: string; choice?: ReadingChoice | null },
   t: (label: string) => string = (label) => label,
 ): string {
-  const theme = reading.theme === "motivational" ? "Motivation" : "Everyday story";
-  return `${t("Original text by EVO")} · Evoluir+ English AI · ${reading.level.toUpperCase()} · ${t(theme)} · ${reading.day}`;
+  const kind = reading.choice
+    ? `${t(READING_CATEGORY_LABELS[reading.choice.category])} · ${t(READING_STYLE_LABELS[reading.choice.style])}`
+    : t(reading.theme === "motivational" ? "Motivation" : "Everyday story");
+  return `${t("Original text by EVO")} · Evoluir+ English AI · ${reading.level.toUpperCase()} · ${kind} · ${reading.day}`;
 }
 
 /** The reading as plain text to copy or share: title, paragraphs and reference. */
 export function readingShareText(
-  reading: { title: string; text: string; level: string; theme: ReadingTheme; day: string },
+  reading: {
+    title: string;
+    text: string;
+    level: string;
+    theme: ReadingTheme;
+    day: string;
+    choice?: ReadingChoice | null;
+  },
   t: (label: string) => string = (label) => label,
 ): string {
   return [

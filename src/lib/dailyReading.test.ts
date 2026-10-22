@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   READING_SPECS,
+  dailyReadingMessages,
+  readingChoiceKey,
+  readingReference,
   fallbackReading,
   gradeReading,
   lookupTerm,
@@ -106,5 +109,42 @@ describe("daily reading rules", () => {
     expect(lookupTerm("Maria’s")).toBe("maria");
     expect(lookupTerm("Habits")).toBe("habits");
     expect(lookupTerm("don't")).toBe("don't");
+  });
+});
+
+describe("reading choice", () => {
+  it("keys the choice, with Today's pick as the default", () => {
+    expect(readingChoiceKey(null)).toBe("today");
+    expect(readingChoiceKey({ category: "travel", style: "dialogue" })).toBe("travel:dialogue");
+  });
+
+  it("briefs the AI on the chosen subject and style instead of the theme", () => {
+    const [system, user] = dailyReadingMessages("b1", "motivational", "2026-10-22", {
+      category: "work",
+      style: "article",
+    });
+    expect(system!.content).toContain("Subject: work and career");
+    expect(system!.content).toContain("magazine-style article");
+    expect(system!.content).not.toContain("Theme:");
+    expect(user!.content).toContain("article about work");
+  });
+
+  it("keeps the daily theme without a choice", () => {
+    const [system] = dailyReadingMessages("b1", "motivational", "2026-10-22");
+    expect(system!.content).toContain("Theme:");
+    expect(system!.content).not.toContain("Subject:");
+  });
+
+  it("names the category and style in the source line", () => {
+    const reference = readingReference(
+      {
+        level: "b1",
+        theme: "story",
+        day: "2026-10-22",
+        choice: { category: "travel", style: "story" },
+      },
+      (label) => label,
+    );
+    expect(reference).toContain("Travel · Story");
   });
 });
