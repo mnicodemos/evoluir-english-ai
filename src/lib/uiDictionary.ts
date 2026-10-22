@@ -745,6 +745,7 @@ const baseUiPt: Record<string, string> = {
   "Writing correction": "Correção de escrita",
   "Download today's summary (PDF)": "Baixar o resumo de hoje (PDF)",
   "Download course": "Baixar curso",
+  "Download study guide": "Baixar guia de aprendizagem e estudo",
   "Download your progress": "Baixar seu progresso",
   "Voice conversation": "Conversa por voz",
   Practice: "Praticar",
