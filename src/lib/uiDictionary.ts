@@ -11,6 +11,7 @@ const baseUiPt: Record<string, string> = {
   "Could not delete this mistake. Please try again.":
     "Não foi possível excluir este erro. Tente novamente.",
   Delete: "Excluir",
+  "Download study book": "Baixar guia de estudos",
   // Life+ AI visual guide (/life/guide)
   "How Life+ AI works": "Como funciona o Life+ AI",
   "Your daily cycle": "Seu ciclo diário",
