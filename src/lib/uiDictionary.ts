@@ -111,6 +111,13 @@ const baseUiPt: Record<string, string> = {
   Routine: "Rotina",
   Habits: "Hábitos",
   "Life Coach": "Life Coach",
+  "Try Premium free for": "Experimente o Premium grátis por",
+  "Nothing is charged today. Cancel before the trial ends and you pay nothing.":
+    "Nada é cobrado hoje. Cancele antes do fim do teste e você não paga nada.",
+  "Start free trial": "Começar teste grátis",
+  "After the trial,": "Depois do teste,",
+  "Cancel any time in My subscription before the trial ends.":
+    "Cancele quando quiser em Minha assinatura antes do fim do teste.",
   "Original text by EVO": "Texto original da EVO",
   "Send by email": "Enviar por e-mail",
   Source: "Fonte",

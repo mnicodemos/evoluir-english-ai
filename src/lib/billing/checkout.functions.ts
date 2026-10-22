@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { BILLING_INTERVALS, resolvePriceId } from "./stripeMapping";
+import { TRIAL_DAYS, trialEligible } from "./trial";
 
 /**
  * Strict input: the client may only name an allowed plan interval. Any attempt
@@ -54,13 +55,32 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
       await linkCustomer(context.userId, customerId);
     }
 
+    // 7 days free on the account's first subscription (trial.ts): Stripe takes
+    // the card now and charges on day 8 unless the student cancels before.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: past } = await supabaseAdmin
+      .from("subscriptions")
+      .select("id")
+      .eq("user_id", context.userId)
+      .limit(1);
+    const withTrial = trialEligible(past ?? [{}]);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
       client_reference_id: context.userId,
       metadata: { user_id: context.userId, interval: data.interval },
-      subscription_data: { metadata: { user_id: context.userId, interval: data.interval } },
+      payment_method_collection: "always",
+      subscription_data: {
+        metadata: { user_id: context.userId, interval: data.interval },
+        ...(withTrial
+          ? {
+              trial_period_days: TRIAL_DAYS,
+              trial_settings: { end_behavior: { missing_payment_method: "cancel" as const } },
+            }
+          : {}),
+      },
       success_url: `${origin}/billing-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/premium`,
     });

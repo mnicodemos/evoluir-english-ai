@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
 import { useUiLang } from "@/lib/uiLang";
 import { createStripeCheckoutSession } from "@/lib/billing/checkout.functions";
+import { TRIAL_DAYS, trialEligible } from "@/lib/billing/trial";
 import { getMyAccess } from "@/lib/billing/entitlements.functions";
 import { createStripePortalSession } from "@/lib/billing/portal.functions";
 import { buildSubscriptionView } from "@/lib/billing/subscriptionView";
@@ -115,6 +116,9 @@ function Premium() {
   // Server/database authority: Premium comes from valid entitlements only.
   const view = access ? buildSubscriptionView(access) : null;
   const isPremium = view ? view.plan === "premium" : profileIsPremium(profile);
+  // 7 days free on the first subscription (trial.ts; the server decides at
+  // checkout, this only shows the offer).
+  const withTrial = access ? trialEligible(access.subscriptions) : false;
 
   async function goToCheckout() {
     if (starting) return;
@@ -257,6 +261,22 @@ function Premium() {
             </section>
           ) : (
             <>
+              {withTrial ? (
+                <section className="card-soft flex items-start gap-3 border border-brand-green/30 bg-brand-green/[0.06] p-5">
+                  <Sparkles
+                    className="mt-0.5 size-5 shrink-0 text-brand-green"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <h2 className="font-display text-base font-semibold">
+                      <span>Try Premium free for</span> {TRIAL_DAYS} <span>days</span>
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Nothing is charged today. Cancel before the trial ends and you pay nothing.
+                    </p>
+                  </div>
+                </section>
+              ) : null}
               <section className="grid gap-5 sm:grid-cols-2">
                 {plans.map((p) => (
                   <button
@@ -320,6 +340,10 @@ function Premium() {
                   {starting && <Loader2 className="mr-2 size-4 animate-spin" />}
                   {starting ? (
                     <span>Opening secure checkout…</span>
+                  ) : withTrial ? (
+                    <>
+                      <span>Start free trial</span> · {TRIAL_DAYS} <span>days</span>
+                    </>
                   ) : (
                     // Separate text nodes so the Portuguese screen translates them.
                     <>
@@ -328,6 +352,14 @@ function Premium() {
                     </>
                   )}
                 </Button>
+                {withTrial ? (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    <span>After the trial,</span> {selected === "yearly" ? "R$ 799,90" : "R$ 79,90"}
+                    <span>{selected === "yearly" ? "/year" : "/month"}</span>
+                    {". "}
+                    <span>Cancel any time in My subscription before the trial ends.</span>
+                  </p>
+                ) : null}
                 <p className="mt-3 text-xs text-muted-foreground">
                   Secure payment is processed by Stripe. Your card details never reach Evoluir+.
                 </p>
