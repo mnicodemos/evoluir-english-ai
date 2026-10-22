@@ -615,7 +615,7 @@ function Dashboard() {
                     )}
                   </div>
                 </div>
-                <div className="grid min-w-0 gap-2 xl:gap-1 2xl:gap-2">
+                <div className="grid min-w-0 gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                   {!hasProgressToday && (
                     <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground">
                       <Clock
@@ -685,7 +685,7 @@ function Dashboard() {
                   </div>
                   <div
                     className={cn(
-                      "mt-1 grid min-h-[1.75rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:mt-2 lg:min-h-[1.75rem] lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-0",
+                      "mt-1 grid min-h-[1.75rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:mt-2 lg:min-h-[1.75rem] lg:grid-cols-[1rem_minmax(0,1fr)] lg:gap-0",
                       minutesToday < profile.daily_minutes && "invisible",
                     )}
                     aria-hidden={minutesToday < profile.daily_minutes}
