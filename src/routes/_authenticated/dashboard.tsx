@@ -614,12 +614,6 @@ function Dashboard() {
                       </span>
                     )}
                   </div>
-                  {minutesToday >= profile.daily_minutes && (
-                    <p className="mt-1 hidden items-center justify-center gap-1 whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-brand-green lg:inline-flex">
-                      <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
-                      {t("Daily goal reached!")}
-                    </p>
-                  )}
                 </div>
                 <div className="grid min-w-0 gap-2 xl:gap-1 2xl:gap-2">
                   {!hasProgressToday && (
@@ -643,7 +637,7 @@ function Dashboard() {
                   <div
                     className={cn(
                       `${hasProgressToday ? "grid" : "hidden"} gap-1 xl:gap-1 2xl:gap-2`,
-                      minutesToday < profile.daily_minutes && "translate-y-4",
+                      "translate-y-4",
                     )}
                   >
                     {learningCards.map((card) => {
@@ -691,7 +685,7 @@ function Dashboard() {
                   </div>
                   <div
                     className={cn(
-                      "mt-1 grid min-h-[1.25rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:hidden",
+                      "mt-1 grid min-h-[1.25rem] grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1",
                       minutesToday < profile.daily_minutes && "invisible",
                     )}
                     aria-hidden={minutesToday < profile.daily_minutes}
