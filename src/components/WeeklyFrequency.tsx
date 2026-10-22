@@ -1,4 +1,4 @@
-import { CalendarDays, Check, CircleCheck, Footprints, Trophy } from "lucide-react";
+import { CalendarDays, Check, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
@@ -296,19 +296,6 @@ export function WeeklyFrequency({
                   ? "day active this week"
                   : "days active this week"}
             </p>
-            {allStudied ? (
-              <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-brand-green">
-                <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
-                {lang === "pt" ? "Ótima consistência!" : "Great consistency!"}
-              </p>
-            ) : (
-              // In progress (user request): footprints and a grey nudge, in the
-              // place the goal check takes once the week's plan is reached.
-              <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-                <Footprints className="size-3.5 shrink-0" aria-hidden="true" />
-                {lang === "pt" ? "Mantenha o ritmo..." : "Keep the pace..."}
-              </p>
-            )}
           </div>
         </div>
         <div className="mt-2 grid grid-cols-7 gap-1">
