@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Check, ChartNoAxesColumnIncreasing, GraduationCap, Lock, Undo2 } from "lucide-react";
+import { Check, ChartNoAxesColumnIncreasing, Download, GraduationCap, Lock, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +37,7 @@ export function LevelCard({
   const highestIndex = LEVELS.indexOf(highest);
   // Left over from the old level switch: studying below the level reached.
   const belowHighest = currentIndex < highestIndex;
+  const studyBookHref = `/study-books/Evoluir_Guia_de_Aprendizagem_e_Estudo_${current.value.toUpperCase()}_Retrato.pdf`;
 
   const returnToHighest = async () => {
     if (returning) return;
@@ -135,10 +136,19 @@ export function LevelCard({
     </button>
   );
 
+  const studyBookButton = (
+    <a
+      href={studyBookHref}
+      download
+      className="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-brand-green/40 px-3 py-1.5 text-xs font-semibold text-brand-green transition hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+      aria-label={`Download study book ${current.value.toUpperCase()}`}
+    >
+      <Download className="size-3.5 shrink-0" aria-hidden="true" />
+      Download study book
+    </a>
+  );
+
   if (compact) {
-    // Dashboard header: the same three lines as the other header cells
-    // (icon tile · level name · level chips · supporting line).
-    const next = LEVELS[highestIndex + 1];
     return (
       <div className="flex h-full min-w-0 items-center gap-3 px-4 py-3 2xl:gap-4 2xl:px-6">
         <span
@@ -155,11 +165,7 @@ export function LevelCard({
           {belowHighest ? (
             <div className="mt-1">{backButton}</div>
           ) : (
-            <p className="mt-1 truncate text-xs leading-tight text-muted-foreground">
-              {next
-                ? `${t("Next level")}: ${next.value.toUpperCase()} · ${t("Final Test")}`
-                : t("Highest level reached")}
-            </p>
+            studyBookButton
           )}
         </div>
       </div>
@@ -183,6 +189,7 @@ export function LevelCard({
         {backButton}
       </div>
       {chips}
+      {studyBookButton}
     </div>
   );
 }
