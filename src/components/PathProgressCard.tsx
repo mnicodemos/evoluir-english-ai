@@ -217,7 +217,7 @@ export function PathProgressCard({
             <Link
               to="/learning"
               aria-label={`${t("Level")} ${t(findLevel(profile.level).label)}`}
-              className="inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 lg:hidden"
+              className="ml-auto inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 lg:hidden"
             >
               {/* Same look as Today's Progress "My progress" link beside it. */}
               <GraduationCap className="size-3.5 shrink-0" aria-hidden="true" />
