@@ -111,6 +111,10 @@ const baseUiPt: Record<string, string> = {
   Routine: "Rotina",
   Habits: "Hábitos",
   "Life Coach": "Life Coach",
+  "Your history": "Seu histórico",
+  "Best position": "Melhor posição",
+  "Join the league to see your position each week.":
+    "Entre na liga para ver sua posição em cada semana.",
   "Try Premium free for": "Experimente o Premium grátis por",
   "Nothing is charged today. Cancel before the trial ends and you pay nothing.":
     "Nada é cobrado hoje. Cancele antes do fim do teste e você não paga nada.",

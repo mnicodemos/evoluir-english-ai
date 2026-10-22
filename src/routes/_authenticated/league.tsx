@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, Trophy, Users } from "lucide-react";
+import { History, Loader2, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { findLevel, leagueLevelOf } from "@/lib/level";
+import { uiPt } from "@/lib/uiDictionary";
+import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/league")({
@@ -199,6 +201,8 @@ function League() {
             </Button>
           </section>
 
+          <LeagueHistory userId={profile?.id ?? null} joined={joined} />
+
           <section className="card-soft p-4">
             <h2 className="font-display text-sm font-semibold">How to earn XP</h2>
             <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
@@ -213,5 +217,115 @@ function League() {
         </aside>
       </div>
     </AppShell>
+  );
+}
+
+type HistoryRow = {
+  week_start: string;
+  xp: number;
+  rank_position: number | null;
+  members: number | null;
+};
+
+/**
+ * The student's league weeks (user request, 2026-10-22: see how the position
+ * changes over time): the last 8 weeks, newest first, with the XP as a bar and
+ * the position among the students who take part (weekly_league_history,
+ * migration 0078). Hidden until that migration is applied.
+ */
+function LeagueHistory({ userId, joined }: { userId: string | null; joined: boolean }) {
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["weekly-league-history", userId, joined],
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      // Not in the generated Supabase types until Lovable regenerates them.
+      const rpc = supabase.rpc as unknown as (
+        name: string,
+        args: { p_weeks: number },
+      ) => Promise<{ data: HistoryRow[] | null; error: { message: string } | null }>;
+      const { data: rows, error } = await rpc("weekly_league_history", { p_weeks: 8 });
+      if (error) throw error;
+      return rows ?? [];
+    },
+  });
+  if (isError) return null;
+  const rows = data ?? [];
+  const maxXp = Math.max(1, ...rows.map((row) => row.xp));
+  const ranked = rows.filter((row) => row.rank_position !== null && row.xp > 0);
+  const best = ranked.length ? Math.min(...ranked.map((row) => row.rank_position!)) : null;
+  const weekLabel = (day: string) =>
+    new Date(`${day}T12:00:00`).toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", {
+      day: "numeric",
+      month: "short",
+    });
+
+  return (
+    <section className="card-soft p-4">
+      <h2 className="font-display flex items-center gap-2 text-sm font-semibold">
+        <History className="size-4 text-brand-green" />
+        {t("Your history")}
+      </h2>
+      {best !== null ? (
+        <p className="mt-1 text-xs text-muted-foreground">
+          <span>{t("Best position")}</span>:{" "}
+          <span className="font-semibold text-foreground">#{best}</span>
+        </p>
+      ) : null}
+      {isLoading ? (
+        <div className="mt-3 space-y-2" aria-busy="true">
+          {[0, 1, 2, 3].map((row) => (
+            <Skeleton key={row} className="h-6 w-full" />
+          ))}
+        </div>
+      ) : (
+        <ol className="mt-3 space-y-1.5">
+          {rows.map((row, index) => (
+            <li
+              key={row.week_start}
+              className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-2 text-xs"
+            >
+              <span
+                className={cn(
+                  "text-muted-foreground",
+                  index === 0 && "font-semibold text-brand-green",
+                )}
+              >
+                {index === 0 ? t("This week") : weekLabel(row.week_start)}
+              </span>
+              <span className="flex min-w-0 items-center gap-2">
+                <span
+                  className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.08]"
+                  aria-hidden="true"
+                >
+                  <span
+                    className="block h-full rounded-full bg-amber-400/80"
+                    style={{ width: `${Math.round((row.xp / maxXp) * 100)}%` }}
+                  />
+                </span>
+                <span className="w-14 shrink-0 text-right tabular-nums">{row.xp} XP</span>
+              </span>
+              <span className="w-14 text-right font-semibold tabular-nums">
+                {row.rank_position !== null && row.xp > 0 ? (
+                  <>
+                    #{row.rank_position}
+                    <span className="font-normal text-muted-foreground">/{row.members}</span>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">—</span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+      {!joined ? (
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          {t("Join the league to see your position each week.")}
+        </p>
+      ) : null}
+    </section>
   );
 }
