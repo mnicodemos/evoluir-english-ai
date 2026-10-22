@@ -147,7 +147,10 @@ function Mistakes() {
   });
 
   const due = useMemo(
-    () => rows.filter((row) => row.review_step === 0 && isMistakeDue(row) && !answered.includes(row.id)),
+    () =>
+      rows.filter(
+        (row) => row.review_step === 0 && isMistakeDue(row) && !answered.includes(row.id),
+      ),
     [rows, answered],
   );
   const current = outcome ? rows.find((row) => row.id === answered.at(-1)) : due[0];
