@@ -371,7 +371,9 @@ function AppShellContent({
       target?.closest(
         'a, button, input, textarea, select, [role="button"], [role="slider"], video, audio, [data-no-swipe]',
       )
-    ) return;
+    ) {
+      return;
+    }
 
     const touch = event.changedTouches[0];
     if (!touch) return;
@@ -379,9 +381,7 @@ function AppShellContent({
     const dy = touch.clientY - start.y;
     if (Math.abs(dx) < 72 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
 
-    const currentIndex = mainSwipeTabs.indexOf(
-      location.pathname as (typeof mainSwipeTabs)[number],
-    );
+    const currentIndex = mainSwipeTabs.indexOf(location.pathname as (typeof mainSwipeTabs)[number]);
     if (currentIndex < 0) return;
     const nextIndex = currentIndex + (dx < 0 ? 1 : -1);
     if (nextIndex < 0 || nextIndex >= mainSwipeTabs.length) return;
