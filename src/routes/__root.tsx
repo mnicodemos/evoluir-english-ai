@@ -95,7 +95,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // Fallback title: the signed-in area renders in the browser only
       // (ssr: false), so its HTML would otherwise arrive without any title.
       { title: "Evoluir+ English AI" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
+      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Evoluir+ English AI" },
       // The app's own dark background, so the phone's status bar blends in.
@@ -183,6 +187,15 @@ function RootComponent() {
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
+
+  // No pinch zoom (user request, 2026-10-23: students enlarged the screen by
+  // accident). The viewport meta blocks it on Android; iPhones ignore
+  // user-scalable=no, so their pinch gesture is cancelled here.
+  useEffect(() => {
+    const block = (event: Event) => event.preventDefault();
+    document.addEventListener("gesturestart", block);
+    return () => document.removeEventListener("gesturestart", block);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
