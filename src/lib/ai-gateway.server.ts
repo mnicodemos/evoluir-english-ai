@@ -116,22 +116,20 @@ export async function callGateway(
       await usageTools.finishAiUsage(ticket, { success: false, errorCode: "not_configured" });
     throw new AiError(500, "Your Google Gemini key is not connected yet.");
   }
-  // Closing the usage record and saving the cache happen after the answer is
-  // returned (waitUntil keeps them running), so the student does not wait on
-  // these writes.
+  // The usage record is closed before answering; saving the cache happens
+  // after the answer is returned (waitUntil keeps it running).
   if (usage && usageTools) {
     const tools = usageTools;
     const answer = text;
-    // AI Speaking closes its record before answering (user report,
-    // 2026-10-17: its background closes were lost and every talking record
-    // stayed pending, blocking the next turn). Other operations keep the
-    // background close, so the student does not wait on it.
-    const closeNow = usage.operation === "talking" ? ticket : null;
-    if (closeNow) await tools.finishAiUsage(closeNow, { success: true, ...usageTokens });
+    // Every operation closes its record before answering (user reports,
+    // 2026-10-17 for AI Speaking and 2026-10-23 for Writing help: background
+    // closes were lost, the record stayed pending and the next request was
+    // refused with "Another AI request is already running" for up to 90 s).
+    // The close is one small write; only the cache stays in the background.
+    if (ticket) await tools.finishAiUsage(ticket, { success: true, ...usageTokens });
     const { keepAlive } = await import("./keepAlive.server");
     void keepAlive(
       Promise.all([
-        ticket && !closeNow ? tools.finishAiUsage(ticket, { success: true, ...usageTokens }) : null,
         ttl > 0
           ? tools.writeAiCache({
               cacheKey,
