@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { ACCENTS } from "@/lib/accents";
@@ -62,14 +63,23 @@ export function LifeHeader() {
               aria-hidden="true"
             />
           </Link>
-          <Link
-            to="/life/guide"
-            aria-label={t("How Life+ AI works")}
-            title={t("How Life+ AI works")}
-            className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
-          >
-            <BookMarked className="size-4" aria-hidden="true" />
-          </Link>
+          {/* A label on hover names the guide (user request, 2026-10-23). */}
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  to="/life/guide"
+                  aria-label={t("How Life+ AI works")}
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
+                >
+                  <BookMarked className="size-4" aria-hidden="true" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="end" sideOffset={8}>
+                {t("How Life+ AI works")}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       }
     />
