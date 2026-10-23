@@ -236,7 +236,9 @@ export function MobileNavigationMenu({
         className={cn(
           "dashboard-shell dark flex w-[min(16rem,78vw)] flex-col gap-0 p-4 text-sidebar-foreground",
           graphitePanelClass,
-          "border-y-0 border-l-0",
+          // Rounded outer corners (user request, 2026-10-23); the edge on the
+          // screen side stays square.
+          "rounded-r-3xl border-y-0 border-l-0",
         )}
       >
         {/* No divider or extra gap under the logo (user request, 2026-10-23: the
