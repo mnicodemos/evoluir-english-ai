@@ -279,13 +279,13 @@ function DashboardNotifications({
                     <Link
                       key={link.to}
                       to={link.to}
-                      className="flex min-h-9 items-center gap-1.5 rounded-md bg-white/[0.05] px-2 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+                      className="flex min-h-9 items-center gap-1.5 rounded-md bg-white/[0.05] px-2 py-1.5 text-xs leading-tight font-medium text-foreground transition-colors hover:bg-accent"
                     >
                       <link.icon
                         className="size-3.5 shrink-0 text-brand-green"
                         aria-hidden="true"
                       />
-                      <span className="min-w-0 truncate">{translate(link.label)}</span>
+                      <span className="min-w-0 text-balance">{translate(link.label)}</span>
                     </Link>
                   ))}
                 </div>
