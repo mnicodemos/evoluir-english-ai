@@ -234,18 +234,20 @@ export function MobileNavigationMenu({
         // a lighter dim so the page shows through.
         overlayClassName="bg-black/30"
         className={cn(
-          "dashboard-shell dark flex w-[min(16rem,78vw)] flex-col p-4 text-sidebar-foreground",
+          "dashboard-shell dark flex w-[min(16rem,78vw)] flex-col gap-0 p-4 text-sidebar-foreground",
           graphitePanelClass,
           "border-y-0 border-l-0",
         )}
       >
-        <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
+        {/* No divider or extra gap under the logo (user request, 2026-10-23: the
+            empty band pushed the items down). */}
+        <SheetHeader className="pb-1 text-left">
           <SheetTitle className="flex items-center gap-2 text-sidebar-foreground">
             <Logo className="size-[3.32rem] shrink-0" />
             <BrandName className="text-base" />
           </SheetTitle>
         </SheetHeader>
-        <nav className="grid gap-1 overflow-y-auto py-3">
+        <nav className="grid gap-1 overflow-y-auto pb-3 pt-1">
           {mobileSheetNav.map((item) => {
             return (
               <div key={item.to}>
