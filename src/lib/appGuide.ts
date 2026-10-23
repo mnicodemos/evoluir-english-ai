@@ -184,6 +184,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Change a goal, task, habit or the priority with its pencil (Edit).",
       "Tick a habit like Study English automatically on your English study days, so it keeps the same run as your streak.",
       "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.",
+      "Stuck between options? Open Decisions: list the options and the criteria that matter, give each a weight and a score, and see the best option, test other weights in What if?, ask EVO for an analysis and turn your choice into a goal.",
       "Try a meditation in English to relax and train your listening.",
       "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.",
       "Open the floating timer from the Dashboard header, beside Weather talk, or from Focus to keep it at hand on any page; minimize, move or close it. Left on Ready, it shrinks to a small pill when you change page.",

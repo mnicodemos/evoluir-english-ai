@@ -167,6 +167,101 @@ const baseUiPt: Record<string, string> = {
   "Send on WhatsApp": "Enviar pelo WhatsApp",
   Copy: "Copiar",
   Copied: "Copiado",
+  Decisions: "Decisões",
+  "Write the decision, your options and the criteria that matter, each with a weight.":
+    "Escreva a decisão, suas opções e os critérios que importam, cada um com um peso.",
+  "Score each option; the best one comes first, and What if? tests other weights.":
+    "Dê notas a cada opção; a melhor aparece primeiro, e E se? testa outros pesos.",
+  "Ask EVO for an analysis and turn your choice into a goal.":
+    "Peça uma análise à EVO e transforme sua escolha em meta.",
+  "Compare your options with clear criteria and decide with more confidence.":
+    "Compare suas opções com critérios claros e decida com mais segurança.",
+  "Back to Life+ AI": "Voltar ao Life+ AI",
+  "New decision": "Nova decisão",
+  "Decisions will be available soon. Please come back later.":
+    "As Decisões estarão disponíveis em breve. Volte mais tarde.",
+  "Stuck between options? List them, choose what matters to you and EVO helps you see the best path.":
+    "Em dúvida entre opções? Liste-as, escolha o que importa para você e a EVO ajuda a ver o melhor caminho.",
+  "Write the decision and your options.": "Escreva a decisão e suas opções.",
+  "Add the criteria that matter, each with a weight.":
+    "Adicione os critérios que importam, cada um com um peso.",
+  "Score each option and see the result.": "Dê notas a cada opção e veja o resultado.",
+  Decided: "Decidida",
+  "Your choice:": "Sua escolha:",
+  "Leading:": "Na frente:",
+  "Score the options to see the result.": "Dê notas às opções para ver o resultado.",
+  options: "opções",
+  criteria: "critérios",
+  "Decision saved.": "Decisão salva.",
+  "Edit decision": "Editar decisão",
+  "What do you need to decide?": "O que você precisa decidir?",
+  "E.g. Which course should I take next year?": "Ex.: Qual curso devo fazer no ano que vem?",
+  "Context (optional)": "Contexto (opcional)",
+  "Details or limits that matter for this decision":
+    "Detalhes ou limites que importam para esta decisão",
+  Options: "Opções",
+  Option: "Opção",
+  "Add option": "Adicionar opção",
+  "Criteria and weights": "Critérios e pesos",
+  "Weight 1 = matters a little, 5 = matters a lot.": "Peso 1 = importa pouco, 5 = importa muito.",
+  Criterion: "Critério",
+  Weight: "Peso",
+  "New criterion": "Novo critério",
+  "Add criterion": "Adicionar critério",
+  Scores: "Notas",
+  "How well does each option meet each criterion? 1 = poorly, 10 = very well.":
+    "Quanto cada opção atende a cada critério? 1 = pouco, 10 = muito bem.",
+  "scores left: an empty score counts as 0.": "notas faltando: nota vazia conta como 0.",
+  "Save decision": "Salvar decisão",
+  "Goal created in Life+ AI. EVO will give you a step every day.":
+    "Meta criada no Life+ AI. A EVO vai te dar um passo por dia.",
+  "You already have 3 goals. Finish or archive one to add this choice as a goal.":
+    "Você já tem 3 metas. Conclua ou arquive uma para adicionar esta escolha como meta.",
+  "Choice saved.": "Escolha salva.",
+  "Decision deleted.": "Decisão excluída.",
+  "The decision could not be deleted.": "Não foi possível excluir a decisão.",
+  "All decisions": "Todas as decisões",
+  "Delete this decision?": "Excluir esta decisão?",
+  "Best option in this scenario": "Melhor opção neste cenário",
+  "Best option": "Melhor opção",
+  "Close call: the first two options are less than 5% apart. Weigh the risks before choosing.":
+    "Resultado apertado: as duas primeiras opções estão a menos de 5% de distância. Pese os riscos antes de escolher.",
+  "Turn into a goal": "Transformar em meta",
+  Reopen: "Reabrir",
+  "What did you decide?": "O que você decidiu?",
+  "Choose and create a goal": "Escolher e criar meta",
+  "Only mark my choice": "Só marcar minha escolha",
+  "The goal takes the option's name; EVO then gives you one step a day.":
+    "A meta leva o nome da opção; depois a EVO te dá um passo por dia.",
+  "What if?": "E se?",
+  "Change the weights to test other scenarios. Nothing is saved.":
+    "Mude os pesos para testar outros cenários. Nada é salvo.",
+  Reset: "Restaurar",
+  "In this scenario the best option changes to": "Neste cenário a melhor opção passa a ser",
+  "EVO's analysis": "Análise da EVO",
+  "An impartial reading of your matrix: risks and what would change it.":
+    "Uma leitura imparcial da sua matriz: riscos e o que mudaria o resultado.",
+  "Ask EVO for an analysis of this decision. It never decides for you.":
+    "Peça à EVO uma análise desta decisão. Ela nunca decide por você.",
+  "EVO is analysing…": "A EVO está analisando…",
+  "Analyse again": "Analisar de novo",
+  "Analyse with EVO": "Analisar com a EVO",
+  Matrix: "Matriz",
+  "Weighted score": "Nota ponderada",
+  "Decisions are part of Premium.": "As Decisões fazem parte do Premium.",
+  "This decision was not found.": "Esta decisão não foi encontrada.",
+  "The decision could not be saved.": "Não foi possível salvar a decisão.",
+  "You can keep up to 20 decisions. Delete an old one to add another.":
+    "Você pode manter até 20 decisões. Exclua uma antiga para adicionar outra.",
+  "This option was not found.": "Esta opção não foi encontrada.",
+  "Add at least two options and one criterion first.":
+    "Adicione pelo menos duas opções e um critério primeiro.",
+  "EVO could not analyse this decision. Please try again.":
+    "A EVO não conseguiu analisar esta decisão. Tente de novo.",
+  "Routine, habits, decisions and the Life Coach are part of Premium. Your goals stay free.":
+    "Rotina, hábitos, decisões e o Life Coach fazem parte do Premium. Suas metas continuam grátis.",
+  "Overall impact": "Impacto geral",
+  "Ease of doing it": "Facilidade de fazer",
   "Routine, habits and the Life Coach are part of Premium. Your goals stay free.":
     "Rotina, hábitos e o Life Coach fazem parte do Premium. Suas metas continuam grátis.",
   "Routine, habits and Life Coach": "Rotina, hábitos e Life Coach",
@@ -1171,8 +1266,8 @@ const baseUiPt: Record<string, string> = {
     "5x mais prática com IA todo dia: conversas, videochamadas e correções",
   "Business English from B1: 36 lessons for meetings, emails and interviews":
     "Inglês para Negócios a partir do B1: 36 lições para reuniões, e-mails e entrevistas",
-  "Full Life+ AI: priority of the day, routine, habits and Life Coach":
-    "Life+ AI completo: prioridade do dia, rotina, hábitos e Life Coach",
+  "Full Life+ AI: priority of the day, routine, habits, decisions and Life Coach":
+    "Life+ AI completo: prioridade do dia, rotina, hábitos, decisões e Life Coach",
   "Every meditation in English": "Todas as meditações em inglês",
   "Every lesson of your level, with video, flashcards and quiz":
     "Todas as lições do seu nível, com vídeo, flashcards e quiz",

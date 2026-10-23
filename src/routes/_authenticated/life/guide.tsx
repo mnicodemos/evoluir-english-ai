@@ -12,6 +12,7 @@ import {
   ListChecks,
   Plus,
   Repeat,
+  Scale,
   Sparkles,
   Star,
   Target,
@@ -133,6 +134,19 @@ function LifeGuidePage() {
       ],
       premium: true,
       art: <CoachArt t={t} />,
+    },
+    {
+      id: "decisions",
+      icon: Scale,
+      title: "Decisions",
+      what: "Compare your options with clear criteria and decide with more confidence.",
+      steps: [
+        "Write the decision, your options and the criteria that matter, each with a weight.",
+        "Score each option; the best one comes first, and What if? tests other weights.",
+        "Ask EVO for an analysis and turn your choice into a goal.",
+      ],
+      premium: true,
+      art: <DecisionArt t={t} />,
     },
     {
       id: "meditation",
@@ -375,6 +389,32 @@ function CoachArt({ t }: { t: T }) {
         <ListChecks className="size-3 text-muted-foreground" />
         {t("Save 10% this week")}
       </span>
+    </div>
+  );
+}
+
+function DecisionArt({ t }: { t: T }) {
+  const rows: [string, number, boolean][] = [
+    [`${t("Option")} A`, 84, true],
+    [`${t("Option")} B`, 67, false],
+  ];
+  return (
+    <div className="space-y-1.5 text-xs">
+      {rows.map(([name, percent, best]) => (
+        <div key={name} className="flex items-center gap-2">
+          <span className="w-16 shrink-0 truncate">{name}</span>
+          <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+            <span
+              className={cn(
+                "block h-full rounded-full",
+                best ? "bg-brand-green" : "bg-violet-400/70",
+              )}
+              style={{ width: `${percent}%` }}
+            />
+          </span>
+          <span className="w-8 shrink-0 text-right tabular-nums">{(percent / 10).toFixed(1)}</span>
+        </div>
+      ))}
     </div>
   );
 }

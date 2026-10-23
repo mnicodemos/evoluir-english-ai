@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookMarked, Crown, Sprout, type LucideIcon } from "lucide-react";
+import { BookMarked, Crown, Scale, Sprout, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
@@ -38,12 +38,21 @@ export function LifeHeader() {
       }
       description={t("Evolve one day at a time.")}
       actions={
-        <Button asChild variant="outline" size="sm" className="gap-1.5">
-          <Link to="/life/guide" aria-label={t("How Life+ AI works")}>
-            <BookMarked className="size-4" aria-hidden="true" />
-            <span className="hidden sm:inline">{t("How Life+ AI works")}</span>
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Decisions has its own page (Life+ AI phase 2, user request). */}
+          <Button asChild variant="outline" size="sm" className="gap-1.5">
+            <Link to="/life/decisions">
+              <Scale className="size-4" aria-hidden="true" />
+              {t("Decisions")}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="gap-1.5">
+            <Link to="/life/guide" aria-label={t("How Life+ AI works")}>
+              <BookMarked className="size-4" aria-hidden="true" />
+              <span className="hidden sm:inline">{t("How Life+ AI works")}</span>
+            </Link>
+          </Button>
+        </div>
       }
     />
   );
@@ -55,6 +64,7 @@ const PREMIUM_ITEMS = [
   "Routine",
   "Habits",
   "Life Coach",
+  "Decisions",
   "All meditations",
 ] as const;
 
@@ -68,7 +78,9 @@ export function LifePremiumGate({ feature }: { feature: string }) {
       </span>
       <h2 className="text-base font-semibold">{t(feature)}</h2>
       <p className="max-w-sm text-sm text-muted-foreground">
-        {t("Routine, habits and the Life Coach are part of Premium. Your goals stay free.")}
+        {t(
+          "Routine, habits, decisions and the Life Coach are part of Premium. Your goals stay free.",
+        )}
       </p>
       <ul className="grid w-full max-w-sm gap-1.5 text-left text-sm">
         {PREMIUM_ITEMS.map((item) => (
