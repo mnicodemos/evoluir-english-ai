@@ -68,6 +68,43 @@ export function studyReminder(
   };
 }
 
+/** Evening reminder line for today's goal steps still open; they also close the study day. */
+export function goalStepsLinePt(open: number): string {
+  if (open <= 0) return "";
+  return open === 1
+    ? "🎯 Falta 1 passo das suas metas, que também fecha o dia de estudo."
+    : `🎯 Faltam ${open} passos das suas metas, que também fecham o dia de estudo.`;
+}
+
+/**
+ * When the Final Test opened: the completion time of the lesson that reached
+ * the required count (completions in any order); null when not reached.
+ */
+export function finalTestUnlockedAt(completedAt: readonly string[], required: number) {
+  const times = completedAt
+    .map((iso) => Date.parse(iso))
+    .filter(Number.isFinite)
+    .sort((a, b) => a - b);
+  return required > 0 && times.length >= required ? times[required - 1]! : null;
+}
+
+/** The one push the morning after the Final Test opens (user request, 2026-10-23). */
+export function finalTestUnlockedPush(
+  level: string,
+  required: number,
+): { title: string; body: string; path: string } {
+  const current = level.toUpperCase();
+  const order = ["A1", "A2", "B1", "B2", "C1", "C2"];
+  const next = order[order.indexOf(current) + 1];
+  return {
+    title: "🏁 Prova Final liberada!",
+    body: next
+      ? `Você concluiu ${required} lições do ${current}. Faça a Prova Final e suba para o ${next}!`
+      : `Você concluiu ${required} lições do ${current}. Faça a Prova Final e conclua o nível!`,
+    path: "/learning",
+  };
+}
+
 /** Evening reminder line while today's daily reading is still open (user request). */
 export const READING_REMINDER_LINE_PT = "📖 A leitura do dia está esperando por você.";
 

@@ -279,6 +279,7 @@ export const APP_GUIDE: GuideSection[] = [
     steps: [
       "Switch the interface between Portuguese and English in the menu; lessons stay in English.",
       "Turn on notifications for the word of the day and your study reminder.",
+      "The bell on the Home lists what is still open today: your plan, reviews, the daily reading, goal steps, habits, the priority of the day and, when it opens, the Final Test.",
       "Ask about the weather with Weather talk to practise small talk.",
     ],
   },
