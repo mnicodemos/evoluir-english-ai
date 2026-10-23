@@ -8,7 +8,7 @@ export function getStripe(): Stripe {
   if (!secretKey) throw new Error("Stripe is not configured (missing STRIPE_SECRET_KEY).");
   // Live keys are allowed (owner decision, 2026-10-23: real payments start);
   // the test phase refused sk_live_ keys here.
-  client ??=new Stripe(secretKey, {
+  client ??= new Stripe(secretKey, {
     httpClient: Stripe.createFetchHttpClient(),
   });
   return client;
