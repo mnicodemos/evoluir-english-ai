@@ -2087,6 +2087,10 @@ const baseUiPt: Record<string, string> = {
   "Grammar practice": "Prática de gramática",
   "Review 1 mistake": "Revisar 1 erro",
   "Review {n} mistakes": "Revisar {n} erros",
+  "Today's activities are done. To reach your goal, start a new one:":
+    "As atividades de hoje estão feitas. Para fechar sua meta, comece uma nova:",
+  "New Listening session": "Nova sessão de Listening",
+  "Read another text": "Ler outro texto",
   "Fix them now so they do not become habits.": "Corrija agora para não virarem hábito.",
   "Nothing else pending right now.": "Nada mais pendente agora.",
   "Extra practice done for today": "Prática extra concluída hoje",
