@@ -68,6 +68,9 @@ export function studyReminder(
   };
 }
 
+/** Evening reminder line while today's daily reading is still open (user request). */
+export const READING_REMINDER_LINE_PT = "📖 A leitura do dia está esperando por você.";
+
 /**
  * Life+ AI's open tasks of the day (user request: notify them), as a line of
  * the morning push and the evening reminder.
