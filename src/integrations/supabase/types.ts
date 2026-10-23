@@ -469,6 +469,33 @@ export type Database = {
           },
         ]
       }
+      daily_reading_variants: {
+        Row: {
+          category: string
+          content: Json
+          created_at: string
+          day: string
+          level: string
+          style: string
+        }
+        Insert: {
+          category: string
+          content: Json
+          created_at?: string
+          day: string
+          level: string
+          style: string
+        }
+        Update: {
+          category?: string
+          content?: Json
+          created_at?: string
+          day?: string
+          level?: string
+          style?: string
+        }
+        Relationships: []
+      }
       daily_readings: {
         Row: {
           content: Json
