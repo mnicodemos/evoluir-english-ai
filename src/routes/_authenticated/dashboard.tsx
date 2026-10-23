@@ -15,6 +15,7 @@ import {
   Flame,
   Flower2,
   Gem,
+  GraduationCap,
   Headphones,
   Layers,
   ListChecks,
@@ -208,6 +209,12 @@ function DashboardNotifications({
   ] as const;
   const activeItems = items.filter((item) => item.visible);
   const hasNotifications = activeItems.length > 0;
+  // Every English activity of the day is done but the minutes goal is not
+  // (user request, 2026-10-23): the bell says where to start something new.
+  const englishPending = activeItems.some((item) =>
+    ["plan", "mistakes", "review", "listening", "writing", "vocabulary"].includes(item.id),
+  );
+  const needsNewActivity = goalMinutesLeft > 0 && indicators.ready && !englishPending;
 
   return (
     <Popover>
@@ -256,6 +263,34 @@ function DashboardNotifications({
                 <span>{translate(item.label)}</span>
               </Link>
             ))}
+            {needsNewActivity ? (
+              <div className="mt-1 rounded-md border border-brand-green/25 bg-brand-green/[0.06] p-2.5">
+                <p className="flex gap-2 text-xs leading-snug text-muted-foreground">
+                  <Sparkles
+                    className="mt-0.5 size-3.5 shrink-0 text-brand-green"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    {translate("Today's activities are done. To reach your goal, start a new one:")}
+                  </span>
+                </p>
+                <div className="mt-2 grid grid-cols-2 gap-1.5">
+                  {NEW_ACTIVITY_LINKS.map((link) => (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      className="flex min-h-9 items-center gap-1.5 rounded-md bg-white/[0.05] px-2 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+                    >
+                      <link.icon
+                        className="size-3.5 shrink-0 text-brand-green"
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 truncate">{translate(link.label)}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         ) : (
           <p className="px-2 py-3 text-sm text-muted-foreground">
@@ -266,6 +301,17 @@ function DashboardNotifications({
     </Popover>
   );
 }
+
+/**
+ * Where a new activity can always be started once the day's ones are done:
+ * each of these makes fresh practice on demand and counts toward the minutes.
+ */
+const NEW_ACTIVITY_LINKS = [
+  { to: "/coach", label: "Talk to EVO", icon: Mic },
+  { to: "/listening", label: "New Listening session", icon: Headphones },
+  { to: "/reading", label: "Read another text", icon: BookOpenText },
+  { to: "/learning", label: "Next lesson", icon: GraduationCap },
+] as const;
 
 const PLAN_SKILL_LABELS: Record<string, string> = {
   grammar: "Grammar",

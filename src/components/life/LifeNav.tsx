@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookMarked, Crown, Scale, Sprout, type LucideIcon } from "lucide-react";
+import { BookMarked, ChevronRight, Crown, Scale, Sprout, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
@@ -38,20 +38,38 @@ export function LifeHeader() {
       }
       description={t("Evolve one day at a time.")}
       actions={
-        <div className="flex items-center gap-2">
-          {/* Decisions has its own page (Life+ AI phase 2, user request). */}
-          <Button asChild variant="outline" size="sm" className="gap-1.5">
-            <Link to="/life/decisions">
-              <Scale className="size-4" aria-hidden="true" />
-              {t("Decisions")}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="gap-1.5">
-            <Link to="/life/guide" aria-label={t("How Life+ AI works")}>
-              <BookMarked className="size-4" aria-hidden="true" />
-              <span className="hidden sm:inline">{t("How Life+ AI works")}</span>
-            </Link>
-          </Button>
+        // Decisions in a glass capsule like the Dashboard's Weather talk, in
+        // the same top-right corner, with the guide in its own grey circle at
+        // the end like the bell (user request, 2026-10-23). Phones keep the
+        // icons only, so the title keeps its room.
+        <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
+          <Link
+            to="/life/decisions"
+            aria-label={`${t("Decisions")} · ${t("Compare your options")}`}
+            className="group flex h-9 shrink-0 items-center gap-2.5 rounded-full text-left transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 sm:pr-3"
+          >
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
+              <Scale className="size-[1.15rem]" aria-hidden="true" />
+            </span>
+            <span className="hidden leading-tight sm:block">
+              <span className="block text-xs font-semibold text-foreground">{t("Decisions")}</span>
+              <span className="block text-[10.5px] text-muted-foreground">
+                {t("Compare your options")}
+              </span>
+            </span>
+            <ChevronRight
+              className="hidden size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 sm:block"
+              aria-hidden="true"
+            />
+          </Link>
+          <Link
+            to="/life/guide"
+            aria-label={t("How Life+ AI works")}
+            title={t("How Life+ AI works")}
+            className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
+          >
+            <BookMarked className="size-4" aria-hidden="true" />
+          </Link>
         </div>
       }
     />
