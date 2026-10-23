@@ -266,16 +266,35 @@ export async function callGemini(
         break; // attempts exhausted on this model: try the next model
       }
 
-      const data = (await res.json()) as {
+      type GeminiAnswer = {
         candidates?: Array<{
           content?: { parts?: Array<{ text?: string }> };
           finishReason?: string;
         }>;
       };
-      const text = (data.candidates?.[0]?.content?.parts ?? [])
-        .map((p) => p.text ?? "")
-        .join("")
-        .trim();
+      const readText = (answer: GeminiAnswer) =>
+        (answer.candidates?.[0]?.content?.parts ?? [])
+          .map((p) => p.text ?? "")
+          .join("")
+          .trim();
+      let data = (await res.json()) as GeminiAnswer;
+      let text = readText(data);
+      // Gemini 3 models may still think with thinkingBudget 0, and the thinking
+      // spends the length cap: the answer comes back empty with MAX_TOKENS
+      // (user report, 2026-10-23: Writing help, 400 tokens, "EVO could not
+      // answer"). Ask once more with the plain request, which has no cap.
+      if (
+        !text &&
+        tryFast &&
+        speed.maxOutputTokens &&
+        data.candidates?.[0]?.finishReason === "MAX_TOKENS"
+      ) {
+        const retry = await send(plainBody);
+        if (retry.ok) {
+          data = (await retry.json()) as GeminiAnswer;
+          text = readText(data);
+        }
+      }
       if (text) {
         if (attempt > 1 || model !== MODELS[0])
           console.info(`Gemini succeeded on ${model}, attempt ${attempt}`);

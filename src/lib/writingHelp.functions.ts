@@ -40,7 +40,7 @@ export const askWritingHelp = createServerFn({ method: "POST" })
         lang: data.lang as "pt" | "en",
       }),
       false,
-      { userId: context.userId, operation: "teacher", fast: true, maxOutputTokens: 400 },
+      { userId: context.userId, operation: "teacher", fast: true, maxOutputTokens: 1000 },
     );
     return { reply: reply.trim() };
   });

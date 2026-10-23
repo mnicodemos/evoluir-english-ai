@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const bodies: Record<string, unknown>[] = [];
 let rejectThinking = false;
+let thinkingEatsCap = false;
 
 beforeEach(() => {
   bodies.length = 0;
@@ -14,6 +15,12 @@ beforeEach(() => {
       bodies.push(body.generationConfig);
       if (rejectThinking && body.generationConfig["thinkingConfig"])
         return new Response("thinking not supported", { status: 400 });
+      // The model thought anyway and the cap ran out before any text.
+      if (thinkingEatsCap && body.generationConfig["maxOutputTokens"])
+        return new Response(
+          JSON.stringify({ candidates: [{ content: { parts: [] }, finishReason: "MAX_TOKENS" }] }),
+          { status: 200 },
+        );
       return new Response(
         JSON.stringify({ candidates: [{ content: { parts: [{ text: "ok" }] } }] }),
         { status: 200 },
@@ -49,5 +56,19 @@ describe("Gemini speed settings", () => {
     await callGemini([{ role: "user", content: "b" }], false, undefined, undefined, speed);
     expect(bodies).toEqual([{}]);
     rejectThinking = false;
+  });
+
+  it("an empty answer cut by the length cap is asked again without the cap", async () => {
+    vi.resetModules();
+    thinkingEatsCap = true;
+    const { callGemini } = await import("./gemini.server");
+    expect(
+      await callGemini([{ role: "user", content: "c" }], false, undefined, undefined, {
+        fast: true,
+        maxOutputTokens: 400,
+      }),
+    ).toBe("ok");
+    expect(bodies).toEqual([{ maxOutputTokens: 400, thinkingConfig: { thinkingBudget: 0 } }, {}]);
+    thinkingEatsCap = false;
   });
 });

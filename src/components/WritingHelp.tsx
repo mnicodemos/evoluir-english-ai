@@ -42,14 +42,18 @@ export function WritingHelp({ task, draft }: { task: string; draft: string }) {
       setAnswers((current) => [{ ask: input.label, reply: result.reply }, ...current].slice(0, 3));
       if (input.kind === "ask") setQuestion("");
     },
-    onError: (error) =>
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : "";
       toast.error(
         t(
-          error instanceof Error && /limit/i.test(error.message)
+          /today's AI limit|month's AI limit/i.test(message)
             ? "You reached today's AI Teacher limit. Please try again tomorrow."
-            : "EVO could not answer this message. Please send it again.",
+            : /already running|wait a moment|busy/i.test(message)
+              ? "Your previous message is still being answered. Wait a few seconds and send it again."
+              : "EVO could not answer this message. Please send it again.",
         ),
-      ),
+      );
+    },
   });
 
   return (
