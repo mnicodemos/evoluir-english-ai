@@ -189,12 +189,21 @@ function RootComponent() {
   }, [router, queryClient]);
 
   // No pinch zoom (user request, 2026-10-23: students enlarged the screen by
-  // accident). The viewport meta blocks it on Android; iPhones ignore
-  // user-scalable=no, so their pinch gesture is cancelled here.
+  // accident; it still happened with the viewport meta alone). The CSS
+  // touch-action covers Android; iPhones ignore user-scalable=no, so their
+  // pinch (Safari's gesture events and any two-finger move) is cancelled here.
   useEffect(() => {
     const block = (event: Event) => event.preventDefault();
-    document.addEventListener("gesturestart", block);
-    return () => document.removeEventListener("gesturestart", block);
+    const blockPinch = (event: TouchEvent) => {
+      if (event.touches.length > 1) event.preventDefault();
+    };
+    const gestures = ["gesturestart", "gesturechange", "gestureend"] as const;
+    for (const name of gestures) document.addEventListener(name, block);
+    document.addEventListener("touchmove", blockPinch, { passive: false });
+    return () => {
+      for (const name of gestures) document.removeEventListener(name, block);
+      document.removeEventListener("touchmove", blockPinch);
+    };
   }, []);
 
   return (

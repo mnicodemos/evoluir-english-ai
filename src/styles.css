@@ -355,10 +355,13 @@
 
   /* The screen never zooms by itself (user request, 2026-10-23): iPhones zoom
      into any field written smaller than 16 px when it gets the focus, and a
-     quick double tap zoomed the page too. Pinch zoom is off too (viewport meta
-     and the gesturestart guard in __root.tsx). */
+     quick double tap zoomed the page too. Pinch zoom is off too (user report:
+     it still happened with only the viewport meta, which browsers may ignore):
+     pan-x pan-y allows scrolling but no zoom gesture, here and on every
+     element below (touch-action stops at each scroll container), and
+     __root.tsx cancels the iPhone's pinch. */
   html {
-    touch-action: manipulation;
+    touch-action: pan-x pan-y;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
@@ -544,5 +547,15 @@
     grid-template-columns:
       min(calc((100cqh - 1.5rem) * 1.5 + 1.5rem), calc(100cqw - 12.5rem - 19.66rem))
       minmax(12.5rem, 1fr) minmax(19.66rem, 1.16fr);
+  }
+}
+
+/* Every element repeats the page's touch-action (see the touch-screen rule
+   above), in the base layer so utilities such as touch-none still win. */
+@layer base {
+  @media (hover: none) and (pointer: coarse) {
+    * {
+      touch-action: pan-x pan-y;
+    }
   }
 }
