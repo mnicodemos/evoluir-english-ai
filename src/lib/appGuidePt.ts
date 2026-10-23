@@ -115,6 +115,8 @@ export const appGuidePt: Record<string, string> = {
     "Marque um hábito como Estudar inglês automaticamente nos seus dias de estudo de inglês, para ele ter a mesma sequência do seu streak.",
   "Stuck between options? Open Decisions: list the options and the criteria that matter, give each a weight and a score, and see the best option, test other weights in What if?, ask EVO for an analysis and turn your choice into a goal.":
     "Em dúvida entre opções? Abra Decisões: liste as opções e os critérios que importam, dê um peso e uma nota a cada um e veja a melhor opção, teste outros pesos em E se?, peça uma análise à EVO e transforme sua escolha em meta.",
+  "The bell on the Home lists what is still open today: your plan, reviews, the daily reading, goal steps, habits, the priority of the day and, when it opens, the Final Test.":
+    "O sininho da Home lista o que ainda está aberto hoje: seu plano, as revisões, a leitura do dia, os passos das metas, os hábitos, a prioridade do dia e, quando liberar, a Prova Final.",
   "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.":
     "Use o Foco em blocos de 15, 25 ou 50 minutos, com dois minutos de inglês em cada pausa.",
   "Add 1 to 3 goals: EVO gives you one small step for each goal every day.":

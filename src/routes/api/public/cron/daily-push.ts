@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { leagueLevelOf } from "@/lib/level";
 import {
+  finalTestUnlockedAt,
+  finalTestUnlockedPush,
+  goalStepsLinePt,
   lifeTasksLinePt,
   READING_REMINDER_LINE_PT,
   lifeTasksReminder,
@@ -9,6 +12,7 @@ import {
   wordOfDayBody,
   type PlanTaskForPush,
 } from "@/lib/reviewReminder";
+import { finalTestLessonsRequired, getCoreCurriculum } from "@/lib/curriculum";
 import { studyDayStartIso, studyToday } from "@/lib/today";
 import { weekStartOf } from "@/lib/streakFreeze";
 import {
@@ -262,8 +266,38 @@ async function sendDailyPush(
     }
   };
 
-  // Life+ AI tasks of the day still open (user request: notify them); a
-  // failure only leaves the line out.
+  // When the student's Final Test opened: the completion of the core lesson
+  // that reached 21 of 30. Returns it only when that was in the last 24 h.
+  const finalTestJustUnlocked = async (userId: string, level: string) => {
+    try {
+      const core = getCoreCurriculum(level);
+      const required = finalTestLessonsRequired(core.length);
+      const { data: rows } = await supabaseAdmin
+        .from("lessons")
+        .select("id")
+        .eq("created_by", userId)
+        .in(
+          "curriculum_key",
+          core.map((lesson) => lesson.key),
+        );
+      const ids = (rows ?? []).map((row) => row.id as string);
+      if (ids.length < required) return null;
+      const { data: done } = await supabaseAdmin
+        .from("user_lessons")
+        .select("completed_at")
+        .eq("user_id", userId)
+        .in("lesson_id", ids)
+        .not("completed_at", "is", null);
+      const unlockedAt = finalTestUnlockedAt(
+        (done ?? []).map((row) => row.completed_at as string),
+        required,
+      );
+      return unlockedAt && Date.now() - unlockedAt < 24 * 60 * 60 * 1000 ? { required } : null;
+    } catch {
+      return null;
+    }
+  };
+
   // Today's daily reading finished (one "daily_reading" activity per day).
   const readingDoneToday = async (userId: string) => {
     const { count, error } = await supabaseAdmin
@@ -276,6 +310,41 @@ async function sendDailyPush(
     return error ? true : (count ?? 0) > 0;
   };
 
+  // Today's goal steps still open (finishing them all closes the study day;
+  // user request, 2026-10-23); a failed read counts as none.
+  const openGoalSteps = async (userId: string) => {
+    const { count, error } = await (
+      supabaseAdmin.from as unknown as (name: string) => {
+        select: (
+          columns: string,
+          options: { count: "exact"; head: true },
+        ) => {
+          eq: (
+            column: string,
+            value: string,
+          ) => {
+            eq: (
+              column: string,
+              value: string,
+            ) => {
+              is: (
+                column: string,
+                value: null,
+              ) => Promise<{ count: number | null; error: unknown }>;
+            };
+          };
+        };
+      }
+    )("plus_goal_steps")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("day", today)
+      .is("done_at", null);
+    return error ? 0 : (count ?? 0);
+  };
+
+  // Life+ AI tasks of the day still open (user request: notify them); a
+  // failure only leaves the line out.
   const openLifeTasks = async (userId: string) => {
     try {
       const from = supabaseAdmin.from as unknown as (name: string) => {
@@ -358,15 +427,20 @@ async function sendDailyPush(
         if (tasksOpen > 0) messages.set(p.id, lifeTasksReminder(tasksOpen));
         return;
       }
-      const [due, task, readingDone] = await Promise.all([
+      const [due, task, readingDone, stepsOpen] = await Promise.all([
         dueReviews(p.id),
         planTask(p.id),
         readingDoneToday(p.id),
+        openGoalSteps(p.id),
       ]);
       const reminder = studyReminder(due, task);
       // The daily reading is also reminded (user request, 2026-10-23).
       if (!readingDone) {
         reminder.body = `${reminder.body} ${READING_REMINDER_LINE_PT}`.slice(0, 280);
+      }
+      // Goal steps also close the study day (user request, 2026-10-23).
+      if (stepsOpen > 0) {
+        reminder.body = `${reminder.body} ${goalStepsLinePt(stepsOpen)}`.slice(0, 280);
       }
       if (tasksOpen > 0) {
         reminder.body = `${reminder.body} ${lifeTasksLinePt(tasksOpen)}.`.slice(0, 280);
@@ -375,6 +449,14 @@ async function sendDailyPush(
       return;
     }
     const level = (p.level ?? "a1").toLowerCase();
+    // The morning after the Final Test opens (21 of the 30 core lessons done
+    // in the last 24 h), the word of the day gives way to that news, once
+    // (user request, 2026-10-23).
+    const unlocked = await finalTestJustUnlocked(p.id, level);
+    if (unlocked) {
+      messages.set(p.id, finalTestUnlockedPush(level, unlocked.required));
+      return;
+    }
     const [{ data: bank }, { data: known }, due, task, tasksOpen] = await Promise.all([
       supabaseAdmin
         .from("vocabulary")

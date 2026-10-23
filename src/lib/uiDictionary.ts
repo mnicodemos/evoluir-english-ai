@@ -2090,6 +2090,10 @@ const baseUiPt: Record<string, string> = {
   "Today's activities are done. To reach your goal, start a new one:":
     "As atividades de hoje estão feitas. Para fechar sua meta, comece uma nova:",
   "New Listening session": "Nova sessão de Listening",
+  "Final Test unlocked: move up to": "Prova Final liberada: suba para o",
+  "Final Test unlocked": "Prova Final liberada",
+  "Goal steps for today": "Passos das metas para hoje",
+  "Habits to check in today": "Hábitos para marcar hoje",
   "Today's reading is waiting": "A leitura do dia está esperando",
   "Compare your options": "Compare suas opções",
   "Read another text": "Ler outro texto",

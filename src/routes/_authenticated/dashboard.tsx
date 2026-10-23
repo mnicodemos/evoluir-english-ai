@@ -25,7 +25,10 @@ import {
   RotateCcw,
   Sparkles,
   SpellCheck,
+  Repeat,
+  Star,
   Target,
+  Trophy,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -34,6 +37,9 @@ import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
 import { studyDayStartIso, studyToday } from "@/lib/today";
+import { habitsDueToday } from "@/lib/life";
+import { getLevelState } from "@/lib/level";
+import { useLearningPath } from "@/hooks/useCurriculum";
 import { useCelebrate } from "@/hooks/useCelebrate";
 import { useLife } from "@/hooks/useLife";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
@@ -157,7 +163,68 @@ function DashboardNotifications({
       return (count ?? 0) > 0;
     },
   });
+  // Today's goal steps still open: finishing every one also closes the study
+  // day (user request, 2026-10-23: activities without a reminder). Only steps
+  // already written for today; the bell never asks the AI to write them.
+  const { data: openGoalSteps = 0 } = useQuery({
+    queryKey: ["plus", "steps-open", profile?.id],
+    enabled: !!profile?.id,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { count } = await (
+        supabase.from as unknown as (name: string) => {
+          select: (
+            columns: string,
+            options: { count: "exact"; head: true },
+          ) => {
+            eq: (
+              column: string,
+              value: string,
+            ) => {
+              eq: (
+                column: string,
+                value: string,
+              ) => { is: (column: string, value: null) => Promise<{ count: number | null }> };
+            };
+          };
+        }
+      )("plus_goal_steps")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", profile!.id)
+        .eq("day", studyToday())
+        .is("done_at", null);
+      return count ?? 0;
+    },
+  });
+  // Habits due today not ticked yet (Premium); a habit linked to the study
+  // day ticks itself, so it is left out.
+  const habitsOpen =
+    life && life.premium
+      ? habitsDueToday(
+          life.habits.filter((habit) => habit.linked !== "study_day"),
+          life.logs,
+          life.today,
+        ).filter(
+          (habit) => !life.logs.some((log) => log.habitId === habit.id && log.day === life.today),
+        ).length
+      : 0;
+  const priorityOpen =
+    !!life?.premium && !!life.priority && life.priority.day === life.today && !life.priority.doneAt;
+  // The Final Test opens with 21 of the 30 core lessons; until it is passed,
+  // the bell says the student can move up.
+  const path = useLearningPath();
+  const finalTestReady = path.finalTest.unlocked && !path.finalTest.passed;
+  const nextLevel = finalTestReady ? getLevelState(path.level).next?.value.toUpperCase() : null;
   const items = [
+    {
+      id: "final-test",
+      to: "/learning",
+      label: nextLevel
+        ? `${translate("Final Test unlocked: move up to")} ${nextLevel}`
+        : translate("Final Test unlocked"),
+      icon: Trophy,
+      visible: finalTestReady,
+    },
     {
       id: "journey",
       to: journey?.message.to ?? "/coach",
@@ -180,6 +247,27 @@ function DashboardNotifications({
       label: `${translate("Life+ AI tasks for today")}: ${openLifeTasks}`,
       icon: ListChecks,
       visible: openLifeTasks > 0,
+    },
+    {
+      id: "goal-steps",
+      to: "/life",
+      label: `${translate("Goal steps for today")}: ${openGoalSteps}`,
+      icon: Target,
+      visible: openGoalSteps > 0,
+    },
+    {
+      id: "habits",
+      to: "/life",
+      label: `${translate("Habits to check in today")}: ${habitsOpen}`,
+      icon: Repeat,
+      visible: habitsOpen > 0,
+    },
+    {
+      id: "priority",
+      to: "/life",
+      label: `${translate("Priority of the day")}: ${life?.priority?.text ?? ""}`,
+      icon: Star,
+      visible: priorityOpen,
     },
     {
       id: "goal",
@@ -236,9 +324,16 @@ function DashboardNotifications({
   // Every English activity of the day is done but the minutes goal is not
   // (user request, 2026-10-23): the bell says where to start something new.
   const englishPending = activeItems.some((item) =>
-    ["plan", "mistakes", "review", "reading", "listening", "writing", "vocabulary"].includes(
-      item.id,
-    ),
+    [
+      "final-test",
+      "plan",
+      "mistakes",
+      "review",
+      "reading",
+      "listening",
+      "writing",
+      "vocabulary",
+    ].includes(item.id),
   );
   const needsNewActivity = goalMinutesLeft > 0 && indicators.ready && !englishPending;
 
