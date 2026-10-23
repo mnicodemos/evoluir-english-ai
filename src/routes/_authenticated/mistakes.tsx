@@ -173,6 +173,9 @@ function Mistakes() {
       const result = await review({ data: { id: current.id, answer } });
       setAnswered((ids) => [...ids, current.id]);
       setOutcome(result);
+      // The Dashboard's "Review n mistakes" and its bell read this count
+      // (user report, 2026-10-23: it stayed until the page was reloaded).
+      void queryClient.invalidateQueries({ queryKey: ["mistakes-due"] });
     } catch {
       toast.error("Could not check your answer. Try again.");
     } finally {
@@ -197,6 +200,7 @@ function Mistakes() {
         setAnswer("");
       }
       await queryClient.invalidateQueries({ queryKey: ["mistakes", profile?.id] });
+      void queryClient.invalidateQueries({ queryKey: ["mistakes-due"] });
       toast.success("Mistake deleted.");
     } catch {
       toast.error("Could not delete this mistake. Please try again.");
