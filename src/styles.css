@@ -352,6 +352,23 @@
   .dashboard-shell :is(a, button, [role="button"], [role="tab"]):not(:disabled):active {
     scale: 0.97;
   }
+
+  /* The screen never zooms by itself (user request, 2026-10-23): iPhones zoom
+     into any field written smaller than 16 px when it gets the focus, and a
+     quick double tap zoomed the page too. Pinching stays possible for anyone
+     who needs bigger text. */
+  html {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  :is(
+    input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]),
+    textarea,
+    select
+  ) {
+    font-size: 16px !important;
+  }
 }
 
 /* Each page arrives with a short fade (user request: app feel). Opacity only:
