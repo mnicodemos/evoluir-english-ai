@@ -554,6 +554,13 @@
       "when": 1792711885910,
       "tag": "0078_weekly_league_history_apply",
       "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1792713633984,
+      "tag": "0079_daily_reading_variants_apply",
+      "breakpoints": true
     }
   ]
 }
