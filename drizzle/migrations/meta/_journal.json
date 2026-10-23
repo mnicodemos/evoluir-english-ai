@@ -561,6 +561,13 @@
       "when": 1792713633984,
       "tag": "0079_daily_reading_variants_apply",
       "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1792713867373,
+      "tag": "0080_life_decisions",
+      "breakpoints": true
     }
   ]
 }
