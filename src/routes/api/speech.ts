@@ -9,7 +9,7 @@ import {
   hashAiRequest,
   loadAiLimit,
   releaseAbandonedAiUsage,
-  reserveAiUsage,
+  reserveAiUsageWithWait,
 } from "@/lib/ai-usage.server";
 import { readTtsCache, writeTtsCache } from "@/lib/tts-cache.server";
 import { ttsCacheKey } from "@/lib/ttsCacheKey";
@@ -140,7 +140,9 @@ export const Route = createFileRoute("/api/speech")({
         let ticket;
         try {
           const [limit, requestHash] = await reads;
-          ticket = await reserveAiUsage({
+          // Waits a few seconds for the previous audio's record to close
+          // instead of refusing at once (user report, 2026-10-23).
+          ticket = await reserveAiUsageWithWait({
             userId,
             operation: "tts",
             model: GEMINI_TTS_MODEL,

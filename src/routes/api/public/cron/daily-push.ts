@@ -3,12 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { leagueLevelOf } from "@/lib/level";
 import {
   lifeTasksLinePt,
+  READING_REMINDER_LINE_PT,
   lifeTasksReminder,
   studyReminder,
   wordOfDayBody,
   type PlanTaskForPush,
 } from "@/lib/reviewReminder";
-import { studyToday } from "@/lib/today";
+import { studyDayStartIso, studyToday } from "@/lib/today";
 import { weekStartOf } from "@/lib/streakFreeze";
 import {
   isLeagueResetDay,
@@ -263,6 +264,18 @@ async function sendDailyPush(
 
   // Life+ AI tasks of the day still open (user request: notify them); a
   // failure only leaves the line out.
+  // Today's daily reading finished (one "daily_reading" activity per day).
+  const readingDoneToday = async (userId: string) => {
+    const { count, error } = await supabaseAdmin
+      .from("activities")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("activity_type", "daily_reading")
+      .gte("created_at", studyDayStartIso());
+    // Unknown counts as done, so a failed read never adds a wrong line.
+    return error ? true : (count ?? 0) > 0;
+  };
+
   const openLifeTasks = async (userId: string) => {
     try {
       const from = supabaseAdmin.from as unknown as (name: string) => {
@@ -345,8 +358,16 @@ async function sendDailyPush(
         if (tasksOpen > 0) messages.set(p.id, lifeTasksReminder(tasksOpen));
         return;
       }
-      const [due, task] = await Promise.all([dueReviews(p.id), planTask(p.id)]);
+      const [due, task, readingDone] = await Promise.all([
+        dueReviews(p.id),
+        planTask(p.id),
+        readingDoneToday(p.id),
+      ]);
       const reminder = studyReminder(due, task);
+      // The daily reading is also reminded (user request, 2026-10-23).
+      if (!readingDone) {
+        reminder.body = `${reminder.body} ${READING_REMINDER_LINE_PT}`.slice(0, 280);
+      }
       if (tasksOpen > 0) {
         reminder.body = `${reminder.body} ${lifeTasksLinePt(tasksOpen)}.`.slice(0, 280);
       }

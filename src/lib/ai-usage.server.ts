@@ -58,9 +58,20 @@ export const ABANDONED_USAGE_SECONDS = 90;
  */
 export const TALKING_ABANDONED_SECONDS = 30;
 
+/**
+ * Short operations whose own stale records are released after
+ * TALKING_ABANDONED_SECONDS: AI Speaking and the voice (tts). A word's or a
+ * sentence's audio streams in a few seconds, and a stream the browser drops
+ * without closing it left the record open for 90 s (user report, 2026-10-23:
+ * Vocabulary's speaker answered "Another AI request is already running").
+ */
+const QUICK_RELEASE_OPERATIONS: readonly string[] = ["talking", "tts"];
+
 /** Seconds after which an open record of this operation counts as abandoned. */
 export function abandonedAfterSeconds(operation: string): number {
-  return operation === "talking" ? TALKING_ABANDONED_SECONDS : ABANDONED_USAGE_SECONDS;
+  return QUICK_RELEASE_OPERATIONS.includes(operation)
+    ? TALKING_ABANDONED_SECONDS
+    : ABANDONED_USAGE_SECONDS;
 }
 
 export function isAbandonedUsage(createdAt: string, now = Date.now()): boolean {
@@ -88,18 +99,17 @@ export async function releaseAbandonedAiUsage(userId: string, operation: AiOpera
     .update(closed)
     .eq("status", "pending")
     .lt("created_at", cutoff);
-  // The student's own AI Speaking records are released sooner (see above).
+  // The student's own AI Speaking and voice records are released sooner (see above).
   const talkingCutoff = new Date(Date.now() - TALKING_ABANDONED_SECONDS * 1000).toISOString();
-  const talking =
-    operation === "talking"
-      ? db
-          .from("ai_usage_events")
-          .update(closed)
-          .eq("status", "pending")
-          .eq("user_id", userId)
-          .eq("operation", "talking")
-          .lt("created_at", talkingCutoff)
-      : null;
+  const talking = QUICK_RELEASE_OPERATIONS.includes(operation)
+    ? db
+        .from("ai_usage_events")
+        .update(closed)
+        .eq("status", "pending")
+        .eq("user_id", userId)
+        .eq("operation", operation)
+        .lt("created_at", talkingCutoff)
+    : null;
   await Promise.all([everyone, talking]);
 }
 

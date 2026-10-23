@@ -73,9 +73,9 @@ describe("isAbandonedUsage", () => {
 });
 
 describe("abandonedAfterSeconds", () => {
-  it("releases AI Speaking records after 30 s and the rest after 90 s", () => {
+  it("releases AI Speaking and voice records after 30 s and the rest after 90 s", () => {
     expect(abandonedAfterSeconds("talking")).toBe(30);
     expect(abandonedAfterSeconds("teacher")).toBe(90);
-    expect(abandonedAfterSeconds("tts")).toBe(90);
+    expect(abandonedAfterSeconds("tts")).toBe(30);
   });
 });

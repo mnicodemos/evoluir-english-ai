@@ -33,7 +33,7 @@ import { useEffect } from "react";
 import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
-import { studyToday } from "@/lib/today";
+import { studyDayStartIso, studyToday } from "@/lib/today";
 import { useCelebrate } from "@/hooks/useCelebrate";
 import { useLife } from "@/hooks/useLife";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
@@ -140,6 +140,23 @@ function DashboardNotifications({
   const openLifeTasks = life
     ? life.tasks.filter((task) => task.day === life.today && !task.doneAt).length
     : 0;
+  // Today's daily reading not finished yet (user request, 2026-10-23: remind
+  // it). Finishing the reading refreshes every query, this one included.
+  const { data: profile } = useProfile();
+  const { data: readingDone } = useQuery({
+    queryKey: ["daily-reading-done", profile?.id],
+    enabled: !!profile?.id,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("activities")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", profile!.id)
+        .eq("activity_type", "daily_reading")
+        .gte("created_at", studyDayStartIso());
+      return (count ?? 0) > 0;
+    },
+  });
   const items = [
     {
       id: "journey",
@@ -186,6 +203,13 @@ function DashboardNotifications({
       visible: reviewCount > 0,
     },
     {
+      id: "reading",
+      to: "/reading",
+      label: "Today's reading is waiting",
+      icon: BookOpenText,
+      visible: readingDone === false,
+    },
+    {
       id: "listening",
       to: "/listening",
       label: "New listening activity",
@@ -212,7 +236,9 @@ function DashboardNotifications({
   // Every English activity of the day is done but the minutes goal is not
   // (user request, 2026-10-23): the bell says where to start something new.
   const englishPending = activeItems.some((item) =>
-    ["plan", "mistakes", "review", "listening", "writing", "vocabulary"].includes(item.id),
+    ["plan", "mistakes", "review", "reading", "listening", "writing", "vocabulary"].includes(
+      item.id,
+    ),
   );
   const needsNewActivity = goalMinutesLeft > 0 && indicators.ready && !englishPending;
 

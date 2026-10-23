@@ -2,6 +2,14 @@ import { isStaleTokenResponse } from "./pushStaleToken";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
 
+/** Waits before each new try of a temporary failure (two more tries). */
+export const FCM_RETRY_WAITS_MS = [2_000, 5_000];
+
+/** 429 and 5xx are temporary; anything else (sent, stale token, bad request) is final. */
+export function isTemporaryFcmStatus(status: number) {
+  return status === 429 || status >= 500;
+}
+
 export type PushMessage = { title: string; body: string; path?: string | undefined };
 
 /** Push credentials, or null when the server is not configured for push. */
@@ -51,21 +59,35 @@ export async function sendFcm(
   message: PushMessage,
   logPrefix = "FCM",
 ): Promise<{ ok: true } | { ok: false; stale: boolean; status: number; detail: string }> {
-  const res = await fetch(`${GATEWAY_URL}/v1/projects/_/messages:send`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${credentials.lovableKey}`,
-      "X-Connection-Api-Key": credentials.connectionKey,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      message: {
-        token,
-        notification: { title: message.title, body: message.body },
-        data: message.path ? { path: message.path } : undefined,
+  const send = () =>
+    fetch(`${GATEWAY_URL}/v1/projects/_/messages:send`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${credentials.lovableKey}`,
+        "X-Connection-Api-Key": credentials.connectionKey,
+        "Content-Type": "application/json",
       },
-    }),
-  });
+      body: JSON.stringify({
+        message: {
+          token,
+          notification: { title: message.title, body: message.body },
+          data: message.path ? { path: message.path } : undefined,
+        },
+      }),
+    }).catch(() => null);
+  // A temporary gateway or FCM failure (429, 5xx, no answer) is tried again
+  // after a short wait (user report, 2026-10-23: the 9:00 word push got 502
+  // for every device and nobody received it).
+  let res = await send();
+  for (const waitMs of FCM_RETRY_WAITS_MS) {
+    if (res && !isTemporaryFcmStatus(res.status)) break;
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+    res = await send();
+  }
+  if (!res) {
+    console.error(`${logPrefix} send failed [network]: no answer`);
+    return { ok: false, stale: false, status: 503, detail: "no answer" };
+  }
   if (res.ok) return { ok: true };
   const errorBody = await res.text();
   console.error(`${logPrefix} send failed [${res.status}]: ${errorBody}`);
