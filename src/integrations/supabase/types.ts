@@ -852,6 +852,51 @@ export type Database = {
         }
         Relationships: []
       }
+      life_decisions: {
+        Row: {
+          analysis: string | null
+          chosen_option_id: string | null
+          context: string
+          created_at: string
+          criteria: Json
+          id: string
+          options: Json
+          ratings: Json
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis?: string | null
+          chosen_option_id?: string | null
+          context?: string
+          created_at?: string
+          criteria?: Json
+          id?: string
+          options?: Json
+          ratings?: Json
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis?: string | null
+          chosen_option_id?: string | null
+          context?: string
+          created_at?: string
+          criteria?: Json
+          id?: string
+          options?: Json
+          ratings?: Json
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       life_habit_logs: {
         Row: {
           created_at: string
