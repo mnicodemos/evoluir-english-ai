@@ -1,9 +1,6 @@
--- Life+ AI Decisions (phase 2, user request, 2026-10-22; the owner's Decision
--- AI module): a weighted decision matrix per student. Options, criteria and
--- scores live in jsonb (validated by the server, src/lib/lifeDecisions.ts);
--- the result is computed on screen, never stored. Premium, like Routine and
--- Habits: students only read their own rows and every write goes through the
--- server (service role), which checks Premium. Idempotent.
+-- Life+ AI Decisions (phase 2): a weighted decision matrix per student.
+-- Students only read their own rows; every write goes through the server
+-- (service role), which checks Premium. Idempotent.
 
 CREATE TABLE IF NOT EXISTS public.life_decisions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -19,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.life_decisions (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+
 CREATE INDEX IF NOT EXISTS life_decisions_user_idx
   ON public.life_decisions (user_id, updated_at DESC);
 

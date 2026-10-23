@@ -469,6 +469,33 @@ export type Database = {
           },
         ]
       }
+      daily_reading_variants: {
+        Row: {
+          category: string
+          content: Json
+          created_at: string
+          day: string
+          level: string
+          style: string
+        }
+        Insert: {
+          category: string
+          content: Json
+          created_at?: string
+          day: string
+          level: string
+          style: string
+        }
+        Update: {
+          category?: string
+          content?: Json
+          created_at?: string
+          day?: string
+          level?: string
+          style?: string
+        }
+        Relationships: []
+      }
       daily_readings: {
         Row: {
           content: Json
@@ -822,6 +849,51 @@ export type Database = {
           updated_at?: string
           video_duration_seconds?: number
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      life_decisions: {
+        Row: {
+          analysis: string | null
+          chosen_option_id: string | null
+          context: string
+          created_at: string
+          criteria: Json
+          id: string
+          options: Json
+          ratings: Json
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis?: string | null
+          chosen_option_id?: string | null
+          context?: string
+          created_at?: string
+          criteria?: Json
+          id?: string
+          options?: Json
+          ratings?: Json
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis?: string | null
+          chosen_option_id?: string | null
+          context?: string
+          created_at?: string
+          criteria?: Json
+          id?: string
+          options?: Json
+          ratings?: Json
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
