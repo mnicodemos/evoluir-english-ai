@@ -22,7 +22,7 @@ describe("today's progress lines", () => {
       ],
     });
     expect(lines.map((line) => line.key)).toEqual(["conversations", "teacher", "lessons"]);
-    expect(lines[0]).toMatchObject({ value: "1", label: "Conversation with EVO", state: "done" });
+    expect(lines[0]).toMatchObject({ value: "1", label: "conversation with EVO", state: "done" });
     expect(lines[1]).toMatchObject({ value: "8", state: "done" });
   });
 
