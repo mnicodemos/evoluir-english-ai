@@ -1,7 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, BookOpen, GraduationCap, Mic, RotateCcw, RefreshCw } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  GraduationCap,
+  Mic,
+  RotateCcw,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
 import reviewGrammar from "@/assets/review-grammar.webp";
@@ -221,7 +229,7 @@ export function SmartReviewCard({
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-brand-green/35 bg-brand-green/[0.07] pr-2">
               <img src={reviewWords} alt="" className="h-full min-h-0 w-16 object-cover" />
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground">{t("Vocabulary")}</p>
+                <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
                 <p className="truncate text-sm font-semibold">
                   {reviewCount === 1
                     ? t("Review 1 word")
@@ -249,7 +257,7 @@ export function SmartReviewCard({
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-warning/35 bg-warning/[0.07] pr-2">
               <img src={reviewMistakes} alt="" className="h-full min-h-0 w-16 object-cover" />
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground">{t("My mistakes")}</p>
+                <RowTag kind="review" label={t("To review")} detail={t("My mistakes")} />
                 <p className="truncate text-sm font-semibold">
                   {mistakesDue === 1
                     ? t("Review 1 mistake")
@@ -294,9 +302,11 @@ export function SmartReviewCard({
                 <div className="min-w-0">
                   {/* A lesson row opens the Learning path, so it says so before
                       the skill it reinforces (user request). */}
-                  <p className="text-[10px] text-muted-foreground">
-                    {item.resource.params ? `${t("Learning")} · ${skillLabel}` : skillLabel}
-                  </p>
+                  <RowTag
+                    kind="review"
+                    label={t("To review")}
+                    detail={item.resource.params ? `${t("Learning")} · ${skillLabel}` : skillLabel}
+                  />
                   <p className="truncate text-sm font-semibold">{t(item.resource.title)}</p>
                   <p
                     className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
@@ -330,12 +340,12 @@ export function SmartReviewCard({
           {newRows.map((row) => (
             <li
               key={row.key}
-              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/45 pr-2"
+              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-dashed border-brand-green/45 bg-brand-green/[0.04] pr-2"
             >
               <img src={SKILL_PHOTO[row.key]} alt="" className="h-full min-h-0 w-16 object-cover" />
               <div className="min-w-0">
                 {/* "New today", never a review: the same item the bell lists. */}
-                <p className="text-[10px] font-semibold text-brand-green">{t("New today")}</p>
+                <RowTag kind="new" label={t("New today")} />
                 <p className="truncate text-sm font-semibold">{t(row.title)}</p>
                 <p
                   className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
@@ -455,6 +465,39 @@ const SKILL_TILE = {
   speaking: { icon: Mic, tone: "bg-dashboard-coral/15 text-dashboard-coral" },
   grammar: { icon: GraduationCap, tone: "bg-dashboard-purple/15 text-dashboard-purple" },
 } as const;
+
+/**
+ * What a row is (user request, 2026-10-24: tell reviews and new activities
+ * apart at a glance): "Review" with the circular arrows for what comes back
+ * from earlier work, "New today" with sparkles in brand green for today's new
+ * activities, which also get a dashed green border.
+ */
+function RowTag({
+  kind,
+  label,
+  detail,
+}: {
+  kind: "review" | "new";
+  label: string;
+  detail?: string;
+}) {
+  const Icon = kind === "new" ? Sparkles : RefreshCw;
+  return (
+    <p className="flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground">
+      <span
+        className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[9px] font-semibold uppercase tracking-[0.06em] ring-1 ring-inset ${
+          kind === "new"
+            ? "bg-brand-green/15 text-brand-green ring-brand-green/35"
+            : "bg-sky-400/10 text-sky-300 ring-sky-400/30"
+        }`}
+      >
+        <Icon className="size-2.5" strokeWidth={2.5} aria-hidden="true" />
+        {label}
+      </span>
+      {detail && <span className="truncate">{detail}</span>}
+    </p>
+  );
+}
 
 function SkillTile({ skill }: { skill: string }) {
   const tile = SKILL_TILE[skill as keyof typeof SKILL_TILE] ?? {
