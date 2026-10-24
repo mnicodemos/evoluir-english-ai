@@ -21,6 +21,7 @@ import {
   checkoutOffer,
   formatBrl,
   offerPriceCents,
+  PLAN_PRICE_CENTS,
 } from "@/lib/billing/blackFriday";
 import { getMyAccess } from "@/lib/billing/entitlements.functions";
 import { createStripePortalSession } from "@/lib/billing/portal.functions";
@@ -135,6 +136,15 @@ function Premium() {
   const selectedOffer = selected === "yearly" ? yearlyOffer : monthlyOffer;
   const trialDays = selectedOffer.trialDays;
   const selectedPrice = formatBrl(offerPriceCents(selected, selectedOffer));
+  // "for 3 months, then R$ 79,90/month": the Black Friday price ends.
+  const discountTail = (
+    <>
+      {" "}
+      <span>for</span> {BLACK_FRIDAY.discountMonths} <span>months, then</span>{" "}
+      {formatBrl(PLAN_PRICE_CENTS.monthly)}
+      <span>/month</span>
+    </>
+  );
 
   async function goToCheckout() {
     if (starting) return;
@@ -290,8 +300,8 @@ function Premium() {
                     <h2 className="font-display text-base font-semibold">Black Friday</h2>
                     <ul className="mt-1 space-y-0.5 text-sm text-muted-foreground">
                       <li>
-                        {BLACK_FRIDAY.yearlyPercentOff}%{" "}
-                        <span>off the first year of the yearly plan</span>
+                        {BLACK_FRIDAY.monthlyPercentOff}% <span>off the monthly plan for</span>{" "}
+                        {BLACK_FRIDAY.discountMonths} <span>months</span>
                       </li>
                       {monthlyOffer.trialDays === BLACK_FRIDAY.monthlyTrialDays ? (
                         <li>
@@ -339,34 +349,34 @@ function Premium() {
                         </span>
                       )}
                     </div>
-                    {p.id === "yearly" && yearlyOffer.couponId ? (
+                    {p.id === "monthly" && monthlyOffer.couponId ? (
                       <p className="mt-3 text-sm text-muted-foreground line-through">{p.price}</p>
                     ) : null}
                     <p
                       className={
-                        p.id === "yearly" && yearlyOffer.couponId
+                        p.id === "monthly" && monthlyOffer.couponId
                           ? "text-3xl font-bold"
                           : "mt-3 text-3xl font-bold"
                       }
                     >
-                      {p.id === "yearly"
-                        ? formatBrl(offerPriceCents("yearly", yearlyOffer))
+                      {p.id === "monthly"
+                        ? formatBrl(offerPriceCents("monthly", monthlyOffer))
                         : p.price}
                       <span className="text-base font-medium text-muted-foreground">
                         {p.period}
                       </span>
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      {p.id === "yearly" && yearlyOffer.couponId ? (
+                      {p.id === "monthly" && monthlyOffer.couponId ? (
                         <>
-                          Black Friday: {BLACK_FRIDAY.yearlyPercentOff}%{" "}
-                          <span>off the first year</span>
-                        </>
-                      ) : p.id === "monthly" &&
-                        monthlyOffer.trialDays === BLACK_FRIDAY.monthlyTrialDays &&
-                        campaign ? (
-                        <>
-                          Black Friday: {BLACK_FRIDAY.monthlyTrialDays} <span>days free</span>
+                          Black Friday: {BLACK_FRIDAY.monthlyPercentOff}% <span>off for</span>{" "}
+                          {BLACK_FRIDAY.discountMonths} <span>months</span>
+                          {monthlyOffer.trialDays === BLACK_FRIDAY.monthlyTrialDays ? (
+                            <>
+                              {" + "}
+                              {BLACK_FRIDAY.monthlyTrialDays} <span>days free</span>
+                            </>
+                          ) : null}
                         </>
                       ) : (
                         p.note
@@ -426,8 +436,15 @@ function Premium() {
                   <p className="mt-3 text-xs text-muted-foreground">
                     <span>After the trial,</span> {selectedPrice}
                     <span>{selected === "yearly" ? "/year" : "/month"}</span>
+                    {selectedOffer.couponId ? discountTail : null}
                     {". "}
                     <span>Cancel any time in My subscription before the trial ends.</span>
+                  </p>
+                ) : selectedOffer.couponId ? (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {selectedPrice}
+                    <span>/month</span>
+                    {discountTail}.
                   </p>
                 ) : null}
                 <p className="mt-3 text-xs text-muted-foreground">

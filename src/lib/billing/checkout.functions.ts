@@ -48,9 +48,10 @@ export function isMissingCustomer(error: unknown): boolean {
 
 /**
  * The Black Friday coupon, created in Stripe the first time it is needed:
- * 15% for 12 months, so it covers the yearly plan's first paid invoice even
- * after a trial (a "once" coupon could be spent on the trial's R$ 0 invoice)
- * and never its renewal.
+ * 30% for 3 months. Its months count from the subscription's start, so after
+ * a 15-day trial it still covers the first 3 paid invoices (days 15, 45 and
+ * 75) and the 4th is full price; a "once" coupon could be spent on the
+ * trial's R$ 0 invoice.
  */
 async function ensureBlackFridayCoupon(stripe: Stripe): Promise<void> {
   try {
@@ -60,9 +61,9 @@ async function ensureBlackFridayCoupon(stripe: Stripe): Promise<void> {
     await stripe.coupons.create({
       id: BLACK_FRIDAY.couponId,
       name: "Black Friday",
-      percent_off: BLACK_FRIDAY.yearlyPercentOff,
+      percent_off: BLACK_FRIDAY.monthlyPercentOff,
       duration: "repeating",
-      duration_in_months: 12,
+      duration_in_months: BLACK_FRIDAY.discountMonths,
       redeem_by: Math.floor(Date.parse(BLACK_FRIDAY.endsAt) / 1000),
     });
   }
@@ -123,7 +124,7 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
         throw new Error(ALREADY_SUBSCRIBED_MESSAGE);
       }
       // The first subscription's free trial (trial.ts), and during Black
-      // Friday 15 days on the monthly plan and 15% off the yearly's first year.
+      // Friday 15 days and 30% off the first 3 months on the monthly plan.
       const offer = checkoutOffer(data.interval, past ?? [{}]);
       if (offer.couponId) await ensureBlackFridayCoupon(stripe);
 
