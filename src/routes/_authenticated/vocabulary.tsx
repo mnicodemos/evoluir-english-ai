@@ -330,7 +330,10 @@ function VocabularyOnline() {
             operationKey: crypto.randomUUID(),
             wordId: word.id,
             transcript: spoken,
-            minutes: minutesSpent(1),
+            // No 1-minute floor: a 5-second attempt used to add a whole minute,
+            // so ten quick words read as ten minutes (audit, 2026-10-24). The
+            // manual clock carries the seconds over to the next attempt.
+            minutes: minutesSpent(0),
           },
         });
         // A late answer from an older attempt must never change the screen.
