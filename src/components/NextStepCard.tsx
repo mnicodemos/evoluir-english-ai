@@ -7,7 +7,6 @@ import {
   ArrowRight,
   BookOpen,
   Check,
-  CheckCircle2,
   ChevronRight,
   Compass,
   GraduationCap,
@@ -554,10 +553,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     {!(quickWinButton && challengeButton) && (
                       // One option left: the other row says it is done.
                       <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !bg-transparent text-xs text-muted-foreground">
-                        <CheckCircle2
-                          className="size-4 shrink-0 text-brand-green"
-                          aria-hidden="true"
-                        />
+                        <DoneSeal size="sm" />
                         {t("Nothing else pending right now.")}
                       </p>
                     )}

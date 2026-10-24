@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
-  CheckCircle2,
   Clock,
   GraduationCap,
   Mic,
@@ -313,7 +312,7 @@ export function SmartReviewCard({
           {rows === 1 && (
             // A single review would leave half the card empty: say the rest is done.
             <li className="flex min-h-0 items-center justify-center gap-2 rounded-md border border-dashed border-border text-xs text-muted-foreground">
-              <CheckCircle2 className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+              <DoneSeal size="sm" />
               {t("Nothing else to review right now.")}
             </li>
           )}
