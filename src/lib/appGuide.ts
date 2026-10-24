@@ -52,8 +52,9 @@ export const APP_GUIDE: GuideSection[] = [
       "Tap Practice now to go straight to the right activity.",
       "Extra practice offers two short options; each shows the XP it earns.",
       "Today's Progress fills the ring with today's minutes and lists what you did.",
+      "Keep improving shows your reviews first (words, mistakes, skills); free rows show today's new activities, marked New today.",
     ],
-    tip: "Take the challenge has a goal for the day and leaves once you reach it.",
+    tip: "Take the challenge has a goal for the day and leaves once you reach it. Every other day it invites you to the AI Teacher or the video call.",
     to: "/dashboard",
   },
   {
@@ -89,7 +90,7 @@ export const APP_GUIDE: GuideSection[] = [
     steps: [
       "Play the sentence; you can listen again as many times as you need.",
       "Repeat it out loud and see how close you were.",
-      "Three Listening sessions complete a study day.",
+      "One session has 9 sentences and is saved every 3; finishing it completes a study day.",
     ],
     to: "/listening",
   },
@@ -213,7 +214,7 @@ export const APP_GUIDE: GuideSection[] = [
     steps: [
       "Finish 1 lesson (the quiz at the end).",
       "Send 3 texts in Writing.",
-      "Do 3 Listening sessions.",
+      "Finish 1 Listening session (9 sentences).",
       "Review 10 words in Vocabulary.",
       "Finish 1 conversation with EVO, in AI Speaking or the video call, up to its report.",
       "Answer every question of the Daily reading.",

@@ -53,11 +53,12 @@ import { profileIsPremium } from "@/lib/billing/subscriptionView";
 import { PathProgressCard } from "@/components/PathProgressCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
+import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DoneSeal } from "@/components/DoneSeal";
+import { ClockHands, DoneSeal } from "@/components/DoneSeal";
 import { GaugeRing } from "@/components/GaugeRing";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
@@ -151,20 +152,7 @@ function DashboardNotifications({
   // Today's daily reading not finished yet (user request, 2026-10-23: remind
   // it). Finishing the reading refreshes every query, this one included.
   const { data: profile } = useProfile();
-  const { data: readingDone } = useQuery({
-    queryKey: ["daily-reading-done", profile?.id],
-    enabled: !!profile?.id,
-    staleTime: 60 * 1000,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("activities")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", profile!.id)
-        .eq("activity_type", "daily_reading")
-        .gte("created_at", studyDayStartIso());
-      return (count ?? 0) > 0;
-    },
-  });
+  const { data: readingDone } = useDailyReadingDone(profile?.id);
   // Today's goal steps still open: finishing every one also closes the study
   // day (user request, 2026-10-23: activities without a reminder). Only steps
   // already written for today; the bell never asks the AI to write them.
@@ -756,7 +744,7 @@ function Dashboard() {
                 <div className="grid min-w-0 gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                   {!hasProgressToday && (
                     <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground">
-                      <DoneSeal icon={Clock} />
+                      <DoneSeal icon={ClockHands} />
                       <p className="text-[11px] font-bold leading-tight">
                         {t("Nothing yet today")}
                       </p>

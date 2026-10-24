@@ -40,7 +40,7 @@ describe("today's progress lines", () => {
     expect(lines.map((line) => [line.key, line.value])).toEqual([
       ["lessons", "1"],
       ["writing", "2"],
-      ["listening", "1"],
+      ["listening", "3"],
     ]);
   });
 

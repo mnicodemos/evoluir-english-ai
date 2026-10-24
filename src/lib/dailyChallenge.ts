@@ -1,6 +1,6 @@
 /**
  * "Take the challenge" with a goal for the day (user request): the challenge
- * names how much to do (3 texts, 3 Listening sessions, 1 conversation, 10
+ * names how much to do (3 texts, 9 Listening sentences, 1 conversation, 10
  * minutes with the AI Teacher, 1 lesson), shows the progress from today's
  * activities and leaves the Dashboard once the goal is reached. The XP shown
  * is what the weekly league already gives each activity (league_week_xp:
@@ -23,11 +23,24 @@ export type DailyChallengeGoal = {
   reached: boolean;
 };
 
-type GoalRule = { target: number; unit: string; types: string[]; measure: "count" | "minutes" };
+type GoalRule = {
+  target: number;
+  unit: string;
+  types: string[];
+  measure: "count" | "minutes";
+  /** How much one row is worth (a Listening part saves 3 sentences). */
+  perRow?: number;
+};
 
 const GOALS: Record<string, GoalRule> = {
   "/writing": { target: 3, unit: "texts", types: ["writing"], measure: "count" },
-  "/listening": { target: 3, unit: "sessions", types: ["listening"], measure: "count" },
+  "/listening": {
+    target: 9,
+    unit: "sentences",
+    types: ["listening"],
+    measure: "count",
+    perRow: 3,
+  },
   "/coach": {
     target: 1,
     unit: "conversations",
@@ -55,7 +68,7 @@ export function dailyChallengeGoal(
   const rows = activities.filter((row) => rule.types.includes(row.activity_type));
   const done =
     rule.measure === "count"
-      ? rows.length
+      ? rows.length * (rule.perRow ?? 1)
       : rows.reduce((sum, row) => sum + Math.max(0, row.duration_minutes ?? 0), 0);
   return {
     target: rule.target,

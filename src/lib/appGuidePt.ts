@@ -11,8 +11,10 @@ export const appGuidePt: Record<string, string> = {
     "A Prática extra oferece duas opções curtas; cada uma mostra quanto XP vale.",
   "Today's Progress fills the ring with today's minutes and lists what you did.":
     "O Progresso de hoje enche o anel com os minutos do dia e mostra o que você fez.",
-  "Take the challenge has a goal for the day and leaves once you reach it.":
-    "O desafio tem uma meta para o dia e some quando você a alcança.",
+  "Keep improving shows your reviews first (words, mistakes, skills); free rows show today's new activities, marked New today.":
+    "O Keep improving mostra primeiro suas revisões (palavras, erros, habilidades); as linhas livres mostram as atividades novas de hoje, marcadas como Nova hoje.",
+  "Take the challenge has a goal for the day and leaves once you reach it. Every other day it invites you to the AI Teacher or the video call.":
+    "O desafio tem uma meta para o dia e some quando você a alcança. Em dias alternados, ele convida você para o Professor de IA ou para a videochamada.",
   "Learning path": "Trilha de aprendizado",
   "The lessons of your level, in order, from the first unit to the Final Test.":
     "As lições do seu nível, em ordem, da primeira unidade até o Teste Final.",
@@ -58,8 +60,8 @@ export const appGuidePt: Record<string, string> = {
     "Responda às perguntas para conferir o que você entendeu.",
   "When EVO's priority is Reading, Practice now opens the daily reading.":
     "Quando a prioridade da EVO é Reading, Praticar agora abre a leitura do dia.",
-  "Three Listening sessions complete a study day.":
-    "Três sessões de Listening completam um dia de estudo.",
+  "One session has 9 sentences and is saved every 3; finishing it completes a study day.":
+    "Uma sessão tem 9 frases e é salva a cada 3; concluí-la completa um dia de estudo.",
   Writing: "Escrita",
   "Write short texts and get them corrected with clear explanations.":
     "Escreva textos curtos e receba a correção com explicações claras.",
@@ -145,7 +147,7 @@ export const appGuidePt: Record<string, string> = {
     "Qualquer uma destas no mesmo dia (horário de Brasília) fecha o seu dia de estudo e mantém a sua sequência.",
   "Finish 1 lesson (the quiz at the end).": "Concluir 1 lição (o quiz do final).",
   "Send 3 texts in Writing.": "Enviar 3 textos no Writing.",
-  "Do 3 Listening sessions.": "Fazer 3 sessões de Listening.",
+  "Finish 1 Listening session (9 sentences).": "Concluir 1 sessão de Listening (9 frases).",
   "Review 10 words in Vocabulary.": "Revisar 10 palavras no Vocabulary.",
   "Finish 1 conversation with EVO, in AI Speaking or the video call, up to its report.":
     "Concluir 1 conversa com a EVO, no AI Speaking ou na chamada de vídeo, até o relatório.",

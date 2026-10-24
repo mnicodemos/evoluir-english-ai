@@ -29,16 +29,11 @@ describe("Dashboard recommended actions", () => {
 });
 
 describe("Listening Lab indicator", () => {
-  it("shows nothing when the current round was completed", () => {
-    expect(listeningHasNewActivity({ round: 4, completedRound: 4 })).toBe(false);
-  });
-
-  it("shows the dot when a new round was unlocked", () => {
-    expect(listeningHasNewActivity({ round: 5, completedRound: 4 })).toBe(true);
-  });
-
-  it("shows the dot when the student never practised", () => {
-    expect(listeningHasNewActivity({ round: 0, completedRound: null })).toBe(true);
+  it("stays open until today's session of 9 sentences (3 parts) is saved", () => {
+    expect(listeningHasNewActivity({ partsToday: 0 })).toBe(true);
+    expect(listeningHasNewActivity({ partsToday: 2 })).toBe(true);
+    expect(listeningHasNewActivity({ partsToday: 3 })).toBe(false);
+    expect(listeningHasNewActivity({ partsToday: 5 })).toBe(false);
   });
 });
 

@@ -94,11 +94,12 @@ export function todayProgressLines(input: {
       };
     })(),
     (() => {
-      const count = countOf(rows, ["listening"]);
+      // Each saved Listening part is 3 sentences of the session of 9.
+      const count = countOf(rows, ["listening"]) * 3;
       return {
         key: "listening",
         icon: "listening" as const,
-        label: count === 1 ? "listening session" : "listening sessions",
+        label: "listening sentences",
         value: String(count),
         state: count > 0 ? ("done" as const) : ("empty" as const),
         active: count > 0,

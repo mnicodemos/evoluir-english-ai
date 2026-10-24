@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
-  Clock,
   GraduationCap,
   Mic,
   RotateCcw,
   RefreshCw,
+  Sparkles,
 } from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
@@ -27,15 +27,17 @@ import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
+import { newTodayRows } from "@/lib/keepImprovingNew";
 import { NEXT_STEP_SKILL_TEXT } from "@/lib/pedagogy/nextStep";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { SMART_REVIEW_MAX_ITEMS, SMART_REVIEW_REASON_TEXT } from "@/lib/pedagogy/smartReviewUx";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
-import { DoneSeal } from "@/components/DoneSeal";
+import { ClockHands, DoneSeal } from "@/components/DoneSeal";
 
 /**
  * "Smart review" — what is worth recovering now. Semantically distinct from
@@ -70,6 +72,8 @@ export function SmartReviewCard({
   });
   // Vocabulary words whose spaced review date has arrived (same count as the bell).
   const { count: reviewCount, ready: reviewsReady } = useDueReviewState(profile?.id);
+  // Today's reading, for the "New today" rows (same query as the bell).
+  const { data: readingDone } = useDailyReadingDone(profile?.id);
   // Never wait longer than this for the extra answers (a vocabulary batch being
   // written can keep "today's practice" loading for a minute).
   const [waited, setWaited] = useState(false);
@@ -81,7 +85,12 @@ export function SmartReviewCard({
   // Compact card: the rows depend on four answers (suggestions, due words,
   // due mistakes, what was done today). Drawing before all of them arrive made
   // rows appear and vanish on load, so it waits, keeping the card's shape.
-  if (compact && (isLoading || (!waited && (!indicators.ready || !reviewsReady || !extrasReady)))) {
+  if (
+    compact &&
+    (isLoading ||
+      (!waited &&
+        (!indicators.ready || !reviewsReady || !extrasReady || readingDone === undefined)))
+  ) {
     return (
       <section
         className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
@@ -132,11 +141,28 @@ export function SmartReviewCard({
   const showMistakes = compact && mistakesDue > 0;
   // Up to three rows: due words, due mistakes, then the server's suggestions.
   const suggestionSlots = 3 - Number(showWordReviews) - Number(showMistakes);
-  const rows =
-    Number(showWordReviews) + Number(showMistakes) + Math.min(items.length, suggestionSlots);
+  const shownItems = items.slice(0, Math.max(suggestionSlots, 0));
+  // Rows still free take today's new activities, the ones the bell lists, so
+  // the card never says "all done" while there is something new to do (user
+  // request, 2026-10-24). Never where another Dashboard button already goes.
+  const newRows = compact
+    ? newTodayRows({
+        readingDone,
+        indicators,
+        taken: [
+          data.activity.to,
+          data.quickWin?.activity.to ?? "",
+          data.quest?.resource.to ?? "",
+          ...shownItems.map((item) => item.resource.to),
+          ...(showWordReviews ? ["/vocabulary"] : []),
+        ],
+        slots: suggestionSlots - shownItems.length,
+      })
+    : [];
+  const rows = Number(showWordReviews) + Number(showMistakes) + shownItems.length + newRows.length;
   // Reviews use the whole history (every level), so any measured skill counts.
   const measured = (data.skills ?? []).some((skill) => skill.score !== null);
-  if (items.length === 0 && !showWordReviews && !showMistakes) {
+  if (items.length === 0 && newRows.length === 0 && !showWordReviews && !showMistakes) {
     // Compact Dashboard slot keeps its place: everything to review is done.
     if (!compact) return null;
     return (
@@ -166,7 +192,7 @@ export function SmartReviewCard({
         ) : (
           // Nothing measured yet: "all done" would be untrue, so it says what fills it.
           <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
-            <DoneSeal icon={Clock} />
+            <DoneSeal icon={ClockHands} />
             <p className="text-sm font-semibold">{t("No reviews yet")}</p>
             <p className="text-[11px] text-muted-foreground">
               {t("Your reviews appear here once EVO measures your skills in lessons and practice.")}
@@ -203,7 +229,7 @@ export function SmartReviewCard({
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-brand-green/35 bg-brand-green/[0.07] pr-2">
               <img src={reviewWords} alt="" className="h-full min-h-0 w-16 object-cover" />
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground">{t("Vocabulary")}</p>
+                <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
                 <p className="truncate text-sm font-semibold">
                   {reviewCount === 1
                     ? t("Review 1 word")
@@ -231,7 +257,7 @@ export function SmartReviewCard({
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-warning/35 bg-warning/[0.07] pr-2">
               <img src={reviewMistakes} alt="" className="h-full min-h-0 w-16 object-cover" />
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground">{t("My mistakes")}</p>
+                <RowTag kind="review" label={t("To review")} detail={t("My mistakes")} />
                 <p className="truncate text-sm font-semibold">
                   {mistakesDue === 1
                     ? t("Review 1 mistake")
@@ -255,7 +281,7 @@ export function SmartReviewCard({
               </Button>
             </li>
           )}
-          {items.slice(0, Math.max(suggestionSlots, 0)).map((item) => {
+          {shownItems.map((item) => {
             const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
             return (
               <li
@@ -276,9 +302,11 @@ export function SmartReviewCard({
                 <div className="min-w-0">
                   {/* A lesson row opens the Learning path, so it says so before
                       the skill it reinforces (user request). */}
-                  <p className="text-[10px] text-muted-foreground">
-                    {item.resource.params ? `${t("Learning")} · ${skillLabel}` : skillLabel}
-                  </p>
+                  <RowTag
+                    kind="review"
+                    label={t("To review")}
+                    detail={item.resource.params ? `${t("Learning")} · ${skillLabel}` : skillLabel}
+                  />
                   <p className="truncate text-sm font-semibold">{t(item.resource.title)}</p>
                   <p
                     className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
@@ -309,6 +337,34 @@ export function SmartReviewCard({
               </li>
             );
           })}
+          {newRows.map((row) => (
+            <li
+              key={row.key}
+              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-dashed border-brand-green/45 bg-brand-green/[0.04] pr-2"
+            >
+              <img src={SKILL_PHOTO[row.key]} alt="" className="h-full min-h-0 w-16 object-cover" />
+              <div className="min-w-0">
+                {/* "New today", never a review: the same item the bell lists. */}
+                <RowTag kind="new" label={t("New today")} />
+                <p className="truncate text-sm font-semibold">{t(row.title)}</p>
+                <p
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                >
+                  {t(row.line)}
+                </p>
+              </div>
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
+              >
+                <Link to={row.to} aria-label={`${t("Start now")}: ${t(row.title)}`}>
+                  <ArrowRight className="size-5" strokeWidth={2.25} aria-hidden="true" />
+                </Link>
+              </Button>
+            </li>
+          ))}
           {rows === 1 && (
             // A single review would leave half the card empty: say the rest is done.
             <li className="flex min-h-0 items-center justify-center gap-2 rounded-md border border-dashed border-border text-xs text-muted-foreground">
@@ -409,6 +465,39 @@ const SKILL_TILE = {
   speaking: { icon: Mic, tone: "bg-dashboard-coral/15 text-dashboard-coral" },
   grammar: { icon: GraduationCap, tone: "bg-dashboard-purple/15 text-dashboard-purple" },
 } as const;
+
+/**
+ * What a row is (user request, 2026-10-24: tell reviews and new activities
+ * apart at a glance): "Review" with the circular arrows for what comes back
+ * from earlier work, "New today" with sparkles in brand green for today's new
+ * activities, which also get a dashed green border.
+ */
+function RowTag({
+  kind,
+  label,
+  detail,
+}: {
+  kind: "review" | "new";
+  label: string;
+  detail?: string;
+}) {
+  const Icon = kind === "new" ? Sparkles : RefreshCw;
+  return (
+    <p className="flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground">
+      <span
+        className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[9px] font-semibold uppercase tracking-[0.06em] ring-1 ring-inset ${
+          kind === "new"
+            ? "bg-brand-green/15 text-brand-green ring-brand-green/35"
+            : "bg-sky-400/10 text-sky-300 ring-sky-400/30"
+        }`}
+      >
+        <Icon className="size-2.5" strokeWidth={2.5} aria-hidden="true" />
+        {label}
+      </span>
+      {detail && <span className="truncate">{detail}</span>}
+    </p>
+  );
+}
 
 function SkillTile({ skill }: { skill: string }) {
   const tile = SKILL_TILE[skill as keyof typeof SKILL_TILE] ?? {
