@@ -8,7 +8,12 @@
  * reviewed mistake 5, plus 30 per study day); the AI Teacher earns no league XP.
  */
 
-export type ChallengeActivityRow = { activity_type: string; duration_minutes: number | null };
+export type ChallengeActivityRow = {
+  activity_type: string;
+  duration_minutes: number | null;
+  /** Pronunciations carry the word ("Vocabulary practice — word"). */
+  title?: string | null;
+};
 
 export type DailyChallengeGoal = {
   target: number;
@@ -61,14 +66,21 @@ export function dailyChallengeGoal(
 }
 
 /** "Say 5 words out loud" (the pronunciation Quick Win) is done once five
- *  words were pronounced today (each pronunciation is one "vocabulary"
- *  activity; user report: it stayed after six). */
+ *  different words were pronounced today. Each attempt is one "vocabulary"
+ *  activity titled with its word, so the same word said again, or a retry
+ *  after a misheard attempt, counts once (user report, 2026-10-24: it was
+ *  done before five words were said). */
 export const QUICK_WIN_PRONUNCIATIONS = 5;
 export function pronunciationQuickWinDone(activities: ChallengeActivityRow[]): boolean {
-  return (
-    activities.filter((row) => row.activity_type === "vocabulary").length >=
-    QUICK_WIN_PRONUNCIATIONS
-  );
+  const words = new Set<string>();
+  let untitled = 0;
+  for (const row of activities) {
+    if (row.activity_type !== "vocabulary") continue;
+    const word = row.title?.trim().toLowerCase();
+    if (word) words.add(word);
+    else untitled += 1;
+  }
+  return words.size + untitled >= QUICK_WIN_PRONUNCIATIONS;
 }
 
 /** League XP the destination's activity earns, as a short English label. */

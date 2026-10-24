@@ -21,7 +21,7 @@ function todayActivitiesQuery(userId?: string) {
       start.setHours(0, 0, 0, 0);
       const { data, error } = await supabase
         .from("activities")
-        .select("duration_minutes, activity_type")
+        .select("duration_minutes, activity_type, title")
         .eq("user_id", userId!)
         .in("activity_type", [...LEARNING_ACTIVITY_TYPES])
         .gte("created_at", start.toISOString());

@@ -36,18 +36,25 @@ describe("daily challenge goal", () => {
 });
 
 describe("pronunciation Quick Win", () => {
-  it("is done once five words were pronounced today", () => {
-    const say = { activity_type: "vocabulary", duration_minutes: 0 };
-    expect(pronunciationQuickWinDone([say, say, say, say])).toBe(false);
-    expect(pronunciationQuickWinDone([say, say, say, say, say, say])).toBe(true);
+  const say = (word: string) => ({
+    activity_type: "vocabulary",
+    duration_minutes: 0,
+    title: `Vocabulary practice — ${word}`,
+  });
+
+  it("is done once five different words were pronounced today", () => {
+    expect(pronunciationQuickWinDone(["a", "b", "c", "d"].map(say))).toBe(false);
+    expect(pronunciationQuickWinDone(["a", "b", "c", "d", "e"].map(say))).toBe(true);
     expect(
       pronunciationQuickWinDone([
-        say,
-        say,
-        say,
-        say,
-        { activity_type: "writing", duration_minutes: 5 },
+        ...["a", "b", "c", "d"].map(say),
+        { activity_type: "writing", duration_minutes: 5, title: "writing" },
       ]),
     ).toBe(false);
+  });
+
+  it("counts a word said again only once", () => {
+    expect(pronunciationQuickWinDone(["a", "a", "a", "b", "b", "c"].map(say))).toBe(false);
+    expect(pronunciationQuickWinDone(["a", "A", "b", "c", "d"].map(say))).toBe(false);
   });
 });
