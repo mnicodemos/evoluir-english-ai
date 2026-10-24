@@ -51,3 +51,17 @@ export function secondsToIso(seconds: number | null | undefined): string | null 
   if (typeof seconds !== "number" || !Number.isFinite(seconds)) return null;
   return new Date(seconds * 1000).toISOString();
 }
+
+/**
+ * A saved Stripe customer that this key cannot see (user report, 2026-10-23:
+ * after the switch to live keys, checkout answered 400 "No such customer ...
+ * a similar object exists in test mode"). Stripe answers resource_missing
+ * for it; the caller then creates a new customer instead of failing.
+ */
+export function isMissingStripeCustomer(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const { code, param } = error as { code?: unknown; param?: unknown };
+  return (
+    code === "resource_missing" && (param === undefined || param === "customer" || param === "id")
+  );
+}

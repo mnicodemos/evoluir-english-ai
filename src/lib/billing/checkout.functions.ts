@@ -29,7 +29,7 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
   .inputValidator(parseCheckoutInput)
   .handler(async ({ data, context }) => {
     const { getStripe } = await import("./stripe.server");
-    const { getLinkedCustomerId, linkCustomer } = await import("./stripeSync.server");
+    const { getUsableCustomerId, linkCustomer } = await import("./stripeSync.server");
 
     const priceId = resolvePriceId(
       data.interval,
@@ -38,7 +38,8 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
     const stripe = getStripe();
     const origin = resolveOrigin();
 
-    let customerId = await getLinkedCustomerId(context.userId);
+    // A test-mode or deleted customer is replaced by a new one (linkCustomer upserts).
+    let customerId = await getUsableCustomerId(stripe, context.userId);
     if (!customerId) {
       const { data: profile } = await context.supabase
         .from("profiles")

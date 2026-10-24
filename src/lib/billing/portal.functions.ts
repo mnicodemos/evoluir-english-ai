@@ -11,17 +11,18 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const createStripePortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ url: string | null }> => {
-    const [{ getStripe }, { getLinkedCustomerId }] = await Promise.all([
+    const [{ getStripe }, { getUsableCustomerId }] = await Promise.all([
       import("./stripe.server"),
       import("./stripeSync.server"),
     ]);
 
-    const customerId = await getLinkedCustomerId(context.userId);
+    const stripe = getStripe();
+    const customerId = await getUsableCustomerId(stripe, context.userId);
     if (!customerId) return { url: null };
 
     const origin = new URL((await import("@tanstack/react-start/server")).getRequest().url).origin;
 
-    const session = await getStripe().billingPortal.sessions.create({
+    const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${origin}/premium`,
     });

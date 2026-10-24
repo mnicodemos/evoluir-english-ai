@@ -2,7 +2,7 @@ import type Stripe from "stripe";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { GATED_FEATURES, subscriptionGrantsAccess } from "./contracts";
-import { mapStripeStatus, secondsToIso } from "./stripeMapping";
+import { isMissingStripeCustomer, mapStripeStatus, secondsToIso } from "./stripeMapping";
 
 const PROVIDER = "stripe";
 
@@ -44,6 +44,23 @@ export async function getLinkedCustomerId(userId: string): Promise<string | null
     .eq("user_id", userId)
     .maybeSingle();
   return data?.stripe_customer_id ?? null;
+}
+
+/**
+ * The linked customer, only when this Stripe key can use it: a customer saved
+ * in test mode (or deleted) is dropped, so checkout creates a new one and the
+ * portal says there is no subscription instead of failing with a 400.
+ */
+export async function getUsableCustomerId(stripe: Stripe, userId: string): Promise<string | null> {
+  const customerId = await getLinkedCustomerId(userId);
+  if (!customerId) return null;
+  try {
+    const customer = await stripe.customers.retrieve(customerId);
+    return "deleted" in customer && customer.deleted ? null : customerId;
+  } catch (error) {
+    if (isMissingStripeCustomer(error)) return null;
+    throw error;
+  }
 }
 
 type StripeSubscriptionLike = Stripe.Subscription & {
