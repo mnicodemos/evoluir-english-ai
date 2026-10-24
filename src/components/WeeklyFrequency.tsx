@@ -3,6 +3,7 @@ import { CalendarDays, Check, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { GoldTrophy } from "@/components/GoldTrophy";
+import { RingHint } from "@/components/RingHint";
 import { useCelebrate } from "@/hooks/useCelebrate";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
 import { STUDY_TIME_ZONE } from "@/lib/today";
@@ -274,26 +275,22 @@ export function WeeklyFrequency({
             </svg>
             {/* Goal reached: the ring fills with a Check in its own colour
                 instead of the day count (user request, like Today's Progress). */}
-            {/* Same goal-met ring as Today's Progress: a bold check with the
-                count kept under it (user request, 2026-10-24: one standard). */}
+            {/* Same goal-met ring as Today's Progress: only the check, the
+                days on hover or tap (RingHint; user request, 2026-10-24). */}
             {allStudied ? (
-              <span
-                className="relative grid justify-items-center gap-0.5"
-                role="img"
-                aria-label={`${studiedCount} of ${weeklyGoal} days, goal reached`}
+              <RingHint
+                label={
+                  lang === "pt"
+                    ? `${studiedCount} de ${weeklyGoal} dias nesta semana`
+                    : `${studiedCount} of ${weeklyGoal} days this week`
+                }
               >
                 <Check
-                  className="size-7 text-brand-green 2xl:size-8"
-                  strokeWidth={3.5}
+                  className="size-8 text-brand-green 2xl:size-9"
+                  strokeWidth={3.25}
                   aria-hidden="true"
                 />
-                <span
-                  className="whitespace-nowrap text-[10px] font-medium leading-none text-muted-foreground"
-                  aria-hidden="true"
-                >
-                  {studiedCount}/{weeklyGoal} {daysLabel}
-                </span>
-              </span>
+              </RingHint>
             ) : (
               <span className="relative text-center font-display text-lg font-bold leading-none text-foreground">
                 {studiedCount}/{weeklyGoal}

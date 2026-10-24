@@ -983,6 +983,7 @@ const baseUiPt: Record<string, string> = {
   // Today's Progress lines read as one phrase after their number, in lower
   // case and singular for 1 (user request, 2026-10-24: "1 Lessons completed").
   "lesson completed": "lição concluída",
+  "{done} of {goal} min today": "{done} de {goal} min hoje",
   "conversation with EVO": "conversa com a EVO",
   "conversations with EVO": "conversas com a EVO",
   "text corrected": "texto corrigido",

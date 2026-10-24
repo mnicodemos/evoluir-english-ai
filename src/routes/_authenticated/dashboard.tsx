@@ -57,6 +57,7 @@ import { SmartReviewCard } from "@/components/SmartReviewCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RingHint } from "@/components/RingHint";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
 import { CampaignJourneyChip } from "@/components/CampaignJourney";
@@ -758,27 +759,20 @@ function Dashboard() {
                         }
                       />
                     </svg>
-                    {/* Goal reached: the ring fills with a Check in its own colour,
-                        with the minutes kept under it (user request, 2026-10-24: the
-                        amount disappeared once the goal was met). */}
+                    {/* Goal reached: the ring shows only its Check; the minutes
+                        come on hover or tap (RingHint; user request, 2026-10-24). */}
                     {minutesToday >= profile.daily_minutes ? (
-                      <span
-                        className="relative grid justify-items-center gap-0.5"
-                        role="img"
-                        aria-label={`${minutesToday} of ${profile.daily_minutes} minutes, goal reached`}
+                      <RingHint
+                        label={t("{done} of {goal} min today")
+                          .replace("{done}", String(minutesToday))
+                          .replace("{goal}", String(profile.daily_minutes))}
                       >
                         <Check
-                          className="size-7 text-brand-green lg:size-8"
-                          strokeWidth={3.5}
+                          className="size-8 text-brand-green lg:size-9"
+                          strokeWidth={3.25}
                           aria-hidden="true"
                         />
-                        <span
-                          className="whitespace-nowrap text-[10px] font-medium leading-none text-muted-foreground"
-                          aria-hidden="true"
-                        >
-                          {minutesToday}/{profile.daily_minutes} min
-                        </span>
-                      </span>
+                      </RingHint>
                     ) : (
                       <span className="relative text-center font-display text-sm font-bold leading-none text-foreground lg:text-lg">
                         <span className="block whitespace-nowrap">
