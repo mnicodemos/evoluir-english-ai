@@ -255,6 +255,7 @@ export function PathProgressCard({
                     the "No data" badge says why. */}
                 <Progress
                   value={row.value ?? 0}
+                  fillIn
                   aria-label={t(meta.label)}
                   className={`bg-secondary/80 ${RING_STROKE_BAR} ${tone.bar}`}
                 />

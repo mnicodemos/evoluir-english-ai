@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { BookOpen, Briefcase, Check, ChevronRight } from "lucide-react";
 import { useMemo } from "react";
 
+import { FILL_IN_TRANSITION, useFillIn } from "@/hooks/useFillIn";
 import { useLessons, useUserLessons } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
 import { getBusinessCourse } from "@/lib/businessCourse";
@@ -47,6 +48,7 @@ export function BusinessDashboardCard() {
     };
   }, [lessons, mine, profile?.level, profile?.max_level]);
   const percent = total ? Math.round((completed / total) * 100) : 0;
+  const barPercent = useFillIn(percent);
   const trackDone = total > 0 && completed >= total;
 
   return (
@@ -93,7 +95,13 @@ export function BusinessDashboardCard() {
         </div>
         <div className="flex items-center gap-2">
           <div className="h-1.5 flex-1 rounded-full bg-secondary" aria-hidden="true">
-            <div className="h-full rounded-full bg-brand-green" style={{ width: `${percent}%` }} />
+            <div
+              className={cn(
+                "h-full rounded-full bg-brand-green transition-[width]",
+                FILL_IN_TRANSITION,
+              )}
+              style={{ width: `${barPercent}%` }}
+            />
           </div>
           {/* The track's share done (user request: % instead of n/36). */}
           <span

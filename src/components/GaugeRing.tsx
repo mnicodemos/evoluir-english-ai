@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { FILL_IN_TRANSITION, useFillIn } from "@/hooks/useFillIn";
+
 /** Open part of the ring, at the bottom, where the amount is written (degrees). */
 export const GAUGE_GAP_DEGREES = 100;
 
@@ -31,7 +33,7 @@ export function GaugeRing({
   unit: string;
   children: ReactNode;
 }) {
-  const share = Math.min(1, Math.max(0, progress));
+  const share = useFillIn(Math.min(1, Math.max(0, progress)));
   return (
     <>
       <svg className="absolute inset-0 size-full" viewBox="0 0 96 96" aria-hidden="true">
@@ -56,6 +58,7 @@ export function GaugeRing({
               strokeWidth={STROKE}
               strokeLinecap="round"
               strokeDasharray={`${ARC * share} ${CIRCUMFERENCE}`}
+              className={`transition-[stroke-dasharray] ${FILL_IN_TRANSITION}`}
             />
           )}
         </g>
