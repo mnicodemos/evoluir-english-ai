@@ -59,6 +59,7 @@ import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
 import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { DoneSeal } from "@/components/DoneSeal";
 
 /**
  * Adaptive next step. Everything shown here is decided server-side from the
@@ -564,7 +565,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </>
               ) : (
                 <div className="mt-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border px-3 text-center">
-                  <CheckCircle2 className="size-7 text-brand-green" aria-hidden="true" />
+                  <DoneSeal />
                   <p className="text-sm font-semibold">{t("Extra practice done for today")}</p>
                   <p className="text-[11px] text-muted-foreground">
                     {t("New options appear tomorrow.")}

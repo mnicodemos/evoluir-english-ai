@@ -36,6 +36,7 @@ import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { SMART_REVIEW_REASON_TEXT } from "@/lib/pedagogy/smartReviewUx";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { DoneSeal } from "@/components/DoneSeal";
 
 /**
  * "Smart review" — what is worth recovering now. Semantically distinct from
@@ -157,7 +158,7 @@ export function SmartReviewCard({
         </div>
         {measured ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
-            <CheckCircle2 className="size-8 text-brand-green" aria-hidden="true" />
+            <DoneSeal />
             <p className="text-sm font-semibold">{t("All reviews done for now")}</p>
             <p className="text-[11px] text-muted-foreground">
               {t("New reviews appear after your next lesson.")}

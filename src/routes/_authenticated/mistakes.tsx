@@ -34,6 +34,7 @@ import {
   mistakeTypeOf,
   type MistakeType,
 } from "@/lib/mistakeType";
+import { DoneSeal } from "@/components/DoneSeal";
 
 export const Route = createFileRoute("/_authenticated/mistakes")({
   head: () => ({
@@ -249,7 +250,7 @@ function Mistakes() {
                 {rows.length === 0 ? (
                   <EvoAvatar decorative className="mx-auto size-14" />
                 ) : (
-                  <CheckCircle2 className="mx-auto size-8 text-primary" />
+                  <DoneSeal className="mx-auto" />
                 )}
                 <p className="font-medium">
                   {rows.length === 0 ? "No mistakes saved yet." : "All caught up for today!"}

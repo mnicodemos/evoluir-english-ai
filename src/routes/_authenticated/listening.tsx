@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Check,
-  CheckCircle2,
   Headphones,
   Loader2,
   Mic,
@@ -46,6 +45,7 @@ import {
 } from "@/lib/voice-recorder";
 import { persistListeningLegacy } from "@/lib/legacyActivity.functions";
 import { listeningAnswerScore } from "@/lib/legacyScores";
+import { DoneSeal } from "@/components/DoneSeal";
 
 export const Route = createFileRoute("/_authenticated/listening")({
   head: () => ({
@@ -518,7 +518,7 @@ function ListeningPage() {
               </span>
             </div>
             <div className="rounded-xl border border-brand-green/40 bg-brand-green/10 p-5 text-center">
-              <CheckCircle2 className="mx-auto size-8 text-brand-green" />
+              <DoneSeal className="mx-auto" />
               <p className="mt-2 font-semibold">Session complete: all 3 sentences done!</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 New listening tasks arrive as soon as you start a new lesson in the Learning Center.
