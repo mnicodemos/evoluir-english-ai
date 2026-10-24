@@ -274,12 +274,26 @@ export function WeeklyFrequency({
             </svg>
             {/* Goal reached: the ring fills with a Check in its own colour
                 instead of the day count (user request, like Today's Progress). */}
+            {/* Same goal-met ring as Today's Progress: a bold check with the
+                count kept under it (user request, 2026-10-24: one standard). */}
             {allStudied ? (
-              <Check
-                className="relative size-8 text-brand-green 2xl:size-10"
-                strokeWidth={3}
+              <span
+                className="relative grid justify-items-center gap-0.5"
+                role="img"
                 aria-label={`${studiedCount} of ${weeklyGoal} days, goal reached`}
-              />
+              >
+                <Check
+                  className="size-7 text-brand-green 2xl:size-8"
+                  strokeWidth={3.5}
+                  aria-hidden="true"
+                />
+                <span
+                  className="whitespace-nowrap text-[10px] font-medium leading-none text-muted-foreground"
+                  aria-hidden="true"
+                >
+                  {studiedCount}/{weeklyGoal} {daysLabel}
+                </span>
+              </span>
             ) : (
               <span className="relative text-center font-display text-lg font-bold leading-none text-foreground">
                 {studiedCount}/{weeklyGoal}
@@ -322,10 +336,13 @@ export function WeeklyFrequency({
                   {labels[i]}
                 </span>
                 {studied ? (
+                  // Like the phone strip: past studied days tinted, today solid.
                   <span
                     className={cn(
-                      "grid size-5 place-items-center rounded-full text-primary-foreground",
-                      "bg-brand-green",
+                      "grid size-5 place-items-center rounded-full",
+                      isToday
+                        ? "bg-brand-green text-primary-foreground"
+                        : "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35",
                     )}
                     title={isToday ? (lang === "pt" ? "Hoje" : "Today") : undefined}
                   >

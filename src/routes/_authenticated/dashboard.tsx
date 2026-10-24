@@ -820,9 +820,7 @@ function Dashboard() {
                       // then lit in the ring's colour (accuracy from 70%).
                       const Icon = TODAY_LINE_ICONS[card.icon];
                       const iconClass =
-                        card.state === "done"
-                          ? "text-brand-green/75 lg:text-brand-green"
-                          : "text-muted-foreground/50";
+                        card.state === "done" ? "text-brand-green/75" : "text-muted-foreground/50";
                       const sr =
                         card.state === "done"
                           ? "Done today."
