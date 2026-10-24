@@ -734,7 +734,9 @@ function Dashboard() {
                         met and the share before. */}
                     <GaugeRing
                       progress={minutesToday / Math.max(profile.daily_minutes, 1)}
-                      label={`${minutesToday}/${profile.daily_minutes} min`}
+                      value={minutesToday}
+                      goal={profile.daily_minutes}
+                      unit="min"
                     >
                       {minutesToday >= profile.daily_minutes ? (
                         <Check
