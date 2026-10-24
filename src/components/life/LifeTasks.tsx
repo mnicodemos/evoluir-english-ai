@@ -18,7 +18,7 @@ import { LIFE_PRIORITIES, type LifePriorityLevel, type LifeTask } from "@/lib/li
 import { haptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 
-const PRIORITY_LABEL: Record<LifePriorityLevel, string> = {
+export const PRIORITY_LABEL: Record<LifePriorityLevel, string> = {
   high: "High",
   medium: "Medium",
   low: "Low",

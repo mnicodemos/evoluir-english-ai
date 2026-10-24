@@ -181,7 +181,7 @@ export const APP_GUIDE: GuideSection[] = [
     steps: [
       "Add 1 to 3 goals: EVO gives you one small step for each goal every day.",
       "Give a goal a deadline and milestones to see how far you are.",
-      "Plan the day's tasks and check in your habits.",
+      "Open Today to tick the day's goal steps, tasks and habits in one list; set them up in Planning.",
       "Change a goal, task or habit with its pencil (Edit).",
       "Tick a habit like Study English automatically on your English study days, so it keeps the same run as your streak.",
       "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.",

@@ -125,8 +125,8 @@ export const appGuidePt: Record<string, string> = {
     "Adicione de 1 a 3 metas: a EVO dá um pequeno passo para cada meta todo dia.",
   "Give a goal a deadline and milestones to see how far you are.":
     "Dê um prazo e etapas a uma meta para ver quanto já avançou.",
-  "Plan the day's tasks and check in your habits.":
-    "Planeje as tarefas do dia e marque seus hábitos.",
+  "Open Today to tick the day's goal steps, tasks and habits in one list; set them up in Planning.":
+    "Abra Hoje para marcar os passos das metas, tarefas e hábitos do dia numa lista só; configure tudo em Planejar.",
   "Change a goal, task or habit with its pencil (Edit).":
     "Altere uma meta, tarefa ou hábito pelo lápis (Editar).",
   "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.":

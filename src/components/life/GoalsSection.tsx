@@ -173,8 +173,8 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
             id="today-steps-title"
             icon={Target}
             accent="green"
-            title={t("Goal steps")}
-            subtitle={t("One small step a day for each goal")}
+            title={t("Your goals")}
+            subtitle={t("EVO's step of the day, deadline and milestones")}
             meta={
               goals.length
                 ? `${todaySteps.filter((step) => step.doneAt).length}/${todaySteps.length}`
