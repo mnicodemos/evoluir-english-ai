@@ -60,3 +60,61 @@ export function newTodayRows(input: {
   };
   return ROWS.filter((row) => open[row.key] && !taken.has(row.to)).slice(0, input.slots);
 }
+
+/**
+ * Practice that never runs out, for the rows still free while today's minutes
+ * goal is open (user decision, 2026-10-24: three rows until the goal is met,
+ * so there is always a next step; once it is met and nothing is pending, the
+ * card shows its done state with one optional "go further" link instead).
+ */
+export type ContinueRow = {
+  key: "coach" | "teacher" | "reading" | "learning";
+  to: "/coach" | "/teacher" | "/reading" | "/learning";
+  title: string;
+  line: string;
+};
+
+const CONTINUE_ROWS: readonly ContinueRow[] = [
+  {
+    key: "coach",
+    to: "/coach",
+    title: "Talk to EVO",
+    line: "A short conversation keeps your speaking moving.",
+  },
+  {
+    key: "teacher",
+    to: "/teacher",
+    title: "AI Teacher",
+    line: "Ask a question or practise with exercises.",
+  },
+  {
+    key: "reading",
+    to: "/reading",
+    title: "Read another text",
+    line: "Pick a new text by theme and style.",
+  },
+  {
+    key: "learning",
+    to: "/learning",
+    title: "Next lesson",
+    line: "Continue your learning path.",
+  },
+];
+
+export function continueRows(input: {
+  /** Today's minutes goal is met: no filler rows then. */
+  goalReached: boolean;
+  /** Destinations already shown or opened by another Dashboard button. */
+  taken: readonly string[];
+  slots: number;
+}): ContinueRow[] {
+  if (input.goalReached || input.slots <= 0) return [];
+  const taken = new Set(input.taken.map((to) => to.split("?")[0]));
+  return CONTINUE_ROWS.filter((row) => !taken.has(row.to)).slice(0, input.slots);
+}
+
+/** The one optional link under the done state: EVO first, else the AI Teacher. */
+export function goFurtherRow(taken: readonly string[]): ContinueRow {
+  const open = new Set(taken.map((to) => to.split("?")[0]));
+  return open.has("/coach") ? CONTINUE_ROWS[1]! : CONTINUE_ROWS[0]!;
+}

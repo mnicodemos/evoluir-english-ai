@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
+  ChevronsRight,
   GraduationCap,
   Mic,
   RotateCcw,
@@ -26,12 +27,13 @@ import { PathProgressCard } from "@/components/PathProgressCard";
 import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMinutesToday } from "@/components/DailyGoalCard";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
-import { newTodayRows } from "@/lib/keepImprovingNew";
+import { continueRows, goFurtherRow, newTodayRows } from "@/lib/keepImprovingNew";
 import { NEXT_STEP_SKILL_TEXT } from "@/lib/pedagogy/nextStep";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { SMART_REVIEW_MAX_ITEMS, SMART_REVIEW_REASON_TEXT } from "@/lib/pedagogy/smartReviewUx";
@@ -74,6 +76,11 @@ export function SmartReviewCard({
   const { count: reviewCount, ready: reviewsReady } = useDueReviewState(profile?.id);
   // Today's reading, for the "New today" rows (same query as the bell).
   const { data: readingDone } = useDailyReadingDone(profile?.id);
+  // Today's minutes against the goal: until it is met, free rows keep a next
+  // step (same query as Today's Progress).
+  const { data: minutesToday } = useMinutesToday(profile?.id);
+  const goalMinutes = profile?.daily_minutes ?? 0;
+  const goalReached = goalMinutes > 0 && (minutesToday ?? 0) >= goalMinutes;
   // Never wait longer than this for the extra answers (a vocabulary batch being
   // written can keep "today's practice" loading for a minute).
   const [waited, setWaited] = useState(false);
@@ -89,7 +96,11 @@ export function SmartReviewCard({
     compact &&
     (isLoading ||
       (!waited &&
-        (!indicators.ready || !reviewsReady || !extrasReady || readingDone === undefined)))
+        (!indicators.ready ||
+          !reviewsReady ||
+          !extrasReady ||
+          readingDone === undefined ||
+          minutesToday === undefined)))
   ) {
     return (
       <section
@@ -145,26 +156,38 @@ export function SmartReviewCard({
   // Rows still free take today's new activities, the ones the bell lists, so
   // the card never says "all done" while there is something new to do (user
   // request, 2026-10-24). Never where another Dashboard button already goes.
+  const taken = [
+    data.activity.to,
+    data.quickWin?.activity.to ?? "",
+    data.quest?.resource.to ?? "",
+    ...shownItems.map((item) => item.resource.to),
+    ...(showWordReviews ? ["/vocabulary"] : []),
+  ];
   const newRows = compact
-    ? newTodayRows({
-        readingDone,
-        indicators,
-        taken: [
-          data.activity.to,
-          data.quickWin?.activity.to ?? "",
-          data.quest?.resource.to ?? "",
-          ...shownItems.map((item) => item.resource.to),
-          ...(showWordReviews ? ["/vocabulary"] : []),
-        ],
-        slots: suggestionSlots - shownItems.length,
+    ? newTodayRows({ readingDone, indicators, taken, slots: suggestionSlots - shownItems.length })
+    : [];
+  // Until today's minutes goal is met, rows still free keep a next step that
+  // never runs out (user decision, 2026-10-24); once it is met, the card may
+  // end in its done state.
+  const keepGoing = compact
+    ? continueRows({
+        goalReached,
+        taken: [...taken, ...newRows.map((row) => row.to)],
+        slots: suggestionSlots - shownItems.length - newRows.length,
       })
     : [];
-  const rows = Number(showWordReviews) + Number(showMistakes) + shownItems.length + newRows.length;
+  const rows =
+    Number(showWordReviews) +
+    Number(showMistakes) +
+    shownItems.length +
+    newRows.length +
+    keepGoing.length;
   // Reviews use the whole history (every level), so any measured skill counts.
   const measured = (data.skills ?? []).some((skill) => skill.score !== null);
-  if (items.length === 0 && newRows.length === 0 && !showWordReviews && !showMistakes) {
+  if (rows === 0 || (!compact && items.length === 0)) {
     // Compact Dashboard slot keeps its place: everything to review is done.
     if (!compact) return null;
+    const goFurther = goFurtherRow(taken);
     return (
       <section
         className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
@@ -199,6 +222,15 @@ export function SmartReviewCard({
             </p>
           </div>
         )}
+        {/* The day is done: one optional invitation, never pressure. */}
+        <Link
+          to={goFurther.to}
+          className="mt-2 flex min-h-9 items-center justify-center gap-1.5 rounded-md border border-dashed border-border px-3 text-xs text-muted-foreground transition-colors hover:border-brand-green/45 hover:text-foreground"
+        >
+          {t("Want to go further?")}{" "}
+          <span className="font-semibold text-brand-green">{t(goFurther.title)}</span>
+          <ArrowRight className="size-3.5" aria-hidden="true" />
+        </Link>
       </section>
     );
   }
@@ -365,6 +397,33 @@ export function SmartReviewCard({
               </Button>
             </li>
           ))}
+          {keepGoing.map((row) => (
+            <li
+              key={row.key}
+              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/30 pr-2"
+            >
+              <ContinueTile rowKey={row.key} />
+              <div className="min-w-0">
+                <RowTag kind="continue" label={t("Keep going")} />
+                <p className="truncate text-sm font-semibold">{t(row.title)}</p>
+                <p
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                >
+                  {t(row.line)}
+                </p>
+              </div>
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
+              >
+                <Link to={row.to} aria-label={`${t("Start now")}: ${t(row.title)}`}>
+                  <ArrowRight className="size-5" strokeWidth={2.25} aria-hidden="true" />
+                </Link>
+              </Button>
+            </li>
+          ))}
           {rows === 1 && (
             // A single review would leave half the card empty: say the rest is done.
             <li className="flex min-h-0 items-center justify-center gap-2 rounded-md border border-dashed border-border text-xs text-muted-foreground">
@@ -477,18 +536,20 @@ function RowTag({
   label,
   detail,
 }: {
-  kind: "review" | "new";
+  kind: "review" | "new" | "continue";
   label: string;
   detail?: string;
 }) {
-  const Icon = kind === "new" ? Sparkles : RefreshCw;
+  const Icon = kind === "new" ? Sparkles : kind === "continue" ? ChevronsRight : RefreshCw;
   return (
     <p className="flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground">
       <span
         className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[9px] font-semibold uppercase tracking-[0.06em] ring-1 ring-inset ${
           kind === "new"
             ? "bg-brand-green/15 text-brand-green ring-brand-green/35"
-            : "bg-sky-400/10 text-sky-300 ring-sky-400/30"
+            : kind === "continue"
+              ? "bg-white/[0.06] text-foreground/80 ring-white/15"
+              : "bg-sky-400/10 text-sky-300 ring-sky-400/30"
         }`}
       >
         <Icon className="size-2.5" strokeWidth={2.5} aria-hidden="true" />
@@ -496,6 +557,27 @@ function RowTag({
       </span>
       {detail && <span className="truncate">{detail}</span>}
     </p>
+  );
+}
+
+/** Photo of a "Keep going" row: EVO's conversation, the teacher, reading, a lesson. */
+function ContinueTile({ rowKey }: { rowKey: "coach" | "teacher" | "reading" | "learning" }) {
+  const photo =
+    rowKey === "coach"
+      ? reviewSpeaking
+      : rowKey === "teacher"
+        ? reviewGrammar
+        : rowKey === "reading"
+          ? reviewReading
+          : null;
+  if (photo) return <img src={photo} alt="" className="h-full min-h-0 w-16 object-cover" />;
+  return (
+    <span
+      className="grid h-full min-h-0 w-16 place-items-center bg-brand-green/15 text-brand-green"
+      aria-hidden="true"
+    >
+      <GraduationCap className="size-6" />
+    </span>
   );
 }
 
