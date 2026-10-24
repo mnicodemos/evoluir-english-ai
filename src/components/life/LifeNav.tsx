@@ -1,6 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { BookMarked, ChevronRight, Crown, Scale, Sprout, type LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import {
+  BookMarked,
+  Check,
+  ChevronRight,
+  Crown,
+  Plus,
+  Scale,
+  Sprout,
+  type LucideIcon,
+} from "lucide-react";
+import { useState, type ReactNode } from "react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { PageHeader } from "@/components/PageHeader";
@@ -186,5 +195,58 @@ export function LifeEmpty({ children }: { children: ReactNode }) {
       <EvoAvatar decorative className="size-9 shrink-0" />
       <p className="text-sm text-muted-foreground">{children}</p>
     </div>
+  );
+}
+
+/**
+ * The one check mark of Life+ AI (goal steps, tasks and habits alike; user
+ * request, 2026-10-24: one system), an empty grey circle or a green one with
+ * its check.
+ */
+export function LifeCheckMark({ done, className }: { done: boolean; className?: string }) {
+  return (
+    <span
+      className={cn(
+        "grid size-5 shrink-0 place-items-center rounded-full border-2 transition-colors",
+        done
+          ? "border-brand-green bg-brand-green text-[oklch(0.2_0.04_160)]"
+          : "border-muted-foreground/60",
+        className,
+      )}
+      aria-hidden="true"
+    >
+      {done ? <Check className="size-3.5" strokeWidth={3} /> : null}
+    </span>
+  );
+}
+
+/**
+ * Creation behind a "+ Add" button under the list (user request, 2026-10-24:
+ * the day's lists are for doing; adding is one tap away instead of a form
+ * always open on top). The form gets close() for its save and cancel.
+ */
+export function LifeAddPanel({
+  label,
+  defaultOpen = false,
+  children,
+}: {
+  label: string;
+  defaultOpen?: boolean;
+  children: (close: () => void) => ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  if (open)
+    return (
+      <div className="rounded-xl border border-border p-3">{children(() => setOpen(false))}</div>
+    );
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-brand-green/50 hover:text-foreground"
+    >
+      <Plus className="size-4" aria-hidden="true" />
+      {label}
+    </button>
   );
 }

@@ -1,7 +1,7 @@
 import { Repeat } from "lucide-react";
 
 import { LifeHabitBoard, LifeHabitForm } from "@/components/life/LifeHabits";
-import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
+import { LifeAddPanel, LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { useLife } from "@/hooks/useLife";
 import { LIFE_MAX_HABITS } from "@/lib/life";
 
@@ -28,11 +28,6 @@ export function HabitsSection() {
         subtitle={t("One check-in a day")}
         meta={`${data.habits.length}/${LIFE_MAX_HABITS}`}
       />
-      {data.habits.length < LIFE_MAX_HABITS ? (
-        <div className="mt-4">
-          <LifeHabitForm onChange={refresh} />
-        </div>
-      ) : null}
       <div className="mt-4">
         <LifeHabitBoard
           habits={data.habits}
@@ -41,6 +36,23 @@ export function HabitsSection() {
           onChange={refresh}
         />
       </div>
+      {/* The list first, adding one tap away (user request, 2026-10-24); open
+          from the start while there is no habit yet. */}
+      {data.habits.length < LIFE_MAX_HABITS ? (
+        <div className="mt-3">
+          <LifeAddPanel label={t("Add habit")} defaultOpen={data.habits.length === 0}>
+            {(close) => (
+              <LifeHabitForm
+                onChange={() => {
+                  close();
+                  refresh();
+                }}
+                {...(data.habits.length === 0 ? {} : { onCancel: close })}
+              />
+            )}
+          </LifeAddPanel>
+        </div>
+      ) : null}
     </section>
   );
 }

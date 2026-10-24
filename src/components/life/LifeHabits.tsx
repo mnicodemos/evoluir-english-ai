@@ -4,7 +4,7 @@ import { Check, Flame, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { LifeEmpty, useLifeT } from "@/components/life/LifeNav";
+import { LifeCheckMark, LifeEmpty, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -91,17 +91,7 @@ export function LifeHabitsToday({
                 done ? "bg-brand-green/10" : "bg-secondary/60 hover:bg-secondary",
               )}
             >
-              <span
-                className={cn(
-                  "grid size-5 shrink-0 place-items-center rounded-full border-2",
-                  done
-                    ? "border-brand-green bg-brand-green text-[oklch(0.2_0.04_160)]"
-                    : "border-muted-foreground/60",
-                )}
-                aria-hidden="true"
-              >
-                {done ? <Check className="size-3.5" strokeWidth={3} /> : null}
-              </span>
+              <LifeCheckMark done={done} />
               <span
                 translate="no"
                 className={cn("min-w-0 flex-1", done && "text-muted-foreground")}
@@ -245,17 +235,7 @@ export function LifeHabitBoard({
                     )}
                   >
                     {weekdayShort(day, lang)}
-                    <span
-                      className={cn(
-                        "grid size-5 place-items-center rounded-full border-2",
-                        done
-                          ? "border-brand-green bg-brand-green text-[oklch(0.2_0.04_160)]"
-                          : "border-muted-foreground/40",
-                      )}
-                      aria-hidden="true"
-                    >
-                      {done ? <Check className="size-3" strokeWidth={3} /> : null}
-                    </span>
+                    <LifeCheckMark done={done} />
                   </button>
                 );
               })}

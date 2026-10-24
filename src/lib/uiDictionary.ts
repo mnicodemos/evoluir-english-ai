@@ -377,6 +377,7 @@ const baseUiPt: Record<string, string> = {
   "All of today's steps are done. Today counts for your streak!":
     "Todos os passos de hoje concluídos. Hoje conta para sua sequência!",
   "New goal": "Nova meta",
+  "Goal options": "Opções da meta",
   "Your goal": "Sua meta",
   Add: "Adicionar",
   "Speak English in meetings": "Falar inglês em reuniões",

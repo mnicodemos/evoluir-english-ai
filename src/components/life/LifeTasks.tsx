@@ -4,7 +4,7 @@ import { Check, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { LifeEmpty, useLifeT } from "@/components/life/LifeNav";
+import { LifeCheckMark, LifeEmpty, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -104,14 +104,9 @@ export function LifeTaskList({
               aria-label={done ? t("Mark as not done") : t("Mark as done")}
               disabled={toggle.isPending}
               onClick={() => toggle.mutate({ id: task.id, done: !done })}
-              className={cn(
-                "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border-2",
-                done
-                  ? "border-brand-green bg-brand-green text-[oklch(0.2_0.04_160)]"
-                  : "border-muted-foreground/60 hover:border-brand-green",
-              )}
+              className="group mt-0.5 shrink-0 rounded-full"
             >
-              {done ? <Check className="size-3.5" strokeWidth={3} aria-hidden="true" /> : null}
+              <LifeCheckMark done={done} className={done ? "" : "group-hover:border-brand-green"} />
             </button>
             <div className="min-w-0 flex-1">
               <p translate="no" className={cn(done && "text-muted-foreground line-through")}>

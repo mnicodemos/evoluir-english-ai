@@ -97,9 +97,10 @@ function LifePage() {
     <AppShell>
       <LifeHeader />
       {/* Four bands (user request, 2026-10-22): the measures on top (Your
-          day, Evolution score, Focus), then the day's plan (Today and Habits;
-          the priority of the day was removed, user decision 2026-10-24), the
-          meditations, and last the Life Coach beside Today's steps. Phones stack everything in this order. */}
+          day, Evolution score, Focus), then the day's plan (goal steps,
+          tasks and habits; the priority of the day was removed, user
+          decision 2026-10-24), the meditations, and last the Life Coach.
+          Phones stack everything in this order. */}
       <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-5">
         <section
           className="card-soft relative overflow-hidden p-4 sm:p-5 xl:p-6"
@@ -162,35 +163,40 @@ function LifePage() {
         </div>
       </div>
 
-      {data.premium ? (
-        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:mt-5 xl:gap-5">
-          <div className="flex flex-col [&>section]:flex-1">
-            <RoutineSection />
-          </div>
-          <div className="flex flex-col [&>section]:flex-1">
-            <HabitsSection />
-          </div>
+      {/* The day's three lists side by side, from the most important (the
+          goal steps, which count for the streak) to the lightest (user
+          request, 2026-10-24: one place answers "what do I do today?").
+          Free students get their free goal steps first, beside the Premium
+          invitation. */}
+      <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:mt-5 xl:grid-cols-3 xl:gap-5">
+        <div className="flex flex-col [&>div]:flex-1">
+          <GoalsSection part="steps" />
         </div>
-      ) : (
-        <div className="mt-4 xl:mt-5">
-          <LifePremiumGate feature="Routine, habits and Life Coach" />
-        </div>
-      )}
+        {data.premium ? (
+          <>
+            <div className="flex flex-col [&>section]:flex-1">
+              <RoutineSection />
+            </div>
+            <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
+              <HabitsSection />
+            </div>
+          </>
+        ) : (
+          <div className="xl:col-span-2">
+            <LifePremiumGate feature="Routine, habits and Life Coach" />
+          </div>
+        )}
+      </div>
 
       <div className="mt-4 xl:mt-5">
         <MeditationSection />
       </div>
 
-      <div className={cn("mt-4 grid gap-4 xl:mt-5 xl:gap-5", data.premium && "lg:grid-cols-2")}>
-        {data.premium ? (
-          <div className="flex flex-col [&>section]:flex-1">
-            <CoachSection />
-          </div>
-        ) : null}
-        <div className="flex flex-col [&>div]:flex-1">
-          <GoalsSection part="steps" />
+      {data.premium ? (
+        <div className="mt-4 xl:mt-5">
+          <CoachSection />
         </div>
-      </div>
+      ) : null}
     </AppShell>
   );
 }

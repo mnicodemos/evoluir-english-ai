@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
 import { useState } from "react";
 
-import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
+import { LifeAddPanel, LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { LifeTaskForm, LifeTaskList } from "@/components/life/LifeTasks";
 import { Button } from "@/components/ui/button";
 import { useLife } from "@/hooks/useLife";
@@ -19,7 +19,12 @@ function dayLabel(day: string, today: string, lang: "pt" | "en", t: (label: stri
   }).format(new Date(`${day}T00:00:00Z`));
 }
 
-/** Routine: the tasks of one day (a week back to a month ahead), by priority. */
+/**
+ * Routine: the tasks of one day (a week back to a month ahead), by priority.
+ * The card is titled "Tasks" with the day under it (user request, 2026-10-24:
+ * "Today" competed with the goals' card and changed as the student browsed
+ * days), the list first and "+ Add task" under it.
+ */
 export function RoutineSection() {
   const { t, lang } = useLifeT();
   const { data, isLoading, refresh } = useLife();
@@ -43,9 +48,8 @@ export function RoutineSection() {
         id="routine-title"
         icon={ListChecks}
         accent="sky"
-        title={dayLabel(day, data.today, lang, t)}
-        titleClassName="capitalize"
-        subtitle={t("Routine")}
+        title={t("Tasks")}
+        subtitle={<span className="capitalize">{dayLabel(day, data.today, lang, t)}</span>}
         meta={`${done}/${tasks.length}`}
       >
         <div className="flex gap-1">
@@ -77,15 +81,27 @@ export function RoutineSection() {
         </div>
       </LifeSectionTitle>
       <div className="mt-4">
-        <LifeTaskForm key={day} day={day} goals={data.goals} onChange={refresh} />
-      </div>
-      <div className="mt-4">
         <LifeTaskList
           tasks={tasks}
           goals={data.goals}
           onChange={refresh}
           emptyText="No tasks for this day yet."
         />
+      </div>
+      <div className="mt-3">
+        <LifeAddPanel key={day} label={t("Add task")}>
+          {(close) => (
+            <LifeTaskForm
+              day={day}
+              goals={data.goals}
+              onChange={() => {
+                close();
+                refresh();
+              }}
+              onCancel={close}
+            />
+          )}
+        </LifeAddPanel>
       </div>
     </section>
   );
