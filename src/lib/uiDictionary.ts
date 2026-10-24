@@ -22,7 +22,7 @@ const baseUiPt: Record<string, string> = {
   "EVO gives a step": "A EVO dá um passo",
   "One small step for each goal, every day.": "Um pequeno passo para cada meta, todo dia.",
   "Plan your day": "Planeje seu dia",
-  "Your priority and the day's tasks.": "Sua prioridade e as tarefas do dia.",
+  "The day's tasks, by priority.": "As tarefas do dia, por prioridade.",
   "Keep your habits": "Mantenha seus hábitos",
   "One check-in a day builds a run.": "Um registro por dia forma uma sequência.",
   "Your day fills up": "Seu dia se completa",
@@ -128,6 +128,13 @@ const baseUiPt: Record<string, string> = {
   "Nothing is charged today. Cancel before the trial ends and you pay nothing.":
     "Nada é cobrado hoje. Cancele antes do fim do teste e você não paga nada.",
   "Start free trial": "Começar teste grátis",
+  "Black Friday": "Black Friday",
+  "Black Friday:": "Black Friday:",
+  "off the first year of the yearly plan": "de desconto no primeiro ano do plano anual",
+  "days free on the monthly plan": "dias grátis no plano mensal",
+  "off the first year": "de desconto no primeiro ano",
+  "days free": "dias grátis",
+  Until: "Até",
   "After the trial,": "Depois do teste,",
   "Cancel any time in My subscription before the trial ends.":
     "Cancele quando quiser em Minha assinatura antes do fim do teste.",
@@ -1285,8 +1292,8 @@ const baseUiPt: Record<string, string> = {
     "5x mais prática com IA todo dia: conversas, videochamadas e correções",
   "Business English from B1: 36 lessons for meetings, emails and interviews":
     "Inglês para Negócios a partir do B1: 36 lições para reuniões, e-mails e entrevistas",
-  "Full Life+ AI: priority of the day, routine, habits, decisions and Life Coach":
-    "Life+ AI completo: prioridade do dia, rotina, hábitos, decisões e Life Coach",
+  "Full Life+ AI: routine, habits, decisions and Life Coach":
+    "Life+ AI completo: rotina, hábitos, decisões e Life Coach",
   "Every meditation in English": "Todas as meditações em inglês",
   "Every lesson of your level, with video, flashcards and quiz":
     "Todas as lições do seu nível, com vídeo, flashcards e quiz",

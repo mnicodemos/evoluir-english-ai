@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Crown, ExternalLink, Loader2, Sparkles } from "lucide-react";
+import { Check, Crown, ExternalLink, Loader2, Sparkles, Tag } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -15,7 +15,13 @@ import {
   ALREADY_SUBSCRIBED_MESSAGE,
   createStripeCheckoutSession,
 } from "@/lib/billing/checkout.functions";
-import { TRIAL_DAYS, trialEligible } from "@/lib/billing/trial";
+import {
+  BLACK_FRIDAY,
+  blackFridayActive,
+  checkoutOffer,
+  formatBrl,
+  offerPriceCents,
+} from "@/lib/billing/blackFriday";
 import { getMyAccess } from "@/lib/billing/entitlements.functions";
 import { createStripePortalSession } from "@/lib/billing/portal.functions";
 import { buildSubscriptionView } from "@/lib/billing/subscriptionView";
@@ -50,7 +56,7 @@ export const Route = createFileRoute("/_authenticated/premium")({
 const premiumPerks = [
   "5x more AI practice every day: conversations, video calls and corrections",
   "Business English from B1: 36 lessons for meetings, emails and interviews",
-  "Full Life+ AI: priority of the day, routine, habits, decisions and Life Coach",
+  "Full Life+ AI: routine, habits, decisions and Life Coach",
   "Every meditation in English",
 ];
 
@@ -119,9 +125,16 @@ function Premium() {
   // Server/database authority: Premium comes from valid entitlements only.
   const view = access ? buildSubscriptionView(access) : null;
   const isPremium = view ? view.plan === "premium" : profileIsPremium(profile);
-  // 7 days free on the first subscription (trial.ts; the server decides at
-  // checkout, this only shows the offer).
-  const withTrial = access ? trialEligible(access.subscriptions) : false;
+  // 7 days free on the first subscription (trial.ts) and, during Black Friday,
+  // 15 days on the monthly plan and 15% off the yearly (blackFriday.ts). The
+  // server decides at checkout; this only shows the offer.
+  const campaign = blackFridayActive();
+  const pastSubscriptions = access ? access.subscriptions : [{}];
+  const monthlyOffer = checkoutOffer("monthly", pastSubscriptions);
+  const yearlyOffer = checkoutOffer("yearly", pastSubscriptions);
+  const selectedOffer = selected === "yearly" ? yearlyOffer : monthlyOffer;
+  const trialDays = selectedOffer.trialDays;
+  const selectedPrice = formatBrl(offerPriceCents(selected, selectedOffer));
 
   async function goToCheckout() {
     if (starting) return;
@@ -270,7 +283,29 @@ function Premium() {
             </section>
           ) : (
             <>
-              {withTrial ? (
+              {campaign ? (
+                <section className="card-soft flex items-start gap-3 border border-amber-400/40 bg-amber-400/[0.07] p-5">
+                  <Tag className="mt-0.5 size-5 shrink-0 text-amber-300" aria-hidden="true" />
+                  <div>
+                    <h2 className="font-display text-base font-semibold">Black Friday</h2>
+                    <ul className="mt-1 space-y-0.5 text-sm text-muted-foreground">
+                      <li>
+                        {BLACK_FRIDAY.yearlyPercentOff}%{" "}
+                        <span>off the first year of the yearly plan</span>
+                      </li>
+                      {monthlyOffer.trialDays === BLACK_FRIDAY.monthlyTrialDays ? (
+                        <li>
+                          {BLACK_FRIDAY.monthlyTrialDays} <span>days free on the monthly plan</span>
+                        </li>
+                      ) : null}
+                      <li>
+                        <span>Until</span> {formatAccessDate(BLACK_FRIDAY.lastDay, lang)}
+                      </li>
+                    </ul>
+                  </div>
+                </section>
+              ) : null}
+              {trialDays ? (
                 <section className="card-soft flex items-start gap-3 border border-brand-green/30 bg-brand-green/[0.06] p-5">
                   <Sparkles
                     className="mt-0.5 size-5 shrink-0 text-brand-green"
@@ -278,7 +313,7 @@ function Premium() {
                   />
                   <div>
                     <h2 className="font-display text-base font-semibold">
-                      <span>Try Premium free for</span> {TRIAL_DAYS} <span>days</span>
+                      <span>Try Premium free for</span> {trialDays} <span>days</span>
                     </h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Nothing is charged today. Cancel before the trial ends and you pay nothing.
@@ -304,13 +339,39 @@ function Premium() {
                         </span>
                       )}
                     </div>
-                    <p className="mt-3 text-3xl font-bold">
-                      {p.price}
+                    {p.id === "yearly" && yearlyOffer.couponId ? (
+                      <p className="mt-3 text-sm text-muted-foreground line-through">{p.price}</p>
+                    ) : null}
+                    <p
+                      className={
+                        p.id === "yearly" && yearlyOffer.couponId
+                          ? "text-3xl font-bold"
+                          : "mt-3 text-3xl font-bold"
+                      }
+                    >
+                      {p.id === "yearly"
+                        ? formatBrl(offerPriceCents("yearly", yearlyOffer))
+                        : p.price}
                       <span className="text-base font-medium text-muted-foreground">
                         {p.period}
                       </span>
                     </p>
-                    <p className="mt-2 text-sm text-muted-foreground">{p.note}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {p.id === "yearly" && yearlyOffer.couponId ? (
+                        <>
+                          Black Friday: {BLACK_FRIDAY.yearlyPercentOff}%{" "}
+                          <span>off the first year</span>
+                        </>
+                      ) : p.id === "monthly" &&
+                        monthlyOffer.trialDays === BLACK_FRIDAY.monthlyTrialDays &&
+                        campaign ? (
+                        <>
+                          Black Friday: {BLACK_FRIDAY.monthlyTrialDays} <span>days free</span>
+                        </>
+                      ) : (
+                        p.note
+                      )}
+                    </p>
                   </button>
                 ))}
               </section>
@@ -349,21 +410,21 @@ function Premium() {
                   {starting && <Loader2 className="mr-2 size-4 animate-spin" />}
                   {starting ? (
                     <span>Opening secure checkout…</span>
-                  ) : withTrial ? (
+                  ) : trialDays ? (
                     <>
-                      <span>Start free trial</span> · {TRIAL_DAYS} <span>days</span>
+                      <span>Start free trial</span> · {trialDays} <span>days</span>
                     </>
                   ) : (
                     // Separate text nodes so the Portuguese screen translates them.
                     <>
-                      <span>Go Premium</span> — {selected === "yearly" ? "R$ 799,90" : "R$ 79,90"}
+                      <span>Go Premium</span> — {selectedPrice}
                       <span>{selected === "yearly" ? "/year" : "/month"}</span>
                     </>
                   )}
                 </Button>
-                {withTrial ? (
+                {trialDays ? (
                   <p className="mt-3 text-xs text-muted-foreground">
-                    <span>After the trial,</span> {selected === "yearly" ? "R$ 799,90" : "R$ 79,90"}
+                    <span>After the trial,</span> {selectedPrice}
                     <span>{selected === "yearly" ? "/year" : "/month"}</span>
                     {". "}
                     <span>Cancel any time in My subscription before the trial ends.</span>

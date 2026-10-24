@@ -26,7 +26,6 @@ import {
   Sparkles,
   SpellCheck,
   Repeat,
-  Star,
   Target,
   Trophy,
 } from "lucide-react";
@@ -198,8 +197,6 @@ function DashboardNotifications({
           (habit) => !life.logs.some((log) => log.habitId === habit.id && log.day === life.today),
         ).length
       : 0;
-  const priorityOpen =
-    !!life?.premium && !!life.priority && life.priority.day === life.today && !life.priority.doneAt;
   // The Final Test opens with 21 of the 30 core lessons; until it is passed,
   // the bell says the student can move up.
   const path = useLearningPath();
@@ -251,13 +248,6 @@ function DashboardNotifications({
       label: `${translate("Habits to check in today")}: ${habitsOpen}`,
       icon: Repeat,
       visible: habitsOpen > 0,
-    },
-    {
-      id: "priority",
-      to: "/life",
-      label: `${translate("Priority of the day")}: ${life?.priority?.text ?? ""}`,
-      icon: Star,
-      visible: priorityOpen,
     },
     {
       id: "goal",

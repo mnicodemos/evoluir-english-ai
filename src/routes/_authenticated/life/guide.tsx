@@ -14,7 +14,6 @@ import {
   Repeat,
   Scale,
   Sparkles,
-  Star,
   Target,
   Timer,
 } from "lucide-react";
@@ -44,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/life/guide")({
 const CYCLE: { icon: typeof Target; title: string; text: string }[] = [
   { icon: Target, title: "Set your goals", text: "Up to 3 goals, with a deadline and milestones." },
   { icon: Sparkles, title: "EVO gives a step", text: "One small step for each goal, every day." },
-  { icon: ListChecks, title: "Plan your day", text: "Your priority and the day's tasks." },
+  { icon: ListChecks, title: "Plan your day", text: "The day's tasks, by priority." },
   { icon: Repeat, title: "Keep your habits", text: "One check-in a day builds a run." },
   {
     icon: Flame,
@@ -85,15 +84,6 @@ function LifeGuidePage() {
       ],
       premium: false,
       art: <GoalsArt t={t} />,
-    },
-    {
-      id: "priority",
-      icon: Star,
-      title: "Priority of the day",
-      what: "The one thing that matters most today.",
-      steps: ["Write it in the morning.", "Tick it when it is done."],
-      premium: true,
-      art: <PriorityArt t={t} />,
     },
     {
       id: "routine",
@@ -320,16 +310,6 @@ function GoalsArt({ t }: { t: T }) {
           {t("{days} days left").replace("{days}", "12")}
         </span>
       </div>
-    </div>
-  );
-}
-
-function PriorityArt({ t }: { t: T }) {
-  return (
-    <div className="flex items-center gap-2 text-xs">
-      <Star className="size-4 shrink-0 text-amber-400" />
-      <Tick />
-      <span>{t("Finish the report before lunch")}</span>
     </div>
   );
 }

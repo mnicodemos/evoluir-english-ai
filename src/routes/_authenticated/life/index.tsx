@@ -1,9 +1,7 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Star, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useEffect } from "react";
 
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
@@ -12,19 +10,15 @@ import { FocusSection } from "@/components/life/FocusSection";
 import { GoalsSection } from "@/components/life/GoalsSection";
 import { HabitsSection } from "@/components/life/HabitsSection";
 import { MeditationSection } from "@/components/life/MeditationSection";
-import { LifeHeader, LifePremiumGate, LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
+import { LifeHeader, LifePremiumGate, useLifeT } from "@/components/life/LifeNav";
 import { RoutineSection } from "@/components/life/RoutineSection";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCelebrate } from "@/hooks/useCelebrate";
 import { useFocusLog } from "@/hooks/useFocusLog";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { FOCUS_DAILY_TARGET, focusSummary, lifeDayProgress } from "@/lib/life";
-import { setLifePriority } from "@/lib/life.functions";
 import { loadPlus } from "@/lib/plus.functions";
-import { haptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/life/")({
@@ -41,15 +35,15 @@ export const Route = createFileRoute("/_authenticated/life/")({
 });
 
 /**
- * Life+ AI on one page (user request: one page instead of tabs): the day and
- * its priority on top, then Goals, Routine with Habits, and the Life Coach
+ * Life+ AI on one page (user request: one page instead of tabs): the day on
+ * top, then Goals, Routine with Habits, and the Life Coach
  * side by side on desktop, stacked on phones. Old tab addresses (/goals,
  * /life/routine, /life/habits, /life/coach) open this page at their section.
  */
 function LifePage() {
   const { t, lang } = useLifeT();
   const { data: profile } = useProfile();
-  const { data, isLoading, refresh } = useLife();
+  const { data, isLoading } = useLife();
   const focusLog = useFocusLog();
   const loadSteps = useServerFn(loadPlus);
   // Same query as the Goals section, for the day ring's goal steps.
@@ -103,9 +97,9 @@ function LifePage() {
     <AppShell>
       <LifeHeader />
       {/* Four bands (user request, 2026-10-22): the measures on top (Your
-          day, Evolution score, Focus), then the day's plan (Priority, Today,
-          Habits), the meditations, and last the Life Coach beside Today's
-          steps. Phones stack everything in this order. */}
+          day, Evolution score, Focus), then the day's plan (Today and Habits;
+          the priority of the day was removed, user decision 2026-10-24), the
+          meditations, and last the Life Coach beside Today's steps. Phones stack everything in this order. */}
       <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-5">
         <section
           className="card-soft relative overflow-hidden p-4 sm:p-5 xl:p-6"
@@ -169,14 +163,11 @@ function LifePage() {
       </div>
 
       {data.premium ? (
-        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:mt-5 xl:grid-cols-3 xl:gap-5">
-          <section className="card-soft p-4 sm:p-5 xl:p-6">
-            <PriorityCard data={data} onChange={refresh} />
-          </section>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:mt-5 xl:gap-5">
           <div className="flex flex-col [&>section]:flex-1">
             <RoutineSection />
           </div>
-          <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
+          <div className="flex flex-col [&>section]:flex-1">
             <HabitsSection />
           </div>
         </div>
@@ -201,123 +192,6 @@ function LifePage() {
         </div>
       </div>
     </AppShell>
-  );
-}
-
-function PriorityCard({
-  data,
-  onChange,
-}: {
-  data: NonNullable<ReturnType<typeof useLife>["data"]>;
-  onChange: () => void;
-}) {
-  const { t } = useLifeT();
-  const save = useServerFn(setLifePriority);
-  const current = data.priority && data.priority.day === data.today ? data.priority : null;
-  const [editing, setEditing] = useState(false);
-  const [text, setText] = useState("");
-  const mutate = useMutation({
-    mutationFn: (input: { text?: string; done?: boolean; clear?: boolean }) =>
-      save({ data: input }),
-    onMutate: (input) => {
-      if (input.done) haptic("tap");
-    },
-    onSuccess: () => {
-      setEditing(false);
-      setText("");
-      onChange();
-    },
-    onError: () => toast.error(t("The priority could not be saved.")),
-  });
-
-  return (
-    <div aria-labelledby="life-priority-title">
-      <LifeSectionTitle
-        id="life-priority-title"
-        icon={Star}
-        accent="amber"
-        title={t("Priority of the day")}
-        subtitle={t("The one thing that makes today count")}
-      />
-      {current && !editing ? (
-        <div className="mt-3 flex items-start gap-3">
-          <button
-            type="button"
-            aria-pressed={!!current.doneAt}
-            aria-label={current.doneAt ? t("Mark as not done") : t("Mark as done")}
-            disabled={mutate.isPending}
-            onClick={() => mutate.mutate({ done: !current.doneAt })}
-            className={cn(
-              "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border-2",
-              current.doneAt
-                ? "border-brand-green bg-brand-green text-[oklch(0.2_0.04_160)]"
-                : "border-muted-foreground/60 hover:border-brand-green",
-            )}
-          >
-            {current.doneAt ? (
-              <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
-            ) : null}
-          </button>
-          <p
-            translate="no"
-            className={cn(
-              "min-w-0 flex-1 text-sm",
-              current.doneAt && "text-muted-foreground line-through",
-            )}
-          >
-            {current.text}
-          </p>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs"
-            onClick={() => {
-              setText(current.text);
-              setEditing(true);
-            }}
-          >
-            {t("Edit")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-7 text-muted-foreground hover:text-destructive"
-            aria-label={t("Delete priority")}
-            title={t("Delete priority")}
-            disabled={mutate.isPending}
-            onClick={() => {
-              if (window.confirm(t("Delete today's priority?"))) mutate.mutate({ clear: true });
-            }}
-          >
-            <Trash2 className="size-3.5" aria-hidden="true" />
-          </Button>
-        </div>
-      ) : (
-        <form
-          className="mt-3 flex gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (text.trim() && !mutate.isPending) mutate.mutate({ text: text.trim() });
-          }}
-        >
-          <Input
-            value={text}
-            maxLength={200}
-            onChange={(event) => setText(event.target.value)}
-            placeholder={t("What matters most today?")}
-            aria-label={t("Priority of the day")}
-          />
-          {editing ? (
-            <Button type="button" variant="ghost" onClick={() => setEditing(false)}>
-              {t("Cancel")}
-            </Button>
-          ) : null}
-          <Button type="submit" disabled={!text.trim() || mutate.isPending}>
-            {t("Save")}
-          </Button>
-        </form>
-      )}
-    </div>
   );
 }
 

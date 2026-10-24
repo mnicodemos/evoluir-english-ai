@@ -1,11 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
+import type Stripe from "stripe";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { subscriptionGrantsAccess } from "./contracts";
 import { BILLING_INTERVALS, resolvePriceId } from "./stripeMapping";
-import { TRIAL_DAYS, trialEligible } from "./trial";
+import { BLACK_FRIDAY, checkoutOffer } from "./blackFriday";
 
 /**
  * Strict input: the client may only name an allowed plan interval. Any attempt
@@ -43,6 +44,28 @@ export function describeCheckoutError(error: unknown): string {
 export function isMissingCustomer(error: unknown): boolean {
   const detail = error as { code?: string; param?: string } | null;
   return detail?.code === "resource_missing" && detail.param === "customer";
+}
+
+/**
+ * The Black Friday coupon, created in Stripe the first time it is needed:
+ * 15% for 12 months, so it covers the yearly plan's first paid invoice even
+ * after a trial (a "once" coupon could be spent on the trial's R$ 0 invoice)
+ * and never its renewal.
+ */
+async function ensureBlackFridayCoupon(stripe: Stripe): Promise<void> {
+  try {
+    await stripe.coupons.retrieve(BLACK_FRIDAY.couponId);
+  } catch (error) {
+    if ((error as { code?: string } | null)?.code !== "resource_missing") throw error;
+    await stripe.coupons.create({
+      id: BLACK_FRIDAY.couponId,
+      name: "Black Friday",
+      percent_off: BLACK_FRIDAY.yearlyPercentOff,
+      duration: "repeating",
+      duration_in_months: 12,
+      redeem_by: Math.floor(Date.parse(BLACK_FRIDAY.endsAt) / 1000),
+    });
+  }
 }
 
 export const createStripeCheckoutSession = createServerFn({ method: "POST" })
@@ -99,7 +122,10 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
       ) {
         throw new Error(ALREADY_SUBSCRIBED_MESSAGE);
       }
-      const withTrial = trialEligible(past ?? [{}]);
+      // The first subscription's free trial (trial.ts), and during Black
+      // Friday 15 days on the monthly plan and 15% off the yearly's first year.
+      const offer = checkoutOffer(data.interval, past ?? [{}]);
+      if (offer.couponId) await ensureBlackFridayCoupon(stripe);
 
       const openSession = (customer: string) =>
         stripe.checkout.sessions.create({
@@ -109,11 +135,12 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
           client_reference_id: context.userId,
           metadata: { user_id: context.userId, interval: data.interval },
           payment_method_collection: "always",
+          ...(offer.couponId ? { discounts: [{ coupon: offer.couponId }] } : {}),
           subscription_data: {
             metadata: { user_id: context.userId, interval: data.interval },
-            ...(withTrial
+            ...(offer.trialDays
               ? {
-                  trial_period_days: TRIAL_DAYS,
+                  trial_period_days: offer.trialDays,
                   trial_settings: { end_behavior: { missing_payment_method: "cancel" as const } },
                 }
               : {}),

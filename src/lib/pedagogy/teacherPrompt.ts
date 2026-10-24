@@ -2,8 +2,6 @@
 // The model produces a pedagogical reply and, at most, a SUGGESTED assessment.
 // Nothing here is authoritative: the server decides what becomes evidence.
 
-import { z } from "zod";
-
 import type { AiMsg } from "@/lib/ai-prompts";
 
 import { TEACHER_EVIDENCE_SKILLS, type TeacherEvidenceSkill } from "./teacherEvidence";
@@ -46,25 +44,6 @@ export type TeacherTurn = {
   observedError: string | null;
   mistake: TeacherMistake | null;
 };
-
-const teacherTurnSchema = z
-  .object({
-    reply: z.string().trim().min(1).max(1800),
-    assessable: z.boolean(),
-    focus_skill: z.enum(TEACHER_EVIDENCE_SKILLS).nullable().optional(),
-    suggested_score: z.number().finite().min(0).max(100).nullable().optional(),
-    observed_error: z.string().trim().max(300).nullable().optional(),
-    mistake: z
-      .object({
-        original: z.string().trim().min(1).max(300),
-        corrected: z.string().trim().min(1).max(300),
-        explanation: z.string().trim().max(500).default(""),
-        category: z.string().trim().max(40).default("grammar"),
-      })
-      .nullable()
-      .optional(),
-  })
-  .strict();
 
 function contextBlock(context: TeacherContextForPrompt): string {
   const lines = [`Student CEFR level: ${context.cefrLevel ?? "unknown"}.`];
@@ -195,27 +174,87 @@ export function teacherTurnMessages(input: {
   ];
 }
 
+/**
+ * Reads the model's turn, keeping whatever is usable (user report, 2026-10-24:
+ * with the thinking step off, a stray key, an unknown skill or an empty
+ * mistake made the whole answer fail with "Something went wrong"). Only the
+ * reply is required; every other field falls back to "nothing to assess", and
+ * the evidence gate (teacherEvidenceDecision) still refuses an invalid skill or
+ * score. A plain-text answer is shown as the reply, never assessed.
+ */
 export function parseTeacherTurn(raw: string): TeacherTurn {
+  const text = raw
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/, "")
+    .trim();
   let value: unknown = null;
   try {
-    value = JSON.parse(
-      raw
-        .replace(/^```(?:json)?/i, "")
-        .replace(/```$/, "")
-        .trim(),
-    );
+    value = JSON.parse(text);
   } catch {
-    value = null;
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      try {
+        value = JSON.parse(text.slice(start, end + 1));
+      } catch {
+        value = null;
+      }
+    }
   }
-  const parsed = teacherTurnSchema.safeParse(value);
-  if (!parsed.success)
+
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    // A plain answer (no JSON at all) is still the teacher's reply.
+    if (text && !text.startsWith("{") && !text.startsWith("[")) {
+      return {
+        reply: text.slice(0, 1800),
+        assessable: false,
+        focusSkill: null,
+        suggestedScore: null,
+        observedError: null,
+        mistake: null,
+      };
+    }
     throw new Error("The AI teacher returned an invalid answer. Please try again.");
+  }
+
+  const turn = value as Record<string, unknown>;
+  const reply = typeof turn["reply"] === "string" ? turn["reply"].trim() : "";
+  if (!reply) throw new Error("The AI teacher returned an invalid answer. Please try again.");
+
+  const skill = TEACHER_EVIDENCE_SKILLS.find((item) => item === turn["focus_skill"]) ?? null;
+  const rawScore = turn["suggested_score"];
+  const score =
+    typeof rawScore === "number"
+      ? rawScore
+      : typeof rawScore === "string" && rawScore.trim() !== ""
+        ? Number(rawScore)
+        : NaN;
+  const observed = turn["observed_error"];
   return {
-    reply: parsed.data.reply,
-    assessable: parsed.data.assessable,
-    focusSkill: parsed.data.focus_skill ?? null,
-    suggestedScore: parsed.data.suggested_score ?? null,
-    observedError: parsed.data.observed_error ?? null,
-    mistake: parsed.data.mistake ?? null,
+    reply: reply.slice(0, 1800),
+    // An unknown skill is never assessed.
+    assessable: turn["assessable"] === true && skill !== null,
+    focusSkill: skill,
+    suggestedScore: Number.isFinite(score) && score >= 0 && score <= 100 ? score : null,
+    observedError:
+      typeof observed === "string" && observed.trim() ? observed.trim().slice(0, 300) : null,
+    mistake: readMistake(turn["mistake"]),
+  };
+}
+
+function readMistake(value: unknown): TeacherTurn["mistake"] {
+  if (!value || typeof value !== "object") return null;
+  const item = value as Record<string, unknown>;
+  const text = (key: string, max: number) =>
+    typeof item[key] === "string" ? (item[key] as string).trim().slice(0, max) : "";
+  const original = text("original", 300);
+  const corrected = text("corrected", 300);
+  if (!original || !corrected) return null;
+  return {
+    original,
+    corrected,
+    explanation: text("explanation", 500),
+    category: text("category", 40) || "grammar",
   };
 }

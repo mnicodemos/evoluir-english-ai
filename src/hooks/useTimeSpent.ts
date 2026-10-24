@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import { logPracticeTelemetry } from "@/lib/legacyActivity.functions";
@@ -122,6 +123,7 @@ export function useLogTimeOnExit(params: {
 }) {
   const { timer } = params;
   const logTelemetry = useServerFn(logPracticeTelemetry);
+  const queryClient = useQueryClient();
   const operationKey = useRef(crypto.randomUUID());
   const latest = useRef(params);
   latest.current = params;
@@ -151,8 +153,14 @@ export function useLogTimeOnExit(params: {
               | "reading",
             minutes,
           },
-        });
+        })
+          // The Dashboard opens before this write lands: refresh today's
+          // minutes once it does, so the challenge and Today's Progress move
+          // without a reload (user report, 2026-10-24: "0/10 min" after the
+          // AI Teacher until the page was refreshed).
+          .then(() => queryClient.invalidateQueries({ queryKey: ["minutes-today"] }))
+          .catch(() => undefined);
       }
     };
-  }, [timer, logTelemetry]);
+  }, [timer, logTelemetry, queryClient]);
 }
