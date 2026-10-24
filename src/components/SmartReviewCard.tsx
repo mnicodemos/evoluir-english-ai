@@ -219,10 +219,10 @@ export function SmartReviewCard({
                 asChild
                 variant="ghost"
                 size="icon"
-                className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
               >
                 <Link to="/vocabulary" aria-label={`${t("Review now")}: ${t("Vocabulary")}`}>
-                  <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
+                  <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
               </Button>
             </li>
@@ -247,10 +247,10 @@ export function SmartReviewCard({
                 asChild
                 variant="ghost"
                 size="icon"
-                className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
               >
                 <Link to="/mistakes" aria-label={`${t("Review now")}: ${t("My mistakes")}`}>
-                  <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
+                  <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
               </Button>
             </li>
@@ -290,7 +290,7 @@ export function SmartReviewCard({
                   asChild
                   variant="ghost"
                   size="icon"
-                  className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+                  className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
                 >
                   {item.resource.params ? (
                     <Link
@@ -298,11 +298,11 @@ export function SmartReviewCard({
                       params={item.resource.params}
                       aria-label={`${t("Review now")}: ${skillLabel}`}
                     >
-                      <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
+                      <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                     </Link>
                   ) : (
                     <Link to={item.resource.to} aria-label={`${t("Review now")}: ${skillLabel}`}>
-                      <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
+                      <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                     </Link>
                   )}
                 </Button>
