@@ -248,7 +248,7 @@ export function WeeklyFrequency({
             <CelebrationBurst active={celebrateWeek} />
             {/* The same open-bottom gauge as Today's Progress (user request,
                 2026-10-24): the days in its gap, the check or the share inside. */}
-            <GaugeRing progress={progress} label={`${studiedCount}/${weeklyGoal} ${daysLabel}`}>
+            <GaugeRing progress={progress} value={studiedCount} goal={weeklyGoal} unit={daysLabel}>
               {allStudied ? (
                 <Check
                   className="size-8 text-brand-green 2xl:size-9"
