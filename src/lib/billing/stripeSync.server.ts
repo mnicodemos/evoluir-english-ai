@@ -117,14 +117,43 @@ export async function syncSubscription(
     subscriptionId = inserted?.id ?? null;
   }
 
+  const grantsAccess = subscriptionGrantsAccess({ status, current_period_end: period.end });
   await reconcileEntitlements({
     userId,
     subscriptionId,
-    grantsAccess: subscriptionGrantsAccess({ status, current_period_end: period.end }),
+    grantsAccess,
     expiresAt: period.end,
   });
+  await syncProfilePlan(userId, grantsAccess, period.end);
 
   return { userId, status };
+}
+
+/**
+ * The screens read profiles.plan (the menu's Premium/Free label, the crowns and
+ * Premium badges; user report, 2026-10-23: a live trial showed "Free"), while
+ * access is decided by the entitlements. Keep the profile in step: Premium
+ * until the period's end while a subscription grants access; Free once nothing
+ * grants it any more (a launch-campaign entitlement still counts).
+ */
+export async function syncProfilePlan(
+  userId: string,
+  grantsAccess: boolean,
+  periodEnd: string | null,
+): Promise<void> {
+  if (grantsAccess) {
+    await supabaseAdmin
+      .from("profiles")
+      .update({ plan: "premium", plan_expires_at: periodEnd })
+      .eq("id", userId);
+    return;
+  }
+  const { hasPremium } = await import("@/lib/premium.server");
+  if (await hasPremium(userId)) return;
+  await supabaseAdmin
+    .from("profiles")
+    .update({ plan: "free", plan_expires_at: null })
+    .eq("id", userId);
 }
 
 /** One entitlement row per (user, feature). Never duplicated. */
