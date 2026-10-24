@@ -221,7 +221,7 @@ function ListeningPage() {
   const lessonCount = startedLessons ?? 0;
   const dayNumber = Math.floor(Date.parse(`${studyToday()}T00:00:00Z`) / 86_400_000);
 
-  const sentences = useMemo(
+  const pickedSentences = useMemo(
     () =>
       pickListeningSentences({
         config,
@@ -231,6 +231,11 @@ function ListeningPage() {
       }),
     [lessons, lessonCount, dayNumber, sessionNumber, config, levelInfo.value],
   );
+  // Kept from the first answer to the session's end: lessons loading late or a
+  // lesson started mid-session would otherwise change the sentences under the
+  // student, and a later part could repeat one already done.
+  const [frozenSentences, setFrozenSentences] = useState<string[] | null>(null);
+  const sentences = frozenSentences ?? pickedSentences;
 
   const sentence = sentences[index] ?? "";
   // The latest saved part, shown as "Last result".
@@ -326,6 +331,7 @@ function ListeningPage() {
       const spoken = await transcribeAudio(await stopVoiceRecording());
       if (!spoken) throw new Error("I couldn't hear that clearly. Please try again.");
       setAnswer(spoken);
+      setFrozenSentences((current) => current ?? sentences);
       const value = listeningAnswerScore(sentence, spoken);
       setChecked(value);
       const nextAttempts = attempts + 1;
@@ -418,6 +424,7 @@ function ListeningPage() {
           : `Listening session saved with ${average}%`,
       );
     setAnother(false);
+    setFrozenSentences(null);
     setIndex(0);
     setScores([]);
     setTranscripts([]);
@@ -426,6 +433,7 @@ function ListeningPage() {
   /** Starts a new session of 9 sentences after today's was finished. */
   function startAnotherSession() {
     setAnother(true);
+    setFrozenSentences(null);
     setIndex(0);
     setAnswer("");
     setChecked(null);
