@@ -147,7 +147,8 @@ export const appGuidePt: Record<string, string> = {
   "Send 3 texts in Writing.": "Enviar 3 textos no Writing.",
   "Do 3 Listening sessions.": "Fazer 3 sessões de Listening.",
   "Review 10 words in Vocabulary.": "Revisar 10 palavras no Vocabulary.",
-  "Finish 1 conversation with EVO in AI Speaking.": "Concluir 1 conversa com a EVO no AI Speaking.",
+  "Finish 1 conversation with EVO, in AI Speaking or the video call, up to its report.":
+    "Concluir 1 conversa com a EVO, no AI Speaking ou na chamada de vídeo, até o relatório.",
   "Answer every question of the Daily reading.": "Responder todas as perguntas da Leitura do dia.",
   "Do every goal step of the day in Life+ AI.":
     "Fazer todos os passos das metas do dia no Life+ AI.",
