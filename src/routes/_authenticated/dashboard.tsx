@@ -719,7 +719,7 @@ function Dashboard() {
                   <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
                 </Link>
               </div>
-              <div className="mb-2.5 mt-3 grid w-full flex-none grid-cols-[6.5rem_minmax(0,1fr)] items-center justify-center gap-x-0 gap-y-1.5 pl-7 lg:mb-0 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
+              <div className="mb-2.5 mt-3 grid w-full flex-none grid-cols-[6.5rem_auto] items-center justify-center gap-x-0 gap-y-1.5 lg:mb-0 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
                 <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                   <div
                     className={cn(
@@ -758,14 +758,27 @@ function Dashboard() {
                         }
                       />
                     </svg>
-                    {/* Goal reached: the ring fills with a Check in its own colour
-                        instead of the minutes (user request). */}
+                    {/* Goal reached: the ring fills with a Check in its own colour,
+                        with the minutes kept under it (user request, 2026-10-24: the
+                        amount disappeared once the goal was met). */}
                     {minutesToday >= profile.daily_minutes ? (
-                      <Check
-                        className="relative size-8 text-brand-green lg:size-10"
-                        strokeWidth={3}
+                      <span
+                        className="relative grid justify-items-center gap-0.5"
+                        role="img"
                         aria-label={`${minutesToday} of ${profile.daily_minutes} minutes, goal reached`}
-                      />
+                      >
+                        <Check
+                          className="size-7 text-brand-green lg:size-8"
+                          strokeWidth={3.5}
+                          aria-hidden="true"
+                        />
+                        <span
+                          className="whitespace-nowrap text-[10px] font-medium leading-none text-muted-foreground"
+                          aria-hidden="true"
+                        >
+                          {minutesToday}/{profile.daily_minutes} min
+                        </span>
+                      </span>
                     ) : (
                       <span className="relative text-center font-display text-sm font-bold leading-none text-foreground lg:text-lg">
                         <span className="block whitespace-nowrap">
@@ -807,7 +820,9 @@ function Dashboard() {
                       // then lit in the ring's colour (accuracy from 70%).
                       const Icon = TODAY_LINE_ICONS[card.icon];
                       const iconClass =
-                        card.state === "done" ? "text-brand-green" : "text-muted-foreground/50";
+                        card.state === "done"
+                          ? "text-brand-green/75 lg:text-brand-green"
+                          : "text-muted-foreground/50";
                       const sr =
                         card.state === "done"
                           ? "Done today."

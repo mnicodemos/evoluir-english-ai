@@ -66,7 +66,7 @@ export function todayProgressLines(input: {
     {
       key: "lessons",
       icon: "lesson",
-      label: "Lessons completed",
+      label: input.lessonsCompleted === 1 ? "lesson completed" : "lessons completed",
       value: String(input.lessonsCompleted),
       state: input.lessonsCompleted > 0 ? "done" : "empty",
       active: input.lessonsCompleted > 0,
@@ -76,7 +76,7 @@ export function todayProgressLines(input: {
       return {
         key: "conversations",
         icon: "conversation" as const,
-        label: count === 1 ? "Conversation with EVO" : "Conversations with EVO",
+        label: count === 1 ? "conversation with EVO" : "conversations with EVO",
         value: String(count),
         state: count > 0 ? ("done" as const) : ("empty" as const),
         active: count > 0,
@@ -87,7 +87,7 @@ export function todayProgressLines(input: {
       return {
         key: "writing",
         icon: "writing" as const,
-        label: count === 1 ? "Text corrected" : "Texts corrected",
+        label: count === 1 ? "text corrected" : "texts corrected",
         value: String(count),
         state: count > 0 ? ("done" as const) : ("empty" as const),
         active: count > 0,
@@ -98,7 +98,7 @@ export function todayProgressLines(input: {
       return {
         key: "listening",
         icon: "listening" as const,
-        label: count === 1 ? "Listening session" : "Listening sessions",
+        label: count === 1 ? "listening session" : "listening sessions",
         value: String(count),
         state: count > 0 ? ("done" as const) : ("empty" as const),
         active: count > 0,
@@ -107,7 +107,7 @@ export function todayProgressLines(input: {
     {
       key: "words",
       icon: "words",
-      label: "Words mastered",
+      label: input.wordsMastered === 1 ? "word mastered" : "words mastered",
       value: String(input.wordsMastered),
       state: input.wordsMastered > 0 ? "done" : "empty",
       active: input.wordsMastered > 0,
@@ -117,7 +117,7 @@ export function todayProgressLines(input: {
       return {
         key: "mistakes",
         icon: "mistakes" as const,
-        label: count === 1 ? "Mistakes review" : "Mistakes reviews",
+        label: count === 1 ? "mistakes review" : "mistakes reviews",
         value: String(count),
         state: count > 0 ? ("done" as const) : ("empty" as const),
         active: count > 0,
@@ -136,7 +136,7 @@ export function todayProgressLines(input: {
       return {
         key: "flashcards",
         icon: "flashcards" as const,
-        label: count === 1 ? "Flashcard review" : "Flashcard reviews",
+        label: count === 1 ? "flashcard review" : "flashcard reviews",
         value: String(count),
         state: count > 0 ? ("done" as const) : ("empty" as const),
         active: count > 0,
@@ -147,7 +147,7 @@ export function todayProgressLines(input: {
       return {
         key: "pronunciation",
         icon: "pronunciation" as const,
-        label: count === 1 ? "Pronunciation practice" : "Pronunciation practices",
+        label: count === 1 ? "pronunciation practice" : "pronunciation practices",
         value: String(count),
         state: count > 0 ? ("done" as const) : ("empty" as const),
         active: count > 0,
@@ -183,7 +183,7 @@ export function todayProgressLines(input: {
     {
       key: "accuracy",
       icon: "accuracy",
-      label: "Accuracy",
+      label: "accuracy",
       value: `${input.accuracy}%`,
       state: accuracyState,
       active: input.accuracy > 0,

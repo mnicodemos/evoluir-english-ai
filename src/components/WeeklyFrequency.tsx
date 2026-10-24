@@ -75,9 +75,14 @@ export function WeeklyFrequency({
         {/* The week count lives with its dots (it used to repeat in a box above). */}
         {/* The days studied and the plan beside them (user request: "6 / 5 days"
             read as a mistake once the plan was passed). */}
-        <p className="col-span-7 mb-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-muted-foreground">
-          <span>{lang === "pt" ? "Esta semana" : "This week"} ·</span>
-          <span className="font-display font-semibold text-foreground">
+        {/* One size on the line, only the count in bold, the dot in its own
+            span (user request, 2026-10-24: it read misaligned). */}
+        <p className="col-span-7 mb-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] leading-none text-muted-foreground">
+          <span>{lang === "pt" ? "Esta semana" : "This week"}</span>
+          <span className="text-muted-foreground/50" aria-hidden="true">
+            ·
+          </span>
+          <span className="font-semibold text-foreground">
             {studiedCount} {studiedCount === 1 ? (lang === "pt" ? "dia" : "day") : daysLabel}
           </span>
           {allStudied ? (
@@ -103,10 +108,14 @@ export function WeeklyFrequency({
                 {labels[i]}
               </span>
               {studied ? (
+                // Past studied days are a soft tint; only today is solid, so the
+                // brand colour marks where the student is (user request, 2026-10-24).
                 <span
                   className={cn(
-                    "grid size-5 place-items-center rounded-full text-primary-foreground",
-                    "bg-brand-green",
+                    "grid size-5 place-items-center rounded-full",
+                    isToday
+                      ? "bg-brand-green text-primary-foreground"
+                      : "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35",
                   )}
                 >
                   <Check className="size-3.5" strokeWidth={3} />
