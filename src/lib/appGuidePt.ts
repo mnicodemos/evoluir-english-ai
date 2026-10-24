@@ -140,6 +140,8 @@ export const appGuidePt: Record<string, string> = {
     "Escolha 2, 3, 5 ou 7 dias por semana e seus minutos diários.",
   "Follow the activity of each day; done days are ticked.":
     "Siga a atividade de cada dia; os dias feitos ficam marcados.",
+  "A new plan starts every Monday, and its order stays the same all week.":
+    "Um plano novo começa toda segunda, e a ordem dele fica a mesma a semana toda.",
   "Reaching your weekly plan lights the three gold stars.":
     "Cumprir seu plano semanal acende as três estrelas douradas.",
   "What counts as a study day": "O que conta como dia de estudo",

@@ -54,6 +54,7 @@ import { PathProgressCard } from "@/components/PathProgressCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
 import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
+import { useMistakesDue } from "@/hooks/useMistakesDue";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -75,7 +76,6 @@ import { FirstWeekGuide } from "@/components/FirstWeekGuide";
 import { WeeklyLeagueSummary } from "@/components/WeeklyLeagueSummary";
 import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
-import { MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
 import { graphitePanelClass } from "@/lib/surfaces";
 import { todayProgressLines, type TodayLineIcon } from "@/lib/todayProgressLines";
 import { uiPt } from "@/lib/uiDictionary";
@@ -494,21 +494,7 @@ function Dashboard() {
     data: mistakesDue = 0,
     isSuccess: mistakesKnown,
     isError: mistakesFailed,
-  } = useQuery({
-    queryKey: ["mistakes-due", profile?.id],
-    enabled: !!profile?.id,
-    staleTime: 60 * 1000,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("learning_errors")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", profile!.id)
-        .eq("review_step", 0)
-        .lt("review_step", MISTAKE_MASTERED_STEP)
-        .lte("next_review_at", new Date().toISOString());
-      return count ?? 0;
-    },
-  });
+  } = useMistakesDue(profile?.id);
   // Same query as the Study Plan page, so opening the plan reuses it.
   const { data: studyPlan } = useQuery({
     queryKey: ["study-plan", profile?.id],

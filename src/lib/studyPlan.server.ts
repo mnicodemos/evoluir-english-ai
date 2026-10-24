@@ -2,13 +2,11 @@
 // existing tables (profiles, lessons, user_lessons, activities). No new content,
 // no AI call, no change to the recommendation engine.
 
-import {
-  hasDailyReadingEvidence,
-  withoutUnmeasuredReading,
-} from "@/lib/pedagogy/readingSource.server";
+import type { AssessmentEvidence } from "@/lib/pedagogy/contracts";
 import { LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
 import { STUDY_TIME_ZONE, studyToday } from "@/lib/today";
 
+import { weekStartNeeds } from "./studyPlanNeeds";
 import {
   buildStudyPlan,
   type PlanLesson,
@@ -68,7 +66,9 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
     // Business English lessons are a bonus track, never planned as level days.
     .neq("category", "business");
   if (level) lessonQuery = lessonQuery.eq("level", level);
-  const recentSince = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  // The order of the week's skills is decided from what existed before Monday
+  // (studyPlanNeeds.ts), so practising during the week never reorders it.
+  const recentSince = new Date(Date.parse(since) - 7 * 86_400_000).toISOString();
   const [
     { data: lessonRows },
     { data: doneRows },
@@ -88,14 +88,20 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
       .eq("user_id", userId)
       .gte("created_at", since),
     supabaseAdmin
-      .from("current_skill_profile")
-      .select("skill, score, confidence_score")
-      .eq("user_id", userId),
+      .from("assessment_evidence")
+      .select(
+        "skill, source_type, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, rubric_version, item_cefr, created_at",
+      )
+      .eq("user_id", userId)
+      .lt("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(1000),
     supabaseAdmin
       .from("activities")
       .select("activity_type")
       .eq("user_id", userId)
-      .gte("created_at", recentSince),
+      .gte("created_at", recentSince)
+      .lt("created_at", since),
   ]);
 
   const done = new Set((doneRows ?? []).map((row) => row.lesson_id));
@@ -164,17 +170,19 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
     }),
   ];
 
-  // Reading only once a daily reading measured it (readingSource.server.ts).
-  const readingMeasured = await hasDailyReadingEvidence(supabaseAdmin, userId);
-  const skillProfile = withoutUnmeasuredReading(skillRows ?? [], readingMeasured);
-  const needs: PlanSkillNeed[] = skillProfile
-    .filter((row) => row.skill)
-    .map((row) => ({
-      skill: row.skill as string,
-      score: row.score === null ? null : Number(row.score),
-      confidence: row.confidence_score === null ? null : Number(row.confidence_score),
-      recentlyPractised: practised.has(row.skill as string),
-    }));
+  const evidence: AssessmentEvidence[] = (skillRows ?? []).map((row) => ({
+    skill: row.skill as AssessmentEvidence["skill"],
+    sourceType: row.source_type as AssessmentEvidence["sourceType"],
+    itemCefr: (row.item_cefr ?? null) as NonNullable<AssessmentEvidence["itemCefr"]> | null,
+    rawScore: Number(row.raw_score),
+    sourceReliability: Number(row.source_reliability),
+    evidenceQuality: Number(row.evidence_quality),
+    sampleWeight: Number(row.sample_weight),
+    evaluatedBy: row.evaluated_by as AssessmentEvidence["evaluatedBy"],
+    rubricVersion: row.rubric_version,
+    createdAt: row.created_at,
+  }));
+  const needs: PlanSkillNeed[] = weekStartNeeds(evidence, practised, Date.parse(since));
 
   return {
     configured: profile?.study_focus != null && profile?.study_days_per_week != null,

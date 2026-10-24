@@ -201,6 +201,7 @@ export const APP_GUIDE: GuideSection[] = [
     steps: [
       "Choose 2, 3, 5 or 7 days a week and your daily minutes.",
       "Follow the activity of each day; done days are ticked.",
+      "A new plan starts every Monday, and its order stays the same all week.",
       "Reaching your weekly plan lights the three gold stars.",
     ],
     to: "/study-plan",
