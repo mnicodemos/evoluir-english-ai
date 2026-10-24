@@ -117,18 +117,18 @@ export const appGuidePt: Record<string, string> = {
     "Marque um hábito como Estudar inglês automaticamente nos seus dias de estudo de inglês, para ele ter a mesma sequência do seu streak.",
   "Stuck between options? Open Decisions: list the options and the criteria that matter, give each a weight and a score, and see the best option, test other weights in What if?, ask EVO for an analysis and turn your choice into a goal.":
     "Em dúvida entre opções? Abra Decisões: liste as opções e os critérios que importam, dê um peso e uma nota a cada um e veja a melhor opção, teste outros pesos em E se?, peça uma análise à EVO e transforme sua escolha em meta.",
-  "The bell on the Home lists what is still open today: your plan, reviews, the daily reading, goal steps, habits, the priority of the day and, when it opens, the Final Test.":
-    "O sininho da Home lista o que ainda está aberto hoje: seu plano, as revisões, a leitura do dia, os passos das metas, os hábitos, a prioridade do dia e, quando liberar, a Prova Final.",
+  "The bell on the Home lists what is still open today: your plan, reviews, the daily reading, goal steps, habits and, when it opens, the Final Test.":
+    "O sininho da Home lista o que ainda está aberto hoje: seu plano, as revisões, a leitura do dia, os passos das metas, os hábitos e, quando liberar, a Prova Final.",
   "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.":
     "Use o Foco em blocos de 15, 25 ou 50 minutos, com dois minutos de inglês em cada pausa.",
   "Add 1 to 3 goals: EVO gives you one small step for each goal every day.":
     "Adicione de 1 a 3 metas: a EVO dá um pequeno passo para cada meta todo dia.",
   "Give a goal a deadline and milestones to see how far you are.":
     "Dê um prazo e etapas a uma meta para ver quanto já avançou.",
-  "Plan the day's tasks, check in your habits and set the priority of the day.":
-    "Planeje as tarefas do dia, marque seus hábitos e defina a prioridade do dia.",
-  "Change a goal, task, habit or the priority with its pencil (Edit).":
-    "Altere uma meta, tarefa, hábito ou a prioridade pelo lápis (Editar).",
+  "Plan the day's tasks and check in your habits.":
+    "Planeje as tarefas do dia e marque seus hábitos.",
+  "Change a goal, task or habit with its pencil (Edit).":
+    "Altere uma meta, tarefa ou hábito pelo lápis (Editar).",
   "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.":
     "Peça um plano à Life Coach; adicione as sugestões com um toque, ou copie uma resposta e envie pelo WhatsApp.",
   "Finishing every goal step of the day also counts for your streak.":

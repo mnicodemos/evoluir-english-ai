@@ -50,7 +50,7 @@ export const Route = createFileRoute("/_authenticated/premium")({
 const premiumPerks = [
   "5x more AI practice every day: conversations, video calls and corrections",
   "Business English from B1: 36 lessons for meetings, emails and interviews",
-  "Full Life+ AI: priority of the day, routine, habits, decisions and Life Coach",
+  "Full Life+ AI: routine, habits, decisions and Life Coach",
   "Every meditation in English",
 ];
 

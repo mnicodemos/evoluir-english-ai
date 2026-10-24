@@ -181,8 +181,8 @@ export const APP_GUIDE: GuideSection[] = [
     steps: [
       "Add 1 to 3 goals: EVO gives you one small step for each goal every day.",
       "Give a goal a deadline and milestones to see how far you are.",
-      "Plan the day's tasks, check in your habits and set the priority of the day.",
-      "Change a goal, task, habit or the priority with its pencil (Edit).",
+      "Plan the day's tasks and check in your habits.",
+      "Change a goal, task or habit with its pencil (Edit).",
       "Tick a habit like Study English automatically on your English study days, so it keeps the same run as your streak.",
       "Ask the Life Coach for a plan; add its suggestions with one tap, or copy an answer and send it on WhatsApp.",
       "Stuck between options? Open Decisions: list the options and the criteria that matter, give each a weight and a score, and see the best option, test other weights in What if?, ask EVO for an analysis and turn your choice into a goal.",
@@ -281,7 +281,7 @@ export const APP_GUIDE: GuideSection[] = [
     steps: [
       "Switch the interface between Portuguese and English in the menu; lessons stay in English.",
       "Turn on notifications for the word of the day and your study reminder.",
-      "The bell on the Home lists what is still open today: your plan, reviews, the daily reading, goal steps, habits, the priority of the day and, when it opens, the Final Test.",
+      "The bell on the Home lists what is still open today: your plan, reviews, the daily reading, goal steps, habits and, when it opens, the Final Test.",
       "Ask about the weather with Weather talk to practise small talk.",
     ],
   },

@@ -87,14 +87,7 @@ export function LifeHeader() {
 }
 
 /** What Premium adds to Life+ AI, each marked with a gold crown for free students. */
-const PREMIUM_ITEMS = [
-  "Priority of the day",
-  "Routine",
-  "Habits",
-  "Life Coach",
-  "Decisions",
-  "All meditations",
-] as const;
+const PREMIUM_ITEMS = ["Routine", "Habits", "Life Coach", "Decisions", "All meditations"] as const;
 
 /** Shown to free students in place of the Premium parts of Life+ AI (Goals stay free). */
 export function LifePremiumGate({ feature }: { feature: string }) {
