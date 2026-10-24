@@ -1,14 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Flame, Loader2, Pencil, Plus, Target, X } from "lucide-react";
+import { Check, Flame, Loader2, MoreHorizontal, Pencil, Plus, Target, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { GoalPlan } from "@/components/life/GoalPlan";
-import { LifeSectionTitle } from "@/components/life/LifeNav";
+import { LifeCheckMark, LifeSectionTitle } from "@/components/life/LifeNav";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { EvoGuide } from "@/components/EvoGuide";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useLife } from "@/hooks/useLife";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
@@ -43,6 +49,9 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
+  // With goals already set, "+ New goal" opens the form (user request,
+  // 2026-10-24); with none, the form and its examples show at once.
+  const [adding, setAdding] = useState(false);
 
   const load = useServerFn(loadPlus);
   const add = useServerFn(addPlusGoal);
@@ -77,6 +86,7 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
     mutationFn: (goal: string) => add({ data: { title: goal } }),
     onSuccess: () => {
       setTitle("");
+      setAdding(false);
       refresh();
     },
     onError: (error) =>
@@ -163,7 +173,7 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
             id="today-steps-title"
             icon={Target}
             accent="green"
-            title={t("Today's steps")}
+            title={t("Goal steps")}
             subtitle={t("One small step a day for each goal")}
             meta={
               goals.length
@@ -245,27 +255,35 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
                         <p className="min-w-0 flex-1 text-sm font-semibold" translate="no">
                           {goal.title}
                         </p>
-                        <button
-                          type="button"
-                          aria-label={t("Edit goal")}
-                          title={t("Edit goal")}
-                          onClick={() => setEditing({ id: goal.id, title: goal.title })}
-                          className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
-                        >
-                          <Pencil className="size-4" aria-hidden="true" />
-                        </button>
-                        <button
-                          type="button"
-                          aria-label={t("Remove goal")}
-                          title={t("Remove goal")}
-                          disabled={removeGoal.isPending}
-                          onClick={() => {
-                            if (window.confirm(t("Remove this goal?"))) removeGoal.mutate(goal.id);
-                          }}
-                          className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
-                        >
-                          <X className="size-4" aria-hidden="true" />
-                        </button>
+                        {/* Managing the goal sits behind one "⋯" (user request,
+                            2026-10-24: the card is for today's step). */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            aria-label={t("Goal options")}
+                            title={t("Goal options")}
+                            className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+                          >
+                            <MoreHorizontal className="size-4" aria-hidden="true" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onSelect={() => setEditing({ id: goal.id, title: goal.title })}
+                            >
+                              <Pencil className="size-4" aria-hidden="true" />
+                              {t("Edit goal")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={removeGoal.isPending}
+                              onSelect={() => {
+                                if (window.confirm(t("Remove this goal?")))
+                                  removeGoal.mutate(goal.id);
+                              }}
+                            >
+                              <X className="size-4" aria-hidden="true" />
+                              {t("Remove goal")}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     )}
                     {step ? (
@@ -279,17 +297,7 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
                           done ? "bg-brand-green/10" : "bg-secondary/60 hover:bg-secondary",
                         )}
                       >
-                        <span
-                          className={cn(
-                            "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border-2",
-                            done
-                              ? "border-brand-green bg-brand-green text-[oklch(0.2_0.04_160)]"
-                              : "border-muted-foreground/60",
-                          )}
-                          aria-hidden="true"
-                        >
-                          {done ? <Check className="size-3.5" strokeWidth={3} /> : null}
-                        </span>
+                        <LifeCheckMark done={done} className="mt-0.5" />
                         <span
                           translate="no"
                           className={cn(done && "text-muted-foreground line-through")}
@@ -327,7 +335,20 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
             </div>
           ) : null}
 
-          {canAdd && !isLoading && !isError ? (
+          {canAdd && !isLoading && !isError && goals.length > 0 && !adding ? (
+            <button
+              type="button"
+              onClick={() => setAdding(true)}
+              className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-brand-green/50 hover:text-foreground"
+            >
+              <Plus className="size-4" aria-hidden="true" />
+              {t("New goal")}{" "}
+              <span className="tabular-nums">
+                ({goals.length}/{PLUS_MAX_GOALS})
+              </span>
+            </button>
+          ) : null}
+          {canAdd && !isLoading && !isError && (goals.length === 0 || adding) ? (
             <form
               className="mt-5 border-t border-border pt-4"
               onSubmit={(event) => {
@@ -349,6 +370,11 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
                   onChange={(event) => setTitle(event.target.value)}
                   placeholder={t("Your goal")}
                 />
+                {adding ? (
+                  <Button type="button" variant="ghost" onClick={() => setAdding(false)}>
+                    {t("Cancel")}
+                  </Button>
+                ) : null}
                 <Button
                   type="submit"
                   disabled={title.trim().length < 3 || addGoal.isPending}
