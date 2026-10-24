@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { blackFridayActive, checkoutOffer, formatBrl, offerPriceCents } from "./blackFriday";
+import {
+  blackFridayActive,
+  blackFridayPhase,
+  blackFridayPush,
+  checkoutOffer,
+  daysUntilBlackFriday,
+  formatBrl,
+  offerPriceCents,
+} from "./blackFriday";
 
 const during = new Date("2026-11-27T12:00:00Z");
 const before = new Date("2026-11-23T02:59:00Z");
@@ -31,5 +39,24 @@ describe("Black Friday offer", () => {
     expect(formatBrl(offerPriceCents("yearly", checkoutOffer("yearly", [], during)))).toBe(
       "R$ 799,90",
     );
+  });
+});
+
+describe("Black Friday warm-up and pushes", () => {
+  it("announces the offer in the 14 days before it starts", () => {
+    expect(blackFridayPhase(new Date("2026-11-09T02:59:00Z"))).toBeNull();
+    expect(blackFridayPhase(new Date("2026-11-09T03:00:00Z"))).toBe("warmup");
+    expect(daysUntilBlackFriday(new Date("2026-11-09T12:00:00Z"))).toBe(14);
+    expect(daysUntilBlackFriday(new Date("2026-11-22T23:00:00Z"))).toBe(1);
+    expect(blackFridayPhase(during)).toBe("live");
+    expect(blackFridayPhase(after)).toBeNull();
+  });
+
+  it("pushes the offer on the first and the last day only", () => {
+    expect(blackFridayPush("2026-11-23")?.title).toContain("começou");
+    expect(blackFridayPush("2026-11-23")?.body).toContain("Até 30/11");
+    expect(blackFridayPush("2026-11-30")?.title).toContain("Último dia");
+    expect(blackFridayPush("2026-11-25")).toBeNull();
+    expect(blackFridayPush("2026-12-01")).toBeNull();
   });
 });

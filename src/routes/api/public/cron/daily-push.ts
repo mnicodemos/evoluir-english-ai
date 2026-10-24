@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { blackFridayPush } from "@/lib/billing/blackFriday";
+import { profileIsPremium } from "@/lib/billing/subscriptionView";
 import { leagueLevelOf } from "@/lib/level";
 import {
   finalTestUnlockedAt,
@@ -221,11 +223,15 @@ async function sendDailyPush(
     last_activity_date: string | null;
     streak_days: number | null;
     league_opt_in: boolean | null;
+    plan: string | null;
+    plan_expires_at: string | null;
   }[] = [];
   for (let at = 0; at < userIds.length; at += PROFILE_CHUNK) {
     const { data: chunk } = await supabaseAdmin
       .from("profiles")
-      .select("id, level, max_level, last_activity_date, streak_days, league_opt_in")
+      .select(
+        "id, level, max_level, last_activity_date, streak_days, league_opt_in, plan, plan_expires_at",
+      )
       .in("id", userIds.slice(at, at + PROFILE_CHUNK));
     profiles.push(...(chunk ?? []));
   }
@@ -483,6 +489,13 @@ async function sendDailyPush(
         reminder.body = `${reminder.body} ${lifeTasksLinePt(tasksOpen)}.`.slice(0, 280);
       }
       messages.set(p.id, reminder);
+      return;
+    }
+    // Black Friday's first and last mornings: free students hear the offer
+    // instead of the word of the day (owner decision, 2026-10-24).
+    const blackFriday = profileIsPremium(p) ? null : blackFridayPush(today);
+    if (blackFriday) {
+      messages.set(p.id, blackFriday);
       return;
     }
     const level = (p.level ?? "a1").toLowerCase();
