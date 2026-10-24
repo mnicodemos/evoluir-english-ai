@@ -57,6 +57,7 @@ import { SmartReviewCard } from "@/components/SmartReviewCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { GaugeRing } from "@/components/GaugeRing";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
 import { CampaignJourneyChip } from "@/components/CampaignJourney";
@@ -728,67 +729,25 @@ function Dashboard() {
                     )}
                   >
                     <CelebrationBurst active={celebrateGoal} />
-                    <svg
-                      className="absolute inset-0 size-full -rotate-90"
-                      viewBox="0 0 96 96"
-                      aria-hidden="true"
+                    {/* An open-bottom gauge (user request, 2026-10-24): the minutes
+                        sit in its gap, the centre shows the check once the goal is
+                        met and the share before. */}
+                    <GaugeRing
+                      progress={minutesToday / Math.max(profile.daily_minutes, 1)}
+                      label={`${minutesToday}/${profile.daily_minutes} min`}
                     >
-                      <circle
-                        cx="48"
-                        cy="48"
-                        r="39"
-                        fill="none"
-                        stroke="var(--secondary)"
-                        strokeWidth="11"
-                      />
-                      <circle
-                        cx="48"
-                        cy="48"
-                        r="39"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="11"
-                        strokeLinecap="round"
-                        strokeDasharray={2 * Math.PI * 39}
-                        strokeDashoffset={
-                          2 *
-                          Math.PI *
-                          39 *
-                          (1 - Math.min(1, minutesToday / Math.max(profile.daily_minutes, 1)))
-                        }
-                      />
-                    </svg>
-                    {/* Goal reached: the ring fills with a Check in its own colour,
-                        with the minutes kept under it (user request, 2026-10-24: the
-                        amount disappeared once the goal was met). */}
-                    {minutesToday >= profile.daily_minutes ? (
-                      <span
-                        className="relative grid justify-items-center gap-0.5"
-                        role="img"
-                        aria-label={`${minutesToday} of ${profile.daily_minutes} minutes, goal reached`}
-                      >
+                      {minutesToday >= profile.daily_minutes ? (
                         <Check
-                          className="size-7 text-brand-green lg:size-8"
-                          strokeWidth={3.5}
-                          aria-hidden="true"
+                          className="size-8 text-brand-green lg:size-9"
+                          strokeWidth={3.25}
+                          aria-label={`${minutesToday} of ${profile.daily_minutes} minutes, goal reached`}
                         />
-                        <span
-                          className="whitespace-nowrap text-[10px] font-medium leading-none text-muted-foreground"
-                          aria-hidden="true"
-                        >
-                          {minutesToday}/{profile.daily_minutes} min
+                      ) : (
+                        <span className="font-display text-lg font-bold leading-none text-foreground lg:text-xl">
+                          {Math.round((minutesToday / Math.max(profile.daily_minutes, 1)) * 100)}%
                         </span>
-                      </span>
-                    ) : (
-                      <span className="relative text-center font-display text-sm font-bold leading-none text-foreground lg:text-lg">
-                        <span className="block whitespace-nowrap">
-                          {minutesToday}/{profile.daily_minutes}
-                        </span>
-                        <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
-                          min
-                        </span>
-                      </span>
-                    )}
+                      )}
+                    </GaugeRing>
                   </div>
                 </div>
                 <div className="grid min-w-0 gap-2 lg:self-start xl:gap-1 2xl:gap-2">

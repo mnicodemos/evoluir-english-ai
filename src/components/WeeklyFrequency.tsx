@@ -3,6 +3,7 @@ import { CalendarDays, Check, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { GoldTrophy } from "@/components/GoldTrophy";
+import { GaugeRing } from "@/components/GaugeRing";
 import { useCelebrate } from "@/hooks/useCelebrate";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
 import { STUDY_TIME_ZONE } from "@/lib/today";
@@ -215,8 +216,6 @@ export function WeeklyFrequency({
   }
 
   if (presentation === "dashboard-panel") {
-    const radius = 39;
-    const circumference = 2 * Math.PI * radius;
     const progress = weeklyGoal > 0 ? Math.min(1, studiedCount / weeklyGoal) : 0;
     return (
       <section
@@ -247,61 +246,21 @@ export function WeeklyFrequency({
             )}
           >
             <CelebrationBurst active={celebrateWeek} />
-            <svg
-              className="absolute inset-0 size-full -rotate-90"
-              viewBox="0 0 96 96"
-              aria-hidden="true"
-            >
-              <circle
-                cx="48"
-                cy="48"
-                r={radius}
-                fill="none"
-                stroke="var(--secondary)"
-                strokeWidth="11"
-              />
-              <circle
-                cx="48"
-                cy="48"
-                r={radius}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="11"
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={circumference * (1 - progress)}
-              />
-            </svg>
-            {/* Goal reached: the ring fills with a Check in its own colour
-                instead of the day count (user request, like Today's Progress). */}
-            {/* Same goal-met ring as Today's Progress: a bold check with the
-                count kept under it (user request, 2026-10-24: one standard). */}
-            {allStudied ? (
-              <span
-                className="relative grid justify-items-center gap-0.5"
-                role="img"
-                aria-label={`${studiedCount} of ${weeklyGoal} days, goal reached`}
-              >
+            {/* The same open-bottom gauge as Today's Progress (user request,
+                2026-10-24): the days in its gap, the check or the share inside. */}
+            <GaugeRing progress={progress} label={`${studiedCount}/${weeklyGoal} ${daysLabel}`}>
+              {allStudied ? (
                 <Check
-                  className="size-7 text-brand-green 2xl:size-8"
-                  strokeWidth={3.5}
-                  aria-hidden="true"
+                  className="size-8 text-brand-green 2xl:size-9"
+                  strokeWidth={3.25}
+                  aria-label={`${studiedCount} of ${weeklyGoal} days, goal reached`}
                 />
-                <span
-                  className="whitespace-nowrap text-[10px] font-medium leading-none text-muted-foreground"
-                  aria-hidden="true"
-                >
-                  {studiedCount}/{weeklyGoal} {daysLabel}
+              ) : (
+                <span className="font-display text-xl font-bold leading-none text-foreground">
+                  {Math.round(progress * 100)}%
                 </span>
-              </span>
-            ) : (
-              <span className="relative text-center font-display text-lg font-bold leading-none text-foreground">
-                {studiedCount}/{weeklyGoal}
-                <span className="mt-1 block text-[10px] font-medium text-muted-foreground">
-                  {daysLabel}
-                </span>
-              </span>
-            )}
+              )}
+            </GaugeRing>
           </div>
           <div>
             {/* Third line (user request), moved above the day count and in
