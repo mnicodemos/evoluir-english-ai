@@ -39,7 +39,15 @@ function ReviewPage() {
   const { data: states } = useUserFlashcards();
   const { data: userLessons } = useUserLessons();
   const minutesSpent = useTimeSpent();
-  useLogTimeOnExit({ timer: minutesSpent, profile, type: "flashcards", title: "Flashcard review" });
+  // Time on this page counts only once a card was rated (audit, 2026-10-24:
+  // opening the deck and leaving added minutes without any review).
+  const [ratedCount, setRatedCount] = useState(0);
+  useLogTimeOnExit({
+    timer: minutesSpent,
+    profile: ratedCount > 0 ? profile : null,
+    type: "flashcards",
+    title: "Flashcard review",
+  });
 
   const queryClient = useQueryClient();
   const [round, setRound] = useState(0);
@@ -121,6 +129,7 @@ function ReviewPage() {
             userId={profile?.id}
             states={states ?? []}
             onRated={() => {
+              setRatedCount((count) => count + 1);
               queryClient.invalidateQueries({ queryKey: ["user-flashcards"] });
               queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
             }}

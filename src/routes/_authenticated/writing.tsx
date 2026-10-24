@@ -152,13 +152,19 @@ function saveResults(signature: string, results: Record<string, WritingFeedback>
   }
 }
 
+/** Words a draft needs before its time counts when the student leaves. */
+const WRITING_DRAFT_MIN_WORDS = 5;
+
 function Writing() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
   const minutesSpent = useTimeSpent();
+  // A text left before the correction still counts once it holds a few words
+  // (minutes audit, 2026-10-24: 10 minutes of writing left with 0).
+  const [draftWords, setDraftWords] = useState(0);
   useLogTimeOnExit({
     timer: minutesSpent,
-    profile,
+    profile: draftWords >= WRITING_DRAFT_MIN_WORDS ? profile : null,
     type: "writing_practice",
     title: "Writing practice",
   });
@@ -188,6 +194,9 @@ function Writing() {
   const [done, setDone] = useState<string[]>([]);
   const [prompt, setPrompt] = useState("");
   const [text, setText] = useState("");
+  useEffect(() => {
+    setDraftWords(text.trim() ? text.trim().split(/\s+/).length : 0);
+  }, [text]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WritingFeedback | null>(null);
   const [results, setResults] = useState<Record<string, WritingFeedback>>({});

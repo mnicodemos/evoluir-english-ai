@@ -172,9 +172,12 @@ function ListeningPage() {
   const sessionsToday = todayActivities.filter((row) => row.activity_type === "listening").length;
   const sessionsGoal = STUDY_DAY_RULE.listening;
   const minutesSpent = useTimeSpent();
+  // A session left before Finish still counts once a sentence was answered
+  // (minutes audit, 2026-10-24: 2 of 3 sentences left with 0).
+  const [answeredSentences, setAnsweredSentences] = useState(0);
   useLogTimeOnExit({
     timer: minutesSpent,
-    profile,
+    profile: answeredSentences > 0 ? profile : null,
     type: "listening_practice",
     title: "Listening practice",
   });
@@ -187,6 +190,9 @@ function ListeningPage() {
   const [checked, setChecked] = useState<number | null>(null);
   const [scores, setScores] = useState<number[]>([]);
   const [transcripts, setTranscripts] = useState<string[][]>([]);
+  useEffect(() => {
+    setAnsweredSentences(transcripts.filter((tries) => tries.length > 0).length);
+  }, [transcripts]);
   const operationKey = useRef(crypto.randomUUID());
   // Up to 3 attempts per sentence; the best score is kept. Below 70% forces a retry.
   const [attempts, setAttempts] = useState(0);

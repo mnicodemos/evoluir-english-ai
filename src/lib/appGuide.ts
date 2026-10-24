@@ -215,7 +215,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Send 3 texts in Writing.",
       "Do 3 Listening sessions.",
       "Review 10 words in Vocabulary.",
-      "Finish 1 conversation with EVO in AI Speaking.",
+      "Finish 1 conversation with EVO, in AI Speaking or the video call, up to its report.",
       "Answer every question of the Daily reading.",
       "Do every goal step of the day in Life+ AI.",
     ],
