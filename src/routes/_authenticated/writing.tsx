@@ -36,6 +36,7 @@ import {
   type WritingLevelConfig,
 } from "@/lib/writingLevels";
 import { studyDayStartIso, studyToday } from "@/lib/today";
+import { DoneSeal } from "@/components/DoneSeal";
 
 export const Route = createFileRoute("/_authenticated/writing")({
   head: () => ({
@@ -392,7 +393,7 @@ function Writing() {
 
             {allDone ? (
               <div className="mt-6 rounded-xl border border-brand-green/40 bg-brand-green/10 p-5 text-center">
-                <CheckCircle2 className="mx-auto size-8 text-brand-green" />
+                <DoneSeal className="mx-auto" />
                 <p className="mt-2 font-semibold">All 3 writing tasks completed!</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   New writing tasks arrive tomorrow, or as soon as you start a new lesson in the
@@ -404,7 +405,7 @@ function Writing() {
               </div>
             ) : currentDone ? (
               <div className="mt-6 rounded-xl border border-brand-green/40 bg-brand-green/10 p-5 text-center">
-                <CheckCircle2 className="mx-auto size-8 text-brand-green" />
+                <DoneSeal className="mx-auto" />
                 <p className="mt-2 font-semibold">This task is already checked.</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Want a better score? Redo it and submit a new version.
