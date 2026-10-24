@@ -166,7 +166,7 @@ export function SmartReviewCard({
         ) : (
           // Nothing measured yet: "all done" would be untrue, so it says what fills it.
           <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
-            <Clock className="size-8 text-brand-green" strokeWidth={1.8} aria-hidden="true" />
+            <DoneSeal icon={Clock} />
             <p className="text-sm font-semibold">{t("No reviews yet")}</p>
             <p className="text-[11px] text-muted-foreground">
               {t("Your reviews appear here once EVO measures your skills in lessons and practice.")}
