@@ -821,12 +821,14 @@ function Dashboard() {
                             ? "text-muted-foreground/60"
                             : "text-foreground";
                       return (
+                        // Phones: the icon sits centred in its column, as far from the
+                        // ring as from the number (user request, 2026-10-24).
                         <div
                           key={card.key}
                           className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
                         >
                           <Icon
-                            className={`size-4 shrink-0 justify-self-end lg:justify-self-auto ${iconClass}`}
+                            className={`size-4 shrink-0 justify-self-center lg:justify-self-auto ${iconClass}`}
                             strokeWidth={2.4}
                             aria-hidden="true"
                           />
