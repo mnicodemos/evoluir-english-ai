@@ -1,4 +1,4 @@
-import { Check, type LucideIcon } from "lucide-react";
+import { Check, createLucideIcon, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -7,8 +7,14 @@ import { cn } from "@/lib/utils";
  * a thin ring and a bold check, the same as a studied day in the week strip.
  * Solid green stays for what is active today; small checks beside list items
  * keep their plain icon. A state that is not done yet ("Nothing yet today")
- * takes the same seal with its own icon (a clock), never a check.
+ * takes the same seal with its own icon (the clock's hands), never a check.
  */
+
+/** Only a clock's hands: the seal's ring is the clock face (user request,
+ *  2026-10-24: the whole clock icon inside the ring drew two circles). */
+export const ClockHands = createLucideIcon("ClockHands", [
+  ["path", { d: "M12 5.5V12l4.5 2.5", key: "clock-hands" }],
+]);
 export function DoneSeal({
   size = "md",
   icon: Icon = Check,
@@ -30,7 +36,10 @@ export function DoneSeal({
       )}
       aria-hidden="true"
     >
-      <Icon className={small ? "size-3" : "size-5"} strokeWidth={Icon === Check ? 3 : 2.5} />
+      <Icon
+        className={small ? "size-3" : Icon === ClockHands ? "size-7" : "size-5"}
+        strokeWidth={Icon === Check ? 3 : Icon === ClockHands ? 2.25 : 2.5}
+      />
     </span>
   );
 }

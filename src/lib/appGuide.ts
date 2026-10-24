@@ -53,7 +53,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Extra practice offers two short options; each shows the XP it earns.",
       "Today's Progress fills the ring with today's minutes and lists what you did.",
     ],
-    tip: "Take the challenge has a goal for the day and leaves once you reach it.",
+    tip: "Take the challenge has a goal for the day and leaves once you reach it. Every other day it invites you to the AI Teacher or the video call.",
     to: "/dashboard",
   },
   {

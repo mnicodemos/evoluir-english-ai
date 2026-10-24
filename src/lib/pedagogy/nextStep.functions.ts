@@ -27,6 +27,7 @@ import {
 } from "./nextStep";
 import { onCardSkills } from "./skillMeter";
 import { deriveSkillQuests } from "./skillQuest";
+import { withConversationChallenge } from "./conversationChallenge";
 import { buildSmartReviewList } from "./smartReviewUx";
 
 const RECENT_DAYS = 7;
@@ -182,7 +183,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
     // "Take the challenge" works a DIFFERENT skill than "Practice now" and opens
     // a different screen, so the Dashboard's three buttons never lead to the
     // same place.
-    const quest =
+    const skillQuest =
       deriveSkillQuests({
         gaps: deriveInvisibleGaps({ evidence }),
         lessonBySkill,
@@ -193,6 +194,13 @@ export const loadNextStep = createServerFn({ method: "POST" })
           candidate.resource.to !== step.activity.to &&
           candidate.resource.to !== step.quickWin?.activity.to,
       ) ?? null;
+    // Every other day the challenge invites the student to the AI Teacher or
+    // the video call instead (user request), never where the other buttons go.
+    const quest = withConversationChallenge(skillQuest, {
+      day: today,
+      prioritySkill: step.prioritySkill,
+      taken: [step.activity.to, step.quickWin?.activity.to].filter(Boolean) as string[],
+    });
 
     // Phase 33: the review recommendations, decided here on the server from the
     // very same rows already read above (no extra query, no per-skill lookup).

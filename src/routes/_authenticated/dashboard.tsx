@@ -57,7 +57,7 @@ import { SmartReviewCard } from "@/components/SmartReviewCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DoneSeal } from "@/components/DoneSeal";
+import { ClockHands, DoneSeal } from "@/components/DoneSeal";
 import { GaugeRing } from "@/components/GaugeRing";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
@@ -756,7 +756,7 @@ function Dashboard() {
                 <div className="grid min-w-0 gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                   {!hasProgressToday && (
                     <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground">
-                      <DoneSeal icon={Clock} />
+                      <DoneSeal icon={ClockHands} />
                       <p className="text-[11px] font-bold leading-tight">
                         {t("Nothing yet today")}
                       </p>

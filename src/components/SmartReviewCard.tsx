@@ -1,15 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import {
-  ArrowRight,
-  BookOpen,
-  Clock,
-  GraduationCap,
-  Mic,
-  RotateCcw,
-  RefreshCw,
-} from "lucide-react";
+import { ArrowRight, BookOpen, GraduationCap, Mic, RotateCcw, RefreshCw } from "lucide-react";
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
 import reviewGrammar from "@/assets/review-grammar.webp";
@@ -35,7 +27,7 @@ import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { SMART_REVIEW_MAX_ITEMS, SMART_REVIEW_REASON_TEXT } from "@/lib/pedagogy/smartReviewUx";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
-import { DoneSeal } from "@/components/DoneSeal";
+import { ClockHands, DoneSeal } from "@/components/DoneSeal";
 
 /**
  * "Smart review" — what is worth recovering now. Semantically distinct from
@@ -166,7 +158,7 @@ export function SmartReviewCard({
         ) : (
           // Nothing measured yet: "all done" would be untrue, so it says what fills it.
           <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
-            <DoneSeal icon={Clock} />
+            <DoneSeal icon={ClockHands} />
             <p className="text-sm font-semibold">{t("No reviews yet")}</p>
             <p className="text-[11px] text-muted-foreground">
               {t("Your reviews appear here once EVO measures your skills in lessons and practice.")}

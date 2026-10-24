@@ -11,8 +11,8 @@ export const appGuidePt: Record<string, string> = {
     "A Prática extra oferece duas opções curtas; cada uma mostra quanto XP vale.",
   "Today's Progress fills the ring with today's minutes and lists what you did.":
     "O Progresso de hoje enche o anel com os minutos do dia e mostra o que você fez.",
-  "Take the challenge has a goal for the day and leaves once you reach it.":
-    "O desafio tem uma meta para o dia e some quando você a alcança.",
+  "Take the challenge has a goal for the day and leaves once you reach it. Every other day it invites you to the AI Teacher or the video call.":
+    "O desafio tem uma meta para o dia e some quando você a alcança. Em dias alternados, ele convida você para o Professor de IA ou para a videochamada.",
   "Learning path": "Trilha de aprendizado",
   "The lessons of your level, in order, from the first unit to the Final Test.":
     "As lições do seu nível, em ordem, da primeira unidade até o Teste Final.",
