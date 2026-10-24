@@ -27,7 +27,7 @@ import { PathProgressCard } from "@/components/PathProgressCard";
 import { ScopeBadge } from "@/components/ScopeBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMinutesToday } from "@/components/DailyGoalCard";
+import { useTodayActivities } from "@/components/DailyGoalCard";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 import { useDueReviewState } from "@/hooks/useDueReviewCount";
@@ -77,8 +77,11 @@ export function SmartReviewCard({
   // Today's reading, for the "New today" rows (same query as the bell).
   const { data: readingDone } = useDailyReadingDone(profile?.id);
   // Today's minutes against the goal: until it is met, free rows keep a next
-  // step (same query as Today's Progress).
-  const { data: minutesToday } = useMinutesToday(profile?.id);
+  // step. The same query as Today's Progress, read without its Realtime
+  // channel: useMinutesToday's channel already exists on the Dashboard, and
+  // opening it twice threw and broke the page.
+  const { data: todayActivities } = useTodayActivities(profile?.id);
+  const minutesToday = todayActivities?.reduce((sum, row) => sum + (row.duration_minutes ?? 0), 0);
   const goalMinutes = profile?.daily_minutes ?? 0;
   const goalReached = goalMinutes > 0 && (minutesToday ?? 0) >= goalMinutes;
   // Never wait longer than this for the extra answers (a vocabulary batch being
