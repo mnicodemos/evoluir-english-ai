@@ -128,6 +128,13 @@ const baseUiPt: Record<string, string> = {
   "Nothing is charged today. Cancel before the trial ends and you pay nothing.":
     "Nada é cobrado hoje. Cancele antes do fim do teste e você não paga nada.",
   "Start free trial": "Começar teste grátis",
+  "Black Friday": "Black Friday",
+  "Black Friday:": "Black Friday:",
+  "off the first year of the yearly plan": "de desconto no primeiro ano do plano anual",
+  "days free on the monthly plan": "dias grátis no plano mensal",
+  "off the first year": "de desconto no primeiro ano",
+  "days free": "dias grátis",
+  Until: "Até",
   "After the trial,": "Depois do teste,",
   "Cancel any time in My subscription before the trial ends.":
     "Cancele quando quiser em Minha assinatura antes do fim do teste.",
