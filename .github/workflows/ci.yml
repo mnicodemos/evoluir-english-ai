@@ -85,7 +85,13 @@ jobs:
           audit_log="$(mktemp)"
           audit_ok=false
           for attempt in 1 2 3; do
-            if bun audit --audit-level=high >"$audit_log" 2>&1; then
+            # Temporarily ignored (2026-10-23): GHSA-mrhx-c7xc-m3w5, zod memory use on
+            # oversized constrained collections, fixed only in zod 4.6.6; the app is
+            # on zod 3 (no 3.x fix). Remove once the app migrates to zod >= 4.6.6.
+            # Also (2026-10-23): GHSA-xjj6-f33q-929c, undici < 7.30.1 (transitive; DoS
+            # only from a malicious server's response, and the app calls trusted
+            # APIs). Remove once bun.lock has undici >= 7.30.1.
+            if bun audit --audit-level=high --ignore=GHSA-mrhx-c7xc-m3w5 --ignore=GHSA-xjj6-f33q-929c >"$audit_log" 2>&1; then
               cat "$audit_log"
               audit_ok=true
               break
@@ -100,6 +106,10 @@ jobs:
               fi
             else
               echo "::error::Dependency audit failed for a reason other than a confirmed npm HTTP 503."
+              # Each finding as an annotation too, readable without the full log.
+              grep -Ei 'high|critical|vulnerab|GHSA|^[a-z@][^ ]* ' "$audit_log" | head -20 | while IFS= read -r line; do
+                echo "::error::audit: ${line}"
+              done
               exit 1
             fi
           done
