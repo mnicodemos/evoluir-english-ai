@@ -118,7 +118,10 @@ async function runTeacherTurn(data: TeacherTurnInput, userId: string) {
       ...(coachPromptBlock ? { coachBlock: coachPromptBlock } : {}),
     }),
     true,
-    { userId, operation: "teacher" },
+    // No thinking step (user report, 2026-10-24: the AI Teacher took too long
+    // to analyse what the student wrote); the fixed rubric and JSON shape in
+    // the prompt carry the analysis, like the lessons and Writing help.
+    { userId, operation: "teacher", fast: true },
   );
   const turn = parseTeacherTurn(raw);
 

@@ -182,7 +182,9 @@ export const analyseAuthoritativeWriting = createServerFn({ method: "POST" })
         priorities: writingConfig.priorities,
       }),
       true,
-      { userId: context.userId, operation: "writing_correction" },
+      // No thinking step, like the AI Teacher (user report, 2026-10-24: the
+      // analysis of what the student wrote took too long).
+      { userId: context.userId, operation: "writing_correction", fast: true },
     );
     const feedback = parseWritingFeedback(raw, data.originalText);
     const record = writingSubmissionRecord({
