@@ -158,6 +158,7 @@ const baseUiPt: Record<string, string> = {
   "Did you finish this task?": "Você terminou esta tarefa?",
   "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
   "Review words": "Revisar palavras",
+  "Review mistakes": "Revisar erros",
   "Focus this week": "Foco nesta semana",
   "in 7 days": "em 7 dias",
   "Focus block done! Time for a break.": "Bloco de foco concluído! Hora da pausa.",

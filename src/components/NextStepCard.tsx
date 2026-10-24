@@ -28,6 +28,8 @@ import { EvoGuide } from "@/components/EvoGuide";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useDueReviewState } from "@/hooks/useDueReviewCount";
+import { useMistakesDue } from "@/hooks/useMistakesDue";
 import { useProfile } from "@/hooks/useProfile";
 import { useTodayActivities } from "@/components/DailyGoalCard";
 import {
@@ -82,6 +84,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const weekDone = !!studyPlan && studyPlan.plan.nextIndex === null;
   // Vocabulary words whose review date has arrived (same count as the bell).
   const activityIndicators = useActivityIndicators();
+  // Reviews waiting today: on phones they take the Quick Win's place when there
+  // is no Quick Win (user request, 2026-10-24).
+  const { count: wordsDue } = useDueReviewState(profile?.id);
+  const { data: mistakesDue = 0 } = useMistakesDue(profile?.id);
   // Until today's practice has loaded, the buttons show right away instead of
   // popping in seconds later; they leave only once that activity is known done.
   const actionAvailable = (to: string, indicators: typeof activityIndicators) =>
@@ -344,6 +350,55 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
 
   // Mobile-only league chip (in place of the challenge, which stays on desktop):
   // the header strip with the league is hidden on phones.
+  // Phones: with no Quick Win, a review fills its place, the same order as
+  // Keep improving: due words, due mistakes, then EVO's first review
+  // suggestion still open today (never where Practice now already goes).
+  const reviewSuggestion = (data.reviews ?? []).find(
+    (item) =>
+      actionAvailable(item.resource.to, activityIndicators) &&
+      item.resource.to !== data.activity.to,
+  );
+  const mobileReview: { to: string; params?: { lessonId: string }; label: string } | null =
+    wordsDue > 0
+      ? { to: "/vocabulary", label: t("Review words") }
+      : mistakesDue > 0
+        ? { to: "/mistakes", label: t("Review mistakes") }
+        : reviewSuggestion
+          ? {
+              to: reviewSuggestion.resource.to,
+              ...(reviewSuggestion.resource.params
+                ? { params: reviewSuggestion.resource.params }
+                : {}),
+              label: `${t("Review")}: ${t(
+                NEXT_STEP_SKILL_TEXT[reviewSuggestion.skill] ?? reviewSuggestion.skill,
+              )}`,
+            }
+          : null;
+  const mobileReviewButton =
+    !quickWinButton && mobileReview ? (
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-7 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:hidden"
+      >
+        {mobileReview.params ? (
+          <Link to="/learning/$lessonId" params={mobileReview.params}>
+            <span className="flex items-center gap-1.5 font-medium leading-none">
+              <RefreshCw className="size-3.5 shrink-0 text-sky-300" aria-hidden="true" />
+              {mobileReview.label}
+            </span>
+          </Link>
+        ) : (
+          <Link to={mobileReview.to}>
+            <span className="flex items-center gap-1.5 font-medium leading-none">
+              <RefreshCw className="size-3.5 shrink-0 text-sky-300" aria-hidden="true" />
+              {mobileReview.label}
+            </span>
+          </Link>
+        )}
+      </Button>
+    ) : null;
   const leagueButton = (
     <Button
       asChild
@@ -472,7 +527,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 card's free height instead of crowding under the EVO label
                 (user report). */}
             <div className="mt-1 flex flex-nowrap items-center gap-1.5 sm:hidden">
-              {quickWinButton}
+              {quickWinButton ?? mobileReviewButton}
               {leagueButton}
               {mapButton}
             </div>
