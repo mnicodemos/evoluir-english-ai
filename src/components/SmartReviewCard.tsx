@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
-  CheckCircle2,
   Clock,
   GraduationCap,
   Mic,
@@ -220,10 +219,10 @@ export function SmartReviewCard({
                 asChild
                 variant="ghost"
                 size="icon"
-                className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
               >
                 <Link to="/vocabulary" aria-label={`${t("Review now")}: ${t("Vocabulary")}`}>
-                  <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
+                  <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
               </Button>
             </li>
@@ -248,10 +247,10 @@ export function SmartReviewCard({
                 asChild
                 variant="ghost"
                 size="icon"
-                className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
               >
                 <Link to="/mistakes" aria-label={`${t("Review now")}: ${t("My mistakes")}`}>
-                  <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
+                  <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
               </Button>
             </li>
@@ -291,7 +290,7 @@ export function SmartReviewCard({
                   asChild
                   variant="ghost"
                   size="icon"
-                  className="size-9 shrink-0 text-white hover:bg-white/10 hover:text-white"
+                  className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
                 >
                   {item.resource.params ? (
                     <Link
@@ -299,11 +298,11 @@ export function SmartReviewCard({
                       params={item.resource.params}
                       aria-label={`${t("Review now")}: ${skillLabel}`}
                     >
-                      <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
+                      <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                     </Link>
                   ) : (
                     <Link to={item.resource.to} aria-label={`${t("Review now")}: ${skillLabel}`}>
-                      <RefreshCw className="size-[1.65rem]" strokeWidth={2.5} aria-hidden="true" />
+                      <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                     </Link>
                   )}
                 </Button>
@@ -313,7 +312,7 @@ export function SmartReviewCard({
           {rows === 1 && (
             // A single review would leave half the card empty: say the rest is done.
             <li className="flex min-h-0 items-center justify-center gap-2 rounded-md border border-dashed border-border text-xs text-muted-foreground">
-              <CheckCircle2 className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+              <DoneSeal size="sm" />
               {t("Nothing else to review right now.")}
             </li>
           )}
