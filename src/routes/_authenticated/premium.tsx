@@ -18,6 +18,8 @@ import {
 import {
   BLACK_FRIDAY,
   blackFridayActive,
+  blackFridayPhase,
+  daysUntilBlackFriday,
   checkoutOffer,
   formatBrl,
   offerPriceCents,
@@ -130,6 +132,8 @@ function Premium() {
   // 15 days on the monthly plan and 15% off the yearly (blackFriday.ts). The
   // server decides at checkout; this only shows the offer.
   const campaign = blackFridayActive();
+  // The 14 days before: the offer is announced, not applied yet.
+  const warmup = blackFridayPhase() === "warmup";
   const pastSubscriptions = access ? access.subscriptions : [{}];
   const monthlyOffer = checkoutOffer("monthly", pastSubscriptions);
   const yearlyOffer = checkoutOffer("yearly", pastSubscriptions);
@@ -293,6 +297,24 @@ function Premium() {
             </section>
           ) : (
             <>
+              {warmup ? (
+                <section className="card-soft flex items-start gap-3 border border-amber-400/40 bg-amber-400/[0.07] p-5">
+                  <Tag className="mt-0.5 size-5 shrink-0 text-amber-300" aria-hidden="true" />
+                  <div>
+                    <h2 className="font-display text-base font-semibold">
+                      <span>Black Friday in</span> {daysUntilBlackFriday()}{" "}
+                      <span>{daysUntilBlackFriday() === 1 ? "day" : "days"}</span>
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      <span>From</span> {formatAccessDate(BLACK_FRIDAY.startsAt, lang)}:{" "}
+                      {BLACK_FRIDAY.monthlyPercentOff}% <span>off the monthly plan for</span>{" "}
+                      {BLACK_FRIDAY.discountMonths} <span>months</span> +{" "}
+                      {BLACK_FRIDAY.monthlyTrialDays}{" "}
+                      <span>days free on your first subscription</span>.
+                    </p>
+                  </div>
+                </section>
+              ) : null}
               {campaign ? (
                 <section className="card-soft flex items-start gap-3 border border-amber-400/40 bg-amber-400/[0.07] p-5">
                   <Tag className="mt-0.5 size-5 shrink-0 text-amber-300" aria-hidden="true" />

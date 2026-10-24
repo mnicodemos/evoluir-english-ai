@@ -21,6 +21,8 @@ export const BLACK_FRIDAY = {
   /** Paid months the discount covers; the 4th is full price. */
   discountMonths: 3,
   monthlyTrialDays: 15,
+  /** Warm-up before the start (owner decision, 2026-10-24): 14 days. */
+  warmupDays: 14,
   /** Stripe coupon, created on first use (ensureBlackFridayCoupon). */
   couponId: "EVOLUIR_BF2026_MONTHLY30X3",
 } as const;
@@ -34,6 +36,62 @@ export const PLAN_PRICE_CENTS: Record<BillingInterval, number> = {
 export function blackFridayActive(now: Date = new Date()): boolean {
   const time = now.getTime();
   return time >= Date.parse(BLACK_FRIDAY.startsAt) && time < Date.parse(BLACK_FRIDAY.endsAt);
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const SAO_PAULO_OFFSET_MS = 3 * 60 * 60 * 1000;
+
+/** The São Paulo calendar day (YYYY-MM-DD) of an instant. */
+function saoPauloDay(time: number): string {
+  return new Date(time - SAO_PAULO_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+/** The first and last days of the offer, in São Paulo. */
+export const BLACK_FRIDAY_FIRST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.startsAt));
+export const BLACK_FRIDAY_LAST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.endsAt) - 1);
+
+/**
+ * Where the campaign stands: the warm-up (the 14 days before, when the app
+ * announces it to bring sign-ups in early), live, or nothing.
+ */
+export function blackFridayPhase(now: Date = new Date()): "warmup" | "live" | null {
+  const time = now.getTime();
+  const start = Date.parse(BLACK_FRIDAY.startsAt);
+  if (blackFridayActive(now)) return "live";
+  if (time < start && time >= start - BLACK_FRIDAY.warmupDays * DAY_MS) return "warmup";
+  return null;
+}
+
+/** Whole São Paulo days until the offer starts (1 on its eve). */
+export function daysUntilBlackFriday(now: Date = new Date()): number {
+  const today = Date.parse(`${saoPauloDay(now.getTime())}T00:00:00Z`);
+  const first = Date.parse(`${BLACK_FRIDAY_FIRST_DAY}T00:00:00Z`);
+  return Math.max(0, Math.round((first - today) / DAY_MS));
+}
+
+/**
+ * The morning push to free students on the first and the last day (owner
+ * decision, 2026-10-24), in place of the word of the day; null other days.
+ */
+export function blackFridayPush(
+  today: string,
+): { title: string; body: string; path: string } | null {
+  const offer = `${BLACK_FRIDAY.monthlyPercentOff}% off no Premium mensal por ${BLACK_FRIDAY.discountMonths} meses + ${BLACK_FRIDAY.monthlyTrialDays} dias grátis na primeira assinatura`;
+  if (today === BLACK_FRIDAY_FIRST_DAY) {
+    return {
+      title: "🖤 A Black Friday começou!",
+      body: `${offer}. Até ${BLACK_FRIDAY_LAST_DAY.slice(8, 10)}/${BLACK_FRIDAY_LAST_DAY.slice(5, 7)}.`,
+      path: "/premium",
+    };
+  }
+  if (today === BLACK_FRIDAY_LAST_DAY) {
+    return {
+      title: "⏰ Último dia de Black Friday",
+      body: `Hoje é a última chance: ${offer}.`,
+      path: "/premium",
+    };
+  }
+  return null;
 }
 
 export type CheckoutOffer = {

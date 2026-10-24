@@ -26,6 +26,7 @@ import {
   Sparkles,
   SpellCheck,
   Repeat,
+  Tag,
   Target,
   Trophy,
 } from "lucide-react";
@@ -49,6 +50,7 @@ import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
 import { businessLevelAllowed } from "@/lib/businessCourse";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
+import { BLACK_FRIDAY, blackFridayPhase, daysUntilBlackFriday } from "@/lib/billing/blackFriday";
 import { PathProgressCard } from "@/components/PathProgressCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
@@ -202,7 +204,20 @@ function DashboardNotifications({
   const path = useLearningPath();
   const finalTestReady = path.finalTest.unlocked && !path.finalTest.passed;
   const nextLevel = finalTestReady ? getLevelState(path.level).next?.value.toUpperCase() : null;
+  // Black Friday (owner decision, 2026-10-24): free students see it coming
+  // during the 14-day warm-up and then the live offer, both opening /premium.
+  const blackFriday = profile && !profileIsPremium(profile) ? blackFridayPhase() : null;
   const items = [
+    {
+      id: "black-friday",
+      to: "/premium",
+      label:
+        blackFriday === "live"
+          ? `Black Friday: ${BLACK_FRIDAY.monthlyPercentOff}% ${translate("off Premium monthly for")} ${BLACK_FRIDAY.discountMonths} ${translate("months")}`
+          : `${translate("Black Friday in")} ${daysUntilBlackFriday()} ${translate(daysUntilBlackFriday() === 1 ? "day" : "days")}: ${BLACK_FRIDAY.monthlyPercentOff}% ${translate("off Premium")}`,
+      icon: Tag,
+      visible: blackFriday !== null,
+    },
     {
       id: "final-test",
       to: "/learning",
