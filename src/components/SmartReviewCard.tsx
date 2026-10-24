@@ -32,7 +32,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import { NEXT_STEP_SKILL_TEXT } from "@/lib/pedagogy/nextStep";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
-import { SMART_REVIEW_REASON_TEXT } from "@/lib/pedagogy/smartReviewUx";
+import { SMART_REVIEW_MAX_ITEMS, SMART_REVIEW_REASON_TEXT } from "@/lib/pedagogy/smartReviewUx";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { DoneSeal } from "@/components/DoneSeal";
@@ -342,7 +342,7 @@ export function SmartReviewCard({
             <p className="text-sm text-muted-foreground">{t("Worth recovering now")}</p>
 
             <ul className="mt-4 grid gap-4">
-              {items.map((item) => {
+              {items.slice(0, SMART_REVIEW_MAX_ITEMS).map((item) => {
                 const skillLabel = t(NEXT_STEP_SKILL_TEXT[item.skill] ?? item.skill);
                 return (
                   <li
