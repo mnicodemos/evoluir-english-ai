@@ -34,6 +34,12 @@ export function describeCheckoutError(error: unknown): string {
     .replace(/(sk|rk|pk)_(live|test)_[A-Za-z0-9]+/g, "$1_$2_***");
 }
 
+/** Stripe's answer for a customer id the account does not have. */
+export function isMissingCustomer(error: unknown): boolean {
+  const detail = error as { code?: string; param?: string } | null;
+  return detail?.code === "resource_missing" && detail.param === "customer";
+}
+
 export const createStripeCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(parseCheckoutInput)
@@ -49,8 +55,7 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
       const stripe = getStripe();
       const origin = resolveOrigin();
 
-      let customerId = await getLinkedCustomerId(context.userId);
-      if (!customerId) {
+      const createCustomer = async () => {
         const { data: profile } = await context.supabase
           .from("profiles")
           .select("email, name")
@@ -62,9 +67,12 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
           ...(profile?.email ? { email: profile.email } : {}),
           ...(profile?.name ? { name: profile.name } : {}),
         });
-        customerId = customer.id;
-        await linkCustomer(context.userId, customerId);
-      }
+        await linkCustomer(context.userId, customer.id);
+        return customer.id;
+      };
+
+      let customerId = await getLinkedCustomerId(context.userId);
+      if (!customerId) customerId = await createCustomer();
 
       // 7 days free on the account's first subscription (trial.ts): Stripe takes
       // the card now and charges on day 8 unless the student cancels before.
@@ -76,25 +84,38 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
         .limit(1);
       const withTrial = trialEligible(past ?? [{}]);
 
-      const session = await stripe.checkout.sessions.create({
-        mode: "subscription",
-        customer: customerId,
-        line_items: [{ price: priceId, quantity: 1 }],
-        client_reference_id: context.userId,
-        metadata: { user_id: context.userId, interval: data.interval },
-        payment_method_collection: "always",
-        subscription_data: {
+      const openSession = (customer: string) =>
+        stripe.checkout.sessions.create({
+          mode: "subscription",
+          customer,
+          line_items: [{ price: priceId, quantity: 1 }],
+          client_reference_id: context.userId,
           metadata: { user_id: context.userId, interval: data.interval },
-          ...(withTrial
-            ? {
-                trial_period_days: TRIAL_DAYS,
-                trial_settings: { end_behavior: { missing_payment_method: "cancel" as const } },
-              }
-            : {}),
-        },
-        success_url: `${origin}/billing-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/premium`,
-      });
+          payment_method_collection: "always",
+          subscription_data: {
+            metadata: { user_id: context.userId, interval: data.interval },
+            ...(withTrial
+              ? {
+                  trial_period_days: TRIAL_DAYS,
+                  trial_settings: { end_behavior: { missing_payment_method: "cancel" as const } },
+                }
+              : {}),
+          },
+          success_url: `${origin}/billing-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${origin}/premium`,
+        });
+
+      let session;
+      try {
+        session = await openSession(customerId);
+      } catch (error) {
+        // A saved customer the account does not have (user report,
+        // 2026-10-23: one created in the Sandbox, then live keys): link a new
+        // one and open the checkout with it.
+        if (!isMissingCustomer(error)) throw error;
+        console.error("Stripe checkout: saved customer not found; creating a new one");
+        session = await openSession(await createCustomer());
+      }
 
       if (!session.url) throw new Error("Stripe did not return a checkout URL.");
       return { url: session.url };
