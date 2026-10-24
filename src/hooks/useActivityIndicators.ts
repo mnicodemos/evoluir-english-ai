@@ -2,14 +2,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 
+import { useTodayActivities } from "@/components/DailyGoalCard";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useRoundStart, useSavedPractice } from "@/hooks/usePracticeSync";
 import { useProfile } from "@/hooks/useProfile";
 import { fetchUserVocabularyMastery } from "@/hooks/useUserVocabularyMastery";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  LISTENING_COMPLETION_KEY,
-  LISTENING_TRACK_ID,
   listeningHasNewActivity,
   readJson,
   readText,
@@ -154,10 +153,13 @@ export function useActivityIndicators(): ActivityIndicators {
 
   const roundStart = useRoundStart();
   const { data: savedPractice } = useSavedPractice();
+  const { data: todayActivities } = useTodayActivities(profile?.id);
+  const listeningPartsToday = (todayActivities ?? []).filter(
+    (row) => row.activity_type === "listening",
+  ).length;
 
   useEffect(() => {
     if (!profile) return;
-    const completion = readJson<Record<string, number>>(LISTENING_COMPLETION_KEY, {});
     const config = writingLevelConfig(profile.level);
     const signature = `${studyToday()}-${config.level}-${round}`;
 
@@ -183,18 +185,14 @@ export function useActivityIndicators(): ActivityIndicators {
       // Only the first load counts as "not known": a background re-read (every
       // 15 s while a batch is empty, or after a mastery change) keeps the last
       // answer, so the Vocabulary row no longer blinks away and back (user request).
-      ready: savedPractice !== undefined && roundStart !== undefined && !vocabularyLoading,
-      // Same rule as the Listening page: a listening saved after the round
-      // began counts as done on every device of this account.
-      listening:
-        !(
-          roundStart !== undefined &&
-          (savedPractice?.listening ?? []).some((at) => !roundStart || at > roundStart)
-        ) &&
-        listeningHasNewActivity({
-          round,
-          completedRound: completion[LISTENING_TRACK_ID] ?? null,
-        }),
+      ready:
+        savedPractice !== undefined &&
+        roundStart !== undefined &&
+        todayActivities !== undefined &&
+        !vocabularyLoading,
+      // Same rule as the Listening page: today's session of 9 sentences is
+      // saved in 3 parts, on any device of this account.
+      listening: listeningHasNewActivity({ partsToday: listeningPartsToday }),
       writing: writingHasNewActivity({
         prompts,
         done,
@@ -214,6 +212,8 @@ export function useActivityIndicators(): ActivityIndicators {
     round,
     roundStart,
     savedPractice,
+    todayActivities,
+    listeningPartsToday,
     vocabularyBatch,
     vocabularyError,
     vocabularyLoading,

@@ -2017,11 +2017,14 @@ const baseUiPt: Record<string, string> = {
   "Cards marked as": "Cartões marcados como",
   "come back sooner. Cards marked as": "voltam antes. Cartões marcados como",
   "move forward.": "avançam.",
-  "Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the activity — a new set arrives every time you start a new lesson in the Learning Center.":
-    "Ouça a frase e repita em voz alta. Conclua as 3 frases para terminar a atividade — um novo conjunto chega sempre que você começa uma nova lição no Centro de Aprendizado.",
+  "Listen to the sentence and repeat it out loud. One session has 9 sentences and your progress is saved every 3, so you can stop and come back later.":
+    "Ouça a frase e repita em voz alta. Uma sessão tem 9 frases e seu progresso é salvo a cada 3, então você pode parar e voltar depois.",
   "Redo today's activity": "Refazer a atividade de hoje",
   "All 3 listening tasks completed!": "As 3 tarefas de listening foram concluídas!",
   "Sessions today": "Sessões hoje",
+  "Sentences today": "Frases hoje",
+  Saved: "Salva",
+  "listening sentences": "frases de Listening",
   "Delete priority": "Apagar prioridade",
   "Life+ AI tasks for today": "Tarefas do Life+ AI para hoje",
   "Add a goal": "Adicionar uma meta",
@@ -2062,8 +2065,13 @@ const baseUiPt: Record<string, string> = {
   "Which habit? e.g. Read 10 pages": "Qual hábito? Ex.: Ler 10 páginas",
   "Study day counted": "Dia de estudo contado",
   "3 sessions complete your study day.": "3 sessões completam seu dia de estudo.",
+  "One session of 9 sentences completes your study day.":
+    "Uma sessão de 9 frases completa seu dia de estudo.",
   "This session": "Esta sessão",
   "Session complete: all 3 sentences done!": "Sessão concluída: as 3 frases feitas!",
+  "Session complete: all 9 sentences done!": "Sessão concluída: as 9 frases feitas!",
+  "Want more? Another session brings 9 new sentences.":
+    "Quer mais? Outra sessão traz 9 frases novas.",
   "Do another session": "Fazer outra sessão",
   "New listening tasks arrive as soon as you start a new lesson in the Learning Center.":
     "Novas tarefas de listening chegam assim que você começa uma nova lição no Centro de Aprendizado.",

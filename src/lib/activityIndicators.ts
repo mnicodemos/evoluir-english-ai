@@ -7,8 +7,6 @@
  * as that state says the round was consumed.
  */
 
-export const LISTENING_COMPLETION_KEY = "listening-lab-completed-v1";
-export const LISTENING_TRACK_ID = "everyday";
 export const WRITING_HISTORY_ROUND_PREFIX = "writing-prompts-round-";
 export const WRITING_DONE_ROUND_PREFIX = "writing-done-round-";
 export const VOCABULARY_GENERATION_FAILED_PREFIX = "vocab-gen-failed:";
@@ -28,12 +26,12 @@ export function vocabularyGenerationRecentlyFailed(raw: string | null, now = Dat
   return now - at < VOCABULARY_FAILURE_PAUSE_MS;
 }
 
-/** The Listening round is new until it is completed for this lesson count. */
-export function listeningHasNewActivity(input: {
-  round: number;
-  completedRound: number | null | undefined;
-}) {
-  return input.completedRound !== input.round;
+/** Listening parts (3 sentences each) a whole session saves: the study day's 3. */
+export const LISTENING_PARTS_PER_SESSION = 3;
+
+/** Listening stays open until today's session of 9 sentences (3 parts) is saved. */
+export function listeningHasNewActivity(input: { partsToday: number }) {
+  return input.partsToday < LISTENING_PARTS_PER_SESSION;
 }
 
 /** Writing is new while the current round still has an unanswered task. */

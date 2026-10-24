@@ -66,4 +66,13 @@ describe("pickListeningSentences fallback", () => {
     const config = listeningLevelConfig("b2");
     expect(pickListeningSentences({ config, rotation: 5, count: 3 })).toHaveLength(3);
   });
+
+  it("fills a whole session of 9 at every level", () => {
+    for (const level of ["a1", "a2", "b1", "b2", "c1", "c2"]) {
+      const config = listeningLevelConfig(level);
+      const picked = pickListeningSentences({ config, rotation: 2, count: 9 });
+      expect(picked).toHaveLength(9);
+      expect(new Set(picked).size).toBe(9);
+    }
+  });
 });

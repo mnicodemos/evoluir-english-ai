@@ -22,11 +22,12 @@ import { useTodayActivities } from "@/components/DailyGoalCard";
 import { Button } from "@/components/ui/button";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
 import { useLessonRound } from "@/hooks/useLessonRound";
-import { useRoundStart, useSavedPractice } from "@/hooks/usePracticeSync";
+import { useSavedPractice } from "@/hooks/usePracticeSync";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { findLevel } from "@/lib/level";
 import { STUDY_DAY_RULE } from "@/lib/studyDay";
+import { studyToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 import {
   listeningLevelConfig,
@@ -68,8 +69,16 @@ export const Route = createFileRoute("/_authenticated/listening")({
   component: ListeningPage,
 });
 
-/** Each round presents one sentence at a time. */
-const SENTENCES_PER_TRACK = 3;
+/**
+ * One session is 9 sentences, one at a time (user request, 2026-10-24: three
+ * sessions of 3 meant pressing "redo" and hearing the same sentences again).
+ * It is saved in parts of 3, each one "listening" activity, so a whole session
+ * is the study day's 3 activities (credit_study_day unchanged) and leaving
+ * halfway keeps the parts already done.
+ */
+const SENTENCES_PER_PART = 3;
+const PARTS_PER_SESSION = STUDY_DAY_RULE.listening;
+const SENTENCES_PER_SESSION = SENTENCES_PER_PART * PARTS_PER_SESSION;
 /** Kept for the existing evidence records, which store one track id. */
 const LEGACY_TRACK_ID = "everyday" as const;
 
@@ -107,38 +116,6 @@ function wordMatches(expected: string, spoken: string) {
     });
 }
 
-const STORAGE_KEY = "listening-lab-completed-v1";
-const PROGRESS_KEY = "listening-lab-progress-v1";
-
-type CompletionMap = Record<string, number>;
-type ProgressMap = Record<string, { round: number; answered: number[] }>;
-
-function readProgress(): ProgressMap {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(window.localStorage.getItem(PROGRESS_KEY) ?? "{}") as ProgressMap;
-  } catch {
-    return {};
-  }
-}
-
-function writeProgress(map: ProgressMap) {
-  try {
-    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(map));
-  } catch {
-    /* storage unavailable */
-  }
-}
-
-function readCompletion(): CompletionMap {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}") as CompletionMap;
-  } catch {
-    return {};
-  }
-}
-
 /** Three short pronunciation tips for the student's CEFR band. */
 function listeningTips(level: string): string[] {
   if (level === "a1" || level === "a2")
@@ -166,11 +143,20 @@ function ListeningPage() {
   const { data: lessons } = useLessons();
   const queryClient = useQueryClient();
   const saveListening = useServerFn(persistListeningLegacy);
-  // Finished sessions today: 3 of them complete the study day (user report:
-  // "3/3 done" after one session of 3 sentences read as three sessions).
-  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
-  const sessionsToday = todayActivities.filter((row) => row.activity_type === "listening").length;
-  const sessionsGoal = STUDY_DAY_RULE.listening;
+  // Parts saved today (each one "listening" activity of 3 sentences). Parts
+  // saved on this screen count at once, before today's activities are read again.
+  const { data: todayActivities } = useTodayActivities(profile?.id);
+  const partsSavedToday = (todayActivities ?? []).filter(
+    (row) => row.activity_type === "listening",
+  ).length;
+  const [partsSavedHere, setPartsSavedHere] = useState(0);
+  const partsToday = Math.max(partsSavedToday, partsSavedHere);
+  const sessionNumber = Math.floor(partsToday / PARTS_PER_SESSION);
+  // "Do another session" after today's session was finished.
+  const [another, setAnother] = useState(false);
+  const sessionDone =
+    partsToday >= PARTS_PER_SESSION && partsToday % PARTS_PER_SESSION === 0 && !another;
+  const sentencesToday = Math.min(partsToday, PARTS_PER_SESSION) * SENTENCES_PER_PART;
   const minutesSpent = useTimeSpent();
   // A session left before Finish still counts once a sentence was answered
   // (minutes audit, 2026-10-24: 2 of 3 sentences left with 0).
@@ -210,14 +196,16 @@ function ListeningPage() {
   const [shadowResult, setShadowResult] = useState<{ score: number; spoken: string } | null>(null);
   const [checking, setChecking] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [completed, setCompleted] = useState<CompletionMap>({});
-  const [progress, setProgress] = useState<ProgressMap>({});
 
+  useEffect(() => () => cancelVoiceRecording(), []);
+
+  // A session left halfway resumes at its next part, once today's parts are known.
+  const resumed = useRef(false);
   useEffect(() => {
-    setCompleted(readCompletion());
-    setProgress(readProgress());
-    return () => cancelVoiceRecording();
-  }, []);
+    if (resumed.current || todayActivities === undefined) return;
+    resumed.current = true;
+    setIndex((partsSavedToday % PARTS_PER_SESSION) * SENTENCES_PER_PART);
+  }, [todayActivities, partsSavedToday]);
 
   useEffect(() => {
     setRevealed(false);
@@ -227,85 +215,30 @@ function ListeningPage() {
     setHeard(false);
   }, [index]);
 
-  // A new round of sentences is unlocked every time the student starts a new lesson.
+  // The sentences move on every day, with every new lesson and with every
+  // session finished today, so "Do another session" never repeats them.
   const { data: startedLessons } = useLessonRound();
   const lessonCount = startedLessons ?? 0;
+  const dayNumber = Math.floor(Date.parse(`${studyToday()}T00:00:00Z`) / 86_400_000);
 
   const sentences = useMemo(
     () =>
       pickListeningSentences({
         config,
         lessonSentences: lessonSentencesForLevel(lessons ?? [], levelInfo.value, config),
-        rotation: lessonCount,
-        count: SENTENCES_PER_TRACK,
+        rotation: dayNumber + lessonCount + sessionNumber,
+        count: SENTENCES_PER_SESSION,
       }),
-    [lessons, lessonCount, config, levelInfo.value],
+    [lessons, lessonCount, dayNumber, sessionNumber, config, levelInfo.value],
   );
 
   const sentence = sentences[index] ?? "";
-  // Finished on any device of this account during the current round.
-  const roundStart = useRoundStart();
+  // The latest saved part, shown as "Last result".
   const { data: saved } = useSavedPractice();
-  const doneOnServer =
-    roundStart !== undefined &&
-    (saved?.listening ?? []).some((at) => !roundStart || at > roundStart);
-  const redoneHere = completed[track.id] === -1 - lessonCount;
-  const isDone = (completed[track.id] === lessonCount || doneOnServer) && !redoneHere;
-  const trackProgress = progress[track.id];
-  const trackRound = trackProgress?.round ?? -1;
-  const trackDone = isDone && (trackRound === lessonCount || doneOnServer);
   // The student advances when reaching 70% or after using all 3 attempts (best score is kept).
   const passed = checked !== null && (checked >= 70 || attempts >= 3);
   const finished = index >= sentences.length - 1 && passed;
   const average = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-
-  function markCompleted(id: string) {
-    const nextCompletion = { ...readCompletion(), [id]: lessonCount };
-    setCompleted(nextCompletion);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextCompletion));
-    } catch {
-      /* storage unavailable */
-    }
-  }
-
-  /** Lets the student redo the current round to try to improve the score. */
-  function redoActivity() {
-    const completion = readCompletion();
-    // Remembered as "redoing this round" so the server's record does not hide it again.
-    completion[track.id] = -1 - lessonCount;
-    setCompleted(completion);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(completion));
-    } catch {
-      /* storage unavailable */
-    }
-    const map = readProgress();
-    delete map[track.id];
-    setProgress(map);
-    writeProgress(map);
-    setIndex(0);
-    setAnswer("");
-    setChecked(null);
-    setScores([]);
-    setTranscripts([]);
-    operationKey.current = crypto.randomUUID();
-    setAttempts(0);
-    setBest(0);
-  }
-
-  function recordAnswer(id: string, sentenceIndex: number) {
-    const map = readProgress();
-    const entry = map[id];
-    const answered = entry?.round === lessonCount ? entry.answered : [];
-    if (answered.includes(sentenceIndex)) return;
-    const next: ProgressMap = {
-      ...map,
-      [id]: { round: lessonCount, answered: [...answered, sentenceIndex] },
-    };
-    setProgress(next);
-    writeProgress(next);
-  }
 
   async function play(slow = false) {
     setPlaying(true);
@@ -411,7 +344,6 @@ function ListeningPage() {
       });
       // After the third attempt, REVEAL stays available for the rest of the sentence.
       if (nextAttempts >= 3) setCanReveal(true);
-      recordAnswer(track.id, index);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "I couldn't hear that clearly. Please try again.",
@@ -422,15 +354,17 @@ function ListeningPage() {
   }
 
   async function next() {
-    if (index < sentences.length - 1) {
+    const lastOfPart = (index + 1) % SENTENCES_PER_PART === 0 || index >= sentences.length - 1;
+    if (!lastOfPart) {
       setIndex(index + 1);
       setAnswer("");
       setChecked(null);
       return;
     }
-    // Saved first: only a stored session marks the round as completed, so a
-    // failed save keeps the answers and the Finish button for a safe retry
-    // (the same operation key makes the retry idempotent).
+    // Each part of 3 is saved before moving on: only a stored part counts, so
+    // a failed save keeps the answers and the button for a safe retry (the
+    // same operation key makes the retry idempotent).
+    const partStart = index - (index % SENTENCES_PER_PART);
     let final: number | null = null;
     if (profile) {
       setSaving(true);
@@ -441,9 +375,9 @@ function ListeningPage() {
             trackId: track.id as "everyday" | "professional" | "travel",
             round: lessonCount,
             minutes: minutesSpent(1),
-            evidence: sentences.map((expected, sentenceIndex) => ({
+            evidence: sentences.slice(partStart, index + 1).map((expected, offset) => ({
               expected,
-              transcripts: transcripts[sentenceIndex] ?? [],
+              transcripts: transcripts[partStart + offset] ?? [],
             })),
           },
         })) as { score?: number };
@@ -458,26 +392,47 @@ function ListeningPage() {
       } finally {
         setSaving(false);
       }
-    }
-    markCompleted(track.id);
-    const map = readProgress();
-    const nextProgress: ProgressMap = {
-      ...map,
-      [track.id]: { round: lessonCount, answered: sentences.map((_, i) => i) },
-    };
-    setProgress(nextProgress);
-    writeProgress(nextProgress);
-    if (final !== null) {
+      setPartsSavedHere(partsToday + 1);
       queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
       queryClient.invalidateQueries({ queryKey: ["saved-practice"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success(`Listening session saved with ${final}%`);
     }
+    operationKey.current = crypto.randomUUID();
+    setAnswer("");
+    setChecked(null);
+    if (index < sentences.length - 1) {
+      // The session goes on with the next part's sentences.
+      if (final !== null)
+        toast.success(
+          lang === "pt"
+            ? `Progresso salvo: ${index + 1}/${sentences.length} frases`
+            : `Progress saved: ${index + 1}/${sentences.length} sentences`,
+        );
+      setIndex(index + 1);
+      return;
+    }
+    if (final !== null)
+      toast.success(
+        lang === "pt"
+          ? `Sessão de Listening salva com ${average}%`
+          : `Listening session saved with ${average}%`,
+      );
+    setAnother(false);
+    setIndex(0);
+    setScores([]);
+    setTranscripts([]);
+  }
+
+  /** Starts a new session of 9 sentences after today's was finished. */
+  function startAnotherSession() {
+    setAnother(true);
     setIndex(0);
     setAnswer("");
     setChecked(null);
     setScores([]);
     setTranscripts([]);
+    setAttempts(0);
+    setBest(0);
     operationKey.current = crypto.randomUUID();
   }
 
@@ -497,39 +452,38 @@ function ListeningPage() {
           descriptionClassName="max-w-3xl"
           description={
             <>
-              Listen to the sentence and repeat it out loud. Finish all 3 sentences to complete the
-              activity — a new set arrives every time you start a new lesson in the Learning Center.
+              Listen to the sentence and repeat it out loud. One session has 9 sentences and your
+              progress is saved every 3, so you can stop and come back later.
             </>
           }
         >
           <StudyDayCounter
-            label={<span>Sessions today</span>}
-            value={sessionsToday}
-            goal={sessionsGoal}
+            label={<span>Sentences today</span>}
+            value={sentencesToday}
+            goal={SENTENCES_PER_SESSION}
             doneText={<span>Study day counted</span>}
-            hint={<span>3 sessions complete your study day.</span>}
+            hint={<span>One session of 9 sentences completes your study day.</span>}
           />
-          <Button variant="ghost" size="sm" className="mt-2 -ml-2" onClick={redoActivity}>
-            <RotateCcw className="mr-2 size-4" /> Redo today's activity
-          </Button>
         </PageHeader>
 
-        {trackDone ? (
+        {sessionDone ? (
           <section className="card-soft space-y-5 p-6">
             <div className="flex items-center justify-between gap-3">
               <label className="text-sm font-medium">This session</label>
               <span className="text-sm text-muted-foreground">
-                <span>3/3 </span>
+                <span>
+                  {SENTENCES_PER_SESSION}/{SENTENCES_PER_SESSION}{" "}
+                </span>
                 <span>sentences</span>
               </span>
             </div>
             <div className="rounded-xl border border-brand-green/40 bg-brand-green/10 p-5 text-center">
               <DoneSeal className="mx-auto" />
-              <p className="mt-2 font-semibold">Session complete: all 3 sentences done!</p>
+              <p className="mt-2 font-semibold">Session complete: all 9 sentences done!</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                New listening tasks arrive as soon as you start a new lesson in the Learning Center.
+                Want more? Another session brings 9 new sentences.
               </p>
-              <Button variant="outline" className="mt-4" onClick={redoActivity}>
+              <Button variant="outline" className="mt-4" onClick={startAnotherSession}>
                 <RotateCcw className="mr-2 size-4" /> Do another session
               </Button>
             </div>
@@ -551,7 +505,7 @@ function ListeningPage() {
                     {sentences.map((_, i) => (
                       <span
                         key={i}
-                        className={`h-1.5 w-6 rounded-full ${
+                        className={`h-1.5 w-3 rounded-full sm:w-5 ${
                           i < index || (i === index && passed)
                             ? "bg-brand-green"
                             : i === index
@@ -754,7 +708,12 @@ function ListeningPage() {
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {done ? (
-                            `${scores[i] ?? 0}%`
+                            // A part saved before this visit has no score here.
+                            scores[i] != null ? (
+                              `${scores[i]}%`
+                            ) : (
+                              <span>Saved</span>
+                            )
                           ) : current ? (
                             <span>In progress</span>
                           ) : (

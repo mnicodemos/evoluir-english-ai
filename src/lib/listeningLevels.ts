@@ -208,8 +208,9 @@ export function pickListeningSentences(options: {
     ),
   ];
   // Some levels' built-in drills are shorter than their word range (B2, C1);
-  // when nothing fits, they still beat an empty activity ("Sentence 1 of 0").
-  const pool = fitting.length > 0 ? fitting : [...new Set(config.sentences)];
+  // when too few fit, the level's other drills fill the session, which beats
+  // a short one ("Sentence 1 of 0", or a session of 9 with only 5 sentences).
+  const pool = fitting.length >= count ? fitting : [...new Set([...fitting, ...config.sentences])];
   if (pool.length === 0) return [];
   const start = (((rotation * count) % pool.length) + pool.length) % pool.length;
   const picked: string[] = [];
