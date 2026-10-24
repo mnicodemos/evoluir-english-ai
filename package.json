@@ -22,7 +22,9 @@
     "nanoid": "3.3.19",
     "dompurify": "3.4.17",
     "@grpc/grpc-js": "1.13.6",
-    "launch-editor": "2.14.2"
+    "launch-editor": "2.14.2",
+    "undici": "7.30.1",
+    "zod": "4.6.7"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -93,7 +95,7 @@
     "use-stick-to-bottom": "^1.1.6",
     "vaul": "^1.1.2",
     "vite-tsconfig-paths": "^6.0.2",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
