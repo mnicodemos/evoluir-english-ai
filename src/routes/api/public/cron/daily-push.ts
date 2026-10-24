@@ -56,14 +56,28 @@ async function sameSecret(provided: string, expected: string) {
   return timingSafeEqual(digest(provided), digest(expected));
 }
 
-/** Runs `task` over `items` with at most `limit` running at once. */
+/**
+ * Runs `task` over `items` with at most `limit` running at once. One item that
+ * fails is logged and skipped: it used to reject the whole run, so a single
+ * student's error left every student without the push (audit, 2026-10-24).
+ */
 async function forEachLimited<T>(items: T[], limit: number, task: (item: T) => Promise<void>) {
   let next = 0;
   const worker = async () => {
-    while (next < items.length) await task(items[next++]!);
+    while (next < items.length) {
+      try {
+        await task(items[next++]!);
+      } catch (error) {
+        console.error("daily-push: one item skipped", error);
+      }
+    }
   };
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
 }
+
+/** The API's maximum rows per request, and ids per profiles request. */
+const PAGE_SIZE = 1000;
+const PROFILE_CHUNK = 200;
 
 function hashIndex(seed: string, size: number) {
   let h = 0;
@@ -180,18 +194,41 @@ async function sendDailyPush(
     report.error = "Push not configured";
     return Response.json({ error: report.error }, { status: 500 });
   }
-  const { data: tokens, error } = await supabaseAdmin.from("push_tokens").select("user_id, token");
-  if (error) {
-    report.error = error.message;
-    return Response.json({ error: error.message }, { status: 500 });
+  // Every device, page by page: one select stops at 1,000 rows, which would
+  // silently leave the rest of the class without the push (audit, 2026-10-24).
+  const tokens: { user_id: string; token: string }[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data: page, error } = await supabaseAdmin
+      .from("push_tokens")
+      .select("user_id, token")
+      .order("token")
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) {
+      report.error = error.message;
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+    tokens.push(...(page ?? []));
+    if (!page || page.length < PAGE_SIZE) break;
   }
-  const userIds = [...new Set((tokens ?? []).map((t) => t.user_id))];
+  const userIds = [...new Set(tokens.map((t) => t.user_id))];
   if (userIds.length === 0) return Response.json({ sent: 0 });
 
-  const { data: profiles } = await supabaseAdmin
-    .from("profiles")
-    .select("id, level, max_level, last_activity_date, streak_days, league_opt_in")
-    .in("id", userIds);
+  // Profiles in chunks, so the id list never makes the request too long.
+  const profiles: {
+    id: string;
+    level: string | null;
+    max_level: string | null;
+    last_activity_date: string | null;
+    streak_days: number | null;
+    league_opt_in: boolean | null;
+  }[] = [];
+  for (let at = 0; at < userIds.length; at += PROFILE_CHUNK) {
+    const { data: chunk } = await supabaseAdmin
+      .from("profiles")
+      .select("id, level, max_level, last_activity_date, streak_days, league_opt_in")
+      .in("id", userIds.slice(at, at + PROFILE_CHUNK));
+    profiles.push(...(chunk ?? []));
+  }
   // Same study day as credit_study_day (America/Sao_Paulo).
   const today = studyToday();
 

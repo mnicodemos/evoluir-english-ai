@@ -2024,6 +2024,8 @@ const baseUiPt: Record<string, string> = {
   "Sessions today": "Sessões hoje",
   "Sentences today": "Frases hoje",
   "New today": "Nova hoje",
+  "Your Premium is already active": "Seu Premium já está ativo",
+  "Manage it in My subscription.": "Gerencie em Minha assinatura.",
   "To review": "A revisar",
   "Start now": "Começar agora",
   "Today's text is waiting: read it and answer the questions.":

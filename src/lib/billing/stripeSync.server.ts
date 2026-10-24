@@ -105,15 +105,23 @@ export async function syncSubscription(
     .eq("provider_subscription_id", subscription.id)
     .maybeSingle();
 
+  // A failed write throws, so the webhook answers 500 and Stripe sends the
+  // event again (audit, 2026-10-24: errors were ignored and the event was
+  // marked processed, leaving a paid student without access).
   let subscriptionId = existing?.id ?? null;
   if (subscriptionId) {
-    await supabaseAdmin.from("subscriptions").update(row).eq("id", subscriptionId);
+    const { error } = await supabaseAdmin
+      .from("subscriptions")
+      .update(row)
+      .eq("id", subscriptionId);
+    if (error) throw new Error(`subscription update failed: ${error.message}`);
   } else {
-    const { data: inserted } = await supabaseAdmin
+    const { data: inserted, error } = await supabaseAdmin
       .from("subscriptions")
       .insert(row)
       .select("id")
       .single();
+    if (error) throw new Error(`subscription insert failed: ${error.message}`);
     subscriptionId = inserted?.id ?? null;
   }
 
@@ -165,19 +173,30 @@ export async function reconcileEntitlements(input: {
 }): Promise<void> {
   const now = new Date().toISOString();
 
+  // The launch campaign's days live in the same entitlement rows (one per
+  // user and feature), so they must survive a subscription: a trial cancelled
+  // during the campaign used to revoke the campaign's free days too (audit,
+  // 2026-10-24).
+  const campaignUntil = await activeCampaignExpiry(input.userId);
+
   if (input.grantsAccess) {
-    await supabaseAdmin.from("entitlements").upsert(
+    const expiresAt =
+      input.expiresAt && campaignUntil && Date.parse(campaignUntil) > Date.parse(input.expiresAt)
+        ? campaignUntil
+        : input.expiresAt;
+    const { error } = await supabaseAdmin.from("entitlements").upsert(
       GATED_FEATURES.map((feature) => ({
         user_id: input.userId,
         feature,
         plan: "premium" as const,
         source_subscription_id: input.subscriptionId,
         granted_at: now,
-        expires_at: input.expiresAt,
+        expires_at: expiresAt,
         revoked_at: null,
       })),
       { onConflict: "user_id,feature" },
     );
+    if (error) throw new Error(`entitlement grant failed: ${error.message}`);
     return;
   }
 
@@ -194,12 +213,44 @@ export async function reconcileEntitlements(input: {
     return;
   }
 
-  await supabaseAdmin
+  if (campaignUntil) {
+    // Back to the campaign's own days instead of losing them.
+    const { error } = await supabaseAdmin.from("entitlements").upsert(
+      GATED_FEATURES.map((feature) => ({
+        user_id: input.userId,
+        feature,
+        plan: "premium" as const,
+        source_subscription_id: null,
+        granted_at: now,
+        expires_at: campaignUntil,
+        revoked_at: null,
+      })),
+      { onConflict: "user_id,feature" },
+    );
+    if (error) throw new Error(`entitlement campaign restore failed: ${error.message}`);
+    return;
+  }
+
+  const { error } = await supabaseAdmin
     .from("entitlements")
     .update({ revoked_at: now })
     .eq("user_id", input.userId)
     .eq("plan", "premium")
     .is("revoked_at", null);
+  if (error) throw new Error(`entitlement revoke failed: ${error.message}`);
+}
+
+/** End of the student's launch-campaign days, when they are still running. */
+async function activeCampaignExpiry(userId: string): Promise<string | null> {
+  const { data } = await supabaseAdmin
+    .from("premium_campaign_grants")
+    .select("expires_at")
+    .eq("user_id", userId)
+    .gt("expires_at", new Date().toISOString())
+    .order("expires_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data?.expires_at ?? null;
 }
 
 async function findOtherGrantingSubscription(

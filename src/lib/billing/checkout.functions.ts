@@ -3,6 +3,7 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { subscriptionGrantsAccess } from "./contracts";
 import { BILLING_INTERVALS, resolvePriceId } from "./stripeMapping";
 import { TRIAL_DAYS, trialEligible } from "./trial";
 
@@ -23,6 +24,10 @@ function resolveOrigin(): string {
   if (referer?.startsWith("http")) return new URL(referer).origin;
   throw new Error("Could not determine the application origin for checkout.");
 }
+
+/** Shown when the account already has a subscription that grants Premium. */
+export const ALREADY_SUBSCRIBED_MESSAGE =
+  "Your Premium is already active. Manage it in My subscription.";
 
 /** Stripe's error type, code and message (never the key), for server_errors. */
 export function describeCheckoutError(error: unknown): string {
@@ -79,9 +84,21 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: past } = await supabaseAdmin
         .from("subscriptions")
-        .select("id")
-        .eq("user_id", context.userId)
-        .limit(1);
+        .select("id, status, current_period_end")
+        .eq("user_id", context.userId);
+      // Never a second subscription while one still grants access (audit,
+      // 2026-10-24: coming back to /premium before the webhook updated the
+      // plan, or a second tap, could open another checkout and charge twice).
+      if (
+        (past ?? []).some((row) =>
+          subscriptionGrantsAccess({
+            status: row.status as never,
+            current_period_end: row.current_period_end,
+          }),
+        )
+      ) {
+        throw new Error(ALREADY_SUBSCRIBED_MESSAGE);
+      }
       const withTrial = trialEligible(past ?? [{}]);
 
       const openSession = (customer: string) =>
@@ -122,7 +139,9 @@ export const createStripeCheckoutSession = createServerFn({ method: "POST" })
     } catch (error) {
       // The student sees a generic message; the reason goes to server_errors
       // (user report, 2026-10-23: a live checkout failed with nothing logged).
-      console.error(`Stripe checkout failed: ${describeCheckoutError(error)}`);
+      if (!(error instanceof Error && error.message === ALREADY_SUBSCRIBED_MESSAGE)) {
+        console.error(`Stripe checkout failed: ${describeCheckoutError(error)}`);
+      }
       throw error;
     }
   });

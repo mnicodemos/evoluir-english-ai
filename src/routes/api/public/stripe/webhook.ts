@@ -55,43 +55,68 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
           .maybeSingle();
 
         if (!claimed) {
+          // A failed event answered 500, so Stripe sends it again: take it back
+          // instead of acknowledging it as a duplicate, which left a paid
+          // subscription without its access (audit, 2026-10-24). A run stuck
+          // in "processing" for 5 minutes (the host stopped) is taken back too.
+          const stuckBefore = new Date(Date.now() - 5 * 60_000).toISOString();
+          const { data: retried } = await supabaseAdmin
+            .from("stripe_webhook_events")
+            .update({ status: "processing", error_message: null })
+            .eq("event_id", event.id)
+            .or(`status.eq.failed,and(status.eq.processing,received_at.lt."${stuckBefore}")`)
+            .select("event_id")
+            .maybeSingle();
+          if (retried) {
+            return processClaimed(stripe, event, startedAt, supabaseAdmin);
+          }
           return new Response(JSON.stringify({ received: true, duplicate: true }), {
             status: 200,
             headers: { "content-type": "application/json" },
           });
         }
 
-        try {
-          const handled = await handleEvent(stripe, event);
-          await supabaseAdmin
-            .from("stripe_webhook_events")
-            .update({
-              status: handled ? "processed" : "ignored",
-              processed_at: new Date().toISOString(),
-              duration_ms: Date.now() - startedAt,
-            })
-            .eq("event_id", event.id);
-          return new Response(JSON.stringify({ received: true }), {
-            status: 200,
-            headers: { "content-type": "application/json" },
-          });
-        } catch (error) {
-          console.error(`[stripe] failed to process ${event.type}`, (error as Error).message);
-          await supabaseAdmin
-            .from("stripe_webhook_events")
-            .update({
-              status: "failed",
-              error_message: (error as Error).message.slice(0, 240),
-              processed_at: new Date().toISOString(),
-              duration_ms: Date.now() - startedAt,
-            })
-            .eq("event_id", event.id);
-          return new Response("Webhook processing failed", { status: 500 });
-        }
+        return processClaimed(stripe, event, startedAt, supabaseAdmin);
       },
     },
   },
 });
+
+/** Processes an event this request claimed and records how it went. */
+async function processClaimed(
+  stripe: Stripe,
+  event: Stripe.Event,
+  startedAt: number,
+  supabaseAdmin: (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"],
+): Promise<Response> {
+  try {
+    const handled = await handleEvent(stripe, event);
+    await supabaseAdmin
+      .from("stripe_webhook_events")
+      .update({
+        status: handled ? "processed" : "ignored",
+        processed_at: new Date().toISOString(),
+        duration_ms: Date.now() - startedAt,
+      })
+      .eq("event_id", event.id);
+    return new Response(JSON.stringify({ received: true }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  } catch (error) {
+    console.error(`[stripe] failed to process ${event.type}`, (error as Error).message);
+    await supabaseAdmin
+      .from("stripe_webhook_events")
+      .update({
+        status: "failed",
+        error_message: (error as Error).message.slice(0, 240),
+        processed_at: new Date().toISOString(),
+        duration_ms: Date.now() - startedAt,
+      })
+      .eq("event_id", event.id);
+    return new Response("Webhook processing failed", { status: 500 });
+  }
+}
 
 async function handleEvent(stripe: Stripe, event: Stripe.Event): Promise<boolean> {
   const { syncSubscription, resolveUserId, linkCustomer } =
@@ -134,7 +159,11 @@ async function handleEvent(stripe: Stripe, event: Stripe.Event): Promise<boolean
     case "customer.subscription.created":
     case "customer.subscription.updated":
     case "customer.subscription.deleted": {
-      await syncSubscription(event.data.object as never);
+      // Read the subscription as it is now: events can arrive out of order,
+      // and an older "updated" must never undo a newer state.
+      const payload = event.data.object as Stripe.Subscription;
+      const subscription = await stripe.subscriptions.retrieve(payload.id).catch(() => payload);
+      await syncSubscription(subscription as never);
       return true;
     }
 

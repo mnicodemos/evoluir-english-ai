@@ -11,7 +11,10 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
 import { useUiLang } from "@/lib/uiLang";
-import { createStripeCheckoutSession } from "@/lib/billing/checkout.functions";
+import {
+  ALREADY_SUBSCRIBED_MESSAGE,
+  createStripeCheckoutSession,
+} from "@/lib/billing/checkout.functions";
 import { TRIAL_DAYS, trialEligible } from "@/lib/billing/trial";
 import { getMyAccess } from "@/lib/billing/entitlements.functions";
 import { createStripePortalSession } from "@/lib/billing/portal.functions";
@@ -126,8 +129,14 @@ function Premium() {
     try {
       const { url } = await startCheckout({ data: { interval: selected } });
       window.location.href = url;
-    } catch {
+    } catch (error) {
       setStarting(false);
+      if (error instanceof Error && error.message === ALREADY_SUBSCRIBED_MESSAGE) {
+        toast.error("Your Premium is already active", {
+          description: "Manage it in My subscription.",
+        });
+        return;
+      }
       toast.error("We could not open the secure checkout", {
         description: "Please try again in a moment.",
       });
