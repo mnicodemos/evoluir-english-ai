@@ -85,7 +85,10 @@ jobs:
           audit_log="$(mktemp)"
           audit_ok=false
           for attempt in 1 2 3; do
-            if bun audit --audit-level=high >"$audit_log" 2>&1; then
+            # Temporarily ignored (2026-10-23): GHSA-mrhx-c7xc-m3w5, zod memory use on
+            # oversized constrained collections, fixed only in zod 4.6.6; the app is
+            # on zod 3 (no 3.x fix). Remove once the app migrates to zod >= 4.6.6.
+            if bun audit --audit-level=high --ignore=GHSA-mrhx-c7xc-m3w5 >"$audit_log" 2>&1; then
               cat "$audit_log"
               audit_ok=true
               break
