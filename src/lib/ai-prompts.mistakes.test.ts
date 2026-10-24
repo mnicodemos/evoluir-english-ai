@@ -49,4 +49,27 @@ describe("parseWritingFeedback mistakes", () => {
   it("still accepts feedback without mistakes", () => {
     expect(parseWritingFeedback(JSON.stringify(base), "text").mistakes).toEqual([]);
   });
+
+  it("keeps an off-format correction usable (fast mode)", () => {
+    const feedback = parseWritingFeedback(
+      `Sure! ${JSON.stringify({
+        corrected: "I went to school.",
+        explanations: ["Past simple.", ""],
+        suggestions: [],
+        grammar: "80",
+        vocabulary: 140,
+        clarity: 70,
+        extra: true,
+      })}`,
+      "I go to school.",
+    );
+    expect(feedback).toMatchObject({
+      corrected: "I went to school.",
+      natural: "I went to school.",
+      explanations: ["Past simple."],
+      grammar: 80,
+      vocabulary: 100,
+      clarity: 70,
+    });
+  });
 });

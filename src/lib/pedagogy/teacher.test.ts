@@ -56,12 +56,33 @@ describe("teacher prompt", () => {
       observedError: null,
       mistake: null,
     });
-    expect(() => parseTeacherTurn("not json")).toThrow();
-    expect(() => parseTeacherTurn('{"reply":"hi"}')).toThrow();
-    // An unsupported skill is never accepted from the model.
-    expect(() =>
+    // No reply at all is still an error.
+    expect(() => parseTeacherTurn('{"assessable":true}')).toThrow();
+    expect(() => parseTeacherTurn('{"reply":')).toThrow();
+    // An unsupported skill is never assessed: the reply is kept, the skill dropped.
+    expect(
       parseTeacherTurn('{"reply":"hi","assessable":true,"focus_skill":"maths"}'),
-    ).toThrow();
+    ).toMatchObject({ reply: "hi", assessable: false, focusSkill: null });
+  });
+
+  it("keeps the reply when the rest of the turn is off-format (fast mode)", () => {
+    // A stray key, a string score and an empty mistake no longer fail the turn.
+    const parsed = parseTeacherTurn(
+      'Here you go: {"reply":"Nice!","assessable":true,"focus_skill":"writing","suggested_score":"74","extra":1,"mistake":{"original":"","corrected":""}}',
+    );
+    expect(parsed).toEqual({
+      reply: "Nice!",
+      assessable: true,
+      focusSkill: "writing",
+      suggestedScore: 74,
+      observedError: null,
+      mistake: null,
+    });
+    // A plain-text answer is shown, never assessed.
+    expect(parseTeacherTurn("Great job! Tell me more.")).toMatchObject({
+      reply: "Great job! Tell me more.",
+      assessable: false,
+    });
   });
 });
 

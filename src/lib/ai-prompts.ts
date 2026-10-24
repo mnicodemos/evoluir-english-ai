@@ -5,6 +5,15 @@ import { z } from "zod";
 
 export type AiMsg = { role: "system" | "user" | "assistant"; content: string };
 
+/** parseJson, then the outermost {...} when the model wrapped it in text. */
+function parseJsonObject(raw: string): unknown {
+  const direct = parseJson(raw);
+  if (direct !== null) return direct;
+  const start = raw.indexOf("{");
+  const end = raw.lastIndexOf("}");
+  return start >= 0 && end > start ? parseJson(raw.slice(start, end + 1)) : null;
+}
+
 function parseJson(raw: string): unknown {
   try {
     const cleaned = raw
@@ -241,20 +250,44 @@ export type WritingFeedback = {
   clarity: number;
 };
 
-const writingFeedbackSchema = z
-  .object({
-    corrected: z.string().trim().min(1).max(12000),
-    natural: z.string().trim().min(1).max(12000),
-    explanations: z.array(z.string().trim().min(1).max(500)).max(20),
-    suggestions: z.array(z.string().trim().min(1).max(500)).max(10),
-    grammar: score,
-    vocabulary: score,
-    clarity: score,
-    // Structured mistakes are salvaged item by item below, so one malformed
-    // entry never invalidates the whole correction.
-    mistakes: z.array(z.unknown()).optional(),
-  })
-  .strict();
+// Read leniently (user report, 2026-10-24: with the thinking step off, a stray
+// key, a score sent as text or one empty tip made the whole correction fail):
+// unknown keys are dropped, scores are read as numbers and kept within 0-100,
+// empty tips are skipped and a missing natural version falls back to the
+// corrected text. The corrected text and the three scores stay required.
+const writingScore = z
+  .preprocess(
+    (value) => (typeof value === "string" && value.trim() !== "" ? Number(value) : value),
+    z.number().finite(),
+  )
+  .transform((value) => Math.max(0, Math.min(100, Math.round(value))));
+const writingTextList = (maxLength: number, maxItems: number) =>
+  z.preprocess(
+    (value) =>
+      Array.isArray(value)
+        ? value
+            .filter((item): item is string => typeof item === "string" && item.trim() !== "")
+            .map((item) => item.trim().slice(0, maxLength))
+            .slice(0, maxItems)
+        : [],
+    z.array(z.string()),
+  );
+const writingFeedbackSchema = z.object({
+  corrected: z
+    .string()
+    .trim()
+    .min(1)
+    .transform((value) => value.slice(0, 12000)),
+  natural: z.string().trim().max(12000).optional().catch(undefined),
+  explanations: writingTextList(500, 20),
+  suggestions: writingTextList(500, 10),
+  grammar: writingScore,
+  vocabulary: writingScore,
+  clarity: writingScore,
+  // Structured mistakes are salvaged item by item below, so one malformed
+  // entry never invalidates the whole correction.
+  mistakes: z.array(z.unknown()).optional().catch(undefined),
+});
 
 const writingMistakeSchema = z.object({
   original: z.string().trim().min(1).max(300),
@@ -303,7 +336,7 @@ export function writingCorrectionMessages(
 }
 
 export function parseWritingFeedback(raw: string, originalText: string): WritingFeedback {
-  const result = writingFeedbackSchema.safeParse(parseJson(raw));
+  const result = writingFeedbackSchema.safeParse(parseJsonObject(raw));
   if (!result.success || (!result.data.corrected && originalText)) {
     throw new Error(
       "The AI returned invalid writing feedback. Your text was preserved; please try again.",
@@ -315,5 +348,6 @@ export function parseWritingFeedback(raw: string, originalText: string): Writing
       return parsed.success && parsed.data.original !== parsed.data.corrected ? [parsed.data] : [];
     })
     .slice(0, 5);
-  return { ...result.data, mistakes };
+  const { natural, mistakes: _raw, ...rest } = result.data;
+  return { ...rest, natural: natural || rest.corrected, mistakes };
 }

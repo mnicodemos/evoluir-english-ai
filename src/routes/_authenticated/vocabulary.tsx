@@ -458,10 +458,13 @@ function VocabularyOnline() {
             activityType: "vocabulary_reading",
             minutes,
           },
-        });
+        })
+          // Refresh today's minutes once the write lands (see useLogTimeOnExit).
+          .then(() => queryClient.invalidateQueries({ queryKey: ["minutes-today"] }))
+          .catch(() => undefined);
       }
     };
-  }, [minutesSpent, logTelemetry]);
+  }, [minutesSpent, logTelemetry, queryClient]);
 
   // Ten new words each day, written by the AI from the lessons in the learning path.
   // A word counts as known for now once it has climbed a step and its next review
