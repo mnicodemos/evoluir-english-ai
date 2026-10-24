@@ -110,8 +110,12 @@ function VocabularyOnline() {
   const pronunciationGate = useRef(createAttemptGate());
   const pronunciationAbort = useRef<AbortController | null>(null);
   const usingBrowserSpeech = useRef(false);
-  // Reading time only counts while the student is actually working on the words.
-  const minutesSpent = useTimeSpent({ manual: true });
+  // Time on the words, paused after a minute without a touch (minutes audit,
+  // 2026-10-24: the manual clock only ran while recording or playing, so
+  // reviewing words never added minutes). It counts once a word was reviewed
+  // or pronounced on this visit.
+  const minutesSpent = useTimeSpent();
+  const workedOnWords = useRef(false);
 
   const { data: words, isLoading } = useQuery({
     queryKey: ["vocabulary"],
@@ -238,6 +242,7 @@ function VocabularyOnline() {
     if (timed) minutesSpent.start();
     try {
       await reviewWord({ data: { wordId, action } });
+      workedOnWords.current = true;
       await invalidateVocabulary();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save this word");
@@ -325,6 +330,7 @@ function VocabularyOnline() {
           spoken = await transcribeAudio(await stopVoiceRecording(), controller.signal);
         }
         const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
+        workedOnWords.current = true;
         const authoritative = await savePronunciation({
           data: {
             operationKey: crypto.randomUUID(),
@@ -445,7 +451,7 @@ function VocabularyOnline() {
 
       const minutes = minutesSpent(0);
       const p = profileRef.current;
-      if (minutes >= 1 && p) {
+      if (minutes >= 1 && p && workedOnWords.current) {
         void logTelemetry({
           data: {
             operationKey: crypto.randomUUID(),

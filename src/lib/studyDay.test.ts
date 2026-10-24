@@ -147,7 +147,7 @@ describe("todayStudyMetrics", () => {
 });
 
 describe("minutes eligibility (existing principle)", () => {
-  it("counts finished activities and lesson page time, never other open-session telemetry", () => {
+  it("counts finished activities, lesson page time and gated leave-time telemetry", () => {
     for (const type of [
       "lesson",
       "final_test",
@@ -157,18 +157,16 @@ describe("minutes eligibility (existing principle)", () => {
       "vocabulary",
       "lesson_practice",
       "reading",
-    ]) {
-      expect(countsAsLearningMinutes(type)).toBe(true);
-    }
-    for (const type of [
-      "final_test_practice",
+      // Written only after a real action (minutes audit, 2026-10-24).
       "conversation_practice",
       "writing_practice",
       "listening_practice",
       "vocabulary_reading",
     ]) {
-      expect(countsAsLearningMinutes(type)).toBe(false);
+      expect(countsAsLearningMinutes(type)).toBe(true);
     }
+    // Ungated open-session telemetry still never counts.
+    expect(countsAsLearningMinutes("final_test_practice")).toBe(false);
   });
 });
 

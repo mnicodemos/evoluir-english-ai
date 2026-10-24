@@ -87,15 +87,14 @@ export function VoiceCoach({
   // The video call is an informal chat with EVO; AI Speaking stays a lesson.
   const callStyle = { casual: presentation === "call", name: profile?.name ?? undefined };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  // Time left unsaved when the student leaves. On the video call (user
-  // request) it counts toward today's minutes once the student has spoken,
-  // even when the call ends before the report; AI Speaking keeps it as
-  // practice telemetry until the session is finished.
-  const spokeOnCall =
-    presentation === "call" && messages.some((message) => message.role === "user");
+  // Time left unsaved when the student leaves counts toward today's minutes
+  // once the student has spoken, even when the session ends before the
+  // report: on the video call (user request) and, the same way, in AI
+  // Speaking (minutes audit, 2026-10-24: 8 minutes of talk left with 0).
+  const spoke = messages.some((message) => message.role === "user");
   useLogTimeOnExit({
     timer: minutesSpent,
-    profile: presentation === "call" && !spokeOnCall ? null : profile,
+    profile: spoke ? profile : null,
     type: presentation === "call" ? "video_call" : "conversation_practice",
     title: presentation === "call" ? "Video call with EVO" : "Speaking practice",
   });

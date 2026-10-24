@@ -55,6 +55,14 @@ export const LEARNING_ACTIVITY_TYPES = [
   "meditation",
   // Daily reading (/reading): minutes only, until it records evidence.
   "reading",
+  // Time left when the student leaves mid-activity, written only after a real
+  // action (minutes audit, 2026-10-24): AI Speaking after speaking, Writing
+  // with a draft of 5+ words, Listening after a sentence, Vocabulary after a
+  // word was reviewed or pronounced.
+  "conversation_practice",
+  "writing_practice",
+  "listening_practice",
+  "vocabulary_reading",
 ] as const;
 
 export function countsAsLearningMinutes(activityType: string) {
@@ -124,6 +132,7 @@ export const ACTIVITY_SKILL_BUCKETS = {
   // Reading is the daily reading only (user decision, 2026-10-17); lessons and
   // words have their own colours.
   vocabulary: "Vocabulary",
+  vocabulary_reading: "Vocabulary",
   flashcards: "Vocabulary",
   lesson: "Lessons",
   lesson_practice: "Lessons",
