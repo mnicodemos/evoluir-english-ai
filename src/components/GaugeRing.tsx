@@ -65,8 +65,10 @@ export function GaugeRing({
       </svg>
       <span className="relative grid place-items-center">{children}</span>
       {/* The amount in the gap: the value large and light, "/goal unit" small
-          and muted on the same baseline (user request, 2026-10-24). */}
-      <span className="absolute inset-x-0 bottom-[8%] flex items-baseline justify-center whitespace-nowrap leading-none tabular-nums">
+          and muted on the same baseline (user request, 2026-10-24). It sits at
+          the box's bottom edge, just under the arc's ends, where the whole
+          width is free, so "120/60 min" never touches the ring. */}
+      <span className="absolute inset-x-0 bottom-0 flex items-baseline justify-center whitespace-nowrap leading-none tabular-nums">
         <span className="text-[15px] font-light text-foreground/90 2xl:text-base">{value}</span>
         <span className="text-[10px] font-normal text-muted-foreground">
           /{goal} {unit}
