@@ -2024,6 +2024,15 @@ const baseUiPt: Record<string, string> = {
   "Sessions today": "Sessões hoje",
   "Sentences today": "Frases hoje",
   "New today": "Nova hoje",
+  "Keep going": "Continue",
+  "Want to go further?": "Quer ir além?",
+  "A short conversation keeps your speaking moving.":
+    "Uma conversa curta mantém sua fala em movimento.",
+  "Ask a question or practise with exercises.": "Tire uma dúvida ou pratique com exercícios.",
+  "Pick a new text by theme and style.": "Escolha um novo texto por tema e estilo.",
+  "Continue your learning path.": "Continue sua trilha de aprendizado.",
+  "Your Premium is already active": "Seu Premium já está ativo",
+  "Manage it in My subscription.": "Gerencie em Minha assinatura.",
   "To review": "A revisar",
   "Start now": "Começar agora",
   "Today's text is waiting: read it and answer the questions.":

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { newTodayRows } from "./keepImprovingNew";
+import { continueRows, goFurtherRow, newTodayRows } from "./keepImprovingNew";
 
 const all = { listening: true, writing: true, vocabulary: true };
 
@@ -29,5 +29,21 @@ describe("Keep improving new-today rows", () => {
       slots: 2,
     });
     expect(rows).toEqual([]);
+  });
+});
+
+describe("Keep improving continue rows", () => {
+  it("fills the free rows while today's goal is open, never a taken place", () => {
+    const rows = continueRows({ goalReached: false, taken: ["/coach"], slots: 2 });
+    expect(rows.map((row) => row.to)).toEqual(["/teacher", "/reading"]);
+  });
+
+  it("adds nothing once today's goal is met", () => {
+    expect(continueRows({ goalReached: true, taken: [], slots: 3 })).toEqual([]);
+  });
+
+  it("offers EVO under the done state, or the AI Teacher when EVO is taken", () => {
+    expect(goFurtherRow([]).to).toBe("/coach");
+    expect(goFurtherRow(["/coach?weather=1"]).to).toBe("/teacher");
   });
 });

@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -27,7 +27,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { findLevel } from "@/lib/level";
 import { STUDY_DAY_RULE } from "@/lib/studyDay";
-import { studyToday } from "@/lib/today";
+import { studyDayStartIso, studyToday } from "@/lib/today";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import {
   listeningLevelConfig,
@@ -243,7 +244,43 @@ function ListeningPage() {
   // The student advances when reaching 70% or after using all 3 attempts (best score is kept).
   const passed = checked !== null && (checked >= 70 || attempts >= 3);
   const finished = index >= sentences.length - 1 && passed;
-  const average = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  // Scores of the parts saved before this visit (a session resumed halfway):
+  // each saved part keeps its sentences' scores (activities.result.itemScores),
+  // so "Today's session" and Accuracy show them instead of "Saved" and NaN
+  // (user report, 2026-10-24).
+  const { data: savedPartScores = [] } = useQuery({
+    queryKey: ["listening-parts-today", profile?.id],
+    enabled: !!profile?.id,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("activities")
+        .select("result, created_at")
+        .eq("user_id", profile!.id)
+        .eq("activity_type", "listening")
+        .gte("created_at", studyDayStartIso())
+        .order("created_at");
+      return (data ?? []).map((row) => {
+        const itemScores = (row.result as { itemScores?: unknown } | null)?.itemScores;
+        return Array.isArray(itemScores)
+          ? itemScores.map((value) => (typeof value === "number" ? value : null))
+          : [];
+      });
+    },
+  });
+  // The current session's earlier parts are the last ones saved today.
+  const partsBefore = Math.floor(index / SENTENCES_PER_PART);
+  const earlierScores = (partsBefore > 0 ? savedPartScores.slice(-partsBefore) : []).flatMap(
+    (part) => Array.from({ length: SENTENCES_PER_PART }, (_, at) => part[at] ?? null),
+  );
+  /** A sentence's score: this visit's answer, else the saved part's. */
+  const scoreAt = (at: number): number | null => scores[at] ?? earlierScores[at] ?? null;
+  const knownScores = sentences
+    .map((_, at) => scoreAt(at))
+    .filter((value): value is number => typeof value === "number");
+  const average = knownScores.length
+    ? Math.round(knownScores.reduce((a, b) => a + b, 0) / knownScores.length)
+    : 0;
 
   async function play(slow = false) {
     setPlaying(true);
@@ -400,6 +437,7 @@ function ListeningPage() {
       }
       setPartsSavedHere(partsToday + 1);
       queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
+      queryClient.invalidateQueries({ queryKey: ["listening-parts-today"] });
       queryClient.invalidateQueries({ queryKey: ["saved-practice"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     }
@@ -527,7 +565,7 @@ function ListeningPage() {
                 <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold">
                   <span>Accuracy</span>
                   {/* "—" until the first try (user report: "0%" read as a failure). */}
-                  <span> {scores.length ? `${average}%` : "—"}</span>
+                  <span> {knownScores.length ? `${average}%` : "—"}</span>
                 </span>
               </div>
 
@@ -717,8 +755,8 @@ function ListeningPage() {
                         <span className="text-xs text-muted-foreground">
                           {done ? (
                             // A part saved before this visit has no score here.
-                            scores[i] != null ? (
-                              `${scores[i]}%`
+                            scoreAt(i) != null ? (
+                              `${scoreAt(i)}%`
                             ) : (
                               <span>Saved</span>
                             )
