@@ -52,6 +52,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Tap Practice now to go straight to the right activity.",
       "Extra practice offers two short options; each shows the XP it earns.",
       "Today's Progress fills the ring with today's minutes and lists what you did.",
+      "Keep improving shows your reviews first (words, mistakes, skills); free rows show today's new activities, marked New today.",
     ],
     tip: "Take the challenge has a goal for the day and leaves once you reach it. Every other day it invites you to the AI Teacher or the video call.",
     to: "/dashboard",

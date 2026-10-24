@@ -2023,6 +2023,13 @@ const baseUiPt: Record<string, string> = {
   "All 3 listening tasks completed!": "As 3 tarefas de listening foram concluídas!",
   "Sessions today": "Sessões hoje",
   "Sentences today": "Frases hoje",
+  "New today": "Nova hoje",
+  "Start now": "Começar agora",
+  "Today's text is waiting: read it and answer the questions.":
+    "O texto de hoje está esperando: leia e responda às perguntas.",
+  "New writing tasks are ready for you.": "Novas tarefas de escrita estão prontas para você.",
+  "New words are ready to learn.": "Novas palavras estão prontas para aprender.",
+  "A session of 9 sentences is waiting.": "Uma sessão de 9 frases está esperando.",
   Saved: "Salva",
   "listening sentences": "frases de Listening",
   "Delete priority": "Apagar prioridade",

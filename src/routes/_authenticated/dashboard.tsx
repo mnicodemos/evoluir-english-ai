@@ -53,6 +53,7 @@ import { profileIsPremium } from "@/lib/billing/subscriptionView";
 import { PathProgressCard } from "@/components/PathProgressCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
+import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -151,20 +152,7 @@ function DashboardNotifications({
   // Today's daily reading not finished yet (user request, 2026-10-23: remind
   // it). Finishing the reading refreshes every query, this one included.
   const { data: profile } = useProfile();
-  const { data: readingDone } = useQuery({
-    queryKey: ["daily-reading-done", profile?.id],
-    enabled: !!profile?.id,
-    staleTime: 60 * 1000,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("activities")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", profile!.id)
-        .eq("activity_type", "daily_reading")
-        .gte("created_at", studyDayStartIso());
-      return (count ?? 0) > 0;
-    },
-  });
+  const { data: readingDone } = useDailyReadingDone(profile?.id);
   // Today's goal steps still open: finishing every one also closes the study
   // day (user request, 2026-10-23: activities without a reminder). Only steps
   // already written for today; the bell never asks the AI to write them.
