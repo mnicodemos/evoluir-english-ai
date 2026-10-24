@@ -11,6 +11,7 @@ import { aggregateSkillEvidence, countsForSkill } from "./aggregateSkill";
 import { measuredCefr } from "./cefr";
 import { hasDailyReadingEvidence, withoutUnmeasuredReading } from "./readingSource.server";
 import {
+  PEDAGOGICAL_SKILLS,
   pedagogicalSkillSchema,
   type AssessmentEvidence,
   type PedagogicalSkill,
@@ -196,7 +197,10 @@ export const loadNextStep = createServerFn({ method: "POST" })
     // Phase 33: the review recommendations, decided here on the server from the
     // very same rows already read above (no extra query, no per-skill lookup).
     // The skill already shown by "Your next step" and by the challenge is left
-    // out so the dashboard never repeats the same card twice.
+    // out so the dashboard never repeats the same card twice. Every candidate
+    // is returned (no cap of three here): the Dashboard first hides the ones
+    // whose practice is already done today and only then keeps three, so a
+    // finished Listening or Writing never takes a slot another skill could fill.
     const reviews = buildSmartReviewList(
       {
         evidence,
@@ -209,6 +213,7 @@ export const loadNextStep = createServerFn({ method: "POST" })
       },
       {
         excludeSkills: [step.prioritySkill, quest?.skill].filter(Boolean) as string[],
+        limit: PEDAGOGICAL_SKILLS.length,
       },
     );
 
