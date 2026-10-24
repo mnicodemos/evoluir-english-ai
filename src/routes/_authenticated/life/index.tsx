@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
@@ -12,7 +12,9 @@ import { HabitsSection } from "@/components/life/HabitsSection";
 import { MeditationSection } from "@/components/life/MeditationSection";
 import { LifeHeader, LifePremiumGate, useLifeT } from "@/components/life/LifeNav";
 import { RoutineSection } from "@/components/life/RoutineSection";
+import { LifeToday } from "@/components/life/LifeToday";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCelebrate } from "@/hooks/useCelebrate";
 import { useFocusLog } from "@/hooks/useFocusLog";
 import { useLife } from "@/hooks/useLife";
@@ -54,6 +56,13 @@ function LifePage() {
     staleTime: 30 * 1000,
   });
 
+  // The planning addresses (#goals, #routine, #habits) open the Plan tab.
+  const [tab, setTab] = useState<"today" | "plan">(() =>
+    typeof window !== "undefined" &&
+    ["#goals", "#routine", "#habits"].includes(window.location.hash)
+      ? "plan"
+      : "today",
+  );
   // Old tab addresses arrive with #goals, #routine, #habits or #coach: scroll
   // there once the sections exist (they render after the data loads).
   const ready = !!data;
@@ -97,10 +106,9 @@ function LifePage() {
     <AppShell>
       <LifeHeader />
       {/* Four bands (user request, 2026-10-22): the measures on top (Your
-          day, Evolution score, Focus), then the day's plan (goal steps,
-          tasks and habits; the priority of the day was removed, user
-          decision 2026-10-24), the meditations, and last the Life Coach.
-          Phones stack everything in this order. */}
+          day, Evolution score, Focus), then Today and Plan (the priority of
+          the day was removed, user decision 2026-10-24), then the
+          meditations. Phones stack everything in this order. */}
       <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-5">
         <section
           className="card-soft relative overflow-hidden p-4 sm:p-5 xl:p-6"
@@ -163,40 +171,65 @@ function LifePage() {
         </div>
       </div>
 
-      {/* The day's three lists side by side, from the most important (the
-          goal steps, which count for the streak) to the lightest (user
-          request, 2026-10-24: one place answers "what do I do today?").
-          Free students get their free goal steps first, beside the Premium
+      {/* Today and Plan (user request, 2026-10-24: a new student should feel
+          a professional app): Today is one list of what to do now (goal
+          steps, tasks, habits) beside the Life Coach; Plan holds the three
+          tools to set them up. Old #goals, #routine and #habits addresses
+          open Plan. Free students get the goal steps and the Premium
           invitation. */}
-      <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:mt-5 xl:grid-cols-3 xl:gap-5">
-        <div className="flex flex-col [&>div]:flex-1">
-          <GoalsSection part="steps" />
-        </div>
-        {data.premium ? (
-          <>
-            <div className="flex flex-col [&>section]:flex-1">
-              <RoutineSection />
+      <Tabs
+        value={tab}
+        onValueChange={(value) => setTab(value === "plan" ? "plan" : "today")}
+        className="mt-4 xl:mt-5"
+      >
+        <TabsList className="h-10 lg:h-10">
+          <TabsTrigger value="today" className="min-h-8 px-4">
+            {t("Today")}
+          </TabsTrigger>
+          <TabsTrigger value="plan" className="min-h-8 px-4">
+            {t("Planning")}
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="today" className="mt-4">
+          <div className="grid gap-4 lg:grid-cols-5 xl:gap-5">
+            <div className="flex flex-col lg:col-span-3 [&>section]:flex-1">
+              <LifeToday />
             </div>
-            <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
-              <HabitsSection />
+            <div className="flex flex-col lg:col-span-2 [&>section]:flex-1">
+              {data.premium ? (
+                <CoachSection />
+              ) : (
+                <LifePremiumGate feature="Routine, habits and Life Coach" />
+              )}
             </div>
-          </>
-        ) : (
-          <div className="xl:col-span-2">
-            <LifePremiumGate feature="Routine, habits and Life Coach" />
           </div>
-        )}
-      </div>
+        </TabsContent>
+        <TabsContent value="plan" className="mt-4">
+          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-5">
+            <div className="flex flex-col [&>div]:flex-1">
+              <GoalsSection part="steps" />
+            </div>
+            {data.premium ? (
+              <>
+                <div className="flex flex-col [&>section]:flex-1">
+                  <RoutineSection />
+                </div>
+                <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
+                  <HabitsSection />
+                </div>
+              </>
+            ) : (
+              <div className="xl:col-span-2">
+                <LifePremiumGate feature="Routine, habits and Life Coach" />
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <div className="mt-4 xl:mt-5">
         <MeditationSection />
       </div>
-
-      {data.premium ? (
-        <div className="mt-4 xl:mt-5">
-          <CoachSection />
-        </div>
-      ) : null}
     </AppShell>
   );
 }
