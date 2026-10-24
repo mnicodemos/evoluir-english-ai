@@ -14,21 +14,22 @@ describe("Black Friday offer", () => {
     expect(blackFridayActive(after)).toBe(false);
   });
 
-  it("gives the monthly plan 15 free days, once per account", () => {
-    expect(checkoutOffer("monthly", [], during)).toEqual({ trialDays: 15, couponId: null });
-    expect(checkoutOffer("monthly", [{}], during)).toEqual({ trialDays: null, couponId: null });
-    expect(checkoutOffer("monthly", [], after)).toEqual({ trialDays: 7, couponId: null });
+  it("gives the monthly plan 30% off and 15 free days, the trial once per account", () => {
+    const first = checkoutOffer("monthly", [], during);
+    expect(first.trialDays).toBe(15);
+    expect(first.couponId).not.toBeNull();
+    expect(formatBrl(offerPriceCents("monthly", first))).toBe("R$ 55,93");
+    const returning = checkoutOffer("monthly", [{}], during);
+    expect(returning.trialDays).toBeNull();
+    expect(returning.couponId).not.toBeNull();
   });
 
-  it("takes 15% off the yearly plan for everyone, keeping its usual trial", () => {
-    const first = checkoutOffer("yearly", [], during);
-    expect(first.trialDays).toBe(7);
-    expect(first.couponId).not.toBeNull();
-    expect(checkoutOffer("yearly", [{}], during).couponId).not.toBeNull();
-    expect(checkoutOffer("yearly", [], before).couponId).toBeNull();
-    expect(formatBrl(offerPriceCents("yearly", first))).toBe("R$ 679,92");
-    expect(formatBrl(offerPriceCents("monthly", checkoutOffer("monthly", [], during)))).toBe(
-      "R$ 79,90",
+  it("leaves the yearly plan and the dates outside the campaign unchanged", () => {
+    expect(checkoutOffer("yearly", [], during)).toEqual({ trialDays: 7, couponId: null });
+    expect(checkoutOffer("monthly", [], after)).toEqual({ trialDays: 7, couponId: null });
+    expect(checkoutOffer("monthly", [], before).couponId).toBeNull();
+    expect(formatBrl(offerPriceCents("yearly", checkoutOffer("yearly", [], during)))).toBe(
+      "R$ 799,90",
     );
   });
 });
