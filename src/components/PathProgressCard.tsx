@@ -22,7 +22,7 @@ import { useLearningPath } from "@/hooks/useCurriculum";
 import { useUserLessons } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
-import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
+import { useNextStep } from "@/hooks/useNextStep";
 import { skillMeterRows, type SkillMeterStatus } from "@/lib/pedagogy/skillMeter";
 import { findLevel } from "@/lib/level";
 import { useUiLang } from "@/lib/uiLang";
@@ -68,10 +68,7 @@ export function PathProgressCard({
 
   // Dashboard card: the same per-skill evidence "Today's priority" is decided
   // from (shared cache with the EVO card), never the old best-ever scores.
-  const { data: nextStep, isLoading: skillsLoading } = useQuery({
-    queryKey: ["next-step", profile?.level ?? null],
-    queryFn: () => loadNextStep({ data: undefined }),
-    staleTime: 60 * 1000,
+  const { data: nextStep, isLoading: skillsLoading } = useNextStep({
     enabled: compact && !!profile,
   });
   // Learning is continuous (user decision): the card keeps each skill's latest

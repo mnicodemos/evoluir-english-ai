@@ -30,6 +30,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useMistakesDue } from "@/hooks/useMistakesDue";
+import { useNextStep } from "@/hooks/useNextStep";
 import { useProfile } from "@/hooks/useProfile";
 import { useTodayActivities } from "@/components/DailyGoalCard";
 import {
@@ -51,10 +52,8 @@ import {
   NEXT_STEP_SKILL_TEXT,
   NEXT_STEP_WHY_NOW_TEXT,
 } from "@/lib/pedagogy/nextStep";
-import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
 
-type NextStepData = Awaited<ReturnType<typeof loadNextStep>>;
 import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
 
 import { findLevel } from "@/lib/level";
@@ -92,36 +91,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // popping in seconds later; they leave only once that activity is known done.
   const actionAvailable = (to: string, indicators: typeof activityIndicators) =>
     !indicators.ready || dashboardActionAvailable(to, indicators);
-  // The last answer is kept in the browser and shown at once on the next visit
-  // while the fresh one loads (user request: EVO's card had a delay on every
-  // page load). Read after mount, so server and client render the same first.
-  const storeKey = profile?.id ? `evoluir-next-step:${profile.id}:${profile.level ?? ""}` : null;
-  const [stored, setStored] = useState<NextStepData | undefined>(undefined);
-  useEffect(() => {
-    if (!storeKey) return;
-    try {
-      const raw = window.localStorage.getItem(storeKey);
-      setStored(raw ? (JSON.parse(raw) as NextStepData) : undefined);
-    } catch {
-      setStored(undefined);
-    }
-  }, [storeKey]);
-  const { data, isLoading, isError, isFetching, isPlaceholderData, refetch } = useQuery({
-    queryKey: ["next-step", profile?.level ?? null],
-    queryFn: async () => {
-      const result = await loadNextStep({ data: undefined });
-      if (storeKey) {
-        try {
-          window.localStorage.setItem(storeKey, JSON.stringify(result));
-        } catch {
-          // Storage full or blocked: the card simply loads as before.
-        }
-      }
-      return result;
-    },
-    staleTime: 60 * 1000,
-    placeholderData: () => stored,
-  });
+  const { data, isLoading, isError, isFetching, isPlaceholderData, refetch } = useNextStep();
 
   // Phones' pill row waits for everything it reads (user report, 2026-10-25:
   // a pill showed, then another replaced it): the Quick Win from the fresh
