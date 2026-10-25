@@ -74,8 +74,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
   const league = useWeeklyLeagueStanding(profile);
-  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
-  const { data: studyPlan } = useQuery({
+  const { data: todayActivities = [], isFetched: todayFetched } = useTodayActivities(profile?.id);
+  const { data: studyPlan, isFetched: planFetched } = useQuery({
     queryKey: ["study-plan", profile?.id],
     queryFn: () => loadStudyPlan({ data: undefined }),
     enabled: !!profile?.id,
@@ -86,8 +86,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const activityIndicators = useActivityIndicators();
   // Reviews waiting today: on phones they take the Quick Win's place when there
   // is no Quick Win (user request, 2026-10-24).
-  const { count: wordsDue } = useDueReviewState(profile?.id);
-  const { data: mistakesDue = 0 } = useMistakesDue(profile?.id);
+  const { count: wordsDue, ready: wordsDueReady } = useDueReviewState(profile?.id);
+  const { data: mistakesDue = 0, isFetched: mistakesFetched } = useMistakesDue(profile?.id);
   // Until today's practice has loaded, the buttons show right away instead of
   // popping in seconds later; they leave only once that activity is known done.
   const actionAvailable = (to: string, indicators: typeof activityIndicators) =>
@@ -106,7 +106,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       setStored(undefined);
     }
   }, [storeKey]);
-  const { data, isLoading, isError, isFetching, refetch } = useQuery({
+  const { data, isLoading, isError, isFetching, isPlaceholderData, refetch } = useQuery({
     queryKey: ["next-step", profile?.level ?? null],
     queryFn: async () => {
       const result = await loadNextStep({ data: undefined });
@@ -122,6 +122,26 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     staleTime: 60 * 1000,
     placeholderData: () => stored,
   });
+
+  // Phones' pill row waits for everything it reads (user report, 2026-10-25:
+  // a pill showed, then another replaced it): the Quick Win from the fresh
+  // answer, not the one kept from the last visit, today's activities, due
+  // words and mistakes, the league and the week, at most 4 s; until then
+  // three pill-shaped placeholders hold the place, so the pills arrive once.
+  const [pillWaitOver, setPillWaitOver] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setPillWaitOver(true), 4000);
+    return () => window.clearTimeout(timer);
+  }, []);
+  const pillsReady =
+    pillWaitOver ||
+    (!isPlaceholderData &&
+      activityIndicators.ready &&
+      todayFetched &&
+      wordsDueReady &&
+      mistakesFetched &&
+      league.loaded &&
+      planFetched);
 
   if (isLoading) {
     return (
@@ -527,9 +547,21 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 card's free height instead of crowding under the EVO label
                 (user report). */}
             <div className="mt-1 flex flex-nowrap items-center gap-1.5 sm:hidden">
-              {quickWinButton ?? mobileReviewButton}
-              {leagueButton}
-              {mapButton}
+              {pillsReady ? (
+                <>
+                  {quickWinButton ?? mobileReviewButton}
+                  {leagueButton}
+                  {mapButton}
+                </>
+              ) : (
+                [0, 1, 2].map((key) => (
+                  <span
+                    key={key}
+                    aria-hidden="true"
+                    className="h-7 flex-auto animate-pulse rounded-full border border-white/10 bg-white/[0.05]"
+                  />
+                ))
+              )}
             </div>
             {/* Mobile-only: one line with the real reason for today's priority.
                 Due word reviews live in the bell; a box here was clipped by the
