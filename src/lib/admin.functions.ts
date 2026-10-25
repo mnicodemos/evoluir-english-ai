@@ -817,3 +817,128 @@ export const deleteAiCreditTopup = createServerFn({ method: "POST" })
     if (error) throw new Error("The top-up could not be removed");
     return { ok: true };
   });
+
+// ------------------------------------------------------------- Lesson videos
+// Admin → Vídeos (audit, 2026-10-25): every curriculum lesson of a level with
+// the video the owner approved (lesson_videos, migration 0081) and the videos
+// students got. Approving one stores it and puts it in every student's copy.
+
+type LessonVideosTable = {
+  from: (table: string) => {
+    select: (columns: string) => {
+      in: (
+        column: string,
+        values: string[],
+      ) => Promise<{
+        data: { curriculum_key: string; video_url: string; video_seconds: number | null }[] | null;
+        error: { message: string } | null;
+      }>;
+    };
+    upsert: (row: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
+    delete: () => {
+      eq: (column: string, value: string) => Promise<{ error: { message: string } | null }>;
+    };
+  };
+};
+
+const lessonVideoLevel = z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]);
+
+export const getLessonVideos = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ level: lessonVideoLevel }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { getCurriculum } = await import("@/lib/curriculum");
+    const { lessonVideoReport } = await import("@/lib/lessonVideoReport");
+    const curriculum = getCurriculum(data.level);
+    const keys = curriculum.map((plan) => plan.key);
+
+    // Every student's copy of these lessons, page by page (1,000 rows a request).
+    const lessons: {
+      curriculum_key: string | null;
+      video_url: string | null;
+      video_duration_seconds: number | null;
+    }[] = [];
+    for (let from = 0; ; from += 1000) {
+      const { data: page, error } = await supabaseAdmin
+        .from("lessons")
+        .select("curriculum_key, video_url, video_duration_seconds")
+        .in("curriculum_key", keys)
+        .order("id")
+        .range(from, from + 999);
+      if (error) throw new Error("The lessons could not be read");
+      lessons.push(...(page ?? []));
+      if (!page || page.length < 1000) break;
+    }
+
+    // Before migration 0081 the table does not exist: no approvals yet.
+    const { data: approved, error: approvedError } = await (
+      supabaseAdmin as unknown as LessonVideosTable
+    )
+      .from("lesson_videos")
+      .select("curriculum_key, video_url, video_seconds")
+      .in("curriculum_key", keys);
+    return {
+      migrationApplied: !approvedError,
+      lessons: lessonVideoReport(curriculum, approved ?? [], lessons),
+    };
+  });
+
+export const setLessonVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        key: z.string().min(3).max(40),
+        url: z.string().trim().min(10).max(300),
+        seconds: z.number().int().min(1).max(7200).nullable(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { findCurriculumLesson } = await import("@/lib/curriculum");
+    const { canonicalYoutubeUrl } = await import("@/lib/lessonVideoReport");
+    if (!findCurriculumLesson(data.key)) throw new Error("Unknown lesson");
+    const url = canonicalYoutubeUrl(data.url);
+    if (!url) throw new Error("Paste a YouTube link");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as unknown as LessonVideosTable)
+      .from("lesson_videos")
+      .upsert({
+        curriculum_key: data.key,
+        video_url: url,
+        video_seconds: data.seconds,
+        approved_by: context.userId,
+        approved_at: new Date().toISOString(),
+      });
+    if (error) throw new Error("The video could not be saved");
+    // Every student's copy of the lesson shows it from now on.
+    const { error: lessonsError } = await supabaseAdmin
+      .from("lessons")
+      .update({ video_url: url, video_duration_seconds: data.seconds ?? 0 })
+      .eq("curriculum_key", data.key);
+    if (lessonsError) throw new Error("The lessons could not be updated");
+    return { ok: true, url };
+  });
+
+export const clearLessonVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ key: z.string().min(3).max(40) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as unknown as LessonVideosTable)
+      .from("lesson_videos")
+      .delete()
+      .eq("curriculum_key", data.key);
+    if (error) throw new Error("The approval could not be removed");
+    return { ok: true };
+  });

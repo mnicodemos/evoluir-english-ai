@@ -5,7 +5,7 @@
 
 /** Extracts the YouTube id of a watch/short/embed URL, or null when it is not YouTube. */
 export function youtubeVideoId(url: string): string | null {
-  const match = url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{6,})/);
+  const match = url.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{6,})/);
   return match?.[1] ?? null;
 }
 
