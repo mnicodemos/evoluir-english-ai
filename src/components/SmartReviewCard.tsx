@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
@@ -36,7 +35,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import { continueRows, goFurtherRow, newTodayRows } from "@/lib/keepImprovingNew";
 import { NEXT_STEP_SKILL_TEXT } from "@/lib/pedagogy/nextStep";
-import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
+import { useNextStep } from "@/hooks/useNextStep";
 import { SMART_REVIEW_MAX_ITEMS, SMART_REVIEW_REASON_TEXT } from "@/lib/pedagogy/smartReviewUx";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -66,13 +65,9 @@ export function SmartReviewCard({
 
   const { data: profile } = useProfile();
   const indicators = useActivityIndicators();
-  // Same query key as the next step: the data is already in cache, so this
-  // section adds no request at all.
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["next-step", profile?.level ?? null],
-    queryFn: () => loadNextStep({ data: undefined }),
-    staleTime: 60 * 1000,
-  });
+  // The EVO card's query (shared cache, and the answer kept from the last
+  // visit), so the rows no longer wait for the server's next step.
+  const { data, isLoading, isError } = useNextStep();
   // Vocabulary words whose spaced review date has arrived (same count as the bell).
   const { count: reviewCount, ready: reviewsReady } = useDueReviewState(profile?.id);
   // Today's reading, for the "New today" rows (same query as the bell).
