@@ -8,7 +8,7 @@ import {
   hashAiRequest,
   loadAiLimit,
   releaseAbandonedAiUsage,
-  reserveAiUsage,
+  reserveAiUsageWithWait,
 } from "@/lib/ai-usage.server";
 import {
   attemptTimeout,
@@ -157,7 +157,10 @@ export const Route = createFileRoute("/api/transcribe")({
             limitReads,
             hashAiRequest({ size: audio.size, sample: audioBase64.slice(0, 1024) }),
           ]);
-          ticket = await reserveAiUsage({
+          // Waits for its turn like the voice and AI Speaking (audit,
+          // 2026-10-25): a quick retry used to get "one at a time" or "too
+          // quickly" at once instead of a check a second later.
+          ticket = await reserveAiUsageWithWait({
             userId,
             operation: "transcription",
             model: GEMINI_TRANSCRIPTION_MODELS[0],
