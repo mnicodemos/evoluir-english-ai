@@ -14,6 +14,7 @@ import {
 
 import reviewListening from "@/assets/review-listening.jpg.asset.json";
 import reviewGrammar from "@/assets/review-grammar.webp";
+import reviewLesson from "@/assets/review-lesson.webp";
 import reviewMistakes from "@/assets/review-mistakes.webp";
 import reviewPronunciation from "@/assets/review-pronunciation.webp";
 import reviewReading from "@/assets/review-reading.webp";
@@ -577,6 +578,8 @@ function RowTag({
 
 /** Photo of a "Keep going" row: EVO's conversation, the teacher, reading, a lesson. */
 function ContinueTile({ rowKey }: { rowKey: "coach" | "teacher" | "reading" | "learning" }) {
+  // Every row has its photo; the next lesson took the owner's "Lessons
+  // learned" photo (user request, 2026-10-25) instead of an icon tile.
   const photo =
     rowKey === "coach"
       ? reviewSpeaking
@@ -584,17 +587,8 @@ function ContinueTile({ rowKey }: { rowKey: "coach" | "teacher" | "reading" | "l
         ? reviewGrammar
         : rowKey === "reading"
           ? reviewReading
-          : null;
-  if (photo)
-    return <img src={photo} alt="" className="h-full min-h-0 w-16 rounded-md object-cover" />;
-  return (
-    <span
-      className="grid h-full min-h-0 w-16 place-items-center rounded-md bg-brand-green/15 text-brand-green"
-      aria-hidden="true"
-    >
-      <GraduationCap className="size-6" />
-    </span>
-  );
+          : reviewLesson;
+  return <img src={photo} alt="" className="h-full min-h-0 w-16 rounded-md object-cover" />;
 }
 
 function SkillTile({ skill }: { skill: string }) {
