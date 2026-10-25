@@ -157,7 +157,7 @@ function ListeningPage() {
   const [another, setAnother] = useState(false);
   const sessionDone =
     partsToday >= PARTS_PER_SESSION && partsToday % PARTS_PER_SESSION === 0 && !another;
-  const sentencesToday = Math.min(partsToday, PARTS_PER_SESSION) * SENTENCES_PER_PART;
+  const savedSentencesToday = Math.min(partsToday, PARTS_PER_SESSION) * SENTENCES_PER_PART;
   const minutesSpent = useTimeSpent();
   // A session left before Finish still counts once a sentence was answered
   // (minutes audit, 2026-10-24: 2 of 3 sentences left with 0).
@@ -278,6 +278,16 @@ function ListeningPage() {
   const knownScores = sentences
     .map((_, at) => scoreAt(at))
     .filter((value): value is number => typeof value === "number");
+  // "Sentences today" moves with every sentence done (user request,
+  // 2026-10-25: it stayed at 0/9 until a part of 3 was saved): the saved
+  // parts plus the sentences passed in the part being done. It stops one
+  // short of the goal until the last part is saved, since only a saved
+  // session completes the study day.
+  const doneInPart = sessionDone ? 0 : (index % SENTENCES_PER_PART) + (passed ? 1 : 0);
+  const sentencesToday =
+    savedSentencesToday >= SENTENCES_PER_SESSION
+      ? SENTENCES_PER_SESSION
+      : Math.min(savedSentencesToday + doneInPart, SENTENCES_PER_SESSION - 1);
   const average = knownScores.length
     ? Math.round(knownScores.reduce((a, b) => a + b, 0) / knownScores.length)
     : 0;

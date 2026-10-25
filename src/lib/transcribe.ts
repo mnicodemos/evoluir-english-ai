@@ -1,8 +1,37 @@
 import { supabase } from "@/integrations/supabase/client";
 import { pronunciationSimilarity } from "@/lib/legacyScores";
 
+/**
+ * The longest the student waits for a check (audit, 2026-10-25): the server
+ * gives up after 20 s, so past 25 s the connection itself has stalled and
+ * "Checking..." would otherwise never end.
+ */
+export const TRANSCRIBE_CLIENT_TIMEOUT_MS = 25_000;
+export const TRANSCRIBE_TIMEOUT_MESSAGE = "This is taking too long. Please try again.";
+
 /** Sends a recorded WAV blob to the transcription endpoint and returns the recognized English text. */
 export async function transcribeAudio(audio: Blob, signal?: AbortSignal): Promise<string> {
+  const controller = new AbortController();
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, TRANSCRIBE_CLIENT_TIMEOUT_MS);
+  const forward = () => controller.abort();
+  if (signal?.aborted) controller.abort();
+  else signal?.addEventListener("abort", forward, { once: true });
+  try {
+    return await transcribeOnce(audio, controller.signal);
+  } catch (error) {
+    if (timedOut) throw new Error(TRANSCRIBE_TIMEOUT_MESSAGE);
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener("abort", forward);
+  }
+}
+
+async function transcribeOnce(audio: Blob, signal: AbortSignal): Promise<string> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   if (!token) throw new Error("Please sign in again to use the microphone.");
@@ -13,7 +42,7 @@ export async function transcribeAudio(audio: Blob, signal?: AbortSignal): Promis
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: form,
-    ...(signal ? { signal } : {}),
+    signal,
   });
 
   if (!response.ok || !response.body) {

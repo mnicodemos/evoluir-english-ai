@@ -389,6 +389,7 @@ const baseUiPt: Record<string, string> = {
   "Goal step": "Passo da meta",
   "Your goals": "Suas metas",
   Planning: "Planejar",
+  "This is taking too long. Please try again.": "Está demorando demais. Tente de novo.",
   Task: "Tarefa",
   Habit: "Hábito",
   "EVO's step of the day, deadline and milestones": "O passo do dia da EVO, prazo e etapas",
