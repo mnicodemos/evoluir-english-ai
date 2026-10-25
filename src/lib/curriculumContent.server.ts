@@ -49,11 +49,51 @@ const SKILL_BRIEF: Record<string, string> = {
     "Focus on grammar: explain the form, the meaning, the common Brazilian-learner mistake and how to fix it.",
 };
 
-/** Finds a captioned video (max 7 minutes) on the same topic as the lesson. */
+/**
+ * The video the owner approved for this lesson in Admin → Vídeos (migration
+ * 0081), or null. Read with the service role; before 0081 is applied (no
+ * table) or on any failure it answers null, so the search still runs.
+ */
+export async function approvedLessonVideo(key: string): Promise<LessonVideo | null> {
+  try {
+    const db = (await contentWriter()) as unknown as {
+      from: (table: string) => {
+        select: (columns: string) => {
+          eq: (
+            column: string,
+            value: string,
+          ) => {
+            maybeSingle: () => Promise<{
+              data: { video_url: string; video_seconds: number | null } | null;
+              error: unknown;
+            }>;
+          };
+        };
+      };
+    };
+    const { data, error } = await db
+      .from("lesson_videos")
+      .select("video_url, video_seconds")
+      .eq("curriculum_key", key)
+      .maybeSingle();
+    if (error || !data) return null;
+    return { url: data.video_url, seconds: data.video_seconds ?? 0 };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The owner's approved video for this lesson, else a captioned video (max 7
+ * minutes) found by topic and level (audit, 2026-10-25: every student of a
+ * lesson sees the same approved video).
+ */
 async function pickVideo(
   supabase: SupabaseClient<Database>,
   plan: CurriculumLesson,
 ): Promise<LessonVideo> {
+  const approved = await approvedLessonVideo(plan.key);
+  if (approved) return approved;
   const { data } = await supabase.from("lessons").select("video_url").not("video_url", "is", null);
   const used = new Set(((data ?? []) as { video_url: string }[]).map((row) => row.video_url));
   return findLessonVideo(`${plan.title} ${plan.level.toUpperCase()}`, plan.skill, used, {

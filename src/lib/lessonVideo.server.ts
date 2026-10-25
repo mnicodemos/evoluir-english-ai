@@ -1,8 +1,11 @@
 /**
  * Picks a YouTube lesson video that matches the lesson topic, lasts at most
  * 7 minutes and has closed captions. It searches YouTube with the captions
- * filter and falls back to a curated, hand-checked pool per skill.
+ * filter, ranks the results by relevance (rankVideoCandidates) and falls back
+ * to a curated, hand-checked pool per skill. A video the owner approved in
+ * Admin → Vídeos (lesson_videos) always wins over both (pickVideo).
  */
+import { rankVideoCandidates, type VideoCandidate } from "./lessonVideoRank";
 
 export type LessonVideo = { url: string; seconds: number };
 
@@ -61,8 +64,13 @@ function toSeconds(text: string): number | null {
   return null;
 }
 
-/** Walks the YouTube search payload and collects every video with a duration. */
-function collect(node: unknown, out: { id: string; seconds: number }[]): void {
+function runsText(value: unknown): string {
+  const node = value as { runs?: { text?: string }[]; simpleText?: string } | undefined;
+  return node?.runs?.map((run) => run.text ?? "").join("") ?? node?.simpleText ?? "";
+}
+
+/** Walks the YouTube search payload and collects every video with a duration, title and channel. */
+function collect(node: unknown, out: VideoCandidate[]): void {
   if (Array.isArray(node)) {
     node.forEach((item) => collect(item, out));
     return;
@@ -74,12 +82,17 @@ function collect(node: unknown, out: { id: string; seconds: number }[]): void {
   if (id && length) {
     const seconds = toSeconds(length);
     if (seconds && seconds >= MIN_VIDEO_SECONDS && seconds <= MAX_VIDEO_SECONDS)
-      out.push({ id, seconds });
+      out.push({
+        id,
+        seconds,
+        title: runsText(obj["title"]),
+        channel: runsText(obj["ownerText"]) || runsText(obj["longBylineText"]),
+      });
   }
   Object.values(obj).forEach((value) => collect(value, out));
 }
 
-async function searchYoutube(query: string): Promise<{ id: string; seconds: number }[]> {
+async function searchYoutube(query: string): Promise<VideoCandidate[]> {
   const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=${CC_FILTER}`;
   const response = await fetch(url, {
     headers: {
@@ -98,27 +111,18 @@ async function searchYoutube(query: string): Promise<{ id: string; seconds: numb
   } catch {
     return [];
   }
-  const found: { id: string; seconds: number }[] = [];
+  const found: VideoCandidate[] = [];
   collect(data, found);
   const seen = new Set<string>();
   return found.filter((v) => (seen.has(v.id) ? false : seen.add(v.id)));
-}
-
-/** A lesson video is easiest to follow between 2½ and 6 minutes. */
-const IDEAL_SECONDS = 300;
-
-/** Closest to the ideal teaching length wins, so 20-second clips never do. */
-function bestByLength(results: { id: string; seconds: number }[]) {
-  return [...results].sort(
-    (a, b) => Math.abs(a.seconds - IDEAL_SECONDS) - Math.abs(b.seconds - IDEAL_SECONDS),
-  );
 }
 
 /**
  * Returns a captioned video matching the lesson topic, preferring one that is
  * not already used by another lesson of this student. The queries describe the
  * lesson itself — topic, objective, skill and CEFR level — instead of relying on
- * the title alone, and the candidate closest to a teaching length is chosen.
+ * the title alone, and the most relevant candidate is chosen (the lesson's
+ * words in its title, a teaching channel, the search order; length last).
  */
 export async function findLessonVideo(
   topic: string,
@@ -136,7 +140,7 @@ export async function findLessonVideo(
 
   for (const query of queries) {
     try {
-      const results = bestByLength(await searchYoutube(query));
+      const results = rankVideoCandidates(await searchYoutube(query), topic, options.level ?? "");
       const fresh = results.find((v) => !used.has(`https://www.youtube.com/watch?v=${v.id}`));
       const pick = fresh ?? results[0];
       if (pick) return { url: `https://www.youtube.com/watch?v=${pick.id}`, seconds: pick.seconds };
