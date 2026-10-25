@@ -1,13 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ExternalLink, Loader2 } from "lucide-react";
+import { Check, Copy, ExternalLink, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { clearLessonVideo, getLessonVideos, setLessonVideo } from "@/lib/admin.functions";
-import type { LessonVideoReportItem } from "@/lib/lessonVideoReport";
+import {
+  lessonVideoListText,
+  type LessonVideoReportItem,
+  type VideoInfo,
+} from "@/lib/lessonVideoReport";
 import { cn } from "@/lib/utils";
 
 const LEVELS = ["a1", "a2", "b1", "b2", "c1", "c2"] as const;
@@ -38,19 +42,23 @@ function formatDuration(seconds: number | null): string {
 }
 
 /** Title and channel from YouTube's public oEmbed, read by the owner's browser. */
-function useVideoInfo(id: string) {
-  return useQuery({
+function videoInfoQuery(id: string) {
+  return {
     queryKey: ["admin", "video-info", id],
     staleTime: Infinity,
     retry: false,
-    queryFn: async () => {
+    queryFn: async (): Promise<VideoInfo> => {
       const response = await fetch(
         `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}`,
       );
       if (!response.ok) return null;
       return (await response.json()) as { title?: string; author_name?: string };
     },
-  });
+  };
+}
+
+function useVideoInfo(id: string) {
+  return useQuery(videoInfoQuery(id));
 }
 
 function VideoTile({
@@ -246,6 +254,35 @@ export function AdminLessonVideos() {
     queryFn: () => load({ data: { level } }),
   });
   const lessons = query.data?.lessons ?? [];
+  const queryClient = useQueryClient();
+  const [copying, setCopying] = useState(false);
+  // Copies the level's list to paste into the chat for a review (owner request):
+  // titles not loaded yet are fetched first, a failed one reads "indisponível".
+  const copyList = async () => {
+    setCopying(true);
+    try {
+      const ids = new Set(
+        lessons.flatMap((item) => [
+          ...(item.approved ? [item.approved.id] : []),
+          ...item.used.map((video) => video.id),
+        ]),
+      );
+      const infos = new Map<string, VideoInfo>();
+      await Promise.all(
+        [...ids].map(async (id) => {
+          infos.set(id, await queryClient.fetchQuery(videoInfoQuery(id)).catch(() => null));
+        }),
+      );
+      await navigator.clipboard.writeText(
+        lessonVideoListText(level, lessons, (id) => infos.get(id)),
+      );
+      toast.success("Lista copiada: cole no chat para a avaliação.");
+    } catch {
+      toast.error("Não foi possível copiar a lista.");
+    } finally {
+      setCopying(false);
+    }
+  };
   const approvedCount = lessons.filter((item) => item.approved).length;
   const units = [...new Set(lessons.map((item) => item.unit))];
 
@@ -276,9 +313,26 @@ export function AdminLessonVideos() {
           </button>
         ))}
         {query.data ? (
-          <span className="ml-auto self-center text-xs text-muted-foreground">
-            {approvedCount} de {lessons.length} lições com vídeo aprovado
-          </span>
+          <>
+            <span className="ml-auto self-center text-xs text-muted-foreground">
+              {approvedCount} de {lessons.length} lições com vídeo aprovado
+            </span>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              disabled={copying || lessons.length === 0}
+              onClick={() => void copyList()}
+            >
+              {copying ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Copy className="size-3.5" aria-hidden="true" />
+              )}
+              Copiar lista
+            </Button>
+          </>
         ) : null}
       </div>
 

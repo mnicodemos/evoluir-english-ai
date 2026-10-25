@@ -78,3 +78,45 @@ export function canonicalYoutubeUrl(input: string): string | null {
   if (!id || !/^[A-Za-z0-9_-]{11}/.test(id)) return null;
   return `https://www.youtube.com/watch?v=${id.slice(0, 11)}`;
 }
+
+export type VideoInfo = { title?: string; author_name?: string } | null | undefined;
+
+function durationText(seconds: number | null): string {
+  if (!seconds) return "duração ?";
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+/**
+ * The level's lessons and their videos as plain text (owner request,
+ * 2026-10-25: paste it into the chat so the fit of each video can be judged by
+ * its title, channel and length; Claude's environment cannot reach YouTube).
+ */
+export function lessonVideoListText(
+  level: string,
+  items: LessonVideoReportItem[],
+  infoOf: (id: string) => VideoInfo,
+): string {
+  const lines = [`Vídeos das lições · nível ${level.toUpperCase()}`, ""];
+  for (const item of items) {
+    lines.push(`U${item.unit} L${item.position} · ${item.title} (${item.skill}) [${item.key}]`);
+    lines.push(`  Objetivo: ${item.objective}`);
+    const videos = [
+      ...(item.approved ? [{ ...item.approved, note: "aprovado" }] : []),
+      ...item.used
+        .filter((video) => video.id !== item.approved?.id)
+        .map((video) => ({
+          ...video,
+          note: `${video.lessons} ${video.lessons === 1 ? "aluno" : "alunos"}`,
+        })),
+    ];
+    if (videos.length === 0) lines.push("  (nenhum vídeo ainda)");
+    for (const video of videos) {
+      const info = infoOf(video.id);
+      lines.push(
+        `  - ${info?.title ?? "título indisponível"} · ${info?.author_name ?? "canal ?"} · ${durationText(video.seconds)} · ${video.note} · ${video.url}`,
+      );
+    }
+    lines.push("");
+  }
+  return lines.join("\n").trimEnd();
+}
