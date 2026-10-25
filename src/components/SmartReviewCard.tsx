@@ -261,8 +261,12 @@ export function SmartReviewCard({
           }`}
         >
           {showWordReviews && (
-            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-brand-green/35 bg-brand-green/[0.07] pr-2">
-              <img src={reviewWords} alt="" className="h-full min-h-0 w-16 object-cover" />
+            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
+              <img
+                src={reviewWords}
+                alt=""
+                className="h-full min-h-0 w-16 rounded-md object-cover"
+              />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
                 <p className="truncate text-sm font-semibold">
@@ -289,8 +293,12 @@ export function SmartReviewCard({
             </li>
           )}
           {showMistakes && (
-            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-warning/35 bg-warning/[0.07] pr-2">
-              <img src={reviewMistakes} alt="" className="h-full min-h-0 w-16 object-cover" />
+            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-warning/35 bg-warning/[0.07] p-1 pr-2">
+              <img
+                src={reviewMistakes}
+                alt=""
+                className="h-full min-h-0 w-16 rounded-md object-cover"
+              />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("My mistakes")} />
                 <p className="truncate text-sm font-semibold">
@@ -321,13 +329,13 @@ export function SmartReviewCard({
             return (
               <li
                 key={item.skill}
-                className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/45 pr-2"
+                className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-border bg-secondary/45 p-1 pr-2"
               >
                 {SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO] ? (
                   <img
                     src={SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO]}
                     alt=""
-                    className="h-full min-h-0 w-16 object-cover"
+                    className="h-full min-h-0 w-16 rounded-md object-cover"
                   />
                 ) : (
                   // Skills without their own photo get their icon, so one skill
@@ -375,9 +383,13 @@ export function SmartReviewCard({
           {newRows.map((row) => (
             <li
               key={row.key}
-              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-dashed border-brand-green/45 bg-brand-green/[0.04] pr-2"
+              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
             >
-              <img src={SKILL_PHOTO[row.key]} alt="" className="h-full min-h-0 w-16 object-cover" />
+              <img
+                src={SKILL_PHOTO[row.key]}
+                alt=""
+                className="h-full min-h-0 w-16 rounded-md object-cover"
+              />
               <div className="min-w-0">
                 {/* "New today", never a review: the same item the bell lists. */}
                 <RowTag kind="new" label={t("New today")} />
@@ -403,7 +415,7 @@ export function SmartReviewCard({
           {keepGoing.map((row) => (
             <li
               key={row.key}
-              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-md border border-border bg-secondary/30 pr-2"
+              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-border bg-secondary/30 p-1 pr-2"
             >
               <ContinueTile rowKey={row.key} />
               <div className="min-w-0">
@@ -573,10 +585,11 @@ function ContinueTile({ rowKey }: { rowKey: "coach" | "teacher" | "reading" | "l
         : rowKey === "reading"
           ? reviewReading
           : null;
-  if (photo) return <img src={photo} alt="" className="h-full min-h-0 w-16 object-cover" />;
+  if (photo)
+    return <img src={photo} alt="" className="h-full min-h-0 w-16 rounded-md object-cover" />;
   return (
     <span
-      className="grid h-full min-h-0 w-16 place-items-center bg-brand-green/15 text-brand-green"
+      className="grid h-full min-h-0 w-16 place-items-center rounded-md bg-brand-green/15 text-brand-green"
       aria-hidden="true"
     >
       <GraduationCap className="size-6" />
@@ -591,7 +604,10 @@ function SkillTile({ skill }: { skill: string }) {
   };
   const Icon = tile.icon;
   return (
-    <span className={`grid h-full min-h-0 w-16 place-items-center ${tile.tone}`} aria-hidden="true">
+    <span
+      className={`grid h-full min-h-0 w-16 place-items-center rounded-md ${tile.tone}`}
+      aria-hidden="true"
+    >
       <Icon className="size-6" />
     </span>
   );
