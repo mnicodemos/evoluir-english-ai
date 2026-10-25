@@ -786,6 +786,30 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_videos: {
+        Row: {
+          approved_at: string
+          approved_by: string | null
+          curriculum_key: string
+          video_seconds: number | null
+          video_url: string
+        }
+        Insert: {
+          approved_at?: string
+          approved_by?: string | null
+          curriculum_key: string
+          video_seconds?: number | null
+          video_url: string
+        }
+        Update: {
+          approved_at?: string
+          approved_by?: string | null
+          curriculum_key?: string
+          video_seconds?: number | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           category: string
