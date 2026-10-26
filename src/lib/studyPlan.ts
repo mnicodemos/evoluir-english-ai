@@ -268,9 +268,19 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
   // can catch up an earlier missed slot of the same skill, but can never
   // complete a future slot. This prevents a student from finishing the entire
   // week on Monday by practising every skill once.
-  const availablePractice = (input.practice ?? [])
-    .filter((event) => event.date >= weekStart && event.date <= today)
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const practiceBySkillAndDate = new Map<string, PlanPractice>();
+  for (const event of (input.practice ?? [])
+    .filter((item) => item.date >= weekStart && item.date <= today)
+    .sort((a, b) => a.date.localeCompare(b.date))) {
+    const key = `${event.skill}:${event.date}`;
+    const existing = practiceBySkillAndDate.get(key);
+    // Multiple activities of one skill on one calendar day count as one
+    // practice day for the weekly schedule. Prefer lesson metadata when present.
+    if (!existing || (!existing.lessonId && event.lessonId)) {
+      practiceBySkillAndDate.set(key, event);
+    }
+  }
+  const availablePractice = [...practiceBySkillAndDate.values()];
   const usedPractice = new Set<PlanPractice>();
 
   const items: StudyPlanDay[] = days.map((day, i) => {
