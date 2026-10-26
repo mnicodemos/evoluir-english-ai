@@ -282,10 +282,7 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
     // or after that slot's scheduled date. Later practice may catch up missed
     // slots, but practice before a future slot must not complete it.
     const matchedPractice = availablePractice.find(
-      (event) =>
-        event.skill === skill &&
-        event.date >= date &&
-        !usedPractice.has(event),
+      (event) => event.skill === skill && event.date >= date && !usedPractice.has(event),
     );
     if (matchedPractice) {
       usedPractice.add(matchedPractice);
