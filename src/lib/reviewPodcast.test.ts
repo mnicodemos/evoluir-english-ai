@@ -48,10 +48,14 @@ describe("lesson audio dialogue", () => {
     expect(messages).toEqual(lessonPodcastMessages(plan));
     expect(messages[0]!.content).toContain("CEFR A1");
     expect(messages[1]!.content).toContain(plan.title);
-    expect(messages[1]!.content).toContain(plan.objective);
+     expect(messages[1]!.content).toContain(plan.objective);
+    expect(messages[0]!.content).toContain("real, relaxed conversation");
+    expect(messages[0]!.content).toContain("LEO");
   });
 
-  it("gives EVO and Leo their own voices", () => {
+  it("labels EVO and LEO and gives them their own voices", () => {
+    expect(PODCAST_SPEAKERS.evo.name).toBe("EVO");
+    expect(PODCAST_SPEAKERS.leo.name).toBe("LEO");
     expect(PODCAST_SPEAKERS.evo.voice).toBe("evo");
     expect(PODCAST_SPEAKERS.leo.voice).toBe("host");
   });
