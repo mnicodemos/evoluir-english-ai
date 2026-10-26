@@ -17,11 +17,10 @@ const SPEAKER_TONE = {
 } as const;
 
 /**
- * The review lessons' podcast (owner request, 2026-10-26): EVO and her co-host
- * Leo talk through the units under review, each in their own voice, line by
- * line, with the line being spoken highlighted and its Portuguese on request.
- * Listening to the end counts as the lesson's video step; while it plays the
- * activity clock keeps running (data-media-playing).
+ * Lesson audio dialogue: EVO and Leo speak in their own voices, line by line,
+ * with the current line highlighted and Portuguese translation available on
+ * request. Listening to the end completes the lesson's media step; while it
+ * plays, the activity clock keeps running (data-media-playing).
  */
 export function LessonPodcast({
   lessonId,
@@ -38,7 +37,7 @@ export function LessonPodcast({
 }) {
   const load = useServerFn(loadLessonPodcast);
   const query = useQuery({
-    queryKey: ["review-podcast", lessonId],
+    queryKey: ["lesson-podcast", lessonId],
     queryFn: () => load({ data: { lessonId } }),
     staleTime: Infinity,
     retry: false,
@@ -90,10 +89,10 @@ export function LessonPodcast({
           voice: PODCAST_SPEAKERS[line.speaker].voice,
         });
       } catch {
-        // One line that could not play does not stop the episode.
+        // One line that could not play does not stop the dialogue.
       }
       if (run.current !== id) return;
-      // The video step moves in quarters, so its saved progress is not written per line.
+      // The media step moves in quarters, so its saved progress is not written per line.
       const percent = Math.floor(((index + 1) / lines.length) * 4) * 25;
       if (percent > reported.current) {
         reported.current = percent;
