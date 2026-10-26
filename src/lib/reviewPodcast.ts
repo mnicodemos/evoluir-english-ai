@@ -28,21 +28,32 @@ const lineSchema = z.object({
 
 export const podcastSchema = z.object({
   title: z.string().trim().min(3).max(120),
-  lines: z.array(lineSchema).min(12).max(30),
+  lines: z
+    .array(lineSchema)
+    .min(12)
+    .max(36)
+    .refine(
+      (lines) =>
+        lines.reduce(
+          (total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length,
+          0,
+        ) >= 420,
+      "The dialogue must contain enough spoken words for at least three minutes of audio.",
+    ),
 });
 
 export type ReviewPodcast = z.infer<typeof podcastSchema>;
 export type PodcastLine = ReviewPodcast["lines"][number];
 
-/** Existing video-generation rule: only Review I and Review II replace video with audio. */
+/** Audio is the learner-facing media experience in Phase 1 for every non-final lesson. */
 export function hasReviewPodcast(plan: CurriculumLesson | null | undefined): boolean {
   return !!plan && plan.reviewUnits.length > 0 && !plan.isReviewTest;
 }
 
-/** Pilot: B1 Unit 2 Lesson 2, plus the existing Review I/II audio experience. */
+/** Phase 1: every non-final lesson gets a lesson-specific EVO + LEO dialogue. */
 export function hasLessonPodcast(plan: CurriculumLesson | null | undefined): boolean {
   if (!plan || plan.isReviewTest) return false;
-  return plan.key === "b1-u2-l2" || plan.reviewUnits.length > 0;
+  return true;
 }
 
 /** How the conversation sounds at each level. */
@@ -83,13 +94,17 @@ export function reviewPodcastMessages(plan: CurriculumLesson) {
         "5) a quick challenge: EVO asks the listener a question, says 'Pause and answer out loud', then gives a model answer; " +
         "6) a short goodbye that invites the listener to the lesson's quiz. " +
         "Only review what the outline covers: no new grammar. Alternate the speakers naturally, EVO speaks first. " +
-        `Write 16 to 24 lines; each line at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        `Write 30 to 36 lines and at least 450 spoken English words in total; each line at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
         "For every line add 'pt', a natural Brazilian Portuguese translation. " +
         'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
     },
     {
       role: "user" as const,
-      content: `Review lesson: ${plan.title}\nObjective: ${plan.objective}\nCEFR level: ${plan.level.toUpperCase()}\nUnits under review:\n${reviewOutline(plan)}`,
+      content: `Review lesson: ${plan.title}
+Objective: ${plan.objective}
+CEFR level: ${plan.level.toUpperCase()}
+Units under review:
+${reviewOutline(plan)}`,
     },
   ];
 }
@@ -122,13 +137,19 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
         "Let EVO and LEO show curiosity, warmth, light humour where natural, and a distinct personality without forced jokes. Use smooth transitions and callbacks to examples already mentioned. " +
         "Conversation arc: EVO opens briefly with the topic; LEO responds with a believable question or observation; they explore examples together; LEO makes one common, level-appropriate mistake and EVO corrects it kindly in context; they recap naturally and give the listener a short speaking challenge with a model answer; they close warmly and briefly. " +
         "Alternate speakers naturally, with no abrupt topic changes. EVO speaks first. Do not make every turn a question-answer pair or have either speaker narrate the structure of the episode. " +
-        `Write 16 to 24 lines; each line at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        `Write 30 to 36 lines and at least 450 spoken English words in total; each line at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
         "For every line add 'pt', a natural Brazilian Portuguese translation. " +
         'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
     },
     {
       role: "user" as const,
-      content: `Lesson: ${plan.title}\nUnit: ${plan.unitTitle}\nLevel: ${plan.level.toUpperCase()}\nSkill: ${plan.skill}\nObjective: ${plan.objective}\nOther lessons in this unit for context only:\n${unitOutline}`,
+      content: `Lesson: ${plan.title}
+Unit: ${plan.unitTitle}
+Level: ${plan.level.toUpperCase()}
+Skill: ${plan.skill}
+Objective: ${plan.objective}
+Other lessons in this unit for context only:
+${unitOutline}`,
     },
   ];
 }
