@@ -121,8 +121,7 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
     },
     {
       role: "user" as const,
-      content:
-        `Lesson: ${plan.title}\nUnit: ${plan.unitTitle}\nLevel: ${plan.level.toUpperCase()}\nSkill: ${plan.skill}\nObjective: ${plan.objective}\nOther lessons in this unit for context only:\n${unitOutline}`,
+      content: `Lesson: ${plan.title}\nUnit: ${plan.unitTitle}\nLevel: ${plan.level.toUpperCase()}\nSkill: ${plan.skill}\nObjective: ${plan.objective}\nOther lessons in this unit for context only:\n${unitOutline}`,
     },
   ];
 }
