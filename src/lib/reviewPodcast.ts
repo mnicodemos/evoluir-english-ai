@@ -34,6 +34,11 @@ export const podcastSchema = z.object({
 export type ReviewPodcast = z.infer<typeof podcastSchema>;
 export type PodcastLine = ReviewPodcast["lines"][number];
 
+/** Existing video-generation rule: only Review I and Review II replace video with audio. */
+export function hasReviewPodcast(plan: CurriculumLesson | null | undefined): boolean {
+  return !!plan && plan.reviewUnits.length > 0 && !plan.isReviewTest;
+}
+
 /** Every curriculum lesson uses an EVO + Leo audio dialogue except the review test. */
 export function hasLessonPodcast(plan: CurriculumLesson | null | undefined): boolean {
   return !!plan && !plan.isReviewTest;
