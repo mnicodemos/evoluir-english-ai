@@ -15,7 +15,12 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useLearningPath, useOpenPathLesson, type PathLesson } from "@/hooks/useCurriculum";
+import {
+  nextPathLesson,
+  useLearningPath,
+  useOpenPathLesson,
+  type PathLesson,
+} from "@/hooks/useCurriculum";
 import { useProfile } from "@/hooks/useProfile";
 import { findLevel } from "@/lib/level";
 import { useUiLang } from "@/lib/uiLang";
@@ -44,10 +49,9 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
   const { data: profile } = useProfile();
   const [planLoading, setPlanLoading] = useState(false);
   // Current lesson = same one the "Next lesson" card shows.
-  const nextLesson =
-    path.units
-      .flatMap((unit) => unit.lessons)
-      .find((lesson) => !lesson.completed && !lesson.locked) ?? null;
+  const nextLesson = nextPathLesson(
+    path.units.flatMap((unit) => unit.lessons).filter((lesson) => !lesson.locked),
+  );
 
   const toggleUnit = (unitNumber: number) => {
     setExpandedUnits((prev) => {

@@ -128,7 +128,7 @@ export function useLearningPath(reviewLevel?: string | null) {
       // (user report: "5/33" beside "21 of the 30 lessons" read as a mistake).
       coreCompleted: coreLessons.filter((lesson) => lesson.completed).length,
       coreTotal: coreLessons.length,
-      next: all.find((l) => !l.completed) ?? null,
+      next: nextPathLesson(all),
       unitTests,
       finalTest: {
         lessonId: testId,
@@ -212,6 +212,24 @@ export function useOpenUnitTest() {
 }
 
 /** True when every unit a review lesson covers has all its lessons completed. */
+/**
+ * The lesson the path suggests next: an open review lesson comes first, so
+ * Review I follows Unit 2 and Review II follows Unit 5 (owner decision,
+ * 2026-10-26: the review matters in the sequence); otherwise the first lesson
+ * not done yet, in order.
+ */
+export function nextPathLesson<
+  T extends { completed: boolean; locked: boolean; reviewUnits: number[] },
+>(lessons: T[]): T | null {
+  return (
+    lessons.find(
+      (lesson) => lesson.reviewUnits.length > 0 && !lesson.locked && !lesson.completed,
+    ) ??
+    lessons.find((lesson) => !lesson.completed) ??
+    null
+  );
+}
+
 export function reviewUnitsDone(reviewUnits: number[], unitsDone: Set<number>) {
   return reviewUnits.every((unit) => unitsDone.has(unit));
 }
