@@ -12,7 +12,7 @@ import {
   type ReviewPodcast,
 } from "./reviewPodcast";
 
-/** Kept beside the review lesson's own content, under its own prompt hash. */
+/** Kept beside the lesson's shared content, under its own prompt hash. */
 const PODCAST_HASH_PREFIX = "podcast-v1:";
 
 async function readSharedPodcast(key: string, promptHash: string) {
@@ -46,11 +46,10 @@ async function saveSharedPodcast(key: string, promptHash: string, podcast: Revie
 }
 
 /**
- * The review podcast of one of the student's lessons (owner request,
- * 2026-10-26): the shared episode of that review lesson and level, written by
- * the AI the first time any student opens it. Null for a lesson that has no
- * podcast; an error when the AI could not write it, so the page offers to try
- * again.
+ * Shared dialogue for one curriculum lesson, written by the AI the first
+ * time a student opens it. Review I and Review II keep their existing review
+ * outlines; core lessons use their own title and objective. Null for the review
+ * Test; an error lets the student retry if generation fails.
  */
 export const loadLessonPodcast = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
