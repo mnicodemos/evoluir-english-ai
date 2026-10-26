@@ -182,6 +182,27 @@ describe("studyPlan week with real dates", () => {
     expect(plan.days[2]).toMatchObject({ day: "Wednesday", completed: false });
   });
 
+  it("counts repeated practice of one skill on the same date as one practice day", () => {
+    const plan = buildStudyPlan(
+      input({
+        daysPerWeek: 5,
+        focus: "listening",
+        today: "2026-10-08", // Thursday
+        practice: [
+          { skill: "listening", date: "2026-10-08" },
+          { skill: "listening", date: "2026-10-08" },
+        ],
+      }),
+    );
+
+    // Thursday's two listening activities can catch up only one missed
+    // listening slot; the other missed slot and Friday remain incomplete.
+    expect(plan.days[0]).toMatchObject({ day: "Monday", skill: "listening", completed: true });
+    expect(plan.days[2]).toMatchObject({ day: "Wednesday", skill: "listening", completed: false });
+    expect(plan.days[4]).toMatchObject({ day: "Friday", skill: "listening", completed: false });
+    expect(plan.completedCount).toBe(1);
+  });
+
   it("has nothing next when the whole week is done", () => {
     const plan = buildStudyPlan(
       input({
