@@ -264,41 +264,36 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
   const weekStart = mondayOf(today);
   const used = new Set<string>();
 
-  // This week's practice per skill: how many distinct days, and the lessons
-  // completed this week (in order), so done days show what was really done.
-  const practisedDates = new Map<string, Set<string>>();
-  const lessonsDone = new Map<string, PlanPractice[]>();
-  for (const event of input.practice ?? []) {
-    if (event.date < weekStart || event.date > addDays(weekStart, 6)) continue;
-    const dates = practisedDates.get(event.skill) ?? new Set<string>();
-    dates.add(event.date);
-    practisedDates.set(event.skill, dates);
-    if (event.lessonId && event.title) {
-      lessonsDone.set(event.skill, [...(lessonsDone.get(event.skill) ?? []), event]);
-    }
-  }
-  const doneSoFar = new Map<string, number>();
+  // Keep each real practice day tied to at most one planned slot. A practice
+  // can catch up an earlier missed slot of the same skill, but can never
+  // complete a future slot. This prevents a student from finishing the entire
+  // week on Monday by practising every skill once.
+  const availablePractice = (input.practice ?? [])
+    .filter((event) => event.date >= weekStart && event.date <= today)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const usedPractice = new Set<PlanPractice>();
 
   const items: StudyPlanDay[] = days.map((day, i) => {
     const skill = skills[i]!;
     const date = addDays(weekStart, WEEK_DAYS.indexOf(day as (typeof WEEK_DAYS)[number]));
     const fallback = FALLBACK_BY_SKILL[skill] ?? FALLBACK_BY_SKILL["reading"]!;
 
-    // A day is done when its skill was practised this week, one practice day
-    // per plan day of that skill.
-    const doneCount = doneSoFar.get(skill) ?? 0;
-    const completed = doneCount < (practisedDates.get(skill)?.size ?? 0);
-    if (completed) {
-      doneSoFar.set(skill, doneCount + 1);
-      const doneLesson = lessonsDone.get(skill)?.shift();
-      if (doneLesson?.lessonId) used.add(doneLesson.lessonId);
+    // One distinct practice event can complete one slot only, and only on
+    // or after that slot's scheduled date. Later practice may catch up missed
+    // slots, but practice before a future slot must not complete it.
+    const matchedPractice = availablePractice.find(
+      (event) => event.skill === skill && event.date >= date && !usedPractice.has(event),
+    );
+    if (matchedPractice) {
+      usedPractice.add(matchedPractice);
+      if (matchedPractice.lessonId) used.add(matchedPractice.lessonId);
       return {
         day,
         date,
         skill,
-        title: doneLesson?.title ?? fallback.title,
-        to: doneLesson?.lessonId ? `/learning/${doneLesson.lessonId}` : fallback.to,
-        lessonId: doneLesson?.lessonId ?? null,
+        title: matchedPractice.title ?? fallback.title,
+        to: matchedPractice.lessonId ? `/learning/${matchedPractice.lessonId}` : fallback.to,
+        lessonId: matchedPractice.lessonId ?? null,
         level: input.level,
         completed: true,
         status: "done",
