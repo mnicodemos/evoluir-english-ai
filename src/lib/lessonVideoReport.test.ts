@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getCurriculum } from "./curriculum";
-import { canonicalYoutubeUrl, lessonVideoReport } from "./lessonVideoReport";
+import { canonicalYoutubeUrl, lessonVideoListText, lessonVideoReport } from "./lessonVideoReport";
 
 describe("lesson video report", () => {
   it("lists every lesson with the approved video and the videos students got", () => {
@@ -57,5 +57,54 @@ describe("lesson video report", () => {
       "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     );
     expect(canonicalYoutubeUrl("https://vimeo.com/123")).toBeNull();
+  });
+});
+
+describe("lesson video list text", () => {
+  const item = {
+    key: "a1-u1-l1",
+    unit: 1,
+    unitTitle: "Hello",
+    position: 1,
+    title: "Greetings",
+    objective: "Say hello",
+    skill: "talking",
+    approved: {
+      url: "https://www.youtube.com/watch?v=AAAAAAAAAAA",
+      id: "AAAAAAAAAAA",
+      seconds: 270,
+    },
+    used: [
+      {
+        url: "https://www.youtube.com/watch?v=AAAAAAAAAAA",
+        id: "AAAAAAAAAAA",
+        seconds: 270,
+        lessons: 3,
+      },
+      {
+        url: "https://www.youtube.com/watch?v=BBBBBBBBBBB",
+        id: "BBBBBBBBBBB",
+        seconds: null,
+        lessons: 1,
+      },
+    ],
+  };
+
+  it("lists each lesson with its approved and used videos once", () => {
+    const text = lessonVideoListText("a1", [item], (id) =>
+      id === "AAAAAAAAAAA"
+        ? { title: "Basic greetings", author_name: "BBC Learning English" }
+        : null,
+    );
+    expect(text).toContain("nível A1");
+    expect(text).toContain("U1 L1 · Greetings (talking) [a1-u1-l1]");
+    expect(text).toContain("Basic greetings · BBC Learning English · 4:30 · aprovado");
+    expect(text).toContain("título indisponível · canal ? · duração ? · 1 aluno");
+    expect(text.match(/AAAAAAAAAAA/g)).toHaveLength(1);
+  });
+
+  it("says when a lesson has no video yet", () => {
+    const text = lessonVideoListText("b2", [{ ...item, approved: null, used: [] }], () => null);
+    expect(text).toContain("(nenhum vídeo ainda)");
   });
 });
