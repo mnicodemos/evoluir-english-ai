@@ -129,3 +129,11 @@ describe("videos chosen by the app", () => {
     expect(lessonVideoListText("a1", report, () => null)).toContain("escolhido pelo app");
   });
 });
+
+describe("Business English videos", () => {
+  it("names the track instead of a level", () => {
+    expect(lessonVideoListText("business", [], () => null)).toContain(
+      "Vídeos das lições · Business English",
+    );
+  });
+});

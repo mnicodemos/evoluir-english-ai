@@ -21,7 +21,7 @@ import {
 } from "@/lib/lessonVideoReport";
 import { cn } from "@/lib/utils";
 
-const LEVELS = ["a1", "a2", "b1", "b2", "c1", "c2"] as const;
+const LEVELS = ["a1", "a2", "b1", "b2", "c1", "c2", "business"] as const;
 type Level = (typeof LEVELS)[number];
 
 const SKILL_LABEL: Record<string, string> = {
@@ -417,7 +417,7 @@ export function AdminLessonVideos() {
                 : "border-border text-muted-foreground hover:text-foreground",
             )}
           >
-            {code}
+            {code === "business" ? "Business" : code}
           </button>
         ))}
         {query.data ? (
