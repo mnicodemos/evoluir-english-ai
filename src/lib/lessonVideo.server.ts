@@ -13,6 +13,7 @@ import {
   apiSearchUrl,
   apiVideosUrl,
   candidatesFromApi,
+  parseIsoDuration,
   type ApiSearchResponse,
   type ApiVideosResponse,
 } from "./youtubeApi";
@@ -174,6 +175,28 @@ function lessonQueries(topic: string, skill: string, objectiveText: string, leve
     objective ? `learn english ${objective} lesson` : "",
     `${skill} english lesson ${topic}`,
   ].filter(Boolean);
+}
+
+/**
+ * The length of each video (owner request, 2026-10-26: approving a pasted link
+ * without its mm:ss left the lesson without "About N minutes"). One videos.list
+ * call (1 unit) for up to 50 ids; an unknown id is left out of the map.
+ */
+export async function fetchVideoDurations(
+  ids: string[],
+  key: string,
+): Promise<Map<string, number>> {
+  const durations = new Map<string, number>();
+  for (let i = 0; i < ids.length; i += 50) {
+    const response = await fetch(apiVideosUrl(ids.slice(i, i + 50), key));
+    if (!response.ok) throw new YoutubeApiError(response.status);
+    const body = (await response.json()) as ApiVideosResponse;
+    for (const item of body.items ?? []) {
+      const seconds = item.id ? parseIsoDuration(item.contentDetails?.duration ?? "") : null;
+      if (item.id && seconds) durations.set(item.id, seconds);
+    }
+  }
+  return durations;
 }
 
 /**

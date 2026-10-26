@@ -338,20 +338,23 @@ export function AdminLessonVideos() {
   const fillLevel = async () => {
     const skip: string[] = [];
     let filled = 0;
+    let lengths = 0;
     setFilling("Buscando…");
     try {
       for (;;) {
         const result = await fill({ data: { level, skip } });
         filled += result.filled.length;
+        lengths += result.lengthsFilled;
         skip.push(...result.notFound);
         setFilling(`${filled} vídeos fixados…`);
         void queryClient.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
         if (result.remaining === 0 || result.filled.length + result.notFound.length === 0) break;
       }
+      const lengthNote = lengths ? ` Duração preenchida em ${lengths}.` : "";
       toast.success(
-        skip.length
+        (skip.length
           ? `${filled} vídeos fixados; ${skip.length} lições sem vídeo adequado (escolha na mão).`
-          : `${filled} vídeos fixados. Confira com "Copiar lista".`,
+          : `${filled} vídeos fixados. Confira com "Copiar lista".`) + lengthNote,
       );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível buscar os vídeos.");
@@ -396,9 +399,10 @@ export function AdminLessonVideos() {
       <p className="text-sm font-semibold">Vídeos das lições</p>
       <p className="text-xs text-muted-foreground">
         Confira se o vídeo de cada lição combina com o tema e o nível. Aprove um vídeo e todos os
-        alunos daquela lição passam a ver o mesmo. "Buscar vídeos do nível" fixa um vídeo nas lições
-        que ainda não têm (precisa do segredo YOUTUBE_API_KEY; cerca de um nível por dia, pela cota
-        grátis do YouTube), marcado como escolhido pelo app até você aprovar ou trocar.
+        alunos daquela lição passam a ver o mesmo; sem mm:ss, a duração vem do YouTube. "Buscar
+        vídeos do nível" fixa um vídeo nas lições que ainda não têm (precisa do segredo
+        YOUTUBE_API_KEY; cerca de um nível por dia, pela cota grátis do YouTube), marcado como
+        escolhido pelo app até você aprovar ou trocar.
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {LEVELS.map((code) => (
