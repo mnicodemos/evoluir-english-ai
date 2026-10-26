@@ -84,6 +84,16 @@ const baseUiPt: Record<string, string> = {
   "Meditations in English": "Meditações em inglês",
   "Relax and train your listening: EVO guides you slowly, with the text on screen.":
     "Relaxe e treine sua escuta: a EVO conduz devagar, com o texto na tela.",
+  "Lesson audio": "Áudio da lição",
+  "Listen to EVO and Leo explore this lesson before you practise.":
+    "Ouça EVO e Leo explorarem esta lição antes de praticar.",
+  "Tap a line to hear it again from there.": "Toque em uma fala para ouvi-la novamente a partir dali.",
+  "Listen to the lesson audio": "Ouvir o áudio da lição",
+  "You did everything else — only the audio is left.": "Você já fez o resto — só falta ouvir o áudio.",
+  "The lesson audio could not be prepared right now. Read the summary below and continue the lesson.":
+    "Não foi possível preparar o áudio agora. Leia o resumo abaixo e continue a lição.",
+  "EVO and Leo are preparing your lesson audio…": "EVO e Leo estão preparando o áudio da sua lição…",
+  "Play audio": "Ouvir áudio",
   "Show translation": "Ver tradução",
   "Hide translation": "Ocultar tradução",
   "Key words": "Palavras-chave",
