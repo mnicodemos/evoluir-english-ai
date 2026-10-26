@@ -187,7 +187,7 @@ describe("studyPlan week with real dates", () => {
       input({
         daysPerWeek: 2,
         focus: "balanced",
-        today,
+        today: "2026-10-08",
         practice: [
           { skill: "speaking", date: "2026-10-06" },
           { skill: "listening", date: "2026-10-08" },
