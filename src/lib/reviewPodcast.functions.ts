@@ -5,10 +5,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { findCurriculumLesson } from "./curriculum";
 import {
-  hasReviewPodcast,
+  hasLessonPodcast,
+  lessonPodcastMessages,
   parseReviewPodcast,
   podcastSchema,
-  reviewPodcastMessages,
   type ReviewPodcast,
 } from "./reviewPodcast";
 
@@ -52,7 +52,7 @@ async function saveSharedPodcast(key: string, promptHash: string, podcast: Revie
  * podcast; an error when the AI could not write it, so the page offers to try
  * again.
  */
-export const loadReviewPodcast = createServerFn({ method: "POST" })
+export const loadLessonPodcast = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ lessonId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<ReviewPodcast | null> => {
@@ -63,10 +63,10 @@ export const loadReviewPodcast = createServerFn({ method: "POST" })
       .maybeSingle();
     const key = (lesson as { curriculum_key?: string | null } | null)?.curriculum_key;
     const plan = key ? findCurriculumLesson(key) : null;
-    if (!plan || !hasReviewPodcast(plan)) return null;
+    if (!plan || !hasLessonPodcast(plan)) return null;
 
     const { hashAiRequest } = await import("./ai-usage.server");
-    const messages = reviewPodcastMessages(plan);
+    const messages = lessonPodcastMessages(plan);
     const promptHash = `${PODCAST_HASH_PREFIX}${await hashAiRequest({ messages, jsonMode: true })}`;
     const shared = await readSharedPodcast(plan.key, promptHash);
     if (shared) return shared;
@@ -79,8 +79,8 @@ export const loadReviewPodcast = createServerFn({ method: "POST" })
     });
     const podcast = parseReviewPodcast(raw);
     if (!podcast) {
-      console.error("Review podcast failed validation", plan.key);
-      throw new Error("EVO could not prepare this podcast. Please try again.");
+      console.error("Lesson podcast failed validation", plan.key);
+      throw new Error("EVO could not prepare this lesson audio. Please try again.");
     }
     await saveSharedPodcast(plan.key, promptHash, podcast);
     return podcast;
