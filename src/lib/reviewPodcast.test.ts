@@ -48,7 +48,7 @@ describe("lesson audio dialogue", () => {
     expect(messages).toEqual(lessonPodcastMessages(plan));
     expect(messages[0]!.content).toContain("CEFR A1");
     expect(messages[1]!.content).toContain(plan.title);
-     expect(messages[1]!.content).toContain(plan.objective);
+    expect(messages[1]!.content).toContain(plan.objective);
     expect(messages[0]!.content).toContain("real, relaxed conversation");
     expect(messages[0]!.content).toContain("LEO");
   });
