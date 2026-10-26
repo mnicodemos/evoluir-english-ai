@@ -28,10 +28,18 @@ const lineSchema = z.object({
 
 export const podcastSchema = z.object({
   title: z.string().trim().min(3).max(120),
-  lines: z.array(lineSchema).min(12).max(36).refine(
-    (lines) => lines.reduce((total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length, 0) >= 420,
-    "The dialogue must contain enough spoken words for at least three minutes of audio.",
-  ),
+  lines: z
+    .array(lineSchema)
+    .min(12)
+    .max(36)
+    .refine(
+      (lines) =>
+        lines.reduce(
+          (total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length,
+          0,
+        ) >= 420,
+      "The dialogue must contain enough spoken words for at least three minutes of audio.",
+    ),
 });
 
 export type ReviewPodcast = z.infer<typeof podcastSchema>;
