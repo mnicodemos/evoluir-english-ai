@@ -1,6 +1,6 @@
 /**
  * Curriculum lesson audio: each lesson opens with an original dialogue between
- * EVO and her co-host Leo instead of a YouTube video. Review I and Review II
+ * EVO and her co-host LEO instead of a YouTube video. Review I and Review II
  * keep their unit-review scripts; other lessons use their own objective and
  * topic. The script is shared per curriculum lesson in lesson_content_templates,
  * and each line's speech audio is cached for reuse. Pure prompt construction is tested.
@@ -9,7 +9,7 @@ import { z } from "zod";
 
 import { getCurriculum, type CurriculumLesson } from "./curriculum";
 
-/** EVO speaks in her usual voice; Leo, the co-host, in a second one. */
+/** EVO speaks in her usual voice; LEO, the co-host, in a second one. */
 export const PODCAST_SPEAKERS = {
   evo: { name: "EVO", voice: "evo" },
   leo: { name: "LEO", voice: "host" },
