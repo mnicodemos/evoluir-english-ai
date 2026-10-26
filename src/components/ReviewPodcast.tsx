@@ -147,41 +147,45 @@ export function LessonPodcast({
       className="card-soft space-y-4 p-4 sm:p-5"
       data-media-playing={playing ? "true" : "false"}
     >
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-green/15 text-brand-green ring-1 ring-brand-green/30">
-          <Headphones className="size-5" aria-hidden="true" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
-            {t("Lesson audio")}
-          </p>
-          <p className="truncate font-display text-base font-semibold" translate="no">
-            {query.data.title}
-          </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-green/15 text-brand-green ring-1 ring-brand-green/30">
+            <Headphones className="size-5" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
+              {t("Lesson audio")}
+            </p>
+            <p className="truncate font-display text-base font-semibold" translate="no">
+              {query.data.title}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
           <Button
+            className="min-w-0 flex-1 sm:flex-none"
             size="sm"
             variant="outline"
             onClick={() => setShowPt((value) => !value)}
             aria-pressed={showPt}
           >
-            <Languages className="size-4" aria-hidden="true" />
+            <Languages className="size-4 shrink-0" aria-hidden="true" />
             {showPt ? t("Hide translation") : t("Show translation")}
           </Button>
           {playing ? (
-            <Button size="sm" onClick={pause}>
-              <Pause className="size-4" aria-hidden="true" /> {t("Pause")}
+            <Button className="min-w-0 flex-1 sm:flex-none" size="sm" onClick={pause}>
+              <Pause className="size-4 shrink-0" aria-hidden="true" /> {t("Pause")}
             </Button>
           ) : (
             <Button
+              className="min-w-0 flex-1 sm:flex-none"
               size="sm"
               onClick={() => void playFrom(done || current >= lines.length - 1 ? 0 : current)}
             >
               {done ? (
-                <RotateCcw className="size-4" aria-hidden="true" />
+                <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
               ) : (
-                <Play className="size-4" aria-hidden="true" />
+                <Play className="size-4 shrink-0" aria-hidden="true" />
               )}
               {done ? t("Listen again") : current > 0 ? t("Continue") : t("Play audio")}
             </Button>
