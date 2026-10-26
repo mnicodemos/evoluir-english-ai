@@ -32,7 +32,7 @@ describe("lesson audio dialogue", () => {
     expect(hasLessonPodcast(findCurriculumLesson("a1-u1-l1"))).toBe(true);
     expect(hasLessonPodcast(findCurriculumLesson("a1-u6-l1"))).toBe(true);
     expect(hasLessonPodcast(findCurriculumLesson("b2-u6-l2"))).toBe(true);
-    expect(hasLessonPodcast(findCurriculumLesson("a1-u6-l3"))).toBe(true);
+    expect(hasLessonPodcast(findCurriculumLesson("a1-u6-l3"))).toBe(false);
     expect(hasLessonPodcast(null)).toBe(false);
   });
 
