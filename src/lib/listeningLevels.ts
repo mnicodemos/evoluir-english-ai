@@ -1,5 +1,7 @@
 import { findLevel } from "@/lib/level";
 
+import { EXTRA_LISTENING_SENTENCES } from "./listeningSentences";
+
 /**
  * CEFR adaptation for the Listening Lab and its pronunciation drills.
  * Nothing here touches the voice provider: the sentence pool, the accepted
@@ -160,6 +162,12 @@ const CONFIGS: Record<string, ListeningLevelConfig> = {
     ],
   },
 };
+
+// About 60 drills per level (listeningSentences.ts), after the original ones.
+for (const [level, extra] of Object.entries(EXTRA_LISTENING_SENTENCES)) {
+  const config = CONFIGS[level];
+  if (config) config.sentences = [...config.sentences, ...extra];
+}
 
 export function listeningLevelConfig(level: string | null | undefined): ListeningLevelConfig {
   const info = findLevel(level);
