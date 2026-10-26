@@ -11,7 +11,10 @@ import {
   reviewPodcastMessages,
 } from "./reviewPodcast";
 
-const line = (speaker: "evo" | "leo", text = "Hello and welcome to the review. Today we will explore useful English examples, practise clear expressions, and connect each idea to everyday conversations so learners can speak with confidence.") => ({
+const line = (
+  speaker: "evo" | "leo",
+  text = "Hello and welcome to the review. Today we will explore useful English examples, practise clear expressions, and connect each idea to everyday conversations so learners can speak with confidence.",
+) => ({
   speaker,
   text,
   pt: "Olá e bem-vindo à revisão.",
