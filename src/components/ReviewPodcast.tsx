@@ -112,7 +112,9 @@ export function LessonPodcast({
     return (
       <div className="card-soft flex flex-col items-center gap-3 p-8 text-center">
         <Loader2 className="size-6 animate-spin text-brand-green" aria-hidden="true" />
-        <p className="text-sm text-muted-foreground">{t("EVO and Leo are preparing your lesson audio…")}</p>
+        <p className="text-sm text-muted-foreground">
+          {t("EVO and Leo are preparing your lesson audio…")}
+        </p>
       </div>
     );
   }
@@ -122,7 +124,9 @@ export function LessonPodcast({
       <div className="card-soft flex flex-col items-center gap-3 p-8 text-center">
         <Headphones className="size-6 text-muted-foreground" aria-hidden="true" />
         <p className="text-sm text-muted-foreground">
-          {t("The lesson audio could not be prepared right now. Read the summary below and continue the lesson.")}
+          {t(
+            "The lesson audio could not be prepared right now. Read the summary below and continue the lesson.",
+          )}
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Button size="sm" variant="secondary" onClick={() => void query.refetch()}>
