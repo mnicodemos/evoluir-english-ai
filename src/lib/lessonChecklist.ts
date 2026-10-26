@@ -8,7 +8,7 @@
 
 export type LessonChecklistInput = {
   hasVideo: boolean;
-  /** The review lessons have EVO and Leo's podcast in the video's place. */
+  /** The curriculum lesson's audio dialogue replaces the video step. */
   podcast?: boolean;
   videoWatched: boolean;
   cardsTotal: number;
@@ -31,7 +31,7 @@ export function flashcardsDone(total: number, reviewed: number) {
 export function lessonChecklist(input: LessonChecklistInput) {
   const items: LessonChecklistItem[] = [
     input.podcast
-      ? { id: "video", label: "Listen to the podcast", done: input.videoWatched }
+      ? { id: "video", label: "Listen to the lesson audio", done: input.videoWatched }
       : { id: "video", label: "Watch the video", done: !input.hasVideo || input.videoWatched },
     {
       id: "flashcards",
@@ -47,7 +47,7 @@ export function lessonChecklist(input: LessonChecklistInput) {
     items,
     pending,
     allDone: pending.length === 0,
-    /** The student did the work but never confirmed the video. */
+    /** The student did the work but has not finished the media step. */
     onlyVideoPending: pending.length === 1 && pending[0] === "video",
   };
 }
