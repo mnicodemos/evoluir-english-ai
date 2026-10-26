@@ -12,7 +12,7 @@ import { getCurriculum, type CurriculumLesson } from "./curriculum";
 /** EVO speaks in her usual voice; Leo, the co-host, in a second one. */
 export const PODCAST_SPEAKERS = {
   evo: { name: "EVO", voice: "evo" },
-  leo: { name: "Leo", voice: "host" },
+  leo: { name: "LEO", voice: "host" },
 } as const;
 
 export type PodcastSpeaker = keyof typeof PODCAST_SPEAKERS;
@@ -111,16 +111,17 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
       content:
         "You write original audio dialogues for Evoluir+, an English course for Brazilian learners. " +
         "The episode is a warm, lively conversation between EVO, the course's AI English mentor (female), " +
-        "and Leo, her co-host (male), who speaks like a learner at the same level. Both have distinct voices; " +
+        "and LEO, her co-host (male), who speaks like a learner at the same level. Both have distinct voices; " +
         "never invent personal lives, places or memories for them. " +
         `Level: CEFR ${plan.level.toUpperCase()}. Style: ${style} ` +
         `Target skill: ${plan.skill}. Lesson title: ${plan.title}. Objective: ${plan.objective}. ` +
         "Focus on this lesson's topic and objective. Use examples that teach the objective naturally in conversation; " +
         "do not drift into unrelated topics or teach grammar above the stated CEFR level. " +
-        "Structure: EVO welcomes the listener and introduces the topic; Leo asks realistic learner questions; " +
-        "they model useful language in context; Leo makes one common, level-appropriate mistake and EVO corrects it kindly; " +
-        "they give the listener a short speaking challenge with a model answer; they close by inviting the listener to practise. " +
-        "Alternate the speakers naturally, EVO speaks first. " +
+        "Make this sound like a real, relaxed conversation, not a lesson script being read aloud. Every reply must connect to the previous line: react to what the other person just said, ask a natural follow-up, or build on an example. " +
+        "Use contractions and everyday spoken English where appropriate; vary sentence length and rhythm. Keep turns concise, avoid long mini-lectures, lists, repeated definitions, stiff transitions, and saying the same point twice. " +
+        "Let EVO and LEO show curiosity, warmth, light humour where natural, and a distinct personality without forced jokes. Use smooth transitions and callbacks to examples already mentioned. " +
+        "Conversation arc: EVO opens briefly with the topic; LEO responds with a believable question or observation; they explore examples together; LEO makes one common, level-appropriate mistake and EVO corrects it kindly in context; they recap naturally and give the listener a short speaking challenge with a model answer; they close warmly and briefly. " +
+        "Alternate speakers naturally, with no abrupt topic changes. EVO speaks first. Do not make every turn a question-answer pair or have either speaker narrate the structure of the episode. " +
         `Write 16 to 24 lines; each line at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
         "For every line add 'pt', a natural Brazilian Portuguese translation. " +
         'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
