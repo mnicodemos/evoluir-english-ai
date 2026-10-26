@@ -93,7 +93,7 @@ function LessonPage() {
 
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   // Remember which tab the user was on so leaving mid-lesson brings them back.
-  const [activeTab, setActiveTab] = usePersistentState<string>(`lesson-tab:${lessonId}`, "video");
+  const [activeTab, setActiveTab] = usePersistentState<string>(`lesson-tab:${lessonId}`, "audio");
 
   const lesson = data?.lesson;
 
@@ -112,7 +112,7 @@ function LessonPage() {
   // the student; opening it as an ordinary lesson would skip the promotion.
   const isFinalTest = !!lesson?.curriculum_key?.endsWith("-final");
   // Curriculum lessons use the EVO + Leo dialogue; video playback remains available for Business and future video content.
-  const podcast = !business && hasLessonPodcast(repairPlan);
+  const podcast = hasLessonPodcast(repairPlan);
   useEffect(() => {
     if (isFinalTest) navigate({ to: "/learning/final-test", replace: true });
   }, [isFinalTest, navigate]);
@@ -357,12 +357,12 @@ function LessonPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger
-              value="video"
-              aria-label={podcast ? t("Lesson audio") : t("Video")}
+              value="audio"
+              aria-label={t("Lesson audio")}
               className="gap-1.5"
             >
-              {podcast ? <Headphones className="size-4" /> : <Video className="size-4" />}{" "}
-              <span className="hidden sm:inline">{podcast ? t("Lesson audio") : t("Video")}</span>
+              <Headphones className="size-4" />{" "}
+              <span className="hidden sm:inline">{t("Lesson audio")}</span>
             </TabsTrigger>
             <TabsTrigger value="summary" aria-label="Summary" className="gap-1.5">
               <BookOpen className="size-4" /> <span className="hidden sm:inline">Summary</span>
@@ -375,7 +375,7 @@ function LessonPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="video" className="mt-5 space-y-4">
+          <TabsContent value="audio" className="mt-5 space-y-4">
             {podcast ? (
               <>
                 <div>
