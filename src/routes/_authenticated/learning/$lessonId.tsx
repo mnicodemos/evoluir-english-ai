@@ -364,13 +364,25 @@ function LessonPage() {
               <Headphones className="size-4" />{" "}
               <span className="hidden sm:inline">{t("Lesson audio")}</span>
             </TabsTrigger>
-            <TabsTrigger value="summary" aria-label="Summary" className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm">
+            <TabsTrigger
+              value="summary"
+              aria-label="Summary"
+              className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+            >
               <BookOpen className="size-4" /> <span className="hidden sm:inline">Summary</span>
             </TabsTrigger>
-            <TabsTrigger value="flashcards" aria-label="Flashcards" className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm">
+            <TabsTrigger
+              value="flashcards"
+              aria-label="Flashcards"
+              className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+            >
               <Layers className="size-4" /> <span className="hidden sm:inline">Flashcards</span>
             </TabsTrigger>
-            <TabsTrigger value="quiz" aria-label="Quiz" className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm">
+            <TabsTrigger
+              value="quiz"
+              aria-label="Quiz"
+              className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+            >
               <ListChecks className="size-4" /> <span className="hidden sm:inline">Quiz</span>
             </TabsTrigger>
           </TabsList>
