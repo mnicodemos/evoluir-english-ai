@@ -28,7 +28,10 @@ const lineSchema = z.object({
 
 export const podcastSchema = z.object({
   title: z.string().trim().min(3).max(120),
-  lines: z.array(lineSchema).min(12).max(36).refine(\n    (lines) => lines.reduce((total, line) => total + line.text.trim().split(/\\s+/).filter(Boolean).length, 0) >= 420,\n    "The dialogue must contain enough spoken words for at least three minutes of audio.",\n  ),
+  lines: z.array(lineSchema).min(12).max(36).refine(
+    (lines) => lines.reduce((total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length, 0) >= 420,
+    "The dialogue must contain enough spoken words for at least three minutes of audio.",
+  ),
 });
 
 export type ReviewPodcast = z.infer<typeof podcastSchema>;
@@ -60,7 +63,8 @@ export function reviewOutline(plan: CurriculumLesson): string {
   return getCurriculum(plan.level)
     .filter((lesson) => plan.reviewUnits.includes(lesson.unit) && lesson.unit <= 5)
     .map((lesson) => `- ${lesson.unitTitle} · ${lesson.title}: ${lesson.objective}`)
-    .join("\n");
+    .join("
+");
 }
 
 /** The request for one review lesson's script (deterministic, so it is shared). */
@@ -89,7 +93,11 @@ export function reviewPodcastMessages(plan: CurriculumLesson) {
     },
     {
       role: "user" as const,
-      content: `Review lesson: ${plan.title}\nObjective: ${plan.objective}\nCEFR level: ${plan.level.toUpperCase()}\nUnits under review:\n${reviewOutline(plan)}`,
+      content: `Review lesson: ${plan.title}
+Objective: ${plan.objective}
+CEFR level: ${plan.level.toUpperCase()}
+Units under review:
+${reviewOutline(plan)}`,
     },
   ];
 }
@@ -103,7 +111,8 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
   const unitOutline = getCurriculum(plan.level)
     .filter((lesson) => lesson.unit === plan.unit && lesson.reviewUnits.length === 0)
     .map((lesson) => `- ${lesson.title} (${lesson.skill}): ${lesson.objective}`)
-    .join("\n");
+    .join("
+");
 
   return [
     {
@@ -128,7 +137,13 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
     },
     {
       role: "user" as const,
-      content: `Lesson: ${plan.title}\nUnit: ${plan.unitTitle}\nLevel: ${plan.level.toUpperCase()}\nSkill: ${plan.skill}\nObjective: ${plan.objective}\nOther lessons in this unit for context only:\n${unitOutline}`,
+      content: `Lesson: ${plan.title}
+Unit: ${plan.unitTitle}
+Level: ${plan.level.toUpperCase()}
+Skill: ${plan.skill}
+Objective: ${plan.objective}
+Other lessons in this unit for context only:
+${unitOutline}`,
     },
   ];
 }
