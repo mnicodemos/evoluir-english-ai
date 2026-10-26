@@ -10,7 +10,7 @@ import {
 describe("lesson video ranking", () => {
   it("keeps only the lesson's own words", () => {
     expect(topicKeywords("Greetings and Introductions A1")).toEqual(["greetings", "introductions"]);
-    expect(topicKeywords("Review I")).toEqual([]);
+    expect(topicKeywords("Review I")).toEqual(["review"]);
   });
 
   it("prefers relevance over the 5-minute length", () => {
@@ -60,7 +60,7 @@ describe("lesson video ranking", () => {
     ).toBe(true);
   });
 
-  it("asks beginners for the lesson's topic even on a teaching channel", () => {
+  it("asks for the lesson's topic even on a teaching channel", () => {
     const keywords = topicKeywords("Hearing Greetings and Names A1");
     const offTopic = {
       id: "Y681hXWwhQY",
@@ -69,7 +69,8 @@ describe("lesson video ranking", () => {
       channel: "BBC Learning English",
     };
     expect(unsuitableVideo(offTopic, keywords, "a1")).toBe(true);
-    expect(unsuitableVideo(offTopic, keywords, "b1")).toBe(false);
+    // Owner review of B1: off-topic is off-topic at every level.
+    expect(unsuitableVideo(offTopic, keywords, "b1")).toBe(true);
     expect(
       unsuitableVideo({ ...offTopic, title: "Greetings in English for beginners" }, keywords, "a1"),
     ).toBe(false);
@@ -159,5 +160,20 @@ describe("lesson video ranking", () => {
     expect(
       pick("Talking about families", "Talking About Your Family A1", "Describe your family."),
     ).toBe(true);
+  });
+
+  // Owner review of B1 (2026-10-26).
+  it("needs two topic words when the topic has three or more", () => {
+    const bbc = (title: string) => ({ id: "aaaaaaaaaaa", seconds: 300, title, channel: "Ellii" });
+    const keywords = topicKeywords("Modals of Advice and Deduction B1");
+    expect(unsuitableVideo(bbc("Present Modals of Ability"), keywords, "b1")).toBe(true);
+    expect(
+      unsuitableVideo(bbc("Modals of deduction and advice: must, might, can't"), keywords, "b1"),
+    ).toBe(false);
+  });
+
+  it("keeps the review topic and drops generic skill words", () => {
+    expect(topicKeywords("Writing a Review B1")).toEqual(["review"]);
+    expect(topicKeywords("Travel and Culture Vocabulary B1")).toEqual(["travel", "culture"]);
   });
 });
