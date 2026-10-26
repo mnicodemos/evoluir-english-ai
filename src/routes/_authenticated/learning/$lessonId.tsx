@@ -393,7 +393,7 @@ function LessonPage() {
                 <div>
                   <h2 className="font-display text-lg font-semibold">{t("Lesson audio")}</h2>
                   <p className="text-sm text-muted-foreground">
-                    {t("Listen to EVO and Leo explore this lesson before you practise.")}
+                    {t("Listen to EVO and LEO explore this lesson before you practise.")}
                   </p>
                 </div>
                 <img
