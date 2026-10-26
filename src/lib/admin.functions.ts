@@ -830,7 +830,14 @@ type LessonVideosTable = {
         column: string,
         values: string[],
       ) => Promise<{
-        data: { curriculum_key: string; video_url: string; video_seconds: number | null }[] | null;
+        data:
+          | {
+              curriculum_key: string;
+              video_url: string;
+              video_seconds: number | null;
+              approved_by: string | null;
+            }[]
+          | null;
         error: { message: string } | null;
       }>;
     };
@@ -879,7 +886,7 @@ export const getLessonVideos = createServerFn({ method: "GET" })
       supabaseAdmin as unknown as LessonVideosTable
     )
       .from("lesson_videos")
-      .select("curriculum_key, video_url, video_seconds")
+      .select("curriculum_key, video_url, video_seconds, approved_by")
       .in("curriculum_key", keys);
     return {
       migrationApplied: !approvedError,
@@ -925,6 +932,86 @@ export const setLessonVideo = createServerFn({ method: "POST" })
       .eq("curriculum_key", data.key);
     if (lessonsError) throw new Error("The lessons could not be updated");
     return { ok: true, url };
+  });
+
+/** Lessons searched per call, so one request stays short; the page calls again. */
+const FILL_BATCH = 6;
+
+/**
+ * Admin → Vídeos "Buscar vídeos do nível" (owner request, 2026-10-26): fixes a
+ * video, found through the YouTube Data API, for the level's lessons that have
+ * none yet, before any student opens them. Saved like an approval but with no
+ * approver (approved_by null: "escolhido pelo app"), so the owner can review
+ * and swap it. Review units are skipped (no topic to search). `skip` holds the
+ * keys already tried in this run with nothing found.
+ */
+export const fillLessonVideos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ level: lessonVideoLevel, skip: z.array(z.string().max(40)).max(60) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const key = process.env["YOUTUBE_API_KEY"];
+    if (!key) throw new Error("Falta o segredo YOUTUBE_API_KEY no Lovable.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { getCurriculum } = await import("@/lib/curriculum");
+    const { prefillLessonVideo, YoutubeApiError } = await import("@/lib/lessonVideo.server");
+    const plans = getCurriculum(data.level).filter(
+      (plan) => plan.reviewUnits.length === 0 && !data.skip.includes(plan.key),
+    );
+    const { data: fixed, error } = await (supabaseAdmin as unknown as LessonVideosTable)
+      .from("lesson_videos")
+      .select("curriculum_key, video_url, video_seconds, approved_by")
+      .in(
+        "curriculum_key",
+        plans.map((plan) => plan.key),
+      );
+    if (error) throw new Error("A migração 0081_lesson_videos ainda não foi aplicada.");
+    const done = new Set((fixed ?? []).map((row) => row.curriculum_key));
+    const todo = plans.filter((plan) => !done.has(plan.key));
+
+    const filled: string[] = [];
+    const notFound: string[] = [];
+    for (const plan of todo.slice(0, FILL_BATCH)) {
+      let video;
+      try {
+        video = await prefillLessonVideo(plan, key);
+      } catch (err) {
+        if (err instanceof YoutubeApiError) {
+          console.error(err.message);
+          const quota = err.status === 403 || err.status === 429;
+          throw new Error(
+            quota
+              ? "O YouTube recusou a busca: cota do dia esgotada ou chave inválida. Tente amanhã ou confira a chave."
+              : "O YouTube recusou a busca. Tente de novo mais tarde.",
+          );
+        }
+        throw err;
+      }
+      if (!video) {
+        notFound.push(plan.key);
+        continue;
+      }
+      const { error: saveError } = await (supabaseAdmin as unknown as LessonVideosTable)
+        .from("lesson_videos")
+        .upsert({
+          curriculum_key: plan.key,
+          video_url: video.url,
+          video_seconds: video.seconds,
+          approved_by: null,
+          approved_at: new Date().toISOString(),
+        });
+      if (saveError) throw new Error("O vídeo não pôde ser salvo.");
+      await supabaseAdmin
+        .from("lessons")
+        .update({ video_url: video.url, video_duration_seconds: video.seconds })
+        .eq("curriculum_key", plan.key);
+      filled.push(plan.key);
+    }
+    return { filled, notFound, remaining: Math.max(0, todo.length - FILL_BATCH) };
   });
 
 export const clearLessonVideo = createServerFn({ method: "POST" })

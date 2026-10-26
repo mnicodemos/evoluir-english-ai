@@ -117,22 +117,23 @@ function fitsLesson(candidate: VideoCandidate): boolean {
   return candidate.seconds >= MIN_VIDEO_SECONDS && candidate.seconds <= MAX_VIDEO_SECONDS;
 }
 
+/** A refused API call (403 quota or a bad key, 400 ...), with its status. */
+export class YoutubeApiError extends Error {
+  constructor(readonly status: number) {
+    super(`YouTube Data API failed: ${status}`);
+  }
+}
+
 /** The official search: one search (100 units) plus one durations read (1 unit). */
 async function searchYoutubeApi(query: string, key: string): Promise<VideoCandidate[]> {
   const search = await fetch(apiSearchUrl(query, key));
-  if (!search.ok) {
-    // 403 quotaExceeded or a bad key: logged, so it shows in the Admin.
-    console.error(`YouTube Data API search failed: ${search.status}`);
-    return [];
-  }
+  // Thrown, so findLessonVideo logs it and it shows in the Admin.
+  if (!search.ok) throw new YoutubeApiError(search.status);
   const found = (await search.json()) as ApiSearchResponse;
   const ids = (found.items ?? []).flatMap((item) => (item.id?.videoId ? [item.id.videoId] : []));
   if (ids.length === 0) return [];
   const details = await fetch(apiVideosUrl(ids, key));
-  if (!details.ok) {
-    console.error(`YouTube Data API videos failed: ${details.status}`);
-    return [];
-  }
+  if (!details.ok) throw new YoutubeApiError(details.status);
   return candidatesFromApi(found, (await details.json()) as ApiVideosResponse).filter(fitsLesson);
 }
 
@@ -163,6 +164,36 @@ async function searchYoutube(query: string): Promise<VideoCandidate[]> {
   return found.filter((v) => (seen.has(v.id) ? false : seen.add(v.id)));
 }
 
+/** The search queries of a lesson, most specific first. */
+function lessonQueries(topic: string, skill: string, objectiveText: string, levelCode: string) {
+  const level = levelCode.toUpperCase();
+  const beginner = level === "A1" || level === "A2";
+  const objective = objectiveText.split(/[.,;]/)[0]?.trim() ?? "";
+  return [
+    `${topic} english lesson ${beginner ? "for beginners" : level}`.trim(),
+    objective ? `learn english ${objective} lesson` : "",
+    `${skill} english lesson ${topic}`,
+  ].filter(Boolean);
+}
+
+/**
+ * Admin → Vídeos "Buscar vídeos do nível" (owner request, 2026-10-26: every
+ * lesson should have its video fixed before the first student opens it): the
+ * best API result of at most two queries, or null when none fits. Never the
+ * pool. Throws YoutubeApiError (quota, bad key) so the batch stops.
+ */
+export async function prefillLessonVideo(
+  plan: { title: string; level: string; objective: string; skill: string },
+  key: string,
+): Promise<LessonVideo | null> {
+  const topic = `${plan.title} ${plan.level.toUpperCase()}`;
+  for (const query of lessonQueries(topic, plan.skill, plan.objective, plan.level).slice(0, 2)) {
+    const pick = rankVideoCandidates(await searchYoutubeApi(query, key), topic, plan.level)[0];
+    if (pick) return { url: `https://www.youtube.com/watch?v=${pick.id}`, seconds: pick.seconds };
+  }
+  return null;
+}
+
 /**
  * Returns a captioned video matching the lesson topic, preferring one that is
  * not already used by another lesson of this student. The queries describe the
@@ -178,12 +209,7 @@ export async function findLessonVideo(
 ): Promise<LessonVideo | null> {
   const level = options.level ? options.level.toUpperCase() : "";
   const beginner = level === "A1" || level === "A2";
-  const objective = (options.objective ?? "").split(/[.,;]/)[0]?.trim() ?? "";
-  const queries = [
-    `${topic} english lesson ${beginner ? "for beginners" : level}`.trim(),
-    objective ? `learn english ${objective} lesson` : "",
-    `${skill} english lesson ${topic}`,
-  ].filter(Boolean);
+  const queries = lessonQueries(topic, skill, options.objective ?? "", level);
 
   let found = 0;
   for (const query of queries) {

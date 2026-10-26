@@ -1,12 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { Check, Copy, ExternalLink, Loader2, Search, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { clearLessonVideo, getLessonVideos, setLessonVideo } from "@/lib/admin.functions";
+import {
+  clearLessonVideo,
+  fillLessonVideos,
+  getLessonVideos,
+  setLessonVideo,
+} from "@/lib/admin.functions";
 import {
   lessonVideoListText,
   type LessonVideoReportItem,
@@ -144,7 +149,9 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
     <li
       className={cn(
         "rounded-xl border p-3",
-        item.approved ? "border-brand-green/40 bg-brand-green/[0.04]" : "border-border",
+        item.approved && !item.approved.auto
+          ? "border-brand-green/40 bg-brand-green/[0.04]"
+          : "border-border",
       )}
     >
       <div className="flex flex-wrap items-baseline gap-x-2">
@@ -155,7 +162,11 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
         <span className="text-xs text-muted-foreground">
           · {SKILL_LABEL[item.skill] ?? item.skill}
         </span>
-        {item.approved ? (
+        {item.approved?.auto ? (
+          <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-sky-400/15 px-2 py-0.5 text-[11px] font-semibold text-sky-300">
+            <Sparkles className="size-3" aria-hidden="true" /> Escolhido pelo app
+          </span>
+        ) : item.approved ? (
           <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[11px] font-semibold text-brand-green">
             <Check className="size-3" aria-hidden="true" /> Aprovado
           </span>
@@ -165,14 +176,31 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
 
       <div className="mt-2 grid gap-2 lg:grid-cols-2">
         {item.approved ? (
-          <VideoTile id={item.approved.id} seconds={item.approved.seconds} note="aprovado">
+          <VideoTile
+            id={item.approved.id}
+            seconds={item.approved.seconds}
+            note={item.approved.auto ? "escolhido pelo app" : "aprovado"}
+          >
+            {item.approved.auto ? (
+              <button
+                type="button"
+                className="text-xs font-semibold text-brand-green hover:underline"
+                disabled={approve.isPending}
+                onClick={() =>
+                  item.approved &&
+                  approve.mutate({ url: item.approved.url, seconds: item.approved.seconds })
+                }
+              >
+                Aprovar este
+              </button>
+            ) : null}
             <button
               type="button"
               className="text-xs text-muted-foreground hover:text-destructive"
               disabled={remove.isPending}
               onClick={() => remove.mutate()}
             >
-              Remover aprovação
+              {item.approved.auto ? "Remover" : "Remover aprovação"}
             </button>
           </VideoTile>
         ) : null}
@@ -258,6 +286,35 @@ export function AdminLessonVideos() {
   const [copying, setCopying] = useState(false);
   // Copies the level's list to paste into the chat for a review (owner request):
   // titles not loaded yet are fetched first, a failed one reads "indisponível".
+  const fill = useServerFn(fillLessonVideos);
+  const [filling, setFilling] = useState<string | null>(null);
+  // Fixes a video for every lesson of the level that has none, a few lessons
+  // per request (owner request, 2026-10-26: before the first student opens them).
+  const fillLevel = async () => {
+    const skip: string[] = [];
+    let filled = 0;
+    setFilling("Buscando…");
+    try {
+      for (;;) {
+        const result = await fill({ data: { level, skip } });
+        filled += result.filled.length;
+        skip.push(...result.notFound);
+        setFilling(`${filled} vídeos fixados…`);
+        void queryClient.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
+        if (result.remaining === 0 || result.filled.length + result.notFound.length === 0) break;
+      }
+      toast.success(
+        skip.length
+          ? `${filled} vídeos fixados; ${skip.length} lições sem vídeo adequado (escolha na mão).`
+          : `${filled} vídeos fixados. Confira com "Copiar lista".`,
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível buscar os vídeos.");
+    } finally {
+      setFilling(null);
+      void queryClient.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
+    }
+  };
   const copyList = async () => {
     setCopying(true);
     try {
@@ -294,7 +351,9 @@ export function AdminLessonVideos() {
       <p className="text-sm font-semibold">Vídeos das lições</p>
       <p className="text-xs text-muted-foreground">
         Confira se o vídeo de cada lição combina com o tema e o nível. Aprove um vídeo e todos os
-        alunos daquela lição passam a ver o mesmo; sem aprovação, o app busca um no YouTube.
+        alunos daquela lição passam a ver o mesmo. "Buscar vídeos do nível" fixa um vídeo nas lições
+        que ainda não têm (precisa do segredo YOUTUBE_API_KEY; cerca de um nível por dia, pela cota
+        grátis do YouTube), marcado como escolhido pelo app até você aprovar ou trocar.
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {LEVELS.map((code) => (
@@ -315,8 +374,23 @@ export function AdminLessonVideos() {
         {query.data ? (
           <>
             <span className="ml-auto self-center text-xs text-muted-foreground">
-              {approvedCount} de {lessons.length} lições com vídeo aprovado
+              {approvedCount} de {lessons.length} lições com vídeo fixo
             </span>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              disabled={filling !== null || !query.data.migrationApplied}
+              onClick={() => void fillLevel()}
+            >
+              {filling ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Search className="size-3.5" aria-hidden="true" />
+              )}
+              {filling ?? "Buscar vídeos do nível"}
+            </Button>
             <Button
               type="button"
               size="sm"
