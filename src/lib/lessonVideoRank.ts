@@ -73,6 +73,43 @@ const STOPWORDS = new Set([
   "which",
   "their",
   "basic",
+  // Generic words of lesson titles and objectives (owner review of A1,
+  // 2026-10-26: "Describing", "People" and "Writing" matched videos about the
+  // weather, health and fiction writing).
+  "listening",
+  "listen",
+  "hearing",
+  "reading",
+  "talking",
+  "speaking",
+  "writing",
+  "describing",
+  "describe",
+  "description",
+  "descriptions",
+  "people",
+  "words",
+  "simple",
+  "short",
+  "everyday",
+  "giving",
+  "making",
+  "telling",
+  "using",
+  "practice",
+  "beginner",
+  "beginners",
+  "understand",
+  "catch",
+  "details",
+  "find",
+  "correct",
+  "correctly",
+  "common",
+  "core",
+  "key",
+  "clear",
+  "clearly",
 ]);
 
 const LEVEL_WORDS: Record<string, string[]> = {
@@ -95,6 +132,12 @@ export function topicKeywords(topic: string): string[] {
     .map((word) => word.replace(/'s$/, ""))
     .filter((word) => word.length >= 4 && !STOPWORDS.has(word) && !/^[abc][12]$/.test(word));
   return [...new Set(words)];
+}
+
+/** The title's words, or the objective's when the title has only generic ones ("Describing Your Day"). */
+export function lessonKeywords(topic: string, objective = ""): string[] {
+  const fromTitle = topicKeywords(topic);
+  return fromTitle.length > 0 ? fromTitle : topicKeywords(objective);
 }
 
 export function isTrustedChannel(channel: string): boolean {
@@ -162,8 +205,9 @@ export function rankVideoCandidates(
   results: VideoCandidate[],
   topic: string,
   level: string,
+  objective = "",
 ): VideoCandidate[] {
-  const keywords = topicKeywords(topic);
+  const keywords = lessonKeywords(topic, objective);
   return results
     .filter((candidate) => !unsuitableVideo(candidate, keywords, level))
     .map((candidate, rank) => ({ candidate, score: scoreVideo(candidate, rank, keywords, level) }))

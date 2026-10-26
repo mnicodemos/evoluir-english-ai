@@ -842,6 +842,14 @@ type LessonVideosTable = {
       }>;
     };
     upsert: (row: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
+    update: (row: Record<string, unknown>) => {
+      in: (
+        column: string,
+        values: string[],
+      ) => {
+        is: (column: string, value: null) => Promise<{ error: { message: string } | null }>;
+      };
+    };
     delete: () => {
       eq: (column: string, value: string) => Promise<{ error: { message: string } | null }>;
     };
@@ -1012,6 +1020,31 @@ export const fillLessonVideos = createServerFn({ method: "POST" })
       filled.push(plan.key);
     }
     return { filled, notFound, remaining: Math.max(0, todo.length - FILL_BATCH) };
+  });
+
+/**
+ * Admin → Vídeos "Aprovar marcados" (owner request, 2026-10-26: approve the
+ * app's good choices in one go): the marked lessons' videos chosen by the app
+ * become the owner's approval. Only rows still without an approver change, so
+ * a video the owner chose is never touched; the lessons already show it.
+ */
+export const approveLessonVideos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ keys: z.array(z.string().min(3).max(40)).min(1).max(60) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as unknown as LessonVideosTable)
+      .from("lesson_videos")
+      .update({ approved_by: context.userId, approved_at: new Date().toISOString() })
+      .in("curriculum_key", data.keys)
+      .is("approved_by", null);
+    if (error) throw new Error("Os vídeos não puderam ser aprovados.");
+    return { ok: true };
   });
 
 export const clearLessonVideo = createServerFn({ method: "POST" })

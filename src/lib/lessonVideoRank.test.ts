@@ -85,4 +85,44 @@ describe("lesson video ranking", () => {
     expect(unsuitableVideo(sixMinute, ["greetings"], "a2")).toBe(true);
     expect(unsuitableVideo(sixMinute, ["greetings"], "b1")).toBe(false);
   });
+
+  // Owner review of A1 (2026-10-26): generic title words chose these videos.
+  it("ignores generic words of the lesson title", () => {
+    const bbc = "BBC Learning English";
+    const keep = (title: string, topic: string, objective: string) =>
+      rankVideoCandidates(
+        [{ id: "aaaaaaaaaaa", seconds: 200, title, channel: bbc }],
+        topic,
+        "a1",
+        objective,
+      ).length === 1;
+    expect(
+      keep(
+        "Describing the weather where you are: Easy English Conversations",
+        "Describing Your Day A1",
+        "Talk about your routine using times and frequency words.",
+      ),
+    ).toBe(false);
+    expect(
+      keep(
+        "How to talk about your daily routine: Easy English Conversations",
+        "Describing Your Day A1",
+        "Talk about your routine using times and frequency words.",
+      ),
+    ).toBe(true);
+    expect(
+      keep(
+        "People are talking about health problems",
+        "Listening to Descriptions of People A1",
+        "Catch simple details about age, family and appearance.",
+      ),
+    ).toBe(false);
+    expect(
+      keep(
+        "How to Start Writing for Beginners - Start Your Story",
+        "Writing a Simple Profile A1",
+        "Write four short sentences about yourself with correct punctuation.",
+      ),
+    ).toBe(false);
+  });
 });

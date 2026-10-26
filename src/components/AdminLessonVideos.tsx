@@ -5,8 +5,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
+  approveLessonVideos,
   clearLessonVideo,
   fillLessonVideos,
   getLessonVideos,
@@ -118,7 +120,17 @@ function VideoTile({
   );
 }
 
-function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level }) {
+function LessonRow({
+  item,
+  level,
+  marked,
+  onMark,
+}: {
+  item: LessonVideoReportItem;
+  level: Level;
+  marked: boolean;
+  onMark: (checked: boolean) => void;
+}) {
   const queryClient = useQueryClient();
   const save = useServerFn(setLessonVideo);
   const clear = useServerFn(clearLessonVideo);
@@ -155,6 +167,14 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
       )}
     >
       <div className="flex flex-wrap items-baseline gap-x-2">
+        {item.approved?.auto ? (
+          <Checkbox
+            checked={marked}
+            onCheckedChange={(checked) => onMark(checked === true)}
+            aria-label={`Marcar ${item.title} para aprovar`}
+            className="self-center"
+          />
+        ) : null}
         <span className="text-xs font-semibold text-muted-foreground">
           U{item.unit} · L{item.position}
         </span>
@@ -286,6 +306,31 @@ export function AdminLessonVideos() {
   const [copying, setCopying] = useState(false);
   // Copies the level's list to paste into the chat for a review (owner request):
   // titles not loaded yet are fetched first, a failed one reads "indisponível".
+  // Batch approval of the app's choices (owner request, 2026-10-26).
+  const approveMany = useServerFn(approveLessonVideos);
+  const [marked, setMarked] = useState<{ level: Level; keys: Set<string> }>({
+    level,
+    keys: new Set(),
+  });
+  const autoKeys = lessons.filter((item) => item.approved?.auto).map((item) => item.key);
+  const markedKeys = marked.level === level ? autoKeys.filter((key) => marked.keys.has(key)) : [];
+  const mark = (key: string, checked: boolean) =>
+    setMarked((current) => {
+      const keys = new Set(current.level === level ? current.keys : []);
+      if (checked) keys.add(key);
+      else keys.delete(key);
+      return { level, keys };
+    });
+  const approveMarked = useMutation({
+    mutationFn: (keys: string[]) => approveMany({ data: { keys } }),
+    onSuccess: (_, keys) => {
+      toast.success(`${keys.length} ${keys.length === 1 ? "vídeo aprovado" : "vídeos aprovados"}.`);
+      setMarked({ level, keys: new Set() });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Não foi possível aprovar."),
+  });
   const fill = useServerFn(fillLessonVideos);
   const [filling, setFilling] = useState<string | null>(null);
   // Fixes a video for every lesson of the level that has none, a few lessons
@@ -410,6 +455,44 @@ export function AdminLessonVideos() {
         ) : null}
       </div>
 
+      {autoKeys.length > 0 ? (
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-sky-400/30 bg-sky-400/[0.06] p-2 text-xs">
+          <Sparkles className="size-3.5 text-sky-300" aria-hidden="true" />
+          <span>
+            {autoKeys.length} {autoKeys.length === 1 ? "vídeo escolhido" : "vídeos escolhidos"} pelo
+            app aguardando aprovação · {markedKeys.length} marcados
+          </span>
+          <button
+            type="button"
+            className="font-semibold text-sky-300 hover:underline"
+            onClick={() => setMarked({ level, keys: new Set(autoKeys) })}
+          >
+            Marcar todos
+          </button>
+          <button
+            type="button"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={() => setMarked({ level, keys: new Set() })}
+          >
+            Desmarcar
+          </button>
+          <Button
+            type="button"
+            size="sm"
+            className="ml-auto h-7 text-xs"
+            disabled={markedKeys.length === 0 || approveMarked.isPending}
+            onClick={() => approveMarked.mutate(markedKeys)}
+          >
+            {approveMarked.isPending ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Check className="size-3.5" aria-hidden="true" />
+            )}
+            Aprovar marcados ({markedKeys.length})
+          </Button>
+        </div>
+      ) : null}
+
       {query.data && !query.data.migrationApplied ? (
         <p className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-2 text-xs">
           A migração 0081_lesson_videos ainda não foi aplicada: você já pode ver os vídeos que os
@@ -434,7 +517,13 @@ export function AdminLessonVideos() {
                 </p>
                 <ul className="mt-2 space-y-2">
                   {unitLessons.map((item) => (
-                    <LessonRow key={item.key} item={item} level={level} />
+                    <LessonRow
+                      key={item.key}
+                      item={item}
+                      level={level}
+                      marked={markedKeys.includes(item.key)}
+                      onMark={(checked) => mark(item.key, checked)}
+                    />
                   ))}
                 </ul>
               </div>
