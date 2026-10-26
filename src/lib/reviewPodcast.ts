@@ -1,11 +1,9 @@
 /**
- * Review podcasts (owner request, 2026-10-26): the review lessons of each
- * level (Unit 6, "Review I" and "Review II") open with a short podcast, a
- * conversation between EVO and her co-host Leo about the units under review,
- * instead of a YouTube video. The script is written by the AI once per
- * lesson and level and shared (lesson_content_templates, its own prompt
- * hash), and each line's audio is cached for everyone, so every student of
- * that lesson hears the same episode at no further cost. Pure, so it is tested.
+ * Curriculum lesson audio: each lesson opens with an original dialogue between
+ * EVO and her co-host Leo instead of a YouTube video. Review I and Review II
+ * keep their unit-review scripts; other lessons use their own objective and
+ * topic. The script is shared per curriculum lesson in lesson_content_templates,
+ * and each line's speech audio is cached for reuse. Pure prompt construction is tested.
  */
 import { z } from "zod";
 
