@@ -91,7 +91,7 @@ export async function approvedLessonVideo(key: string): Promise<LessonVideo | nu
 async function pickVideo(
   supabase: SupabaseClient<Database>,
   plan: CurriculumLesson,
-): Promise<LessonVideo> {
+): Promise<LessonVideo | null> {
   const approved = await approvedLessonVideo(plan.key);
   if (approved) return approved;
   const { data } = await supabase.from("lessons").select("video_url").not("video_url", "is", null);
@@ -506,8 +506,8 @@ export async function writeLesson(
         summary: content.summary,
         transcript: content.transcript,
         transcript_pt: content.transcript_pt ?? "",
-        video_url: video.url,
-        video_duration_seconds: video.seconds,
+        video_url: video?.url ?? null,
+        video_duration_seconds: video?.seconds ?? 0,
         sort_order: plan.index,
         curriculum_key: plan.key,
         unit_number: plan.unit,

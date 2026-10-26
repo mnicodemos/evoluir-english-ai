@@ -37,6 +37,21 @@ export const TRUSTED_CHANNELS = [
   "simple english videos",
 ];
 
+/**
+ * Channels and titles made for teachers, not learners (owner review of A1,
+ * 2026-10-26: "Reading effectively - a 3-stage lesson guide" reached a student).
+ */
+const TEACHER_CHANNELS = [
+  "teaching english with oxford",
+  "teachingenglish",
+  "cambridge english teacher",
+];
+const TEACHER_TITLE =
+  /\b(for teachers|lesson plans?|lesson guide|teaching tips|how to teach|esl teachers?|tefl|celta)\b/;
+
+/** Series pitched above beginners (6 Minute English is B1-B2). */
+const ABOVE_BEGINNER_TITLE = /\b6 minute english\b/;
+
 const STOPWORDS = new Set([
   "english",
   "lesson",
@@ -87,10 +102,34 @@ export function isTrustedChannel(channel: string): boolean {
   return TRUSTED_CHANNELS.some((trusted) => name === trusted || name.startsWith(trusted));
 }
 
-/** A word matches its plural or "-ing" form too ("greeting" in "greetings"). */
+/**
+ * A word matches its other forms through its root ("greetings" in "greeting",
+ * "introductions" in "introduce"): long words keep about 60% of their letters.
+ */
 function mentions(title: string, word: string): boolean {
-  const stem = word.length > 5 ? word.slice(0, -1) : word;
+  const stem = word.length > 5 ? word.slice(0, Math.max(5, Math.ceil(word.length * 0.6))) : word;
   return title.includes(stem);
+}
+
+function isBeginnerLevel(level: string): boolean {
+  return /^a[12]$/i.test(level.trim());
+}
+
+/** Never shown: made for teachers, or (A1-A2) off-topic or pitched above beginners. */
+export function unsuitableVideo(
+  candidate: VideoCandidate,
+  keywords: string[],
+  level: string,
+): boolean {
+  const title = normalize(candidate.title);
+  const channel = normalize(candidate.channel).trim();
+  if (TEACHER_CHANNELS.some((name) => channel.startsWith(name)) || TEACHER_TITLE.test(title))
+    return true;
+  if (!isBeginnerLevel(level)) return false;
+  // A trusted channel is not enough for a beginner: the lesson's topic must be
+  // in the title (owner review of A1: "The benefits of doing nothing" for greetings).
+  if (keywords.length > 0 && !keywords.some((word) => mentions(title, word))) return true;
+  return ABOVE_BEGINNER_TITLE.test(title);
 }
 
 export function scoreVideo(
@@ -115,7 +154,10 @@ export function scoreVideo(
   );
 }
 
-/** Best first; candidates with nothing of the lesson and no teaching channel are dropped. */
+/**
+ * Best first; candidates with nothing of the lesson and no teaching channel,
+ * and the unsuitable ones (unsuitableVideo), are dropped.
+ */
 export function rankVideoCandidates(
   results: VideoCandidate[],
   topic: string,
@@ -123,6 +165,7 @@ export function rankVideoCandidates(
 ): VideoCandidate[] {
   const keywords = topicKeywords(topic);
   return results
+    .filter((candidate) => !unsuitableVideo(candidate, keywords, level))
     .map((candidate, rank) => ({ candidate, score: scoreVideo(candidate, rank, keywords, level) }))
     .filter((entry) => entry.score > -5)
     .sort((a, b) => b.score - a.score)
