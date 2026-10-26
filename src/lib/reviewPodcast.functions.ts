@@ -5,14 +5,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { findCurriculumLesson } from "./curriculum";
 import {
-  hasReviewPodcast,
+  hasLessonPodcast,
+  lessonPodcastMessages,
   parseReviewPodcast,
   podcastSchema,
-  reviewPodcastMessages,
   type ReviewPodcast,
 } from "./reviewPodcast";
 
-/** Kept beside the review lesson's own content, under its own prompt hash. */
+/** Kept beside the lesson's shared content, under its own prompt hash. */
 const PODCAST_HASH_PREFIX = "podcast-v1:";
 
 async function readSharedPodcast(key: string, promptHash: string) {
@@ -46,13 +46,12 @@ async function saveSharedPodcast(key: string, promptHash: string, podcast: Revie
 }
 
 /**
- * The review podcast of one of the student's lessons (owner request,
- * 2026-10-26): the shared episode of that review lesson and level, written by
- * the AI the first time any student opens it. Null for a lesson that has no
- * podcast; an error when the AI could not write it, so the page offers to try
- * again.
+ * Shared dialogue for one curriculum lesson, written by the AI the first
+ * time a student opens it. Review I and Review II keep their existing review
+ * outlines; core lessons use their own title and objective. Null for the review
+ * Test; an error lets the student retry if generation fails.
  */
-export const loadReviewPodcast = createServerFn({ method: "POST" })
+export const loadLessonPodcast = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ lessonId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<ReviewPodcast | null> => {
@@ -63,10 +62,10 @@ export const loadReviewPodcast = createServerFn({ method: "POST" })
       .maybeSingle();
     const key = (lesson as { curriculum_key?: string | null } | null)?.curriculum_key;
     const plan = key ? findCurriculumLesson(key) : null;
-    if (!plan || !hasReviewPodcast(plan)) return null;
+    if (!plan || !hasLessonPodcast(plan)) return null;
 
     const { hashAiRequest } = await import("./ai-usage.server");
-    const messages = reviewPodcastMessages(plan);
+    const messages = lessonPodcastMessages(plan);
     const promptHash = `${PODCAST_HASH_PREFIX}${await hashAiRequest({ messages, jsonMode: true })}`;
     const shared = await readSharedPodcast(plan.key, promptHash);
     if (shared) return shared;
@@ -79,8 +78,8 @@ export const loadReviewPodcast = createServerFn({ method: "POST" })
     });
     const podcast = parseReviewPodcast(raw);
     if (!podcast) {
-      console.error("Review podcast failed validation", plan.key);
-      throw new Error("EVO could not prepare this podcast. Please try again.");
+      console.error("Lesson podcast failed validation", plan.key);
+      throw new Error("EVO could not prepare this lesson audio. Please try again.");
     }
     await saveSharedPodcast(plan.key, promptHash, podcast);
     return podcast;

@@ -20,7 +20,7 @@ import { EvoGuide } from "@/components/EvoGuide";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { LessonQuiz } from "@/components/LessonQuiz";
 import { LessonVideo } from "@/components/LessonVideo";
-import { ReviewPodcast } from "@/components/ReviewPodcast";
+import { LessonPodcast } from "@/components/ReviewPodcast";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,7 +39,7 @@ import { vocabularyGenerationFailureKey } from "@/lib/activityIndicators";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 import { findBusinessLesson, isBusinessKey } from "@/lib/businessCourse";
 import { findCurriculumLesson } from "@/lib/curriculum";
-import { hasReviewPodcast } from "@/lib/reviewPodcast";
+import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
 import { formatVideoDuration, videoReviewPoints } from "@/lib/lessonVideoDisplay";
@@ -56,12 +56,13 @@ export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
       { title: "Lesson - Evoluir+ English AI" },
       {
         name: "description",
-        content: "Watch the video, review the flashcards and take the quiz of this lesson.",
+        content:
+          "Listen to the lesson dialogue, review the flashcards and take the quiz of this lesson.",
       },
       { property: "og:title", content: "Lesson - Evoluir+ English AI" },
       {
         property: "og:description",
-        content: "Video, summary, flashcards and quiz in one English lesson.",
+        content: "Lesson audio, summary, flashcards and quiz in one English lesson.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -110,8 +111,8 @@ function LessonPage() {
   // A level's final test is only taken on its own page, where passing promotes
   // the student; opening it as an ordinary lesson would skip the promotion.
   const isFinalTest = !!lesson?.curriculum_key?.endsWith("-final");
-  // The review lessons open with EVO and Leo's podcast instead of a video.
-  const podcast = !business && hasReviewPodcast(repairPlan);
+  // Curriculum lessons use the EVO + Leo dialogue; video playback remains available for Business and future video content.
+  const podcast = !business && hasLessonPodcast(repairPlan);
   useEffect(() => {
     if (isFinalTest) navigate({ to: "/learning/final-test", replace: true });
   }, [isFinalTest, navigate]);
@@ -342,8 +343,12 @@ function LessonPage() {
             {checklist.onlyVideoPending && (
               <p className="text-xs text-muted-foreground">
                 {lang === "pt"
-                  ? 'Você já fez o resto — só falta tocar em "Eu assisti" no vídeo.'
-                  : 'You did everything else — only the "I watched it" button on the video is left.'}
+                  ? podcast
+                    ? "Você já fez o resto — só falta ouvir o áudio."
+                    : 'Você já fez o resto — só falta tocar em "Eu assisti" no vídeo.'
+                  : podcast
+                    ? "You did everything else — only the audio is left."
+                    : 'You did everything else — only the "I watched it" button on the video is left.'}
               </p>
             )}
           </section>
@@ -353,11 +358,11 @@ function LessonPage() {
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger
               value="video"
-              aria-label={podcast ? "Podcast" : "Video"}
+              aria-label={podcast ? t("Lesson audio") : t("Video")}
               className="gap-1.5"
             >
               {podcast ? <Headphones className="size-4" /> : <Video className="size-4" />}{" "}
-              <span className="hidden sm:inline">{podcast ? "Podcast" : "Video"}</span>
+              <span className="hidden sm:inline">{podcast ? t("Lesson audio") : t("Video")}</span>
             </TabsTrigger>
             <TabsTrigger value="summary" aria-label="Summary" className="gap-1.5">
               <BookOpen className="size-4" /> <span className="hidden sm:inline">Summary</span>
@@ -374,27 +379,28 @@ function LessonPage() {
             {podcast ? (
               <>
                 <div>
-                  <h2 className="font-display text-lg font-semibold">Review podcast</h2>
+                  <h2 className="font-display text-lg font-semibold">{t("Lesson audio")}</h2>
                   <p className="text-sm text-muted-foreground">
-                    Listen to EVO and Leo review these units before you practise.
+                    {t("Listen to EVO and Leo explore this lesson before you practise.")}
                   </p>
                 </div>
-                <ReviewPodcast
+                <LessonPodcast
                   lessonId={lessonId}
                   level={lesson.level}
                   progress={progress}
                   onProgress={handleProgress}
+                  t={t}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Tap a line to hear it again from there.
+                  {t("Tap a line to hear it again from there.")}
                 </p>
               </>
             ) : (
               <>
                 <div>
-                  <h2 className="font-display text-lg font-semibold">Video reinforcement</h2>
+                  <h2 className="font-display text-lg font-semibold">{t("Video reinforcement")}</h2>
                   <p className="text-sm text-muted-foreground">
-                    Watch this short explanation before you practise.
+                    {t("Watch this short explanation before you practise.")}
                     {videoLength ? ` About ${videoLength}.` : ""}
                   </p>
                 </div>
@@ -405,7 +411,7 @@ function LessonPage() {
                   resumeKey={lessonId}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Turn on the video subtitles (CC) to follow along while you watch.
+                  {t("Turn on the video subtitles (CC) to follow along while you watch.")}
                 </p>
               </>
             )}

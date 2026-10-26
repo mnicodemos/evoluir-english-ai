@@ -14,7 +14,7 @@ import { resolveQuizEvidenceSkill, type QuizEvidenceSkill } from "@/lib/pedagogy
 import { callGateway } from "./ai-gateway.server";
 import { hashAiRequest } from "./ai-usage.server";
 import { findLessonVideo, isPoolVideo, type LessonVideo } from "./lessonVideo.server";
-import { hasReviewPodcast } from "./reviewPodcast";
+import { hasLessonPodcast } from "./reviewPodcast";
 
 export async function callContentAi(
   messages: { role: "system" | "user" | "assistant"; content: string }[],
@@ -116,9 +116,9 @@ async function pickVideo(
   supabase: SupabaseClient<Database>,
   plan: CurriculumLesson,
 ): Promise<LessonVideo | null> {
-  // The review lessons play EVO and Leo's podcast instead of a video, so no
-  // YouTube search is spent on them (reviewPodcast.ts).
-  if (hasReviewPodcast(plan)) return null;
+  // Curriculum lessons now use EVO + Leo audio, so skip unnecessary YouTube searches.
+  // The video player and Admin → Vídeos remain available for future owner-produced content.
+  if (hasLessonPodcast(plan)) return null;
   const approved = await approvedLessonVideo(plan.key);
   if (approved) return approved;
   const found = await foundLessonVideo(plan.key);

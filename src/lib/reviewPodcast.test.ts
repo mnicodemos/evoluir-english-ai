@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { findCurriculumLesson } from "./curriculum";
 import {
-  hasReviewPodcast,
+  hasLessonPodcast,
+  lessonPodcastMessages,
   parseReviewPodcast,
   PODCAST_LINE_MAX,
   PODCAST_SPEAKERS,
@@ -20,13 +21,16 @@ const episode = (count = 16) => ({
   lines: Array.from({ length: count }, (_, i) => line(i % 2 ? "leo" : "evo")),
 });
 
-describe("review podcast", () => {
-  it("belongs to the two review lessons, never the review Test or a core lesson", () => {
-    expect(hasReviewPodcast(findCurriculumLesson("a1-u6-l1"))).toBe(true);
-    expect(hasReviewPodcast(findCurriculumLesson("b2-u6-l2"))).toBe(true);
-    expect(hasReviewPodcast(findCurriculumLesson("a1-u6-l3"))).toBe(false);
-    expect(hasReviewPodcast(findCurriculumLesson("a1-u1-l1"))).toBe(false);
-    expect(hasReviewPodcast(null)).toBe(false);
+describe("lesson audio dialogue", () => {
+  it("enables the pilot only for B1 Unit 2 Lesson 2 and preserves review audio", () => {
+    expect(hasLessonPodcast(findCurriculumLesson("b1-u2-l2"))).toBe(true);
+    expect(hasLessonPodcast(findCurriculumLesson("b1-u2-l1"))).toBe(false);
+    expect(hasLessonPodcast(findCurriculumLesson("b1-u2-l3"))).toBe(false);
+    expect(hasLessonPodcast(findCurriculumLesson("a1-u1-l1"))).toBe(false);
+    expect(hasLessonPodcast(findCurriculumLesson("a1-u6-l1"))).toBe(true);
+    expect(hasLessonPodcast(findCurriculumLesson("b2-u6-l2"))).toBe(true);
+    expect(hasLessonPodcast(findCurriculumLesson("a1-u6-l3"))).toBe(false);
+    expect(hasLessonPodcast(null)).toBe(false);
   });
 
   it("asks for the units under review only, the same way every time", () => {
@@ -36,6 +40,15 @@ describe("review podcast", () => {
     expect(outline).not.toContain("Listening to Daily Routines");
     expect(reviewPodcastMessages(plan)).toEqual(reviewPodcastMessages(plan));
     expect(reviewPodcastMessages(plan)[0]!.content).toContain("CEFR A1");
+  });
+
+  it("creates a lesson-specific dialogue from the lesson objective", () => {
+    const plan = findCurriculumLesson("a1-u1-l1")!;
+    const messages = lessonPodcastMessages(plan);
+    expect(messages).toEqual(lessonPodcastMessages(plan));
+    expect(messages[0]!.content).toContain("CEFR A1");
+    expect(messages[1]!.content).toContain(plan.title);
+    expect(messages[1]!.content).toContain(plan.objective);
   });
 
   it("gives EVO and Leo their own voices", () => {
