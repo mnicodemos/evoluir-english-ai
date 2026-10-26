@@ -396,6 +396,12 @@ function LessonPage() {
                     {t("Listen to EVO and Leo explore this lesson before you practise.")}
                   </p>
                 </div>
+                <img
+                  src="/study-books/1793031809285.jpg"
+                  alt="EVO and Leo"
+                  className="mx-auto h-auto w-full max-w-3xl rounded-xl object-contain"
+                  loading="lazy"
+                />
                 <LessonPodcast
                   lessonId={lessonId}
                   level={lesson.level}
