@@ -189,8 +189,8 @@ describe("studyPlan week with real dates", () => {
         focus: "balanced",
         today,
         practice: [
-          { skill: "speaking", date: "2026-10-05" },
-          { skill: "listening", date: "2026-10-06" },
+          { skill: "speaking", date: "2026-10-06" },
+          { skill: "listening", date: "2026-10-08" },
         ],
       }),
     );
