@@ -142,6 +142,46 @@ describe("studyPlan week with real dates", () => {
     expect(plan.nextIndex).toBe(0);
   });
 
+  it("does not let Monday practice complete future days of the same skill", () => {
+    const plan = buildStudyPlan(
+      input({
+        daysPerWeek: 5,
+        focus: "listening",
+        today: "2026-10-05", // Monday
+        practice: [
+          { skill: "listening", date: "2026-10-05" },
+          { skill: "speaking", date: "2026-10-05" },
+          { skill: "vocabulary", date: "2026-10-05" },
+          { skill: "grammar", date: "2026-10-05" },
+          { skill: "writing", date: "2026-10-05" },
+        ],
+      }),
+    );
+
+    expect(plan.completedCount).toBe(1);
+    expect(plan.progressPercent).toBe(20);
+    expect(plan.days[0]).toMatchObject({ day: "Monday", status: "done" });
+    expect(plan.days.slice(1).every((day) => !day.completed)).toBe(true);
+  });
+
+  it("allows a later practice day to catch up a missed slot without completing future slots", () => {
+    const plan = buildStudyPlan(
+      input({
+        daysPerWeek: 5,
+        focus: "listening",
+        today: "2026-10-06", // Tuesday
+        practice: [
+          { skill: "listening", date: "2026-10-06" },
+          { skill: "speaking", date: "2026-10-06" },
+        ],
+      }),
+    );
+
+    expect(plan.days[0]).toMatchObject({ day: "Monday", completed: true });
+    expect(plan.days[1]).toMatchObject({ day: "Tuesday", completed: true });
+    expect(plan.days[2]).toMatchObject({ day: "Wednesday", completed: false });
+  });
+
   it("has nothing next when the whole week is done", () => {
     const plan = buildStudyPlan(
       input({
