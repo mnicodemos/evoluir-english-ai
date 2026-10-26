@@ -1,5 +1,7 @@
 import { findLevel } from "@/lib/level";
 
+import { EXTRA_LISTENING_SENTENCES } from "./listeningSentences";
+
 /**
  * CEFR adaptation for the Listening Lab and its pronunciation drills.
  * Nothing here touches the voice provider: the sentence pool, the accepted
@@ -161,6 +163,12 @@ const CONFIGS: Record<string, ListeningLevelConfig> = {
   },
 };
 
+// About 60 drills per level (listeningSentences.ts), after the original ones.
+for (const [level, extra] of Object.entries(EXTRA_LISTENING_SENTENCES)) {
+  const config = CONFIGS[level];
+  if (config) config.sentences = [...config.sentences, ...extra];
+}
+
 export function listeningLevelConfig(level: string | null | undefined): ListeningLevelConfig {
   const info = findLevel(level);
   return CONFIGS[info.value] ?? CONFIGS["b2"]!;
@@ -195,13 +203,35 @@ export function sentencesFromText(text: string, config: ListeningLevelConfig) {
  * of the same level are added, and the rotation offset keeps recent practice
  * from repeating the same sentences.
  */
+/** Sentences of the newest lesson that open each session (owner report, 2026-10-26). */
+export const RECENT_LESSON_SENTENCES = 3;
+
 export function pickListeningSentences(options: {
   config: ListeningLevelConfig;
   lessonSentences?: string[];
+  /**
+   * Sentences of the lesson the student opened last: up to three of them open
+   * the session, so a new lesson is heard in the next Listening (owner report,
+   * 2026-10-26: its sentences sat at the end of a pool of about 60 and almost
+   * never came up).
+   */
+  recentSentences?: string[];
   rotation?: number;
   count?: number;
 }): string[] {
-  const { config, lessonSentences = [], rotation = 0, count = 3 } = options;
+  const { config, lessonSentences = [], recentSentences = [], rotation = 0, count = 3 } = options;
+  const recent = [...new Set(recentSentences.filter((sentence) => fitsLevel(sentence, config)))]
+    .slice(0, Math.min(RECENT_LESSON_SENTENCES, count))
+    .filter(Boolean);
+  if (recent.length > 0) {
+    const rest = pickListeningSentences({
+      config,
+      lessonSentences: lessonSentences.filter((sentence) => !recent.includes(sentence)),
+      rotation,
+      count: count + recent.length,
+    }).filter((sentence) => !recent.includes(sentence));
+    return [...recent, ...rest].slice(0, count);
+  }
   const fitting = [
     ...new Set(
       [...config.sentences, ...lessonSentences].filter((sentence) => fitsLevel(sentence, config)),

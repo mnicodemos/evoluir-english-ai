@@ -76,3 +76,62 @@ describe("pickListeningSentences fallback", () => {
     }
   });
 });
+
+// Owner request (2026-10-26): a new student's sessions of 9 repeated most of
+// the 10 to 14 built-in sentences.
+describe("listening drills per level", () => {
+  const levels = ["a1", "a2", "b1", "b2", "c1", "c2"];
+
+  it("has about 60 distinct drills inside each level's range", () => {
+    for (const level of levels) {
+      const config = listeningLevelConfig(level);
+      const fitting = new Set(config.sentences.filter((sentence) => fitsLevel(sentence, config)));
+      expect(fitting.size, level).toBeGreaterThanOrEqual(55);
+      expect(new Set(config.sentences).size, level).toBe(config.sentences.length);
+    }
+  });
+
+  it("gives a new student six sessions without repeating a sentence", () => {
+    for (const level of levels) {
+      const config = listeningLevelConfig(level);
+      const seen = new Set<string>();
+      for (let rotation = 0; rotation < 6; rotation += 1) {
+        for (const sentence of pickListeningSentences({ config, rotation, count: 9 })) {
+          expect(seen.has(sentence), `${level} session ${rotation}`).toBe(false);
+          seen.add(sentence);
+        }
+      }
+    }
+  });
+});
+
+describe("the lesson opened last", () => {
+  it("opens the session with its sentences, then the usual rotation", () => {
+    const config = listeningLevelConfig("a1");
+    const recent = [
+      "I like my new teacher.",
+      "We read a short story.",
+      "The class starts at eight.",
+    ];
+    const session = pickListeningSentences({
+      config,
+      recentSentences: recent,
+      rotation: 4,
+      count: 9,
+    });
+    expect(session.slice(0, 3)).toEqual(recent);
+    expect(session).toHaveLength(9);
+    expect(new Set(session).size).toBe(9);
+  });
+
+  it("skips its sentences that do not fit the level", () => {
+    const config = listeningLevelConfig("a1");
+    const session = pickListeningSentences({
+      config,
+      recentSentences: ["This sentence is much too long for a beginner to repeat."],
+      count: 9,
+    });
+    expect(session).not.toContain("This sentence is much too long for a beginner to repeat.");
+    expect(session).toHaveLength(9);
+  });
+});

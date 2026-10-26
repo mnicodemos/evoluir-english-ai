@@ -21,7 +21,6 @@ import { AppShell } from "@/components/AppShell";
 import { useTodayActivities } from "@/components/DailyGoalCard";
 import { Button } from "@/components/ui/button";
 import { useLessons, type Lesson } from "@/hooks/useLearning";
-import { useLessonRound } from "@/hooks/useLessonRound";
 import { useSavedPractice } from "@/hooks/usePracticeSync";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
@@ -33,6 +32,7 @@ import { cn } from "@/lib/utils";
 import {
   listeningLevelConfig,
   pickListeningSentences,
+  RECENT_LESSON_SENTENCES,
   sentencesFromText,
   type ListeningLevelConfig,
 } from "@/lib/listeningLevels";
@@ -216,21 +216,41 @@ function ListeningPage() {
     setHeard(false);
   }, [index]);
 
-  // The sentences move on every day, with every new lesson and with every
-  // session finished today, so "Do another session" never repeats them.
-  const { data: startedLessons } = useLessonRound();
-  const lessonCount = startedLessons ?? 0;
+  // The sentences move on every day, with every lesson opened and with every
+  // session finished today, so "Do another session" never repeats them, and
+  // the lesson opened last opens the session with its own sentences (owner
+  // report, 2026-10-26: only completed lessons moved the rotation, and the
+  // lesson's sentences sat at the end of the pool).
+  const levelLessons = useMemo(
+    () => (lessons ?? []).filter((lesson) => findLevel(lesson.level).value === levelInfo.value),
+    [lessons, levelInfo.value],
+  );
+  const lessonCount = levelLessons.length;
+  // The lesson opened last, while it is from today: its sentences open the
+  // day's sessions, three per session, so "Do another session" never repeats them.
+  const newestLesson = useMemo(
+    () => [...levelLessons].sort((a, b) => b.created_at.localeCompare(a.created_at))[0],
+    [levelLessons],
+  );
+  const recentSentences = useMemo(() => {
+    if (!newestLesson || studyToday(new Date(newestLesson.created_at)) !== studyToday()) return [];
+    return sentencesFromText(
+      `${newestLesson.summary ?? ""} ${newestLesson.transcript ?? ""}`,
+      config,
+    ).slice(sessionNumber * RECENT_LESSON_SENTENCES, (sessionNumber + 1) * RECENT_LESSON_SENTENCES);
+  }, [newestLesson, config, sessionNumber]);
   const dayNumber = Math.floor(Date.parse(`${studyToday()}T00:00:00Z`) / 86_400_000);
 
   const pickedSentences = useMemo(
     () =>
       pickListeningSentences({
         config,
-        lessonSentences: lessonSentencesForLevel(lessons ?? [], levelInfo.value, config),
+        lessonSentences: lessonSentencesForLevel(levelLessons, levelInfo.value, config),
+        recentSentences,
         rotation: dayNumber + lessonCount + sessionNumber,
         count: SENTENCES_PER_SESSION,
       }),
-    [lessons, lessonCount, dayNumber, sessionNumber, config, levelInfo.value],
+    [levelLessons, recentSentences, lessonCount, dayNumber, sessionNumber, config, levelInfo.value],
   );
   // Kept from the first answer to the session's end: lessons loading late or a
   // lesson started mid-session would otherwise change the sentences under the
