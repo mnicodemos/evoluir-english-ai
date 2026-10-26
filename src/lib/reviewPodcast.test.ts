@@ -11,7 +11,7 @@ import {
   reviewPodcastMessages,
 } from "./reviewPodcast";
 
-const line = (speaker: "evo" | "leo", text = "Hello and welcome to the review.") => ({
+const line = (speaker: "evo" | "leo", text = "Hello and welcome to the review. Today we will explore useful English examples, practise clear expressions, and connect each idea to everyday conversations so learners can speak with confidence.") => ({
   speaker,
   text,
   pt: "Olá e bem-vindo à revisão.",
@@ -22,14 +22,14 @@ const episode = (count = 16) => ({
 });
 
 describe("lesson audio dialogue", () => {
-  it("enables the pilot only for B1 Unit 2 Lesson 2 and preserves review audio", () => {
+  it("enables audio for every non-final lesson and preserves review audio", () => {
     expect(hasLessonPodcast(findCurriculumLesson("b1-u2-l2"))).toBe(true);
-    expect(hasLessonPodcast(findCurriculumLesson("b1-u2-l1"))).toBe(false);
-    expect(hasLessonPodcast(findCurriculumLesson("b1-u2-l3"))).toBe(false);
-    expect(hasLessonPodcast(findCurriculumLesson("a1-u1-l1"))).toBe(false);
+    expect(hasLessonPodcast(findCurriculumLesson("b1-u2-l1"))).toBe(true);
+    expect(hasLessonPodcast(findCurriculumLesson("b1-u2-l3"))).toBe(true);
+    expect(hasLessonPodcast(findCurriculumLesson("a1-u1-l1"))).toBe(true);
     expect(hasLessonPodcast(findCurriculumLesson("a1-u6-l1"))).toBe(true);
     expect(hasLessonPodcast(findCurriculumLesson("b2-u6-l2"))).toBe(true);
-    expect(hasLessonPodcast(findCurriculumLesson("a1-u6-l3"))).toBe(false);
+    expect(hasLessonPodcast(findCurriculumLesson("a1-u6-l3"))).toBe(true);
     expect(hasLessonPodcast(null)).toBe(false);
   });
 
