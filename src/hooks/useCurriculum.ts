@@ -57,6 +57,8 @@ export function useLearningPath(reviewLevel?: string | null) {
       lessonId ? (mine ?? []).find((m) => m.lesson_id === lessonId) : undefined;
 
     let previousDone = true;
+    // Units whose lessons are all completed, for the review unit's own rule.
+    const unitsDone = new Set<number>();
     const units: PathUnit[] = getUnits(level).map((unit) => {
       const list = unit.lessons.map((plan) => {
         const row = byKey.get(plan.key);
@@ -71,11 +73,19 @@ export function useLearningPath(reviewLevel?: string | null) {
           progress: completed
             ? 100
             : Math.round(((state?.video_progress ?? 0) + (state?.progress ?? 0)) / 2),
-          locked: !review && !previousDone,
+          // A review lesson opens once the units it reviews are done (owner
+          // request, 2026-10-26: Review I after Units 1-2, Review II after
+          // Units 3-5, the Test after 1-5), not after the lesson before it.
+          locked:
+            !review &&
+            (plan.reviewUnits.length > 0
+              ? !reviewUnitsDone(plan.reviewUnits, unitsDone)
+              : !previousDone),
         };
         previousDone = completed;
         return item;
       });
+      if (list.length > 0 && list.every((lesson) => lesson.completed)) unitsDone.add(unit.unit);
       return {
         unit: unit.unit,
         title: unit.title,
@@ -199,4 +209,9 @@ export function useOpenUnitTest() {
       queryClient.invalidateQueries({ queryKey: ["lessons"] });
     },
   });
+}
+
+/** True when every unit a review lesson covers has all its lessons completed. */
+export function reviewUnitsDone(reviewUnits: number[], unitsDone: Set<number>) {
+  return reviewUnits.every((unit) => unitsDone.has(unit));
 }

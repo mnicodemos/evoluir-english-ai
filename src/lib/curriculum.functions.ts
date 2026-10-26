@@ -73,7 +73,38 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
       .maybeSingle();
     const reviewLevel = isReviewLevel(plan.level, owner?.max_level ?? owner?.level);
 
-    if (plan.index > 0 && !reviewLevel) {
+    if (plan.reviewUnits.length > 0 && !reviewLevel) {
+      // A review lesson opens once every lesson of the units it reviews is done
+      // (owner request, 2026-10-26: Review I after Units 1-2, Review II after
+      // Units 3-5, the Test after 1-5), not after the lesson before it.
+      const keys = getCurriculum(plan.level)
+        .filter(
+          (lesson) => plan.reviewUnits.includes(lesson.unit) && lesson.reviewUnits.length === 0,
+        )
+        .map((lesson) => lesson.key);
+      const { data: unitLessons } = await supabase
+        .from("lessons")
+        .select("id, curriculum_key")
+        .in("curriculum_key", keys);
+      const ids = (unitLessons ?? []).map((row) => row.id as string);
+      const { data: doneRows } = ids.length
+        ? await supabase
+            .from("user_lessons")
+            .select("lesson_id")
+            .eq("user_id", userId)
+            .in("lesson_id", ids)
+            .not("completed_at", "is", null)
+        : { data: [] };
+      const doneIds = new Set((doneRows ?? []).map((row) => row.lesson_id as string));
+      const doneKeys = new Set(
+        (unitLessons ?? [])
+          .filter((row) => doneIds.has(row.id as string))
+          .map((row) => row.curriculum_key as string),
+      );
+      if (!keys.every((key) => doneKeys.has(key))) {
+        throw new Error("Finish the lessons of the units this review covers to unlock it.");
+      }
+    } else if (plan.index > 0 && !reviewLevel) {
       const previous = getCurriculum(plan.level)[plan.index - 1]!;
       const { data: prevLesson } = await supabase
         .from("lessons")

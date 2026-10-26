@@ -1137,6 +1137,8 @@ const baseUiPt: Record<string, string> = {
   "Your course plan is downloading.": "O plano do seu curso está sendo baixado.",
   "Could not build the course PDF. Please try again.":
     "Não foi possível criar o PDF do curso. Tente novamente.",
+  "Finish the lessons of the units this review covers to unlock it.":
+    "Conclua as lições das unidades que esta revisão cobre para liberá-la.",
   "Finish the previous lesson first to unlock this one.":
     "Conclua primeiro a lição anterior para liberar esta.",
   "Final Test": "Teste Final",
