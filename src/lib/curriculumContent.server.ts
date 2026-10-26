@@ -13,7 +13,7 @@ import { resolveQuizEvidenceSkill, type QuizEvidenceSkill } from "@/lib/pedagogy
 
 import { callGateway } from "./ai-gateway.server";
 import { hashAiRequest } from "./ai-usage.server";
-import { findLessonVideo, type LessonVideo } from "./lessonVideo.server";
+import { findLessonVideo, isPoolVideo, type LessonVideo } from "./lessonVideo.server";
 
 export async function callContentAi(
   messages: { role: "system" | "user" | "assistant"; content: string }[],
@@ -84,9 +84,32 @@ export async function approvedLessonVideo(key: string): Promise<LessonVideo | nu
 }
 
 /**
- * The owner's approved video for this lesson, else a captioned video (max 7
- * minutes) found by topic and level (audit, 2026-10-25: every student of a
- * lesson sees the same approved video).
+ * The video another student's copy of this lesson already found by search
+ * (never a pool video), so a lesson is searched once (the YouTube Data API
+ * allows about 100 searches a day) and its students share one video.
+ */
+async function foundLessonVideo(key: string): Promise<LessonVideo | null> {
+  try {
+    const { data } = await (
+      await contentWriter()
+    )
+      .from("lessons")
+      .select("video_url, video_duration_seconds")
+      .eq("curriculum_key", key)
+      .not("video_url", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    const row = (data ?? []).find((item) => item.video_url && !isPoolVideo(item.video_url));
+    return row?.video_url ? { url: row.video_url, seconds: row.video_duration_seconds ?? 0 } : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The owner's approved video for this lesson, else the one a classmate's copy
+ * found, else a captioned video (max 7 minutes) found by topic and level
+ * (audit, 2026-10-25: every student of a lesson sees the same approved video).
  */
 async function pickVideo(
   supabase: SupabaseClient<Database>,
@@ -94,6 +117,8 @@ async function pickVideo(
 ): Promise<LessonVideo | null> {
   const approved = await approvedLessonVideo(plan.key);
   if (approved) return approved;
+  const found = await foundLessonVideo(plan.key);
+  if (found) return found;
   const { data } = await supabase.from("lessons").select("video_url").not("video_url", "is", null);
   const used = new Set(((data ?? []) as { video_url: string }[]).map((row) => row.video_url));
   return findLessonVideo(`${plan.title} ${plan.level.toUpperCase()}`, plan.skill, used, {
