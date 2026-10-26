@@ -1,9 +1,11 @@
 /**
  * Picks a YouTube lesson video that matches the lesson topic, lasts at most
  * 7 minutes and has closed captions. It searches YouTube with the captions
- * filter, ranks the results by relevance (rankVideoCandidates) and falls back
- * to a curated, hand-checked pool per skill. A video the owner approved in
- * Admin → Vídeos (lesson_videos) always wins over both (pickVideo).
+ * filter, ranks the results by relevance (rankVideoCandidates) and, from B1,
+ * falls back to a curated pool per skill. A1-A2 get no video rather than a
+ * pool one (owner review, 2026-10-26: the pool's B1-B2 videos reached A1
+ * lessons on other topics). A video the owner approved in Admin → Vídeos
+ * (lesson_videos) always wins over both (pickVideo).
  */
 import { rankVideoCandidates, type VideoCandidate } from "./lessonVideoRank";
 
@@ -25,7 +27,6 @@ export const fallbackPool: Record<string, LessonVideo[]> = {
     { url: "https://www.youtube.com/watch?v=tAdO5O1kSRE", seconds: 379 },
   ],
   reading: [
-    { url: "https://www.youtube.com/watch?v=xh8M_x57pa4", seconds: 270 },
     { url: "https://www.youtube.com/watch?v=LbO3lRXT0ww", seconds: 186 },
     { url: "https://www.youtube.com/watch?v=4swFGRhQoMI", seconds: 314 },
     { url: "https://www.youtube.com/watch?v=A419UZ5nD0w", seconds: 221 },
@@ -129,18 +130,22 @@ export async function findLessonVideo(
   skill: string,
   used: Set<string>,
   options: { objective?: string; level?: string } = {},
-): Promise<LessonVideo> {
+): Promise<LessonVideo | null> {
   const level = options.level ? options.level.toUpperCase() : "";
+  const beginner = level === "A1" || level === "A2";
   const objective = (options.objective ?? "").split(/[.,;]/)[0]?.trim() ?? "";
   const queries = [
-    `${topic} english lesson ${level}`.trim(),
+    `${topic} english lesson ${beginner ? "for beginners" : level}`.trim(),
     objective ? `learn english ${objective} lesson` : "",
     `${skill} english lesson ${topic}`,
   ].filter(Boolean);
 
+  let found = 0;
   for (const query of queries) {
     try {
-      const results = rankVideoCandidates(await searchYoutube(query), topic, options.level ?? "");
+      const raw = await searchYoutube(query);
+      found += raw.length;
+      const results = rankVideoCandidates(raw, topic, options.level ?? "");
       const fresh = results.find((v) => !used.has(`https://www.youtube.com/watch?v=${v.id}`));
       const pick = fresh ?? results[0];
       if (pick) return { url: `https://www.youtube.com/watch?v=${pick.id}`, seconds: pick.seconds };
@@ -149,6 +154,9 @@ export async function findLessonVideo(
     }
   }
 
+  // No result at all means YouTube refused the search, not that nothing fits.
+  if (found === 0) console.error("YouTube lesson video search returned no results");
+  if (beginner) return null;
   const pool = fallbackPool[skill] ?? fallbackPool["grammar"]!;
   const others = Object.entries(fallbackPool)
     .filter(([key]) => key !== skill)
