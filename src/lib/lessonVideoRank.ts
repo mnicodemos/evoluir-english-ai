@@ -81,6 +81,8 @@ const STOPWORDS = new Set([
   "hearing",
   "reading",
   "talking",
+  "talk",
+  "talks",
   "speaking",
   "writing",
   "describing",
@@ -146,12 +148,19 @@ export function isTrustedChannel(channel: string): boolean {
 }
 
 /**
- * A word matches its other forms through its root ("greetings" in "greeting",
- * "introductions" in "introduce"): long words keep about 60% of their letters.
+ * A word matches the start of a title word, so its other forms match too
+ * ("greetings" in "greeting", "introductions" in "introduce"): words of seven
+ * letters or more keep about 60% of them (at least six), shorter ones all of
+ * them, so "advert" no longer matches "adverbs" (owner review of A2,
+ * 2026-10-26: "Adverbs of Frequency" for "Reading a Job Advert"); a final y
+ * also matches "ies" ("family" in "families").
  */
 function mentions(title: string, word: string): boolean {
-  const stem = word.length > 5 ? word.slice(0, Math.max(5, Math.ceil(word.length * 0.6))) : word;
-  return title.includes(stem);
+  const stem = word.length >= 7 ? word.slice(0, Math.max(6, Math.ceil(word.length * 0.6))) : word;
+  const plural = word.endsWith("y") ? `${word.slice(0, -1)}ie` : null;
+  return title
+    .split(/[^a-z0-9']+/)
+    .some((part) => part.startsWith(stem) || (plural !== null && part.startsWith(plural)));
 }
 
 function isBeginnerLevel(level: string): boolean {

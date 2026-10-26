@@ -125,4 +125,39 @@ describe("lesson video ranking", () => {
       ),
     ).toBe(false);
   });
+
+  // Owner review of A2 (2026-10-26).
+  it("matches whole word starts, not pieces of other words", () => {
+    const pick = (title: string, topic: string, objective: string) =>
+      rankVideoCandidates(
+        [{ id: "aaaaaaaaaaa", seconds: 200, title, channel: "BBC Learning English" }],
+        topic,
+        "a2",
+        objective,
+      ).length === 1;
+    expect(
+      pick(
+        "Adverbs of Frequency – English Grammar Lessons",
+        "Reading a Job Advert A2",
+        "Understand duties and requirements in a short advert.",
+      ),
+    ).toBe(false);
+    expect(
+      pick(
+        "How to talk about your daily routine",
+        "Telling What You Did A2",
+        "Talk about last weekend with past simple verbs.",
+      ),
+    ).toBe(false);
+    expect(
+      pick(
+        "What did you do last weekend? English conversation",
+        "Telling What You Did A2",
+        "Talk about last weekend with past simple verbs.",
+      ),
+    ).toBe(true);
+    expect(
+      pick("Talking about families", "Talking About Your Family A1", "Describe your family."),
+    ).toBe(true);
+  });
 });
