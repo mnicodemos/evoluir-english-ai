@@ -2257,7 +2257,8 @@ const baseUiPt: Record<string, string> = {
     "Não foi possível preparar o podcast agora. Leia o resumo abaixo e continue a lição.",
   "Listen to EVO and Leo review these units before you practise.":
     "Ouça EVO e Leo revisarem estas unidades antes de praticar.",
-  "Tap a line to hear it again from there.": "Toque em uma fala para ouvi-la novamente a partir dali.",
+  "Tap a line to hear it again from there.":
+    "Toque em uma fala para ouvi-la novamente a partir dali.",
   "Listen to the podcast": "Ouvir o podcast",
   Episode: "Episódio",
   "Watch the video": "Assistir ao vídeo",
