@@ -188,7 +188,12 @@ export async function prefillLessonVideo(
 ): Promise<LessonVideo | null> {
   const topic = `${plan.title} ${plan.level.toUpperCase()}`;
   for (const query of lessonQueries(topic, plan.skill, plan.objective, plan.level).slice(0, 2)) {
-    const pick = rankVideoCandidates(await searchYoutubeApi(query, key), topic, plan.level)[0];
+    const pick = rankVideoCandidates(
+      await searchYoutubeApi(query, key),
+      topic,
+      plan.level,
+      plan.objective,
+    )[0];
     if (pick) return { url: `https://www.youtube.com/watch?v=${pick.id}`, seconds: pick.seconds };
   }
   return null;
@@ -216,7 +221,7 @@ export async function findLessonVideo(
     try {
       const raw = await searchYoutube(query);
       found += raw.length;
-      const results = rankVideoCandidates(raw, topic, options.level ?? "");
+      const results = rankVideoCandidates(raw, topic, options.level ?? "", options.objective ?? "");
       const fresh = results.find((v) => !used.has(`https://www.youtube.com/watch?v=${v.id}`));
       const pick = fresh ?? results[0];
       if (pick) return { url: `https://www.youtube.com/watch?v=${pick.id}`, seconds: pick.seconds };
