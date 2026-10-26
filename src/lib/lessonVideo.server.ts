@@ -1,13 +1,21 @@
 /**
  * Picks a YouTube lesson video that matches the lesson topic, lasts at most
- * 7 minutes and has closed captions. It searches YouTube with the captions
- * filter, ranks the results by relevance (rankVideoCandidates) and, from B1,
+ * 7 minutes and has closed captions. It searches YouTube through the official
+ * Data API when YOUTUBE_API_KEY is set (youtubeApi.ts), else the results page,
+ * with the captions filter, ranks the results by relevance (rankVideoCandidates) and, from B1,
  * falls back to a curated pool per skill. A1-A2 get no video rather than a
  * pool one (owner review, 2026-10-26: the pool's B1-B2 videos reached A1
  * lessons on other topics). A video the owner approved in Admin → Vídeos
  * (lesson_videos) always wins over both (pickVideo).
  */
 import { rankVideoCandidates, type VideoCandidate } from "./lessonVideoRank";
+import {
+  apiSearchUrl,
+  apiVideosUrl,
+  candidatesFromApi,
+  type ApiSearchResponse,
+  type ApiVideosResponse,
+} from "./youtubeApi";
 
 export type LessonVideo = { url: string; seconds: number };
 
@@ -19,6 +27,17 @@ const MIN_VIDEO_SECONDS = 90;
 const CC_FILTER = "EgIoAQ%3D%3D";
 
 /** Hand-checked videos with captions, used when the live search is unavailable. */
+/** Pool videos taken out after the owner's review (2026-10-26), still on older lessons. */
+const RETIRED_POOL_URLS = ["https://www.youtube.com/watch?v=xh8M_x57pa4"];
+
+/** Every pool URL, so a pool video is never reused as a lesson's found video. */
+export function isPoolVideo(url: string): boolean {
+  return (
+    RETIRED_POOL_URLS.includes(url) ||
+    Object.values(fallbackPool).some((list) => list.some((video) => video.url === url))
+  );
+}
+
 export const fallbackPool: Record<string, LessonVideo[]> = {
   listening: [
     { url: "https://www.youtube.com/watch?v=Y681hXWwhQY", seconds: 380 },
@@ -93,7 +112,33 @@ function collect(node: unknown, out: VideoCandidate[]): void {
   Object.values(obj).forEach((value) => collect(value, out));
 }
 
+/** Durations the lessons accept, for both search paths. */
+function fitsLesson(candidate: VideoCandidate): boolean {
+  return candidate.seconds >= MIN_VIDEO_SECONDS && candidate.seconds <= MAX_VIDEO_SECONDS;
+}
+
+/** The official search: one search (100 units) plus one durations read (1 unit). */
+async function searchYoutubeApi(query: string, key: string): Promise<VideoCandidate[]> {
+  const search = await fetch(apiSearchUrl(query, key));
+  if (!search.ok) {
+    // 403 quotaExceeded or a bad key: logged, so it shows in the Admin.
+    console.error(`YouTube Data API search failed: ${search.status}`);
+    return [];
+  }
+  const found = (await search.json()) as ApiSearchResponse;
+  const ids = (found.items ?? []).flatMap((item) => (item.id?.videoId ? [item.id.videoId] : []));
+  if (ids.length === 0) return [];
+  const details = await fetch(apiVideosUrl(ids, key));
+  if (!details.ok) {
+    console.error(`YouTube Data API videos failed: ${details.status}`);
+    return [];
+  }
+  return candidatesFromApi(found, (await details.json()) as ApiVideosResponse).filter(fitsLesson);
+}
+
 async function searchYoutube(query: string): Promise<VideoCandidate[]> {
+  const key = process.env["YOUTUBE_API_KEY"];
+  if (key) return searchYoutubeApi(query, key);
   const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=${CC_FILTER}`;
   const response = await fetch(url, {
     headers: {
