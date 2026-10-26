@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Copy, ExternalLink, Loader2, Search, Sparkles } from "lucide-react";
+import { Check, Copy, ExternalLink, Loader2, RotateCcw, Search, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -335,14 +335,18 @@ export function AdminLessonVideos() {
   const [filling, setFilling] = useState<string | null>(null);
   // Fixes a video for every lesson of the level that has none, a few lessons
   // per request (owner request, 2026-10-26: before the first student opens them).
-  const fillLevel = async () => {
+  const fillLevel = async (redo = false) => {
     const skip: string[] = [];
     let filled = 0;
     let lengths = 0;
     setFilling("Buscando…");
     try {
       for (;;) {
-        const result = await fill({ data: { level, skip } });
+        // "Refazer" clears the app's unapproved choices on the first call only.
+        const result = await fill({
+          data: { level, skip, redo: redo && filled === 0 && skip.length === 0 },
+        });
+        redo = false;
         filled += result.filled.length;
         lengths += result.lengthsFilled;
         skip.push(...result.notFound);
@@ -440,6 +444,26 @@ export function AdminLessonVideos() {
               )}
               {filling ?? "Buscar vídeos do nível"}
             </Button>
+            {autoKeys.length > 0 ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs"
+                disabled={filling !== null}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      `Refazer os ${autoKeys.length} vídeos escolhidos pelo app que você ainda não aprovou? Os aprovados por você ficam como estão.`,
+                    )
+                  )
+                    void fillLevel(true);
+                }}
+              >
+                <RotateCcw className="size-3.5" aria-hidden="true" />
+                Refazer escolhas do app
+              </Button>
+            ) : null}
             <Button
               type="button"
               size="sm"

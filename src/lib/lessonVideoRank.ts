@@ -63,7 +63,6 @@ const STOPWORDS = new Set([
   "from",
   "into",
   "unit",
-  "review",
   "that",
   "this",
   "them",
@@ -112,6 +111,11 @@ const STOPWORDS = new Set([
   "key",
   "clear",
   "clearly",
+  "basics",
+  "write",
+  "writes",
+  "vocabulary",
+  "grammar",
 ]);
 
 const LEVEL_WORDS: Record<string, string[]> = {
@@ -167,21 +171,25 @@ function isBeginnerLevel(level: string): boolean {
   return /^a[12]$/i.test(level.trim());
 }
 
-/** Never shown: made for teachers, or (A1-A2) off-topic or pitched above beginners. */
+/** Never shown: made for teachers, off-topic, or (A1-A2) pitched above beginners. */
 export function unsuitableVideo(
   candidate: VideoCandidate,
   keywords: string[],
   level: string,
+  minHits = keywords.length >= 3 ? 2 : 1,
 ): boolean {
   const title = normalize(candidate.title);
   const channel = normalize(candidate.channel).trim();
   if (TEACHER_CHANNELS.some((name) => channel.startsWith(name)) || TEACHER_TITLE.test(title))
     return true;
-  if (!isBeginnerLevel(level)) return false;
-  // A trusted channel is not enough for a beginner: the lesson's topic must be
-  // in the title (owner review of A1: "The benefits of doing nothing" for greetings).
-  if (keywords.length > 0 && !keywords.some((word) => mentions(title, word))) return true;
-  return ABOVE_BEGINNER_TITLE.test(title);
+  // A trusted channel is never enough: the lesson's topic must be in the title
+  // (owner reviews of A1 and B1, 2026-10-26: "The benefits of doing nothing"
+  // for greetings, natural conversations, a podcast story and a discussion),
+  // two of its words when the topic has three or more ("Modals of Advice and
+  // Deduction" is not "Present Modals of Ability").
+  const hits = keywords.filter((word) => mentions(title, word)).length;
+  if (keywords.length > 0 && hits < minHits) return true;
+  return isBeginnerLevel(level) && ABOVE_BEGINNER_TITLE.test(title);
 }
 
 export function scoreVideo(
@@ -217,8 +225,10 @@ export function rankVideoCandidates(
   objective = "",
 ): VideoCandidate[] {
   const keywords = lessonKeywords(topic, objective);
+  // Words taken from the objective (a generic title) only need one match.
+  const minHits = topicKeywords(topic).length >= 3 ? 2 : 1;
   return results
-    .filter((candidate) => !unsuitableVideo(candidate, keywords, level))
+    .filter((candidate) => !unsuitableVideo(candidate, keywords, level, minHits))
     .map((candidate, rank) => ({ candidate, score: scoreVideo(candidate, rank, keywords, level) }))
     .filter((entry) => entry.score > -5)
     .sort((a, b) => b.score - a.score)

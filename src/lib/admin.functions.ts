@@ -856,6 +856,44 @@ type LessonVideosTable = {
   };
 };
 
+/**
+ * "Refazer escolhas do app" (owner review of B1, 2026-10-26: the old rule let
+ * off-topic videos of trusted channels in): the level's videos the app chose
+ * and the owner has not approved are taken off, from lesson_videos and from
+ * the lessons showing them, so the next search picks again under the current
+ * rules. Videos the owner approved or pasted are never touched.
+ */
+async function clearAutoLessonVideos(
+  supabaseAdmin: typeof import("@/integrations/supabase/client.server").supabaseAdmin,
+  rows: { curriculum_key: string; video_url: string; approved_by: string | null }[],
+) {
+  for (const row of rows.filter((item) => item.approved_by === null)) {
+    await (
+      supabaseAdmin as unknown as {
+        from: (table: string) => {
+          delete: () => {
+            eq: (
+              column: string,
+              value: string,
+            ) => {
+              is: (column: string, value: null) => Promise<{ error: { message: string } | null }>;
+            };
+          };
+        };
+      }
+    )
+      .from("lesson_videos")
+      .delete()
+      .eq("curriculum_key", row.curriculum_key)
+      .is("approved_by", null);
+    await supabaseAdmin
+      .from("lessons")
+      .update({ video_url: null, video_duration_seconds: 0 })
+      .eq("curriculum_key", row.curriculum_key)
+      .eq("video_url", row.video_url);
+  }
+}
+
 const lessonVideoLevel = z.enum(["a1", "a2", "b1", "b2", "c1", "c2", "business"]);
 
 /**
@@ -980,7 +1018,13 @@ const FILL_BATCH = 6;
 export const fillLessonVideos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z.object({ level: lessonVideoLevel, skip: z.array(z.string().max(40)).max(60) }).parse(data),
+    z
+      .object({
+        level: lessonVideoLevel,
+        skip: z.array(z.string().max(40)).max(60),
+        redo: z.boolean().optional(),
+      })
+      .parse(data),
   )
   .handler(async ({ context, data }) => {
     if (!(await hasAdminRole(context.supabase, context.userId))) {
@@ -1001,8 +1045,13 @@ export const fillLessonVideos = createServerFn({ method: "POST" })
         plans.map((plan) => plan.key),
       );
     if (error) throw new Error("A migração 0081_lesson_videos ainda não foi aplicada.");
+    let fixedRows = fixed ?? [];
+    if (data.redo) {
+      await clearAutoLessonVideos(supabaseAdmin, fixedRows);
+      fixedRows = fixedRows.filter((row) => row.approved_by !== null);
+    }
     // Fixed videos without a length (pasted without mm:ss) get it from YouTube.
-    const noLength = (fixed ?? []).filter((row) => !row.video_seconds);
+    const noLength = fixedRows.filter((row) => !row.video_seconds);
     let lengthsFilled = 0;
     if (noLength.length > 0) {
       const { fetchVideoDurations } = await import("@/lib/lessonVideo.server");
@@ -1028,7 +1077,7 @@ export const fillLessonVideos = createServerFn({ method: "POST" })
         lengthsFilled += 1;
       }
     }
-    const done = new Set((fixed ?? []).map((row) => row.curriculum_key));
+    const done = new Set(fixedRows.map((row) => row.curriculum_key));
     const todo = plans.filter((plan) => !done.has(plan.key));
 
     const filled: string[] = [];
