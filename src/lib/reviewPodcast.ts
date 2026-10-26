@@ -63,8 +63,7 @@ export function reviewOutline(plan: CurriculumLesson): string {
   return getCurriculum(plan.level)
     .filter((lesson) => plan.reviewUnits.includes(lesson.unit) && lesson.unit <= 5)
     .map((lesson) => `- ${lesson.unitTitle} · ${lesson.title}: ${lesson.objective}`)
-    .join("
-");
+    .join("\n");
 }
 
 /** The request for one review lesson's script (deterministic, so it is shared). */
@@ -111,8 +110,7 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
   const unitOutline = getCurriculum(plan.level)
     .filter((lesson) => lesson.unit === plan.unit && lesson.reviewUnits.length === 0)
     .map((lesson) => `- ${lesson.title} (${lesson.skill}): ${lesson.objective}`)
-    .join("
-");
+    .join("\n");
 
   return [
     {
