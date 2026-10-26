@@ -103,7 +103,12 @@ export function lessonVideoListText(
   items: LessonVideoReportItem[],
   infoOf: (id: string) => VideoInfo,
 ): string {
-  const lines = [`Vídeos das lições · nível ${level.toUpperCase()}`, ""];
+  const lines = [
+    level === "business"
+      ? "Vídeos das lições · Business English"
+      : `Vídeos das lições · nível ${level.toUpperCase()}`,
+    "",
+  ];
   for (const item of items) {
     lines.push(`U${item.unit} L${item.position} · ${item.title} (${item.skill}) [${item.key}]`);
     lines.push(`  Objetivo: ${item.objective}`);

@@ -856,7 +856,21 @@ type LessonVideosTable = {
   };
 };
 
-const lessonVideoLevel = z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]);
+const lessonVideoLevel = z.enum(["a1", "a2", "b1", "b2", "c1", "c2", "business"]);
+
+/**
+ * The lessons of one Admin → Vídeos tab: a CEFR level, or the Business
+ * English track (owner request, 2026-10-26), whose keys ("biz-u1-l1") are the
+ * same at every level, so one video serves B1 to C2.
+ */
+async function videoTabLessons(level: z.infer<typeof lessonVideoLevel>) {
+  if (level === "business") {
+    const { getBusinessCourse } = await import("@/lib/businessCourse");
+    return getBusinessCourse("b1");
+  }
+  const { getCurriculum } = await import("@/lib/curriculum");
+  return getCurriculum(level);
+}
 
 export const getLessonVideos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -866,9 +880,8 @@ export const getLessonVideos = createServerFn({ method: "GET" })
       throw new Error("Forbidden");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getCurriculum } = await import("@/lib/curriculum");
     const { lessonVideoReport } = await import("@/lib/lessonVideoReport");
-    const curriculum = getCurriculum(data.level);
+    const curriculum = await videoTabLessons(data.level);
     const keys = curriculum.map((plan) => plan.key);
 
     // Every student's copy of these lessons, page by page (1,000 rows a request).
@@ -918,8 +931,11 @@ export const setLessonVideo = createServerFn({ method: "POST" })
       throw new Error("Forbidden");
     }
     const { findCurriculumLesson } = await import("@/lib/curriculum");
+    const { findBusinessLesson } = await import("@/lib/businessCourse");
     const { canonicalYoutubeUrl } = await import("@/lib/lessonVideoReport");
-    if (!findCurriculumLesson(data.key)) throw new Error("Unknown lesson");
+    if (!findCurriculumLesson(data.key) && !findBusinessLesson(data.key, "b1")) {
+      throw new Error("Unknown lesson");
+    }
     const url = canonicalYoutubeUrl(data.url);
     if (!url) throw new Error("Paste a YouTube link");
     // No mm:ss typed: the length comes from YouTube when the key is set.
@@ -973,9 +989,8 @@ export const fillLessonVideos = createServerFn({ method: "POST" })
     const key = process.env["YOUTUBE_API_KEY"];
     if (!key) throw new Error("Falta o segredo YOUTUBE_API_KEY no Lovable.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getCurriculum } = await import("@/lib/curriculum");
     const { prefillLessonVideo, YoutubeApiError } = await import("@/lib/lessonVideo.server");
-    const plans = getCurriculum(data.level).filter(
+    const plans = (await videoTabLessons(data.level)).filter(
       (plan) => plan.reviewUnits.length === 0 && !data.skip.includes(plan.key),
     );
     const { data: fixed, error } = await (supabaseAdmin as unknown as LessonVideosTable)
