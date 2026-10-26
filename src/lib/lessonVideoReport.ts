@@ -16,6 +16,8 @@ export type ApprovedVideoRow = {
   curriculum_key: string;
   video_url: string;
   video_seconds: number | null;
+  /** Null when the app chose it ("Buscar vídeos do nível"), not the owner. */
+  approved_by?: string | null;
 };
 
 export type LessonVideoReportItem = {
@@ -26,7 +28,7 @@ export type LessonVideoReportItem = {
   title: string;
   objective: string;
   skill: string;
-  approved: { url: string; id: string; seconds: number | null } | null;
+  approved: { url: string; id: string; seconds: number | null; auto: boolean } | null;
   used: { url: string; id: string; seconds: number | null; lessons: number }[];
 };
 
@@ -65,7 +67,12 @@ export function lessonVideoReport(
       skill: plan.skill,
       approved:
         mine && approvedId
-          ? { url: mine.video_url, id: approvedId, seconds: mine.video_seconds }
+          ? {
+              url: mine.video_url,
+              id: approvedId,
+              seconds: mine.video_seconds,
+              auto: mine.approved_by === null,
+            }
           : null,
       used: [...counts.values()].sort((a, b) => b.lessons - a.lessons),
     };
@@ -101,7 +108,9 @@ export function lessonVideoListText(
     lines.push(`U${item.unit} L${item.position} · ${item.title} (${item.skill}) [${item.key}]`);
     lines.push(`  Objetivo: ${item.objective}`);
     const videos = [
-      ...(item.approved ? [{ ...item.approved, note: "aprovado" }] : []),
+      ...(item.approved
+        ? [{ ...item.approved, note: item.approved.auto ? "escolhido pelo app" : "aprovado" }]
+        : []),
       ...item.used
         .filter((video) => video.id !== item.approved?.id)
         .map((video) => ({

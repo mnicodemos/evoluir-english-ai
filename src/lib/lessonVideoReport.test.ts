@@ -73,6 +73,7 @@ describe("lesson video list text", () => {
       url: "https://www.youtube.com/watch?v=AAAAAAAAAAA",
       id: "AAAAAAAAAAA",
       seconds: 270,
+      auto: false,
     },
     used: [
       {
@@ -106,5 +107,25 @@ describe("lesson video list text", () => {
   it("says when a lesson has no video yet", () => {
     const text = lessonVideoListText("b2", [{ ...item, approved: null, used: [] }], () => null);
     expect(text).toContain("(nenhum vídeo ainda)");
+  });
+});
+
+describe("videos chosen by the app", () => {
+  it("tells the app's choice from the owner's approval", () => {
+    const [plan] = getCurriculum("a1");
+    const report = lessonVideoReport(
+      [plan!],
+      [
+        {
+          curriculum_key: plan!.key,
+          video_url: "https://www.youtube.com/watch?v=AAAAAAAAAAA",
+          video_seconds: 200,
+          approved_by: null,
+        },
+      ],
+      [],
+    );
+    expect(report[0]!.approved?.auto).toBe(true);
+    expect(lessonVideoListText("a1", report, () => null)).toContain("escolhido pelo app");
   });
 });
