@@ -56,7 +56,8 @@ export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
       { title: "Lesson - Evoluir+ English AI" },
       {
         name: "description",
-        content: "Listen to the lesson dialogue, review the flashcards and take the quiz of this lesson.",
+        content:
+          "Listen to the lesson dialogue, review the flashcards and take the quiz of this lesson.",
       },
       { property: "og:title", content: "Lesson - Evoluir+ English AI" },
       {
