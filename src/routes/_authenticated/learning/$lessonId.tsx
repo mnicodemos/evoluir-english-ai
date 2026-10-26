@@ -355,27 +355,27 @@ function LessonPage() {
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="relative z-10 grid h-auto min-h-12 w-full grid-cols-4 gap-1 p-1 sm:gap-2">
             <TabsTrigger
               value="audio"
               aria-label={t("Lesson audio")}
-              className="gap-1.5"
+              className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <Headphones className="size-4" />{" "}
               <span className="hidden sm:inline">{t("Lesson audio")}</span>
             </TabsTrigger>
-            <TabsTrigger value="summary" aria-label="Summary" className="gap-1.5">
+            <TabsTrigger value="summary" aria-label="Summary" className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm">
               <BookOpen className="size-4" /> <span className="hidden sm:inline">Summary</span>
             </TabsTrigger>
-            <TabsTrigger value="flashcards" aria-label="Flashcards" className="gap-1.5">
+            <TabsTrigger value="flashcards" aria-label="Flashcards" className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm">
               <Layers className="size-4" /> <span className="hidden sm:inline">Flashcards</span>
             </TabsTrigger>
-            <TabsTrigger value="quiz" aria-label="Quiz" className="gap-1.5">
+            <TabsTrigger value="quiz" aria-label="Quiz" className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm">
               <ListChecks className="size-4" /> <span className="hidden sm:inline">Quiz</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="audio" className="mt-5 space-y-4">
+          <TabsContent value="audio" className="relative z-0 mt-5 space-y-4">
             {podcast ? (
               <>
                 <div>
@@ -437,7 +437,7 @@ function LessonPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="summary" className="mt-5">
+          <TabsContent value="summary" className="relative z-0 mt-5">
             <div className="card-soft space-y-5 p-6">
               <div>
                 <h2 className="font-display text-lg font-semibold">
@@ -466,7 +466,7 @@ function LessonPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="flashcards" className="mt-5">
+          <TabsContent value="flashcards" className="relative z-0 mt-5">
             <FlashcardDeck
               cards={data.flashcards}
               userId={profile?.id}
@@ -483,7 +483,7 @@ function LessonPage() {
             />
           </TabsContent>
 
-          <TabsContent value="quiz" className="mt-5">
+          <TabsContent value="quiz" className="relative z-0 mt-5">
             {needsQuizRepair ? (
               <div className="card-soft space-y-3 p-6 text-sm text-muted-foreground">
                 <p>
