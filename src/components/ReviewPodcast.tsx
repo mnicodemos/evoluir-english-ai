@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { listeningLevelConfig } from "@/lib/listeningLevels";
-import { loadReviewPodcast } from "@/lib/reviewPodcast.functions";
+import { loadLessonPodcast } from "@/lib/reviewPodcast.functions";
 import { PODCAST_SPEAKERS } from "@/lib/reviewPodcast";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
 import { cn } from "@/lib/utils";
@@ -23,18 +23,20 @@ const SPEAKER_TONE = {
  * Listening to the end counts as the lesson's video step; while it plays the
  * activity clock keeps running (data-media-playing).
  */
-export function ReviewPodcast({
+export function LessonPodcast({
   lessonId,
   level,
   progress,
   onProgress,
+  t,
 }: {
   lessonId: string;
   level: string;
   progress: number;
   onProgress: (percent: number) => void;
+  t: (text: string) => string;
 }) {
-  const load = useServerFn(loadReviewPodcast);
+  const load = useServerFn(loadLessonPodcast);
   const query = useQuery({
     queryKey: ["review-podcast", lessonId],
     queryFn: () => load({ data: { lessonId } }),
@@ -111,7 +113,7 @@ export function ReviewPodcast({
     return (
       <div className="card-soft flex flex-col items-center gap-3 p-8 text-center">
         <Loader2 className="size-6 animate-spin text-brand-green" aria-hidden="true" />
-        <p className="text-sm text-muted-foreground">EVO and Leo are recording your episode…</p>
+        <p className="text-sm text-muted-foreground">{t("EVO and Leo are preparing your lesson audio…")}</p>
       </div>
     );
   }
@@ -121,15 +123,14 @@ export function ReviewPodcast({
       <div className="card-soft flex flex-col items-center gap-3 p-8 text-center">
         <Headphones className="size-6 text-muted-foreground" aria-hidden="true" />
         <p className="text-sm text-muted-foreground">
-          The podcast could not be prepared right now. Read the summary below and continue the
-          lesson.
+          {t("The lesson audio could not be prepared right now. Read the summary below and continue the lesson.")}
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Button size="sm" variant="secondary" onClick={() => void query.refetch()}>
-            <RotateCcw className="size-4" aria-hidden="true" /> Try again
+            <RotateCcw className="size-4" aria-hidden="true" /> {t("Try again")}
           </Button>
           <Button size="sm" variant="ghost" onClick={() => onProgress(100)}>
-            Mark this part as done
+            {t("Mark this part as done")}
           </Button>
         </div>
       </div>
@@ -149,7 +150,7 @@ export function ReviewPodcast({
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
-            Episode
+            {t("Lesson audio")}
           </p>
           <p className="truncate font-display text-base font-semibold" translate="no">
             {query.data.title}
@@ -163,11 +164,11 @@ export function ReviewPodcast({
             aria-pressed={showPt}
           >
             <Languages className="size-4" aria-hidden="true" />
-            {showPt ? "Hide translation" : "Show translation"}
+            {showPt ? t("Hide translation") : t("Show translation")}
           </Button>
           {playing ? (
             <Button size="sm" onClick={pause}>
-              <Pause className="size-4" aria-hidden="true" /> Pause
+              <Pause className="size-4" aria-hidden="true" /> {t("Pause")}
             </Button>
           ) : (
             <Button
@@ -179,7 +180,7 @@ export function ReviewPodcast({
               ) : (
                 <Play className="size-4" aria-hidden="true" />
               )}
-              {done ? "Listen again" : current > 0 ? "Continue" : "Play episode"}
+              {done ? t("Listen again") : current > 0 ? t("Continue") : t("Play audio")}
             </Button>
           )}
         </div>
