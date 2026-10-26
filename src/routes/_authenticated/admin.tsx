@@ -12,6 +12,7 @@ import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminAlerts } from "@/components/AdminAlerts";
 import { AdminCreditBalance } from "@/components/AdminCreditBalance";
 import { AdminLessonVideos } from "@/components/AdminLessonVideos";
+import { AdminPodcasts } from "@/components/AdminPodcasts";
 import { AdminGoals } from "@/components/AdminGoals";
 import { AdminMistakeReview } from "@/components/AdminMistakeReview";
 import { AdminRetention } from "@/components/AdminRetention";
@@ -118,7 +119,7 @@ function AdminPage() {
           <AdminCreditBalance />
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-4 gap-1 sm:grid-cols-7">
+            <TabsList className="grid h-auto w-full grid-cols-4 gap-1 sm:grid-cols-8">
               <TabsTrigger
                 value="users"
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
@@ -155,6 +156,12 @@ function AdminPage() {
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
               >
                 {t("Videos")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="podcasts"
+                className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
+              >
+                {t("Podcasts")}
               </TabsTrigger>
             </TabsList>
 
@@ -236,6 +243,9 @@ function AdminPage() {
             </TabsContent>
             <TabsContent value="videos">
               <AdminLessonVideos />
+            </TabsContent>
+            <TabsContent value="podcasts">
+              <AdminPodcasts />
             </TabsContent>
           </Tabs>
         </section>
