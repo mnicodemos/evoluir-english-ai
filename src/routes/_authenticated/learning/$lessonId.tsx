@@ -389,30 +389,32 @@ function LessonPage() {
 
           <TabsContent value="audio" className="relative z-0 mt-5 space-y-4">
             {podcast ? (
-              <>
-                <div>
-                  <h2 className="font-display text-lg font-semibold">{t("Lesson audio")}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {t("Listen to EVO and LEO explore this lesson before you practise.")}
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2 md:gap-8">
                 <img
                   src="/study-books/1793031809285.jpg"
                   alt="EVO and Leo"
-                  className="mx-auto h-auto w-full max-w-3xl rounded-xl object-contain"
+                  className="mx-auto h-auto w-full rounded-xl object-contain"
                   loading="lazy"
                 />
-                <LessonPodcast
-                  lessonId={lessonId}
-                  level={lesson.level}
-                  progress={progress}
-                  onProgress={handleProgress}
-                  t={t}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t("Tap a line to hear it again from there.")}
-                </p>
-              </>
+                <div className="min-w-0 space-y-4">
+                  <div>
+                    <h2 className="font-display text-lg font-semibold">{t("Lesson audio")}</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {t("Listen to EVO and LEO explore this lesson before you practise.")}
+                    </p>
+                  </div>
+                  <LessonPodcast
+                    lessonId={lessonId}
+                    level={lesson.level}
+                    progress={progress}
+                    onProgress={handleProgress}
+                    t={t}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t("Tap a line to hear it again from there.")}
+                  </p>
+                </div>
+              </div>
             ) : (
               <>
                 <div>
