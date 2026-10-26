@@ -203,13 +203,35 @@ export function sentencesFromText(text: string, config: ListeningLevelConfig) {
  * of the same level are added, and the rotation offset keeps recent practice
  * from repeating the same sentences.
  */
+/** Sentences of the newest lesson that open each session (owner report, 2026-10-26). */
+export const RECENT_LESSON_SENTENCES = 3;
+
 export function pickListeningSentences(options: {
   config: ListeningLevelConfig;
   lessonSentences?: string[];
+  /**
+   * Sentences of the lesson the student opened last: up to three of them open
+   * the session, so a new lesson is heard in the next Listening (owner report,
+   * 2026-10-26: its sentences sat at the end of a pool of about 60 and almost
+   * never came up).
+   */
+  recentSentences?: string[];
   rotation?: number;
   count?: number;
 }): string[] {
-  const { config, lessonSentences = [], rotation = 0, count = 3 } = options;
+  const { config, lessonSentences = [], recentSentences = [], rotation = 0, count = 3 } = options;
+  const recent = [...new Set(recentSentences.filter((sentence) => fitsLevel(sentence, config)))]
+    .slice(0, Math.min(RECENT_LESSON_SENTENCES, count))
+    .filter(Boolean);
+  if (recent.length > 0) {
+    const rest = pickListeningSentences({
+      config,
+      lessonSentences: lessonSentences.filter((sentence) => !recent.includes(sentence)),
+      rotation,
+      count: count + recent.length,
+    }).filter((sentence) => !recent.includes(sentence));
+    return [...recent, ...rest].slice(0, count);
+  }
   const fitting = [
     ...new Set(
       [...config.sentences, ...lessonSentences].filter((sentence) => fitsLevel(sentence, config)),

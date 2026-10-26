@@ -104,3 +104,34 @@ describe("listening drills per level", () => {
     }
   });
 });
+
+describe("the lesson opened last", () => {
+  it("opens the session with its sentences, then the usual rotation", () => {
+    const config = listeningLevelConfig("a1");
+    const recent = [
+      "I like my new teacher.",
+      "We read a short story.",
+      "The class starts at eight.",
+    ];
+    const session = pickListeningSentences({
+      config,
+      recentSentences: recent,
+      rotation: 4,
+      count: 9,
+    });
+    expect(session.slice(0, 3)).toEqual(recent);
+    expect(session).toHaveLength(9);
+    expect(new Set(session).size).toBe(9);
+  });
+
+  it("skips its sentences that do not fit the level", () => {
+    const config = listeningLevelConfig("a1");
+    const session = pickListeningSentences({
+      config,
+      recentSentences: ["This sentence is much too long for a beginner to repeat."],
+      count: 9,
+    });
+    expect(session).not.toContain("This sentence is much too long for a beginner to repeat.");
+    expect(session).toHaveLength(9);
+  });
+});
