@@ -87,8 +87,6 @@ const baseUiPt: Record<string, string> = {
   "Lesson audio": "Áudio da lição",
   "Listen to EVO and Leo explore this lesson before you practise.":
     "Ouça EVO e Leo explorarem esta lição antes de praticar.",
-  "Tap a line to hear it again from there.":
-    "Toque em uma fala para ouvi-la novamente a partir dali.",
   "Listen to the lesson audio": "Ouvir o áudio da lição",
   "You did everything else — only the audio is left.":
     "Você já fez o resto — só falta ouvir o áudio.",
@@ -2259,7 +2257,7 @@ const baseUiPt: Record<string, string> = {
     "Não foi possível preparar o podcast agora. Leia o resumo abaixo e continue a lição.",
   "Listen to EVO and Leo review these units before you practise.":
     "Ouça EVO e Leo revisarem estas unidades antes de praticar.",
-  "Tap a line to hear it again from there.": "Toque em uma fala para ouvir de novo a partir dela.",
+  "Tap a line to hear it again from there.": "Toque em uma fala para ouvi-la novamente a partir dali.",
   "Listen to the podcast": "Ouvir o podcast",
   Episode: "Episódio",
   "Watch the video": "Assistir ao vídeo",
