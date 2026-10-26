@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-import { findCurriculumLesson } from "./curriculum";
+import { findCurriculumLesson } from "./curriculum";\nimport { findBusinessLesson, isBusinessKey } from "./businessCourse";
 import {
   hasLessonPodcast,
   lessonPodcastMessages,
@@ -57,11 +57,11 @@ export const loadLessonPodcast = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<ReviewPodcast | null> => {
     const { data: lesson } = await context.supabase
       .from("lessons")
-      .select("curriculum_key")
+      .select("curriculum_key, level")
       .eq("id", data.lessonId)
       .maybeSingle();
     const key = (lesson as { curriculum_key?: string | null } | null)?.curriculum_key;
-    const plan = key ? findCurriculumLesson(key) : null;
+    const plan = key\n      ? isBusinessKey(key)\n        ? findBusinessLesson(key, (lesson as { level?: string | null } | null)?.level ?? "b1")\n        : findCurriculumLesson(key)\n      : null;
     if (!plan || !hasLessonPodcast(plan)) return null;
 
     const { hashAiRequest } = await import("./ai-usage.server");
