@@ -89,3 +89,33 @@ export const loadLessonPodcast = createServerFn({ method: "POST" })
     await saveSharedPodcast(plan.key, promptHash, podcast);
     return podcast;
   });
+
+
+/** Admin-only export of podcast scripts already persisted in shared lesson templates. */
+export const listAdminPodcastScripts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (roleError || isAdmin !== true) throw new Error("Forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("lesson_content_templates")
+      .select("curriculum_key, prompt_hash, content, created_at")
+      .like("prompt_hash", "podcast-v1:%")
+      .order("curriculum_key", { ascending: true });
+    if (error) throw error;
+
+    return (data ?? []).flatMap((row) => {
+      const parsed = podcastSchema.safeParse(row.content);
+      if (!parsed.success) return [];
+      return [{
+        curriculumKey: row.curriculum_key,
+        createdAt: row.created_at,
+        podcast: parsed.data,
+      }];
+    });
+  });
