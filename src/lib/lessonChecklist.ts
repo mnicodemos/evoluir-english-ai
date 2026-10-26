@@ -8,6 +8,8 @@
 
 export type LessonChecklistInput = {
   hasVideo: boolean;
+  /** The review lessons have EVO and Leo's podcast in the video's place. */
+  podcast?: boolean;
   videoWatched: boolean;
   cardsTotal: number;
   cardsReviewed: number;
@@ -28,7 +30,9 @@ export function flashcardsDone(total: number, reviewed: number) {
 
 export function lessonChecklist(input: LessonChecklistInput) {
   const items: LessonChecklistItem[] = [
-    { id: "video", label: "Watch the video", done: !input.hasVideo || input.videoWatched },
+    input.podcast
+      ? { id: "video", label: "Listen to the podcast", done: input.videoWatched }
+      : { id: "video", label: "Watch the video", done: !input.hasVideo || input.videoWatched },
     {
       id: "flashcards",
       label: "Review the flashcards",

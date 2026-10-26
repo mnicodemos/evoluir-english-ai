@@ -2234,6 +2234,21 @@ const baseUiPt: Record<string, string> = {
     "Não foi possível gerar o código de conexão. Tente novamente.",
   "WhatsApp account linking is prepared, but English practice through WhatsApp is not active yet.":
     "A vinculação da conta ao WhatsApp está preparada, mas a prática de inglês pelo WhatsApp ainda não está ativa.",
+  // Review podcast (owner request, 2026-10-26).
+  Podcast: "Podcast",
+  "Review podcast": "Podcast de revisão",
+  "Listen again": "Ouvir de novo",
+  "Play episode": "Ouvir episódio",
+  "EVO and Leo are recording your episode…": "EVO e Leo estão gravando o seu episódio…",
+  "The podcast could not be prepared right now. Read the summary below and continue the lesson.":
+    "Não foi possível preparar o podcast agora. Leia o resumo abaixo e continue a lição.",
+  "Listen to EVO and Leo review these units before you practise.":
+    "Ouça EVO e Leo revisarem estas unidades antes de praticar.",
+  "Tap a line to hear it again from there.": "Toque em uma fala para ouvir de novo a partir dela.",
+  "Listen to the podcast": "Ouvir o podcast",
+  Episode: "Episódio",
+  "Watch the video": "Assistir ao vídeo",
+  "Pass the quiz (70%)": "Passar no quiz (70%)",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.

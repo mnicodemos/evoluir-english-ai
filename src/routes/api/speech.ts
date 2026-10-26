@@ -17,13 +17,15 @@ import { ttsCacheKey } from "@/lib/ttsCacheKey";
 const requestSchema = z.object({
   text: z.string().trim().min(1).max(500),
   cacheable: z.boolean().default(false),
+  /** "host" is Leo, EVO's co-host in the review podcasts (owner request, 2026-10-26). */
+  voice: z.enum(["evo", "host"]).default("evo"),
 });
 
 // The Lovable audio gateway needs workspace credits; this project has its own
 // Google Gemini key connected, so speech is generated there instead.
 const GEMINI_TTS_MODEL = "gemini-2.5-flash-preview-tts";
 
-const GEMINI_VOICE = "Kore";
+const GEMINI_VOICES = { evo: "Kore", host: "Puck" } as const;
 
 const TTS_PROMPT_PREFIX = "Say clearly and naturally in English for a Brazilian learner:";
 
@@ -63,11 +65,12 @@ export const Route = createFileRoute("/api/speech")({
         }
 
         const prompt = `${TTS_PROMPT_PREFIX} ${parsed.data.text}`;
+        const voiceName = GEMINI_VOICES[parsed.data.voice];
         // Shared cache only for audio the client already marks as reusable.
         const cacheKey = parsed.data.cacheable
           ? await ttsCacheKey({
               text: parsed.data.text,
-              voice: GEMINI_VOICE,
+              voice: voiceName,
               model: GEMINI_TTS_MODEL,
               prompt: TTS_PROMPT_PREFIX,
             })
@@ -115,7 +118,7 @@ export const Route = createFileRoute("/api/speech")({
           ],
           generationConfig: {
             responseModalities: ["AUDIO"],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: GEMINI_VOICE } } },
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
           },
         });
 
