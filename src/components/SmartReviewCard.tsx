@@ -258,11 +258,7 @@ export function SmartReviewCard({
         >
           {showWordReviews && (
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
-              <img
-                src={reviewWords}
-                alt=""
-                className="h-full min-h-0 w-16 rounded-md object-cover"
-              />
+              <img src={reviewWords} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
                 <p className="truncate text-sm font-semibold">
@@ -271,7 +267,7 @@ export function SmartReviewCard({
                     : t("Review {n} words").replace("{n}", String(reviewCount))}
                 </p>
                 <p
-                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
                 >
                   {t("Their review date has arrived: a quick review keeps them in memory.")}
                 </p>
@@ -290,11 +286,7 @@ export function SmartReviewCard({
           )}
           {showMistakes && (
             <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-warning/35 bg-warning/[0.07] p-1 pr-2">
-              <img
-                src={reviewMistakes}
-                alt=""
-                className="h-full min-h-0 w-16 rounded-md object-cover"
-              />
+              <img src={reviewMistakes} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("My mistakes")} />
                 <p className="truncate text-sm font-semibold">
@@ -303,7 +295,7 @@ export function SmartReviewCard({
                     : t("Review {n} mistakes").replace("{n}", String(mistakesDue))}
                 </p>
                 <p
-                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
                 >
                   {t("Fix them now so they do not become habits.")}
                 </p>
@@ -331,7 +323,7 @@ export function SmartReviewCard({
                   <img
                     src={SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO]}
                     alt=""
-                    className="h-full min-h-0 w-16 rounded-md object-cover"
+                    className={ROW_PHOTO}
                   />
                 ) : (
                   // Skills without their own photo get their icon, so one skill
@@ -348,7 +340,7 @@ export function SmartReviewCard({
                   />
                   <p className="truncate text-sm font-semibold">{t(item.resource.title)}</p>
                   <p
-                    className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                    className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
                   >
                     {t(SMART_REVIEW_REASON_TEXT[item.category])}
                   </p>
@@ -381,17 +373,13 @@ export function SmartReviewCard({
               key={row.key}
               className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
             >
-              <img
-                src={SKILL_PHOTO[row.key]}
-                alt=""
-                className="h-full min-h-0 w-16 rounded-md object-cover"
-              />
+              <img src={SKILL_PHOTO[row.key]} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 {/* "New today", never a review: the same item the bell lists. */}
                 <RowTag kind="new" label={t("New today")} />
                 <p className="truncate text-sm font-semibold">{t(row.title)}</p>
                 <p
-                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
                 >
                   {t(row.line)}
                 </p>
@@ -418,7 +406,7 @@ export function SmartReviewCard({
                 <RowTag kind="continue" label={t("Keep going")} />
                 <p className="truncate text-sm font-semibold">{t(row.title)}</p>
                 <p
-                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? "line-clamp-1" : "line-clamp-2"}`}
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
                 >
                   {t(row.line)}
                 </p>
@@ -572,6 +560,21 @@ function RowTag({
 }
 
 /** Photo of a "Keep going" row: EVO's conversation, the teacher, reading, a lesson. */
+/**
+ * A row's photo follows the row's text instead of setting its height (audit,
+ * 2026-10-26: each 64 px square photo made the three rows 74 px tall, which
+ * pushed the Dashboard past one screen): no height of its own while the row is
+ * sized (h-0), then the row's full height (min-h-full, self-stretch).
+ */
+const ROW_PHOTO = "h-0 min-h-full w-16 self-stretch rounded-md object-cover";
+
+/**
+ * With three rows, each row's note keeps one line, and on desktop screens up
+ * to 62rem tall (where the Dashboard's gaps also tighten) it leaves, so the
+ * card is no taller than Your English Skills beside it (audit, 2026-10-26).
+ */
+const ROW_NOTE_TIGHT = "line-clamp-1 [@media(min-width:80rem)_and_(max-height:62rem)]:hidden";
+
 function ContinueTile({ rowKey }: { rowKey: "coach" | "teacher" | "reading" | "learning" }) {
   // Every row has its photo; the next lesson took the owner's "Lessons
   // learned" photo (user request, 2026-10-25) instead of an icon tile.
@@ -583,7 +586,7 @@ function ContinueTile({ rowKey }: { rowKey: "coach" | "teacher" | "reading" | "l
         : rowKey === "reading"
           ? reviewReading
           : reviewLesson;
-  return <img src={photo} alt="" className="h-full min-h-0 w-16 rounded-md object-cover" />;
+  return <img src={photo} alt="" className={ROW_PHOTO} />;
 }
 
 function SkillTile({ skill }: { skill: string }) {
@@ -594,7 +597,7 @@ function SkillTile({ skill }: { skill: string }) {
   const Icon = tile.icon;
   return (
     <span
-      className={`grid h-full min-h-0 w-16 place-items-center rounded-md ${tile.tone}`}
+      className={`grid h-0 min-h-full w-16 self-stretch place-items-center rounded-md ${tile.tone}`}
       aria-hidden="true"
     >
       <Icon className="size-6" />
