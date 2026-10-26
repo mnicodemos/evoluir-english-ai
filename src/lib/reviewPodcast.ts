@@ -39,9 +39,10 @@ export function hasReviewPodcast(plan: CurriculumLesson | null | undefined): boo
   return !!plan && plan.reviewUnits.length > 0 && !plan.isReviewTest;
 }
 
-/** Every curriculum lesson uses an EVO + Leo audio dialogue except the review test. */
+/** Pilot: B1 Unit 2 Lesson 2, plus the existing Review I/II audio experience. */
 export function hasLessonPodcast(plan: CurriculumLesson | null | undefined): boolean {
-  return !!plan && !plan.isReviewTest;
+  if (!plan || plan.isReviewTest) return false;
+  return plan.key === "b1-u2-l2" || plan.reviewUnits.length > 0;
 }
 
 /** How the conversation sounds at each level. */
