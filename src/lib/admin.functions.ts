@@ -922,13 +922,21 @@ export const setLessonVideo = createServerFn({ method: "POST" })
     if (!findCurriculumLesson(data.key)) throw new Error("Unknown lesson");
     const url = canonicalYoutubeUrl(data.url);
     if (!url) throw new Error("Paste a YouTube link");
+    // No mm:ss typed: the length comes from YouTube when the key is set.
+    let seconds = data.seconds;
+    const youtubeKey = process.env["YOUTUBE_API_KEY"];
+    if (seconds === null && youtubeKey) {
+      const { fetchVideoDurations } = await import("@/lib/lessonVideo.server");
+      const id = url.slice(url.indexOf("v=") + 2);
+      seconds = (await fetchVideoDurations([id], youtubeKey).catch(() => null))?.get(id) ?? null;
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await (supabaseAdmin as unknown as LessonVideosTable)
       .from("lesson_videos")
       .upsert({
         curriculum_key: data.key,
         video_url: url,
-        video_seconds: data.seconds,
+        video_seconds: seconds,
         approved_by: context.userId,
         approved_at: new Date().toISOString(),
       });
@@ -936,10 +944,10 @@ export const setLessonVideo = createServerFn({ method: "POST" })
     // Every student's copy of the lesson shows it from now on.
     const { error: lessonsError } = await supabaseAdmin
       .from("lessons")
-      .update({ video_url: url, video_duration_seconds: data.seconds ?? 0 })
+      .update({ video_url: url, video_duration_seconds: seconds ?? 0 })
       .eq("curriculum_key", data.key);
     if (lessonsError) throw new Error("The lessons could not be updated");
-    return { ok: true, url };
+    return { ok: true, url, seconds };
   });
 
 /** Lessons searched per call, so one request stays short; the page calls again. */
@@ -978,6 +986,33 @@ export const fillLessonVideos = createServerFn({ method: "POST" })
         plans.map((plan) => plan.key),
       );
     if (error) throw new Error("A migração 0081_lesson_videos ainda não foi aplicada.");
+    // Fixed videos without a length (pasted without mm:ss) get it from YouTube.
+    const noLength = (fixed ?? []).filter((row) => !row.video_seconds);
+    let lengthsFilled = 0;
+    if (noLength.length > 0) {
+      const { fetchVideoDurations } = await import("@/lib/lessonVideo.server");
+      const idOf = (url: string) => url.slice(url.indexOf("v=") + 2);
+      const durations = await fetchVideoDurations(
+        noLength.map((row) => idOf(row.video_url)),
+        key,
+      ).catch((err: unknown) => {
+        console.error("YouTube video durations failed", err);
+        return new Map<string, number>();
+      });
+      for (const row of noLength) {
+        const seconds = durations.get(idOf(row.video_url));
+        if (!seconds) continue;
+        await (supabaseAdmin as unknown as LessonVideosTable)
+          .from("lesson_videos")
+          .upsert({ ...row, video_seconds: seconds });
+        await supabaseAdmin
+          .from("lessons")
+          .update({ video_duration_seconds: seconds })
+          .eq("curriculum_key", row.curriculum_key)
+          .eq("video_url", row.video_url);
+        lengthsFilled += 1;
+      }
+    }
     const done = new Set((fixed ?? []).map((row) => row.curriculum_key));
     const todo = plans.filter((plan) => !done.has(plan.key));
 
@@ -1019,7 +1054,12 @@ export const fillLessonVideos = createServerFn({ method: "POST" })
         .eq("curriculum_key", plan.key);
       filled.push(plan.key);
     }
-    return { filled, notFound, remaining: Math.max(0, todo.length - FILL_BATCH) };
+    return {
+      filled,
+      notFound,
+      lengthsFilled,
+      remaining: Math.max(0, todo.length - FILL_BATCH),
+    };
   });
 
 /**
