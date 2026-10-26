@@ -63,7 +63,11 @@ describe("lesson audio step", () => {
   it("asks to listen to the podcast until it was heard to the end", () => {
     const base = { hasVideo: false, cardsTotal: 0, cardsReviewed: 0, quizPassed: false };
     const pending = lessonChecklist({ ...base, podcast: true, videoWatched: false });
-    expect(pending.items[0]).toEqual({ id: "video", label: "Listen to the lesson audio", done: false });
+    expect(pending.items[0]).toEqual({
+      id: "video",
+      label: "Listen to the lesson audio",
+      done: false,
+    });
     const heard = lessonChecklist({ ...base, podcast: true, videoWatched: true });
     expect(heard.items[0]?.done).toBe(true);
   });
