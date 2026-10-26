@@ -66,6 +66,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Open the next lesson: watch the video, read the summary and review the cards.",
       "Answer the quiz: 70% or more completes the lesson.",
       "After 21 of the 30 lessons, the Final Test opens; 70% moves you up a level.",
+      "The review lessons of Unit 6 open with a podcast: EVO and Leo talk through the units, and you can follow every line with its translation.",
     ],
     tip: "Time on a lesson page counts toward your daily minutes, even before the quiz.",
     to: "/learning",

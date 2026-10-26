@@ -20,7 +20,11 @@ export type SpeechOptions = {
   rate?: number;
   /** Called once, when the first sound of this text is scheduled to play. */
   onStart?: () => void;
+  /** EVO (default) or Leo, her co-host in the review podcasts. */
+  voice?: SpeechVoice;
 };
+
+export type SpeechVoice = "evo" | "host";
 
 let audioContext: AudioContext | null = null;
 const activeSources = new Set<AudioBufferSourceNode>();
@@ -135,13 +139,16 @@ async function requestSpeech(
   onChunk?: (chunk: Uint8Array) => void,
   cacheMode: SpeechOptions["cache"] = "memory",
   signal?: AbortSignal,
+  voice: SpeechVoice = "evo",
 ): Promise<Float32Array> {
-  const cacheKey = value.toLocaleLowerCase("en-US");
+  // Each voice keeps its own audio of the same text; EVO's keys stay as before.
+  const storeKey = voice === "evo" ? value : `${voice}::${value}`;
+  const cacheKey = storeKey.toLocaleLowerCase("en-US");
   const cached = audioCache.get(cacheKey);
   if (cached) return cached;
 
   if (cacheMode === "persistent") {
-    const persisted = await readPersistentSpeech(value);
+    const persisted = await readPersistentSpeech(storeKey);
     if (persisted) {
       audioCache.set(cacheKey, persisted);
       return persisted;
@@ -169,7 +176,11 @@ async function requestSpeech(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: value, cacheable: cacheMode === "persistent" }),
+      body: JSON.stringify({
+        text: value,
+        cacheable: cacheMode === "persistent",
+        ...(voice === "evo" ? {} : { voice }),
+      }),
       ...(signal ? { signal } : {}),
     });
     if (!response.ok || !response.body) {
@@ -241,7 +252,7 @@ async function requestSpeech(
     const samples = mergePcmChunks(chunks);
     audioCache.set(cacheKey, samples);
     // Saved in the background so playback never waits on storage.
-    if (cacheMode === "persistent") void writePersistentSpeech(value, chunks);
+    if (cacheMode === "persistent") void writePersistentSpeech(storeKey, chunks);
     return samples;
   })();
 
@@ -381,13 +392,19 @@ let prepareChain: Promise<unknown> = Promise.resolve();
  * student) and share the cache, so speakEnglish later finds them ready or
  * already in flight. Failures are ignored: playback simply requests again.
  */
-export function prepareSpeech(text: string, options: Pick<SpeechOptions, "cache"> = {}) {
+export function prepareSpeech(text: string, options: Pick<SpeechOptions, "cache" | "voice"> = {}) {
   const value = text?.trim();
   if (!value || typeof window === "undefined" || !window.AudioContext) return;
   const blocks = splitForFirstAudio(value);
   prepareChain = prepareChain.then(async () => {
     for (const block of blocks) {
-      await requestSpeech(block, undefined, options.cache ?? "memory").catch(() => undefined);
+      await requestSpeech(
+        block,
+        undefined,
+        options.cache ?? "memory",
+        undefined,
+        options.voice,
+      ).catch(() => undefined);
     }
   });
 }
@@ -474,7 +491,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
       try {
         samples = prefetched
           ? await prefetched
-          : await requestSpeech(block, onChunk, cacheMode, controller.signal);
+          : await requestSpeech(block, onChunk, cacheMode, controller.signal, options.voice);
       } catch (error) {
         if (requestId !== playRequest) return;
         if (scheduledAny) break;
@@ -486,7 +503,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
       // Prepare the next block while this one is already playing.
       const next = blocks[index + 1];
       prefetched = next
-        ? requestSpeech(next, undefined, cacheMode, controller.signal).catch(() => {
+        ? requestSpeech(next, undefined, cacheMode, controller.signal, options.voice).catch(() => {
             throw new Error("The rest of the answer could not be played.");
           })
         : null;

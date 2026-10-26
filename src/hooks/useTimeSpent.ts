@@ -76,7 +76,10 @@ export function useTimeSpent(options?: { manual?: boolean }): TimeSpent {
     const watching = setInterval(() => {
       if (document.visibilityState === "hidden") return;
       const media = Array.from(document.querySelectorAll("video, audio")) as HTMLMediaElement[];
-      const playing = media.some((element) => !element.paused && !element.ended);
+      // The review podcast plays through Web Audio, so its player marks itself.
+      const playing =
+        media.some((element) => !element.paused && !element.ended) ||
+        !!document.querySelector("[data-media-playing='true']");
       if (playing || document.activeElement?.tagName === "IFRAME") onActivity();
     }, 15_000);
     return () => {

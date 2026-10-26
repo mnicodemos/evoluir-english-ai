@@ -20,6 +20,8 @@ export const appGuidePt: Record<string, string> = {
     "As lições do seu nível, em ordem, da primeira unidade até o Teste Final.",
   "Open the next lesson: watch the video, read the summary and review the cards.":
     "Abra a próxima lição: assista ao vídeo, leia o resumo e revise os cards.",
+  "The review lessons of Unit 6 open with a podcast: EVO and Leo talk through the units, and you can follow every line with its translation.":
+    "As lições de revisão da Unidade 6 começam com um podcast: EVO e Leo conversam sobre as unidades, e você acompanha cada fala com a tradução.",
   "Answer the quiz: 70% or more completes the lesson.":
     "Responda o quiz: 70% ou mais conclui a lição.",
   "After 21 of the 30 lessons, the Final Test opens; 70% moves you up a level.":
