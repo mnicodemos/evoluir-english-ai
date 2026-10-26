@@ -36,9 +36,9 @@ export const podcastSchema = z.object({
 export type ReviewPodcast = z.infer<typeof podcastSchema>;
 export type PodcastLine = ReviewPodcast["lines"][number];
 
-/** Lessons that get a podcast: the two review lessons, never the review Test. */
-export function hasReviewPodcast(plan: CurriculumLesson | null | undefined): boolean {
-  return !!plan && plan.reviewUnits.length > 0 && !plan.isReviewTest;
+/** Every curriculum lesson uses an EVO + Leo audio dialogue except the review test. */
+export function hasLessonPodcast(plan: CurriculumLesson | null | undefined): boolean {
+  return !!plan && !plan.isReviewTest;
 }
 
 /** How the conversation sounds at each level. */
@@ -86,6 +86,45 @@ export function reviewPodcastMessages(plan: CurriculumLesson) {
     {
       role: "user" as const,
       content: `Review lesson: ${plan.title}\nObjective: ${plan.objective}\nCEFR level: ${plan.level.toUpperCase()}\nUnits under review:\n${reviewOutline(plan)}`,
+    },
+  ];
+}
+
+/** A lesson-specific dialogue; review lessons keep their existing, detailed script. */
+export function lessonPodcastMessages(plan: CurriculumLesson) {
+  if (plan.reviewUnits.length > 0) return reviewPodcastMessages(plan);
+
+  const level = plan.level.toLowerCase();
+  const style = LEVEL_STYLE[level] ?? LEVEL_STYLE["b1"]!;
+  const unitOutline = getCurriculum(plan.level)
+    .filter((lesson) => lesson.unit === plan.unit && lesson.reviewUnits.length === 0)
+    .map((lesson) => `- ${lesson.title} (${lesson.skill}): ${lesson.objective}`)
+    .join("\n");
+
+  return [
+    {
+      role: "system" as const,
+      content:
+        "You write original audio dialogues for Evoluir+, an English course for Brazilian learners. " +
+        "The episode is a warm, lively conversation between EVO, the course's AI English mentor (female), " +
+        "and Leo, her co-host (male), who speaks like a learner at the same level. Both have distinct voices; " +
+        "never invent personal lives, places or memories for them. " +
+        `Level: CEFR ${plan.level.toUpperCase()}. Style: ${style} ` +
+        `Target skill: ${plan.skill}. Lesson title: ${plan.title}. Objective: ${plan.objective}. ` +
+        "Focus on this lesson's topic and objective. Use examples that teach the objective naturally in conversation; " +
+        "do not drift into unrelated topics or teach grammar above the stated CEFR level. " +
+        "Structure: EVO welcomes the listener and introduces the topic; Leo asks realistic learner questions; " +
+        "they model useful language in context; Leo makes one common, level-appropriate mistake and EVO corrects it kindly; " +
+        "they give the listener a short speaking challenge with a model answer; they close by inviting the listener to practise. " +
+        "Alternate the speakers naturally, EVO speaks first. " +
+        `Write 16 to 24 lines; each line at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        "For every line add 'pt', a natural Brazilian Portuguese translation. " +
+        'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
+    },
+    {
+      role: "user" as const,
+      content:
+        `Lesson: ${plan.title}\nUnit: ${plan.unitTitle}\nLevel: ${plan.level.toUpperCase()}\nSkill: ${plan.skill}\nObjective: ${plan.objective}\nOther lessons in this unit for context only:\n${unitOutline}`,
     },
   ];
 }
