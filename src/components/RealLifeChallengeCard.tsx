@@ -22,7 +22,9 @@ export function RealLifeChallengeCard({
   const [selected, setSelected] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const [syncReady, setSyncReady] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<"loading" | "synced" | "pending" | "local-only">("loading");
+  const [syncStatus, setSyncStatus] = useState<
+    "loading" | "synced" | "pending" | "local-only"
+  >("loading");
 
   useEffect(() => {
     let cancelled = false;
@@ -54,14 +56,15 @@ export function RealLifeChallengeCard({
 
         if (data) {
           const remoteSelected =
-            data.selected_option_id && challenge?.options.some((option) => option.id === data.selected_option_id)
+            data.selected_option_id &&
+            challenge?.options.some((option) => option.id === data.selected_option_id)
               ? data.selected_option_id
               : null;
-          const restoredSelection = remoteSelected ?? (
-            localSelected && challenge?.options.some((option) => option.id === localSelected)
+          const restoredSelection =
+            remoteSelected ??
+            (localSelected && challenge?.options.some((option) => option.id === localSelected)
               ? localSelected
-              : null
-          );
+              : null);
           // Completion is monotonic: a locally completed challenge must not be
           // silently downgraded by an older/incomplete server record.
           const restoredCompleted = data.completed || localCompleted;
@@ -74,16 +77,18 @@ export function RealLifeChallengeCard({
             restoredCompleted !== data.completed ||
             restoredSelection !== data.selected_option_id
           ) {
-            const { error: reconcileError } = await supabase.from("real_life_challenge_progress").upsert(
-              {
-                user_id: userId!,
-                lesson_key: lessonKey!,
-                selected_option_id: restoredSelection,
-                completed: restoredCompleted,
-                updated_at: new Date().toISOString(),
-              },
-              { onConflict: "user_id,lesson_key" },
-            );
+            const { error: reconcileError } = await supabase
+              .from("real_life_challenge_progress")
+              .upsert(
+                {
+                  user_id: userId!,
+                  lesson_key: lessonKey!,
+                  selected_option_id: restoredSelection,
+                  completed: restoredCompleted,
+                  updated_at: new Date().toISOString(),
+                },
+                { onConflict: "user_id,lesson_key" },
+              );
             if (reconcileError) throw reconcileError;
           }
         } else {
@@ -94,16 +99,18 @@ export function RealLifeChallengeCard({
           setSelected(restoredSelection);
           setCompleted(localCompleted);
           if (restoredSelection || localCompleted) {
-            const { error: saveError } = await supabase.from("real_life_challenge_progress").upsert(
-              {
-                user_id: userId!,
-                lesson_key: lessonKey!,
-                selected_option_id: restoredSelection,
-                completed: localCompleted,
-                updated_at: new Date().toISOString(),
-              },
-              { onConflict: "user_id,lesson_key" },
-            );
+            const { error: saveError } = await supabase
+              .from("real_life_challenge_progress")
+              .upsert(
+                {
+                  user_id: userId!,
+                  lesson_key: lessonKey!,
+                  selected_option_id: restoredSelection,
+                  completed: localCompleted,
+                  updated_at: new Date().toISOString(),
+                },
+                { onConflict: "user_id,lesson_key" },
+              );
             if (saveError) throw saveError;
           }
         }
@@ -139,16 +146,18 @@ export function RealLifeChallengeCard({
     if (isCompleted) writeStorage(challengeStorageKey(userId, lessonKey), "done");
     setSyncStatus("pending");
     try {
-      const { error } = await supabase.from("real_life_challenge_progress").upsert(
-        {
-          user_id: userId,
-          lesson_key: lessonKey,
-          selected_option_id: optionId,
-          completed: isCompleted,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,lesson_key" },
-      );
+      const { error } = await supabase
+        .from("real_life_challenge_progress")
+        .upsert(
+          {
+            user_id: userId,
+            lesson_key: lessonKey,
+            selected_option_id: optionId,
+            completed: isCompleted,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,lesson_key" },
+        );
       if (error) throw error;
       setSyncStatus("synced");
     } catch {
@@ -274,15 +283,23 @@ export function RealLifeChallengeCard({
       </div>
 
       {syncStatus === "local-only" && (
-        <div className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm sm:flex-row sm:items-center sm:justify-between" role="status">
-          <p>{t("Progress is available on this device, but could not be loaded from the server.")}</p>
+        <div
+          className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
+          role="status"
+        >
+          <p>
+            {t("Progress is available on this device, but could not be loaded from the server.")}
+          </p>
           <Button size="sm" variant="outline" onClick={retrySync}>
             {t("Retry sync")}
           </Button>
         </div>
       )}
       {syncStatus === "pending" && (
-        <div className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm sm:flex-row sm:items-center sm:justify-between" role="status">
+        <div
+          className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
+          role="status"
+        >
           <p>{t("Your progress is saved on this device and is waiting to sync.")}</p>
           <Button size="sm" variant="outline" onClick={retrySync}>
             {t("Retry sync")}
