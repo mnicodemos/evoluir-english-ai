@@ -31,7 +31,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
@@ -143,10 +143,10 @@ function DashboardNotifications({
 }: DashboardNotificationsProps) {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const resetCloseTimer = () => {
+  const resetCloseTimer = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     closeTimer.current = setTimeout(() => setOpen(false), 13_000);
-  };
+  }, []);
   useEffect(() => {
     if (!open) {
       if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -158,7 +158,7 @@ function DashboardNotifications({
       if (closeTimer.current) clearTimeout(closeTimer.current);
       closeTimer.current = null;
     };
-  }, [open]);
+  }, [open, resetCloseTimer]);
   // Everything the student still has to do, most immediate first: the launch
   // campaign's mission of the day, the plan's day, today's goal, due reviews,
   // then new content in each area.
