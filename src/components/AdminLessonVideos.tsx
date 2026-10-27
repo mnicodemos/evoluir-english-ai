@@ -1,564 +1,77 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Copy, ExternalLink, Loader2, RotateCcw, Search, Sparkles } from "lucide-react";
+import { ExternalLink, Loader2, Trash2, Video } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import {
-  approveLessonVideos,
-  clearLessonVideo,
-  fillLessonVideos,
-  getLessonVideos,
-  setLessonVideo,
-} from "@/lib/admin.functions";
-import {
-  lessonVideoListText,
-  type LessonVideoReportItem,
-  type VideoInfo,
-} from "@/lib/lessonVideoReport";
+import { clearLessonVideo, getLessonVideos, setLessonVideo } from "@/lib/admin.functions";
+import type { LessonVideoReportItem } from "@/lib/lessonVideoReport";
 import { cn } from "@/lib/utils";
 
 const LEVELS = ["a1", "a2", "b1", "b2", "c1", "c2", "business"] as const;
 type Level = (typeof LEVELS)[number];
+const SKILLS: Record<string, string> = { listening: "Listening", reading: "Reading", talking: "Speaking", writing: "Writing", vocabulary: "Vocabulário", grammar: "Gramática" };
 
-const SKILL_LABEL: Record<string, string> = {
-  listening: "Listening",
-  reading: "Reading",
-  talking: "Speaking",
-  writing: "Writing",
-  vocabulary: "Vocabulário",
-  grammar: "Gramática",
-};
-
-/** "4:30" → 270; "" → null; anything else → undefined (invalid). */
-function parseDuration(text: string): number | null | undefined {
-  const clean = text.trim();
-  if (!clean) return null;
-  const match = clean.match(/^(\d{1,2}):([0-5]\d)$/);
-  if (!match) return undefined;
-  const seconds = Number(match[1]) * 60 + Number(match[2]);
-  return seconds > 0 ? seconds : undefined;
-}
-
-function formatDuration(seconds: number | null): string {
-  if (!seconds) return "duração ?";
-  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
-}
-
-/** Title and channel from YouTube's public oEmbed, read by the owner's browser. */
-function videoInfoQuery(id: string) {
-  return {
-    queryKey: ["admin", "video-info", id],
-    staleTime: Infinity,
-    retry: false,
-    queryFn: async (): Promise<VideoInfo> => {
-      const response = await fetch(
-        `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}`,
-      );
-      if (!response.ok) return null;
-      return (await response.json()) as { title?: string; author_name?: string };
-    },
-  };
-}
-
-function useVideoInfo(id: string) {
-  return useQuery(videoInfoQuery(id));
-}
-
-function VideoTile({
-  id,
-  seconds,
-  note,
-  children,
-}: {
-  id: string;
-  seconds: number | null;
-  note?: string;
-  children?: React.ReactNode;
-}) {
-  const info = useVideoInfo(id).data;
-  return (
-    <div className="flex gap-3 rounded-lg border border-border p-2">
-      <a
-        href={`https://www.youtube.com/watch?v=${id}`}
-        target="_blank"
-        rel="noreferrer"
-        className="relative shrink-0"
-      >
-        <img
-          src={`https://i.ytimg.com/vi/${id}/mqdefault.jpg`}
-          alt=""
-          className="h-[68px] w-[120px] rounded-md object-cover"
-          loading="lazy"
-        />
-        <span className="absolute bottom-1 right-1 rounded bg-black/75 px-1 text-[10px] text-white">
-          {formatDuration(seconds)}
-        </span>
-      </a>
-      <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-sm font-medium">{info?.title ?? `Vídeo ${id}`}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {info?.author_name ?? "Canal não identificado"}
-          {note ? ` · ${note}` : ""}
-        </p>
-        <div className="mt-1.5 flex flex-wrap items-center gap-2">
-          <a
-            href={`https://www.youtube.com/watch?v=${id}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-sky-300 hover:underline"
-          >
-            <ExternalLink className="size-3" aria-hidden="true" /> Abrir
-          </a>
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function LessonRow({
-  item,
-  level,
-  marked,
-  onMark,
-}: {
-  item: LessonVideoReportItem;
-  level: Level;
-  marked: boolean;
-  onMark: (checked: boolean) => void;
-}) {
-  const queryClient = useQueryClient();
+function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level }) {
+  const qc = useQueryClient();
   const save = useServerFn(setLessonVideo);
   const clear = useServerFn(clearLessonVideo);
   const [url, setUrl] = useState("");
-  const [duration, setDuration] = useState("");
-  const refresh = () =>
-    void queryClient.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
-  const approve = useMutation({
-    mutationFn: (input: { url: string; seconds: number | null }) =>
-      save({ data: { key: item.key, ...input } }),
-    onSuccess: () => {
-      setUrl("");
-      setDuration("");
-      toast.success("Vídeo aprovado: todos os alunos desta lição passam a vê-lo.");
-      refresh();
-    },
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : "Não foi possível salvar o vídeo."),
+  const currentUrl = item.approved?.url ?? item.used[0]?.url ?? null;
+  const refresh = () => void qc.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
+  const saveMutation = useMutation({
+    mutationFn: () => save({ data: { key: item.key, url: url.trim(), seconds: null } }),
+    onSuccess: () => { setUrl(""); toast.success("Link do Vimeo salvo."); refresh(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível salvar o link."),
   });
-  const remove = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: () => clear({ data: { key: item.key } }),
-    onSuccess: refresh,
-    onError: () => toast.error("Não foi possível remover a aprovação."),
+    onSuccess: () => { toast.success("Vídeo removido."); refresh(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível remover o vídeo."),
   });
-  const typedSeconds = parseDuration(duration);
-
-  return (
-    <li
-      className={cn(
-        "rounded-xl border p-3",
-        item.approved && !item.approved.auto
-          ? "border-brand-green/40 bg-brand-green/[0.04]"
-          : "border-border",
-      )}
-    >
-      <div className="flex flex-wrap items-baseline gap-x-2">
-        {item.approved?.auto ? (
-          <Checkbox
-            checked={marked}
-            onCheckedChange={(checked) => onMark(checked === true)}
-            aria-label={`Marcar ${item.title} para aprovar`}
-            className="self-center"
-          />
-        ) : null}
-        <span className="text-xs font-semibold text-muted-foreground">
-          U{item.unit} · L{item.position}
-        </span>
-        <span className="text-sm font-semibold">{item.title}</span>
-        <span className="text-xs text-muted-foreground">
-          · {SKILL_LABEL[item.skill] ?? item.skill}
-        </span>
-        {item.approved?.auto ? (
-          <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-sky-400/15 px-2 py-0.5 text-[11px] font-semibold text-sky-300">
-            <Sparkles className="size-3" aria-hidden="true" /> Escolhido pelo app
-          </span>
-        ) : item.approved ? (
-          <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[11px] font-semibold text-brand-green">
-            <Check className="size-3" aria-hidden="true" /> Aprovado
-          </span>
-        ) : null}
-      </div>
-      <p className="mt-0.5 text-xs text-muted-foreground">{item.objective}</p>
-
-      <div className="mt-2 grid gap-2 lg:grid-cols-2">
-        {item.approved ? (
-          <VideoTile
-            id={item.approved.id}
-            seconds={item.approved.seconds}
-            note={item.approved.auto ? "escolhido pelo app" : "aprovado"}
-          >
-            {item.approved.auto ? (
-              <button
-                type="button"
-                className="text-xs font-semibold text-brand-green hover:underline"
-                disabled={approve.isPending}
-                onClick={() =>
-                  item.approved &&
-                  approve.mutate({ url: item.approved.url, seconds: item.approved.seconds })
-                }
-              >
-                Aprovar este
-              </button>
-            ) : null}
-            <button
-              type="button"
-              className="text-xs text-muted-foreground hover:text-destructive"
-              disabled={remove.isPending}
-              onClick={() => remove.mutate()}
-            >
-              {item.approved.auto ? "Remover" : "Remover aprovação"}
-            </button>
-          </VideoTile>
-        ) : null}
-        {item.used
-          .filter((video) => video.id !== item.approved?.id)
-          .slice(0, 4)
-          .map((video) => (
-            <VideoTile
-              key={video.id}
-              id={video.id}
-              seconds={video.seconds}
-              note={`${video.lessons} ${video.lessons === 1 ? "aluno" : "alunos"}`}
-            >
-              <button
-                type="button"
-                className="text-xs font-semibold text-brand-green hover:underline"
-                disabled={approve.isPending}
-                onClick={() => approve.mutate({ url: video.url, seconds: video.seconds })}
-              >
-                Aprovar este
-              </button>
-            </VideoTile>
-          ))}
-        {!item.approved && item.used.length === 0 ? (
-          <p className="text-xs text-muted-foreground">
-            Nenhum aluno abriu esta lição ainda: aprove um vídeo antes do primeiro.
-          </p>
-        ) : null}
-      </div>
-
-      <form
-        className="mt-2 flex flex-wrap gap-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!url.trim() || typedSeconds === undefined) return;
-          approve.mutate({ url, seconds: typedSeconds });
-        }}
-      >
-        <Input
-          value={url}
-          onChange={(event) => setUrl(event.target.value)}
-          placeholder="Colar link do YouTube"
-          aria-label={`Link do vídeo para ${item.title}`}
-          className="h-8 min-w-[14rem] flex-1 text-xs"
-        />
-        <Input
-          value={duration}
-          onChange={(event) => setDuration(event.target.value)}
-          placeholder="mm:ss"
-          aria-label="Duração do vídeo"
-          className={cn("h-8 w-20 text-xs", typedSeconds === undefined && "border-destructive")}
-        />
-        <Button
-          type="submit"
-          size="sm"
-          className="h-8"
-          disabled={!url.trim() || typedSeconds === undefined || approve.isPending}
-        >
-          {approve.isPending ? <Loader2 className="size-3.5 animate-spin" /> : null}
-          {item.approved ? "Trocar" : "Aprovar"}
-        </Button>
-      </form>
-    </li>
-  );
+  return <li className={cn("rounded-xl border p-3", currentUrl ? "border-brand-green/40 bg-brand-green/[0.04]" : "border-border")}>
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <span className="text-xs font-semibold text-muted-foreground">U{item.unit} · L{item.position}</span>
+      <span className="text-sm font-semibold">{item.title}</span>
+      <span className="text-xs text-muted-foreground">· {SKILLS[item.skill] ?? item.skill}</span>
+      <span className={cn("ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold", currentUrl ? "bg-brand-green/15 text-brand-green" : "bg-secondary text-muted-foreground")}>{currentUrl ? "Com vídeo" : "Sem vídeo"}</span>
+    </div>
+    <p className="mt-0.5 text-xs text-muted-foreground">{item.objective}</p>
+    {currentUrl ? <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-border p-2">
+      <Video className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+      <a href={currentUrl} target="_blank" rel="noreferrer" className="min-w-0 flex-1 break-all text-xs text-sky-300 hover:underline">{currentUrl}</a>
+      <a href={currentUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-muted-foreground"><ExternalLink className="size-3" /> Abrir</a>
+      <Button type="button" size="sm" variant="ghost" className="h-7 text-xs text-destructive" disabled={deleteMutation.isPending} onClick={() => { if (window.confirm("Apagar o vídeo desta lição?")) deleteMutation.mutate(); }}>
+        {deleteMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />} Apagar
+      </Button>
+    </div> : <p className="mt-2 text-xs text-muted-foreground">Nenhum vídeo cadastrado para esta lição.</p>}
+    <form className="mt-2 flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); if (url.trim()) saveMutation.mutate(); }}>
+      <Input value={url} onChange={(e) => setUrl(e.target.value)} type="url" placeholder={currentUrl ? "Novo link do Vimeo para substituir" : "Cole o link do Vimeo"} aria-label={`Link do Vimeo para ${item.title}`} className="h-9 min-w-[16rem] flex-1 text-xs" />
+      <Button type="submit" size="sm" className="h-9" disabled={!url.trim() || saveMutation.isPending}>
+        {saveMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : null}{currentUrl ? "Alterar vídeo" : "Adicionar vídeo"}
+      </Button>
+    </form>
+  </li>;
 }
 
-/**
- * Admin → Vídeos (owner request, 2026-10-25: audit whether each lesson's video
- * matches its level and topic): per level, every curriculum lesson with the
- * video approved for it and the videos students actually got, with their
- * thumbnail, title and channel; approving one (or pasting a link) gives every
- * student of that lesson the same video.
- */
 export function AdminLessonVideos() {
   const [level, setLevel] = useState<Level>("a1");
   const load = useServerFn(getLessonVideos);
-  const query = useQuery({
-    queryKey: ["admin", "lesson-videos", level],
-    queryFn: () => load({ data: { level } }),
-  });
+  const query = useQuery({ queryKey: ["admin", "lesson-videos", level], queryFn: () => load({ data: { level } }) });
   const lessons = query.data?.lessons ?? [];
-  const queryClient = useQueryClient();
-  const [copying, setCopying] = useState(false);
-  // Copies the level's list to paste into the chat for a review (owner request):
-  // titles not loaded yet are fetched first, a failed one reads "indisponível".
-  // Batch approval of the app's choices (owner request, 2026-10-26).
-  const approveMany = useServerFn(approveLessonVideos);
-  const [marked, setMarked] = useState<{ level: Level; keys: Set<string> }>({
-    level,
-    keys: new Set(),
-  });
-  const autoKeys = lessons.filter((item) => item.approved?.auto).map((item) => item.key);
-  const markedKeys = marked.level === level ? autoKeys.filter((key) => marked.keys.has(key)) : [];
-  const mark = (key: string, checked: boolean) =>
-    setMarked((current) => {
-      const keys = new Set(current.level === level ? current.keys : []);
-      if (checked) keys.add(key);
-      else keys.delete(key);
-      return { level, keys };
-    });
-  const approveMarked = useMutation({
-    mutationFn: (keys: string[]) => approveMany({ data: { keys } }),
-    onSuccess: (_, keys) => {
-      toast.success(`${keys.length} ${keys.length === 1 ? "vídeo aprovado" : "vídeos aprovados"}.`);
-      setMarked({ level, keys: new Set() });
-      void queryClient.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
-    },
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : "Não foi possível aprovar."),
-  });
-  const fill = useServerFn(fillLessonVideos);
-  const [filling, setFilling] = useState<string | null>(null);
-  // Fixes a video for every lesson of the level that has none, a few lessons
-  // per request (owner request, 2026-10-26: before the first student opens them).
-  const fillLevel = async (redo = false) => {
-    const skip: string[] = [];
-    let filled = 0;
-    let lengths = 0;
-    setFilling("Buscando…");
-    try {
-      for (;;) {
-        // "Refazer" clears the app's unapproved choices on the first call only.
-        const result = await fill({
-          data: { level, skip, redo: redo && filled === 0 && skip.length === 0 },
-        });
-        redo = false;
-        filled += result.filled.length;
-        lengths += result.lengthsFilled;
-        skip.push(...result.notFound);
-        setFilling(`${filled} vídeos fixados…`);
-        void queryClient.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
-        if (result.remaining === 0 || result.filled.length + result.notFound.length === 0) break;
-      }
-      const lengthNote = lengths ? ` Duração preenchida em ${lengths}.` : "";
-      toast.success(
-        (skip.length
-          ? `${filled} vídeos fixados; ${skip.length} lições sem vídeo adequado (escolha na mão).`
-          : `${filled} vídeos fixados. Confira com "Copiar lista".`) + lengthNote,
-      );
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível buscar os vídeos.");
-    } finally {
-      setFilling(null);
-      void queryClient.invalidateQueries({ queryKey: ["admin", "lesson-videos", level] });
-    }
-  };
-  const copyList = async () => {
-    setCopying(true);
-    try {
-      const ids = new Set(
-        lessons.flatMap((item) => [
-          ...(item.approved ? [item.approved.id] : []),
-          ...item.used.map((video) => video.id),
-        ]),
-      );
-      const infos = new Map<string, VideoInfo>();
-      await Promise.all(
-        [...ids].map(async (id) => {
-          infos.set(id, await queryClient.fetchQuery(videoInfoQuery(id)).catch(() => null));
-        }),
-      );
-      await navigator.clipboard.writeText(
-        lessonVideoListText(level, lessons, (id) => infos.get(id)),
-      );
-      toast.success("Lista copiada: cole no chat para a avaliação.");
-    } catch {
-      toast.error("Não foi possível copiar a lista.");
-    } finally {
-      setCopying(false);
-    }
-  };
-  const approvedCount = lessons.filter((item) => item.approved).length;
-  const units = [...new Set(lessons.map((item) => item.unit))];
-
-  return (
-    <section
-      className="mt-4 rounded-xl border border-border p-3 sm:p-4"
-      aria-label="Vídeos das lições"
-    >
-      <p className="text-sm font-semibold">Vídeos das lições</p>
-      <p className="text-xs text-muted-foreground">
-        Confira se o vídeo de cada lição combina com o tema e o nível. Aprove um vídeo e todos os
-        alunos daquela lição passam a ver o mesmo; sem mm:ss, a duração vem do YouTube. "Buscar
-        vídeos do nível" fixa um vídeo nas lições que ainda não têm (precisa do segredo
-        YOUTUBE_API_KEY; cerca de um nível por dia, pela cota grátis do YouTube), marcado como
-        escolhido pelo app até você aprovar ou trocar.
-      </p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {LEVELS.map((code) => (
-          <button
-            key={code}
-            type="button"
-            onClick={() => setLevel(code)}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-semibold uppercase",
-              code === level
-                ? "border-brand-green bg-brand-green/15 text-brand-green"
-                : "border-border text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {code === "business" ? "Business" : code}
-          </button>
-        ))}
-        {query.data ? (
-          <>
-            <span className="ml-auto self-center text-xs text-muted-foreground">
-              {approvedCount} de {lessons.length} lições com vídeo fixo
-            </span>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="h-7 text-xs"
-              disabled={filling !== null || !query.data.migrationApplied}
-              onClick={() => void fillLevel()}
-            >
-              {filling ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Search className="size-3.5" aria-hidden="true" />
-              )}
-              {filling ?? "Buscar vídeos do nível"}
-            </Button>
-            {autoKeys.length > 0 ? (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="h-7 text-xs"
-                disabled={filling !== null}
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      `Refazer os ${autoKeys.length} vídeos escolhidos pelo app que você ainda não aprovou? Os aprovados por você ficam como estão.`,
-                    )
-                  )
-                    void fillLevel(true);
-                }}
-              >
-                <RotateCcw className="size-3.5" aria-hidden="true" />
-                Refazer escolhas do app
-              </Button>
-            ) : null}
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="h-7 text-xs"
-              disabled={copying || lessons.length === 0}
-              onClick={() => void copyList()}
-            >
-              {copying ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Copy className="size-3.5" aria-hidden="true" />
-              )}
-              Copiar lista
-            </Button>
-          </>
-        ) : null}
-      </div>
-
-      {autoKeys.length > 0 ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-sky-400/30 bg-sky-400/[0.06] p-2 text-xs">
-          <Sparkles className="size-3.5 text-sky-300" aria-hidden="true" />
-          <span>
-            {autoKeys.length} {autoKeys.length === 1 ? "vídeo escolhido" : "vídeos escolhidos"} pelo
-            app aguardando aprovação · {markedKeys.length} marcados
-          </span>
-          <button
-            type="button"
-            className="font-semibold text-sky-300 hover:underline"
-            onClick={() => setMarked({ level, keys: new Set(autoKeys) })}
-          >
-            Marcar todos
-          </button>
-          <button
-            type="button"
-            className="text-muted-foreground hover:text-foreground"
-            onClick={() => setMarked({ level, keys: new Set() })}
-          >
-            Desmarcar
-          </button>
-          <Button
-            type="button"
-            size="sm"
-            className="ml-auto h-7 text-xs"
-            disabled={markedKeys.length === 0 || approveMarked.isPending}
-            onClick={() => approveMarked.mutate(markedKeys)}
-          >
-            {approveMarked.isPending ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Check className="size-3.5" aria-hidden="true" />
-            )}
-            Aprovar marcados ({markedKeys.length})
-          </Button>
-        </div>
-      ) : null}
-
-      {query.data && !query.data.migrationApplied ? (
-        <p className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-2 text-xs">
-          A migração 0081_lesson_videos ainda não foi aplicada: você já pode ver os vídeos que os
-          alunos receberam, mas aprovar só funciona depois de aplicá-la pelo chat do Lovable.
-        </p>
-      ) : null}
-
-      {query.isPending ? (
-        <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Carregando
-        </div>
-      ) : query.isError ? (
-        <p className="mt-3 text-sm text-muted-foreground">Não foi possível carregar os vídeos.</p>
-      ) : (
-        <div className="mt-3 space-y-4">
-          {units.map((unit) => {
-            const unitLessons = lessons.filter((item) => item.unit === unit);
-            return (
-              <div key={unit}>
-                <p className="text-xs font-semibold uppercase text-muted-foreground">
-                  {unitLessons[0]?.unitTitle}
-                </p>
-                <ul className="mt-2 space-y-2">
-                  {unitLessons.map((item) => (
-                    <LessonRow
-                      key={item.key}
-                      item={item}
-                      level={level}
-                      marked={markedKeys.includes(item.key)}
-                      onMark={(checked) => mark(item.key, checked)}
-                    />
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </section>
-  );
+  const units = [...new Set(lessons.map((x) => x.unit))];
+  const count = lessons.filter((x) => x.approved || x.used.length > 0).length;
+  return <section className="mt-4 rounded-xl border border-border p-3 sm:p-4" aria-label="Gestão de vídeos das lições">
+    <p className="text-sm font-semibold">Vídeos das lições</p>
+    <p className="text-xs text-muted-foreground">Consulte todas as lições e gerencie os links do Vimeo. Adicionar, alterar ou apagar aqui atualiza o vídeo exibido aos alunos na aba Summary, sem precisar editar código ou abrir PR para a gestão diária.</p>
+    <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      {LEVELS.map((code) => <button key={code} type="button" onClick={() => setLevel(code)} className={cn("rounded-full border px-3 py-1 text-xs font-semibold uppercase", code === level ? "border-brand-green bg-brand-green/15 text-brand-green" : "border-border text-muted-foreground hover:text-foreground")}>{code === "business" ? "Business" : code}</button>)}
+      {query.data ? <span className="ml-auto self-center text-xs text-muted-foreground">{count} com vídeo · {lessons.length - count} sem vídeo · {lessons.length} lições</span> : null}
+    </div>
+    {query.isPending ? <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Carregando lições…</div>
+    : query.isError ? <p className="mt-3 text-sm text-muted-foreground">Não foi possível carregar as lições e os vídeos.</p>
+    : <div className="mt-3 space-y-4">{units.map((unit) => { const group = lessons.filter((x) => x.unit === unit); return <div key={unit}><p className="text-xs font-semibold uppercase text-muted-foreground">{group[0]?.unitTitle}</p><ul className="mt-2 space-y-2">{group.map((item) => <LessonRow key={item.key} item={item} level={level} />)}</ul></div>; })}{lessons.length === 0 ? <p className="py-4 text-sm text-muted-foreground">Nenhuma lição encontrada neste nível.</p> : null}</div>}
+  </section>;
 }
