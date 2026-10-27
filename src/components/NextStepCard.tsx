@@ -335,7 +335,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             />
           ) : (
             <CalendarDays
-              className={todayDone ? "size-3.5 shrink-0 text-brand-green" : "size-3.5 shrink-0 text-pink-400"}
+              className={
+                todayDone ? "size-3.5 shrink-0 text-brand-green" : "size-3.5 shrink-0 text-pink-400"
+              }
               strokeWidth={2.2}
               aria-hidden="true"
             />
