@@ -501,7 +501,7 @@ function LessonPage() {
                     <iframe
                       className="h-full w-full"
                       src="https://player.vimeo.com/video/1239966935"
-                      title="B2 Unit 1 Lesson 1 — Listening to a Debate"
+                      title={t("B2 Unit 1 Lesson 1 — Listening to a Debate")}
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
