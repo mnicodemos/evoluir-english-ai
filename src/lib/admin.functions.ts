@@ -1208,7 +1208,9 @@ export const getSummaryVideoLinks = createServerFn({ method: "GET" })
 export const saveSummaryVideoLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z.object({ key: z.string().min(3).max(40), url: z.string().trim().min(10).max(300) }).parse(data),
+    z
+      .object({ key: z.string().min(3).max(40), url: z.string().trim().min(10).max(300) })
+      .parse(data),
   )
   .handler(async ({ context, data }) => {
     if (!(await hasAdminRole(context.supabase, context.userId))) {
@@ -1251,4 +1253,3 @@ export const deleteSummaryVideoLink = createServerFn({ method: "POST" })
     if (error) throw new Error("The Summary video link could not be removed");
     return { ok: true };
   });
-
