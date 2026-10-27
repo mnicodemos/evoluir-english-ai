@@ -501,7 +501,14 @@ function PlanTodaySummary({
       tone={tone}
       label={label}
       value={weekDone ? translate("All days done") : translate("Your week")}
-      valueStyle={{ color: tone === "green" ? "var(--brand-green)" : tone === "blue" ? "rgb(56 189 248)" : "rgb(244 114 182)" }}
+      valueStyle={{
+        color:
+          tone === "green"
+            ? "var(--brand-green)"
+            : tone === "blue"
+              ? "rgb(56 189 248)"
+              : "rgb(244 114 182)",
+      }}
       // Always three lines, like the other header cells (user request).
       detail={detail}
       to="/study-plan"
