@@ -50,6 +50,25 @@ export const Route = createFileRoute("/api/music")({
           return Response.json({ message: "Your profile level is not configured for Music Lab yet." }, { status: 409 });
         }
 
+        // Initial cost safeguard: allow one successful song per account in a rolling 24-hour window.
+        const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { count: recentSongs, error: usageReadError } = await supabaseAdmin
+          .from("ai_usage_events")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("operation", "music_generation")
+          .eq("success", true)
+          .gte("created_at", since24h);
+        if (usageReadError) {
+          console.error("[music-lab] usage safeguard unavailable");
+          return Response.json({ message: "Music generation is temporarily unavailable." }, { status: 503 });
+        }
+        if ((recentSongs ?? 0) >= 1) {
+          return Response.json(
+            { message: "You can create one song every 24 hours for now. Please come back later for another track." },
+            { status: 429 },
+          );
+        }
         const apiKey = process.env["GOOGLE_GEMINI_API_KEY"];
         if (!apiKey) {
           return Response.json(
