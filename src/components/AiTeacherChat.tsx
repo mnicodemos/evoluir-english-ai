@@ -145,9 +145,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
       cancelVoiceRecording();
       setMicState("idle");
       toast.error(
-        cause instanceof Error
-          ? cause.message
-          : t("Microphone unavailable. Please try again."),
+        cause instanceof Error ? cause.message : t("Microphone unavailable. Please try again."),
       );
     } finally {
       micBusy.current = false;
@@ -450,8 +448,20 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
               type="button"
               size="icon"
               variant={micState === "recording" ? "destructive" : "outline"}
-              aria-label={t(micState === "recording" ? "Stop recording" : micState === "transcribing" ? "Transcribing speech" : "Record a message")}
-              title={t(micState === "recording" ? "Stop recording" : micState === "transcribing" ? "Transcribing speech" : "Record a message")}
+              aria-label={t(
+                micState === "recording"
+                  ? "Stop recording"
+                  : micState === "transcribing"
+                    ? "Transcribing speech"
+                    : "Record a message",
+              )}
+              title={t(
+                micState === "recording"
+                  ? "Stop recording"
+                  : micState === "transcribing"
+                    ? "Transcribing speech"
+                    : "Record a message",
+              )}
               disabled={turn.isPending || micState === "transcribing"}
               onClick={() => void toggleTeacherMicrophone()}
             >
