@@ -22,9 +22,9 @@ export function RealLifeChallengeCard({
   const [selected, setSelected] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const [syncReady, setSyncReady] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<
-    "loading" | "synced" | "pending" | "local-only"
-  >("loading");
+  const [syncStatus, setSyncStatus] = useState<"loading" | "synced" | "pending" | "local-only">(
+    "loading",
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -99,18 +99,16 @@ export function RealLifeChallengeCard({
           setSelected(restoredSelection);
           setCompleted(localCompleted);
           if (restoredSelection || localCompleted) {
-            const { error: saveError } = await supabase
-              .from("real_life_challenge_progress")
-              .upsert(
-                {
-                  user_id: userId!,
-                  lesson_key: lessonKey!,
-                  selected_option_id: restoredSelection,
-                  completed: localCompleted,
-                  updated_at: new Date().toISOString(),
-                },
-                { onConflict: "user_id,lesson_key" },
-              );
+            const { error: saveError } = await supabase.from("real_life_challenge_progress").upsert(
+              {
+                user_id: userId!,
+                lesson_key: lessonKey!,
+                selected_option_id: restoredSelection,
+                completed: localCompleted,
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: "user_id,lesson_key" },
+            );
             if (saveError) throw saveError;
           }
         }
@@ -146,18 +144,16 @@ export function RealLifeChallengeCard({
     if (isCompleted) writeStorage(challengeStorageKey(userId, lessonKey), "done");
     setSyncStatus("pending");
     try {
-      const { error } = await supabase
-        .from("real_life_challenge_progress")
-        .upsert(
-          {
-            user_id: userId,
-            lesson_key: lessonKey,
-            selected_option_id: optionId,
-            completed: isCompleted,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "user_id,lesson_key" },
-        );
+      const { error } = await supabase.from("real_life_challenge_progress").upsert(
+        {
+          user_id: userId,
+          lesson_key: lessonKey,
+          selected_option_id: optionId,
+          completed: isCompleted,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,lesson_key" },
+      );
       if (error) throw error;
       setSyncStatus("synced");
     } catch {
