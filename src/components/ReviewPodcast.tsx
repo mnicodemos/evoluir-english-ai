@@ -200,7 +200,11 @@ export function LessonPodcast({
         className="h-1.5"
       />
 
-      <ol ref={listRef} className={cn("max-h-80 space-y-2 overflow-y-auto pr-1", compact && "max-h-64 space-y-1.5")} translate="no">
+      <ol
+        ref={listRef}
+        className={cn("max-h-80 space-y-2 overflow-y-auto pr-1", compact && "max-h-64 space-y-1.5")}
+        translate="no"
+      >
         {lines.map((line, index) => (
           <li key={index}>
             <button
