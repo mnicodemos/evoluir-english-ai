@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Camera, Check, Copy, Loader2, MessageCircle, Settings, UserRound } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { AdminPanelButton } from "@/components/AdminPanelButton";
@@ -194,10 +194,10 @@ export function ProfileMenu({
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_path);
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const resetCloseTimer = () => {
+  const resetCloseTimer = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     closeTimer.current = setTimeout(() => setOpen(false), 13_000);
-  };
+  }, []);
   useEffect(() => {
     if (!open) {
       if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -209,7 +209,7 @@ export function ProfileMenu({
       if (closeTimer.current) clearTimeout(closeTimer.current);
       closeTimer.current = null;
     };
-  }, [open]);
+  }, [open, resetCloseTimer]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
