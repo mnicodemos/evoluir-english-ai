@@ -494,8 +494,8 @@ function PlanTodaySummary({
   weekDone: boolean;
   translate: (label: string) => string;
 }) {
-  // Keep the calendar visually neutral regardless of daily or weekly completion.
-  const tone = "grey";
+  // Keep pink while the study week is pending; remove green completion styling.
+  const tone = weekDone ? "grey" : "pink";
   const label = weekDone
     ? translate("Week plan complete")
     : !next
