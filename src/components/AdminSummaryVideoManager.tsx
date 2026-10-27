@@ -91,7 +91,9 @@ export function AdminSummaryVideoManager() {
             onChange={(event) => setLevel(event.target.value as (typeof LEVELS)[number]["value"])}
           >
             {LEVELS.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
             ))}
           </select>
         </label>
@@ -119,7 +121,9 @@ export function AdminSummaryVideoManager() {
       ) : (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            {(linksQuery.data ?? []).filter((item) => item.videoUrl).length} of {(linksQuery.data ?? []).length} lessons have a Vimeo link.
+            {(linksQuery.data ?? []).filter((item) => item.videoUrl).length} of {
+              (linksQuery.data ?? []).length
+            } lessons have a Vimeo link.
           </p>
           {visibleLessons.map((item) => {
             const draft = drafts[item.key] ?? "";
@@ -131,7 +135,8 @@ export function AdminSummaryVideoManager() {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="text-xs font-medium text-muted-foreground">
-                      {level === "business" ? "Business English" : level.toUpperCase()} · Unit {item.unit}, Lesson {item.position}
+                      {level === "business" ? "Business English" : level.toUpperCase()} · Unit{" "}
+                      {item.unit}, Lesson {item.position}
                     </p>
                     <h4 className="mt-1 font-medium">{item.title}</h4>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -143,7 +148,9 @@ export function AdminSummaryVideoManager() {
                       <Check className="size-3" /> Video saved
                     </span>
                   ) : (
-                    <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">No video</span>
+                    <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
+                      No video
+                    </span>
                   )}
                 </div>
 
@@ -162,53 +169,84 @@ export function AdminSummaryVideoManager() {
                     autoComplete="url"
                     placeholder="https://vimeo.com/123456789"
                     value={draft}
-                    onChange={(event) => setDrafts((current) => ({ ...current, [item.key]: event.target.value }))}
+                    onChange={(event) =>
+                      setDrafts((current) => ({ ...current, [item.key]: event.target.value }))
+                    }
                   />
                 </label>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button
                     size="sm"
-                    disabled={!draft.trim() || draft.trim() === savedUrl || isSaving || isDeleting || saveMutation.isPending || deleteMutation.isPending}
+                    disabled={
+                      !draft.trim() ||
+                      draft.trim() === savedUrl ||
+                      isSaving ||
+                      isDeleting ||
+                      saveMutation.isPending ||
+                      deleteMutation.isPending
+                    }
                     onClick={() => saveMutation.mutate({ key: item.key, url: draft.trim() })}
                   >
-                    {isSaving ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="mr-2 size-4" />}
+                    {isSaving ? (
+                      <Loader2 className="mr-2 size-4 animate-spin" />
+                    ) : (
+                      <Save className="mr-2 size-4" />
+                    )}
                     Save Vimeo link
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled={!savedUrl || isSaving || isDeleting || saveMutation.isPending || deleteMutation.isPending}
+                    disabled={
+                      !savedUrl ||
+                      isSaving ||
+                      isDeleting ||
+                      saveMutation.isPending ||
+                      deleteMutation.isPending
+                    }
                     onClick={() => {
                       if (window.confirm("Remove this video link from Summary for this lesson?")) {
                         deleteMutation.mutate(item.key);
                       }
                     }}
                   >
-                    {isDeleting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Trash2 className="mr-2 size-4" />}
+                    {isDeleting ? (
+                      <Loader2 className="mr-2 size-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="mr-2 size-4" />
+                    )}
                     Remove link
                   </Button>
                   {draft.trim() === savedUrl && savedUrl && (
-                    <span className="self-center text-xs text-muted-foreground">No unsaved changes</span>
+                    <span className="self-center text-xs text-muted-foreground">
+                      No unsaved changes
+                    </span>
                   )}
                 </div>
-                {(saveMutation.isError && saveMutation.variables?.key === item.key) && (
+                {saveMutation.isError && saveMutation.variables?.key === item.key && (
                   <p className="mt-2 text-sm text-destructive">
-                    {saveMutation.error instanceof Error ? saveMutation.error.message : "The link could not be saved."}
+                    {saveMutation.error instanceof Error
+                    ? saveMutation.error.message
+                    : "The link could not be saved."}
                   </p>
                 )}
-                {(deleteMutation.isError && deleteMutation.variables === item.key) && (
+                {deleteMutation.isError && deleteMutation.variables === item.key && (
                   <p className="mt-2 text-sm text-destructive">
-                    {deleteMutation.error instanceof Error ? deleteMutation.error.message : "The link could not be removed."}
+                    {deleteMutation.error instanceof Error
+                    ? deleteMutation.error.message
+                    : "The link could not be removed."}
                   </p>
                 )}
-                {(saveMutation.isSuccess && saveMutation.variables?.key === item.key) && (
+                {saveMutation.isSuccess && saveMutation.variables?.key === item.key && (
                   <p className="mt-2 text-sm text-emerald-600">Vimeo link saved to Summary.</p>
                 )}
               </article>
             );
           })}
           {visibleLessons.length === 0 && (
-            <p className="py-5 text-sm text-muted-foreground">No lessons match your search.</p>
+            <p className="py-5 text-sm text-muted-foreground">
+              No lessons match your search.
+            </p>
           )}
         </div>
       )}
