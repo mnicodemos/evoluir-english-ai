@@ -3,11 +3,7 @@ import { useEffect, useState } from "react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
-import {
-  challengeFor,
-  challengeOption,
-  challengeStorageKey,
-} from "@/lib/realLifeChallenges";
+import { challengeFor, challengeOption, challengeStorageKey } from "@/lib/realLifeChallenges";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { cn } from "@/lib/utils";
 
