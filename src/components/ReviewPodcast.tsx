@@ -28,12 +28,14 @@ export function LessonPodcast({
   progress,
   onProgress,
   t,
+  compact = false,
 }: {
   lessonId: string;
   level: string;
   progress: number;
   onProgress: (percent: number) => void;
   t: (text: string) => string;
+  compact?: boolean;
 }) {
   const load = useServerFn(loadLessonPodcast);
   const query = useQuery({
@@ -144,7 +146,7 @@ export function LessonPodcast({
 
   return (
     <section
-      className="card-soft space-y-4 p-4 sm:p-5"
+      className={cn("card-soft space-y-4 p-4 sm:p-5", compact && "space-y-3 p-3 sm:p-4")}
       data-media-playing={playing ? "true" : "false"}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -198,7 +200,11 @@ export function LessonPodcast({
         className="h-1.5"
       />
 
-      <ol ref={listRef} className="max-h-80 space-y-2 overflow-y-auto pr-1" translate="no">
+      <ol
+        ref={listRef}
+        className={cn("max-h-80 space-y-2 overflow-y-auto pr-1", compact && "max-h-64 space-y-1.5")}
+        translate="no"
+      >
         {lines.map((line, index) => (
           <li key={index}>
             <button

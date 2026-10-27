@@ -400,11 +400,12 @@ function LessonPage() {
                   <img
                     src="/study-books/1793031809285.jpg"
                     alt="EVO and Leo"
-                    className="mx-auto h-auto max-h-64 w-full rounded-xl object-contain md:max-h-72"
+                    className="mx-auto h-auto w-full rounded-xl object-contain"
                     loading="lazy"
                   />
                   <div className="min-w-0 space-y-3">
                     <LessonPodcast
+                      compact
                       lessonId={lessonId}
                       level={lesson.level}
                       progress={progress}
