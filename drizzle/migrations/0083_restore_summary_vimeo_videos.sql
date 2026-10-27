@@ -12,8 +12,7 @@ SET
     WHEN 'a1-u1-l3' THEN 'https://vimeo.com/1239904982'
     WHEN 'biz-u1-l1' THEN 'https://vimeo.com/1239925702'
     ELSE video_url
-  END,
-  video_duration_seconds = 0
+  END
 WHERE curriculum_key IN (
   'b1-u2-l2',
   'b2-u1-l1',
