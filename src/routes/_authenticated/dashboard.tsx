@@ -31,7 +31,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
@@ -141,6 +141,24 @@ function DashboardNotifications({
   translate,
   placement,
 }: DashboardNotificationsProps) {
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetCloseTimer = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpen(false), 13_000);
+  };
+  useEffect(() => {
+    if (!open) {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+      return;
+    }
+    resetCloseTimer();
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    };
+  }, [open]);
   // Everything the student still has to do, most immediate first: the launch
   // campaign's mission of the day, the plan's day, today's goal, due reviews,
   // then new content in each area.
@@ -333,7 +351,7 @@ function DashboardNotifications({
   const needsNewActivity = goalMinutesLeft > 0 && indicators.ready && !englishPending;
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
@@ -360,6 +378,9 @@ function DashboardNotifications({
       <PopoverContent
         align="end"
         sideOffset={8}
+        onPointerMove={resetCloseTimer}
+        onKeyDown={resetCloseTimer}
+        onClick={resetCloseTimer}
         className={`dashboard-shell dark w-[min(20rem,calc(100vw-1.5rem))] p-2 ${graphitePanelClass}`}
       >
         <p className="px-2 py-1.5 font-display text-sm font-semibold">
