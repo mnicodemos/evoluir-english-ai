@@ -495,8 +495,8 @@ function LessonPage() {
                   <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
                     <iframe
                       className="h-full w-full"
-                      src="https://www.youtube-nocookie.com/embed/McFzodsLg_0"
-                      title="B1 Unit 2 Lesson 2 — Reading a Work Report"
+                      src="https://player.vimeo.com/video/1239699995"
+                      title="B1 Unit 2 Lesson 2 — Reading a Work Report (Vimeo)"
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
