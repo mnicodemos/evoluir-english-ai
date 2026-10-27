@@ -66,7 +66,9 @@ export function AdminSummaryVideoManager() {
   });
 
   const visibleLessons = (linksQuery.data ?? []).filter((item) =>
-    `${item.unit} ${item.position} ${item.title} ${item.key}`.toLowerCase().includes(filter.toLowerCase()),
+    `${item.unit} ${item.position} ${item.title} ${item.key}`
+      .toLowerCase()
+      .includes(filter.toLowerCase()),
   );
 
   return (
@@ -78,7 +80,8 @@ export function AdminSummaryVideoManager() {
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
           Manage the Vimeo link displayed in each lesson's student-facing Summary. Changes are
-          written directly to the lessons table used by Summary; the legacy Videos table is not used.
+          written directly to the lessons table used by Summary; the legacy Videos table is not
+          used.
         </p>
       </div>
 
@@ -121,9 +124,8 @@ export function AdminSummaryVideoManager() {
       ) : (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            {(linksQuery.data ?? []).filter((item) => item.videoUrl).length} of {
-              (linksQuery.data ?? []).length
-            } lessons have a Vimeo link.
+            {(linksQuery.data ?? []).filter((item) => item.videoUrl).length} of{" "}
+            {(linksQuery.data ?? []).length} lessons have a Vimeo link.
           </p>
           {visibleLessons.map((item) => {
             const draft = drafts[item.key] ?? "";
@@ -245,9 +247,7 @@ export function AdminSummaryVideoManager() {
             );
           })}
           {visibleLessons.length === 0 && (
-            <p className="py-5 text-sm text-muted-foreground">
-              No lessons match your search.
-            </p>
+            <p className="py-5 text-sm text-muted-foreground">No lessons match your search.</p>
           )}
         </div>
       )}
