@@ -57,7 +57,7 @@ export function lessonVideoReport(
     }
     const mine = approved.find((row) => row.curriculum_key === plan.key);
     const approvedId = mine
-      ? vimeoVideoId(mine.video_url) ?? youtubeVideoId(mine.video_url)
+      ? (vimeoVideoId(mine.video_url) ?? youtubeVideoId(mine.video_url))
       : null;
     return {
       key: plan.key,
