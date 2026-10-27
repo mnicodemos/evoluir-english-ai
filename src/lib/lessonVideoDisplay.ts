@@ -14,8 +14,8 @@ export function vimeoVideoId(url: string | null | undefined): string | null {
   if (!url) return null;
   try {
     const parsed = new URL(url);
-    if (parsed.protocol !== "https:" || !/(^|\\.)vimeo\\.com$/i.test(parsed.hostname)) return null;
-    const match = parsed.pathname.match(/^\\/(?:video\\/)?(\\d+)\\/?$/);
+    if (parsed.protocol !== "https:" || !/(^|\.)vimeo\.com$/i.test(parsed.hostname)) return null;
+    const match = parsed.pathname.match(/^\/(?:video\/)?(\d+)\/?$/);
     return match?.[1] ?? null;
   } catch {
     return null;
@@ -31,7 +31,7 @@ export function isPlayableVideoUrl(url: string | null | undefined): boolean {
   } catch {
     return false;
   }
-  return youtubeVideoId(url) !== null || /\.(mp4|webm|ogg|m3u8)(\?|$)/i.test(url);
+  return youtubeVideoId(url) !== null || vimeoVideoId(url) !== null || /\.(mp4|webm|ogg|m3u8)(\?|$)/i.test(url);
 }
 
 /**
