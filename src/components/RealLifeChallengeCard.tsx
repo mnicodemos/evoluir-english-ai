@@ -277,7 +277,8 @@ export function RealLifeChallengeCard({
           </div>
           {completed && (
             <p className="flex items-center gap-2 text-sm font-medium text-brand-green">
-              <CheckCircle2 className="size-4" aria-hidden="true" /> {t("Challenge completed. Your lesson score is unchanged.")}
+              <CheckCircle2 className="size-4" aria-hidden="true" />{" "}
+              {t("Challenge completed. Your lesson score is unchanged.")}
             </p>
           )}
         </div>
