@@ -335,9 +335,7 @@ function DashboardNotifications({
   const activeItems = items.filter((item) => item.visible);
   const hasNotifications = activeItems.length > 0;
   const lifeNotificationIds = ["life-tasks", "goal-steps", "habits"];
-  const hasLifeNotifications = activeItems.some((item) =>
-    lifeNotificationIds.includes(item.id),
-  );
+  const hasLifeNotifications = activeItems.some((item) => lifeNotificationIds.includes(item.id));
   const hasNonLifeNotifications = activeItems.some(
     (item) => !lifeNotificationIds.includes(item.id),
   );
