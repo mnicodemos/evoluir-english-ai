@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Headphones,
   Lightbulb,
+  CalendarCheck2,
   CalendarDays,
   Medal,
   MessageSquareText,
@@ -322,11 +323,19 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       <Link to="/study-plan">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium">
-          <CalendarDays
-            className={weekDone ? "size-3.5 shrink-0 text-muted-foreground" : "size-3.5 shrink-0 text-pink-400"}
-            strokeWidth={2.2}
-            aria-hidden="true"
-          />
+          {weekDone ? (
+            <CalendarCheck2
+              className="size-3.5 shrink-0 text-brand-green"
+              strokeWidth={2.2}
+              aria-hidden="true"
+            />
+          ) : (
+            <CalendarDays
+              className="size-3.5 shrink-0 text-pink-400"
+              strokeWidth={2.2}
+              aria-hidden="true"
+            />
+          )}
           {t("Your week")}
         </span>
       </Link>
