@@ -131,23 +131,23 @@ export function AdminSummaryVideoManager() {
             } lessons have a Vimeo link.
           </p>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {visibleLessons.map((item) => {
-            const draft = drafts[item.key] ?? "";
-            const savedUrl = item.videoUrl ?? "";
-            const isSaving = saveMutation.isPending && saveMutation.variables?.key === item.key;
-            const isDeleting = deleteMutation.isPending && deleteMutation.variables === item.key;
-            return (
-              <article key={item.key} className="rounded-lg border border-border p-3 sm:p-4">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium text-muted-foreground">
-                      {level === "business" ? "Business English" : level.toUpperCase()} · Unit{" "}
-                      {item.unit}, Lesson {item.position}
-                    </p>
-                    <h4 className="mt-1 font-medium">{item.title}</h4>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {item.copiesWithVideo} of {item.copies} lesson records currently have a link.
-                    </p>
+            {visibleLessons.map((item) => {
+              const draft = drafts[item.key] ?? "";
+              const savedUrl = item.videoUrl ?? "";
+              const isSaving = saveMutation.isPending && saveMutation.variables?.key === item.key;
+              const isDeleting = deleteMutation.isPending && deleteMutation.variables === item.key;
+              return (
+                <article key={item.key} className="rounded-lg border border-border p-3 sm:p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        {level === "business" ? "Business English" : level.toUpperCase()} · Unit{" "}
+                        {item.unit}, Lesson {item.position}
+                      </p>
+                      <h4 className="mt-1 font-medium">{item.title}</h4>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {item.copiesWithVideo} of {item.copies} lesson records currently have a link.
+                      </p>
                   </div>
                   {savedUrl ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs text-emerald-600">
