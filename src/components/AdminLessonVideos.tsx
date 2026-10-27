@@ -68,7 +68,9 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
         <span
           className={cn(
             "ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold",
-            currentUrl ? "bg-brand-green/15 text-brand-green" : "bg-secondary text-muted-foreground",
+            currentUrl
+              ? "bg-brand-green/15 text-brand-green"
+              : "bg-secondary text-muted-foreground",
           )}
         >
           {currentUrl ? "Com vídeo" : "Sem vídeo"}
