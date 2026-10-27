@@ -472,6 +472,24 @@ function LessonPage() {
                     : "Everything you need from this lesson, straight to the point."}
                 </p>
               </div>
+              {lesson?.curriculum_key === "b1-u2-l2" && (
+                <section className="space-y-2" aria-labelledby="summary-video-title">
+                  <h3 id="summary-video-title" className="text-sm font-semibold">
+                    Video reinforcement
+                  </h3>
+                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
+                    <iframe
+                      className="h-full w-full"
+                      src="https://player.vimeo.com/video/1239699995"
+                      title="B1 Unit 2 Lesson 2 — Reading a Work Report (Vimeo)"
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                </section>
+              )}
               {guide.map((section) => (
                 <section key={section.id} className="space-y-2">
                   <h3 className="text-sm font-semibold">
@@ -487,24 +505,7 @@ function LessonPage() {
                 </section>
               ))}
 
-              {lesson?.curriculum_key === "b1-u2-l2" && (
-                <section className="space-y-2" aria-labelledby="summary-video-title">
-                  <h3 id="summary-video-title" className="text-sm font-semibold">
-                    Video reinforcement
-                  </h3>
-                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
-                    <iframe
-                      className="h-full w-full"
-                      src="https://www.youtube-nocookie.com/embed/McFzodsLg_0"
-                      title="B1 Unit 2 Lesson 2 — Reading a Work Report"
-                      loading="lazy"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  </div>
-                </section>
-              )}
+
             </div>
           </TabsContent>
 
