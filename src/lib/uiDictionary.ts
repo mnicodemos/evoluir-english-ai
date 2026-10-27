@@ -1228,6 +1228,13 @@ const baseUiPt: Record<string, string> = {
   "EVO explains": "A EVO explica",
   "Try another approach": "Tentar outra abordagem",
   "Finish challenge": "Concluir desafio",
+  "Complete challenge": "Concluir desafio",
+  "Put your English to the test": "Coloque seu inglês à prova",
+  "Practice a real situation. Choose what you would say.": "Pratique uma situação real. Escolha o que você diria.",
+  "Your mission": "Sua missão",
+  "Choose your response": "Escolha sua resposta",
+  "Loading saved challenge progress…": "Carregando o progresso salvo do desafio…",
+  "Challenge completed. Your lesson score is unchanged.": "Desafio concluído. A nota da lição não foi alterada.",
   "Stop and check": "Parar e verificar",
   "Playing...": "Tocando...",
   "You finished the 3 sentences of this group. A new set will be released when you create new lessons in the Learning Center.":
