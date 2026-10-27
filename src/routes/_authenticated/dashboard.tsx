@@ -491,9 +491,11 @@ function PlanTodaySummary({
   todayDone: boolean;
   translate: (label: string) => string;
 }) {
-  // Show the green checked calendar only when every planned day is done.
-  // Completing today's activity must not mark an unfinished week as complete.
-  const ok = weekDone;
+  // Green means the whole week is complete; blue means today's plan is done;
+  // pink means the next planned activity is still pending.
+  const tone = weekDone ? "green" : todayDone ? "blue" : "pink";
+  const calendarDate = todayDone ? studyToday() : (next?.date ?? studyToday());
+  const dayNumber = Number(calendarDate.slice(-2));
   const label = weekDone
     ? translate("Week plan complete")
     : !next
@@ -511,15 +513,28 @@ function PlanTodaySummary({
   return (
     <DashboardHeaderStat
       icon={
-        ok ? (
+        weekDone ? (
           <CalendarCheck2 className="size-6" strokeWidth={2.2} />
         ) : (
-          <CalendarDays className="size-6" strokeWidth={2.2} />
+          <span className="relative grid size-6 place-items-center">
+            <CalendarDays className="size-6" strokeWidth={2.2} />
+            <span className="absolute top-[10px] text-[8px] font-bold leading-none">
+              {dayNumber}
+            </span>
+          </span>
         )
       }
-      tone={ok ? "green" : "pink"}
+      tone={tone}
       label={label}
       value={weekDone ? translate("All days done") : translate("Your week")}
+      valueStyle={{
+        color:
+          tone === "green"
+            ? "var(--brand-green)"
+            : tone === "blue"
+              ? "rgb(56 189 248)"
+              : "rgb(244 114 182)",
+      }}
       // Always three lines, like the other header cells (user request).
       detail={detail}
       to="/study-plan"
