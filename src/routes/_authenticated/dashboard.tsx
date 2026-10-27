@@ -370,26 +370,27 @@ function DashboardNotifications({
             {activeItems.map((item) => {
               const isLifeActivity = ["life-tasks", "goal-steps", "habits"].includes(item.id);
               return (
-              <Link
-                key={item.id}
-                to={item.to}
-                className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-              >
-                <span
-                  className="grid size-8 place-items-center rounded-full bg-brand-green/15 text-brand-green"
-                  style={
-                    isLifeActivity
-                      ? {
-                          color: "oklch(0.72 0.10 220)",
-                          backgroundColor: "color-mix(in oklab, oklch(0.72 0.10 220) 15%, transparent)",
-                        }
-                      : undefined
-                  }
+                <Link
+                  key={item.id}
+                  to={item.to}
+                  className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
                 >
-                  <item.icon className="size-4" aria-hidden="true" />
-                </span>
-                <span>{translate(item.label)}</span>
-              </Link>
+                  <span
+                    className="grid size-8 place-items-center rounded-full bg-brand-green/15 text-brand-green"
+                    style={
+                      isLifeActivity
+                        ? {
+                            color: "oklch(0.72 0.10 220)",
+                            backgroundColor:
+                              "color-mix(in oklab, oklch(0.72 0.10 220) 15%, transparent)",
+                          }
+                        : undefined
+                    }
+                  >
+                    <item.icon className="size-4" aria-hidden="true" />
+                  </span>
+                  <span>{translate(item.label)}</span>
+                </Link>
               );
             })}
             {needsNewActivity ? (
