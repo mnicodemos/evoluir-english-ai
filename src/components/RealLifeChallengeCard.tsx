@@ -1,10 +1,14 @@
-import { CheckCircle2, RotateCcw, Target, Zap, BriefcaseBusiness } from "lucide-react";
+import { BriefcaseBusiness, CheckCircle2, RotateCcw, Target, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { challengeFor, challengeOption, challengeStorageKey } from "@/lib/realLifeChallenges";
+import {
+  challengeFor,
+  challengeOption,
+  challengeStorageKey,
+} from "@/lib/realLifeChallenges";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { cn } from "@/lib/utils";
 
