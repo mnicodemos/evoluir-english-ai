@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { BookmarkCheck, GraduationCap, Plus, Send, Sparkles } from "lucide-react";
+import {
+  BookmarkCheck,
+  GraduationCap,
+  Loader2,
+  Mic,
+  MicOff,
+  Plus,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import {
   Conversation,
@@ -29,6 +39,12 @@ import {
 } from "@/lib/teacherChat";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
+import {
+  cancelVoiceRecording,
+  startVoiceRecording,
+  stopVoiceRecording,
+} from "@/lib/voice-recorder";
+import { transcribeAudio } from "@/lib/transcribe";
 
 /**
  * Display-only formatting for teacher replies: the "Correct form:" line becomes a
@@ -94,12 +110,47 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
   const [messages, setMessages] = useState<TeacherChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | undefined>(undefined);
   const [input, setInput] = useState("");
+  const [micState, setMicState] = useState<"idle" | "recording" | "transcribing">("idle");
+  const micBusy = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
   const [mode, setMode] = useState<string | null>(null);
   const [coachActive, setCoachActive] = useState(false);
   // The last reply's mistake went to "My mistakes" for spaced review.
   const [mistakeSaved, setMistakeSaved] = useState(false);
+
+  useEffect(() => () => cancelVoiceRecording(), []);
+
+  async function toggleTeacherMicrophone() {
+    if (micBusy.current) return;
+    micBusy.current = true;
+    try {
+      if (micState === "recording") {
+        setMicState("transcribing");
+        const audio = await stopVoiceRecording();
+        const transcript = await transcribeAudio(audio);
+        setInput((current) =>
+          [current.trim(), transcript]
+            .filter(Boolean)
+            .join(current.trim() ? " " : "")
+            .slice(0, TEACHER_MESSAGE_MAX),
+        );
+        setMicState("idle");
+        requestAnimationFrame(() => inputRef.current?.focus());
+      } else {
+        await startVoiceRecording();
+        setMicState("recording");
+      }
+    } catch (cause) {
+      cancelVoiceRecording();
+      setMicState("idle");
+      toast.error(
+        cause instanceof Error ? cause.message : t("Microphone unavailable. Please try again."),
+      );
+    } finally {
+      micBusy.current = false;
+    }
+  }
 
   // Time with the AI Teacher counts toward today's minutes once the student
   // has written at least one message (saved when leaving the screen).
@@ -378,7 +429,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             maxLength={TEACHER_MESSAGE_MAX}
             rows={2}
             placeholder={t("Type your message...")}
-            disabled={turn.isPending}
+            disabled={turn.isPending || micState === "transcribing"}
             onChange={(event) => setInput(event.target.value)}
             onFocus={(event) => {
               const target = event.currentTarget;
@@ -392,15 +443,46 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
             }}
             className="min-h-[52px] scroll-mb-32 resize-none"
           />
-          <Button
-            type="submit"
-            size="icon"
-            className="shrink-0"
-            aria-label={t("Send message")}
-            disabled={turn.isPending || !validateTeacherMessage(input).ok}
-          >
-            <Send className="size-4" aria-hidden="true" />
-          </Button>
+          <div className="flex shrink-0 flex-col gap-2">
+            <Button
+              type="button"
+              size="icon"
+              variant={micState === "recording" ? "destructive" : "outline"}
+              aria-label={t(
+                micState === "recording"
+                  ? "Stop recording"
+                  : micState === "transcribing"
+                    ? "Transcribing speech"
+                    : "Record a message",
+              )}
+              title={t(
+                micState === "recording"
+                  ? "Stop recording"
+                  : micState === "transcribing"
+                    ? "Transcribing speech"
+                    : "Record a message",
+              )}
+              disabled={turn.isPending || micState === "transcribing"}
+              onClick={() => void toggleTeacherMicrophone()}
+            >
+              {micState === "transcribing" ? (
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              ) : micState === "recording" ? (
+                <MicOff className="size-4" aria-hidden="true" />
+              ) : (
+                <Mic className="size-4" aria-hidden="true" />
+              )}
+            </Button>
+            <Button
+              type="submit"
+              size="icon"
+              className="shrink-0"
+              aria-label={t("Send message")}
+              disabled={turn.isPending || !validateTeacherMessage(input).ok || micState !== "idle"}
+            >
+              <Send className="size-4" aria-hidden="true" />
+            </Button>
+          </div>
         </form>
       </div>
     </div>

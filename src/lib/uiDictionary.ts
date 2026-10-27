@@ -3,6 +3,7 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Microphone unavailable. Please try again.": "Microfone indisponível. Tente novamente.",
   Corrected: "Corrigido",
   "Next plan on Monday": "Próximo plano na segunda",
   "Delete this saved mistake? This cannot be undone.":
