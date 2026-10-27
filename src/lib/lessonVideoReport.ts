@@ -56,7 +56,9 @@ export function lessonVideoReport(
       counts.set(id, entry);
     }
     const mine = approved.find((row) => row.curriculum_key === plan.key);
-    const approvedId = mine ? vimeoVideoId(mine.video_url) ?? youtubeVideoId(mine.video_url) : null;
+    const approvedId = mine
+      ? (vimeoVideoId(mine.video_url) ?? youtubeVideoId(mine.video_url))
+      : null;
     return {
       key: plan.key,
       unit: plan.unit,
@@ -134,7 +136,6 @@ export function lessonVideoListText(
   }
   return lines.join("\n").trimEnd();
 }
-
 
 /** Canonical Vimeo URL accepted by the admin video manager. */
 export function canonicalVimeoUrl(input: string): string | null {
