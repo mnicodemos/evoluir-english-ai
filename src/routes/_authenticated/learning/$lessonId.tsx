@@ -404,16 +404,16 @@ function LessonPage() {
                     loading="lazy"
                   />
                   <div className="min-w-0 space-y-3">
-                  <LessonPodcast
-                    lessonId={lessonId}
-                    level={lesson.level}
-                    progress={progress}
-                    onProgress={handleProgress}
-                    t={t}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {t("Tap a line to hear it again from there.")}
-                  </p>
+                    <LessonPodcast
+                      lessonId={lessonId}
+                      level={lesson.level}
+                      progress={progress}
+                      onProgress={handleProgress}
+                      t={t}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {t("Tap a line to hear it again from there.")}
+                    </p>
                   </div>
                 </div>
               </div>
