@@ -575,6 +575,13 @@
       "when": 1792971403104,
       "tag": "0081_0081_lesson_videos",
       "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1793088000000,
+      "tag": "0082_admin_vimeo_lesson_management_apply",
+      "breakpoints": true
     }
   ]
 }
