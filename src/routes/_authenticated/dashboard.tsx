@@ -488,13 +488,10 @@ const PLAN_SKILL_LABELS: Record<string, string> = {
 function PlanTodaySummary({
   next,
   weekDone,
-  todayDone,
   translate,
 }: {
   next: StudyPlanDay | null | undefined;
   weekDone: boolean;
-  /** Today's plan day is already done. */
-  todayDone: boolean;
   translate: (label: string) => string;
 }) {
   // Keep the calendar visually neutral regardless of daily or weekly completion.
@@ -703,12 +700,6 @@ function Dashboard() {
                 <PlanTodaySummary
                   next={planNext}
                   weekDone={!!studyPlan && studyPlan.plan.nextIndex === null}
-                  todayDone={
-                    !!studyPlan &&
-                    studyPlan.plan.days.some(
-                      (day) => day.date === studyToday() && day.status === "done",
-                    )
-                  }
                   translate={t}
                 />
               </div>
