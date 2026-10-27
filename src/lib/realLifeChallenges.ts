@@ -38,8 +38,7 @@ export const REAL_LIFE_CHALLENGES: Record<string, RealLifeChallenge> = {
         id: "closed",
         text: "Nice.",
         outcome: "adjust",
-        consequence:
-          "Your colleague smiles, but the conversation quickly runs out of energy.",
+        consequence: "Your colleague smiles, but the conversation quickly runs out of energy.",
         feedback:
           "This is polite, but it does not give the other person much to respond to. Add a detail or ask a follow-up question to keep the conversation going.",
       },
