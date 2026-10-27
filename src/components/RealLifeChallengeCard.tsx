@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  challengeFor,
-  challengeOption,
-  challengeStorageKey,
-} from "@/lib/realLifeChallenges";
+import { challengeFor, challengeOption, challengeStorageKey } from "@/lib/realLifeChallenges";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { cn } from "@/lib/utils";
 
@@ -55,25 +51,42 @@ export function RealLifeChallengeCard({
 
         if (data) {
           const remoteSelected = data.selected_option_id;
-          setSelected(remoteSelected && challenge?.options.some((option) => option.id === remoteSelected) ? remoteSelected : null);
+          setSelected(
+            remoteSelected && challenge?.options.some((option) => option.id === remoteSelected)
+              ? remoteSelected
+              : null,
+          );
           setCompleted(data.completed);
           if (data.completed) writeStorage(challengeStorageKey(userId!, lessonKey!), "done");
           if (remoteSelected) writeStorage(localSelectionKey, remoteSelected);
         } else {
-          const restoredSelection = localSelected && challenge?.options.some((option) => option.id === localSelected) ? localSelected : null;
+          const restoredSelection =
+            localSelected && challenge?.options.some((option) => option.id === localSelected)
+              ? localSelected
+              : null;
           setSelected(restoredSelection);
           setCompleted(localCompleted);
           if (restoredSelection || localCompleted) {
-            const { error: saveError } = await supabase.from("real_life_challenge_progress").upsert(
-              { user_id: userId!, lesson_key: lessonKey!, selected_option_id: restoredSelection, completed: localCompleted },
-              { onConflict: "user_id,lesson_key" },
-            );
+            const { error: saveError } = await supabase
+              .from("real_life_challenge_progress")
+              .upsert(
+                {
+                  user_id: userId!,
+                  lesson_key: lessonKey!,
+                  selected_option_id: restoredSelection,
+                  completed: localCompleted,
+                },
+                { onConflict: "user_id,lesson_key" },
+              );
             if (saveError) throw saveError;
           }
         }
       } catch {
         if (cancelled) return;
-        const restoredSelection = localSelected && challenge?.options.some((option) => option.id === localSelected) ? localSelected : null;
+        const restoredSelection =
+          localSelected && challenge?.options.some((option) => option.id === localSelected)
+            ? localSelected
+            : null;
         setSelected(restoredSelection);
         setCompleted(localCompleted);
       } finally {
@@ -134,7 +147,10 @@ export function RealLifeChallengeCard({
       className="card-soft relative space-y-5 overflow-hidden border border-primary/25 p-4 sm:p-6"
       aria-labelledby="real-life-challenge-title"
     >
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-primary/70" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-primary/70"
+      />
       <header className="flex items-start gap-3 pt-1">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <Target className="size-5" aria-hidden="true" />
@@ -143,7 +159,10 @@ export function RealLifeChallengeCard({
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-primary">
             EVO · {t("Real-Life Challenge")}
           </p>
-          <h3 id="real-life-challenge-title" className="text-lg font-semibold leading-snug sm:text-xl">
+          <h3
+            id="real-life-challenge-title"
+            className="text-lg font-semibold leading-snug sm:text-xl"
+          >
             {t("Put your English to the test")}
           </h3>
           <p className="text-sm leading-relaxed text-muted-foreground">
@@ -181,7 +200,7 @@ export function RealLifeChallengeCard({
               type="button"
               role="radio"
               aria-checked={isChosen}
-              disabled={!!selected && !isChosen || !syncReady}
+              disabled={(!!selected && !isChosen) || !syncReady}
               onClick={() => chooseOption(option.id)}
               className={cn(
                 "flex min-h-12 w-full items-start gap-3 rounded-xl border p-3 text-left text-sm leading-relaxed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -194,18 +213,30 @@ export function RealLifeChallengeCard({
                 !syncReady && "cursor-wait",
               )}
             >
-              <span className={cn(
-                "flex size-7 shrink-0 items-center justify-center rounded-lg border text-xs font-bold",
-                isChosen ? "border-primary/40 bg-primary/10 text-primary" : "border-border bg-secondary/60 text-foreground",
-              )}>
+              <span
+                className={cn(
+                  "flex size-7 shrink-0 items-center justify-center rounded-lg border text-xs font-bold",
+                  isChosen
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border bg-secondary/60 text-foreground",
+                )}
+              >
                 {String.fromCharCode(65 + index)}
               </span>
-              <span translate="no" className="min-w-0 flex-1 pt-0.5">{option.text}</span>
-              {isChosen && <CheckCircle2 className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />}
+              <span translate="no" className="min-w-0 flex-1 pt-0.5">
+                {option.text}
+              </span>
+              {isChosen && (
+                <CheckCircle2 className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />
+              )}
             </button>
           );
         })}
-        {!syncReady && <p className="text-xs text-muted-foreground">{t("Loading saved challenge progress…")}</p>}
+        {!syncReady && (
+          <p className="text-xs text-muted-foreground">
+            {t("Loading saved challenge progress…")}
+          </p>
+        )}
       </div>
 
       {chosen && (
@@ -214,17 +245,28 @@ export function RealLifeChallengeCard({
             <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">
               {t("What happens")}
             </p>
-            <p translate="no" className="text-sm leading-relaxed">{chosen.consequence}</p>
+            <p translate="no" className="text-sm leading-relaxed">
+              {chosen.consequence}
+            </p>
           </div>
           <div className="flex gap-3 rounded-xl border border-primary/15 bg-primary/5 p-3 sm:p-4">
             <EvoAvatar decorative className="size-10 shrink-0 sm:size-11" />
             <div className="min-w-0 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-wide text-primary">{t("EVO explains")}</p>
-              <p translate="no" className="text-sm leading-relaxed">{chosen.feedback}</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-primary">
+                {t("EVO explains")}
+              </p>
+              <p translate="no" className="text-sm leading-relaxed">
+                {chosen.feedback}
+              </p>
             </div>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            <Button className="min-h-11 w-full sm:w-auto" size="sm" variant="outline" onClick={retry}>
+            <Button
+              className="min-h-11 w-full sm:w-auto"
+              size="sm"
+              variant="outline"
+              onClick={retry}
+            >
               <RotateCcw className="size-4" aria-hidden="true" /> {t("Try another approach")}
             </Button>
             {!completed && (
