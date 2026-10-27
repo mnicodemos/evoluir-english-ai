@@ -55,9 +55,7 @@ describe("lesson video report", () => {
   });
 
   it("canonicalizes supported Vimeo links for administrator entry", () => {
-    expect(canonicalVimeoUrl("https://vimeo.com/1239966935")).toBe(
-      "https://vimeo.com/1239966935",
-    );
+    expect(canonicalVimeoUrl("https://vimeo.com/1239966935")).toBe("https://vimeo.com/1239966935");
     expect(canonicalVimeoUrl("https://player.vimeo.com/video/1239966935?h=abc")).toBe(
       "https://vimeo.com/1239966935?h=abc",
     );
