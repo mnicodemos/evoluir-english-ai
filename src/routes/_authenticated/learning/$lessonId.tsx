@@ -19,7 +19,6 @@ import { AppShell } from "@/components/AppShell";
 import { EvoGuide } from "@/components/EvoGuide";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { LessonQuiz } from "@/components/LessonQuiz";
-import { LessonVideo } from "@/components/LessonVideo";
 import { LessonPodcast } from "@/components/ReviewPodcast";
 import { RealLifeChallengeCard } from "@/components/RealLifeChallengeCard";
 import { Button } from "@/components/ui/button";
@@ -43,7 +42,7 @@ import { findCurriculumLesson } from "@/lib/curriculum";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
-import { formatVideoDuration, videoReviewPoints, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
+import { vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -130,9 +129,7 @@ function LessonPage() {
       });
   }, [needsQuizRepair, repairPlan, lessonId, repairLesson, queryClient]);
   // Reinforcement copy comes from the lesson text that already exists.
-  const reviewPoints = videoReviewPoints(lesson?.summary);
   const summaryVimeoUrl = vimeoEmbedUrl(lesson?.video_url);
-  const videoLength = formatVideoDuration(lesson?.video_duration_seconds);
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
   const lessonSkill = lesson?.skill
     ? t(lesson.skill.charAt(0).toUpperCase() + lesson.skill.slice(1))
@@ -421,34 +418,14 @@ function LessonPage() {
                 </div>
               </div>
             ) : (
-              <>
-                <div>
-                  <h2 className="font-display text-lg font-semibold">{t("Video reinforcement")}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {t("Watch this short explanation before you practise.")}
-                    {videoLength ? ` About ${videoLength}.` : ""}
-                  </p>
-                </div>
-                <LessonVideo
-                  url={lesson.video_url}
-                  progress={progress}
-                  onProgress={handleProgress}
-                  resumeKey={lessonId}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t("Turn on the video subtitles (CC) to follow along while you watch.")}
-                </p>
-              </>
-            )}
-
-            {reviewPoints.length > 0 && (
               <section className="card-soft space-y-2 p-5">
-                <h3 className="text-sm font-semibold">What you just reviewed</h3>
-                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                  {reviewPoints.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
+                <h2 className="font-display text-lg font-semibold">{t("Lesson audio")}</h2>
+                <p className="text-sm text-muted-foreground">
+                  {t("Audio is not available for this lesson yet. You can watch the video in Summary.")}
+                </p>
+                <Button size="sm" onClick={() => setActiveTab("summary")}>
+                  <BookOpen className="size-4" /> Summary
+                </Button>
               </section>
             )}
 
