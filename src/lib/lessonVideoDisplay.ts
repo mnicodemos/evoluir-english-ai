@@ -70,5 +70,7 @@ export function formatVideoDuration(seconds: number | null | undefined): string 
   if (!seconds || seconds <= 0) return null;
   const minutes = Math.floor(seconds / 60);
   const remainder = seconds % 60;
-  return remainder ? String(minutes) + ":" + String(remainder).padStart(2, "0") : String(minutes) + ":00";
+  return remainder
+    ? String(minutes) + ":" + String(remainder).padStart(2, "0")
+    : String(minutes) + ":00";
 }
