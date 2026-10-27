@@ -93,13 +93,13 @@ export const Route = createFileRoute("/api/music")({
           `Topic: ${parsed.data.topic}.`,
           `Genre: ${parsed.data.genre}.`,
           `Learning focus: ${parsed.data.goal}.`,
-          "Use clear, natural English and a memorable chorus. Keep the song around 60–90 seconds. Make the lyrics original; do not imitate any named artist or existing song, and do not quote copyrighted lyrics.",
+          "Use clear, natural English and a memorable chorus. Keep the complete song exactly 30 seconds long. Make the lyrics original; do not imitate any named artist or existing song, and do not quote copyrighted lyrics.",
           "Return the lyrics as readable text with section labels such as [Verse 1], [Chorus], and [Verse 2], together with the generated audio.",
         ].join("\n");
 
         try {
           const upstream = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/lyria-3.5:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/lyria-3-clip-preview:generateContent",
             {
               method: "POST",
               headers: {
@@ -151,7 +151,7 @@ export const Route = createFileRoute("/api/music")({
           const { error: usageWriteError } = await supabaseAdmin.from("ai_usage_events").insert({
             user_id: userId,
             operation: "music_generation",
-            model: "lyria-3.5",
+            model: "lyria-3-clip-preview",
             status: "success",
             success: true,
             completed_at: new Date().toISOString(),
