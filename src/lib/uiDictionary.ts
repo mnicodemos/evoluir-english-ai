@@ -1223,7 +1223,6 @@ const baseUiPt: Record<string, string> = {
   "Checking...": "Verificando...",
   "Try again": "Tente novamente",
   "Real-Life Challenge": "Desafio da Vida Real",
-  "Completed": "Concluído",
   "Choose your email": "Escolha seu email",
   "What happens": "O que acontece",
   "EVO explains": "A EVO explica",
