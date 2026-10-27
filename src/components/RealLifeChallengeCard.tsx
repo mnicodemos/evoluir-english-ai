@@ -39,7 +39,8 @@ export function RealLifeChallengeCard({
       const localSelected = readStorage(localSelectionKey);
 
       try {
-        const { data, error } = await supabase.from("real_life_challenge_progress")
+        const { data, error } = await supabase
+          .from("real_life_challenge_progress")
           .select("selected_option_id, completed")
           .eq("user_id", userId!)
           .eq("lesson_key", lessonKey!)
@@ -229,11 +230,7 @@ export function RealLifeChallengeCard({
             </button>
           );
         })}
-        {!syncReady && (
-          <p className="text-xs text-muted-foreground">
-            {t("Loading saved challenge progress…")}
-          </p>
-        )}
+        {!syncReady && <p className="text-xs text-muted-foreground">{t("Loading saved challenge progress…")}</p>}
       </div>
 
       {chosen && (
