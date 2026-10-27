@@ -5,6 +5,7 @@ import {
   BookOpen,
   BookOpenText,
   CalendarCheck2,
+  CalendarCheck2,
   CalendarDays,
   ChartLine,
   Check,
@@ -494,8 +495,9 @@ function PlanTodaySummary({
   weekDone: boolean;
   translate: (label: string) => string;
 }) {
-  // Keep pink while the study week is pending; remove green completion styling.
-  const tone = weekDone ? "grey" : "pink";
+  // A completed week gets the green checked calendar; a pending week stays pink.
+  // Completing today alone never changes the week status.
+  const tone = weekDone ? "green" : "pink";
   const label = weekDone
     ? translate("Week plan complete")
     : !next
@@ -512,7 +514,13 @@ function PlanTodaySummary({
       : translate("Your week");
   return (
     <DashboardHeaderStat
-      icon={<CalendarDays className="size-6" strokeWidth={2.2} />}
+      icon={
+        weekDone ? (
+          <CalendarCheck2 className="size-6" strokeWidth={2.2} />
+        ) : (
+          <CalendarDays className="size-6" strokeWidth={2.2} />
+        )
+      }
       tone={tone}
       label={label}
       value={weekDone ? translate("All days done") : translate("Your week")}
