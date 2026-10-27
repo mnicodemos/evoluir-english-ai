@@ -12,6 +12,8 @@ const baseUiPt: Record<string, string> = {
     "Não foi possível excluir este erro. Tente novamente.",
   Delete: "Excluir",
   "Download study book": "Baixar guia de estudos",
+  "Listen to EVO and LEO explore this lesson before you practise.":
+    "Ouça EVO e LEO explorarem esta lição antes de praticar.",
   "click here": "clique aqui",
   // Life+ AI visual guide (/life/guide)
   "How Life+ AI works": "Como funciona o Life+ AI",
