@@ -116,7 +116,9 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
           </Button>
         </div>
       ) : (
-        <p className="mt-2 text-xs text-muted-foreground">Nenhum vídeo cadastrado para esta lição.</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Nenhum vídeo cadastrado para esta lição.
+        </p>
       )}
 
       <form
