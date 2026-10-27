@@ -491,6 +491,25 @@ function LessonPage() {
                   </div>
                 </section>
               )}
+
+              {lesson?.curriculum_key === "b1-u1-l6" && (
+                <section className="space-y-2" aria-labelledby="summary-video-b1-u1-l6-title">
+                  <h3 id="summary-video-b1-u1-l6-title" className="text-sm font-semibold">
+                    Video reinforcement
+                  </h3>
+                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
+                    <iframe
+                      className="h-full w-full"
+                      src="https://player.vimeo.com/video/1239865994"
+                      title="B1 Unit 1 Lesson 6 — Present Perfect vs Past Simple"
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                </section>
+              )}
               {guide.map((section, sectionIndex) => (
                 <section
                   key={section.id}
