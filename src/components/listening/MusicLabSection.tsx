@@ -131,7 +131,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
             {loading ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Sparkles className="mr-2 size-4" />}
             {loading ? "Creating your song..." : "Create my song"}
           </Button>
-          <p className="text-xs text-muted-foreground">Creates an original English song with vocals and instrumental music.</p>
+          <p className="text-xs text-muted-foreground">Creates an original 30-second English song with vocals and instrumental music.</p>
         </div>
       </form>
 
