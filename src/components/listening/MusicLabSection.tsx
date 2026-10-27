@@ -1,10 +1,8 @@
-import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
 import { Download, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 type GeneratedSong = {
   lyrics: string;
@@ -42,7 +40,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [loading, setLoading] = useState(false);
   const [song, setSong] = useState<GeneratedSong | null>(null);
 
-  async function createSong(event: React.FormEvent<HTMLFormElement>) {
+  async function createSong(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setSong(null);
@@ -144,7 +142,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
             <a
               href={audioUrl}
               download="evoluir-music-lab.mp3"
-              className={cn("inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-sm font-medium text-brand-green hover:bg-brand-green/10")}
+              className="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-sm font-medium text-brand-green hover:bg-brand-green/10"
             >
               <Download className="size-4" /> Download song
             </a>
