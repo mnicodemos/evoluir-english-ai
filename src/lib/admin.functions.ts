@@ -970,20 +970,13 @@ export const setLessonVideo = createServerFn({ method: "POST" })
     }
     const { findCurriculumLesson } = await import("@/lib/curriculum");
     const { findBusinessLesson } = await import("@/lib/businessCourse");
-    const { canonicalYoutubeUrl } = await import("@/lib/lessonVideoReport");
+    const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
     if (!findCurriculumLesson(data.key) && !findBusinessLesson(data.key, "b1")) {
       throw new Error("Unknown lesson");
     }
-    const url = canonicalYoutubeUrl(data.url);
-    if (!url) throw new Error("Paste a YouTube link");
-    // No mm:ss typed: the length comes from YouTube when the key is set.
-    let seconds = data.seconds;
-    const youtubeKey = process.env["YOUTUBE_API_KEY"];
-    if (seconds === null && youtubeKey) {
-      const { fetchVideoDurations } = await import("@/lib/lessonVideo.server");
-      const id = url.slice(url.indexOf("v=") + 2);
-      seconds = (await fetchVideoDurations([id], youtubeKey).catch(() => null))?.get(id) ?? null;
-    }
+    const url = canonicalVimeoUrl(data.url);
+    if (!url) throw new Error("Cole um link válido do Vimeo.");
+    const seconds = data.seconds;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await (supabaseAdmin as unknown as LessonVideosTable)
       .from("lesson_videos")
@@ -1163,6 +1156,11 @@ export const clearLessonVideo = createServerFn({ method: "POST" })
       .from("lesson_videos")
       .delete()
       .eq("curriculum_key", data.key);
-    if (error) throw new Error("The approval could not be removed");
+    if (error) throw new Error("The video could not be removed");
+    const { error: lessonsError } = await supabaseAdmin
+      .from("lessons")
+      .update({ video_url: null, video_duration_seconds: 0 })
+      .eq("curriculum_key", data.key);
+    if (lessonsError) throw new Error("The lesson video could not be removed");
     return { ok: true };
   });
