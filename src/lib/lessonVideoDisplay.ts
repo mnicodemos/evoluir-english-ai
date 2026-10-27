@@ -30,7 +30,8 @@ export function vimeoEmbedUrl(url: string | null | undefined): string | null {
     const parsed = new URL(url);
     const pathMatch = parsed.pathname.match(/^\/(?:video\/)?\d+\/([A-Za-z0-9]+)\/?$/);
     const hash = parsed.searchParams.get("h") ?? pathMatch?.[1] ?? null;
-    return `https://player.vimeo.com/video/${id}${hash ? `?h=${encodeURIComponent(hash)}` : ""}`;
+    const query = hash ? "?h=" + encodeURIComponent(hash) : "";
+    return "https://player.vimeo.com/video/" + id + query;
   } catch {
     return null;
   }
@@ -53,21 +54,21 @@ export function isPlayableVideoUrl(url: string | null | undefined): boolean {
 }
 
 /**
- * Turns the existing lesson summary into 1 to 3 short review points shown under
- * the player ("What you just reviewed"). No new content is invented.
+ * Turns the existing lesson summary into 1 to 3 short review points.
+ * It is deliberately deterministic and never changes the lesson score.
  */
-export function videoReviewPoints(summary: string | null | undefined, max = 3): string[] {
+export function videoReviewPoints(summary: string | null | undefined): string[] {
   if (!summary) return [];
   return summary
     .split(/(?<=[.!?])\s+/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 12)
-    .slice(0, max);
+    .map((part) => part.trim())
+    .filter((part) => part.length >= 20)
+    .slice(0, 3);
 }
 
-/** Formats a stored duration in seconds as "5 min" for the video header. */
 export function formatVideoDuration(seconds: number | null | undefined): string | null {
   if (!seconds || seconds <= 0) return null;
-  const minutes = Math.max(1, Math.round(seconds / 60));
-  return `${minutes} min`;
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  return remainder ? String(minutes) + ":" + String(remainder).padStart(2, "0") : String(minutes) + ":00";
 }
