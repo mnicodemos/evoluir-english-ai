@@ -472,21 +472,6 @@ function LessonPage() {
                     : "Everything you need from this lesson, straight to the point."}
                 </p>
               </div>
-              {guide.map((section) => (
-                <section key={section.id} className="space-y-2">
-                  <h3 className="text-sm font-semibold">
-                    <span aria-hidden="true">{section.emoji}</span> {t(section.title)}
-                  </h3>
-                  <ul className="grid gap-2 sm:grid-cols-2">
-                    {section.items.map((item) => (
-                      <li key={item} className="rounded-lg bg-secondary/60 px-3 py-2 text-sm">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
-
               {lesson?.curriculum_key === "b1-u2-l2" && (
                 <section className="space-y-2" aria-labelledby="summary-video-title">
                   <h3 id="summary-video-title" className="text-sm font-semibold">
@@ -495,7 +480,7 @@ function LessonPage() {
                   <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
                     <iframe
                       className="h-full w-full"
-                      src="https://www.youtube-nocookie.com/embed/McFzodsLg_0"
+                      src="https://player.vimeo.com/video/1239699995"
                       title="B1 Unit 2 Lesson 2 — Reading a Work Report"
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
@@ -505,6 +490,52 @@ function LessonPage() {
                   </div>
                 </section>
               )}
+              {guide.map((section, sectionIndex) => (
+                <section
+                  key={section.id}
+                  className={
+                    sectionIndex === 0 ? "space-y-3" : "space-y-3 border-t border-border/60 pt-5"
+                  }
+                >
+                  <h3 className="flex items-center gap-2 text-sm font-semibold">
+                    <span aria-hidden="true" className="text-base">
+                      {section.emoji}
+                    </span>
+                    <span>{t(section.title)}</span>
+                  </h3>
+                  <ul
+                    className={
+                      section.id === "quick"
+                        ? "grid gap-2 sm:grid-cols-2"
+                        : section.id === "usage"
+                          ? "grid gap-2"
+                          : "grid gap-2"
+                    }
+                  >
+                    {section.items.map((item, itemIndex) => (
+                      <li
+                        key={item}
+                        className={
+                          section.id === "quick"
+                            ? "rounded-lg border border-border/60 bg-background/60 px-3 py-2 text-sm leading-relaxed"
+                            : section.id === "attention"
+                              ? "rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5 text-sm leading-relaxed"
+                              : section.id === "before-quiz"
+                                ? "flex gap-3 rounded-lg bg-primary/5 px-3 py-2.5 text-sm leading-relaxed"
+                                : "rounded-lg bg-secondary/40 px-3 py-2.5 text-sm leading-relaxed"
+                        }
+                      >
+                        {section.id === "before-quiz" && (
+                          <span className="shrink-0 font-semibold text-primary">
+                            {itemIndex + 1}.
+                          </span>
+                        )}
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
             </div>
           </TabsContent>
 
