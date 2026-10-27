@@ -21,7 +21,7 @@ const LEVELS = [
 ] as const;
 
 function getVimeoVideoId(url: string): string | null {
-  const match = url.match(/vimeo\\.com\\/(?:video\\/)?(\\d+)/i);
+  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
   return match?.[1] ?? null;
 }
 
