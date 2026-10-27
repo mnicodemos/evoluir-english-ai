@@ -496,7 +496,7 @@ function LessonPage() {
                     <iframe
                       className="h-full w-full"
                       src="https://www.youtube-nocookie.com/embed/XxtW0dfwtY8"
-                      title="B1 Unit 2 Lesson 2 — Reading a Work Report"
+                      title="Vídeo de reforço — B1 Unidade 2, Lição 2: Leitura de um relatório de trabalho"
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
