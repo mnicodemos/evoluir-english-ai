@@ -68,7 +68,9 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
         <span
           className={cn(
             "ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold",
-            currentUrl ? "bg-brand-green/15 text-brand-green" : "bg-secondary text-muted-foreground",
+            currentUrl
+              ? "bg-brand-green/15 text-brand-green"
+              : "bg-secondary text-muted-foreground",
           )}
         >
           {currentUrl ? "Com vídeo" : "Sem vídeo"}
@@ -114,9 +116,7 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
           </Button>
         </div>
       ) : (
-        <p className="mt-2 text-xs text-muted-foreground">
-          Nenhum vídeo cadastrado para esta lição.
-        </p>
+        <p className="mt-2 text-xs text-muted-foreground">Nenhum vídeo cadastrado para esta lição.</p>
       )}
 
       <form
@@ -148,7 +148,6 @@ function LessonRow({ item, level }: { item: LessonVideoReportItem; level: Level 
   );
 }
 
-/** Admin can audit and maintain the Vimeo link for every lesson without code changes. */
 export function AdminLessonVideos() {
   const [level, setLevel] = useState<Level>("a1");
   const load = useServerFn(getLessonVideos);
@@ -206,14 +205,14 @@ export function AdminLessonVideos() {
       ) : (
         <div className="mt-3 space-y-4">
           {units.map((unit) => {
-            const group = lessons.filter((item) => item.unit === unit);
+            const unitLessons = lessons.filter((item) => item.unit === unit);
             return (
               <div key={unit}>
                 <p className="text-xs font-semibold uppercase text-muted-foreground">
-                  {group[0]?.unitTitle}
+                  {unitLessons[0]?.unitTitle}
                 </p>
                 <ul className="mt-2 space-y-2">
-                  {group.map((item) => (
+                  {unitLessons.map((item) => (
                     <LessonRow key={item.key} item={item} level={level} />
                   ))}
                 </ul>
