@@ -529,6 +529,43 @@ function LessonPage() {
                   </div>
                 </section>
               )}
+              {lesson?.curriculum_key === "a1-u1-l3" && (
+                <section className="space-y-2" aria-labelledby="summary-video-a1-u1-l3-title">
+                  <h3 id="summary-video-a1-u1-l3-title" className="text-sm font-semibold">
+                    Video reinforcement
+                  </h3>
+                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
+                    <iframe
+                      className="h-full w-full"
+                      src="https://player.vimeo.com/video/1239904982"
+                      title="A1 Unit 1 Lesson 3 — Introducing Yourself"
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                </section>
+              )}
+
+              {lesson?.curriculum_key === "biz-u1-l1" && (
+                <section className="space-y-2" aria-labelledby="summary-video-biz-u1-l1-title">
+                  <h3 id="summary-video-biz-u1-l1-title" className="text-sm font-semibold">
+                    Video reinforcement
+                  </h3>
+                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
+                    <iframe
+                      className="h-full w-full"
+                      src="https://player.vimeo.com/video/1239925702"
+                      title="Business English Unit 1 Lesson 1 — Following a Status Meeting"
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                </section>
+              )}
               {guide.map((section, sectionIndex) => (
                 <section
                   key={section.id}
