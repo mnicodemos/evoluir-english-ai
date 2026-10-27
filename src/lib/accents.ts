@@ -4,6 +4,8 @@
  */
 export const ACCENTS = {
   green: "bg-brand-green/12 text-brand-green ring-brand-green/25",
+  diamond:
+    "bg-[oklch(0.72_0.10_220)]/12 text-[oklch(0.72_0.10_220)] ring-[oklch(0.85_0.10_210)]/25",
   sky: "bg-sky-400/12 text-sky-400 ring-sky-400/25",
   violet: "bg-violet-400/12 text-violet-400 ring-violet-400/25",
   amber: "bg-amber-400/12 text-amber-400 ring-amber-400/25",

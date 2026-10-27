@@ -367,18 +367,32 @@ function DashboardNotifications({
         </p>
         {hasNotifications ? (
           <div className="grid gap-1">
-            {activeItems.map((item) => (
-              <Link
-                key={item.id}
-                to={item.to}
-                className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-              >
-                <span className="grid size-8 place-items-center rounded-full bg-brand-green/15 text-brand-green">
-                  <item.icon className="size-4" aria-hidden="true" />
-                </span>
-                <span>{translate(item.label)}</span>
-              </Link>
-            ))}
+            {activeItems.map((item) => {
+              const isLifeActivity = ["life-tasks", "goal-steps", "habits"].includes(item.id);
+              return (
+                <Link
+                  key={item.id}
+                  to={item.to}
+                  className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                >
+                  <span
+                    className="grid size-8 place-items-center rounded-full bg-brand-green/15 text-brand-green"
+                    style={
+                      isLifeActivity
+                        ? {
+                            color: "oklch(0.72 0.10 220)",
+                            backgroundColor:
+                              "color-mix(in oklab, oklch(0.72 0.10 220) 15%, transparent)",
+                          }
+                        : undefined
+                    }
+                  >
+                    <item.icon className="size-4" aria-hidden="true" />
+                  </span>
+                  <span>{translate(item.label)}</span>
+                </Link>
+              );
+            })}
             {needsNewActivity ? (
               <div className="mt-1 rounded-md border border-brand-green/25 bg-brand-green/[0.06] p-2.5">
                 <p className="flex gap-2 text-xs leading-snug text-muted-foreground">
