@@ -22,19 +22,14 @@ export function RealLifeChallengeCard({
   const [selected, setSelected] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const [syncReady, setSyncReady] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<"loading" | "synced" | "pending" | "local-only">(
-    "loading",
-  );
 
   useEffect(() => {
     let cancelled = false;
     setSyncReady(false);
-    setSyncStatus("loading");
     setSelected(null);
     setCompleted(false);
     if (!userId || !lessonKey) {
       setSyncReady(true);
-      setSyncStatus("synced");
       return;
     }
 
@@ -112,10 +107,8 @@ export function RealLifeChallengeCard({
             if (saveError) throw saveError;
           }
         }
-        setSyncStatus("synced");
       } catch {
         if (cancelled) return;
-        setSyncStatus("local-only");
         const restoredSelection =
           localSelected && challenge?.options.some((option) => option.id === localSelected)
             ? localSelected
@@ -142,7 +135,6 @@ export function RealLifeChallengeCard({
     if (optionId) writeStorage(selectionKey, optionId);
     else writeStorage(selectionKey, "");
     if (isCompleted) writeStorage(challengeStorageKey(userId, lessonKey), "done");
-    setSyncStatus("pending");
     try {
       const { error } = await supabase.from("real_life_challenge_progress").upsert(
         {
@@ -155,16 +147,9 @@ export function RealLifeChallengeCard({
         { onConflict: "user_id,lesson_key" },
       );
       if (error) throw error;
-      setSyncStatus("synced");
     } catch {
-      // Keep the local state usable offline, but make the failed sync visible
-      // and let the learner explicitly retry without losing local progress.
-      setSyncStatus("pending");
+      // Keep local progress usable offline. A later progress change retries the sync silently.
     }
-  }
-
-  function retrySync() {
-    void persistProgress(selected, completed);
   }
 
   function chooseOption(optionId: string) {
@@ -277,31 +262,6 @@ export function RealLifeChallengeCard({
           <p className="text-xs text-muted-foreground">{t("Loading saved challenge progress…")}</p>
         )}
       </div>
-
-      {syncStatus === "local-only" && (
-        <div
-          className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
-          role="status"
-        >
-          <p>
-            {t("Progress is available on this device, but could not be loaded from the server.")}
-          </p>
-          <Button size="sm" variant="outline" onClick={retrySync}>
-            {t("Retry sync")}
-          </Button>
-        </div>
-      )}
-      {syncStatus === "pending" && (
-        <div
-          className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
-          role="status"
-        >
-          <p>{t("Your progress is saved on this device and is waiting to sync.")}</p>
-          <Button size="sm" variant="outline" onClick={retrySync}>
-            {t("Retry sync")}
-          </Button>
-        </div>
-      )}
 
       {chosen && (
         <div className="space-y-3" aria-live="polite">
