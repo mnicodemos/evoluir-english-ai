@@ -22,7 +22,8 @@
     "nanoid": "3.3.19",
     "dompurify": "3.4.17",
     "@grpc/grpc-js": "1.13.6",
-    "launch-editor": "2.14.2"
+    "launch-editor": "2.14.2",
+    "undici": "7.30.1"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

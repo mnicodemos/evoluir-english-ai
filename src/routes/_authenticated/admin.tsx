@@ -11,7 +11,6 @@ import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
 import { AdminAlerts } from "@/components/AdminAlerts";
 import { AdminCreditBalance } from "@/components/AdminCreditBalance";
-import { AdminLessonVideos } from "@/components/AdminLessonVideos";
 import { AdminGoals } from "@/components/AdminGoals";
 import { AdminMistakeReview } from "@/components/AdminMistakeReview";
 import { AdminRetention } from "@/components/AdminRetention";
@@ -118,7 +117,7 @@ function AdminPage() {
           <AdminCreditBalance />
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-4 gap-1 sm:grid-cols-7">
+            <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-6">
               <TabsTrigger
                 value="users"
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
@@ -149,12 +148,6 @@ function AdminPage() {
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
               >
                 {t("Retention")}
-              </TabsTrigger>
-              <TabsTrigger
-                value="videos"
-                className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
-              >
-                {t("Videos")}
               </TabsTrigger>
             </TabsList>
 
@@ -233,9 +226,6 @@ function AdminPage() {
               <AdminRetention />
               <AdminGoals />
               <AdminMistakeReview />
-            </TabsContent>
-            <TabsContent value="videos">
-              <AdminLessonVideos />
             </TabsContent>
           </Tabs>
         </section>
