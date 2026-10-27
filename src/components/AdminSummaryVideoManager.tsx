@@ -156,7 +156,8 @@ export function AdminSummaryVideoManager() {
 
                 {item.hasConflictingLinks && (
                   <p className="mt-2 text-xs text-amber-600">
-                    Different links exist across lesson records. Saving one link below will synchronize all records for this lesson.
+                    Different links exist across lesson records. Saving one link below will
+                    synchronize all records for this lesson.
                   </p>
                 )}
 
@@ -226,15 +227,15 @@ export function AdminSummaryVideoManager() {
                 {saveMutation.isError && saveMutation.variables?.key === item.key && (
                   <p className="mt-2 text-sm text-destructive">
                     {saveMutation.error instanceof Error
-                    ? saveMutation.error.message
-                    : "The link could not be saved."}
+                      ? saveMutation.error.message
+                      : "The link could not be saved."}
                   </p>
                 )}
                 {deleteMutation.isError && deleteMutation.variables === item.key && (
                   <p className="mt-2 text-sm text-destructive">
                     {deleteMutation.error instanceof Error
-                    ? deleteMutation.error.message
-                    : "The link could not be removed."}
+                      ? deleteMutation.error.message
+                      : "The link could not be removed."}
                   </p>
                 )}
                 {saveMutation.isSuccess && saveMutation.variables?.key === item.key && (
