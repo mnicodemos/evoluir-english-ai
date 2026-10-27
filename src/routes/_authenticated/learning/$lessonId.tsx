@@ -21,6 +21,7 @@ import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { LessonQuiz } from "@/components/LessonQuiz";
 import { LessonVideo } from "@/components/LessonVideo";
 import { LessonPodcast } from "@/components/ReviewPodcast";
+import { RealLifeChallengeCard } from "@/components/RealLifeChallengeCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -536,6 +537,11 @@ function LessonPage() {
                   </ul>
                 </section>
               ))}
+              <RealLifeChallengeCard
+                lessonKey={lesson?.curriculum_key}
+                userId={profile?.id}
+                t={t}
+              />
             </div>
           </TabsContent>
 
