@@ -10,6 +10,8 @@ const baseUiPt: Record<string, string> = {
     "Seu progresso está salvo neste dispositivo e aguarda sincronização.",
   "B1 Unit 1 Lesson 3 — Keeping a Conversation Going":
     "B1 Unidade 1 Lição 3 — Mantendo uma conversa",
+  "B2 Unit 1 Lesson 1 — Listening to a Debate":
+    "B2 Unidade 1 Lição 1 — Ouvindo um debate",
   "Microphone unavailable. Please try again.": "Microfone indisponível. Tente novamente.",
   Corrected: "Corrigido",
   "Next plan on Monday": "Próximo plano na segunda",

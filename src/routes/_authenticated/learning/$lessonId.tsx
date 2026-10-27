@@ -492,6 +492,25 @@ function LessonPage() {
                 </section>
               )}
 
+              {lesson?.curriculum_key === "b2-u1-l1" && (
+                <section className="space-y-2" aria-labelledby="summary-video-b2-u1-l1-title">
+                  <h3 id="summary-video-b2-u1-l1-title" className="text-sm font-semibold">
+                    Video reinforcement
+                  </h3>
+                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
+                    <iframe
+                      className="h-full w-full"
+                      src="https://player.vimeo.com/video/1239966935"
+                      title={t("B2 Unit 1 Lesson 1 — Listening to a Debate")}
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                </section>
+              )}
+
               {lesson?.curriculum_key === "b1-u1-l3" && (
                 <section className="space-y-2" aria-labelledby="summary-video-b1-u1-l3-title">
                   <h3 id="summary-video-b1-u1-l3-title" className="text-sm font-semibold">
