@@ -46,7 +46,11 @@ export function isPlayableVideoUrl(url: string | null | undefined): boolean {
   } catch {
     return false;
   }
-  return youtubeVideoId(url) !== null || vimeoVideoId(url) !== null || /\.(mp4|webm|ogg|m3u8)(\?|$)/i.test(url);
+  return (
+    youtubeVideoId(url) !== null ||
+    vimeoVideoId(url) !== null ||
+    /\.(mp4|webm|ogg|m3u8)(\?|$)/i.test(url)
+  );
 }
 
 /**
