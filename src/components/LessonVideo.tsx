@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { isPlayableVideoUrl, vimeoVideoId, youtubeVideoId } from "@/lib/lessonVideoDisplay";
+import { isPlayableVideoUrl, vimeoEmbedUrl, youtubeVideoId } from "@/lib/lessonVideoDisplay";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 
 const speeds = [0.75, 1, 1.25, 1.5];
@@ -172,14 +172,14 @@ export function LessonVideo({
     );
   }
 
-  const vimeoId = vimeoVideoId(url);
-  if (vimeoId) {
+  const vimeoUrl = vimeoEmbedUrl(url);
+  if (vimeoUrl) {
     return (
       <div className="space-y-3">
         <div className="overflow-hidden rounded-xl bg-black">
           <iframe
             className="aspect-video w-full"
-            src={`https://player.vimeo.com/video/${vimeoId}`}
+            src={vimeoUrl}
             title="Lesson video"
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
