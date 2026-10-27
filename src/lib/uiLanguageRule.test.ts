@@ -37,6 +37,8 @@ const SAME_IN_BOTH = new Set([
   "UK /",
   "Marcelo",
   "evoluirmaisoficial@hotmail.com",
+  // Accessible title identifying an English learning video, not interface copy.
+  "B1 Unit 1 Lesson 6 — Present Perfect vs Past Simple",
 ]);
 const ATTRS = new Set(["title", "aria-label", "placeholder"]);
 

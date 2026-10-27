@@ -1,4 +1,4 @@
-import { CheckCircle2, RotateCcw, Target, Zap, BriefcaseBusiness } from "lucide-react";
+import { BriefcaseBusiness, CheckCircle2, RotateCcw, Target, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
@@ -231,9 +231,7 @@ export function RealLifeChallengeCard({
           );
         })}
         {!syncReady && (
-          <p className="text-xs text-muted-foreground">
-            {t("Loading saved challenge progress…")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("Loading saved challenge progress…")}</p>
         )}
       </div>
 
@@ -269,7 +267,8 @@ export function RealLifeChallengeCard({
             </Button>
             {!completed && (
               <Button className="min-h-11 w-full sm:w-auto" size="sm" onClick={finish}>
-                <Zap className="size-4" aria-hidden="true" /> {t("Complete challenge")}
+                <Zap className="size-4" aria-hidden="true" />
+                {t("Complete challenge")}
               </Button>
             )}
           </div>
