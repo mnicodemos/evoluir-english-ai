@@ -5,7 +5,6 @@ import {
   BookOpen,
   BookOpenText,
   CalendarCheck2,
-  CalendarCheck2,
   CalendarDays,
   ChartLine,
   Check,
