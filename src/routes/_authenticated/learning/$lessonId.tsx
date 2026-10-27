@@ -481,7 +481,7 @@ function LessonPage() {
                     <iframe
                       className="h-full w-full"
                       src="https://player.vimeo.com/video/1239699995"
-                      title="B1 Unit 2 Lesson 2 — Reading a Work Report (Vimeo)"
+                      title="B1 Unit 2 Lesson 2 — Reading a Work Report"
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
