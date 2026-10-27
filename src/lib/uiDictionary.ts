@@ -2282,6 +2282,10 @@ const baseUiPt: Record<string, string> = {
   "Listen to the podcast": "Ouvir o podcast",
   Episode: "Episódio",
   "Watch the video": "Assistir ao vídeo",
+  "A1 Unit 1 Lesson 3 — Introducing Yourself":
+    "A1 Unidade 1, Lição 3 — Apresentando-se",
+  "Business English Unit 1 Lesson 1 — Following a Status Meeting":
+    "Business English Unidade 1, Lição 1 — Acompanhando uma reunião de status",
   "B1 Unit 2 Lesson 2 — Reading a Work Report":
     "B1 Unidade 2, Lição 2 — Leitura de um relatório de trabalho",
   "Pass the quiz (70%)": "Passar no quiz (70%)",
