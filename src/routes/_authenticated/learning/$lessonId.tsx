@@ -472,21 +472,6 @@ function LessonPage() {
                     : "Everything you need from this lesson, straight to the point."}
                 </p>
               </div>
-              {guide.map((section) => (
-                <section key={section.id} className="space-y-2">
-                  <h3 className="text-sm font-semibold">
-                    <span aria-hidden="true">{section.emoji}</span> {t(section.title)}
-                  </h3>
-                  <ul className="grid gap-2 sm:grid-cols-2">
-                    {section.items.map((item) => (
-                      <li key={item} className="rounded-lg bg-secondary/60 px-3 py-2 text-sm">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
-
               {lesson?.curriculum_key === "b1-u2-l2" && (
                 <section className="space-y-2" aria-labelledby="summary-video-title">
                   <h3 id="summary-video-title" className="text-sm font-semibold">
@@ -505,6 +490,22 @@ function LessonPage() {
                   </div>
                 </section>
               )}
+              {guide.map((section) => (
+                <section key={section.id} className="space-y-2">
+                  <h3 className="text-sm font-semibold">
+                    <span aria-hidden="true">{section.emoji}</span> {t(section.title)}
+                  </h3>
+                  <ul className="grid gap-2 sm:grid-cols-2">
+                    {section.items.map((item) => (
+                      <li key={item} className="rounded-lg bg-secondary/60 px-3 py-2 text-sm">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+
+
             </div>
           </TabsContent>
 
