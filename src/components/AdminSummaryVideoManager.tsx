@@ -21,7 +21,7 @@ const LEVELS = [
 ] as const;
 
 function getVimeoVideoId(url: string): string | null {
-  const match = url.match(/vimeo\\.com\\/(?:video\\/)?(\\d+)/i);
+  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
   return match?.[1] ?? null;
 }
 
@@ -149,7 +149,8 @@ export function AdminSummaryVideoManager() {
                       </p>
                       <h4 className="mt-1 font-medium">{item.title}</h4>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {item.copiesWithVideo} of {item.copies} lesson records currently have a link.
+                        {item.copiesWithVideo} of {item.copies} lesson records currently have a
+                        link.
                       </p>
                     </div>
                     {savedUrl ? (
