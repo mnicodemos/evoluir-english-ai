@@ -3,7 +3,8 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
-  "B1 Unit 1 Lesson 3 — Keeping a Conversation Going": "B1 Unidade 1 Lição 3 — Mantendo uma conversa",
+  "B1 Unit 1 Lesson 3 — Keeping a Conversation Going":
+    "B1 Unidade 1 Lição 3 — Mantendo uma conversa",
   "Microphone unavailable. Please try again.": "Microfone indisponível. Tente novamente.",
   Corrected: "Corrigido",
   "Next plan on Monday": "Próximo plano na segunda",
