@@ -1,6 +1,6 @@
--- Move lesson video management to Vimeo links entered by an administrator.
--- Preserve the six Vimeo reinforcements previously embedded directly in Summary.
--- Safe to re-run: the seed uses ON CONFLICT and the URL constraint is replaced.
+-- Restore the six Vimeo lesson videos that were previously embedded directly in Summary.
+-- Store them as approved lesson links so both Summary and Admin read the same source.
+-- Idempotent: safe to apply again without duplicating rows.
 
 CREATE TABLE IF NOT EXISTS public.lesson_videos (
   curriculum_key text PRIMARY KEY CHECK (char_length(curriculum_key) BETWEEN 3 AND 40),
@@ -14,25 +14,13 @@ ALTER TABLE public.lesson_videos ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.lesson_videos FROM PUBLIC, anon, authenticated;
 GRANT ALL ON public.lesson_videos TO service_role;
 
--- Migration 0081 constrained this field to YouTube URLs. Replace that rule.
 ALTER TABLE public.lesson_videos
   DROP CONSTRAINT IF EXISTS lesson_videos_video_url_check;
 ALTER TABLE public.lesson_videos
   DROP CONSTRAINT IF EXISTS lesson_videos_video_url_vimeo_check;
-
-DELETE FROM public.lesson_videos
-WHERE video_url !~ '^https://vimeo[.]com/[0-9]+([?]h=[A-Za-z0-9]+)?$';
-
 ALTER TABLE public.lesson_videos
   ADD CONSTRAINT lesson_videos_video_url_vimeo_check
   CHECK (video_url ~ '^https://vimeo[.]com/[0-9]+([?]h=[A-Za-z0-9]+)?$');
-
--- Remove legacy YouTube links from lesson records, then seed the six Vimeo
--- links that were previously hard-coded in the Summary component.
-UPDATE public.lessons
-SET video_url = NULL,
-    video_duration_seconds = 0
-WHERE video_url ~* '^https://(www[.]youtube[.]com|youtu[.]be)/';
 
 INSERT INTO public.lesson_videos (curriculum_key, video_url, video_seconds, approved_by, approved_at)
 VALUES
@@ -48,10 +36,10 @@ SET video_url = EXCLUDED.video_url,
     approved_by = EXCLUDED.approved_by,
     approved_at = EXCLUDED.approved_at;
 
-UPDATE public.lessons AS l
-SET video_url = v.video_url,
-    video_duration_seconds = COALESCE(v.video_seconds, 0)
-FROM public.lesson_videos AS v
-WHERE l.curriculum_key = v.curriculum_key;
+UPDATE public.lessons AS lesson
+SET video_url = video.video_url,
+    video_duration_seconds = COALESCE(video.video_seconds, 0)
+FROM public.lesson_videos AS video
+WHERE lesson.curriculum_key = video.curriculum_key;
 
 NOTIFY pgrst, 'reload schema';
