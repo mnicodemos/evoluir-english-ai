@@ -18,6 +18,7 @@ import { AdminSpeakingWait } from "@/components/AdminSpeakingWait";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
+import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isAdminUser, listRegisteredUsers } from "@/lib/admin.functions";
@@ -117,7 +118,7 @@ function AdminPage() {
           <AdminCreditBalance />
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-6">
+            <TabsList className="grid h-auto w-full grid-cols-4 gap-1 sm:grid-cols-7">
               <TabsTrigger
                 value="users"
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
@@ -139,6 +140,12 @@ function AdminPage() {
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
               >
                 {t("Lesson test")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="summary-videos"
+                className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
+              >
+                {t("Summary videos")}
               </TabsTrigger>
               <TabsTrigger value="push" className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm">
                 {t("Push")}
@@ -218,6 +225,9 @@ function AdminPage() {
             </TabsContent>
             <TabsContent value="lesson-test">
               <AdminLessonCompare />
+            </TabsContent>
+            <TabsContent value="summary-videos">
+              <AdminSummaryVideoManager />
             </TabsContent>
             <TabsContent value="push">
               <AdminPushTest />
