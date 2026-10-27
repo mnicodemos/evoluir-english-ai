@@ -9,7 +9,7 @@ import {
   MessageCircleMore,
   Volume2,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AroundYou } from "@/components/AroundYou";
@@ -37,10 +37,10 @@ export function WeatherTalk({
   const [speaking, setSpeaking] = useState(false);
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const resetCloseTimer = () => {
+  const resetCloseTimer = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     closeTimer.current = setTimeout(() => setOpen(false), 13_000);
-  };
+  }, []);
   useEffect(() => {
     if (!open) {
       if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -52,7 +52,7 @@ export function WeatherTalk({
       if (closeTimer.current) clearTimeout(closeTimer.current);
       closeTimer.current = null;
     };
-  }, [open]);
+  }, [open, resetCloseTimer]);
   const talk = WEATHER_TALK[condition];
   const Icon = weatherIcons[condition];
   // The button never shows a bare sun or moon, the usual light/dark theme
