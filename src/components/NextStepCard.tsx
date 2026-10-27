@@ -12,7 +12,6 @@ import {
   GraduationCap,
   Headphones,
   Lightbulb,
-  CalendarCheck2,
   CalendarDays,
   Medal,
   MessageSquareText,
@@ -82,9 +81,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     staleTime: 60 * 1000,
   });
   const weekDone = !!studyPlan && studyPlan.plan.nextIndex === null;
-  const todayDone = !!studyPlan?.plan.days.some(
-    (day) => day.date === studyToday() && day.status === "done",
-  );
   // Vocabulary words whose review date has arrived (same count as the bell).
   const activityIndicators = useActivityIndicators();
   // Reviews waiting today: on phones they take the Quick Win's place when there
@@ -327,21 +323,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       <Link to="/study-plan">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium">
-          {weekDone ? (
-            <CalendarCheck2
-              className="size-3.5 shrink-0 text-brand-green"
-              strokeWidth={2.2}
-              aria-hidden="true"
-            />
-          ) : (
-            <CalendarDays
-              className={
-                todayDone ? "size-3.5 shrink-0 text-brand-green" : "size-3.5 shrink-0 text-pink-400"
-              }
-              strokeWidth={2.2}
-              aria-hidden="true"
-            />
-          )}
+          <CalendarDays
+            className={weekDone ? "size-3.5 shrink-0 text-muted-foreground" : "size-3.5 shrink-0 text-pink-400"}
+            strokeWidth={2.2}
+            aria-hidden="true"
+          />
           {t("Your week")}
         </span>
       </Link>
