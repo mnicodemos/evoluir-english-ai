@@ -231,9 +231,7 @@ export function RealLifeChallengeCard({
           );
         })}
         {!syncReady && (
-          <p className="text-xs text-muted-foreground">
-            {t("Loading saved challenge progress…")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("Loading saved challenge progress…")}</p>
         )}
       </div>
 
