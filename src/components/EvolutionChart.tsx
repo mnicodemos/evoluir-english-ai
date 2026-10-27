@@ -15,6 +15,7 @@ import { buildSkillHistory } from "@/lib/skillHistory";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { studyToday } from "@/lib/today";
+import { ACTIVITY_CHART_COLORS } from "@/lib/activityChartColors";
 
 type Props = {
   userId: string;
@@ -22,12 +23,12 @@ type Props = {
 };
 
 const SERIES_COLORS: Record<string, string> = {
-  Listening: "var(--color-chart-1)",
-  Reading: "var(--color-chart-2)",
-  Talking: "var(--color-chart-3)",
-  Writing: "var(--color-chart-4)",
-  Grammar: "var(--color-chart-5)",
-  Vocabulary: "var(--color-primary)",
+  Listening: ACTIVITY_CHART_COLORS.Listening,
+  Reading: ACTIVITY_CHART_COLORS.Reading,
+  Talking: ACTIVITY_CHART_COLORS.Talking,
+  Writing: ACTIVITY_CHART_COLORS.Writing,
+  Grammar: ACTIVITY_CHART_COLORS.Grammar,
+  Vocabulary: ACTIVITY_CHART_COLORS.Vocabulary,
 };
 
 export function EvolutionChart({ userId }: Props) {

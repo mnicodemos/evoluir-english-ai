@@ -13,6 +13,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { skillBucketOf, type SkillBucket } from "@/lib/studyDay";
 import { useUiLang } from "@/lib/uiLang";
+import { ACTIVITY_CHART_COLORS } from "@/lib/activityChartColors";
 
 type Props = {
   userId: string;
@@ -104,15 +105,15 @@ export function MinutesByDayChart({ userId, level }: Props) {
               labelClassName="text-foreground"
             />
             <Legend wrapperStyle={{ fontSize: "12px" }} iconSize={10} />
-            <Bar dataKey="Lessons" stackId="min" fill="var(--color-chart-5)" />
-            <Bar dataKey="Vocabulary" stackId="min" fill="oklch(0.68 0.13 25)" />
-            <Bar dataKey="Listening" stackId="min" fill="var(--color-chart-1)" />
-            <Bar dataKey="Reading" stackId="min" fill="var(--color-chart-2)" />
-            <Bar dataKey="Talking" stackId="min" fill="var(--color-chart-3)" />
+            <Bar dataKey="Lessons" stackId="min" fill={ACTIVITY_CHART_COLORS.Lessons} />
+            <Bar dataKey="Vocabulary" stackId="min" fill={ACTIVITY_CHART_COLORS.Vocabulary} />
+            <Bar dataKey="Listening" stackId="min" fill={ACTIVITY_CHART_COLORS.Listening} />
+            <Bar dataKey="Reading" stackId="min" fill={ACTIVITY_CHART_COLORS.Reading} />
+            <Bar dataKey="Talking" stackId="min" fill={ACTIVITY_CHART_COLORS.Talking} />
             <Bar
               dataKey="Writing"
               stackId="min"
-              fill="var(--color-chart-4)"
+              fill={ACTIVITY_CHART_COLORS.Writing}
               radius={[4, 4, 0, 0]}
             />
           </BarChart>
