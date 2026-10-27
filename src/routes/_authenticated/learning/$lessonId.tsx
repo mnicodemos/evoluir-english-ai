@@ -443,16 +443,6 @@ function LessonPage() {
 
           <TabsContent value="summary" className="relative z-0 mt-5">
             <div className="card-soft space-y-5 p-6">
-              <div>
-                <h2 className="font-display text-lg font-semibold">
-                  {lang === "pt" ? "Guia de Aprendizagem" : "Learning Guide"}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  {lang === "pt"
-                    ? "Tudo o que você precisa desta lição, direto ao ponto."
-                    : "Everything you need from this lesson, straight to the point."}
-                </p>
-              </div>
               {summaryVimeoUrl ? (
                 <section className="space-y-2" aria-labelledby="summary-video-title">
                   <h3 id="summary-video-title" className="text-sm font-semibold">
@@ -471,6 +461,16 @@ function LessonPage() {
                   </div>
                 </section>
               ) : null}
+              <div>
+                <h2 className="font-display text-lg font-semibold">
+                  {lang === "pt" ? "Guia de Aprendizagem" : "Learning Guide"}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {lang === "pt"
+                    ? "Tudo o que você precisa desta lição, direto ao ponto."
+                    : "Everything you need from this lesson, straight to the point."}
+                </p>
+              </div>
               {guide.map((section, sectionIndex) => (
                 <section
                   key={section.id}
