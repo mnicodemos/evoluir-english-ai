@@ -264,7 +264,10 @@ export function MobileNavigationMenu({
                         : "text-sidebar-foreground/75",
                     }}
                   >
-                    <item.icon className="size-5 shrink-0" style={item.to === "/life" ? { color: "oklch(0.72 0.10 220)" } : undefined} />
+                    <item.icon
+                      className="size-5 shrink-0"
+                      style={item.to === "/life" ? { color: "oklch(0.72 0.10 220)" } : undefined}
+                    />
                     <span className="truncate">{translate(item.label)}</span>
                   </Link>
                 </SheetClose>
@@ -526,7 +529,10 @@ function AppShellContent({
                       : "text-sidebar-foreground/70",
                   }}
                 >
-                  <item.icon className="size-5" style={item.to === "/life" ? { color: "oklch(0.72 0.10 220)" } : undefined} />
+                  <item.icon
+                    className="size-5"
+                    style={item.to === "/life" ? { color: "oklch(0.72 0.10 220)" } : undefined}
+                  />
                   <span className="truncate text-left">{translate(item.label)}</span>
                 </Link>
               </Fragment>
