@@ -141,7 +141,7 @@ export function WeeklyFrequency({
       <div className="flex h-20 min-w-0 flex-col items-center justify-center gap-1 text-center lg:hidden">
         <div className="relative shrink-0">
           <CalendarDays
-            className="size-[1.8rem] text-brand-green"
+            className={cn("size-[1.8rem]", allStudied ? "text-brand-green" : "text-pink-400")}
             strokeWidth={2.4}
             aria-hidden="true"
           />
@@ -168,7 +168,7 @@ export function WeeklyFrequency({
       <div className="flex h-full min-w-0 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-3 sm:px-3 sm:text-left">
         <div className="relative shrink-0 sm:hidden">
           <CalendarDays
-            className="size-[1.8rem] text-brand-green"
+            className={cn("size-[1.8rem]", allStudied ? "text-brand-green" : "text-pink-400")}
             strokeWidth={2.4}
             aria-hidden="true"
           />
@@ -180,7 +180,7 @@ export function WeeklyFrequency({
         </div>
         <div className="relative hidden shrink-0 sm:block">
           <CalendarDays
-            className="size-[2.31rem] text-brand-green"
+            className={cn("size-[2.31rem]", allStudied ? "text-brand-green" : "text-pink-400")}
             strokeWidth={2.4}
             aria-hidden="true"
           />
