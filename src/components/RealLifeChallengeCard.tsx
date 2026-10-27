@@ -22,14 +22,17 @@ export function RealLifeChallengeCard({
   const [selected, setSelected] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const [syncReady, setSyncReady] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<"loading" | "synced" | "pending" | "local-only">("loading");
 
   useEffect(() => {
     let cancelled = false;
     setSyncReady(false);
+    setSyncStatus("loading");
     setSelected(null);
     setCompleted(false);
     if (!userId || !lessonKey) {
       setSyncReady(true);
+      setSyncStatus("synced");
       return;
     }
 
@@ -50,15 +53,39 @@ export function RealLifeChallengeCard({
         if (cancelled) return;
 
         if (data) {
-          const remoteSelected = data.selected_option_id;
-          setSelected(
-            remoteSelected && challenge?.options.some((option) => option.id === remoteSelected)
-              ? remoteSelected
-              : null,
+          const remoteSelected =
+            data.selected_option_id && challenge?.options.some((option) => option.id === data.selected_option_id)
+              ? data.selected_option_id
+              : null;
+          const restoredSelection = remoteSelected ?? (
+            localSelected && challenge?.options.some((option) => option.id === localSelected)
+              ? localSelected
+              : null
           );
-          setCompleted(data.completed);
-          if (data.completed) writeStorage(challengeStorageKey(userId!, lessonKey!), "done");
-          if (remoteSelected) writeStorage(localSelectionKey, remoteSelected);
+          // Completion is monotonic: a locally completed challenge must not be
+          // silently downgraded by an older/incomplete server record.
+          const restoredCompleted = data.completed || localCompleted;
+          setSelected(restoredSelection);
+          setCompleted(restoredCompleted);
+          if (restoredCompleted) writeStorage(challengeStorageKey(userId!, lessonKey!), "done");
+          if (restoredSelection) writeStorage(localSelectionKey, restoredSelection);
+
+          if (
+            restoredCompleted !== data.completed ||
+            restoredSelection !== data.selected_option_id
+          ) {
+            const { error: reconcileError } = await supabase.from("real_life_challenge_progress").upsert(
+              {
+                user_id: userId!,
+                lesson_key: lessonKey!,
+                selected_option_id: restoredSelection,
+                completed: restoredCompleted,
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: "user_id,lesson_key" },
+            );
+            if (reconcileError) throw reconcileError;
+          }
         } else {
           const restoredSelection =
             localSelected && challenge?.options.some((option) => option.id === localSelected)
@@ -73,14 +100,17 @@ export function RealLifeChallengeCard({
                 lesson_key: lessonKey!,
                 selected_option_id: restoredSelection,
                 completed: localCompleted,
+                updated_at: new Date().toISOString(),
               },
               { onConflict: "user_id,lesson_key" },
             );
             if (saveError) throw saveError;
           }
         }
+        setSyncStatus("synced");
       } catch {
         if (cancelled) return;
+        setSyncStatus("local-only");
         const restoredSelection =
           localSelected && challenge?.options.some((option) => option.id === localSelected)
             ? localSelected
@@ -107,6 +137,7 @@ export function RealLifeChallengeCard({
     if (optionId) writeStorage(selectionKey, optionId);
     else writeStorage(selectionKey, "");
     if (isCompleted) writeStorage(challengeStorageKey(userId, lessonKey), "done");
+    setSyncStatus("pending");
     try {
       const { error } = await supabase.from("real_life_challenge_progress").upsert(
         {
@@ -119,9 +150,16 @@ export function RealLifeChallengeCard({
         { onConflict: "user_id,lesson_key" },
       );
       if (error) throw error;
+      setSyncStatus("synced");
     } catch {
-      // Keep the local state usable offline; the next load retries reconciliation.
+      // Keep the local state usable offline, but make the failed sync visible
+      // and let the learner explicitly retry without losing local progress.
+      setSyncStatus("pending");
     }
+  }
+
+  function retrySync() {
+    void persistProgress(selected, completed);
   }
 
   function chooseOption(optionId: string) {
@@ -234,6 +272,23 @@ export function RealLifeChallengeCard({
           <p className="text-xs text-muted-foreground">{t("Loading saved challenge progress…")}</p>
         )}
       </div>
+
+      {syncStatus === "local-only" && (
+        <div className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm sm:flex-row sm:items-center sm:justify-between" role="status">
+          <p>{t("Progress is available on this device, but could not be loaded from the server.")}</p>
+          <Button size="sm" variant="outline" onClick={retrySync}>
+            {t("Retry sync")}
+          </Button>
+        </div>
+      )}
+      {syncStatus === "pending" && (
+        <div className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm sm:flex-row sm:items-center sm:justify-between" role="status">
+          <p>{t("Your progress is saved on this device and is waiting to sync.")}</p>
+          <Button size="sm" variant="outline" onClick={retrySync}>
+            {t("Retry sync")}
+          </Button>
+        </div>
+      )}
 
       {chosen && (
         <div className="space-y-3" aria-live="polite">
