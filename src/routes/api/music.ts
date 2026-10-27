@@ -148,6 +148,15 @@ export const Route = createFileRoute("/api/music")({
             );
           }
 
+          const { error: usageWriteError } = await supabaseAdmin.from("ai_usage_events").insert({
+            user_id: userId,
+            operation: "music_generation",
+            model: "lyria-3.5",
+            status: "success",
+            success: true,
+            completed_at: new Date().toISOString(),
+          });
+          if (usageWriteError) console.error("[music-lab] could not record successful generation");
           return Response.json({ lyrics, audioBase64, mimeType });
         } catch (error) {
           console.error("[music-lab] generation failed", error instanceof Error ? error.message : "unknown");
