@@ -103,6 +103,7 @@ export function RealLifeChallengeCard({
           lesson_key: lessonKey,
           selected_option_id: optionId,
           completed: isCompleted,
+          updated_at: new Date().toISOString(),
         },
         { onConflict: "user_id,lesson_key" },
       );
@@ -124,7 +125,7 @@ export function RealLifeChallengeCard({
 
   function finish() {
     setCompleted(true);
-    writeStorage(challengeStorageKey(userId ?? "anonymous", lessonKey ?? challenge.key), "done");
+    if (userId && lessonKey) writeStorage(challengeStorageKey(userId, lessonKey), "done");
     void persistProgress(selected, true);
   }
 
