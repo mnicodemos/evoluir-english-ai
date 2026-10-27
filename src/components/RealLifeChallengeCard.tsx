@@ -67,15 +67,17 @@ export function RealLifeChallengeCard({
           setSelected(restoredSelection);
           setCompleted(localCompleted);
           if (restoredSelection || localCompleted) {
-            const { error: saveError } = await supabase.from("real_life_challenge_progress").upsert(
-            {
-              user_id: userId!,
-              lesson_key: lessonKey!,
-              selected_option_id: restoredSelection,
-              completed: localCompleted,
-            },
-            { onConflict: "user_id,lesson_key" },
-          );
+            const { error: saveError } = await supabase
+              .from("real_life_challenge_progress")
+              .upsert(
+                {
+                  user_id: userId!,
+                  lesson_key: lessonKey!,
+                  selected_option_id: restoredSelection,
+                  completed: localCompleted,
+                },
+                { onConflict: "user_id,lesson_key" },
+              );
             if (saveError) throw saveError;
           }
         }
@@ -267,14 +269,15 @@ export function RealLifeChallengeCard({
             </Button>
             {!completed && (
               <Button className="min-h-11 w-full sm:w-auto" size="sm" onClick={finish}>
-                <Zap className="size-4" aria-hidden="true" />{" "}
-              {t("Complete challenge")}
+                <Zap className="size-4" aria-hidden="true" />
+                {t("Complete challenge")}
               </Button>
             )}
           </div>
           {completed && (
             <p className="flex items-center gap-2 text-sm font-medium text-brand-green">
-              <CheckCircle2 className="size-4" aria-hidden="true" /> {t("Challenge completed. Your lesson score is unchanged.")}
+              <CheckCircle2 className="size-4" aria-hidden="true" />{" "}
+              {t("Challenge completed. Your lesson score is unchanged.")}
             </p>
           )}
         </div>
