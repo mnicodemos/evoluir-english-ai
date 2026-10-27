@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const requestSchema = z.object({
   topic: z.string().trim().min(2).max(80),
@@ -36,6 +35,7 @@ export const Route = createFileRoute("/api/music")({
           return Response.json({ message: "Choose a topic, style and learning focus." }, { status: 400 });
         }
 
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: profile, error: profileError } = await supabaseAdmin
           .from("profiles")
           .select("level")
