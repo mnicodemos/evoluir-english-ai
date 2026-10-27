@@ -37,6 +37,7 @@ export function LifeHeader() {
   return (
     <PageHeader
       icon={Sprout}
+      accent="diamond"
       className="mb-4"
       title={
         // The name with its plus in the brand colour, like Evoluir+.
