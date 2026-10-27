@@ -9,6 +9,19 @@ export function youtubeVideoId(url: string): string | null {
   return match?.[1] ?? null;
 }
 
+/** Extracts a numeric Vimeo id from a public or player Vimeo URL. */
+export function vimeoVideoId(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" || !/(^|\\.)vimeo\\.com$/i.test(parsed.hostname)) return null;
+    const match = parsed.pathname.match(/^\\/(?:video\\/)?(\\d+)\\/?$/);
+    return match?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** True when the URL can be played by the existing lesson player. */
 export function isPlayableVideoUrl(url: string | null | undefined): boolean {
   if (!url) return false;
