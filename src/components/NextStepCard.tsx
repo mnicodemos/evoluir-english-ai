@@ -32,7 +32,6 @@ import { useMistakesDue } from "@/hooks/useMistakesDue";
 import { useNextStep } from "@/hooks/useNextStep";
 import { useProfile } from "@/hooks/useProfile";
 import { useTodayActivities } from "@/components/DailyGoalCard";
-import { studyToday } from "@/lib/today";
 import {
   dailyChallengeGoal,
   pronunciationQuickWinDone,
