@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { isPlayableVideoUrl, youtubeVideoId } from "@/lib/lessonVideoDisplay";
+import { isPlayableVideoUrl, vimeoVideoId, youtubeVideoId } from "@/lib/lessonVideoDisplay";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 
 const speeds = [0.75, 1, 1.25, 1.5];
@@ -168,6 +168,31 @@ export function LessonVideo({
           Mark this part as done
         </Button>
         <Progress value={progress} className="mt-1 h-2 w-full" />
+      </div>
+    );
+  }
+
+  const vimeoId = vimeoVideoId(url);
+  if (vimeoId) {
+    return (
+      <div className="space-y-3">
+        <div className="overflow-hidden rounded-xl bg-black">
+          <iframe
+            className="aspect-video w-full"
+            src={`https://player.vimeo.com/video/${vimeoId}`}
+            title="Lesson video"
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Progress value={progress} className="h-2 flex-1" />
+          <Button size="sm" variant="secondary" onClick={() => onProgress(100)} disabled={progress >= 100}>
+            {progress >= 100 ? "Watched" : "I watched it"}
+          </Button>
+        </div>
       </div>
     );
   }
