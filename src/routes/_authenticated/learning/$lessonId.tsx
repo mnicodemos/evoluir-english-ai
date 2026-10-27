@@ -493,10 +493,14 @@ function LessonPage() {
               {guide.map((section, sectionIndex) => (
                 <section
                   key={section.id}
-                  className={sectionIndex === 0 ? "space-y-3" : "space-y-3 border-t border-border/60 pt-5"}
+                  className={
+                    sectionIndex === 0 ? "space-y-3" : "space-y-3 border-t border-border/60 pt-5"
+                  }
                 >
                   <h3 className="flex items-center gap-2 text-sm font-semibold">
-                    <span aria-hidden="true" className="text-base">{section.emoji}</span>
+                    <span aria-hidden="true" className="text-base">
+                      {section.emoji}
+                    </span>
                     <span>{t(section.title)}</span>
                   </h3>
                   <ul
@@ -522,7 +526,9 @@ function LessonPage() {
                         }
                       >
                         {section.id === "before-quiz" && (
-                          <span className="shrink-0 font-semibold text-primary">{itemIndex + 1}.</span>
+                          <span className="shrink-0 font-semibold text-primary">
+                            {itemIndex + 1}.
+                          </span>
                         )}
                         <span>{item}</span>
                       </li>
@@ -530,8 +536,6 @@ function LessonPage() {
                   </ul>
                 </section>
               ))}
-
-
             </div>
           </TabsContent>
 
