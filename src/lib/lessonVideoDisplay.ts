@@ -30,7 +30,8 @@ export function vimeoEmbedUrl(url: string | null | undefined): string | null {
     const parsed = new URL(url);
     const pathMatch = parsed.pathname.match(/^\/(?:video\/)?\d+\/([A-Za-z0-9]+)\/?$/);
     const hash = parsed.searchParams.get("h") ?? pathMatch?.[1] ?? null;
-    return "https://player.vimeo.com/video/" + id + (hash ? "?h=" + encodeURIComponent(hash) : "");
+    const query = hash ? `?h=${encodeURIComponent(hash)}` : "";
+    return `https://player.vimeo.com/video/${id}${query}`;
   } catch {
     return null;
   }
@@ -45,7 +46,11 @@ export function isPlayableVideoUrl(url: string | null | undefined): boolean {
   } catch {
     return false;
   }
-  return youtubeVideoId(url) !== null || vimeoVideoId(url) !== null || /\.(mp4|webm|ogg|m3u8)(\?|$)/i.test(url);
+  return (
+    youtubeVideoId(url) !== null ||
+    vimeoVideoId(url) !== null ||
+    /\.(mp4|webm|ogg|m3u8)(\?|$)/i.test(url)
+  );
 }
 
 /**
