@@ -43,7 +43,7 @@ import { findCurriculumLesson } from "@/lib/curriculum";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
-import { formatVideoDuration, videoReviewPoints, vimeoVideoId } from "@/lib/lessonVideoDisplay";
+import { formatVideoDuration, videoReviewPoints, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -131,7 +131,7 @@ function LessonPage() {
   }, [needsQuizRepair, repairPlan, lessonId, repairLesson, queryClient]);
   // Reinforcement copy comes from the lesson text that already exists.
   const reviewPoints = videoReviewPoints(lesson?.summary);
-  const summaryVimeoId = vimeoVideoId(lesson?.video_url);
+  const summaryVimeoUrl = vimeoEmbedUrl(lesson?.video_url);
   const videoLength = formatVideoDuration(lesson?.video_duration_seconds);
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
   const lessonSkill = lesson?.skill
@@ -474,7 +474,7 @@ function LessonPage() {
                     : "Everything you need from this lesson, straight to the point."}
                 </p>
               </div>
-              {summaryVimeoId ? (
+              {summaryVimeoUrl ? (
                 <section className="space-y-2" aria-labelledby="summary-video-title">
                   <h3 id="summary-video-title" className="text-sm font-semibold">
                     Video reinforcement
@@ -482,7 +482,7 @@ function LessonPage() {
                   <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
                     <iframe
                       className="h-full w-full"
-                      src={`https://player.vimeo.com/video/${summaryVimeoId}`}
+                      src={summaryVimeoUrl}
                       title={lesson?.title ?? "Lesson video reinforcement"}
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
