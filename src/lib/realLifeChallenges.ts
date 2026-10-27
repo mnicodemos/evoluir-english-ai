@@ -27,6 +27,42 @@ export type RealLifeChallenge = {
 };
 
 export const REAL_LIFE_CHALLENGES: Record<string, RealLifeChallenge> = {
+  "b1-u1-l3": {
+    key: "b1-u1-l3",
+    title: "Keeping a conversation going",
+    situation:
+      "A colleague tells you they tried a new restaurant over the weekend. You want to show interest and keep the conversation natural.",
+    task: "What would you say next?",
+    options: [
+      {
+        id: "closed",
+        text: "Nice.",
+        outcome: "adjust",
+        consequence:
+          "Your colleague smiles, but the conversation quickly runs out of energy.",
+        feedback:
+          "This is polite, but it does not give the other person much to respond to. Add a detail or ask a follow-up question to keep the conversation going.",
+      },
+      {
+        id: "follow-up",
+        text: "That sounds interesting! What did you like most about it?",
+        outcome: "works",
+        consequence:
+          "Your colleague explains what they enjoyed and the conversation continues naturally.",
+        feedback:
+          "Great choice. You show interest and ask an open follow-up question. This invites a fuller answer and gives the conversation somewhere to go.",
+      },
+      {
+        id: "change-topic",
+        text: "Anyway, did you finish the report?",
+        outcome: "adjust",
+        consequence:
+          "Your colleague switches to work, and the original topic ends before they can share more.",
+        feedback:
+          "Changing the topic too quickly can stop a conversation from developing. First respond to what the other person said, then ask a related follow-up question.",
+      },
+    ],
+  },
   "b1-u2-l4": {
     key: "b1-u2-l4",
     title: "Asking a client for two more days",
