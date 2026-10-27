@@ -4,7 +4,7 @@
  * used first. Pure, so it is tested; the server reads the rows.
  */
 import type { CurriculumLesson } from "./curriculum";
-import { youtubeVideoId } from "./lessonVideoDisplay";
+import { vimeoVideoId, youtubeVideoId } from "./lessonVideoDisplay";
 
 export type LessonVideoRow = {
   curriculum_key: string | null;
@@ -44,7 +44,7 @@ export function lessonVideoReport(
     >();
     for (const row of lessons) {
       if (row.curriculum_key !== plan.key || !row.video_url) continue;
-      const id = youtubeVideoId(row.video_url);
+      const id = vimeoVideoId(row.video_url) ?? youtubeVideoId(row.video_url);
       if (!id) continue;
       const entry = counts.get(id) ?? {
         url: row.video_url,
@@ -56,7 +56,9 @@ export function lessonVideoReport(
       counts.set(id, entry);
     }
     const mine = approved.find((row) => row.curriculum_key === plan.key);
-    const approvedId = mine ? youtubeVideoId(mine.video_url) : null;
+    const approvedId = mine
+      ? (vimeoVideoId(mine.video_url) ?? youtubeVideoId(mine.video_url))
+      : null;
     return {
       key: plan.key,
       unit: plan.unit,
@@ -133,4 +135,19 @@ export function lessonVideoListText(
     lines.push("");
   }
   return lines.join("\n").trimEnd();
+}
+
+/** Canonical Vimeo URL accepted by the admin video manager. */
+export function canonicalVimeoUrl(input: string): string | null {
+  const clean = input.trim();
+  const id = vimeoVideoId(clean);
+  if (!id) return null;
+  try {
+    const parsed = new URL(clean);
+    const pathMatch = parsed.pathname.match(/^\/(?:video\/)?\d+\/([A-Za-z0-9]+)\/?$/);
+    const hash = parsed.searchParams.get("h") ?? pathMatch?.[1] ?? null;
+    return `https://vimeo.com/${id}${hash ? `?h=${encodeURIComponent(hash)}` : ""}`;
+  } catch {
+    return null;
+  }
 }

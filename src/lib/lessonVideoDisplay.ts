@@ -9,6 +9,33 @@ export function youtubeVideoId(url: string): string | null {
   return match?.[1] ?? null;
 }
 
+/** Extracts a numeric Vimeo id from a public or unlisted Vimeo URL. */
+export function vimeoVideoId(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" || !/(^|\.)vimeo\.com$/i.test(parsed.hostname)) return null;
+    const match = parsed.pathname.match(/^\/(?:video\/)?(\d+)(?:\/([A-Za-z0-9]+))?\/?$/);
+    return match?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Builds the Vimeo player URL and preserves the privacy hash for unlisted videos. */
+export function vimeoEmbedUrl(url: string | null | undefined): string | null {
+  const id = vimeoVideoId(url);
+  if (!id || !url) return null;
+  try {
+    const parsed = new URL(url);
+    const pathMatch = parsed.pathname.match(/^\/(?:video\/)?\d+\/([A-Za-z0-9]+)\/?$/);
+    const hash = parsed.searchParams.get("h") ?? pathMatch?.[1] ?? null;
+    return "https://player.vimeo.com/video/" + id + (hash ? "?h=" + encodeURIComponent(hash) : "");
+  } catch {
+    return null;
+  }
+}
+
 /** True when the URL can be played by the existing lesson player. */
 export function isPlayableVideoUrl(url: string | null | undefined): boolean {
   if (!url) return false;
@@ -18,7 +45,7 @@ export function isPlayableVideoUrl(url: string | null | undefined): boolean {
   } catch {
     return false;
   }
-  return youtubeVideoId(url) !== null || /\.(mp4|webm|ogg|m3u8)(\?|$)/i.test(url);
+  return youtubeVideoId(url) !== null || vimeoVideoId(url) !== null || /\.(mp4|webm|ogg|m3u8)(\?|$)/i.test(url);
 }
 
 /**

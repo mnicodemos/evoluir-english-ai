@@ -43,7 +43,7 @@ import { findCurriculumLesson } from "@/lib/curriculum";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
-import { formatVideoDuration, videoReviewPoints } from "@/lib/lessonVideoDisplay";
+import { formatVideoDuration, videoReviewPoints, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -131,6 +131,7 @@ function LessonPage() {
   }, [needsQuizRepair, repairPlan, lessonId, repairLesson, queryClient]);
   // Reinforcement copy comes from the lesson text that already exists.
   const reviewPoints = videoReviewPoints(lesson?.summary);
+  const summaryVimeoUrl = vimeoEmbedUrl(lesson?.video_url);
   const videoLength = formatVideoDuration(lesson?.video_duration_seconds);
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
   const lessonSkill = lesson?.skill
@@ -473,7 +474,7 @@ function LessonPage() {
                     : "Everything you need from this lesson, straight to the point."}
                 </p>
               </div>
-              {lesson?.curriculum_key === "b1-u2-l2" && (
+              {summaryVimeoUrl ? (
                 <section className="space-y-2" aria-labelledby="summary-video-title">
                   <h3 id="summary-video-title" className="text-sm font-semibold">
                     Video reinforcement
@@ -481,8 +482,8 @@ function LessonPage() {
                   <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
                     <iframe
                       className="h-full w-full"
-                      src="https://player.vimeo.com/video/1239699995"
-                      title="B1 Unit 2 Lesson 2 — Reading a Work Report"
+                      src={summaryVimeoUrl}
+                      title={lesson?.title ?? "Lesson video reinforcement"}
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -490,101 +491,7 @@ function LessonPage() {
                     />
                   </div>
                 </section>
-              )}
-
-              {lesson?.curriculum_key === "b2-u1-l1" && (
-                <section className="space-y-2" aria-labelledby="summary-video-b2-u1-l1-title">
-                  <h3 id="summary-video-b2-u1-l1-title" className="text-sm font-semibold">
-                    Video reinforcement
-                  </h3>
-                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
-                    <iframe
-                      className="h-full w-full"
-                      src="https://player.vimeo.com/video/1239966935"
-                      title={t("B2 Unit 1 Lesson 1 — Listening to a Debate")}
-                      loading="lazy"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  </div>
-                </section>
-              )}
-
-              {lesson?.curriculum_key === "b1-u1-l3" && (
-                <section className="space-y-2" aria-labelledby="summary-video-b1-u1-l3-title">
-                  <h3 id="summary-video-b1-u1-l3-title" className="text-sm font-semibold">
-                    Video reinforcement
-                  </h3>
-                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
-                    <iframe
-                      className="h-full w-full"
-                      src="https://player.vimeo.com/video/1239888973"
-                      title={t("B1 Unit 1 Lesson 3 — Keeping a Conversation Going")}
-                      loading="lazy"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  </div>
-                </section>
-              )}
-
-              {lesson?.curriculum_key === "b1-u1-l6" && (
-                <section className="space-y-2" aria-labelledby="summary-video-b1-u1-l6-title">
-                  <h3 id="summary-video-b1-u1-l6-title" className="text-sm font-semibold">
-                    Video reinforcement
-                  </h3>
-                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
-                    <iframe
-                      className="h-full w-full"
-                      src="https://player.vimeo.com/video/1239865994"
-                      title="B1 Unit 1 Lesson 6 — Present Perfect vs Past Simple"
-                      loading="lazy"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  </div>
-                </section>
-              )}
-              {lesson?.curriculum_key === "a1-u1-l3" && (
-                <section className="space-y-2" aria-labelledby="summary-video-a1-u1-l3-title">
-                  <h3 id="summary-video-a1-u1-l3-title" className="text-sm font-semibold">
-                    Video reinforcement
-                  </h3>
-                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
-                    <iframe
-                      className="h-full w-full"
-                      src="https://player.vimeo.com/video/1239904982"
-                      title="A1 Unit 1 Lesson 3 — Introducing Yourself"
-                      loading="lazy"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  </div>
-                </section>
-              )}
-
-              {lesson?.curriculum_key === "biz-u1-l1" && (
-                <section className="space-y-2" aria-labelledby="summary-video-biz-u1-l1-title">
-                  <h3 id="summary-video-biz-u1-l1-title" className="text-sm font-semibold">
-                    Video reinforcement
-                  </h3>
-                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
-                    <iframe
-                      className="h-full w-full"
-                      src="https://player.vimeo.com/video/1239925702"
-                      title="Business English Unit 1 Lesson 1 — Following a Status Meeting"
-                      loading="lazy"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  </div>
-                </section>
-              )}
+              ) : null}
               {guide.map((section, sectionIndex) => (
                 <section
                   key={section.id}

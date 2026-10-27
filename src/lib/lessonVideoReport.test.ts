@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { getCurriculum } from "./curriculum";
-import { canonicalYoutubeUrl, lessonVideoListText, lessonVideoReport } from "./lessonVideoReport";
+import {
+  canonicalVimeoUrl,
+  canonicalYoutubeUrl,
+  lessonVideoListText,
+  lessonVideoReport,
+} from "./lessonVideoReport";
 
 describe("lesson video report", () => {
   it("lists every lesson with the approved video and the videos students got", () => {
@@ -47,6 +52,17 @@ describe("lesson video report", () => {
     ]);
     expect(report[0]!.used[1]!.seconds).toBeNull();
     expect(report[1]!.approved).toBeNull();
+  });
+
+  it("canonicalizes supported Vimeo links for administrator entry", () => {
+    expect(canonicalVimeoUrl("https://vimeo.com/1239966935")).toBe(
+      "https://vimeo.com/1239966935",
+    );
+    expect(canonicalVimeoUrl("https://player.vimeo.com/video/1239966935?h=abc")).toBe(
+      "https://vimeo.com/1239966935?h=abc",
+    );
+    expect(canonicalVimeoUrl("https://youtube.com/watch?v=dQw4w9WgXcQ")).toBeNull();
+    expect(canonicalVimeoUrl("javascript:alert(1)")).toBeNull();
   });
 
   it("stores one form of a YouTube link", () => {
