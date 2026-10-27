@@ -10,6 +10,7 @@ const TONES = {
   green: "bg-brand-green/12 text-brand-green",
   // Not teal (user request): a teal tile read as a button, the menu's colour.
   pink: "bg-pink-400/12 text-pink-400",
+  blue: "bg-sky-400/12 text-sky-400",
   // League medal by place (user request): gold, silver, bronze, then grey.
   gold: "bg-amber-400/12 text-amber-400",
   silver: "bg-slate-300/12 text-slate-300",
@@ -32,6 +33,7 @@ export function DashboardHeaderStat({
   value,
   detail,
   detailStyle,
+  valueStyle,
   iconColor,
   to,
   hint,
@@ -42,6 +44,7 @@ export function DashboardHeaderStat({
   value: string;
   detail?: string | null;
   detailStyle?: CSSProperties | undefined;
+  valueStyle?: CSSProperties | undefined;
   iconColor?: string | undefined;
   to?: "/league" | "/study-plan";
   /** Shown on hover: how the number works (e.g. the jewels rule). */
