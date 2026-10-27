@@ -1,6 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Camera, Check, Copy, Loader2, MessageCircle, Settings, UserRound } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from "react";
 import { toast } from "sonner";
 
 import { AdminPanelButton } from "@/components/AdminPanelButton";
@@ -193,6 +201,23 @@ export function ProfileMenu({
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_path);
   const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetCloseTimer = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpen(false), 13_000);
+  }, []);
+  useEffect(() => {
+    if (!open) {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+      return;
+    }
+    resetCloseTimer();
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    };
+  }, [open, resetCloseTimer]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
@@ -584,6 +609,9 @@ export function ProfileMenu({
           side="top"
           align="start"
           sideOffset={8}
+          onPointerMove={resetCloseTimer}
+          onKeyDown={resetCloseTimer}
+          onClick={resetCloseTimer}
           // The gear toggles the popover itself; its click is not "outside".
           onInteractOutside={(event) => {
             if (gearRef.current?.contains(event.target as Node)) event.preventDefault();
@@ -615,6 +643,9 @@ export function ProfileMenu({
         <DialogTrigger asChild>{triggerButton}</DialogTrigger>
       )}
       <DialogContent
+        onPointerMove={resetCloseTimer}
+        onKeyDown={resetCloseTimer}
+        onClick={resetCloseTimer}
         // Translucent graphite like Weather talk and the bell (user request).
         // Phones: inset from the edges with rounded corners and never taller than
         // the screen; a darker dim there, since the side menu stays open behind.

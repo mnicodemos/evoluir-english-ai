@@ -9,7 +9,7 @@ import {
   MessageCircleMore,
   Volume2,
 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AroundYou } from "@/components/AroundYou";
@@ -35,6 +35,24 @@ export function WeatherTalk({
   const { condition, isLive: live, refresh: requestLocation } = useWeatherCondition();
   const locating = false;
   const [speaking, setSpeaking] = useState(false);
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetCloseTimer = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpen(false), 13_000);
+  }, []);
+  useEffect(() => {
+    if (!open) {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+      return;
+    }
+    resetCloseTimer();
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    };
+  }, [open, resetCloseTimer]);
   const talk = WEATHER_TALK[condition];
   const Icon = weatherIcons[condition];
   // The button never shows a bare sun or moon, the usual light/dark theme
@@ -54,7 +72,7 @@ export function WeatherTalk({
   }
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         {placement === "desktop" ? (
           // It holds two practices now, the weather and the places around
@@ -105,6 +123,9 @@ export function WeatherTalk({
       <PopoverContent
         align="end"
         sideOffset={8}
+        onPointerMove={resetCloseTimer}
+        onKeyDown={resetCloseTimer}
+        onClick={resetCloseTimer}
         className={cn(
           "dashboard-shell dark p-4",
           // Desktop: the weather and the places side by side, so neither hides
