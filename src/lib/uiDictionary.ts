@@ -96,6 +96,7 @@ const baseUiPt: Record<string, string> = {
   "Relax and train your listening: EVO guides you slowly, with the text on screen.":
     "Relaxe e treine sua escuta: a EVO conduz devagar, com o texto na tela.",
   "Lesson audio": "Áudio da lição",
+  "Summary videos": "Vídeos do Summary",
   "Listen to EVO and Leo explore this lesson before you practise.":
     "Ouça EVO e Leo explorarem esta lição antes de praticar.",
   "Listen to the lesson audio": "Ouvir o áudio da lição",
