@@ -107,7 +107,8 @@ export function GoalsTodayCard() {
         {/* Life+ AI holds the goals (user decision): the title opens it, and
             Premium students also see today's tasks and habits at a glance. */}
         <Sprout
-          className="size-[1.65rem] shrink-0 text-brand-green"
+          className="size-[1.65rem] shrink-0"
+          style={{ color: "oklch(0.72 0.10 220)" }}
           strokeWidth={2.4}
           aria-hidden="true"
         />

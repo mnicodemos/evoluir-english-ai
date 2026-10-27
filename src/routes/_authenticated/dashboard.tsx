@@ -316,6 +316,11 @@ function DashboardNotifications({
   ] as const;
   const activeItems = items.filter((item) => item.visible);
   const hasNotifications = activeItems.length > 0;
+  // The single bell indicator reflects the Life+ AI accent whenever at least
+  // one Life+ AI activity is present; otherwise keep the existing green color.
+  const hasLifeNotifications = activeItems.some((item) =>
+    ["life-tasks", "goal-steps", "habits"].includes(item.id),
+  );
   // Every English activity of the day is done but the minutes goal is not
   // (user request, 2026-10-23): the bell says where to start something new.
   const englishPending = activeItems.some((item) =>
@@ -350,7 +355,7 @@ function DashboardNotifications({
           <Bell className={placement === "mobile" ? "size-[1.15rem]" : "size-4"} />
           {hasNotifications && (
             <span
-              className={`absolute size-2 rounded-full bg-brand-green ring-2 ring-background ${placement === "mobile" ? "right-0.5 top-1" : "right-2 top-2"}`}
+              className={`absolute size-2 rounded-full ${hasLifeNotifications ? "bg-[oklch(0.72_0.10_220)]" : "bg-brand-green"} ring-2 ring-background ${placement === "mobile" ? "right-0.5 top-1" : "right-2 top-2"}`}
             >
               <span className="sr-only">{translate("New activities available")}</span>
             </span>
