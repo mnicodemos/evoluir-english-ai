@@ -1222,6 +1222,13 @@ const baseUiPt: Record<string, string> = {
   "Repeat the sentence": "Repita a frase",
   "Checking...": "Verificando...",
   "Try again": "Tente novamente",
+  "Real-Life Challenge": "Desafio da Vida Real",
+  "Completed": "Concluído",
+  "Choose your email": "Escolha seu email",
+  "What happens": "O que acontece",
+  "EVO explains": "A EVO explica",
+  "Try another approach": "Tentar outra abordagem",
+  "Finish challenge": "Concluir desafio",
   "Stop and check": "Parar e verificar",
   "Playing...": "Tocando...",
   "You finished the 3 sentences of this group. A new set will be released when you create new lessons in the Learning Center.":
