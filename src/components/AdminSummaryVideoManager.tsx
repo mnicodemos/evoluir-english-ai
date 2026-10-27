@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Save, Trash2, Video } from "lucide-react";
+import { Check, Loader2, Play, Save, Trash2, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,11 @@ const LEVELS = [
   { value: "c2", label: "C2" },
   { value: "business", label: "Business English" },
 ] as const;
+
+function getVimeoVideoId(url: string): string | null {
+  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+  return match?.[1] ?? null;
+}
 
 export function AdminSummaryVideoManager() {
   const [level, setLevel] = useState<(typeof LEVELS)[number]["value"]>("b1");
@@ -125,6 +130,7 @@ export function AdminSummaryVideoManager() {
               (linksQuery.data ?? []).length
             } lessons have a Vimeo link.
           </p>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {visibleLessons.map((item) => {
             const draft = drafts[item.key] ?? "";
             const savedUrl = item.videoUrl ?? "";
@@ -160,6 +166,28 @@ export function AdminSummaryVideoManager() {
                     synchronize all records for this lesson.
                   </p>
                 )}
+
+                {savedUrl && getVimeoVideoId(savedUrl) ? (
+                  <a
+                    href={savedUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`Open Vimeo video for ${item.title}`}
+                    className="group relative mt-3 block overflow-hidden rounded-md bg-muted"
+                  >
+                    <img
+                      src={`https://vumbnail.com/${getVimeoVideoId(savedUrl)}.jpg`}
+                      alt={`Video thumbnail: ${item.title}`}
+                      loading="lazy"
+                      className="aspect-video w-full object-cover transition-opacity group-hover:opacity-90"
+                    />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/15 transition-colors group-hover:bg-black/30">
+                      <span className="flex size-12 items-center justify-center rounded-full bg-black/70 text-white shadow-lg">
+                        <Play className="ml-1 size-5 fill-current" />
+                      </span>
+                    </span>
+                  </a>
+                ) : null}
 
                 <label className="mt-3 block text-sm">
                   Vimeo URL
@@ -244,6 +272,7 @@ export function AdminSummaryVideoManager() {
               </article>
             );
           })}
+          </div>
           {visibleLessons.length === 0 && (
             <p className="py-5 text-sm text-muted-foreground">
               No lessons match your search.
