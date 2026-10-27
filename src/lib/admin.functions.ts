@@ -1164,3 +1164,91 @@ export const clearLessonVideo = createServerFn({ method: "POST" })
     if (lessonsError) throw new Error("The lesson video could not be removed");
     return { ok: true };
   });
+
+// Summary video administration: the lesson Summary reads public.lessons.video_url.
+// This path deliberately never reads or writes the legacy lesson_videos table.
+export const getSummaryVideoLinks = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ level: lessonVideoLevel }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const curriculum = await videoTabLessons(data.level);
+    const keys = curriculum.map((plan) => plan.key);
+    const { data: rows, error } = await supabaseAdmin
+      .from("lessons")
+      .select("curriculum_key, video_url")
+      .in("curriculum_key", keys)
+      .order("id");
+    if (error) throw new Error("The Summary video links could not be loaded");
+
+    return curriculum.map((plan) => {
+      const copies = (rows ?? []).filter((row) => row.curriculum_key === plan.key);
+      const urlCounts = new Map<string, number>();
+      for (const copy of copies) {
+        if (copy.video_url) urlCounts.set(copy.video_url, (urlCounts.get(copy.video_url) ?? 0) + 1);
+      }
+      const videoUrl = [...urlCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+      return {
+        key: plan.key,
+        unit: plan.unit,
+        unitTitle: plan.unitTitle,
+        position: plan.position,
+        title: plan.title,
+        videoUrl,
+        copies: copies.length,
+        copiesWithVideo: copies.filter((copy) => Boolean(copy.video_url)).length,
+        hasConflictingLinks: urlCounts.size > 1,
+      };
+    });
+  });
+
+export const saveSummaryVideoLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ key: z.string().min(3).max(40), url: z.string().trim().min(10).max(300) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { findCurriculumLesson } = await import("@/lib/curriculum");
+    const { findBusinessLesson } = await import("@/lib/businessCourse");
+    const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
+    if (!findCurriculumLesson(data.key) && !findBusinessLesson(data.key, "b1")) {
+      throw new Error("Unknown lesson");
+    }
+    const url = canonicalVimeoUrl(data.url);
+    if (!url) throw new Error("Cole um link válido do Vimeo.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("lessons")
+      .update({ video_url: url })
+      .eq("curriculum_key", data.key);
+    if (error) throw new Error("The Summary video link could not be saved");
+    return { ok: true, url };
+  });
+
+export const deleteSummaryVideoLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ key: z.string().min(3).max(40) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { findCurriculumLesson } = await import("@/lib/curriculum");
+    const { findBusinessLesson } = await import("@/lib/businessCourse");
+    if (!findCurriculumLesson(data.key) && !findBusinessLesson(data.key, "b1")) {
+      throw new Error("Unknown lesson");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("lessons")
+      .update({ video_url: null })
+      .eq("curriculum_key", data.key);
+    if (error) throw new Error("The Summary video link could not be removed");
+    return { ok: true };
+  });
+
