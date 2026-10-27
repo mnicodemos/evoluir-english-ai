@@ -1,6 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { BookmarkCheck, GraduationCap, Loader2, Mic, MicOff, Plus, Send, Sparkles } from "lucide-react";
+import {
+  BookmarkCheck,
+  GraduationCap,
+  Loader2,
+  Mic,
+  MicOff,
+  Plus,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -30,7 +39,11 @@ import {
 } from "@/lib/teacherChat";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
-import { cancelVoiceRecording, startVoiceRecording, stopVoiceRecording } from "@/lib/voice-recorder";
+import {
+  cancelVoiceRecording,
+  startVoiceRecording,
+  stopVoiceRecording,
+} from "@/lib/voice-recorder";
 import { transcribeAudio } from "@/lib/transcribe";
 
 /**
@@ -116,7 +129,12 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
         setMicState("transcribing");
         const audio = await stopVoiceRecording();
         const transcript = await transcribeAudio(audio);
-        setInput((current) => [current.trim(), transcript].filter(Boolean).join(current.trim() ? " " : "").slice(0, TEACHER_MESSAGE_MAX));
+        setInput((current) =>
+          [current.trim(), transcript]
+            .filter(Boolean)
+            .join(current.trim() ? " " : "")
+            .slice(0, TEACHER_MESSAGE_MAX),
+        );
         setMicState("idle");
         requestAnimationFrame(() => inputRef.current?.focus());
       } else {
@@ -126,7 +144,11 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
     } catch (cause) {
       cancelVoiceRecording();
       setMicState("idle");
-      toast.error(cause instanceof Error ? cause.message : t("Microphone unavailable. Please try again."));
+      toast.error(
+        cause instanceof Error
+          ? cause.message
+          : t("Microphone unavailable. Please try again."),
+      );
     } finally {
       micBusy.current = false;
     }
@@ -433,7 +455,13 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
               disabled={turn.isPending || micState === "transcribing"}
               onClick={() => void toggleTeacherMicrophone()}
             >
-              {micState === "transcribing" ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : micState === "recording" ? <MicOff className="size-4" aria-hidden="true" /> : <Mic className="size-4" aria-hidden="true" />}
+              {micState === "transcribing" ? (
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              ) : micState === "recording" ? (
+                <MicOff className="size-4" aria-hidden="true" />
+              ) : (
+                <Mic className="size-4" aria-hidden="true" />
+              )}
             </Button>
             <Button
               type="submit"
