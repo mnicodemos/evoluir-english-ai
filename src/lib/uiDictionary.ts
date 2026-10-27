@@ -2288,6 +2288,8 @@ const baseUiPt: Record<string, string> = {
   "Listen to the podcast": "Ouvir o podcast",
   Episode: "Episódio",
   "Watch the video": "Assistir ao vídeo",
+  "Audio is not available for this lesson yet. You can watch the video in Summary.":
+    "O áudio ainda não está disponível para esta lição. Você pode assistir ao vídeo no Resumo.",
   "A1 Unit 1 Lesson 3 — Introducing Yourself": "A1 Unidade 1, Lição 3 — Apresentando-se",
   "Business English Unit 1 Lesson 1 — Following a Status Meeting":
     "Business English Unidade 1, Lição 1 — Acompanhando uma reunião de status",
