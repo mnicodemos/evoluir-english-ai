@@ -138,6 +138,15 @@ export function lessonVideoListText(
 
 /** Canonical Vimeo URL accepted by the admin video manager. */
 export function canonicalVimeoUrl(input: string): string | null {
-  const id = vimeoVideoId(input.trim());
-  return id ? `https://vimeo.com/${id}` : null;
+  const clean = input.trim();
+  const id = vimeoVideoId(clean);
+  if (!id) return null;
+  try {
+    const parsed = new URL(clean);
+    const pathMatch = parsed.pathname.match(/^\/(?:video\/)?\d+\/([A-Za-z0-9]+)\/?$/);
+    const hash = parsed.searchParams.get("h") ?? pathMatch?.[1] ?? null;
+    return `https://vimeo.com/${id}${hash ? `?h=${encodeURIComponent(hash)}` : ""}`;
+  } catch {
+    return null;
+  }
 }
