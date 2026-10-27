@@ -421,7 +421,9 @@ function LessonPage() {
               <section className="card-soft space-y-2 p-5">
                 <h2 className="font-display text-lg font-semibold">{t("Lesson audio")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  {t("Audio is not available for this lesson yet. You can watch the video in Summary.")}
+                  {t(
+                    "Audio is not available for this lesson yet. You can watch the video in Summary.",
+                  )}
                 </p>
                 <Button size="sm" onClick={() => setActiveTab("summary")}>
                   <BookOpen className="size-4" /> Summary
