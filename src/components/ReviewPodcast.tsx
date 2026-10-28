@@ -11,6 +11,16 @@ import { PODCAST_SPEAKERS } from "@/lib/reviewPodcast";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
 import { cn } from "@/lib/utils";
 
+function readPodcastPosition(lessonId: string): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const value = Number(window.localStorage.getItem(`lesson-podcast-position:${lessonId}`));
+    return Number.isInteger(value) && value >= 0 ? value : 0;
+  } catch {
+    return 0;
+  }
+}
+
 const SPEAKER_TONE = {
   evo: "bg-brand-green/15 text-brand-green ring-brand-green/35",
   leo: "bg-sky-400/15 text-sky-300 ring-sky-400/35",
@@ -45,7 +55,7 @@ export function LessonPodcast({
     retry: false,
   });
   const lines = query.data?.lines ?? [];
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(() => readPodcastPosition(lessonId));
   const [playing, setPlaying] = useState(false);
   const [showPt, setShowPt] = useState(false);
   const run = useRef(0);
@@ -182,7 +192,7 @@ export function LessonPodcast({
             <Button
               className="min-w-0 flex-1 sm:flex-none"
               size="sm"
-              onClick={() => void playFrom(done || current >= lines.length - 1 ? 0 : current)}
+              onClick={() => void playFrom(done ? 0 : Math.min(current, Math.max(0, lines.length - 1)))}
             >
               {done ? (
                 <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
