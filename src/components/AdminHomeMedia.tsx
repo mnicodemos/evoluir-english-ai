@@ -4,6 +4,7 @@ import { ImagePlus, Loader2, Save, Monitor, Smartphone, UserRound } from "lucide
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getHomeDashboardImages, saveHomeDashboardImage } from "@/lib/admin.functions";
+import evoGuide from "@/assets/evo-guide.webp";
 
 type Target = "desktop" | "mobile" | "evo-avatar";
 const TARGETS: { key: Target; title: string; description: string; Icon: typeof Monitor }[] = [
@@ -72,7 +73,7 @@ export function AdminHomeMedia() {
           const draft = files[key];
           const current =
             key === "evo-avatar"
-              ? imagesQuery.data?.evoAvatar ?? "/assets/evo-guide.webp"
+              ? imagesQuery.data?.evoAvatar ?? evoGuide
               : imagesQuery.data?.[key] ?? "/study-books/1793212191251.jpg";
           const saving = mutation.isPending && mutation.variables?.target === key;
           return <article key={key} className="min-w-0 space-y-3 rounded-lg border border-border p-3 sm:p-4">
