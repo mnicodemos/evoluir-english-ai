@@ -202,7 +202,7 @@ export function LessonPodcast({
             <Button
               className="min-w-0 flex-1 sm:flex-none"
               size="sm"
-              onClick={() => void playFrom(done ? 0 : Math.min(current, Math.max(0, lines.length - 1)))}
+              onClick={() =>\n                void playFrom(done ? 0 : Math.min(current, Math.max(0, lines.length - 1)))\n              }
             >
               {done ? (
                 <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
