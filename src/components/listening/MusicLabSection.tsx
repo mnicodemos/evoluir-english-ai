@@ -89,8 +89,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
     }
   }
 
-  const focusLabel = (value: string) =>
-    GOALS.find((item) => item.value === value)?.label ?? value;
+  const focusLabel = (value: string) => GOALS.find((item) => item.value === value)?.label ?? value;
   const focusTabs = [
     { value: "all", label: "All", count: songs.length },
     ...GOALS.map((item) => ({
@@ -230,7 +229,10 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-|-$/g, "") || "evoluir-song";
               return (
-                <article key={song.id} className="overflow-hidden rounded-xl border border-brand-green/25">
+                <article
+                  key={song.id}
+                  className="overflow-hidden rounded-xl border border-brand-green/25"
+                >
                   <div className="flex items-center gap-3 p-3 sm:p-4">
                     <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-green/10 text-brand-green">
                       <Music2 className="size-5" aria-hidden="true" />
@@ -257,7 +259,11 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                       aria-label={expanded ? "Minimize song details" : "Expand song details"}
                       className="grid size-9 shrink-0 place-items-center rounded-md hover:bg-secondary"
                     >
-                      {expanded ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
+                      {expanded ? (
+                        <ChevronUp className="size-5" />
+                      ) : (
+                        <ChevronDown className="size-5" />
+                      )}
                     </button>
                   </div>
                   {expanded && (
