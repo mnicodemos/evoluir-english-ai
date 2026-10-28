@@ -173,44 +173,56 @@ export function VideoCallStage({
             Ready to practise English in a realistic video call? Press the button when you are
             ready.
           </p>
-          <button
-            type="button"
-            onClick={() => {
-              // Browsers allow sound only after a user gesture. Play a short,
-              // synthesized double-tone ringback while EVO connects.
-              try {
-                const context = new AudioContext();
-                const gain = context.createGain();
-                gain.gain.setValueAtTime(0.0001, context.currentTime);
-                gain.connect(context.destination);
-                const first = context.createOscillator();
-                const second = context.createOscillator();
-                first.frequency.value = 440;
-                second.frequency.value = 480;
-                first.connect(gain);
-                second.connect(gain);
-                const now = context.currentTime;
-                gain.gain.setValueAtTime(0.0001, now);
-                gain.gain.setValueAtTime(0.055, now + 0.06);
-                gain.gain.setValueAtTime(0.0001, now + 0.42);
-                gain.gain.setValueAtTime(0.055, now + 0.58);
-                gain.gain.setValueAtTime(0.0001, now + 0.98);
-                first.start(now);
-                second.start(now);
-                first.stop(now + 1.02);
-                second.stop(now + 1.02);
-                window.setTimeout(() => void context.close().catch(() => undefined), 1200);
-              } catch {
-                // Ringback is an enhancement; the call must still start if audio is unavailable.
-              }
-              setSeconds(0);
-              onStartCall();
-            }}
-            className="mt-8 inline-flex h-14 items-center justify-center gap-3 rounded-full bg-brand-green px-8 text-base font-bold text-[oklch(0.15_0.03_180)] shadow-xl transition-transform hover:scale-[1.02] hover:bg-brand-green/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-          >
-            <Video className="size-5" />
-            Call EVO
-          </button>
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                // Browsers allow sound only after a user gesture. Play a short,
+                // synthesized double-tone ringback while EVO connects.
+                try {
+                  const context = new AudioContext();
+                  const gain = context.createGain();
+                  gain.gain.setValueAtTime(0.0001, context.currentTime);
+                  gain.connect(context.destination);
+                  const first = context.createOscillator();
+                  const second = context.createOscillator();
+                  first.frequency.value = 440;
+                  second.frequency.value = 480;
+                  first.connect(gain);
+                  second.connect(gain);
+                  const now = context.currentTime;
+                  gain.gain.setValueAtTime(0.0001, now);
+                  gain.gain.setValueAtTime(0.055, now + 0.06);
+                  gain.gain.setValueAtTime(0.0001, now + 0.42);
+                  gain.gain.setValueAtTime(0.055, now + 0.58);
+                  gain.gain.setValueAtTime(0.0001, now + 0.98);
+                  first.start(now);
+                  second.start(now);
+                  first.stop(now + 1.02);
+                  second.stop(now + 1.02);
+                  window.setTimeout(() => void context.close().catch(() => undefined), 1200);
+                } catch {
+                  // Ringback is an enhancement; the call must still start if audio is unavailable.
+                }
+                setSeconds(0);
+                onStartCall();
+              }}
+              aria-label="Start video call with EVO"
+              title="Video call with EVO"
+              className="grid size-14 place-items-center rounded-full bg-brand-green text-[oklch(0.15_0.03_180)] shadow-xl transition-transform hover:scale-[1.02] hover:bg-brand-green/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            >
+              <Video className="size-6" />
+            </button>
+            <button
+              type="button"
+              onClick={endCall}
+              aria-label="End and return to dashboard"
+              title="End"
+              className="grid size-14 place-items-center rounded-full bg-red-600 text-white shadow-xl ring-2 ring-white/30 transition-colors hover:bg-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600"
+            >
+              <PhoneOff className="size-6" />
+            </button>
+          </div>
           <p className="mt-3 text-xs text-white/50">
             No call or AI request starts until you press this button.
           </p>
@@ -324,10 +336,11 @@ export function VideoCallStage({
       <button
         type="button"
         onClick={endCall}
-        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-20 inline-flex h-12 items-center gap-2 rounded-full bg-red-600 px-4 text-sm font-bold text-white shadow-2xl ring-2 ring-white/30 transition-colors hover:bg-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600 sm:right-8"
+        aria-label="End call and return to dashboard"
+        title="End call"
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-20 grid size-12 place-items-center rounded-full bg-red-600 text-white shadow-2xl ring-2 ring-white/30 transition-colors hover:bg-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600 sm:right-8"
       >
-        <PhoneOff className="size-4" />
-        <span>End call</span>
+        <PhoneOff className="size-5" />
       </button>
 
       {/* Controls. */}

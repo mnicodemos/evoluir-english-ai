@@ -3,6 +3,9 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "End and return to dashboard": "Encerrar e voltar ao painel",
+  End: "Encerrar",
+  "End call and return to dashboard": "Encerrar a chamada e voltar ao painel",
   "Start video call with EVO": "Iniciar videochamada com a EVO",
   "Ready to practise English in a realistic video call? Press the button when you are ready.":
     "Pronto para praticar inglês em uma videochamada realista? Pressione o botão quando estiver pronto.",
