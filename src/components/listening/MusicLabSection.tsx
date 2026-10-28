@@ -18,6 +18,7 @@ type GeneratedSong = {
   goal: (typeof GOALS)[number]["value"];
   lyrics: string;
   audioUrl: string;
+  downloadUrl: string;
   mimeType: string;
   createdAt: string;
 };
@@ -290,7 +291,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                       </p>
                     </div>
                     <a
-                      href={song.audioUrl}
+                      href={song.downloadUrl}
                       download={`evoluir-${safeFilename}.${musicAudioExtension(song.mimeType)}`}
                       aria-label={`Download song: ${song.topic}`}
                       className="grid size-9 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10"
