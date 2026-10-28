@@ -37,6 +37,23 @@ export function vimeoEmbedUrl(url: string | null | undefined): string | null {
   }
 }
 
+/** Builds a safe embed URL for supported Vimeo and YouTube lesson videos. */
+export function lessonVideoEmbedUrl(url: string | null | undefined): string | null {
+  const vimeo = vimeoEmbedUrl(url);
+  if (vimeo) return vimeo;
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" || !/(^|\\.)youtube\\.com$/i.test(parsed.hostname) && parsed.hostname !== "youtu.be") {
+      return null;
+    }
+    const id = youtubeVideoId(url);
+    return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+  } catch {
+    return null;
+  }
+}
+
 /** True when the URL can be played by the existing lesson player. */
 export function isPlayableVideoUrl(url: string | null | undefined): boolean {
   if (!url) return false;
