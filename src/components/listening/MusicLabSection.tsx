@@ -153,10 +153,14 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </div>
       </div>
 
-      <div className="rounded-lg border border-brand-green/25 bg-brand-green/5 p-3 text-sm" role="note">
+      <div
+        className="rounded-lg border border-brand-green/25 bg-brand-green/5 p-3 text-sm"
+        role="note"
+      >
         <p className="font-semibold">Your song is available for this session only.</p>
         <p className="mt-1 text-muted-foreground">
-          Play it now and use Download to save the audio to your device before leaving or refreshing this page.
+          Play it now and use Download to save the audio to your device before leaving or
+          refreshing this page.
           Evoluir+ does not keep a permanent copy of the audio.
         </p>
       </div>
