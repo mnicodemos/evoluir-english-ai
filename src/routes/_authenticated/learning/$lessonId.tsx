@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -39,6 +39,7 @@ import { vocabularyGenerationFailureKey } from "@/lib/activityIndicators";
 import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 import { findBusinessLesson, isBusinessKey } from "@/lib/businessCourse";
 import { findCurriculumLesson } from "@/lib/curriculum";
+import { getSummaryVideoForLesson } from "@/lib/curriculum.functions";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
@@ -128,8 +129,18 @@ function LessonPage() {
         toast.error("We could not prepare this quiz. Please try again.");
       });
   }, [needsQuizRepair, repairPlan, lessonId, repairLesson, queryClient]);
-  // Reinforcement copy comes from the lesson text that already exists.
-  const summaryVideoEmbedUrl = lessonVideoEmbedUrl(lesson?.video_url);
+  // Summary videos are shared by curriculum key, so they remain available
+  // even when this student has no lesson row yet.
+  const fetchSummaryVideo = useServerFn(getSummaryVideoForLesson);
+  const summaryVideoQuery = useQuery({
+    queryKey: ["summary-video", lesson?.curriculum_key],
+    queryFn: () => fetchSummaryVideo({ data: { key: lesson!.curriculum_key! } }),
+    enabled: !!lesson?.curriculum_key,
+    retry: false,
+  });
+  const summaryVideoEmbedUrl = lessonVideoEmbedUrl(
+    summaryVideoQuery.data?.url ?? lesson?.video_url,
+  );
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
   const lessonSkill = lesson?.skill
     ? t(lesson.skill.charAt(0).toUpperCase() + lesson.skill.slice(1))
@@ -152,7 +163,7 @@ function LessonPage() {
     (state) => cardIds.has(state.flashcard_id) && state.times_reviewed > 0,
   ).length;
   const checklist = lessonChecklist({
-    hasVideo: !!lesson?.video_url,
+    hasVideo: !!(lesson?.video_url || summaryVideoQuery.data?.url),
     podcast,
     videoWatched: progress >= 100,
     cardsTotal: data?.flashcards.length ?? 0,
