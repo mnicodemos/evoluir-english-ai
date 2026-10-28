@@ -263,6 +263,45 @@ export type Database = {
         }
         Relationships: []
       }
+      music_lab_songs: {
+        Row: {
+          audio_path: string
+          created_at: string
+          genre: string
+          goal: string
+          id: string
+          level: string
+          lyrics: string
+          mime_type: string
+          topic: string
+          user_id: string
+        }
+        Insert: {
+          audio_path: string
+          created_at?: string
+          genre: string
+          goal: string
+          id?: string
+          level: string
+          lyrics: string
+          mime_type?: string
+          topic: string
+          user_id: string
+        }
+        Update: {
+          audio_path?: string
+          created_at?: string
+          genre?: string
+          goal?: string
+          id?: string
+          level?: string
+          lyrics?: string
+          mime_type?: string
+          topic?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       assessment_evidence: {
         Row: {
           assessment_session_id: string
