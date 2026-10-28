@@ -1254,32 +1254,28 @@ export const deleteSummaryVideoLink = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-
 // Public dashboard media reads; all writes remain server-side and admin-only.
-export const getHomeDashboardImages = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // The settings table is shared with the dashboard and is not in generated DB types yet.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabaseAdmin as any)
-      .from("home_media_settings")
-      .select("setting_key, image_url");
-    if (error) throw new Error("The dashboard images could not be loaded.");
+export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // The settings table is shared with the dashboard and is not in generated DB types yet.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabaseAdmin as any).from("home_media_settings").select("setting_key, image_url");
+  if (error) throw new Error("The dashboard images could not be loaded.");
 
-    const result: { desktop: string | null; mobile: string | null; evoAvatar: string | null } = {
-      desktop: null,
-      mobile: null,
-      evoAvatar: null,
-    };
-    for (const row of data ?? []) {
-      if (row.setting_key === "desktop" || row.setting_key === "mobile") {
-        result[row.setting_key] = row.image_url;
-      } else if (row.setting_key === "evo-avatar") {
-        result.evoAvatar = row.image_url;
-      }
+  const result: { desktop: string | null; mobile: string | null; evoAvatar: string | null } = {
+    desktop: null,
+    mobile: null,
+    evoAvatar: null,
+  };
+  for (const row of data ?? []) {
+    if (row.setting_key === "desktop" || row.setting_key === "mobile") {
+      result[row.setting_key] = row.image_url;
+    } else if (row.setting_key === "evo-avatar") {
+      result.evoAvatar = row.image_url;
     }
-    return result;
-  });
+  }
+  return result;
+});
 
 export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -1296,9 +1292,7 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
     if (!(await hasAdminRole(context.supabase, context.userId))) {
       throw new Error("Forbidden");
     }
-    const match = data.dataUrl.match(
-      /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/,
-    );
+    const match = data.dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
     if (!match || match[1] !== data.mimeType) {
       throw new Error("Choose a valid JPG, PNG or WebP image.");
     }
@@ -1325,13 +1319,11 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
       .getPublicUrl(path);
     // The settings table is shared with the dashboard and is not in generated DB types yet.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: saveError } = await (supabaseAdmin as any)
-      .from("home_media_settings")
-      .upsert({
-        setting_key: data.target,
-        image_url: publicData.publicUrl,
-        updated_at: new Date().toISOString(),
-      });
+    const { error: saveError } = await (supabaseAdmin as any).from("home_media_settings").upsert({
+      setting_key: data.target,
+      image_url: publicData.publicUrl,
+      updated_at: new Date().toISOString(),
+    });
     if (saveError) {
       throw new Error("The image was uploaded but could not be published.");
     }
