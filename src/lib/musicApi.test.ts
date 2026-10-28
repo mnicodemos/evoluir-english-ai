@@ -37,8 +37,8 @@ describe("Music Lab request", () => {
     expect(musicErrorMessage(503, "Could not load your saved songs. Please try again.")).toBe(
       "Could not load your saved songs. Please try again.",
     );
-    expect(
-      musicErrorMessage(503, "Could not load your saved songs. Secret=private"),
-    ).not.toContain("private");
+    expect(musicErrorMessage(503, "Could not load your saved songs. Secret=private")).not.toContain(
+      "private",
+    );
   });
 });
