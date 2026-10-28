@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { getCurriculum } from "./curriculum";
 import {
+  canonicalSummaryVideoUrl,
   canonicalVimeoUrl,
   canonicalYoutubeUrl,
   lessonVideoListText,
@@ -61,6 +62,16 @@ describe("lesson video report", () => {
     );
     expect(canonicalVimeoUrl("https://youtube.com/watch?v=dQw4w9WgXcQ")).toBeNull();
     expect(canonicalVimeoUrl("javascript:alert(1)")).toBeNull();
+  });
+
+  it("accepts either Vimeo or YouTube links for Summary videos", () => {
+    expect(canonicalSummaryVideoUrl("https://vimeo.com/1239966935")).toBe(
+      "https://vimeo.com/1239966935",
+    );
+    expect(canonicalSummaryVideoUrl("https://youtu.be/dQw4w9WgXcQ?t=3")).toBe(
+      "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    );
+    expect(canonicalSummaryVideoUrl("javascript:alert(1)")).toBeNull();
   });
 
   it("stores one form of a YouTube link", () => {
