@@ -50,7 +50,10 @@ export const Route = createFileRoute("/api/music")({
 
         if (error) {
           console.error("[music-lab] cooldown status unavailable");
-          return privateJson({ message: "Music generation status is temporarily unavailable." }, { status: 503 });
+          return privateJson(
+            { message: "Music generation status is temporarily unavailable." },
+            { status: 503 },
+          );
         }
 
         const availableAt = recentUsage?.created_at
