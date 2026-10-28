@@ -106,7 +106,7 @@ export const Route = createFileRoute("/api/music")({
         };
 
         const prompt = [
-          "Create one original English-language song for an English-learning app. Generate the actual song with lead vocals and full instrumental arrangement, not just a description.",
+          "Create one original English-language song for an English-learning app. Generate the actual song with a clearly female lead singing voice and full instrumental arrangement, not just a description. Use a natural, expressive female vocal tone; do not use a male lead voice.",
           `Student's CEFR level: ${level.toUpperCase()}.`,
           `Language guidance for this level: ${levelGuidance[level]}.`,
           `Topic: ${parsed.data.topic}.`,
