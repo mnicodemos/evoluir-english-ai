@@ -15,6 +15,17 @@ export function musicErrorMessage(status: number, serverMessage?: string | null)
       ? serverMessage
       : "The music service is busy right now. Please try again in a few minutes.";
   if (status === 502) return "The music service could not create your song. Please try again.";
-  if (status === 503) return "Music generation is temporarily unavailable. Please try again later.";
+  if (status === 503) {
+    const safeMessages = [
+      "Music generation is not configured yet. Please contact support if this continues.",
+      "Your song was generated, but we couldn't safely record its usage. Please contact support before trying again.",
+      "We couldn't load your learning level. Please try again.",
+      "Music generation is temporarily unavailable.",
+      "Music generation timed out or is temporarily unavailable. Please try again.",
+    ];
+    return safeMessages.includes(serverMessage ?? "")
+      ? serverMessage!
+      : "Music generation is temporarily unavailable. Please try again later.";
+  }
   return serverMessage || "Music generation is unavailable right now.";
 }

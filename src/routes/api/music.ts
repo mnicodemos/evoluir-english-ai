@@ -84,10 +84,11 @@ export const Route = createFileRoute("/api/music")({
             { status: 429 },
           );
         }
-        const apiKey = process.env["GOOGLE_GEMINI_API_KEY"];
-        if (!apiKey) {
+        const lovableKey = process.env["LOVABLE_API_KEY"];
+        const connectionKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
+        if (!lovableKey || !connectionKey) {
           return Response.json(
-            { message: "Music generation is not configured yet. Please try again later." },
+            { message: "Music generation is not configured yet. Please contact support if this continues." },
             { status: 503 },
           );
         }
@@ -114,11 +115,12 @@ export const Route = createFileRoute("/api/music")({
 
         try {
           const upstream = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/lyria-3-clip-preview:generateContent",
+            "https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/lyria-3-clip-preview:generateContent",
             {
               method: "POST",
               headers: {
-                "x-goog-api-key": apiKey,
+                Authorization: `Bearer ${lovableKey}`,
+                "X-Connection-Api-Key": connectionKey,
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
@@ -178,12 +180,16 @@ export const Route = createFileRoute("/api/music")({
             user_id: userId,
             operation: "music_generation",
             model: "lyria-3-clip-preview",
-            status: "success",
+            status: "completed",
             success: true,
             completed_at: new Date().toISOString(),
           });
           if (usageWriteError) {
             console.error("[music-lab] could not record successful generation");
+            return Response.json(
+              { message: "Your song was generated, but we couldn't safely record its usage. Please contact support before trying again." },
+              { status: 503 },
+            );
           }
           return Response.json({ lyrics, audioBase64, mimeType });
         } catch (error) {
