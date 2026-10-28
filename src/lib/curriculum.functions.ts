@@ -385,3 +385,45 @@ export const openUnitTest = createServerFn({ method: "POST" })
 
     return { lessonId: lesson.id as string };
   });
+
+/** Read the approved, shared Summary video independently of a student's lesson row. */
+export const getSummaryVideoForLesson = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ key: z.string().min(3).max(40) }).parse(input))
+  .handler(async ({ data }) => {
+    const { findCurriculumLesson } = await import("@/lib/curriculum");
+    const { findBusinessLesson } = await import("@/lib/businessCourse");
+    if (!findCurriculumLesson(data.key) && !findBusinessLesson(data.key, "b1")) {
+      throw new Error("Unknown lesson");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const db = supabaseAdmin as unknown as {
+      from: (table: string) => {
+        select: (columns: string) => {
+          eq: (
+            column: string,
+            value: string,
+          ) => {
+            not: (
+              column: string,
+              operator: string,
+              value: null,
+            ) => {
+              maybeSingle: () => Promise<{
+                data: { video_url: string; approved_by: string | null } | null;
+                error: { message: string } | null;
+              }>;
+            };
+          };
+        };
+      };
+    };
+    const { data: row, error } = await db
+      .from("lesson_videos")
+      .select("video_url, approved_by")
+      .eq("curriculum_key", data.key)
+      .not("approved_by", "is", null)
+      .maybeSingle();
+    if (error) throw new Error("The shared Summary video could not be loaded");
+    return { url: row?.video_url ?? null };
+  });
