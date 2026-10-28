@@ -188,7 +188,10 @@ export const Route = createFileRoute("/api/music")({
             completed_at: new Date().toISOString(),
           });
           if (usageWriteError) {
-            console.error("[music-lab] could not record successful generation");
+            console.error("[music-lab] could not record successful generation", {
+              code: usageWriteError.code,
+              message: usageWriteError.message,
+            });
             return Response.json(
               {
                 message:
