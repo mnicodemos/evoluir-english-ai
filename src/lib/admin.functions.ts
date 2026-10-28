@@ -1263,9 +1263,17 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" })
       .from("home_media_settings")
       .select("setting_key, image_url");
     if (error) throw new Error("The dashboard images could not be loaded.");
-    const result: { desktop: string | null; mobile: string | null } = { desktop: null, mobile: null };
+    const result: { desktop: string | null; mobile: string | null; evoAvatar: string | null } = {
+      desktop: null,
+      mobile: null,
+      evoAvatar: null,
+    };
     for (const row of data ?? []) {
-      if (row.setting_key === "desktop" || row.setting_key === "mobile") result[row.setting_key] = row.image_url;
+      if (row.setting_key === "desktop" || row.setting_key === "mobile") {
+        result[row.setting_key] = row.image_url;
+      } else if (row.setting_key === "evo-avatar") {
+        result.evoAvatar = row.image_url;
+      }
     }
     return result;
   });
@@ -1273,7 +1281,7 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" })
 export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({
-    target: z.enum(["desktop", "mobile"]),
+    target: z.enum(["desktop", "mobile", "evo-avatar"]),
     dataUrl: z.string().min(100).max(4_300_000),
     mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
   }).parse(data))
