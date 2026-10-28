@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { ChevronDown, ChevronUp, Download, Loader2, Music2, PlayCircle, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
