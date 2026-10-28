@@ -386,7 +386,6 @@ export const openUnitTest = createServerFn({ method: "POST" })
     return { lessonId: lesson.id as string };
   });
 
-
 /** Read the approved, shared Summary video independently of a student's lesson row. */
 export const getSummaryVideoForLesson = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -401,8 +400,15 @@ export const getSummaryVideoForLesson = createServerFn({ method: "GET" })
     const db = supabaseAdmin as unknown as {
       from: (table: string) => {
         select: (columns: string) => {
-          eq: (column: string, value: string) => {
-            not: (column: string, operator: string, value: null) => {
+          eq: (
+            column: string,
+            value: string,
+          ) => {
+            not: (
+              column: string,
+              operator: string,
+              value: null,
+            ) => {
               maybeSingle: () => Promise<{
                 data: { video_url: string; approved_by: string | null } | null;
                 error: { message: string } | null;
