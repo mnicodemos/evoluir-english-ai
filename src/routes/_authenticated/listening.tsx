@@ -739,10 +739,11 @@ function ListeningPage() {
                     ) : (
                       <Button
                         size="lg"
+                        className="min-h-14 px-7 text-base"
                         onClick={startRepeat}
                         disabled={checking || playing || !heard}
                       >
-                        <Mic className="mr-2 size-4" />{" "}
+                        <Mic className="mr-2 size-5" />{" "}
                         {checking
                           ? "Checking..."
                           : checked !== null
