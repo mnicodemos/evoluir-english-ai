@@ -620,7 +620,6 @@ function VocabularyOnline() {
         }
       />
 
-
       {q.length >= 2 ? (
         <DictionaryResult
           q={q}
