@@ -82,7 +82,9 @@ export function AdminLessonAudioImage() {
           <Loader2 className="size-4 animate-spin" /> Loading current image…
         </div>
       ) : imageQuery.isError ? (
-        <p className="text-sm text-destructive">The current Lesson Audio image could not be loaded.</p>
+        <p className="text-sm text-destructive">
+          The current Lesson Audio image could not be loaded.
+        </p>
       ) : (
         <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-start">
           <div className="overflow-hidden rounded-lg border border-border bg-muted">
