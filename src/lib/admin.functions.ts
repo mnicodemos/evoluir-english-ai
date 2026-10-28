@@ -1242,9 +1242,7 @@ export const saveSummaryVideoLink = createServerFn({ method: "POST" })
     const url = canonicalSummaryVideoUrl(data.url);
     if (!url) throw new Error("Cole um link válido do Vimeo ou YouTube.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error: sharedSaveError } = await (
-      supabaseAdmin as unknown as LessonVideosTable
-    )
+    const { error: sharedSaveError } = await (supabaseAdmin as unknown as LessonVideosTable)
       .from("lesson_videos")
       .upsert({
         curriculum_key: data.key,
