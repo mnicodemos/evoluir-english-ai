@@ -602,7 +602,7 @@ function ListeningPage() {
                     onClick={() => play(false)}
                     disabled={playing}
                     aria-label={playing ? "Playing..." : "Play sentence"}
-                    className="grid size-16 place-items-center rounded-full bg-brand-green text-sidebar shadow-[0_0_0_7px_oklch(0.8_0.15_175/0.12)] transition-transform hover:scale-105 disabled:opacity-70"
+                    className="grid size-[72.32px] shrink-0 place-items-center rounded-full bg-brand-green text-sidebar shadow-[0_0_0_7px_oklch(0.8_0.15_175/0.12)] transition-transform hover:scale-105 disabled:opacity-70"
                   >
                     <Volume2 className="size-7" />
                   </button>
