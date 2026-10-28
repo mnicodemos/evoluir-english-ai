@@ -3,6 +3,7 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Checking song availability…": "Verificando disponibilidade da música…",
   "Your song is available for this session only.":
     "Sua música fica disponível apenas nesta sessão.",
   "Play it now and use Download to save the audio to your device before leaving or refreshing this page. Evoluir+ does not keep a permanent copy of the audio.":
