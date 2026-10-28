@@ -55,10 +55,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         headers,
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
-      const result = (await response.json().catch(() => null)) as (
-        | (GeneratedSong & { message?: string })
-        | null
-      );
+      const result = (await response.json().catch(() => null)) as (GeneratedSong & { message?: string }) | null;
       if (!response.ok) {
         throw new Error(musicErrorMessage(response.status, result?.message));
       }
@@ -96,8 +93,8 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             EVO adapts the lyrics and language to your current level:{" "}
-            <strong className="text-foreground">{levelLabel || level}</strong>. You choose the
-            topic and sound, not the CEFR level.
+            <strong className="text-foreground">{levelLabel || level}</strong>. You choose the topic
+            and sound, not the CEFR level.
           </p>
         </div>
       </div>
