@@ -563,7 +563,7 @@ function ListeningPage() {
           // Desktop: the practice stage on the left, today's session and the
           // level focus on the right. Below xl both cards sit under the stage.
           <div className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)_minmax(22rem,1.1fr)]">
-            <section className="card-soft h-full space-y-4 p-4 sm:p-5">
+            <section className="card-soft flex h-full flex-col gap-4 p-4 sm:p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-muted-foreground">
@@ -594,162 +594,169 @@ function ListeningPage() {
                 </span>
               </div>
 
-              {/* Listening stage: one big play control, slower replay underneath. */}
-              <div className="flex flex-col items-center gap-2 py-1 text-center">
-                <button
-                  type="button"
-                  onClick={() => play(false)}
-                  disabled={playing}
-                  aria-label={playing ? "Playing..." : "Play sentence"}
-                  className="grid size-16 place-items-center rounded-full bg-brand-green text-sidebar shadow-[0_0_0_7px_oklch(0.8_0.15_175/0.12)] transition-transform hover:scale-105 disabled:opacity-70"
-                >
-                  <Volume2 className="size-7" />
-                </button>
-                <p className="text-sm font-medium">{playing ? "Playing..." : "Play sentence"}</p>
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => play(true)} disabled={playing}>
-                    <RotateCcw className="mr-2 size-4" />{" "}
-                    {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => void shadow()}
-                    disabled={playing || shadowing || recording || checking}
-                    title="Speak along with the audio, at the same time. Headphones help."
-                  >
-                    {shadowing ? (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    ) : (
-                      <AudioLines className="mr-2 size-4" />
-                    )}
-                    {shadowing ? "Speak along now..." : "Shadowing: speak along"}
-                  </Button>
-                </div>
-                {shadowResult && (
-                  <p className="max-w-md text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">
-                      <span>Shadowing</span> · {shadowResult.score}%
-                    </span>{" "}
-                    <span>(practice only, not scored)</span>
-                    {shadowResult.spoken && (
-                      <span className="block break-words">
-                        <span>You said:</span> {shadowResult.spoken}
-                      </span>
-                    )}
-                  </p>
-                )}
-              </div>
-
-              {/* One slot per word: the length of the sentence before listening,
-                  the words heard after a check, the full text when revealed. */}
-              <div
-                className="flex min-h-12 flex-wrap items-end justify-center gap-x-2 gap-y-3 rounded-xl bg-secondary/40 px-4 py-4"
-                role="group"
-                aria-label="Sentence words"
-              >
-                {checked !== null
-                  ? wordMatches(sentence, answer).map((item, i) => (
-                      <span
-                        key={`${item.word}-${i}`}
-                        className={
-                          item.hit
-                            ? "rounded bg-brand-green/15 px-1.5 py-0.5 text-sm text-brand-green"
-                            : "rounded bg-destructive/15 px-1.5 py-0.5 text-sm text-destructive"
-                        }
-                      >
-                        {item.word}
-                      </span>
-                    ))
-                  : sentence
-                      .split(/\s+/)
-                      .filter(Boolean)
-                      .map((word, i) =>
-                        revealed ? (
-                          <span key={`${word}-${i}`} className="text-sm">
-                            {word}
-                          </span>
-                        ) : (
-                          <span
-                            key={`${word}-${i}`}
-                            className="h-1 rounded-full bg-muted-foreground/40"
-                            style={{ width: `${Math.max(2, word.length) * 0.55}rem` }}
-                          />
-                        ),
-                      )}
-              </div>
-
-              {(canReveal || revealed) && checked === null && (
-                <div className="text-center">
+              <div className="flex flex-1 flex-col justify-center gap-4 py-3">
+                {/* Listening stage: one big play control, slower replay underneath. */}
+                <div className="flex flex-col items-center gap-2 py-1 text-center">
                   <button
                     type="button"
-                    onClick={() => setRevealed((value) => !value)}
-                    className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-success underline-offset-4 hover:underline"
+                    onClick={() => play(false)}
+                    disabled={playing}
+                    aria-label={playing ? "Playing..." : "Play sentence"}
+                    className="grid size-16 place-items-center rounded-full bg-brand-green text-sidebar shadow-[0_0_0_7px_oklch(0.8_0.15_175/0.12)] transition-transform hover:scale-105 disabled:opacity-70"
                   >
-                    {revealed ? "Hide sentence" : "REVEAL"}
+                    <Volume2 className="size-7" />
                   </button>
-                </div>
-              )}
-
-              {checked !== null ? (
-                <div className="rounded-xl bg-secondary p-4 text-sm">
-                  <p className="flex items-center gap-2 font-medium">
-                    {checked >= 80 ? (
-                      <Check className="size-4 text-primary" />
-                    ) : (
-                      <X className="size-4 text-destructive" />
-                    )}
-                    You repeated {checked}% of the words.
-                  </p>
-                  <p className="mt-2 break-words text-muted-foreground">
-                    Correct sentence: {sentence}
-                  </p>
-                  {answer && (
-                    <p className="mt-1 break-words text-muted-foreground">You said: {answer}</p>
-                  )}
-                  <p className="mt-2 text-muted-foreground">
-                    Attempt {attempts} of 3 · Best result: {best}%
-                    {!passed && checked < 70 && " · You need at least 70% — try again."}
-                    {passed && checked < 70 && " · No attempts left, keeping your best result."}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-1 text-center">
-                  <p className="text-sm font-medium">
-                    {heard ? "Now repeat the sentence out loud" : "Play the sentence first"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Record your voice and the AI checks which words you understood and repeated.
-                  </p>
-                </div>
-              )}
-
-              <div className="flex justify-center">
-                {checked === null || !passed ? (
-                  recording ? (
-                    <Button size="lg" variant="destructive" onClick={stopRepeat}>
-                      <Square className="mr-2 size-4" /> Stop and check
-                    </Button>
-                  ) : (
+                  <p className="text-sm font-medium">{playing ? "Playing..." : "Play sentence"}</p>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
                     <Button
-                      size="lg"
-                      onClick={startRepeat}
-                      disabled={checking || playing || !heard}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => play(true)}
+                      disabled={playing}
                     >
-                      <Mic className="mr-2 size-4" />{" "}
-                      {checking
-                        ? "Checking..."
-                        : checked !== null
-                          ? "Try again"
-                          : "Repeat the sentence"}
+                      <RotateCcw className="mr-2 size-4" />{" "}
+                      {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
                     </Button>
-                  )
-                ) : (
-                  <Button size="lg" onClick={next} disabled={saving}>
-                    {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
-                    {finished ? "Finish session" : "Next sentence"}
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => void shadow()}
+                      disabled={playing || shadowing || recording || checking}
+                      title="Speak along with the audio, at the same time. Headphones help."
+                    >
+                      {shadowing ? (
+                        <Loader2 className="mr-2 size-4 animate-spin" />
+                      ) : (
+                        <AudioLines className="mr-2 size-4" />
+                      )}
+                      {shadowing ? "Speak along now..." : "Shadowing: speak along"}
+                    </Button>
+                  </div>
+                  {shadowResult && (
+                    <p className="max-w-md text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">
+                        <span>Shadowing</span> · {shadowResult.score}%
+                      </span>{" "}
+                      <span>(practice only, not scored)</span>
+                      {shadowResult.spoken && (
+                        <span className="block break-words">
+                          <span>You said:</span> {shadowResult.spoken}
+                        </span>
+                      )}
+                    </p>
+                  )}
+                </div>
+
+                {/* One slot per word: the length of the sentence before listening,
+                    the words heard after a check, the full text when revealed. */}
+                <div
+                  className="flex min-h-12 flex-wrap items-end justify-center gap-x-2 gap-y-3 rounded-xl bg-secondary/40 px-4 py-4"
+                  role="group"
+                  aria-label="Sentence words"
+                >
+                  {checked !== null
+                    ? wordMatches(sentence, answer).map((item, i) => (
+                        <span
+                          key={`${item.word}-${i}`}
+                          className={
+                            item.hit
+                              ? "rounded bg-brand-green/15 px-1.5 py-0.5 text-sm text-brand-green"
+                              : "rounded bg-destructive/15 px-1.5 py-0.5 text-sm text-destructive"
+                          }
+                        >
+                          {item.word}
+                        </span>
+                      ))
+                    : sentence
+                        .split(/\s+/)
+                        .filter(Boolean)
+                        .map((word, i) =>
+                          revealed ? (
+                            <span key={`${word}-${i}`} className="text-sm">
+                              {word}
+                            </span>
+                          ) : (
+                            <span
+                              key={`${word}-${i}`}
+                              className="h-1 rounded-full bg-muted-foreground/40"
+                              style={{ width: `${Math.max(2, word.length) * 0.55}rem` }}
+                            />
+                          ),
+                        )}
+                </div>
+
+                {(canReveal || revealed) && checked === null && (
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={() => setRevealed((value) => !value)}
+                      className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-success underline-offset-4 hover:underline"
+                    >
+                      {revealed ? "Hide sentence" : "REVEAL"}
+                    </button>
+                  </div>
                 )}
+
+                {checked !== null ? (
+                  <div className="rounded-xl bg-secondary p-4 text-sm">
+                    <p className="flex items-center gap-2 font-medium">
+                      {checked >= 80 ? (
+                        <Check className="size-4 text-primary" />
+                      ) : (
+                        <X className="size-4 text-destructive" />
+                      )}
+                      You repeated {checked}% of the words.
+                    </p>
+                    <p className="mt-2 break-words text-muted-foreground">
+                      Correct sentence: {sentence}
+                    </p>
+                    {answer && (
+                      <p className="mt-1 break-words text-muted-foreground">You said: {answer}</p>
+                    )}
+                    <p className="mt-2 text-muted-foreground">
+                      Attempt {attempts} of 3 · Best result: {best}%
+                      {!passed && checked < 70 && " · You need at least 70% — try again."}
+                      {passed && checked < 70 && " · No attempts left, keeping your best result."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1 text-center">
+                    <p className="text-sm font-medium">
+                      {heard ? "Now repeat the sentence out loud" : "Play the sentence first"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Record your voice and the AI checks which words you understood and repeated.
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex justify-center">
+                  {checked === null || !passed ? (
+                    recording ? (
+                      <Button size="lg" variant="destructive" onClick={stopRepeat}>
+                        <Square className="mr-2 size-4" /> Stop and check
+                      </Button>
+                    ) : (
+                      <Button
+                        size="lg"
+                        onClick={startRepeat}
+                        disabled={checking || playing || !heard}
+                      >
+                        <Mic className="mr-2 size-4" />{" "}
+                        {checking
+                          ? "Checking..."
+                          : checked !== null
+                            ? "Try again"
+                            : "Repeat the sentence"}
+                      </Button>
+                    )
+                  ) : (
+                    <Button size="lg" onClick={next} disabled={saving}>
+                      {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
+                      {finished ? "Finish session" : "Next sentence"}
+                    </Button>
+                  )}
+                </div>
               </div>
             </section>
 
