@@ -73,7 +73,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
   const loadHomeImages = useServerFn(getHomeDashboardImages);
-  const { data: homeImages } = useQuery({ queryKey: ["home-dashboard-image-public"], queryFn: () => loadHomeImages(), staleTime: 60_000, retry: false });
+  const { data: homeImages } = useQuery({
+    queryKey: ["home-dashboard-image-public"],
+    queryFn: () => loadHomeImages(),
+    staleTime: 60_000,
+    retry: false,
+  });
   const desktopImage = homeImages?.desktop ?? "/study-books/1793212191251.jpg";
   const mobileImage = homeImages?.mobile ?? "/study-books/1793212191251.jpg";
   const league = useWeeklyLeagueStanding(profile);
