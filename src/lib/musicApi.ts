@@ -25,6 +25,9 @@ export function musicErrorMessage(status: number, serverMessage?: string | null)
       "We couldn't load your learning level. Please try again.",
       "Music generation is temporarily unavailable.",
       "Music generation timed out or is temporarily unavailable. Please try again.",
+      "Your saved songs are temporarily unavailable. Please try again.",
+      "We couldn't save your song. Please try again later.",
+      "We couldn't prepare your saved song. Please try again later.",
     ];
     return safeMessages.includes(serverMessage ?? "")
       ? serverMessage!
