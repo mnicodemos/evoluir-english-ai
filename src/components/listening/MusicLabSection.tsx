@@ -66,9 +66,10 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         if (!headers) return;
 
         const response = await fetch("/api/music", { method: "GET", headers });
-        const result = (await response.json().catch(() => null)) as
-          | { songs?: GeneratedSong[]; message?: string }
-          | null;
+        const result = (await response.json().catch(() => null)) as {
+          songs?: GeneratedSong[];
+          message?: string;
+        } | null;
         if (!response.ok) {
           throw new Error(musicErrorMessage(response.status, result?.message));
         }
@@ -113,8 +114,10 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         headers,
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
-      const result = (await response.json().catch(() => null)) as
-        { song?: GeneratedSong; message?: string } | null;
+      const result = (await response.json().catch(() => null)) as {
+        song?: GeneratedSong;
+        message?: string;
+      } | null;
       if (!response.ok) {
         throw new Error(musicErrorMessage(response.status, result?.message));
       }
@@ -270,10 +273,11 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <div className="space-y-3">
             {visibleSongs.map((song) => {
               const expanded = expandedSongs.has(song.id);
-              const safeFilename = song.topic
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/^-|-$/g, "") || "evoluir-song";
+              const safeFilename =
+                song.topic
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/^-|-$/g, "") || "evoluir-song";
               return (
                 <article
                   key={song.id}
