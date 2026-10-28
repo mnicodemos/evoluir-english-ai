@@ -26,6 +26,7 @@ export function ProofOfProgressMission() {
     queryKey: ["language-arena-proof-listening", profile?.id, weekStart],
     enabled: !!profile?.id,
     staleTime: 30_000,
+    refetchInterval: 15_000,
     queryFn: async () => {
       const { data: rows, error } = await supabase
         .from("activities")
@@ -33,6 +34,7 @@ export function ProofOfProgressMission() {
         .eq("user_id", profile!.id)
         .eq("activity_type", "listening")
         .gte("created_at", weekStart)
+        .lt("created_at", new Date(Date.parse(weekStart) + 7 * 24 * 60 * 60 * 1000).toISOString())
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (rows ?? []).map((row) => ({
