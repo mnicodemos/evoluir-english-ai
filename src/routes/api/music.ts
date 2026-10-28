@@ -258,7 +258,10 @@ export const Route = createFileRoute("/api/music")({
               code: audioUploadError.name,
             });
             return Response.json(
-              { message: "Your song was generated, but we couldn't save it safely. Please try again later." },
+              {
+                message:
+                  "Your song was generated, but we couldn't save it safely. Please try again later.",
+              },
               { status: 503 },
             );
           }
@@ -276,7 +279,10 @@ export const Route = createFileRoute("/api/music")({
             await removeUploadedAudio();
             console.error("[music-lab] could not sign newly saved audio");
             return Response.json(
-              { message: "Your song was generated, but we couldn't save it safely. Please try again later." },
+              {
+                message:
+                  "Your song was generated, but we couldn't save it safely. Please try again later.",
+              },
               { status: 503 },
             );
           }
@@ -303,7 +309,10 @@ export const Route = createFileRoute("/api/music")({
               code: songWriteError?.code,
             });
             return Response.json(
-              { message: "Your song was generated, but we couldn't save it safely. Please try again later." },
+              {
+                message:
+                  "Your song was generated, but we couldn't save it safely. Please try again later.",
+              },
               { status: 503 },
             );
           }
