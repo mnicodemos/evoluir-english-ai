@@ -48,7 +48,10 @@ function audioFileExtension(mimeType: string): string {
 }
 
 function safeSongFilename(topic: string): string {
-  const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const slug = topic
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
   return slug || "evoluir-song";
 }
 
