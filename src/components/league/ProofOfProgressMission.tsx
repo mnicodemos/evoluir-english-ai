@@ -59,7 +59,9 @@ export function ProofOfProgressMission() {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-green">
-            {portuguese ? "Language Arena · Progresso comprovado" : "Language Arena · Proof of Progress"}
+            {portuguese
+              ? "Language Arena · Progresso comprovado"
+              : "Language Arena · Proof of Progress"}
           </p>
           <h2 id="proof-of-progress-title" className="mt-1 font-display text-base font-semibold">
             {portuguese ? "Missão: Listening em prática" : "Mission: Listening in action"}
