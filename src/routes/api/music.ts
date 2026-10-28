@@ -19,6 +19,62 @@ const CEFR_LEVELS = new Set(["a1", "a2", "b1", "b2", "c1", "c2"]);
 export const Route = createFileRoute("/api/music")({
   server: {
     handlers: {
+      GET: async ({ request }) => {
+        let userId: string;
+        try {
+          userId = await authenticateApiRequest(request);
+        } catch (error) {
+          return Response.json(
+            { message: "Please sign in to create a song." },
+            { status: error instanceof Response ? error.status : 401 },
+          );
+        }
+
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: savedSongs, error: historyReadError } = await supabaseAdmin
+          .from("music_lab_songs")
+          .select("id, topic, genre, goal, lyrics, audio_path, mime_type, created_at")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+
+        if (historyReadError) {
+          console.error("[music-lab] saved history unavailable", { code: historyReadError.code });
+          return Response.json(
+            { message: "Could not load your saved songs. Please try again." },
+            { status: 503 },
+          );
+        }
+
+        try {
+          const songs = await Promise.all(
+            (savedSongs ?? []).map(async (song) => {
+              const { data: signedAudio, error: signedAudioError } = await supabaseAdmin.storage
+                .from("music-lab-audio")
+                .createSignedUrl(song.audio_path, 60 * 60);
+              if (signedAudioError || !signedAudio?.signedUrl) {
+                throw new Error("Saved audio URL could not be created.");
+              }
+              return {
+                id: song.id,
+                topic: song.topic,
+                genre: song.genre,
+                goal: song.goal,
+                lyrics: song.lyrics,
+                audioUrl: signedAudio.signedUrl,
+                mimeType: song.mime_type,
+                createdAt: song.created_at,
+              };
+            }),
+          );
+          return Response.json({ songs });
+        } catch {
+          console.error("[music-lab] saved audio signing unavailable");
+          return Response.json(
+            { message: "Could not load your saved songs. Please try again." },
+            { status: 503 },
+          );
+        }
+      },
       POST: async ({ request }) => {
         let userId: string;
         try {
@@ -179,6 +235,79 @@ export const Route = createFileRoute("/api/music")({
             );
           }
 
+          const normalizedMimeType = mimeType.split(";")[0]?.trim().toLowerCase();
+          const extension =
+            normalizedMimeType === "audio/wav" || normalizedMimeType === "audio/x-wav"
+              ? "wav"
+              : normalizedMimeType === "audio/ogg"
+                ? "ogg"
+                : normalizedMimeType === "audio/mp4"
+                  ? "m4a"
+                  : "mp3";
+          const songId = crypto.randomUUID();
+          const audioPath = `${userId}/${songId}.${extension}`;
+          const audioStorage = supabaseAdmin.storage.from("music-lab-audio");
+          const { error: audioUploadError } = await audioStorage.upload(
+            audioPath,
+            Buffer.from(audioBase64, "base64"),
+            { contentType: mimeType, upsert: false },
+          );
+
+          if (audioUploadError) {
+            console.error("[music-lab] audio persistence failed", {
+              code: audioUploadError.name,
+            });
+            return Response.json(
+              { message: "Your song was generated, but we couldn't save it safely. Please try again later." },
+              { status: 503 },
+            );
+          }
+
+          const removeUploadedAudio = async () => {
+            const { error } = await audioStorage.remove([audioPath]);
+            if (error) console.error("[music-lab] temporary audio cleanup failed");
+          };
+
+          const { data: signedAudio, error: signedAudioError } = await audioStorage.createSignedUrl(
+            audioPath,
+            60 * 60,
+          );
+          if (signedAudioError || !signedAudio?.signedUrl) {
+            await removeUploadedAudio();
+            console.error("[music-lab] could not sign newly saved audio");
+            return Response.json(
+              { message: "Your song was generated, but we couldn't save it safely. Please try again later." },
+              { status: 503 },
+            );
+          }
+
+          const { data: savedSong, error: songWriteError } = await supabaseAdmin
+            .from("music_lab_songs")
+            .insert({
+              id: songId,
+              user_id: userId,
+              topic: parsed.data.topic,
+              genre: parsed.data.genre,
+              goal: parsed.data.goal,
+              lyrics,
+              audio_path: audioPath,
+              mime_type: mimeType,
+              level,
+            })
+            .select("created_at")
+            .single();
+
+          if (songWriteError || !savedSong) {
+            await removeUploadedAudio();
+            console.error("[music-lab] song metadata persistence failed", {
+              code: songWriteError?.code,
+            });
+            return Response.json(
+              { message: "Your song was generated, but we couldn't save it safely. Please try again later." },
+              { status: 503 },
+            );
+          }
+
           const { error: usageWriteError } = await supabaseAdmin.from("ai_usage_events").insert({
             user_id: userId,
             operation: "music_generation",
@@ -188,6 +317,12 @@ export const Route = createFileRoute("/api/music")({
             completed_at: new Date().toISOString(),
           });
           if (usageWriteError) {
+            await supabaseAdmin
+              .from("music_lab_songs")
+              .delete()
+              .eq("id", songId)
+              .eq("user_id", userId);
+            await removeUploadedAudio();
             console.error("[music-lab] could not record successful generation", {
               code: usageWriteError.code,
               message: usageWriteError.message,
@@ -200,7 +335,19 @@ export const Route = createFileRoute("/api/music")({
               { status: 503 },
             );
           }
-          return Response.json({ lyrics, audioBase64, mimeType });
+
+          return Response.json({
+            song: {
+              id: songId,
+              topic: parsed.data.topic,
+              genre: parsed.data.genre,
+              goal: parsed.data.goal,
+              lyrics,
+              audioUrl: signedAudio.signedUrl,
+              mimeType,
+              createdAt: savedSong.created_at,
+            },
+          });
         } catch (error) {
           console.error(
             "[music-lab] generation failed",
