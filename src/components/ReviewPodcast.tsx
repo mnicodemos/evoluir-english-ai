@@ -64,6 +64,16 @@ export function LessonPodcast({
   // A little slower for beginners, like the Listening Lab.
   const rate = Math.max(0.85, listeningLevelConfig(level).rate);
 
+  // Persist the active line per lesson so the progress bar and Play control
+  // agree after leaving the page and returning later.
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(`lesson-podcast-position:${lessonId}`, String(current));
+    } catch {
+      // Storage can be unavailable in private browsing; playback still works.
+    }
+  }, [current, lessonId]);
+
   useEffect(
     () => () => {
       run.current += 1;
