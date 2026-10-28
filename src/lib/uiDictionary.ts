@@ -3,6 +3,13 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Your song is available for this session only.":
+    "Sua música fica disponível apenas nesta sessão.",
+  "Play it now and use Download to save the audio to your device before leaving or refreshing this page. Evoluir+ does not keep a permanent copy of the audio.":
+    "Reproduza agora e use Baixar para salvar o áudio no seu dispositivo antes de sair ou atualizar esta página. O Evoluir+ não mantém uma cópia permanente do áudio.",
+  "Session-only audio — download it now to keep a copy.":
+    "Áudio disponível apenas nesta sessão — baixe agora para guardar uma cópia.",
+  "Today's session progress": "Progresso da sessão de hoje",
   "Progress is available on this device, but could not be loaded from the server.":
     "O progresso está disponível neste dispositivo, mas não pôde ser carregado do servidor.",
   "Retry sync": "Tentar sincronizar novamente",
