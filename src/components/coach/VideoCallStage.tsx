@@ -147,13 +147,10 @@ export function VideoCallStage({
   const showTranslation = translation?.source === lastAssistantText ? translation.text : null;
 
   const endCall = () => {
-    if (canFinish) {
-      onFinish();
-      return;
-    }
-    // On phones, ending the call goes straight back to the Dashboard.
-    const isMobile = window.matchMedia("(max-width: 1023px)").matches;
-    void navigate({ to: isMobile ? "/dashboard" : "/coach" });
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    setCameraOn(false);
+    void navigate({ to: "/dashboard" });
   };
 
   if (!callStarted) {
@@ -394,20 +391,30 @@ export function VideoCallStage({
             {cameraOn ? <Video className="size-5" /> : <VideoOff className="size-5" />}
           </RoundButton>
         </div>
-        <div className="mt-4 flex justify-center">
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
           <button
             type="button"
             onClick={endCall}
-            disabled={finishing}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-red-600 px-6 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-red-600/90 disabled:opacity-60"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-red-600 px-6 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-red-600/90"
           >
-            {finishing ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <PhoneOff className="size-4" />
-            )}
-            {canFinish ? "End call and see report" : "End call"}
+            <PhoneOff className="size-4" />
+            End call
           </button>
+          {canFinish && (
+            <button
+              type="button"
+              onClick={onFinish}
+              disabled={finishing}
+              className="inline-flex h-11 items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-white/20 disabled:opacity-60"
+            >
+              {finishing ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <PhoneOff className="size-4" />
+              )}
+              End call and see report
+            </button>
+          )}
         </div>
         {/* Only a call that ends with its report counts as the study day
             (user request: say so before the student hangs up). */}
