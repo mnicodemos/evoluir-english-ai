@@ -4,7 +4,12 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function requireAdmin(context: {
-  supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => PromiseLike<{ data: boolean | null; error: unknown }> };
+  supabase: {
+    rpc: (
+      fn: "has_role",
+      args: { _user_id: string; _role: "admin" },
+    ) => PromiseLike<{ data: boolean | null; error: unknown }>;
+  };
   userId: string;
 }) {
   const { data, error } = await context.supabase.rpc("has_role", {
@@ -25,40 +30,64 @@ export const getLessonAudioImage = createServerFn({ method: "GET" }).handler(asy
     .eq("setting_key", "lesson-audio")
     .maybeSingle();
   if (error) throw new Error("The Lesson Audio image could not be loaded.");
-  return { imageUrl: (data as { image_url?: string | null } | null)?.image_url ?? "/study-books/1793031809285.jpg" };
+  return {
+    imageUrl:
+      (data as { image_url?: string | null } | null)?.image_url ??
+      "/study-books/1793031809285.jpg",
+  };
 });
 
 export const saveLessonAudioImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z.object({
-      dataUrl: z.string().min(100).max(4_300_000),
-      mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
-    }).parse(data),
+    z
+      .object({
+        dataUrl: z.string().min(100).max(4_300_000),
+        mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+      })
+      .parse(data),
   )
   .handler(async ({ context, data }) => {
     await requireAdmin(context);
-    const match = data.dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+    const match = data.dataUrl.match(
+      /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/,
+    );
     const encodedImage = match?.[2];
     if (!match || match[1] !== data.mimeType || !encodedImage) {
       throw new Error("Choose a valid JPG, PNG or WebP image.");
     }
+
     const bytes = Uint8Array.from(atob(encodedImage), (character) => character.charCodeAt(0));
-    if (bytes.byteLength > 3 * 1024 * 1024) throw new Error("The image must be 3 MB or smaller.");
-    const extension = data.mimeType === "image/jpeg" ? "jpg" : data.mimeType === "image/png" ? "png" : "webp";
+    if (bytes.byteLength > 3 * 1024 * 1024) {
+      throw new Error("The image must be 3 MB or smaller.");
+    }
+
+    const extension =
+      data.mimeType === "image/jpeg" ? "jpg" : data.mimeType === "image/png" ? "png" : "webp";
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const path = `lesson-audio/${Date.now()}.${extension}`;
     const { error: uploadError } = await supabaseAdmin.storage
       .from("dashboard-home-images")
-      .upload(path, bytes, { contentType: data.mimeType, cacheControl: "3600", upsert: false });
-    if (uploadError) throw new Error("The Lesson Audio image could not be uploaded. Please try again.");
-    const { data: publicData } = supabaseAdmin.storage.from("dashboard-home-images").getPublicUrl(path);
+      .upload(path, bytes, {
+        contentType: data.mimeType,
+        cacheControl: "3600",
+        upsert: false,
+      });
+    if (uploadError) {
+      throw new Error("The Lesson Audio image could not be uploaded. Please try again.");
+    }
+
+    const { data: publicData } = supabaseAdmin.storage
+      .from("dashboard-home-images")
+      .getPublicUrl(path);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: saveError } = await (supabaseAdmin as any).from("home_media_settings").upsert({
-      setting_key: "lesson-audio",
-      image_url: publicData.publicUrl,
-      updated_at: new Date().toISOString(),
-    });
+    const { error: saveError } = await (supabaseAdmin as any)
+      .from("home_media_settings")
+      .upsert({
+        setting_key: "lesson-audio",
+        image_url: publicData.publicUrl,
+        updated_at: new Date().toISOString(),
+      });
     if (saveError) throw new Error("The image was uploaded but could not be published.");
     return { ok: true, url: publicData.publicUrl };
   });
