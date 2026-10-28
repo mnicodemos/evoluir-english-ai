@@ -87,8 +87,8 @@ export function AdminSummaryVideoManager() {
           Summary video links
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage the Vimeo or YouTube video displayed in each lesson's student-facing Summary. Changes
-          are written directly to the lessons table used by Summary.
+          Manage the Vimeo or YouTube video displayed in each lesson's student-facing Summary.
+          Changes are written directly to the lessons table used by Summary.
         </p>
       </div>
 
