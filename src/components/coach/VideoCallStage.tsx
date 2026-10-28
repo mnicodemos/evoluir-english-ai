@@ -158,7 +158,11 @@ export function VideoCallStage({
 
   if (!callStarted) {
     return (
-      <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[radial-gradient(circle_at_50%_30%,oklch(0.24_0.05_190),oklch(0.11_0.02_240)_70%)] px-6 text-white" role="dialog" aria-label="Start video call with EVO">
+      <div
+        className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[radial-gradient(circle_at_50%_30%,oklch(0.24_0.05_190),oklch(0.11_0.02_240)_70%)] px-6 text-white"
+        role="dialog"
+        aria-label="Start video call with EVO"
+      >
         <div className="flex w-full max-w-md flex-col items-center text-center">
           <div className="relative mb-7 aspect-square w-[min(70vw,18rem)] overflow-hidden rounded-full shadow-2xl ring-2 ring-white/15">
             <img
@@ -169,7 +173,8 @@ export function VideoCallStage({
           </div>
           <p className="font-display text-xl font-bold sm:text-2xl">EVO · English teacher</p>
           <p className="mt-2 text-sm leading-relaxed text-white/70">
-            Ready to practise English in a realistic video call? Press the button when you are ready.
+            Ready to practise English in a realistic video call? Press the button when you are
+            ready.
           </p>
           <button
             type="button"
@@ -209,7 +214,9 @@ export function VideoCallStage({
             <Video className="size-5" />
             Call EVO
           </button>
-          <p className="mt-3 text-xs text-white/50">No call or AI request starts until you press this button.</p>
+          <p className="mt-3 text-xs text-white/50">
+            No call or AI request starts until you press this button.
+          </p>
         </div>
       </div>
     );
