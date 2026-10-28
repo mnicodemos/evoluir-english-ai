@@ -1259,7 +1259,9 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   // The settings table is shared with the dashboard and is not in generated DB types yet.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabaseAdmin as any).from("home_media_settings").select("setting_key, image_url");
+  const { data, error } = await (supabaseAdmin as any)
+    .from("home_media_settings")
+    .select("setting_key, image_url");
   if (error) throw new Error("The dashboard images could not be loaded.");
 
   const result: { desktop: string | null; mobile: string | null; evoAvatar: string | null } = {
@@ -1319,7 +1321,8 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
       .getPublicUrl(path);
     // The settings table is shared with the dashboard and is not in generated DB types yet.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: saveError } = await (supabaseAdmin as any).from("home_media_settings").upsert({
+    const { error: saveError } = await (supabaseAdmin as any).from("home_media_settings")
+      .upsert({
       setting_key: data.target,
       image_url: publicData.publicUrl,
       updated_at: new Date().toISOString(),
