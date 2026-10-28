@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Download, Loader2, Music2, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, Loader2, Music2, PlayCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { MUSIC_SIGN_IN_MESSAGE, musicErrorMessage, musicRequestHeaders } from "@/lib/musicApi";
 
 type GeneratedSong = {
+  id: string;
+  topic: string;
+  genre: (typeof GENRES)[number]["value"];
+  goal: (typeof GOALS)[number]["value"];
   lyrics: string;
   audioBase64: string;
   mimeType: string;
@@ -40,12 +44,13 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [genre, setGenre] = useState<(typeof GENRES)[number]["value"]>("pop");
   const [goal, setGoal] = useState<(typeof GOALS)[number]["value"]>("everyday vocabulary");
   const [loading, setLoading] = useState(false);
-  const [song, setSong] = useState<GeneratedSong | null>(null);
+  const [songs, setSongs] = useState<GeneratedSong[]>([]);
+  const [activeFocus, setActiveFocus] = useState<string>("all");
+  const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
 
   async function createSong(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
-    setSong(null);
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const headers = musicRequestHeaders(sessionData.session?.access_token);
@@ -56,18 +61,26 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
       const result = (await response.json().catch(() => null)) as
-        (GeneratedSong & { message?: string }) | null;
+        (Omit<GeneratedSong, "id" | "topic" | "genre" | "goal"> & { message?: string }) | null;
       if (!response.ok) {
         throw new Error(musicErrorMessage(response.status, result?.message));
       }
       if (!result?.audioBase64 || !result.lyrics) {
         throw new Error("The music service returned an incomplete song. Please try again.");
       }
-      setSong({
+
+      const newSong: GeneratedSong = {
+        id: crypto.randomUUID(),
+        topic: topic.trim(),
+        genre,
+        goal,
         lyrics: result.lyrics,
         audioBase64: result.audioBase64,
         mimeType: result.mimeType || "audio/mpeg",
-      });
+      };
+      setSongs((current) => [newSong, ...current]);
+      setActiveFocus(goal);
+      setExpandedSongs((current) => new Set(current).add(newSong.id));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Could not create your song.";
       toast.error(message);
@@ -76,8 +89,27 @@ export function MusicLabSection({ level, levelLabel }: Props) {
     }
   }
 
-  const audioUrl = song ? `data:${song.mimeType};base64,${song.audioBase64}` : undefined;
-  const safeTopic = topic.trim();
+  const focusLabel = (value: string) =>
+    GOALS.find((item) => item.value === value)?.label ?? value;
+  const focusTabs = [
+    { value: "all", label: "All", count: songs.length },
+    ...GOALS.map((item) => ({
+      value: item.value,
+      label: item.label,
+      count: songs.filter((song) => song.goal === item.value).length,
+    })).filter((item) => item.count > 0),
+  ];
+  const visibleSongs =
+    activeFocus === "all" ? songs : songs.filter((song) => song.goal === activeFocus);
+
+  function toggleExpanded(id: string) {
+    setExpandedSongs((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   return (
     <section className="card-soft space-y-5 p-5 sm:p-6" aria-labelledby="music-lab-title">
@@ -161,28 +193,102 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </div>
       </form>
 
-      {song && audioUrl && (
-        <div className="space-y-4 rounded-xl border border-brand-green/30 bg-brand-green/5 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-semibold">{safeTopic || "Your new song"}</h3>
-            <a
-              href={audioUrl}
-              download="evoluir-music-lab.mp3"
-              className="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-sm font-medium text-brand-green hover:bg-brand-green/10"
+      {songs.length > 0 && (
+        <section className="space-y-4" aria-label="Generated songs">
+          <div className="space-y-2">
+            <h3 className="font-display text-base font-semibold">My songs</h3>
+            <div
+              className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
+              role="tablist"
+              aria-label="Filter songs by Learning focus"
             >
-              <Download className="size-4" /> Download song
-            </a>
+              {focusTabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeFocus === tab.value}
+                  onClick={() => setActiveFocus(tab.value)}
+                  className={`min-h-10 shrink-0 rounded-full border px-3 text-sm font-medium transition-colors ${
+                    activeFocus === tab.value
+                      ? "border-brand-green bg-brand-green/10 text-brand-green"
+                      : "border-border bg-background text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab.label} <span className="ml-1 text-xs opacity-75">{tab.count}</span>
+                </button>
+              ))}
+            </div>
           </div>
-          <audio controls preload="metadata" src={audioUrl} className="w-full">
-            Your browser does not support audio playback.
-          </audio>
-          <div>
-            <h4 className="mb-2 text-sm font-semibold">Lyrics</h4>
-            <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-7 text-foreground">
-              {song.lyrics}
-            </pre>
+
+          <div className="space-y-3">
+            {visibleSongs.map((song) => {
+              const expanded = expandedSongs.has(song.id);
+              const audioUrl = `data:${song.mimeType};base64,${song.audioBase64}`;
+              const safeFilename = song.topic
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-|-$/g, "") || "evoluir-song";
+              return (
+                <article key={song.id} className="overflow-hidden rounded-xl border border-brand-green/25">
+                  <div className="flex items-center gap-3 p-3 sm:p-4">
+                    <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-green/10 text-brand-green">
+                      <Music2 className="size-5" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="truncate font-semibold">{song.topic || "Your new song"}</h4>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {focusLabel(song.goal)} <span aria-hidden="true">·</span>{" "}
+                        {GENRES.find((item) => item.value === song.genre)?.label ?? song.genre}
+                      </p>
+                    </div>
+                    <a
+                      href={audioUrl}
+                      download={`evoluir-${safeFilename}.mp3`}
+                      aria-label={`Download song: ${song.topic}`}
+                      className="grid size-9 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10"
+                    >
+                      <Download className="size-4" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => toggleExpanded(song.id)}
+                      aria-expanded={expanded}
+                      aria-label={expanded ? "Minimize song details" : "Expand song details"}
+                      className="grid size-9 shrink-0 place-items-center rounded-md hover:bg-secondary"
+                    >
+                      {expanded ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
+                    </button>
+                  </div>
+                  {expanded && (
+                    <div className="space-y-4 border-t border-border/70 p-3 sm:p-4">
+                      <audio
+                        controls
+                        preload="metadata"
+                        src={audioUrl}
+                        className="w-full"
+                        aria-label={`Play song: ${song.topic}`}
+                      >
+                        Your browser does not support audio playback.
+                      </audio>
+                      <div>
+                        <h5 className="mb-2 text-sm font-semibold">Lyrics</h5>
+                        <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-7 text-foreground">
+                          {song.lyrics}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+            {visibleSongs.length === 0 && (
+              <p className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
+                No songs for this Learning focus yet.
+              </p>
+            )}
           </div>
-        </div>
+        </section>
       )}
     </section>
   );
