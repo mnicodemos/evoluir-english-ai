@@ -231,10 +231,20 @@ export function VideoCallStage({
           <p className="font-display text-base font-bold sm:text-lg">EVO · English teacher</p>
           <p className="truncate text-xs text-white/65 sm:text-sm">{topicLabel}</p>
         </div>
-        <span className="flex shrink-0 items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm tabular-nums">
-          <span className="size-2 rounded-full bg-red-500" aria-hidden="true" />
-          {clock}
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm tabular-nums">
+            <span className="size-2 rounded-full bg-red-500" aria-hidden="true" />
+            {clock}
+          </span>
+          <button
+            type="button"
+            onClick={endCall}
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-red-600 px-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-red-600/90 sm:px-4"
+          >
+            <PhoneOff className="size-4" />
+            <span>End call</span>
+          </button>
+        </div>
       </header>
 
       {/* Stage: EVO with a ring that reacts to the conversation. */}
@@ -392,14 +402,6 @@ export function VideoCallStage({
           </RoundButton>
         </div>
         <div className="mt-4 flex flex-wrap justify-center gap-3">
-          <button
-            type="button"
-            onClick={endCall}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-red-600 px-6 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-red-600/90"
-          >
-            <PhoneOff className="size-4" />
-            End call
-          </button>
           {canFinish && (
             <button
               type="button"
