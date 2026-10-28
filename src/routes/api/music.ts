@@ -24,9 +24,18 @@ function topicSlug(value: string): string {
 
 function audioExtension(mimeType: string): string {
   if (mimeType.includes("wav")) return "wav";
-  if (mimeType.includes("mp4")) return "mp4";
+  if (mimeType.includes("mp4")) return "m4a";
   if (mimeType.includes("ogg")) return "ogg";
-  return "mp3";
+  if (mimeType.includes("webm")) return "webm";
+  if (mimeType.includes("l16")) return "pcm";
+  if (mimeType.includes("mpeg") || mimeType.includes("mp3")) return "mp3";
+  return "audio";
+}
+
+function privateJson(body: unknown, init?: ResponseInit): Response {
+  const headers = new Headers(init?.headers);
+  headers.set("Cache-Control", "private, no-store");
+  return Response.json(body, { ...init, headers });
 }
 
 export const Route = createFileRoute("/api/music")({
@@ -60,7 +69,7 @@ export const Route = createFileRoute("/api/music")({
           );
         }
 
-        if (!songs?.length) return Response.json({ songs: [] });
+        if (!songs?.length) return privateJson({ songs: [] });
 
         const paths = songs.map((song) => song.storage_path);
         const storage = supabaseAdmin.storage.from(MUSIC_BUCKET);
@@ -101,7 +110,7 @@ export const Route = createFileRoute("/api/music")({
           );
         }
 
-        return Response.json({ songs: savedSongs });
+        return privateJson({ songs: savedSongs });
       },
       POST: async ({ request }) => {
         let userId: string;
@@ -365,7 +374,7 @@ export const Route = createFileRoute("/api/music")({
             );
           }
 
-          return Response.json({
+          return privateJson({
             id: songId,
             topic: parsed.data.topic,
             genre: parsed.data.genre,
