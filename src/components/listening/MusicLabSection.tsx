@@ -17,6 +17,8 @@ type GeneratedSong = {
   mimeType: string;
 };
 
+type MusicHistoryResponse = { songs?: GeneratedSong[]; message?: string } | null;
+
 const GENRES = [
   { value: "pop", label: "Pop" },
   { value: "acoustic", label: "Acoustic" },
@@ -45,6 +47,10 @@ function audioFileExtension(mimeType: string): string {
   return "audio";
 }
 
+function safeSongFilename(topic: string): string {
+  return topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "evoluir-song";
+}
+
 type Props = {
   level: string;
   levelLabel: string;
@@ -71,12 +77,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         if (!headers) return;
 
         const response = await fetch("/api/music", { method: "GET", headers });
-        const result = (await response.json().catch(() => null)) as
-          | {
-              songs?: GeneratedSong[];
-              message?: string;
-            }
-          | null;
+        const result = (await response.json().catch(() => null)) as MusicHistoryResponse;
         if (!response.ok) {
           const message =
             response.status === 401
@@ -289,10 +290,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <div className="space-y-3">
             {visibleSongs.map((song) => {
               const expanded = expandedSongs.has(song.id);
-              const safeFilename = song.topic
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/^-|-$/g, "") || "evoluir-song";
+              const safeFilename = safeSongFilename(song.topic);
               const fileExtension = audioFileExtension(song.mimeType);
               return (
                 <article
