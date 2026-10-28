@@ -40,6 +40,7 @@ import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 import { findBusinessLesson, isBusinessKey } from "@/lib/businessCourse";
 import { findCurriculumLesson } from "@/lib/curriculum";
 import { getSummaryVideoForLesson } from "@/lib/curriculum.functions";
+import { getLessonAudioImage } from "@/lib/lessonAudioMedia.functions";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
@@ -132,6 +133,13 @@ function LessonPage() {
   // Summary videos are shared by curriculum key, so they remain available
   // even when this student has no lesson row yet.
   const fetchSummaryVideo = useServerFn(getSummaryVideoForLesson);
+  const fetchLessonAudioImage = useServerFn(getLessonAudioImage);
+  const lessonAudioImageQuery = useQuery({
+    queryKey: ["lesson-audio-image"],
+    queryFn: () => fetchLessonAudioImage(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
   const summaryVideoQuery = useQuery({
     queryKey: ["summary-video", lesson?.curriculum_key],
     queryFn: () => fetchSummaryVideo({ data: { key: lesson!.curriculum_key! } }),
@@ -408,7 +416,7 @@ function LessonPage() {
                 </div>
                 <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 md:gap-6">
                   <img
-                    src="/study-books/1793031809285.jpg"
+                    src={lessonAudioImageQuery.data?.imageUrl ?? "/study-books/1793031809285.jpg"}
                     alt="EVO and Leo"
                     className="mx-auto h-auto w-full rounded-xl object-contain"
                     loading="lazy"
