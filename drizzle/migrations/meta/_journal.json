@@ -582,6 +582,20 @@
       "when": 1793088000000,
       "tag": "0082_admin_vimeo_lesson_management_apply",
       "breakpoints": true
+    },
+    {
+      "idx": 83,
+      "version": "7",
+      "when": 1793145839067,
+      "tag": "0083_create_real_life_challenge_progress",
+      "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1793145857531,
+      "tag": "0084_real_life_challenge_progress_columns",
+      "breakpoints": true
     }
   ]
 }

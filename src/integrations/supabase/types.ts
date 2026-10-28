@@ -14,30 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      real_life_challenge_progress: {
-        Row: {
-          user_id: string
-          lesson_key: string
-          selected_option_id: string | null
-          completed: boolean
-          updated_at: string
-        }
-        Insert: {
-          user_id: string
-          lesson_key: string
-          selected_option_id?: string | null
-          completed?: boolean
-          updated_at?: string
-        }
-        Update: {
-          user_id?: string
-          lesson_key?: string
-          selected_option_id?: string | null
-          completed?: boolean
-          updated_at?: string
-        }
-        Relationships: []
-      }
       activities: {
         Row: {
           activity_type: string
@@ -1596,6 +1572,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      real_life_challenge_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string
+          lesson_key: string
+          selected_option_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string
+          lesson_key: string
+          selected_option_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string
+          lesson_key?: string
+          selected_option_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       server_errors: {
         Row: {
