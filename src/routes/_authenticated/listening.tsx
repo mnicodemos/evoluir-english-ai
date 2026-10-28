@@ -835,7 +835,11 @@ function ListeningPage() {
                       type="button"
                       onClick={() => setPronunciationFocusExpanded((expanded) => !expanded)}
                       aria-expanded={pronunciationFocusExpanded}
-                      aria-label={pronunciationFocusExpanded ? "Minimize pronunciation focus" : "Maximize pronunciation focus"}
+                      aria-label={
+                        pronunciationFocusExpanded
+                          ? "Minimize pronunciation focus"
+                          : "Maximize pronunciation focus"
+                      }
                       className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       {pronunciationFocusExpanded ? (
@@ -847,7 +851,9 @@ function ListeningPage() {
                   </div>
                   {pronunciationFocusExpanded && (
                     <>
-                      <p className="mt-1 text-xs leading-snug text-muted-foreground">{config.focus}</p>
+                      <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                        {config.focus}
+                      </p>
                       <ul className="mt-1.5 space-y-1 text-xs leading-snug text-muted-foreground">
                         {listeningTips(config.level).map((tip) => (
                           <li key={tip} className="flex gap-2">
