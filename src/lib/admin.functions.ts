@@ -1270,8 +1270,10 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
     evoAvatar: null,
   };
   for (const row of data ?? []) {
-    if (row.setting_key === "desktop" || row.setting_key === "mobile") {
-      result[row.setting_key] = row.image_url;
+    if (row.setting_key === "desktop") {
+      result.desktop = row.image_url;
+    } else if (row.setting_key === "mobile") {
+      result.mobile = row.image_url;
     } else if (row.setting_key === "evo-avatar") {
       result.evoAvatar = row.image_url;
     }
@@ -1295,10 +1297,11 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
       throw new Error("Forbidden");
     }
     const match = data.dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
-    if (!match || match[1] !== data.mimeType) {
+    const encodedImage = match?.[2];
+    if (!match || match[1] !== data.mimeType || !encodedImage) {
       throw new Error("Choose a valid JPG, PNG or WebP image.");
     }
-    const bytes = Uint8Array.from(atob(match[2]), (character) => character.charCodeAt(0));
+    const bytes = Uint8Array.from(atob(encodedImage), (character) => character.charCodeAt(0));
     if (bytes.byteLength > 3 * 1024 * 1024) {
       throw new Error("The image must be 3 MB or smaller.");
     }
