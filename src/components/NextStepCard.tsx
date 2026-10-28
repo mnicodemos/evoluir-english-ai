@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import evoDashboardApproved from "@/assets/evo-dashboard-more-than-english.png.asset.json";
-import evoDashboardMobileFull from "@/assets/evo-banner-mobile-full.webp";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -430,7 +428,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Mobile: the owner's whole banner, uncropped, inset from the card
                 edges with rounded corners — the same look as the desktop image. */}
             <img
-              src={evoDashboardMobileFull}
+              src="/study-books/1793212191251.jpg"
               alt=""
               width={1400}
               height={415}
@@ -438,7 +436,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             />
             <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:items-center sm:overflow-visible">
               <img
-                src={evoDashboardApproved.url}
+                src="/study-books/1793212191251.jpg"
                 alt=""
                 width={1536}
                 height={1024}
