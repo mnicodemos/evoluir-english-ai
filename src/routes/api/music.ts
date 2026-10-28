@@ -213,7 +213,6 @@ export const Route = createFileRoute("/api/music")({
             completed_at: new Date().toISOString(),
           });
           if (usageWriteError) {
-            await rollbackSong();
             console.error("[music-lab] could not record successful generation", {
               code: usageWriteError.code,
               message: usageWriteError.message,
