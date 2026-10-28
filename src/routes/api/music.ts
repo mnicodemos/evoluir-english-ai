@@ -23,12 +23,13 @@ function topicSlug(value: string): string {
 }
 
 function audioExtension(mimeType: string): string {
-  if (mimeType.includes("wav")) return "wav";
-  if (mimeType.includes("mp4")) return "m4a";
-  if (mimeType.includes("ogg")) return "ogg";
-  if (mimeType.includes("webm")) return "webm";
-  if (mimeType.includes("l16")) return "pcm";
-  if (mimeType.includes("mpeg") || mimeType.includes("mp3")) return "mp3";
+  const normalized = mimeType.toLowerCase();
+  if (normalized.includes("wav")) return "wav";
+  if (normalized.includes("mp4")) return "m4a";
+  if (normalized.includes("ogg")) return "ogg";
+  if (normalized.includes("webm")) return "webm";
+  if (normalized.includes("l16")) return "pcm";
+  if (normalized.includes("mpeg") || normalized.includes("mp3")) return "mp3";
   return "audio";
 }
 
