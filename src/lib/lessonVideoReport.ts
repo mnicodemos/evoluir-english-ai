@@ -137,6 +137,11 @@ export function lessonVideoListText(
   return lines.join("\n").trimEnd();
 }
 
+/** Canonical public video URL accepted by the Summary video manager. */
+export function canonicalSummaryVideoUrl(input: string): string | null {
+  return canonicalVimeoUrl(input) ?? canonicalYoutubeUrl(input);
+}
+
 /** Canonical Vimeo URL accepted by the admin video manager. */
 export function canonicalVimeoUrl(input: string): string | null {
   const clean = input.trim();
