@@ -438,6 +438,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   let pendingByte: number | null = null;
   let scheduledAny = false;
   let lastSource: AudioBufferSourceNode | undefined;
+  let fallbackRemainder = "";
 
   const scheduleSamples = (floats: Float32Array) => {
     if (requestId !== playRequest || floats.length === 0) return;
@@ -494,7 +495,13 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
           : await requestSpeech(block, onChunk, cacheMode, controller.signal, options.voice);
       } catch (error) {
         if (requestId !== playRequest) return;
-        if (scheduledAny) break;
+        if (scheduledAny) {
+          // Some blocks may already be queued when a later stream block fails.
+          // Keep the episode complete by speaking the failed block and anything
+          // after it with the browser voice once the queued audio has finished.
+          fallbackRemainder = blocks.slice(index).join(" ");
+          break;
+        }
         if (controller.signal.aborted) return;
         void error;
         return speakWithBrowser(value, rate);
@@ -522,6 +529,9 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
         context.currentTime >= playhead + 0.25,
       remainingMs + PLAYBACK_END_GRACE_MS,
     );
+    if (fallbackRemainder && requestId === playRequest) {
+      await speakWithBrowser(fallbackRemainder, rate);
+    }
   } finally {
     abortControllers.delete(controller);
   }
