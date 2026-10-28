@@ -2297,6 +2297,7 @@ const baseUiPt: Record<string, string> = {
   "B1 Unit 2 Lesson 2 — Reading a Work Report":
     "B1 Unidade 2, Lição 2 — Leitura de um relatório de trabalho",
   "Pass the quiz (70%)": "Passar no quiz (70%)",
+  "Loading saved songs...": "Carregando músicas salvas...",
   "Generated songs": "Músicas geradas",
   "My songs": "Minhas músicas",
   "Filter songs by Learning focus": "Filtrar músicas por foco de aprendizagem",
