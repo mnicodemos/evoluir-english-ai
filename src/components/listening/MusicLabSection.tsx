@@ -34,6 +34,17 @@ const GOALS = [
   { value: "grammar in context", label: "Grammar in context" },
 ] as const;
 
+function audioFileExtension(mimeType: string): string {
+  const normalized = mimeType.toLowerCase();
+  if (normalized.includes("wav")) return "wav";
+  if (normalized.includes("mp4")) return "m4a";
+  if (normalized.includes("ogg")) return "ogg";
+  if (normalized.includes("webm")) return "webm";
+  if (normalized.includes("l16")) return "pcm";
+  if (normalized.includes("mpeg") || normalized.includes("mp3")) return "mp3";
+  return "audio";
+}
+
 type Props = {
   level: string;
   levelLabel: string;
@@ -61,7 +72,10 @@ export function MusicLabSection({ level, levelLabel }: Props) {
 
         const response = await fetch("/api/music", { method: "GET", headers });
         const result = (await response.json().catch(() => null)) as
-          | { songs?: GeneratedSong[]; message?: string }
+          | {
+              songs?: GeneratedSong[];
+              message?: string;
+            }
           | null;
         if (!response.ok) {
           const message =
@@ -279,20 +293,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-|-$/g, "") || "evoluir-song";
-              const normalizedMimeType = song.mimeType.toLowerCase();
-              const fileExtension = normalizedMimeType.includes("wav")
-                ? "wav"
-                : normalizedMimeType.includes("mp4")
-                  ? "m4a"
-                  : normalizedMimeType.includes("ogg")
-                    ? "ogg"
-                    : normalizedMimeType.includes("webm")
-                      ? "webm"
-                      : normalizedMimeType.includes("l16")
-                        ? "pcm"
-                        : normalizedMimeType.includes("mpeg") || normalizedMimeType.includes("mp3")
-                          ? "mp3"
-                          : "audio";
+              const fileExtension = audioFileExtension(song.mimeType);
               return (
                 <article
                   key={song.id}
