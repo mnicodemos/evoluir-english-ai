@@ -14,30 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      real_life_challenge_progress: {
-        Row: {
-          user_id: string
-          lesson_key: string
-          selected_option_id: string | null
-          completed: boolean
-          updated_at: string
-        }
-        Insert: {
-          user_id: string
-          lesson_key: string
-          selected_option_id?: string | null
-          completed?: boolean
-          updated_at?: string
-        }
-        Update: {
-          user_id?: string
-          lesson_key?: string
-          selected_option_id?: string | null
-          completed?: boolean
-          updated_at?: string
-        }
-        Relationships: []
-      }
       activities: {
         Row: {
           activity_type: string
