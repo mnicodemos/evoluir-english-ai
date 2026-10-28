@@ -578,7 +578,10 @@ function VocabularyOnline() {
               Look up an English word or phrase and see its meaning in Portuguese without leaving
               Evoluir+.
             </p>
-            <label htmlFor="vocab-search" className="mt-3 block text-sm font-semibold text-foreground">
+            <label
+              htmlFor="vocab-search"
+              className="mt-3 block text-sm font-semibold text-foreground"
+            >
               Search in English
             </label>
             <div className="relative mt-1.5">
