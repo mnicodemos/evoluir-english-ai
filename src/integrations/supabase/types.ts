@@ -1575,18 +1575,27 @@ export type Database = {
       }
       real_life_challenge_progress: {
         Row: {
+          completed: boolean
           completed_at: string
           lesson_key: string
+          selected_option_id: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
+          completed?: boolean
           completed_at?: string
           lesson_key: string
+          selected_option_id?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
+          completed?: boolean
           completed_at?: string
           lesson_key?: string
+          selected_option_id?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
