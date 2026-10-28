@@ -191,8 +191,12 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           Play it now and use Download to save the audio to your device before leaving or refreshing
           this page. Evoluir+ does not keep a permanent copy of the audio.
         </p>
-        {cooldownMessage && <p className="mt-2 font-medium" role="status">{cooldownMessage}</p>}
-        {checkingCooldown && <p className="mt-2 text-muted-foreground" role="status">Checking song availability…</p>}
+        {cooldownMessage && <p className="mt-2 font-medium" role="status">
+            {cooldownMessage}
+          </p>}
+        {checkingCooldown && <p className="mt-2 text-muted-foreground" role="status">
+            Checking song availability…
+          </p>}
       </div>
 
       <form onSubmit={createSong} className="grid gap-4 md:grid-cols-2">
@@ -245,7 +249,10 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </label>
 
         <div className="flex flex-wrap items-center gap-3 md:col-span-2">
-          <Button type="submit" disabled={checkingCooldown || cooldownActive || loading || !topic.trim() || !level}>
+          <Button
+            type="submit"
+            disabled={checkingCooldown || cooldownActive || loading || !topic.trim() || !level}
+          >
             {loading ? (
               <Loader2 className="mr-2 size-4 animate-spin" />
             ) : (
