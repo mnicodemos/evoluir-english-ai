@@ -71,7 +71,11 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           message?: string;
         } | null;
         if (!response.ok) {
-          throw new Error(musicErrorMessage(response.status, result?.message));
+          const message =
+            response.status === 401
+              ? "Please sign in to view your saved songs."
+              : musicErrorMessage(response.status, result?.message);
+          throw new Error(message);
         }
 
         if (!cancelled) {
