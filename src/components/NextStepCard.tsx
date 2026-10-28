@@ -51,6 +51,8 @@ import {
   NEXT_STEP_WHY_NOW_TEXT,
 } from "@/lib/pedagogy/nextStep";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
+import { getHomeDashboardImages } from "@/lib/admin.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
 
@@ -70,6 +72,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // Key the cache by the current CEFR level: when the level changes, the
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
+  const loadHomeImages = useServerFn(getHomeDashboardImages);
+  const { data: homeImages } = useQuery({ queryKey: ["home-dashboard-image-public"], queryFn: () => loadHomeImages(), staleTime: 60_000, retry: false });
+  const desktopImage = homeImages?.desktop ?? "/study-books/1793212191251.jpg";
+  const mobileImage = homeImages?.mobile ?? "/study-books/1793212191251.jpg";
   const league = useWeeklyLeagueStanding(profile);
   const { data: todayActivities = [], isFetched: todayFetched } = useTodayActivities(profile?.id);
   const { data: studyPlan, isFetched: planFetched } = useQuery({
@@ -428,7 +434,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Mobile: the owner's whole banner, uncropped, inset from the card
                 edges with rounded corners — the same look as the desktop image. */}
             <img
-              src="/study-books/1793212191251.jpg"
+              src={mobileImage}
               alt=""
               width={1400}
               height={415}
@@ -436,7 +442,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             />
             <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:items-center sm:overflow-visible">
               <img
-                src="/study-books/1793212191251.jpg"
+                src={desktopImage}
                 alt=""
                 width={1536}
                 height={1024}

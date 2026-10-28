@@ -1253,3 +1253,47 @@ export const deleteSummaryVideoLink = createServerFn({ method: "POST" })
     if (error) throw new Error("The Summary video link could not be removed");
     return { ok: true };
   });
+
+
+// Public dashboard media reads; all writes remain server-side and admin-only.
+export const getHomeDashboardImages = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await (supabaseAdmin as any)
+      .from("home_media_settings")
+      .select("setting_key, image_url");
+    if (error) throw new Error("The dashboard images could not be loaded.");
+    const result: { desktop: string | null; mobile: string | null } = { desktop: null, mobile: null };
+    for (const row of data ?? []) {
+      if (row.setting_key === "desktop" || row.setting_key === "mobile") result[row.setting_key] = row.image_url;
+    }
+    return result;
+  });
+
+export const saveHomeDashboardImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({
+    target: z.enum(["desktop", "mobile"]),
+    dataUrl: z.string().min(100).max(4_300_000),
+    mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+  }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const match = data.dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+    if (!match || match[1] !== data.mimeType) throw new Error("Choose a valid JPG, PNG or WebP image.");
+    const bytes = Uint8Array.from(atob(match[2]), (character) => character.charCodeAt(0));
+    if (bytes.byteLength > 3 * 1024 * 1024) throw new Error("The image must be 3 MB or smaller.");
+    const extension = data.mimeType === "image/jpeg" ? "jpg" : data.mimeType === "image/png" ? "png" : "webp";
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const path = `${data.target}/${Date.now()}.${extension}`;
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from("dashboard-home-images")
+      .upload(path, bytes, { contentType: data.mimeType, cacheControl: "3600", upsert: false });
+    if (uploadError) throw new Error("The image could not be uploaded. Please try again.");
+    const { data: publicData } = supabaseAdmin.storage.from("dashboard-home-images").getPublicUrl(path);
+    const { error: saveError } = await (supabaseAdmin as any)
+      .from("home_media_settings")
+      .upsert({ setting_key: data.target, image_url: publicData.publicUrl, updated_at: new Date().toISOString() });
+    if (saveError) throw new Error("The image was uploaded but could not be published.");
+    return { ok: true, url: publicData.publicUrl };
+  });
