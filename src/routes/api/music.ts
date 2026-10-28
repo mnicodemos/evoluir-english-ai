@@ -95,7 +95,7 @@ export const Route = createFileRoute("/api/music")({
           return privateJson({ songs });
         } catch {
           console.error("[music-lab] saved audio signing unavailable");
-          return Response.json(
+          return privateJson(
             { message: "Could not load your saved songs. Please try again." },
             { status: 503 },
           );
