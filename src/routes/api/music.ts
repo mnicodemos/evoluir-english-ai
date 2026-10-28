@@ -19,7 +19,12 @@ const MUSIC_BUCKET = "music-lab-audio";
 const SIGNED_URL_TTL_SECONDS = 60 * 60;
 
 function topicSlug(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "song";
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "song"
+  );
 }
 
 function audioExtension(mimeType: string): string {
