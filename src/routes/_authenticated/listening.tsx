@@ -562,8 +562,8 @@ function ListeningPage() {
         ) : (
           // Desktop: the practice stage on the left, today's session and the
           // level focus on the right. Below xl both cards sit under the stage.
-          <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)_minmax(22rem,1.1fr)]">
-            <section className="card-soft space-y-4 p-4 sm:p-5">
+          <div className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)_minmax(22rem,1.1fr)]">
+            <section className="card-soft h-full space-y-4 p-4 sm:p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-muted-foreground">
@@ -753,8 +753,8 @@ function ListeningPage() {
               </div>
             </section>
 
-            <aside className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
-              <section className="card-soft space-y-4 p-4">
+            <aside className="grid h-full gap-4 md:grid-cols-2 xl:grid-cols-1">
+              <section className="card-soft h-full space-y-4 p-4">
                 <div>
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="font-display text-sm font-semibold">Today's session</h2>
