@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ChevronDown, ChevronUp, Download, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
@@ -66,9 +66,37 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [genre, setGenre] = useState<(typeof GENRES)[number]["value"]>("pop");
   const [goal, setGoal] = useState<(typeof GOALS)[number]["value"]>("everyday vocabulary");
   const [loading, setLoading] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState<string | null>(null);
+  const [checkingCooldown, setCheckingCooldown] = useState(true);
   const [songs, setSongs] = useState<GeneratedSong[]>([]);
   const [activeFocus, setActiveFocus] = useState<string>("all");
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let active = true;
+    async function loadCooldown() {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const headers = musicRequestHeaders(sessionData.session?.access_token);
+        if (!headers) return;
+        const response = await fetch("/api/music", { headers, cache: "no-store" });
+        if (!response.ok) return;
+        const result = (await response.json()) as { availableAt?: string | null };
+        if (active) setCooldownUntil(result.availableAt ?? null);
+      } catch {
+        // The server remains authoritative and will reject attempts during cooldown.
+      } finally {
+        if (active) setCheckingCooldown(false);
+      }
+    }
+    void loadCooldown();
+    return () => { active = false; };
+  }, []);
+
+  const cooldownActive = Boolean(cooldownUntil && new Date(cooldownUntil).getTime() > Date.now());
+  const cooldownMessage = cooldownActive
+    ? `You can create another song after ${new Date(cooldownUntil!).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}.`
+    : null;
 
   async function createSong(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -101,6 +129,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         mimeType: result.mimeType || "audio/mpeg",
       };
       setSongs((current) => [newSong, ...current]);
+      setCooldownUntil(new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString());
       setActiveFocus(goal);
       setExpandedSongs((current) => new Set(current).add(newSong.id));
     } catch (error) {
@@ -162,6 +191,8 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           Play it now and use Download to save the audio to your device before leaving or refreshing
           this page. Evoluir+ does not keep a permanent copy of the audio.
         </p>
+        {cooldownMessage && <p className="mt-2 font-medium" role="status">{cooldownMessage}</p>}
+        {checkingCooldown && <p className="mt-2 text-muted-foreground" role="status">Checking song availability…</p>}
       </div>
 
       <form onSubmit={createSong} className="grid gap-4 md:grid-cols-2">
@@ -169,6 +200,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <span className="font-medium">What should your song be about?</span>
           <input
             value={topic}
+            disabled={checkingCooldown || cooldownActive || loading}
             onChange={(event) => setTopic(event.target.value.slice(0, 80))}
             maxLength={80}
             required
@@ -184,6 +216,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <span className="font-medium">Music style</span>
           <select
             value={genre}
+            disabled={checkingCooldown || cooldownActive || loading}
             onChange={(event) => setGenre(event.target.value as typeof genre)}
             className="min-h-11 w-full rounded-lg border border-input bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
@@ -198,6 +231,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         <label className="space-y-1.5 text-sm">
           <span className="font-medium">Learning focus</span>
           <select
+            disabled={checkingCooldown || cooldownActive || loading}
             value={goal}
             onChange={(event) => setGoal(event.target.value as typeof goal)}
             className="min-h-11 w-full rounded-lg border border-input bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -211,7 +245,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </label>
 
         <div className="flex flex-wrap items-center gap-3 md:col-span-2">
-          <Button type="submit" disabled={loading || !topic.trim() || !level}>
+          <Button type="submit" disabled={checkingCooldown || cooldownActive || loading || !topic.trim() || !level}>
             {loading ? (
               <Loader2 className="mr-2 size-4 animate-spin" />
             ) : (
