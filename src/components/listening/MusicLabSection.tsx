@@ -77,7 +77,9 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         if (!cancelled) {
           const savedSongs = Array.isArray(result?.songs) ? result.songs : [];
           setSongs((current) => {
-            const byId = new Map([...savedSongs, ...current].map((song) => [song.id, song]));
+            const byId = new Map(
+              [...savedSongs, ...current].map((song) => [song.id, song] as const),
+            );
             return [...byId.values()].sort(
               (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt),
             );
