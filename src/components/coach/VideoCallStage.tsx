@@ -31,6 +31,8 @@ export type CallVoiceState =
  */
 export function VideoCallStage({
   preparing,
+  callStarted,
+  onStartCall,
   topicLabel,
   lastAssistantText,
   voiceState,
@@ -44,6 +46,8 @@ export function VideoCallStage({
   onFinish,
 }: {
   preparing: boolean;
+  callStarted: boolean;
+  onStartCall: () => void;
   topicLabel: string;
   lastAssistantText: string;
   voiceState: CallVoiceState;
@@ -65,11 +69,12 @@ export function VideoCallStage({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Call timer.
+  // The timer starts only after the student explicitly places the call.
   useEffect(() => {
+    if (!callStarted) return;
     const timer = window.setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [callStarted]);
 
   // Local camera preview only: never recorded, never sent.
   useEffect(() => {
@@ -150,6 +155,72 @@ export function VideoCallStage({
     const isMobile = window.matchMedia("(max-width: 1023px)").matches;
     void navigate({ to: isMobile ? "/dashboard" : "/coach" });
   };
+
+  if (!callStarted) {
+    return (
+      <div
+        className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[radial-gradient(circle_at_50%_30%,oklch(0.24_0.05_190),oklch(0.11_0.02_240)_70%)] px-6 text-white"
+        role="dialog"
+        aria-label="Start video call with EVO"
+      >
+        <div className="flex w-full max-w-md flex-col items-center text-center">
+          <div className="relative mb-7 aspect-square w-[min(70vw,18rem)] overflow-hidden rounded-full shadow-2xl ring-2 ring-white/15">
+            <img
+              src={evoVideoCall}
+              alt="EVO, your English teacher"
+              className="size-full scale-[1.3] object-cover [object-position:50%_30%] [transform-origin:50%_28%]"
+            />
+          </div>
+          <p className="font-display text-xl font-bold sm:text-2xl">EVO · English teacher</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/70">
+            Ready to practise English in a realistic video call? Press the button when you are
+            ready.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              // Browsers allow sound only after a user gesture. Play a short,
+              // synthesized double-tone ringback while EVO connects.
+              try {
+                const context = new AudioContext();
+                const gain = context.createGain();
+                gain.gain.setValueAtTime(0.0001, context.currentTime);
+                gain.connect(context.destination);
+                const first = context.createOscillator();
+                const second = context.createOscillator();
+                first.frequency.value = 440;
+                second.frequency.value = 480;
+                first.connect(gain);
+                second.connect(gain);
+                const now = context.currentTime;
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.setValueAtTime(0.055, now + 0.06);
+                gain.gain.setValueAtTime(0.0001, now + 0.42);
+                gain.gain.setValueAtTime(0.055, now + 0.58);
+                gain.gain.setValueAtTime(0.0001, now + 0.98);
+                first.start(now);
+                second.start(now);
+                first.stop(now + 1.02);
+                second.stop(now + 1.02);
+                window.setTimeout(() => void context.close().catch(() => undefined), 1200);
+              } catch {
+                // Ringback is an enhancement; the call must still start if audio is unavailable.
+              }
+              setSeconds(0);
+              onStartCall();
+            }}
+            className="mt-8 inline-flex h-14 items-center justify-center gap-3 rounded-full bg-brand-green px-8 text-base font-bold text-[oklch(0.15_0.03_180)] shadow-xl transition-transform hover:scale-[1.02] hover:bg-brand-green/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          >
+            <Video className="size-5" />
+            Call EVO
+          </button>
+          <p className="mt-3 text-xs text-white/50">
+            No call or AI request starts until you press this button.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

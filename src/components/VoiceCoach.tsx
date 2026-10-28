@@ -87,6 +87,9 @@ export function VoiceCoach({
   // The video call is an informal chat with EVO; AI Speaking stays a lesson.
   const callStyle = { casual: presentation === "call", name: profile?.name ?? undefined };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // Video Call remains idle until the student explicitly starts it.
+  const [callStarted, setCallStarted] = useState(presentation !== "call");
+  const callStartRequested = useRef(presentation !== "call");
   // Time left unsaved when the student leaves counts toward today's minutes
   // once the student has spoken, even when the session ends before the
   // report: on the video call (user request) and, the same way, in AI
@@ -123,17 +126,17 @@ export function VoiceCoach({
     };
   }, []);
   useEffect(() => {
-    if (!lessonTopic || scenario) return;
+    if (presentation === "call" || !lessonTopic || scenario) return;
     const opener = `Great, you just finished the lesson "${lessonTopic}". Let's practise it in a real conversation. Can you use what you learned in a sentence about your week?`;
     setScenario("everyday");
     setMessages([{ role: "assistant", content: opener }]);
     void playResponse(opener);
-  }, [lessonTopic, scenario]);
+  }, [lessonTopic, presentation, scenario]);
 
   // The AI always opens the conversation and chooses the subject itself.
   const started = useRef(false);
   useEffect(() => {
-    if (lessonTopic || started.current) return;
+    if (presentation === "call" || lessonTopic || started.current) return;
     started.current = true;
     const businessPlay = findBusinessRolePlay(business);
     if (businessPlay) startRolePlay(businessPlay);
@@ -152,6 +155,37 @@ export function VoiceCoach({
     // `started` ref already guarantees a single opener.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonTopic]);
+
+  async function beginCall() {
+    if (callStartRequested.current) return;
+    callStartRequested.current = true;
+    setCallStarted(true);
+
+    if (lessonTopic) {
+      const opener = `Great, you just finished the lesson "${lessonTopic}". Let's practise it in a real conversation. Can you use what you learned in a sentence about your week?`;
+      setScenario("everyday");
+      setMessages([{ role: "assistant", content: opener }]);
+      void playResponse(opener);
+      return;
+    }
+
+    const businessPlay = findBusinessRolePlay(business);
+    if (businessPlay) {
+      startRolePlay(businessPlay);
+    } else if (isWeatherCondition(weather)) {
+      startRolePlay(weatherRolePlay(weather));
+    } else if (isPlaceKind(place)) {
+      startRolePlay(placeRolePlay(place));
+    } else if (goal) {
+      setVoiceState("thinking");
+      const play = await loadGoalRolePlay(goal);
+      if (!mounted.current) return;
+      if (play) startRolePlay(play);
+      else void start(0);
+    } else {
+      void start(0);
+    }
+  }
 
   async function playResponse(text: string) {
     setVoiceState("speaking");
@@ -436,6 +470,8 @@ export function VoiceCoach({
     return (
       <VideoCallStage
         preparing={!scenario}
+        callStarted={callStarted}
+        onStartCall={() => void beginCall()}
         topicLabel={rolePlay ? rolePlay.label : "Casual chat"}
         lastAssistantText={lastAssistant?.content ?? ""}
         voiceState={voiceState}
