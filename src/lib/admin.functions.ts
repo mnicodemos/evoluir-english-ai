@@ -1279,7 +1279,7 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ context, data }) => {
     if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
-    const match = data.dataUrl.match(/^data:(image\\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+    const match = data.dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
     if (!match || match[1] !== data.mimeType) throw new Error("Choose a valid JPG, PNG or WebP image.");
     const bytes = Uint8Array.from(atob(match[2]), (character) => character.charCodeAt(0));
     if (bytes.byteLength > 3 * 1024 * 1024) throw new Error("The image must be 3 MB or smaller.");
