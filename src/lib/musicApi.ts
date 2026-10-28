@@ -1,4 +1,4 @@
-/** Browser helpers for POST /api/music (Music Lab). The server verifies the bearer token. */
+/** Browser helpers for the authenticated Music Lab API. The server verifies the bearer token. */
 
 export const MUSIC_SIGN_IN_MESSAGE =
   "Your session has expired. Please sign in again to create a song.";
@@ -10,7 +10,6 @@ export function musicRequestHeaders(
   return { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` };
 }
 
-/** A safe message per status; never shows raw server or provider details. */
 export function musicAudioExtension(mimeType: string): string {
   const mediaType = mimeType.split(";")[0]?.trim().toLowerCase();
   if (mediaType === "audio/wav" || mediaType === "audio/x-wav") return "wav";
