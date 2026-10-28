@@ -44,9 +44,9 @@ export function lessonVideoEmbedUrl(url: string | null | undefined): string | nu
   if (!url) return null;
   try {
     const parsed = new URL(url);
-    if (parsed.protocol !== "https:" || !/(^|\.)youtube\.com$/i.test(parsed.hostname) && parsed.hostname !== "youtu.be") {
-      return null;
-    }
+    const isYoutubeHost =
+      /(^|\.)youtube\.com$/i.test(parsed.hostname) || parsed.hostname === "youtu.be";
+    if (parsed.protocol !== "https:" || !isYoutubeHost) return null;
     const id = youtubeVideoId(url);
     return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
   } catch {
