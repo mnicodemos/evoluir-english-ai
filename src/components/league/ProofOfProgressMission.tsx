@@ -5,31 +5,12 @@ import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
-
-const REQUIRED_PARTS = 3;
-const PASS_SCORE = 70;
-
-/** Monday 00:00 in America/Sao_Paulo, converted to an ISO instant. */
-function leagueWeekStartIso(now = new Date()): string {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    weekday: "short",
-  }).formatToParts(now);
-  const get = (type: string) => parts.find((part) => part.type === type)?.value ?? "";
-  const date = new Date(Date.UTC(Number(get("year")), Number(get("month")) - 1, Number(get("day"))));
-  const daysSinceMonday = (date.getUTCDay() + 6) % 7;
-  date.setUTCDate(date.getUTCDate() - daysSinceMonday);
-  const localMonday = [
-    date.getUTCFullYear(),
-    String(date.getUTCMonth() + 1).padStart(2, "0"),
-    String(date.getUTCDate()).padStart(2, "0"),
-  ].join("-");
-  // São Paulo is UTC-03:00. Construct the local Monday boundary as an instant.
-  return new Date(`${localMonday}T03:00:00.000Z`).toISOString();
-}
+import {
+  countQualifiedListeningParts,
+  LANGUAGE_ARENA_LISTENING_PASS_SCORE,
+  LANGUAGE_ARENA_LISTENING_REQUIRED_PARTS,
+  leagueWeekStartIso,
+} from "@/lib/languageArenaProof";
 
 /**
  * First Language Arena mission: three saved Listening parts scoring >=70%.
@@ -62,9 +43,8 @@ export function ProofOfProgressMission() {
     },
   });
 
-  const qualified = (data ?? []).filter((row) => row.score !== null && row.score >= PASS_SCORE);
-  const completed = Math.min(REQUIRED_PARTS, qualified.length);
-  const done = completed >= REQUIRED_PARTS;
+  const completed = countQualifiedListeningParts((data ?? []).map((row) => row.score));
+  const done = completed >= LANGUAGE_ARENA_LISTENING_REQUIRED_PARTS;
 
   return (
     <section className="card-soft space-y-3 p-4 sm:p-5" aria-labelledby="proof-of-progress-title">
@@ -90,7 +70,7 @@ export function ProofOfProgressMission() {
           </p>
         </div>
         <span className="shrink-0 rounded-full border border-border px-2 py-1 text-xs font-semibold tabular-nums">
-          {isLoading ? "—" : `${completed}/${REQUIRED_PARTS}`}
+          {isLoading ? "—" : `${completed}/${LANGUAGE_ARENA_LISTENING_REQUIRED_PARTS}`}
         </span>
       </div>
 
@@ -99,12 +79,12 @@ export function ProofOfProgressMission() {
         role="progressbar"
         aria-label={portuguese ? "Progresso da missão" : "Mission progress"}
         aria-valuemin={0}
-        aria-valuemax={REQUIRED_PARTS}
+        aria-valuemax={LANGUAGE_ARENA_LISTENING_REQUIRED_PARTS}
         aria-valuenow={completed}
       >
         <div
           className={cn("h-full rounded-full bg-brand-green transition-[width]", done ? "w-full" : "")}
-          style={{ width: `${(completed / REQUIRED_PARTS) * 100}%` }}
+          style={{ width: `${(completed / LANGUAGE_ARENA_LISTENING_REQUIRED_PARTS) * 100}%` }}
         />
       </div>
 
