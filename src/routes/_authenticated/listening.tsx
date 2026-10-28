@@ -16,7 +16,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
-import { StudyDayCounter } from "@/components/StudyDayCounter";
 import { AppShell } from "@/components/AppShell";
 import { useTodayActivities } from "@/components/DailyGoalCard";
 import { Button } from "@/components/ui/button";
@@ -533,18 +532,10 @@ function ListeningPage() {
               progress is saved every 3, so you can stop and come back later.
             </>
           }
-        >
-          <StudyDayCounter
-            label={<span>Sentences today</span>}
-            value={sentencesToday}
-            goal={SENTENCES_PER_SESSION}
-            doneText={<span>Study day counted</span>}
-            hint={<span>One session of 9 sentences completes your study day.</span>}
-          />
-        </PageHeader>
+        />
 
         {sessionDone ? (
-          <section className="card-soft space-y-5 p-6">
+          <section className="card-soft space-y-4 p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <label className="text-sm font-medium">This session</label>
               <span className="text-sm text-muted-foreground">
@@ -568,8 +559,8 @@ function ListeningPage() {
         ) : (
           // Desktop: the practice stage on the left, today's session and the
           // level focus on the right. Below xl both cards sit under the stage.
-          <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,1fr)]">
-            <section className="card-soft space-y-6 p-5 sm:p-6">
+          <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)_minmax(22rem,1.1fr)]">
+            <section className="card-soft space-y-4 p-4 sm:p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-muted-foreground">
@@ -601,15 +592,15 @@ function ListeningPage() {
               </div>
 
               {/* Listening stage: one big play control, slower replay underneath. */}
-              <div className="flex flex-col items-center gap-3 py-2 text-center">
+              <div className="flex flex-col items-center gap-2 py-1 text-center">
                 <button
                   type="button"
                   onClick={() => play(false)}
                   disabled={playing}
                   aria-label={playing ? "Playing..." : "Play sentence"}
-                  className="grid size-20 place-items-center rounded-full bg-brand-green text-sidebar shadow-[0_0_0_10px_oklch(0.8_0.15_175/0.12)] transition-transform hover:scale-105 disabled:opacity-70"
+                  className="grid size-16 place-items-center rounded-full bg-brand-green text-sidebar shadow-[0_0_0_7px_oklch(0.8_0.15_175/0.12)] transition-transform hover:scale-105 disabled:opacity-70"
                 >
-                  <Volume2 className="size-8" />
+                  <Volume2 className="size-7" />
                 </button>
                 <p className="text-sm font-medium">{playing ? "Playing..." : "Play sentence"}</p>
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -840,7 +831,7 @@ function ListeningPage() {
                   <ul className="mt-2.5 space-y-2 text-sm text-muted-foreground">
                     {listeningTips(config.level).map((tip) => (
                       <li key={tip} className="flex gap-2">
-                        <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-green" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-green" />
                         <span>{tip}</span>
                       </li>
                     ))}
@@ -849,8 +840,9 @@ function ListeningPage() {
               </section>
             </aside>
           </div>
+          <MusicLabSection level={levelInfo.value} levelLabel={levelInfo.label} />
         )}
-        <MusicLabSection level={levelInfo.value} levelLabel={levelInfo.label} />
+        {sessionDone && <MusicLabSection level={levelInfo.value} levelLabel={levelInfo.label} />}
       </div>
     </AppShell>
   );
