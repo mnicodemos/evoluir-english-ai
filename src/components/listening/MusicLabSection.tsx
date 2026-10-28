@@ -282,10 +282,16 @@ export function MusicLabSection({ level, levelLabel }: Props) {
               const fileExtension = song.mimeType.includes("wav")
                 ? "wav"
                 : song.mimeType.includes("mp4")
-                  ? "mp4"
+                  ? "m4a"
                   : song.mimeType.includes("ogg")
                     ? "ogg"
-                    : "mp3";
+                    : song.mimeType.includes("webm")
+                      ? "webm"
+                      : song.mimeType.includes("l16")
+                        ? "pcm"
+                        : song.mimeType.includes("mpeg") || song.mimeType.includes("mp3")
+                          ? "mp3"
+                          : "audio";
               return (
                 <article
                   key={song.id}
