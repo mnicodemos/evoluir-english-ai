@@ -84,7 +84,9 @@ export function MusicLabSection({ level, levelLabel }: Props) {
       } catch (error) {
         if (!cancelled) {
           const message =
-            error instanceof Error ? error.message : "Could not load your saved songs. Please try again.";
+            error instanceof Error
+              ? error.message
+              : "Could not load your saved songs. Please try again.";
           toast.error(message);
         }
       } finally {
@@ -245,20 +247,20 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                 aria-label="Filter songs by Learning focus"
               >
                 {focusTabs.map((tab) => (
-                <button
-                  key={tab.value}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeFocus === tab.value}
-                  onClick={() => setActiveFocus(tab.value)}
-                  className={`min-h-10 shrink-0 rounded-full border px-3 text-sm font-medium transition-colors ${
-                    activeFocus === tab.value
-                      ? "border-brand-green bg-brand-green/10 text-brand-green"
-                      : "border-border bg-background text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {tab.label} <span className="ml-1 text-xs opacity-75">{tab.count}</span>
-                </button>
+                  <button
+                    key={tab.value}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeFocus === tab.value}
+                    onClick={() => setActiveFocus(tab.value)}
+                    className={`min-h-10 shrink-0 rounded-full border px-3 text-sm font-medium transition-colors ${
+                      activeFocus === tab.value
+                        ? "border-brand-green bg-brand-green/10 text-brand-green"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {tab.label} <span className="ml-1 text-xs opacity-75">{tab.count}</span>
+                  </button>
                 ))}
               </div>
             )}
