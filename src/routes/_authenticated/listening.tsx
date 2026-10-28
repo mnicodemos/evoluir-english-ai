@@ -48,6 +48,7 @@ import {
 import { persistListeningLegacy } from "@/lib/legacyActivity.functions";
 import { listeningAnswerScore } from "@/lib/legacyScores";
 import { DoneSeal } from "@/components/DoneSeal";
+import { MusicLabSection } from "@/components/listening/MusicLabSection";
 
 export const Route = createFileRoute("/_authenticated/listening")({
   head: () => ({
@@ -829,6 +830,7 @@ function ListeningPage() {
             </aside>
           </div>
         )}
+        <MusicLabSection level={levelInfo.value} levelLabel={levelInfo.label} />
       </div>
     </AppShell>
   );
