@@ -1573,6 +1573,24 @@ export type Database = {
           },
         ]
       }
+      real_life_challenge_progress: {
+        Row: {
+          completed_at: string
+          lesson_key: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          lesson_key: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          lesson_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       server_errors: {
         Row: {
           area: string
