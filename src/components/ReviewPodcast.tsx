@@ -227,8 +227,13 @@ export function LessonPodcast({
       </div>
 
       {playbackError ? (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm" role="alert">
-          <p className="text-destructive">{t("Audio could not be played")}: {playbackError}</p>
+        <div
+          className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm"
+          role="alert"
+        >
+          <p className="text-destructive">
+            {t("Audio could not be played")}: {playbackError}
+          </p>
           <p className="mt-1 text-muted-foreground">
             {t("Your progress was not advanced. Press Continue to retry this line.")}
           </p>
