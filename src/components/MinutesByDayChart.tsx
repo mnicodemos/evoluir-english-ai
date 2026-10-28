@@ -65,8 +65,8 @@ export function MinutesByDayChart({ userId, level }: Props) {
   if (!hasMinutes) return null;
 
   return (
-    <div className="mt-3 sm:mt-6">
-      <h3 className="text-sm font-medium">Minutes per day</h3>
+    <div>
+      <h3 className="font-display text-base font-semibold sm:text-lg">Minutes per day</h3>
       <p className="mt-1 hidden text-xs text-muted-foreground sm:block">
         Each bar is your practice time that day, split by activity.
       </p>
@@ -95,7 +95,7 @@ export function MinutesByDayChart({ userId, level }: Props) {
               labelClassName="text-foreground"
             />
             <Legend wrapperStyle={{ fontSize: "12px" }} iconSize={10} />
-            <Bar dataKey="Lessons" stackId="min" fill={ACTIVITY_CHART_COLORS.Lessons} />
+            <Bar dataKey="Lessons" stackId="min" fill="#EC4899" />
             <Bar dataKey="Vocabulary" stackId="min" fill={ACTIVITY_CHART_COLORS.Vocabulary} />
             <Bar dataKey="Listening" stackId="min" fill={ACTIVITY_CHART_COLORS.Listening} />
             <Bar dataKey="Reading" stackId="min" fill={ACTIVITY_CHART_COLORS.Reading} />
