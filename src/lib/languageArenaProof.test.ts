@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  countQualifiedListeningParts,
-  leagueWeekStartIso,
-} from "@/lib/languageArenaProof";
+import { countQualifiedListeningParts, leagueWeekStartIso } from "@/lib/languageArenaProof";
 
 describe("Language Arena proof mission", () => {
   it("counts only saved scores at or above 70 and caps progress at the goal", () => {
