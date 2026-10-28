@@ -3,6 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Check,
+  ChevronDown,
+  ChevronUp,
   Headphones,
   Loader2,
   Mic,
@@ -197,6 +199,7 @@ function ListeningPage() {
   const [shadowResult, setShadowResult] = useState<{ score: number; spoken: string } | null>(null);
   const [checking, setChecking] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [pronunciationFocusExpanded, setPronunciationFocusExpanded] = useState(true);
 
   useEffect(() => () => cancelVoiceRecording(), []);
 
@@ -822,20 +825,39 @@ function ListeningPage() {
                   )}
                 </div>
                 <div className="border-t border-border pt-4">
-                  <h3 className="flex items-center gap-2 text-sm font-semibold">
-                    <AudioLines className="size-4 text-brand-green" aria-hidden="true" />
-                    <span>Pronunciation focus</span>
-                    <span className="text-muted-foreground">· {config.label}</span>
-                  </h3>
-                  <p className="mt-1 text-xs leading-snug text-muted-foreground">{config.focus}</p>
-                  <ul className="mt-1.5 space-y-1 text-xs leading-snug text-muted-foreground">
-                    {listeningTips(config.level).map((tip) => (
-                      <li key={tip} className="flex gap-2">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-green" />
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="flex min-w-0 items-center gap-2 text-sm font-semibold">
+                      <AudioLines className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+                      <span>Pronunciation focus</span>
+                      <span className="text-muted-foreground">· {config.label}</span>
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setPronunciationFocusExpanded((expanded) => !expanded)}
+                      aria-expanded={pronunciationFocusExpanded}
+                      aria-label={pronunciationFocusExpanded ? "Minimize pronunciation focus" : "Maximize pronunciation focus"}
+                      className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      {pronunciationFocusExpanded ? (
+                        <ChevronUp className="size-4" aria-hidden="true" />
+                      ) : (
+                        <ChevronDown className="size-4" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                  {pronunciationFocusExpanded && (
+                    <>
+                      <p className="mt-1 text-xs leading-snug text-muted-foreground">{config.focus}</p>
+                      <ul className="mt-1.5 space-y-1 text-xs leading-snug text-muted-foreground">
+                        {listeningTips(config.level).map((tip) => (
+                          <li key={tip} className="flex gap-2">
+                            <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-green" />
+                            <span>{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
                 </div>
               </section>
             </aside>
