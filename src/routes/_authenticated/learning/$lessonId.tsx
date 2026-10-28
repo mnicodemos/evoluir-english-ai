@@ -423,7 +423,11 @@ function LessonPage() {
             )}
           </TabsList>
 
-          <TabsContent value="audio" hidden={!!repairPlan?.isReviewTest} className="relative z-0 mt-5 space-y-4">
+          <TabsContent
+            value="audio"
+            hidden={!!repairPlan?.isReviewTest}
+            className="relative z-0 mt-5 space-y-4"
+          >
             {podcast ? (
               <div className="space-y-3">
                 <div className="space-y-1">
