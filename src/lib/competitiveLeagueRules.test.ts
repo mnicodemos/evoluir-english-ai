@@ -1,21 +1,35 @@
 import { describe, expect, it } from "vitest";
 
-import { COMPETITIVE_LEAGUES, leagueMovement, rankLeagueParticipants } from "@/lib/competitiveLeagueRules";
+import {
+  COMPETITIVE_LEAGUES,
+  leagueMovement,
+  rankLeagueParticipants,
+} from "@/lib/competitiveLeagueRules";
 
 describe("competitive league rules", () => {
   it("defines the ten divisions in progression order", () => {
     expect(COMPETITIVE_LEAGUES).toEqual([
-      "Bronze", "Silver", "Gold", "Sapphire", "Ruby",
-      "Emerald", "Amethyst", "Pearl", "Obsidian", "Diamond",
+      "Bronze",
+      "Silver",
+      "Gold",
+      "Sapphire",
+      "Ruby",
+      "Emerald",
+      "Amethyst",
+      "Pearl",
+      "Obsidian",
+      "Diamond",
     ]);
   });
 
   it("ranks equal XP deterministically by immutable ID", () => {
-    expect(rankLeagueParticipants([
-      { id: "user-c", xp: 100 },
-      { id: "user-a", xp: 100 },
-      { id: "user-b", xp: 120 },
-    ])).toEqual([
+    expect(
+      rankLeagueParticipants([
+        { id: "user-c", xp: 100 },
+        { id: "user-a", xp: 100 },
+        { id: "user-b", xp: 120 },
+      ]),
+    ).toEqual([
       { id: "user-b", xp: 120, rank: 1 },
       { id: "user-a", xp: 100, rank: 2 },
       { id: "user-c", xp: 100, rank: 3 },
@@ -28,12 +42,21 @@ describe("competitive league rules", () => {
   });
 
   it("promotes the top four and demotes the bottom three in a full group", () => {
-    expect([1, 2, 3, 4].map((rank) => leagueMovement("Silver", rank, 20)))
-      .toEqual(["promote", "promote", "promote", "promote"]);
-    expect([5, 17].map((rank) => leagueMovement("Silver", rank, 20)))
-      .toEqual(["stay", "stay"]);
-    expect([18, 19, 20].map((rank) => leagueMovement("Silver", rank, 20)))
-      .toEqual(["demote", "demote", "demote"]);
+    expect([1, 2, 3, 4].map((rank) => leagueMovement("Silver", rank, 20))).toEqual([
+      "promote",
+      "promote",
+      "promote",
+      "promote",
+    ]);
+    expect([5, 17].map((rank) => leagueMovement("Silver", rank, 20))).toEqual([
+      "stay",
+      "stay",
+    ]);
+    expect([18, 19, 20].map((rank) => leagueMovement("Silver", rank, 20))).toEqual([
+      "demote",
+      "demote",
+      "demote",
+    ]);
   });
 
   it("does not demote Bronze and awards Diamond elite status instead of promotion", () => {
