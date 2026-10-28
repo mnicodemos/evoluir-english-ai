@@ -126,6 +126,44 @@ export function RealLifeChallengeCard({
     };
   }, [userId, lessonKey, challenge]);
 
+  // Follow progress made on another device or tab without a page reload:
+  // re-read on focus / tab return and every 15 s while the tab is visible.
+  useEffect(() => {
+    if (!userId || !lessonKey || !challenge) return;
+    let cancelled = false;
+    async function refresh() {
+      if (document.visibilityState !== "visible") return;
+      const { data, error } = await supabase
+        .from("real_life_challenge_progress")
+        .select("selected_option_id, completed")
+        .eq("user_id", userId!)
+        .eq("lesson_key", lessonKey!)
+        .maybeSingle();
+      if (cancelled || error || !data) return;
+      const remoteSelected =
+        data.selected_option_id &&
+        challenge!.options.some((option) => option.id === data.selected_option_id)
+          ? data.selected_option_id
+          : null;
+      setSelected(remoteSelected);
+      if (data.completed) {
+        setCompleted(true);
+        writeStorage(challengeStorageKey(userId!, lessonKey!), "done");
+      }
+    }
+    const onVisible = () => void refresh();
+    window.addEventListener("focus", onVisible);
+    document.addEventListener("visibilitychange", onVisible);
+    const timer = window.setInterval(onVisible, 15000);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", onVisible);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.clearInterval(timer);
+    };
+  }, [userId, lessonKey, challenge]);
+
+
   if (!challenge) return null;
   const chosen = challengeOption(challenge, selected);
 
