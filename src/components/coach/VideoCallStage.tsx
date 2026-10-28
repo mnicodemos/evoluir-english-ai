@@ -231,20 +231,10 @@ export function VideoCallStage({
           <p className="font-display text-base font-bold sm:text-lg">EVO · English teacher</p>
           <p className="truncate text-xs text-white/65 sm:text-sm">{topicLabel}</p>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm tabular-nums">
-            <span className="size-2 rounded-full bg-red-500" aria-hidden="true" />
-            {clock}
-          </span>
-          <button
-            type="button"
-            onClick={endCall}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-red-600 px-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-red-600/90 sm:px-4"
-          >
-            <PhoneOff className="size-4" />
-            <span>End call</span>
-          </button>
-        </div>
+        <span className="flex shrink-0 items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm tabular-nums">
+          <span className="size-2 rounded-full bg-red-500" aria-hidden="true" />
+          {clock}
+        </span>
       </header>
 
       {/* Stage: EVO with a ring that reacts to the conversation. */}
@@ -329,6 +319,16 @@ export function VideoCallStage({
           </div>
         </div>
       )}
+
+      {/* Persistent end action: fixed above the stage and report overlay on every viewport. */}
+      <button
+        type="button"
+        onClick={endCall}
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-20 inline-flex h-12 items-center gap-2 rounded-full bg-red-600 px-4 text-sm font-bold text-white shadow-2xl ring-2 ring-white/30 transition-colors hover:bg-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600 sm:right-8"
+      >
+        <PhoneOff className="size-4" />
+        <span>End call</span>
+      </button>
 
       {/* Controls. */}
       <footer className="px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3">
