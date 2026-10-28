@@ -88,7 +88,10 @@ export const Route = createFileRoute("/api/music")({
         const connectionKey = process.env["UDC_MARCELO_S_GOOGLE_GEMINI_KEY_API_KEY"];
         if (!lovableKey || !connectionKey) {
           return Response.json(
-            { message: "Music generation is not configured yet. Please contact support if this continues." },
+            {
+              message:
+                "Music generation is not configured yet. Please contact support if this continues.",
+            },
             { status: 503 },
           );
         }
@@ -187,7 +190,10 @@ export const Route = createFileRoute("/api/music")({
           if (usageWriteError) {
             console.error("[music-lab] could not record successful generation");
             return Response.json(
-              { message: "Your song was generated, but we couldn't safely record its usage. Please contact support before trying again." },
+              {
+                message:
+                  "Your song was generated, but we couldn't safely record its usage. Please contact support before trying again.",
+              },
               { status: 503 },
             );
           }

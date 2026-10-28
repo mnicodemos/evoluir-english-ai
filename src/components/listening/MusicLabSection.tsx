@@ -55,7 +55,10 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         headers,
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
-      const result = (await response.json().catch(() => null)) as (GeneratedSong & { message?: string }) | null;
+      const result = (await response.json().catch(() => null)) as (
+        | (GeneratedSong & { message?: string })
+        | null
+      );
       if (!response.ok) {
         throw new Error(musicErrorMessage(response.status, result?.message));
       }
@@ -122,7 +125,11 @@ export function MusicLabSection({ level, levelLabel }: Props) {
             onChange={(event) => setGenre(event.target.value as typeof genre)}
             className="min-h-11 w-full rounded-lg border border-input bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {GENRES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+            {GENRES.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -133,7 +140,11 @@ export function MusicLabSection({ level, levelLabel }: Props) {
             onChange={(event) => setGoal(event.target.value as typeof goal)}
             className="min-h-11 w-full rounded-lg border border-input bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {GOALS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+            {GOALS.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
           </select>
         </label>
 

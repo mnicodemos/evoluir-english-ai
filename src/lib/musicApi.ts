@@ -2,7 +2,9 @@
 
 export const MUSIC_SIGN_IN_MESSAGE = "Your session has expired. Please sign in again to create a song.";
 
-export function musicRequestHeaders(accessToken: string | null | undefined): Record<string, string> | null {
+export function musicRequestHeaders(
+  accessToken: string | null | undefined,
+): Record<string, string> | null {
   if (!accessToken) return null;
   return { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` };
 }
