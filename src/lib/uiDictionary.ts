@@ -2306,6 +2306,7 @@ const baseUiPt: Record<string, string> = {
   "Look up an English word or phrase and see its meaning in Portuguese without leaving Evoluir+.":
     "Pesquise uma palavra ou expressão em inglês e veja o significado em português sem sair do Evoluir+.",
   "Search in English": "Pesquisar em inglês",
+  "Redo words": "Refazer palavras",
   "Enter an English word or phrase...": "Digite uma palavra ou expressão em inglês...",
   "Search in English with the built-in translator": "Pesquisar em inglês com o tradutor integrado",
   "Listening Experience • Music Lab": "Experiência de escuta • Laboratório de música",
