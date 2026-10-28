@@ -1,6 +1,7 @@
 /** Browser helpers for POST /api/music (Music Lab). The server verifies the bearer token. */
 
-export const MUSIC_SIGN_IN_MESSAGE = "Your session has expired. Please sign in again to create a song.";
+export const MUSIC_SIGN_IN_MESSAGE =
+  "Your session has expired. Please sign in again to create a song.";
 
 export function musicRequestHeaders(
   accessToken: string | null | undefined,
