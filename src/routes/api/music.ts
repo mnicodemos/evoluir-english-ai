@@ -4,6 +4,12 @@ import { z } from "zod";
 import { authenticateApiRequest } from "@/lib/api-auth.server";
 import { musicAudioExtension } from "@/lib/musicApi";
 
+function privateJson(body: unknown, init?: ResponseInit): Response {
+  const headers = new Headers(init?.headers);
+  headers.set("Cache-Control", "private, no-store");
+  return Response.json(body, { ...init, headers });
+}
+
 function musicDownloadFilename(topic: string, mimeType: string): string {
   const safeTopic =
     topic
@@ -34,8 +40,8 @@ export const Route = createFileRoute("/api/music")({
         try {
           userId = await authenticateApiRequest(request);
         } catch (error) {
-          return Response.json(
-            { message: "Please sign in to create a song." },
+          return privateJson(
+            { message: "Please sign in to view your saved songs." },
             { status: error instanceof Response ? error.status : 401 },
           );
         }
@@ -49,7 +55,7 @@ export const Route = createFileRoute("/api/music")({
 
         if (historyReadError) {
           console.error("[music-lab] saved history unavailable", { code: historyReadError.code });
-          return Response.json(
+          return privateJson(
             { message: "Could not load your saved songs. Please try again." },
             { status: 503 },
           );
@@ -86,7 +92,7 @@ export const Route = createFileRoute("/api/music")({
               };
             }),
           );
-          return Response.json({ songs });
+          return privateJson({ songs });
         } catch {
           console.error("[music-lab] saved audio signing unavailable");
           return Response.json(
@@ -372,7 +378,7 @@ export const Route = createFileRoute("/api/music")({
             );
           }
 
-          return Response.json({
+          return privateJson({
             song: {
               id: songId,
               topic: parsed.data.topic,
