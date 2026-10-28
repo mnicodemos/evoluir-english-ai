@@ -1,13 +1,4 @@
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { useSkillHistory } from "@/hooks/useSkillHistory";
@@ -27,7 +18,7 @@ const SERIES_COLORS: Record<string, string> = {
   Reading: ACTIVITY_CHART_COLORS.Reading,
   Talking: ACTIVITY_CHART_COLORS.Talking,
   Writing: ACTIVITY_CHART_COLORS.Writing,
-  Grammar: ACTIVITY_CHART_COLORS.Grammar,
+  Grammar: "#F5B82E",
   Vocabulary: ACTIVITY_CHART_COLORS.Vocabulary,
 };
 
@@ -77,10 +68,9 @@ export function EvolutionChart({ userId }: Props) {
         <span>{chartData[0]?.name}</span> <span>{t("and day 7 is today")}</span>{" "}
         <span>({chartData[6]?.name})</span>. <span>{t("Each line shows your score in %.")}</span>
       </p>
-      <div className="mt-4 h-56 w-full sm:mt-5 sm:h-72">
+      <div className="mt-4 h-72 w-full sm:mt-5 sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ left: -20, right: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
             <XAxis
               dataKey="name"
               interval={0}

@@ -1,14 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { supabase } from "@/integrations/supabase/client";
 import { skillBucketOf, type SkillBucket } from "@/lib/studyDay";
@@ -79,10 +70,9 @@ export function MinutesByDayChart({ userId, level }: Props) {
       <p className="mt-1 hidden text-xs text-muted-foreground sm:block">
         Each bar is your practice time that day, split by activity.
       </p>
-      <div className="mt-3 h-48 w-full sm:h-56">
+      <div className="mt-3 h-72 w-full sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={minutesByDay ?? []} margin={{ left: -24, right: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
             <XAxis
               dataKey="name"
               tick={{ fontSize: 11 }}
