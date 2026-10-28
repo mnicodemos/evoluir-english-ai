@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import evoLeagueSymbol from "@/assets/evo-liga-simbolo.webp";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AppShell } from "@/components/AppShell";
+import { ProofOfProgressMission } from "@/components/league/ProofOfProgressMission";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
@@ -95,6 +96,10 @@ function League() {
             </p>
           </div>
         </header>
+
+        <div className="lg:col-span-2">
+          <ProofOfProgressMission />
+        </div>
 
         <section className="card-soft space-y-2 p-3 sm:p-5">
           <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
