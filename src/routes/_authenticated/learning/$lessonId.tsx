@@ -376,37 +376,51 @@ function LessonPage() {
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className={`relative z-10 grid h-auto min-h-12 w-full ${repairPlan?.isReviewTest ? "grid-cols-1" : "grid-cols-4"} gap-1 p-1 sm:gap-2`}>
-            {!repairPlan?.isReviewTest && <TabsTrigger
-              value="summary"
-              aria-label="Summary"
-              className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
-            >
-              <BookOpen className="size-4" /> <span className="hidden sm:inline">Summary</span>
-            </TabsTrigger>}
-            {!repairPlan?.isReviewTest && <TabsTrigger
-              value="audio"
-              aria-label={t("Lesson audio")}
-              className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
-            >
-              <Headphones className="size-4" />{" "}
-              <span className="hidden sm:inline">{t("Lesson audio")}</span>
-            </TabsTrigger>}
-            {!repairPlan?.isReviewTest && <TabsTrigger
-              value="flashcards"
-              aria-label="Flashcards"
-              className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
-            >
-              <Layers className="size-4" /> <span className="hidden sm:inline">Flashcards</span>
-            </TabsTrigger>}
-            {!repairPlan?.isReviewTest && <TabsTrigger
-              value="quiz"
-              aria-label="Quiz"
-              className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
-            >
-              <ListChecks className="size-4" /> <span className="hidden sm:inline">Quiz</span>
-            </TabsTrigger>}
-            {repairPlan?.isReviewTest && <TabsTrigger value="quiz" aria-label="Quiz" className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"><ListChecks className="size-4" /> <span>Quiz</span></TabsTrigger>}
+          <TabsList
+            className={`relative z-10 grid h-auto min-h-12 w-full ${repairPlan?.isReviewTest ? "grid-cols-1" : "grid-cols-4"} gap-1 p-1 sm:gap-2`}
+          >
+            {!repairPlan?.isReviewTest && (
+              <>
+                <TabsTrigger
+                  value="summary"
+                  aria-label="Summary"
+                  className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+                >
+                  <BookOpen className="size-4" /> <span className="hidden sm:inline">Summary</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="audio"
+                  aria-label={t("Lesson audio")}
+                  className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+                >
+                  <Headphones className="size-4" />{" "}
+                  <span className="hidden sm:inline">{t("Lesson audio")}</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="flashcards"
+                  aria-label="Flashcards"
+                  className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+                >
+                  <Layers className="size-4" /> <span className="hidden sm:inline">Flashcards</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="quiz"
+                  aria-label="Quiz"
+                  className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+                >
+                  <ListChecks className="size-4" /> <span className="hidden sm:inline">Quiz</span>
+                </TabsTrigger>
+              </>
+            )}
+            {repairPlan?.isReviewTest && (
+              <TabsTrigger
+                value="quiz"
+                aria-label="Quiz"
+                className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+              >
+                <ListChecks className="size-4" /> <span>Quiz</span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="audio" hidden={!!repairPlan?.isReviewTest} className="relative z-0 mt-5 space-y-4">
