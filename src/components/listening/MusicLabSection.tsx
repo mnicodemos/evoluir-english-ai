@@ -3,6 +3,8 @@ import { Download, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { MUSIC_SIGN_IN_MESSAGE, musicErrorMessage, musicRequestHeaders } from "@/lib/musicApi";
 
 type GeneratedSong = {
   lyrics: string;
@@ -45,14 +47,17 @@ export function MusicLabSection({ level, levelLabel }: Props) {
     setLoading(true);
     setSong(null);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers = musicRequestHeaders(sessionData.session?.access_token);
+      if (!headers) throw new Error(MUSIC_SIGN_IN_MESSAGE);
       const response = await fetch("/api/music", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
       const result = (await response.json().catch(() => null)) as (GeneratedSong & { message?: string }) | null;
       if (!response.ok) {
-        throw new Error(result?.message ?? "Music generation is unavailable right now.");
+        throw new Error(musicErrorMessage(response.status, result?.message));
       }
       if (!result?.audioBase64 || !result.lyrics) {
         throw new Error("The music service returned an incomplete song. Please try again.");
