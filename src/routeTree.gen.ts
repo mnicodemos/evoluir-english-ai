@@ -37,6 +37,7 @@ import { Route as AuthenticatedTeacherRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedVocabularyRouteImport } from './routes/_authenticated/vocabulary'
 import { Route as AuthenticatedWritingRouteImport } from './routes/_authenticated/writing'
 import { Route as ApiCoachStreamRouteImport } from './routes/api/coach-stream'
+import { Route as ApiMusicRouteImport } from './routes/api/music'
 import { Route as ApiSpeechRouteImport } from './routes/api/speech'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authenticated/learning/index'
@@ -195,6 +196,11 @@ const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
   path: '/api/coach-stream',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMusicRoute = ApiMusicRouteImport.update({
+  id: '/api/music',
+  path: '/api/music',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSpeechRoute = ApiSpeechRouteImport.update({
   id: '/api/speech',
   path: '/api/speech',
@@ -318,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/vocabulary': typeof AuthenticatedVocabularyRoute
   '/writing': typeof AuthenticatedWritingRoute
   '/api/coach-stream': typeof ApiCoachStreamRoute
+  '/api/music': typeof ApiMusicRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
@@ -364,6 +371,7 @@ export interface FileRoutesByTo {
   '/vocabulary': typeof AuthenticatedVocabularyRoute
   '/writing': typeof AuthenticatedWritingRoute
   '/api/coach-stream': typeof ApiCoachStreamRoute
+  '/api/music': typeof ApiMusicRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
@@ -412,6 +420,7 @@ export interface FileRoutesById {
   '/_authenticated/vocabulary': typeof AuthenticatedVocabularyRoute
   '/_authenticated/writing': typeof AuthenticatedWritingRoute
   '/api/coach-stream': typeof ApiCoachStreamRoute
+  '/api/music': typeof ApiMusicRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/_authenticated/learning/$lessonId': typeof AuthenticatedLearningLessonIdRoute
@@ -460,6 +469,7 @@ export interface FileRouteTypes {
     | '/vocabulary'
     | '/writing'
     | '/api/coach-stream'
+    | '/api/music'
     | '/api/speech'
     | '/api/transcribe'
     | '/learning/$lessonId'
@@ -506,6 +516,7 @@ export interface FileRouteTypes {
     | '/vocabulary'
     | '/writing'
     | '/api/coach-stream'
+    | '/api/music'
     | '/api/speech'
     | '/api/transcribe'
     | '/learning/$lessonId'
@@ -553,6 +564,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vocabulary'
     | '/_authenticated/writing'
     | '/api/coach-stream'
+    | '/api/music'
     | '/api/speech'
     | '/api/transcribe'
     | '/_authenticated/learning/$lessonId'
@@ -581,6 +593,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
   ApiCoachStreamRoute: typeof ApiCoachStreamRoute
+  ApiMusicRoute: typeof ApiMusicRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiPublicCronDailyPushRoute: typeof ApiPublicCronDailyPushRoute
@@ -787,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCoachStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/music': {
+      id: '/api/music'
+      path: '/api/music'
+      fullPath: '/api/music'
+      preLoaderRoute: typeof ApiMusicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/speech': {
       id: '/api/speech'
       path: '/api/speech'
@@ -989,6 +1009,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
   ApiCoachStreamRoute: ApiCoachStreamRoute,
+  ApiMusicRoute: ApiMusicRoute,
   ApiSpeechRoute: ApiSpeechRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
   ApiPublicCronDailyPushRoute: ApiPublicCronDailyPushRoute,
