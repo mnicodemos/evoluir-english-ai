@@ -543,7 +543,7 @@ function VocabularyOnline() {
           </>
         }
       />
-            <section
+      <section
         aria-labelledby="vocab-search-title"
         className="mt-4 rounded-2xl border border-brand-green/40 bg-brand-green/5 p-4 shadow-sm sm:p-5"
       >
@@ -596,17 +596,19 @@ function VocabularyOnline() {
         goal={reviewGoal}
         doneText={t("Study day counted")}
         hint={t("10 reviewed words complete your study day.")}
-        action={(daily?.length ?? 0) > 0 ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 shrink-0 px-2 text-[11px]"
-            disabled={busy === "redo"}
-            onClick={redoTodayWords}
-          >
-            <RotateCcw className="mr-1.5 size-3.5" /> Redo words
-          </Button>
-        ) : undefined}
+        action={
+          (daily?.length ?? 0) > 0 ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 shrink-0 px-2 text-[11px]"
+              disabled={busy === "redo"}
+              onClick={redoTodayWords}
+            >
+              <RotateCcw className="mr-1.5 size-3.5" /> Redo words
+            </Button>
+          ) : undefined
+        }
       />
 
 
