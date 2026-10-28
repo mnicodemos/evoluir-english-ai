@@ -2297,7 +2297,7 @@ const baseUiPt: Record<string, string> = {
   "B1 Unit 2 Lesson 2 — Reading a Work Report":
     "B1 Unidade 2, Lição 2 — Leitura de um relatório de trabalho",
   "Pass the quiz (70%)": "Passar no quiz (70%)",
-  "Listening Lab · Music Lab": "Laboratório de escuta · Laboratório de música",
+  "Listening Experience · Music Lab": "Experiência de escuta · Laboratório de música",
   "Learn English through your own song": "Aprenda inglês com sua própria música",
   "EVO adapts the lyrics and language to your current level:": "A EVO adapta a letra e a linguagem ao seu nível atual:",
   ". You choose the topic and sound, not the CEFR level.": ". Você escolhe o tema e o estilo, não o nível CEFR.",
