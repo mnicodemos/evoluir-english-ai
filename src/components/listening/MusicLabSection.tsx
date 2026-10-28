@@ -1,10 +1,15 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ChevronDown, ChevronUp, Download, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { MUSIC_SIGN_IN_MESSAGE, musicErrorMessage, musicRequestHeaders } from "@/lib/musicApi";
+import {
+  MUSIC_SIGN_IN_MESSAGE,
+  musicAudioExtension,
+  musicErrorMessage,
+  musicRequestHeaders,
+} from "@/lib/musicApi";
 
 type GeneratedSong = {
   id: string;
@@ -12,8 +17,9 @@ type GeneratedSong = {
   genre: (typeof GENRES)[number]["value"];
   goal: (typeof GOALS)[number]["value"];
   lyrics: string;
-  audioBase64: string;
+  audioUrl: string;
   mimeType: string;
+  createdAt: string;
 };
 
 const GENRES = [
@@ -45,8 +51,52 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [goal, setGoal] = useState<(typeof GOALS)[number]["value"]>("everyday vocabulary");
   const [loading, setLoading] = useState(false);
   const [songs, setSongs] = useState<GeneratedSong[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [activeFocus, setActiveFocus] = useState<string>("all");
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSavedSongs() {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const headers = musicRequestHeaders(sessionData.session?.access_token);
+        if (!headers) return;
+
+        const response = await fetch("/api/music", { method: "GET", headers });
+        const result = (await response.json().catch(() => null)) as
+          | { songs?: GeneratedSong[]; message?: string }
+          | null;
+        if (!response.ok) {
+          throw new Error(musicErrorMessage(response.status, result?.message));
+        }
+
+        if (!cancelled) {
+          const savedSongs = Array.isArray(result?.songs) ? result.songs : [];
+          setSongs((current) => {
+            const byId = new Map([...savedSongs, ...current].map((song) => [song.id, song]));
+            return [...byId.values()].sort(
+              (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt),
+            );
+          });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          const message =
+            error instanceof Error ? error.message : "Could not load your saved songs. Please try again.";
+          toast.error(message);
+        }
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
+      }
+    }
+
+    void loadSavedSongs();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function createSong(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,23 +111,15 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
       const result = (await response.json().catch(() => null)) as
-        (Omit<GeneratedSong, "id" | "topic" | "genre" | "goal"> & { message?: string }) | null;
+        { song?: GeneratedSong; message?: string } | null;
       if (!response.ok) {
         throw new Error(musicErrorMessage(response.status, result?.message));
       }
-      if (!result?.audioBase64 || !result.lyrics) {
+      if (!result?.song?.audioUrl || !result.song.lyrics) {
         throw new Error("The music service returned an incomplete song. Please try again.");
       }
 
-      const newSong: GeneratedSong = {
-        id: crypto.randomUUID(),
-        topic: topic.trim(),
-        genre,
-        goal,
-        lyrics: result.lyrics,
-        audioBase64: result.audioBase64,
-        mimeType: result.mimeType || "audio/mpeg",
-      };
+      const newSong: GeneratedSong = result.song;
       setSongs((current) => [newSong, ...current]);
       setActiveFocus(goal);
       setExpandedSongs((current) => new Set(current).add(newSong.id));
@@ -178,7 +220,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </label>
 
         <div className="flex flex-wrap items-center gap-3 md:col-span-2">
-          <Button type="submit" disabled={loading || !topic.trim() || !level}>
+          <Button type="submit" disabled={loading || historyLoading || !topic.trim() || !level}>
             {loading ? (
               <Loader2 className="mr-2 size-4 animate-spin" />
             ) : (
@@ -192,16 +234,17 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </div>
       </form>
 
-      {songs.length > 0 && (
+      {(historyLoading || songs.length > 0) && (
         <section className="space-y-4" aria-label="Generated songs">
           <div className="space-y-2">
             <h3 className="font-display text-base font-semibold">My songs</h3>
-            <div
-              className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
-              role="tablist"
-              aria-label="Filter songs by Learning focus"
-            >
-              {focusTabs.map((tab) => (
+            {songs.length > 0 && (
+              <div
+                className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
+                role="tablist"
+                aria-label="Filter songs by Learning focus"
+              >
+                {focusTabs.map((tab) => (
                 <button
                   key={tab.value}
                   type="button"
@@ -216,14 +259,14 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                 >
                   {tab.label} <span className="ml-1 text-xs opacity-75">{tab.count}</span>
                 </button>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-3">
             {visibleSongs.map((song) => {
               const expanded = expandedSongs.has(song.id);
-              const audioUrl = `data:${song.mimeType};base64,${song.audioBase64}`;
               const safeFilename = song.topic
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, "-")
@@ -245,8 +288,8 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                       </p>
                     </div>
                     <a
-                      href={audioUrl}
-                      download={`evoluir-${safeFilename}.mp3`}
+                      href={song.audioUrl}
+                      download={`evoluir-${safeFilename}.${musicAudioExtension(song.mimeType)}`}
                       aria-label={`Download song: ${song.topic}`}
                       className="grid size-9 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10"
                     >
@@ -271,7 +314,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                       <audio
                         controls
                         preload="metadata"
-                        src={audioUrl}
+                        src={song.audioUrl}
                         className="w-full"
                         aria-label={`Play song: ${song.topic}`}
                       >
@@ -288,11 +331,15 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                 </article>
               );
             })}
-            {visibleSongs.length === 0 && (
+            {historyLoading && songs.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
+                Loading saved songs...
+              </p>
+            ) : visibleSongs.length === 0 ? (
               <p className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
                 No songs for this Learning focus yet.
               </p>
-            )}
+            ) : null}
           </div>
         </section>
       )}
