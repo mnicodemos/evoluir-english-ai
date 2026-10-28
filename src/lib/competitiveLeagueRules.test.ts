@@ -48,10 +48,7 @@ describe("competitive league rules", () => {
       "promote",
       "promote",
     ]);
-    expect([5, 17].map((rank) => leagueMovement("Silver", rank, 20))).toEqual([
-      "stay",
-      "stay",
-    ]);
+    expect([5, 17].map((rank) => leagueMovement("Silver", rank, 20))).toEqual(["stay", "stay"]);
     expect([18, 19, 20].map((rank) => leagueMovement("Silver", rank, 20))).toEqual([
       "demote",
       "demote",
