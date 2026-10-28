@@ -839,8 +839,8 @@ function ListeningPage() {
                 </div>
               </section>
             </aside>
+            <MusicLabSection level={levelInfo.value} levelLabel={levelInfo.label} />
           </div>
-          <MusicLabSection level={levelInfo.value} levelLabel={levelInfo.label} />
         )}
         {sessionDone && <MusicLabSection level={levelInfo.value} levelLabel={levelInfo.label} />}
       </div>
