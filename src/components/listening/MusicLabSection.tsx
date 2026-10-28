@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { ChevronDown, ChevronUp, Download, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,7 +17,6 @@ type GeneratedSong = {
   mimeType: string;
 };
 
-type MusicHistoryResponse = { songs?: GeneratedSong[]; message?: string } | null;
 type MusicCreateResponse = (GeneratedSong & { message?: string }) | null;
 
 const GENRES = [
@@ -68,50 +67,8 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [goal, setGoal] = useState<(typeof GOALS)[number]["value"]>("everyday vocabulary");
   const [loading, setLoading] = useState(false);
   const [songs, setSongs] = useState<GeneratedSong[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(true);
   const [activeFocus, setActiveFocus] = useState<string>("all");
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadSavedSongs() {
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const headers = musicRequestHeaders(sessionData.session?.access_token);
-        if (!headers) return;
-
-        const response = await fetch("/api/music", { method: "GET", headers });
-        const result = (await response.json().catch(() => null)) as MusicHistoryResponse;
-        if (!response.ok) {
-          const message =
-            response.status === 401
-              ? "Please sign in to view your saved songs."
-              : musicErrorMessage(response.status, result?.message);
-          throw new Error(message);
-        }
-        if (!Array.isArray(result?.songs)) {
-          throw new Error("Your saved songs are temporarily unavailable. Please try again.");
-        }
-        if (!cancelled) setSongs(result.songs);
-      } catch (error) {
-        if (!cancelled) {
-          toast.error(
-            error instanceof Error
-              ? error.message
-              : "Your saved songs are temporarily unavailable. Please try again.",
-          );
-        }
-      } finally {
-        if (!cancelled) setHistoryLoading(false);
-      }
-    }
-
-    void loadSavedSongs();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   async function createSong(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -196,6 +153,14 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </div>
       </div>
 
+      <div className="rounded-lg border border-brand-green/25 bg-brand-green/5 p-3 text-sm" role="note">
+        <p className="font-semibold">Your song is available for this session only.</p>
+        <p className="mt-1 text-muted-foreground">
+          Play it now and use Download to save the audio to your device before leaving or refreshing this page.
+          Evoluir+ does not keep a permanent copy of the audio.
+        </p>
+      </div>
+
       <form onSubmit={createSong} className="grid gap-4 md:grid-cols-2">
         <label className="space-y-1.5 text-sm md:col-span-2">
           <span className="font-medium">What should your song be about?</span>
@@ -257,16 +222,10 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </div>
       </form>
 
-      {(songs.length > 0 || historyLoading) && (
+      {songs.length > 0 && (
         <section className="space-y-4" aria-label="Generated songs">
           <div className="space-y-2">
             <h3 className="font-display text-base font-semibold">My songs</h3>
-            {historyLoading && (
-              <p className="flex items-center gap-2 text-xs text-muted-foreground" role="status">
-                <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
-                Loading saved songs...
-              </p>
-            )}
             <div
               className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
               role="tablist"
@@ -336,6 +295,9 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                   </div>
                   {expanded && (
                     <div className="space-y-4 border-t border-border/70 p-3 sm:p-4">
+                      <p className="text-xs text-muted-foreground">
+                        Session-only audio — download it now to keep a copy.
+                      </p>
                       <audio
                         controls
                         preload="metadata"
