@@ -1184,13 +1184,30 @@ export const getSummaryVideoLinks = createServerFn({ method: "GET" })
       .order("id");
     if (error) throw new Error("The Summary video links could not be loaded");
 
+    // Review lessons may not have a lessons row yet. Keep the owner-provided
+    // Summary URL in the shared lesson_videos table so saving never depends on
+    // opening a lesson first.
+    const { data: sharedVideos, error: sharedVideosError } = await (
+      supabaseAdmin as unknown as LessonVideosTable
+    )
+      .from("lesson_videos")
+      .select("curriculum_key, video_url, video_seconds, approved_by")
+      .in("curriculum_key", keys);
+    if (sharedVideosError) throw new Error("The shared Summary video links could not be loaded");
+
     return curriculum.map((plan) => {
       const copies = (rows ?? []).filter((row) => row.curriculum_key === plan.key);
+      const approvedSharedVideo = (sharedVideos ?? []).find(
+        (row) => row.curriculum_key === plan.key && row.approved_by !== null,
+      );
       const urlCounts = new Map<string, number>();
       for (const copy of copies) {
         if (copy.video_url) urlCounts.set(copy.video_url, (urlCounts.get(copy.video_url) ?? 0) + 1);
       }
-      const videoUrl = [...urlCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+      const videoUrl =
+        approvedSharedVideo?.video_url ??
+        [...urlCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ??
+        null;
       return {
         key: plan.key,
         unit: plan.unit,
@@ -1225,18 +1242,28 @@ export const saveSummaryVideoLink = createServerFn({ method: "POST" })
     const url = canonicalSummaryVideoUrl(data.url);
     if (!url) throw new Error("Cole um link válido do Vimeo ou YouTube.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: sharedSaveError } = await (
+      supabaseAdmin as unknown as LessonVideosTable
+    )
+      .from("lesson_videos")
+      .upsert({
+        curriculum_key: data.key,
+        video_url: url,
+        video_seconds: 0,
+        approved_by: context.userId,
+        approved_at: new Date().toISOString(),
+      });
+    if (sharedSaveError) throw new Error("The Summary video link could not be saved");
+
+    // Existing student lesson copies get the URL immediately; future copies
+    // read the approved shared URL from lesson_videos when they open Summary.
     const { data: updatedRows, error } = await supabaseAdmin
       .from("lessons")
       .update({ video_url: url })
       .eq("curriculum_key", data.key)
       .select("id");
-    if (error) throw new Error("The Summary video link could not be saved");
-    if (!updatedRows?.length) {
-      throw new Error(
-        "Nenhum registro desta lição foi encontrado para salvar o vídeo. Abra a lição Review I/II B1 uma vez e tente novamente.",
-      );
-    }
-    return { ok: true, url, updated: updatedRows.length };
+    if (error) throw new Error("The Summary video link could not be synchronized");
+    return { ok: true, url, updated: updatedRows?.length ?? 0 };
   });
 
 export const deleteSummaryVideoLink = createServerFn({ method: "POST" })
@@ -1252,6 +1279,19 @@ export const deleteSummaryVideoLink = createServerFn({ method: "POST" })
       throw new Error("Unknown lesson");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: sharedDeleteError } = await (
+      supabaseAdmin as unknown as {
+        from: (table: string) => {
+          delete: () => {
+            eq: (column: string, value: string) => Promise<{ error: { message: string } | null }>;
+          };
+        };
+      }
+    )
+      .from("lesson_videos")
+      .delete()
+      .eq("curriculum_key", data.key);
+    if (sharedDeleteError) throw new Error("The shared Summary video link could not be removed");
     const { error } = await supabaseAdmin
       .from("lessons")
       .update({ video_url: null })
