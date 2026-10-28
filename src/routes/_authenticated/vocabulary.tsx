@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Check, CheckCircle2, Loader2, RotateCcw, Search, X } from "lucide-react";
+import { BookOpen, Check, CheckCircle2, Languages, Loader2, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -562,31 +562,53 @@ function VocabularyOnline() {
         </Button>
       )}
 
-      <label htmlFor="vocab-search" className="mt-3 block text-sm font-medium text-foreground">
-        Search in English:
-      </label>
-      <div className="relative mt-1">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <input
-          id="vocab-search"
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter text or word..."
-          aria-label="Search vocabulary"
-          className="h-9 w-full rounded-lg border border-border bg-card pl-10 pr-10 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={() => setQuery("")}
-            aria-label="Clear search"
-            className="absolute right-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-muted-foreground hover:text-foreground"
-          >
-            <X className="size-4" />
-          </button>
-        )}
-      </div>
+      <section
+        aria-labelledby="vocab-search-title"
+        className="mt-4 rounded-2xl border border-brand-green/40 bg-brand-green/5 p-4 shadow-sm sm:p-5"
+      >
+        <div className="flex items-start gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-green/15 text-brand-green">
+            <Languages className="size-5" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 id="vocab-search-title" className="font-display text-base font-semibold">
+              Built-in English translator
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Look up an English word or phrase and see its meaning in Portuguese without leaving
+              Evoluir+.
+            </p>
+            <label
+              htmlFor="vocab-search"
+              className="mt-3 block text-sm font-semibold text-foreground"
+            >
+              Search in English
+            </label>
+            <div className="relative mt-1.5">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-brand-green" />
+              <input
+                id="vocab-search"
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Enter an English word or phrase..."
+                aria-label="Search in English with the built-in translator"
+                className="h-11 w-full rounded-xl border border-brand-green/40 bg-background pl-10 pr-10 text-sm outline-none transition focus:border-brand-green focus:ring-2 focus:ring-brand-green/30"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-muted-foreground hover:text-foreground"
+                >
+                  <X className="size-4" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {q.length >= 2 ? (
         <DictionaryResult
