@@ -10,7 +10,9 @@ export function leagueWeekStartIso(now = new Date()): string {
     day: "2-digit",
   }).formatToParts(now);
   const get = (type: string) => parts.find((part) => part.type === type)?.value ?? "";
-  const date = new Date(Date.UTC(Number(get("year")), Number(get("month")) - 1, Number(get("day"))));
+  const date = new Date(
+    Date.UTC(Number(get("year")), Number(get("month")) - 1, Number(get("day"))),
+  );
   const daysSinceMonday = (date.getUTCDay() + 6) % 7;
   date.setUTCDate(date.getUTCDate() - daysSinceMonday);
   const localMonday = [
