@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   formatVideoDuration,
   isPlayableVideoUrl,
+  lessonVideoEmbedUrl,
   videoReviewPoints,
   youtubeVideoId,
 } from "./lessonVideoDisplay";
@@ -16,6 +17,25 @@ describe("youtubeVideoId", () => {
 
   it("returns null for a non-YouTube URL", () => {
     expect(youtubeVideoId("https://example.com/video")).toBeNull();
+  });
+});
+
+describe("lessonVideoEmbedUrl", () => {
+  it("builds privacy-enhanced YouTube embeds and preserves Vimeo support", () => {
+    expect(lessonVideoEmbedUrl("https://youtu.be/dQw4w9WgXcQ")).toBe(
+      "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+    );
+    expect(lessonVideoEmbedUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).toBe(
+      "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+    );
+    expect(lessonVideoEmbedUrl("https://vimeo.com/123456789")).toBe(
+      "https://player.vimeo.com/video/123456789",
+    );
+  });
+
+  it("rejects unrelated hosts and insecure URLs", () => {
+    expect(lessonVideoEmbedUrl("https://youtube.com.evil.test/watch?v=dQw4w9WgXcQ")).toBeNull();
+    expect(lessonVideoEmbedUrl("http://youtube.com/watch?v=dQw4w9WgXcQ")).toBeNull();
   });
 });
 

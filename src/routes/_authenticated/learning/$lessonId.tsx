@@ -42,7 +42,7 @@ import { findCurriculumLesson } from "@/lib/curriculum";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
-import { vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
+import { lessonVideoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -129,7 +129,7 @@ function LessonPage() {
       });
   }, [needsQuizRepair, repairPlan, lessonId, repairLesson, queryClient]);
   // Reinforcement copy comes from the lesson text that already exists.
-  const summaryVimeoUrl = vimeoEmbedUrl(lesson?.video_url);
+  const summaryVideoEmbedUrl = lessonVideoEmbedUrl(lesson?.video_url);
   const progress = videoProgress ?? data?.userLesson?.video_progress ?? 0;
   const lessonSkill = lesson?.skill
     ? t(lesson.skill.charAt(0).toUpperCase() + lesson.skill.slice(1))
@@ -443,7 +443,7 @@ function LessonPage() {
 
           <TabsContent value="summary" className="relative z-0 mt-5">
             <div className="card-soft space-y-5 p-6">
-              {summaryVimeoUrl ? (
+              {summaryVideoEmbedUrl ? (
                 <section className="space-y-2" aria-labelledby="summary-video-title">
                   <h3 id="summary-video-title" className="text-sm font-semibold">
                     Video reinforcement
@@ -451,7 +451,7 @@ function LessonPage() {
                   <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
                     <iframe
                       className="h-full w-full"
-                      src={summaryVimeoUrl}
+                      src={summaryVideoEmbedUrl}
                       title={lesson?.title ?? "Lesson video reinforcement"}
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
