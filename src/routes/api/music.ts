@@ -161,9 +161,7 @@ export const Route = createFileRoute("/api/music")({
             .map((part) => part.text?.trim())
             .filter(Boolean)
             .join("\n\n");
-          const audioPart = parts.find(
-            (part) => part.inlineData?.data || part.inline_data?.data,
-          );
+          const audioPart = parts.find((part) => part.inlineData?.data || part.inline_data?.data);
           const audioBase64 = audioPart?.inlineData?.data ?? audioPart?.inline_data?.data;
           const mimeType =
             audioPart?.inlineData?.mimeType ?? audioPart?.inline_data?.mime_type ?? "audio/mpeg";
