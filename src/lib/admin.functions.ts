@@ -970,12 +970,12 @@ export const setLessonVideo = createServerFn({ method: "POST" })
     }
     const { findCurriculumLesson } = await import("@/lib/curriculum");
     const { findBusinessLesson } = await import("@/lib/businessCourse");
-    const { canonicalSummaryVideoUrl } = await import("@/lib/lessonVideoReport");
+    const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
     if (!findCurriculumLesson(data.key) && !findBusinessLesson(data.key, "b1")) {
       throw new Error("Unknown lesson");
     }
-    const url = canonicalSummaryVideoUrl(data.url);
-    if (!url) throw new Error("Cole um link válido do Vimeo ou YouTube.");
+    const url = canonicalVimeoUrl(data.url);
+    if (!url) throw new Error("Cole um link válido do Vimeo.");
     const seconds = data.seconds;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await (supabaseAdmin as unknown as LessonVideosTable)
@@ -1218,12 +1218,12 @@ export const saveSummaryVideoLink = createServerFn({ method: "POST" })
     }
     const { findCurriculumLesson } = await import("@/lib/curriculum");
     const { findBusinessLesson } = await import("@/lib/businessCourse");
-    const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
+    const { canonicalSummaryVideoUrl } = await import("@/lib/lessonVideoReport");
     if (!findCurriculumLesson(data.key) && !findBusinessLesson(data.key, "b1")) {
       throw new Error("Unknown lesson");
     }
-    const url = canonicalVimeoUrl(data.url);
-    if (!url) throw new Error("Cole um link válido do Vimeo.");
+    const url = canonicalSummaryVideoUrl(data.url);
+    if (!url) throw new Error("Cole um link válido do Vimeo ou YouTube.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: updatedRows, error } = await supabaseAdmin
       .from("lessons")
