@@ -804,7 +804,11 @@ function ListeningPage() {
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {done ? (
-                              scoreAt(i) != null ? `${scoreAt(i)}%` : <span>Saved</span>
+                              scoreAt(i) != null ? (
+                                `${scoreAt(i)}%`
+                              ) : (
+                                <span>Saved</span>
+                              )
                             ) : current ? (
                               <span>In progress</span>
                             ) : (
