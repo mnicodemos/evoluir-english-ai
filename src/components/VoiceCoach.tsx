@@ -128,7 +128,7 @@ export function VoiceCoach({
     setScenario("everyday");
     setMessages([{ role: "assistant", content: opener }]);
     void playResponse(opener);
-  }, [lessonTopic, scenario]);
+  }, [lessonTopic, presentation, scenario]);
 
   // The AI always opens the conversation and chooses the subject itself.
   const started = useRef(false);
