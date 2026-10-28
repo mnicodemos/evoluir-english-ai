@@ -760,72 +760,88 @@ function ListeningPage() {
             </section>
 
             <aside className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
-              <section className="card-soft p-4">
-                <h2 className="font-display text-sm font-semibold">Today's session</h2>
-                <ol className="mt-2.5 space-y-1.5">
-                  {sentences.map((_, i) => {
-                    const done = i < index || (i === index && passed);
-                    const current = i === index && !passed;
-                    return (
-                      <li
-                        key={i}
-                        className={`flex items-center gap-3 rounded-lg border px-3 py-1.5 text-sm ${
-                          current ? "border-brand-green/50 bg-brand-green/10" : "border-border"
-                        }`}
-                      >
-                        <span
-                          className={`grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${
-                            done ? "bg-brand-green text-sidebar" : "bg-secondary"
+              <section className="card-soft space-y-4 p-4">
+                <div>
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="font-display text-sm font-semibold">Today's session</h2>
+                    <span className="text-xs tabular-nums text-muted-foreground">
+                      {sentencesToday}/{SENTENCES_PER_SESSION}
+                    </span>
+                  </div>
+                  <div
+                    className="mt-2 h-2 overflow-hidden rounded-full bg-secondary"
+                    role="progressbar"
+                    aria-label="Today's session progress"
+                    aria-valuemin={0}
+                    aria-valuemax={SENTENCES_PER_SESSION}
+                    aria-valuenow={sentencesToday}
+                  >
+                    <div
+                      className="h-full rounded-full bg-brand-green transition-[width]"
+                      style={{ width: `${(sentencesToday / SENTENCES_PER_SESSION) * 100}%` }}
+                    />
+                  </div>
+                  <ol className="mt-3 space-y-1.5">
+                    {sentences.map((_, i) => {
+                      const done = i < index || (i === index && passed);
+                      const current = i === index && !passed;
+                      return (
+                        <li
+                          key={i}
+                          className={`flex items-center gap-3 rounded-lg border px-3 py-1.5 text-sm ${
+                            current ? "border-brand-green/50 bg-brand-green/10" : "border-border"
                           }`}
                         >
-                          {done ? <Check className="size-3.5" /> : i + 1}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span>Sentence</span> <span>{i + 1}</span>
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {done ? (
-                            // A part saved before this visit has no score here.
-                            scoreAt(i) != null ? (
-                              `${scoreAt(i)}%`
+                          <span
+                            className={`grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${
+                              done ? "bg-brand-green text-sidebar" : "bg-secondary"
+                            }`}
+                          >
+                            {done ? <Check className="size-3.5" /> : i + 1}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span>Sentence</span> <span>{i + 1}</span>
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {done ? (
+                              scoreAt(i) != null ? `${scoreAt(i)}%` : <span>Saved</span>
+                            ) : current ? (
+                              <span>In progress</span>
                             ) : (
-                              <span>Saved</span>
-                            )
-                          ) : current ? (
-                            <span>In progress</span>
-                          ) : (
-                            <span>Up next</span>
-                          )}
-                        </span>
+                              <span>Up next</span>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  {saved?.lastListening && (
+                    <p className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
+                      <span>
+                        <span>Last result</span> · {formatDate(saved.lastListening.at, lang)}
+                      </span>
+                      <span className="text-base font-bold text-brand-green">
+                        {saved.lastListening.score != null ? `${saved.lastListening.score}%` : "—"}
+                      </span>
+                    </p>
+                  )}
+                </div>
+                <div className="border-t border-border pt-4">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold">
+                    <AudioLines className="size-4 text-brand-green" aria-hidden="true" />
+                    <span>Pronunciation focus</span>
+                    <span className="text-muted-foreground">· {config.label}</span>
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{config.focus}</p>
+                  <ul className="mt-2.5 space-y-2 text-sm text-muted-foreground">
+                    {listeningTips(config.level).map((tip) => (
+                      <li key={tip} className="flex gap-2">
+                        <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-green" />
+                        <span>{tip}</span>
                       </li>
-                    );
-                  })}
-                </ol>
-                {saved?.lastListening && (
-                  <p className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
-                    <span>
-                      <span>Last result</span> · {formatDate(saved.lastListening.at, lang)}
-                    </span>
-                    <span className="text-base font-bold text-brand-green">
-                      {saved.lastListening.score != null ? `${saved.lastListening.score}%` : "—"}
-                    </span>
-                  </p>
-                )}
-              </section>
-
-              <section className="card-soft p-4">
-                <h2 className="font-display text-sm font-semibold">
-                  <span>Pronunciation focus</span> · {config.label}
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">{config.focus}</p>
-                <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
-                  {listeningTips(config.level).map((tip) => (
-                    <li key={tip} className="flex gap-2">
-                      <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-green" />
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
+                    ))}
+                  </ul>
+                </div>
               </section>
             </aside>
           </div>
