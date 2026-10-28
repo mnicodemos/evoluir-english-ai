@@ -2297,16 +2297,22 @@ const baseUiPt: Record<string, string> = {
   "B1 Unit 2 Lesson 2 — Reading a Work Report":
     "B1 Unidade 2, Lição 2 — Leitura de um relatório de trabalho",
   "Pass the quiz (70%)": "Passar no quiz (70%)",
-  "Listening Experience • Music Lab": "Experiência de escuta • Laboratório de música",
-  "Learn English through your own song": "Aprenda inglês com sua própria música",
-  "EVO adapts the lyrics and language to your current level:": "A EVO adapta a letra e a linguagem ao seu nível atual:",
-  ". You choose the topic and sound, not the CEFR level.": ". Você escolhe o tema e o estilo, não o nível CEFR.",
+  "Listening Experience • Music Lab":
+    "Experiência de escuta • Laboratório de música",
+  "Learn English through your own song":
+    "Aprenda inglês com sua própria música",
+  "EVO adapts the lyrics and language to your current level:":
+    "A EVO adapta a letra e a linguagem ao seu nível atual:",
+  ". You choose the topic and sound, not the CEFR level.":
+    ". Você escolhe o tema e o estilo, não o nível CEFR.",
   "What should your song be about?": "Sobre o que deve ser sua música?",
-  "e.g. travelling alone, new beginnings, everyday life": "ex.: viajar sozinho, novos começos, vida cotidiana",
+  "e.g. travelling alone, new beginnings, everyday life":
+    "ex.: viajar sozinho, novos começos, vida cotidiana",
   "Up to 80 characters. Keep it original and specific.": "Até 80 caracteres. Seja original e específico.",
   "Music style": "Estilo musical",
   "Learning focus": "Foco do aprendizado",
-  "Creates an original 30-second English song with vocals and instrumental music.": "Cria uma música original em inglês de 30 segundos, com vocais e instrumental.",
+  "Creates an original 30-second English song with vocals and instrumental music.":
+    "Cria uma música original em inglês de 30 segundos, com vocais e instrumental.",
   "Download song": "Baixar música",
   "Your browser does not support audio playback.": "Seu navegador não oferece suporte à reprodução de áudio.",
   Lyrics: "Letra",
