@@ -482,7 +482,11 @@ function LessonPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="summary" hidden={!!repairPlan?.isReviewTest} className="relative z-0 mt-5">
+          <TabsContent
+            value="summary"
+            hidden={!!repairPlan?.isReviewTest}
+            className="relative z-0 mt-5"
+          >
             <div className="card-soft space-y-5 p-6">
               {summaryVideoEmbedUrl ? (
                 <section className="space-y-2" aria-labelledby="summary-video-title">
