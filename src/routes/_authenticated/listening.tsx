@@ -608,7 +608,12 @@ function ListeningPage() {
                   </button>
                   <p className="text-sm font-medium">{playing ? "Playing..." : "Play sentence"}</p>
                   <div className="flex flex-wrap items-center justify-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => play(true)} disabled={playing}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => play(true)}
+                      disabled={playing}
+                    >
                       <RotateCcw className="mr-2 size-4" />{" "}
                       {config.slowMode === "word-by-word" ? "Play word by word" : "Play slower"}
                     </Button>
