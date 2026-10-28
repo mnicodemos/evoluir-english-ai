@@ -11,6 +11,15 @@ export function musicRequestHeaders(
 }
 
 /** A safe message per status; never shows raw server or provider details. */
+export function musicAudioExtension(mimeType: string): string {
+  const mediaType = mimeType.split(";")[0]?.trim().toLowerCase();
+  if (mediaType === "audio/wav" || mediaType === "audio/x-wav") return "wav";
+  if (mediaType === "audio/ogg") return "ogg";
+  if (mediaType === "audio/mp4") return "m4a";
+  return "mp3";
+}
+
+/** A safe message per status; never shows raw server or provider details. */
 export function musicErrorMessage(status: number, serverMessage?: string | null): string {
   if (status === 401) return MUSIC_SIGN_IN_MESSAGE;
   if (status === 429)
@@ -25,6 +34,8 @@ export function musicErrorMessage(status: number, serverMessage?: string | null)
       "We couldn't load your learning level. Please try again.",
       "Music generation is temporarily unavailable.",
       "Music generation timed out or is temporarily unavailable. Please try again.",
+      "Could not load your saved songs. Please try again.",
+      "Your song was generated, but we couldn't save it safely. Please try again later.",
     ];
     return safeMessages.includes(serverMessage ?? "")
       ? serverMessage!
