@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ChevronDown, ChevronUp, Download, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,9 +12,13 @@ type GeneratedSong = {
   genre: (typeof GENRES)[number]["value"];
   goal: (typeof GOALS)[number]["value"];
   lyrics: string;
-  audioBase64: string;
+  audioUrl: string;
+  downloadUrl: string;
   mimeType: string;
 };
+
+type MusicHistoryResponse = { songs?: GeneratedSong[]; message?: string } | null;
+type MusicCreateResponse = (GeneratedSong & { message?: string }) | null;
 
 const GENRES = [
   { value: "pop", label: "Pop" },
@@ -33,6 +37,25 @@ const GOALS = [
   { value: "grammar in context", label: "Grammar in context" },
 ] as const;
 
+function audioFileExtension(mimeType: string): string {
+  const normalized = mimeType.toLowerCase();
+  if (normalized.includes("wav")) return "wav";
+  if (normalized.includes("mp4")) return "m4a";
+  if (normalized.includes("ogg")) return "ogg";
+  if (normalized.includes("webm")) return "webm";
+  if (normalized.includes("l16")) return "pcm";
+  if (normalized.includes("mpeg") || normalized.includes("mp3")) return "mp3";
+  return "audio";
+}
+
+function safeSongFilename(topic: string): string {
+  const slug = topic
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return slug || "evoluir-song";
+}
+
 type Props = {
   level: string;
   levelLabel: string;
@@ -45,8 +68,50 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [goal, setGoal] = useState<(typeof GOALS)[number]["value"]>("everyday vocabulary");
   const [loading, setLoading] = useState(false);
   const [songs, setSongs] = useState<GeneratedSong[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [activeFocus, setActiveFocus] = useState<string>("all");
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSavedSongs() {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const headers = musicRequestHeaders(sessionData.session?.access_token);
+        if (!headers) return;
+
+        const response = await fetch("/api/music", { method: "GET", headers });
+        const result = (await response.json().catch(() => null)) as MusicHistoryResponse;
+        if (!response.ok) {
+          const message =
+            response.status === 401
+              ? "Please sign in to view your saved songs."
+              : musicErrorMessage(response.status, result?.message);
+          throw new Error(message);
+        }
+        if (!Array.isArray(result?.songs)) {
+          throw new Error("Your saved songs are temporarily unavailable. Please try again.");
+        }
+        if (!cancelled) setSongs(result.songs);
+      } catch (error) {
+        if (!cancelled) {
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Your saved songs are temporarily unavailable. Please try again.",
+          );
+        }
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
+      }
+    }
+
+    void loadSavedSongs();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function createSong(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,22 +125,22 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         headers,
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
-      const result = (await response.json().catch(() => null)) as
-        (Omit<GeneratedSong, "id" | "topic" | "genre" | "goal"> & { message?: string }) | null;
+      const result = (await response.json().catch(() => null)) as MusicCreateResponse;
       if (!response.ok) {
         throw new Error(musicErrorMessage(response.status, result?.message));
       }
-      if (!result?.audioBase64 || !result.lyrics) {
+      if (!result?.id || !result.audioUrl || !result.downloadUrl || !result.lyrics) {
         throw new Error("The music service returned an incomplete song. Please try again.");
       }
 
       const newSong: GeneratedSong = {
-        id: crypto.randomUUID(),
-        topic: topic.trim(),
-        genre,
-        goal,
+        id: result.id,
+        topic: result.topic,
+        genre: result.genre,
+        goal: result.goal,
         lyrics: result.lyrics,
-        audioBase64: result.audioBase64,
+        audioUrl: result.audioUrl,
+        downloadUrl: result.downloadUrl,
         mimeType: result.mimeType || "audio/mpeg",
       };
       setSongs((current) => [newSong, ...current]);
@@ -192,10 +257,16 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </div>
       </form>
 
-      {songs.length > 0 && (
+      {(songs.length > 0 || historyLoading) && (
         <section className="space-y-4" aria-label="Generated songs">
           <div className="space-y-2">
             <h3 className="font-display text-base font-semibold">My songs</h3>
+            {historyLoading && (
+              <p className="flex items-center gap-2 text-xs text-muted-foreground" role="status">
+                <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                Loading saved songs...
+              </p>
+            )}
             <div
               className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
               role="tablist"
@@ -223,11 +294,8 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <div className="space-y-3">
             {visibleSongs.map((song) => {
               const expanded = expandedSongs.has(song.id);
-              const audioUrl = `data:${song.mimeType};base64,${song.audioBase64}`;
-              const safeFilename = song.topic
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/^-|-$/g, "") || "evoluir-song";
+              const safeFilename = safeSongFilename(song.topic);
+              const fileExtension = audioFileExtension(song.mimeType);
               return (
                 <article
                   key={song.id}
@@ -245,8 +313,8 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                       </p>
                     </div>
                     <a
-                      href={audioUrl}
-                      download={`evoluir-${safeFilename}.mp3`}
+                      href={song.downloadUrl}
+                      download={`evoluir-${safeFilename}.${fileExtension}`}
                       aria-label={`Download song: ${song.topic}`}
                       className="grid size-9 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10"
                     >
@@ -271,7 +339,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                       <audio
                         controls
                         preload="metadata"
-                        src={audioUrl}
+                        src={song.audioUrl}
                         className="w-full"
                         aria-label={`Play song: ${song.topic}`}
                       >
