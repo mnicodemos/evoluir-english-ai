@@ -279,17 +279,18 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-|-$/g, "") || "evoluir-song";
-              const fileExtension = song.mimeType.includes("wav")
+              const normalizedMimeType = song.mimeType.toLowerCase();
+              const fileExtension = normalizedMimeType.includes("wav")
                 ? "wav"
-                : song.mimeType.includes("mp4")
+                : normalizedMimeType.includes("mp4")
                   ? "m4a"
-                  : song.mimeType.includes("ogg")
+                  : normalizedMimeType.includes("ogg")
                     ? "ogg"
-                    : song.mimeType.includes("webm")
+                    : normalizedMimeType.includes("webm")
                       ? "webm"
-                      : song.mimeType.includes("l16")
+                      : normalizedMimeType.includes("l16")
                         ? "pcm"
-                        : song.mimeType.includes("mpeg") || song.mimeType.includes("mp3")
+                        : normalizedMimeType.includes("mpeg") || normalizedMimeType.includes("mp3")
                           ? "mp3"
                           : "audio";
               return (
