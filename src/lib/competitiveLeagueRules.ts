@@ -12,12 +12,7 @@ export const COMPETITIVE_LEAGUES = [
 ] as const;
 
 export type CompetitiveLeague = (typeof COMPETITIVE_LEAGUES)[number];
-export type LeagueMovement =
-  | "promote"
-  | "stay"
-  | "demote"
-  | "rank-only"
-  | "elite-achievement";
+export type LeagueMovement = "promote" | "stay" | "demote" | "rank-only" | "elite-achievement";
 
 export type LeagueParticipant = {
   id: string;
