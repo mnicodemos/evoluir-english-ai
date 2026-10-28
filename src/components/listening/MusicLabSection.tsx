@@ -203,7 +203,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         )}
         {checkingCooldown && (
           <p className="mt-2 text-muted-foreground" role="status">
-            {portuguese ? "Verificando disponibilidade da música…" : "Checking song availability…"}
+            Checking song availability…
           </p>
         )}
       </div>
