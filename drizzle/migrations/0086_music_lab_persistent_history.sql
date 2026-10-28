@@ -27,6 +27,7 @@ ALTER TABLE public.music_lab_songs ENABLE ROW LEVEL SECURITY;
 
 -- Access is intentionally server-only: API routes authenticate the owner and use the service role.
 REVOKE ALL ON TABLE public.music_lab_songs FROM anon, authenticated;
+GRANT ALL ON TABLE public.music_lab_songs TO service_role;
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES ('music-lab-audio', 'music-lab-audio', false, 26214400, NULL)
