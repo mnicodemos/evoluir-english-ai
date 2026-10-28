@@ -2301,8 +2301,7 @@ const baseUiPt: Record<string, string> = {
   "Generated songs": "Músicas geradas",
   "My songs": "Minhas músicas",
   "Filter songs by Learning focus": "Filtrar músicas por foco de aprendizado",
-  "No songs for this Learning focus yet.":
-    "Ainda não há músicas para este foco de aprendizado.",
+  "No songs for this Learning focus yet.": "Ainda não há músicas para este foco de aprendizado.",
   "Learn English through your own song": "Aprenda inglês com sua própria música",
   "EVO adapts the lyrics and language to your current level:":
     "A EVO adapta a letra e a linguagem ao seu nível atual:",
