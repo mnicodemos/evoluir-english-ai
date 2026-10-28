@@ -14,12 +14,14 @@ export function StudyDayCounter({
   goal,
   doneText,
   hint,
+  action,
 }: {
   label: ReactNode;
   value: number;
   goal: number;
   doneText: ReactNode;
   hint: ReactNode;
+  action?: ReactNode;
 }) {
   const reached = value >= goal;
   const shown = Math.min(value, goal);
@@ -44,16 +46,19 @@ export function StudyDayCounter({
           style={{ width: `${goal ? (shown / goal) * 100 : 0}%` }}
         />
       </div>
-      <p className="mt-1.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-        {reached ? (
-          <>
-            <CheckCircle2 className="size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
-            <span className="text-brand-green">{doneText}</span>
-          </>
-        ) : (
-          hint
-        )}
-      </p>
+      <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+        <p className="flex min-w-0 flex-1 items-center gap-1 text-[11px] text-muted-foreground">
+          {reached ? (
+            <>
+              <CheckCircle2 className="size-3.5 shrink-0 text-brand-green" aria-hidden="true" />
+              <span className="text-brand-green">{doneText}</span>
+            </>
+          ) : (
+            hint
+          )}
+        </p>
+        {action}
+      </div>
     </div>
   );
 }
