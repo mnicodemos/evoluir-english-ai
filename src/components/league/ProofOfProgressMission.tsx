@@ -84,7 +84,10 @@ export function ProofOfProgressMission() {
         aria-valuenow={completed}
       >
         <div
-          className={cn("h-full rounded-full bg-brand-green transition-[width]", done ? "w-full" : "")}
+          className={cn(
+            "h-full rounded-full bg-brand-green transition-[width]",
+            done ? "w-full" : "",
+          )}
           style={{ width: `${(completed / LANGUAGE_ARENA_LISTENING_REQUIRED_PARTS) * 100}%` }}
         />
       </div>
@@ -106,7 +109,9 @@ export function ProofOfProgressMission() {
         <p className="flex items-center gap-2 text-xs text-muted-foreground">
           <LockKeyhole className="size-3.5 shrink-0" aria-hidden="true" />
           {isLoading
-            ? (portuguese ? "Verificando atividades salvas…" : "Checking saved activities…")
+            ? portuguese
+              ? "Verificando atividades salvas…"
+              : "Checking saved activities…"
             : portuguese
               ? `${completed} de 3 partes qualificadas. A missão usa resultados salvos; não concede XP extra.`
               : `${completed} of 3 qualifying parts. This mission uses saved results and grants no bonus XP.`}
