@@ -3,6 +3,11 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Start video call with EVO": "Iniciar videochamada com a EVO",
+  "Ready to practise English in a realistic video call? Press the button when you are ready.":
+    "Pronto para praticar inglês em uma videochamada realista? Pressione o botão quando estiver pronto.",
+  "No call or AI request starts until you press this button.":
+    "Nenhuma chamada ou solicitação à IA começa até você pressionar este botão.",
   "Checking song availability…": "Verificando disponibilidade da música…",
   "Your song is available for this session only.":
     "Sua música fica disponível apenas nesta sessão.",
