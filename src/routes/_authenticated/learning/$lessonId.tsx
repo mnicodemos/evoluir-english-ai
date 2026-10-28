@@ -118,6 +118,9 @@ function LessonPage() {
   useEffect(() => {
     if (isFinalTest) navigate({ to: "/learning/final-test", replace: true });
   }, [isFinalTest, navigate]);
+  useEffect(() => {
+    if (repairPlan?.isReviewTest) setActiveTab("quiz");
+  }, [repairPlan?.isReviewTest, setActiveTab]);
   const needsQuizRepair =
     !!data && !!repairPlan && !repairPlan.isReviewTest && data.quiz.length === 0;
   useEffect(() => {
@@ -373,39 +376,40 @@ function LessonPage() {
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="relative z-10 grid h-auto min-h-12 w-full grid-cols-4 gap-1 p-1 sm:gap-2">
-            <TabsTrigger
+          <TabsList className={`relative z-10 grid h-auto min-h-12 w-full ${repairPlan?.isReviewTest ? "grid-cols-1" : "grid-cols-4"} gap-1 p-1 sm:gap-2`}>
+            {!repairPlan?.isReviewTest && <TabsTrigger
               value="summary"
               aria-label="Summary"
               className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <BookOpen className="size-4" /> <span className="hidden sm:inline">Summary</span>
-            </TabsTrigger>
-            <TabsTrigger
+            </TabsTrigger>}
+            {!repairPlan?.isReviewTest && <TabsTrigger
               value="audio"
               aria-label={t("Lesson audio")}
               className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <Headphones className="size-4" />{" "}
               <span className="hidden sm:inline">{t("Lesson audio")}</span>
-            </TabsTrigger>
-            <TabsTrigger
+            </TabsTrigger>}
+            {!repairPlan?.isReviewTest && <TabsTrigger
               value="flashcards"
               aria-label="Flashcards"
               className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <Layers className="size-4" /> <span className="hidden sm:inline">Flashcards</span>
-            </TabsTrigger>
-            <TabsTrigger
+            </TabsTrigger>}
+            {!repairPlan?.isReviewTest && <TabsTrigger
               value="quiz"
               aria-label="Quiz"
               className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <ListChecks className="size-4" /> <span className="hidden sm:inline">Quiz</span>
-            </TabsTrigger>
+            </TabsTrigger>}
+            {repairPlan?.isReviewTest && <TabsTrigger value="quiz" aria-label="Quiz" className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"><ListChecks className="size-4" /> <span>Quiz</span></TabsTrigger>}
           </TabsList>
 
-          <TabsContent value="audio" className="relative z-0 mt-5 space-y-4">
+          <TabsContent value="audio" hidden={!!repairPlan?.isReviewTest} className="relative z-0 mt-5 space-y-4">
             {podcast ? (
               <div className="space-y-3">
                 <div className="space-y-1">
@@ -460,7 +464,7 @@ function LessonPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="summary" className="relative z-0 mt-5">
+          <TabsContent value="summary" hidden={!!repairPlan?.isReviewTest} className="relative z-0 mt-5">
             <div className="card-soft space-y-5 p-6">
               {summaryVideoEmbedUrl ? (
                 <section className="space-y-2" aria-labelledby="summary-video-title">
@@ -544,7 +548,7 @@ function LessonPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="flashcards" className="relative z-0 mt-5">
+          <TabsContent value="flashcards" hidden={!!repairPlan?.isReviewTest} className="relative z-0 mt-5">
             <FlashcardDeck
               cards={data.flashcards}
               userId={profile?.id}
