@@ -63,8 +63,7 @@ export function AdminLessonAudioImage() {
     }
   }
 
-  const current =
-    draft?.dataUrl ?? imageQuery.data?.imageUrl ?? "/study-books/1793031809285.jpg";
+  const current = draft?.dataUrl ?? imageQuery.data?.imageUrl ?? "/study-books/1793031809285.jpg";
 
   return (
     <section className="mt-5 space-y-3 border-t border-border pt-4">
