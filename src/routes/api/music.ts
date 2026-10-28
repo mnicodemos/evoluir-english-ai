@@ -2,6 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
+import { musicAudioExtension } from "@/lib/musicApi";
+
+function musicDownloadFilename(topic: string, mimeType: string): string {
+  const safeTopic =
+    topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "evoluir-song";
+  return `evoluir-${safeTopic}.${musicAudioExtension(mimeType)}`;
+}
 
 const requestSchema = z.object({
   topic: z.string().trim().min(2).max(80),
@@ -48,11 +55,20 @@ export const Route = createFileRoute("/api/music")({
         try {
           const songs = await Promise.all(
             (savedSongs ?? []).map(async (song) => {
-              const { data: signedAudio, error: signedAudioError } = await supabaseAdmin.storage
-                .from("music-lab-audio")
-                .createSignedUrl(song.audio_path, 60 * 60);
-              if (signedAudioError || !signedAudio?.signedUrl) {
-                throw new Error("Saved audio URL could not be created.");
+              const audioStorage = supabaseAdmin.storage.from("music-lab-audio");
+              const [signedAudioResult, signedDownloadResult] = await Promise.all([
+                audioStorage.createSignedUrl(song.audio_path, 60 * 60),
+                audioStorage.createSignedUrl(song.audio_path, 60 * 60, {
+                  download: musicDownloadFilename(song.topic, song.mime_type),
+                }),
+              ]);
+              if (
+                signedAudioResult.error ||
+                !signedAudioResult.data?.signedUrl ||
+                signedDownloadResult.error ||
+                !signedDownloadResult.data?.signedUrl
+              ) {
+                throw new Error("Saved audio URLs could not be created.");
               }
               return {
                 id: song.id,
@@ -60,7 +76,8 @@ export const Route = createFileRoute("/api/music")({
                 genre: song.genre,
                 goal: song.goal,
                 lyrics: song.lyrics,
-                audioUrl: signedAudio.signedUrl,
+                audioUrl: signedAudioResult.data.signedUrl,
+                downloadUrl: signedDownloadResult.data.signedUrl,
                 mimeType: song.mime_type,
                 createdAt: song.created_at,
               };
@@ -271,11 +288,18 @@ export const Route = createFileRoute("/api/music")({
             if (error) console.error("[music-lab] temporary audio cleanup failed");
           };
 
-          const { data: signedAudio, error: signedAudioError } = await audioStorage.createSignedUrl(
-            audioPath,
-            60 * 60,
-          );
-          if (signedAudioError || !signedAudio?.signedUrl) {
+          const [signedAudioResult, signedDownloadResult] = await Promise.all([
+            audioStorage.createSignedUrl(audioPath, 60 * 60),
+            audioStorage.createSignedUrl(audioPath, 60 * 60, {
+              download: musicDownloadFilename(parsed.data.topic, mimeType),
+            }),
+          ]);
+          if (
+            signedAudioResult.error ||
+            !signedAudioResult.data?.signedUrl ||
+            signedDownloadResult.error ||
+            !signedDownloadResult.data?.signedUrl
+          ) {
             await removeUploadedAudio();
             console.error("[music-lab] could not sign newly saved audio");
             return Response.json(
@@ -352,7 +376,8 @@ export const Route = createFileRoute("/api/music")({
               genre: parsed.data.genre,
               goal: parsed.data.goal,
               lyrics,
-              audioUrl: signedAudio.signedUrl,
+              audioUrl: signedAudioResult.data.signedUrl,
+              downloadUrl: signedDownloadResult.data.signedUrl,
               mimeType,
               createdAt: savedSong.created_at,
             },
