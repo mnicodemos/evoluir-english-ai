@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Loader2, Play, Save, Trash2, Video } from "lucide-react";
 import { useEffect, useState } from "react";
+import { youtubeVideoId } from "@/lib/lessonVideoDisplay";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +21,11 @@ const LEVELS = [
   { value: "business", label: "Business English" },
 ] as const;
 
-function getVimeoVideoId(url: string): string | null {
-  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
-  return match?.[1] ?? null;
+function getVideoThumbnailUrl(url: string): string | null {
+  const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+  if (vimeoMatch?.[1]) return `https://vumbnail.com/${vimeoMatch[1]}.jpg`;
+  const youtubeId = youtubeVideoId(url);
+  return youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg` : null;
 }
 
 export function AdminSummaryVideoManager() {
@@ -84,9 +87,8 @@ export function AdminSummaryVideoManager() {
           Summary video links
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage the Vimeo link displayed in each lesson's student-facing Summary. Changes are
-          written directly to the lessons table used by Summary; the legacy Videos table is not
-          used.
+          Manage the Vimeo or YouTube video displayed in each lesson's student-facing Summary. Changes
+          are written directly to the lessons table used by Summary.
         </p>
       </div>
 
@@ -130,7 +132,7 @@ export function AdminSummaryVideoManager() {
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">
             {(linksQuery.data ?? []).filter((item) => item.videoUrl).length} of{" "}
-            {(linksQuery.data ?? []).length} lessons have a Vimeo link.
+            {(linksQuery.data ?? []).length} lessons have a video link.
           </p>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {visibleLessons.map((item) => {
@@ -171,16 +173,16 @@ export function AdminSummaryVideoManager() {
                     </p>
                   )}
 
-                  {savedUrl && getVimeoVideoId(savedUrl) ? (
+                  {savedUrl && getVideoThumbnailUrl(savedUrl) ? (
                     <a
                       href={savedUrl}
                       target="_blank"
                       rel="noreferrer"
-                      aria-label={`Open Vimeo video for ${item.title}`}
+                      aria-label={`Open lesson video for ${item.title}`}
                       className="group relative mt-3 block overflow-hidden rounded-md bg-muted"
                     >
                       <img
-                        src={`https://vumbnail.com/${getVimeoVideoId(savedUrl)}.jpg`}
+                        src={getVideoThumbnailUrl(savedUrl)!}
                         alt={`Video thumbnail: ${item.title}`}
                         loading="lazy"
                         className="aspect-video w-full object-cover transition-opacity group-hover:opacity-90"
@@ -194,13 +196,13 @@ export function AdminSummaryVideoManager() {
                   ) : null}
 
                   <label className="mt-3 block text-sm">
-                    Vimeo URL
+                    Vimeo or YouTube URL
                     <input
                       className="mt-1 block w-full min-w-0 rounded-md border border-border bg-background px-3 py-2"
                       type="url"
                       inputMode="url"
                       autoComplete="url"
-                      placeholder="https://vimeo.com/123456789"
+                      placeholder="https://youtu.be/... or https://vimeo.com/..."
                       value={draft}
                       onChange={(event) =>
                         setDrafts((current) => ({ ...current, [item.key]: event.target.value }))
@@ -225,7 +227,7 @@ export function AdminSummaryVideoManager() {
                       ) : (
                         <Save className="mr-2 size-4" />
                       )}
-                      Save Vimeo link
+                      Save video link
                     </Button>
                     <Button
                       size="sm"
@@ -273,7 +275,7 @@ export function AdminSummaryVideoManager() {
                     </p>
                   )}
                   {saveMutation.isSuccess && saveMutation.variables?.key === item.key && (
-                    <p className="mt-2 text-sm text-emerald-600">Vimeo link saved to Summary.</p>
+                    <p className="mt-2 text-sm text-emerald-600">Video link saved to Summary.</p>
                   )}
                 </article>
               );
