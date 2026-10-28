@@ -32,7 +32,10 @@ export const Route = createFileRoute("/api/music")({
 
         const parsed = requestSchema.safeParse(await request.json().catch(() => null));
         if (!parsed.success) {
-          return Response.json({ message: "Choose a topic, style and learning focus." }, { status: 400 });
+          return Response.json(
+            { message: "Choose a topic, style and learning focus." },
+            { status: 400 },
+          );
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -42,12 +45,18 @@ export const Route = createFileRoute("/api/music")({
           .eq("id", userId)
           .maybeSingle();
         if (profileError || !profile?.level) {
-          return Response.json({ message: "We couldn't load your learning level. Please try again." }, { status: 503 });
+          return Response.json(
+            { message: "We couldn't load your learning level. Please try again." },
+            { status: 503 },
+          );
         }
 
         const level = String(profile.level).toLowerCase();
         if (!CEFR_LEVELS.has(level)) {
-          return Response.json({ message: "Your profile level is not configured for Music Lab yet." }, { status: 409 });
+          return Response.json(
+            { message: "Your profile level is not configured for Music Lab yet." },
+            { status: 409 },
+          );
         }
 
         // Initial cost safeguard: allow one successful song per account in a rolling 24-hour window.
@@ -61,11 +70,17 @@ export const Route = createFileRoute("/api/music")({
           .gte("created_at", since24h);
         if (usageReadError) {
           console.error("[music-lab] usage safeguard unavailable");
-          return Response.json({ message: "Music generation is temporarily unavailable." }, { status: 503 });
+          return Response.json(
+            { message: "Music generation is temporarily unavailable." },
+            { status: 503 },
+          );
         }
         if ((recentSongs ?? 0) >= 1) {
           return Response.json(
-            { message: "You can create one song every 24 hours for now. Please come back later for another track." },
+            {
+              message:
+                "You can create one song every 24 hours for now. Please come back later for another track.",
+            },
             { status: 429 },
           );
         }
@@ -116,29 +131,42 @@ export const Route = createFileRoute("/api/music")({
 
           if (!upstream.ok) {
             const details = await upstream.text().catch(() => "");
-            console.error(`[music-lab] provider error ${upstream.status}: ${details.slice(0, 300)}`);
+            console.error(
+              `[music-lab] provider error ${upstream.status}: ${details.slice(0, 300)}`,
+            );
             return Response.json(
-              { message: upstream.status === 429
-                  ? "The music service is busy right now. Please try again later."
-                  : "We couldn't generate the song right now. Please try again later." },
+              {
+                message:
+                  upstream.status === 429
+                    ? "The music service is busy right now. Please try again later."
+                    : "We couldn't generate the song right now. Please try again later.",
+              },
               { status: upstream.status === 429 ? 429 : 502 },
             );
           }
 
-          const result = await upstream.json() as {
+          const result = (await upstream.json()) as {
             candidates?: Array<{
-              content?: { parts?: Array<{
-                text?: string;
-                inlineData?: { data?: string; mimeType?: string };
-                inline_data?: { data?: string; mime_type?: string };
-              }> };
+              content?: {
+                parts?: Array<{
+                  text?: string;
+                  inlineData?: { data?: string; mimeType?: string };
+                  inline_data?: { data?: string; mime_type?: string };
+                }>;
+              };
             }>;
           };
           const parts = result.candidates?.[0]?.content?.parts ?? [];
-          const lyrics = parts.map((part) => part.text?.trim()).filter(Boolean).join("\n\n");
-          const audioPart = parts.find((part) => part.inlineData?.data || part.inline_data?.data);
+          const lyrics = parts
+            .map((part) => part.text?.trim())
+            .filter(Boolean)
+            .join("\n\n");
+          const audioPart = parts.find(
+            (part) => part.inlineData?.data || part.inline_data?.data,
+          );
           const audioBase64 = audioPart?.inlineData?.data ?? audioPart?.inline_data?.data;
-          const mimeType = audioPart?.inlineData?.mimeType ?? audioPart?.inline_data?.mime_type ?? "audio/mpeg";
+          const mimeType =
+            audioPart?.inlineData?.mimeType ?? audioPart?.inline_data?.mime_type ?? "audio/mpeg";
 
           if (!audioBase64 || !lyrics) {
             console.error("[music-lab] provider response missing audio or lyrics");
@@ -156,12 +184,20 @@ export const Route = createFileRoute("/api/music")({
             success: true,
             completed_at: new Date().toISOString(),
           });
-          if (usageWriteError) console.error("[music-lab] could not record successful generation");
+          if (usageWriteError) {
+            console.error("[music-lab] could not record successful generation");
+          }
           return Response.json({ lyrics, audioBase64, mimeType });
         } catch (error) {
-          console.error("[music-lab] generation failed", error instanceof Error ? error.message : "unknown");
+          console.error(
+            "[music-lab] generation failed",
+            error instanceof Error ? error.message : "unknown",
+          );
           return Response.json(
-            { message: "Music generation timed out or is temporarily unavailable. Please try again." },
+            {
+              message:
+                "Music generation timed out or is temporarily unavailable. Please try again.",
+            },
             { status: 503 },
           );
         }
