@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { MUSIC_SIGN_IN_MESSAGE, musicErrorMessage, musicRequestHeaders } from "./musicApi";
+import {
+  MUSIC_SIGN_IN_MESSAGE,
+  musicAudioExtension,
+  musicErrorMessage,
+  musicRequestHeaders,
+} from "./musicApi";
 
 describe("Music Lab request", () => {
   it("sends the access token as a Bearer header with JSON", () => {
@@ -22,5 +27,18 @@ describe("Music Lab request", () => {
   });
   it("hides provider details on 502", () => {
     expect(musicErrorMessage(502, "Gemini quota exceeded key=xyz")).not.toContain("xyz");
+  });
+  it("chooses a download extension from the saved audio MIME type", () => {
+    expect(musicAudioExtension("audio/wav")).toBe("wav");
+    expect(musicAudioExtension("audio/mp4; codecs=mp4a")).toBe("m4a");
+    expect(musicAudioExtension("audio/mpeg")).toBe("mp3");
+  });
+  it("uses the safe history-load message for a 503", () => {
+    expect(musicErrorMessage(503, "Could not load your saved songs. Please try again.")).toBe(
+      "Could not load your saved songs. Please try again.",
+    );
+    expect(
+      musicErrorMessage(503, "Could not load your saved songs. Secret=private"),
+    ).not.toContain("private");
   });
 });
