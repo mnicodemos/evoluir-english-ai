@@ -1,14 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, Save, Monitor, Smartphone } from "lucide-react";
+import { ImagePlus, Loader2, Save, Monitor, Smartphone, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getHomeDashboardImages, saveHomeDashboardImage } from "@/lib/admin.functions";
 
-type Target = "desktop" | "mobile";
+type Target = "desktop" | "mobile" | "evo-avatar";
 const TARGETS: { key: Target; title: string; description: string; Icon: typeof Monitor }[] = [
   { key: "desktop", title: "Desktop image", description: "Used on desktop and larger screens.", Icon: Monitor },
   { key: "mobile", title: "Mobile image", description: "Used on phones and narrow screens.", Icon: Smartphone },
+  { key: "evo-avatar", title: "EVO mascot avatar", description: "Shared round portrait wherever the EVO avatar is used.", Icon: UserRound },
 ];
 
 export function AdminHomeMedia() {
@@ -23,7 +24,13 @@ export function AdminHomeMedia() {
       saveImage({ data: { target, dataUrl, mimeType } }),
     onSuccess: async (_result, variables) => {
       setFiles((current) => { const next = { ...current }; delete next[variables.target]; return next; });
-      setNotice(variables.target === "desktop" ? "Desktop image published." : "Mobile image published.");
+      setNotice(
+        variables.target === "desktop"
+          ? "Desktop image published."
+          : variables.target === "mobile"
+            ? "Mobile image published."
+            : "EVO mascot avatar published.",
+      );
       await queryClient.invalidateQueries({ queryKey: ["home-dashboard-images"] });
       await queryClient.invalidateQueries({ queryKey: ["home-dashboard-image-public"] });
     },
@@ -63,12 +70,21 @@ export function AdminHomeMedia() {
       : <div className="grid gap-4 lg:grid-cols-2">
         {TARGETS.map(({ key, title, description, Icon }) => {
           const draft = files[key];
-          const current = imagesQuery.data?.[key] ?? "/study-books/1793212191251.jpg";
+          const current =
+            key === "evo-avatar"
+              ? imagesQuery.data?.evoAvatar ?? "/assets/evo-guide.webp"
+              : imagesQuery.data?.[key] ?? "/study-books/1793212191251.jpg";
           const saving = mutation.isPending && mutation.variables?.target === key;
           return <article key={key} className="min-w-0 space-y-3 rounded-lg border border-border p-3 sm:p-4">
             <div className="flex items-center gap-2"><Icon className="size-4 text-muted-foreground" /><h4 className="font-semibold">{title}</h4></div>
             <p className="text-sm text-muted-foreground">{description}</p>
-            <div className="overflow-hidden rounded-lg border border-border bg-muted"><img src={draft?.dataUrl ?? current} alt={draft ? `Preview: ${draft.name}` : `Current ${key} dashboard image`} className="block max-h-64 w-full object-contain" /></div>
+            <div className={key === "evo-avatar" ? "flex justify-center rounded-lg border border-border bg-muted p-4" : "overflow-hidden rounded-lg border border-border bg-muted"}>
+              <img
+                src={draft?.dataUrl ?? current}
+                alt={draft ? `Preview: ${draft.name}` : `Current ${key} image`}
+                className={key === "evo-avatar" ? "size-32 rounded-full object-cover ring-2 ring-brand-green/60" : "block max-h-64 w-full object-contain"}
+              />
+            </div>
             {draft ? <p className="truncate text-xs text-muted-foreground">Preview: {draft.name} — not published yet</p> : <p className="text-xs text-muted-foreground">Currently published</p>}
             <label className="block text-sm font-medium">Choose image
               <input className="mt-1 block w-full cursor-pointer rounded-md border border-border bg-background px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-secondary file:px-3 file:py-1.5" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void selectFile(key, event.target.files?.[0])} />
