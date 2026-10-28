@@ -163,7 +163,6 @@ export function RealLifeChallengeCard({
     };
   }, [userId, lessonKey, challenge]);
 
-
   if (!challenge) return null;
   const chosen = challengeOption(challenge, selected);
 

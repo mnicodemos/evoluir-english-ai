@@ -16,7 +16,9 @@ describe("Music Lab request", () => {
     expect(musicErrorMessage(401, "Please sign in to create a song.")).toBe(MUSIC_SIGN_IN_MESSAGE);
   });
   it("keeps the one-song-per-24-hours message on 429", () => {
-    expect(musicErrorMessage(429, "You can create one song every 24 hours for now.")).toContain("24 hours");
+    expect(musicErrorMessage(429, "You can create one song every 24 hours for now.")).toContain(
+      "24 hours",
+    );
   });
   it("hides provider details on 502", () => {
     expect(musicErrorMessage(502, "Gemini quota exceeded key=xyz")).not.toContain("xyz");
