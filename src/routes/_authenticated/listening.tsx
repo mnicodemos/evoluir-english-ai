@@ -827,8 +827,8 @@ function ListeningPage() {
                     <span>Pronunciation focus</span>
                     <span className="text-muted-foreground">· {config.label}</span>
                   </h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{config.focus}</p>
-                  <ul className="mt-2.5 space-y-2 text-sm text-muted-foreground">
+                  <p className="mt-1 text-xs leading-snug text-muted-foreground">{config.focus}</p>
+                  <ul className="mt-1.5 space-y-1 text-xs leading-snug text-muted-foreground">
                     {listeningTips(config.level).map((tip) => (
                       <li key={tip} className="flex gap-2">
                         <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-green" />
