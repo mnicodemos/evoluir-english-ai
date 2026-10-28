@@ -2321,6 +2321,7 @@ const baseUiPt: Record<string, string> = {
   "Your browser does not support audio playback.":
     "Seu navegador não oferece suporte à reprodução de áudio.",
   "Loading saved songs...": "Carregando músicas salvas...",
+  "Please sign in to view your saved songs.": "Entre para ver suas músicas salvas.",
   "Could not load your saved songs. Please try again.":
     "Não foi possível carregar suas músicas salvas. Tente novamente.",
   "Your song was generated, but we couldn't save it safely. Please try again later.":
