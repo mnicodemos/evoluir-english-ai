@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { MUSIC_SIGN_IN_MESSAGE, musicErrorMessage, musicRequestHeaders } from "@/lib/musicApi";
+import { useUiLang } from "@/lib/uiLang";
 
 type GeneratedSong = {
   id: string;
@@ -62,6 +63,8 @@ type Props = {
 
 /** Music creation lives inside Listening Lab; the server resolves the authoritative profile level. */
 export function MusicLabSection({ level, levelLabel }: Props) {
+  const { lang } = useUiLang();
+  const portuguese = lang === "pt";
   const [topic, setTopic] = useState("");
   const [genre, setGenre] = useState<(typeof GENRES)[number]["value"]>("pop");
   const [goal, setGoal] = useState<(typeof GOALS)[number]["value"]>("everyday vocabulary");
@@ -200,7 +203,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         )}
         {checkingCooldown && (
           <p className="mt-2 text-muted-foreground" role="status">
-            Checking song availability…
+            {portuguese ? "Verificando disponibilidade da música…" : "Checking song availability…"}
           </p>
         )}
       </div>
