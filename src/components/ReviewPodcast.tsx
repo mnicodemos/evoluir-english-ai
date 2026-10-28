@@ -241,7 +241,11 @@ export function LessonPodcast({
       ) : null}
 
       <Progress
-        value={playbackError ? progress : Math.max(progress, lines.length ? (current / lines.length) * 100 : 0)}
+        value={
+          playbackError
+            ? progress
+            : Math.max(progress, lines.length ? (current / lines.length) * 100 : 0)
+        }
         className="h-1.5"
       />
 
