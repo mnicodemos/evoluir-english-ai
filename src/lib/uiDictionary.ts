@@ -2297,6 +2297,17 @@ const baseUiPt: Record<string, string> = {
   "B1 Unit 2 Lesson 2 — Reading a Work Report":
     "B1 Unidade 2, Lição 2 — Leitura de um relatório de trabalho",
   "Pass the quiz (70%)": "Passar no quiz (70%)",
+  "Generated songs": "Músicas geradas",
+  "My songs": "Minhas músicas",
+  "Filter songs by Learning focus": "Filtrar músicas por foco de aprendizagem",
+  "No songs for this Learning focus yet.":
+    "Ainda não há músicas para este foco de aprendizagem.",
+  "Built-in English translator": "Tradutor de inglês integrado",
+  "Look up an English word or phrase and see its meaning in Portuguese without leaving Evoluir+.":
+    "Pesquise uma palavra ou expressão em inglês e veja o significado em português sem sair do Evoluir+.",
+  "Search in English": "Pesquisar em inglês",
+  "Enter an English word or phrase...": "Digite uma palavra ou expressão em inglês...",
+  "Search in English with the built-in translator": "Pesquisar em inglês com o tradutor integrado",
   "Listening Experience • Music Lab": "Experiência de escuta • Laboratório de música",
   "Learn English through your own song": "Aprenda inglês com sua própria música",
   "EVO adapts the lyrics and language to your current level:":
