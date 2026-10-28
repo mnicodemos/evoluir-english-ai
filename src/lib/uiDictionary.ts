@@ -2300,8 +2300,7 @@ const baseUiPt: Record<string, string> = {
   "Generated songs": "Músicas geradas",
   "My songs": "Minhas músicas",
   "Filter songs by Learning focus": "Filtrar músicas por foco de aprendizagem",
-  "No songs for this Learning focus yet.":
-    "Ainda não há músicas para este foco de aprendizagem.",
+  "No songs for this Learning focus yet.": "Ainda não há músicas para este foco de aprendizagem.",
   "Built-in English translator": "Tradutor de inglês integrado",
   "Look up an English word or phrase and see its meaning in Portuguese without leaving Evoluir+.":
     "Pesquise uma palavra ou expressão em inglês e veja o significado em português sem sair do Evoluir+.",
