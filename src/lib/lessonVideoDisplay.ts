@@ -44,7 +44,7 @@ export function lessonVideoEmbedUrl(url: string | null | undefined): string | nu
   if (!url) return null;
   try {
     const parsed = new URL(url);
-    if (parsed.protocol !== "https:" || !/(^|\\.)youtube\\.com$/i.test(parsed.hostname) && parsed.hostname !== "youtu.be") {
+    if (parsed.protocol !== "https:" || !/(^|\.)youtube\.com$/i.test(parsed.hostname) && parsed.hostname !== "youtu.be") {
       return null;
     }
     const id = youtubeVideoId(url);
