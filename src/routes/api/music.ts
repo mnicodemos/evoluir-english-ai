@@ -6,7 +6,10 @@ import { musicAudioExtension } from "@/lib/musicApi";
 
 function musicDownloadFilename(topic: string, mimeType: string): string {
   const safeTopic =
-    topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "evoluir-song";
+    topic
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "evoluir-song";
   return `evoluir-${safeTopic}.${musicAudioExtension(mimeType)}`;
 }
 
