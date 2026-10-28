@@ -199,7 +199,7 @@ function ListeningPage() {
   const [shadowResult, setShadowResult] = useState<{ score: number; spoken: string } | null>(null);
   const [checking, setChecking] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [pronunciationFocusExpanded, setPronunciationFocusExpanded] = useState(true);
+  const [pronunciationFocusExpanded, setPronunciationFocusExpanded] = useState(false);
 
   useEffect(() => () => cancelVoiceRecording(), []);
 
