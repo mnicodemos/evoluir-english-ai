@@ -55,7 +55,9 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         headers,
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
-      const result = (await response.json().catch(() => null)) as (GeneratedSong & { message?: string }) | null;
+      const result = (await response.json().catch(() => null)) as
+        | (GeneratedSong & { message?: string })
+        | null;
       if (!response.ok) {
         throw new Error(musicErrorMessage(response.status, result?.message));
       }
