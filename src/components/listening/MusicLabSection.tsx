@@ -90,7 +90,9 @@ export function MusicLabSection({ level, levelLabel }: Props) {
       }
     }
     void loadCooldown();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
 
   const cooldownActive = Boolean(cooldownUntil && new Date(cooldownUntil).getTime() > Date.now());
@@ -191,12 +193,16 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           Play it now and use Download to save the audio to your device before leaving or refreshing
           this page. Evoluir+ does not keep a permanent copy of the audio.
         </p>
-        {cooldownMessage && <p className="mt-2 font-medium" role="status">
+        {cooldownMessage && (
+          <p className="mt-2 font-medium" role="status">
             {cooldownMessage}
-          </p>}
-        {checkingCooldown && <p className="mt-2 text-muted-foreground" role="status">
+          </p>
+        )}
+        {checkingCooldown && (
+          <p className="mt-2 text-muted-foreground" role="status">
             Checking song availability…
-          </p>}
+          </p>
+        )}
       </div>
 
       <form onSubmit={createSong} className="grid gap-4 md:grid-cols-2">
