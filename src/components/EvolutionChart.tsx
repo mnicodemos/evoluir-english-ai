@@ -1,12 +1,4 @@
-import {
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { useSkillHistory } from "@/hooks/useSkillHistory";
