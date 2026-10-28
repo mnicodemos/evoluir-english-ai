@@ -55,7 +55,8 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         headers,
         body: JSON.stringify({ topic: topic.trim(), genre, goal }),
       });
-      const result = (await response.json().catch(() => null)) as (GeneratedSong & { message?: string }) | null;
+      const result = (await response.json().catch(() => null)) as
+        (GeneratedSong & { message?: string }) | null;
       if (!response.ok) {
         throw new Error(musicErrorMessage(response.status, result?.message));
       }
@@ -86,7 +87,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-green">
-            Listening Lab · Music Lab
+            Listening Experience • Music Lab
           </p>
           <h2 id="music-lab-title" className="mt-1 font-display text-xl font-semibold">
             Learn English through your own song
