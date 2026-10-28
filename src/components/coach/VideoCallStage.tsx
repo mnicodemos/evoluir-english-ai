@@ -6,7 +6,6 @@ import {
   Loader2,
   Mic,
   MicOff,
-  Phone,
   PhoneOff,
   Video,
   VideoOff,
@@ -208,11 +207,11 @@ export function VideoCallStage({
                 setSeconds(0);
                 onStartCall();
               }}
-              aria-label="Call EVO"
-              title="Call EVO"
+              aria-label="Start video call with EVO"
+              title="Video call with EVO"
               className="grid size-14 place-items-center rounded-full bg-brand-green text-[oklch(0.15_0.03_180)] shadow-xl transition-transform hover:scale-[1.02] hover:bg-brand-green/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
-              <Phone className="size-6" />
+              <Video className="size-6" />
             </button>
             <button
               type="button"
