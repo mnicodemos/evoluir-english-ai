@@ -570,7 +570,11 @@ function LessonPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="flashcards" hidden={!!repairPlan?.isReviewTest} className="relative z-0 mt-5">
+          <TabsContent
+            value="flashcards"
+            hidden={!!repairPlan?.isReviewTest}
+            className="relative z-0 mt-5"
+          >
             <FlashcardDeck
               cards={data.flashcards}
               userId={profile?.id}
