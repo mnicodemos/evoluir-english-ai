@@ -34,8 +34,30 @@ export const Route = createFileRoute("/api/music")({
           );
         }
 
-        // Audio is intentionally session-only; do not query persistent song tables or storage.
-        return privateJson({ songs: [] });
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const userId = await authenticateApiRequest(request);
+        const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { data: recentUsage, error } = await supabaseAdmin
+          .from("ai_usage_events")
+          .select("created_at")
+          .eq("user_id", userId)
+          .eq("operation", "music_generation")
+          .eq("success", true)
+          .gte("created_at", since24h)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.error("[music-lab] cooldown status unavailable");
+          return privateJson({ message: "Music generation status is temporarily unavailable." }, { status: 503 });
+        }
+
+        const availableAt = recentUsage?.created_at
+          ? new Date(new Date(recentUsage.created_at).getTime() + 24 * 60 * 60 * 1000).toISOString()
+          : null;
+        // Audio is intentionally session-only; expose only the cooldown, never song or usage details.
+        return privateJson({ songs: [], availableAt });
       },
       POST: async ({ request }) => {
         let userId: string;
