@@ -7,7 +7,6 @@ import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 import {
   countQualifiedListeningParts,
-  LANGUAGE_ARENA_LISTENING_PASS_SCORE,
   LANGUAGE_ARENA_LISTENING_REQUIRED_PARTS,
   leagueWeekStartIso,
 } from "@/lib/languageArenaProof";
