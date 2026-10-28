@@ -87,6 +87,9 @@ export function VoiceCoach({
   // The video call is an informal chat with EVO; AI Speaking stays a lesson.
   const callStyle = { casual: presentation === "call", name: profile?.name ?? undefined };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // Video Call remains idle until the student explicitly starts it.
+  const [callStarted, setCallStarted] = useState(presentation !== "call");
+  const callStartRequested = useRef(presentation !== "call");
   // Time left unsaved when the student leaves counts toward today's minutes
   // once the student has spoken, even when the session ends before the
   // report: on the video call (user request) and, the same way, in AI
