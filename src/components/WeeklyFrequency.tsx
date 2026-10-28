@@ -1,4 +1,4 @@
-import { CalendarDays, Check, Trophy } from "lucide-react";
+import { Activity, CalendarDays, Check, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
@@ -225,9 +225,10 @@ export function WeeklyFrequency({
         {/* Same header line as Keep improving and the skills card beside it
             (their 1.65rem icon row and xl:p-4 top), so the pills line up (user request). */}
         <div className="flex min-h-[1.65rem] items-center gap-2 xl:mt-1">
-          <CalendarDays
+          <Activity
             className="size-[1.375rem] shrink-0 text-dashboard-cyan"
             strokeWidth={2.4}
+            aria-hidden="true"
           />
           <h2 id="weekly-rhythm-title" className="font-display text-sm font-semibold">
             {lang === "pt" ? "Seu ritmo de aprendizado" : "Your Learning Rhythm"}
