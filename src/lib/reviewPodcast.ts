@@ -94,7 +94,7 @@ export function reviewPodcastMessages(plan: CurriculumLesson) {
         "5) a quick challenge: EVO asks the listener a question, says 'Pause and answer out loud', then gives a model answer; " +
         "6) a short goodbye that invites the listener to the lesson's quiz. " +
         "Only review what the outline covers: no new grammar. Alternate the speakers naturally, EVO speaks first. " +
-        `Write 30 to 36 lines and at least 450 spoken English words in total. Aim for 13-15 spoken words per line and verify the total reaches 450 before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        `Write 30 to 36 lines and at least 500 spoken English words in total. Aim for 15-17 spoken words per line and verify the total reaches 500 before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
         "For every line add 'pt', a natural Brazilian Portuguese translation. " +
         'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
     },
@@ -137,7 +137,7 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
         "Let EVO and LEO show curiosity, warmth, light humour where natural, and a distinct personality without forced jokes. Use smooth transitions and callbacks to examples already mentioned. " +
         "Conversation arc: EVO opens briefly with the topic; LEO responds with a believable question or observation; they explore examples together; LEO makes one common, level-appropriate mistake and EVO corrects it kindly in context; they recap naturally and give the listener a short speaking challenge with a model answer; they close warmly and briefly. " +
         "Alternate speakers naturally, with no abrupt topic changes. EVO speaks first. Do not make every turn a question-answer pair or have either speaker narrate the structure of the episode. " +
-        `Write 30 to 36 lines and at least 450 spoken English words in total. Aim for 13-15 spoken words per line and verify the total reaches 450 before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        `Write 30 to 36 lines and at least 500 spoken English words in total. Aim for 15-17 spoken words per line and verify the total reaches 500 before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
         "For every line add 'pt', a natural Brazilian Portuguese translation. " +
         'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
     },
