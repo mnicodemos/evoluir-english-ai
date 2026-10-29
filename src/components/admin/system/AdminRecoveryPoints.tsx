@@ -125,7 +125,9 @@ export function AdminRecoveryPoints() {
           </Button>
         </div>
         {save.isError && <p className="text-sm text-red-400 sm:col-span-2">{save.error.message}</p>}
-        {save.isSuccess && <p className="text-sm text-emerald-400 sm:col-span-2">Ponto de recuperação registrado.</p>}
+        {save.isSuccess && (
+          <p className="text-sm text-emerald-400 sm:col-span-2">Ponto de recuperação registrado.</p>
+        )}
       </form>
 
       <div className="grid gap-2">
