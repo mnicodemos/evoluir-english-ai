@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Loader2, Save } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 
 import { Button } from "@/components/ui/button";
@@ -68,9 +68,6 @@ export function AdminLessonAudioImage() {
 
   const current = draft?.dataUrl ?? imageQuery.data?.imageUrl ?? null;
 
-  useEffect(() => {
-    setImageFailed(false);
-  }, [current]);
 
   return (
     <section className="mt-5 space-y-3 border-t border-border pt-4">
