@@ -45,7 +45,7 @@ import { useLife } from "@/hooks/useLife";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
-import { getLeague, getNextLeague } from "@/components/LeagueBadge";
+import { getLeague } from "@/components/LeagueBadge";
 import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
 import { businessLevelAllowed } from "@/lib/businessCourse";
@@ -89,10 +89,13 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { title: "Home - Evoluir+ English AI" },
       {
         name: "description",
-        content: "Your daily English plan, streak and skill scores in one place.",
+        content: "Your daily English plan, jewel achievements and skill scores in one place.",
       },
       { property: "og:title", content: "Home - Evoluir+ English AI" },
-      { property: "og:description", content: "Your daily English plan, streak and skill scores." },
+      {
+        property: "og:description",
+        content: "Your daily English plan, jewel achievements and skill scores.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -558,8 +561,6 @@ function Dashboard() {
     !!profile &&
     (businessLevelAllowed(profile.max_level || profile.level) || !profileIsPremium(profile));
   const streakDays = profile ? effectiveStreak(profile) : 0;
-  const nextLeague = profile ? getNextLeague(streakDays) : null;
-  const jewelDaysLeft = getLeague(streakDays).nextIn;
   const { data: permanentJewelIndex = null } = useQuery({
     queryKey: ["permanent-jewels", profile?.id],
     enabled: !!profile?.id,
@@ -593,23 +594,55 @@ function Dashboard() {
     },
     staleTime: 60 * 1000,
   });
+  const jewelNames =
+    lang === "pt"
+      ? [
+          "Bronze",
+          "Prata",
+          "Ouro",
+          "Safira",
+          "Rubi",
+          "Esmeralda",
+          "Ametista",
+          "Pérola",
+          "Obsidiana",
+          "Diamante",
+        ]
+      : [
+          "Bronze",
+          "Silver",
+          "Gold",
+          "Sapphire",
+          "Ruby",
+          "Emerald",
+          "Amethyst",
+          "Pearl",
+          "Obsidian",
+          "Diamond",
+        ];
   const permanentJewelName =
+    permanentJewelIndex == null ? null : (jewelNames[permanentJewelIndex] ?? null);
+  const jewelThresholds = [1, 7, 14, 21, 28, 35, 42, 49, 56, 63];
+  const nextJewelIndex = permanentJewelIndex == null ? 0 : permanentJewelIndex + 1;
+  const nextJewelName = nextJewelIndex < jewelNames.length ? jewelNames[nextJewelIndex] : null;
+  const nextJewelThreshold =
+    nextJewelIndex < jewelThresholds.length ? jewelThresholds[nextJewelIndex] : null;
+  const nextJewelDetail =
     permanentJewelIndex == null
-      ? null
-      : lang === "pt"
-        ? [
-            "Bronze",
-            "Prata",
-            "Ouro",
-            "Safira",
-            "Rubi",
-            "Esmeralda",
-            "Ametista",
-            "Pérola",
-            "Obsidiana",
-            "Diamante",
-          ][permanentJewelIndex]
-        : getLeague(permanentJewelIndex * 7).name;
+      ? lang === "pt"
+        ? "Conquiste Bronze no próximo dia válido de estudo"
+        : "Earn Bronze on your next valid study day"
+      : nextJewelName && nextJewelThreshold != null
+        ? streakDays >= nextJewelThreshold
+          ? lang === "pt"
+            ? `Próxima: ${nextJewelName} · reconstrua uma sequência de ${nextJewelThreshold} dias`
+            : `Next: ${nextJewelName} · rebuild a ${nextJewelThreshold}-day streak`
+          : lang === "pt"
+            ? `Próxima: ${nextJewelName} · marco de ${nextJewelThreshold} dias consecutivos`
+            : `Next: ${nextJewelName} · ${nextJewelThreshold}-day streak milestone`
+        : lang === "pt"
+          ? "Todas as 10 joias conquistadas"
+          : "All 10 jewels earned";
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
 
@@ -731,26 +764,26 @@ function Dashboard() {
                   <DashboardHeaderStat
                     icon={<Gem className="size-6" strokeWidth={2.2} />}
                     tone="coral"
-                    iconColor={getLeague(streakDays).from}
-                    label={
-                      permanentJewelName
-                        ? `${t("Study streak")} · ${lang === "pt" ? "Joia permanente" : "Permanent jewel"}: ${permanentJewelName}`
-                        : t("Study streak")
+                    iconColor={
+                      permanentJewelIndex == null
+                        ? "hsl(var(--muted-foreground))"
+                        : getLeague(permanentJewelIndex * 7).from
                     }
-                    value={`${streakDays} ${t("days")}`}
-                    detail={
-                      nextLeague
-                        ? lang === "pt"
-                          ? `${nextLeague.namePt} em ${jewelDaysLeft} ${jewelDaysLeft === 1 ? "dia seguido" : "dias seguidos"}`
-                          : `${nextLeague.name} in ${jewelDaysLeft} ${jewelDaysLeft === 1 ? "day" : "days"} in a row`
-                        : null
+                    label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
+                    value={
+                      permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
                     }
+                    detail={nextJewelDetail}
                     hint={
                       lang === "pt"
-                        ? "As joias sobem a cada 7 dias seguidos de estudo (1 falta por semana é protegida). Cumprir seu plano da semana vale as 3 estrelas douradas."
-                        : "Jewels climb every 7 study days in a row (one missed day a week is protected). Meeting your weekly plan earns the 3 gold stars."
+                        ? "As joias são conquistas permanentes registradas no banco. A sequência de estudos continua seguindo as regras atuais."
+                        : "Jewels are permanent achievements stored in your account. Your study-streak rules remain unchanged."
                     }
-                    detailStyle={nextLeague ? { color: nextLeague.from } : undefined}
+                    detailStyle={
+                      nextJewelIndex < jewelNames.length
+                        ? { color: getLeague(nextJewelThreshold ?? 0).from }
+                        : undefined
+                    }
                   />
                 </div>
                 <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
