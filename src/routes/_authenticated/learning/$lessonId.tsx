@@ -111,6 +111,9 @@ function LessonPage() {
       ? findBusinessLesson(lesson.curriculum_key, lesson.level)
       : findCurriculumLesson(lesson.curriculum_key)
     : null;
+  // Review I and II use only Summary (video + guide) and Quiz. The Review Test
+  // remains Quiz-only; regular lessons keep all four learning tabs.
+  const isReviewUnit = !!repairPlan?.reviewUnits.length && !repairPlan.isReviewTest;
   // A level's final test is only taken on its own page, where passing promotes
   // the student; opening it as an ordinary lesson would skip the promotion.
   const isFinalTest = !!lesson?.curriculum_key?.endsWith("-final");
@@ -120,8 +123,12 @@ function LessonPage() {
     if (isFinalTest) navigate({ to: "/learning/final-test", replace: true });
   }, [isFinalTest, navigate]);
   useEffect(() => {
-    if (repairPlan?.isReviewTest) setActiveTab("quiz");
-  }, [repairPlan?.isReviewTest, setActiveTab]);
+    if (repairPlan?.isReviewTest) {
+      setActiveTab("quiz");
+    } else if (isReviewUnit && (activeTab === "audio" || activeTab === "flashcards")) {
+      setActiveTab("summary");
+    }
+  }, [repairPlan?.isReviewTest, isReviewUnit, activeTab, setActiveTab]);
   const needsQuizRepair =
     !!data &&
     !!repairPlan &&
@@ -326,14 +333,22 @@ function LessonPage() {
             <div>
               <p className="text-sm font-semibold">Lesson completed</p>
               <p className="text-xs text-muted-foreground">
-                Everything you did is saved. Want to practise again? Redo the flashcards or the
-                quiz.
+                {isReviewUnit || repairPlan?.isReviewTest
+                  ? "Everything you did is saved. You can review the summary and retake the quiz."
+                  : "Everything you did is saved. Want to practise again? Redo the flashcards or the quiz."}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={() => setActiveTab("flashcards")}>
-                <Layers className="size-4" /> Flashcards
-              </Button>
+              {!isReviewUnit && !repairPlan?.isReviewTest && (
+                <Button variant="outline" size="sm" onClick={() => setActiveTab("flashcards")}>
+                  <Layers className="size-4" /> Flashcards
+                </Button>
+              )}
+              {isReviewUnit && (
+                <Button variant="outline" size="sm" onClick={() => setActiveTab("summary")}>
+                  <BookOpen className="size-4" /> Summary
+                </Button>
+              )}
               <Button variant="outline" size="sm" onClick={() => setActiveTab("quiz")}>
                 <ListChecks className="size-4" /> Quiz
               </Button>
@@ -385,9 +400,9 @@ function LessonPage() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList
-            className={`relative z-10 grid h-auto min-h-12 w-full ${repairPlan?.isReviewTest ? "grid-cols-1" : "grid-cols-4"} gap-1 p-1 sm:gap-2`}
+            className={`relative z-10 grid h-auto min-h-12 w-full ${repairPlan?.isReviewTest ? "grid-cols-1" : isReviewUnit ? "grid-cols-2" : "grid-cols-4"} gap-1 p-1 sm:gap-2`}
           >
-            {!repairPlan?.isReviewTest && (
+            {!repairPlan?.isReviewTest && !isReviewUnit && (
               <>
                 <TabsTrigger
                   value="summary"
@@ -420,6 +435,24 @@ function LessonPage() {
                 </TabsTrigger>
               </>
             )}
+            {isReviewUnit && (
+              <>
+                <TabsTrigger
+                  value="summary"
+                  aria-label="Summary"
+                  className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+                >
+                  <BookOpen className="size-4" /> <span>Summary</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="quiz"
+                  aria-label="Quiz"
+                  className="min-w-0 gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-3 sm:text-sm"
+                >
+                  <ListChecks className="size-4" /> <span>Quiz</span>
+                </TabsTrigger>
+              </>
+            )}
             {repairPlan?.isReviewTest && (
               <TabsTrigger
                 value="quiz"
@@ -433,7 +466,7 @@ function LessonPage() {
 
           <TabsContent
             value="audio"
-            hidden={!!repairPlan?.isReviewTest}
+            hidden={isReviewUnit || !!repairPlan?.isReviewTest}
             className="relative z-0 mt-5 space-y-4"
           >
             {podcast ? (
@@ -580,7 +613,7 @@ function LessonPage() {
 
           <TabsContent
             value="flashcards"
-            hidden={!!repairPlan?.isReviewTest}
+            hidden={isReviewUnit || !!repairPlan?.isReviewTest}
             className="relative z-0 mt-5"
           >
             <FlashcardDeck
