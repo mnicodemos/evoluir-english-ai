@@ -4,6 +4,7 @@ import { ImagePlus, Loader2, Monitor, Save, Smartphone, UserRound } from "lucide
 import { useEffect, useState } from "react";
 import evoGuide from "@/assets/evo-guide.webp";
 import { Button } from "@/components/ui/button";
+import { AdminLessonAudioImage } from "@/components/AdminLessonAudioImage";
 import { getHomeDashboardImages, saveHomeDashboardImage } from "@/lib/admin.functions";
 
 type Target = "desktop" | "mobile" | "evo-avatar";
@@ -211,6 +212,7 @@ export function AdminHomeMedia() {
           {notice}
         </p>
       ) : null}
+      <AdminLessonAudioImage />
     </section>
   );
 }

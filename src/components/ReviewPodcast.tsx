@@ -58,6 +58,7 @@ export function LessonPodcast({
   const [current, setCurrent] = useState(() => readPodcastPosition(lessonId));
   const [playing, setPlaying] = useState(false);
   const [showPt, setShowPt] = useState(false);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
   const run = useRef(0);
   const listRef = useRef<HTMLOListElement>(null);
   const reported = useRef(progress);
@@ -92,6 +93,7 @@ export function LessonPodcast({
 
   async function playFrom(start: number) {
     const id = ++run.current;
+    setPlaybackError(null);
     setPlaying(true);
     for (let index = start; index < lines.length; index += 1) {
       if (run.current !== id) return;
@@ -110,8 +112,15 @@ export function LessonPodcast({
           rate,
           voice: PODCAST_SPEAKERS[line.speaker].voice,
         });
-      } catch {
-        // One line that could not play does not stop the dialogue.
+      } catch (error) {
+        if (run.current !== id) return;
+        setPlaybackError(
+          error instanceof Error
+            ? error.message
+            : "This line could not be played. Check your connection and try again.",
+        );
+        setPlaying(false);
+        return;
       }
       if (run.current !== id) return;
       // The media step moves in quarters, so its saved progress is not written per line.
@@ -217,8 +226,26 @@ export function LessonPodcast({
         </div>
       </div>
 
+      {playbackError ? (
+        <div
+          className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm"
+          role="alert"
+        >
+          <p className="text-destructive">
+            {t("Audio could not be played")}: {playbackError}
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            {t("Your progress was not advanced. Press Continue to retry this line.")}
+          </p>
+        </div>
+      ) : null}
+
       <Progress
-        value={Math.max(progress, lines.length ? (current / lines.length) * 100 : 0)}
+        value={
+          playbackError
+            ? progress
+            : Math.max(progress, lines.length ? (current / lines.length) * 100 : 0)
+        }
         className="h-1.5"
       />
 
