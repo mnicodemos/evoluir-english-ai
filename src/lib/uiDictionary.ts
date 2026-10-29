@@ -2353,6 +2353,7 @@ const baseUiPt: Record<string, string> = {
   "Download song": "Baixar música",
   "Your browser does not support audio playback.":
     "Seu navegador não oferece suporte à reprodução de áudio.",
+  "Recovery points": "Pontos de recuperação",
   Lyrics: "Letra",
 };
 
