@@ -41,10 +41,29 @@ describe("nextPathLesson", () => {
     expect(nextPathLesson(path)?.title).toBe("Review I");
   });
 
-  it("goes back to the path once the review is done or while it is locked", () => {
-    expect(nextPathLesson([lesson("U3 L1", false), lesson("Review I", true, [1, 2])])?.title).toBe(
-      "U3 L1",
-    );
+  it("resumes Unit 3 after Review I instead of jumping to a later review", () => {
+    const path = [
+      lesson("U1 L6", true),
+      lesson("U2 L6", true),
+      lesson("Review I", true, [1, 2]),
+      lesson("U3 L1", false),
+      lesson("Review II", false, [3, 4, 5]),
+      lesson("Review Test", false, [1, 2, 3, 4, 5]),
+    ];
+    expect(nextPathLesson(path)?.title).toBe("U3 L1");
+  });
+
+  it("suggests Review II only after the core lessons are complete", () => {
+    const path = [
+      lesson("U1–U5 core lessons", true),
+      lesson("Review I", true, [1, 2]),
+      lesson("Review II", false, [3, 4, 5]),
+      lesson("Review Test", false, [1, 2, 3, 4, 5]),
+    ];
+    expect(nextPathLesson(path)?.title).toBe("Review II");
+  });
+
+  it("goes back to the path while Review I is locked and returns null when done", () => {
     expect(
       nextPathLesson([lesson("U1 L2", false), lesson("Review I", false, [1, 2], true)])?.title,
     ).toBe("U1 L2");
