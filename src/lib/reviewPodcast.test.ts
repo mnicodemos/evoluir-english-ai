@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { findCurriculumLesson } from "./curriculum";
 import {
+  diagnoseReviewPodcast,
   hasLessonPodcast,
   lessonPodcastMessages,
   parseReviewPodcast,
@@ -75,5 +76,75 @@ describe("lesson audio dialogue", () => {
     long.lines[3] = line("leo", "x".repeat(PODCAST_LINE_MAX + 1));
     expect(parseReviewPodcast(JSON.stringify(long))).toBeNull();
     expect(parseReviewPodcast("no json here")).toBeNull();
+  });
+
+  it("keeps parseReviewPodcast returning the validated podcast", () => {
+    const podcast = {
+      title: "Lesson audio",
+      lines: Array.from({ length: 36 }, (_, index) => ({
+        speaker: index % 2 === 0 ? "evo" : "leo",
+        text: "This is a simple spoken sentence for our English lesson today and practice.",
+        pt: "Esta é uma frase de exemplo para a aula de inglês.",
+      })),
+    };
+    expect(parseReviewPodcast(JSON.stringify(podcast))).toEqual(podcast);
+  });
+
+  it("diagnoses replies without a JSON object without exposing content", () => {
+    expect(diagnoseReviewPodcast("No structured response was returned.")).toEqual({
+      reason: "no_json_object",
+      lineCount: null,
+      spokenWordCount: null,
+      validationIssues: [],
+    });
+  });
+
+  it("diagnoses malformed JSON without exposing parser errors or raw response", () => {
+    expect(diagnoseReviewPodcast('{"title": broken}')).toEqual({
+      reason: "invalid_json",
+      lineCount: null,
+      spokenWordCount: null,
+      validationIssues: [],
+    });
+  });
+
+  it("reports line and spoken-word counts when the minimum word requirement fails", () => {
+    const shortPodcast = {
+      title: "Short audio",
+      lines: Array.from({ length: 12 }, () => ({
+        speaker: "evo",
+        text: "Hello there friend today.",
+        pt: "Olá, amigo, hoje.",
+      })),
+    };
+
+    expect(parseReviewPodcast(JSON.stringify(shortPodcast))).toBeNull();
+    expect(diagnoseReviewPodcast(JSON.stringify(shortPodcast))).toMatchObject({
+      reason: "insufficient_spoken_words",
+      lineCount: 12,
+      spokenWordCount: 48,
+    });
+  });
+
+  it("reports schema paths and codes without logging dialogue or translations", () => {
+    const invalidPodcast = {
+      title: "Lesson audio",
+      lines: Array.from({ length: 36 }, (_, index) => ({
+        speaker: index === 0 ? "invalid" : index % 2 === 0 ? "evo" : "leo",
+        text: "This is a simple spoken sentence for our English lesson today and practice.",
+        pt: "Esta é uma frase de exemplo para a aula de inglês.",
+      })),
+    };
+
+    const diagnostic = diagnoseReviewPodcast(JSON.stringify(invalidPodcast));
+    expect(diagnostic.reason).toBe("schema_validation_failed");
+    expect(diagnostic.lineCount).toBe(36);
+    expect(diagnostic.spokenWordCount).toBeGreaterThanOrEqual(420);
+    expect(diagnostic.validationIssues).toContainEqual({
+      path: "lines.0.speaker",
+      code: "invalid_enum_value",
+    });
+    expect(JSON.stringify(diagnostic)).not.toContain("simple spoken sentence");
+    expect(JSON.stringify(diagnostic)).not.toContain("frase de exemplo");
   });
 });
