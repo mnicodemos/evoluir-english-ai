@@ -2303,6 +2303,9 @@ const baseUiPt: Record<string, string> = {
   "Tap a line to hear it again from there.":
     "Toque em uma fala para ouvi-la novamente a partir dali.",
   "Listen to the podcast": "Ouvir o podcast",
+  "Audio could not be played": "Não foi possível reproduzir o áudio",
+  "Your progress was not advanced. Press Continue to retry this line.":
+    "Seu progresso não avançou. Pressione Continuar para tentar esta fala novamente.",
   Episode: "Episódio",
   "Watch the video": "Assistir ao vídeo",
   "Audio is not available for this lesson yet. You can watch the video in Summary.":
