@@ -74,7 +74,7 @@ export function EvoDailyReflection({
       className={
         placement === "mobile-card"
           ? "card-soft flex min-w-0 items-start gap-4 overflow-hidden p-4 lg:hidden"
-          : "hidden min-w-0 items-start gap-4 border-l border-border pl-6 lg:flex"
+          : "hidden min-w-0 items-start gap-4 pl-6 lg:flex"
       }
     >
       <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
