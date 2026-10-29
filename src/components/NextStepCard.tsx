@@ -431,7 +431,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-border bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:-mt-1 max-sm:h-[calc(100%+0.25rem)]"
         aria-label={t("Your next step")}
       >
-        <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[14rem_minmax(0,1fr)]">
+        <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[16rem_minmax(0,1fr)]">
           <div
             className="relative h-auto w-full flex-none self-stretch overflow-hidden bg-transparent p-2.5 pb-0 sm:min-h-[13.5rem] sm:h-auto sm:p-0 lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
