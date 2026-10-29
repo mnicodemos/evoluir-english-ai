@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Loader2, Play, Save, Trash2, Video } from "lucide-react";
 import { useEffect, useState } from "react";
-import { youtubeVideoId } from "@/lib/lessonVideoDisplay";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,9 +22,7 @@ const LEVELS = [
 
 function getVideoThumbnailUrl(url: string): string | null {
   const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
-  if (vimeoMatch?.[1]) return `https://vumbnail.com/${vimeoMatch[1]}.jpg`;
-  const youtubeId = youtubeVideoId(url);
-  return youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg` : null;
+  return vimeoMatch?.[1] ? `https://vumbnail.com/${vimeoMatch[1]}.jpg` : null;
 }
 
 export function AdminSummaryVideoManager() {
@@ -87,8 +84,8 @@ export function AdminSummaryVideoManager() {
           Summary video links
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage the Vimeo or YouTube video displayed in each lesson's student-facing Summary.
-          Changes are written directly to the lessons table used by Summary.
+          Manage the Vimeo video displayed in each lesson's student-facing Summary. Changes are
+          written directly to the lessons table used by Summary.
         </p>
       </div>
 
@@ -196,13 +193,13 @@ export function AdminSummaryVideoManager() {
                   ) : null}
 
                   <label className="mt-3 block text-sm">
-                    Vimeo or YouTube URL
+                    Vimeo URL
                     <input
                       className="mt-1 block w-full min-w-0 rounded-md border border-border bg-background px-3 py-2"
                       type="url"
                       inputMode="url"
                       autoComplete="url"
-                      placeholder="https://youtu.be/... or https://vimeo.com/..."
+                      placeholder="https://vimeo.com/..."
                       value={draft}
                       onChange={(event) =>
                         setDrafts((current) => ({ ...current, [item.key]: event.target.value }))

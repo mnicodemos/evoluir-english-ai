@@ -13,7 +13,8 @@ import { resolveQuizEvidenceSkill, type QuizEvidenceSkill } from "@/lib/pedagogy
 
 import { callGateway } from "./ai-gateway.server";
 import { hashAiRequest } from "./ai-usage.server";
-import { findLessonVideo, isPoolVideo, type LessonVideo } from "./lessonVideo.server";
+import { canonicalVimeoUrl } from "./lessonVideoReport";
+import type { LessonVideo } from "./lessonVideo.server";
 import { hasLessonPodcast } from "./reviewPodcast";
 
 export async function callContentAi(
@@ -100,7 +101,7 @@ async function foundLessonVideo(key: string): Promise<LessonVideo | null> {
       .not("video_url", "is", null)
       .order("created_at", { ascending: false })
       .limit(20);
-    const row = (data ?? []).find((item) => item.video_url && !isPoolVideo(item.video_url));
+    const row = (data ?? []).find((item) => item.video_url && canonicalVimeoUrl(item.video_url));
     return row?.video_url ? { url: row.video_url, seconds: row.video_duration_seconds ?? 0 } : null;
   } catch {
     return null;
@@ -108,27 +109,16 @@ async function foundLessonVideo(key: string): Promise<LessonVideo | null> {
 }
 
 /**
- * The owner's approved video for this lesson, else the one a classmate's copy
- * found, else a captioned video (max 7 minutes) found by topic and level
- * (audit, 2026-10-25: every student of a lesson sees the same approved video).
+ * The owner's approved Vimeo video for this lesson, else the Vimeo video a
+ * classmate's copy already shows; never a YouTube search or pool video (owner
+ * decision, 2026-10-29: lesson videos are Vimeo only).
  */
-async function pickVideo(
-  supabase: SupabaseClient<Database>,
-  plan: CurriculumLesson,
-): Promise<LessonVideo | null> {
-  // Curriculum lessons now use EVO + Leo audio, so skip unnecessary YouTube searches.
-  // The video player and Admin → Vídeos remain available for future owner-produced content.
+async function pickVideo(plan: CurriculumLesson): Promise<LessonVideo | null> {
+  // Curriculum lessons use the EVO + Leo audio instead of a video.
   if (hasLessonPodcast(plan)) return null;
   const approved = await approvedLessonVideo(plan.key);
-  if (approved) return approved;
-  const found = await foundLessonVideo(plan.key);
-  if (found) return found;
-  const { data } = await supabase.from("lessons").select("video_url").not("video_url", "is", null);
-  const used = new Set(((data ?? []) as { video_url: string }[]).map((row) => row.video_url));
-  return findLessonVideo(`${plan.title} ${plan.level.toUpperCase()}`, plan.skill, used, {
-    objective: plan.objective,
-    level: plan.level,
-  });
+  if (approved && canonicalVimeoUrl(approved.url)) return approved;
+  return foundLessonVideo(plan.key);
 }
 
 export const quizItemSchema = z
@@ -523,7 +513,7 @@ export async function writeLesson(
 
   let lesson: { id: string } | null = repairLessonId ? { id: repairLessonId } : null;
   if (!lesson) {
-    const video = await pickVideo(supabase, plan);
+    const video = await pickVideo(plan);
     const inserted = await (
       await contentWriter()
     )
