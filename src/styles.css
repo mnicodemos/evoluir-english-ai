@@ -537,16 +537,7 @@
     container-type: size;
   }
   .dashboard-evo-grid {
-    grid-template-columns:
-      min(calc((100cqh - 1.5rem) * 1.5 + 1.5rem), calc(100cqw - 12.5rem - 18rem))
-      minmax(12.5rem, 1fr) minmax(18rem, 1.16fr);
-  }
-}
-@media (min-width: 1440px) {
-  .dashboard-evo-grid {
-    grid-template-columns:
-      min(calc((100cqh - 1.5rem) * 1.5 + 1.5rem), calc(100cqw - 12.5rem - 19.66rem))
-      minmax(12.5rem, 1fr) minmax(19.66rem, 1.16fr);
+    grid-template-columns: minmax(0, 38fr) minmax(12.5rem, 34fr) minmax(16rem, 28fr);
   }
 }
 

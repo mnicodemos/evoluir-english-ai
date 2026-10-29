@@ -445,13 +445,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               height={415}
               className="block h-auto w-full rounded-lg sm:hidden"
             />
-            <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:items-center sm:overflow-visible">
+            <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:rounded-lg">
               <img
                 src={desktopImage}
                 alt=""
-                width={1536}
-                height={1024}
-                className="hidden h-auto w-full sm:block sm:h-auto sm:w-auto sm:max-h-full sm:max-w-full sm:rounded-lg sm:object-contain"
+                width={1580}
+                height={1180}
+                className="hidden sm:block sm:h-full sm:w-full sm:rounded-lg sm:object-cover sm:object-center"
               />
             </div>
           </div>
