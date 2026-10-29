@@ -667,8 +667,9 @@ function Dashboard() {
               <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
             </div>
 
-            <div className="grid min-w-0 grid-cols-[5fr_5fr_6fr] gap-3 lg:col-span-8">
-              <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
+            <div className="grid min-w-0 grid-cols-[10fr_6fr] gap-3 lg:col-span-8">
+              <div className="grid min-w-0 grid-cols-2 gap-0">
+                <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
                 {/* The streak climbs a ladder of jewels (Bronze, Silver, Gold...); the
                   gem takes the current jewel's colour, so it is not mistaken for
                   the weekly league. */}
@@ -696,10 +697,11 @@ function Dashboard() {
                 />
               </div>
 
-              <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
-                {/* Minutes today already live in Today's Progress; this slot shows the
-                  weekly league instead. */}
-                <WeeklyLeagueSummary profile={profile} translate={t} />
+                <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
+                  {/* Minutes today already live in Today's Progress; this slot shows the
+                    weekly league instead. */}
+                  <WeeklyLeagueSummary profile={profile} translate={t} />
+                </div>
               </div>
               <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
                 {/* The week count already lives in "Your learning rhythm"; this slot
