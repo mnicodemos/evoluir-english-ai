@@ -560,6 +560,42 @@ function Dashboard() {
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const nextLeague = profile ? getNextLeague(streakDays) : null;
   const jewelDaysLeft = getLeague(streakDays).nextIn;
+  const { data: permanentJewelIndex = null } = useQuery({
+    queryKey: ["permanent-jewels", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: async (): Promise<number | null> => {
+      const { data, error } = await (
+        supabase.from as unknown as (name: string) => {
+          select: (columns: string) => {
+            eq: (column: string, value: string) => {
+              order: (
+                column: string,
+                options: { ascending: boolean },
+              ) => {
+                limit: (count: number) => Promise<{
+                  data: { jewel_index: number }[] | null;
+                  error: Error | null;
+                }>;
+              };
+            };
+          };
+        }
+      )("permanent_jewel_awards")
+        .select("jewel_index")
+        .eq("user_id", profile!.id)
+        .order("jewel_index", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      return data?.[0]?.jewel_index ?? null;
+    },
+    staleTime: 60 * 1000,
+  });
+  const permanentJewelName =
+    permanentJewelIndex == null
+      ? null
+      : lang === "pt"
+        ? ["Bronze", "Prata", "Ouro", "Safira", "Rubi", "Esmeralda", "Ametista", "Pérola", "Obsidiana", "Diamante"][permanentJewelIndex]
+        : getLeague(permanentJewelIndex * 7).name;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
 
@@ -682,7 +718,11 @@ function Dashboard() {
                     icon={<Gem className="size-6" strokeWidth={2.2} />}
                     tone="coral"
                     iconColor={getLeague(streakDays).from}
-                    label={t("Study streak")}
+                    label={
+                      permanentJewelName
+                        ? `${t("Study streak")} · ${lang === "pt" ? "Joia permanente" : "Permanent jewel"}: ${permanentJewelName}`
+                        : t("Study streak")
+                    }
                     value={`${streakDays} ${t("days")}`}
                     detail={
                       nextLeague
