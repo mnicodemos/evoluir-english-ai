@@ -174,7 +174,11 @@ export function AdminHomeMedia() {
                   ) : (
                     <div
                       aria-hidden="true"
-                      className={key === "evo-avatar" ? "size-32 rounded-full bg-muted animate-pulse" : "aspect-[4/3] w-full animate-pulse bg-muted"}
+                      className={
+                        key === "evo-avatar"
+                          ? "size-32 rounded-full bg-muted animate-pulse"
+                          : "aspect-[4/3] w-full animate-pulse bg-muted"
+                      }
                     />
                   )}
                 </div>
