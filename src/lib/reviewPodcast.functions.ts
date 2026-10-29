@@ -77,12 +77,30 @@ export const loadLessonPodcast = createServerFn({ method: "POST" })
     if (shared) return shared;
 
     const { callGateway } = await import("./ai-gateway.server");
-    const raw = await callGateway(messages, true, {
+    const requestOptions = {
       userId: context.userId,
-      operation: "lesson_generation",
+      operation: "lesson_generation" as const,
       fast: true,
-    });
-    const podcast = parseReviewPodcast(raw);
+    };
+    let raw = await callGateway(messages, true, requestOptions);
+    let podcast = parseReviewPodcast(raw);
+
+    // A short response is the only validation failure that triggers one repair attempt.
+    // Keep the original schema strict and preserve the same lesson/level instructions.
+    if (!podcast && diagnoseReviewPodcast(raw).reason === "insufficient_spoken_words") {
+      const retryMessages = messages.map((message) => ({ ...message }));
+      const lastMessage = retryMessages[retryMessages.length - 1];
+      if (lastMessage) {
+        lastMessage.content +=
+          "\n\nRETRY: The previous dialogue was below the required spoken-word minimum. " +
+          "Write a complete replacement dialogue with 500 spoken English words across 30-36 lines. " +
+          "Aim for 15-17 spoken words per line, count the spoken words before returning JSON, " +
+          "and keep every line simple, natural, and appropriate to the learner's exact CEFR level and lesson topic.";
+      }
+      raw = await callGateway(retryMessages, true, requestOptions);
+      podcast = parseReviewPodcast(raw);
+    }
+
     if (!podcast) {
       console.error("Lesson podcast failed validation", {
         lessonKey: plan.key,
