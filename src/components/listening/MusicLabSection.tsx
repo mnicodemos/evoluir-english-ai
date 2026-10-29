@@ -335,8 +335,6 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <div className="space-y-3">
             {visibleSongs.map((song) => {
               const expanded = expandedSongs.has(song.id);
-              const safeFilename = safeSongFilename(song.topic);
-              const fileExtension = audioFileExtension(song.mimeType);
               return (
                 <article
                   key={song.id}
