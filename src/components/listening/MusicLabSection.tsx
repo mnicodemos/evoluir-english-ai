@@ -158,15 +158,23 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const visibleSongs =
     activeFocus === "all" ? songs : songs.filter((song) => song.goal === activeFocus);
 
-  async function downloadSong(song: GeneratedSong) {
+  function downloadSong(song: GeneratedSong) {
     setDownloadingSongId(song.id);
     let objectUrl: string | null = null;
     try {
-      // Music Lab currently returns a Base64 data URL. Convert it to a Blob first
-      // so the browser downloads a file instead of navigating to the large data URL.
-      const response = await fetch(song.downloadUrl);
-      if (!response.ok) throw new Error("The audio file could not be loaded.");
-      const audioBlob = await response.blob();
+      // Decode the generated Base64 data URL synchronously so the browser's
+      // download remains directly connected to the user's click activation.
+      const [metadata, encodedAudio] = song.downloadUrl.split(",", 2);
+      if (!metadata?.startsWith("data:audio/") || !metadata.includes(";base64") || !encodedAudio) {
+        throw new Error("The audio file format is not supported.");
+      }
+
+      const binaryAudio = window.atob(encodedAudio);
+      const audioBytes = new Uint8Array(binaryAudio.length);
+      for (let index = 0; index < binaryAudio.length; index += 1) {
+        audioBytes[index] = binaryAudio.charCodeAt(index);
+      }
+      const audioBlob = new Blob([audioBytes], { type: song.mimeType });
       if (audioBlob.size === 0) throw new Error("The generated audio file is empty.");
 
       objectUrl = URL.createObjectURL(audioBlob);
