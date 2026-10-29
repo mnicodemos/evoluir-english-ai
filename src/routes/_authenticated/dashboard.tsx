@@ -184,12 +184,16 @@ function DashboardNotifications({
   const { data: nextStep } = useNextStep({ enabled: !!profile?.id });
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
   const quickWin = nextStep?.quickWin;
-  const quickWinVisible = !!quickWin &&
+  const quickWinVisible =
+    !!quickWin &&
     (!indicators.ready || dashboardActionAvailable(quickWin.activity.to, indicators)) &&
     !(quickWin.cta === "Say 5 words out loud" && pronunciationQuickWinDone(todayActivities));
   const challenge = nextStep?.quest;
-  const challengeGoal = challenge ? dailyChallengeGoal(challenge.resource.to, todayActivities) : null;
-  const challengeVisible = !!challenge &&
+  const challengeGoal = challenge
+    ? dailyChallengeGoal(challenge.resource.to, todayActivities)
+    : null;
+  const challengeVisible =
+    !!challenge &&
     (!indicators.ready || dashboardActionAvailable(challenge.resource.to, indicators)) &&
     !challengeGoal?.reached;
   // Today's goal steps still open: finishing every one also closes the study
@@ -355,14 +359,28 @@ function DashboardNotifications({
   const activeItems = items.filter((item) => item.visible);
   // Actionable extras use the same availability rules as NextStepCard.
   const recommendationItems = [
-    ...(quickWinVisible && quickWin ? [{
-      id: "quick-win", to: quickWin.activity.to, params: quickWin.activity.params,
-      label: `${translate("Quick Win")}: ${translate(quickWin.cta)}`, icon: Zap,
-    }] : []),
-    ...(challengeVisible && challenge ? [{
-      id: "take-challenge", to: challenge.resource.to, params: challenge.resource.params,
-      label: `${translate("Take the challenge")}: ${translate(challenge.resource.title)}`, icon: Trophy,
-    }] : []),
+    ...(quickWinVisible && quickWin
+      ? [
+          {
+            id: "quick-win",
+            to: quickWin.activity.to,
+            params: quickWin.activity.params,
+            label: `${translate("Quick Win")}: ${translate(quickWin.cta)}`,
+            icon: Zap,
+          },
+        ]
+      : []),
+    ...(challengeVisible && challenge
+      ? [
+          {
+            id: "take-challenge",
+            to: challenge.resource.to,
+            params: challenge.resource.params,
+            label: `${translate("Take the challenge")}: ${translate(challenge.resource.title)}`,
+            icon: Trophy,
+          },
+        ]
+      : []),
   ];
   const hasNotifications = activeItems.length > 0 || recommendationItems.length > 0;
   const lifeNotificationIds = ["life-tasks", "goal-steps", "habits"];
@@ -467,9 +485,15 @@ function DashboardNotifications({
                   <span>{item.label}</span>
                 </>
               );
-              const className = "grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent";
+              const className =
+                "grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent";
               return item.params ? (
-                <Link key={item.id} to="/learning/$lessonId" params={item.params} className={className}>
+                <Link
+                  key={item.id}
+                  to="/learning/$lessonId"
+                  params={item.params}
+                  className={className}
+                >
                   {content}
                 </Link>
               ) : (
