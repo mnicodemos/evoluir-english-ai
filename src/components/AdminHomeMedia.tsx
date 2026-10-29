@@ -38,7 +38,8 @@ const TARGETS: {
   {
     key: "video-call",
     title: "AI Video Call image",
-    description: "Image shown on the full-screen video call with EVO. This setting is independent of the shared avatar.",
+    description:
+      "Image shown on the full-screen video call with EVO. This setting is independent of the shared avatar.",
     Icon: Video,
   },
 ];
