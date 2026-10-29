@@ -33,6 +33,7 @@ export function DashboardHeaderStat({
   value,
   detail,
   detailStyle,
+  detailIcon,
   valueStyle,
   iconColor,
   to,
@@ -44,6 +45,7 @@ export function DashboardHeaderStat({
   value: string;
   detail?: string | null;
   detailStyle?: CSSProperties | undefined;
+  detailIcon?: ReactNode;
   valueStyle?: CSSProperties | undefined;
   iconColor?: string | undefined;
   to?: "/league" | "/study-plan";
@@ -74,12 +76,22 @@ export function DashboardHeaderStat({
           {value}
         </span>
         {detail && (
-          <span
-            className="mt-0.5 block truncate text-xs leading-tight text-muted-foreground"
-            style={detailStyle}
-          >
-            {detail}
-          </span>
+          detailIcon ? (
+            <span
+              className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px] leading-tight text-muted-foreground"
+              style={detailStyle}
+            >
+              {detailIcon}
+              <span className="min-w-0 whitespace-nowrap">{detail}</span>
+            </span>
+          ) : (
+            <span
+              className="mt-0.5 block truncate text-xs leading-tight text-muted-foreground"
+              style={detailStyle}
+            >
+              {detail}
+            </span>
+          )
         )}
       </span>
     </>
