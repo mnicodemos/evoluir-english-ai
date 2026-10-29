@@ -31,7 +31,9 @@ export const getLessonAudioImage = createServerFn({ method: "GET" }).handler(asy
     .maybeSingle();
   if (error) throw new Error("The Lesson Audio image could not be loaded.");
   return {
-    imageUrl: (data as { image_url?: string | null } | null)?.image_url ?? "/study-books/1793031809285.jpg",
+    imageUrl:
+      (data as { image_url?: string | null } | null)?.image_url ??
+      "/study-books/1793031809285.jpg",
   };
 });
 
@@ -47,9 +49,7 @@ export const saveLessonAudioImage = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     await requireAdmin(context);
-    const match = data.dataUrl.match(
-      /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/,
-    );
+    const match = data.dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
     const encodedImage = match?.[2];
     if (!match || match[1] !== data.mimeType || !encodedImage) {
       throw new Error("Choose a valid JPG, PNG or WebP image.");
