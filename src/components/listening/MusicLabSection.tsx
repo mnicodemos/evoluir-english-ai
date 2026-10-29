@@ -173,7 +173,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <Music2 className="size-5" aria-hidden="true" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-wide text-brand-green">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-green">
             Listening Experience • Music Lab
           </p>
           <h2 id="music-lab-title" className="mt-1 font-display text-xl font-semibold">
