@@ -667,20 +667,24 @@ function Dashboard() {
               <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
             </div>
 
-            <div className="grid min-w-0 grid-cols-[10fr_6fr] gap-3 lg:col-span-8">
-              <div className="grid min-w-0 grid-cols-2 gap-0">
-                <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
-                  {/* The streak climbs a ladder of jewels (Bronze, Silver, Gold...); the
-                    gem takes the current jewel's colour, so it is not mistaken for
-                    the weekly league. */}
+            <div className="grid min-w-0 grid-cols-[6fr_10fr] gap-3 lg:col-span-8">
+              <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
+                {/* Your Week comes first; the combined streak/league block follows it. */}
+                <PlanTodaySummary
+                  next={planNext}
+                  weekDone={!!studyPlan && studyPlan.plan.nextIndex === null}
+                  translate={t}
+                />
+              </div>
+              <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
+                {/* One continuous card for Study Streak and Weekly League, with no card seam. */}
+                <div className="grid min-w-0 grid-cols-2 gap-0">
                   <DashboardHeaderStat
                     icon={<Gem className="size-6" strokeWidth={2.2} />}
                     tone="coral"
                     iconColor={getLeague(streakDays).from}
                     label={t("Study streak")}
                     value={`${streakDays} ${t("days")}`}
-                    // How many days in a row the next jewel needs, and the rule on
-                    // hover (user request: make the rule clear, not change it).
                     detail={
                       nextLeague
                         ? lang === "pt"
@@ -695,22 +699,8 @@ function Dashboard() {
                     }
                     detailStyle={nextLeague ? { color: nextLeague.from } : undefined}
                   />
-                </div>
-
-                <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
-                  {/* Minutes today already live in Today's Progress; this slot shows the
-                    weekly league instead. */}
                   <WeeklyLeagueSummary profile={profile} translate={t} />
                 </div>
-              </div>
-              <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
-                {/* The week count already lives in "Your learning rhythm"; this slot
-                  shows what to do now in the study plan instead. */}
-                <PlanTodaySummary
-                  next={planNext}
-                  weekDone={!!studyPlan && studyPlan.plan.nextIndex === null}
-                  translate={t}
-                />
               </div>
             </div>
           </div>
