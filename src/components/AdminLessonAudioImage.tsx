@@ -100,7 +100,9 @@ export function AdminLessonAudioImage() {
               />
             ) : (
               <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-                {current ? "The image could not be loaded. Choose another image to replace it." : "No Lesson Audio image is published yet. Choose an image to get started."}
+                {current
+                  ? "The image could not be loaded. Choose another image to replace it."
+                  : "No Lesson Audio image is published yet. Choose an image to get started."}
               </p>
             )}
           </div>
