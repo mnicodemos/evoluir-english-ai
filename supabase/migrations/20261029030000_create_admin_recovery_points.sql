@@ -33,6 +33,15 @@ insert into public.admin_recovery_points
   (title, description, repository, branch_name, commit_sha, source_pr, environment)
 values
   (
+    'Recovery point — after PR #504',
+    'Previously established stable checkpoint. Preserves the 72.32px button size and centered alignment recorded at that stage.',
+    'mnicodemos/evoluir-english-ai',
+    'recovery-after-pr-504',
+    '9d6097ee2dfbb88e8aff93454807c757223573a3',
+    504,
+    'Lovable Cloud'
+  ),
+  (
     'Recovery point — 2026-10-29 (after PR #554)',
     'Stable code checkpoint created before the admin recovery-points registry. PR #555 (mobile permanent jewels) was still open and is not included in this checkpoint.',
     'mnicodemos/evoluir-english-ai',
