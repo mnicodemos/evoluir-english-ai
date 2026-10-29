@@ -461,7 +461,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               with room for the scope badge. From xl: top-aligned, the EVO label
               level with "Why this matters now" (same 12 px top padding and 22 px
               icon row; user request). */}
-          <div className="relative z-10 flex min-w-0 flex-col gap-2 px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:gap-2 max-sm:py-2 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:pl-5 xl:pr-4 min-[1440px]:pl-8 min-[1440px]:pr-6">
+          <div className="relative z-10 flex min-w-0 flex-col gap-2 px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:gap-2 max-sm:py-2 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:px-3 xl:text-left">
             {/* Top-right of the priority column below xl; from xl it moves to the
                 "Why this matters now" column (see the aside). */}
             {/* Coach label: white, with the AI icon in the brand colour (the
@@ -474,7 +474,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 strokeWidth={2.4}
                 aria-hidden="true"
               />
-              <span className="truncate">EVO · {t("Your AI Learning Coach")}</span>
+              <span className="truncate xl:whitespace-normal">EVO · {t("Your AI Learning Coach")}</span>
             </p>
             {/* From xl the priority block sits at the bottom: Practice now ends
                 level with the bottom of the challenge's last text line in the Extra
@@ -566,7 +566,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {mainAvailable && (
               <Button
                 asChild
-                className="mt-2 hidden w-full max-w-full shrink-0 bg-brand-green text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-2 sm:flex sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold xl:w-full xl:max-w-64"
+                className="mt-2 hidden w-full max-w-full shrink-0 bg-brand-green text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-2 sm:flex sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold xl:w-full"
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
@@ -585,14 +585,14 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-l xl:border-t-0">
+          <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:px-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-l xl:border-t-0">
             {/* Top-right corner of the card (user request): level with the weekday
                 badge of Today's Progress (its header centres a 22 px icon inside
                 the card's padding) and in line with Keep improving's badge below
                 (16 px from the card's right edge). */}
-            <div className="flex items-center gap-2 xl:pr-24">
-              <Lightbulb className="size-[1.375rem] text-warning" aria-hidden="true" />
-              <h3 className="whitespace-nowrap text-[13px] font-semibold tracking-tight text-sidebar-foreground">
+            <div className="flex items-center gap-2">
+              <Lightbulb className="size-[1.375rem] shrink-0 text-warning" aria-hidden="true" />
+              <h3 className="text-[13px] font-semibold text-sidebar-foreground">
                 {t("Why this matters now")}
               </h3>
             </div>
@@ -600,7 +600,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 happened ("You have not practiced this skill yet"). */}
             {/* Wraps before the Continuous badge's left edge (user request). */}
             {/* At most two lines, so it never runs into Extra practice (user request). */}
-            <p className="mt-2 line-clamp-2 text-[13px] leading-snug text-sidebar-foreground/80 xl:pr-24">
+            <p className="mt-2 line-clamp-2 text-[13px] leading-snug text-sidebar-foreground/80">
               {priorityText}
             </p>
             {/* Always there (user request): when today's extras are done the

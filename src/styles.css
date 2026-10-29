@@ -526,18 +526,15 @@
   }
 }
 
-/* EVO card (desktop): the image column is as wide as the complete 3:2 image
-   needs to be exactly as tall as the card (100cqh; 1.5rem = the 0.75rem inset
-   on both sides), so it lines up with the "Why this matters now" column. It
-   never takes the minimum room of the priority text and that column (100cqw);
-   when there is not enough width the image stays complete and centered.
-   Nothing is cropped or distorted. */
+/* Dashboard-only desktop columns: wider cover image, left-aligned coach,
+   and a full-width explanation/practice column. Narrow screens keep their
+   existing composition; uploaded desktop images fill the same image slot. */
 @media (min-width: 1280px) {
   .dashboard-focus {
     container-type: size;
   }
   .dashboard-evo-grid {
-    grid-template-columns: minmax(0, 38fr) minmax(12.5rem, 34fr) minmax(16rem, 28fr);
+    grid-template-columns: minmax(0, 45fr) minmax(0, 28fr) minmax(0, 27fr);
   }
 }
 
