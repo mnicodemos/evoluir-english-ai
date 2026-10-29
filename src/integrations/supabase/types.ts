@@ -636,6 +636,24 @@ export type Database = {
           },
         ]
       }
+      home_media_settings: {
+        Row: {
+          image_url: string
+          setting_key: string
+          updated_at: string
+        }
+        Insert: {
+          image_url: string
+          setting_key: string
+          updated_at?: string
+        }
+        Update: {
+          image_url?: string
+          setting_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       landing_daily_stats: {
         Row: {
           count: number
@@ -1050,50 +1068,6 @@ export type Database = {
             columns: ["goal_id"]
             isOneToOne: false
             referencedRelation: "plus_goals"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      music_lab_songs: {
-        Row: {
-          created_at: string
-          genre: string
-          goal: string
-          id: string
-          lyrics: string
-          mime_type: string
-          storage_path: string
-          topic: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          genre: string
-          goal: string
-          id?: string
-          lyrics: string
-          mime_type?: string
-          storage_path: string
-          topic: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          genre?: string
-          goal?: string
-          id?: string
-          lyrics?: string
-          mime_type?: string
-          storage_path?: string
-          topic?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "music_lab_songs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
