@@ -221,13 +221,30 @@ export function useOpenUnitTest() {
 export function nextPathLesson<
   T extends { completed: boolean; locked: boolean; reviewUnits: number[] },
 >(lessons: T[]): T | null {
-  return (
-    lessons.find(
-      (lesson) => lesson.reviewUnits.length > 0 && !lesson.locked && !lesson.completed,
-    ) ??
-    lessons.find((lesson) => !lesson.completed) ??
-    null
+  // Review I is the one intentional interruption after Units 1–2.
+  const reviewOne = lessons.find(
+    (lesson) =>
+      lesson.reviewUnits.length === 2 &&
+      lesson.reviewUnits[0] === 1 &&
+      lesson.reviewUnits[1] === 2 &&
+      !lesson.locked &&
+      !lesson.completed,
   );
+  if (reviewOne) return reviewOne;
+
+  // Once Review I is complete, resume the core curriculum before considering
+  // later reviews. Review II and the review test belong after Units 3–5.
+  const nextCoreLesson = lessons.find(
+    (lesson) => lesson.reviewUnits.length === 0 && !lesson.completed && !lesson.locked,
+  );
+  if (nextCoreLesson) return nextCoreLesson;
+
+  const nextUnlockedReview = lessons.find(
+    (lesson) => lesson.reviewUnits.length > 0 && !lesson.locked && !lesson.completed,
+  );
+  if (nextUnlockedReview) return nextUnlockedReview;
+
+  return lessons.find((lesson) => !lesson.completed) ?? null;
 }
 
 export function reviewUnitsDone(reviewUnits: number[], unitsDone: Set<number>) {
