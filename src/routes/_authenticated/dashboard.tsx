@@ -630,8 +630,8 @@ function Dashboard() {
   const nextJewelDetail =
     permanentJewelIndex == null
       ? lang === "pt"
-        ? "Conquiste Bronze no próximo dia válido de estudo"
-        : "Earn Bronze on your next valid study day"
+        ? "Estude para ganhar Bronze"
+        : "Study to earn Bronze"
       : nextJewelName && nextJewelThreshold != null
         ? streakDays >= nextJewelThreshold
           ? lang === "pt"
