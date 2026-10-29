@@ -670,32 +670,32 @@ function Dashboard() {
             <div className="grid min-w-0 grid-cols-[10fr_6fr] gap-3 lg:col-span-8">
               <div className="grid min-w-0 grid-cols-2 gap-0">
                 <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
-                {/* The streak climbs a ladder of jewels (Bronze, Silver, Gold...); the
-                  gem takes the current jewel's colour, so it is not mistaken for
-                  the weekly league. */}
-                <DashboardHeaderStat
-                  icon={<Gem className="size-6" strokeWidth={2.2} />}
-                  tone="coral"
-                  iconColor={getLeague(streakDays).from}
-                  label={t("Study streak")}
-                  value={`${streakDays} ${t("days")}`}
-                  // How many days in a row the next jewel needs, and the rule on
-                  // hover (user request: make the rule clear, not change it).
-                  detail={
-                    nextLeague
-                      ? lang === "pt"
-                        ? `${nextLeague.namePt} em ${jewelDaysLeft} ${jewelDaysLeft === 1 ? "dia seguido" : "dias seguidos"}`
-                        : `${nextLeague.name} in ${jewelDaysLeft} ${jewelDaysLeft === 1 ? "day" : "days"} in a row`
-                      : null
-                  }
-                  hint={
-                    lang === "pt"
-                      ? "As joias sobem a cada 7 dias seguidos de estudo (1 falta por semana é protegida). Cumprir seu plano da semana vale as 3 estrelas douradas."
-                      : "Jewels climb every 7 study days in a row (one missed day a week is protected). Meeting your weekly plan earns the 3 gold stars."
-                  }
-                  detailStyle={nextLeague ? { color: nextLeague.from } : undefined}
-                />
-              </div>
+                  {/* The streak climbs a ladder of jewels (Bronze, Silver, Gold...); the
+                    gem takes the current jewel's colour, so it is not mistaken for
+                    the weekly league. */}
+                  <DashboardHeaderStat
+                    icon={<Gem className="size-6" strokeWidth={2.2} />}
+                    tone="coral"
+                    iconColor={getLeague(streakDays).from}
+                    label={t("Study streak")}
+                    value={`${streakDays} ${t("days")}`}
+                    // How many days in a row the next jewel needs, and the rule on
+                    // hover (user request: make the rule clear, not change it).
+                    detail={
+                      nextLeague
+                        ? lang === "pt"
+                          ? `${nextLeague.namePt} em ${jewelDaysLeft} ${jewelDaysLeft === 1 ? "dia seguido" : "dias seguidos"}`
+                          : `${nextLeague.name} in ${jewelDaysLeft} ${jewelDaysLeft === 1 ? "day" : "days"} in a row`
+                        : null
+                    }
+                    hint={
+                      lang === "pt"
+                        ? "As joias sobem a cada 7 dias seguidos de estudo (1 falta por semana é protegida). Cumprir seu plano da semana vale as 3 estrelas douradas."
+                        : "Jewels climb every 7 study days in a row (one missed day a week is protected). Meeting your weekly plan earns the 3 gold stars."
+                    }
+                    detailStyle={nextLeague ? { color: nextLeague.from } : undefined}
+                  />
+                </div>
 
                 <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
                   {/* Minutes today already live in Today's Progress; this slot shows the
