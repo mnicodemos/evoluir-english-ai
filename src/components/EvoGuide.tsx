@@ -79,8 +79,7 @@ export function EvoGuide({
           "aspect-[1536/1024] w-full",
           imageSize === "diagnosis" && "w-28 sm:order-2 sm:w-full",
           imageSize === "diagnosisIntro" && "w-24 sm:order-2 sm:w-full",
-          imageSize === "dashboard" &&
-            "h-[3.4rem] w-[5.1rem] shrink-0 sm:h-[4.2rem] sm:w-[6.3rem]",
+          imageSize === "dashboard" && "h-[3.4rem] w-[5.1rem] shrink-0 sm:h-[4.2rem] sm:w-[6.3rem]",
           imageSize === "lesson" && "h-full",
         )}
       >
