@@ -185,12 +185,12 @@ function DashboardNotifications({
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
   const quickWin = nextStep?.quickWin;
   const quickWinVisible = !!quickWin &&
-    dashboardActionAvailable(quickWin.activity.to, indicators) &&
+    (!indicators.ready || dashboardActionAvailable(quickWin.activity.to, indicators)) &&
     !(quickWin.cta === "Say 5 words out loud" && pronunciationQuickWinDone(todayActivities));
   const challenge = nextStep?.quest;
   const challengeGoal = challenge ? dailyChallengeGoal(challenge.resource.to, todayActivities) : null;
   const challengeVisible = !!challenge &&
-    dashboardActionAvailable(challenge.resource.to, indicators) &&
+    (!indicators.ready || dashboardActionAvailable(challenge.resource.to, indicators)) &&
     !challengeGoal?.reached;
   // Today's goal steps still open: finishing every one also closes the study
   // day (user request, 2026-10-23: activities without a reminder). Only steps
@@ -388,6 +388,8 @@ function DashboardNotifications({
       "listening",
       "writing",
       "vocabulary",
+      "quick-win",
+      "take-challenge",
     ].includes(item.id),
   );
   const needsNewActivity = goalMinutesLeft > 0 && indicators.ready && !englishPending;
