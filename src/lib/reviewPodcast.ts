@@ -173,7 +173,12 @@ export function parseReviewPodcast(raw: string): ReviewPodcast | null {
 }
 
 export type PodcastValidationDiagnostic = {
-  reason: "no_json_object" | "invalid_json" | "insufficient_spoken_words" | "schema_validation_failed";
+  reason:
+    | "no_json_object"
+    | "invalid_json"
+    | "insufficient_spoken_words"
+    | "schema_validation_failed"
+    | "valid";
   lineCount: number | null;
   spokenWordCount: number | null;
   validationIssues: Array<{ path: string; code: string }>;
@@ -225,7 +230,7 @@ export function diagnoseReviewPodcast(raw: string): PodcastValidationDiagnostic 
   const parsed = podcastSchema.safeParse(candidate);
   if (parsed.success) {
     return {
-      reason: "schema_validation_failed",
+      reason: "valid",
       lineCount,
       spokenWordCount,
       validationIssues: [],
@@ -236,9 +241,13 @@ export function diagnoseReviewPodcast(raw: string): PodcastValidationDiagnostic 
     path: issue.path.length ? issue.path.join(".") : "(root)",
     code: issue.code,
   }));
-  const insufficientWords = parsed.error.issues.some(
-    (issue) => issue.code === "custom" && issue.path.join(".") === "lines",
-  );
+  const insufficientWords =
+    lineCount !== null &&
+    lineCount >= 12 &&
+    lineCount <= 36 &&
+    parsed.error.issues.some(
+      (issue) => issue.code === "custom" && issue.path.join(".") === "lines",
+    );
 
   return {
     reason: insufficientWords ? "insufficient_spoken_words" : "schema_validation_failed",
