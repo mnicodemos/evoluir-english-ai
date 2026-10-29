@@ -630,8 +630,8 @@ function Dashboard() {
   const nextJewelDetail =
     permanentJewelIndex == null
       ? lang === "pt"
-        ? "Conquiste Bronze no próximo dia válido de estudo"
-        : "Earn Bronze on your next valid study day"
+        ? "Estude para ganhar Bronze"
+        : "Study to earn Bronze"
       : nextJewelName && nextJewelThreshold != null
         ? streakDays >= nextJewelThreshold
           ? lang === "pt"
@@ -770,9 +770,7 @@ function Dashboard() {
                         : getLeague(permanentJewelIndex * 7).from
                     }
                     label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
-                    value={
-                      permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
-                    }
+                    value={permanentJewelName ?? (lang === "pt" ? "0 dias" : "0 days")}
                     detail={nextJewelDetail}
                     hint={
                       lang === "pt"
