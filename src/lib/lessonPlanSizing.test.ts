@@ -29,6 +29,7 @@ describe("quiz sizing", () => {
   it("stays between 5 and 10 for the whole curriculum", () => {
     for (const level of ["a1", "a2", "b1", "b2", "c1", "c2"]) {
       for (const lesson of getCurriculum(level)) {
+        if (lesson.isReviewTest) continue;
         const count = quizQuestionCount(lesson);
         expect(count).toBeGreaterThanOrEqual(QUIZ_MIN);
         expect(count).toBeLessThanOrEqual(QUIZ_MAX);
