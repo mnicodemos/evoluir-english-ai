@@ -785,17 +785,22 @@ function Dashboard() {
                     <span
                       className="flex items-center gap-1 pl-1.5 pr-0.5"
                       role="img"
-                      title={`${streakDays} ${t("days")}`}
-                      aria-label={`${t("Study streak")}: ${streakDays} ${t("days")}`}
+                      title={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
+                      aria-label={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
                     >
                       <Gem
                         className="size-5 shrink-0"
-                        style={{ color: getLeague(streakDays).from }}
+                        style={{
+                          color:
+                            permanentJewelIndex == null
+                              ? "hsl(var(--muted-foreground))"
+                              : getLeague(permanentJewelIndex * 7).from,
+                        }}
                         strokeWidth={2.4}
                         aria-hidden="true"
                       />
                       <span className="font-display text-sm font-bold" aria-hidden="true">
-                        {streakDays}
+                        {permanentJewelIndex == null ? 0 : permanentJewelIndex + 1}
                       </span>
                     </span>
                     {/* Tomato before the weather on phones (user request). */}
