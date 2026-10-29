@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 import { Button } from "@/components/ui/button";
 import { getLessonAudioImage, saveLessonAudioImage } from "@/lib/lessonAudioMedia.functions";
+import { ADMIN_IMAGE_MAX_WIDTH, compressImageFile, dataUrlBytes } from "@/lib/imageCompress";
 
 type Draft = {
   name: string;
@@ -44,23 +45,30 @@ export function AdminLessonAudioImage() {
       setNotice("Choose a JPG, PNG or WebP image.");
       return;
     }
-    if (file.size > 3 * 1024 * 1024) {
-      setNotice("The image must be 3 MB or smaller.");
-      return;
-    }
-
     try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () =>
-          typeof reader.result === "string"
-            ? resolve(reader.result)
-            : reject(new Error("Could not read image."));
-        reader.onerror = () => reject(new Error("Could not read image."));
-        reader.readAsDataURL(file);
-      });
+      // Resized and turned into WebP before upload (user report, 2026-10-29).
+      const compressed = await compressImageFile(file, ADMIN_IMAGE_MAX_WIDTH["lesson-audio"]);
+      const dataUrl =
+        compressed?.dataUrl ??
+        (await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () =>
+            typeof reader.result === "string"
+              ? resolve(reader.result)
+              : reject(new Error("Could not read image."));
+          reader.onerror = () => reject(new Error("Could not read image."));
+          reader.readAsDataURL(file);
+        }));
+      if (dataUrlBytes(dataUrl) > 3 * 1024 * 1024) {
+        setNotice("The image must be 3 MB or smaller.");
+        return;
+      }
       setImageFailed(false);
-      setDraft({ name: file.name, dataUrl, mimeType: file.type as Draft["mimeType"] });
+      setDraft({
+        name: file.name,
+        dataUrl,
+        mimeType: compressed?.mimeType ?? (file.type as Draft["mimeType"]),
+      });
     } catch {
       setNotice("Could not read the selected image.");
     }

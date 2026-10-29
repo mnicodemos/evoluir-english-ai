@@ -66,7 +66,8 @@ export const saveLessonAudioImage = createServerFn({ method: "POST" })
       .from("dashboard-home-images")
       .upload(path, bytes, {
         contentType: data.mimeType,
-        cacheControl: "3600",
+        // A new file name per upload, so a long cache never shows an old image.
+        cacheControl: "31536000",
         upsert: false,
       });
     if (uploadError) {

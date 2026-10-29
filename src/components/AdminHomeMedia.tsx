@@ -6,6 +6,7 @@ import evoGuide from "@/assets/evo-guide.webp";
 import evoVideoCall from "@/assets/evo-video-call.jpg";
 import { Button } from "@/components/ui/button";
 import { AdminLessonAudioImage } from "@/components/AdminLessonAudioImage";
+import { ADMIN_IMAGE_MAX_WIDTH, compressImageFile, dataUrlBytes } from "@/lib/imageCompress";
 import { getHomeDashboardImages, saveHomeDashboardImage } from "@/lib/admin.functions";
 
 type Target = "desktop" | "mobile" | "evo-avatar" | "video-call";
@@ -100,22 +101,27 @@ export function AdminHomeMedia() {
       setNotice("Choose a JPG, PNG or WebP image.");
       return;
     }
-    if (file.size > 3 * 1024 * 1024) {
+    // Resized and turned into WebP here, so the page never ships the original
+    // photo (user report, 2026-10-29: images loaded after the rest of the page).
+    const compressed = await compressImageFile(file, ADMIN_IMAGE_MAX_WIDTH[target]);
+    const dataUrl =
+      compressed?.dataUrl ??
+      (await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () =>
+          typeof reader.result === "string"
+            ? resolve(reader.result)
+            : reject(new Error("Could not read image."));
+        reader.onerror = () => reject(new Error("Could not read image."));
+        reader.readAsDataURL(file);
+      }));
+    if (dataUrlBytes(dataUrl) > 3 * 1024 * 1024) {
       setNotice("The image must be 3 MB or smaller.");
       return;
     }
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () =>
-        typeof reader.result === "string"
-          ? resolve(reader.result)
-          : reject(new Error("Could not read image."));
-      reader.onerror = () => reject(new Error("Could not read image."));
-      reader.readAsDataURL(file);
-    });
     setFiles((current) => ({
       ...current,
-      [target]: { name: file.name, dataUrl, mimeType: file.type },
+      [target]: { name: file.name, dataUrl, mimeType: compressed?.mimeType ?? file.type },
     }));
   }
 
