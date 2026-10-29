@@ -13,8 +13,8 @@ export const QUIZ_MAX = 10;
 export const CARDS_MIN = 5;
 export const CARDS_MAX = 15;
 
-/** The Unit 6 review Test keeps its historical fixed size. */
-export const REVIEW_TEST_QUESTIONS = 10;
+/** The Unit 6 Review Test is a comprehensive 30-question assessment. */
+export const REVIEW_TEST_QUESTIONS = 30;
 
 export type SizingPlan = Pick<
   CurriculumLesson,
