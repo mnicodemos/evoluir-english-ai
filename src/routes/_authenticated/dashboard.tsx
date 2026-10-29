@@ -775,16 +775,22 @@ function Dashboard() {
                       permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
                     }
                     detail={nextJewelDetail}
-                    detailIcon={<ArrowUpRight className="size-3 shrink-0" aria-hidden="true" />}
+                    detailIcon={
+                      <ArrowUpRight
+                        className="size-3 shrink-0"
+                        style={{
+                          color:
+                            nextJewelIndex < jewelNames.length
+                              ? getLeague(nextJewelThreshold ?? 0).from
+                              : undefined,
+                        }}
+                        aria-hidden="true"
+                      />
+                    }
                     hint={
                       lang === "pt"
                         ? "As joias são conquistas permanentes registradas no banco. A sequência de estudos continua seguindo as regras atuais."
                         : "Jewels are permanent achievements stored in your account. Your study-streak rules remain unchanged."
-                    }
-                    detailStyle={
-                      nextJewelIndex < jewelNames.length
-                        ? { color: getLeague(nextJewelThreshold ?? 0).from }
-                        : undefined
                     }
                   />
                 </div>
