@@ -1373,6 +1373,33 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
     return { ok: true, url: publicData.publicUrl };
   });
 
+/**
+ * Why the recovery points table could not be used, in the owner's words: the
+ * table missing or not granted to the server (migration 0095 not applied yet)
+ * or another failure (owner report, 2026-10-29: the tab only said it failed).
+ */
+function recoveryPointsError(
+  error: { code?: string; message?: string },
+  action: "carregados" | "salvo",
+): Error {
+  console.error(`Admin recovery points failed: ${error.code ?? "?"} ${error.message ?? ""}`);
+  const missing =
+    error.code === "42P01" ||
+    error.code === "PGRST205" ||
+    error.code === "42501" ||
+    /does not exist|permission denied|schema cache/i.test(error.message ?? "");
+  if (missing) {
+    return new Error(
+      "A tabela dos pontos de recuperação não está pronta. Peça ao chat do Lovable para rodar a migração 0095_admin_recovery_points_grant.sql.",
+    );
+  }
+  return new Error(
+    action === "carregados"
+      ? "Os pontos de recuperação não puderam ser carregados."
+      : "O ponto de recuperação não pôde ser salvo.",
+  );
+}
+
 /** Admin-only registry of Git recovery checkpoints (metadata, not database backups). */
 export const listRecoveryPoints = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -1390,7 +1417,7 @@ export const listRecoveryPoints = createServerFn({ method: "GET" })
       )
       .order("created_at", { ascending: false })
       .limit(100);
-    if (error) throw new Error("Os pontos de recuperação não puderam ser carregados.");
+    if (error) throw recoveryPointsError(error, "carregados");
     return (data ?? []).map(
       (row: {
         id: string;
@@ -1460,6 +1487,6 @@ export const createRecoveryPoint = createServerFn({ method: "POST" })
     if (error?.code === "23505") {
       throw new Error("Este commit já está registrado como ponto de recuperação.");
     }
-    if (error) throw new Error("O ponto de recuperação não pôde ser salvo.");
+    if (error) throw recoveryPointsError(error, "salvo");
     return { ok: true, id: saved.id };
   });

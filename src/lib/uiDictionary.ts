@@ -2354,6 +2354,14 @@ const baseUiPt: Record<string, string> = {
   "Your browser does not support audio playback.":
     "Seu navegador não oferece suporte à reprodução de áudio.",
   "Recovery points": "Pontos de recuperação",
+  Students: "Alunos",
+  "AI and costs": "IA e custos",
+  Content: "Conteúdo",
+  Communication: "Comunicação",
+  System: "Sistema",
+  "Home images": "Imagens da Home",
+  "Error monitoring": "Monitoramento de erros",
+  "Lesson test": "Teste de lição",
   Lyrics: "Letra",
 };
 
