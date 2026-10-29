@@ -678,7 +678,7 @@ function Dashboard() {
               </div>
               <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
                 {/* One continuous card for Study Streak and Weekly League, with no card seam. */}
-                <div className="grid min-w-0 grid-cols-2 gap-0">
+                <div className="grid min-w-0 grid-cols-2 items-stretch divide-x divide-border">
                   <DashboardHeaderStat
                     icon={<Gem className="size-6" strokeWidth={2.2} />}
                     tone="coral"
