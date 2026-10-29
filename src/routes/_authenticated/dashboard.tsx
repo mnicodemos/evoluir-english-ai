@@ -89,10 +89,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { title: "Home - Evoluir+ English AI" },
       {
         name: "description",
-        content: "Your daily English plan, permanent jewels and skill scores in one place.",
+        content: "Your daily English plan, jewel achievements and skill scores in one place.",
       },
       { property: "og:title", content: "Home - Evoluir+ English AI" },
-      { property: "og:description", content: "Your daily English plan, permanent jewels and skill scores." },
+      { property: "og:description", content: "Your daily English plan, jewel achievements and skill scores." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -766,7 +766,7 @@ function Dashboard() {
                         ? "hsl(var(--muted-foreground))"
                         : getLeague(permanentJewelIndex * 7).from
                     }
-                    label={lang === "pt" ? "Joias permanentes" : "Permanent Jewels"}
+                    label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
                     value={permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}
                     detail={nextJewelDetail}
                     hint={
