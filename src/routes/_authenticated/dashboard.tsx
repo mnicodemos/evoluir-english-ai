@@ -567,7 +567,10 @@ function Dashboard() {
       const { data, error } = await (
         supabase.from as unknown as (name: string) => {
           select: (columns: string) => {
-            eq: (column: string, value: string) => {
+            eq: (
+              column: string,
+              value: string,
+            ) => {
               order: (
                 column: string,
                 options: { ascending: boolean },
@@ -594,7 +597,18 @@ function Dashboard() {
     permanentJewelIndex == null
       ? null
       : lang === "pt"
-        ? ["Bronze", "Prata", "Ouro", "Safira", "Rubi", "Esmeralda", "Ametista", "Pérola", "Obsidiana", "Diamante"][permanentJewelIndex]
+        ? [
+            "Bronze",
+            "Prata",
+            "Ouro",
+            "Safira",
+            "Rubi",
+            "Esmeralda",
+            "Ametista",
+            "Pérola",
+            "Obsidiana",
+            "Diamante",
+          ][permanentJewelIndex]
         : getLeague(permanentJewelIndex * 7).name;
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
