@@ -14,6 +14,7 @@ const requestSchema = z.object({
   ]),
 });
 
+const MUSIC_MODEL = "lyria-3-clip-preview";
 const CEFR_LEVELS = new Set(["a1", "a2", "b1", "b2", "c1", "c2"]);
 function privateJson(body: unknown, init?: ResponseInit): Response {
   const headers = new Headers(init?.headers);
@@ -139,6 +140,73 @@ export const Route = createFileRoute("/api/music")({
           );
         }
 
+        // The song is claimed before the provider is called (audit, 2026-10-29:
+        // the 24-hour rule was checked only before the call and the record was
+        // written after it, so requests sent together each got a song). The
+        // claim is a pending usage record; when another pending or successful
+        // song of the last 24 hours exists, this one gives way. A claim left
+        // pending by a crash stops counting after 10 minutes.
+        const startedAt = Date.now();
+        const { data: claim, error: claimError } = await supabaseAdmin
+          .from("ai_usage_events")
+          .insert({
+            user_id: userId,
+            operation: "music_generation",
+            model: MUSIC_MODEL,
+            status: "pending",
+            success: false,
+          })
+          .select("id")
+          .single();
+        if (claimError || !claim) {
+          console.error("[music-lab] usage safeguard unavailable");
+          return Response.json(
+            { message: "Music generation is temporarily unavailable." },
+            { status: 503 },
+          );
+        }
+        const close = async (
+          status: "completed" | "error" | "denied",
+          errorCode?: string,
+        ): Promise<boolean> => {
+          const { error: closeError } = await supabaseAdmin
+            .from("ai_usage_events")
+            .update({
+              status,
+              success: status === "completed",
+              error_code: errorCode ?? null,
+              duration_ms: Math.max(0, Date.now() - startedAt),
+              completed_at: new Date().toISOString(),
+            })
+            .eq("id", claim.id);
+          if (closeError) {
+            console.error("[music-lab] could not close the usage record", {
+              code: closeError.code,
+            });
+          }
+          return !closeError;
+        };
+        const staleBefore = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+        const { count: claims, error: claimsError } = await supabaseAdmin
+          .from("ai_usage_events")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("operation", "music_generation")
+          .gte("created_at", since24h)
+          .or(`success.eq.true,and(status.eq.pending,created_at.gt."${staleBefore}")`);
+        if (claimsError || (claims ?? 0) > 1) {
+          await close("denied", claimsError ? "limits_unavailable" : "concurrent_limit");
+          return Response.json(
+            claimsError
+              ? { message: "Music generation is temporarily unavailable." }
+              : {
+                  message:
+                    "Your song is already being created, or you made one in the last 24 hours. Please come back later for another track.",
+                },
+            { status: claimsError ? 503 : 429 },
+          );
+        }
+
         const levelGuidance: Record<string, string> = {
           a1: "Use very common concrete words, short present-tense sentences, repetition, and a clear chorus. Avoid idioms and complex clauses.",
           a2: "Use familiar everyday vocabulary, short connected sentences, simple past and future where useful, and a repetitive chorus.",
@@ -161,7 +229,7 @@ export const Route = createFileRoute("/api/music")({
 
         try {
           const upstream = await fetch(
-            "https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/lyria-3-clip-preview:generateContent",
+            `https://connector-gateway.lovable.dev/udc_marcelo_s_google_gemini_key/v1beta/models/${MUSIC_MODEL}:generateContent`,
             {
               method: "POST",
               headers: {
@@ -182,6 +250,7 @@ export const Route = createFileRoute("/api/music")({
             console.error(
               `[music-lab] provider error ${upstream.status}: ${details.slice(0, 300)}`,
             );
+            await close("error", `gemini_${upstream.status}`);
             return Response.json(
               {
                 message:
@@ -219,6 +288,7 @@ export const Route = createFileRoute("/api/music")({
 
           if (!audioBase64 || !lyrics) {
             console.error("[music-lab] provider response missing audio or lyrics");
+            await close("error", "incomplete_song");
             return Response.json(
               { message: "The music service returned an incomplete song. Please try again." },
               { status: 502 },
@@ -229,19 +299,8 @@ export const Route = createFileRoute("/api/music")({
           const audioUrl = `data:${mimeType};base64,${audioBase64}`;
           const downloadUrl = audioUrl;
 
-          const { error: usageWriteError } = await supabaseAdmin.from("ai_usage_events").insert({
-            user_id: userId,
-            operation: "music_generation",
-            model: "lyria-3-clip-preview",
-            status: "completed",
-            success: true,
-            completed_at: new Date().toISOString(),
-          });
-          if (usageWriteError) {
-            console.error("[music-lab] could not record successful generation", {
-              code: usageWriteError.code,
-              message: usageWriteError.message,
-            });
+          const recorded = await close("completed");
+          if (!recorded) {
             return Response.json(
               {
                 message:
@@ -266,6 +325,7 @@ export const Route = createFileRoute("/api/music")({
             "[music-lab] generation failed",
             error instanceof Error ? error.message : "unknown",
           );
+          await close("error", "music_unavailable");
           return Response.json(
             {
               message:

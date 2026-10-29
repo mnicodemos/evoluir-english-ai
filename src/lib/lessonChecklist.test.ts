@@ -71,4 +71,27 @@ describe("lesson audio step", () => {
     const heard = lessonChecklist({ ...base, podcast: true, videoWatched: true });
     expect(heard.items[0]?.done).toBe(true);
   });
+  it("keeps only the quiz for the review lessons", () => {
+    const pending = lessonChecklist({
+      hasVideo: true,
+      podcast: true,
+      videoWatched: false,
+      cardsTotal: 8,
+      cardsReviewed: 0,
+      quizPassed: false,
+      quizOnly: true,
+    });
+    expect(pending.items.map((item) => item.id)).toEqual(["quiz"]);
+    expect(pending.onlyVideoPending).toBe(false);
+    const done = lessonChecklist({
+      hasVideo: true,
+      podcast: true,
+      videoWatched: false,
+      cardsTotal: 8,
+      cardsReviewed: 0,
+      quizPassed: true,
+      quizOnly: true,
+    });
+    expect(done.allDone).toBe(true);
+  });
 });

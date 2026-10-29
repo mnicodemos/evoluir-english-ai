@@ -1218,12 +1218,13 @@ export const saveSummaryVideoLink = createServerFn({ method: "POST" })
     }
     const { findCurriculumLesson } = await import("@/lib/curriculum");
     const { findBusinessLesson } = await import("@/lib/businessCourse");
-    const { canonicalSummaryVideoUrl } = await import("@/lib/lessonVideoReport");
+    const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
     if (!findCurriculumLesson(data.key) && !findBusinessLesson(data.key, "b1")) {
       throw new Error("Unknown lesson");
     }
-    const url = canonicalSummaryVideoUrl(data.url);
-    if (!url) throw new Error("Cole um link válido do Vimeo ou YouTube.");
+    // Lesson videos are Vimeo only (owner decision, 2026-10-29: YouTube links removed).
+    const url = canonicalVimeoUrl(data.url);
+    if (!url) throw new Error("Cole um link válido do Vimeo.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: updatedRows, error } = await supabaseAdmin
       .from("lessons")

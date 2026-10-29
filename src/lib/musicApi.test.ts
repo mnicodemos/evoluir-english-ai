@@ -20,6 +20,11 @@ describe("Music Lab request", () => {
       "24 hours",
     );
   });
+  it("keeps the song-in-progress message on 429", () => {
+    const message =
+      "Your song is already being created, or you made one in the last 24 hours. Please come back later for another track.";
+    expect(musicErrorMessage(429, message)).toBe(message);
+  });
   it("hides provider details on 502", () => {
     expect(musicErrorMessage(502, "Gemini quota exceeded key=xyz")).not.toContain("xyz");
   });
