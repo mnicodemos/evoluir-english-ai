@@ -676,9 +676,8 @@ function Dashboard() {
                   translate={t}
                 />
               </div>
-              <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
-                {/* One continuous card for Study Streak and Weekly League, with a full-height divider. */}
-                <div className="relative grid h-full min-w-0 grid-cols-2 items-stretch before:absolute before:inset-y-0 before:left-1/2 before:z-10 before:w-px before:-translate-x-1/2 before:bg-border">
+              <div className="grid h-full min-w-0 grid-cols-2 items-stretch gap-3">
+                <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
                   <DashboardHeaderStat
                     icon={<Gem className="size-6" strokeWidth={2.2} />}
                     tone="coral"
@@ -699,6 +698,8 @@ function Dashboard() {
                     }
                     detailStyle={nextLeague ? { color: nextLeague.from } : undefined}
                   />
+                </div>
+                <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
                   <WeeklyLeagueSummary profile={profile} translate={t} />
                 </div>
               </div>
