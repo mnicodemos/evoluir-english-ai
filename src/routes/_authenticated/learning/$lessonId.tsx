@@ -40,6 +40,7 @@ import { persistQuizLegacy } from "@/lib/legacyActivity.functions";
 import { findBusinessLesson, isBusinessKey } from "@/lib/businessCourse";
 import { findCurriculumLesson } from "@/lib/curriculum";
 import { getSummaryVideoForLesson } from "@/lib/curriculum.functions";
+import { REVIEW_TEST_QUESTIONS } from "@/lib/lessonPlanSizing";
 import { getLessonAudioImage } from "@/lib/lessonAudioMedia.functions";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
@@ -122,7 +123,9 @@ function LessonPage() {
     if (repairPlan?.isReviewTest) setActiveTab("quiz");
   }, [repairPlan?.isReviewTest, setActiveTab]);
   const needsQuizRepair =
-    !!data && !!repairPlan && !repairPlan.isReviewTest && data.quiz.length === 0;
+    !!data &&
+    !!repairPlan &&
+    (repairPlan.isReviewTest ? data.quiz.length < REVIEW_TEST_QUESTIONS : data.quiz.length === 0);
   useEffect(() => {
     if (!needsQuizRepair || !repairPlan || repairTried.current === lessonId) return;
     repairTried.current = lessonId;
@@ -344,22 +347,27 @@ function LessonPage() {
               {lang === "pt" ? "O que falta nesta lição" : "What is left in this lesson"}
             </p>
             <ul className="space-y-2">
-              {checklist.items.map((item) => (
-                <li key={item.id} className="flex items-center gap-2 text-sm">
-                  {item.done ? (
-                    <CheckCircle2
-                      className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <Circle className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                  )}
-                  <span className={item.done ? "text-muted-foreground line-through" : ""}>
-                    {t(item.label)}
-                  </span>
-                  <span className="sr-only">{item.done ? t("done") : t("still to do")}</span>
-                </li>
-              ))}
+              {checklist.items
+                .filter((item) => !repairPlan?.reviewUnits.length || item.id === "quiz")
+                .map((item) => (
+                  <li key={item.id} className="flex items-center gap-2 text-sm">
+                    {item.done ? (
+                      <CheckCircle2
+                        className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Circle
+                        className="size-4 shrink-0 text-muted-foreground"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span className={item.done ? "text-muted-foreground line-through" : ""}>
+                      {t(item.label)}
+                    </span>
+                    <span className="sr-only">{item.done ? t("done") : t("still to do")}</span>
+                  </li>
+                ))}
             </ul>
             {checklist.onlyVideoPending && (
               <p className="text-xs text-muted-foreground">

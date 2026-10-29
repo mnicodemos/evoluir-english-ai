@@ -31,7 +31,8 @@ export const getLessonAudioImage = createServerFn({ method: "GET" }).handler(asy
     .maybeSingle();
   if (error) throw new Error("The Lesson Audio image could not be loaded.");
   return {
-    imageUrl: (data as { image_url?: string | null } | null)?.image_url ?? "/study-books/1793031809285.jpg",
+    imageUrl:
+      (data as { image_url?: string | null } | null)?.image_url ?? "/study-books/1793031809285.jpg",
   };
 });
 

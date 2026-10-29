@@ -12,7 +12,7 @@ import {
   normalizeLevel,
   unitTestKey,
 } from "@/lib/curriculum";
-import { unitTestQuestionCount } from "@/lib/lessonPlanSizing";
+import { REVIEW_TEST_QUESTIONS, unitTestQuestionCount } from "@/lib/lessonPlanSizing";
 import { isReviewLevel } from "@/lib/level";
 
 import {
@@ -53,12 +53,13 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
 
     if (existing?.id) {
       // A lesson saved without its quiz (interrupted generation) is repaired once.
-      if (!plan.isReviewTest) {
-        const { count } = await supabase
-          .from("quizzes")
-          .select("id", { count: "exact", head: true })
-          .eq("lesson_id", existing.id);
-        if (!count) await writeLesson(supabase, userId, plan, existing.id as string);
+      const { count } = await supabase
+        .from("quizzes")
+        .select("id", { count: "exact", head: true })
+        .eq("lesson_id", existing.id);
+      const needsQuizRepair = plan.isReviewTest ? (count ?? 0) < REVIEW_TEST_QUESTIONS : !count;
+      if (needsQuizRepair) {
+        await writeLesson(supabase, userId, plan, existing.id as string);
       }
       prepareNext();
       return { lessonId: existing.id as string };
