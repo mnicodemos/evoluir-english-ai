@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, Monitor, Save, Smartphone, UserRound } from "lucide-react";
+import { ImagePlus, Loader2, Monitor, Save, Smartphone, UserRound, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import evoGuide from "@/assets/evo-guide.webp";
+import evoVideoCall from "@/assets/evo-video-call.jpg";
 import { Button } from "@/components/ui/button";
 import { AdminLessonAudioImage } from "@/components/AdminLessonAudioImage";
 import { getHomeDashboardImages, saveHomeDashboardImage } from "@/lib/admin.functions";
 
-type Target = "desktop" | "mobile" | "evo-avatar";
+type Target = "desktop" | "mobile" | "evo-avatar" | "video-call";
 type DraftImage = { name: string; dataUrl: string; mimeType: string };
 
 const TARGETS: {
@@ -33,6 +34,12 @@ const TARGETS: {
     title: "EVO mascot avatar",
     description: "Shared round portrait wherever the EVO avatar is used.",
     Icon: UserRound,
+  },
+  {
+    key: "video-call",
+    title: "AI Video Call image",
+    description: "Image shown on the full-screen video call with EVO. This setting is independent of the shared avatar.",
+    Icon: Video,
   },
 ];
 
@@ -68,7 +75,9 @@ export function AdminHomeMedia() {
           ? "Desktop image published."
           : variables.target === "mobile"
             ? "Mobile image published."
-            : "EVO mascot avatar published.",
+            : variables.target === "evo-avatar"
+              ? "EVO mascot avatar published."
+              : "AI Video Call image published.",
       );
       await queryClient.invalidateQueries({ queryKey: ["home-dashboard-images"] });
       await queryClient.invalidateQueries({ queryKey: ["home-dashboard-image-public"] });
@@ -136,7 +145,9 @@ export function AdminHomeMedia() {
             const current =
               key === "evo-avatar"
                 ? (imagesQuery.data?.evoAvatar ?? evoGuide)
-                : imagesQuery.data?.[key];
+                : key === "video-call"
+                  ? (imagesQuery.data?.videoCall ?? evoVideoCall)
+                  : imagesQuery.data?.[key];
             const saving = mutation.isPending && mutation.variables?.target === key;
 
             return (
@@ -153,7 +164,9 @@ export function AdminHomeMedia() {
                   className={
                     key === "evo-avatar"
                       ? "flex justify-center rounded-lg border border-border bg-muted p-4"
-                      : "overflow-hidden rounded-lg border border-border bg-muted"
+                      : key === "video-call"
+                        ? "mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-lg border border-border bg-muted"
+                        : "overflow-hidden rounded-lg border border-border bg-muted"
                   }
                 >
                   {draft?.dataUrl || current ? (
@@ -166,9 +179,11 @@ export function AdminHomeMedia() {
                       className={
                         key === "evo-avatar"
                           ? "size-32 rounded-full object-cover ring-2 ring-brand-green/60"
-                          : key === "desktop"
-                            ? "block aspect-[4/3] w-full object-cover"
-                            : "block max-h-64 w-full object-contain"
+                          : key === "video-call"
+                            ? "block size-full scale-[1.1] object-cover [object-position:50%_30%]"
+                            : key === "desktop"
+                              ? "block aspect-[4/3] w-full object-cover"
+                              : "block max-h-64 w-full object-contain"
                       }
                     />
                   ) : (
@@ -177,7 +192,9 @@ export function AdminHomeMedia() {
                       className={
                         key === "evo-avatar"
                           ? "size-32 rounded-full bg-muted animate-pulse"
-                          : "aspect-[4/3] w-full animate-pulse bg-muted"
+                          : key === "video-call"
+                            ? "aspect-square w-full animate-pulse bg-muted"
+                            : "aspect-[4/3] w-full animate-pulse bg-muted"
                       }
                     />
                   )}
