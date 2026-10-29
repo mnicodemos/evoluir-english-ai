@@ -191,6 +191,7 @@ function LessonPage() {
     cardsTotal: data?.flashcards.length ?? 0,
     cardsReviewed: reviewedCards,
     quizPassed: !!data?.userLesson?.completed_at,
+    quizOnly: isReviewUnit || !!repairPlan?.isReviewTest,
   });
 
   async function handleProgress(percent: number) {

@@ -14,6 +14,12 @@ export type LessonChecklistInput = {
   cardsTotal: number;
   cardsReviewed: number;
   quizPassed: boolean;
+  /**
+   * Review I, Review II and the review Test show only Summary and Quiz, so the
+   * quiz is their one step (audit, 2026-10-29: the hidden audio and
+   * flashcards kept their checklist from ever finishing).
+   */
+  quizOnly?: boolean;
 };
 
 export type LessonChecklistItem = {
@@ -29,17 +35,24 @@ export function flashcardsDone(total: number, reviewed: number) {
 }
 
 export function lessonChecklist(input: LessonChecklistInput) {
-  const items: LessonChecklistItem[] = [
-    input.podcast
-      ? { id: "video", label: "Listen to the lesson audio", done: input.videoWatched }
-      : { id: "video", label: "Watch the video", done: !input.hasVideo || input.videoWatched },
-    {
-      id: "flashcards",
-      label: "Review the flashcards",
-      done: flashcardsDone(input.cardsTotal, input.cardsReviewed),
-    },
-    { id: "quiz", label: "Pass the quiz (70%)", done: input.quizPassed },
-  ];
+  const quiz: LessonChecklistItem = {
+    id: "quiz",
+    label: "Pass the quiz (70%)",
+    done: input.quizPassed,
+  };
+  const items: LessonChecklistItem[] = input.quizOnly
+    ? [quiz]
+    : [
+        input.podcast
+          ? { id: "video", label: "Listen to the lesson audio", done: input.videoWatched }
+          : { id: "video", label: "Watch the video", done: !input.hasVideo || input.videoWatched },
+        {
+          id: "flashcards",
+          label: "Review the flashcards",
+          done: flashcardsDone(input.cardsTotal, input.cardsReviewed),
+        },
+        quiz,
+      ];
 
   const pending = items.filter((item) => !item.done).map((item) => item.id);
 

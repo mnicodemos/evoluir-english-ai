@@ -2340,6 +2340,10 @@ const baseUiPt: Record<string, string> = {
   "Up to 80 characters. Keep it original and specific.":
     "Até 80 caracteres. Seja original e específico.",
   "Music style": "Estilo musical",
+  "Your song is already being created, or you made one in the last 24 hours. Please come back later for another track.":
+    "Sua música já está sendo criada, ou você criou uma nas últimas 24 horas. Volte mais tarde para criar outra.",
+  "You can create one song every 24 hours for now. Please come back later for another track.":
+    "Por enquanto, você pode criar uma música a cada 24 horas. Volte mais tarde para criar outra.",
   "Learning focus": "Foco do aprendizado",
   "Creates an original 30-second English song with vocals and instrumental music.":
     "Cria uma música original em inglês de 30 segundos, com vocais e instrumental.",
