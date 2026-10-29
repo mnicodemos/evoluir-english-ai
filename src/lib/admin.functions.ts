@@ -1231,7 +1231,35 @@ export const saveSummaryVideoLink = createServerFn({ method: "POST" })
       .eq("curriculum_key", data.key)
       .select("id");
     if (error) throw new Error("The Summary video link could not be saved");
-    return { ok: true, url, updated: updatedRows?.length ?? 0 };
+
+    // A summary video must be configurable before a student opens/unlocks the
+    // lesson. If no lesson row exists yet, create a minimal owner-managed row
+    // in the same lessons source; the student's own lesson is still generated
+    // by the existing learning flow when they open it.
+    if (!updatedRows?.length) {
+      const plan = findCurriculumLesson(data.key) ?? findBusinessLesson(data.key, "b1");
+      if (!plan) throw new Error("Unknown lesson");
+      const { error: insertError } = await supabaseAdmin.from("lessons").insert({
+        title: plan.title,
+        category: plan.category,
+        level: plan.level,
+        objective: plan.objective,
+        summary: "",
+        transcript: "",
+        transcript_pt: "",
+        video_url: url,
+        video_duration_seconds: 0,
+        sort_order: plan.index ?? 0,
+        curriculum_key: data.key,
+        unit_number: plan.unit,
+        position_in_unit: plan.position,
+        skill: plan.skill,
+        created_by: context.userId,
+        generated: true,
+      });
+      if (insertError) throw new Error("The Summary video link could not be saved");
+    }
+    return { ok: true, url, updated: updatedRows?.length ?? 0, created: !updatedRows?.length };
   });
 
 export const deleteSummaryVideoLink = createServerFn({ method: "POST" })
