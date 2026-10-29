@@ -55,6 +55,8 @@ describe("lesson audio dialogue", () => {
     expect(messages[1]!.content).toContain(plan.objective);
     expect(messages[0]!.content).toContain("real, relaxed conversation");
     expect(messages[0]!.content).toContain("LEO");
+    expect(messages[0]!.content).toContain("at least 500 spoken English words");
+    expect(messages[0]!.content).toContain("15-17 spoken words per line");
   });
 
   it("labels EVO and LEO and gives them their own voices", () => {
