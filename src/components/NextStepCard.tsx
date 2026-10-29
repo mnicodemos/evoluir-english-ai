@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Compass,
   GraduationCap,
+  Dumbbell,
   Headphones,
   Lightbulb,
   CalendarCheck2,
@@ -631,7 +632,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <div className="mt-3 hidden sm:block xl:mt-auto">
               {/* A short heading tells the student what these two extras are. */}
               <div className="flex items-center gap-2">
-                <Sparkles className="size-[1.375rem] shrink-0 text-warning" aria-hidden="true" />
+                <Dumbbell className="size-[1.375rem] shrink-0 text-warning" aria-hidden="true" />
                 <h3 className="text-[13px] font-semibold text-sidebar-foreground">
                   {t("Extra practice")}
                 </h3>
