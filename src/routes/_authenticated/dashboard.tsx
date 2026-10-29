@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
+  ArrowUpRight,
   BookA,
   BookOpen,
   BookOpenText,
@@ -628,21 +629,21 @@ function Dashboard() {
   const nextJewelThreshold =
     nextJewelIndex < jewelThresholds.length ? jewelThresholds[nextJewelIndex] : null;
   const nextJewelDetail =
-    permanentJewelIndex == null
-      ? lang === "pt"
-        ? "Estude para ganhar Bronze"
-        : "Study to earn Bronze"
-      : nextJewelName && nextJewelThreshold != null
-        ? streakDays >= nextJewelThreshold
-          ? lang === "pt"
-            ? `Próxima: ${nextJewelName} · reconstrua uma sequência de ${nextJewelThreshold} dias`
-            : `Next: ${nextJewelName} · rebuild a ${nextJewelThreshold}-day streak`
-          : lang === "pt"
-            ? `Próxima: ${nextJewelName} · marco de ${nextJewelThreshold} dias consecutivos`
-            : `Next: ${nextJewelName} · ${nextJewelThreshold}-day streak milestone`
-        : lang === "pt"
-          ? "Todas as 10 joias conquistadas"
-          : "All 10 jewels earned";
+    nextJewelName && nextJewelThreshold != null
+      ? (() => {
+          const daysRemaining = nextJewelThreshold - streakDays;
+          if (daysRemaining <= 0) {
+            return lang === "pt" ? `${nextJewelName} disponível` : `${nextJewelName} ready`;
+          }
+          const daysLabel = String(daysRemaining).padStart(2, "0");
+          if (lang === "pt") {
+            return `${nextJewelName} em ${daysLabel} ${daysRemaining === 1 ? "dia" : "dias"}`;
+          }
+          return `${nextJewelName} in ${daysLabel} ${daysRemaining === 1 ? "day" : "days"}`;
+        })()
+      : lang === "pt"
+        ? "Todas as 10 joias conquistadas"
+        : "All 10 jewels earned";
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
 
@@ -774,15 +775,22 @@ function Dashboard() {
                       permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
                     }
                     detail={nextJewelDetail}
+                    detailIcon={
+                      <ArrowUpRight
+                        className="size-3 shrink-0"
+                        style={{
+                          color:
+                            nextJewelIndex < jewelNames.length
+                              ? getLeague(nextJewelThreshold ?? 0).from
+                              : undefined,
+                        }}
+                        aria-hidden="true"
+                      />
+                    }
                     hint={
                       lang === "pt"
                         ? "As joias são conquistas permanentes registradas no banco. A sequência de estudos continua seguindo as regras atuais."
                         : "Jewels are permanent achievements stored in your account. Your study-streak rules remain unchanged."
-                    }
-                    detailStyle={
-                      nextJewelIndex < jewelNames.length
-                        ? { color: getLeague(nextJewelThreshold ?? 0).from }
-                        : undefined
                     }
                   />
                 </div>
