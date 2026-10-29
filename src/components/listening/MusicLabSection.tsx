@@ -74,6 +74,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [songs, setSongs] = useState<GeneratedSong[]>([]);
   const [activeFocus, setActiveFocus] = useState<string>("all");
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
+  const [downloadingSongId, setDownloadingSongId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -156,6 +157,34 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   ];
   const visibleSongs =
     activeFocus === "all" ? songs : songs.filter((song) => song.goal === activeFocus);
+
+  async function downloadSong(song: GeneratedSong) {
+    setDownloadingSongId(song.id);
+    let objectUrl: string | null = null;
+    try {
+      // Music Lab currently returns a Base64 data URL. Convert it to a Blob first
+      // so the browser downloads a file instead of navigating to the large data URL.
+      const response = await fetch(song.downloadUrl);
+      if (!response.ok) throw new Error("The audio file could not be loaded.");
+      const audioBlob = await response.blob();
+      if (audioBlob.size === 0) throw new Error("The generated audio file is empty.");
+
+      objectUrl = URL.createObjectURL(audioBlob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = `evoluir-${safeSongFilename(song.topic)}.${audioFileExtension(song.mimeType)}`;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Your song download has started.");
+    } catch {
+      toast.error("Could not download this song. Your session is still open; please try again.");
+    } finally {
+      if (objectUrl) window.setTimeout(() => URL.revokeObjectURL(objectUrl!), 60_000);
+      setDownloadingSongId(null);
+    }
+  }
 
   function toggleExpanded(id: string) {
     setExpandedSongs((current) => {
@@ -324,14 +353,20 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                         {GENRES.find((item) => item.value === song.genre)?.label ?? song.genre}
                       </p>
                     </div>
-                    <a
-                      href={song.downloadUrl}
-                      download={`evoluir-${safeFilename}.${fileExtension}`}
+                    <button
+                      type="button"
+                      onClick={() => void downloadSong(song)}
+                      disabled={downloadingSongId === song.id}
                       aria-label={`Download song: ${song.topic}`}
-                      className="grid size-9 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10"
+                      aria-busy={downloadingSongId === song.id}
+                      className="grid size-9 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10 disabled:cursor-wait disabled:opacity-50"
                     >
-                      <Download className="size-4" />
-                    </a>
+                      {downloadingSongId === song.id ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Download className="size-4" />
+                      )}
+                    </button>
                     <button
                       type="button"
                       onClick={() => toggleExpanded(song.id)}
