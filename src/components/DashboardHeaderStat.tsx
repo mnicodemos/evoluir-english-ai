@@ -78,7 +78,7 @@ export function DashboardHeaderStat({
         {detail &&
           (detailIcon ? (
             <span
-              className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px] leading-tight text-muted-foreground"
+              className="mt-0.5 flex min-w-0 items-center gap-1 text-xs leading-tight text-muted-foreground"
               style={detailStyle}
             >
               {detailIcon}
