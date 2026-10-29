@@ -136,7 +136,7 @@ export function AdminHomeMedia() {
             const current =
               key === "evo-avatar"
                 ? (imagesQuery.data?.evoAvatar ?? evoGuide)
-                : (imagesQuery.data?.[key] ?? "/study-books/1793212191251.jpg");
+                : imagesQuery.data?.[key];
             const saving = mutation.isPending && mutation.variables?.target === key;
 
             return (
@@ -156,17 +156,27 @@ export function AdminHomeMedia() {
                       : "overflow-hidden rounded-lg border border-border bg-muted"
                   }
                 >
-                  <img
-                    src={draft?.dataUrl ?? current}
-                    alt={draft ? `Preview: ${draft.name}` : `Current ${key} image`}
-                    className={
-                      key === "evo-avatar"
-                        ? "size-32 rounded-full object-cover ring-2 ring-brand-green/60"
-                        : key === "desktop"
-                          ? "block aspect-[4/3] w-full object-cover"
-                          : "block max-h-64 w-full object-contain"
-                    }
-                  />
+                  {draft?.dataUrl || current ? (
+                    <img
+                      src={draft?.dataUrl ?? current}
+                      alt={draft ? `Preview: ${draft.name}` : `Current ${key} image`}
+                      onError={(event) => {
+                        event.currentTarget.style.visibility = "hidden";
+                      }}
+                      className={
+                        key === "evo-avatar"
+                          ? "size-32 rounded-full object-cover ring-2 ring-brand-green/60"
+                          : key === "desktop"
+                            ? "block aspect-[4/3] w-full object-cover"
+                            : "block max-h-64 w-full object-contain"
+                      }
+                    />
+                  ) : (
+                    <div
+                      aria-hidden="true"
+                      className={key === "evo-avatar" ? "size-32 rounded-full bg-muted animate-pulse" : "aspect-[4/3] w-full animate-pulse bg-muted"}
+                    />
+                  )}
                 </div>
                 {draft ? (
                   <p className="truncate text-xs text-muted-foreground">
