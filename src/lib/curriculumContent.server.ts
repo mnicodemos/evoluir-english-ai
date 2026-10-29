@@ -608,14 +608,14 @@ export async function writeLesson(
   if (plan.isReviewTest && quiz.length !== quizTotal) {
     throw new Error(`The AI could not write all ${quizTotal} review questions. Please try again.`);
   }
-  const existingQuizCount = repairLessonId
-    ? (
-        (await supabase
-          .from("quizzes")
-          .select("id", { count: "exact", head: true })
-          .eq("lesson_id", repairLessonId)).count ?? 0
-      )
-    : 0;
+  let existingQuizCount = 0;
+  if (repairLessonId) {
+    const { count } = await supabase
+      .from("quizzes")
+      .select("id", { count: "exact", head: true })
+      .eq("lesson_id", repairLessonId);
+    existingQuizCount = count ?? 0;
+  }
   const missingQuiz = quiz.slice(existingQuizCount);
   if (missingQuiz.length) {
     // Non-review lesson quizzes are constrained by the prompt to the lesson's
