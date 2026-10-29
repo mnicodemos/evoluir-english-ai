@@ -75,8 +75,8 @@ export function DashboardHeaderStat({
         <span className="mt-0.5 line-clamp-2 break-words font-display text-lg font-bold leading-tight text-foreground">
           {value}
         </span>
-        {detail && (
-          detailIcon ? (
+        {detail &&
+          (detailIcon ? (
             <span
               className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px] leading-tight text-muted-foreground"
               style={detailStyle}
@@ -91,8 +91,7 @@ export function DashboardHeaderStat({
             >
               {detail}
             </span>
-          )
-        )}
+          ))}
       </span>
     </>
   );
