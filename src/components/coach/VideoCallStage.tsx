@@ -13,10 +13,13 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import evoVideoCall from "@/assets/evo-video-call.jpg";
 import { aiChat } from "@/lib/aiChat.functions";
+import { getHomeDashboardImages } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
 
 export type CallVoiceState =
@@ -61,6 +64,13 @@ export function VideoCallStage({
   onFinish: () => void;
 }) {
   const navigate = useNavigate();
+  const loadHomeImages = useServerFn(getHomeDashboardImages);
+  const { data: homeImages } = useQuery({
+    queryKey: ["home-dashboard-image-public"],
+    queryFn: () => loadHomeImages(),
+    staleTime: 60_000,
+    retry: false,
+  });
   const [seconds, setSeconds] = useState(0);
   const [captionsOn, setCaptionsOn] = useState(true);
   const [translation, setTranslation] = useState<{ source: string; text: string } | null>(null);
@@ -163,7 +173,7 @@ export function VideoCallStage({
         <div className="flex w-full max-w-md flex-col items-center text-center">
           <div className="relative mb-7 aspect-square w-[min(70vw,18rem)] overflow-hidden rounded-full shadow-2xl ring-2 ring-white/15">
             <img
-              src={evoVideoCall}
+              src={homeImages?.videoCall ?? evoVideoCall}
               alt="EVO, your English teacher"
               className="size-full scale-[1.3] object-cover [object-position:50%_30%] [transform-origin:50%_28%]"
             />
@@ -264,7 +274,7 @@ export function VideoCallStage({
             )}
           >
             <img
-              src={evoVideoCall}
+              src={homeImages?.videoCall ?? evoVideoCall}
               alt="EVO, your English teacher, on the call"
               className="size-full scale-[1.3] object-cover [object-position:50%_30%] [transform-origin:50%_28%]"
             />

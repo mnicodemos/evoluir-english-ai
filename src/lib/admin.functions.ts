@@ -1293,10 +1293,16 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
     .select("setting_key, image_url");
   if (error) throw new Error("The dashboard images could not be loaded.");
 
-  const result: { desktop: string | null; mobile: string | null; evoAvatar: string | null } = {
+  const result: {
+    desktop: string | null;
+    mobile: string | null;
+    evoAvatar: string | null;
+    videoCall: string | null;
+  } = {
     desktop: null,
     mobile: null,
     evoAvatar: null,
+    videoCall: null,
   };
   for (const row of data ?? []) {
     if (row.setting_key === "desktop") {
@@ -1305,6 +1311,8 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
       result.mobile = row.image_url;
     } else if (row.setting_key === "evo-avatar") {
       result.evoAvatar = row.image_url;
+    } else if (row.setting_key === "video-call") {
+      result.videoCall = row.image_url;
     }
   }
   return result;
@@ -1315,7 +1323,7 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   .inputValidator((data) =>
     z
       .object({
-        target: z.enum(["desktop", "mobile", "evo-avatar"]),
+        target: z.enum(["desktop", "mobile", "evo-avatar", "video-call"]),
         dataUrl: z.string().min(100).max(4_300_000),
         mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
       })
