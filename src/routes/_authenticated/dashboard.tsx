@@ -770,7 +770,7 @@ function Dashboard() {
                         : getLeague(permanentJewelIndex * 7).from
                     }
                     label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
-                    value={permanentJewelName ?? (lang === "pt" ? "0 dias" : "0 days")}
+                    value={permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}
                     detail={nextJewelDetail}
                     hint={
                       lang === "pt"
