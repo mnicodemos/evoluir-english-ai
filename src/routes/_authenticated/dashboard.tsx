@@ -558,8 +558,6 @@ function Dashboard() {
     !!profile &&
     (businessLevelAllowed(profile.max_level || profile.level) || !profileIsPremium(profile));
   const streakDays = profile ? effectiveStreak(profile) : 0;
-  const nextLeague = profile ? getNextLeague(streakDays) : null;
-  const jewelDaysLeft = getLeague(streakDays).nextIn;
   const { data: permanentJewelIndex = null } = useQuery({
     queryKey: ["permanent-jewels", profile?.id],
     enabled: !!profile?.id,
