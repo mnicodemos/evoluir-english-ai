@@ -8,6 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createRecoveryPoint, listRecoveryPoints } from "@/lib/admin.functions";
 
+type RecoveryPoint = {
+  id: string;
+  title: string;
+  description: string;
+  repository: string;
+  branchName: string;
+  commitSha: string;
+  sourcePr: number | null;
+  environment: string;
+  createdAt: string;
+};
+
 export function AdminRecoveryPoints() {
   const queryClient = useQueryClient();
   const list = useServerFn(listRecoveryPoints);
@@ -140,7 +152,7 @@ export function AdminRecoveryPoints() {
         ) : points.isError ? (
           <p className="text-sm text-red-400">{points.error.message}</p>
         ) : points.data?.length ? (
-          points.data.map((point) => (
+          points.data.map((point: RecoveryPoint) => (
             <article
               key={point.id}
               className="grid gap-1 rounded-lg border border-border p-3 text-sm"
