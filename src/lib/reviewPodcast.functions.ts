@@ -6,6 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { findCurriculumLesson } from "./curriculum";
 import { findBusinessLesson, isBusinessKey } from "./businessCourse";
 import {
+  diagnoseReviewPodcast,
   hasLessonPodcast,
   lessonPodcastMessages,
   parseReviewPodcast,
@@ -83,7 +84,10 @@ export const loadLessonPodcast = createServerFn({ method: "POST" })
     });
     const podcast = parseReviewPodcast(raw);
     if (!podcast) {
-      console.error("Lesson podcast failed validation", plan.key);
+      console.error("Lesson podcast failed validation", {
+        lessonKey: plan.key,
+        ...diagnoseReviewPodcast(raw),
+      });
       throw new Error("EVO could not prepare this lesson audio. Please try again.");
     }
     await saveSharedPodcast(plan.key, promptHash, podcast);
