@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Loader2, Save } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ export function AdminLessonAudioImage() {
   const saveImage = useServerFn(saveLessonAudioImage);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [notice, setNotice] = useState("");
+  const [imageFailed, setImageFailed] = useState(false);
   const imageQuery = useQuery({
     queryKey: ["lesson-audio-image"],
     queryFn: () => getImage(),
@@ -28,6 +29,7 @@ export function AdminLessonAudioImage() {
       saveImage({ data: { dataUrl: image.dataUrl, mimeType: image.mimeType } }),
     onSuccess: async () => {
       setDraft(null);
+      setImageFailed(false);
       setNotice("Lesson Audio image published.");
       await queryClient.invalidateQueries({ queryKey: ["lesson-audio-image"] });
     },
@@ -57,13 +59,18 @@ export function AdminLessonAudioImage() {
         reader.onerror = () => reject(new Error("Could not read image."));
         reader.readAsDataURL(file);
       });
+      setImageFailed(false);
       setDraft({ name: file.name, dataUrl, mimeType: file.type as Draft["mimeType"] });
     } catch {
       setNotice("Could not read the selected image.");
     }
   }
 
-  const current = draft?.dataUrl ?? imageQuery.data?.imageUrl ?? "/study-books/1793031809285.jpg";
+  const current = draft?.dataUrl ?? imageQuery.data?.imageUrl ?? null;
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [current]);
 
   return (
     <section className="mt-5 space-y-3 border-t border-border pt-4">
@@ -86,12 +93,19 @@ export function AdminLessonAudioImage() {
         </p>
       ) : (
         <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-start">
-          <div className="overflow-hidden rounded-lg border border-border bg-muted">
-            <img
-              src={current}
-              alt={draft ? `Preview: ${draft.name}` : "Current Lesson Audio image"}
-              className="block max-h-64 w-full object-contain"
-            />
+          <div className="flex min-h-48 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+            {current && !imageFailed ? (
+              <img
+                src={current}
+                alt={draft ? `Preview: ${draft.name}` : "Current Lesson Audio image"}
+                onError={() => setImageFailed(true)}
+                className="block max-h-64 w-full object-contain"
+              />
+            ) : (
+              <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+                {current ? "The image could not be loaded. Choose another image to replace it." : "No Lesson Audio image is published yet. Choose an image to get started."}
+              </p>
+            )}
           </div>
           <div className="space-y-3">
             <label className="block text-sm font-medium">
