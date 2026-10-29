@@ -45,7 +45,7 @@ import { useLife } from "@/hooks/useLife";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
-import { getLeague, getNextLeague } from "@/components/LeagueBadge";
+import { getLeague } from "@/components/LeagueBadge";
 import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
 import { businessLevelAllowed } from "@/lib/businessCourse";
