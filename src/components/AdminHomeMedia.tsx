@@ -162,7 +162,9 @@ export function AdminHomeMedia() {
                     className={
                       key === "evo-avatar"
                         ? "size-32 rounded-full object-cover ring-2 ring-brand-green/60"
-                        : "block max-h-64 w-full object-contain"
+                        : key === "desktop"
+                          ? "block aspect-[4/3] w-full object-cover"
+                          : "block max-h-64 w-full object-contain"
                     }
                   />
                 </div>
