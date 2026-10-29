@@ -540,7 +540,6 @@
     grid-template-columns: minmax(0, 38fr) minmax(12.5rem, 34fr) minmax(16rem, 28fr);
   }
 }
-}
 
 /* Every element repeats the page's touch-action (see the touch-screen rule
    above), in the base layer so utilities such as touch-none still win. */

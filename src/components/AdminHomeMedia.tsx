@@ -116,8 +116,9 @@ export function AdminHomeMedia() {
           <ImagePlus className="size-4" /> Home dashboard images
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Upload and publish desktop and mobile images independently. Existing dimensions, rounded
-          corners and responsive layout remain unchanged.
+          Upload and publish desktop and mobile images independently. Desktop: use a 4:3 image
+          (about 1580 × 1180 px) with EVO in the centre; it fills the card's image column and the
+          edges may be trimmed, never stretched.
         </p>
       </div>
       {imagesQuery.isPending ? (
