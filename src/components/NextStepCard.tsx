@@ -474,7 +474,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 strokeWidth={2.4}
                 aria-hidden="true"
               />
-              <span className="truncate xl:whitespace-normal">EVO · {t("Your AI Learning Coach")}</span>
+              <span className="truncate xl:whitespace-normal">
+                EVO · {t("Your AI Learning Coach")}
+              </span>
             </p>
             {/* From xl the priority block sits at the bottom: Practice now ends
                 level with the bottom of the challenge's last text line in the Extra
