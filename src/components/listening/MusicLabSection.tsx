@@ -74,6 +74,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [songs, setSongs] = useState<GeneratedSong[]>([]);
   const [activeFocus, setActiveFocus] = useState<string>("all");
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
+  const [downloadingSongId, setDownloadingSongId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -156,6 +157,42 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   ];
   const visibleSongs =
     activeFocus === "all" ? songs : songs.filter((song) => song.goal === activeFocus);
+
+  function downloadSong(song: GeneratedSong) {
+    setDownloadingSongId(song.id);
+    let objectUrl: string | null = null;
+    try {
+      // Decode the generated Base64 data URL synchronously so the browser's
+      // download remains directly connected to the user's click activation.
+      const [metadata, encodedAudio] = song.downloadUrl.split(",", 2);
+      if (!metadata?.startsWith("data:audio/") || !metadata.includes(";base64") || !encodedAudio) {
+        throw new Error("The audio file format is not supported.");
+      }
+
+      const binaryAudio = window.atob(encodedAudio);
+      const audioBytes = new Uint8Array(binaryAudio.length);
+      for (let index = 0; index < binaryAudio.length; index += 1) {
+        audioBytes[index] = binaryAudio.charCodeAt(index);
+      }
+      const audioBlob = new Blob([audioBytes], { type: song.mimeType });
+      if (audioBlob.size === 0) throw new Error("The generated audio file is empty.");
+
+      objectUrl = URL.createObjectURL(audioBlob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = `evoluir-${safeSongFilename(song.topic)}.${audioFileExtension(song.mimeType)}`;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Your song download has started.");
+    } catch {
+      toast.error("Could not download this song. Your session is still open; please try again.");
+    } finally {
+      if (objectUrl) window.setTimeout(() => URL.revokeObjectURL(objectUrl!), 60_000);
+      setDownloadingSongId(null);
+    }
+  }
 
   function toggleExpanded(id: string) {
     setExpandedSongs((current) => {
@@ -306,8 +343,6 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <div className="space-y-3">
             {visibleSongs.map((song) => {
               const expanded = expandedSongs.has(song.id);
-              const safeFilename = safeSongFilename(song.topic);
-              const fileExtension = audioFileExtension(song.mimeType);
               return (
                 <article
                   key={song.id}
@@ -324,14 +359,20 @@ export function MusicLabSection({ level, levelLabel }: Props) {
                         {GENRES.find((item) => item.value === song.genre)?.label ?? song.genre}
                       </p>
                     </div>
-                    <a
-                      href={song.downloadUrl}
-                      download={`evoluir-${safeFilename}.${fileExtension}`}
+                    <button
+                      type="button"
+                      onClick={() => void downloadSong(song)}
+                      disabled={downloadingSongId === song.id}
                       aria-label={`Download song: ${song.topic}`}
-                      className="grid size-9 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10"
+                      aria-busy={downloadingSongId === song.id}
+                      className="grid size-9 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10 disabled:cursor-wait disabled:opacity-50"
                     >
-                      <Download className="size-4" />
-                    </a>
+                      {downloadingSongId === song.id ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Download className="size-4" />
+                      )}
+                    </button>
                     <button
                       type="button"
                       onClick={() => toggleExpanded(song.id)}
