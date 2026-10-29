@@ -158,7 +158,7 @@ export function AdminHomeMedia() {
                 >
                   {draft?.dataUrl || current ? (
                     <img
-                      src={draft?.dataUrl ?? current}
+                      src={draft?.dataUrl ?? current ?? undefined}
                       alt={draft ? `Preview: ${draft.name}` : `Current ${key} image`}
                       onError={(event) => {
                         event.currentTarget.style.visibility = "hidden";
