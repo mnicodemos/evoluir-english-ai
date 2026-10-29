@@ -1190,8 +1190,7 @@ export const getSummaryVideoLinks = createServerFn({ method: "GET" })
       for (const copy of copies) {
         if (copy.video_url) urlCounts.set(copy.video_url, (urlCounts.get(copy.video_url) ?? 0) + 1);
       }
-      const videoUrl =
-        [...urlCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+      const videoUrl = [...urlCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
       return {
         key: plan.key,
         unit: plan.unit,
