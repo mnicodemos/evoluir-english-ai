@@ -630,9 +630,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 leaving a hole in the card. */}
             <div className="mt-3 hidden sm:block xl:mt-auto">
               {/* A short heading tells the student what these two extras are. */}
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
-                {t("Extra practice")}
-              </p>
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-[1.375rem] shrink-0 text-warning" aria-hidden="true" />
+                <h3 className="text-[13px] font-semibold text-sidebar-foreground">
+                  {t("Extra practice")}
+                </h3>
+              </div>
               {quickWinButton || challengeButton ? (
                 <>
                   <p className="mt-0.5 text-xs text-sidebar-foreground/70">
