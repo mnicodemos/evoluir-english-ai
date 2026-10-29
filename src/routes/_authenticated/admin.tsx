@@ -20,6 +20,7 @@ import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
 import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager";
 import { AdminHomeMedia } from "@/components/AdminHomeMedia";
+import { AdminRecoveryPoints } from "@/components/AdminRecoveryPoints";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isAdminUser, listRegisteredUsers } from "@/lib/admin.functions";
@@ -119,7 +120,7 @@ function AdminPage() {
           <AdminCreditBalance />
 
           <Tabs defaultValue="users" className="mt-2 min-w-0 sm:mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-4 gap-1 sm:grid-cols-8">
+            <TabsList className="grid h-auto w-full grid-cols-4 gap-1 sm:grid-cols-9">
               <TabsTrigger
                 value="users"
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
@@ -159,6 +160,12 @@ function AdminPage() {
                 className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
               >
                 {t("Retention")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="recovery"
+                className="min-w-0 truncate px-2 py-1.5 text-xs sm:text-sm"
+              >
+                {t("Recovery points")}
               </TabsTrigger>
             </TabsList>
 
@@ -243,6 +250,9 @@ function AdminPage() {
               <AdminRetention />
               <AdminGoals />
               <AdminMistakeReview />
+            </TabsContent>
+            <TabsContent value="recovery">
+              <AdminRecoveryPoints />
             </TabsContent>
           </Tabs>
         </section>
