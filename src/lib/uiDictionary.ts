@@ -1376,6 +1376,8 @@ const baseUiPt: Record<string, string> = {
   "Full Life+ AI: routine, habits, decisions and Life Coach":
     "Life+ AI completo: rotina, hábitos, decisões e Life Coach",
   "Every meditation in English": "Todas as meditações em inglês",
+  "Music Lab: your own English song, one a day":
+    "Laboratório de música: sua própria música em inglês, uma por dia",
   "Every lesson of your level, with video, flashcards and quiz":
     "Todas as lições do seu nível, com vídeo, flashcards e quiz",
   "AI Teacher, AI Speaking and video calls, with a daily limit":
@@ -2340,6 +2342,7 @@ const baseUiPt: Record<string, string> = {
   "Up to 80 characters. Keep it original and specific.":
     "Até 80 caracteres. Seja original e específico.",
   "Music style": "Estilo musical",
+  "Music Lab is part of Premium.": "O Laboratório de música faz parte do Premium.",
   "Your song is already being created, or you made one in the last 24 hours. Please come back later for another track.":
     "Sua música já está sendo criada, ou você criou uma nas últimas 24 horas. Volte mais tarde para criar outra.",
   "You can create one song every 24 hours for now. Please come back later for another track.":

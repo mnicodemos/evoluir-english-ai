@@ -1,7 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ChevronDown, ChevronUp, Download, Loader2, Music2, Sparkles } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { ChevronDown, ChevronUp, Crown, Download, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
+import { PremiumBadge, useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { MUSIC_SIGN_IN_MESSAGE, musicErrorMessage, musicRequestHeaders } from "@/lib/musicApi";
@@ -75,6 +77,8 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   const [activeFocus, setActiveFocus] = useState<string>("all");
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
   const [downloadingSongId, setDownloadingSongId] = useState<string | null>(null);
+  // Music Lab is Premium (owner decision, 2026-10-29); the server checks it too.
+  const locked = useIsPremium() === false;
 
   useEffect(() => {
     let active = true;
@@ -210,9 +214,12 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <Music2 className="size-5" aria-hidden="true" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-green">
-            Listening Experience • Music Lab
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-green">
+              Listening Experience • Music Lab
+            </p>
+            <PremiumBadge />
+          </div>
           <h2 id="music-lab-title" className="mt-1 font-display text-xl font-semibold">
             Learn English through your own song
           </h2>
@@ -250,7 +257,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <span className="font-medium">What should your song be about?</span>
           <input
             value={topic}
-            disabled={checkingCooldown || cooldownActive || loading}
+            disabled={locked || checkingCooldown || cooldownActive || loading}
             onChange={(event) => setTopic(event.target.value.slice(0, 80))}
             maxLength={80}
             required
@@ -266,7 +273,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
           <span className="font-medium">Music style</span>
           <select
             value={genre}
-            disabled={checkingCooldown || cooldownActive || loading}
+            disabled={locked || checkingCooldown || cooldownActive || loading}
             onChange={(event) => setGenre(event.target.value as typeof genre)}
             className="min-h-11 w-full rounded-lg border border-input bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
@@ -281,7 +288,7 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         <label className="space-y-1.5 text-sm">
           <span className="font-medium">Learning focus</span>
           <select
-            disabled={checkingCooldown || cooldownActive || loading}
+            disabled={locked || checkingCooldown || cooldownActive || loading}
             value={goal}
             onChange={(event) => setGoal(event.target.value as typeof goal)}
             className="min-h-11 w-full rounded-lg border border-input bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -295,20 +302,34 @@ export function MusicLabSection({ level, levelLabel }: Props) {
         </label>
 
         <div className="flex flex-wrap items-center gap-3 md:col-span-2">
-          <Button
-            type="submit"
-            disabled={checkingCooldown || cooldownActive || loading || !topic.trim() || !level}
-          >
-            {loading ? (
-              <Loader2 className="mr-2 size-4 animate-spin" />
-            ) : (
-              <Sparkles className="mr-2 size-4" />
-            )}
-            {loading ? "Creating your song..." : "Create my song"}
-          </Button>
-          <p className="text-xs text-muted-foreground">
-            Creates an original 30-second English song with vocals and instrumental music.
-          </p>
+          {locked ? (
+            <>
+              <Button asChild>
+                <Link to="/premium">
+                  <Crown className="mr-2 size-4" aria-hidden="true" />
+                  See plans
+                </Link>
+              </Button>
+              <p className="text-xs text-muted-foreground">Music Lab is part of Premium.</p>
+            </>
+          ) : (
+            <>
+              <Button
+                type="submit"
+                disabled={checkingCooldown || cooldownActive || loading || !topic.trim() || !level}
+              >
+                {loading ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Sparkles className="mr-2 size-4" />
+                )}
+                {loading ? "Creating your song..." : "Create my song"}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Creates an original 30-second English song with vocals and instrumental music.
+              </p>
+            </>
+          )}
         </div>
       </form>
 

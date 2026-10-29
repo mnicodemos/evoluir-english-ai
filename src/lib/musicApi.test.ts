@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { MUSIC_SIGN_IN_MESSAGE, musicErrorMessage, musicRequestHeaders } from "./musicApi";
+import {
+  MUSIC_PREMIUM_MESSAGE,
+  MUSIC_SIGN_IN_MESSAGE,
+  musicErrorMessage,
+  musicRequestHeaders,
+} from "./musicApi";
 
 describe("Music Lab request", () => {
   it("sends the access token as a Bearer header with JSON", () => {
@@ -24,6 +29,9 @@ describe("Music Lab request", () => {
     const message =
       "Your song is already being created, or you made one in the last 24 hours. Please come back later for another track.";
     expect(musicErrorMessage(429, message)).toBe(message);
+  });
+  it("says Music Lab is Premium on 403", () => {
+    expect(musicErrorMessage(403, "anything")).toBe(MUSIC_PREMIUM_MESSAGE);
   });
   it("hides provider details on 502", () => {
     expect(musicErrorMessage(502, "Gemini quota exceeded key=xyz")).not.toContain("xyz");

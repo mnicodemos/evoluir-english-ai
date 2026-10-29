@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { authenticateApiRequest } from "@/lib/api-auth.server";
+import { MUSIC_PREMIUM_MESSAGE } from "@/lib/musicApi";
 
 const requestSchema = z.object({
   topic: z.string().trim().min(2).max(80),
@@ -80,6 +81,12 @@ export const Route = createFileRoute("/api/music")({
             { message: "Choose a topic, style and learning focus." },
             { status: 400 },
           );
+        }
+
+        // Music Lab is Premium (owner decision, 2026-10-29).
+        const { hasPremium } = await import("@/lib/premium.server");
+        if (!(await hasPremium(userId))) {
+          return Response.json({ message: MUSIC_PREMIUM_MESSAGE }, { status: 403 });
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
