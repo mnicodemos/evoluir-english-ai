@@ -1371,3 +1371,81 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
     }
     return { ok: true, url: publicData.publicUrl };
   });
+
+
+/** Admin-only registry of Git recovery checkpoints (metadata, not database backups). */
+export const listRecoveryPoints = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // This administrative table is intentionally not exposed through the client Data API.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin as any)
+      .from("admin_recovery_points")
+      .select("id, title, description, repository, branch_name, commit_sha, source_pr, environment, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error("Os pontos de recuperação não puderam ser carregados.");
+    return (data ?? []).map((row: {
+      id: string;
+      title: string;
+      description: string;
+      repository: string;
+      branch_name: string;
+      commit_sha: string;
+      source_pr: number | null;
+      environment: string;
+      created_at: string;
+    }) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      repository: row.repository,
+      branchName: row.branch_name,
+      commitSha: row.commit_sha,
+      sourcePr: row.source_pr,
+      environment: row.environment,
+      createdAt: row.created_at,
+    }));
+  });
+
+export const createRecoveryPoint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({
+      title: z.string().trim().min(3).max(120),
+      description: z.string().trim().max(2000).default(""),
+      branchName: z.string().trim().min(1).max(120).regex(/^[A-Za-z0-9._/-]+$/),
+      commitSha: z.string().trim().regex(/^[0-9a-fA-F]{7,40}$/),
+      sourcePr: z.number().int().positive().nullable(),
+    }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: saved, error } = await (supabaseAdmin as any)
+      .from("admin_recovery_points")
+      .insert({
+        title: data.title,
+        description: data.description,
+        repository: "mnicodemos/evoluir-english-ai",
+        branch_name: data.branchName,
+        commit_sha: data.commitSha.toLowerCase(),
+        source_pr: data.sourcePr,
+        environment: "Lovable Cloud",
+        created_by: context.userId,
+      })
+      .select("id")
+      .single();
+    if (error?.code === "23505") {
+      throw new Error("Este commit já está registrado como ponto de recuperação.");
+    }
+    if (error) throw new Error("O ponto de recuperação não pôde ser salvo.");
+    return { ok: true, id: saved.id };
+  });
