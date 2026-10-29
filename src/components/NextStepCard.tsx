@@ -79,8 +79,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     staleTime: 60_000,
     retry: false,
   });
-  const desktopImage = homeImages?.desktop ?? "/study-books/1793212191251.jpg";
-  const mobileImage = homeImages?.mobile ?? "/study-books/1793212191251.jpg";
+  const desktopImage = homeImages?.desktop;
+  const mobileImage = homeImages?.mobile;
   const league = useWeeklyLeagueStanding(profile);
   const { data: todayActivities = [], isFetched: todayFetched } = useTodayActivities(profile?.id);
   const { data: studyPlan, isFetched: planFetched } = useQuery({
@@ -438,21 +438,41 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           >
             {/* Mobile: the owner's whole banner, uncropped, inset from the card
                 edges with rounded corners — the same look as the desktop image. */}
-            <img
-              src={mobileImage}
-              alt=""
-              width={1400}
-              height={415}
-              className="block h-auto w-full rounded-lg sm:hidden"
-            />
-            <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:rounded-lg">
+            {mobileImage ? (
               <img
-                src={desktopImage}
+                src={mobileImage}
                 alt=""
-                width={1580}
-                height={1180}
-                className="hidden sm:block sm:h-full sm:w-full sm:rounded-lg sm:object-cover sm:object-center"
+                width={1400}
+                height={415}
+                className="block h-auto w-full rounded-lg sm:hidden"
+                onError={(event) => {
+                  event.currentTarget.style.visibility = "hidden";
+                }}
               />
+            ) : (
+              <div
+                aria-hidden="true"
+                className="block aspect-[1400/415] w-full rounded-lg bg-muted animate-pulse sm:hidden"
+              />
+            )}
+            <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:rounded-lg">
+              {desktopImage ? (
+                <img
+                  src={desktopImage}
+                  alt=""
+                  width={1580}
+                  height={1180}
+                  className="hidden sm:block sm:h-full sm:w-full sm:rounded-lg sm:object-cover sm:object-center"
+                  onError={(event) => {
+                    event.currentTarget.style.visibility = "hidden";
+                  }}
+                />
+              ) : (
+                <div
+                  aria-hidden="true"
+                  className="hidden h-full w-full animate-pulse rounded-lg bg-muted sm:block"
+                />
+              )}
             </div>
           </div>
 
