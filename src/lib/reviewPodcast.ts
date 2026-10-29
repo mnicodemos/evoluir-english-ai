@@ -215,12 +215,12 @@ export function diagnoseReviewPodcast(raw: string): PodcastValidationDiagnostic 
     candidate !== null && typeof candidate === "object"
       ? (candidate as Record<string, unknown>)
       : null;
-  const lines = Array.isArray(record?.lines) ? record.lines : null;
+  const lines = Array.isArray(record?.["lines"]) ? record["lines"] : null;
   const lineCount = lines?.length ?? null;
   const spokenWordCount = lines
     ? lines.reduce((total, line) => {
         if (line === null || typeof line !== "object") return total;
-        const text = (line as Record<string, unknown>).text;
+        const text = (line as Record<string, unknown>)["text"];
         return typeof text === "string"
           ? total + text.trim().split(/\s+/).filter(Boolean).length
           : total;
