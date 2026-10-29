@@ -398,32 +398,13 @@ export const getSummaryVideoForLesson = createServerFn({ method: "GET" })
       throw new Error("Unknown lesson");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const db = supabaseAdmin as unknown as {
-      from: (table: string) => {
-        select: (columns: string) => {
-          eq: (
-            column: string,
-            value: string,
-          ) => {
-            not: (
-              column: string,
-              operator: string,
-              value: null,
-            ) => {
-              maybeSingle: () => Promise<{
-                data: { video_url: string; approved_by: string | null } | null;
-                error: { message: string } | null;
-              }>;
-            };
-          };
-        };
-      };
-    };
-    const { data: row, error } = await db
-      .from("lesson_videos")
-      .select("video_url, approved_by")
+    const { data: row, error } = await supabaseAdmin
+      .from("lessons")
+      .select("video_url")
       .eq("curriculum_key", data.key)
-      .not("approved_by", "is", null)
+      .not("video_url", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
     if (error) throw new Error("The shared Summary video could not be loaded");
     return { url: row?.video_url ?? null };
