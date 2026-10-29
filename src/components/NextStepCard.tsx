@@ -579,7 +579,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               />
               <span className="min-w-0 truncate">{priorityText}</span>
             </p>
-            <p className="mt-1 hidden whitespace-nowrap text-[clamp(0.625rem,0.85vw,0.75rem)] text-sidebar-foreground/70 sm:mt-3 sm:block">
+            <p className="mt-1 hidden max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-[clamp(0.625rem,0.85vw,0.75rem)] text-sidebar-foreground/70 sm:mt-3 sm:block">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
             <p className="mt-2 hidden line-clamp-1 text-sm text-sidebar-foreground/85 sm:mt-1 sm:block">
