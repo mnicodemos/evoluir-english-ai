@@ -155,14 +155,104 @@ ${unitOutline}`,
 }
 
 /** The script inside an AI reply (JSON, possibly wrapped in text or a code fence). */
-export function parseReviewPodcast(raw: string): ReviewPodcast | null {
+function extractPodcastJson(raw: string): string | null {
   const start = raw.indexOf("{");
   const end = raw.lastIndexOf("}");
-  if (start < 0 || end <= start) return null;
+  return start < 0 || end <= start ? null : raw.slice(start, end + 1);
+}
+
+export function parseReviewPodcast(raw: string): ReviewPodcast | null {
+  const json = extractPodcastJson(raw);
+  if (!json) return null;
   try {
-    const parsed = podcastSchema.safeParse(JSON.parse(raw.slice(start, end + 1)));
+    const parsed = podcastSchema.safeParse(JSON.parse(json));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
   }
+}
+
+export type PodcastValidationDiagnostic = {
+  reason:
+    | "no_json_object"
+    | "invalid_json"
+    | "insufficient_spoken_words"
+    | "schema_validation_failed"
+    | "valid";
+  lineCount: number | null;
+  spokenWordCount: number | null;
+  validationIssues: Array<{ path: string; code: string }>;
+};
+
+/**
+ * Safe failure diagnostics for server logs. Never returns dialogue, translations,
+ * titles, raw model output, or Zod messages that could contain submitted values.
+ */
+export function diagnoseReviewPodcast(raw: string): PodcastValidationDiagnostic {
+  const json = extractPodcastJson(raw);
+  if (!json) {
+    return {
+      reason: "no_json_object",
+      lineCount: null,
+      spokenWordCount: null,
+      validationIssues: [],
+    };
+  }
+
+  let candidate: unknown;
+  try {
+    candidate = JSON.parse(json);
+  } catch {
+    return {
+      reason: "invalid_json",
+      lineCount: null,
+      spokenWordCount: null,
+      validationIssues: [],
+    };
+  }
+
+  const record =
+    candidate !== null && typeof candidate === "object"
+      ? (candidate as Record<string, unknown>)
+      : null;
+  const lines = Array.isArray(record?.["lines"]) ? record["lines"] : null;
+  const lineCount = lines?.length ?? null;
+  const spokenWordCount = lines
+    ? lines.reduce((total, line) => {
+        if (line === null || typeof line !== "object") return total;
+        const text = (line as Record<string, unknown>)["text"];
+        return typeof text === "string"
+          ? total + text.trim().split(/\s+/).filter(Boolean).length
+          : total;
+      }, 0)
+    : null;
+
+  const parsed = podcastSchema.safeParse(candidate);
+  if (parsed.success) {
+    return {
+      reason: "valid",
+      lineCount,
+      spokenWordCount,
+      validationIssues: [],
+    };
+  }
+
+  const validationIssues = parsed.error.issues.map((issue) => ({
+    path: issue.path.length ? issue.path.join(".") : "(root)",
+    code: issue.code,
+  }));
+  const insufficientWords =
+    lineCount !== null &&
+    lineCount >= 12 &&
+    lineCount <= 36 &&
+    parsed.error.issues.some(
+      (issue) => issue.code === "custom" && issue.path.join(".") === "lines",
+    );
+
+  return {
+    reason: insufficientWords ? "insufficient_spoken_words" : "schema_validation_failed",
+    lineCount,
+    spokenWordCount,
+    validationIssues,
+  };
 }
