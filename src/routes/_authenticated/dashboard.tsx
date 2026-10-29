@@ -30,6 +30,7 @@ import {
   Tag,
   Target,
   Trophy,
+  Zap,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -69,6 +70,9 @@ import { CampaignJourneyChip } from "@/components/CampaignJourney";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useCampaignJourney } from "@/hooks/useCampaignJourney";
 import { useDueReviewCount } from "@/hooks/useDueReviewCount";
+import { useNextStep } from "@/hooks/useNextStep";
+import { dailyChallengeGoal, pronunciationQuickWinDone } from "@/lib/dailyChallenge";
+import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import type { StudyPlanDay } from "@/lib/studyPlan";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
@@ -176,6 +180,18 @@ function DashboardNotifications({
   // it). Finishing the reading refreshes every query, this one included.
   const { data: profile } = useProfile();
   const { data: readingDone } = useDailyReadingDone(profile?.id);
+  // Reuse EVO’s server-side decision; the bell does not derive new pedagogy.
+  const { data: nextStep } = useNextStep({ enabled: !!profile?.id });
+  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
+  const quickWin = nextStep?.quickWin;
+  const quickWinVisible = !!quickWin &&
+    dashboardActionAvailable(quickWin.activity.to, indicators) &&
+    !(quickWin.cta === "Say 5 words out loud" && pronunciationQuickWinDone(todayActivities));
+  const challenge = nextStep?.quest;
+  const challengeGoal = challenge ? dailyChallengeGoal(challenge.resource.to, todayActivities) : null;
+  const challengeVisible = !!challenge &&
+    dashboardActionAvailable(challenge.resource.to, indicators) &&
+    !challengeGoal?.reached;
   // Today's goal steps still open: finishing every one also closes the study
   // day (user request, 2026-10-23: activities without a reminder). Only steps
   // already written for today; the bell never asks the AI to write them.
@@ -337,7 +353,18 @@ function DashboardNotifications({
     },
   ] as const;
   const activeItems = items.filter((item) => item.visible);
-  const hasNotifications = activeItems.length > 0;
+  // Actionable extras use the same availability rules as NextStepCard.
+  const recommendationItems = [
+    ...(quickWinVisible && quickWin ? [{
+      id: "quick-win", to: quickWin.activity.to, params: quickWin.activity.params,
+      label: `${translate("Quick Win")}: ${translate(quickWin.cta)}`, icon: Zap,
+    }] : []),
+    ...(challengeVisible && challenge ? [{
+      id: "take-challenge", to: challenge.resource.to, params: challenge.resource.params,
+      label: `${translate("Take the challenge")}: ${translate(challenge.resource.title)}`, icon: Trophy,
+    }] : []),
+  ];
+  const hasNotifications = activeItems.length > 0 || recommendationItems.length > 0;
   const lifeNotificationIds = ["life-tasks", "goal-steps", "habits"];
   const hasLifeNotifications = activeItems.some((item) => lifeNotificationIds.includes(item.id));
   const hasNonLifeNotifications = activeItems.some(
@@ -426,6 +453,26 @@ function DashboardNotifications({
                     <item.icon className="size-4" aria-hidden="true" />
                   </span>
                   <span>{translate(item.label)}</span>
+                </Link>
+              );
+            })}
+            {recommendationItems.map((item) => {
+              const content = (
+                <>
+                  <span className="grid size-8 place-items-center rounded-full bg-brand-green/15 text-brand-green">
+                    <item.icon className="size-4" aria-hidden="true" />
+                  </span>
+                  <span>{item.label}</span>
+                </>
+              );
+              const className = "grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent";
+              return item.params ? (
+                <Link key={item.id} to="/learning/$lessonId" params={item.params} className={className}>
+                  {content}
+                </Link>
+              ) : (
+                <Link key={item.id} to={item.to} className={className}>
+                  {content}
                 </Link>
               );
             })}
