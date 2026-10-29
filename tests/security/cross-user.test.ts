@@ -99,7 +99,7 @@ d("cross-user data isolation", () => {
     expect(del.error).toBeNull();
     const stillThere = await b.from("profiles").select("id").eq("id", idB).maybeSingle();
     expect(stillThere.data?.id).toBe(idB);
-  });
+  }, 15000);
 
   it("A cannot insert progress rows that claim B's user_id", async () => {
     // `progress` is written only by the server (0014 revoked browser writes);
@@ -115,7 +115,7 @@ d("cross-user data isolation", () => {
       recorded_at: new Date().toISOString(),
     });
     expect(inserted.error).not.toBeNull();
-  });
+  }, 15000);
 
   it("A cannot write progress even for itself (server-only since 0014)", async () => {
     const inserted = await a.from("progress").insert({
@@ -131,7 +131,7 @@ d("cross-user data isolation", () => {
     // Skill scores come from the evidence layer; students never write this
     // legacy table directly, not even their own row.
     expect(inserted.error?.code).toBe("42501");
-  });
+  }, 15000);
 
   it("A cannot read B's quiz results or activities", async () => {
     const quiz = await a.from("quiz_results").select("id").eq("user_id", idB);

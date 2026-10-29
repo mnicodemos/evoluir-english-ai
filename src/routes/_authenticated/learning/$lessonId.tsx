@@ -95,6 +95,7 @@ function LessonPage() {
   });
 
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
+  const [lessonAudioImageFailed, setLessonAudioImageFailed] = useState(false);
   // Remember which tab the user was on so leaving mid-lesson brings them back.
   const [activeTab, setActiveTab] = usePersistentState<string>(`lesson-tab:${lessonId}`, "summary");
 
@@ -478,12 +479,20 @@ function LessonPage() {
                   </p>
                 </div>
                 <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 md:gap-6">
-                  <img
-                    src={lessonAudioImageQuery.data?.imageUrl ?? "/study-books/1793031809285.jpg"}
-                    alt="EVO and Leo"
-                    className="mx-auto h-auto w-full rounded-xl object-contain"
-                    loading="lazy"
-                  />
+                  {lessonAudioImageQuery.data?.imageUrl && !lessonAudioImageFailed ? (
+                    <img
+                      src={lessonAudioImageQuery.data.imageUrl}
+                      alt="EVO and Leo"
+                      className="mx-auto h-auto w-full rounded-xl object-contain"
+                      loading="lazy"
+                      onError={() => setLessonAudioImageFailed(true)}
+                    />
+                  ) : (
+                    <div
+                      aria-hidden="true"
+                      className="min-h-48 w-full rounded-xl bg-muted animate-pulse"
+                    />
+                  )}
                   <div className="min-w-0 space-y-3">
                     <LessonPodcast
                       compact
