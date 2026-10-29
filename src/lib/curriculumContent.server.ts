@@ -609,7 +609,10 @@ export async function writeLesson(
     throw new Error(`The AI could not write all ${quizTotal} review questions. Please try again.`);
   }
   const existingQuizCount = repairLessonId
-    ? ((await supabase.from("quizzes").select("id", { count: "exact", head: true }).eq("lesson_id", repairLessonId)).count ?? 0)
+    ? ((await supabase
+        .from("quizzes")
+        .select("id", { count: "exact", head: true })
+        .eq("lesson_id", repairLessonId)).count ?? 0)
     : 0;
   const missingQuiz = quiz.slice(existingQuizCount);
   if (missingQuiz.length) {
