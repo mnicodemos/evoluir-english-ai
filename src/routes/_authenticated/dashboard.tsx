@@ -92,7 +92,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
         content: "Your daily English plan, permanent jewels and skill scores in one place.",
       },
       { property: "og:title", content: "Home - Evoluir+ English AI" },
-      { property: "og:description", content: "Your daily English plan, streak and skill scores." },
+      { property: "og:description", content: "Your daily English plan, permanent jewels and skill scores." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -591,27 +591,55 @@ function Dashboard() {
     },
     staleTime: 60 * 1000,
   });
-  const jewelNames = lang === "pt"
-    ? ["Bronze", "Prata", "Ouro", "Safira", "Rubi", "Esmeralda", "Ametista", "Pérola", "Obsidiana", "Diamante"]
-    : ["Bronze", "Silver", "Gold", "Sapphire", "Ruby", "Emerald", "Amethyst", "Pearl", "Obsidian", "Diamond"];
+  const jewelNames =
+    lang === "pt"
+      ? [
+          "Bronze",
+          "Prata",
+          "Ouro",
+          "Safira",
+          "Rubi",
+          "Esmeralda",
+          "Ametista",
+          "Pérola",
+          "Obsidiana",
+          "Diamante",
+        ]
+      : [
+          "Bronze",
+          "Silver",
+          "Gold",
+          "Sapphire",
+          "Ruby",
+          "Emerald",
+          "Amethyst",
+          "Pearl",
+          "Obsidian",
+          "Diamond",
+        ];
   const permanentJewelName =
-    permanentJewelIndex == null ? null : jewelNames[permanentJewelIndex] ?? null;
+    permanentJewelIndex == null ? null : (jewelNames[permanentJewelIndex] ?? null);
   const jewelThresholds = [1, 7, 14, 21, 28, 35, 42, 49, 56, 63];
   const nextJewelIndex = permanentJewelIndex == null ? 0 : permanentJewelIndex + 1;
   const nextJewelName = nextJewelIndex < jewelNames.length ? jewelNames[nextJewelIndex] : null;
   const nextJewelThreshold =
     nextJewelIndex < jewelThresholds.length ? jewelThresholds[nextJewelIndex] : null;
-  const nextJewelDetail = permanentJewelIndex == null
-    ? lang === "pt"
-      ? "Conquiste Bronze no próximo dia válido de estudo"
-      : "Earn Bronze on your next valid study day"
-    : nextJewelName && nextJewelThreshold != null
+  const nextJewelDetail =
+    permanentJewelIndex == null
       ? lang === "pt"
-        ? `Próxima: ${nextJewelName} · marco de ${nextJewelThreshold} dias consecutivos`
-        : `Next: ${nextJewelName} · ${nextJewelThreshold}-day streak milestone`
-      : lang === "pt"
-        ? "Todas as 10 joias conquistadas"
-        : "All 10 jewels earned";
+        ? "Conquiste Bronze no próximo dia válido de estudo"
+        : "Earn Bronze on your next valid study day"
+      : nextJewelName && nextJewelThreshold != null
+        ? streakDays >= nextJewelThreshold
+          ? lang === "pt"
+            ? `Próxima: ${nextJewelName} · reconstrua uma sequência de ${nextJewelThreshold} dias`
+            : `Next: ${nextJewelName} · rebuild a ${nextJewelThreshold}-day streak`
+          : lang === "pt"
+            ? `Próxima: ${nextJewelName} · marco de ${nextJewelThreshold} dias consecutivos`
+            : `Next: ${nextJewelName} · ${nextJewelThreshold}-day streak milestone`
+        : lang === "pt"
+          ? "Todas as 10 joias conquistadas"
+          : "All 10 jewels earned";
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
 
@@ -733,7 +761,11 @@ function Dashboard() {
                   <DashboardHeaderStat
                     icon={<Gem className="size-6" strokeWidth={2.2} />}
                     tone="coral"
-                    iconColor={permanentJewelIndex == null ? "hsl(var(--muted-foreground))" : getLeague(permanentJewelIndex * 7).from}
+                    iconColor={
+                      permanentJewelIndex == null
+                        ? "hsl(var(--muted-foreground))"
+                        : getLeague(permanentJewelIndex * 7).from
+                    }
                     label={lang === "pt" ? "Joias permanentes" : "Permanent Jewels"}
                     value={permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}
                     detail={nextJewelDetail}
@@ -742,7 +774,11 @@ function Dashboard() {
                         ? "As joias são conquistas permanentes registradas no banco. A sequência de estudos continua seguindo as regras atuais."
                         : "Jewels are permanent achievements stored in your account. Your study-streak rules remain unchanged."
                     }
-                    detailStyle={nextJewelIndex < jewelNames.length ? { color: getLeague(Math.max(0, (nextJewelThreshold ?? 1) - 1)).from } : undefined}
+                    detailStyle={
+                      nextJewelIndex < jewelNames.length
+                        ? { color: getLeague(nextJewelThreshold ?? 0).from }
+                        : undefined
+                    }
                   />
                 </div>
                 <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
