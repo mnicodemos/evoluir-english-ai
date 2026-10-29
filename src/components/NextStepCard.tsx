@@ -607,7 +607,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
           </div>
 
-          <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:px-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-l xl:border-t-0">
+          <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:px-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-t-0">
             {/* Top-right corner of the card (user request): level with the weekday
                 badge of Today's Progress (its header centres a 22 px icon inside
                 the card's padding) and in line with Keep improving's badge below
