@@ -10,9 +10,12 @@ export function musicRequestHeaders(
   return { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` };
 }
 
+export const MUSIC_PREMIUM_MESSAGE = "Music Lab is part of Premium.";
+
 /** A safe message per status; never shows raw server or provider details. */
 export function musicErrorMessage(status: number, serverMessage?: string | null): string {
   if (status === 401) return MUSIC_SIGN_IN_MESSAGE;
+  if (status === 403) return MUSIC_PREMIUM_MESSAGE;
   if (status === 429)
     return serverMessage?.includes("24 hours")
       ? serverMessage
