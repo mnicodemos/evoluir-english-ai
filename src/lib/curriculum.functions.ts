@@ -57,9 +57,7 @@ export const openCurriculumLesson = createServerFn({ method: "POST" })
         .from("quizzes")
         .select("id", { count: "exact", head: true })
         .eq("lesson_id", existing.id);
-      const needsQuizRepair = plan.isReviewTest
-        ? (count ?? 0) < REVIEW_TEST_QUESTIONS
-        : !count;
+      const needsQuizRepair = plan.isReviewTest ? (count ?? 0) < REVIEW_TEST_QUESTIONS : !count;
       if (needsQuizRepair) {
         await writeLesson(supabase, userId, plan, existing.id as string);
       }
