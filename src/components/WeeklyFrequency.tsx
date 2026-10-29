@@ -1,4 +1,5 @@
 import { Activity, CalendarDays, Check, Trophy } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
@@ -8,6 +9,7 @@ import { useCelebrate } from "@/hooks/useCelebrate";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
+import { supabase } from "@/integrations/supabase/client";
 
 type Props = {
   userId: string;
@@ -32,6 +34,21 @@ export function WeeklyFrequency({
   const weeklyGoal = daysPerWeek ?? 7;
   const { lang } = useUiLang();
   const labels = lang === "pt" ? LABELS_PT : LABELS_EN;
+
+  // All-time count from the authoritative history of credited valid study days.
+  const { data: totalStudyDays } = useQuery({
+    queryKey: ["total-credited-study-days", userId],
+    enabled: !!userId,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("study_days")
+        .select("day", { count: "exact", head: true })
+        .eq("user_id", userId);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
   const todayKey = dayFmt.format(new Date());
 
   // Build the 7 day keys of the current week (Sunday to Saturday) in study time zone.
@@ -86,6 +103,11 @@ export function WeeklyFrequency({
           <span className="font-semibold text-foreground">
             {studiedCount} {studiedCount === 1 ? (lang === "pt" ? "dia" : "day") : daysLabel}
           </span>
+          {totalStudyDays != null && (
+            <span>
+              · {totalStudyDays} {lang === "pt" ? "dias no total" : "total study days"}
+            </span>
+          )}
           {allStudied ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-semibold text-brand-green">
               <Check className="size-3" strokeWidth={3} aria-hidden="true" />
@@ -279,6 +301,11 @@ export function WeeklyFrequency({
                   ? "day active this week"
                   : "days active this week"}
             </p>
+            {totalStudyDays != null && (
+              <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
+                {totalStudyDays} {lang === "pt" ? "dias de estudo no total" : "total study days"}
+              </p>
+            )}
           </div>
         </div>
         <div className="mt-2 grid grid-cols-7 gap-1">
