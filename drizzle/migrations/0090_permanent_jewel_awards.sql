@@ -60,6 +60,7 @@ BEGIN
     (9, 'diamond', 63)
   ) AS milestone(jewel_index, jewel_code, required_streak_days)
   WHERE NEW.streak_days >= milestone.required_streak_days
+    AND COALESCE(OLD.streak_days, 0) < milestone.required_streak_days
   ON CONFLICT (user_id, jewel_index) DO NOTHING;
 
   RETURN NEW;
