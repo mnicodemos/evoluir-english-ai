@@ -65,9 +65,6 @@ import { DoneSeal } from "@/components/DoneSeal";
  * Adaptive next step. Everything shown here is decided server-side from the
  * student's own pedagogical data; the card only presents it.
  */
-/** A 1x1 transparent GIF: what the Dashboard image slot of the other screen size loads. */
-const EMPTY_PIXEL =
-  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { lang } = useUiLang();
@@ -78,7 +75,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { data: profile } = useProfile();
   const { data: homeImages } = useHomeImages();
   const desktopImage = homeImages?.desktop;
-  const mobileImage = homeImages?.mobile;
   const league = useWeeklyLeagueStanding(profile);
   const { data: todayActivities = [], isFetched: todayFetched } = useTodayActivities(profile?.id);
   const { data: studyPlan, isFetched: planFetched } = useQuery({
@@ -429,58 +425,31 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         className="dashboard-focus relative h-full min-w-0 overflow-hidden rounded-lg border border-border bg-card text-sidebar-foreground shadow-[var(--shadow-soft)] max-sm:-mt-1 max-sm:h-[calc(100%+0.25rem)]"
         aria-label={t("Your next step")}
       >
-        <div className="dashboard-evo-grid flex h-full min-w-0 flex-col sm:grid sm:grid-cols-[16rem_minmax(0,1fr)]">
+        {/* Phones show the desktop layout too (owner request, 2026-10-30: the same
+            image in the same place): the image on the left, the priority beside it. */}
+        <div className="dashboard-evo-grid grid h-full min-w-0 grid-cols-[minmax(0,42%)_minmax(0,1fr)] sm:grid-cols-[16rem_minmax(0,1fr)]">
           <div
-            className="relative h-auto w-full flex-none self-stretch overflow-hidden bg-transparent p-2.5 pb-0 sm:min-h-[13.5rem] sm:h-auto sm:p-0 lg:min-h-[10.5rem] xl:min-h-0"
+            className="relative min-h-[11.5rem] w-full self-stretch overflow-hidden bg-transparent sm:min-h-[13.5rem] lg:min-h-[10.5rem] xl:min-h-0"
             aria-hidden="true"
           >
-            {/* Mobile: the owner's whole banner, uncropped, inset from the card
-                edges with rounded corners — the same look as the desktop image. */}
-            {mobileImage ? (
-              <picture className="contents">
-                {/* An <img> hidden by CSS still downloads; on a wider screen this
-                    slot gets an empty pixel instead of the phone banner. */}
-                <source media="(min-width: 640px)" srcSet={EMPTY_PIXEL} />
+            <div className="absolute inset-2.5 flex overflow-hidden rounded-lg sm:inset-3">
+              {desktopImage ? (
                 <img
-                  src={mobileImage}
+                  src={desktopImage}
                   fetchPriority="high"
                   decoding="async"
                   alt=""
-                  width={1400}
-                  height={415}
-                  className="block h-auto w-full rounded-lg sm:hidden"
+                  width={1580}
+                  height={1180}
+                  className="block h-full w-full rounded-lg object-cover object-center"
                   onError={(event) => {
                     event.currentTarget.style.visibility = "hidden";
                   }}
                 />
-              </picture>
-            ) : (
-              <div
-                aria-hidden="true"
-                className="block aspect-[1400/415] w-full rounded-lg bg-muted animate-pulse sm:hidden"
-              />
-            )}
-            <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:rounded-lg">
-              {desktopImage ? (
-                <picture className="contents">
-                  <source media="(max-width: 639.98px)" srcSet={EMPTY_PIXEL} />
-                  <img
-                    src={desktopImage}
-                    fetchPriority="high"
-                    decoding="async"
-                    alt=""
-                    width={1580}
-                    height={1180}
-                    className="hidden sm:block sm:h-full sm:w-full sm:rounded-lg sm:object-cover sm:object-center"
-                    onError={(event) => {
-                      event.currentTarget.style.visibility = "hidden";
-                    }}
-                  />
-                </picture>
               ) : (
                 <div
                   aria-hidden="true"
-                  className="hidden h-full w-full animate-pulse rounded-lg bg-muted sm:block"
+                  className="h-full w-full animate-pulse rounded-lg bg-muted"
                 />
               )}
             </div>
@@ -491,7 +460,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               with room for the scope badge. From xl: top-aligned, the EVO label
               level with "Why this matters now" (same 12 px top padding and 22 px
               icon row; user request). */}
-          <div className="relative z-10 flex min-w-0 flex-col gap-2 px-3 py-2 max-sm:flex-1 max-sm:justify-center max-sm:gap-2 max-sm:py-2 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:px-3 xl:text-left">
+          <div className="relative z-10 flex min-w-0 flex-col justify-center gap-1.5 py-3 pl-1 pr-3 sm:gap-2 sm:justify-center sm:pb-4 sm:pt-10 xl:justify-start xl:pb-6 xl:pt-3 sm:pl-6 sm:pr-5 xl:order-2 xl:px-3 xl:text-left">
             {/* Top-right of the priority column below xl; from xl it moves to the
                 "Why this matters now" column (see the aside). */}
             {/* Coach label: white, with the AI icon in the brand colour (the
@@ -504,7 +473,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 strokeWidth={2.4}
                 aria-hidden="true"
               />
-              <span className="truncate xl:whitespace-normal">
+              <span className="sm:truncate xl:whitespace-normal">
                 EVO · {t("Your AI Learning Coach")}
               </span>
             </p>
@@ -516,7 +485,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Phones: the same padding above the coach label and below the last
                 line, so EVO sits as far from the image as the reason line from the
                 card's bottom, with a little more room under the label (user request). */}
-            <div className="mt-1 flex items-center justify-between gap-3 sm:mt-2 sm:block xl:mt-auto">
+            <div className="mt-1 sm:mt-2 xl:mt-auto">
               <div className="min-w-0 flex-1">
                 <div>
                   {/* No level badge here: next to the priority it read as part of it,
@@ -526,7 +495,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   <p className="whitespace-nowrap text-[11px] font-bold leading-none tracking-[0.08em] text-brand-green sm:text-xs">
                     {t("TODAY'S PRIORITY")}
                   </p>
-                  <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-2 sm:text-2xl xl:text-3xl">
+                  <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-xl font-bold leading-tight text-sidebar-foreground sm:mt-2 sm:text-2xl xl:text-3xl">
                     <PriorityIcon
                       className="size-5 shrink-0 text-warning sm:size-[1.375rem]"
                       aria-hidden="true"
@@ -535,72 +504,17 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   </h2>
                 </div>
               </div>
-              {/* Phones (user request): lower and wider, beside the priority, so
-                  the coach label above keeps its whole line. */}
-              {mainAvailable && (
-                <Button
-                  asChild
-                  className="h-9 w-[54%] shrink-0 self-center rounded-xl bg-brand-green px-4 text-sm font-bold text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:hidden"
-                >
-                  {data.activity.params ? (
-                    <Link to="/learning/$lessonId" params={data.activity.params}>
-                      <PriorityIcon className="size-4 shrink-0" aria-hidden="true" />
-                      {t("Practice now")}
-                      <ChevronRight strokeWidth={3} aria-hidden="true" />
-                    </Link>
-                  ) : (
-                    <Link to={data.activity.to}>
-                      <PriorityIcon className="size-4 shrink-0" aria-hidden="true" />
-                      {t("Practice now")}
-                      <ChevronRight strokeWidth={3} aria-hidden="true" />
-                    </Link>
-                  )}
-                </Button>
-              )}
             </div>
-            {/* Mobile-only action row: Quick Win + weekly league + Your trail. */}
-            {/* Glass pills (user request: more sophisticated than outlined ones).
-                The priority, pills and reason line breathe evenly through the
-                card's free height instead of crowding under the EVO label
-                (user report). */}
-            <div className="mt-1 flex flex-nowrap items-center gap-1.5 sm:hidden">
-              {pillsReady ? (
-                <>
-                  {quickWinButton ?? mobileReviewButton}
-                  {leagueButton}
-                  {mapButton}
-                </>
-              ) : (
-                [0, 1, 2].map((key) => (
-                  <span
-                    key={key}
-                    aria-hidden="true"
-                    className="h-7 flex-auto animate-pulse rounded-full border border-white/10 bg-white/[0.05]"
-                  />
-                ))
-              )}
-            </div>
-            {/* Mobile-only: one line with the real reason for today's priority.
-                Due word reviews live in the bell; a box here was clipped by the
-                card and showed only as a green line. */}
-            <p className="mt-1 flex items-center gap-1.5 text-[11px] leading-snug text-sidebar-foreground/75 sm:hidden">
-              <Lightbulb
-                className="size-3.5 shrink-0 text-warning"
-                strokeWidth={2.5}
-                aria-hidden="true"
-              />
-              <span className="min-w-0 truncate">{priorityText}</span>
-            </p>
-            <p className="mt-1 hidden whitespace-nowrap text-[clamp(0.625rem,0.85vw,0.75rem)] text-sidebar-foreground/70 sm:mt-3 sm:block">
+            <p className="mt-1 text-[11px] leading-snug text-sidebar-foreground/70 sm:mt-3 sm:whitespace-nowrap sm:text-[clamp(0.625rem,0.85vw,0.75rem)]">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
-            <p className="mt-2 hidden line-clamp-1 text-sm text-sidebar-foreground/85 sm:mt-1 sm:block">
+            <p className="mt-1 line-clamp-2 text-xs text-sidebar-foreground/85 sm:mt-1 sm:line-clamp-1 sm:text-sm">
               {t("How to practice")}: <span className="font-semibold">{data.activity.title}</span>
             </p>
             {mainAvailable && (
               <Button
                 asChild
-                className="mt-2 hidden w-full max-w-full shrink-0 bg-brand-green text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-2 sm:flex sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold lg:w-[90%] xl:mx-auto xl:w-[90%]"
+                className="mt-2 flex h-9 w-full max-w-full shrink-0 rounded-xl bg-brand-green text-sm font-bold text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-2 sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold lg:w-[90%] xl:mx-auto xl:w-[90%]"
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
@@ -616,6 +530,29 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   </Link>
                 )}
               </Button>
+            )}
+          </div>
+
+          {/* Mobile-only action row: Quick Win + weekly league + Your trail. */}
+          {/* Glass pills (user request: more sophisticated than outlined ones).
+              The priority, pills and reason line breathe evenly through the
+              card's free height instead of crowding under the EVO label
+              (user report). */}
+          <div className="col-span-2 flex flex-nowrap items-center gap-1.5 px-2.5 pb-2.5 sm:hidden">
+            {pillsReady ? (
+              <>
+                {quickWinButton ?? mobileReviewButton}
+                {leagueButton}
+                {mapButton}
+              </>
+            ) : (
+              [0, 1, 2].map((key) => (
+                <span
+                  key={key}
+                  aria-hidden="true"
+                  className="h-7 flex-auto animate-pulse rounded-full border border-white/10 bg-white/[0.05]"
+                />
+              ))
             )}
           </div>
 
