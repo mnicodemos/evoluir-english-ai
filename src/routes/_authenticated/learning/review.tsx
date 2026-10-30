@@ -118,6 +118,7 @@ function ReviewPage() {
         </Link>
 
         <PageHeader
+          guide="vocabulary"
           icon={Repeat}
           accent="violet"
           eyebrow={<>Word review</>}

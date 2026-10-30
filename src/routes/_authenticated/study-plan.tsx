@@ -125,6 +125,7 @@ function StudyPlanPage() {
     <AppShell mobileOneScreen>
       <div className="space-y-3 lg:space-y-4 xl:grid xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,1fr)] xl:items-start xl:gap-4 xl:space-y-0">
         <PageHeader
+          guide="plan"
           icon={CalendarDays}
           accent="pink"
           className="xl:col-span-2"

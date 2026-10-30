@@ -262,6 +262,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
       <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-3">
         {/* The same page header as the other pages (user request). */}
         <PageHeader
+          guide="teacher"
           icon={Sparkles}
           className="min-w-0"
           title={t("AI Teacher")}

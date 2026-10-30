@@ -7,6 +7,7 @@ import {
   CalendarCheck,
   ChartLine,
   Check,
+  ChevronDown,
   ChevronRight,
   Crown,
   Gem,
@@ -14,6 +15,7 @@ import {
   Headphones,
   House,
   Lightbulb,
+  ListChecks,
   MessageSquareText,
   PenLine,
   Search,
@@ -38,7 +40,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { APP_GUIDE, type GuideIcon } from "@/lib/appGuide";
+import { APP_GUIDE, GUIDE_GROUPS, type GuideIcon } from "@/lib/appGuide";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -70,6 +72,7 @@ const ICONS: Record<GuideIcon, typeof House> = {
   business: Briefcase,
   progress: ChartLine,
   settings: Settings,
+  method: ListChecks,
 };
 
 /**
@@ -86,6 +89,8 @@ function GuidePage() {
   // its steps and tip, in the language on screen, ignoring accents and case.
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<string[]>([]);
+  // Steps past GUIDE_MAX_STEPS sit behind More details (a search shows them all).
+  const [moreOpen, setMoreOpen] = useState<string[]>([]);
   const fold = (text: string) =>
     text
       .normalize("NFD")
@@ -95,7 +100,13 @@ function GuidePage() {
   const sections = needle
     ? APP_GUIDE.filter((section) =>
         fold(
-          [section.title, section.what, ...section.steps, section.tip ?? ""]
+          [
+            section.title,
+            section.what,
+            ...section.steps,
+            ...(section.more ?? []),
+            section.tip ?? "",
+          ]
             .map((text) => t(text))
             .join(" "),
         ).includes(needle),
@@ -107,6 +118,16 @@ function GuidePage() {
     // sections follows needle; listing it would reopen on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [needle]);
+  // The "?" of each page opens /guide#<section>: open that section and show it.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!APP_GUIDE.some((section) => section.id === id)) return;
+    setOpen([id]);
+    const frame = requestAnimationFrame(() =>
+      document.getElementById(id)?.scrollIntoView({ block: "start" }),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   return (
     <AppShell>
@@ -137,82 +158,119 @@ function GuidePage() {
         </p>
       ) : null}
 
-      <Accordion
-        type="multiple"
-        value={open}
-        onValueChange={setOpen}
-        className={cn("card-soft mt-4 px-4 sm:px-5", sections.length === 0 && "hidden")}
-      >
-        {sections.map((section) => {
-          const Icon = ICONS[section.icon];
-          return (
-            <AccordionItem
-              key={section.id}
-              value={section.id}
-              id={section.id}
-              className="scroll-mt-4"
+      {GUIDE_GROUPS.map((group) => {
+        const groupSections = sections.filter((section) => section.group === group.id);
+        if (groupSections.length === 0) return null;
+        return (
+          <section key={group.id} className="mt-5">
+            <h2 className="px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-green">
+              {t(group.title)}
+            </h2>
+            <Accordion
+              type="multiple"
+              value={open}
+              onValueChange={setOpen}
+              className="card-soft mt-2 px-4 sm:px-5"
             >
-              <AccordionTrigger className="gap-3 py-4 text-left hover:no-underline">
-                <span className="flex min-w-0 items-center gap-3">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-green/12 text-brand-green">
-                    <Icon className="size-5" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="flex items-center gap-1.5 text-sm font-semibold">
-                      {t(section.title)}
-                      {section.premium && !premium ? (
-                        <Crown className="size-3.5 text-amber-400" aria-label="Premium" />
-                      ) : null}
-                    </span>
-                    <span className="block text-xs font-normal text-muted-foreground">
-                      {t(section.what)}
-                    </span>
-                  </span>
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-green">
-                  {section.anyOf ? t("Any one of these") : t("How to use it")}
-                </p>
-                <ol className="mt-2 space-y-2 text-sm">
-                  {section.steps.map((step, index) => (
-                    <li key={step} className="flex gap-2.5">
-                      {section.anyOf ? (
-                        <Check
-                          className="mt-0.5 size-4 shrink-0 text-brand-green"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <span className="grid size-5 shrink-0 place-items-center rounded-full bg-secondary text-[11px] font-bold">
-                          {index + 1}
-                        </span>
-                      )}
-                      <span>{t(step)}</span>
-                    </li>
-                  ))}
-                </ol>
-                {section.tip ? (
-                  <p className="mt-3 flex gap-2 rounded-lg bg-warning/10 p-2.5 text-xs">
-                    <Lightbulb className="size-4 shrink-0 text-warning" aria-hidden="true" />
-                    <span>
-                      <span className="font-semibold">{t("Tip")}:</span> {t(section.tip)}
-                    </span>
-                  </p>
-                ) : null}
-                {section.to ? (
-                  <Link
-                    to={section.to}
-                    className="mt-3 inline-flex items-center gap-0.5 text-sm font-semibold text-brand-green"
+              {groupSections.map((section) => {
+                const Icon = ICONS[section.icon];
+                const showMore = Boolean(needle) || moreOpen.includes(section.id);
+                return (
+                  <AccordionItem
+                    key={section.id}
+                    value={section.id}
+                    id={section.id}
+                    className="scroll-mt-4"
                   >
-                    {t("Open")} {t(section.title)}
-                    <ChevronRight className="size-4" aria-hidden="true" />
-                  </Link>
-                ) : null}
-              </AccordionContent>
-            </AccordionItem>
-          );
-        })}
-      </Accordion>
+                    <AccordionTrigger className="gap-3 py-4 text-left hover:no-underline">
+                      <span className="flex min-w-0 items-center gap-3">
+                        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-green/12 text-brand-green">
+                          <Icon className="size-5" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="flex items-center gap-1.5 text-sm font-semibold">
+                            {t(section.title)}
+                            {section.premium && !premium ? (
+                              <Crown className="size-3.5 text-amber-400" aria-label="Premium" />
+                            ) : null}
+                          </span>
+                          <span className="block text-xs font-normal text-muted-foreground">
+                            {t(section.what)}
+                          </span>
+                        </span>
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-green">
+                        {section.anyOf ? t("Any one of these") : t("How to use it")}
+                      </p>
+                      <ol className="mt-2 space-y-2 text-sm">
+                        {[...section.steps, ...(showMore ? (section.more ?? []) : [])].map(
+                          (step, index) => (
+                            <li key={step} className="flex gap-2.5">
+                              {section.anyOf ? (
+                                <Check
+                                  className="mt-0.5 size-4 shrink-0 text-brand-green"
+                                  aria-hidden="true"
+                                />
+                              ) : (
+                                <span className="grid size-5 shrink-0 place-items-center rounded-full bg-secondary text-[11px] font-bold">
+                                  {index + 1}
+                                </span>
+                              )}
+                              <span>{t(step)}</span>
+                            </li>
+                          ),
+                        )}
+                      </ol>
+                      {section.more?.length && !needle ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setMoreOpen((ids) =>
+                              ids.includes(section.id)
+                                ? ids.filter((id) => id !== section.id)
+                                : [...ids, section.id],
+                            )
+                          }
+                          className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                          aria-expanded={showMore}
+                        >
+                          {showMore ? t("Fewer details") : t("More details")}
+                          <ChevronDown
+                            className={cn(
+                              "size-3.5 transition-transform",
+                              showMore && "rotate-180",
+                            )}
+                            aria-hidden="true"
+                          />
+                        </button>
+                      ) : null}
+                      {section.tip ? (
+                        <p className="mt-3 flex gap-2 rounded-lg bg-warning/10 p-2.5 text-xs">
+                          <Lightbulb className="size-4 shrink-0 text-warning" aria-hidden="true" />
+                          <span>
+                            <span className="font-semibold">{t("Tip")}:</span> {t(section.tip)}
+                          </span>
+                        </p>
+                      ) : null}
+                      {section.to ? (
+                        <Link
+                          to={section.to}
+                          className="mt-3 inline-flex items-center gap-0.5 text-sm font-semibold text-brand-green"
+                        >
+                          {t("Open")} {t(section.title)}
+                          <ChevronRight className="size-4" aria-hidden="true" />
+                        </Link>
+                      ) : null}
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </section>
+        );
+      })}
     </AppShell>
   );
 }

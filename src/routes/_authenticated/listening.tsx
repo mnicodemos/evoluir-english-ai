@@ -519,6 +519,7 @@ function ListeningPage() {
     <AppShell mobileOneScreen>
       <div className="space-y-6">
         <PageHeader
+          guide="listening"
           icon={Headphones}
           accent="sky"
           eyebrow={

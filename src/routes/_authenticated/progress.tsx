@@ -116,7 +116,7 @@ function ProgressPage() {
 
   return (
     <AppShell mobileOneScreen>
-      <PageHeader icon={TrendingUp} title={t("My Progress")} />
+      <PageHeader guide="progress" icon={TrendingUp} title={t("My Progress")} />
 
       <div className="mt-3 sm:mt-4">
         {isLoading ? (

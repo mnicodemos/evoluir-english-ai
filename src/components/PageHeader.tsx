@@ -1,7 +1,10 @@
-import type { LucideIcon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { CircleHelp, type LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { ACCENTS, type Accent } from "@/lib/accents";
+import { uiPt } from "@/lib/uiDictionary";
+import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 /**
@@ -9,7 +12,8 @@ import { cn } from "@/lib/utils";
  * elegant look across the app): the page's icon in a tinted tile (smaller on
  * phones, so the one-screen pages keep their room),
  * a small brand-coloured eyebrow, the title and its line, actions on the right
- * and anything else (pills, level chips) under the line.
+ * and anything else (pills, level chips) under the line. `guide` adds a "?"
+ * that opens that page's section of the App guide (/guide#<id>).
  */
 export function PageHeader({
   icon: Icon,
@@ -19,6 +23,7 @@ export function PageHeader({
   description,
   descriptionClassName,
   actions,
+  guide,
   className,
   children,
 }: {
@@ -29,12 +34,17 @@ export function PageHeader({
   description?: ReactNode;
   descriptionClassName?: string;
   actions?: ReactNode;
+  /** An App guide section id (src/lib/appGuide.ts). */
+  guide?: string;
   className?: string;
   children?: ReactNode;
 }) {
   // Phones: once the header scrolls away, a compact glass bar keeps the page's
   // name on top, like a native app's large title (user request).
   const ref = useRef<HTMLElement>(null);
+  const { lang } = useUiLang();
+  const helpLabel =
+    lang === "pt" ? (uiPt["How this page works"] ?? "How this page works") : "How this page works";
   const [compact, setCompact] = useState(false);
   useEffect(() => {
     const node = ref.current;
@@ -93,7 +103,22 @@ export function PageHeader({
           ) : null}
           {children}
         </div>
-        {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+        {actions || guide ? (
+          <div className="flex shrink-0 items-center gap-2">
+            {actions}
+            {guide ? (
+              <Link
+                to="/guide"
+                hash={guide}
+                aria-label={helpLabel}
+                title={helpLabel}
+                className="grid size-9 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+              >
+                <CircleHelp className="size-[1.125rem]" aria-hidden="true" />
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
       </header>
     </>
   );

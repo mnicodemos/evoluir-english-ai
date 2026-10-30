@@ -165,6 +165,7 @@ function BusinessPage() {
     <AppShell>
       <div className="space-y-4">
         <PageHeader
+          guide="business"
           icon={Briefcase}
           title={<>Business English</>}
           description={
