@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { History, Loader2, Trophy, Users } from "lucide-react";
+import { History, Loader2, TrendingUp, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -8,6 +8,7 @@ import evoLeagueSymbol from "@/assets/evo-liga-simbolo.webp";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AppShell } from "@/components/AppShell";
 import { ProofOfProgressMission } from "@/components/league/ProofOfProgressMission";
+import { useWeeklyLeagueStanding, weekXpLine } from "@/components/WeeklyLeagueSummary";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,7 @@ import { findLevel, leagueLevelOf } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
+import { RANKING_MIN_MEMBERS, rankingOpen, type WeekXpSummary } from "@/lib/weekXp";
 
 export const Route = createFileRoute("/_authenticated/league")({
   head: () => ({
@@ -57,6 +59,9 @@ function League() {
   const me = rows.find((row) => row.is_me);
   const joined = me?.joined ?? profile?.league_opt_in ?? false;
   const ranking = rows.filter((row) => row.joined);
+  // Your week until the league has enough students for a ranking (product review, 2026-10-31).
+  const { week } = useWeeklyLeagueStanding(profile);
+  const showRanking = rankingOpen(ranking.length);
 
   async function setJoined(value: boolean) {
     if (!profile) return;
@@ -101,7 +106,14 @@ function League() {
           <ProofOfProgressMission />
         </div>
 
-        <section className="card-soft space-y-2 p-3 sm:p-5">
+        {!showRanking && !isLoading && !loadError ? <YourWeek week={week} /> : null}
+
+        <section
+          className={cn(
+            "card-soft space-y-2 p-3 sm:p-5",
+            !showRanking && !isLoading && !loadError && "hidden",
+          )}
+        >
           <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
             <Trophy className="size-4 text-amber-400 sm:size-5" />
             Ranking
@@ -195,6 +207,12 @@ function League() {
                 ? "Other students at your level see your first name and initial, and your XP."
                 : "You are not in the ranking. Join to appear with your first name and initial."}
             </p>
+            {!showRanking ? (
+              <p className="text-xs text-muted-foreground">
+                <span>The ranking with other students opens when your level&apos;s league has</span>{" "}
+                <span>{RANKING_MIN_MEMBERS}</span> <span>students taking part.</span>
+              </p>
+            ) : null}
             <Button
               size="sm"
               variant={joined ? "outline" : "default"}
@@ -222,6 +240,47 @@ function League() {
         </aside>
       </div>
     </AppShell>
+  );
+}
+
+/**
+ * Your week (product review, 2026-10-31): with few students per level a ranking
+ * only says "you are alone", so the student's own XP against last week and their
+ * best week leads the page until the league reaches RANKING_MIN_MEMBERS.
+ */
+function YourWeek({ week }: { week: WeekXpSummary }) {
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const ahead = week.lastWeek > 0 && week.delta >= 0;
+  return (
+    <section className="card-soft space-y-3 p-4 sm:p-5">
+      <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
+        <TrendingUp className="size-4 text-brand-green sm:size-5" />
+        {t("Weekly XP")}
+      </h2>
+      <p className="flex items-baseline gap-1.5">
+        <span className="font-display text-4xl font-bold tabular-nums">{week.thisWeek}</span>
+        <span className="text-sm text-muted-foreground">{t("XP this week")}</span>
+      </p>
+      <p className={cn("text-sm font-medium", ahead || week.record ? "text-brand-green" : "")}>
+        {weekXpLine(week, t)}
+      </p>
+      <dl className="grid grid-cols-2 gap-2 text-sm">
+        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+          <dt className="text-xs text-muted-foreground">{t("Last week")}</dt>
+          <dd className="mt-0.5 font-semibold tabular-nums">{week.lastWeek} XP</dd>
+        </div>
+        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+          <dt className="text-xs text-muted-foreground">{t("Your best week")}</dt>
+          <dd className="mt-0.5 font-semibold tabular-nums">
+            {Math.max(week.best, week.thisWeek)} XP
+          </dd>
+        </div>
+      </dl>
+      <p className="text-xs text-muted-foreground">
+        {t("Beat your own last week: every lesson, text, conversation and review adds XP.")}
+      </p>
+    </section>
   );
 }
 

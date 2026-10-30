@@ -2070,6 +2070,19 @@ const baseUiPt: Record<string, string> = {
 
   // Weekly league
   "Weekly league": "Liga semanal",
+  "Weekly XP": "XP da semana",
+  "XP this week": "XP nesta semana",
+  "Last week": "Semana passada",
+  "Your best week": "Sua melhor semana",
+  "Your best week so far": "Sua melhor semana até agora",
+  "Every activity earns XP": "Toda atividade vale XP",
+  "vs last week": "a mais que na semana passada",
+  "to beat last week": "para superar a semana passada",
+  "The ranking with other students opens when your level's league has":
+    "O ranking com outros alunos abre quando a liga do seu nível tiver",
+  "students taking part.": "alunos participando.",
+  "Beat your own last week: every lesson, text, conversation and review adds XP.":
+    "Supere a sua semana passada: cada lição, texto, conversa e revisão soma XP.",
   "Monday to Sunday · resets every Monday": "Segunda a domingo · recomeça toda segunda",
   Ranking: "Ranking",
   "You are the only one in your level's league this week. Each level has its own league, so students at other levels compete in theirs.":

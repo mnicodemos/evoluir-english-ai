@@ -1,15 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { Medal } from "lucide-react";
+import { Medal, TrendingUp } from "lucide-react";
 
 import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
 import { leagueLevelOf } from "@/lib/level";
+import { rankingOpen, weekXpSummary } from "@/lib/weekXp";
 
 /**
- * Dashboard header cell: the student's place in this week's league (same
- * weekly_league ranking and query key as the league page), or an invitation to
- * join. Uses a medal (ranking) icon: the trophy already marks the weekly goal in
- * "Your learning rhythm", and the league artwork stays on the league page.
+ * Dashboard header cell: "Your week" (product review, 2026-10-31), the
+ * student's XP this week against last week, until their league has enough
+ * students for a ranking (rankingOpen); then their place in this week's league
+ * (same weekly_league ranking and query key as the league page). Uses a medal
+ * for the ranking: the trophy already marks the weekly goal in "Your learning
+ * rhythm", and the league artwork stays on the league page.
  */
 type LeagueProfile = { id: string; level: string | null; max_level?: string | null };
 
@@ -25,14 +28,47 @@ export function useWeeklyLeagueStanding(profile: LeagueProfile | null | undefine
     },
     staleTime: 5 * 60 * 1000,
   });
+  // The student's own weeks (weekly_league_history, migration 0078), for Your week.
+  const { data: weeks } = useQuery({
+    queryKey: ["week-xp-history", profile?.id],
+    enabled: !!profile?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      // Not in the generated Supabase types until Lovable regenerates them.
+      const rpc = supabase.rpc as unknown as (
+        name: string,
+        args: { p_weeks: number },
+      ) => Promise<{ data: { xp: number }[] | null; error: { message: string } | null }>;
+      const { data, error } = await rpc("weekly_league_history", { p_weeks: 8 });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   const me = rows?.find((row) => row.is_me);
+  const xp = me?.xp ?? 0;
+  const total = rows?.filter((row) => row.joined).length ?? 0;
+  const joined = !!me?.joined;
   return {
     loaded: !!rows,
-    joined: !!me?.joined,
+    joined,
     rank: me?.rank_position ?? null,
-    xp: me?.xp ?? 0,
-    total: rows?.filter((row) => row.joined).length ?? 0,
+    xp,
+    total,
+    /** Whether the ranking among students is shown (joined, and enough students). */
+    ranked: joined && rankingOpen(total),
+    week: weekXpSummary(weeks ?? [], rows ? xp : undefined),
   };
+}
+
+/** One line on Your week: against last week, or how XP is earned before there is one. */
+export function weekXpLine(
+  week: { lastWeek: number; delta: number; record: boolean },
+  translate: (label: string) => string,
+): string {
+  if (week.record) return translate("Your best week so far");
+  if (week.lastWeek <= 0) return translate("Every activity earns XP");
+  if (week.delta >= 0) return `+${week.delta} XP ${translate("vs last week")}`;
+  return `${-week.delta} XP ${translate("to beat last week")}`;
 }
 
 export type LeagueMedal = "gold" | "silver" | "bronze" | "grey";
@@ -62,7 +98,20 @@ export function WeeklyLeagueSummary({
   profile: LeagueProfile;
   translate: (label: string) => string;
 }) {
-  const { joined, total, rank, xp } = useWeeklyLeagueStanding(profile);
+  const { total, rank, xp, joined, ranked, week } = useWeeklyLeagueStanding(profile);
+
+  if (!ranked) {
+    return (
+      <DashboardHeaderStat
+        icon={<TrendingUp className="size-6" strokeWidth={2.2} />}
+        tone={week.lastWeek > 0 && week.delta >= 0 ? "green" : "grey"}
+        label={translate("Weekly XP")}
+        value={`${week.thisWeek} XP`}
+        detail={weekXpLine(week, translate)}
+        to="/league"
+      />
+    );
+  }
 
   return (
     <DashboardHeaderStat
