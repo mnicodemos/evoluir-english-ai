@@ -29,6 +29,7 @@ import {
 
 import { useEffect, useState } from "react";
 
+import { JewelsCard } from "@/components/JewelsCard";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -245,6 +246,11 @@ function GuidePage() {
                             aria-hidden="true"
                           />
                         </button>
+                      ) : null}
+                      {section.jewels ? (
+                        <div className="mt-3">
+                          <JewelsCard translate={t} />
+                        </div>
                       ) : null}
                       {section.tip ? (
                         <p className="mt-3 flex gap-2 rounded-lg bg-warning/10 p-2.5 text-xs">

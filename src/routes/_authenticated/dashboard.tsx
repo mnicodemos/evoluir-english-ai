@@ -47,6 +47,7 @@ import { useLife } from "@/hooks/useLife";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
+import { JewelsPopover } from "@/components/JewelsCard";
 import { getLeague } from "@/components/LeagueBadge";
 import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
@@ -795,26 +796,33 @@ function Dashboard() {
                       like the desktop one (user request); the bell closes it in
                       its own grey circle. */}
                   <div className="flex h-10 items-center gap-0 rounded-full border border-white/10 bg-white/[0.04] p-1 backdrop-blur-xl">
-                    <span
-                      className="flex items-center gap-1 pl-1.5 pr-0.5"
-                      role="img"
-                      title={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
-                      aria-label={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
-                    >
-                      <Gem
-                        className="size-5 shrink-0"
-                        style={{
-                          color:
-                            permanentJewelIndex == null
-                              ? "hsl(var(--muted-foreground))"
-                              : getLeague(permanentJewelIndex * 7).from,
-                        }}
-                        strokeWidth={2.4}
-                        aria-hidden="true"
-                      />
-                      <span className="font-display text-sm font-bold" aria-hidden="true">
-                        {permanentJewelIndex == null ? 0 : permanentJewelIndex + 1}
-                      </span>
+                    <span className="shrink-0">
+                      <JewelsPopover
+                        translate={t}
+                        label={lang === "pt" ? "Ver as joias" : "See the jewels"}
+                      >
+                        <span
+                          className="flex items-center gap-1 pl-1.5 pr-0.5"
+                          role="img"
+                          title={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
+                          aria-label={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
+                        >
+                          <Gem
+                            className="size-5 shrink-0"
+                            style={{
+                              color:
+                                permanentJewelIndex == null
+                                  ? "hsl(var(--muted-foreground))"
+                                  : getLeague(permanentJewelIndex * 7).from,
+                            }}
+                            strokeWidth={2.4}
+                            aria-hidden="true"
+                          />
+                          <span className="font-display text-sm font-bold" aria-hidden="true">
+                            {permanentJewelIndex == null ? 0 : permanentJewelIndex + 1}
+                          </span>
+                        </span>
+                      </JewelsPopover>
                     </span>
                     {/* Tomato before the weather on phones (user request). */}
                     <FocusHeaderButton translate={t} placement="mobile" />
@@ -854,37 +862,43 @@ function Dashboard() {
               </div>
               <div className="grid h-full min-w-0 grid-cols-2 items-stretch gap-3">
                 <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
-                  <DashboardHeaderStat
-                    icon={<Gem className="size-6" strokeWidth={2.2} />}
-                    tone="coral"
-                    iconColor={
-                      permanentJewelIndex == null
-                        ? "hsl(var(--muted-foreground))"
-                        : getLeague(permanentJewelIndex * 7).from
-                    }
-                    label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
-                    value={
-                      permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
-                    }
-                    detail={nextJewelDetail}
-                    detailIcon={
-                      <ArrowUpRight
-                        className="size-3 shrink-0"
-                        style={{
-                          color:
-                            nextJewelIndex < jewelNames.length
-                              ? getLeague(nextJewelThreshold ?? 0).from
-                              : undefined,
-                        }}
-                        aria-hidden="true"
-                      />
-                    }
-                    hint={
-                      lang === "pt"
-                        ? "As joias são conquistas permanentes registradas no banco. A sequência de estudos continua seguindo as regras atuais."
-                        : "Jewels are permanent achievements stored in your account. Your study-streak rules remain unchanged."
-                    }
-                  />
+                  {/* Opens the ten jewels in a popover (owner request, 2026-10-31). */}
+                  <JewelsPopover
+                    translate={t}
+                    label={lang === "pt" ? "Ver as joias" : "See the jewels"}
+                  >
+                    <DashboardHeaderStat
+                      icon={<Gem className="size-6" strokeWidth={2.2} />}
+                      tone="coral"
+                      iconColor={
+                        permanentJewelIndex == null
+                          ? "hsl(var(--muted-foreground))"
+                          : getLeague(permanentJewelIndex * 7).from
+                      }
+                      label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
+                      value={
+                        permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
+                      }
+                      detail={nextJewelDetail}
+                      detailIcon={
+                        <ArrowUpRight
+                          className="size-3 shrink-0"
+                          style={{
+                            color:
+                              nextJewelIndex < jewelNames.length
+                                ? getLeague(nextJewelThreshold ?? 0).from
+                                : undefined,
+                          }}
+                          aria-hidden="true"
+                        />
+                      }
+                      hint={
+                        lang === "pt"
+                          ? "As joias são conquistas permanentes registradas no banco. A sequência de estudos continua seguindo as regras atuais."
+                          : "Jewels are permanent achievements stored in your account. Your study-streak rules remain unchanged."
+                      }
+                    />
+                  </JewelsPopover>
                 </div>
                 <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
                   <WeeklyLeagueSummary profile={profile} translate={t} />

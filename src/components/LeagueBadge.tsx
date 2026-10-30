@@ -102,6 +102,19 @@ const LEAGUES: (Omit<League, "index"> & { pt: string })[] = [
 
 export const DAYS_PER_LEAGUE = 7;
 
+/**
+ * The ten jewels with the days in a row that grant each (Bronze on the first
+ * study day, then every 7 days); the same thresholds as the permanent-jewel
+ * trigger (migrations 0090-0093) and the Dashboard.
+ */
+export const JEWELS = LEAGUES.map((jewel, index) => ({
+  index,
+  name: jewel.name,
+  namePt: jewel.pt,
+  color: jewel.from,
+  days: index === 0 ? 1 : index * DAYS_PER_LEAGUE,
+}));
+
 export function getLeague(streakDays: number): League & { nextIn: number; progress: number } {
   const step = Math.floor(Math.max(0, streakDays) / DAYS_PER_LEAGUE);
   const index = Math.min(step, LEAGUES.length - 1);

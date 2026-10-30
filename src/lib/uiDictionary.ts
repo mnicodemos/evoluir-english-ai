@@ -2321,8 +2321,8 @@ const baseUiPt: Record<string, string> = {
   "Adjust my plan": "Ajustar meu plano",
   "Save and rebuild my week": "Salvar e refazer minha semana",
   "Days per week": "Dias por semana",
-  "Your weekly plan earns the 3 gold stars. Jewels need 7 study days in a row (one missed day a week is protected), so study more days to climb them.":
-    "Cumprir seu plano da semana vale as 3 estrelas douradas. As joias pedem 7 dias seguidos de estudo (1 falta por semana é protegida): estude mais dias para subir de joia.",
+  "Your weekly plan sets your learning rhythm. Jewels need study days in a row (one missed day a week is protected), so study more days to climb them.":
+    "Seu plano da semana define o seu ritmo de aprendizado. As joias pedem dias seguidos de estudo (1 falta por semana é protegida): estude mais dias para subir de joia.",
   "Week complete!": "Semana concluída!",
   "You did every day of this week's plan. A new week starts on Monday.":
     "Você fez todos os dias do plano desta semana. Uma nova semana começa na segunda-feira.",

@@ -52,6 +52,8 @@ export type GuideSection = {
   /** The steps are alternatives (any one is enough), shown as a list, not in order. */
   anyOf?: boolean;
   tip?: string;
+  /** Shows the ten jewels card (JewelsCard) under the steps. */
+  jewels?: boolean;
   /** Where the "Open" button goes; none for settings spread across the app. */
   to?: string;
   premium?: boolean;
@@ -269,7 +271,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Choose 2, 3, 5 or 7 days a week and your daily minutes.",
       "Follow the activity of each day; done days are ticked.",
       "A new plan starts every Monday, and its order stays the same all week.",
-      "Reaching your weekly plan lights the three gold stars.",
+      "Your learning rhythm on the Dashboard shows how many days of your plan you studied this week.",
     ],
     to: "/study-plan",
   },
@@ -293,17 +295,18 @@ export const APP_GUIDE: GuideSection[] = [
     to: "/dashboard",
   },
   {
-    id: "streak",
+    id: "jewels",
     group: "start",
     icon: "streak",
-    title: "Streak, jewels and stars",
-    what: "How your consistency is counted.",
+    title: "Your jewels",
+    what: "Jewels reward studying on days in a row, and once earned they are yours for good.",
     steps: [
       "Close your study day with any one of the activities in What counts as a study day.",
-      "Days in a row raise your streak and change its jewel; one missed day a week is protected.",
-      "The stars in Your learning rhythm light up when you reach your own weekly plan.",
+      "Your first study day earns Bronze; then each 7 days in a row earn the next jewel, up to Diamond at 63.",
+      "A jewel you earn stays with you, even if your run of days breaks; one missed day a week is protected.",
+      "The Dashboard shows your highest jewel and how many days are left for the next one.",
     ],
-    to: "/dashboard",
+    jewels: true,
   },
   {
     id: "league",

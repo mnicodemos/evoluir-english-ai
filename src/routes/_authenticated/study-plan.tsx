@@ -253,9 +253,9 @@ function StudyPlanPage() {
                       onChange={(v) => setDaysPerWeek(Number(v))}
                     />
                     {/* The rule is told where the plan is chosen (user request): the plan
-                        earns the weekly stars, jewels need more days in a row. */}
+                        sets the weekly rhythm, jewels need more days in a row. */}
                     <p className="text-[11px] leading-snug text-muted-foreground sm:pl-[8rem] sm:text-xs">
-                      Your weekly plan earns the 3 gold stars. Jewels need 7 study days in a row
+                      Your weekly plan sets your learning rhythm. Jewels need study days in a row
                       (one missed day a week is protected), so study more days to climb them.
                     </p>
                     <Choice
