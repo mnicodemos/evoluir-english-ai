@@ -18,6 +18,11 @@ export type SpeechOptions = {
    * audio provider or the cached audio itself.
    */
   rate?: number;
+  /**
+   * false: never fall back to the browser's own voice; the call fails instead,
+   * so a two-voice dialogue (lesson audio) never switches to a robotic voice.
+   */
+  browserFallback?: boolean;
   /** Called once, when the first sound of this text is scheduled to play. */
   onStart?: () => void;
   /** EVO (default) or Leo, her co-host in the review podcasts. */
@@ -134,6 +139,16 @@ function mergePcmChunks(chunks: Uint8Array[]): Float32Array {
   return pcmBytesToSamples(pcm);
 }
 
+/** An /api/speech answer that was not audio, with its HTTP status. */
+class SpeechHttpError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
 async function requestSpeech(
   value: string,
   onChunk?: (chunk: Uint8Array) => void,
@@ -185,12 +200,19 @@ async function requestSpeech(
     });
     if (!response.ok || !response.body) {
       const body = (await response.json().catch(() => null)) as { message?: string } | null;
-      if (response.status === 429 || response.status >= 500) {
-        const retryAfter = Number(response.headers.get("Retry-After"));
+      // Only a real limit (429) pauses every voice request. A passing provider
+      // error (5xx, about 1 in 40 in the Admin, 2026-10-30) used to block all
+      // audio for a minute, so the lesson audio stalled or turned robotic; it is
+      // now asked again once (below), and a Retry-After it sends is respected.
+      const retryAfter = Number(response.headers.get("Retry-After"));
+      if (response.status === 429 || (response.status >= 500 && retryAfter > 0)) {
         const delayMs = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 60_000;
         aiSpeechUnavailableUntil = Date.now() + delayMs;
       }
-      throw new Error(body?.message ?? `Audio failed (${response.status}).`);
+      throw new SpeechHttpError(
+        body?.message ?? `Audio failed (${response.status}).`,
+        response.status,
+      );
     }
 
     let buffer = "";
@@ -241,7 +263,23 @@ async function requestSpeech(
   };
 
   const request = (async () => {
-    let { chunks, streamError } = await fetchOnce();
+    let first;
+    try {
+      first = await fetchOnce();
+    } catch (error) {
+      // A passing provider error (5xx) is asked again once, after a pause.
+      if (
+        !(error instanceof SpeechHttpError) ||
+        error.status < 500 ||
+        signal?.aborted ||
+        Date.now() < aiSpeechUnavailableUntil
+      )
+        throw error;
+      await new Promise((resolve) => setTimeout(resolve, 1_500));
+      if (signal?.aborted) throw error;
+      first = await fetchOnce();
+    }
+    let { chunks, streamError } = first;
     if (streamError && chunks.length === 0 && !signal?.aborted) {
       // A short pause first, so the voice service's "too quickly" guard lets it through.
       await new Promise((resolve) => setTimeout(resolve, 1_500));
@@ -439,6 +477,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
   let scheduledAny = false;
   let lastSource: AudioBufferSourceNode | undefined;
   let fallbackRemainder = "";
+  let partialFailure: Error | null = null;
 
   const scheduleSamples = (floats: Float32Array) => {
     if (requestId !== playRequest || floats.length === 0) return;
@@ -495,6 +534,11 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
           : await requestSpeech(block, onChunk, cacheMode, controller.signal, options.voice);
       } catch (error) {
         if (requestId !== playRequest) return;
+        if (scheduledAny && options.browserFallback === false) {
+          // No robotic voice: fail once the queued audio ends, so the caller can retry.
+          partialFailure = error instanceof Error ? error : new Error("Audio stopped.");
+          break;
+        }
         if (scheduledAny) {
           // Some blocks may already be queued when a later stream block fails.
           // Keep the episode complete by speaking the failed block and anything
@@ -503,7 +547,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
           break;
         }
         if (controller.signal.aborted) return;
-        void error;
+        if (options.browserFallback === false) throw error;
         return speakWithBrowser(value, rate);
       }
       if (requestId !== playRequest) return;
@@ -529,6 +573,7 @@ export async function speakEnglish(text: string, options: SpeechOptions = {}): P
         context.currentTime >= playhead + 0.25,
       remainingMs + PLAYBACK_END_GRACE_MS,
     );
+    if (partialFailure && requestId === playRequest) throw partialFailure;
     if (fallbackRemainder && requestId === playRequest) {
       await speakWithBrowser(fallbackRemainder, rate);
     }

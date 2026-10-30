@@ -253,12 +253,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left"
+        className="h-8 min-w-0 px-2 max-sm:text-[11px] min-[380px]:max-sm:text-xs text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium sm:text-[13px]">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
@@ -269,7 +269,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         ) : (
           <Link to={quickWin.activity.to}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium sm:text-[13px]">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
@@ -286,12 +286,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left"
+        className="h-8 min-w-0 px-2 max-sm:text-[11px] min-[380px]:max-sm:text-xs text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium sm:text-[13px]">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
@@ -303,7 +303,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         ) : (
           <Link to={data.quest.resource.to}>
             <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium sm:text-[13px]">
+              <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
               <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
@@ -322,19 +322,19 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
+      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:whitespace-nowrap sm:h-9"
     >
       <Link to="/study-plan">
-        <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium">
+        <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium">
           {weekDone ? (
             <CalendarCheck2
-              className="size-3.5 shrink-0 text-brand-green"
+              className="size-3.5 shrink-0 max-sm:size-4 text-brand-green"
               strokeWidth={2.2}
               aria-hidden="true"
             />
           ) : (
             <CalendarDays
-              className="size-3.5 shrink-0 text-pink-400"
+              className="size-3.5 shrink-0 max-sm:size-4 text-pink-400"
               strokeWidth={2.2}
               aria-hidden="true"
             />
@@ -377,20 +377,28 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:hidden"
+        className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-0 max-sm:shrink max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:whitespace-nowrap sm:hidden"
       >
         {mobileReview.params ? (
           <Link to="/learning/$lessonId" params={mobileReview.params}>
-            <span className="flex items-center gap-1.5 font-medium leading-none">
-              <RefreshCw className="size-3.5 shrink-0 text-sky-300" aria-hidden="true" />
-              {mobileReview.label}
+            <span className="flex min-w-0 items-center gap-1.5 font-medium leading-none">
+              <RefreshCw
+                className="size-3.5 shrink-0 max-sm:size-4 text-sky-300"
+                aria-hidden="true"
+              />
+              {/* A long skill name is cut rather than pushing the row past the card. */}
+              <span className="min-w-0 truncate">{mobileReview.label}</span>
             </span>
           </Link>
         ) : (
           <Link to={mobileReview.to}>
-            <span className="flex items-center gap-1.5 font-medium leading-none">
-              <RefreshCw className="size-3.5 shrink-0 text-sky-300" aria-hidden="true" />
-              {mobileReview.label}
+            <span className="flex min-w-0 items-center gap-1.5 font-medium leading-none">
+              <RefreshCw
+                className="size-3.5 shrink-0 max-sm:size-4 text-sky-300"
+                aria-hidden="true"
+              />
+              {/* A long skill name is cut rather than pushing the row past the card. */}
+              <span className="min-w-0 truncate">{mobileReview.label}</span>
             </span>
           </Link>
         )}
@@ -401,12 +409,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
+      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:whitespace-nowrap sm:h-9"
     >
       <Link to="/league">
-        <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium">
+        <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium">
           <Medal
-            className={`size-3.5 shrink-0 ${LEAGUE_MEDAL_TEXT[leagueMedal(league)]}`}
+            className={`size-3.5 shrink-0 max-sm:size-4 ${LEAGUE_MEDAL_TEXT[leagueMedal(league)]}`}
             aria-hidden="true"
           />
           {league.joined
