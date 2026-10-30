@@ -149,12 +149,15 @@ export function LevelCard({
       <a
         href={studyBookHref}
         download
-        className="group -ml-1 inline-flex items-center gap-1 rounded-full pr-1 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
+        className="group inline-flex items-center gap-1.5 rounded transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
         aria-label={`Download study book ${current.value.toUpperCase()}`}
       >
-        <span className="grid size-6 place-items-center rounded-full text-amber-400 transition-colors group-hover:bg-amber-400/10 group-hover:text-amber-300">
-          <Download className="size-4" strokeWidth={2.4} aria-hidden="true" />
-        </span>
+        {/* As tall as the text (owner request: aligned with it). */}
+        <Download
+          className="size-[1em] shrink-0 text-amber-400 transition-colors group-hover:text-amber-300"
+          strokeWidth={2.4}
+          aria-hidden="true"
+        />
         {t("Download study book")}
       </a>
     </p>
