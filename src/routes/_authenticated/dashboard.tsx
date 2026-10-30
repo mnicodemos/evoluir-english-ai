@@ -868,6 +868,7 @@ function Dashboard() {
                     label={lang === "pt" ? "Ver as joias" : "See the jewels"}
                   >
                     <DashboardHeaderStat
+                      opens
                       icon={<Gem className="size-6" strokeWidth={2.2} />}
                       tone="coral"
                       iconColor={
