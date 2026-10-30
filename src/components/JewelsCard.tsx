@@ -54,7 +54,7 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
 
   return (
     <ol
-      className="grid grid-cols-3 gap-2 min-[480px]:grid-cols-5"
+      className="grid grid-cols-5 gap-1.5 min-[480px]:gap-2"
       aria-label={translate("Your jewels")}
     >
       {JEWELS.map((jewel) => {
@@ -65,7 +65,7 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
           <li
             key={jewel.index}
             className={cn(
-              "flex flex-col items-center gap-1 rounded-xl border px-2 py-3 text-center",
+              "flex min-w-0 flex-col items-center gap-0.5 rounded-xl border px-0 py-2 text-center min-[480px]:gap-1 min-[480px]:px-2 min-[480px]:py-3",
               isEarned
                 ? "border-white/15 bg-white/[0.05]"
                 : isNext
@@ -73,16 +73,16 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
                   : "border-white/10 bg-transparent",
             )}
           >
-            <span className="relative grid size-10 place-items-center">
+            <span className="relative grid size-7 place-items-center min-[480px]:size-10">
               <Gem
-                className={cn("size-8", !isEarned && !isNext && "opacity-35")}
+                className={cn("size-6 min-[480px]:size-8", !isEarned && !isNext && "opacity-35")}
                 style={{ color: jewel.color }}
                 strokeWidth={2.2}
                 aria-hidden="true"
               />
               {isEarned ? (
                 <Check
-                  className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-brand-green p-0.5 text-sidebar"
+                  className="absolute -bottom-0.5 -right-1 size-3.5 rounded-full bg-brand-green p-0.5 text-sidebar min-[480px]:-right-0.5 min-[480px]:size-4"
                   strokeWidth={3.5}
                   aria-hidden="true"
                 />
@@ -93,8 +93,14 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
                 />
               ) : null}
             </span>
-            <span className="text-sm font-semibold">{pt ? jewel.namePt : jewel.name}</span>
-            <span className="text-[11px] leading-tight text-muted-foreground">
+            <span className="max-w-full truncate text-[9.5px] font-semibold tracking-tight min-[480px]:text-sm min-[480px]:tracking-normal">
+              {pt ? jewel.namePt : jewel.name}
+            </span>
+            {/* Phones: the days only, the full rule from 480 px. */}
+            <span className="text-[10px] leading-tight text-muted-foreground min-[480px]:hidden">
+              <span>{jewel.days}</span> <span>{translate(jewel.days === 1 ? "day" : "days")}</span>
+            </span>
+            <span className="hidden text-[11px] leading-tight text-muted-foreground min-[480px]:inline">
               {jewel.days === 1 ? (
                 translate("First study day")
               ) : (
@@ -104,16 +110,17 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
               )}
             </span>
             {isEarned ? (
-              <span className="text-[11px] font-semibold text-brand-green">
+              <span className="hidden text-[11px] font-semibold text-brand-green min-[480px]:inline">
                 {translate("Earned")}
               </span>
             ) : isNext && profile ? (
-              <span className="text-[11px] font-semibold text-brand-green">
+              <span className="text-[10px] font-semibold leading-tight text-brand-green min-[480px]:text-[11px]">
                 {left === 0 ? (
                   translate("Next jewel")
                 ) : (
                   <>
-                    <span>{translate("Next:")}</span> <span>{left}</span>{" "}
+                    <span className="hidden min-[480px]:inline">{translate("Next:")} </span>
+                    <span>{left}</span>{" "}
                     <span>{translate(left === 1 ? "day left" : "days left")}</span>
                   </>
                 )}
