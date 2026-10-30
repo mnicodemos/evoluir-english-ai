@@ -521,7 +521,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <div>
                   {/* No level badge here: next to the priority it read as part of it,
                       and the level already shows in the reason line. */}
-                  <p className="whitespace-nowrap text-[10px] font-semibold leading-none text-sidebar-foreground/75 sm:text-xs sm:font-bold sm:tracking-[0.08em] sm:text-brand-green">
+                  {/* The same brand-green, bold, spaced label on phones as on
+                      desktop (owner request, 2026-10-30: it read grey on phones). */}
+                  <p className="whitespace-nowrap text-[11px] font-bold leading-none tracking-[0.08em] text-brand-green sm:text-xs">
                     {t("TODAY'S PRIORITY")}
                   </p>
                   <h2 className="mt-2 flex min-w-0 items-center gap-2 break-words text-lg font-bold leading-tight text-sidebar-foreground sm:mt-2 sm:text-2xl xl:text-3xl">
