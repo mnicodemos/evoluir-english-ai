@@ -4,6 +4,7 @@ import {
   ArrowRight,
   BookOpen,
   Check,
+  ChevronDown,
   Flag,
   GraduationCap,
   Mic,
@@ -193,8 +194,14 @@ function CommercialLanding() {
             there, an idea cut in two); it starts whole once scrolled. */}
         <section className="relative flex flex-col justify-center overflow-hidden border-b border-border/70 lg:min-h-[calc(100svh-4rem)]">
           <div className="absolute inset-0 surface-hero opacity-45" aria-hidden="true" />
-          <div className="relative mx-auto grid w-full max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10 lg:px-8 lg:py-10">
-            <div className="z-10 max-w-2xl pb-2 lg:pb-12">
+          {/* Premium depth (owner review, 2026-10-31: the full-screen hero read
+              flat and empty): a soft turquoise light from the video's side. */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_65%_at_78%_50%,rgba(20,220,185,0.13),transparent_70%)]"
+            aria-hidden="true"
+          />
+          <div className="relative mx-auto grid w-full max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:px-8 lg:py-16">
+            <div className="z-10 max-w-2xl pb-2 lg:pb-0">
               <LaunchCampaignBadge className="mb-4" />
               <h1 className="text-[2.15rem] font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
                 Fale inglês sem travar.
@@ -238,9 +245,10 @@ function CommercialLanding() {
 
             {/* The brand video in EVO's place (owner request, 2026-10-31: the
                 full-body EVO and the video below repeated her). */}
-            <div className="relative mx-auto w-full max-w-xl pb-8 lg:max-w-none lg:pb-12">
+            <div className="relative mx-auto w-full max-w-xl pb-8 lg:max-w-none lg:pb-0">
+              {/* A studio light behind the video. */}
               <div
-                className="absolute -inset-6 rounded-full bg-success/10 blur-3xl"
+                className="absolute -inset-10 rounded-[3rem] bg-primary/20 blur-[90px]"
                 aria-hidden="true"
               />
               <div className="relative">
@@ -248,10 +256,24 @@ function CommercialLanding() {
               </div>
             </div>
           </div>
+          {/* The first screen is closed, so it says there is more below. */}
+          <a
+            href="#veja-na-pratica"
+            onClick={(event) => {
+              const target = document.getElementById("veja-na-pratica");
+              if (!target) return;
+              event.preventDefault();
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground lg:flex"
+          >
+            Veja como funciona
+            <ChevronDown className="size-4 animate-bounce" aria-hidden="true" />
+          </a>
         </section>
 
         {/* DEMO — one conversation turn, animated */}
-        <section className="border-b border-border/70">
+        <section id="veja-na-pratica" className="scroll-mt-16 border-b border-border/70">
           {/* The conversation on the left and the text on the right on desktop
               (owner request, 2026-10-31), the section compact enough to be
               seen whole on one screen; phones keep the text first. */}

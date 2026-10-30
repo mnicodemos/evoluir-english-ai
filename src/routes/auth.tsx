@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import evoImage from "@/assets/evo-landing.webp";
+import { EvoAvatar } from "@/components/EvoAvatar";
+import { GOOGLE_SIGN_IN_ENABLED } from "@/lib/authProviders";
 import { authErrorMessage } from "@/lib/authErrors";
 import { uiPt } from "@/lib/uiDictionary";
 import { Button } from "@/components/ui/button";
@@ -15,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
-import { GOOGLE_SIGN_IN_ENABLED } from "@/lib/authProviders";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup", "forgot"]).optional() });
 
@@ -45,21 +46,6 @@ function AuthPage() {
   const lang = "pt" as const;
   const t = (label: string) => uiPt[label] ?? label;
   const [googleLoading, setGoogleLoading] = useState(false);
-  const signInWithGoogle = async () => {
-    setGoogleLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      // Public return page: /auth sends a signed-in student straight to /dashboard.
-      redirect_uri: `${window.location.origin}/auth`,
-    });
-    if (result.error) {
-      setGoogleLoading(false);
-      toast.error(t("We could not sign you in with Google. Please try again."));
-      return;
-    }
-    if (result.redirected) return;
-    setGoogleLoading(false);
-    void navigate({ to: "/dashboard" });
-  };
   const [mode, setMode] = useState<"signin" | "signup">(
     search.mode === "signup" ? "signup" : "signin",
   );
@@ -164,6 +150,27 @@ function AuthPage() {
     }
   }
 
+  /**
+   * One tap with Google through Lovable Cloud's OAuth (owner decision, 2026-10-31).
+   * It returns to /auth, which sends a signed-in student to /dashboard (and a new
+   * account on to onboarding); returning to /dashboard directly could bounce back
+   * here before the session is ready.
+   */
+  async function signInWithGoogle() {
+    setGoogleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/auth`,
+    });
+    if (result.error) {
+      setGoogleLoading(false);
+      toast.error(t("We could not sign you in with Google. Please try again."));
+      return;
+    }
+    if (result.redirected) return;
+    setGoogleLoading(false);
+    void navigate({ to: "/dashboard" });
+  }
+
   function backToSignIn() {
     setSent(false);
     setResetSent(false);
@@ -175,37 +182,59 @@ function AuthPage() {
   return (
     <div className="dashboard-shell brand-dashboard-theme dark flex min-h-dvh flex-col bg-background text-foreground">
       <div className="grid flex-1 lg:grid-cols-2">
+        {/* Premium pass (owner request, 2026-10-31): the same turquoise light as
+            the public home's hero, the title in two or three lines over EVO,
+            who stands on the panel's base with a studio glow behind her. */}
         <aside className="relative hidden flex-col overflow-hidden border-r border-border bg-card p-10 shadow-[var(--shadow-soft)] lg:flex">
           <div className="absolute inset-0 surface-hero opacity-40" aria-hidden="true" />
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_55%_at_70%_70%,rgba(20,220,185,0.14),transparent_70%)]"
+            aria-hidden="true"
+          />
           <Link to="/" className="relative flex items-center gap-2.5">
             <Logo className="size-10" />
             <BrandName />
           </Link>
-          <div className="relative grid flex-1 grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] items-center gap-4">
-            <div>
-              <h2 className="max-w-sm text-3xl font-bold leading-tight text-foreground xl:text-4xl">
-                {t("Your English teacher is waiting for you.")}
-              </h2>
-              <p className="mt-4 max-w-sm text-muted-foreground">
-                {t("Conversation, writing and vocabulary practice with feedback in seconds.")}
-              </p>
-            </div>
+          <div className="relative mt-10 max-w-lg">
+            <h2 className="text-3xl font-bold leading-tight text-foreground xl:text-4xl">
+              {t("Your English teacher is waiting for you.")}
+            </h2>
+            <p className="mt-4 max-w-md text-muted-foreground">
+              {t("Conversation, writing and vocabulary practice with feedback in seconds.")}
+            </p>
+          </div>
+          <div className="relative mt-auto flex flex-1 items-end justify-center">
+            <div
+              className="absolute bottom-[12%] left-1/2 h-2/3 w-2/3 -translate-x-1/2 rounded-full bg-primary/15 blur-[90px]"
+              aria-hidden="true"
+            />
             <img
               src={evoImage}
               alt=""
               width={848}
               height={1264}
-              className="max-h-[min(70dvh,34rem)] w-full object-contain object-bottom drop-shadow-2xl"
+              className="relative -mb-10 max-h-[min(58dvh,30rem)] w-auto object-contain object-bottom drop-shadow-2xl"
             />
           </div>
         </aside>
 
-        <main className="flex items-center justify-center px-5 py-8 sm:py-14">
-          <div className="w-full max-w-sm">
-            <Link to="/" className="mb-8 flex items-center gap-2 lg:hidden">
+        <main className="relative flex items-start justify-center overflow-hidden px-5 py-8 sm:items-center sm:py-14">
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_40%_at_50%_0%,rgba(20,220,185,0.10),transparent_75%)] lg:bg-[radial-gradient(55%_45%_at_50%_50%,rgba(20,220,185,0.06),transparent_75%)]"
+            aria-hidden="true"
+          />
+          <div className="relative w-full max-w-sm">
+            <Link to="/" className="mb-6 flex items-center gap-2 lg:hidden">
               <Logo className="size-[1.5rem]" />
               <BrandName />
             </Link>
+            {/* Phones have no side panel, so EVO greets here. */}
+            <div className="mb-6 flex items-center gap-3 lg:hidden">
+              <EvoAvatar decorative className="size-12 ring-2 ring-primary/40" />
+              <p className="text-sm text-muted-foreground">
+                {t("EVO is ready for your next conversation.")}
+              </p>
+            </div>
 
             <Link
               to="/"
@@ -252,14 +281,14 @@ function AuthPage() {
                 </Button>
               </div>
             ) : (
-              <>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-md sm:p-7">
                 <h1 className="text-2xl font-bold">
                   {t(
                     forgot
                       ? "Reset your password"
                       : mode === "signup"
                         ? "Create your account"
-                        : "Welcome back",
+                        : "Good to have you back",
                   )}
                 </h1>
                 <p className="mt-2 text-sm text-muted-foreground">
@@ -271,32 +300,31 @@ function AuthPage() {
                 </p>
 
                 {GOOGLE_SIGN_IN_ENABLED && !forgot && (
-                  <div className="mt-7">
+                  <>
                     <Button
                       type="button"
                       variant="outline"
                       size="lg"
-                      className="w-full"
-                      disabled={googleLoading}
+                      className="mt-6 w-full gap-2.5 border-white/15 bg-white/[0.04] hover:bg-white/[0.08]"
+                      disabled={loading || googleLoading}
                       onClick={() => void signInWithGoogle()}
                     >
-                      {googleLoading ? (
-                        <Loader2 className="size-4 animate-spin" />
-                      ) : (
-                        <svg viewBox="0 0 24 24" className="size-4" aria-hidden="true">
-                          <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.3 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z" />
-                        </svg>
-                      )}
+                      {googleLoading ? <Loader2 className="size-5 animate-spin" /> : <GoogleMark />}
                       {t("Continue with Google")}
                     </Button>
                     <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="h-px flex-1 bg-border" />
-                      {t("or use your email")}
-                      <span className="h-px flex-1 bg-border" />
+                      <span className="h-px flex-1 bg-border" aria-hidden="true" />
+                      {t("or with your email")}
+                      <span className="h-px flex-1 bg-border" aria-hidden="true" />
                     </div>
-                  </div>
+                  </>
                 )}
-                <form onSubmit={onSubmit} className="mt-5 space-y-4">
+                <form
+                  onSubmit={onSubmit}
+                  className={
+                    GOOGLE_SIGN_IN_ENABLED && !forgot ? "mt-5 space-y-4" : "mt-7 space-y-4"
+                  }
+                >
                   {mode === "signup" && !forgot && (
                     <div className="space-y-2">
                       <Label htmlFor="name">{t("Your name")}</Label>
@@ -347,7 +375,7 @@ function AuthPage() {
                           type={showPassword ? "text" : "password"}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••"
+                          placeholder={t(mode === "signup" ? "Create a password" : "Your password")}
                           minLength={6}
                           required
                           autoComplete={mode === "signup" ? "new-password" : "current-password"}
@@ -447,12 +475,36 @@ function AuthPage() {
                     </button>
                   </p>
                 )}
-              </>
+              </div>
             )}
           </div>
         </main>
       </div>
       <Footer minimal leftAligned lang={lang} />
     </div>
+  );
+}
+
+/** Google's four-colour "G", drawn inline (no external request). */
+function GoogleMark() {
+  return (
+    <svg viewBox="0 0 48 48" className="size-5" aria-hidden="true">
+      <path
+        fill="#FFC107"
+        d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"
+      />
+      <path
+        fill="#FF3D00"
+        d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+      />
+      <path
+        fill="#4CAF50"
+        d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"
+      />
+      <path
+        fill="#1976D2"
+        d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"
+      />
+    </svg>
   );
 }
