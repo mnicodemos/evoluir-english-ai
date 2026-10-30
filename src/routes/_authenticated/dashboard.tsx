@@ -68,6 +68,7 @@ import { ClockHands, DoneSeal } from "@/components/DoneSeal";
 import { GaugeRing } from "@/components/GaugeRing";
 import { WeeklyFrequency } from "@/components/WeeklyFrequency";
 
+import { BlackFridayChip } from "@/components/BlackFridayChip";
 import { CampaignJourneyChip } from "@/components/CampaignJourney";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useCampaignJourney } from "@/hooks/useCampaignJourney";
@@ -253,7 +254,7 @@ function DashboardNotifications({
   const finalTestReady = path.finalTest.unlocked && !path.finalTest.passed;
   const nextLevel = finalTestReady ? getLevelState(path.level).next?.value.toUpperCase() : null;
   // Black Friday (owner decision, 2026-10-24): free students see it coming
-  // during the 14-day warm-up and then the live offer, both opening /premium.
+  // during the 21-day warm-up (from 02/11, owner decision, 2026-10-31) and then the live offer, both opening /premium.
   const blackFriday = profile && !profileIsPremium(profile) ? blackFridayPhase() : null;
   const items = [
     {
@@ -763,6 +764,7 @@ function Dashboard() {
               desktopSubtitleTrailing={
                 <div className="flex items-center gap-1.5">
                   <CampaignJourneyChip translate={t} placement="desktop" />
+                  <BlackFridayChip translate={t} placement="desktop" />
                   {/* One capsule for Weather talk, the Focus timer and the bell, the
                       bell in its own grey circle at the end (user request). */}
                   <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
@@ -785,6 +787,7 @@ function Dashboard() {
               mobileTrailing={
                 <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                   <CampaignJourneyChip translate={t} placement="mobile" />
+                  <BlackFridayChip translate={t} placement="mobile" />
                   <FirstWeekGuide profile={profile} placement="mobile" />
                   {/* Gem + number only: the word "days" pushed the greeting's name
                       out of the row. Screen readers still hear "20 days". */}
