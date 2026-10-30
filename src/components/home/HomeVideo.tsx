@@ -4,7 +4,8 @@ import { useState } from "react";
 /**
  * The owner's 23-second brand video on the public home (owner request,
  * 2026-10-31). The poster shows until the visitor taps play, so the page loads
- * no video at all (preload none, about 2.3 MB at 720p once played); it plays
+ * no video at all (about 2.3 MB at 720p once played); since 2026-10-31 it is the
+ * hero's visual, so the poster loads first (fetchPriority high); it plays
  * with sound and the player's own controls, and the captions are burned in.
  */
 export function HomeVideo() {
@@ -34,7 +35,7 @@ export function HomeVideo() {
             alt=""
             width={1280}
             height={720}
-            loading="lazy"
+            fetchPriority="high"
             className="size-full object-cover"
           />
           <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent transition-opacity group-hover:opacity-70" />
