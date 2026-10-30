@@ -63,7 +63,7 @@ const premiumPerks = [
   "Full Life+ AI: routine, habits, decisions and Life Coach",
   "Every meditation in English",
   "Music Lab: your own English song, one a day",
-  "Extra lesson videos, by level and unit",
+  "Extra lesson videos, by level",
 ];
 
 const freePerks = [

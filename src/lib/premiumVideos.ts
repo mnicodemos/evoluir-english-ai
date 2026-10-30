@@ -1,56 +1,46 @@
-import { findCurriculumLesson, type CurriculumLesson } from "@/lib/curriculum";
-
 /**
- * Premium extra videos (owner request, 2026-10-31): one Vimeo video per
- * curriculum lesson, on their own page for Premium students. Stored in
- * premium_lesson_videos (migration 0100), read only through the server.
+ * Premium extra videos (owner decision, 2026-10-31): any number of Vimeo
+ * videos per level, each with its own title, not tied to a unit or lesson.
+ * Stored in premium_level_videos (migration 0101), read only through the
+ * server, which hands out the links only to Premium students.
  */
+export const PREMIUM_VIDEO_LEVELS = ["a1", "a2", "b1", "b2", "c1", "c2"] as const;
+export type PremiumVideoLevel = (typeof PREMIUM_VIDEO_LEVELS)[number];
+
 export type PremiumVideoRow = {
-  curriculum_key: string;
+  id: string;
+  level: string;
+  title: string;
   video_url: string;
-  title: string | null;
+  created_at: string;
 };
 
 export type PremiumVideo = {
-  key: string;
-  level: string;
-  unit: number;
-  unitTitle: string;
-  position: number;
-  lessonTitle: string;
+  id: string;
+  level: PremiumVideoLevel;
   title: string;
   /** Null for a free student: the link is handed out only to Premium. */
   url: string | null;
 };
 
-/** A curriculum lesson key that can hold an extra video (never the review Test). */
-export function premiumVideoLesson(key: string): CurriculumLesson | null {
-  const lesson = findCurriculumLesson(key);
-  return lesson && !lesson.isReviewTest ? lesson : null;
+export function isPremiumVideoLevel(level: string): level is PremiumVideoLevel {
+  return (PREMIUM_VIDEO_LEVELS as readonly string[]).includes(level);
 }
 
-/** Rows to the page's list, in study order; rows of unknown lessons are dropped. */
+/** Rows to the page's list: by level (A1 first), then oldest first within it. */
 export function premiumVideoList(rows: PremiumVideoRow[], withLinks: boolean): PremiumVideo[] {
   return rows
-    .flatMap((row) => {
-      const lesson = premiumVideoLesson(row.curriculum_key);
-      if (!lesson) return [];
-      return [
-        {
-          key: lesson.key,
-          level: lesson.level,
-          unit: lesson.unit,
-          unitTitle: lesson.unitTitle,
-          position: lesson.position,
-          lessonTitle: lesson.title,
-          title: row.title?.trim() || lesson.title,
-          url: withLinks ? row.video_url : null,
-        },
-      ];
-    })
+    .filter((row) => isPremiumVideoLevel(row.level))
     .sort((a, b) =>
       a.level === b.level
-        ? a.unit - b.unit || a.position - b.position
-        : a.level.localeCompare(b.level),
-    );
+        ? a.created_at.localeCompare(b.created_at)
+        : PREMIUM_VIDEO_LEVELS.indexOf(a.level as PremiumVideoLevel) -
+          PREMIUM_VIDEO_LEVELS.indexOf(b.level as PremiumVideoLevel),
+    )
+    .map((row) => ({
+      id: row.id,
+      level: row.level as PremiumVideoLevel,
+      title: row.title,
+      url: withLinks ? row.video_url : null,
+    }));
 }
