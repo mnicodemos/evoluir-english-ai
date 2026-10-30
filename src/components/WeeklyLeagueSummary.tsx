@@ -4,7 +4,7 @@ import { Medal, TrendingUp } from "lucide-react";
 import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
 import { leagueLevelOf } from "@/lib/level";
-import { rankingOpen, weekXpSummary } from "@/lib/weekXp";
+import { rankingOpen, weekXpRising, weekXpSummary } from "@/lib/weekXp";
 
 /**
  * Dashboard header cell: "Your week" (product review, 2026-10-31), the
@@ -104,7 +104,7 @@ export function WeeklyLeagueSummary({
     return (
       <DashboardHeaderStat
         icon={<TrendingUp className="size-6" strokeWidth={2.2} />}
-        tone={week.lastWeek > 0 && week.delta >= 0 ? "green" : "grey"}
+        tone={weekXpRising(week) ? "green" : "grey"}
         label={translate("Weekly XP")}
         value={`${week.thisWeek} XP`}
         detail={weekXpLine(week, translate)}

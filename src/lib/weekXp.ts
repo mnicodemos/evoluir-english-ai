@@ -32,6 +32,15 @@ export function weekXpSummary(weeks: { xp: number }[], currentXp?: number): Week
   };
 }
 
+/**
+ * The Weekly XP icon is green while the week is going up (owner report,
+ * 2026-10-31: grey on the Dashboard, green on the page): some XP this week and
+ * at least last week's. Grey with no XP yet or below last week.
+ */
+export function weekXpRising(week: { thisWeek: number; delta: number }): boolean {
+  return week.thisWeek > 0 && week.delta >= 0;
+}
+
 /** Whether the ranking among students is worth showing. */
 export function rankingOpen(members: number): boolean {
   return members >= RANKING_MIN_MEMBERS;
