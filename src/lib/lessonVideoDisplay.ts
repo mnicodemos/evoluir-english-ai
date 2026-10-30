@@ -88,3 +88,13 @@ export function formatVideoDuration(seconds: number | null | undefined): string 
   const minutes = Math.round(seconds / 60);
   return String(minutes) + " min";
 }
+
+/** The Vimeo player without its own title, byline and portrait (the page names the video). */
+export function cleanVimeoPlayerUrl(embed: string): string {
+  const url = new URL(embed);
+  url.searchParams.set("title", "0");
+  url.searchParams.set("byline", "0");
+  url.searchParams.set("portrait", "0");
+  url.searchParams.set("dnt", "1");
+  return url.toString();
+}

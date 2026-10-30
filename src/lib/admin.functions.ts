@@ -1244,3 +1244,69 @@ export const deleteLevelIntroVideo = createServerFn({ method: "POST" })
     if (error) throw new Error("Não foi possível remover o vídeo.");
     return { ok: true };
   });
+
+/**
+ * Premium extra videos (owner request, 2026-10-31; migration
+ * 0100_premium_lesson_videos): one Vimeo video per curriculum lesson, listed
+ * for Premium students on /learning/videos. Until 0100 is applied the list
+ * says so instead of failing.
+ */
+export const getPremiumVideosAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
+    const { data, error } = await (
+      await premiumVideoTable()
+    ).select("curriculum_key, video_url, title");
+    if (error) return { missingMigration: true, videos: [] };
+    return { missingMigration: false, videos: data ?? [] };
+  });
+
+export const savePremiumVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        key: z.string().trim().min(8).max(16),
+        url: z.string().trim().min(10).max(300),
+        title: z.string().trim().max(120).optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { premiumVideoLesson } = await import("@/lib/premiumVideos");
+    if (!premiumVideoLesson(data.key)) throw new Error("Escolha uma lição da trilha.");
+    const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
+    const url = canonicalVimeoUrl(data.url);
+    if (!url) throw new Error("Cole um link válido do Vimeo.");
+    const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
+    const { error } = await (
+      await premiumVideoTable()
+    ).upsert({
+      curriculum_key: data.key,
+      video_url: url,
+      title: data.title || null,
+      updated_by: context.userId,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) {
+      console.error(`Premium video could not be saved: ${error.code ?? ""} ${error.message}`);
+      throw new Error(
+        "Não foi possível salvar. Confira se a migração 0100_premium_lesson_videos foi aplicada.",
+      );
+    }
+    return { ok: true, url };
+  });
+
+export const deletePremiumVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ key: z.string().trim().min(8).max(16) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
+    const { error } = await (await premiumVideoTable()).delete().eq("curriculum_key", data.key);
+    if (error) throw new Error("Não foi possível remover o vídeo.");
+    return { ok: true };
+  });
