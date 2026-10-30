@@ -2205,6 +2205,12 @@ const baseUiPt: Record<string, string> = {
   "Preparing the first sentence…": "Preparando a primeira frase…",
   Replay: "Repetir",
   "Search results": "Resultados da busca",
+  "Search a lesson by name, e.g. past simple": "Busque uma lição pelo nome, ex.: past simple",
+  "Search a lesson by name": "Buscar lição pelo nome",
+  "No lesson with this name. Try another word.":
+    "Nenhuma lição com esse nome. Tente outra palavra.",
+  "lesson found": "lição encontrada",
+  "lessons found": "lições encontradas",
   "No dictionary entry found for": "Nenhum verbete encontrado para",
   "Page not found": "Página não encontrada",
   "The page you're looking for doesn't exist or has been moved.":

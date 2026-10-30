@@ -261,6 +261,8 @@ export const appGuidePt: Record<string, string> = {
     "O Comece aqui, no topo da trilha, tem o vídeo de apresentação do seu nível (o Business English tem o dele).",
   "Extra videos (Premium), at the top of the path, go deeper into the lessons of each level.":
     "Os vídeos extras (Premium), no topo da trilha, aprofundam as lições de cada nível.",
+  "The search box above the units finds a lesson of your level by its name; locked lessons stay locked.":
+    "A busca acima das unidades encontra uma lição do seu nível pelo nome; lições bloqueadas continuam bloqueadas.",
   Organize: "Organize",
   "More details": "Mais detalhes",
   "Fewer details": "Menos detalhes",
