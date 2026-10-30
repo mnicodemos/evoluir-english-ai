@@ -269,7 +269,7 @@ function AuthPage() {
                       : t("Sign in to continue your streak.")}
                 </p>
 
-                {!forgot && (
+                {GOOGLE_SIGN_IN_ENABLED && !forgot && (
                   <div className="mt-7">
                     <Button
                       type="button"
