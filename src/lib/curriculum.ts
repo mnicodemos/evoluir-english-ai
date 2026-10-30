@@ -249,7 +249,12 @@ const CURRICULUM: Record<string, UnitBlueprint[]> = {
       lessons: [
         ["Listening to a Team Meeting", "Understand decisions, deadlines and action points."],
         ["Reading a Work Report", "Extract key facts and conclusions from a short report."],
-        ["Giving Updates in a Meeting", "Report progress and problems clearly in full sentences."],
+        // Owner decision, 2026-10-30: the owner's "Following a Status Meeting" video
+        // moved here from Business English; the lesson keeps its speaking aim.
+        [
+          "Following a Status Meeting",
+          "Follow a status meeting and give your own update: progress, problems and next steps.",
+        ],
         ["Writing a Professional Email", "Write a structured email with request and next step."],
         ["Workplace Collocations", "Use natural word partnerships such as meet a deadline."],
         ["Reported Speech Basics", "Report what people said with correct tense changes."],
