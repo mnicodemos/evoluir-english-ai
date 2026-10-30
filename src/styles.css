@@ -183,6 +183,14 @@
 }
 
 .dashboard-shell {
+  /* One brand green (owner request, 2026-10-31: the mint brand-green, the
+     buttons' turquoise and the emerald success read as three greens side by
+     side): inside the app and the public pages every brand accent and every
+     "right / done" mark uses the buttons' turquoise. */
+  --brand-green: var(--dashboard-cyan);
+  --success: var(--dashboard-cyan);
+  --ring: var(--dashboard-cyan);
+  --gradient-growth: linear-gradient(120deg, oklch(0.8 0.15 172), oklch(0.86 0.12 192));
   --background: oklch(0.115 0.016 238);
   --foreground: oklch(0.96 0.006 240);
   --card: oklch(0.17 0.018 240);
