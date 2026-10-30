@@ -1333,6 +1333,21 @@ const baseUiPt: Record<string, string> = {
   "Tap any word you don't understand to see its translation.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução.",
   "Words you marked": "Palavras que você marcou",
+  "A pause after each line to repeat it out loud":
+    "Uma pausa depois de cada fala para repetir em voz alta",
+  "Repeat after": "Repetir depois",
+  "Your turn": "Sua vez",
+  "You said": "Você disse",
+  "Record again": "Gravar de novo",
+  "Record my answer": "Gravar minha resposta",
+  "Hear the model answer": "Ouvir a resposta modelo",
+  "Common mistake": "Erro comum",
+  Correction: "Correção",
+  "Hear this line again": "Ouvir esta fala de novo",
+  "We could not hear you. Try again or listen to the model answer.":
+    "Não conseguimos ouvir você. Tente de novo ou ouça a resposta modelo.",
+  "Answer out loud. You can record it to see what you said, then hear EVO's model answer.":
+    "Responda em voz alta. Você pode gravar para ver o que disse e depois ouvir a resposta modelo da EVO.",
   "Your reading week": "Sua semana de leitura",
   "Read it again": "Ler de novo",
   "Reading done": "Leitura feita",

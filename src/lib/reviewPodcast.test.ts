@@ -4,10 +4,12 @@ import { findCurriculumLesson } from "./curriculum";
 import {
   diagnoseReviewPodcast,
   hasLessonPodcast,
+  isChallengeLine,
   lessonPodcastMessages,
   parseReviewPodcast,
   PODCAST_LINE_MAX,
   PODCAST_SPEAKERS,
+  podcastLength,
   reviewOutline,
   reviewPodcastMessages,
 } from "./reviewPodcast";
@@ -55,8 +57,32 @@ describe("lesson audio dialogue", () => {
     expect(messages[1]!.content).toContain(plan.objective);
     expect(messages[0]!.content).toContain("real, relaxed conversation");
     expect(messages[0]!.content).toContain("LEO");
-    expect(messages[0]!.content).toContain("at least 500 spoken English words");
-    expect(messages[0]!.content).toContain("15-17 spoken words per line");
+    expect(messages[0]!.content).toContain("at least 250 spoken English words");
+    expect(messages[0]!.content).toContain("13-17 spoken words per line");
+    expect(messages[0]!.content).toContain('"challenge" on the challenge line');
+  });
+
+  it("asks for a longer dialogue from B1", () => {
+    const plan = findCurriculumLesson("b1-u1-l1")!;
+    expect(lessonPodcastMessages(plan)[0]!.content).toContain("Write 30 to 36 lines");
+    expect(lessonPodcastMessages(plan)[0]!.content).toContain("at least 500 spoken English words");
+    expect(podcastLength("A2")).toEqual({ lines: "16 to 22", words: 250 });
+  });
+
+  it("keeps a valid mark and drops an unknown one", () => {
+    const lines = Array.from({ length: 12 }, (_, index) => ({
+      ...line(index % 2 ? "leo" : "evo"),
+      ...(index === 3 ? { mark: "mistake" } : index === 5 ? { mark: "shout" } : {}),
+    }));
+    const podcast = parseReviewPodcast(JSON.stringify({ title: "A test episode", lines }));
+    expect(podcast?.lines[3]?.mark).toBe("mistake");
+    expect(podcast?.lines[5]?.mark).toBeUndefined();
+  });
+
+  it("finds the challenge line, marked or said in words", () => {
+    expect(isChallengeLine({ text: "Tell me about you.", mark: "challenge" })).toBe(true);
+    expect(isChallengeLine({ text: "What's your name? Pause and answer out loud." })).toBe(true);
+    expect(isChallengeLine({ text: "Let's pause here for a moment." })).toBe(false);
   });
 
   it("labels EVO and LEO and gives them their own voices", () => {

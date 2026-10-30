@@ -1,14 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Headphones, Languages, Loader2, Pause, Play, RotateCcw } from "lucide-react";
+import {
+  Headphones,
+  Languages,
+  Loader2,
+  Mic,
+  MicOff,
+  Pause,
+  Play,
+  Repeat,
+  RotateCcw,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { listeningLevelConfig } from "@/lib/listeningLevels";
 import { loadLessonPodcast } from "@/lib/reviewPodcast.functions";
-import { PODCAST_SPEAKERS } from "@/lib/reviewPodcast";
+import { isChallengeLine, PODCAST_SPEAKERS } from "@/lib/reviewPodcast";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
+import { transcribeAudio } from "@/lib/transcribe";
+import {
+  cancelVoiceRecording,
+  startVoiceRecording,
+  stopVoiceRecording,
+} from "@/lib/voice-recorder";
 import { cn } from "@/lib/utils";
 
 function readPodcastPosition(lessonId: string): number {
@@ -20,6 +36,37 @@ function readPodcastPosition(lessonId: string): number {
     return 0;
   }
 }
+
+/** Listener choices kept on this device: a slower voice and a pause to repeat each line. */
+const SLOW_KEY = "evoluir-podcast-slow";
+const SHADOW_KEY = "evoluir-podcast-shadow";
+
+function readFlag(key: string) {
+  try {
+    return window.localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function saveFlag(key: string, value: boolean) {
+  try {
+    window.localStorage.setItem(key, value ? "1" : "0");
+  } catch {
+    // Blocked storage: the choice lasts until the page closes.
+  }
+}
+
+/** Time to repeat a line out loud in shadowing mode: about half a second a word. */
+function shadowPauseMs(text: string) {
+  const words = text.split(/\s+/).filter(Boolean).length;
+  return Math.min(9_000, Math.max(1_800, words * 450));
+}
+
+const MARK_TONE = {
+  mistake: "bg-destructive/15 text-destructive ring-destructive/40",
+  correction: "bg-brand-green/15 text-brand-green ring-brand-green/40",
+} as const;
 
 const SPEAKER_TONE = {
   evo: "bg-brand-green/15 text-brand-green ring-brand-green/35",
@@ -62,8 +109,21 @@ export function LessonPodcast({
   const run = useRef(0);
   const listRef = useRef<HTMLOListElement>(null);
   const reported = useRef(progress);
-  // A little slower for beginners, like the Listening Lab.
-  const rate = Math.max(0.85, listeningLevelConfig(level).rate);
+  // A little slower for beginners, like the Listening Lab; 0.8× on request.
+  const [slow, setSlow] = useState(false);
+  // Shadowing: a pause after each line to repeat it out loud.
+  const [shadow, setShadow] = useState(false);
+  useEffect(() => {
+    setSlow(readFlag(SLOW_KEY));
+    setShadow(readFlag(SHADOW_KEY));
+  }, []);
+  const rate = Math.max(0.85, listeningLevelConfig(level).rate) * (slow ? 0.8 : 1);
+  // The challenge line waiting for the listener's answer ("Your turn").
+  const [turn, setTurn] = useState<number | null>(null);
+  const [recording, setRecording] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [said, setSaid] = useState<string | null>(null);
+  const [turnError, setTurnError] = useState<string | null>(null);
 
   // Persist the active line per lesson so the progress bar and Play control
   // agree after leaving the page and returning later.
@@ -79,6 +139,7 @@ export function LessonPodcast({
     () => () => {
       run.current += 1;
       stopSpeaking();
+      cancelVoiceRecording();
     },
     [],
   );
@@ -91,9 +152,13 @@ export function LessonPodcast({
     list.scrollTo({ top: item.offsetTop - list.offsetTop - 8, behavior: "smooth" });
   }, [current]);
 
-  async function playFrom(start: number) {
+  /** Plays from a line to the end, or only that line (single, the ↻ button). */
+  async function playFrom(start: number, single = false) {
     const id = ++run.current;
     setPlaybackError(null);
+    setTurn(null);
+    setSaid(null);
+    setTurnError(null);
     setPlaying(true);
     for (let index = start; index < lines.length; index += 1) {
       if (run.current !== id) return;
@@ -111,7 +176,7 @@ export function LessonPodcast({
           // Only EVO's and Leo's voices: never the device's robotic one.
           browserFallback: false,
           onStart: () => {
-            if (!next || run.current !== id) return;
+            if (!next || single || run.current !== id) return;
             prepareSpeech(next.text, {
               cache: "persistent",
               voice: PODCAST_SPEAKERS[next.speaker].voice,
@@ -145,14 +210,75 @@ export function LessonPodcast({
         reported.current = percent;
         onProgress(percent);
       }
+      if (single) break;
+      // The challenge waits for the listener (owner request, 2026-10-30: the
+      // model answer used to follow at once, so nobody answered).
+      if (isChallengeLine(line) && next) {
+        setTurn(index);
+        setPlaying(false);
+        return;
+      }
+      if (shadow && next) {
+        await new Promise((resolve) => setTimeout(resolve, shadowPauseMs(line.text)));
+        if (run.current !== id) return;
+      }
     }
     if (run.current === id) setPlaying(false);
+  }
+
+  async function toggleRecording() {
+    setTurnError(null);
+    if (!recording) {
+      try {
+        await startVoiceRecording();
+        setSaid(null);
+        setRecording(true);
+      } catch (error) {
+        setTurnError(error instanceof Error ? error.message : "Microphone unavailable.");
+      }
+      return;
+    }
+    setRecording(false);
+    setChecking(true);
+    try {
+      const blob = await stopVoiceRecording();
+      const text = (await transcribeAudio(blob)).trim();
+      setSaid(text || null);
+      if (!text) setTurnError(t("We could not hear you. Try again or listen to the model answer."));
+    } catch (error) {
+      setTurnError(error instanceof Error ? error.message : "Your answer could not be checked.");
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  function continueAfterTurn() {
+    if (turn === null) return;
+    if (recording) {
+      cancelVoiceRecording();
+      setRecording(false);
+    }
+    void playFrom(turn + 1);
   }
 
   function pause() {
     run.current += 1;
     stopSpeaking();
     setPlaying(false);
+  }
+
+  function toggleSlow() {
+    setSlow((value) => {
+      saveFlag(SLOW_KEY, !value);
+      return !value;
+    });
+  }
+
+  function toggleShadow() {
+    setShadow((value) => {
+      saveFlag(SHADOW_KEY, !value);
+      return !value;
+    });
   }
 
   if (query.isPending) {
@@ -219,6 +345,27 @@ export function LessonPodcast({
             <Languages className="size-4 shrink-0" aria-hidden="true" />
             {showPt ? t("Hide translation") : t("Show translation")}
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className={cn("tabular-nums", slow && "border-brand-green text-brand-green")}
+            aria-pressed={slow}
+            aria-label={t("Slower voice")}
+            title={t("Slower voice")}
+            onClick={toggleSlow}
+          >
+            0.8×
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className={cn(shadow && "border-brand-green text-brand-green")}
+            aria-pressed={shadow}
+            title={t("A pause after each line to repeat it out loud")}
+            onClick={toggleShadow}
+          >
+            <Repeat className="size-4 shrink-0" aria-hidden="true" /> {t("Repeat after")}
+          </Button>
           {playing ? (
             <Button className="min-w-0 flex-1 sm:flex-none" size="sm" onClick={pause}>
               <Pause className="size-4 shrink-0" aria-hidden="true" /> {t("Pause")}
@@ -228,7 +375,9 @@ export function LessonPodcast({
               className="min-w-0 flex-1 sm:flex-none"
               size="sm"
               onClick={() =>
-                void playFrom(done ? 0 : Math.min(current, Math.max(0, lines.length - 1)))
+                turn !== null
+                  ? continueAfterTurn()
+                  : void playFrom(done ? 0 : Math.min(current, Math.max(0, lines.length - 1)))
               }
             >
               {done ? (
@@ -256,6 +405,60 @@ export function LessonPodcast({
         </div>
       ) : null}
 
+      {turn !== null ? (
+        <div
+          className="rounded-xl border border-amber-400/40 bg-amber-400/[0.07] p-3 sm:p-4"
+          role="status"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-400">
+            {t("Your turn")}
+          </p>
+          <p className="mt-1 text-sm" translate="no" lang="en">
+            {lines[turn]?.text}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t(
+              "Answer out loud. You can record it to see what you said, then hear EVO's model answer.",
+            )}
+          </p>
+          {said ? (
+            <p className="mt-2 rounded-lg bg-white/[0.05] px-3 py-2 text-sm">
+              <span className="text-xs text-muted-foreground">{t("You said")}:</span>{" "}
+              <span translate="no" lang="en">
+                {said}
+              </span>
+            </p>
+          ) : null}
+          {turnError ? <p className="mt-2 text-xs text-destructive">{turnError}</p> : null}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant={recording ? "default" : "outline"}
+              disabled={checking}
+              onClick={() => void toggleRecording()}
+            >
+              {checking ? (
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              ) : recording ? (
+                <MicOff className="size-4" aria-hidden="true" />
+              ) : (
+                <Mic className="size-4" aria-hidden="true" />
+              )}
+              {checking
+                ? t("Checking...")
+                : recording
+                  ? t("Stop recording")
+                  : said
+                    ? t("Record again")
+                    : t("Record my answer")}
+            </Button>
+            <Button size="sm" disabled={checking} onClick={continueAfterTurn}>
+              <Play className="size-4" aria-hidden="true" /> {t("Hear the model answer")}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <Progress
         value={
           playbackError
@@ -271,13 +474,13 @@ export function LessonPodcast({
         translate="no"
       >
         {lines.map((line, index) => (
-          <li key={index}>
+          <li key={index} className="flex items-start gap-1">
             <button
               type="button"
               onClick={() => void playFrom(index)}
               className={cn(
-                "flex w-full gap-3 rounded-lg p-2 text-left transition-colors",
-                index === current && (playing || current > 0)
+                "flex min-w-0 flex-1 gap-3 rounded-lg p-2 text-left transition-colors",
+                index === current && (playing || current > 0 || turn !== null)
                   ? "bg-white/[0.06] ring-1 ring-inset ring-white/10"
                   : "hover:bg-white/[0.03]",
               )}
@@ -291,9 +494,30 @@ export function LessonPodcast({
                 {PODCAST_SPEAKERS[line.speaker].name}
               </span>
               <span className="min-w-0 space-y-0.5">
+                {line.mark === "mistake" || line.mark === "correction" ? (
+                  <span
+                    className={cn(
+                      "inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset",
+                      MARK_TONE[line.mark],
+                    )}
+                    translate="yes"
+                  >
+                    {line.mark === "mistake" ? t("Common mistake") : t("Correction")}
+                  </span>
+                ) : null}
                 <span className="block text-sm leading-relaxed">{line.text}</span>
                 {showPt && <span className="block text-xs text-muted-foreground">{line.pt}</span>}
               </span>
+            </button>
+            {/* Hear only this line again (owner request, 2026-10-30). */}
+            <button
+              type="button"
+              className="mt-1.5 grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
+              aria-label={t("Hear this line again")}
+              title={t("Hear this line again")}
+              onClick={() => void playFrom(index, true)}
+            >
+              <RotateCcw className="size-3.5" aria-hidden="true" />
             </button>
           </li>
         ))}

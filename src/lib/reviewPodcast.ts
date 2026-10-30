@@ -20,10 +20,32 @@ export type PodcastSpeaker = keyof typeof PODCAST_SPEAKERS;
 /** Each line is spoken in one audio request (the voice route takes 500 characters). */
 export const PODCAST_LINE_MAX = 420;
 
+/**
+ * Length by level (owner request, 2026-10-30): about two minutes at A1-A2,
+ * where a longer episode loses a beginner's attention, and three to four from
+ * B1. The schema accepts the shorter one; each prompt asks for its own.
+ */
+export function podcastLength(level: string) {
+  const beginner = ["a1", "a2"].includes(level.toLowerCase());
+  return beginner ? { lines: "16 to 22", words: 250 } : { lines: "30 to 36", words: 500 };
+}
+const PODCAST_MIN_WORDS = 220;
+
+/** The line where the listener answers out loud: marked, or said in words (older scripts). */
+export function isChallengeLine(line: { text: string; mark?: string | undefined }) {
+  return line.mark === "challenge" || /\bpause and (answer|say|try)\b/i.test(line.text);
+}
+
 const lineSchema = z.object({
   speaker: z.enum(["evo", "leo"]),
   text: z.string().trim().min(1).max(PODCAST_LINE_MAX),
   pt: z.string().trim().min(1).max(700),
+  /**
+   * The teaching moments, so the player can mark them (owner request,
+   * 2026-10-30): LEO's common mistake, EVO's correction and the challenge line
+   * where the listener answers out loud. Absent on ordinary lines.
+   */
+  mark: z.enum(["mistake", "correction", "challenge"]).optional().catch(undefined),
 });
 
 export const podcastSchema = z.object({
@@ -37,8 +59,8 @@ export const podcastSchema = z.object({
         lines.reduce(
           (total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length,
           0,
-        ) >= 420,
-      "The dialogue must contain enough spoken words for at least three minutes of audio.",
+        ) >= PODCAST_MIN_WORDS,
+      "The dialogue must contain enough spoken words for at least two minutes of audio.",
     ),
 });
 
@@ -115,6 +137,7 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
 
   const level = plan.level.toLowerCase();
   const style = LEVEL_STYLE[level] ?? LEVEL_STYLE["b1"]!;
+  const length = podcastLength(level);
   const unitOutline = getCurriculum(plan.level)
     .filter((lesson) => lesson.unit === plan.unit && lesson.reviewUnits.length === 0)
     .map((lesson) => `- ${lesson.title} (${lesson.skill}): ${lesson.objective}`)
@@ -137,9 +160,11 @@ export function lessonPodcastMessages(plan: CurriculumLesson) {
         "Let EVO and LEO show curiosity, warmth, light humour where natural, and a distinct personality without forced jokes. Use smooth transitions and callbacks to examples already mentioned. " +
         "Conversation arc: EVO opens briefly with the topic; LEO responds with a believable question or observation; they explore examples together; LEO makes one common, level-appropriate mistake and EVO corrects it kindly in context; they recap naturally and give the listener a short speaking challenge with a model answer; they close warmly and briefly. " +
         "Alternate speakers naturally, with no abrupt topic changes. EVO speaks first. Do not make every turn a question-answer pair or have either speaker narrate the structure of the episode. " +
-        `Write 30 to 36 lines and at least 500 spoken English words in total. Aim for 15-17 spoken words per line and verify the total reaches 500 before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        `Write ${length.lines} lines and at least ${length.words} spoken English words in total. Aim for 13-17 spoken words per line and verify the total reaches ${length.words} before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        "In the challenge, EVO asks the listener one question and says 'Pause and answer out loud.' in that same line; the next line is EVO's short model answer. " +
         "For every line add 'pt', a natural Brazilian Portuguese translation. " +
-        'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
+        "Mark the teaching moments with 'mark': \"mistake\" on LEO's line with the common mistake, \"correction\" on EVO's line that corrects it, and \"challenge\" on the challenge line; leave 'mark' out of every other line. " +
+        'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "...", "mark"?: "mistake" | "correction" | "challenge"}]}',
     },
     {
       role: "user" as const,
