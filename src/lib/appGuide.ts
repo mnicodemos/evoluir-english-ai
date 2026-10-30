@@ -312,9 +312,10 @@ export const APP_GUIDE: GuideSection[] = [
     title: "Weekly league",
     what: "A friendly ranking with students of your level, reset every Monday.",
     steps: [
+      "Weekly XP shows your XP this week against last week and your best week, so you always have someone to beat: yourself.",
       "Join the league; other students only see your first name and initial.",
       "Earn XP with lessons, texts, Listening, conversations, the daily reading, words and mistakes, plus a bonus for each study day.",
-      "Your medal shows your place: gold, silver or bronze for the top three.",
+      "The ranking opens once your level's league has 5 students taking part; then your medal shows your place: gold, silver or bronze for the top three.",
     ],
     to: "/league",
   },

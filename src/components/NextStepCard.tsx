@@ -14,6 +14,7 @@ import {
   CalendarCheck2,
   CalendarDays,
   Medal,
+  TrendingUp,
   MessageSquareText,
   Mic,
   PenLine,
@@ -77,7 +78,16 @@ type MobilePill = {
   params?: { lessonId: string };
   label: string;
 };
-type LeagueSummary = { joined: boolean; rank: number | null; xp: number; total: number };
+type LeagueSummary = {
+  joined: boolean;
+  rank: number | null;
+  xp: number;
+  total: number;
+  ranked?: boolean;
+  /** This week minus last week (Your week, before the ranking opens). */
+  delta?: number;
+  lastWeek?: number;
+};
 
 export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { lang } = useUiLang();
@@ -165,10 +175,25 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       rank: league.rank,
       xp: league.xp,
       total: league.total,
+      ranked: league.ranked,
+      delta: league.week.delta,
+      lastWeek: league.week.lastWeek,
     };
     writeStorage(leaguePillKey, JSON.stringify(summary));
-  }, [leaguePillKey, league.loaded, league.joined, league.rank, league.xp, league.total]);
-  const leagueShown: LeagueSummary | null = league.loaded ? league : cachedLeague;
+  }, [
+    leaguePillKey,
+    league.loaded,
+    league.joined,
+    league.rank,
+    league.xp,
+    league.total,
+    league.ranked,
+    league.week.delta,
+    league.week.lastWeek,
+  ]);
+  const leagueShown: LeagueSummary | null = league.loaded
+    ? { ...league, delta: league.week.delta, lastWeek: league.week.lastWeek }
+    : cachedLeague;
   const leaguePillReady = pillWaitOver || !!leagueShown;
 
   if (isLoading) {
@@ -468,15 +493,33 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     >
       <Link to="/league">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium">
-          <Medal
-            className={`size-3.5 shrink-0 max-sm:size-4 ${LEAGUE_MEDAL_TEXT[leagueMedal(leagueShown ?? league)]}`}
-            aria-hidden="true"
-          />
-          {leagueShown?.joined
-            ? leagueShown.total > 1 && leagueShown.rank
-              ? `#${leagueShown.rank} · ${leagueShown.xp} XP`
-              : `${leagueShown.xp} XP`
-            : t("Weekly league")}
+          {leagueShown?.ranked ? (
+            <>
+              <Medal
+                className={`size-3.5 shrink-0 max-sm:size-4 ${LEAGUE_MEDAL_TEXT[leagueMedal(leagueShown)]}`}
+                aria-hidden="true"
+              />
+              {leagueShown.rank
+                ? `#${leagueShown.rank} · ${leagueShown.xp} XP`
+                : `${leagueShown.xp} XP`}
+            </>
+          ) : (
+            <>
+              {/* Your week: XP against last week until the league has a ranking. */}
+              <TrendingUp
+                className={`size-3.5 shrink-0 max-sm:size-4 ${
+                  (leagueShown?.lastWeek ?? 0) > 0 && (leagueShown?.delta ?? 0) >= 0
+                    ? "text-brand-green"
+                    : "text-muted-foreground"
+                }`}
+                aria-hidden="true"
+              />
+              {`${leagueShown?.xp ?? 0} XP`}
+              {(leagueShown?.lastWeek ?? 0) > 0 && (leagueShown?.delta ?? 0) > 0
+                ? ` · +${leagueShown!.delta}`
+                : ""}
+            </>
+          )}
         </span>
       </Link>
     </Button>

@@ -289,4 +289,8 @@ export const appGuidePt: Record<string, string> = {
     "Toda semana, siga o seu plano de estudos; quando o Teste Final do seu nível abrir, faça.",
   "Short on time? Tap Practice now and finish that one activity: it is the best use of 5 minutes.":
     "Pouco tempo? Toque em Praticar agora e termine essa atividade: é o melhor uso de 5 minutos.",
+  "Weekly XP shows your XP this week against last week and your best week, so you always have someone to beat: yourself.":
+    "O XP da semana mostra o seu XP desta semana contra a semana passada e a sua melhor semana, para você sempre ter alguém para superar: você mesmo.",
+  "The ranking opens once your level's league has 5 students taking part; then your medal shows your place: gold, silver or bronze for the top three.":
+    "O ranking abre quando a liga do seu nível tiver 5 alunos participando; aí a sua medalha mostra a sua posição: ouro, prata ou bronze para os três primeiros.",
 };
