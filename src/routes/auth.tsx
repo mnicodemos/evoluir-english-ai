@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup", "forgot"]).optional() });
 
@@ -42,6 +43,21 @@ function AuthPage() {
   // Login screen is always in Portuguese — no language option here.
   const lang = "pt" as const;
   const t = (label: string) => uiPt[label] ?? label;
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const signInWithGoogle = async () => {
+    setGoogleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setGoogleLoading(false);
+      toast.error(t("We could not sign you in with Google. Please try again."));
+      return;
+    }
+    if (result.redirected) return;
+    setGoogleLoading(false);
+    void navigate({ to: "/dashboard" });
+  };
   const [mode, setMode] = useState<"signin" | "signup">(
     search.mode === "signup" ? "signup" : "signin",
   );
@@ -252,7 +268,33 @@ function AuthPage() {
                       : t("Sign in to continue your streak.")}
                 </p>
 
-                <form onSubmit={onSubmit} className="mt-7 space-y-4">
+                {!forgot && (
+                  <div className="mt-7">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      className="w-full"
+                      disabled={googleLoading}
+                      onClick={() => void signInWithGoogle()}
+                    >
+                      {googleLoading ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <svg viewBox="0 0 24 24" className="size-4" aria-hidden="true">
+                          <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.3 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z" />
+                        </svg>
+                      )}
+                      {t("Continue with Google")}
+                    </Button>
+                    <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="h-px flex-1 bg-border" />
+                      {t("or use your email")}
+                      <span className="h-px flex-1 bg-border" />
+                    </div>
+                  </div>
+                )}
+                <form onSubmit={onSubmit} className="mt-5 space-y-4">
                   {mode === "signup" && !forgot && (
                     <div className="space-y-2">
                       <Label htmlFor="name">{t("Your name")}</Label>

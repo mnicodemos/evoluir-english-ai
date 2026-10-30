@@ -1972,6 +1972,9 @@ const baseUiPt: Record<string, string> = {
   "Two minutes to set up your personal learning plan.":
     "Dois minutos para configurar seu plano de aprendizado pessoal.",
   "Sign in to continue your streak.": "Entre para continuar sua sequência.",
+  "Continue with Google": "Continuar com Google",
+  "or use your email": "ou use seu e-mail",
+  "We could not sign you in with Google. Please try again.": "Não foi possível entrar com o Google. Tente novamente.",
   Email: "E-mail",
   Password: "Senha",
   "Hide password": "Ocultar senha",

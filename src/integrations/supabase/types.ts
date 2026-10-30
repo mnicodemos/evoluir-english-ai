@@ -62,6 +62,45 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_recovery_points: {
+        Row: {
+          branch_name: string
+          commit_sha: string
+          created_at: string
+          created_by: string | null
+          description: string
+          environment: string
+          id: string
+          repository: string
+          source_pr: number | null
+          title: string
+        }
+        Insert: {
+          branch_name: string
+          commit_sha: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          environment?: string
+          id?: string
+          repository: string
+          source_pr?: number | null
+          title: string
+        }
+        Update: {
+          branch_name?: string
+          commit_sha?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          environment?: string
+          id?: string
+          repository?: string
+          source_pr?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
       ai_conversations: {
         Row: {
           created_at: string
@@ -804,27 +843,6 @@ export type Database = {
         }
         Relationships: []
       }
-      level_intro_videos: {
-        Row: {
-          level: string
-          updated_at: string
-          updated_by: string | null
-          video_url: string
-        }
-        Insert: {
-          level: string
-          updated_at?: string
-          updated_by?: string | null
-          video_url: string
-        }
-        Update: {
-          level?: string
-          updated_at?: string
-          updated_by?: string | null
-          video_url?: string
-        }
-        Relationships: []
-      }
       lesson_videos: {
         Row: {
           approved_at: string
@@ -912,6 +930,27 @@ export type Database = {
           updated_at?: string
           video_duration_seconds?: number
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      level_intro_videos: {
+        Row: {
+          level: string
+          updated_at: string
+          updated_by: string | null
+          video_url: string
+        }
+        Insert: {
+          level: string
+          updated_at?: string
+          updated_by?: string | null
+          video_url: string
+        }
+        Update: {
+          level?: string
+          updated_at?: string
+          updated_by?: string | null
+          video_url?: string
         }
         Relationships: []
       }
@@ -1151,6 +1190,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "pedagogical_dual_write_failures_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      permanent_jewel_awards: {
+        Row: {
+          granted_at: string
+          id: string
+          jewel_code: string
+          jewel_index: number
+          rule_version: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          id?: string
+          jewel_code: string
+          jewel_index: number
+          rule_version?: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          id?: string
+          jewel_code?: string
+          jewel_index?: number
+          rule_version?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permanent_jewel_awards_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
