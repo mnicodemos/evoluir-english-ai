@@ -101,26 +101,28 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     !indicators.ready || dashboardActionAvailable(to, indicators);
   const { data, isLoading, isError, isFetching, isPlaceholderData, refetch } = useNextStep();
 
-  // Phones' pill row waits for everything it reads (user report, 2026-10-25:
-  // a pill showed, then another replaced it): the Quick Win from the fresh
-  // answer, not the one kept from the last visit, today's activities, due
-  // words and mistakes, the league and the week, at most 4 s; until then
-  // three pill-shaped placeholders hold the place, so the pills arrive once.
+  // Phones' pill row (user report, 2026-10-25: a pill showed, then another
+  // replaced it; owner report, 2026-10-31: the whole row took seconds to
+  // show). Only the first pill (Quick Win or review) depends on EVO's fresh
+  // answer, the page's slowest read, so only it waits for that answer and
+  // today's activities, due words and mistakes, at most 2.5 s, behind a
+  // pill-shaped placeholder; the league and Your week show as soon as their
+  // own data arrives.
   const [pillWaitOver, setPillWaitOver] = useState(false);
   useEffect(() => {
-    const timer = window.setTimeout(() => setPillWaitOver(true), 4000);
+    const timer = window.setTimeout(() => setPillWaitOver(true), 2500);
     return () => window.clearTimeout(timer);
   }, []);
-  const pillsReady =
+  const firstPillReady =
     pillWaitOver ||
     (!isPlaceholderData &&
       activityIndicators.ready &&
       todayFetched &&
       wordsDueReady &&
       cardsFetched &&
-      mistakesFetched &&
-      league.loaded &&
-      planFetched);
+      mistakesFetched);
+  const leaguePillReady = pillWaitOver || league.loaded;
+  const weekPillReady = pillWaitOver || planFetched;
 
   if (isLoading) {
     return (
@@ -433,6 +435,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     </Button>
   );
 
+  const pillPlaceholder = (
+    <span
+      aria-hidden="true"
+      className="h-10 min-w-16 flex-auto animate-pulse rounded-full border border-white/10 bg-white/[0.05]"
+    />
+  );
+
   if (compact) {
     return (
       <section
@@ -553,21 +562,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               card's free height instead of crowding under the EVO label
               (user report). */}
           <div className="col-span-2 flex flex-nowrap items-center gap-1.5 px-2.5 pb-2.5 sm:hidden">
-            {pillsReady ? (
-              <>
-                {quickWinButton ?? mobileReviewButton}
-                {leagueButton}
-                {mapButton}
-              </>
-            ) : (
-              [0, 1, 2].map((key) => (
-                <span
-                  key={key}
-                  aria-hidden="true"
-                  className="h-10 flex-auto animate-pulse rounded-full border border-white/10 bg-white/[0.05]"
-                />
-              ))
-            )}
+            {firstPillReady ? (quickWinButton ?? mobileReviewButton) : pillPlaceholder}
+            {leaguePillReady ? leagueButton : pillPlaceholder}
+            {weekPillReady ? mapButton : pillPlaceholder}
           </div>
 
           <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:px-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-t-0">
