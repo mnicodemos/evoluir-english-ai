@@ -126,3 +126,25 @@ export const deleteMistake = createServerFn({ method: "POST" })
     if (error) throw new Error("Mistake could not be deleted");
     return { success: true };
   });
+
+/**
+ * Permanently deletes several saved mistakes at once (owner request,
+ * 2026-10-31: one by one was slow for a long list). Only the student's own
+ * rows are touched: the delete is filtered by their id as well.
+ */
+export const deleteMistakes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(200) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin: admin } = await import("@/integrations/supabase/client.server");
+    const { data: deleted, error } = await admin
+      .from("learning_errors")
+      .delete()
+      .in("id", [...new Set(data.ids)])
+      .eq("user_id", context.userId)
+      .select("id");
+    if (error) throw new Error("Mistakes could not be deleted");
+    return { deleted: deleted?.length ?? 0 };
+  });

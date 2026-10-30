@@ -212,6 +212,18 @@ const baseUiPt: Record<string, string> = {
   "Did you finish this task?": "Você terminou esta tarefa?",
   "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
   "Review words": "Revisar palavras",
+  "Delete 1 saved mistake? This cannot be undone.":
+    "Apagar 1 erro salvo? Isso não pode ser desfeito.",
+  "Delete {n} saved mistakes? This cannot be undone.":
+    "Apagar {n} erros salvos? Isso não pode ser desfeito.",
+  "1 mistake deleted.": "1 erro apagado.",
+  "{n} mistakes deleted.": "{n} erros apagados.",
+  "Could not delete these mistakes. Please try again.":
+    "Não foi possível apagar esses erros. Tente de novo.",
+  "Clear selection": "Limpar seleção",
+  "Select all": "Selecionar todos",
+  "Select to delete": "Selecionar para apagar",
+  Select: "Selecionar",
   "See in Portuguese": "Ver em português",
   "Translating…": "Traduzindo…",
   "Review mistakes": "Revisar erros",
