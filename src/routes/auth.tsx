@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup", "forgot"]).optional() });
 
@@ -44,6 +45,7 @@ function AuthPage() {
   // Login screen is always in Portuguese — no language option here.
   const lang = "pt" as const;
   const t = (label: string) => uiPt[label] ?? label;
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup">(
     search.mode === "signup" ? "signup" : "signin",
   );
@@ -148,17 +150,25 @@ function AuthPage() {
     }
   }
 
-  /** One tap with Google (owner decision, 2026-10-31); the Dashboard sends a new account to onboarding. */
+  /**
+   * One tap with Google through Lovable Cloud's OAuth (owner decision, 2026-10-31).
+   * It returns to /auth, which sends a signed-in student to /dashboard (and a new
+   * account on to onboarding); returning to /dashboard directly could bounce back
+   * here before the session is ready.
+   */
   async function signInWithGoogle() {
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+    setGoogleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/auth`,
     });
-    if (error) {
-      setLoading(false);
-      toast.error(t("Google sign-in is not available right now."));
+    if (result.error) {
+      setGoogleLoading(false);
+      toast.error(t("We could not sign you in with Google. Please try again."));
+      return;
     }
+    if (result.redirected) return;
+    setGoogleLoading(false);
+    void navigate({ to: "/dashboard" });
   }
 
   function backToSignIn() {
@@ -296,10 +306,10 @@ function AuthPage() {
                       variant="outline"
                       size="lg"
                       className="mt-6 w-full gap-2.5 border-white/15 bg-white/[0.04] hover:bg-white/[0.08]"
-                      disabled={loading}
+                      disabled={loading || googleLoading}
                       onClick={() => void signInWithGoogle()}
                     >
-                      <GoogleMark />
+                      {googleLoading ? <Loader2 className="size-5 animate-spin" /> : <GoogleMark />}
                       {t("Continue with Google")}
                     </Button>
                     <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground">

@@ -217,7 +217,6 @@ const baseUiPt: Record<string, string> = {
   "or with your email": "ou com seu e-mail",
   "Your password": "Sua senha",
   "Create a password": "Crie uma senha",
-  "Google sign-in is not available right now.": "O login com Google não está disponível agora.",
   "EVO is ready for your next conversation.": "A EVO está pronta para a sua próxima conversa.",
   "30 core lessons in 5 units, plus a review unit":
     "30 lições principais em 5 unidades, mais uma unidade de revisão",
@@ -1979,6 +1978,8 @@ const baseUiPt: Record<string, string> = {
   "Two minutes to set up your personal learning plan.":
     "Dois minutos para configurar seu plano de aprendizado pessoal.",
   "Sign in to continue your streak.": "Entre para continuar sua sequência.",
+  "We could not sign you in with Google. Please try again.":
+    "Não foi possível entrar com o Google. Tente novamente.",
   Email: "E-mail",
   Password: "Senha",
   "Hide password": "Ocultar senha",
