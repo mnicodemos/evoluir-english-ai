@@ -19,13 +19,15 @@ import { cn } from "@/lib/utils";
  */
 export function JewelsCard({ translate }: { translate: (label: string) => string }) {
   const { data: profile } = useProfile();
-  const { data: earned = [] } = useQuery({
-    queryKey: ["permanent-jewels", profile?.id],
+  const { data: earnedData } = useQuery({
+    // Its own key: the Dashboard keeps the highest jewel (a number) under
+    // ["permanent-jewels", id], and sharing it crashed the popover.
+    queryKey: ["permanent-jewels-list", profile?.id],
     enabled: !!profile?.id,
     staleTime: 60 * 1000,
     queryFn: async () => {
       // Not in the generated Supabase types until Lovable regenerates them.
-      const from = supabase.from as unknown as (table: string) => {
+      const from = supabase.from.bind(supabase) as unknown as (table: string) => {
         select: (columns: string) => {
           eq: (
             column: string,
@@ -40,6 +42,7 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
       return (data ?? []).map((row) => row.jewel_index);
     },
   });
+  const earned = Array.isArray(earnedData) ? earnedData : [];
   const streak = profile ? effectiveStreak(profile) : 0;
   const nextIndex = JEWELS.find((jewel) => !earned.includes(jewel.index))?.index ?? null;
   const pt = useUiLang().lang === "pt";

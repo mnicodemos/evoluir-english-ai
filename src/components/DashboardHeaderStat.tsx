@@ -37,6 +37,7 @@ export function DashboardHeaderStat({
   valueStyle,
   iconColor,
   to,
+  opens,
   hint,
 }: {
   icon: ReactNode;
@@ -49,6 +50,9 @@ export function DashboardHeaderStat({
   valueStyle?: CSSProperties | undefined;
   iconColor?: string | undefined;
   to?: "/league" | "/study-plan";
+  /** The cell sits inside a trigger that opens something (the jewels
+   *  popover): it shows the same chevron as a cell with `to`. */
+  opens?: boolean;
   /** Shown on hover: how the number works (e.g. the jewels rule). */
   hint?: string;
 }) {
@@ -95,11 +99,23 @@ export function DashboardHeaderStat({
       </span>
     </>
   );
+  const chevron = (
+    <span
+      className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition-colors group-hover:border-brand-green/50 group-hover:text-brand-green group-focus-visible:text-brand-green"
+      aria-hidden="true"
+    >
+      <ChevronRight className="size-4" strokeWidth={2.4} />
+    </span>
+  );
   const cell = "flex h-full min-w-0 items-center gap-3 px-4 py-3 2xl:gap-4 2xl:px-6";
   if (!to)
     return (
-      <div className={cell} title={hint}>
+      <div
+        className={cn(cell, opens && "group transition-colors hover:bg-foreground/[0.03]")}
+        title={hint}
+      >
         {body}
+        {opens ? chevron : null}
       </div>
     );
   return (
@@ -112,12 +128,7 @@ export function DashboardHeaderStat({
       )}
     >
       {body}
-      <span
-        className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition-colors group-hover:border-brand-green/50 group-hover:text-brand-green group-focus-visible:text-brand-green"
-        aria-hidden="true"
-      >
-        <ChevronRight className="size-4" strokeWidth={2.4} />
-      </span>
+      {chevron}
     </Link>
   );
 }
