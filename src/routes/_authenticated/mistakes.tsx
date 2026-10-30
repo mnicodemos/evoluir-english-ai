@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   CheckCircle2,
   Dumbbell,
+  ListChecks,
   Loader2,
   RotateCcw,
   SpellCheck,
@@ -25,8 +26,15 @@ import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { isMistakeDue, MISTAKE_MASTERED_STEP } from "@/lib/mistakeReview";
 import { findMistakeSentence, type MistakeSentence } from "@/lib/mistakeSentence";
-import { deleteMistake, practiceMistake, reviewMistake } from "@/lib/mistakes.functions";
+import {
+  deleteMistake,
+  deleteMistakes,
+  practiceMistake,
+  reviewMistake,
+} from "@/lib/mistakes.functions";
 import type { MistakePractice } from "@/lib/mistakePractice";
+import { uiPt } from "@/lib/uiDictionary";
+import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 import {
   MISTAKE_TYPE_LABEL,
@@ -66,6 +74,8 @@ type MistakeRow = {
 type Outcome = { correct: boolean; corrected: string; explanation: string };
 
 function Mistakes() {
+  const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
   const { data: learning } = useQuery({
@@ -83,6 +93,12 @@ function Mistakes() {
   const review = useServerFn(reviewMistake);
   const removeMistake = useServerFn(deleteMistake);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Delete several at once (owner request, 2026-10-31): a select mode with a
+  // checkbox on each phrase, "Select all" for the tab on screen.
+  const removeMistakes = useServerFn(deleteMistakes);
+  const [selecting, setSelecting] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [deletingMany, setDeletingMany] = useState(false);
   const [answer, setAnswer] = useState("");
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [checking, setChecking] = useState(false);
@@ -209,6 +225,48 @@ function Mistakes() {
       setDeletingId(null);
     }
   }
+
+  function toggleSelected(id: string) {
+    setSelected((ids) => (ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]));
+  }
+
+  function stopSelecting() {
+    setSelecting(false);
+    setSelected([]);
+  }
+
+  async function deleteSelected() {
+    const ids = selected.filter((id) => rows.some((row) => row.id === id));
+    if (!ids.length) return;
+    const question =
+      ids.length === 1
+        ? t("Delete 1 saved mistake? This cannot be undone.")
+        : t("Delete {n} saved mistakes? This cannot be undone.").replace("{n}", String(ids.length));
+    if (!window.confirm(question)) return;
+    setDeletingMany(true);
+    try {
+      const { deleted } = await removeMistakes({ data: { ids } });
+      setAnswered((list) => list.filter((item) => !ids.includes(item)));
+      if (answered.some((item) => ids.includes(item))) {
+        setOutcome(null);
+        setAnswer("");
+      }
+      stopSelecting();
+      await queryClient.invalidateQueries({ queryKey: ["mistakes", profile?.id] });
+      void queryClient.invalidateQueries({ queryKey: ["mistakes-due"] });
+      toast.success(
+        deleted === 1
+          ? t("1 mistake deleted.")
+          : t("{n} mistakes deleted.").replace("{n}", String(deleted)),
+      );
+    } catch {
+      toast.error(t("Could not delete these mistakes. Please try again."));
+    } finally {
+      setDeletingMany(false);
+    }
+  }
+
+  const allListedSelected = listed.length > 0 && listed.every((row) => selected.includes(row.id));
 
   return (
     <AppShell mobileOneScreen>
@@ -443,24 +501,106 @@ function Mistakes() {
               ))}
             </div>
           ) : null}
+          {rows.length > 0 &&
+            (selecting ? (
+              <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/60 bg-white/[0.03] p-2 text-xs">
+                <button
+                  type="button"
+                  className="min-h-9 font-semibold text-primary hover:underline"
+                  onClick={() =>
+                    setSelected(
+                      allListedSelected
+                        ? selected.filter((id) => !listed.some((row) => row.id === id))
+                        : [...new Set([...selected, ...listed.map((row) => row.id)])],
+                    )
+                  }
+                >
+                  {allListedSelected ? (
+                    t("Clear selection")
+                  ) : (
+                    <>
+                      <span>{t("Select all")}</span> <span>({listed.length})</span>
+                    </>
+                  )}
+                </button>
+                <span className="ml-auto flex items-center gap-1.5">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs"
+                    onClick={stopSelecting}
+                  >
+                    {t("Cancel")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="h-8 gap-1.5 px-2.5 text-xs"
+                    disabled={selected.length === 0 || deletingMany}
+                    onClick={() => void deleteSelected()}
+                  >
+                    {deletingMany ? (
+                      <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Trash2 className="size-3.5" aria-hidden="true" />
+                    )}
+                    <span>{t("Delete")}</span> <span>({selected.length})</span>
+                  </Button>
+                </span>
+              </div>
+            ) : (
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => setSelecting(true)}
+                >
+                  <ListChecks className="size-3.5" aria-hidden="true" />
+                  {t("Select to delete")}
+                </Button>
+              </div>
+            ))}
           {rows.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nothing here yet.</p>
           ) : (
             <ul className="max-h-[50vh] space-y-1.5 overflow-y-auto pr-1 lg:max-h-[60vh]">
               {listed.map((row) => (
-                <li key={row.id} className="rounded-lg border border-border/60 p-2 text-sm">
-                  <p className="mb-1 text-[11px] font-medium text-muted-foreground">
-                    {(() => {
-                      const detectedAt = new Date(row.last_detected);
-                      const today = new Date();
-                      detectedAt.setHours(0, 0, 0, 0);
-                      today.setHours(0, 0, 0, 0);
-                      const days = Math.max(
-                        0,
-                        Math.floor((today.getTime() - detectedAt.getTime()) / 86_400_000),
-                      );
-                      return days === 0 ? "Today" : days === 1 ? "1 day ago" : `${days} days ago`;
-                    })()}
+                <li
+                  key={row.id}
+                  className={cn(
+                    "rounded-lg border p-2 text-sm",
+                    selecting && selected.includes(row.id)
+                      ? "border-destructive/50 bg-destructive/[0.06]"
+                      : "border-border/60",
+                  )}
+                >
+                  <p className="mb-1 flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
+                    {selecting && (
+                      <input
+                        type="checkbox"
+                        className="size-4 accent-[var(--destructive)]"
+                        checked={selected.includes(row.id)}
+                        onChange={() => toggleSelected(row.id)}
+                        aria-label={`${t("Select")}: ${row.corrected_text}`}
+                      />
+                    )}
+                    <span>
+                      {(() => {
+                        const detectedAt = new Date(row.last_detected);
+                        const today = new Date();
+                        detectedAt.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+                        const days = Math.max(
+                          0,
+                          Math.floor((today.getTime() - detectedAt.getTime()) / 86_400_000),
+                        );
+                        return days === 0 ? "Today" : days === 1 ? "1 day ago" : `${days} days ago`;
+                      })()}
+                    </span>
                   </p>
                   {row.sentence ? (
                     <p translate="no" lang="en">
@@ -498,7 +638,7 @@ function Mistakes() {
                       />
                     ))}
                   </div>
-                  <div className="mt-2 flex justify-end">
+                  <div className={cn("mt-2 flex justify-end", selecting && "hidden")}>
                     <Button
                       type="button"
                       variant="ghost"

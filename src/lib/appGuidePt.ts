@@ -35,8 +35,8 @@ export const appGuidePt: Record<string, string> = {
     "Ouça cada palavra e fale em voz alta para treinar a pronúncia.",
   "Tap I know it when you are sure: the word comes back later for review.":
     "Toque em Eu sei quando tiver certeza: a palavra volta depois para revisão.",
-  "Review the words that are due; ten reviewed words complete a study day.":
-    "Revise as palavras do dia; dez palavras revisadas completam um dia de estudo.",
+  "Review the words that are due; ten reviewed words complete a study day. Your lesson cards due show right under them, in the same word review.":
+    "Revise as palavras do dia; dez palavras revisadas fecham o dia de estudo. Os cartões das lições para revisar aparecem logo abaixo, na mesma revisão de palavras.",
   Listening: "Escuta",
   "Short sentences at your level to train your ear.":
     "Frases curtas no seu nível para treinar o ouvido.",
@@ -44,12 +44,12 @@ export const appGuidePt: Record<string, string> = {
     "Toque a frase; você pode ouvir de novo quantas vezes precisar.",
   "Repeat it out loud and see how close you were.":
     "Repita em voz alta e veja o quanto chegou perto.",
-  "A short text at your level every day: a motivational text one day, an everyday story the next.":
-    "Um texto curto no seu nível todos os dias: um dia, um texto motivacional; no outro, uma história do cotidiano.",
+  "A short text at your level every day, on a different subject each day: daily life, travel, technology, work, culture, wellbeing and, once a week, a motivational text.":
+    "Um texto curto no seu nível todo dia, com um assunto diferente a cada dia: dia a dia, viagem, tecnologia, trabalho, cultura, bem-estar e, uma vez por semana, um texto motivacional.",
   "Read the text; it gets longer and richer as your level goes up.":
     "Leia o texto; ele fica mais longo e mais rico conforme seu nível sobe.",
-  "Tap Listen to EVO to hear it read aloud.":
-    "Toque em Ouvir a EVO para escutar o texto em voz alta.",
+  "Tap Listen to EVO to hear it read aloud; the paragraph being read is highlighted, and 0.8× slows the voice.":
+    "Toque em Ouvir a EVO para escutar o texto em voz alta; o parágrafo lido fica destacado, e 0.8× deixa a voz mais lenta.",
   "Tap any word you don't understand to see its translation; the words you tap stay marked, and Save to my Vocabulary sends them to your word reviews.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução; as palavras tocadas ficam marcadas, e Salvar no meu Vocabulário as envia para as suas revisões de palavras.",
   "Keep Today's pick or choose what to read: a category (daily life, work, travel, technology, health, culture) and a style (story, article, dialogue).":
@@ -58,8 +58,8 @@ export const appGuidePt: Record<string, string> = {
     "O primeiro texto que você termina no dia é o que conta; os outros textos do dia são prática extra.",
   "Your answers are your Reading score and close your study day.":
     "Suas respostas formam a sua nota de Reading e fecham o seu dia de estudo.",
-  "Answer the questions to check what you understood.":
-    "Responda às perguntas para conferir o que você entendeu.",
+  "Answer the questions to check what you understood; after checking, See in the text shows the paragraph with each answer.":
+    "Responda às perguntas para conferir o que entendeu; depois da correção, Ver no texto mostra o parágrafo de cada resposta.",
   "When EVO's priority is Reading, Practice now opens the daily reading.":
     "Quando a prioridade da EVO é Reading, Praticar agora abre a leitura do dia.",
   "One session has 9 sentences and is saved every 3; finishing it completes a study day.":
@@ -74,8 +74,8 @@ export const appGuidePt: Record<string, string> = {
   "There are three tasks a day; your mistakes go to My mistakes, and three texts complete a study day.":
     "São três tarefas por dia; seus erros vão para Meus erros, e três textos completam um dia de estudo.",
   "My mistakes": "Meus erros",
-  "The mistakes you made in Writing and with the AI Teacher, for spaced review.":
-    "Os erros que você cometeu no Writing e com o AI Teacher, para revisão espaçada.",
+  "The mistakes you made in Writing, with the AI Teacher and in lesson quizzes, for spaced review.":
+    "Os erros que você cometeu no Writing, com o Professor de IA e nos quizzes das lições, para revisão espaçada.",
   "Correct the marked part of each sentence and check your answer.":
     "Corrija a parte marcada de cada frase e confira sua resposta.",
   "Use Practise the rule for one more question on the same point.":
@@ -98,7 +98,8 @@ export const appGuidePt: Record<string, string> = {
     "Inicie a chamada e fale naturalmente; a EVO reage e mantém a conversa.",
   "Small mistakes are fixed by EVO repeating your sentence the right way.":
     "Pequenos erros são corrigidos com a EVO repetindo sua frase do jeito certo.",
-  "End the call to see your report.": "Encerre a chamada para ver seu relatório.",
+  "End the call to see your report; a call that reaches its report (3 answers) completes a study day.":
+    "Encerre a chamada para ver seu relatório; a chamada que chega ao relatório (3 respostas) fecha o dia de estudo.",
   "AI Teacher": "AI Teacher",
   "A written tutor at your level: explanations, examples, practice and corrections.":
     "Um professor por escrito no seu nível: explicações, exemplos, exercícios e correções.",
@@ -247,4 +248,18 @@ export const appGuidePt: Record<string, string> = {
   "Full guide": "Guia completo",
   "Stuck? Open Ask EVO for help under the box: a way to start, useful words or a check of your last sentence.":
     "Travou? Abra Pedir ajuda à EVO embaixo da caixa: um jeito de começar, palavras úteis ou a conferência da sua última frase.",
+  "A retake brings the questions in a new order, the ones you missed first, and a wrong fill-in answer goes to My mistakes.":
+    "Ao refazer, as perguntas vêm em outra ordem, as que você errou primeiro, e a lacuna respondida errado vai para My mistakes.",
+  "Unit 6 has two review lessons: Review I opens after Units 1 and 2, and Review II after Units 3 to 5.":
+    "A Unidade 6 tem duas lições de revisão: a Review I abre depois das Unidades 1 e 2, e a Review II depois das Unidades 3 a 5.",
+  "Look up any English word or phrase in the built-in translator at the top.":
+    "Procure qualquer palavra ou expressão em inglês no tradutor no topo da página.",
+  "Premium: in Music Lab, create one song a day in English at your level.":
+    "Premium: no Music Lab, crie uma música por dia em inglês no seu nível.",
+  "Your reading week, above the text, opens the texts of the last seven days again.":
+    "Sua semana de leitura, acima do texto, abre de novo os textos dos últimos sete dias.",
+  "Filter the list by type of mistake, and tap Select to delete to remove several at once.":
+    "Filtre a lista por tipo de erro e toque em Selecionar para apagar para remover vários de uma vez.",
+  "My Subscription, in the menu, shows your plan; the first Premium subscription starts with 7 free days, and you can cancel there.":
+    "Minha assinatura, no menu, mostra o seu plano; a primeira assinatura Premium começa com 7 dias grátis, e você pode cancelar ali.",
 };
