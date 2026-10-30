@@ -105,7 +105,7 @@ export function WeeklyLeagueSummary({
       <DashboardHeaderStat
         icon={<TrendingUp className="size-6" strokeWidth={2.2} />}
         tone={weekXpRising(week) ? "green" : "grey"}
-        label={translate("Weekly XP")}
+        label={translate("Weekly league")}
         value={`${week.thisWeek} XP`}
         detail={weekXpLine(week, translate)}
         to="/league"
