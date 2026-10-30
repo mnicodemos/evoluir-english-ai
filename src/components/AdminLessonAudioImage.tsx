@@ -77,16 +77,17 @@ export function AdminLessonAudioImage() {
   const current = draft?.dataUrl ?? imageQuery.data?.imageUrl ?? null;
 
   return (
-    <section className="mt-5 space-y-3 border-t border-border pt-4">
-      <div>
-        <h3 className="flex items-center gap-2 font-semibold">
-          <ImagePlus className="size-4" /> Lesson Audio image
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Independent image for the Lesson Audio tab in Review I and Review II across A1–C2. The
-          Home dashboard and EVO avatar are not affected.
-        </p>
+    // A card of the Home images grid, beside the video call (owner request,
+    // 2026-10-30: the empty space next to it), laid out like the other cards.
+    <article className="min-w-0 space-y-3 rounded-lg border border-border p-3 sm:p-4">
+      <div className="flex items-center gap-2">
+        <ImagePlus className="size-4 text-muted-foreground" />
+        <h4 className="font-semibold">Lesson Audio image</h4>
       </div>
+      <p className="text-sm text-muted-foreground">
+        Shown beside the Lesson audio tab of every lesson. The Home dashboard and EVO avatar are not
+        affected.
+      </p>
       {imageQuery.isPending ? (
         <div className="flex items-center gap-2 py-3 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" /> Loading current image…
@@ -96,14 +97,14 @@ export function AdminLessonAudioImage() {
           The current Lesson Audio image could not be loaded.
         </p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-start">
-          <div className="flex min-h-48 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+        <>
+          <div className="mx-auto flex aspect-square w-full max-w-xs items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
             {current && !imageFailed ? (
               <img
                 src={current}
                 alt={draft ? `Preview: ${draft.name}` : "Current Lesson Audio image"}
                 onError={() => setImageFailed(true)}
-                className="block max-h-64 w-full object-contain"
+                className="block size-full object-contain"
               />
             ) : (
               <p className="px-4 py-8 text-center text-sm text-muted-foreground">
@@ -113,40 +114,43 @@ export function AdminLessonAudioImage() {
               </p>
             )}
           </div>
-          <div className="space-y-3">
-            <label className="block text-sm font-medium">
-              Choose image
-              <input
-                className="mt-1 block w-full cursor-pointer rounded-md border border-border bg-background px-3 py-2 text-sm"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(event) => void selectFile(event.target.files?.[0])}
-              />
-            </label>
-            <p className="text-xs text-muted-foreground">
-              JPG, PNG or WebP · maximum 3 MB. Preview before publishing.
+          {draft ? (
+            <p className="truncate text-xs text-muted-foreground">
+              Preview: {draft.name} — not published yet
             </p>
-            <Button
-              type="button"
-              className="w-full gap-2"
-              disabled={!draft || mutation.isPending}
-              onClick={() => draft && mutation.mutate(draft)}
-            >
-              {mutation.isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Save className="size-4" />
-              )}
-              {mutation.isPending ? "Publishing…" : "Publish image"}
-            </Button>
-            {notice ? (
-              <p role="status" className="text-sm text-muted-foreground">
-                {notice}
-              </p>
-            ) : null}
-          </div>
-        </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Currently published</p>
+          )}
+          <label className="block text-sm font-medium">
+            Choose image
+            <input
+              className="mt-1 block w-full cursor-pointer rounded-md border border-border bg-background px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-secondary file:px-3 file:py-1.5"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(event) => void selectFile(event.target.files?.[0])}
+            />
+          </label>
+          <p className="text-xs text-muted-foreground">JPG, PNG or WebP · maximum 3 MB</p>
+          <Button
+            type="button"
+            className="w-full gap-2"
+            disabled={!draft || mutation.isPending}
+            onClick={() => draft && mutation.mutate(draft)}
+          >
+            {mutation.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Save className="size-4" />
+            )}
+            {mutation.isPending ? "Publishing…" : "Publish image"}
+          </Button>
+          {notice ? (
+            <p role="status" className="text-sm text-muted-foreground">
+              {notice}
+            </p>
+          ) : null}
+        </>
       )}
-    </section>
+    </article>
   );
 }

@@ -238,6 +238,7 @@ export function AdminHomeMedia() {
               </article>
             );
           })}
+          <AdminLessonAudioImage />
         </div>
       )}
       {notice ? (
@@ -245,7 +246,6 @@ export function AdminHomeMedia() {
           {notice}
         </p>
       ) : null}
-      <AdminLessonAudioImage />
     </section>
   );
 }
