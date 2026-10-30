@@ -118,7 +118,8 @@ function LessonPage() {
   // A level's final test is only taken on its own page, where passing promotes
   // the student; opening it as an ordinary lesson would skip the promotion.
   const isFinalTest = !!lesson?.curriculum_key?.endsWith("-final");
-  // Curriculum lessons use the EVO + Leo dialogue; video playback remains available for Business and future video content.
+  // Curriculum and Business lessons use the EVO + Leo dialogue instead of a video (owner
+  // decision, 2026-10-30: no videos in Business English); the review Test has neither.
   const podcast = hasLessonPodcast(repairPlan);
   useEffect(() => {
     if (isFinalTest) navigate({ to: "/learning/final-test", replace: true });
