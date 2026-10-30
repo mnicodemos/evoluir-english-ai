@@ -37,12 +37,15 @@ export function HomeVideo() {
             loading="lazy"
             className="size-full object-cover"
           />
-          <span className="absolute inset-0 bg-black/15 transition-colors group-hover:bg-black/5" />
-          <span className="absolute left-1/2 top-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-success text-primary-foreground shadow-lg ring-8 ring-success/20 transition-transform group-hover:scale-105 sm:size-20">
-            <Play className="ml-1 size-7 fill-current sm:size-8" aria-hidden="true" />
-          </span>
-          <span className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
-            0:23
+          <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent transition-opacity group-hover:opacity-70" />
+          {/* Bottom-left glass pill (owner review, 2026-10-31): the centred
+              button sat on EVO's chin; the play is the brand's CTA turquoise. */}
+          <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/45 py-1 pl-1 pr-3 text-xs sm:gap-2.5 sm:py-1.5 sm:pl-1.5 sm:pr-4 sm:text-sm font-semibold text-white backdrop-blur-md transition-colors group-hover:bg-black/60 sm:bottom-5 sm:left-5">
+            <span className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform group-hover:scale-105 sm:size-10">
+              <Play className="ml-0.5 size-3.5 fill-current sm:size-5" aria-hidden="true" />
+            </span>
+            <span>Assistir</span>
+            <span className="text-white/60">· 0:23</span>
           </span>
         </button>
       )}
