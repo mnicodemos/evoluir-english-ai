@@ -484,23 +484,13 @@ function AppShellContent({
     <TooltipProvider delayDuration={200}>
       <div
         className={cn(
-          "dashboard-shell dark relative isolate flex min-h-screen flex-col bg-background",
+          "dashboard-shell dark flex min-h-screen flex-col bg-background",
           dashboardLayout
             ? "h-dvh overflow-hidden lg:h-auto lg:overflow-visible lg:pb-0"
             : "pb-[calc(4.275rem+_env(safe-area-inset-bottom))] lg:pb-0",
           "lg:pl-[13.2rem]",
         )}
       >
-        {/* The Dashboard's light (owner request, 2026-10-31: the same soft turquoise
-            as the public home): one glow from the top-right over the page's base and
-            a fainter one at the bottom-left, both fading out gradually (eased stops),
-            behind the cards. Dashboard only, so other pages keep their plain base. */}
-        {dashboardLayout ? (
-          <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
-            <div className="absolute inset-0 bg-[radial-gradient(60%_55%_at_80%_8%,rgba(20,220,185,0.13)_0%,rgba(20,220,185,0.095)_25%,rgba(20,220,185,0.05)_50%,rgba(20,220,185,0.015)_75%,transparent_100%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(50%_45%_at_18%_95%,rgba(20,220,185,0.06)_0%,rgba(20,220,185,0.03)_45%,rgba(20,220,185,0.008)_75%,transparent_100%)]" />
-          </div>
-        ) : null}
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
           <Link
             to="/dashboard"
