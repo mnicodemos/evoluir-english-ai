@@ -45,7 +45,7 @@ import { useLessonAudioImage } from "@/hooks/useHomeImages";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
-import { lessonVideoEmbedUrl } from "@/lib/lessonVideoDisplay";
+import { cleanVimeoPlayerUrl, lessonVideoEmbedUrl, vimeoVideoId } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -535,20 +535,38 @@ function LessonPage() {
           >
             <div className="card-soft space-y-5 p-6">
               {summaryVideoEmbedUrl ? (
-                <section className="space-y-2" aria-labelledby="summary-video-title">
-                  <h3 id="summary-video-title" className="text-sm font-semibold">
-                    Video reinforcement
-                  </h3>
-                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
+                // One video size across the app (owner request, 2026-10-31): half the
+                // card on desktop with a panel beside it, like the level
+                // presentation and the extra videos; full width on phones.
+                <section
+                  className="grid gap-4 lg:grid-cols-2 lg:items-center lg:gap-6"
+                  aria-labelledby="summary-video-title"
+                >
+                  <div className="aspect-video w-full overflow-hidden rounded-xl bg-black shadow-[0_18px_40px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
                     <iframe
                       className="h-full w-full"
-                      src={summaryVideoEmbedUrl}
+                      src={
+                        vimeoVideoId(summaryVideoEmbedUrl)
+                          ? cleanVimeoPlayerUrl(summaryVideoEmbedUrl)
+                          : summaryVideoEmbedUrl
+                      }
                       title={lesson?.title ?? "Lesson video reinforcement"}
                       loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-brand-green">
+                      Video reinforcement
+                    </p>
+                    <h3 id="summary-video-title" className="font-display text-xl font-semibold">
+                      <span translate="no">{lesson?.title}</span>
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Watch the video, then read the guide below and take the quiz.
+                    </p>
                   </div>
                 </section>
               ) : null}
