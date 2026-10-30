@@ -44,7 +44,12 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
   });
   const earned = Array.isArray(earnedData) ? earnedData : [];
   const streak = profile ? effectiveStreak(profile) : 0;
-  const nextIndex = JEWELS.find((jewel) => !earned.includes(jewel.index))?.index ?? null;
+  // Reaching a jewel means passing every one before it, and older accounts
+  // only have their highest jewel stored (backfill), so the highest award
+  // marks all jewels up to it as earned and the next one is the one after it
+  // (owner report, 2026-10-31: Amethyst earned, Bronze shown as next).
+  const highest = earned.length ? Math.max(...earned) : -1;
+  const nextIndex = highest + 1 < JEWELS.length ? highest + 1 : null;
   const pt = useUiLang().lang === "pt";
 
   return (
@@ -53,7 +58,7 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
       aria-label={translate("Your jewels")}
     >
       {JEWELS.map((jewel) => {
-        const isEarned = earned.includes(jewel.index);
+        const isEarned = jewel.index <= highest;
         const isNext = jewel.index === nextIndex;
         const left = Math.max(0, jewel.days - streak);
         return (
