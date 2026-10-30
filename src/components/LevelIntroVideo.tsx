@@ -53,12 +53,15 @@ export function LevelIntroVideo({
   level,
   label,
   userId,
+  started = false,
 }: {
   /** "a1" to "c2", or "business". */
   level: string;
   /** What the student sees: "A1", "Business English". */
   label: string;
   userId?: string | undefined;
+  /** The student already completed lessons here: the card starts as one row. */
+  started?: boolean;
 }) {
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
@@ -85,7 +88,9 @@ export function LevelIntroVideo({
   );
   const embed = vimeoEmbedUrl(url);
   if (!embed) return null;
-  const showPlayer = !seen || open;
+  // A student already into the level gets the one row at first (owner review,
+  // 2026-10-31: at 13/30 the open video took the whole first screen).
+  const showPlayer = open || (!seen && !started);
   const business = level === "business";
   const facts = business ? BUSINESS_FACTS : LEVEL_FACTS;
   const subtitle = business ? t("English for work") : findLevel(level).hint;
@@ -102,7 +107,8 @@ export function LevelIntroVideo({
           <PlayCircle className="size-5" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1 text-sm font-semibold">
-          <span>{t("Level presentation")}</span> · <span>{label}</span>
+          <span>{seen ? t("Level presentation") : t("Watch the level presentation")}</span> ·{" "}
+          <span>{label}</span>
         </span>
         <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
       </button>
@@ -119,7 +125,7 @@ export function LevelIntroVideo({
         aria-hidden="true"
         className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
       />
-      <div className="relative grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(15rem,2fr)] lg:items-center lg:gap-6">
+      <div className="relative grid gap-4 lg:grid-cols-2 lg:items-center lg:gap-6">
         <div className="overflow-hidden rounded-xl bg-black shadow-[0_18px_40px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
           <iframe
             className="aspect-video w-full"
@@ -143,8 +149,8 @@ export function LevelIntroVideo({
           </div>
           <ul className="space-y-2">
             {facts.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-start gap-2.5 text-sm">
-                <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-md bg-white/[0.06] text-brand-green">
+              <li key={text} className="flex items-center gap-2.5 text-sm">
+                <span className="grid size-6 shrink-0 place-items-center rounded-md bg-white/[0.06] text-brand-green">
                   <Icon className="size-3.5" aria-hidden="true" />
                 </span>
                 <span className="text-foreground/85">{t(text)}</span>
@@ -152,8 +158,16 @@ export function LevelIntroVideo({
             ))}
           </ul>
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            {seen ? (
-              <Button size="sm" variant="ghost" className="gap-1.5" onClick={() => setOpen(false)}>
+            {seen || started ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="gap-1.5"
+                onClick={() => {
+                  setSeen(true);
+                  setOpen(false);
+                }}
+              >
                 <ChevronDown className="size-4 rotate-180" aria-hidden="true" />
                 {t("Hide video")}
               </Button>
