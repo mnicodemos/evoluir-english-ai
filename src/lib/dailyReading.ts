@@ -377,6 +377,14 @@ export function sentenceWith(text: string, term: string): string {
   return (found ?? "").trim().slice(0, 400);
 }
 
+/** The last seven study days, oldest first, ending today ("YYYY-MM-DD"). */
+export function readingWeekDays(today: string): string[] {
+  const base = Date.parse(`${today}T12:00:00Z`);
+  return Array.from({ length: 7 }, (_, index) =>
+    new Date(base - (6 - index) * 86_400_000).toISOString().slice(0, 10),
+  );
+}
+
 /** Words a learner reads per minute, by level (slower than a native reader). */
 const READING_WORDS_PER_MINUTE: Record<ReadingLevel, number> = {
   a1: 70,

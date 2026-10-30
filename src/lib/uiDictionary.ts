@@ -1333,6 +1333,16 @@ const baseUiPt: Record<string, string> = {
   "Tap any word you don't understand to see its translation.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução.",
   "Words you marked": "Palavras que você marcou",
+  "Your reading week": "Sua semana de leitura",
+  "Read it again": "Ler de novo",
+  "Reading done": "Leitura feita",
+  "Reading again from": "Relendo o texto de",
+  "practice: today's study day is not changed.": "prática: o dia de estudo de hoje não muda.",
+  "Back to today": "Voltar para hoje",
+  "Your answers from that day.": "Suas respostas daquele dia.",
+  "Practice: answers checked here, today's study day is not changed.":
+    "Prática: respostas conferidas aqui, o dia de estudo de hoje não muda.",
+  "Read another topic": "Ler outro tema",
   "Slower voice": "Voz mais lenta",
   "See in the text": "Ver no texto",
   "Save to my Vocabulary": "Salvar no meu Vocabulário",

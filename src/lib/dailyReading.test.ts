@@ -14,6 +14,7 @@ import {
   readingParagraphs,
   readingSpeechChunks,
   readingSpeechParts,
+  readingWeekDays,
   readingThemeForDay,
   readingKindLabel,
   readingEstimate,
@@ -116,6 +117,18 @@ describe("daily reading rules", () => {
       { text: "Third paragraph here.", paragraph: 1 },
     ]);
     expect(readingSpeechChunks("First one.\n\nSecond.")).toEqual(["First one.", "Second."]);
+  });
+
+  it("lists the last seven study days, oldest first", () => {
+    expect(readingWeekDays("2026-11-02")).toEqual([
+      "2026-10-27",
+      "2026-10-28",
+      "2026-10-29",
+      "2026-10-30",
+      "2026-10-31",
+      "2026-11-01",
+      "2026-11-02",
+    ]);
   });
 
   it("estimates the size of the reading by level", () => {

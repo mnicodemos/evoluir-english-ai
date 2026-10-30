@@ -19,13 +19,14 @@ import {
   READING_STYLES,
   readingLevel,
   readingThemeForDay,
+  readingWeekDays,
   todaysPickForDay,
   type DailyReadingContent,
   type ReadingChoice,
   type ReadingLevel,
   type ReadingTheme,
 } from "./dailyReading";
-import { studyDayStartIso, studyToday } from "./today";
+import { studyToday } from "./today";
 
 export type DailyReading = {
   day: string;
@@ -35,6 +36,11 @@ export type DailyReading = {
   fallback: boolean;
   /** The category and style the student chose; null for "Today's pick". */
   choice: ReadingChoice | null;
+  /**
+   * A text of an earlier day of the week, opened again from the reading week:
+   * practice only, it never closes a study day.
+   */
+  past: boolean;
   /**
    * The student already finished today's reading: their answers (when
    * recorded), score and the text they read (choice), so the page shows it
@@ -52,15 +58,25 @@ const choiceSchema = z
   .strict()
   .nullable();
 
-/** Today's reading of the student, if they finished it (one per day). */
-async function readCompletion(userId: string): Promise<DailyReading["completed"]> {
+/** The instant a São Paulo study day began, as a UTC ISO string. */
+function dayStartIso(day: string) {
+  return new Date(`${day}T00:00:00-03:00`).toISOString();
+}
+
+/** The student's reading of a day (today by default), if they finished it (one per day). */
+async function readCompletion(
+  userId: string,
+  day: string = studyToday(),
+): Promise<DailyReading["completed"]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const next = new Date(Date.parse(`${day}T12:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
   const { data } = await supabaseAdmin
     .from("activities")
     .select("score, result")
     .eq("user_id", userId)
     .eq("activity_type", "daily_reading")
-    .gte("created_at", studyDayStartIso())
+    .gte("created_at", dayStartIso(day))
+    .lt("created_at", dayStartIso(next))
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -117,16 +133,109 @@ export const loadDailyReading = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z
-      .object({ choice: choiceSchema.optional() })
+      .object({
+        choice: choiceSchema.optional(),
+        /** An earlier day of the week to read again; today when absent. */
+        day: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional(),
+      })
       .strict()
       .parse(input ?? {}),
   )
   .handler(async ({ data, context }): Promise<DailyReading> => {
+    const today = studyToday();
+    if (data.day && data.day !== today) {
+      return pastReading(context.userId, data.day, data.choice ?? null);
+    }
     const [reading, completed] = await Promise.all([
       todaysReading(context.userId, data.choice ?? null),
       readCompletion(context.userId),
     ]);
-    return { ...reading, completed };
+    return { ...reading, past: false, completed };
+  });
+
+/**
+ * A text of the last seven days, read again (owner request, 2026-10-30: each
+ * day was isolated). Only a stored text: no AI call for a past day. The
+ * student's answers of that day come back with it; answering again is
+ * practice on the device.
+ */
+async function pastReading(
+  userId: string,
+  day: string,
+  choice: ReadingChoice | null,
+): Promise<DailyReading> {
+  if (!readingWeekDays(studyToday()).includes(day)) {
+    throw new Error("Only the readings of the last seven days can be opened again.");
+  }
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("level")
+    .eq("id", userId)
+    .maybeSingle();
+  const level = readingLevel(profile?.level);
+  const [stored, completed] = await Promise.all([
+    readStored(day, level, choice),
+    readCompletion(userId, day),
+  ]);
+  if (!stored?.content) throw new Error("This reading is no longer available.");
+  const theme = (stored.theme as ReadingTheme | undefined) ?? readingThemeForDay(day);
+  return { day, level, theme, fallback: false, choice, past: true, completed, ...stored.content };
+}
+
+export type ReadingWeekDay = {
+  day: string;
+  /** Finished that day (the study-day reading). */
+  done: boolean;
+  score: number | null;
+  /** The text read that day: its category and style, or null for the day's pick. */
+  choice: ReadingChoice | null;
+  /** A stored text the student can open again (never today, which is the page itself). */
+  available: boolean;
+};
+
+/**
+ * The student's last seven days of reading for the week strip: which days
+ * were finished, with the score, and which earlier texts can be read again.
+ */
+export const loadReadingWeek = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ReadingWeekDay[]> => {
+    const today = studyToday();
+    const days = readingWeekDays(today);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [{ data: profile }, { data: rows }] = await Promise.all([
+      supabaseAdmin.from("profiles").select("level").eq("id", context.userId).maybeSingle(),
+      supabaseAdmin
+        .from("activities")
+        .select("score, result, created_at")
+        .eq("user_id", context.userId)
+        .eq("activity_type", "daily_reading")
+        .gte("created_at", dayStartIso(days[0]!))
+        .order("created_at", { ascending: true })
+        .limit(20),
+    ]);
+    const level = readingLevel(profile?.level);
+    const byDay = new Map<string, { score: number | null; choice: ReadingChoice | null }>();
+    for (const row of rows ?? []) {
+      const result = (row.result ?? {}) as { day?: unknown; choice?: unknown };
+      const day =
+        typeof result.day === "string" ? result.day : studyToday(new Date(row.created_at));
+      const choice = choiceSchema.safeParse(result.choice ?? null);
+      byDay.set(day, { score: row.score ?? null, choice: choice.success ? choice.data : null });
+    }
+    return Promise.all(
+      days.map(async (day) => {
+        const read = byDay.get(day);
+        const choice = read?.choice ?? null;
+        const available =
+          day !== today && !!(await readStored(day, level, choice).catch(() => null))?.content;
+        return { day, done: !!read, score: read?.score ?? null, choice, available };
+      }),
+    );
   });
 
 /**
@@ -137,7 +246,7 @@ export const loadDailyReading = createServerFn({ method: "GET" })
 async function todaysReading(
   userId: string,
   choice: ReadingChoice | null,
-): Promise<Omit<DailyReading, "completed">> {
+): Promise<Omit<DailyReading, "completed" | "past">> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: profile } = await supabaseAdmin
     .from("profiles")
