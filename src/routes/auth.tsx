@@ -47,7 +47,8 @@ function AuthPage() {
   const signInWithGoogle = async () => {
     setGoogleLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      // Public return page: /auth sends a signed-in student straight to /dashboard.
+      redirect_uri: `${window.location.origin}/auth`,
     });
     if (result.error) {
       setGoogleLoading(false);
