@@ -16,7 +16,7 @@ import { findLevel, leagueLevelOf } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
-import { RANKING_MIN_MEMBERS, rankingOpen, type WeekXpSummary } from "@/lib/weekXp";
+import { RANKING_MIN_MEMBERS, rankingOpen, weekXpRising, type WeekXpSummary } from "@/lib/weekXp";
 
 export const Route = createFileRoute("/_authenticated/league")({
   head: () => ({
@@ -251,18 +251,20 @@ function League() {
 function YourWeek({ week }: { week: WeekXpSummary }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
-  const ahead = week.lastWeek > 0 && week.delta >= 0;
+  const rising = weekXpRising(week);
   return (
     <section className="card-soft space-y-3 p-4 sm:p-5">
       <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
-        <TrendingUp className="size-4 text-brand-green sm:size-5" />
+        <TrendingUp
+          className={cn("size-4 sm:size-5", rising ? "text-brand-green" : "text-muted-foreground")}
+        />
         {t("Weekly XP")}
       </h2>
       <p className="flex items-baseline gap-1.5">
         <span className="font-display text-4xl font-bold tabular-nums">{week.thisWeek}</span>
         <span className="text-sm text-muted-foreground">{t("XP this week")}</span>
       </p>
-      <p className={cn("text-sm font-medium", ahead || week.record ? "text-brand-green" : "")}>
+      <p className={cn("text-sm font-medium", rising ? "text-brand-green" : "")}>
         {weekXpLine(week, t)}
       </p>
       <dl className="grid grid-cols-2 gap-2 text-sm">

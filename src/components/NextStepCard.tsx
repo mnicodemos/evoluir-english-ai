@@ -64,6 +64,7 @@ import { useUiLang } from "@/lib/uiLang";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { studyToday } from "@/lib/today";
 import { wordReviewTarget } from "@/lib/wordReview";
+import { weekXpRising } from "@/lib/weekXp";
 import { DoneSeal } from "@/components/DoneSeal";
 
 /**
@@ -508,7 +509,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {/* Your week: XP against last week until the league has a ranking. */}
               <TrendingUp
                 className={`size-3.5 shrink-0 max-sm:size-4 ${
-                  (leagueShown?.lastWeek ?? 0) > 0 && (leagueShown?.delta ?? 0) >= 0
+                  weekXpRising({
+                    thisWeek: leagueShown?.xp ?? 0,
+                    delta: leagueShown?.delta ?? 0,
+                  })
                     ? "text-brand-green"
                     : "text-muted-foreground"
                 }`}

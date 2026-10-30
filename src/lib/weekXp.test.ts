@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { rankingOpen, weekXpSummary } from "./weekXp";
+import { rankingOpen, weekXpRising, weekXpSummary } from "./weekXp";
 
 describe("weekXpSummary", () => {
   it("compares this week with last week and the best earlier week", () => {
@@ -29,5 +29,14 @@ describe("rankingOpen", () => {
   it("opens the ranking from five students", () => {
     expect(rankingOpen(1)).toBe(false);
     expect(rankingOpen(5)).toBe(true);
+  });
+});
+
+describe("weekXpRising", () => {
+  it("is green with XP at or above last week, the first week included", () => {
+    expect(weekXpRising({ thisWeek: 40, delta: 40 })).toBe(true);
+    expect(weekXpRising({ thisWeek: 80, delta: 0 })).toBe(true);
+    expect(weekXpRising({ thisWeek: 30, delta: -20 })).toBe(false);
+    expect(weekXpRising({ thisWeek: 0, delta: 0 })).toBe(false);
   });
 });
