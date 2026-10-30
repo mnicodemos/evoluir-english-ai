@@ -58,6 +58,7 @@ function LearningCenter() {
     <AppShell>
       <div className="space-y-5 lg:space-y-4">
         <PageHeader
+          guide="learning"
           icon={GraduationCap}
           eyebrow={<>Learning Center</>}
           title={

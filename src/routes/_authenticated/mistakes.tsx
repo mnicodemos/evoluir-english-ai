@@ -272,6 +272,7 @@ function Mistakes() {
     <AppShell mobileOneScreen>
       <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,1fr)] lg:items-start lg:gap-4 lg:space-y-0">
         <PageHeader
+          guide="mistakes"
           icon={SpellCheck}
           accent="amber"
           className="lg:col-span-2"

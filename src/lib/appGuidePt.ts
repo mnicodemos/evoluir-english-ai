@@ -264,4 +264,29 @@ export const appGuidePt: Record<string, string> = {
     "Minha assinatura, no menu, mostra o seu plano; a primeira assinatura Premium começa com 7 dias grátis, e você pode cancelar ali.",
   "Start here, on top of the path, has the presentation video of your level (Business English has its own).":
     "O Comece aqui, no topo da trilha, tem o vídeo de apresentação do seu nível (o Business English tem o dele).",
+  Organize: "Organize",
+  "More details": "Mais detalhes",
+  "Fewer details": "Menos detalhes",
+  "How this page works": "Como esta página funciona",
+  "How to study with Evoluir+": "Como estudar com o Evoluir+",
+  "A 15-minute routine that works at any level. Do it on most days of the week.":
+    "Uma rotina de 15 minutos que funciona em qualquer nível. Faça na maioria dos dias da semana.",
+  "Open the Home and tap Practice now: it is EVO's priority, the most useful thing for you today (about 5 minutes).":
+    "Abra a Home e toque em Praticar agora: é a prioridade da EVO, o que mais ajuda você hoje (uns 5 minutos).",
+  "Do one review: the words, cards or mistakes due today (about 5 minutes). Reviewing on the right day is what makes them stay.":
+    "Faça uma revisão: as palavras, cartões ou erros do dia (uns 5 minutos). Revisar no dia certo é o que faz ficar na memória.",
+  "Produce something: talk to EVO or write a short text (about 5 minutes). You learn to speak by speaking, not only by understanding.":
+    "Produza algo: converse com a EVO ou escreva um texto curto (uns 5 minutos). Você aprende a falar falando, não só entendendo.",
+  "Close your study day (see What counts as a study day) and, if you have time, go on with the next lesson or the daily reading.":
+    "Feche o seu dia de estudo (veja O que conta como dia de estudo) e, se tiver tempo, siga com a próxima lição ou a leitura do dia.",
+  "Say everything out loud: the lesson audio, the cards and the Listening sentences. Your mouth needs practice as much as your ears.":
+    "Fale tudo em voz alta: o áudio da aula, os cartões e as frases do Listening. A boca precisa de treino tanto quanto os ouvidos.",
+  "Don't be afraid of mistakes: each one goes to My mistakes and comes back until you master it.":
+    "Não tenha medo de errar: cada erro vai para Meus erros e volta até você dominar.",
+  "A little every day beats a lot once a week: 15 minutes on 5 days teaches more than 75 minutes on Sunday.":
+    "Pouco todo dia vale mais que muito uma vez por semana: 15 minutos em 5 dias ensinam mais que 75 minutos no domingo.",
+  "Every week, follow your study plan; when the Final Test of your level opens, take it.":
+    "Toda semana, siga o seu plano de estudos; quando o Teste Final do seu nível abrir, faça.",
+  "Short on time? Tap Practice now and finish that one activity: it is the best use of 5 minutes.":
+    "Pouco tempo? Toque em Praticar agora e termine essa atividade: é o melhor uso de 5 minutos.",
 };

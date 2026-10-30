@@ -777,6 +777,7 @@ function ReadingPage() {
   return (
     <AppShell>
       <PageHeader
+        guide="reading"
         icon={BookOpenText}
         accent="amber"
         eyebrow={t("Reading practice")}

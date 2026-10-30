@@ -326,6 +326,7 @@ function Writing() {
   return (
     <AppShell mobileOneScreen>
       <PageHeader
+        guide="writing"
         icon={PenLine}
         accent="sky"
         eyebrow={<>Writing Practice</>}
