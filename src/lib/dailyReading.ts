@@ -82,10 +82,37 @@ export function readingLevel(level: string | null | undefined): ReadingLevel {
   return (READING_LEVELS as readonly string[]).includes(value) ? (value as ReadingLevel) : "b1";
 }
 
-/** Motivational on even days, an everyday story on odd days (São Paulo calendar day). */
-export function readingThemeForDay(day: string): ReadingTheme {
+/**
+ * Today's pick rotates through eight subjects, one a day (owner report,
+ * 2026-10-30: alternating motivational and story every other day read as
+ * "always motivation"). null is the motivational text, once every eight days;
+ * the others are a category and style like the student's own choices. The
+ * offset keeps 2026-10-30, whose texts were already written as motivational,
+ * on the motivational slot.
+ */
+const TODAY_ROTATION: readonly (ReadingChoice | null)[] = [
+  null,
+  { category: "daily_life", style: "story" },
+  { category: "travel", style: "dialogue" },
+  { category: "technology", style: "article" },
+  { category: "work", style: "story" },
+  { category: "culture", style: "article" },
+  { category: "wellbeing", style: "dialogue" },
+  { category: "daily_life", style: "dialogue" },
+];
+const TODAY_ROTATION_OFFSET = 4;
+
+/** The subject of Today's pick for a São Paulo calendar day. */
+export function todaysPickForDay(day: string): ReadingChoice | null {
   const days = Math.floor(Date.parse(`${day}T00:00:00Z`) / 86_400_000);
-  return Number.isFinite(days) && days % 2 === 0 ? "motivational" : "story";
+  if (!Number.isFinite(days)) return null;
+  const size = TODAY_ROTATION.length;
+  return TODAY_ROTATION[(((days - TODAY_ROTATION_OFFSET) % size) + size) % size] ?? null;
+}
+
+/** The stored theme of Today's pick: motivational only on its own day. */
+export function readingThemeForDay(day: string): ReadingTheme {
+  return todaysPickForDay(day) ? "story" : "motivational";
 }
 
 const THEME_BRIEF: Record<ReadingTheme, string> = {
@@ -450,18 +477,41 @@ export function lookupTerm(word: string): string {
 }
 
 /**
+ * What the text is about: the student's choice, or Today's pick of the day
+ * (Motivation, or the category and style of the rotation).
+ */
+export function readingKindLabel(
+  reading: { theme: ReadingTheme; day: string; choice?: ReadingChoice | null; fallback?: boolean },
+  t: (label: string) => string = (label) => label,
+): string {
+  // The fixed text shown when the AI fails says what it is, not the day's subject.
+  if (reading.fallback)
+    return t(reading.theme === "motivational" ? "Motivation" : "Everyday story");
+  const subject =
+    reading.choice ?? (reading.theme === "motivational" ? null : todaysPickForDay(reading.day));
+  if (subject) {
+    return `${t(READING_CATEGORY_LABELS[subject.category])} · ${t(READING_STYLE_LABELS[subject.style])}`;
+  }
+  return t(reading.theme === "motivational" ? "Motivation" : "Everyday story");
+}
+
+/**
  * Where the text comes from (user request: the reference of an article, book
  * or magazine). Every daily reading is an original text written by EVO for the
  * student's level, never copied from a publication, so the reference says so
  * plainly instead of inventing an author or source.
  */
 export function readingReference(
-  reading: { level: string; theme: ReadingTheme; day: string; choice?: ReadingChoice | null },
+  reading: {
+    level: string;
+    theme: ReadingTheme;
+    day: string;
+    choice?: ReadingChoice | null;
+    fallback?: boolean;
+  },
   t: (label: string) => string = (label) => label,
 ): string {
-  const kind = reading.choice
-    ? `${t(READING_CATEGORY_LABELS[reading.choice.category])} · ${t(READING_STYLE_LABELS[reading.choice.style])}`
-    : t(reading.theme === "motivational" ? "Motivation" : "Everyday story");
+  const kind = readingKindLabel(reading, t);
   return `${t("Original text by EVO")} · Evoluir+ English AI · ${reading.level.toUpperCase()} · ${kind} · ${reading.day}`;
 }
 

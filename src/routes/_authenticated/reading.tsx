@@ -30,6 +30,7 @@ import {
   READING_STYLE_LABELS,
   READING_STYLES,
   readingChoiceKey,
+  readingKindLabel,
   readingParagraphs,
   readingReference,
   readingShareText,
@@ -458,11 +459,7 @@ function ReadingPage() {
           <section className="card-soft p-4 sm:p-6" aria-labelledby="reading-title">
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="rounded-full bg-amber-400/12 px-2.5 py-1 font-medium text-amber-400">
-                {reading.choice
-                  ? `${t(READING_CATEGORY_LABELS[reading.choice.category])} · ${t(READING_STYLE_LABELS[reading.choice.style])}`
-                  : reading.theme === "motivational"
-                    ? t("Motivation")
-                    : t("Everyday story")}
+                {readingKindLabel(reading, t)}
               </span>
               <span className="rounded-full bg-secondary px-2.5 py-1 font-medium uppercase">
                 {reading.level}
