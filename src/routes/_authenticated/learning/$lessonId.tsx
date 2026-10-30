@@ -623,6 +623,7 @@ function LessonPage() {
           >
             <FlashcardDeck
               cards={data.flashcards}
+              level={profile?.level}
               userId={profile?.id}
               storageKey={profile?.id ? `lesson-cards:${profile.id}:${lessonId}` : null}
               states={cardStates ?? []}

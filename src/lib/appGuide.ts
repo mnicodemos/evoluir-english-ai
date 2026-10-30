@@ -52,7 +52,7 @@ export const APP_GUIDE: GuideSection[] = [
       "Tap Practice now to go straight to the right activity.",
       "Extra practice offers two short options; each shows the XP it earns.",
       "Today's Progress fills the ring with today's minutes and lists what you did.",
-      "Keep improving shows your reviews first (words, mistakes, skills), then today's new activities (New today); until your daily goal is met, free rows suggest more practice (Keep going).",
+      "Keep improving shows your reviews first (words, mistakes, lesson cards, skills), then today's new activities (New today); until your daily goal is met, free rows suggest more practice (Keep going).",
     ],
     tip: "Take the challenge has a goal for the day and leaves once you reach it. Every other day it invites you to the AI Teacher or the video call.",
     to: "/dashboard",
@@ -63,7 +63,7 @@ export const APP_GUIDE: GuideSection[] = [
     title: "Learning path",
     what: "The lessons of your level, in order, from the first unit to the Final Test.",
     steps: [
-      "Open the next lesson: watch the video, read the summary and review the cards.",
+      "Open the next lesson: listen to the lesson audio, read the summary and review the cards, rating each one Again, Hard or Easy (a missed card comes back in the same round).",
       "Answer the quiz: 70% or more completes the lesson.",
       "After 21 of the 30 lessons, the Final Test opens; 70% moves you up a level.",
       "Every lesson has its Lesson audio: EVO and Leo talk about the topic, and you can follow every line with its translation. At the challenge, answer out loud before hearing EVO's model answer, and use ↻ or Repeat after to practise each line.",

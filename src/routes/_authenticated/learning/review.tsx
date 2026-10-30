@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Repeat, RotateCcw, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
@@ -92,6 +92,17 @@ function ReviewPage() {
     return [...list].sort((a, b) => weight(a) - weight(b));
   }, [cards, states, today, startedLessonIds]);
 
+  // The round's cards are fixed when it starts: each rating refreshes the
+  // states and a rated card leaves the due list, which used to shift the deck
+  // and skip the next card (audit, 2026-10-30).
+  const [frozen, setFrozen] = useState<Flashcard[] | null>(null);
+  const ready =
+    !isLoading && cards !== undefined && states !== undefined && userLessons !== undefined;
+  useEffect(() => {
+    if (frozen === null && ready) setFrozen(queue);
+  }, [frozen, ready, queue]);
+  const roundCards = frozen ?? queue;
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -109,15 +120,15 @@ function ReviewPage() {
           title={<>Your hardest words first</>}
           description={
             <>
-              Cards marked as <strong>Incorrect</strong> come back sooner. Cards marked as{" "}
-              <strong>Correct</strong> move forward.
+              Cards marked <strong>Again</strong> come back in this round and tomorrow;{" "}
+              <strong>Hard</strong> and <strong>Easy</strong> move them further ahead.
             </>
           }
         />
 
         {isLoading ? (
           <Skeleton className="h-64 w-full" />
-        ) : queue.length === 0 ? (
+        ) : roundCards.length === 0 ? (
           <p className="card-soft p-6 text-sm text-muted-foreground">
             <Sparkles className="mb-2 size-5" /> No cards yet — open a lesson to start building your
             deck.
@@ -125,7 +136,8 @@ function ReviewPage() {
         ) : (
           <FlashcardDeck
             key={round}
-            cards={queue}
+            cards={roundCards}
+            level={profile?.level}
             userId={profile?.id}
             states={states ?? []}
             onRated={() => {
@@ -142,7 +154,10 @@ function ReviewPage() {
 
         <button
           type="button"
-          onClick={() => setRound((r) => r + 1)}
+          onClick={() => {
+            setFrozen(null);
+            setRound((r) => r + 1);
+          }}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <RotateCcw className="size-4" /> Start a new round
