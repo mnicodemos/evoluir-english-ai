@@ -144,17 +144,18 @@ export function LevelCard({
   );
 
   const studyBookLink = (
-    // A yellow download icon instead of "click here" (owner request).
-    <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-      {t("Download study book")}
+    // A yellow download icon before the text instead of "click here" (owner request).
+    <p className="mt-1 text-xs text-muted-foreground">
       <a
         href={studyBookHref}
         download
-        title={t("Download study book")}
-        className="grid size-6 place-items-center rounded-full text-amber-400 transition-colors hover:bg-amber-400/10 hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
+        className="group -ml-1 inline-flex items-center gap-1 rounded-full pr-1 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
         aria-label={`Download study book ${current.value.toUpperCase()}`}
       >
-        <Download className="size-4" strokeWidth={2.4} aria-hidden="true" />
+        <span className="grid size-6 place-items-center rounded-full text-amber-400 transition-colors group-hover:bg-amber-400/10 group-hover:text-amber-300">
+          <Download className="size-4" strokeWidth={2.4} aria-hidden="true" />
+        </span>
+        {t("Download study book")}
       </a>
     </p>
   );

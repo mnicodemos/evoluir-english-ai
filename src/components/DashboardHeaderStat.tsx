@@ -38,6 +38,7 @@ export function DashboardHeaderStat({
   iconColor,
   to,
   opens,
+  singleLine,
   hint,
 }: {
   icon: ReactNode;
@@ -53,6 +54,9 @@ export function DashboardHeaderStat({
   /** The cell sits inside a trigger that opens something (the jewels
    *  popover): it shows a magnifier in the same circle as a cell with `to`. */
   opens?: boolean;
+  /** The value keeps to one line (the jewels cell; owner request: the jewel's
+   *  name never on two lines). */
+  singleLine?: boolean;
   /** Shown on hover: how the number works (e.g. the jewels rule). */
   hint?: string;
 }) {
@@ -76,9 +80,15 @@ export function DashboardHeaderStat({
         <span className="line-clamp-2 text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground">
           {label}
         </span>
-        <span className="mt-0.5 line-clamp-2 break-words font-display text-lg font-bold leading-tight text-foreground">
-          {value}
-        </span>
+        {singleLine ? (
+          <span className="mt-0.5 block truncate font-display text-lg font-bold leading-tight text-foreground">
+            {value}
+          </span>
+        ) : (
+          <span className="mt-0.5 line-clamp-2 break-words font-display text-lg font-bold leading-tight text-foreground">
+            {value}
+          </span>
+        )}
         {detail &&
           (detailIcon ? (
             <span

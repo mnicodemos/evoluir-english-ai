@@ -48,6 +48,9 @@ import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard"
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
 import { JewelsPopover } from "@/components/JewelsCard";
+import { DiamondCelebration } from "@/components/DiamondCelebration";
+import { useDiamondLevel } from "@/hooks/useDiamondCycles";
+import { daysToNextDiamond, diamondName } from "@/lib/diamondCycles";
 import { getLeague } from "@/components/LeagueBadge";
 import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
@@ -705,7 +708,16 @@ function Dashboard() {
           "Obsidian",
           "Diamond",
         ];
+  // After the Diamond, Diamond cycles (owner decision, 2026-10-31).
+  const diamondLvl = useDiamondLevel(profile?.id, permanentJewelIndex === jewelNames.length - 1);
   const permanentJewelName =
+    permanentJewelIndex == null
+      ? null
+      : diamondLvl >= 1
+        ? diamondName(diamondLvl, lang === "pt" ? "pt" : "en")
+        : (jewelNames[permanentJewelIndex] ?? null);
+  // The cell keeps the jewel's own name on one line; the cycle is a chip.
+  const permanentJewelBaseName =
     permanentJewelIndex == null ? null : (jewelNames[permanentJewelIndex] ?? null);
   const jewelThresholds = [1, 7, 14, 21, 28, 35, 42, 49, 56, 63];
   const nextJewelIndex = permanentJewelIndex == null ? 0 : permanentJewelIndex + 1;
@@ -725,9 +737,18 @@ function Dashboard() {
           }
           return `${nextJewelName} in ${daysLabel} ${daysRemaining === 1 ? "day" : "days"}`;
         })()
-      : lang === "pt"
-        ? "Todas as 10 joias conquistadas"
-        : "All 10 jewels earned";
+      : diamondLvl >= 1
+        ? (() => {
+            // Short: the value already names the Diamond.
+            const next = `${diamondLvl >= 2 ? `×${diamondLvl} · ` : ""}×${diamondLvl + 1}`;
+            const days = daysToNextDiamond(diamondLvl, streakDays);
+            return lang === "pt"
+              ? `${next} em ${days} ${days === 1 ? "dia" : "dias"}`
+              : `${next} in ${days} ${days === 1 ? "day" : "days"}`;
+          })()
+        : lang === "pt"
+          ? "Todas as 10 joias conquistadas"
+          : "All 10 jewels earned";
   const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
 
@@ -756,345 +777,360 @@ function Dashboard() {
       {isLoading || !profile ? (
         <DashboardSkeleton />
       ) : (
-        <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(16.45rem,min-content)_minmax(min-content,1fr)_minmax(7.59rem,auto)] xl:gap-5 xl:pb-3">
-          <header className="animate-rise min-w-0 xl:h-16">
-            <EvoDailyReflection
-              userId={profile.id}
-              name={profile.name}
-              placement="dashboard-header"
-              desktopSubtitleTrailing={
-                <div className="flex items-center gap-1.5">
-                  <CampaignJourneyChip translate={t} placement="desktop" />
-                  <BlackFridayChip translate={t} placement="desktop" />
-                  {/* One capsule for Weather talk, the Focus timer and the bell, the
+        <>
+          <DiamondCelebration
+            userId={profile.id}
+            level={diamondLvl}
+            streakDays={streakDays}
+            englishLevel={profile.level ?? null}
+            lang={lang === "pt" ? "pt" : "en"}
+            translate={t}
+          />
+          <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(16.45rem,min-content)_minmax(min-content,1fr)_minmax(7.59rem,auto)] xl:gap-5 xl:pb-3">
+            <header className="animate-rise min-w-0 xl:h-16">
+              <EvoDailyReflection
+                userId={profile.id}
+                name={profile.name}
+                placement="dashboard-header"
+                desktopSubtitleTrailing={
+                  <div className="flex items-center gap-1.5">
+                    <CampaignJourneyChip translate={t} placement="desktop" />
+                    <BlackFridayChip translate={t} placement="desktop" />
+                    {/* One capsule for Weather talk, the Focus timer and the bell, the
                       bell in its own grey circle at the end (user request). */}
-                  <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
-                    <WeatherTalk translate={t} placement="desktop" />
-                    <FocusHeaderButton translate={t} placement="desktop" />
-                    <DashboardNotifications
-                      indicators={indicators}
-                      reviewCount={reviewCount}
-                      cardsDue={cardsDue}
-                      planTask={planNext}
-                      mistakesDue={mistakesDue}
-                      goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
-                      translate={t}
-                      placement="desktop"
-                    />
+                    <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
+                      <WeatherTalk translate={t} placement="desktop" />
+                      <FocusHeaderButton translate={t} placement="desktop" />
+                      <DashboardNotifications
+                        indicators={indicators}
+                        reviewCount={reviewCount}
+                        cardsDue={cardsDue}
+                        planTask={planNext}
+                        mistakesDue={mistakesDue}
+                        goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
+                        translate={t}
+                        placement="desktop"
+                      />
+                    </div>
+                    <FirstWeekGuide profile={profile} placement="desktop" />
                   </div>
-                  <FirstWeekGuide profile={profile} placement="desktop" />
-                </div>
-              }
-              mobileTrailing={
-                <div className="flex items-center justify-end gap-2 whitespace-nowrap">
-                  <CampaignJourneyChip translate={t} placement="mobile" />
-                  <BlackFridayChip translate={t} placement="mobile" />
-                  <FirstWeekGuide profile={profile} placement="mobile" />
-                  {/* Gem + number only: the word "days" pushed the greeting's name
-                      out of the row. Screen readers still hear "20 days". */}
-                  {/* One glass capsule holds the streak, Weather talk and the bell,
+                }
+                mobileTrailing={
+                  <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+                    <CampaignJourneyChip translate={t} placement="mobile" />
+                    <BlackFridayChip translate={t} placement="mobile" />
+                    <FirstWeekGuide profile={profile} placement="mobile" />
+                    {/* The gem alone, in the colour of the highest jewel (owner request,
+                      2026-10-31: a number beside it read as days and clashed with the
+                      popup's "days left"); it opens the jewels popover. */}
+                    {/* One glass capsule holds the streak, Weather talk and the bell,
                       like the desktop one (user request); the bell closes it in
                       its own grey circle. */}
-                  <div className="flex h-10 items-center gap-0 rounded-full border border-white/10 bg-white/[0.04] p-1 backdrop-blur-xl">
-                    <span className="shrink-0">
-                      <JewelsPopover
-                        translate={t}
-                        label={lang === "pt" ? "Ver as joias" : "See the jewels"}
-                      >
-                        <span
-                          className="flex items-center gap-1 pl-1.5 pr-0.5"
-                          role="img"
-                          title={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
-                          aria-label={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
+                    <div className="flex h-10 items-center gap-0 rounded-full border border-white/10 bg-white/[0.04] p-1 backdrop-blur-xl">
+                      <span className="shrink-0">
+                        <JewelsPopover
+                          translate={t}
+                          label={lang === "pt" ? "Ver as joias" : "See the jewels"}
                         >
-                          <Gem
-                            className="size-5 shrink-0"
+                          <span
+                            className="grid h-8 w-7 place-items-center"
+                            role="img"
+                            title={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
+                            aria-label={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
+                          >
+                            <Gem
+                              className="size-5 shrink-0"
+                              style={{
+                                color:
+                                  permanentJewelIndex == null
+                                    ? "hsl(var(--muted-foreground))"
+                                    : getLeague(permanentJewelIndex * 7).from,
+                              }}
+                              strokeWidth={2.4}
+                              aria-hidden="true"
+                            />
+                          </span>
+                        </JewelsPopover>
+                      </span>
+                      {/* Tomato before the weather on phones (user request). */}
+                      <FocusHeaderButton translate={t} placement="mobile" />
+                      <WeatherTalk translate={t} placement="mobile" />
+                      <DashboardNotifications
+                        indicators={indicators}
+                        reviewCount={reviewCount}
+                        cardsDue={cardsDue}
+                        planTask={planNext}
+                        mistakesDue={mistakesDue}
+                        goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
+                        translate={t}
+                        placement="mobile"
+                      />
+                    </div>
+                  </div>
+                }
+              />
+            </header>
+
+            {/* The level selector has its own card, apart from the three
+              indicators (user request), with the same gap as the cards below. */}
+            <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
+              {/* As wide as the Business English card (4 of 12 columns; user request). */}
+              <div className="card-soft min-w-0 overflow-hidden lg:col-span-4">
+                <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
+              </div>
+
+              <div className="grid min-w-0 grid-cols-[6fr_10fr] gap-3 lg:col-span-8">
+                <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
+                  {/* Your Week comes first; the combined streak/league block follows it. */}
+                  <PlanTodaySummary
+                    next={planNext}
+                    weekDone={!!studyPlan && studyPlan.plan.nextIndex === null}
+                    translate={t}
+                  />
+                </div>
+                <div className="grid h-full min-w-0 grid-cols-2 items-stretch gap-3">
+                  <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
+                    {/* Opens the ten jewels in a popover (owner request, 2026-10-31). */}
+                    <JewelsPopover
+                      translate={t}
+                      label={lang === "pt" ? "Ver as joias" : "See the jewels"}
+                    >
+                      <DashboardHeaderStat
+                        opens
+                        singleLine
+                        icon={<Gem className="size-6" strokeWidth={2.2} />}
+                        tone="coral"
+                        iconColor={
+                          permanentJewelIndex == null
+                            ? "hsl(var(--muted-foreground))"
+                            : getLeague(permanentJewelIndex * 7).from
+                        }
+                        label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
+                        value={
+                          permanentJewelBaseName ??
+                          (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
+                        }
+                        detail={nextJewelDetail}
+                        detailIcon={
+                          <ArrowUpRight
+                            className="size-3 shrink-0"
                             style={{
                               color:
-                                permanentJewelIndex == null
-                                  ? "hsl(var(--muted-foreground))"
-                                  : getLeague(permanentJewelIndex * 7).from,
+                                nextJewelIndex < jewelNames.length
+                                  ? getLeague(nextJewelThreshold ?? 0).from
+                                  : undefined,
                             }}
-                            strokeWidth={2.4}
                             aria-hidden="true"
                           />
-                          <span className="font-display text-sm font-bold" aria-hidden="true">
-                            {permanentJewelIndex == null ? 0 : permanentJewelIndex + 1}
-                          </span>
-                        </span>
-                      </JewelsPopover>
-                    </span>
-                    {/* Tomato before the weather on phones (user request). */}
-                    <FocusHeaderButton translate={t} placement="mobile" />
-                    <WeatherTalk translate={t} placement="mobile" />
-                    <DashboardNotifications
-                      indicators={indicators}
-                      reviewCount={reviewCount}
-                      cardsDue={cardsDue}
-                      planTask={planNext}
-                      mistakesDue={mistakesDue}
-                      goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
-                      translate={t}
-                      placement="mobile"
-                    />
+                        }
+                        hint={
+                          lang === "pt"
+                            ? "As joias são conquistas permanentes registradas no banco. A sequência de estudos continua seguindo as regras atuais."
+                            : "Jewels are permanent achievements stored in your account. Your study-streak rules remain unchanged."
+                        }
+                      />
+                    </JewelsPopover>
+                  </div>
+                  <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
+                    <WeeklyLeagueSummary profile={profile} translate={t} />
                   </div>
                 </div>
-              }
-            />
-          </header>
-
-          {/* The level selector has its own card, apart from the three
-              indicators (user request), with the same gap as the cards below. */}
-          <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
-            {/* As wide as the Business English card (4 of 12 columns; user request). */}
-            <div className="card-soft min-w-0 overflow-hidden lg:col-span-4">
-              <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
-            </div>
-
-            <div className="grid min-w-0 grid-cols-[6fr_10fr] gap-3 lg:col-span-8">
-              <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
-                {/* Your Week comes first; the combined streak/league block follows it. */}
-                <PlanTodaySummary
-                  next={planNext}
-                  weekDone={!!studyPlan && studyPlan.plan.nextIndex === null}
-                  translate={t}
-                />
-              </div>
-              <div className="grid h-full min-w-0 grid-cols-2 items-stretch gap-3">
-                <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
-                  {/* Opens the ten jewels in a popover (owner request, 2026-10-31). */}
-                  <JewelsPopover
-                    translate={t}
-                    label={lang === "pt" ? "Ver as joias" : "See the jewels"}
-                  >
-                    <DashboardHeaderStat
-                      opens
-                      icon={<Gem className="size-6" strokeWidth={2.2} />}
-                      tone="coral"
-                      iconColor={
-                        permanentJewelIndex == null
-                          ? "hsl(var(--muted-foreground))"
-                          : getLeague(permanentJewelIndex * 7).from
-                      }
-                      label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
-                      value={
-                        permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
-                      }
-                      detail={nextJewelDetail}
-                      detailIcon={
-                        <ArrowUpRight
-                          className="size-3 shrink-0"
-                          style={{
-                            color:
-                              nextJewelIndex < jewelNames.length
-                                ? getLeague(nextJewelThreshold ?? 0).from
-                                : undefined,
-                          }}
-                          aria-hidden="true"
-                        />
-                      }
-                      hint={
-                        lang === "pt"
-                          ? "As joias são conquistas permanentes registradas no banco. A sequência de estudos continua seguindo as regras atuais."
-                          : "Jewels are permanent achievements stored in your account. Your study-streak rules remain unchanged."
-                      }
-                    />
-                  </JewelsPopover>
-                </div>
-                <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
-                  <WeeklyLeagueSummary profile={profile} translate={t} />
-                </div>
               </div>
             </div>
-          </div>
 
-          <div className="order-2 flex min-h-0 min-w-0 flex-1 flex-col gap-[5px] lg:order-none lg:grid lg:grid-cols-12 lg:gap-3 xl:[min-height:auto]">
-            <section className="flex min-h-0 min-w-0 flex-1 flex-col lg:col-span-9 lg:block xl:h-full">
-              <NextStepCard compact />
-            </section>
-            <section
-              className="card-soft flex min-w-0 flex-col p-3 lg:col-span-3 xl:h-full xl:px-4 xl:py-3 2xl:p-4"
-              aria-labelledby="today-progress-title"
-            >
-              <div className="flex items-center gap-2">
-                <Flame className="size-[1.375rem] shrink-0 text-dashboard-cyan" strokeWidth={2.5} />
-                <h2 id="today-progress-title" className="font-display text-sm font-semibold">
-                  {t("Today's Progress")}
-                </h2>
-                {/* Mobile: My Progress left the bottom navigation; it opens from the
+            <div className="order-2 flex min-h-0 min-w-0 flex-1 flex-col gap-[5px] lg:order-none lg:grid lg:grid-cols-12 lg:gap-3 xl:[min-height:auto]">
+              <section className="flex min-h-0 min-w-0 flex-1 flex-col lg:col-span-9 lg:block xl:h-full">
+                <NextStepCard compact />
+              </section>
+              <section
+                className="card-soft flex min-w-0 flex-col p-3 lg:col-span-3 xl:h-full xl:px-4 xl:py-3 2xl:p-4"
+                aria-labelledby="today-progress-title"
+              >
+                <div className="flex items-center gap-2">
+                  <Flame
+                    className="size-[1.375rem] shrink-0 text-dashboard-cyan"
+                    strokeWidth={2.5}
+                  />
+                  <h2 id="today-progress-title" className="font-display text-sm font-semibold">
+                    {t("Today's Progress")}
+                  </h2>
+                  {/* Mobile: My Progress left the bottom navigation; it opens from the
                     title line, so the card keeps its height. Desktop has its button below. */}
-                <Link
-                  to="/progress"
-                  className="ml-auto inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 lg:hidden"
-                >
-                  <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
-                  {t("My progress")}
-                  <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
-                </Link>
-              </div>
-              <div className="mb-2.5 mt-3 grid w-full flex-none grid-cols-[6.5rem_auto] items-center justify-center gap-x-0 gap-y-1.5 lg:mb-0 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
-                <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
-                  <div
-                    className={cn(
-                      "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:translate-y-5 lg:size-24 lg:justify-self-start 2xl:size-30",
-                      celebrateGoal && "animate-celebrate",
-                    )}
+                  <Link
+                    to="/progress"
+                    className="ml-auto inline-flex items-center gap-1 rounded-md text-[11px] font-semibold leading-none text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 lg:hidden"
                   >
-                    <CelebrationBurst active={celebrateGoal} />
-                    {/* An open-bottom gauge (user request, 2026-10-24): the minutes
+                    <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
+                    {t("My progress")}
+                    <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+                  </Link>
+                </div>
+                <div className="mb-2.5 mt-3 grid w-full flex-none grid-cols-[6.5rem_auto] items-center justify-center gap-x-0 gap-y-1.5 lg:mb-0 lg:mt-2 lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
+                  <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
+                    <div
+                      className={cn(
+                        "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:translate-y-5 lg:size-24 lg:justify-self-start 2xl:size-30",
+                        celebrateGoal && "animate-celebrate",
+                      )}
+                    >
+                      <CelebrationBurst active={celebrateGoal} />
+                      {/* An open-bottom gauge (user request, 2026-10-24): the minutes
                         sit in its gap, the centre shows the check once the goal is
                         met and the share before. */}
-                    <GaugeRing
-                      progress={minutesToday / Math.max(profile.daily_minutes, 1)}
-                      value={minutesToday}
-                      goal={profile.daily_minutes}
-                      unit="min"
-                    >
-                      {minutesToday >= profile.daily_minutes ? (
-                        <Check
-                          className="size-8 text-brand-green lg:size-9"
-                          strokeWidth={3.25}
-                          aria-label={`${minutesToday} of ${profile.daily_minutes} minutes, goal reached`}
-                        />
-                      ) : (
-                        <span className="font-display text-lg font-bold leading-none text-foreground lg:text-xl">
-                          {Math.round((minutesToday / Math.max(profile.daily_minutes, 1)) * 100)}%
-                        </span>
-                      )}
-                    </GaugeRing>
-                  </div>
-                </div>
-                <div className="grid min-w-0 gap-2 lg:self-start xl:gap-1 2xl:gap-2">
-                  {!hasProgressToday && (
-                    <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground">
-                      <DoneSeal icon={ClockHands} />
-                      <p className="text-[11px] font-bold leading-tight">
-                        {t("Nothing yet today")}
-                      </p>
-                      <p className="text-[11px] font-medium leading-tight">
-                        {t("{minutes} min to hit your goal").replace(
-                          "{minutes}",
-                          String(Math.max(minutesToGoal, 0)),
-                        )}
-                      </p>
-                    </div>
-                  )}
-                  <div
-                    className={cn(
-                      `${hasProgressToday ? "grid" : "hidden"} gap-1 self-center lg:translate-y-[42px] xl:gap-1 2xl:gap-2`,
-                    )}
-                  >
-                    {learningCards.map((card) => {
-                      // Each line has its own activity icon: grey until done today,
-                      // then lit in the ring's colour (accuracy from 70%).
-                      const Icon = TODAY_LINE_ICONS[card.icon];
-                      const iconClass =
-                        card.state === "done" ? "text-brand-green/75" : "text-muted-foreground/50";
-                      const sr =
-                        card.state === "done"
-                          ? "Done today."
-                          : card.state === "attention"
-                            ? "Needs attention."
-                            : "Nothing yet.";
-                      const valueClass =
-                        card.state === "attention"
-                          ? "text-warning"
-                          : card.state === "empty"
-                            ? "text-muted-foreground/60"
-                            : "text-foreground";
-                      return (
-                        // Phones: the icon sits centred in its column, as far from the
-                        // ring as from the number (user request, 2026-10-24).
-                        <div
-                          key={card.key}
-                          className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
-                        >
-                          <Icon
-                            className={`size-4 shrink-0 justify-self-center lg:justify-self-auto ${iconClass}`}
-                            strokeWidth={2.4}
-                            aria-hidden="true"
+                      <GaugeRing
+                        progress={minutesToday / Math.max(profile.daily_minutes, 1)}
+                        value={minutesToday}
+                        goal={profile.daily_minutes}
+                        unit="min"
+                      >
+                        {minutesToday >= profile.daily_minutes ? (
+                          <Check
+                            className="size-8 text-brand-green lg:size-9"
+                            strokeWidth={3.25}
+                            aria-label={`${minutesToday} of ${profile.daily_minutes} minutes, goal reached`}
                           />
-                          <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
-                            <span
-                              className={`font-display text-[13px] font-semibold lg:text-sm lg:font-bold ${valueClass}`}
-                            >
-                              {card.value}
-                            </span>
-                            {/* Margin, not a space character: the value and its label
+                        ) : (
+                          <span className="font-display text-lg font-bold leading-none text-foreground lg:text-xl">
+                            {Math.round((minutesToday / Math.max(profile.daily_minutes, 1)) * 100)}%
+                          </span>
+                        )}
+                      </GaugeRing>
+                    </div>
+                  </div>
+                  <div className="grid min-w-0 gap-2 lg:self-start xl:gap-1 2xl:gap-2">
+                    {!hasProgressToday && (
+                      <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground">
+                        <DoneSeal icon={ClockHands} />
+                        <p className="text-[11px] font-bold leading-tight">
+                          {t("Nothing yet today")}
+                        </p>
+                        <p className="text-[11px] font-medium leading-tight">
+                          {t("{minutes} min to hit your goal").replace(
+                            "{minutes}",
+                            String(Math.max(minutesToGoal, 0)),
+                          )}
+                        </p>
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        `${hasProgressToday ? "grid" : "hidden"} gap-1 self-center lg:translate-y-[42px] xl:gap-1 2xl:gap-2`,
+                      )}
+                    >
+                      {learningCards.map((card) => {
+                        // Each line has its own activity icon: grey until done today,
+                        // then lit in the ring's colour (accuracy from 70%).
+                        const Icon = TODAY_LINE_ICONS[card.icon];
+                        const iconClass =
+                          card.state === "done"
+                            ? "text-brand-green/75"
+                            : "text-muted-foreground/50";
+                        const sr =
+                          card.state === "done"
+                            ? "Done today."
+                            : card.state === "attention"
+                              ? "Needs attention."
+                              : "Nothing yet.";
+                        const valueClass =
+                          card.state === "attention"
+                            ? "text-warning"
+                            : card.state === "empty"
+                              ? "text-muted-foreground/60"
+                              : "text-foreground";
+                        return (
+                          // Phones: the icon sits centred in its column, as far from the
+                          // ring as from the number (user request, 2026-10-24).
+                          <div
+                            key={card.key}
+                            className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
+                          >
+                            <Icon
+                              className={`size-4 shrink-0 justify-self-center lg:justify-self-auto ${iconClass}`}
+                              strokeWidth={2.4}
+                              aria-hidden="true"
+                            />
+                            <p className="line-clamp-2 text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
+                              <span
+                                className={`font-display text-[13px] font-semibold lg:text-sm lg:font-bold ${valueClass}`}
+                              >
+                                {card.value}
+                              </span>
+                              {/* Margin, not a space character: the value and its label
                                 never touch, whatever the font. */}
-                            <span className="ml-1.5">{t(card.label)}</span>
-                          </p>
-                          <span className="sr-only">{sr}</span>
-                        </div>
-                      );
-                    })}
+                              <span className="ml-1.5">{t(card.label)}</span>
+                            </p>
+                            <span className="sr-only">{sr}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-              {/* Desktop-only secondary action to the Study Plan, styled like the
+                {/* Desktop-only secondary action to the Study Plan, styled like the
                   app's other buttons (not a status pill), above a quiet closing line. */}
-              <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5 min-[1680px]:gap-1.5 min-[1680px]:pt-3">
-                {/* The study plan has its own header slot; this button opens My Progress,
+                <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5 min-[1680px]:gap-1.5 min-[1680px]:pt-3">
+                  {/* The study plan has its own header slot; this button opens My Progress,
                     which left the sidebar. A secondary glass button (owner review,
                     2026-10-31: two solid turquoise buttons side by side competed), so
                     Practice now stays the Dashboard's one solid action. */}
-                <Link
-                  to="/progress"
-                  className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-5 text-sm font-semibold text-foreground [word-spacing:0.1em] transition-colors hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-                >
-                  <ChartLine className="size-4 shrink-0" aria-hidden="true" />
-                  {t("My progress")}
-                  <ChevronRight className="size-4 shrink-0" aria-hidden="true" />
-                </Link>
+                  <Link
+                    to="/progress"
+                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-5 text-sm font-semibold text-foreground [word-spacing:0.1em] transition-colors hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                  >
+                    <ChartLine className="size-4 shrink-0" aria-hidden="true" />
+                    {t("My progress")}
+                    <ChevronRight className="size-4 shrink-0" aria-hidden="true" />
+                  </Link>
+                </div>
+                <WeeklyFrequency
+                  userId={profile.id}
+                  daysPerWeek={profile.study_days_per_week ?? 7}
+                  presentation="mobile-strip"
+                />
+              </section>
+            </div>
+
+            <div className="order-3 grid min-w-0 gap-[5px] lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
+              <div className="min-w-0 lg:col-span-5 xl:h-full">
+                <PathProgressCard compact />
               </div>
-              <WeeklyFrequency
-                userId={profile.id}
-                daysPerWeek={profile.study_days_per_week ?? 7}
-                presentation="mobile-strip"
-              />
-            </section>
-          </div>
+              <div className="hidden min-w-0 lg:col-span-4 lg:block xl:h-full">
+                <SmartReviewCard
+                  streakDays={streakDays}
+                  compact
+                  mistakesDue={mistakesDue}
+                  extrasReady={mistakesKnown || mistakesFailed}
+                />
+              </div>
+              <div className="hidden min-w-0 lg:col-span-3 lg:block xl:h-full">
+                <WeeklyFrequency
+                  userId={profile.id}
+                  daysPerWeek={profile.study_days_per_week ?? 7}
+                  presentation="dashboard-panel"
+                />
+              </div>
+            </div>
 
-          <div className="order-3 grid min-w-0 gap-[5px] lg:order-none lg:grid-cols-12 lg:gap-3 xl:min-h-0">
-            <div className="min-w-0 lg:col-span-5 xl:h-full">
-              <PathProgressCard compact />
-            </div>
-            <div className="hidden min-w-0 lg:col-span-4 lg:block xl:h-full">
-              <SmartReviewCard
-                streakDays={streakDays}
-                compact
-                mistakesDue={mistakesDue}
-                extrasReady={mistakesKnown || mistakesFailed}
-              />
-            </div>
-            <div className="hidden min-w-0 lg:col-span-3 lg:block xl:h-full">
-              <WeeklyFrequency
-                userId={profile.id}
-                daysPerWeek={profile.study_days_per_week ?? 7}
-                presentation="dashboard-panel"
-              />
-            </div>
-          </div>
-
-          {/* Desktop: the Quick Access row repeated the sidebar; today's goal
+            {/* Desktop: the Quick Access row repeated the sidebar; today's goal
               steps took its place. */}
-          {/* Business English (Premium bonus from B1) sits beside today's
+            {/* Business English (Premium bonus from B1) sits beside today's
               goals; below B1 the goals keep the whole row. */}
-          <div
-            className={`order-4 hidden min-w-0 gap-3 lg:order-none xl:h-full xl:min-h-0 ${
-              showBusinessCard ? "lg:grid lg:grid-cols-12" : "lg:block"
-            }`}
-          >
-            <div className="min-w-0 lg:col-span-8 xl:h-full xl:min-h-0">
-              <GoalsTodayCard />
-            </div>
-            {showBusinessCard && (
-              <div className="min-w-0 lg:col-span-4 xl:h-full xl:min-h-0">
-                <BusinessDashboardCard />
+            <div
+              className={`order-4 hidden min-w-0 gap-3 lg:order-none xl:h-full xl:min-h-0 ${
+                showBusinessCard ? "lg:grid lg:grid-cols-12" : "lg:block"
+              }`}
+            >
+              <div className="min-w-0 lg:col-span-8 xl:h-full xl:min-h-0">
+                <GoalsTodayCard />
               </div>
-            )}
+              {showBusinessCard && (
+                <div className="min-w-0 lg:col-span-4 xl:h-full xl:min-h-0">
+                  <BusinessDashboardCard />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </AppShell>
   );

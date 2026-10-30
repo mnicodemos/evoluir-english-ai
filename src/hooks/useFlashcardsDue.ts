@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import { isFlashcardDue, lessonStarted } from "@/lib/flashcards";
 import { studyToday } from "@/lib/today";
 
 /**
@@ -15,12 +16,32 @@ export function useFlashcardsDue(userId?: string) {
     enabled: !!userId,
     staleTime: 60 * 1000,
     queryFn: async () => {
-      const { count } = await supabase
-        .from("user_flashcards")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userId!)
-        .lte("next_review_date", studyToday());
-      return count ?? 0;
+      // The same rule as the review deck (isFlashcardDue): cards never rated
+      // from opened lessons count too.
+      const [cards, states, lessons] = await Promise.all([
+        supabase.from("flashcards").select("id, lesson_id"),
+        supabase
+          .from("user_flashcards")
+          .select("flashcard_id, next_review_date")
+          .eq("user_id", userId!),
+        supabase
+          .from("user_lessons")
+          .select("lesson_id, video_progress, progress, completed_at")
+          .eq("user_id", userId!),
+      ]);
+      if (cards.error) throw cards.error;
+      if (states.error) throw states.error;
+      if (lessons.error) throw lessons.error;
+      const byCard = new Map(
+        (states.data ?? []).map((state) => [state.flashcard_id, state] as const),
+      );
+      const started = new Set(
+        (lessons.data ?? []).filter(lessonStarted).map((lesson) => lesson.lesson_id),
+      );
+      const today = studyToday();
+      return (cards.data ?? []).filter((card) =>
+        isFlashcardDue(card, byCard.get(card.id), started, today),
+      ).length;
     },
   });
 }
