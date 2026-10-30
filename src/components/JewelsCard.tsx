@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Check, Gem, Lock } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { JEWELS } from "@/components/LeagueBadge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -136,8 +136,12 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
 /**
  * The jewels card in a popover, opened from the Dashboard's jewels cell and the
  * phone header's gem (owner request, 2026-10-31: the same frosted graphite as
- * Weather talk and the bell).
+ * Weather talk and the bell). It closes by itself 10 s after opening
+ * (JEWELS_POPOVER_AUTO_CLOSE_MS; owner request); touching or scrolling it
+ * restarts the count, so it never closes while the student reads it.
  */
+export const JEWELS_POPOVER_AUTO_CLOSE_MS = 10_000;
+
 export function JewelsPopover({
   children,
   translate,
@@ -147,8 +151,16 @@ export function JewelsPopover({
   translate: (label: string) => string;
   label: string;
 }) {
+  const [open, setOpen] = useState(false);
+  const [touchedAt, setTouchedAt] = useState(0);
+  useEffect(() => {
+    if (!open) return;
+    const timer = window.setTimeout(() => setOpen(false), JEWELS_POPOVER_AUTO_CLOSE_MS);
+    return () => window.clearTimeout(timer);
+  }, [open, touchedAt]);
+  const touch = () => setTouchedAt(Date.now());
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -161,6 +173,8 @@ export function JewelsPopover({
       <PopoverContent
         align="end"
         sideOffset={8}
+        onPointerDown={touch}
+        onScroll={touch}
         className={cn(
           "dashboard-shell dark max-h-[80dvh] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:p-5",
           graphitePanelClass,
