@@ -41,7 +41,7 @@ import { findBusinessLesson, isBusinessKey } from "@/lib/businessCourse";
 import { findCurriculumLesson } from "@/lib/curriculum";
 import { getSummaryVideoForLesson } from "@/lib/curriculum.functions";
 import { REVIEW_TEST_QUESTIONS } from "@/lib/lessonPlanSizing";
-import { getLessonAudioImage } from "@/lib/lessonAudioMedia.functions";
+import { useLessonAudioImage } from "@/hooks/useHomeImages";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
@@ -147,13 +147,7 @@ function LessonPage() {
   // Summary videos are shared by curriculum key, so they remain available
   // even when this student has no lesson row yet.
   const fetchSummaryVideo = useServerFn(getSummaryVideoForLesson);
-  const fetchLessonAudioImage = useServerFn(getLessonAudioImage);
-  const lessonAudioImageQuery = useQuery({
-    queryKey: ["lesson-audio-image"],
-    queryFn: () => fetchLessonAudioImage(),
-    staleTime: 5 * 60 * 1000,
-    retry: false,
-  });
+  const lessonAudioImageQuery = useLessonAudioImage();
   const summaryVideoQuery = useQuery({
     queryKey: ["summary-video", lesson?.curriculum_key],
     queryFn: () => fetchSummaryVideo({ data: { key: lesson!.curriculum_key! } }),

@@ -13,13 +13,11 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import evoVideoCall from "@/assets/evo-video-call.jpg";
 import { aiChat } from "@/lib/aiChat.functions";
-import { getHomeDashboardImages } from "@/lib/admin.functions";
+import { useHomeImages } from "@/hooks/useHomeImages";
 import { cn } from "@/lib/utils";
 
 export type CallVoiceState =
@@ -64,13 +62,7 @@ export function VideoCallStage({
   onFinish: () => void;
 }) {
   const navigate = useNavigate();
-  const loadHomeImages = useServerFn(getHomeDashboardImages);
-  const { data: homeImages } = useQuery({
-    queryKey: ["home-dashboard-image-public"],
-    queryFn: () => loadHomeImages(),
-    staleTime: 60_000,
-    retry: false,
-  });
+  const { data: homeImages } = useHomeImages();
   const [seconds, setSeconds] = useState(0);
   const [captionsOn, setCaptionsOn] = useState(true);
   const [translation, setTranslation] = useState<{ source: string; text: string } | null>(null);

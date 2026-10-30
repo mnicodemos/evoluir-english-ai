@@ -52,8 +52,7 @@ import {
   NEXT_STEP_WHY_NOW_TEXT,
 } from "@/lib/pedagogy/nextStep";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
-import { getHomeDashboardImages } from "@/lib/admin.functions";
-import { useServerFn } from "@tanstack/react-start";
+import { useHomeImages } from "@/hooks/useHomeImages";
 
 import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
 
@@ -66,6 +65,10 @@ import { DoneSeal } from "@/components/DoneSeal";
  * Adaptive next step. Everything shown here is decided server-side from the
  * student's own pedagogical data; the card only presents it.
  */
+/** A 1x1 transparent GIF: what the Dashboard image slot of the other screen size loads. */
+const EMPTY_PIXEL =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
 export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -73,13 +76,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // Key the cache by the current CEFR level: when the level changes, the
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
-  const loadHomeImages = useServerFn(getHomeDashboardImages);
-  const { data: homeImages } = useQuery({
-    queryKey: ["home-dashboard-image-public"],
-    queryFn: () => loadHomeImages(),
-    staleTime: 60_000,
-    retry: false,
-  });
+  const { data: homeImages } = useHomeImages();
   const desktopImage = homeImages?.desktop;
   const mobileImage = homeImages?.mobile;
   const league = useWeeklyLeagueStanding(profile);
@@ -440,16 +437,23 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Mobile: the owner's whole banner, uncropped, inset from the card
                 edges with rounded corners — the same look as the desktop image. */}
             {mobileImage ? (
-              <img
-                src={mobileImage}
-                alt=""
-                width={1400}
-                height={415}
-                className="block h-auto w-full rounded-lg sm:hidden"
-                onError={(event) => {
-                  event.currentTarget.style.visibility = "hidden";
-                }}
-              />
+              <picture className="contents">
+                {/* An <img> hidden by CSS still downloads; on a wider screen this
+                    slot gets an empty pixel instead of the phone banner. */}
+                <source media="(min-width: 640px)" srcSet={EMPTY_PIXEL} />
+                <img
+                  src={mobileImage}
+                  fetchPriority="high"
+                  decoding="async"
+                  alt=""
+                  width={1400}
+                  height={415}
+                  className="block h-auto w-full rounded-lg sm:hidden"
+                  onError={(event) => {
+                    event.currentTarget.style.visibility = "hidden";
+                  }}
+                />
+              </picture>
             ) : (
               <div
                 aria-hidden="true"
@@ -458,16 +462,21 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             )}
             <div className="absolute inset-0 hidden overflow-hidden sm:inset-3 sm:flex sm:rounded-lg">
               {desktopImage ? (
-                <img
-                  src={desktopImage}
-                  alt=""
-                  width={1580}
-                  height={1180}
-                  className="hidden sm:block sm:h-full sm:w-full sm:rounded-lg sm:object-cover sm:object-center"
-                  onError={(event) => {
-                    event.currentTarget.style.visibility = "hidden";
-                  }}
-                />
+                <picture className="contents">
+                  <source media="(max-width: 639.98px)" srcSet={EMPTY_PIXEL} />
+                  <img
+                    src={desktopImage}
+                    fetchPriority="high"
+                    decoding="async"
+                    alt=""
+                    width={1580}
+                    height={1180}
+                    className="hidden sm:block sm:h-full sm:w-full sm:rounded-lg sm:object-cover sm:object-center"
+                    onError={(event) => {
+                      event.currentTarget.style.visibility = "hidden";
+                    }}
+                  />
+                </picture>
               ) : (
                 <div
                   aria-hidden="true"
