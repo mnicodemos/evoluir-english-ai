@@ -239,6 +239,11 @@ const intervalByRating: Record<string, (prev: number) => number> = {
   easy: (prev) => Math.max(4, Math.round(prev * 2.5)),
 };
 
+/** Days until a card comes back after this rating (shown under the rating buttons). */
+export function nextReviewDays(rating: "easy" | "medium" | "hard", current?: UserFlashcard) {
+  return Math.min(60, intervalByRating[rating]!(current?.interval_days ?? 1));
+}
+
 const masteryDelta: Record<string, number> = { hard: -15, medium: 10, easy: 25 };
 
 /** Spaced-repetition update: harder cards come back sooner. */

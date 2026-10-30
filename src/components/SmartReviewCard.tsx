@@ -31,6 +31,7 @@ import { useTodayActivities } from "@/components/DailyGoalCard";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 import { useDueReviewState } from "@/hooks/useDueReviewCount";
+import { useFlashcardsDue } from "@/hooks/useFlashcardsDue";
 import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import { continueRows, goFurtherRow, newTodayRows } from "@/lib/keepImprovingNew";
@@ -70,6 +71,12 @@ export function SmartReviewCard({
   const { data, isLoading, isError } = useNextStep();
   // Vocabulary words whose spaced review date has arrived (same count as the bell).
   const { count: reviewCount, ready: reviewsReady } = useDueReviewState(profile?.id);
+  // Lesson flashcards whose review date has arrived (same count as the bell).
+  const {
+    data: cardsDue = 0,
+    isSuccess: cardsKnown,
+    isError: cardsFailed,
+  } = useFlashcardsDue(profile?.id);
   // Today's reading, for the "New today" rows (same query as the bell).
   const { data: readingDone } = useDailyReadingDone(profile?.id);
   // Today's minutes against the goal: until it is met, free rows keep a next
@@ -97,6 +104,7 @@ export function SmartReviewCard({
       (!waited &&
         (!indicators.ready ||
           !reviewsReady ||
+          !(cardsKnown || cardsFailed) ||
           !extrasReady ||
           readingDone === undefined ||
           minutesToday === undefined)))
@@ -149,8 +157,10 @@ export function SmartReviewCard({
   const showWordReviews = compact && reviewCount > 0;
   const items = showWordReviews ? allItems.filter((item) => item.skill !== "vocabulary") : allItems;
   const showMistakes = compact && mistakesDue > 0;
-  // Up to three rows: due words, due mistakes, then the server's suggestions.
-  const suggestionSlots = 3 - Number(showWordReviews) - Number(showMistakes);
+  // Due lesson flashcards take a row after words and mistakes, while one is free.
+  const showCards = compact && cardsDue > 0 && Number(showWordReviews) + Number(showMistakes) < 3;
+  // Up to three rows: due words, due mistakes, due cards, then the server's suggestions.
+  const suggestionSlots = 3 - Number(showWordReviews) - Number(showMistakes) - Number(showCards);
   const shownItems = items.slice(0, Math.max(suggestionSlots, 0));
   // Rows still free take today's new activities, the ones the bell lists, so
   // the card never says "all done" while there is something new to do (user
@@ -161,6 +171,7 @@ export function SmartReviewCard({
     data.quest?.resource.to ?? "",
     ...shownItems.map((item) => item.resource.to),
     ...(showWordReviews ? ["/vocabulary"] : []),
+    ...(showCards ? ["/learning/review"] : []),
   ];
   const newRows = compact
     ? newTodayRows({ readingDone, indicators, taken, slots: suggestionSlots - shownItems.length })
@@ -178,6 +189,7 @@ export function SmartReviewCard({
   const rows =
     Number(showWordReviews) +
     Number(showMistakes) +
+    Number(showCards) +
     shownItems.length +
     newRows.length +
     keepGoing.length;
@@ -307,6 +319,34 @@ export function SmartReviewCard({
                 className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
               >
                 <Link to="/mistakes" aria-label={`${t("Review now")}: ${t("My mistakes")}`}>
+                  <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
+                </Link>
+              </Button>
+            </li>
+          )}
+          {showCards && (
+            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-sky-400/30 bg-sky-400/[0.06] p-1 pr-2">
+              <img src={reviewLesson} alt="" className={ROW_PHOTO} />
+              <div className="min-w-0">
+                <RowTag kind="review" label={t("To review")} detail={t("Flashcards")} />
+                <p className="truncate text-sm font-semibold">
+                  {cardsDue === 1
+                    ? t("Review 1 card")
+                    : t("Review {n} cards").replace("{n}", String(cardsDue))}
+                </p>
+                <p
+                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
+                >
+                  {t("Their review date has arrived: a quick review keeps them in memory.")}
+                </p>
+              </div>
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
+              >
+                <Link to="/learning/review" aria-label={`${t("Review now")}: ${t("Flashcards")}`}>
                   <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
               </Button>

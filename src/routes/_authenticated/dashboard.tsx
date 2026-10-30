@@ -57,6 +57,7 @@ import { PathProgressCard } from "@/components/PathProgressCard";
 import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
 import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
+import { useFlashcardsDue } from "@/hooks/useFlashcardsDue";
 import { useMistakesDue } from "@/hooks/useMistakesDue";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -130,6 +131,8 @@ type DashboardNotificationsProps = {
   indicators: ReturnType<typeof useActivityIndicators>;
   /** Vocabulary reviews due today (already capped at the daily review limit). */
   reviewCount: number;
+  /** Lesson flashcards whose review date has arrived. */
+  cardsDue: number;
   /** The study plan's day to do now (today or a missed day), if any. */
   planTask: StudyPlanDay | null | undefined;
   /** "My mistakes" corrections whose review date has arrived. */
@@ -143,6 +146,7 @@ type DashboardNotificationsProps = {
 function DashboardNotifications({
   indicators,
   reviewCount,
+  cardsDue,
   planTask,
   mistakesDue,
   goalMinutesLeft,
@@ -328,6 +332,13 @@ function DashboardNotifications({
       visible: reviewCount > 0,
     },
     {
+      id: "cards",
+      to: "/learning/review",
+      label: `${translate("Flashcards to review")}: ${cardsDue}`,
+      icon: Layers,
+      visible: cardsDue > 0,
+    },
+    {
       id: "reading",
       to: "/reading",
       label: "Today's reading is waiting",
@@ -402,6 +413,7 @@ function DashboardNotifications({
       "plan",
       "mistakes",
       "review",
+      "cards",
       "reading",
       "listening",
       "writing",
@@ -615,6 +627,7 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const reviewCount = useDueReviewCount(profile?.id);
+  const { data: cardsDue = 0 } = useFlashcardsDue(profile?.id);
   const {
     data: mistakesDue = 0,
     isSuccess: mistakesKnown,
@@ -762,6 +775,7 @@ function Dashboard() {
                     <DashboardNotifications
                       indicators={indicators}
                       reviewCount={reviewCount}
+                      cardsDue={cardsDue}
                       planTask={planNext}
                       mistakesDue={mistakesDue}
                       goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
@@ -809,6 +823,7 @@ function Dashboard() {
                     <DashboardNotifications
                       indicators={indicators}
                       reviewCount={reviewCount}
+                      cardsDue={cardsDue}
                       planTask={planNext}
                       mistakesDue={mistakesDue}
                       goalMinutesLeft={Math.max(0, (profile.daily_minutes ?? 0) - minutesToday)}
