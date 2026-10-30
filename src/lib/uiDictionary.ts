@@ -1154,6 +1154,8 @@ const baseUiPt: Record<string, string> = {
   "Lesson video": "Vídeo da lição",
   "I watched it": "Já assisti",
   "Video reinforcement": "Reforço em vídeo",
+  "Watch the video, then read the guide below and take the quiz.":
+    "Assista ao vídeo, depois leia o guia abaixo e faça o quiz.",
   "Watch this short explanation before you practise.":
     "Assista a uma explicação curta antes de praticar.",
   "What you just reviewed": "O que você acabou de revisar",
