@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, GraduationCap, RotateCcw } from "lucide-react";
 
 import { LevelIntroVideo } from "@/components/LevelIntroVideo";
+import { useLearningPath } from "@/hooks/useCurriculum";
 import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { CurriculumPath } from "@/components/LearningPathCard";
@@ -47,6 +48,8 @@ function LearningCenter() {
   );
   const reviewLevel =
     review && reviewLevels.some((level) => level.value === review) ? findLevel(review) : null;
+  // Lessons already done at this level close the presentation to one row.
+  const path = useLearningPath(reviewLevel?.value ?? null);
 
   const tab =
     "inline-flex h-8 items-center gap-1 rounded-full border px-3 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60";
@@ -124,6 +127,7 @@ function LearningCenter() {
             level={(reviewLevel ?? current).value}
             label={(reviewLevel ?? current).value.toUpperCase()}
             userId={profile.id}
+            started={path.coreCompleted > 0}
           />
         )}
 

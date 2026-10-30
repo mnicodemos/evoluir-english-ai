@@ -220,6 +220,7 @@ const baseUiPt: Record<string, string> = {
     "O Teste Final abre depois de 21 lições; 70% sobe você de nível",
   "36 lessons in 6 units, written at your level": "36 lições em 6 unidades, escritas no seu nível",
   "Download each unit as a PDF workbook": "Baixe cada unidade como apostila em PDF",
+  "Watch the level presentation": "Ver a apresentação do nível",
   "Hide video": "Esconder vídeo",
   "Optional: watch it whenever you like.": "Opcional: assista quando quiser.",
   "Level presentation": "Apresentação do nível",
