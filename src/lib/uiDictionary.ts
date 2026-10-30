@@ -2482,6 +2482,13 @@ const baseUiPt: Record<string, string> = {
   "Lesson test": "Teste de lição",
   Lyrics: "Letra",
   // Premium extra videos (owner request, 2026-10-31).
+  "Watch an extra video": "Assista a um vídeo extra",
+  "Choose a video of your level": "Escolha um vídeo do seu nível",
+  "Follow the main idea": "Acompanhe a ideia principal",
+  "Write down two new words": "Anote duas palavras novas",
+  Pick: "Escolha",
+  Watch: "Assistir",
+  Note: "Anote",
   "Just added": "Novidade",
   "Lessons on video, Premium": "Lições em vídeo, Premium",
   "New: extra lesson videos": "Novidade: vídeos extras das lições",
@@ -2495,7 +2502,6 @@ const baseUiPt: Record<string, string> = {
     "Os vídeos extras fazem parte do Premium. Assine para assistir a todos.",
   "No extra videos here yet. New ones are added over time.":
     "Ainda não há vídeos extras aqui. Novos vídeos chegam com o tempo.",
-  Watch: "Assistir",
   "Close video": "Fechar vídeo",
   // Diamond celebration and cycles (owner decision, 2026-10-31).
   "days in a row. Another Diamond cycle is yours for good.":

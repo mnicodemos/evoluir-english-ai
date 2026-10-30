@@ -14,6 +14,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { findLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
+import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
+import { studyToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/learning/videos")({
@@ -58,6 +60,16 @@ function ExtraVideosPage() {
   const [picked, setPicked] = useState<string | null>(null);
   const level = picked ?? (levels.includes(studentLevel) ? studentLevel : (levels[0] ?? null));
   const [playing, setPlaying] = useState<string | null>(null);
+  // Playing a video closes today's "Watch an extra video" Quick Win on this device.
+  const watch = (id: string) => {
+    setPlaying(id);
+    if (!profile?.id) return;
+    try {
+      window.localStorage.setItem(extraVideoWatchedKey(profile.id, studyToday()), "1");
+    } catch {
+      /* the Quick Win simply stays until tomorrow */
+    }
+  };
 
   const levelVideos = useMemo(
     () => videos.filter((video) => video.level === level),
@@ -182,7 +194,7 @@ function ExtraVideosPage() {
                         <Button
                           size="sm"
                           className="shrink-0 gap-1.5"
-                          onClick={() => setPlaying(video.id)}
+                          onClick={() => watch(video.id)}
                         >
                           <PlayCircle className="size-4" /> Watch
                         </Button>
