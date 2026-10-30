@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  BookmarkPlus,
   BookOpenText,
   Check,
   ChevronLeft,
   ChevronRight,
   CircleCheck,
+  Clock,
   Languages,
   Loader2,
   Square,
@@ -30,12 +32,15 @@ import {
   READING_STYLE_LABELS,
   READING_STYLES,
   readingChoiceKey,
+  readingEstimate,
   readingKindLabel,
+  readingLevel,
   readingParagraphs,
   readingReference,
   readingShareText,
   readingSpeechChunks,
   readingTokens,
+  sentenceWith,
   type ReadingChoice,
 } from "@/lib/dailyReading";
 import {
@@ -44,6 +49,7 @@ import {
   type DailyReading,
 } from "@/lib/dailyReading.functions";
 import { lookupWord } from "@/lib/dictionary.functions";
+import { saveReadingWords } from "@/lib/readingWords.functions";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
 import { uiPt } from "@/lib/uiDictionary";
@@ -148,6 +154,150 @@ function WordMeaning({ term, glossaryPt }: { term: string; glossaryPt: string | 
         </>
       ) : (
         <span className="text-muted-foreground">{t("No translation found for this word.")}</span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The size of the task before starting (owner request, 2026-10-30): about how
+ * many minutes, the words of the text and the questions.
+ */
+function ReadingSize({ reading, t }: { reading: DailyReading; t: (label: string) => string }) {
+  const { minutes, words } = readingEstimate(
+    reading.text,
+    readingLevel(reading.level),
+    reading.questions.length,
+  );
+  return (
+    <span className="inline-flex items-center gap-1 text-muted-foreground">
+      <Clock className="size-3.5" aria-hidden="true" />
+      <span>≈ {minutes}</span> <span>{t("min")}</span> <span>·</span> <span>{words}</span>{" "}
+      <span>{t("words")}</span> <span>·</span> <span>{reading.questions.length}</span>{" "}
+      <span>{t("questions")}</span>
+    </span>
+  );
+}
+
+/**
+ * Marked words join the student's Vocabulary reviews (owner request,
+ * 2026-10-30: they used to live only on this device for the day). Each goes
+ * with its meaning (the glossary's or the dictionary's) and the sentence of
+ * the text it came from; the words already saved are remembered for the day.
+ */
+function SaveMarkedWords({
+  reading,
+  marked,
+  glossaryPt,
+  t,
+}: {
+  reading: DailyReading;
+  marked: string[];
+  glossaryPt: Map<string, string>;
+  t: (label: string) => string;
+}) {
+  const queryClient = useQueryClient();
+  const searchDictionary = useServerFn(lookupWord);
+  const save = useServerFn(saveReadingWords);
+  const key = `${markedKey(reading)}:saved`;
+  const [saved, setSaved] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      const parsed: unknown = JSON.parse(window.localStorage.getItem(key) ?? "[]");
+      setSaved(Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : []);
+    } catch {
+      setSaved([]);
+    }
+  }, [key]);
+  const pending = marked.filter((term) => !saved.includes(term));
+
+  const mutation = useMutation({
+    mutationFn: async (terms: string[]) => {
+      const items = await Promise.all(
+        terms.map(async (term) => {
+          let translation = glossaryPt.get(term) ?? "";
+          let meaning = "";
+          if (!translation) {
+            const entry = await queryClient
+              .fetchQuery({
+                queryKey: ["dictionary-v2", term],
+                queryFn: () => searchDictionary({ data: { term } }),
+                staleTime: 1000 * 60 * 60,
+              })
+              .catch(() => null);
+            translation = [...new Set(entry?.meanings.flatMap((item) => item.translations) ?? [])]
+              .slice(0, 3)
+              .join(", ");
+            meaning = entry?.meanings.find((item) => item.definition)?.definition ?? "";
+          }
+          return translation
+            ? {
+                word: term,
+                translation: translation.slice(0, 200),
+                meaning: meaning.slice(0, 400),
+                example: sentenceWith(reading.text, term),
+              }
+            : null;
+        }),
+      );
+      const words = items.filter((item): item is NonNullable<typeof item> => item !== null);
+      if (!words.length) throw new Error("no translation");
+      await save({ data: { words } });
+      return words.map((item) => item.word);
+    },
+    onSuccess: (terms) => {
+      const next = [...new Set([...saved, ...terms])];
+      setSaved(next);
+      try {
+        window.localStorage.setItem(key, JSON.stringify(next));
+      } catch {
+        // Blocked storage: the button may offer these words again later.
+      }
+      // The Vocabulary page, its review count and the Dashboard's due words.
+      void queryClient.invalidateQueries({
+        predicate: (query) => String(query.queryKey[0]).includes("vocabulary"),
+      });
+    },
+  });
+
+  if (!pending.length) {
+    return saved.length ? (
+      <p className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-brand-green">
+        <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
+        <span>{t("Saved to your Vocabulary reviews.")}</span>
+        <Link to="/vocabulary" className="font-semibold underline-offset-2 hover:underline">
+          {t("Open Vocabulary")}
+        </Link>
+      </p>
+    ) : null;
+  }
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-2">
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        className="gap-1.5"
+        disabled={mutation.isPending}
+        onClick={() => mutation.mutate(pending)}
+      >
+        {mutation.isPending ? (
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        ) : (
+          <BookmarkPlus className="size-4" aria-hidden="true" />
+        )}
+        <span>{t("Save to my Vocabulary")}</span> <span>({pending.length})</span>
+      </Button>
+      {mutation.isError ? (
+        <span className="text-xs text-destructive">
+          {mutation.error instanceof Error && mutation.error.message === "no translation"
+            ? t("No translation found for this word.")
+            : t("Could not save the words. Please try again.")}
+        </span>
+      ) : (
+        <span className="text-xs text-muted-foreground">
+          {t("They come back in your word reviews.")}
+        </span>
       )}
     </div>
   );
@@ -464,6 +614,7 @@ function ReadingPage() {
               <span className="rounded-full bg-secondary px-2.5 py-1 font-medium uppercase">
                 {reading.level}
               </span>
+              <ReadingSize reading={reading} t={t} />
             </div>
             <h2
               id="reading-title"
@@ -573,6 +724,7 @@ function ReadingPage() {
                     </span>
                   ))}
                 </div>
+                <SaveMarkedWords reading={reading} marked={marked} glossaryPt={glossaryPt} t={t} />
               </div>
             ) : null}
 

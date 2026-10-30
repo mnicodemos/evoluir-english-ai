@@ -14,6 +14,8 @@ import {
   readingSpeechChunks,
   readingThemeForDay,
   readingKindLabel,
+  readingEstimate,
+  sentenceWith,
   todaysPickForDay,
   readingTokens,
   wordCount,
@@ -64,6 +66,21 @@ describe("daily reading rules", () => {
     );
     expect(readingThemeForDay("2026-10-31")).toBe("story");
     expect(todaysPickForDay("2026-11-07")).toBeNull();
+  });
+
+  it("finds the sentence a marked word came from", () => {
+    const text = "Ana gets up at seven. She drinks coffee!\n\nHer dog loves the park.";
+    expect(sentenceWith(text, "coffee")).toBe("She drinks coffee!");
+    expect(sentenceWith(text, "Dog")).toBe("Her dog loves the park.");
+    expect(sentenceWith(text, "do")).toBe("");
+    expect(sentenceWith(text, "gets up")).toBe("Ana gets up at seven.");
+  });
+
+  it("estimates the size of the reading by level", () => {
+    const text = Array.from({ length: 200 }, () => "word").join(" ");
+    expect(readingEstimate(text, "b1", 5)).toEqual({ words: 200, minutes: 5 });
+    expect(readingEstimate(text, "a1", 3).minutes).toBe(4);
+    expect(readingEstimate("Hi.", "c2", 0).minutes).toBe(1);
   });
 
   it("labels Today's pick by its subject", () => {

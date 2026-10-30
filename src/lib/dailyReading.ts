@@ -301,6 +301,45 @@ export function readingParagraphs(text: string) {
     .filter(Boolean);
 }
 
+/** The sentence of the text where a marked word appears, as its example in Vocabulary. */
+export function sentenceWith(text: string, term: string): string {
+  const needle = term.toLowerCase();
+  const sentences = readingParagraphs(text).flatMap(
+    (paragraph) => paragraph.match(/[^.!?]+[.!?]*["'”’)]?/g) ?? [paragraph],
+  );
+  const found = sentences.find((sentence) =>
+    new RegExp(
+      `(^|[^\\p{L}])${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^\\p{L}]|$)`,
+      "iu",
+    ).test(sentence),
+  );
+  return (found ?? "").trim().slice(0, 400);
+}
+
+/** Words a learner reads per minute, by level (slower than a native reader). */
+const READING_WORDS_PER_MINUTE: Record<ReadingLevel, number> = {
+  a1: 70,
+  a2: 85,
+  b1: 100,
+  b2: 115,
+  c1: 130,
+  c2: 140,
+};
+
+/**
+ * The size of the task before the student starts (owner request, 2026-10-30):
+ * the words of the text and about how many minutes reading it and answering
+ * the questions takes (half a minute a question), never under one.
+ */
+export function readingEstimate(text: string, level: ReadingLevel, questions: number) {
+  const words = text.split(/\s+/).filter(Boolean).length;
+  const minutes = Math.max(
+    1,
+    Math.round(words / READING_WORDS_PER_MINUTE[level] + questions * 0.5),
+  );
+  return { words, minutes };
+}
+
 /**
  * The text as voice chunks of whole sentences, at most `maxChars` each (the
  * speech API takes 500 characters per request), read one after the other.
