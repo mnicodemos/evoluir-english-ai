@@ -13,6 +13,10 @@ import {
   readingParagraphs,
   readingSpeechChunks,
   readingThemeForDay,
+  readingKindLabel,
+  readingEstimate,
+  sentenceWith,
+  todaysPickForDay,
   readingTokens,
   wordCount,
 } from "./dailyReading";
@@ -49,11 +53,46 @@ describe("daily reading rules", () => {
     expect(readingLevel("intermediate")).toBe("b1");
   });
 
-  it("alternates the theme day by day", () => {
-    const today = readingThemeForDay("2026-10-17");
-    const tomorrow = readingThemeForDay("2026-10-18");
-    expect(today).not.toBe(tomorrow);
-    expect(readingThemeForDay("2026-10-19")).toBe(today);
+  it("rotates Today's pick through eight subjects, motivation once", () => {
+    const days = Array.from({ length: 8 }, (_, index) =>
+      new Date(Date.UTC(2026, 9, 30 + index)).toISOString().slice(0, 10),
+    );
+    const picks = days.map((day) => todaysPickForDay(day));
+    expect(picks[0]).toBeNull();
+    expect(readingThemeForDay("2026-10-30")).toBe("motivational");
+    expect(picks.filter((pick) => pick === null)).toHaveLength(1);
+    expect(new Set(picks.map((pick) => (pick ? `${pick.category}:${pick.style}` : "m"))).size).toBe(
+      8,
+    );
+    expect(readingThemeForDay("2026-10-31")).toBe("story");
+    expect(todaysPickForDay("2026-11-07")).toBeNull();
+  });
+
+  it("finds the sentence a marked word came from", () => {
+    const text = "Ana gets up at seven. She drinks coffee!\n\nHer dog loves the park.";
+    expect(sentenceWith(text, "coffee")).toBe("She drinks coffee!");
+    expect(sentenceWith(text, "Dog")).toBe("Her dog loves the park.");
+    expect(sentenceWith(text, "do")).toBe("");
+    expect(sentenceWith(text, "gets up")).toBe("Ana gets up at seven.");
+  });
+
+  it("estimates the size of the reading by level", () => {
+    const text = Array.from({ length: 200 }, () => "word").join(" ");
+    expect(readingEstimate(text, "b1", 5)).toEqual({ words: 200, minutes: 5 });
+    expect(readingEstimate(text, "a1", 3).minutes).toBe(4);
+    expect(readingEstimate("Hi.", "c2", 0).minutes).toBe(1);
+  });
+
+  it("labels Today's pick by its subject", () => {
+    expect(readingKindLabel({ theme: "motivational", day: "2026-10-30" })).toBe("Motivation");
+    expect(readingKindLabel({ theme: "story", day: "2026-10-31" })).toBe("Daily life · Story");
+    expect(
+      readingKindLabel({
+        theme: "story",
+        day: "2026-10-31",
+        choice: { category: "travel", style: "article" },
+      }),
+    ).toBe("Travel · Article");
   });
 
   it("accepts a reply that fits the level", () => {

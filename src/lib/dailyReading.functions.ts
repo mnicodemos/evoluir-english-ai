@@ -19,6 +19,7 @@ import {
   READING_STYLES,
   readingLevel,
   readingThemeForDay,
+  todaysPickForDay,
   type DailyReadingContent,
   type ReadingChoice,
   type ReadingLevel,
@@ -157,7 +158,9 @@ async function todaysReading(
   let content: DailyReadingContent | null = null;
   try {
     const { callGateway } = await import("./ai-gateway.server");
-    const raw = await callGateway(dailyReadingMessages(level, theme, day, choice), true, {
+    // Today's pick writes the subject of the day's rotation (stored as the day's text).
+    const subject = choice ?? todaysPickForDay(day);
+    const raw = await callGateway(dailyReadingMessages(level, theme, day, subject), true, {
       userId: userId,
       operation: "lesson_generation",
       // One shared text per level and day (and per category and style).
@@ -172,7 +175,11 @@ async function todaysReading(
       `Daily reading could not be written: ${error instanceof Error ? error.message : "unknown"}`,
     );
   }
-  if (!content) return { day, level, theme, fallback: true, choice, ...fallbackReading(level) };
+  if (!content) {
+    // The fixed texts: an everyday story at A1-A2, a reflection on habits above.
+    const fallbackTheme: ReadingTheme = level === "a1" || level === "a2" ? "story" : "motivational";
+    return { day, level, theme: fallbackTheme, fallback: true, choice, ...fallbackReading(level) };
+  }
 
   // Another student of this level may have stored it meanwhile: keep theirs.
   const table = await readings(choice);

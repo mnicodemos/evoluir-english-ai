@@ -1333,6 +1333,12 @@ const baseUiPt: Record<string, string> = {
   "Tap any word you don't understand to see its translation.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução.",
   "Words you marked": "Palavras que você marcou",
+  "Save to my Vocabulary": "Salvar no meu Vocabulário",
+  "Saved to your Vocabulary reviews.": "Salvas nas suas revisões do Vocabulário.",
+  "Open Vocabulary": "Abrir Vocabulário",
+  "Could not save the words. Please try again.":
+    "Não foi possível salvar as palavras. Tente de novo.",
+  "They come back in your word reviews.": "Elas voltam nas suas revisões de palavras.",
   "Reading done: today counts as a study day.": "Leitura feita: hoje conta como dia de estudo.",
   "What do you want to read?": "O que você quer ler?",
   "Today's pick": "Texto do dia",

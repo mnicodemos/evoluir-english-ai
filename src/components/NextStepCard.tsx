@@ -253,7 +253,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-7 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left"
+        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -286,7 +286,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-7 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left"
+        className="h-8 min-w-0 px-2 max-sm:text-[10px] text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
@@ -322,7 +322,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-7 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
+      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
     >
       <Link to="/study-plan">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium">
@@ -377,7 +377,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-7 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:hidden"
+        className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:hidden"
       >
         {mobileReview.params ? (
           <Link to="/learning/$lessonId" params={mobileReview.params}>
@@ -401,7 +401,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       asChild
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-7 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
+      className="h-8 min-w-0 px-2 text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:text-[10px] max-sm:whitespace-nowrap sm:h-9"
     >
       <Link to="/league">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[10px] max-sm:font-medium">
@@ -550,7 +550,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 <span
                   key={key}
                   aria-hidden="true"
-                  className="h-7 flex-auto animate-pulse rounded-full border border-white/10 bg-white/[0.05]"
+                  className="h-10 flex-auto animate-pulse rounded-full border border-white/10 bg-white/[0.05]"
                 />
               ))
             )}
