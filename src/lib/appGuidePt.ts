@@ -262,4 +262,6 @@ export const appGuidePt: Record<string, string> = {
     "Filtre a lista por tipo de erro e toque em Selecionar para apagar para remover vários de uma vez.",
   "My Subscription, in the menu, shows your plan; the first Premium subscription starts with 7 free days, and you can cancel there.":
     "Minha assinatura, no menu, mostra o seu plano; a primeira assinatura Premium começa com 7 dias grátis, e você pode cancelar ali.",
+  "Start here, on top of the path, has the presentation video of your level (Business English has its own).":
+    "O Comece aqui, no topo da trilha, tem o vídeo de apresentação do seu nível (o Business English tem o dele).",
 };

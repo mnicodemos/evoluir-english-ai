@@ -17,6 +17,7 @@ import {
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { LevelIntroVideo } from "@/components/LevelIntroVideo";
 import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -199,6 +200,8 @@ function BusinessPage() {
                 </Button>
               </section>
             )}
+
+            <LevelIntroVideo level="business" label="Business English" userId={profile.id} />
 
             {/* Same layout as the learning path (user request): progress and the
                 next lesson on top, the unit with the next lesson open on the left

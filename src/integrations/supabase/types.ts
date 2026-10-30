@@ -804,6 +804,27 @@ export type Database = {
         }
         Relationships: []
       }
+      level_intro_videos: {
+        Row: {
+          level: string
+          updated_at: string
+          updated_by: string | null
+          video_url: string
+        }
+        Insert: {
+          level: string
+          updated_at?: string
+          updated_by?: string | null
+          video_url: string
+        }
+        Update: {
+          level?: string
+          updated_at?: string
+          updated_by?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       lesson_videos: {
         Row: {
           approved_at: string
