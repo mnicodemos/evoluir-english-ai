@@ -25,6 +25,17 @@ export const AI_MODEL_PRICING: Record<
   },
 };
 
+/**
+ * Models billed per generated item rather than per token (USD per item). The
+ * usage record stores the item count as output_tokens (input 0), so the Admin
+ * re-prices these calls like any other. Lyria 3 Clip: one 30-second song; the
+ * owner's billing (Oct 2026) shows 5 songs for R$ 1.19 at the report's USD 1 =
+ * 5.93 (the rate its token SKUs above give), so US$ 0.04 a song.
+ */
+export const AI_MODEL_PRICE_PER_ITEM: Record<string, number> = {
+  "lyria-3-clip-preview": 0.04,
+};
+
 /** The token counts Gemini returns with every answer (generateContent and its stream). */
 export type GeminiUsageMetadata = {
   promptTokenCount?: number;
@@ -63,6 +74,10 @@ export function estimateAiCost(
   inputTokens: number | null | undefined,
   outputTokens: number | null | undefined,
 ): number | null {
+  const perItem = model ? AI_MODEL_PRICE_PER_ITEM[model] : undefined;
+  if (perItem !== undefined) {
+    return typeof outputTokens === "number" ? outputTokens * perItem : null;
+  }
   const price = model ? AI_MODEL_PRICING[model] : undefined;
   if (!price || typeof inputTokens !== "number" || typeof outputTokens !== "number") return null;
   return (

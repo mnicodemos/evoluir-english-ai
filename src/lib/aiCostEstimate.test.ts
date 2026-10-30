@@ -33,3 +33,14 @@ describe("TTS and transcription costs (user request: measure every call)", () =>
     expect(geminiUsageTokens({ candidatesTokenCount: 3 })).toBeNull();
   });
 });
+
+describe("per-song pricing (Music Lab)", () => {
+  it("prices each Lyria song at US$ 0.04", () => {
+    expect(estimateAiCost("lyria-3-clip-preview", 0, 1)).toBeCloseTo(0.04, 6);
+    expect(estimateAiCost("lyria-3-clip-preview", 0, 5)).toBeCloseTo(0.2, 6);
+  });
+
+  it("leaves a song without its count unmeasured", () => {
+    expect(estimateAiCost("lyria-3-clip-preview", null, null)).toBeNull();
+  });
+});
