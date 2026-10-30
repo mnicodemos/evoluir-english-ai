@@ -45,6 +45,7 @@ import { Route as AuthenticatedLearningLessonIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedLearningFinalTestRouteImport } from './routes/_authenticated/learning/final-test'
 import { Route as AuthenticatedLearningReviewRouteImport } from './routes/_authenticated/learning/review'
 import { Route as AuthenticatedLearningUnitTestRouteImport } from './routes/_authenticated/learning/unit-test'
+import { Route as AuthenticatedLearningVideosRouteImport } from './routes/_authenticated/learning/videos'
 import { Route as AuthenticatedLifeIndexRouteImport } from './routes/_authenticated/life/index'
 import { Route as AuthenticatedLifeCoachRouteImport } from './routes/_authenticated/life/coach'
 import { Route as AuthenticatedLifeDecisionsRouteImport } from './routes/_authenticated/life/decisions'
@@ -241,6 +242,12 @@ const AuthenticatedLearningUnitTestRoute =
     path: '/learning/unit-test',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLearningVideosRoute =
+  AuthenticatedLearningVideosRouteImport.update({
+    id: '/learning/videos',
+    path: '/learning/videos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLifeIndexRoute = AuthenticatedLifeIndexRouteImport.update({
   id: '/life/',
   path: '/life/',
@@ -331,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/learning/review': typeof AuthenticatedLearningReviewRoute
   '/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
+  '/learning/videos': typeof AuthenticatedLearningVideosRoute
   '/life/coach': typeof AuthenticatedLifeCoachRoute
   '/life/decisions': typeof AuthenticatedLifeDecisionsRoute
   '/life/guide': typeof AuthenticatedLifeGuideRoute
@@ -378,6 +386,7 @@ export interface FileRoutesByTo {
   '/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/learning/review': typeof AuthenticatedLearningReviewRoute
   '/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
+  '/learning/videos': typeof AuthenticatedLearningVideosRoute
   '/life/coach': typeof AuthenticatedLifeCoachRoute
   '/life/decisions': typeof AuthenticatedLifeDecisionsRoute
   '/life/guide': typeof AuthenticatedLifeGuideRoute
@@ -427,6 +436,7 @@ export interface FileRoutesById {
   '/_authenticated/learning/final-test': typeof AuthenticatedLearningFinalTestRoute
   '/_authenticated/learning/review': typeof AuthenticatedLearningReviewRoute
   '/_authenticated/learning/unit-test': typeof AuthenticatedLearningUnitTestRoute
+  '/_authenticated/learning/videos': typeof AuthenticatedLearningVideosRoute
   '/_authenticated/life/coach': typeof AuthenticatedLifeCoachRoute
   '/_authenticated/life/decisions': typeof AuthenticatedLifeDecisionsRoute
   '/_authenticated/life/guide': typeof AuthenticatedLifeGuideRoute
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/learning/final-test'
     | '/learning/review'
     | '/learning/unit-test'
+    | '/learning/videos'
     | '/life/coach'
     | '/life/decisions'
     | '/life/guide'
@@ -523,6 +534,7 @@ export interface FileRouteTypes {
     | '/learning/final-test'
     | '/learning/review'
     | '/learning/unit-test'
+    | '/learning/videos'
     | '/life/coach'
     | '/life/decisions'
     | '/life/guide'
@@ -571,6 +583,7 @@ export interface FileRouteTypes {
     | '/_authenticated/learning/final-test'
     | '/_authenticated/learning/review'
     | '/_authenticated/learning/unit-test'
+    | '/_authenticated/learning/videos'
     | '/_authenticated/life/coach'
     | '/_authenticated/life/decisions'
     | '/_authenticated/life/guide'
@@ -856,6 +869,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearningUnitTestRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/learning/videos': {
+      id: '/_authenticated/learning/videos'
+      path: '/learning/videos'
+      fullPath: '/learning/videos'
+      preLoaderRoute: typeof AuthenticatedLearningVideosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/life/': {
       id: '/_authenticated/life/'
       path: '/life'
@@ -954,6 +974,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLearningFinalTestRoute: typeof AuthenticatedLearningFinalTestRoute
   AuthenticatedLearningReviewRoute: typeof AuthenticatedLearningReviewRoute
   AuthenticatedLearningUnitTestRoute: typeof AuthenticatedLearningUnitTestRoute
+  AuthenticatedLearningVideosRoute: typeof AuthenticatedLearningVideosRoute
   AuthenticatedLifeCoachRoute: typeof AuthenticatedLifeCoachRoute
   AuthenticatedLifeDecisionsRoute: typeof AuthenticatedLifeDecisionsRoute
   AuthenticatedLifeGuideRoute: typeof AuthenticatedLifeGuideRoute
@@ -988,6 +1009,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLearningFinalTestRoute: AuthenticatedLearningFinalTestRoute,
   AuthenticatedLearningReviewRoute: AuthenticatedLearningReviewRoute,
   AuthenticatedLearningUnitTestRoute: AuthenticatedLearningUnitTestRoute,
+  AuthenticatedLearningVideosRoute: AuthenticatedLearningVideosRoute,
   AuthenticatedLifeCoachRoute: AuthenticatedLifeCoachRoute,
   AuthenticatedLifeDecisionsRoute: AuthenticatedLifeDecisionsRoute,
   AuthenticatedLifeGuideRoute: AuthenticatedLifeGuideRoute,

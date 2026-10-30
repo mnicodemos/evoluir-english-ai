@@ -13,19 +13,9 @@ import { Button } from "@/components/ui/button";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { supabase } from "@/integrations/supabase/client";
 import { findLevel } from "@/lib/level";
-import { vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
+import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
-
-/** The Vimeo player without its own title, byline and portrait (the card names the level). */
-function cleanPlayerUrl(embed: string): string {
-  const url = new URL(embed);
-  url.searchParams.set("title", "0");
-  url.searchParams.set("byline", "0");
-  url.searchParams.set("portrait", "0");
-  url.searchParams.set("dnt", "1");
-  return url.toString();
-}
 
 /** What the level holds, beside the video (the same facts as the path and the guide). */
 const LEVEL_FACTS = [
@@ -129,7 +119,7 @@ export function LevelIntroVideo({
         <div className="overflow-hidden rounded-xl bg-black shadow-[0_18px_40px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
           <iframe
             className="aspect-video w-full"
-            src={cleanPlayerUrl(embed)}
+            src={cleanVimeoPlayerUrl(embed)}
             title={t("Level presentation")}
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"

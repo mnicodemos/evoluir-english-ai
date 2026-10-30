@@ -55,14 +55,15 @@ export const Route = createFileRoute("/_authenticated/premium")({
 // reports, priority lessons and support that do not exist, and "3 per day"
 // limits that are not the real ones). Premium: 5x the daily AI limits
 // (ai_limits premium_daily_limit), Business English (businessCourse.functions),
-// the Premium parts of Life+ AI (life.functions), every meditation and Music Lab
-// (/api/music).
+// the Premium parts of Life+ AI (life.functions), every meditation, Music Lab
+// (/api/music) and the extra lesson videos (loadPremiumVideos).
 const premiumPerks = [
   "5x more AI practice every day: conversations, video calls and corrections",
   "Business English from B1: 36 lessons for meetings, emails and interviews",
   "Full Life+ AI: routine, habits, decisions and Life Coach",
   "Every meditation in English",
   "Music Lab: your own English song, one a day",
+  "Extra lesson videos, by level and unit",
 ];
 
 const freePerks = [

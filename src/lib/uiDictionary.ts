@@ -2479,6 +2479,19 @@ const baseUiPt: Record<string, string> = {
   "Error monitoring": "Monitoramento de erros",
   "Lesson test": "Teste de lição",
   Lyrics: "Letra",
+  // Premium extra videos (owner request, 2026-10-31).
+  "Extra lesson videos, by level and unit": "Vídeos extras das lições, por nível e unidade",
+  "Extra videos": "Vídeos extras",
+  "Premium extras": "Extras Premium",
+  "Extra lesson videos": "Vídeos extras das lições",
+  "Short videos that go deeper into the lessons of your path.":
+    "Vídeos curtos que aprofundam as lições da sua trilha.",
+  "Extra videos are part of Premium. Subscribe to watch every one of them.":
+    "Os vídeos extras fazem parte do Premium. Assine para assistir a todos.",
+  "No extra videos here yet. New ones are added over time.":
+    "Ainda não há vídeos extras aqui. Novos vídeos chegam com o tempo.",
+  Watch: "Assistir",
+  "Close video": "Fechar vídeo",
   // Diamond celebration and cycles (owner decision, 2026-10-31).
   "days in a row. Another Diamond cycle is yours for good.":
     "dias seguidos. Mais um ciclo do Diamante é seu para sempre.",
