@@ -13,6 +13,7 @@ describe("mistakeReviewReport", () => {
     expect(report).toEqual([
       { source: "teacher", saved: 3, reviewed: 2, retained: 1, percent: 50 },
       { source: "writing", saved: 1, reviewed: 0, retained: 0, percent: null },
+      { source: "quiz", saved: 0, reviewed: 0, retained: 0, percent: null },
     ]);
   });
 });

@@ -3,7 +3,11 @@ import { useServerFn } from "@tanstack/react-start";
 
 import { getMistakeReviewReport } from "@/lib/admin.functions";
 
-const SOURCE_LABEL = { teacher: "Professor de IA", writing: "Writing" } as const;
+const SOURCE_LABEL = {
+  teacher: "Professor de IA",
+  writing: "Writing",
+  quiz: "Quiz das lições",
+} as const;
 
 /**
  * Admin: do corrections stick? Mistakes saved by the AI Teacher and by

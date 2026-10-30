@@ -71,7 +71,7 @@ export const submitAuthoritativeQuiz = createServerFn({ method: "POST" })
 
     const { data: questions, error: questionError } = await admin
       .from("quizzes")
-      .select("id, question, correct_answer, sort_order")
+      .select("id, question, correct_answer, sort_order, explanation, pedagogical_skill")
       .eq("lesson_id", data.lessonId)
       .order("sort_order");
     if (questionError) throw new Error("Quiz questions are unavailable");
@@ -131,6 +131,19 @@ export const submitAuthoritativeQuiz = createServerFn({ method: "POST" })
       };
     }
     await processQuizResultSafely(admin, context.userId, data.attemptKey);
+    // Wrong fill-in answers join My mistakes, once per attempt (recordMistakes
+    // never throws; a repeated phrase is reinforced, not duplicated).
+    const { quizMistakes } = await import("@/lib/quizMistakes");
+    const { recordMistakes } = await import("@/lib/learningErrors.server");
+    const mistakes = quizMistakes(questions ?? [], graded.details);
+    for (const skill of ["grammar", "vocabulary"] as const) {
+      await recordMistakes(
+        admin,
+        context.userId,
+        mistakes.filter((mistake) => mistake.category === skill),
+        { skill, source: "quiz" },
+      );
+    }
     return { resultId: data.attemptKey, ...graded };
   });
 

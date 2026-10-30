@@ -49,6 +49,8 @@ export type QuizQuestion = {
   options: string[];
   explanation: string;
   sort_order: number;
+  /** grammar or vocabulary, for the result's "what to review" line. */
+  pedagogical_skill?: string | null;
 };
 
 export type UserLesson = {
