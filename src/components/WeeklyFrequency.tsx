@@ -100,21 +100,34 @@ export function WeeklyFrequency({
           <span className="text-muted-foreground/50" aria-hidden="true">
             ·
           </span>
-          <span className="font-semibold text-foreground">
-            {studiedCount} {studiedCount === 1 ? (lang === "pt" ? "dia" : "day") : daysLabel}
-          </span>
-          {totalStudyDays != null && (
+          {/* The week's count beside its plan, then the all-time total last
+              (owner report, 2026-10-30: "42 total study days of 7 planned"
+              read the plan as the total's). */}
+          {allStudied ? (
+            <>
+              <span className="font-semibold text-foreground">
+                {studiedCount} {studiedCount === 1 ? (lang === "pt" ? "dia" : "day") : daysLabel}
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-semibold text-brand-green">
+                <Check className="size-3" strokeWidth={3} aria-hidden="true" />
+                {lang === "pt" ? `Plano de ${weeklyGoal} batido` : `Plan of ${weeklyGoal} reached`}
+              </span>
+            </>
+          ) : (
             <span>
-              · {totalStudyDays} {lang === "pt" ? "dias no total" : "total study days"}
+              <span className="font-semibold text-foreground">{studiedCount}</span>{" "}
+              {lang === "pt" ? `de ${weeklyGoal} dias` : `of ${weeklyGoal} days`}
             </span>
           )}
-          {allStudied ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-semibold text-brand-green">
-              <Check className="size-3" strokeWidth={3} aria-hidden="true" />
-              {lang === "pt" ? `Plano de ${weeklyGoal} batido` : `Plan of ${weeklyGoal} reached`}
-            </span>
-          ) : (
-            <span>{lang === "pt" ? `de ${weeklyGoal} no plano` : `of ${weeklyGoal} planned`}</span>
+          {totalStudyDays != null && (
+            <>
+              <span className="text-muted-foreground/50" aria-hidden="true">
+                ·
+              </span>
+              <span>
+                {totalStudyDays} {lang === "pt" ? "dias de estudo no total" : "study days in total"}
+              </span>
+            </>
           )}
         </p>
         {weekKeys.map((key, i) => {
