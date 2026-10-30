@@ -21,8 +21,11 @@ export const BLACK_FRIDAY = {
   /** Paid months the discount covers; the 4th is full price. */
   discountMonths: 3,
   monthlyTrialDays: 15,
-  /** Warm-up before the start (owner decision, 2026-10-24): 14 days. */
-  warmupDays: 14,
+  /**
+   * Warm-up before the start: 21 days, from Monday 02/11 (owner decision,
+   * 2026-10-31; was 14 days from 09/11).
+   */
+  warmupDays: 21,
   /** Stripe coupon, created on first use (ensureBlackFridayCoupon). */
   couponId: "EVOLUIR_BF2026_MONTHLY30X3",
 } as const;
@@ -49,9 +52,18 @@ function saoPauloDay(time: number): string {
 /** The first and last days of the offer, in São Paulo. */
 export const BLACK_FRIDAY_FIRST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.startsAt));
 export const BLACK_FRIDAY_LAST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.endsAt) - 1);
+/** The first day of the warm-up, in São Paulo (02/11 with the current dates). */
+export const BLACK_FRIDAY_WARMUP_FIRST_DAY = saoPauloDay(
+  Date.parse(BLACK_FRIDAY.startsAt) - BLACK_FRIDAY.warmupDays * 24 * 60 * 60 * 1000,
+);
+
+/** A São Paulo day as DD/MM. */
+export function dayMonth(day: string): string {
+  return `${day.slice(8, 10)}/${day.slice(5, 7)}`;
+}
 
 /**
- * Where the campaign stands: the warm-up (the 14 days before, when the app
+ * Where the campaign stands: the warm-up (the days before, when the app
  * announces it to bring sign-ups in early), live, or nothing.
  */
 export function blackFridayPhase(now: Date = new Date()): "warmup" | "live" | null {
@@ -70,17 +82,26 @@ export function daysUntilBlackFriday(now: Date = new Date()): number {
 }
 
 /**
- * The morning push to free students on the first and the last day (owner
- * decision, 2026-10-24), in place of the word of the day; null other days.
+ * The morning push to free students on the warm-up's first day (owner
+ * decision, 2026-10-31: announce it early) and on the offer's first and last
+ * days (owner decision, 2026-10-24), in place of the word of the day; null
+ * other days.
  */
 export function blackFridayPush(
   today: string,
 ): { title: string; body: string; path: string } | null {
   const offer = `${BLACK_FRIDAY.monthlyPercentOff}% off no Premium mensal por ${BLACK_FRIDAY.discountMonths} meses + ${BLACK_FRIDAY.monthlyTrialDays} dias grátis na primeira assinatura`;
+  if (today === BLACK_FRIDAY_WARMUP_FIRST_DAY) {
+    return {
+      title: "🖤 A Black Friday do Evoluir+ vem aí",
+      body: `De ${dayMonth(BLACK_FRIDAY_FIRST_DAY)} a ${dayMonth(BLACK_FRIDAY_LAST_DAY)}: ${offer}. Já marque na agenda!`,
+      path: "/premium",
+    };
+  }
   if (today === BLACK_FRIDAY_FIRST_DAY) {
     return {
       title: "🖤 A Black Friday começou!",
-      body: `${offer}. Até ${BLACK_FRIDAY_LAST_DAY.slice(8, 10)}/${BLACK_FRIDAY_LAST_DAY.slice(5, 7)}.`,
+      body: `${offer}. Até ${dayMonth(BLACK_FRIDAY_LAST_DAY)}.`,
       path: "/premium",
     };
   }

@@ -43,10 +43,10 @@ describe("Black Friday offer", () => {
 });
 
 describe("Black Friday warm-up and pushes", () => {
-  it("announces the offer in the 14 days before it starts", () => {
-    expect(blackFridayPhase(new Date("2026-11-09T02:59:00Z"))).toBeNull();
-    expect(blackFridayPhase(new Date("2026-11-09T03:00:00Z"))).toBe("warmup");
-    expect(daysUntilBlackFriday(new Date("2026-11-09T12:00:00Z"))).toBe(14);
+  it("announces the offer in the 21 days before it starts", () => {
+    expect(blackFridayPhase(new Date("2026-11-02T02:59:00Z"))).toBeNull();
+    expect(blackFridayPhase(new Date("2026-11-02T03:00:00Z"))).toBe("warmup");
+    expect(daysUntilBlackFriday(new Date("2026-11-02T12:00:00Z"))).toBe(21);
     expect(daysUntilBlackFriday(new Date("2026-11-22T23:00:00Z"))).toBe(1);
     expect(blackFridayPhase(during)).toBe("live");
     expect(blackFridayPhase(after)).toBeNull();
@@ -57,6 +57,9 @@ describe("Black Friday warm-up and pushes", () => {
     expect(blackFridayPush("2026-11-23")?.body).toContain("Até 30/11");
     expect(blackFridayPush("2026-11-30")?.title).toContain("Último dia");
     expect(blackFridayPush("2026-11-25")).toBeNull();
+    expect(blackFridayPush("2026-11-02")?.title).toContain("vem aí");
+    expect(blackFridayPush("2026-11-02")?.body).toContain("De 23/11 a 30/11");
+    expect(blackFridayPush("2026-11-03")).toBeNull();
     expect(blackFridayPush("2026-12-01")).toBeNull();
   });
 });

@@ -20,6 +20,7 @@ import { Footer } from "@/components/Footer";
 import { ConversationDemo } from "@/components/home/ConversationDemo";
 import { HomeVideo } from "@/components/home/HomeVideo";
 import evoImage from "@/assets/evo-landing.webp";
+import { BlackFridayBadge } from "@/components/home/BlackFridayBadge";
 import { LaunchCampaignBadge, LaunchCampaignPopup } from "@/components/home/LaunchCampaignPopup";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
@@ -210,6 +211,7 @@ function CommercialLanding() {
           <div className="relative mx-auto grid w-full max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:px-8 lg:py-16">
             <div className="z-10 max-w-2xl pb-2 lg:pb-0">
               <LaunchCampaignBadge className="mb-4" />
+              <BlackFridayBadge className="mb-4" />
               <h1 className="text-[2.15rem] font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
                 Fale inglês sem travar.
                 <span className="mt-2 block text-gradient-growth">
