@@ -188,9 +188,12 @@ function CommercialLanding() {
 
       <main>
         {/* HERO — what it is, for whom, and the first step */}
-        <section className="relative overflow-hidden border-b border-border/70">
+        {/* From lg the hero fills the first screen under the 4rem header (owner
+            report, 2026-10-31: the next section showed half its conversation
+            there, an idea cut in two); it starts whole once scrolled. */}
+        <section className="relative flex flex-col justify-center overflow-hidden border-b border-border/70 lg:min-h-[calc(100svh-4rem)]">
           <div className="absolute inset-0 surface-hero opacity-45" aria-hidden="true" />
-          <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10 lg:px-8 lg:pt-10">
+          <div className="relative mx-auto grid w-full max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10 lg:px-8 lg:py-10">
             <div className="z-10 max-w-2xl pb-2 lg:pb-12">
               <LaunchCampaignBadge className="mb-4" />
               <h1 className="text-[2.15rem] font-bold leading-[1.05] sm:text-5xl lg:text-6xl">

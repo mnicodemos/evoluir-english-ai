@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -60,6 +60,8 @@ import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
 import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { readStorage, writeStorage } from "@/lib/safeStorage";
+import { studyToday } from "@/lib/today";
 import { wordReviewTarget } from "@/lib/wordReview";
 import { DoneSeal } from "@/components/DoneSeal";
 
@@ -67,6 +69,15 @@ import { DoneSeal } from "@/components/DoneSeal";
  * Adaptive next step. Everything shown here is decided server-side from the
  * student's own pedagogical data; the card only presents it.
  */
+
+/** The first phone pill, kept on the device to show at once next time. */
+type MobilePill = {
+  kind: "quick" | "review";
+  to: string;
+  params?: { lessonId: string };
+  label: string;
+};
+type LeagueSummary = { joined: boolean; rank: number | null; xp: number; total: number };
 
 export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { lang } = useUiLang();
@@ -113,16 +124,52 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     const timer = window.setTimeout(() => setPillWaitOver(true), 2500);
     return () => window.clearTimeout(timer);
   }, []);
-  const firstPillReady =
-    pillWaitOver ||
-    (!isPlaceholderData &&
-      activityIndicators.ready &&
-      todayFetched &&
-      wordsDueReady &&
-      cardsFetched &&
-      mistakesFetched);
-  const leaguePillReady = pillWaitOver || league.loaded;
-  const weekPillReady = pillWaitOver || planFetched;
+  const firstPillFresh =
+    !isPlaceholderData &&
+    activityIndicators.ready &&
+    todayFetched &&
+    wordsDueReady &&
+    cardsFetched &&
+    mistakesFetched;
+  const firstPillReady = pillWaitOver || firstPillFresh;
+  // Owner report, 2026-10-31 (still slow after the split): each pill shows at
+  // once what it showed last time on this device (the first pill only from
+  // today), then follows the fresh data quietly; a pill seen for the first
+  // time keeps its placeholder. Your week has a fixed label and shows at once.
+  const firstPillKey = profile?.id ? `evoluir-first-pill:${profile.id}:${studyToday()}` : null;
+  const leaguePillKey = profile?.id ? `evoluir-league-pill:${profile.id}` : null;
+  const [cachedFirstPill, setCachedFirstPill] = useState<MobilePill | null>(null);
+  const [cachedLeague, setCachedLeague] = useState<LeagueSummary | null>(null);
+  useEffect(() => {
+    if (!firstPillKey || !leaguePillKey) return;
+    try {
+      const first = readStorage(firstPillKey);
+      if (first) setCachedFirstPill(JSON.parse(first) as MobilePill);
+      const standing = readStorage(leaguePillKey);
+      if (standing) setCachedLeague(JSON.parse(standing) as LeagueSummary);
+    } catch {
+      /* a broken cache only means waiting for the fresh data */
+    }
+  }, [firstPillKey, leaguePillKey]);
+  // The fresh first pill, filled during render below, saved once it is known.
+  const freshFirstPill = useRef<MobilePill | null | undefined>(undefined);
+  useEffect(() => {
+    if (!firstPillKey || !firstPillFresh) return;
+    if (freshFirstPill.current === undefined) return;
+    writeStorage(firstPillKey, JSON.stringify(freshFirstPill.current));
+  });
+  useEffect(() => {
+    if (!leaguePillKey || !league.loaded) return;
+    const summary: LeagueSummary = {
+      joined: league.joined,
+      rank: league.rank,
+      xp: league.xp,
+      total: league.total,
+    };
+    writeStorage(leaguePillKey, JSON.stringify(summary));
+  }, [leaguePillKey, league.loaded, league.joined, league.rank, league.xp, league.total]);
+  const leagueShown: LeagueSummary | null = league.loaded ? league : cachedLeague;
+  const leaguePillReady = pillWaitOver || !!leagueShown;
 
   if (isLoading) {
     return (
@@ -422,19 +469,66 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       <Link to="/league">
         <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium">
           <Medal
-            className={`size-3.5 shrink-0 max-sm:size-4 ${LEAGUE_MEDAL_TEXT[leagueMedal(league)]}`}
+            className={`size-3.5 shrink-0 max-sm:size-4 ${LEAGUE_MEDAL_TEXT[leagueMedal(leagueShown ?? league)]}`}
             aria-hidden="true"
           />
-          {league.joined
-            ? league.total > 1 && league.rank
-              ? `#${league.rank} · ${league.xp} XP`
-              : `${league.xp} XP`
+          {leagueShown?.joined
+            ? leagueShown.total > 1 && leagueShown.rank
+              ? `#${leagueShown.rank} · ${leagueShown.xp} XP`
+              : `${leagueShown.xp} XP`
             : t("Weekly league")}
         </span>
       </Link>
     </Button>
   );
 
+  // The first phone pill as plain data, so it can be kept on the device.
+  const currentFirstPill: MobilePill | null = quickWinButton
+    ? {
+        kind: "quick",
+        to: quickWin!.activity.to,
+        ...(quickWin!.activity.params ? { params: quickWin!.activity.params } : {}),
+        label: t("Quick Win"),
+      }
+    : mobileReviewButton && mobileReview
+      ? {
+          kind: "review",
+          to: mobileReview.to,
+          ...(mobileReview.params ? { params: mobileReview.params } : {}),
+          label: mobileReview.label,
+        }
+      : null;
+  freshFirstPill.current = currentFirstPill;
+  const shownFirstPill = firstPillReady ? currentFirstPill : cachedFirstPill;
+  const renderMobilePill = (pill: MobilePill) => {
+    const content = (
+      <span className="flex min-w-0 items-center gap-1.5 font-medium leading-none">
+        {pill.kind === "quick" ? (
+          quickWinIcon
+        ) : (
+          <RefreshCw className="size-4 shrink-0 text-sky-300" aria-hidden="true" />
+        )}
+        {/* A long skill name is cut rather than pushing the row past the card. */}
+        <span className="min-w-0 truncate">{pill.label}</span>
+      </span>
+    );
+    return (
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="h-10 min-w-0 shrink flex-auto justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-1.5 text-[11px] text-sidebar-foreground whitespace-nowrap hover:bg-sidebar-accent min-[380px]:text-xs"
+      >
+        {pill.params ? (
+          <Link to="/learning/$lessonId" params={pill.params}>
+            {content}
+          </Link>
+        ) : (
+          <Link to={pill.to}>{content}</Link>
+        )}
+      </Button>
+    );
+  };
   const pillPlaceholder = (
     <span
       aria-hidden="true"
@@ -562,9 +656,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               card's free height instead of crowding under the EVO label
               (user report). */}
           <div className="col-span-2 flex flex-nowrap items-center gap-1.5 px-2.5 pb-2.5 sm:hidden">
-            {firstPillReady ? (quickWinButton ?? mobileReviewButton) : pillPlaceholder}
+            {shownFirstPill
+              ? renderMobilePill(shownFirstPill)
+              : firstPillReady
+                ? null
+                : pillPlaceholder}
             {leaguePillReady ? leagueButton : pillPlaceholder}
-            {weekPillReady ? mapButton : pillPlaceholder}
+            {mapButton}
           </div>
 
           <aside className="relative z-10 hidden min-w-0 sm:col-span-2 sm:block sm:border-t sm:border-border sm:px-5 sm:py-4 xl:order-3 xl:px-3 xl:py-3 xl:col-span-1 xl:flex xl:flex-col xl:self-stretch xl:border-t-0">
