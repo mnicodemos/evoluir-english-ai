@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { estimateAiCost } from "@/lib/aiPricing";
 import { authenticateApiRequest } from "@/lib/api-auth.server";
 import { MUSIC_PREMIUM_MESSAGE } from "@/lib/musicApi";
 
@@ -181,6 +182,15 @@ export const Route = createFileRoute("/api/music")({
             .update({
               status,
               success: status === "completed",
+              // One song, priced per item (AI_MODEL_PRICE_PER_ITEM), so its cost
+              // reaches the credit balance and Cost & Performance.
+              ...(status === "completed"
+                ? {
+                    input_tokens: 0,
+                    output_tokens: 1,
+                    estimated_cost: estimateAiCost(MUSIC_MODEL, 0, 1),
+                  }
+                : {}),
               error_code: errorCode ?? null,
               duration_ms: Math.max(0, Date.now() - startedAt),
               completed_at: new Date().toISOString(),
