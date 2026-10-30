@@ -2479,6 +2479,17 @@ const baseUiPt: Record<string, string> = {
   "Error monitoring": "Monitoramento de erros",
   "Lesson test": "Teste de lição",
   Lyrics: "Letra",
+  // Diamond celebration and cycles (owner decision, 2026-10-31).
+  "days in a row. Another Diamond cycle is yours for good.":
+    "dias seguidos. Mais um ciclo do Diamante é seu para sempre.",
+  "63 days in a row: the last jewel is yours for good.":
+    "63 dias seguidos: a última joia é sua para sempre.",
+  "Look how far you have come. I am proud of you!":
+    "Olha só quanto você já caminhou. Tenho orgulho de você!",
+  "study days": "dias de estudo",
+  "words learned": "palavras aprendidas",
+  "Every 63 more days in a row adds another Diamond cycle.":
+    "A cada mais 63 dias seguidos, você ganha mais um ciclo do Diamante.",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.

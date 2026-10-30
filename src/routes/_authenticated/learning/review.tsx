@@ -13,6 +13,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 
 import { supabase } from "@/integrations/supabase/client";
+import { isFlashcardDue, lessonStarted } from "@/lib/flashcards";
 import { studyToday } from "@/lib/today";
 
 export const Route = createFileRoute("/_authenticated/learning/review")({
@@ -71,23 +72,21 @@ function ReviewPage() {
   const today = studyToday();
 
   const startedLessonIds = useMemo(
-    () =>
-      new Set(
-        (userLessons ?? [])
-          .filter((l) => l.video_progress > 0 || l.progress > 0 || l.completed_at)
-          .map((l) => l.lesson_id),
-      ),
+    () => new Set((userLessons ?? []).filter(lessonStarted).map((l) => l.lesson_id)),
     [userLessons],
   );
 
   const queue = useMemo(() => {
     // Only cards from lessons already opened (or already answered), and only the ones due today.
-    const list = (cards ?? []).filter((c) => {
-      const state = (states ?? []).find((s) => s.flashcard_id === c.id);
-      const unlocked = !c.lesson_id || startedLessonIds.has(c.lesson_id) || Boolean(state);
-      if (!unlocked) return false;
-      return !state || state.next_review_date <= today;
-    });
+    // One rule with the Dashboard's count (isFlashcardDue).
+    const list = (cards ?? []).filter((c) =>
+      isFlashcardDue(
+        c,
+        (states ?? []).find((s) => s.flashcard_id === c.id),
+        startedLessonIds,
+        today,
+      ),
+    );
     const weight = (c: Flashcard) => {
       const s = (states ?? []).find((x) => x.flashcard_id === c.id);
       if (!s) return c.difficulty === "hard" ? 0 : c.difficulty === "medium" ? 1 : 2;
