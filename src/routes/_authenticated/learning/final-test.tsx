@@ -186,6 +186,7 @@ function FinalTestPage() {
             )}
             <LessonQuiz
               questions={data.quiz}
+              level={profile?.level}
               userId={profile?.id}
               lessonId={id}
               onFinished={finish}

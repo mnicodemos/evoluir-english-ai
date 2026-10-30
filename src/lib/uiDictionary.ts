@@ -212,6 +212,8 @@ const baseUiPt: Record<string, string> = {
   "Did you finish this task?": "Você terminou esta tarefa?",
   "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
   "Review words": "Revisar palavras",
+  "See in Portuguese": "Ver em português",
+  "Translating…": "Traduzindo…",
   "Review mistakes": "Revisar erros",
   "Focus this week": "Foco nesta semana",
   "in 7 days": "em 7 dias",
@@ -509,6 +511,13 @@ const baseUiPt: Record<string, string> = {
   "New writing activity": "Nova atividade de escrita",
   "New vocabulary activity": "Nova atividade de vocabulário",
   "Words to review": "Palavras para revisar",
+  "Word review": "Revisão de palavras",
+  "Lesson cards to review": "Cartões das lições para revisar",
+  "Review cards": "Revisar cartões",
+  "Your lessons' words as flashcards: part of the same word review.":
+    "As palavras das suas lições em cartões: parte da mesma revisão de palavras.",
+  "The other part of your word review, in Vocabulary.":
+    "A outra parte da sua revisão de palavras, no Vocabulário.",
   "Extra practice": "Prática extra",
   "Two short options beyond today's priority.": "Duas opções curtas além da prioridade de hoje.",
   "Compete with students at your level": "Dispute com alunos do seu nível",

@@ -58,6 +58,7 @@ import { NextStepCard } from "@/components/NextStepCard";
 import { SmartReviewCard } from "@/components/SmartReviewCard";
 import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 import { useFlashcardsDue } from "@/hooks/useFlashcardsDue";
+import { wordReviewTarget } from "@/lib/wordReview";
 import { useMistakesDue } from "@/hooks/useMistakesDue";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -153,6 +154,7 @@ function DashboardNotifications({
   translate,
   placement,
 }: DashboardNotificationsProps) {
+  const wordReview = wordReviewTarget(reviewCount, cardsDue);
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resetCloseTimer = useCallback(() => {
@@ -324,19 +326,14 @@ function DashboardNotifications({
       icon: SpellCheck,
       visible: mistakesDue > 0,
     },
+    // One word review: Vocabulary's words and the lessons' cards in one count
+    // and one door (owner request, 2026-10-30; wordReviewTarget).
     {
       id: "review",
-      to: "/vocabulary",
-      label: `${translate("Words to review")}: ${reviewCount}`,
+      to: wordReview.to,
+      label: `${translate("Words to review")}: ${wordReview.total}`,
       icon: RotateCcw,
-      visible: reviewCount > 0,
-    },
-    {
-      id: "cards",
-      to: "/learning/review",
-      label: `${translate("Flashcards to review")}: ${cardsDue}`,
-      icon: Layers,
-      visible: cardsDue > 0,
+      visible: wordReview.total > 0,
     },
     {
       id: "reading",
@@ -413,7 +410,6 @@ function DashboardNotifications({
       "plan",
       "mistakes",
       "review",
-      "cards",
       "reading",
       "listening",
       "writing",
