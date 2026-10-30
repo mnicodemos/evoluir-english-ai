@@ -212,6 +212,16 @@ const baseUiPt: Record<string, string> = {
   "Did you finish this task?": "Você terminou esta tarefa?",
   "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
   "Review words": "Revisar palavras",
+  "30 core lessons in 5 units, plus a review unit":
+    "30 lições principais em 5 unidades, mais uma unidade de revisão",
+  "Each lesson: audio with EVO and Leo, summary, cards and quiz":
+    "Cada lição: áudio com a EVO e o Leo, resumo, cartões e quiz",
+  "The Final Test opens after 21 lessons; 70% moves you up":
+    "O Teste Final abre depois de 21 lições; 70% sobe você de nível",
+  "36 lessons in 6 units, written at your level": "36 lições em 6 unidades, escritas no seu nível",
+  "Download each unit as a PDF workbook": "Baixe cada unidade como apostila em PDF",
+  "Hide video": "Esconder vídeo",
+  "Optional: watch it whenever you like.": "Opcional: assista quando quiser.",
   "Level presentation": "Apresentação do nível",
   "Start here": "Comece aqui",
   "Welcome to": "Boas-vindas ao",
