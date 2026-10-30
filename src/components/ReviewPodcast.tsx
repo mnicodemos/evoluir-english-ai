@@ -100,18 +100,34 @@ export function LessonPodcast({
       setCurrent(index);
       const line = lines[index]!;
       const next = lines[index + 1];
-      if (next) {
-        prepareSpeech(next.text, {
-          cache: "persistent",
-          voice: PODCAST_SPEAKERS[next.speaker].voice,
-        });
-      }
-      try {
-        await speakEnglish(line.text, {
+      // The next line is prepared only once this one is playing (owner report,
+      // 2026-10-30: the dialogue stalled). Asked before, it took the student's
+      // one voice request first, and this line waited behind it.
+      const speakLine = () =>
+        speakEnglish(line.text, {
           cache: "persistent",
           rate,
           voice: PODCAST_SPEAKERS[line.speaker].voice,
+          // Only EVO's and Leo's voices: never the device's robotic one.
+          browserFallback: false,
+          onStart: () => {
+            if (!next || run.current !== id) return;
+            prepareSpeech(next.text, {
+              cache: "persistent",
+              voice: PODCAST_SPEAKERS[next.speaker].voice,
+            });
+          },
         });
+      try {
+        try {
+          await speakLine();
+        } catch {
+          // One more try after a short pause before the student sees an error.
+          if (run.current !== id) return;
+          await new Promise((resolve) => setTimeout(resolve, 2_000));
+          if (run.current !== id) return;
+          await speakLine();
+        }
       } catch (error) {
         if (run.current !== id) return;
         setPlaybackError(
