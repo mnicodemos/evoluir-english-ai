@@ -18,6 +18,7 @@ import appMistakes from "@/assets/home/app-mistakes.jpg";
 import evoImage from "@/assets/evo-landing.webp";
 import { Footer } from "@/components/Footer";
 import { ConversationDemo } from "@/components/home/ConversationDemo";
+import { HomeVideo } from "@/components/home/HomeVideo";
 import { LaunchCampaignBadge, LaunchCampaignPopup } from "@/components/home/LaunchCampaignPopup";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
@@ -246,6 +247,21 @@ function CommercialLanding() {
                 className="relative h-[30vh] max-h-[560px] w-full object-contain object-bottom drop-shadow-2xl sm:h-[42vh] lg:h-[64vh]"
               />
             </div>
+          </div>
+        </section>
+
+        {/* VÍDEO — the owner's brand video, played only on tap */}
+        <section className="border-b border-border/70">
+          <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+            <div className="mb-6 text-center">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
+                Conheça o Evoluir+
+              </p>
+              <h2 className="text-2xl font-bold leading-tight sm:text-4xl">
+                Mais que inglês, em 23 segundos.
+              </h2>
+            </div>
+            <HomeVideo />
           </div>
         </section>
 
