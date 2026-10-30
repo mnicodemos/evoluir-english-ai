@@ -1281,6 +1281,13 @@ export const deleteSummaryVideoLink = createServerFn({ method: "POST" })
       .update({ video_url: null })
       .eq("curriculum_key", data.key);
     if (error) throw new Error("The Summary video link could not be removed");
+    // The approved copy in lesson_videos goes too, so no new lesson picks the
+    // removed video up again (owner decision, 2026-10-30: Business without
+    // videos). Before migration 0081 the table may not exist: ignored.
+    await (supabaseAdmin as unknown as LessonVideosTable)
+      .from("lesson_videos")
+      .delete()
+      .eq("curriculum_key", data.key);
     return { ok: true };
   });
 
