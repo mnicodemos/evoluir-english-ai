@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { GOOGLE_SIGN_IN_ENABLED } from "@/lib/authProviders";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup", "forgot"]).optional() });
 
@@ -47,7 +48,8 @@ function AuthPage() {
   const signInWithGoogle = async () => {
     setGoogleLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      // Public return page: /auth sends a signed-in student straight to /dashboard.
+      redirect_uri: `${window.location.origin}/auth`,
     });
     if (result.error) {
       setGoogleLoading(false);
@@ -268,7 +270,7 @@ function AuthPage() {
                       : t("Sign in to continue your streak.")}
                 </p>
 
-                {!forgot && (
+                {GOOGLE_SIGN_IN_ENABLED && !forgot && (
                   <div className="mt-7">
                     <Button
                       type="button"
