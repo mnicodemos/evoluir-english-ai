@@ -668,6 +668,7 @@ function LessonPage() {
                 lessonId={lessonId}
                 onFinished={finishLesson}
                 lessonCompleted={!!data.userLesson?.completed_at}
+                continueTo={{ to: "/learning", label: "Continue to the next lesson" }}
               />
             )}
           </TabsContent>

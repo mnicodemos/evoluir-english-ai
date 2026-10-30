@@ -1333,6 +1333,15 @@ const baseUiPt: Record<string, string> = {
   "Tap any word you don't understand to see its translation.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução.",
   "Words you marked": "Palavras que você marcou",
+  "Sign in to save and grade this quiz.": "Entre na sua conta para salvar e corrigir este quiz.",
+  "Your answers are safe, but progress could not be saved. Try again.":
+    "Suas respostas estão seguras, mas o progresso não foi salvo. Tente de novo.",
+  "You need at least 70% to pass. Review the explanations and retake the quiz: the questions come in a new order, the ones you missed first.":
+    "Você precisa de pelo menos 70% para passar. Revise as explicações e refaça o quiz: as perguntas vêm em nova ordem, primeiro as que você errou.",
+  "Practise it with the AI Teacher": "Pratique com o Professor de IA",
+  "Saving…": "Salvando…",
+  "Try saving again": "Tentar salvar de novo",
+  "Continue to the next lesson": "Seguir para a próxima lição",
   "Review finished": "Revisão concluída",
   "Say it in English": "Diga em inglês",
   "Practise again": "Treinar de novo",
