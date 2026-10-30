@@ -2,13 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Clapperboard, Crown, Lock, PlayCircle, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/PageHeader";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { useProfile } from "@/hooks/useProfile";
 import { findLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
@@ -46,6 +47,11 @@ function ExtraVideosPage() {
     queryFn: () => fetchVideos(),
   });
   const videos = useMemo(() => query.data?.videos ?? [], [query.data?.videos]);
+  // Opening the page clears the "Just added" mark of the pill and the bell.
+  const { markSeen } = useExtraVideosNews(profile?.id);
+  useEffect(() => {
+    if (videos.length > 0) markSeen();
+  }, [videos.length, markSeen]);
   const premium = query.data?.premium ?? false;
   const levels = useMemo(() => [...new Set(videos.map((video) => video.level))], [videos]);
   const studentLevel = findLevel(profile?.level).value;

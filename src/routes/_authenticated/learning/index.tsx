@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Clapperboard, GraduationCap, RotateCcw } from "lucide-react";
+import { Check, GraduationCap, RotateCcw } from "lucide-react";
 
 import { LevelIntroVideo } from "@/components/LevelIntroVideo";
 import { useLearningPath } from "@/hooks/useCurriculum";
+import { ExtraVideosPill } from "@/components/ExtraVideosPill";
 import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { CurriculumPath } from "@/components/LearningPathCard";
@@ -64,16 +65,9 @@ function LearningCenter() {
           title={
             reviewLevel ? <span>Review an earlier level</span> : <span>Your learning path</span>
           }
-          actions={
-            // Premium extra videos, one per lesson (owner request, 2026-10-31).
-            <Link
-              to="/learning/videos"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 text-sm font-semibold transition-colors hover:border-white/25 hover:bg-white/[0.08]"
-            >
-              <Clapperboard className="size-4 text-warning" aria-hidden="true" />
-              <span>Extra videos</span>
-            </Link>
-          }
+          // Premium extra videos, one per lesson (owner request, 2026-10-31), in
+          // the Weather talk capsule's size.
+          actions={<ExtraVideosPill />}
         >
           {reviewLevel ? (
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
