@@ -1,4 +1,5 @@
 import { CheckCircle2, ChevronLeft, ChevronRight, XCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { type QuizQuestion } from "@/hooks/useLearning";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { submitAuthoritativeQuiz } from "@/lib/pedagogy/dualWrite.functions";
+import { loadQuizExplanationsPt } from "@/lib/quizExplanationPt.functions";
+import { showsExplanationPt } from "@/lib/quizExplanationPt";
 import { quizSkillSummary } from "@/lib/quizSummary";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -42,6 +45,7 @@ export function LessonQuiz({
   onFinished,
   lessonCompleted,
   continueTo,
+  level,
 }: {
   questions: QuizQuestion[];
   userId?: string | undefined;
@@ -51,6 +55,8 @@ export function LessonQuiz({
   lessonCompleted?: boolean | undefined;
   /** Where to go once the quiz is passed (the learning path, for a lesson). */
   continueTo?: { to: "/learning"; label: string } | undefined;
+  /** The student's level: at A1-A2 the explanations also show in Portuguese. */
+  level?: string | null | undefined;
 }) {
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
@@ -91,6 +97,20 @@ export function LessonQuiz({
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const submitQuiz = useServerFn(submitAuthoritativeQuiz);
+  // The explanations in Portuguese once the quiz is checked: at once at A1-A2,
+  // on request above (owner request, 2026-10-30). Translated once per lesson
+  // text and shared, so most students read it from the cache.
+  const ptAtOnce = showsExplanationPt(level);
+  const [ptAsked, setPtAsked] = useState(false);
+  const loadPt = useServerFn(loadQuizExplanationsPt);
+  const { data: explanationsPt, isFetching: ptLoading } = useQuery({
+    queryKey: ["quiz-explanations-pt", lessonId],
+    enabled: submitted && (ptAtOnce || ptAsked),
+    staleTime: Infinity,
+    retry: false,
+    queryFn: () => loadPt({ data: { lessonId } }),
+  });
+  const showPt = ptAtOnce || ptAsked;
 
   // A quiz passed here whose lesson never got completed (the completion call
   // failed or ran before the server-side rule) is completed once on open.
@@ -343,7 +363,23 @@ export function LessonQuiz({
             ) : (
               <XCircle className="mt-0.5 size-4 shrink-0 text-[oklch(0.6_0.16_25)]" />
             )}
-            <span translate="no">{q.explanation}</span>
+            <span className="min-w-0">
+              <span translate="no">{q.explanation}</span>
+              {showPt && explanationsPt?.[q.id] ? (
+                <span className="mt-1 block text-foreground/80" translate="no" lang="pt-BR">
+                  {explanationsPt[q.id]}
+                </span>
+              ) : !ptAtOnce && q.explanation ? (
+                <button
+                  type="button"
+                  className="mt-1 block text-xs font-medium text-brand-green hover:underline disabled:opacity-60"
+                  disabled={ptLoading}
+                  onClick={() => setPtAsked(true)}
+                >
+                  {ptLoading ? t("Translating…") : t("See in Portuguese")}
+                </button>
+              ) : null}
+            </span>
           </p>
         )}
         <div className="mt-4 flex items-center justify-between">

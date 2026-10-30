@@ -1,12 +1,13 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Repeat, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Repeat, RotateCcw, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useUserFlashcards, useUserLessons, type Flashcard } from "@/hooks/useLearning";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
@@ -51,6 +52,9 @@ function ReviewPage() {
 
   const queryClient = useQueryClient();
   const [round, setRound] = useState(0);
+  // One word review (owner request, 2026-10-30): Vocabulary's words due are
+  // the other part, one tap away.
+  const { count: wordsDue } = useDueReviewState(profile?.id);
 
   const { data: cards, isLoading } = useQuery({
     queryKey: ["all-flashcards"],
@@ -116,7 +120,7 @@ function ReviewPage() {
         <PageHeader
           icon={Repeat}
           accent="violet"
-          eyebrow={<>Smart review</>}
+          eyebrow={<>Word review</>}
           title={<>Your hardest words first</>}
           description={
             <>
@@ -150,6 +154,21 @@ function ReviewPage() {
               queryClient.invalidateQueries({ queryKey: ["study-snapshot"] });
             }}
           />
+        )}
+
+        {wordsDue > 0 && (
+          <Link
+            to="/vocabulary"
+            className="flex items-center justify-between gap-3 rounded-xl border border-brand-green/35 bg-brand-green/[0.07] p-3 text-sm font-medium hover:bg-brand-green/10"
+          >
+            <span>
+              <span>Words to review</span> <span>({wordsDue})</span>
+              <span className="block text-xs font-normal text-muted-foreground">
+                The other part of your word review, in Vocabulary.
+              </span>
+            </span>
+            <ArrowRight className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
+          </Link>
         )}
 
         <button

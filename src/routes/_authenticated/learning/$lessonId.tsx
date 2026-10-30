@@ -664,6 +664,7 @@ function LessonPage() {
             ) : (
               <LessonQuiz
                 questions={data.quiz}
+                level={profile?.level}
                 userId={profile?.id}
                 lessonId={lessonId}
                 onFinished={finishLesson}

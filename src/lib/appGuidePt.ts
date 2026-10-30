@@ -11,8 +11,8 @@ export const appGuidePt: Record<string, string> = {
     "A Prática extra oferece duas opções curtas; cada uma mostra quanto XP vale.",
   "Today's Progress fills the ring with today's minutes and lists what you did.":
     "O Progresso de hoje enche o anel com os minutos do dia e mostra o que você fez.",
-  "Keep improving shows your reviews first (words, mistakes, lesson cards, skills), then today's new activities (New today); until your daily goal is met, free rows suggest more practice (Keep going).":
-    "O Keep improving mostra primeiro suas revisões (palavras, erros, cartões das lições, habilidades), depois as atividades novas de hoje (Nova hoje); até você bater a meta do dia, as linhas livres sugerem mais prática (Continue).",
+  "Keep improving shows your reviews first (words and lesson cards in one word review, mistakes, skills), then today's new activities (New today); until your daily goal is met, free rows suggest more practice (Keep going).":
+    "O Keep improving mostra primeiro suas revisões (palavras e cartões das lições numa só revisão de palavras, erros, habilidades), depois as atividades novas de hoje (Nova hoje); até você bater a meta do dia, as linhas livres sugerem mais prática (Continue).",
   "Take the challenge has a goal for the day and leaves once you reach it. Every other day it invites you to the AI Teacher or the video call.":
     "O desafio tem uma meta para o dia e some quando você a alcança. Em dias alternados, ele convida você para o Professor de IA ou para a videochamada.",
   "Learning path": "Trilha de aprendizado",
@@ -22,8 +22,8 @@ export const appGuidePt: Record<string, string> = {
     "Abra a próxima lição: ouça o áudio da aula, leia o resumo e revise os cartões, dando a cada um Errei, Difícil ou Fácil (o cartão errado volta na mesma rodada).",
   "Every lesson has its Lesson audio: EVO and Leo talk about the topic, and you can follow every line with its translation. At the challenge, answer out loud before hearing EVO's model answer, and use ↻ or Repeat after to practise each line.":
     "Toda lição tem o seu Áudio da aula: a EVO e o Leo conversam sobre o tema, e você acompanha cada fala com a tradução. No desafio, responda em voz alta antes de ouvir a resposta modelo da EVO, e use ↻ ou Repetir depois para treinar cada fala.",
-  "Answer the quiz: 70% or more completes the lesson.":
-    "Responda o quiz: 70% ou mais conclui a lição.",
+  "Answer the quiz: 70% or more completes the lesson. After checking it, each answer explains why; at A1-A2 the explanation also shows in Portuguese.":
+    "Responda ao quiz: 70% ou mais conclui a lição. Depois da correção, cada resposta explica o porquê; no A1-A2 a explicação aparece também em português.",
   "After 21 of the 30 lessons, the Final Test opens; 70% moves you up a level.":
     "Depois de 21 das 30 lições, o Teste Final abre; 70% leva você ao próximo nível.",
   "Time on a lesson page counts toward your daily minutes, even before the quiz.":

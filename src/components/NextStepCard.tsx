@@ -27,6 +27,7 @@ import { EvoGuide } from "@/components/EvoGuide";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
+import { useFlashcardsDue } from "@/hooks/useFlashcardsDue";
 import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useMistakesDue } from "@/hooks/useMistakesDue";
 import { useNextStep } from "@/hooks/useNextStep";
@@ -59,6 +60,7 @@ import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
 import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { wordReviewTarget } from "@/lib/wordReview";
 import { DoneSeal } from "@/components/DoneSeal";
 
 /**
@@ -89,6 +91,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // Reviews waiting today: on phones they take the Quick Win's place when there
   // is no Quick Win (user request, 2026-10-24).
   const { count: wordsDue, ready: wordsDueReady } = useDueReviewState(profile?.id);
+  // Lesson cards due count with the words: one word review (owner request, 2026-10-30).
+  const { data: cardsDue = 0, isFetched: cardsFetched } = useFlashcardsDue(profile?.id);
+  const wordReview = wordReviewTarget(wordsDue, cardsDue);
   const { data: mistakesDue = 0, isFetched: mistakesFetched } = useMistakesDue(profile?.id);
   // Until today's practice has loaded, the buttons show right away instead of
   // popping in seconds later; they leave only once that activity is known done.
@@ -112,6 +117,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       activityIndicators.ready &&
       todayFetched &&
       wordsDueReady &&
+      cardsFetched &&
       mistakesFetched &&
       league.loaded &&
       planFetched);
@@ -356,8 +362,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       item.resource.to !== data.activity.to,
   );
   const mobileReview: { to: string; params?: { lessonId: string }; label: string } | null =
-    wordsDue > 0
-      ? { to: "/vocabulary", label: t("Review words") }
+    wordReview.total > 0
+      ? { to: wordReview.to, label: t("Review words") }
       : mistakesDue > 0
         ? { to: "/mistakes", label: t("Review mistakes") }
         : reviewSuggestion

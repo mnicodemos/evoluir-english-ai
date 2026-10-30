@@ -1,11 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   BookOpen,
   Check,
   CheckCircle2,
   Languages,
+  Layers,
   Loader2,
   RotateCcw,
   Search,
@@ -27,6 +28,7 @@ import { Button } from "@/components/ui/button";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useFlashcardsDue } from "@/hooks/useFlashcardsDue";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
@@ -105,6 +107,9 @@ function VocabularyOnline() {
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data: profile } = useProfile();
+  // The lessons' flashcards due: the second part of the one word review
+  // (owner request, 2026-10-30), right under the words.
+  const { data: cardsDue = 0 } = useFlashcardsDue(profile?.id);
   const loadDailyWords = useServerFn(dailyWords);
   const savePronunciation = useServerFn(persistPronunciationLegacy);
   const logTelemetry = useServerFn(logPracticeTelemetry);
@@ -679,6 +684,27 @@ function VocabularyOnline() {
                       {t("Review due")} ({reviewItems.filter((w) => !knownNow(w.id)).length})
                     </h2>
                     <VocabularyWordList items={reviewItems} highlightKnown {...listProps} />
+                  </section>
+                )}
+                {cardsDue > 0 && (
+                  <section
+                    aria-label={t("Lesson cards to review")}
+                    className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-sky-400/30 bg-sky-400/[0.06] p-3"
+                  >
+                    <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-sky-400/15 text-sky-300">
+                      <Layers className="size-5" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="font-display text-sm font-semibold">
+                        <span>{t("Lesson cards to review")}</span> <span>({cardsDue})</span>
+                      </h2>
+                      <p className="text-xs text-muted-foreground">
+                        {t("Your lessons' words as flashcards: part of the same word review.")}
+                      </p>
+                    </div>
+                    <Button asChild size="sm" variant="outline" className="shrink-0">
+                      <Link to="/learning/review">{t("Review cards")}</Link>
+                    </Button>
                   </section>
                 )}
                 {today.length > 0 ? (
