@@ -1020,10 +1020,12 @@ function Dashboard() {
                   app's other buttons (not a status pill), above a quiet closing line. */}
               <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5 min-[1680px]:gap-1.5 min-[1680px]:pt-3">
                 {/* The study plan has its own header slot; this button opens My Progress,
-                    which left the sidebar. */}
+                    which left the sidebar. A secondary glass button (owner review,
+                    2026-10-31: two solid turquoise buttons side by side competed), so
+                    Practice now stays the Dashboard's one solid action. */}
                 <Link
                   to="/progress"
-                  className="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-green px-5 text-sm font-bold text-sidebar [word-spacing:0.1em] transition-colors hover:bg-brand-green/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                  className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-5 text-sm font-semibold text-foreground [word-spacing:0.1em] transition-colors hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
                 >
                   <ChartLine className="size-4 shrink-0" aria-hidden="true" />
                   {t("My progress")}
