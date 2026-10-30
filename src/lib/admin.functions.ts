@@ -1369,6 +1369,11 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
       updated_at: new Date().toISOString(),
     });
     if (saveError) {
+      // The reason reaches the Admin's server errors (owner report, 2026-10-30:
+      // the video call image failed with no cause shown).
+      console.error(
+        `Home image could not be published: ${saveError.code ?? "?"} ${saveError.message ?? ""}`,
+      );
       throw new Error("The image was uploaded but could not be published.");
     }
     return { ok: true, url: publicData.publicUrl };
