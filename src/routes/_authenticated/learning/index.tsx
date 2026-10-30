@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, GraduationCap, RotateCcw } from "lucide-react";
 
+import { LevelIntroVideo } from "@/components/LevelIntroVideo";
 import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 import { CurriculumPath } from "@/components/LearningPathCard";
@@ -116,6 +117,15 @@ function LearningCenter() {
             </nav>
           )}
         </PageHeader>
+
+        {profile && (
+          <LevelIntroVideo
+            key={(reviewLevel ?? current).value}
+            level={(reviewLevel ?? current).value}
+            label={(reviewLevel ?? current).value.toUpperCase()}
+            userId={profile.id}
+          />
+        )}
 
         {isLoading ? (
           <div className="space-y-4">

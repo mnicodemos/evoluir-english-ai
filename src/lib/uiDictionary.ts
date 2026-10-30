@@ -212,6 +212,9 @@ const baseUiPt: Record<string, string> = {
   "Did you finish this task?": "Você terminou esta tarefa?",
   "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
   "Review words": "Revisar palavras",
+  "Level presentation": "Apresentação do nível",
+  "Start here": "Comece aqui",
+  "Welcome to": "Boas-vindas ao",
   "Delete 1 saved mistake? This cannot be undone.":
     "Apagar 1 erro salvo? Isso não pode ser desfeito.",
   "Delete {n} saved mistakes? This cannot be undone.":

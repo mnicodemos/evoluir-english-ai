@@ -18,6 +18,7 @@ import { AdminSpeakingWait } from "@/components/AdminSpeakingWait";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
+import { AdminLevelIntroVideos } from "@/components/AdminLevelIntroVideos";
 import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager";
 import { AdminHomeMedia } from "@/components/AdminHomeMedia";
 import { AdminRecoveryPoints } from "@/components/AdminRecoveryPoints";
@@ -232,6 +233,7 @@ function AdminPage() {
                 ]}
               >
                 <TabsContent value="summary-videos">
+                  <AdminLevelIntroVideos />
                   <AdminSummaryVideoManager />
                 </TabsContent>
                 <TabsContent value="home">

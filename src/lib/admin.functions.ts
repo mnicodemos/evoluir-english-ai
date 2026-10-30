@@ -1181,3 +1181,66 @@ export const createRecoveryPoint = createServerFn({ method: "POST" })
     if (error) throw recoveryPointsError(error, "salvo");
     return { ok: true, id: saved.id };
   });
+
+/** Levels with a presentation video: the six CEFR levels and Business English. */
+const INTRO_LEVELS = ["a1", "a2", "b1", "b2", "c1", "c2", "business"] as const;
+
+/**
+ * The level presentation videos (owner request, 2026-10-31; migration
+ * 0097_level_intro_videos): one Vimeo video per level and one for Business.
+ * Until 0097 is applied the list says so instead of failing.
+ */
+export const getLevelIntroVideos = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("level_intro_videos")
+      .select("level, video_url, updated_at");
+    if (error) return { missingMigration: true, videos: {} as Record<string, string> };
+    return {
+      missingMigration: false,
+      videos: Object.fromEntries((data ?? []).map((row) => [row.level, row.video_url])),
+    };
+  });
+
+export const saveLevelIntroVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ level: z.enum(INTRO_LEVELS), url: z.string().trim().min(10).max(300) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
+    const url = canonicalVimeoUrl(data.url);
+    if (!url) throw new Error("Cole um link válido do Vimeo.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("level_intro_videos").upsert({
+      level: data.level,
+      video_url: url,
+      updated_by: context.userId,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) {
+      console.error(`Level intro video could not be saved: ${error.code ?? ""} ${error.message}`);
+      throw new Error(
+        "Não foi possível salvar. Confira se a migração 0097_level_intro_videos foi aplicada.",
+      );
+    }
+    return { ok: true, url };
+  });
+
+export const deleteLevelIntroVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ level: z.enum(INTRO_LEVELS) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("level_intro_videos")
+      .delete()
+      .eq("level", data.level);
+    if (error) throw new Error("Não foi possível remover o vídeo.");
+    return { ok: true };
+  });

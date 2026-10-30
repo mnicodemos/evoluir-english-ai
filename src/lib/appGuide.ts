@@ -63,6 +63,7 @@ export const APP_GUIDE: GuideSection[] = [
     title: "Learning path",
     what: "The lessons of your level, in order, from the first unit to the Final Test.",
     steps: [
+      "Start here, on top of the path, has the presentation video of your level (Business English has its own).",
       "Open the next lesson: listen to the lesson audio, read the summary and review the cards, rating each one Again, Hard or Easy (a missed card comes back in the same round).",
       "Answer the quiz: 70% or more completes the lesson. After checking it, each answer explains why; at A1-A2 the explanation also shows in Portuguese.",
       "A retake brings the questions in a new order, the ones you missed first, and a wrong fill-in answer goes to My mistakes.",
