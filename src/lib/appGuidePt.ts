@@ -145,8 +145,6 @@ export const appGuidePt: Record<string, string> = {
     "Siga a atividade de cada dia; os dias feitos ficam marcados.",
   "A new plan starts every Monday, and its order stays the same all week.":
     "Um plano novo começa toda segunda, e a ordem dele fica a mesma a semana toda.",
-  "Reaching your weekly plan lights the three gold stars.":
-    "Cumprir seu plano semanal acende as três estrelas douradas.",
   "What counts as a study day": "O que conta como dia de estudo",
   "Any one of these on the same day (Brasília time) closes your study day and keeps your streak.":
     "Qualquer uma destas no mesmo dia (horário de Brasília) fecha o seu dia de estudo e mantém a sua sequência.",
@@ -162,14 +160,11 @@ export const appGuidePt: Record<string, string> = {
   "Opening a screen or only spending minutes does not close the day; the minutes still count toward your daily goal.":
     "Abrir uma tela ou só passar minutos nela não fecha o dia; os minutos continuam contando na sua meta diária.",
   "Any one of these": "Qualquer uma destas",
-  "Streak, jewels and stars": "Sequência, joias e estrelas",
   "How your consistency is counted.": "Como a sua constância é contada.",
   "Close your study day with any one of the activities in What counts as a study day.":
     "Feche o seu dia de estudo com qualquer uma das atividades de O que conta como dia de estudo.",
   "Days in a row raise your streak and change its jewel; one missed day a week is protected.":
     "Dias seguidos aumentam sua sequência e mudam a joia; um dia perdido por semana fica protegido.",
-  "The stars in Your learning rhythm light up when you reach your own weekly plan.":
-    "As estrelas do Seu ritmo de aprendizado acendem quando você cumpre seu plano semanal.",
   "Weekly league": "Liga semanal",
   "A friendly ranking with students of your level, reset every Monday.":
     "Um ranking amigável com alunos do seu nível, que recomeça toda segunda-feira.",
@@ -293,4 +288,22 @@ export const appGuidePt: Record<string, string> = {
     "O XP da semana mostra o seu XP desta semana contra a semana passada e a sua melhor semana, para você sempre ter alguém para superar: você mesmo.",
   "The ranking opens once your level's league has 5 students taking part; then your medal shows your place: gold, silver or bronze for the top three.":
     "O ranking abre quando a liga do seu nível tiver 5 alunos participando; aí a sua medalha mostra a sua posição: ouro, prata ou bronze para os três primeiros.",
+  "Your jewels": "Suas joias",
+  "Jewels reward studying on days in a row, and once earned they are yours for good.":
+    "As joias premiam estudar em dias seguidos, e uma vez conquistadas são suas para sempre.",
+  "Your first study day earns Bronze; then each 7 days in a row earn the next jewel, up to Diamond at 63.":
+    "Seu primeiro dia de estudo vale o Bronze; depois, cada 7 dias seguidos valem a próxima joia, até o Diamante aos 63.",
+  "A jewel you earn stays with you, even if your run of days breaks; one missed day a week is protected.":
+    "A joia conquistada fica com você, mesmo se a sequência de dias quebrar; um dia perdido por semana é protegido.",
+  "The Dashboard shows your highest jewel and how many days are left for the next one.":
+    "O Dashboard mostra sua joia mais alta e quantos dias faltam para a próxima.",
+  "Your learning rhythm on the Dashboard shows how many days of your plan you studied this week.":
+    "O Seu ritmo de aprendizado, no Dashboard, mostra quantos dias do seu plano você estudou nesta semana.",
+  "First study day": "Primeiro dia de estudo",
+  "days in a row": "dias seguidos",
+  Earned: "Conquistada",
+  "Next jewel": "Próxima joia",
+  "Next:": "Próxima:",
+  "day left": "dia restante",
+  "See the jewels": "Ver as joias",
 };
