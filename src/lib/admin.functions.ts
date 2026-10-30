@@ -985,20 +985,16 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
 
   const result: {
     desktop: string | null;
-    mobile: string | null;
     evoAvatar: string | null;
     videoCall: string | null;
   } = {
     desktop: null,
-    mobile: null,
     evoAvatar: null,
     videoCall: null,
   };
   for (const row of data ?? []) {
     if (row.setting_key === "desktop") {
       result.desktop = row.image_url;
-    } else if (row.setting_key === "mobile") {
-      result.mobile = row.image_url;
     } else if (row.setting_key === "evo-avatar") {
       result.evoAvatar = row.image_url;
     } else if (row.setting_key === "video-call") {
@@ -1013,7 +1009,7 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   .inputValidator((data) =>
     z
       .object({
-        target: z.enum(["desktop", "mobile", "evo-avatar", "video-call"]),
+        target: z.enum(["desktop", "evo-avatar", "video-call"]),
         dataUrl: z.string().min(100).max(4_300_000),
         mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
       })

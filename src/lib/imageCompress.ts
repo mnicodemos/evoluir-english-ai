@@ -8,7 +8,6 @@
 /** The widest the image is ever drawn, in device pixels. */
 export const ADMIN_IMAGE_MAX_WIDTH = {
   desktop: 1600,
-  mobile: 1400,
   "evo-avatar": 384,
   "video-call": 1200,
   "lesson-audio": 1200,

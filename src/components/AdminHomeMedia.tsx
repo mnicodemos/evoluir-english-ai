@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, Monitor, Save, Smartphone, UserRound, Video } from "lucide-react";
+import { ImagePlus, Loader2, Monitor, Save, UserRound, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import evoGuide from "@/assets/evo-guide.webp";
 import evoVideoCall from "@/assets/evo-video-call.jpg";
@@ -9,7 +9,7 @@ import { AdminLessonAudioImage } from "@/components/AdminLessonAudioImage";
 import { ADMIN_IMAGE_MAX_WIDTH, compressImageFile, dataUrlBytes } from "@/lib/imageCompress";
 import { getHomeDashboardImages, saveHomeDashboardImage } from "@/lib/admin.functions";
 
-type Target = "desktop" | "mobile" | "evo-avatar" | "video-call";
+type Target = "desktop" | "evo-avatar" | "video-call";
 type DraftImage = { name: string; dataUrl: string; mimeType: string };
 
 const TARGETS: {
@@ -21,14 +21,8 @@ const TARGETS: {
   {
     key: "desktop",
     title: "Desktop image",
-    description: "Used on desktop and larger screens.",
+    description: "EVO's card on the Dashboard, on desktop and phones alike.",
     Icon: Monitor,
-  },
-  {
-    key: "mobile",
-    title: "Mobile image",
-    description: "Used on phones and narrow screens.",
-    Icon: Smartphone,
   },
   {
     key: "evo-avatar",
@@ -75,11 +69,9 @@ export function AdminHomeMedia() {
       setNotice(
         variables.target === "desktop"
           ? "Desktop image published."
-          : variables.target === "mobile"
-            ? "Mobile image published."
-            : variables.target === "evo-avatar"
-              ? "EVO mascot avatar published."
-              : "AI Video Call image published.",
+          : variables.target === "evo-avatar"
+            ? "EVO mascot avatar published."
+            : "AI Video Call image published.",
       );
       await queryClient.invalidateQueries({ queryKey: ["home-dashboard-images"] });
       await queryClient.invalidateQueries({ queryKey: ["home-dashboard-image-public"] });
@@ -132,9 +124,9 @@ export function AdminHomeMedia() {
           <ImagePlus className="size-4" /> Home dashboard images
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Upload and publish desktop and mobile images independently. Desktop: use a 4:3 image
-          (about 1580 × 1180 px) with EVO in the centre; it fills the card's image column and the
-          edges may be trimmed, never stretched.
+          Upload and publish each image independently. Dashboard: use a 4:3 image (about 1580 × 1180
+          px) with EVO in the centre; it fills the card's image column and the edges may be trimmed,
+          never stretched.
         </p>
       </div>
       {imagesQuery.isPending ? (
