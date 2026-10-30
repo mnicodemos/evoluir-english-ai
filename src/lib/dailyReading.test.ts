@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  answerParagraph,
   READING_SPECS,
   dailyReadingMessages,
   readingChoiceKey,
@@ -12,6 +13,7 @@ import {
   readingLevel,
   readingParagraphs,
   readingSpeechChunks,
+  readingSpeechParts,
   readingThemeForDay,
   readingKindLabel,
   readingEstimate,
@@ -74,6 +76,46 @@ describe("daily reading rules", () => {
     expect(sentenceWith(text, "Dog")).toBe("Her dog loves the park.");
     expect(sentenceWith(text, "do")).toBe("");
     expect(sentenceWith(text, "gets up")).toBe("Ana gets up at seven.");
+  });
+
+  it("keeps a question's quote only when it is really in the text", () => {
+    const raw = JSON.parse(reply(75, 3)) as { questions: Record<string, unknown>[] };
+    raw.questions[0]!["evidence"] = "word3 word4 word5";
+    raw.questions[1]!["evidence"] = "a sentence that is not there";
+    const reading = parseDailyReading(JSON.stringify(raw), "a1");
+    expect(reading?.questions[0]?.evidence).toBe("word3 word4 word5");
+    expect(reading?.questions[1]?.evidence).toBeUndefined();
+    expect(reading?.questions[2]?.evidence).toBeUndefined();
+  });
+
+  it("finds the paragraph that answers a question", () => {
+    const text =
+      "Ana wakes up early and drinks coffee in the kitchen.\n\nAt work, Ana answers emails and talks to customers about their orders.\n\nIn the evening she walks her dog in the park.";
+    const base = {
+      question: "Where does Ana walk her dog?",
+      options: ["At the office", "In the park", "In the kitchen", "At the station"],
+      answer: 1,
+    };
+    expect(answerParagraph(text, base)).toBe(2);
+    expect(
+      answerParagraph(text, { ...base, evidence: "Ana answers emails and talks to customers" }),
+    ).toBe(1);
+    expect(
+      answerParagraph(text, {
+        question: "Why is it nice?",
+        options: ["Yes", "No", "Maybe", "Never"],
+        answer: 0,
+      }),
+    ).toBeNull();
+  });
+
+  it("tags each spoken chunk with its paragraph", () => {
+    const parts = readingSpeechParts("First one. Second one.\n\nThird paragraph here.");
+    expect(parts).toEqual([
+      { text: "First one. Second one.", paragraph: 0 },
+      { text: "Third paragraph here.", paragraph: 1 },
+    ]);
+    expect(readingSpeechChunks("First one.\n\nSecond.")).toEqual(["First one.", "Second."]);
   });
 
   it("estimates the size of the reading by level", () => {

@@ -195,7 +195,7 @@ export function dailyReadingMessages(
     "Write a completely original text. Never copy or adapt a published book, article or song.",
     `Then write ${spec.questions} multiple-choice comprehension questions in English about ${spec.questionFocus} Each has 4 options and exactly one correct answer; the explanation is one short sentence in Brazilian Portuguese.`,
     "Also give 6 to 10 key words or short expressions from the text with their Brazilian Portuguese meaning in this context, and a natural Brazilian Portuguese translation of the whole text, with the same paragraphs.",
-    'Reply with JSON only: {"title": string, "text": string, "text_pt": string, "glossary": [{"word": string, "pt": string}], "questions": [{"question": string, "options": [string, string, string, string], "answer": number (0-3), "explanation_pt": string}]}',
+    'Reply with JSON only: {"title": string, "text": string, "text_pt": string, "glossary": [{"word": string, "pt": string}], "questions": [{"question": string, "options": [string, string, string, string], "answer": number (0-3), "explanation_pt": string, "evidence": string (the exact sentence of the text that answers it, copied word for word)}]}',
   ].join("\n");
   return [
     { role: "system" as const, content: system },
@@ -214,6 +214,9 @@ const questionSchema = z
     options: z.array(z.string().trim().min(1).max(200)).length(4),
     answer: z.number().int().min(0).max(3),
     explanation_pt: z.string().trim().max(400).default(""),
+    // The sentence of the text that answers it ("See in the text"); dropped
+    // when it is not really in the text.
+    evidence: z.string().trim().max(400).optional().catch(undefined),
   })
   .strict();
 
@@ -267,9 +270,14 @@ export function parseDailyReading(raw: string, level: ReadingLevel): DailyReadin
   const spec = READING_SPECS[level];
   const words = wordCount(parsed.data.text);
   if (words < spec.minWords * 0.75 || words > spec.maxWords * 1.25) return null;
-  const questions = parsed.data.questions.filter(
-    (item) => new Set(item.options.map((option) => option.toLowerCase())).size === 4,
-  );
+  const flatText = flatten(parsed.data.text);
+  const questions = parsed.data.questions
+    .filter((item) => new Set(item.options.map((option) => option.toLowerCase())).size === 4)
+    .map(({ evidence, ...item }) =>
+      evidence && flatten(evidence).length >= 8 && flatText.includes(flatten(evidence))
+        ? { ...item, evidence }
+        : item,
+    );
   if (questions.length < spec.questions) return null;
   return {
     title: parsed.data.title,
@@ -299,6 +307,59 @@ export function readingParagraphs(text: string) {
     .split(/\n\s*\n/)
     .map((paragraph) => paragraph.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
+
+/** Lower case with single spaces, to compare a quote with the text. */
+function flatten(value: string) {
+  return value.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+const COMMON_WORDS = new Set(
+  "about after again also because been before being could does doing every from have here into just like made make many more most much never only other over same should some such than that their them then there these they this those very what when where which while with would your".split(
+    " ",
+  ),
+);
+
+/** The meaningful words of a sentence, cut to a four-letter stem so "walks" meets "walk". */
+function keyWords(value: string): Set<string> {
+  const words = value.toLowerCase().match(/\p{L}+/gu) ?? [];
+  return new Set(
+    words
+      .filter((word) => word.length > 3 && !COMMON_WORDS.has(word))
+      .map((word) => word.slice(0, 4)),
+  );
+}
+
+/**
+ * The paragraph that answers a question, for "See in the text" (owner
+ * request, 2026-10-30: a wrong answer taught nothing): the AI's quoted
+ * sentence when it has one, else the paragraph sharing the most meaningful
+ * words with the question and its right answer (texts written before the
+ * quote existed). null when no paragraph clearly matches.
+ */
+export function answerParagraph(
+  text: string,
+  question: Pick<DailyReadingQuestion, "question" | "options" | "answer" | "evidence">,
+): number | null {
+  const paragraphs = readingParagraphs(text);
+  if (question.evidence) {
+    const quote = flatten(question.evidence);
+    const found = paragraphs.findIndex((paragraph) => flatten(paragraph).includes(quote));
+    if (found >= 0) return found;
+  }
+  const target = keyWords(`${question.question} ${question.options[question.answer] ?? ""}`);
+  let best = -1;
+  let bestScore = 0;
+  paragraphs.forEach((paragraph, index) => {
+    const words = keyWords(paragraph);
+    let score = 0;
+    for (const word of target) if (words.has(word)) score += 1;
+    if (score > bestScore) {
+      best = index;
+      bestScore = score;
+    }
+  });
+  return bestScore >= 2 ? best : null;
 }
 
 /** The sentence of the text where a marked word appears, as its example in Vocabulary. */
@@ -345,8 +406,20 @@ export function readingEstimate(text: string, level: ReadingLevel, questions: nu
  * speech API takes 500 characters per request), read one after the other.
  */
 export function readingSpeechChunks(text: string, maxChars = 400): string[] {
-  const chunks: string[] = [];
-  for (const paragraph of readingParagraphs(text)) {
+  return readingSpeechParts(text, maxChars).map((part) => part.text);
+}
+
+/**
+ * The same chunks with the paragraph each one belongs to (a chunk never spans
+ * two paragraphs), so the page can highlight the paragraph EVO is reading.
+ */
+export function readingSpeechParts(
+  text: string,
+  maxChars = 400,
+): { text: string; paragraph: number }[] {
+  const parts: { text: string; paragraph: number }[] = [];
+  readingParagraphs(text).forEach((paragraph, paragraphIndex) => {
+    const chunks: string[] = [];
     const sentences = paragraph.match(/[^.!?]+[.!?]+["')\]]*\s*|[^.!?]+$/g) ?? [paragraph];
     let current = "";
     for (const raw of sentences) {
@@ -367,8 +440,9 @@ export function readingSpeechChunks(text: string, maxChars = 400): string[] {
       current = current ? `${current} ${rest}` : rest;
     }
     if (current) chunks.push(current);
-  }
-  return chunks.filter(Boolean);
+    for (const chunk of chunks) if (chunk) parts.push({ text: chunk, paragraph: paragraphIndex });
+  });
+  return parts;
 }
 
 /**

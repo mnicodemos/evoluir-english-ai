@@ -12,6 +12,7 @@ import {
   Languages,
   Loader2,
   Square,
+  TextSearch,
   Volume2,
   X,
 } from "lucide-react";
@@ -25,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/useProfile";
 import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import {
+  answerParagraph,
   gradeReading,
   lookupTerm,
   READING_CATEGORIES,
@@ -38,7 +40,7 @@ import {
   readingParagraphs,
   readingReference,
   readingShareText,
-  readingSpeechChunks,
+  readingSpeechParts,
   readingTokens,
   sentenceWith,
   type ReadingChoice,
@@ -74,20 +76,32 @@ export const Route = createFileRoute("/_authenticated/reading")({
  * underlined; words the student marked stay highlighted.
  */
 function ReadingParagraph({
+  id,
   text,
   glossary,
   marked,
   selected,
   onSelect,
+  highlight = null,
 }: {
+  id?: string;
   text: string;
   glossary: ReadonlySet<string>;
   marked: readonly string[];
   selected: string | null;
   onSelect: (term: string) => void;
+  /** "audio" while EVO reads it, "answer" for "See in the text". */
+  highlight?: "audio" | "answer" | null;
 }) {
   return (
-    <p>
+    <p
+      id={id}
+      className={cn(
+        "-mx-2 rounded-md px-2 py-0.5 transition-colors duration-300",
+        highlight === "audio" && "bg-brand-green/10",
+        highlight === "answer" && "bg-amber-400/15 ring-1 ring-amber-400/40",
+      )}
+    >
       {readingTokens(text).map((token, index) => {
         if (!token.word) return <span key={index}>{token.text}</span>;
         const term = lookupTerm(token.text);
@@ -303,6 +317,8 @@ function SaveMarkedWords({
   );
 }
 
+const SLOW_KEY = "evoluir-reading-slow";
+
 const markedKey = (reading: DailyReading) =>
   `reading-marked:${reading.day}:${reading.level}${reading.choice ? `:${readingChoiceKey(reading.choice)}` : ""}`;
 
@@ -444,6 +460,35 @@ function ReadingPage() {
   const [marked, setMarked] = useState<string[]>([]);
   const [showPt, setShowPt] = useState(false);
   const [playing, setPlaying] = useState(false);
+  // The paragraph EVO is reading, highlighted while the audio plays.
+  const [speakingParagraph, setSpeakingParagraph] = useState<number | null>(null);
+  // A slower voice (0.8×), kept on this device; useful at A1-A2.
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    try {
+      setSlow(window.localStorage.getItem(SLOW_KEY) === "1");
+    } catch {
+      setSlow(false);
+    }
+  }, []);
+  function toggleSlow() {
+    setSlow((value) => {
+      try {
+        window.localStorage.setItem(SLOW_KEY, value ? "0" : "1");
+      } catch {
+        // Blocked storage: the choice lasts until the page closes.
+      }
+      return !value;
+    });
+  }
+  // The paragraph that answers the question on screen ("See in the text").
+  const [answerAt, setAnswerAt] = useState<number | null>(null);
+  function seeInText(paragraph: number) {
+    setAnswerAt(paragraph);
+    document
+      .getElementById(`reading-paragraph-${paragraph}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
   const [chosen, setChosen] = useState<(number | null)[]>([]);
   const [checked, setChecked] = useState(false);
   // The question on screen: the five questions sit behind numbered tabs.
@@ -547,6 +592,7 @@ function ReadingPage() {
     if (playing) {
       stopSpeaking();
       setPlaying(false);
+      setSpeakingParagraph(null);
       return;
     }
     const run = playRun.current;
@@ -555,18 +601,23 @@ function ReadingPage() {
     // Read chunk by chunk (the voice takes 500 characters at a time), the next
     // one prepared while the current one plays. Same text for every student of
     // the level, so each chunk's audio is cached once.
-    const chunks = readingSpeechChunks(current.text);
+    const parts = readingSpeechParts(current.text);
     try {
-      for (let index = 0; index < chunks.length; index += 1) {
+      for (let index = 0; index < parts.length; index += 1) {
         if (playRun.current !== run) return;
-        const next = chunks[index + 1];
-        if (next) prepareSpeech(next, { cache: "persistent" });
-        await speakEnglish(chunks[index]!, { cache: "persistent" });
+        const next = parts[index + 1];
+        if (next) prepareSpeech(next.text, { cache: "persistent" });
+        setSpeakingParagraph(parts[index]!.paragraph);
+        // The speed is applied on playback, so the cached audio stays shared.
+        await speakEnglish(parts[index]!.text, { cache: "persistent", rate: slow ? 0.8 : 1 });
       }
     } catch {
       // Playback stopped or failed: the text is still on screen.
     } finally {
-      if (playRun.current === run) setPlaying(false);
+      if (playRun.current === run) {
+        setPlaying(false);
+        setSpeakingParagraph(null);
+      }
     }
   }
 
@@ -640,6 +691,18 @@ function ReadingPage() {
                 )}
                 {playing ? t("Stop") : t("Listen to EVO")}
               </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className={cn("tabular-nums", slow && "border-brand-green text-brand-green")}
+                aria-pressed={slow}
+                aria-label={t("Slower voice")}
+                title={t("Slower voice")}
+                onClick={toggleSlow}
+              >
+                0.8×
+              </Button>
               {reading.textPt ? (
                 <Button
                   type="button"
@@ -663,6 +726,10 @@ function ReadingPage() {
               {readingParagraphs(reading.text).map((paragraph, index) => (
                 <ReadingParagraph
                   key={index}
+                  id={`reading-paragraph-${index}`}
+                  highlight={
+                    speakingParagraph === index ? "audio" : answerAt === index ? "answer" : null
+                  }
                   text={paragraph}
                   glossary={glossaryTerms}
                   marked={marked}
@@ -758,7 +825,10 @@ function ReadingPage() {
                     role="tab"
                     aria-selected={current === qIndex}
                     aria-label={`${t("Question")} ${qIndex + 1}`}
-                    onClick={() => setCurrent(qIndex)}
+                    onClick={() => {
+                      setCurrent(qIndex);
+                      setAnswerAt(null);
+                    }}
                     className={cn(
                       "grid size-8 place-items-center rounded-full border text-xs font-semibold tabular-nums transition-colors",
                       right
@@ -840,6 +910,22 @@ function ReadingPage() {
                       {question.explanation_pt}
                     </p>
                   ) : null}
+                  {checked
+                    ? (() => {
+                        // Where the answer is, once the answers are checked.
+                        const at = answerParagraph(reading.text, question);
+                        return at === null ? null : (
+                          <button
+                            type="button"
+                            className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 underline-offset-2 hover:underline"
+                            onClick={() => seeInText(at)}
+                          >
+                            <TextSearch className="size-3.5" aria-hidden="true" />
+                            {t("See in the text")}
+                          </button>
+                        );
+                      })()
+                    : null}
                   <div className="mt-3 flex items-center justify-between">
                     <Button
                       type="button"
@@ -847,7 +933,10 @@ function ReadingPage() {
                       variant="ghost"
                       className="gap-1"
                       disabled={qIndex === 0}
-                      onClick={() => setCurrent(qIndex - 1)}
+                      onClick={() => {
+                        setCurrent(qIndex - 1);
+                        setAnswerAt(null);
+                      }}
                     >
                       <ChevronLeft className="size-4" aria-hidden="true" />
                       {t("Previous")}
@@ -861,7 +950,10 @@ function ReadingPage() {
                       variant="ghost"
                       className="gap-1"
                       disabled={qIndex >= reading.questions.length - 1}
-                      onClick={() => setCurrent(qIndex + 1)}
+                      onClick={() => {
+                        setCurrent(qIndex + 1);
+                        setAnswerAt(null);
+                      }}
                     >
                       {t("Next")}
                       <ChevronRight className="size-4" aria-hidden="true" />

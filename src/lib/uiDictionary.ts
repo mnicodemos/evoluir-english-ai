@@ -1333,6 +1333,8 @@ const baseUiPt: Record<string, string> = {
   "Tap any word you don't understand to see its translation.":
     "Toque em qualquer palavra que você não entendeu para ver a tradução.",
   "Words you marked": "Palavras que você marcou",
+  "Slower voice": "Voz mais lenta",
+  "See in the text": "Ver no texto",
   "Save to my Vocabulary": "Salvar no meu Vocabulário",
   "Saved to your Vocabulary reviews.": "Salvas nas suas revisões do Vocabulário.",
   "Open Vocabulary": "Abrir Vocabulário",
