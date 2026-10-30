@@ -183,16 +183,26 @@ function AuthPage() {
 
   return (
     <div className="dashboard-shell brand-dashboard-theme dark flex min-h-dvh flex-col bg-background text-foreground">
-      <div className="grid flex-1 lg:grid-cols-2">
+      <div className="relative grid flex-1 lg:grid-cols-2">
+        {/* Melts into the footer's darker base instead of meeting it on a line. */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#0B0B0C]"
+          aria-hidden="true"
+        />
         {/* Premium pass (owner request, 2026-10-31): the same turquoise light as
             the public home's hero, the title in two or three lines over EVO,
             who stands on the panel's base with a studio glow behind her. */}
-        <aside className="relative hidden flex-col overflow-hidden border-r border-border bg-card p-10 shadow-[var(--shadow-soft)] lg:flex">
-          <div className="absolute inset-0 surface-hero opacity-40" aria-hidden="true" />
+        {/* One background, like the public home (owner request, 2026-10-31): no
+            divider or card fill between the panel and the form; the panel's
+            texture and light fade out toward the form over eased stops. */}
+        <aside className="relative hidden flex-col overflow-hidden p-10 lg:flex">
           <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_55%_at_70%_70%,rgba(20,220,185,0.14),transparent_70%)]"
+            className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_right,black_0%,black_45%,rgba(0,0,0,0.75)_62%,rgba(0,0,0,0.4)_78%,rgba(0,0,0,0.12)_92%,transparent_100%)]"
             aria-hidden="true"
-          />
+          >
+            <div className="absolute inset-0 surface-hero opacity-40" />
+            <div className="absolute inset-0 bg-[radial-gradient(60%_55%_at_60%_70%,rgba(20,220,185,0.14),transparent_70%)]" />
+          </div>
           <Link to="/" className="relative flex items-center gap-2.5">
             <Logo className="size-10" />
             <BrandName />
