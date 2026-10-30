@@ -15,10 +15,10 @@ import {
 import appCoach from "@/assets/home/app-coach.jpg";
 import appLearning from "@/assets/home/app-learning.jpg";
 import appMistakes from "@/assets/home/app-mistakes.jpg";
-import evoImage from "@/assets/evo-landing.webp";
 import { Footer } from "@/components/Footer";
 import { ConversationDemo } from "@/components/home/ConversationDemo";
 import { HomeVideo } from "@/components/home/HomeVideo";
+import evoImage from "@/assets/evo-landing.webp";
 import { LaunchCampaignBadge, LaunchCampaignPopup } from "@/components/home/LaunchCampaignPopup";
 import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
@@ -190,7 +190,7 @@ function CommercialLanding() {
         {/* HERO — what it is, for whom, and the first step */}
         <section className="relative overflow-hidden border-b border-border/70">
           <div className="absolute inset-0 surface-hero opacity-45" aria-hidden="true" />
-          <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:px-8 lg:pt-10">
+          <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10 lg:px-8 lg:pt-10">
             <div className="z-10 max-w-2xl pb-2 lg:pb-12">
               <LaunchCampaignBadge className="mb-4" />
               <h1 className="text-[2.15rem] font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
@@ -233,35 +233,17 @@ function CommercialLanding() {
               </ul>
             </div>
 
-            <div className="relative mx-auto flex w-full max-w-[460px] items-end justify-center self-end">
+            {/* The brand video in EVO's place (owner request, 2026-10-31: the
+                full-body EVO and the video below repeated her). */}
+            <div className="relative mx-auto w-full max-w-xl pb-8 lg:max-w-none lg:pb-12">
               <div
-                className="absolute bottom-[10%] left-1/2 h-24 w-2/3 -translate-x-1/2 rounded-full bg-success/10 blur-3xl"
+                className="absolute -inset-6 rounded-full bg-success/10 blur-3xl"
                 aria-hidden="true"
               />
-              <img
-                src={evoImage}
-                alt="EVO, a professora de inglês com IA do Evoluir+"
-                width={848}
-                height={1264}
-                fetchPriority="high"
-                className="relative h-[30vh] max-h-[560px] w-full object-contain object-bottom drop-shadow-2xl sm:h-[42vh] lg:h-[64vh]"
-              />
+              <div className="relative">
+                <HomeVideo />
+              </div>
             </div>
-          </div>
-        </section>
-
-        {/* VÍDEO — the owner's brand video, played only on tap */}
-        <section className="border-b border-border/70">
-          <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-            <div className="mb-6 text-center">
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
-                Conheça o Evoluir+
-              </p>
-              <h2 className="text-2xl font-bold leading-tight sm:text-4xl">
-                Mais que inglês, em 23 segundos.
-              </h2>
-            </div>
-            <HomeVideo />
           </div>
         </section>
 
@@ -426,23 +408,42 @@ function CommercialLanding() {
           </div>
         </section>
 
-        {/* CTA FINAL */}
+        {/* CTA FINAL — the full-body EVO presents the last call (owner request,
+            2026-10-31: she left the hero to the brand video and came here). */}
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 surface-hero opacity-55" aria-hidden="true" />
-          <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 py-12 text-center sm:px-6 lg:py-16">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
-              More than English
-            </p>
-            <h2 className="text-3xl font-bold leading-tight sm:text-5xl">
-              Sua primeira conversa com a EVO
-              <span className="block text-gradient-growth">começa hoje.</span>
-            </h2>
-            <Button asChild size="lg" className="mt-6 min-h-12 w-full sm:w-auto">
-              <Link to="/auth" search={{ mode: "signup" }} onClick={countSignupClick}>
-                Começar grátis <ArrowRight aria-hidden="true" />
-              </Link>
-            </Button>
-            <p className="mt-3 text-xs text-muted-foreground">Teste de nível rápido · sem cartão</p>
+          <div className="relative mx-auto grid max-w-6xl items-end gap-6 px-4 pt-12 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:px-8 lg:pt-14">
+            <div className="flex flex-col items-center pb-2 text-center lg:items-start lg:self-center lg:pb-14 lg:text-left">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
+                More than English
+              </p>
+              <h2 className="text-3xl font-bold leading-tight sm:text-5xl">
+                Sua primeira conversa com a EVO
+                <span className="block text-gradient-growth">começa hoje.</span>
+              </h2>
+              <Button asChild size="lg" className="mt-6 min-h-12 w-full sm:w-auto">
+                <Link to="/auth" search={{ mode: "signup" }} onClick={countSignupClick}>
+                  Começar grátis <ArrowRight aria-hidden="true" />
+                </Link>
+              </Button>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Teste de nível rápido · sem cartão
+              </p>
+            </div>
+            <div className="relative mx-auto flex w-full max-w-[380px] items-end justify-center">
+              <div
+                className="absolute bottom-[8%] left-1/2 h-24 w-2/3 -translate-x-1/2 rounded-full bg-success/10 blur-3xl"
+                aria-hidden="true"
+              />
+              <img
+                src={evoImage}
+                alt="EVO, a professora de inglês com IA do Evoluir+"
+                width={848}
+                height={1264}
+                loading="lazy"
+                className="relative h-[300px] w-full object-contain object-bottom drop-shadow-2xl sm:h-[380px] lg:h-[460px]"
+              />
+            </div>
           </div>
         </section>
       </main>
