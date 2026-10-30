@@ -2482,6 +2482,9 @@ const baseUiPt: Record<string, string> = {
   "Lesson test": "Teste de lição",
   Lyrics: "Letra",
   // Premium extra videos (owner request, 2026-10-31).
+  "Just added": "Novidade",
+  "Lessons on video, Premium": "Lições em vídeo, Premium",
+  "New: extra lesson videos": "Novidade: vídeos extras das lições",
   "Extra lesson videos, by level and unit": "Vídeos extras das lições, por nível e unidade",
   "Extra videos": "Vídeos extras",
   "Premium extras": "Extras Premium",

@@ -9,6 +9,7 @@ import {
   CalendarDays,
   ChartLine,
   Check,
+  Clapperboard,
   ChevronRight,
   ClipboardCheck,
   Clock,
@@ -50,6 +51,7 @@ import { LevelCard } from "@/components/LevelCard";
 import { JewelsPopover } from "@/components/JewelsCard";
 import { DiamondCelebration } from "@/components/DiamondCelebration";
 import { useDiamondLevel } from "@/hooks/useDiamondCycles";
+import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { daysToNextDiamond, diamondName } from "@/lib/diamondCycles";
 import { getLeague } from "@/components/LeagueBadge";
 import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
@@ -191,6 +193,7 @@ function DashboardNotifications({
   // it). Finishing the reading refreshes every query, this one included.
   const { data: profile } = useProfile();
   const { data: readingDone } = useDailyReadingDone(profile?.id);
+  const extraVideos = useExtraVideosNews(profile?.id);
   // Reuse EVO’s server-side decision; the bell does not derive new pedagogy.
   const { data: nextStep } = useNextStep({ enabled: !!profile?.id });
   const { data: todayActivities = [] } = useTodayActivities(profile?.id);
@@ -339,6 +342,15 @@ function DashboardNotifications({
       label: `${translate("Words to review")}: ${wordReview.total}`,
       icon: RotateCcw,
       visible: wordReview.total > 0,
+    },
+    // Premium extra videos just added (owner request, 2026-10-31), until the
+    // student opens the page on this device.
+    {
+      id: "extra-videos",
+      to: "/learning/videos",
+      label: "New: extra lesson videos",
+      icon: Clapperboard,
+      visible: extraVideos.hasNew,
     },
     {
       id: "reading",
