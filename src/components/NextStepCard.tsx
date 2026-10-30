@@ -467,13 +467,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 AI Teacher's sparkles; a red "!" read as an error, user
                 request). Its own full line on phones, with Practice now beside
                 the priority below; desktop matches "Why this matters now". */}
-            <p className="flex items-center gap-1.5 font-display text-sm font-semibold leading-tight text-sidebar-foreground sm:gap-2 sm:text-base sm:leading-snug">
+            <p className="flex items-center gap-1 whitespace-nowrap font-display text-[10.5px] font-semibold leading-tight text-sidebar-foreground min-[380px]:text-[11px] min-[400px]:text-xs sm:gap-2 sm:text-base sm:leading-snug">
               <Sparkles
-                className="size-4 shrink-0 text-brand-green sm:size-[1.375rem]"
+                className="size-3.5 shrink-0 text-brand-green sm:size-[1.375rem]"
                 strokeWidth={2.4}
                 aria-hidden="true"
               />
-              <span className="sm:truncate xl:whitespace-normal">
+              <span className="truncate xl:whitespace-normal">
                 EVO · {t("Your AI Learning Coach")}
               </span>
             </p>
