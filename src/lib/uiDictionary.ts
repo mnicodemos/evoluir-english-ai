@@ -212,6 +212,13 @@ const baseUiPt: Record<string, string> = {
   "Did you finish this task?": "Você terminou esta tarefa?",
   "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
   "Review words": "Revisar palavras",
+  "Good to have you back": "Que bom ter você de volta",
+  "Continue with Google": "Continuar com Google",
+  "or with your email": "ou com seu e-mail",
+  "Your password": "Sua senha",
+  "Create a password": "Crie uma senha",
+  "Google sign-in is not available right now.": "O login com Google não está disponível agora.",
+  "EVO is ready for your next conversation.": "A EVO está pronta para a sua próxima conversa.",
   "30 core lessons in 5 units, plus a review unit":
     "30 lições principais em 5 unidades, mais uma unidade de revisão",
   "Each lesson: audio with EVO and Leo, summary, cards and quiz":
@@ -1959,7 +1966,7 @@ const baseUiPt: Record<string, string> = {
     "Uso inapropriado de fórmulas sociais em resposta a perguntas abertas",
 
   // Auth / login page
-  "Your English teacher is waiting for you.": "Seu professor de inglês está esperando por você.",
+  "Your English teacher is waiting for you.": "Sua professora de inglês está esperando por você.",
   "Conversation, writing and vocabulary practice with feedback in seconds.":
     "Pratique conversação, escrita e vocabulário com feedback em segundos.",
   "Back to home": "Voltar ao início",
