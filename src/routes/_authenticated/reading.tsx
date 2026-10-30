@@ -6,11 +6,14 @@ import {
   BookOpenText,
   Check,
   ChevronLeft,
+  ChevronDown,
   ChevronRight,
   CircleCheck,
   Clock,
   Languages,
   Loader2,
+  MousePointerClick,
+  Shapes,
   Square,
   TextSearch,
   Volume2,
@@ -48,7 +51,9 @@ import {
 import {
   completeDailyReading,
   loadDailyReading,
+  loadReadingWeek,
   type DailyReading,
+  type ReadingWeekDay,
 } from "@/lib/dailyReading.functions";
 import { lookupWord } from "@/lib/dictionary.functions";
 import { saveReadingWords } from "@/lib/readingWords.functions";
@@ -357,6 +362,97 @@ const chipClass = (active: boolean) =>
       : "border-border text-muted-foreground hover:text-foreground",
   );
 
+/** "30/10" (Portuguese) or "Oct 30" (English) for a "YYYY-MM-DD" study day. */
+function shortDate(day: string, lang: string) {
+  return new Intl.DateTimeFormat(lang === "pt" ? "pt-BR" : "en-US", {
+    day: "numeric",
+    month: lang === "pt" ? "2-digit" : "short",
+    timeZone: "UTC",
+  }).format(new Date(`${day}T12:00:00Z`));
+}
+
+/**
+ * The student's reading week (owner request, 2026-10-30: each day was
+ * isolated): the last seven days, done ones in green with their score, today
+ * outlined; an earlier day with a stored text opens again as practice.
+ */
+function ReadingWeek({
+  week,
+  openDay,
+  onOpen,
+  lang,
+  t,
+}: {
+  week: ReadingWeekDay[];
+  openDay: string | null;
+  onOpen: (entry: ReadingWeekDay | null) => void;
+  lang: string;
+  t: (label: string) => string;
+}) {
+  const doneCount = week.filter((entry) => entry.done).length;
+  const today = week[week.length - 1]?.day;
+  return (
+    <section className="card-soft mt-5 p-3 sm:p-4" aria-labelledby="reading-week-title">
+      <h2 id="reading-week-title" className="text-xs font-semibold text-muted-foreground">
+        <span>{t("Your reading week")}</span> <span>·</span>{" "}
+        <span className="text-foreground">{doneCount}</span> <span>{t("of")}</span> <span>7</span>{" "}
+        <span>{t("days")}</span>
+      </h2>
+      <ol className="mt-2 grid max-w-xl grid-cols-7 gap-1.5">
+        {week.map((entry) => {
+          const isToday = entry.day === today;
+          const selected = isToday ? openDay === null : openDay === entry.day;
+          const canOpen = isToday || entry.available;
+          const weekday = new Intl.DateTimeFormat(lang === "pt" ? "pt-BR" : "en-US", {
+            weekday: "short",
+            timeZone: "UTC",
+          })
+            .format(new Date(`${entry.day}T12:00:00Z`))
+            .replace(".", "");
+          return (
+            <li key={entry.day}>
+              <button
+                type="button"
+                disabled={!canOpen}
+                aria-pressed={selected}
+                aria-label={`${shortDate(entry.day, lang)}${entry.done ? ` · ${t("Reading done")}` : ""}${entry.score !== null ? ` · ${entry.score}%` : ""}`}
+                title={canOpen && !isToday ? t("Read it again") : undefined}
+                onClick={() => onOpen(isToday ? null : entry)}
+                className={cn(
+                  "flex w-full flex-col items-center gap-1 rounded-lg py-1.5 text-[10px] transition-colors sm:text-xs",
+                  canOpen ? "hover:bg-white/[0.04]" : "cursor-default opacity-60",
+                  selected && "bg-white/[0.06] ring-1 ring-inset ring-white/10",
+                )}
+              >
+                <span className="capitalize text-muted-foreground">{weekday}</span>
+                <span
+                  className={cn(
+                    "grid size-7 place-items-center rounded-full text-[10px] font-semibold tabular-nums",
+                    entry.done
+                      ? "bg-brand-green/15 text-brand-green ring-1 ring-brand-green/50"
+                      : "bg-white/[0.04] text-muted-foreground",
+                    isToday && !entry.done && "ring-1 ring-brand-green/60",
+                  )}
+                >
+                  {entry.done ? (
+                    entry.score !== null ? (
+                      `${entry.score}`
+                    ) : (
+                      <Check className="size-3.5" aria-hidden="true" />
+                    )
+                  ) : (
+                    shortDate(entry.day, lang).split(/[/\s]/)[lang === "pt" ? 0 : 1]
+                  )}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
 /**
  * What to read (user request, 2026-10-22): "Today's pick" (the theme of the
  * day) or one of six categories in one of three styles. Each choice is a text
@@ -371,6 +467,23 @@ function ReadingPicker({
   onChange: (choice: ReadingChoice | null) => void;
   t: (label: string) => string;
 }) {
+  // Closed while the student keeps Today's pick (owner request, 2026-10-30:
+  // eighteen choices before the text asked for a decision first).
+  const [open, setOpen] = useState(false);
+  if (!open && !choice) {
+    return (
+      <button
+        type="button"
+        className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        aria-expanded={false}
+        onClick={() => setOpen(true)}
+      >
+        <Shapes className="size-3.5" aria-hidden="true" />
+        {t("Read another topic")}
+        <ChevronDown className="size-3.5" aria-hidden="true" />
+      </button>
+    );
+  }
   return (
     <section className="card-soft mt-5 p-3 sm:p-4" aria-labelledby="reading-picker-title">
       <h2 id="reading-picker-title" className="text-xs font-semibold text-muted-foreground">
@@ -447,11 +560,29 @@ function ReadingPage() {
     setChoice(readChoice());
     setChoiceReady(true);
   }, []);
+  // An earlier day of the week opened again from the reading week (practice).
+  const [pastDay, setPastDay] = useState<ReadingWeekDay | null>(null);
+  const shownChoice = pastDay ? pastDay.choice : choice;
   const { data: reading, isLoading } = useQuery({
-    queryKey: ["daily-reading", profile?.level, readingChoiceKey(choice)],
-    queryFn: () => fetchReading({ data: { choice } }),
+    queryKey: [
+      "daily-reading",
+      profile?.level,
+      readingChoiceKey(shownChoice),
+      pastDay?.day ?? "today",
+    ],
+    queryFn: () =>
+      fetchReading({
+        data: pastDay ? { choice: pastDay.choice, day: pastDay.day } : { choice },
+      }),
     enabled: !!profile && choiceReady,
     staleTime: 1000 * 60 * 30,
+  });
+  const fetchWeek = useServerFn(loadReadingWeek);
+  const { data: week } = useQuery({
+    queryKey: ["reading-week", profile?.id],
+    queryFn: () => fetchWeek(),
+    enabled: !!profile,
+    staleTime: 1000 * 60 * 10,
   });
 
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
@@ -536,7 +667,8 @@ function ReadingPage() {
     !!reading &&
     !!completed &&
     readingChoiceKey(completed.choice) === readingChoiceKey(reading.choice);
-  const practice = !!completed && !doneHere;
+  // An earlier day is always practice; today, any text but the one finished.
+  const practice = reading?.past ? !doneHere : !!completed && !doneHere;
 
   function pick(next: ReadingChoice | null) {
     playRun.current += 1;
@@ -544,8 +676,18 @@ function ReadingPage() {
     setPlaying(false);
     setShowPt(false);
     finish.reset();
+    setPastDay(null);
     setChoice(next);
     saveChoice(next);
+  }
+
+  function openDay(entry: ReadingWeekDay | null) {
+    playRun.current += 1;
+    stopSpeaking();
+    setPlaying(false);
+    setShowPt(false);
+    finish.reset();
+    setPastDay(entry);
   }
 
   useEffect(() => {
@@ -644,7 +786,31 @@ function ReadingPage() {
         )}
       />
 
-      <ReadingPicker choice={choice} onChange={pick} t={t} />
+      {week ? (
+        <ReadingWeek
+          week={week}
+          openDay={pastDay?.day ?? null}
+          onOpen={openDay}
+          lang={lang}
+          t={t}
+        />
+      ) : null}
+
+      {pastDay ? (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-400/30 bg-amber-400/[0.06] px-3 py-2 text-xs sm:text-sm">
+          <span>
+            <span>{t("Reading again from")}</span> <span>{shortDate(pastDay.day, lang)}</span>{" "}
+            <span className="text-muted-foreground">
+              · {t("practice: today's study day is not changed.")}
+            </span>
+          </span>
+          <Button type="button" size="sm" variant="outline" onClick={() => openDay(null)}>
+            {t("Back to today")}
+          </Button>
+        </div>
+      ) : (
+        <ReadingPicker choice={choice} onChange={pick} t={t} />
+      )}
 
       {isLoading || !reading ? (
         <div className="mt-5 space-y-3">
@@ -718,6 +884,15 @@ function ReadingPage() {
               ) : null}
             </div>
 
+            {/* The tip comes before the text (owner request, 2026-10-30: at the
+                bottom it was read too late), until the first word is marked. */}
+            {marked.length === 0 ? (
+              <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+                <MousePointerClick className="size-3.5 shrink-0" aria-hidden="true" />
+                {t("Tap any word you don't understand to see its translation.")}
+              </p>
+            ) : null}
+
             <div
               translate="no"
               lang="en"
@@ -753,11 +928,7 @@ function ReadingPage() {
 
             {selectedWord ? (
               <WordMeaning term={selectedWord} glossaryPt={glossaryPt.get(selectedWord) ?? null} />
-            ) : (
-              <p className="mt-4 text-xs text-muted-foreground">
-                {t("Tap any word you don't understand to see its translation.")}
-              </p>
-            )}
+            ) : null}
 
             {marked.length ? (
               <div className="mt-4">
@@ -987,7 +1158,13 @@ function ReadingPage() {
                 {t("Check answers")}
               </Button>
             )}
-            {practice ? (
+            {reading.past ? (
+              <p className="mt-3 text-xs text-muted-foreground">
+                {doneHere
+                  ? t("Your answers from that day.")
+                  : t("Practice: answers checked here, today's study day is not changed.")}
+              </p>
+            ) : practice ? (
               <p className="mt-3 text-xs text-muted-foreground">
                 {t("Extra practice: today's reading already counts as a study day.")}
               </p>
@@ -1010,9 +1187,6 @@ function ReadingPage() {
                 </Button>
               </p>
             ) : null}
-            <p className="mt-3 text-xs text-muted-foreground">
-              {t("A new reading arrives every day, matching your level.")}
-            </p>
           </section>
         </div>
       )}
