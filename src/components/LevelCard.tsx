@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Check, ChartNoAxesColumnIncreasing, GraduationCap, Lock, Undo2 } from "lucide-react";
+import {
+  Check,
+  ChartNoAxesColumnIncreasing,
+  Download,
+  GraduationCap,
+  Lock,
+  Undo2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -137,15 +144,17 @@ export function LevelCard({
   );
 
   const studyBookLink = (
-    <p className="mt-1 text-xs text-muted-foreground">
-      {t("Download study book")}{" "}
+    // A yellow download icon instead of "click here" (owner request).
+    <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+      {t("Download study book")}
       <a
         href={studyBookHref}
         download
-        className="text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        title={t("Download study book")}
+        className="grid size-6 place-items-center rounded-full text-amber-400 transition-colors hover:bg-amber-400/10 hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
         aria-label={`Download study book ${current.value.toUpperCase()}`}
       >
-        {t("click here")}
+        <Download className="size-4" strokeWidth={2.4} aria-hidden="true" />
       </a>
     </p>
   );
