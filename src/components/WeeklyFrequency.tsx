@@ -124,8 +124,13 @@ export function WeeklyFrequency({
               <span className="text-muted-foreground/50" aria-hidden="true">
                 ·
               </span>
-              <span>
-                {totalStudyDays} {lang === "pt" ? "dias de estudo no total" : "study days in total"}
+              {/* A yellow trophy as tall as the text marks the all-time count (owner request, 2026-10-30). */}
+              <span className="inline-flex items-center gap-1">
+                <Trophy className="size-[1em] shrink-0 text-amber-400" aria-hidden="true" />
+                <span>
+                  {totalStudyDays}{" "}
+                  {lang === "pt" ? "dias de estudo no total" : "study days in total"}
+                </span>
               </span>
             </>
           )}
@@ -315,8 +320,14 @@ export function WeeklyFrequency({
                   : "days active this week"}
             </p>
             {totalStudyDays != null && (
-              <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
-                {totalStudyDays} {lang === "pt" ? "dias de estudo no total" : "total study days"}
+              <p className="mt-0.5 flex items-start gap-1 text-[11px] leading-tight text-muted-foreground">
+                <Trophy
+                  className="mt-[0.125em] size-[1em] shrink-0 text-amber-400"
+                  aria-hidden="true"
+                />
+                <span>
+                  {totalStudyDays} {lang === "pt" ? "dias de estudo no total" : "total study days"}
+                </span>
               </p>
             )}
           </div>
