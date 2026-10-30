@@ -8,12 +8,14 @@ import {
   Loader2,
   Lock,
   Play,
+  Search,
   Trophy,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import {
   nextPathLesson,
@@ -25,6 +27,14 @@ import { useProfile } from "@/hooks/useProfile";
 import { findLevel } from "@/lib/level";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
+
+/** Lower case without accents, so "licao" finds "lição" and "PAST" finds "past". */
+function foldText(text: string) {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Something went wrong. Please try again.";
@@ -48,6 +58,15 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
   const [expandedUnits, setExpandedUnits] = useState<Set<number>>(() => new Set());
   const { data: profile } = useProfile();
   const [planLoading, setPlanLoading] = useState(false);
+  // Search by lesson name (user request, 2026-10-31): the level's lessons whose
+  // title (or unit title) holds the words typed, ignoring case and accents.
+  const [query, setQuery] = useState("");
+  const needle = foldText(query.trim());
+  const found = needle
+    ? path.units
+        .flatMap((unit) => unit.lessons)
+        .filter((lesson) => foldText(`${lesson.title} ${lesson.unitTitle}`).includes(needle))
+    : [];
   // Current lesson = same one the "Next lesson" card shows.
   const nextLesson = nextPathLesson(
     path.units.flatMap((unit) => unit.lessons).filter((lesson) => !lesson.locked),
@@ -104,6 +123,75 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
     } finally {
       setBusyKey(null);
     }
+  };
+
+  // One lesson row, shared by the units and the search results (which also
+  // name the lesson's unit).
+  const lessonRow = (lesson: PathLesson, withUnit = false) => {
+    const busy = busyKey === lesson.key;
+    const isCurrent = nextLesson?.key === lesson.key;
+    const isDone = lesson.completed;
+    return (
+      <li key={lesson.key}>
+        <button
+          type="button"
+          onClick={() => void start(lesson)}
+          disabled={busy || open.isPending}
+          aria-label={lesson.title}
+          title={lesson.objective}
+          aria-current={isCurrent ? "true" : undefined}
+          className={`flex w-full items-center gap-3 rounded-xl border-[1.5px] p-3 text-left transition-shadow lg:py-1.5 hover:shadow-[var(--shadow-lift)] ${
+            isCurrent ? "border-[rgb(0_245_206)]/45 bg-[rgb(0_245_206)]/10" : "border-border"
+          } ${lesson.locked && !isCurrent ? "opacity-80" : ""}`}
+        >
+          <span
+            className={`grid size-8 shrink-0 place-items-center rounded-lg text-xs font-semibold ${
+              isCurrent
+                ? "bg-[rgb(0_245_206)] text-[#03231f]"
+                : "bg-secondary text-muted-foreground"
+            }`}
+          >
+            {lesson.position}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span
+              className={`block truncate text-sm ${
+                isCurrent ? "font-bold" : isDone ? "text-muted-foreground" : "font-medium"
+              }`}
+            >
+              {lesson.title}
+            </span>
+            {withUnit ? (
+              <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                <span>{t("Unit")}</span> <span>{lesson.unit}</span>
+                <span> · </span>
+                <span>{t("Lesson")}</span> <span>{lesson.position}</span>
+                <span> · </span>
+                <span translate="no">{lesson.unitTitle.replace(/^Unit \d+\s*[—-]\s*/, "")}</span>
+              </span>
+            ) : null}
+            <span
+              className={`mt-1 block text-xs lg:hidden ${
+                isDone && !isCurrent ? "text-muted-foreground/70" : "text-muted-foreground"
+              }`}
+            >
+              {lesson.objective}
+            </span>
+          </span>
+          {busy ? (
+            <Loader2 className="size-4 shrink-0 animate-spin" />
+          ) : isCurrent ? (
+            <Play className="size-4 shrink-0 fill-current text-[rgb(0_245_206)]" />
+          ) : isDone ? (
+            <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
+          ) : lesson.locked ? (
+            <Lock className="size-4 shrink-0 text-muted-foreground" />
+          ) : (
+            <Play className="size-4 shrink-0 text-[oklch(0.45_0.11_255)]" />
+          )}
+        </button>
+      </li>
+    );
   };
 
   const corePct = path.coreTotal ? Math.round((path.coreCompleted / path.coreTotal) * 100) : 0;
@@ -200,10 +288,47 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
         })()}
       </div>
 
+      <div className="relative">
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <Input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={t("Search a lesson by name, e.g. past simple")}
+          aria-label={t("Search a lesson by name")}
+          className="pl-9"
+        />
+      </div>
+
+      {needle ? (
+        <section className="card-soft p-4" aria-label={t("Search results")}>
+          <p className="text-xs font-semibold text-muted-foreground">
+            {found.length === 0 ? (
+              t("No lesson with this name. Try another word.")
+            ) : (
+              <>
+                <span>{found.length}</span>{" "}
+                <span>{found.length === 1 ? t("lesson found") : t("lessons found")}</span>
+              </>
+            )}
+          </p>
+          {found.length > 0 ? (
+            <ul className="mt-3 space-y-2 lg:space-y-1.5">
+              {found.map((lesson) => lessonRow(lesson, true))}
+            </ul>
+          ) : null}
+        </section>
+      ) : null}
+
       {/* The open unit fills the left column; the collapsed ones stack on the right. */}
       {/* grid-cols-1 caps the column at the screen width: without it a long
           button label widened the open unit past 360 px phones. */}
-      <div className="grid grid-cols-1 items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3 lg:gap-x-4 lg:gap-y-2.5">
+      <div
+        className={`${needle ? "hidden" : "grid"} grid-cols-1 items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3 lg:gap-x-4 lg:gap-y-2.5`}
+      >
         {path.units.map((unit) => {
           const allDone = unit.lessons.length > 0 && unit.completed === unit.lessons.length;
           const containsNext = nextLesson?.unit === unit.unit;
@@ -246,71 +371,7 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
 
           const lessonsList = (
             <ul className="mt-4 space-y-2 lg:mt-3 lg:space-y-1.5">
-              {unit.lessons.map((lesson) => {
-                const busy = busyKey === lesson.key;
-                const isCurrent = nextLesson?.key === lesson.key;
-                const isDone = lesson.completed;
-                return (
-                  <li key={lesson.key}>
-                    <button
-                      type="button"
-                      onClick={() => void start(lesson)}
-                      disabled={busy || open.isPending}
-                      aria-label={lesson.title}
-                      title={lesson.objective}
-                      aria-current={isCurrent ? "true" : undefined}
-                      className={`flex w-full items-center gap-3 rounded-xl border-[1.5px] p-3 text-left transition-shadow lg:py-1.5 hover:shadow-[var(--shadow-lift)] ${
-                        isCurrent
-                          ? "border-[rgb(0_245_206)]/45 bg-[rgb(0_245_206)]/10"
-                          : "border-border"
-                      } ${lesson.locked && !isCurrent ? "opacity-80" : ""}`}
-                    >
-                      <span
-                        className={`grid size-8 shrink-0 place-items-center rounded-lg text-xs font-semibold ${
-                          isCurrent
-                            ? "bg-[rgb(0_245_206)] text-[#03231f]"
-                            : "bg-secondary text-muted-foreground"
-                        }`}
-                      >
-                        {lesson.position}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span
-                          className={`block truncate text-sm ${
-                            isCurrent
-                              ? "font-bold"
-                              : isDone
-                                ? "text-muted-foreground"
-                                : "font-medium"
-                          }`}
-                        >
-                          {lesson.title}
-                        </span>
-                        <span
-                          className={`mt-1 block text-xs lg:hidden ${
-                            isDone && !isCurrent
-                              ? "text-muted-foreground/70"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {lesson.objective}
-                        </span>
-                      </span>
-                      {busy ? (
-                        <Loader2 className="size-4 shrink-0 animate-spin" />
-                      ) : isCurrent ? (
-                        <Play className="size-4 shrink-0 fill-current text-[rgb(0_245_206)]" />
-                      ) : isDone ? (
-                        <CheckCircle2 className="size-4 shrink-0 text-[oklch(0.55_0.15_150)]" />
-                      ) : lesson.locked ? (
-                        <Lock className="size-4 shrink-0 text-muted-foreground" />
-                      ) : (
-                        <Play className="size-4 shrink-0 text-[oklch(0.45_0.11_255)]" />
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
+              {unit.lessons.map((lesson) => lessonRow(lesson))}
             </ul>
           );
 
