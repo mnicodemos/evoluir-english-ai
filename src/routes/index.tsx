@@ -249,8 +249,11 @@ function CommercialLanding() {
 
         {/* DEMO — one conversation turn, animated */}
         <section className="border-b border-border/70">
-          <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 lg:px-8 lg:py-14">
-            <div>
+          {/* The conversation on the left and the text on the right on desktop
+              (owner request, 2026-10-31), the section compact enough to be
+              seen whole on one screen; phones keep the text first. */}
+          <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:px-8 lg:py-10">
+            <div className="lg:order-2">
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-success">
                 Veja na prática
               </p>
@@ -274,7 +277,7 @@ function CommercialLanding() {
                 ))}
               </ul>
             </div>
-            <div className="mx-auto w-full max-w-md lg:max-w-lg">
+            <div className="mx-auto w-full max-w-md lg:order-1 lg:max-w-lg">
               <ConversationDemo />
             </div>
           </div>

@@ -50,7 +50,7 @@ export function ConversationDemo() {
       </div>
 
       <div
-        className="flex h-[21rem] flex-col justify-end gap-2.5 p-4 text-sm"
+        className="flex h-[18rem] flex-col justify-end gap-2.5 p-4 text-sm"
         translate="no"
         aria-live="off"
       >
