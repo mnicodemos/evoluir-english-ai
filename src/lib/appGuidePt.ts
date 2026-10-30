@@ -259,8 +259,8 @@ export const appGuidePt: Record<string, string> = {
     "Minha assinatura, no menu, mostra o seu plano; a primeira assinatura Premium começa com 7 dias grátis, e você pode cancelar ali.",
   "Start here, on top of the path, has the presentation video of your level (Business English has its own).":
     "O Comece aqui, no topo da trilha, tem o vídeo de apresentação do seu nível (o Business English tem o dele).",
-  "Extra videos (Premium), at the top of the path, go deeper into the lessons, by level and unit.":
-    "Os vídeos extras (Premium), no topo da trilha, aprofundam as lições, por nível e unidade.",
+  "Extra videos (Premium), at the top of the path, go deeper into the lessons of each level.":
+    "Os vídeos extras (Premium), no topo da trilha, aprofundam as lições de cada nível.",
   Organize: "Organize",
   "More details": "Mais detalhes",
   "Fewer details": "Menos detalhes",

@@ -13,7 +13,6 @@ import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { useProfile } from "@/hooks/useProfile";
 import { findLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
-import type { PremiumVideo } from "@/lib/premiumVideos";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/learning/videos")({
       { title: "Extra videos - Evoluir+ English AI" },
       {
         name: "description",
-        content: "Extra lesson videos for Premium students, by level and unit.",
+        content: "Extra lesson videos for Premium students, by level.",
       },
     ],
   }),
@@ -31,8 +30,9 @@ export const Route = createFileRoute("/_authenticated/learning/videos")({
 });
 
 /**
- * Premium extra videos (owner request, 2026-10-31): the owner's Vimeo videos,
- * one per lesson of the path, by level and unit. Premium students watch them
+ * Premium extra videos (owner decision, 2026-10-31: by level only): the
+ * owner's Vimeo videos of each level, in the order they were added, not tied
+ * to a unit or lesson. Premium students watch them
  * here; free students see the list with locks and the Premium invitation (the
  * server hands out the links only to Premium). Optional: they never count
  * toward the checklist, the study day or the Final Test.
@@ -59,15 +59,10 @@ function ExtraVideosPage() {
   const level = picked ?? (levels.includes(studentLevel) ? studentLevel : (levels[0] ?? null));
   const [playing, setPlaying] = useState<string | null>(null);
 
-  const units = useMemo(() => {
-    const byUnit = new Map<number, { title: string; videos: PremiumVideo[] }>();
-    for (const video of videos.filter((item) => item.level === level)) {
-      const unit = byUnit.get(video.unit) ?? { title: video.unitTitle, videos: [] };
-      unit.videos.push(video);
-      byUnit.set(video.unit, unit);
-    }
-    return [...byUnit.entries()].map(([unit, value]) => ({ unit, ...value }));
-  }, [videos, level]);
+  const levelVideos = useMemo(
+    () => videos.filter((video) => video.level === level),
+    [videos, level],
+  );
 
   return (
     <AppShell>
@@ -129,88 +124,78 @@ function ExtraVideosPage() {
           </div>
         ) : null}
 
-        {!query.isPending && units.length === 0 ? (
+        {!query.isPending && levelVideos.length === 0 ? (
           <p className="card-soft p-6 text-sm text-muted-foreground">
             No extra videos here yet. New ones are added over time.
           </p>
         ) : null}
 
-        {units.map((unit) => (
-          <section key={unit.unit} className="space-y-2">
-            <h2 className="font-display text-base font-semibold">
-              <span translate="no">{unit.title}</span>
-            </h2>
-            <ul className="grid gap-3 lg:grid-cols-2">
-              {unit.videos.map((video) => {
-                const embed = video.url ? vimeoEmbedUrl(video.url) : null;
-                const open = playing === video.key && embed;
-                return (
-                  <li key={video.key} className="card-soft overflow-hidden">
-                    {open ? (
-                      <div className="relative bg-black">
-                        <iframe
-                          className="aspect-video w-full"
-                          src={`${cleanVimeoPlayerUrl(embed)}&autoplay=1`}
-                          title={video.title}
-                          referrerPolicy="strict-origin-when-cross-origin"
-                          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-                          allowFullScreen
-                        />
-                      </div>
-                    ) : null}
-                    <div className="flex items-center gap-3 p-3">
-                      <span
-                        className={cn(
-                          "grid size-10 shrink-0 place-items-center rounded-xl",
-                          premium ? "bg-warning/12 text-warning" : "bg-muted text-muted-foreground",
-                        )}
-                        aria-hidden="true"
-                      >
-                        {premium ? <PlayCircle className="size-5" /> : <Lock className="size-4" />}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-semibold" translate="no">
-                          {video.title}
-                        </span>
-                        <span className="block truncate text-xs text-muted-foreground">
-                          <span>Unit</span> <span>{video.unit}</span> · <span>Lesson</span>{" "}
-                          <span>{video.position}</span> ·{" "}
-                          <span translate="no">{video.lessonTitle}</span>
-                        </span>
-                      </span>
-                      {premium && embed ? (
-                        open ? (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="shrink-0"
-                            aria-label="Close video"
-                            onClick={() => setPlaying(null)}
-                          >
-                            <X className="size-4" />
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            className="shrink-0 gap-1.5"
-                            onClick={() => setPlaying(video.key)}
-                          >
-                            <PlayCircle className="size-4" /> Watch
-                          </Button>
-                        )
-                      ) : (
-                        <Lock
-                          className="size-4 shrink-0 text-muted-foreground"
-                          aria-hidden="true"
-                        />
-                      )}
+        {levelVideos.length > 0 ? (
+          <ul className="grid gap-3 lg:grid-cols-2">
+            {levelVideos.map((video) => {
+              const embed = video.url ? vimeoEmbedUrl(video.url) : null;
+              const open = playing === video.id && embed;
+              return (
+                <li key={video.id} className="card-soft overflow-hidden">
+                  {open ? (
+                    <div className="relative bg-black">
+                      <iframe
+                        className="aspect-video w-full"
+                        src={`${cleanVimeoPlayerUrl(embed)}&autoplay=1`}
+                        title={video.title}
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                        allowFullScreen
+                      />
                     </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ))}
+                  ) : null}
+                  <div className="flex items-center gap-3 p-3">
+                    <span
+                      className={cn(
+                        "grid size-10 shrink-0 place-items-center rounded-xl",
+                        premium ? "bg-warning/12 text-warning" : "bg-muted text-muted-foreground",
+                      )}
+                      aria-hidden="true"
+                    >
+                      {premium ? <PlayCircle className="size-5" /> : <Lock className="size-4" />}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold" translate="no">
+                        {video.title}
+                      </span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        <span>Level</span> <span>{video.level.toUpperCase()}</span>
+                      </span>
+                    </span>
+                    {premium && embed ? (
+                      open ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="shrink-0"
+                          aria-label="Close video"
+                          onClick={() => setPlaying(null)}
+                        >
+                          <X className="size-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="shrink-0 gap-1.5"
+                          onClick={() => setPlaying(video.id)}
+                        >
+                          <PlayCircle className="size-4" /> Watch
+                        </Button>
+                      )
+                    ) : (
+                      <Lock className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
       </div>
     </AppShell>
   );

@@ -2485,7 +2485,7 @@ const baseUiPt: Record<string, string> = {
   "Just added": "Novidade",
   "Lessons on video, Premium": "Lições em vídeo, Premium",
   "New: extra lesson videos": "Novidade: vídeos extras das lições",
-  "Extra lesson videos, by level and unit": "Vídeos extras das lições, por nível e unidade",
+  "Extra lesson videos, by level": "Vídeos extras das lições, por nível",
   "Extra videos": "Vídeos extras",
   "Premium extras": "Extras Premium",
   "Extra lesson videos": "Vídeos extras das lições",
