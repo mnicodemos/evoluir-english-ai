@@ -14,8 +14,10 @@ import { resolveQuizEvidenceSkill, type QuizEvidenceSkill } from "@/lib/pedagogy
 import { callGateway } from "./ai-gateway.server";
 import { hashAiRequest } from "./ai-usage.server";
 import { canonicalVimeoUrl } from "./lessonVideoReport";
-import type { LessonVideo } from "./lessonVideo.server";
 import { hasLessonPodcast } from "./reviewPodcast";
+
+/** A lesson's video: its Vimeo link and length in seconds (0 when unknown). */
+type LessonVideo = { url: string; seconds: number };
 
 export async function callContentAi(
   messages: { role: "system" | "user" | "assistant"; content: string }[],
