@@ -195,7 +195,7 @@ function CommercialLanding() {
         <section className="relative flex flex-col justify-center overflow-hidden lg:min-h-[calc(100svh-4rem)]">
           {/* Fades out at the bottom, so the hero melts into the page's one background. */}
           <div
-            className="absolute inset-0 surface-hero opacity-45 [mask-image:linear-gradient(to_bottom,black_55%,transparent)]"
+            className="absolute inset-0 surface-hero opacity-45 [mask-image:linear-gradient(to_bottom,black_0%,black_25%,rgba(0,0,0,0.75)_50%,rgba(0,0,0,0.4)_72%,rgba(0,0,0,0.12)_88%,transparent_100%)]"
             aria-hidden="true"
           />
           {/* Premium depth (owner review, 2026-10-31: the full-screen hero read
@@ -447,12 +447,17 @@ function CommercialLanding() {
             2026-10-31: she left the hero to the brand video and came here). */}
         <section className="relative overflow-hidden">
           <div
-            className="absolute inset-0 surface-hero opacity-55 [mask-image:linear-gradient(to_top,black_50%,transparent)]"
+            className="absolute inset-0 surface-hero opacity-55 [mask-image:linear-gradient(to_top,black_0%,black_25%,rgba(0,0,0,0.75)_50%,rgba(0,0,0,0.4)_72%,rgba(0,0,0,0.12)_88%,transparent_100%)]"
             aria-hidden="true"
           />
           {/* The hero's light again, from EVO's side: the page opens and closes on it. */}
           <div
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_70%_at_78%_60%,rgba(20,220,185,0.13),transparent_70%)]"
+            aria-hidden="true"
+          />
+          {/* Melts into the footer's darker base instead of meeting it on a line. */}
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#0B0B0C]"
             aria-hidden="true"
           />
           <div className="relative mx-auto grid max-w-6xl items-end gap-6 px-4 pt-12 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:px-8 lg:pt-14">
