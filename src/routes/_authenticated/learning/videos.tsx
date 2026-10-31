@@ -118,11 +118,10 @@ function ExtraVideosPage() {
   const levelAll = useMemo(() => videos.filter((video) => video.level === level), [videos, level]);
   const levelShorts = useMemo(() => levelAll.filter((video) => video.kind === "short"), [levelAll]);
   // Shorts (owner request, 2026-10-31: vertical videos and Instagram Reels) have
-  // their own tab; a level with only shorts opens on it.
+  // their own tab, the first one (owner request, 2026-10-31); a level with
+  // regular videos and no shorts opens on Videos.
   const [pickedTab, setPickedTab] = useState<"videos" | "shorts" | null>(null);
-  const tab =
-    pickedTab ??
-    (levelAll.length > 0 && levelShorts.length === levelAll.length ? "shorts" : "videos");
+  const tab = pickedTab ?? (levelShorts.length === 0 && levelAll.length > 0 ? "videos" : "shorts");
   const levelVideos = useMemo(
     () => levelAll.filter((video) => (video.kind === "short") === (tab === "shorts")),
     [levelAll, tab],
@@ -221,8 +220,8 @@ function ExtraVideosPage() {
           >
             {(
               [
-                ["videos", Film, "Videos", levelAll.length - levelShorts.length],
                 ["shorts", Smartphone, "Shorts", levelShorts.length],
+                ["videos", Film, "Videos", levelAll.length - levelShorts.length],
               ] as const
             ).map(([value, Icon, label, count]) => (
               <button
