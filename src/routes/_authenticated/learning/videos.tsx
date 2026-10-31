@@ -1,7 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Clapperboard, Crown, Lock, PlayCircle, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Clapperboard,
+  Crown,
+  Film,
+  Lock,
+  PlayCircle,
+  Smartphone,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
@@ -13,6 +22,7 @@ import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { useProfile } from "@/hooks/useProfile";
 import { findLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
+import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { studyToday } from "@/lib/today";
@@ -71,9 +81,17 @@ function ExtraVideosPage() {
     }
   };
 
+  const levelAll = useMemo(() => videos.filter((video) => video.level === level), [videos, level]);
+  const levelShorts = useMemo(() => levelAll.filter((video) => video.kind === "short"), [levelAll]);
+  // Shorts (owner request, 2026-10-31: vertical videos and Instagram Reels) have
+  // their own tab; a level with only shorts opens on it.
+  const [pickedTab, setPickedTab] = useState<"videos" | "shorts" | null>(null);
+  const tab =
+    pickedTab ??
+    (levelAll.length > 0 && levelShorts.length === levelAll.length ? "shorts" : "videos");
   const levelVideos = useMemo(
-    () => videos.filter((video) => video.level === level),
-    [videos, level],
+    () => levelAll.filter((video) => (video.kind === "short") === (tab === "shorts")),
+    [levelAll, tab],
   );
 
   return (
@@ -103,6 +121,7 @@ function ExtraVideosPage() {
                   aria-current={value === level ? "page" : undefined}
                   onClick={() => {
                     setPicked(value);
+                    setPickedTab(null);
                     setPlaying(null);
                   }}
                   className={cn(
@@ -136,13 +155,66 @@ function ExtraVideosPage() {
           </div>
         ) : null}
 
+        {!query.isPending ? (
+          <div
+            role="tablist"
+            aria-label="Video type"
+            className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-1"
+          >
+            {(
+              [
+                ["videos", Film, "Videos", levelAll.length - levelShorts.length],
+                ["shorts", Smartphone, "Shorts", levelShorts.length],
+              ] as const
+            ).map(([value, Icon, label, count]) => (
+              <button
+                key={value}
+                type="button"
+                role="tab"
+                aria-selected={tab === value}
+                onClick={() => {
+                  setPickedTab(value);
+                  setPlaying(null);
+                }}
+                className={cn(
+                  "inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-colors",
+                  tab === value
+                    ? "bg-brand-green text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <Icon className="size-3.5" aria-hidden="true" />
+                <span>{label}</span>
+                <span className="tabular-nums opacity-70">{count}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+
         {!query.isPending && levelVideos.length === 0 ? (
           <p className="card-soft p-6 text-sm text-muted-foreground">
-            No extra videos here yet. New ones are added over time.
+            {tab === "shorts"
+              ? "No shorts here yet. New ones are added over time."
+              : "No extra videos here yet. New ones are added over time."}
           </p>
         ) : null}
 
-        {levelVideos.length > 0 ? (
+        {tab === "shorts" && levelVideos.length > 0 ? (
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {levelVideos.map((video) => (
+              <ShortCard
+                key={video.id}
+                video={video}
+                premium={premium}
+                open={playing === video.id}
+                onPlay={() => watch(video.id)}
+                onClose={() => setPlaying(null)}
+              />
+            ))}
+          </ul>
+        ) : null}
+
+        {tab === "videos" && levelVideos.length > 0 ? (
           <ul className="grid gap-3 lg:grid-cols-2">
             {levelVideos.map((video) => {
               const embed = video.url ? vimeoEmbedUrl(video.url) : null;
@@ -210,5 +282,92 @@ function ExtraVideosPage() {
         ) : null}
       </div>
     </AppShell>
+  );
+}
+
+/** The player of a short: a vertical Vimeo video or an Instagram Reel. */
+function shortPlayerUrl(url: string | null): string | null {
+  if (!url) return null;
+  const reel = reelEmbedUrl(url);
+  if (reel) return reel;
+  const embed = vimeoEmbedUrl(url);
+  return embed ? `${cleanVimeoPlayerUrl(embed)}&autoplay=1` : null;
+}
+
+/** One short in the 9:16 grid: a poster tile until played, then its player. */
+function ShortCard({
+  video,
+  premium,
+  open,
+  onPlay,
+  onClose,
+}: {
+  video: PremiumVideo;
+  premium: boolean;
+  open: boolean;
+  onPlay: () => void;
+  onClose: () => void;
+}) {
+  const player = premium ? shortPlayerUrl(video.url) : null;
+  const reel = !!(video.url && reelEmbedUrl(video.url));
+  return (
+    <li className="card-soft overflow-hidden">
+      <div className="relative aspect-[9/16] bg-black">
+        {open && player ? (
+          <>
+            <iframe
+              className="absolute inset-0 size-full"
+              src={player}
+              title={video.title}
+              referrerPolicy="strict-origin-when-cross-origin"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write"
+              allowFullScreen
+            />
+            <button
+              type="button"
+              aria-label="Close video"
+              onClick={onClose}
+              className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-black/60 text-white backdrop-blur"
+            >
+              <X className="size-4" />
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            disabled={!player}
+            onClick={onPlay}
+            aria-label={player ? video.title : undefined}
+            className="group absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_50%_35%,rgb(245_158_11/0.18),transparent_65%)] disabled:cursor-default"
+          >
+            <span
+              className={cn(
+                "grid size-14 place-items-center rounded-full border border-white/15 bg-white/10 backdrop-blur transition-transform group-hover:scale-105",
+                !player && "opacity-70",
+              )}
+              aria-hidden="true"
+            >
+              {player ? (
+                <PlayCircle className="size-7 text-warning" />
+              ) : (
+                <Lock className="size-5 text-muted-foreground" />
+              )}
+            </span>
+            {reel ? (
+              <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-white/85">
+                Reel
+              </span>
+            ) : null}
+          </button>
+        )}
+      </div>
+      <p
+        className="line-clamp-2 px-3 py-2 text-sm font-semibold leading-snug"
+        translate="no"
+        title={video.title}
+      >
+        {video.title}
+      </p>
+    </li>
   );
 }

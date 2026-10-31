@@ -1255,10 +1255,10 @@ export const getPremiumVideosAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
-    const { premiumVideoTable, PREMIUM_VIDEO_COLUMNS } = await import("@/lib/premiumVideos.server");
-    const { data, error } = await (await premiumVideoTable()).select(PREMIUM_VIDEO_COLUMNS);
-    if (error) return { missingMigration: true, videos: [] };
-    return { missingMigration: false, videos: data ?? [] };
+    const { selectPremiumVideos } = await import("@/lib/premiumVideos.server");
+    const { data, error, kindReady } = await selectPremiumVideos();
+    if (error) return { missingMigration: true, kindReady: false, videos: [] };
+    return { missingMigration: false, kindReady, videos: data ?? [] };
   });
 
 export const savePremiumVideo = createServerFn({ method: "POST" })
@@ -1269,14 +1269,23 @@ export const savePremiumVideo = createServerFn({ method: "POST" })
         level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]),
         url: z.string().trim().min(10).max(300),
         title: z.string().trim().min(1).max(120),
+        kind: z.enum(["video", "short"]).default("video"),
       })
       .parse(data),
   )
   .handler(async ({ context, data }) => {
     if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
     const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
-    const url = canonicalVimeoUrl(data.url);
-    if (!url) throw new Error("Cole um link válido do Vimeo.");
+    const { canonicalReelUrl } = await import("@/lib/premiumVideos");
+    // A short may be a vertical Vimeo video or an Instagram Reel; a video is Vimeo only.
+    const url =
+      canonicalVimeoUrl(data.url) ?? (data.kind === "short" ? canonicalReelUrl(data.url) : null);
+    if (!url)
+      throw new Error(
+        data.kind === "short"
+          ? "Cole um link válido do Vimeo ou de um Reel do Instagram."
+          : "Cole um link válido do Vimeo.",
+      );
     const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
     const { error } = await (
       await premiumVideoTable()
@@ -1285,9 +1294,15 @@ export const savePremiumVideo = createServerFn({ method: "POST" })
       title: data.title,
       video_url: url,
       updated_by: context.userId,
+      // A regular video leaves the column to its default, so it saves before 0102 too.
+      ...(data.kind === "short" ? { kind: "short" } : {}),
     });
     if (error) {
       if (error.code === "23505") throw new Error("Este vídeo já está neste nível.");
+      if (data.kind === "short")
+        throw new Error(
+          "Não foi possível salvar o short. Confira se a migração 0102_premium_video_kind foi aplicada.",
+        );
       console.error(`Premium video could not be saved: ${error.code ?? ""} ${error.message}`);
       throw new Error(
         "Não foi possível salvar. Confira se a migração 0101_premium_level_videos foi aplicada.",
