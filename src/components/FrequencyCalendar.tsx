@@ -11,8 +11,10 @@ type Props = {
 };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
-const WEEKDAYS_EN = ["S", "M", "T", "W", "T", "F", "S"];
-const WEEKDAYS_PT = ["D", "S", "T", "Q", "Q", "S", "S"];
+// Monday first, like the study plan, Your learning rhythm and the weekly
+// league (owner request, 2026-10-31: one week everywhere).
+const WEEKDAYS_EN = ["M", "T", "W", "T", "F", "S", "S"];
+const WEEKDAYS_PT = ["S", "T", "Q", "Q", "S", "S", "D"];
 
 /** Monthly calendar showing the days the user studied (any activity recorded). */
 export function FrequencyCalendar({ userId }: Props) {
@@ -41,7 +43,8 @@ export function FrequencyCalendar({ userId }: Props) {
   });
 
   const daysInMonth = new Date(year, month, 0).getDate();
-  const firstWeekday = new Date(year, month - 1, 1).getDay();
+  // Blank cells before the 1st, counted from Monday.
+  const firstWeekday = (new Date(year, month - 1, 1).getDay() + 6) % 7;
   const monthLabel = new Intl.DateTimeFormat(lang === "pt" ? "pt-BR" : "en-US", {
     month: "long",
     year: "numeric",

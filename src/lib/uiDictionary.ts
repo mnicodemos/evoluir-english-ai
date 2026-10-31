@@ -2151,6 +2151,7 @@ const baseUiPt: Record<string, string> = {
   ": AI practice, words and the weekly league are not affected.":
     ": a prática com IA, as palavras e a liga semanal não mudam.",
   "My level": "Meu nível",
+  "Other levels": "Outros níveis",
   "Start lesson": "Começar lição",
   Levels: "Níveis",
   "Could not change your level. Please try again.":
