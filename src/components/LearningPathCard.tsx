@@ -25,16 +25,9 @@ import {
 } from "@/hooks/useCurriculum";
 import { useProfile } from "@/hooks/useProfile";
 import { findLevel } from "@/lib/level";
+import { searchLessons } from "@/lib/lessonSearch";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
-
-/** Lower case without accents, so "licao" finds "lição" and "PAST" finds "past". */
-function foldText(text: string) {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Something went wrong. Please try again.";
@@ -61,12 +54,11 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
   // Search by lesson name (user request, 2026-10-31): the level's lessons whose
   // title (or unit title) holds the words typed, ignoring case and accents.
   const [query, setQuery] = useState("");
-  const needle = foldText(query.trim());
-  const found = needle
-    ? path.units
-        .flatMap((unit) => unit.lessons)
-        .filter((lesson) => foldText(`${lesson.title} ${lesson.unitTitle}`).includes(needle))
-    : [];
+  const searching = query.trim().length > 0;
+  const found = searchLessons(
+    path.units.flatMap((unit) => unit.lessons),
+    query,
+  );
   // Current lesson = same one the "Next lesson" card shows.
   const nextLesson = nextPathLesson(
     path.units.flatMap((unit) => unit.lessons).filter((lesson) => !lesson.locked),
@@ -303,7 +295,7 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
         />
       </div>
 
-      {needle ? (
+      {searching ? (
         <section className="card-soft p-4" aria-label={t("Search results")}>
           <p className="text-xs font-semibold text-muted-foreground">
             {found.length === 0 ? (
@@ -327,7 +319,7 @@ export function CurriculumPath({ reviewLevel }: { reviewLevel?: string | null } 
       {/* grid-cols-1 caps the column at the screen width: without it a long
           button label widened the open unit past 360 px phones. */}
       <div
-        className={`${needle ? "hidden" : "grid"} grid-cols-1 items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3 lg:gap-x-4 lg:gap-y-2.5`}
+        className={`${searching ? "hidden" : "grid"} grid-cols-1 items-start gap-5 md:grid-flow-dense md:grid-cols-2 md:gap-y-3 lg:gap-x-4 lg:gap-y-2.5`}
       >
         {path.units.map((unit) => {
           const allDone = unit.lessons.length > 0 && unit.completed === unit.lessons.length;

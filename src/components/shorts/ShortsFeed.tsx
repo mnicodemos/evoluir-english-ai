@@ -18,7 +18,7 @@ import { toast } from "sonner";
 
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
-import { COMMENT_MAX_LENGTH } from "@/lib/premiumVideoSocial";
+import { COMMENT_MAX_LENGTH, DOUBLE_TAP_MS, shortTap } from "@/lib/premiumVideoSocial";
 import {
   addVideoComment,
   deleteOwnVideoComment,
@@ -271,13 +271,14 @@ function ShortSlide({
   // One tap pauses or plays; a double tap likes (and never unlikes), like Instagram.
   const onTap = () => {
     const now = Date.now();
-    if (now - lastTap.current < 300) {
+    const tap = shortTap(now, lastTap.current, counts?.liked);
+    if (tap.kind === "double") {
       if (tapTimer.current) window.clearTimeout(tapTimer.current);
       tapTimer.current = null;
       lastTap.current = 0;
       setBurst((value) => value + 1);
       haptic("tap");
-      if (counts && !counts.liked) onLike();
+      if (tap.like) onLike();
       return;
     }
     lastTap.current = now;
@@ -285,7 +286,7 @@ function ShortSlide({
       tapTimer.current = null;
       tellVimeo(paused ? "play" : "pause");
       setPaused(!paused);
-    }, 300);
+    }, DOUBLE_TAP_MS);
   };
 
   const src = reel

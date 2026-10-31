@@ -62,3 +62,16 @@ export function reportedCommentPush(comment: { author: string; body: string }, v
     path: "/admin",
   };
 }
+
+/** Two taps closer than this on a short are a double tap (a like), like Instagram. */
+export const DOUBLE_TAP_MS = 300;
+
+/**
+ * A tap on a short: the second of two quick taps likes (and never unlikes a
+ * liked short); a single tap waits DOUBLE_TAP_MS, then pauses or plays.
+ */
+export function shortTap(now: number, lastTap: number, liked: boolean | undefined) {
+  if (lastTap > 0 && now - lastTap < DOUBLE_TAP_MS)
+    return { kind: "double" as const, like: liked === false };
+  return { kind: "single" as const };
+}

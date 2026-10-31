@@ -36,6 +36,29 @@ export function isChallengeLine(line: { text: string; mark?: string | undefined 
   return line.mark === "challenge" || /\bpause and (answer|say|try)\b/i.test(line.text);
 }
 
+/** Time to repeat a line out loud in shadowing mode: about half a second a word. */
+export function shadowPauseMs(text: string) {
+  const words = text.split(/\s+/).filter(Boolean).length;
+  return Math.min(9_000, Math.max(1_800, words * 450));
+}
+
+/**
+ * What the player does after a line: stop on the challenge for "Your turn"
+ * (owner request, 2026-10-30: the model answer used to follow at once), pause
+ * for the listener to repeat in "Repeat after" mode, or go on. The last line
+ * never waits: there is nothing after it.
+ */
+export function afterPodcastLine(
+  line: { text: string; mark?: string | undefined },
+  hasNext: boolean,
+  shadow: boolean,
+): { kind: "turn" } | { kind: "pause"; ms: number } | { kind: "next" } {
+  if (!hasNext) return { kind: "next" };
+  if (isChallengeLine(line)) return { kind: "turn" };
+  if (shadow) return { kind: "pause", ms: shadowPauseMs(line.text) };
+  return { kind: "next" };
+}
+
 const lineSchema = z.object({
   speaker: z.enum(["evo", "leo"]),
   text: z.string().trim().min(1).max(PODCAST_LINE_MAX),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { checkComment, commentAuthorName } from "./premiumVideoSocial";
+import { checkComment, commentAuthorName, DOUBLE_TAP_MS, shortTap } from "./premiumVideoSocial";
 
 describe("video comments", () => {
   it("names a student by first name and initial", () => {
@@ -49,5 +49,22 @@ describe("comment moderation", () => {
     expect(push.body.startsWith('Ana S. em "A2 · Phrasal verbs": ')).toBe(true);
     expect(push.body.endsWith("…")).toBe(true);
     expect(push.path).toBe("/admin");
+  });
+});
+
+describe("tapping a short", () => {
+  it("a quick second tap likes, never unlikes", () => {
+    expect(shortTap(1_000, 1_000 - DOUBLE_TAP_MS + 50, false)).toEqual({
+      kind: "double",
+      like: true,
+    });
+    expect(shortTap(1_000, 900, true)).toEqual({ kind: "double", like: false });
+    // Counts not loaded yet: the heart pops but nothing is sent.
+    expect(shortTap(1_000, 900, undefined)).toEqual({ kind: "double", like: false });
+  });
+
+  it("a slow or first tap pauses or plays", () => {
+    expect(shortTap(1_000, 1_000 - DOUBLE_TAP_MS, false)).toEqual({ kind: "single" });
+    expect(shortTap(5_000, 0, false)).toEqual({ kind: "single" });
   });
 });

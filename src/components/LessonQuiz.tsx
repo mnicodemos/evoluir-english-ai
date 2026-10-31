@@ -16,26 +16,13 @@ import { quizSkillSummary } from "@/lib/quizSummary";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
+import { optionSeed, quizRoundOrder, stableShuffle } from "@/lib/quizRound";
 
 type SubmittedDetail = {
   question_id: string;
   correct_answer: string;
   is_correct: boolean;
 };
-
-/** Same order every render for a question (seeded by its id), so the right answer's
- * position varies between questions even when the AI always lists it first. */
-function stableShuffle<T>(items: T[], seed: string): T[] {
-  let h = 2166136261;
-  for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
-  const out = [...items];
-  for (let i = out.length - 1; i > 0; i--) {
-    h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
-    const j = h % (i + 1);
-    [out[i], out[j]] = [out[j]!, out[i]!];
-  }
-  return out;
-}
 
 /** Multiple-choice / fill-in quiz with instant score, explanations and review advice. */
 export function LessonQuiz({
@@ -124,14 +111,7 @@ export function LessonQuiz({
 
   const correct = submittedResult?.correct ?? 0;
   const score = submittedResult?.score ?? 0;
-  const ordered = (() => {
-    if (round === 0) return questions;
-    const shuffled = stableShuffle(questions, `${lessonId}:${round}`);
-    return [
-      ...shuffled.filter((q) => missedFirst.includes(q.id)),
-      ...shuffled.filter((q) => !missedFirst.includes(q.id)),
-    ];
-  })();
+  const ordered = quizRoundOrder(questions, lessonId, round, missedFirst);
 
   async function submit() {
     setSaving(true);
@@ -329,7 +309,7 @@ export function LessonQuiz({
           {q.question}
         </p>
         <div className="mt-3 grid gap-2">
-          {stableShuffle(q.options, round === 0 ? q.id : `${q.id}:${round}`).map((opt) => {
+          {stableShuffle(q.options, optionSeed(q.id, round)).map((opt) => {
             const selected = chosen === opt;
             let style = "border-border hover:bg-secondary";
             let textColor = "";

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { listeningLevelConfig } from "@/lib/listeningLevels";
 import { loadLessonPodcast } from "@/lib/reviewPodcast.functions";
-import { isChallengeLine, PODCAST_SPEAKERS } from "@/lib/reviewPodcast";
+import { afterPodcastLine, PODCAST_SPEAKERS } from "@/lib/reviewPodcast";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
 import { transcribeAudio } from "@/lib/transcribe";
 import {
@@ -55,12 +55,6 @@ function saveFlag(key: string, value: boolean) {
   } catch {
     // Blocked storage: the choice lasts until the page closes.
   }
-}
-
-/** Time to repeat a line out loud in shadowing mode: about half a second a word. */
-function shadowPauseMs(text: string) {
-  const words = text.split(/\s+/).filter(Boolean).length;
-  return Math.min(9_000, Math.max(1_800, words * 450));
 }
 
 const MARK_TONE = {
@@ -213,13 +207,14 @@ export function LessonPodcast({
       if (single) break;
       // The challenge waits for the listener (owner request, 2026-10-30: the
       // model answer used to follow at once, so nobody answered).
-      if (isChallengeLine(line) && next) {
+      const after = afterPodcastLine(line, !!next, shadow);
+      if (after.kind === "turn") {
         setTurn(index);
         setPlaying(false);
         return;
       }
-      if (shadow && next) {
-        await new Promise((resolve) => setTimeout(resolve, shadowPauseMs(line.text)));
+      if (after.kind === "pause") {
+        await new Promise((resolve) => setTimeout(resolve, after.ms));
         if (run.current !== id) return;
       }
     }
