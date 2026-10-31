@@ -114,7 +114,7 @@ export const APP_GUIDE: GuideSection[] = [
     ],
     more: [
       "Start here, on top of the path, has the presentation video of your level (Business English has its own).",
-      "Extra videos (Premium), at the top of the path, go deeper into the lessons of each level; the Shorts tab has quick vertical videos and Reels.",
+      "Extra videos (Premium), at the top of the path, go deeper into the lessons of each level; the Shorts tab has quick vertical videos and Reels, in a full-screen feed where you can like and comment.",
       "The search box above the units finds a lesson of your level by its name; locked lessons stay locked.",
       "A retake brings the questions in a new order, the ones you missed first, and a wrong fill-in answer goes to My mistakes.",
       "Unit 6 has two review lessons: Review I opens after Units 1 and 2, and Review II after Units 3 to 5.",

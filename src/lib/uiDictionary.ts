@@ -2507,6 +2507,42 @@ const baseUiPt: Record<string, string> = {
     "Vídeos curtos que aprofundam as lições da sua trilha.",
   "Extra videos are part of Premium. Subscribe to watch every one of them.":
     "Os vídeos extras fazem parte do Premium. Assine para assistir a todos.",
+  Play: "Reproduzir",
+  Like: "Curtir",
+  Unlike: "Descurtir",
+  Comments: "Comentários",
+  "Loading...": "Carregando...",
+  "Delete comment": "Excluir comentário",
+  "Delete this comment?": "Excluir este comentário?",
+  "Report comment": "Denunciar comentário",
+  "Report this comment to the Evoluir+ team?":
+    "Denunciar este comentário para a equipe do Evoluir+?",
+  "Add a comment...": "Adicione um comentário...",
+  Send: "Enviar",
+  "No comments yet. Be the first to comment, in English if you can!":
+    "Ainda não há comentários. Seja o primeiro a comentar, em inglês se puder!",
+  "Others see your first name and initial. No links or contact details.":
+    "Os outros alunos veem seu primeiro nome e a inicial. Sem links nem contatos.",
+  "Thanks. The team will review this comment.": "Obrigado. A equipe vai revisar este comentário.",
+  "Likes and comments are part of Premium.": "Curtidas e comentários fazem parte do Premium.",
+  "This video is no longer available.": "Este vídeo não está mais disponível.",
+  "Could not save your like. Please try again.":
+    "Não foi possível salvar sua curtida. Tente de novo.",
+  "Could not save your like.": "Não foi possível salvar sua curtida.",
+  "Could not load the comments. Please try again.":
+    "Não foi possível carregar os comentários. Tente de novo.",
+  "Write a comment first.": "Escreva um comentário primeiro.",
+  "Keep your comment under 500 characters.": "Seu comentário deve ter até 500 caracteres.",
+  "Comments cannot have links.": "Comentários não podem ter links.",
+  "Comments cannot have contact details.": "Comentários não podem ter contatos.",
+  "You have commented a lot this hour. Please try again later.":
+    "Você comentou bastante nesta hora. Tente de novo mais tarde.",
+  "Could not post your comment. Please try again.":
+    "Não foi possível publicar seu comentário. Tente de novo.",
+  "Could not delete the comment. Please try again.":
+    "Não foi possível excluir o comentário. Tente de novo.",
+  "Could not send the report. Please try again.":
+    "Não foi possível enviar a denúncia. Tente de novo.",
   Shorts: "Shorts",
   Reel: "Reel",
   "Video type": "Tipo de vídeo",

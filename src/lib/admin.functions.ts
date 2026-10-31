@@ -1321,3 +1321,63 @@ export const deletePremiumVideo = createServerFn({ method: "POST" })
     if (error) throw new Error("Não foi possível remover o vídeo.");
     return { ok: true };
   });
+
+/**
+ * Admin → Content → Summary videos: comments on the Premium extra videos
+ * (migration 0103_premium_video_social), reported ones first, so the owner can
+ * delete what does not belong. Until 0103 is applied the list says so.
+ */
+export const getVideoCommentsAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { socialTables, missingSocialTables } = await import("@/lib/premiumVideoSocial.server");
+    const tables = await socialTables();
+    const [comments, reports] = await Promise.all([
+      tables
+        .comments()
+        .select("id, video_id, user_id, author_name, body, created_at")
+        .order("created_at", { ascending: false })
+        .limit(300),
+      tables.reports().select("comment_id, user_id").limit(5000),
+    ]);
+    if (comments.error || reports.error) {
+      if (missingSocialTables(comments.error ?? reports.error))
+        return { missingMigration: true, comments: [] };
+      throw new Error("Não foi possível carregar os comentários.");
+    }
+    const reportsBy = new Map<string, number>();
+    for (const row of reports.data ?? [])
+      reportsBy.set(row.comment_id, (reportsBy.get(row.comment_id) ?? 0) + 1);
+    const ids = [...new Set((comments.data ?? []).map((row) => row.video_id))];
+    const titles = new Map<string, string>();
+    if (ids.length) {
+      const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
+      const videos = await (
+        await premiumVideoTable()
+      ).select("id, level, title, video_url, created_at");
+      for (const video of videos.data ?? [])
+        titles.set(video.id, `${video.level.toUpperCase()} · ${video.title}`);
+    }
+    const list = (comments.data ?? []).map((row) => ({
+      id: row.id,
+      author: row.author_name,
+      body: row.body,
+      createdAt: row.created_at,
+      video: titles.get(row.video_id) ?? "",
+      reports: reportsBy.get(row.id) ?? 0,
+    }));
+    list.sort((a, b) => b.reports - a.reports || b.createdAt.localeCompare(a.createdAt));
+    return { missingMigration: false, comments: list };
+  });
+
+export const deleteVideoCommentAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { socialTables } = await import("@/lib/premiumVideoSocial.server");
+    const { error } = await (await socialTables()).comments().delete().eq("id", data.id);
+    if (error) throw new Error("Não foi possível remover o comentário.");
+    return { ok: true };
+  });

@@ -7,8 +7,10 @@ import {
   Clapperboard,
   Crown,
   Film,
+  Heart,
   Layers,
   Lock,
+  MessageCircle,
   PlayCircle,
   Smartphone,
   X,
@@ -24,7 +26,10 @@ import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { useProfile } from "@/hooks/useProfile";
 import { findLevel, isReviewLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
+import { ShortsFeed } from "@/components/shorts/ShortsFeed";
+import { useVideoSocial } from "@/hooks/useVideoSocial";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
+import type { VideoSocialCounts } from "@/lib/premiumVideoSocial.functions";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { studyToday } from "@/lib/today";
@@ -109,6 +114,11 @@ function ExtraVideosPage() {
     () => levelAll.filter((video) => (video.kind === "short") === (tab === "shorts")),
     [levelAll, tab],
   );
+  // Likes and comments of the level's shorts (migration 0103), and the
+  // full-screen feed opened on the short that was tapped.
+  const shortIds = useMemo(() => levelShorts.map((video) => video.id), [levelShorts]);
+  const social = useVideoSocial(profile?.id, shortIds);
+  const [feedStart, setFeedStart] = useState<number | null>(null);
 
   return (
     <AppShell>
@@ -236,17 +246,33 @@ function ExtraVideosPage() {
 
         {tab === "shorts" && levelVideos.length > 0 ? (
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {levelVideos.map((video) => (
+            {levelVideos.map((video, index) => (
               <ShortCard
                 key={video.id}
                 video={video}
                 premium={premium}
-                open={playing === video.id}
-                onPlay={() => watch(video.id)}
-                onClose={() => setPlaying(null)}
+                counts={social.ready ? social.counts[video.id] : undefined}
+                onOpen={() => {
+                  watch(video.id);
+                  setFeedStart(index);
+                }}
               />
             ))}
           </ul>
+        ) : null}
+
+        {feedStart !== null && tab === "shorts" && premium ? (
+          <ShortsFeed
+            videos={levelVideos.filter((video) => !!video.url)}
+            startIndex={Math.min(feedStart, Math.max(0, levelVideos.length - 1))}
+            social={social}
+            onLike={social.toggleLike}
+            onCommentsChanged={social.refresh}
+            onClose={() => {
+              setFeedStart(null);
+              setPlaying(null);
+            }}
+          />
         ) : null}
 
         {tab === "videos" && levelVideos.length > 0 ? (
@@ -320,82 +346,63 @@ function ExtraVideosPage() {
   );
 }
 
-/** The player of a short: a vertical Vimeo video or an Instagram Reel. */
-function shortPlayerUrl(url: string | null): string | null {
-  if (!url) return null;
-  const reel = reelEmbedUrl(url);
-  if (reel) return reel;
-  const embed = vimeoEmbedUrl(url);
-  return embed ? `${cleanVimeoPlayerUrl(embed)}&autoplay=1` : null;
-}
-
-/** One short in the 9:16 grid: a poster tile until played, then its player. */
+/** One short in the 9:16 grid: tapping it opens the full-screen feed there. */
 function ShortCard({
   video,
   premium,
-  open,
-  onPlay,
-  onClose,
+  counts,
+  onOpen,
 }: {
   video: PremiumVideo;
   premium: boolean;
-  open: boolean;
-  onPlay: () => void;
-  onClose: () => void;
+  counts: VideoSocialCounts | undefined;
+  onOpen: () => void;
 }) {
-  const player = premium ? shortPlayerUrl(video.url) : null;
+  const playable = premium && !!video.url;
   const reel = !!(video.url && reelEmbedUrl(video.url));
   return (
     <li className="card-soft overflow-hidden">
-      <div className="relative aspect-[9/16] bg-black">
-        {open && player ? (
-          <>
-            <iframe
-              className="absolute inset-0 size-full"
-              src={player}
-              title={video.title}
-              referrerPolicy="strict-origin-when-cross-origin"
-              allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write"
-              allowFullScreen
-            />
-            <button
-              type="button"
-              aria-label="Close video"
-              onClick={onClose}
-              className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-black/60 text-white backdrop-blur"
-            >
-              <X className="size-4" />
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            disabled={!player}
-            onClick={onPlay}
-            aria-label={player ? video.title : undefined}
-            className="group absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_50%_35%,rgb(245_158_11/0.18),transparent_65%)] disabled:cursor-default"
-          >
-            <span
-              className={cn(
-                "grid size-14 place-items-center rounded-full border border-white/15 bg-white/10 backdrop-blur transition-transform group-hover:scale-105",
-                !player && "opacity-70",
-              )}
-              aria-hidden="true"
-            >
-              {player ? (
-                <PlayCircle className="size-7 text-warning" />
-              ) : (
-                <Lock className="size-5 text-muted-foreground" />
-              )}
+      <button
+        type="button"
+        disabled={!playable}
+        onClick={onOpen}
+        aria-label={playable ? video.title : undefined}
+        className="group relative block aspect-[9/16] w-full bg-black bg-[radial-gradient(circle_at_50%_35%,rgb(245_158_11/0.18),transparent_65%)] disabled:cursor-default"
+      >
+        <span
+          className={cn(
+            "absolute left-1/2 top-1/2 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-white/10 backdrop-blur transition-transform group-hover:scale-105",
+            !playable && "opacity-70",
+          )}
+          aria-hidden="true"
+        >
+          {playable ? (
+            <PlayCircle className="size-7 text-warning" />
+          ) : (
+            <Lock className="size-5 text-muted-foreground" />
+          )}
+        </span>
+        {reel ? (
+          <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-white/85">
+            Reel
+          </span>
+        ) : null}
+        {counts ? (
+          <span className="absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/70 to-transparent px-3 pb-2 pt-6 text-xs font-semibold text-white/90 tabular-nums">
+            <span className="inline-flex items-center gap-1">
+              <Heart
+                className={cn("size-3.5", counts.liked && "fill-rose-500 text-rose-500")}
+                aria-hidden="true"
+              />
+              {counts.likes}
             </span>
-            {reel ? (
-              <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-white/85">
-                Reel
-              </span>
-            ) : null}
-          </button>
-        )}
-      </div>
+            <span className="inline-flex items-center gap-1">
+              <MessageCircle className="size-3.5" aria-hidden="true" />
+              {counts.comments}
+            </span>
+          </span>
+        ) : null}
+      </button>
       <p
         className="line-clamp-2 px-3 py-2 text-sm font-semibold leading-snug"
         translate="no"

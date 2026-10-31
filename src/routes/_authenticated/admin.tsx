@@ -20,6 +20,7 @@ import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
 import { AdminLevelIntroVideos } from "@/components/AdminLevelIntroVideos";
 import { AdminPremiumVideos } from "@/components/AdminPremiumVideos";
+import { AdminVideoComments } from "@/components/AdminVideoComments";
 import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager";
 import { AdminHomeMedia } from "@/components/AdminHomeMedia";
 import { AdminRecoveryPoints } from "@/components/AdminRecoveryPoints";
@@ -236,6 +237,7 @@ function AdminPage() {
                 <TabsContent value="summary-videos">
                   <AdminLevelIntroVideos />
                   <AdminPremiumVideos />
+                  <AdminVideoComments />
                   <AdminSummaryVideoManager />
                 </TabsContent>
                 <TabsContent value="home">
