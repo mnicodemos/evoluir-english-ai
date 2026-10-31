@@ -37,6 +37,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
+import { ShortsHeaderButton } from "@/components/shorts/ShortsHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
 import { studyDayStartIso, studyToday } from "@/lib/today";
@@ -864,6 +865,8 @@ function Dashboard() {
                           </span>
                         </JewelsPopover>
                       </span>
+                      {/* Shorts right after the jewel (owner request, 2026-10-31). */}
+                      <ShortsHeaderButton userId={profile.id} level={profile.level} translate={t} />
                       {/* Tomato before the weather on phones (user request). */}
                       <FocusHeaderButton translate={t} placement="mobile" />
                       <WeatherTalk translate={t} placement="mobile" />

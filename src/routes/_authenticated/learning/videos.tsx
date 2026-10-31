@@ -15,7 +15,7 @@ import {
   Smartphone,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/PageHeader";
@@ -27,6 +27,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { findLevel, isReviewLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { ShortsFeed } from "@/components/shorts/ShortsFeed";
+import { useShortsShortcut } from "@/hooks/useShortsShortcut";
 import { useVideoSocial } from "@/hooks/useVideoSocial";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { recordVideoView, type VideoSocialCounts } from "@/lib/premiumVideoSocial.functions";
@@ -49,6 +50,10 @@ export const Route = createFileRoute("/_authenticated/learning/videos")({
       },
     ],
   }),
+  // ?feed=shorts (the phone Dashboard's Shorts shortcut) opens the Shorts tab
+  // and, for Premium, the feed at its first short.
+  validateSearch: (search: Record<string, unknown>): { feed?: "shorts" } =>
+    search["feed"] === "shorts" ? { feed: "shorts" } : {},
   component: ExtraVideosPage,
 });
 
@@ -131,6 +136,22 @@ function ExtraVideosPage() {
   const shortIds = useMemo(() => levelShorts.map((video) => video.id), [levelShorts]);
   const social = useVideoSocial(profile?.id, shortIds);
   const [feedStart, setFeedStart] = useState<number | null>(null);
+  // The Shorts shortcut: the Shorts tab of the student's level, and the feed
+  // at once for Premium (once per visit).
+  const search = Route.useSearch();
+  const shortcutApplied = useRef(false);
+  useEffect(() => {
+    if (search.feed !== "shorts" || shortcutApplied.current || !query.data) return;
+    shortcutApplied.current = true;
+    setPickedTab("shorts");
+    if (premium && levelShorts.some((video) => !!video.url)) setFeedStart(0);
+  }, [search.feed, query.data, premium, levelShorts]);
+  // Seeing the Shorts tab of their own level clears the shortcut's dot.
+  const shortsShortcut = useShortsShortcut(profile?.id, profile?.level);
+  const markShortsSeen = shortsShortcut.markSeen;
+  useEffect(() => {
+    if (tab === "shorts" && level === studentLevel && levelShorts.length > 0) markShortsSeen();
+  }, [tab, level, studentLevel, levelShorts.length, markShortsSeen]);
 
   return (
     <AppShell>
