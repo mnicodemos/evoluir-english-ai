@@ -65,7 +65,10 @@ async function userIdOf(client: SupabaseClient): Promise<string> {
   return data.user.id;
 }
 
-d("cross-user data isolation", () => {
+// Each test makes several round trips to the real backend, so the default
+// 5 s per test is too tight on a slow CI network (a timeout there is not a
+// security failure; a wrong answer still fails as before).
+d("cross-user data isolation", { timeout: 30_000 }, () => {
   let a: SupabaseClient;
   let b: SupabaseClient;
   let idA = "";
