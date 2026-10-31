@@ -72,7 +72,18 @@ export async function alertAdmins(supabaseAdmin: SupabaseAdmin) {
   const { alerts } = await loadOpsAlerts(supabaseAdmin);
   const message = adminAlertPush(alerts);
   if (!message) return { sent: 0 };
+  return pushAdmins(supabaseAdmin, message, "admin alert FCM");
+}
 
+/**
+ * One push to every admin's devices (admins decided by user_roles, never by
+ * email). Used by the alerts above and by a reported video comment.
+ */
+export async function pushAdmins(
+  supabaseAdmin: SupabaseAdmin,
+  message: { title: string; body: string; path?: string },
+  logPrefix = "admin push FCM",
+) {
   const { data: admins } = await supabaseAdmin
     .from("user_roles")
     .select("user_id")
@@ -89,7 +100,7 @@ export async function alertAdmins(supabaseAdmin: SupabaseAdmin) {
     .in("user_id", adminIds);
   let sent = 0;
   for (const { token } of tokens ?? []) {
-    const result = await sendFcm(credentials, token, message, "admin alert FCM");
+    const result = await sendFcm(credentials, token, message, logPrefix);
     if (result.ok) sent += 1;
   }
   return { sent };

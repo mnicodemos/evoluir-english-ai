@@ -466,7 +466,10 @@ function CommentsPanel({
   });
   const flag = useMutation({
     mutationFn: (id: string) => report({ data: { id } }),
-    onSuccess: () => toast.success(t("Thanks. The team will review this comment.")),
+    onSuccess: async () => {
+      toast.success(t("Thanks. The team will review this comment."));
+      await refresh();
+    },
     onError: fail,
   });
 

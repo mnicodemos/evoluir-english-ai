@@ -1,10 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Flag, Loader2, MessageCircle, Trash2 } from "lucide-react";
+import { Check, EyeOff, Flag, Loader2, MessageCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { deleteVideoCommentAdmin, getVideoCommentsAdmin } from "@/lib/admin.functions";
+import {
+  deleteVideoCommentAdmin,
+  getVideoCommentsAdmin,
+  keepVideoCommentAdmin,
+} from "@/lib/admin.functions";
+import { HIDE_AFTER_REPORTS, hiddenByReports } from "@/lib/premiumVideoSocial";
 
 /**
  * Admin → Conteúdo: comments on the Premium extra videos (migration 0103),
@@ -14,6 +19,7 @@ export function AdminVideoComments() {
   const queryClient = useQueryClient();
   const fetchComments = useServerFn(getVideoCommentsAdmin);
   const remove = useServerFn(deleteVideoCommentAdmin);
+  const keep = useServerFn(keepVideoCommentAdmin);
   const query = useQuery({
     queryKey: ["admin-video-comments"],
     queryFn: () => fetchComments(),
@@ -28,6 +34,17 @@ export function AdminVideoComments() {
     },
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "Não foi possível remover."),
+  });
+  const keepMutation = useMutation({
+    mutationFn: (id: string) => keep({ data: { id } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-video-comments"] });
+      await queryClient.invalidateQueries({ queryKey: ["video-comments"] });
+      await queryClient.invalidateQueries({ queryKey: ["video-social"] });
+      toast.success("Comentário mantido: as denúncias foram limpas.");
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Não foi possível manter."),
   });
   const comments = query.data?.comments ?? [];
   const reported = comments.filter((comment) => comment.reports > 0).length;
@@ -48,9 +65,10 @@ export function AdminVideoComments() {
             ) : null}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Os comentários aparecem na hora para os alunos Premium. Os denunciados vêm primeiro;
-            remova o que não estiver de acordo. Os alunos só veem o primeiro nome e a inicial, e
-            links ou contatos são bloqueados.
+            Os comentários aparecem na hora para os alunos Premium. Na primeira denúncia você recebe
+            um push; com {HIDE_AFTER_REPORTS} denúncias o comentário fica oculto até você decidir:
+            "Manter" limpa as denúncias e o devolve, a lixeira remove. Os alunos só veem o primeiro
+            nome e a inicial, e links ou contatos são bloqueados.
           </p>
         </div>
       </div>
@@ -86,21 +104,40 @@ export function AdminVideoComments() {
                       <Flag className="size-3" /> {comment.reports}
                     </span>
                   ) : null}
+                  {hiddenByReports(comment.reports) ? (
+                    <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-destructive/15 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
+                      <EyeOff className="size-3" /> Oculto
+                    </span>
+                  ) : null}
                 </span>
                 <span className="block break-words">{comment.body}</span>
               </span>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8 justify-self-start text-destructive hover:text-destructive sm:justify-self-end"
-                disabled={deleteMutation.isPending}
-                aria-label="Remover comentário"
-                onClick={() => {
-                  if (window.confirm("Remover este comentário?")) deleteMutation.mutate(comment.id);
-                }}
-              >
-                <Trash2 className="size-4" />
-              </Button>
+              <span className="flex items-center gap-1 justify-self-start sm:justify-self-end">
+                {comment.reports ? (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 gap-1"
+                    disabled={keepMutation.isPending}
+                    onClick={() => keepMutation.mutate(comment.id)}
+                  >
+                    <Check className="size-4" /> Manter
+                  </Button>
+                ) : null}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 text-destructive hover:text-destructive"
+                  disabled={deleteMutation.isPending}
+                  aria-label="Remover comentário"
+                  onClick={() => {
+                    if (window.confirm("Remover este comentário?"))
+                      deleteMutation.mutate(comment.id);
+                  }}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </span>
             </li>
           ))}
         </ul>

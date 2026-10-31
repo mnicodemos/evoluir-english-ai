@@ -41,3 +41,24 @@ export function checkComment(input: string): CommentCheck {
   if (CONTACT.test(body)) return { ok: false, reason: "Comments cannot have contact details." };
   return { ok: true, body };
 }
+
+/**
+ * Moderation (owner request, 2026-10-31): a comment reported by this many
+ * students is hidden from everyone but its author until the owner keeps it
+ * (clearing its reports) or deletes it in the Admin.
+ */
+export const HIDE_AFTER_REPORTS = 3;
+
+export function hiddenByReports(reports: number): boolean {
+  return reports >= HIDE_AFTER_REPORTS;
+}
+
+/** The admins' push for a comment's first report: who, which video and the start of it. */
+export function reportedCommentPush(comment: { author: string; body: string }, video: string) {
+  const excerpt = comment.body.length > 80 ? `${comment.body.slice(0, 79)}…` : comment.body;
+  return {
+    title: "🚩 Comentário denunciado",
+    body: `${comment.author}${video ? ` em "${video}"` : ""}: ${excerpt}`,
+    path: "/admin",
+  };
+}

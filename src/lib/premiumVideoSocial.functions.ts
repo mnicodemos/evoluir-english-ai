@@ -7,6 +7,8 @@ import {
   commentAuthorName,
   COMMENTS_PAGE,
   COMMENTS_PER_HOUR,
+  hiddenByReports,
+  reportedCommentPush,
 } from "@/lib/premiumVideoSocial";
 
 /**
@@ -40,7 +42,7 @@ export const loadVideoSocial = createServerFn({ method: "POST" })
     const tables = await socialTables();
     const [likes, comments] = await Promise.all([
       tables.likes().select("video_id, user_id").in("video_id", data.videoIds).limit(20000),
-      tables.comments().select("video_id").in("video_id", data.videoIds).limit(20000),
+      tables.comments().select("id, video_id").in("video_id", data.videoIds).limit(20000),
     ]);
     if (likes.error || comments.error) {
       const missing = missingSocialTables(likes.error) || missingSocialTables(comments.error);
@@ -56,9 +58,12 @@ export const loadVideoSocial = createServerFn({ method: "POST" })
       entry.likes += 1;
       if (row.user_id === context.userId) entry.liked = true;
     }
-    for (const row of (comments.data ?? []) as { video_id: string }[]) {
+    // A comment hidden by reports is not counted (moderation).
+    const commentRows = (comments.data ?? []) as { id: string; video_id: string }[];
+    const reports = await reportCounts(commentRows.map((row) => row.id));
+    for (const row of commentRows) {
       const entry = counts[row.video_id];
-      if (entry) entry.comments += 1;
+      if (entry && !hiddenByReports(reports.get(row.id) ?? 0)) entry.comments += 1;
     }
     return { ready: true, counts };
   });
@@ -72,6 +77,31 @@ async function requireVideo(videoId: string) {
   const { socialTables } = await import("@/lib/premiumVideoSocial.server");
   const { data, error } = await (await socialTables()).videos().select("id").eq("id", videoId);
   if (error || !data?.length) throw new Error("This video is no longer available.");
+}
+
+/**
+ * How many students reported each of these comments (missing ids: none), and
+ * which of them this student reported.
+ */
+async function reportCounts(
+  commentIds: string[],
+  userId?: string,
+): Promise<Map<string, number> & { byMe: Set<string> }> {
+  const counts = Object.assign(new Map<string, number>(), { byMe: new Set<string>() });
+  if (commentIds.length === 0) return counts;
+  const { socialTables } = await import("@/lib/premiumVideoSocial.server");
+  const { data } = await (
+    await socialTables()
+  )
+    .reports()
+    .select("comment_id, user_id")
+    .in("comment_id", commentIds)
+    .limit(20000);
+  for (const row of data ?? []) {
+    counts.set(row.comment_id, (counts.get(row.comment_id) ?? 0) + 1);
+    if (userId && row.user_id === userId) counts.byMe.add(row.comment_id);
+  }
+  return counts;
 }
 
 export const toggleVideoLike = createServerFn({ method: "POST" })
@@ -122,8 +152,19 @@ export const loadVideoComments = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(COMMENTS_PAGE);
     if (error) throw new Error("Could not load the comments. Please try again.");
+    // A comment hidden by reports stays visible only to its author, and one
+    // this student reported leaves their list at once.
+    const reports = await reportCounts(
+      (rows ?? []).map((row) => row.id),
+      context.userId,
+    );
+    const visible = (rows ?? []).filter(
+      (row) =>
+        row.user_id === context.userId ||
+        (!hiddenByReports(reports.get(row.id) ?? 0) && !reports.byMe.has(row.id)),
+    );
     return {
-      comments: (rows ?? []).map((row) => ({
+      comments: visible.map((row) => ({
         id: row.id,
         author: row.author_name,
         body: row.body,
@@ -202,6 +243,17 @@ export const reportVideoComment = createServerFn({ method: "POST" })
       console.error(`Video comment report failed: ${error.code ?? ""} ${error.message}`);
       throw new Error("Could not send the report. Please try again.");
     }
+    // The comment's first report tells the admins at once (one push).
+    if (!error) {
+      try {
+        const reports = await reportCounts([data.id]);
+        if ((reports.get(data.id) ?? 0) === 1) await pushReportToAdmins(data.id);
+      } catch (pushError) {
+        console.error(
+          `Reported comment push failed: ${pushError instanceof Error ? pushError.message : ""}`,
+        );
+      }
+    }
     return { ok: true };
   });
 
@@ -231,3 +283,29 @@ export const recordVideoView = createServerFn({ method: "POST" })
     }
     return { recorded: true };
   });
+
+async function pushReportToAdmins(commentId: string) {
+  const { socialTables } = await import("@/lib/premiumVideoSocial.server");
+  const tables = await socialTables();
+  const { data: comments } = await tables
+    .comments()
+    .select("id, video_id, user_id, author_name, body, created_at")
+    .eq("id", commentId);
+  const comment = comments?.[0];
+  if (!comment) return;
+  const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
+  const { data: videos } = await (
+    await premiumVideoTable()
+  ).select("id, level, title, video_url, created_at");
+  const video = (videos ?? []).find((row) => row.id === comment.video_id);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { pushAdmins } = await import("@/lib/opsAlerts.server");
+  await pushAdmins(
+    supabaseAdmin,
+    reportedCommentPush(
+      { author: comment.author_name, body: comment.body },
+      video ? `${video.level.toUpperCase()} · ${video.title}` : "",
+    ),
+    "reported comment FCM",
+  );
+}

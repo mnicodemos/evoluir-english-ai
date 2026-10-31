@@ -1391,3 +1391,15 @@ export const getFeatureUsage = createServerFn({ method: "GET" })
     const { loadFeatureUsage } = await import("@/lib/productMetrics.server");
     return { rows: await loadFeatureUsage(supabaseAdmin) };
   });
+
+/** The owner keeps a reported comment: its reports are cleared and it shows again. */
+export const keepVideoCommentAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { socialTables } = await import("@/lib/premiumVideoSocial.server");
+    const { error } = await (await socialTables()).reports().delete().eq("comment_id", data.id);
+    if (error) throw new Error("Não foi possível manter o comentário.");
+    return { ok: true };
+  });

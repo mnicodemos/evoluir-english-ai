@@ -31,3 +31,23 @@ describe("video comments", () => {
     expect(checkComment("I watched it 3 times, 10/10").ok).toBe(true);
   });
 });
+
+describe("comment moderation", () => {
+  it("hides a comment from its third report", async () => {
+    const { hiddenByReports } = await import("./premiumVideoSocial");
+    expect(hiddenByReports(2)).toBe(false);
+    expect(hiddenByReports(3)).toBe(true);
+  });
+
+  it("writes the admins' push with a short excerpt", async () => {
+    const { reportedCommentPush } = await import("./premiumVideoSocial");
+    const push = reportedCommentPush(
+      { author: "Ana S.", body: "x".repeat(120) },
+      "A2 · Phrasal verbs",
+    );
+    expect(push.title).toContain("denunciado");
+    expect(push.body.startsWith('Ana S. em "A2 · Phrasal verbs": ')).toBe(true);
+    expect(push.body.endsWith("…")).toBe(true);
+    expect(push.path).toBe("/admin");
+  });
+});
