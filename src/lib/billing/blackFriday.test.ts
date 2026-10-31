@@ -48,6 +48,9 @@ describe("Black Friday warm-up and pushes", () => {
     expect(blackFridayPhase(new Date("2026-11-02T03:00:00Z"))).toBe("warmup");
     expect(daysUntilBlackFriday(new Date("2026-11-02T12:00:00Z"))).toBe(21);
     expect(daysUntilBlackFriday(new Date("2026-11-22T23:00:00Z"))).toBe(1);
+    // The warm-up runs through Sunday 22/11, right up to the offer.
+    expect(blackFridayPhase(new Date("2026-11-22T23:00:00Z"))).toBe("warmup");
+    expect(blackFridayPhase(new Date("2026-11-23T03:00:00Z"))).toBe("live");
     expect(blackFridayPhase(during)).toBe("live");
     expect(blackFridayPhase(after)).toBeNull();
   });

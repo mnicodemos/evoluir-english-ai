@@ -22,10 +22,12 @@ export const BLACK_FRIDAY = {
   discountMonths: 3,
   monthlyTrialDays: 15,
   /**
-   * Warm-up before the start: 21 days, from Monday 02/11 (owner decision,
-   * 2026-10-31; was 14 days from 09/11).
+   * Warm-up (owner decision, 2026-10-31): Monday 02/11 through Sunday 22/11,
+   * São Paulo, right up to the offer.
    */
-  warmupDays: 21,
+  warmupStartsAt: "2026-11-02T03:00:00Z",
+  /** Exclusive: the warm-up's last day is 22/11, the eve of the offer. */
+  warmupEndsAt: "2026-11-23T03:00:00Z",
   /** Stripe coupon, created on first use (ensureBlackFridayCoupon). */
   couponId: "EVOLUIR_BF2026_MONTHLY30X3",
 } as const;
@@ -53,9 +55,7 @@ function saoPauloDay(time: number): string {
 export const BLACK_FRIDAY_FIRST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.startsAt));
 export const BLACK_FRIDAY_LAST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.endsAt) - 1);
 /** The first day of the warm-up, in São Paulo (02/11 with the current dates). */
-export const BLACK_FRIDAY_WARMUP_FIRST_DAY = saoPauloDay(
-  Date.parse(BLACK_FRIDAY.startsAt) - BLACK_FRIDAY.warmupDays * 24 * 60 * 60 * 1000,
-);
+export const BLACK_FRIDAY_WARMUP_FIRST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.warmupStartsAt));
 
 /** A São Paulo day as DD/MM. */
 export function dayMonth(day: string): string {
@@ -68,9 +68,12 @@ export function dayMonth(day: string): string {
  */
 export function blackFridayPhase(now: Date = new Date()): "warmup" | "live" | null {
   const time = now.getTime();
-  const start = Date.parse(BLACK_FRIDAY.startsAt);
   if (blackFridayActive(now)) return "live";
-  if (time < start && time >= start - BLACK_FRIDAY.warmupDays * DAY_MS) return "warmup";
+  if (
+    time >= Date.parse(BLACK_FRIDAY.warmupStartsAt) &&
+    time < Date.parse(BLACK_FRIDAY.warmupEndsAt)
+  )
+    return "warmup";
   return null;
 }
 
