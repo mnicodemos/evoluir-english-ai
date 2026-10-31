@@ -17,6 +17,26 @@ export const loadPremiumVideos = createServerFn({ method: "GET" })
       selectPremiumVideos(),
       hasPremium(context.userId),
     ]);
-    if (error) return { missingMigration: true, premium, videos: [] };
-    return { missingMigration: false, premium, videos: premiumVideoList(data ?? [], premium) };
+    if (error) return { missingMigration: true, premium, watchedToday: false, videos: [] };
+    return {
+      missingMigration: false,
+      premium,
+      watchedToday: premium ? await watchedVideoToday(context.userId) : false,
+      videos: premiumVideoList(data ?? [], premium),
+    };
   });
+
+/** Whether the student played an extra video today (migration 0104; false before it). */
+async function watchedVideoToday(userId: string): Promise<boolean> {
+  const { socialTables } = await import("@/lib/premiumVideoSocial.server");
+  const { studyToday } = await import("@/lib/today");
+  const { data, error } = await (
+    await socialTables()
+  )
+    .views()
+    .select("video_id")
+    .eq("user_id", userId)
+    .eq("day", studyToday())
+    .limit(1);
+  return !error && (data?.length ?? 0) > 0;
+}

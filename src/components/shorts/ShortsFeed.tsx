@@ -38,6 +38,8 @@ type Props = {
   social: { ready: boolean; counts: Record<string, VideoSocialCounts> };
   onLike: (videoId: string) => void;
   onCommentsChanged: () => void;
+  /** Called once for each short that comes on screen (the server records the play). */
+  onView?: (videoId: string) => void;
   onClose: () => void;
 };
 
@@ -55,6 +57,7 @@ export function ShortsFeed({
   social,
   onLike,
   onCommentsChanged,
+  onView,
   onClose,
 }: Props) {
   const { lang } = useUiLang();
@@ -84,6 +87,15 @@ export function ShortsFeed({
     for (const child of Array.from(root.children)) observer.observe(child);
     return () => observer.disconnect();
   }, [videos.length]);
+
+  // Each short that comes on screen counts as watched once.
+  const viewed = useRef(new Set<string>());
+  useEffect(() => {
+    const id = videos[active]?.id;
+    if (!id || viewed.current.has(id)) return;
+    viewed.current.add(id);
+    onView?.(id);
+  }, [active, videos, onView]);
 
   const go = useCallback(
     (step: number) => {

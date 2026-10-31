@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 
-import { getLandingFunnel, getRetention } from "@/lib/admin.functions";
+import { getFeatureUsage, getLandingFunnel, getRetention } from "@/lib/admin.functions";
 import type { LandingFunnel } from "@/lib/landingStats";
 import type { Rate } from "@/lib/retention";
 
@@ -98,6 +98,63 @@ function LandingFunnelPanel() {
 }
 
 /**
+ * "Uso dos recursos" (featureUsage.ts): students and uses of each feature in
+ * 7 and 30 days, admins left out, to decide what to keep and where to invest.
+ */
+function FeatureUsagePanel() {
+  const load = useServerFn(getFeatureUsage);
+  const query = useQuery({ queryKey: ["admin", "feature-usage"], queryFn: () => load() });
+  return (
+    <section className="rounded-xl border border-border p-3">
+      <h3 className="font-display text-sm font-semibold">Uso dos recursos</h3>
+      <p className="text-xs text-muted-foreground">
+        Alunos que usaram cada recurso e quantas vezes, nos últimos 7 e 30 dias (admins fora).
+      </p>
+      {query.isPending ? (
+        <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" /> Carregando
+        </p>
+      ) : query.isError ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Não foi possível carregar o uso dos recursos agora.
+        </p>
+      ) : (
+        <div className="mt-2 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-border text-xs font-semibold uppercase text-muted-foreground">
+                <th className="py-2 pr-3">Recurso</th>
+                <th className="py-2 pr-3 text-right">Alunos 7d</th>
+                <th className="py-2 pr-3 text-right">Usos 7d</th>
+                <th className="py-2 pr-3 text-right">Alunos 30d</th>
+                <th className="py-2 text-right">Usos 30d</th>
+              </tr>
+            </thead>
+            <tbody>
+              {query.data.rows.map((row) => (
+                <tr key={row.id} className="border-b border-border/50 last:border-0">
+                  <td className="py-2 pr-3">
+                    {row.label}
+                    {!row.available ? (
+                      <span className="ml-2 text-[11px] text-warning">migração pendente</span>
+                    ) : null}
+                  </td>
+                  {[row.students7, row.uses7, row.students30, row.uses30].map((value, index) => (
+                    <td key={index} className="py-2 pr-3 text-right tabular-nums last:pr-0">
+                      {row.available ? value : "—"}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/**
  * Admin "Retention" tab: how many students come back the next day and the
  * following weeks after signing up, overall and per signup week.
  */
@@ -131,6 +188,7 @@ export function AdminRetention() {
   return (
     <div className="mt-4 space-y-4">
       <LandingFunnelPanel />
+      <FeatureUsagePanel />
       <div className="grid grid-cols-3 gap-2 text-center">
         {[
           { label: "Ativos hoje", value: report.activeToday },
