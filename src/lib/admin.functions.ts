@@ -1403,3 +1403,73 @@ export const keepVideoCommentAdmin = createServerFn({ method: "POST" })
     if (error) throw new Error("Não foi possível manter o comentário.");
     return { ok: true };
   });
+
+/**
+ * Admin → Conteúdo → "Áudios das lições" (owner request, 2026-10-31: the first
+ * student of a lesson waited for its dialogue to be written): the level's
+ * lessons whose audio tab students see (core lessons; Review I, Review II and
+ * the review Test show none) and whether each dialogue is already written.
+ */
+async function levelPodcastLessons(level: string) {
+  const { getCurriculum } = await import("@/lib/curriculum");
+  return getCurriculum(level).filter(
+    (lesson) => !lesson.isReviewTest && lesson.reviewUnits.length === 0,
+  );
+}
+
+const podcastLevel = z.object({ level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]) });
+
+export const getLevelPodcastStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => podcastLevel.parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { lessonPodcastReady } = await import("@/lib/lessonPodcast.server");
+    const lessons = await levelPodcastLessons(data.level);
+    const ready = await Promise.all(lessons.map((lesson) => lessonPodcastReady(lesson)));
+    return {
+      total: lessons.length,
+      ready: ready.filter(Boolean).length,
+      missing: lessons
+        .filter((_, index) => !ready[index])
+        .map((lesson) => `U${lesson.unit}·L${lesson.position} ${lesson.title}`),
+    };
+  });
+
+/**
+ * Writes the next dialogues still missing in the level, at most two per call
+ * (each takes the AI some seconds); the page calls again until none is left.
+ * An AI refusal (daily limit, busy provider) stops the run with its message.
+ */
+export const prepareLevelPodcasts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => podcastLevel.parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { ensureLessonPodcast, lessonPodcastReady } = await import("@/lib/lessonPodcast.server");
+    const lessons = await levelPodcastLessons(data.level);
+    let generated = 0;
+    const failed: string[] = [];
+    for (const lesson of lessons) {
+      if (generated + failed.length >= 2) break;
+      if (await lessonPodcastReady(lesson)) continue;
+      try {
+        await ensureLessonPodcast(lesson, context.userId);
+        generated += 1;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "erro";
+        failed.push(`U${lesson.unit}·L${lesson.position} ${lesson.title}: ${message}`);
+        // A refusal of the AI usage (limit, busy) would refuse the next ones too.
+        if (/limit|busy|too quickly|one at a time|already running/i.test(message)) break;
+      }
+    }
+    const ready = await Promise.all(lessons.map((lesson) => lessonPodcastReady(lesson)));
+    const readyCount = ready.filter(Boolean).length;
+    return {
+      total: lessons.length,
+      ready: readyCount,
+      generated,
+      failed,
+      done: readyCount === lessons.length,
+    };
+  });

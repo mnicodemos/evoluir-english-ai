@@ -19,6 +19,7 @@ import { AdminCostPerformance } from "@/components/AdminCostPerformance";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
 import { AdminLevelIntroVideos } from "@/components/AdminLevelIntroVideos";
+import { AdminLessonAudioPrep } from "@/components/AdminLessonAudioPrep";
 import { AdminPremiumVideos } from "@/components/AdminPremiumVideos";
 import { AdminVideoComments } from "@/components/AdminVideoComments";
 import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager";
@@ -244,6 +245,7 @@ function AdminPage() {
                   <AdminHomeMedia />
                 </TabsContent>
                 <TabsContent value="lesson-test">
+                  <AdminLessonAudioPrep />
                   <AdminLessonCompare />
                 </TabsContent>
               </FolderTabs>
