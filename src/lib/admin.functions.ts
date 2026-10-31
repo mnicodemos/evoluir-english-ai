@@ -1308,7 +1308,13 @@ export const savePremiumVideo = createServerFn({ method: "POST" })
         "Não foi possível salvar. Confira se a migração 0101_premium_level_videos foi aplicada.",
       );
     }
-    return { ok: true, url };
+    // Each new short notifies the students of its level (owner request, 2026-10-31).
+    if (data.kind === "short") {
+      const { notifyNewShort } = await import("@/lib/newShortPush.server");
+      const push = await notifyNewShort(data.level, data.title);
+      return { ok: true, url, notified: push.sent };
+    }
+    return { ok: true, url, notified: null as number | null };
   });
 
 export const deletePremiumVideo = createServerFn({ method: "POST" })

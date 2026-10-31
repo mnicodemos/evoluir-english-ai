@@ -42,11 +42,15 @@ export function AdminPremiumVideos() {
   };
   const saveMutation = useMutation({
     mutationFn: () => save({ data: { level, url, title: title.trim(), kind } }),
-    onSuccess: async () => {
+    onSuccess: async (result) => {
       await refresh();
       setUrl("");
       setTitle("");
-      toast.success("Vídeo extra salvo.");
+      toast.success(
+        result.notified === null
+          ? "Vídeo extra salvo."
+          : `Short salvo. Notificação enviada a ${result.notified} aparelho(s) de alunos do nível.`,
+      );
     },
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "Não foi possível salvar."),
