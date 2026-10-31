@@ -11,10 +11,12 @@ import { premiumVideoList } from "@/lib/premiumVideos";
 export const loadPremiumVideos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { premiumVideoTable, PREMIUM_VIDEO_COLUMNS } = await import("@/lib/premiumVideos.server");
+    const { selectPremiumVideos } = await import("@/lib/premiumVideos.server");
     const { hasPremium } = await import("@/lib/premium.server");
-    const [table, premium] = await Promise.all([premiumVideoTable(), hasPremium(context.userId)]);
-    const { data, error } = await table.select(PREMIUM_VIDEO_COLUMNS);
+    const [{ data, error }, premium] = await Promise.all([
+      selectPremiumVideos(),
+      hasPremium(context.userId),
+    ]);
     if (error) return { missingMigration: true, premium, videos: [] };
     return { missingMigration: false, premium, videos: premiumVideoList(data ?? [], premium) };
   });

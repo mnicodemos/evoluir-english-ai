@@ -24,6 +24,7 @@ export function AdminPremiumVideos() {
   const [level, setLevel] = useState<(typeof LEVELS)[number]>("a1");
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
+  const [kind, setKind] = useState<"video" | "short">("video");
 
   const query = useQuery({
     queryKey: ["admin-premium-videos"],
@@ -40,7 +41,7 @@ export function AdminPremiumVideos() {
     await queryClient.invalidateQueries({ queryKey: ["premium-videos"] });
   };
   const saveMutation = useMutation({
-    mutationFn: () => save({ data: { level, url, title: title.trim() } }),
+    mutationFn: () => save({ data: { level, url, title: title.trim(), kind } }),
     onSuccess: async () => {
       await refresh();
       setUrl("");
@@ -87,7 +88,13 @@ export function AdminPremiumVideos() {
         </p>
       ) : (
         <>
-          <div className="grid gap-2 sm:grid-cols-[6rem_minmax(0,1.2fr)_minmax(0,1fr)_auto]">
+          {query.data && !query.data.kindReady ? (
+            <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
+              Para cadastrar Shorts, aplique a migração <code>0102_premium_video_kind.sql</code>{" "}
+              pelo chat do Lovable. Os vídeos normais funcionam sem ela.
+            </p>
+          ) : null}
+          <div className="grid gap-2 sm:grid-cols-[6rem_7rem_minmax(0,1.2fr)_minmax(0,1fr)_auto]">
             <select
               aria-label="Nível"
               className={field}
@@ -100,12 +107,25 @@ export function AdminPremiumVideos() {
                 </option>
               ))}
             </select>
+            <select
+              aria-label="Tipo"
+              className={field}
+              value={kind}
+              onChange={(event) => setKind(event.target.value as "video" | "short")}
+            >
+              <option value="video">Vídeo</option>
+              <option value="short">Short / Reel</option>
+            </select>
             <input
               type="url"
               value={url}
               onChange={(event) => setUrl(event.target.value)}
-              placeholder="https://vimeo.com/123456789"
-              aria-label="Link do Vimeo"
+              placeholder={
+                kind === "short"
+                  ? "Vimeo ou https://www.instagram.com/reel/…"
+                  : "https://vimeo.com/123456789"
+              }
+              aria-label={kind === "short" ? "Link do Vimeo ou do Reel" : "Link do Vimeo"}
               className={field}
             />
             <input
@@ -132,8 +152,9 @@ export function AdminPremiumVideos() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Os vídeos aparecem na ordem em que foram cadastrados. Para trocar um vídeo, remova e
-            cadastre de novo.
+            Os vídeos aparecem na ordem em que foram cadastrados. Shorts são vídeos verticais
+            (9:16): um vídeo do Vimeo ou um Reel público do Instagram, e ficam na aba "Shorts" da
+            página. Para trocar um vídeo, remova e cadastre de novo.
           </p>
 
           {saved.length === 0 ? (
@@ -146,8 +167,13 @@ export function AdminPremiumVideos() {
                   className="grid gap-2 rounded-lg border border-border/60 p-2 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 >
                   <span className="min-w-0">
-                    <span className="font-semibold">{video.level.toUpperCase()}</span> —{" "}
-                    {video.title}
+                    <span className="font-semibold">{video.level.toUpperCase()}</span>
+                    {video.kind === "short" ? (
+                      <span className="ml-1.5 rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-semibold text-warning">
+                        SHORT
+                      </span>
+                    ) : null}{" "}
+                    — {video.title}
                     <a
                       href={video.url ?? undefined}
                       target="_blank"

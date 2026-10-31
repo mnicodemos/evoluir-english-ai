@@ -43,3 +43,43 @@ describe("premium extra videos (by level)", () => {
     expect(premiumVideoList(rows, true)[0]?.url).toBe("https://vimeo.com/1");
   });
 });
+
+describe("Instagram Reels in the Shorts tab", () => {
+  it("keeps one canonical Reel link", async () => {
+    const { canonicalReelUrl, reelEmbedUrl } = await import("./premiumVideos");
+    expect(canonicalReelUrl("https://www.instagram.com/reel/C1a2B3c4D5e/?igsh=abc")).toBe(
+      "https://www.instagram.com/reel/C1a2B3c4D5e/",
+    );
+    expect(canonicalReelUrl("https://instagram.com/reels/C1a2B3c4D5e")).toBe(
+      "https://www.instagram.com/reel/C1a2B3c4D5e/",
+    );
+    expect(canonicalReelUrl("https://www.instagram.com/evoluir/reel/C1a2B3c4D5e/")).toBe(
+      "https://www.instagram.com/reel/C1a2B3c4D5e/",
+    );
+    expect(reelEmbedUrl("https://www.instagram.com/p/C1a2B3c4D5e/")).toBe(
+      "https://www.instagram.com/reel/C1a2B3c4D5e/embed/",
+    );
+  });
+
+  it("refuses other links", async () => {
+    const { canonicalReelUrl } = await import("./premiumVideos");
+    expect(canonicalReelUrl("https://vimeo.com/123456")).toBeNull();
+    expect(canonicalReelUrl("http://www.instagram.com/reel/C1a2B3c4D5e/")).toBeNull();
+    expect(canonicalReelUrl("https://evil-instagram.com/reel/C1a2B3c4D5e/")).toBeNull();
+    expect(canonicalReelUrl("https://www.instagram.com/evoluir/")).toBeNull();
+  });
+});
+
+describe("video kinds", () => {
+  it("reads a missing kind as a regular video", () => {
+    const base = { level: "a1", title: "T", video_url: "https://vimeo.com/1", created_at: "x" };
+    const list = premiumVideoList(
+      [
+        { ...base, id: "1" },
+        { ...base, id: "2", kind: "short" },
+      ],
+      true,
+    );
+    expect(list.map((video) => video.kind)).toEqual(["video", "short"]);
+  });
+});

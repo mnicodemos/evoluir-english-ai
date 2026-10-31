@@ -2506,6 +2506,11 @@ const baseUiPt: Record<string, string> = {
     "Vídeos curtos que aprofundam as lições da sua trilha.",
   "Extra videos are part of Premium. Subscribe to watch every one of them.":
     "Os vídeos extras fazem parte do Premium. Assine para assistir a todos.",
+  Shorts: "Shorts",
+  Reel: "Reel",
+  "Video type": "Tipo de vídeo",
+  "No shorts here yet. New ones are added over time.":
+    "Ainda não há shorts aqui. Novos são adicionados com o tempo.",
   "No extra videos here yet. New ones are added over time.":
     "Ainda não há vídeos extras aqui. Novos vídeos chegam com o tempo.",
   "Close video": "Fechar vídeo",
