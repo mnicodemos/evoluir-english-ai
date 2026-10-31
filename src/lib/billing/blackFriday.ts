@@ -22,12 +22,12 @@ export const BLACK_FRIDAY = {
   discountMonths: 3,
   monthlyTrialDays: 15,
   /**
-   * Warm-up (owner decision, 2026-10-31): Monday 02/11 through Friday 20/11,
-   * São Paulo; the weekend before the offer (21-22/11) shows nothing.
+   * Warm-up (owner decision, 2026-10-31): Monday 02/11 through Sunday 22/11,
+   * São Paulo, right up to the offer.
    */
   warmupStartsAt: "2026-11-02T03:00:00Z",
-  /** Exclusive: the warm-up's last day is 20/11. */
-  warmupEndsAt: "2026-11-21T03:00:00Z",
+  /** Exclusive: the warm-up's last day is 22/11, the eve of the offer. */
+  warmupEndsAt: "2026-11-23T03:00:00Z",
   /** Stripe coupon, created on first use (ensureBlackFridayCoupon). */
   couponId: "EVOLUIR_BF2026_MONTHLY30X3",
 } as const;
