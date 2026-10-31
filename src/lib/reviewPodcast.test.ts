@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { findCurriculumLesson } from "./curriculum";
 import {
+  afterPodcastLine,
   diagnoseReviewPodcast,
   hasLessonPodcast,
   isChallengeLine,
@@ -12,6 +13,7 @@ import {
   podcastLength,
   reviewOutline,
   reviewPodcastMessages,
+  shadowPauseMs,
 } from "./reviewPodcast";
 
 const line = (
@@ -174,5 +176,22 @@ describe("lesson audio dialogue", () => {
     });
     expect(JSON.stringify(diagnostic)).not.toContain("simple spoken sentence");
     expect(JSON.stringify(diagnostic)).not.toContain("frase de exemplo");
+  });
+});
+
+describe("lesson audio pauses", () => {
+  it("stops on the challenge for Your turn, unless it is the last line", () => {
+    const challenge = { text: "Tell me about you.", mark: "challenge" };
+    expect(afterPodcastLine(challenge, true, false)).toEqual({ kind: "turn" });
+    expect(afterPodcastLine(challenge, true, true)).toEqual({ kind: "turn" });
+    expect(afterPodcastLine(challenge, false, false)).toEqual({ kind: "next" });
+  });
+
+  it("pauses about half a second a word in Repeat after mode", () => {
+    const line = { text: "I usually get up at seven in the morning, before work." };
+    expect(afterPodcastLine(line, true, false)).toEqual({ kind: "next" });
+    expect(afterPodcastLine(line, true, true)).toEqual({ kind: "pause", ms: 11 * 450 });
+    expect(shadowPauseMs("Hi")).toBe(1_800);
+    expect(shadowPauseMs(Array(40).fill("word").join(" "))).toBe(9_000);
   });
 });

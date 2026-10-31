@@ -57,7 +57,57 @@ authenticated("authenticated smoke", () => {
     await expect(page.getByRole("tab", { name: "Flashcards" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Quiz" })).toBeVisible();
     await page.getByRole("tab", { name: "Quiz" }).click();
-    await expect(page.getByRole("tabpanel", { name: "Quiz" })).toBeVisible();
+    const quiz = page.getByRole("tabpanel", { name: "Quiz" });
+    await expect(quiz).toBeVisible();
+    // One question at a time behind numbered tabs, sent with "Finish quiz".
+    await expect(quiz.getByRole("button", { name: /Finish quiz/ })).toBeVisible({
+      timeout: 20_000,
+    });
+  });
+
+  test("lesson search finds a lesson by name and hides the units", async ({ page }) => {
+    await page.goto("/learning", { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: /Your learning path/i })).toBeVisible();
+    // A lesson row of the path (its button is named by the lesson title).
+    const row = page.locator("main li > button[aria-label][title]").first();
+    await expect(row).toBeVisible({ timeout: 20_000 });
+    const title = (await row.getAttribute("aria-label")) ?? "";
+    expect(title.length).toBeGreaterThan(0);
+
+    const search = page.getByRole("searchbox", { name: "Search a lesson by name" });
+    await search.fill(title.toUpperCase());
+    const results = page.getByRole("region", { name: "Search results" });
+    await expect(results.getByRole("button", { name: title, exact: true })).toBeVisible();
+
+    await search.fill("zzqqxx");
+    await expect(results.getByText("No lesson with this name. Try another word.")).toBeVisible();
+
+    await search.fill("");
+    await expect(results).toHaveCount(0);
+    await expect(row).toBeVisible();
+  });
+
+  test("extra videos page has the Videos and Shorts tabs", async ({ page }) => {
+    await page.goto("/learning/videos", { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { level: 1, name: "Extra lesson videos" })).toBeVisible({
+      timeout: 20_000,
+    });
+    const tabs = page.getByRole("tablist", { name: "Video type" });
+    await expect(tabs).toBeVisible({ timeout: 20_000 });
+    const shorts = tabs.getByRole("tab", { name: /^Shorts/ });
+    await shorts.click();
+    await expect(shorts).toHaveAttribute("aria-selected", "true");
+    await expect(tabs.getByRole("tab", { name: /^Videos/ })).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+  });
+
+  test("flashcard review opens", async ({ page }) => {
+    await page.goto("/learning/review", { waitUntil: "domcontentloaded" });
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Your hardest words first" }),
+    ).toBeVisible({ timeout: 20_000 });
   });
 
   test("authenticated pages pass axe and mobile navigation order is correct", async ({
