@@ -20,8 +20,11 @@ type Props = {
 };
 
 const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: STUDY_TIME_ZONE });
-const LABELS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const LABELS_PT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+// Monday to Sunday, like the study plan, the weekly league and the streak
+// protection (owner request, 2026-10-31: Your week started on Monday and this
+// card on Sunday).
+const LABELS_EN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const LABELS_PT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
 /** Weekly frequency strip: one tile per weekday of the current week.
  *  The trophy uses the student's configured weekly frequency, falling back to 7. */
@@ -51,11 +54,11 @@ export function WeeklyFrequency({
   });
   const todayKey = dayFmt.format(new Date());
 
-  // Build the 7 day keys of the current week (Sunday to Saturday) in study time zone.
+  // Build the 7 day keys of the current week (Monday to Sunday) in study time zone.
   const [y, m, d] = todayKey.split("-").map(Number);
   const base = new Date(Date.UTC(y!, (m ?? 1) - 1, d ?? 1));
   const weekStart = new Date(base);
-  weekStart.setUTCDate(base.getUTCDate() - base.getUTCDay());
+  weekStart.setUTCDate(base.getUTCDate() - ((base.getUTCDay() + 6) % 7));
   const weekKeys = Array.from({ length: 7 }, (_, i) => {
     const day = new Date(weekStart);
     day.setUTCDate(weekStart.getUTCDate() + i);

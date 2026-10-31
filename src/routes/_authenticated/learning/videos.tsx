@@ -3,9 +3,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
+  Check,
   Clapperboard,
   Crown,
   Film,
+  Layers,
   Lock,
   PlayCircle,
   Smartphone,
@@ -20,13 +22,17 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { useProfile } from "@/hooks/useProfile";
-import { findLevel } from "@/lib/level";
+import { findLevel, isReviewLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { studyToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
+
+/** The learning path's level chip (src/routes/_authenticated/learning/index.tsx). */
+const LEVEL_CHIP =
+  "inline-flex h-8 items-center gap-1 rounded-full border px-3 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60";
 
 export const Route = createFileRoute("/_authenticated/learning/videos")({
   head: () => ({
@@ -68,8 +74,18 @@ function ExtraVideosPage() {
   const levels = useMemo(() => [...new Set(videos.map((video) => video.level))], [videos]);
   const studentLevel = findLevel(profile?.level).value;
   const [picked, setPicked] = useState<string | null>(null);
-  const level = picked ?? (levels.includes(studentLevel) ? studentLevel : (levels[0] ?? null));
+  const highest = findLevel(profile?.max_level || profile?.level).value;
+  // Level chips as on the learning path (owner request, 2026-10-31): "My level"
+  // first, always, then the other levels that have videos, conquered ones with
+  // a check.
+  const otherLevels = levels.filter((value) => value !== studentLevel);
+  const level = picked ?? (profile ? studentLevel : (levels[0] ?? null));
   const [playing, setPlaying] = useState<string | null>(null);
+  const pickLevel = (value: string) => {
+    setPicked(value);
+    setPickedTab(null);
+    setPlaying(null);
+  };
   // Playing a video closes today's "Watch an extra video" Quick Win on this device.
   const watch = (id: string) => {
     setPlaying(id);
@@ -112,28 +128,47 @@ function ExtraVideosPage() {
           description={<>Short videos that go deeper into the lessons of your path.</>}
           actions={<PremiumBadge />}
         >
-          {levels.length > 1 ? (
-            <nav className="mt-3 flex flex-wrap gap-1.5" aria-label="Levels">
-              {levels.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-current={value === level ? "page" : undefined}
-                  onClick={() => {
-                    setPicked(value);
-                    setPickedTab(null);
-                    setPlaying(null);
-                  }}
-                  className={cn(
-                    "rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
-                    value === level
-                      ? "border-transparent bg-brand-green text-primary-foreground"
-                      : "border-border text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {value.toUpperCase()}
-                </button>
-              ))}
+          {profile && otherLevels.length > 0 ? (
+            <nav className="mt-3 flex flex-wrap items-center gap-1.5" aria-label="Levels">
+              <button
+                type="button"
+                aria-current={level === studentLevel ? "page" : undefined}
+                onClick={() => pickLevel(studentLevel)}
+                className={cn(
+                  LEVEL_CHIP,
+                  level === studentLevel
+                    ? "border-transparent bg-brand-green text-primary-foreground"
+                    : "border-border text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <span>My level</span> · <span>{studentLevel.toUpperCase()}</span>
+              </button>
+              <span className="ml-1.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <Layers className="size-3.5" aria-hidden="true" />
+                <span>Other levels</span>
+              </span>
+              {otherLevels.map((value) => {
+                const active = value === level;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => pickLevel(value)}
+                    className={cn(
+                      LEVEL_CHIP,
+                      active
+                        ? "border-brand-green/60 bg-brand-green/15 text-brand-green"
+                        : "border-brand-green/25 text-brand-green/85 hover:border-brand-green/60 hover:bg-brand-green/10",
+                    )}
+                  >
+                    {isReviewLevel(value, highest) ? (
+                      <Check className="size-3" strokeWidth={3} aria-hidden="true" />
+                    ) : null}
+                    {value.toUpperCase()}
+                  </button>
+                );
+              })}
             </nav>
           ) : null}
         </PageHeader>
