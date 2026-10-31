@@ -10,6 +10,7 @@ import {
   getPremiumVideosAdmin,
   notifyPremiumShort,
   savePremiumVideo,
+  setPremiumVideoKind,
 } from "@/lib/admin.functions";
 import type { NewShortPushResult } from "@/lib/newShortPush";
 import { PREMIUM_VIDEO_LEVELS, premiumVideoList } from "@/lib/premiumVideos";
@@ -30,7 +31,9 @@ export function AdminPremiumVideos() {
   const [level, setLevel] = useState<(typeof LEVELS)[number]>("a1");
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
-  const [kind, setKind] = useState<"video" | "short">("video");
+  // Shorts are what the owner adds most now, so the form starts on them
+  // (owner report, 2026-10-31: a short saved as "Vídeo" sent no push).
+  const [kind, setKind] = useState<"video" | "short">("short");
 
   const query = useQuery({
     queryKey: ["admin-premium-videos"],
@@ -64,6 +67,17 @@ export function AdminPremiumVideos() {
     onSuccess: (push) => showPushResult(push, "Aviso do Short."),
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "Não foi possível notificar."),
+  });
+  const changeKind = useServerFn(setPremiumVideoKind);
+  const kindMutation = useMutation({
+    mutationFn: (input: { id: string; kind: "video" | "short" }) => changeKind({ data: input }),
+    onSuccess: async (result) => {
+      await refresh();
+      if (result.push) showPushResult(result.push, "Agora é Short.");
+      else toast.success("Agora é vídeo.");
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Não foi possível mudar o tipo."),
   });
   const deleteMutation = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
@@ -198,6 +212,27 @@ export function AdminPremiumVideos() {
                     </a>
                   </span>
                   <span className="flex items-center gap-1 justify-self-start sm:justify-self-end">
+                    {query.data?.kindReady ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 text-xs"
+                        disabled={kindMutation.isPending}
+                        title={
+                          video.kind === "short"
+                            ? "Mudar para vídeo comum (aba Videos)"
+                            : "Mudar para Short (aba Shorts) e notificar os alunos do nível"
+                        }
+                        onClick={() =>
+                          kindMutation.mutate({
+                            id: video.id,
+                            kind: video.kind === "short" ? "video" : "short",
+                          })
+                        }
+                      >
+                        {video.kind === "short" ? "Virar vídeo" : "Virar Short"}
+                      </Button>
+                    ) : null}
                     {video.kind === "short" ? (
                       <Button
                         size="sm"

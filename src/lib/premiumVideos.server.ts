@@ -12,6 +12,9 @@ export async function premiumVideoTable() {
     select: (columns: string) => Result<PremiumVideoRow[]>;
     insert: (row: Record<string, unknown>) => Result<null>;
     delete: () => { eq: (column: string, value: string) => Result<null> };
+    update: (row: Record<string, unknown>) => {
+      eq: (column: string, value: string) => Result<null>;
+    };
   };
   return from("premium_level_videos");
 }

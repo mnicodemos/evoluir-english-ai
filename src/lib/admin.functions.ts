@@ -1317,6 +1317,43 @@ export const savePremiumVideo = createServerFn({ method: "POST" })
     return { ok: true, url, push: null };
   });
 
+/**
+ * Turns a saved extra video into a short or back (owner report, 2026-10-31: a
+ * short saved with the type left on "Vídeo" sent no push and had no Notificar).
+ * Becoming a short sends its push, like saving one. An Instagram Reel can only
+ * be a short (migration 0102's check).
+ */
+export const setPremiumVideoKind = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ id: z.string().uuid(), kind: z.enum(["video", "short"]) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { premiumVideoTable, selectPremiumVideos } = await import("@/lib/premiumVideos.server");
+    const { data: videos } = await selectPremiumVideos();
+    const video = (videos ?? []).find((row) => row.id === data.id);
+    if (!video) throw new Error("Vídeo não encontrado.");
+    const { error } = await (
+      await premiumVideoTable()
+    )
+      .update({ kind: data.kind })
+      .eq("id", data.id);
+    if (error) {
+      console.error(
+        `Premium video kind could not be changed: ${error.code ?? ""} ${error.message}`,
+      );
+      throw new Error(
+        data.kind === "video"
+          ? "Não foi possível mudar para vídeo. Um Reel do Instagram só pode ser Short."
+          : "Não foi possível mudar o tipo. Confira se a migração 0102_premium_video_kind foi aplicada.",
+      );
+    }
+    if (data.kind !== "short") return { push: null };
+    const { notifyNewShort } = await import("@/lib/newShortPush.server");
+    return { push: await notifyNewShort(video.level, video.title) };
+  });
+
 /** Sends a short's "new short" push again (Admin → Summary videos, "Notificar"). */
 export const notifyPremiumShort = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
