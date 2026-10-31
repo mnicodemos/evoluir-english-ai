@@ -555,3 +555,31 @@
     }
   }
 }
+
+/* The heart that pops on a short's double tap (ShortsFeed). Tailwind v4's
+   translate utilities use the translate property, so this scale composes
+   with the centring. */
+@keyframes short-like {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1) translateY(-30%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="animate-[short-like"] {
+    animation-duration: 0.01ms !important;
+  }
+}
