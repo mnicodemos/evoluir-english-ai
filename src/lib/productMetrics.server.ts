@@ -252,3 +252,75 @@ export async function loadMistakeReviewReport(supabaseAdmin: SupabaseAdmin) {
   const adminIds = new Set((admins ?? []).map((row) => row.user_id));
   return mistakeReviewReport(rows.filter((row) => !adminIds.has(row.user_id)));
 }
+
+/**
+ * Admin → Retenção "Uso dos recursos" (featureUsage.ts): who used each feature
+ * in the last 30 days, read page by page from the rows each feature leaves.
+ * A table that cannot be read (a migration not applied yet) marks its feature
+ * as unavailable instead of failing the tab.
+ */
+export async function loadFeatureUsage(supabaseAdmin: SupabaseAdmin) {
+  const { featureUsageReport } = await import("@/lib/featureUsage");
+  type FeatureId = import("@/lib/featureUsage").FeatureId;
+  type FeatureEvent = import("@/lib/featureUsage").FeatureEvent;
+  type Filterable = PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }> & {
+    gte: (column: string, value: string) => Filterable;
+    eq: (column: string, value: string) => Filterable;
+    order: (column: string, options: { ascending: boolean }) => Filterable;
+    range: (from: number, to: number) => Filterable;
+  };
+  const from = supabaseAdmin.from.bind(supabaseAdmin) as unknown as (table: string) => {
+    select: (columns: string) => Filterable;
+  };
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const PAGE = 1000;
+  const MAX_ROWS = 50_000;
+  const events: FeatureEvent[] = [];
+  const unavailable = new Set<FeatureId>();
+
+  async function read(
+    feature: FeatureId,
+    table: string,
+    timeColumn: string,
+    extra?: { column: string; value: string },
+  ) {
+    for (let start = 0; start < MAX_ROWS; start += PAGE) {
+      let query = from(table).select(`user_id, ${timeColumn}`).gte(timeColumn, since);
+      if (extra) query = query.eq(extra.column, extra.value);
+      const { data, error } = await query
+        .order(timeColumn, { ascending: true })
+        .range(start, start + PAGE - 1);
+      if (error) {
+        unavailable.add(feature);
+        return;
+      }
+      for (const row of data ?? []) {
+        const userId = row["user_id"];
+        const at = row[timeColumn];
+        if (typeof userId === "string" && typeof at === "string")
+          events.push({ feature, userId, at });
+      }
+      if (!data || data.length < PAGE) return;
+    }
+  }
+
+  const [admins] = await Promise.all([
+    supabaseAdmin.from("user_roles").select("user_id").eq("role", "admin"),
+    read("extra_video", "premium_video_views", "created_at"),
+    read("video_like", "premium_video_likes", "created_at"),
+    read("video_comment", "premium_video_comments", "created_at"),
+    read("lesson_media", "user_lessons", "video_completed_at"),
+    read("flashcards", "user_flashcards", "last_reviewed_at"),
+    read("quiz", "quiz_results", "created_at"),
+    read("daily_reading", "activities", "created_at", {
+      column: "activity_type",
+      value: "daily_reading",
+    }),
+    read("conversation", "activities", "created_at", {
+      column: "activity_type",
+      value: "conversation",
+    }),
+  ]);
+  const adminIds = new Set((admins.data ?? []).map((row) => row.user_id));
+  return featureUsageReport(events, { adminIds, unavailable });
+}

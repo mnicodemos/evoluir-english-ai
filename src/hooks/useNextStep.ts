@@ -67,9 +67,10 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
         day: today,
         premium,
         levelHasVideos,
-        watchedToday,
+        // This device's mark, or a play recorded on the server from any device.
+        watchedToday: watchedToday || !!videos?.watchedToday,
       }),
-    [today, premium, levelHasVideos, watchedToday],
+    [today, premium, levelHasVideos, watchedToday, videos?.watchedToday],
   );
 
   return useQuery({

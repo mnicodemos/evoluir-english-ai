@@ -204,3 +204,30 @@ export const reportVideoComment = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+/**
+ * A Premium student played an extra video or short (migration 0104): one row
+ * per student, video and São Paulo day, so "watched today" follows the student
+ * to every device and the Admin sees which videos are watched. Never fails the
+ * screen: before 0104, or on any error, it answers recorded: false.
+ */
+export const recordVideoView = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ videoId: z.string().uuid() }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { hasPremium } = await import("@/lib/premium.server");
+    if (!(await hasPremium(context.userId))) return { recorded: false };
+    const { socialTables, missingSocialTables } = await import("@/lib/premiumVideoSocial.server");
+    const { studyToday } = await import("@/lib/today");
+    const { error } = await (
+      await socialTables()
+    )
+      .views()
+      .insert({ video_id: data.videoId, user_id: context.userId, day: studyToday() });
+    if (error && error.code !== "23505") {
+      if (!missingSocialTables(error))
+        console.error(`Video view could not be saved: ${error.code ?? ""} ${error.message}`);
+      return { recorded: false };
+    }
+    return { recorded: true };
+  });

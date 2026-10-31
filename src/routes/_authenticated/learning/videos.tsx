@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -29,7 +29,7 @@ import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { ShortsFeed } from "@/components/shorts/ShortsFeed";
 import { useVideoSocial } from "@/hooks/useVideoSocial";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
-import type { VideoSocialCounts } from "@/lib/premiumVideoSocial.functions";
+import { recordVideoView, type VideoSocialCounts } from "@/lib/premiumVideoSocial.functions";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { studyToday } from "@/lib/today";
@@ -91,14 +91,27 @@ function ExtraVideosPage() {
     setPickedTab(null);
     setPlaying(null);
   };
-  // Playing a video closes today's "Watch an extra video" Quick Win on this device.
+  // Playing a video closes today's "Watch an extra video" Quick Win: on this
+  // device at once, and on the server (migration 0104) for every device and the
+  // Admin's numbers. A failed record never stops the video.
+  const queryClient = useQueryClient();
+  const sendView = useServerFn(recordVideoView);
+  const recordView = (id: string) => {
+    void sendView({ data: { videoId: id } })
+      .then((result) => {
+        if (result.recorded)
+          void queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
+      })
+      .catch(() => undefined);
+  };
   const watch = (id: string) => {
     setPlaying(id);
+    recordView(id);
     if (!profile?.id) return;
     try {
       window.localStorage.setItem(extraVideoWatchedKey(profile.id, studyToday()), "1");
     } catch {
-      /* the Quick Win simply stays until tomorrow */
+      /* the server's record still closes the Quick Win */
     }
   };
 
@@ -268,6 +281,7 @@ function ExtraVideosPage() {
             social={social}
             onLike={social.toggleLike}
             onCommentsChanged={social.refresh}
+            onView={recordView}
             onClose={() => {
               setFeedStart(null);
               setPlaying(null);

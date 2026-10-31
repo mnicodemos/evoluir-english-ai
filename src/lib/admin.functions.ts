@@ -1381,3 +1381,13 @@ export const deleteVideoCommentAdmin = createServerFn({ method: "POST" })
     if (error) throw new Error("Não foi possível remover o comentário.");
     return { ok: true };
   });
+
+/** Admin → Retenção "Uso dos recursos": students and uses per feature, 7 and 30 days. */
+export const getFeatureUsage = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { loadFeatureUsage } = await import("@/lib/productMetrics.server");
+    return { rows: await loadFeatureUsage(supabaseAdmin) };
+  });
