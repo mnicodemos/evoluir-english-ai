@@ -50,6 +50,8 @@ async function saveSharedPodcast(key: string, promptHash: string, podcast: Revie
 export async function ensureLessonPodcast(
   plan: CurriculumLesson,
   userId: string,
+  /** Prepared by the owner in the Admin: their own daily AI quota does not apply. */
+  ownerTask = false,
 ): Promise<{ podcast: ReviewPodcast; generated: boolean }> {
   const { hashAiRequest } = await import("./ai-usage.server");
   const messages = lessonPodcastMessages(plan);
@@ -62,6 +64,7 @@ export async function ensureLessonPodcast(
     userId,
     operation: "lesson_generation" as const,
     fast: true,
+    ...(ownerTask ? { ownerTask: true } : {}),
   };
   let raw = await callGateway(messages, true, requestOptions);
   let podcast = parseReviewPodcast(raw);

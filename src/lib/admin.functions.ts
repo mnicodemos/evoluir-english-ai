@@ -1475,7 +1475,7 @@ export const prepareLevelPodcasts = createServerFn({ method: "POST" })
       if (generated + failed.length >= 2) break;
       if (await lessonPodcastReady(lesson)) continue;
       try {
-        await ensureLessonPodcast(lesson, context.userId);
+        await ensureLessonPodcast(lesson, context.userId, true);
         generated += 1;
       } catch (error) {
         const message = error instanceof Error ? error.message : "erro";

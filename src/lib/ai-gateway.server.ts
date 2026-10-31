@@ -30,6 +30,13 @@ export async function callGateway(
     fast?: boolean;
     /** Cap on the answer length, in tokens. */
     maxOutputTokens?: number;
+    /**
+     * An Admin task run for every student (preparing a level's lesson audio):
+     * the owner's own daily and monthly quota does not apply, while the call
+     * is still reserved, recorded and priced, and the one-at-a-time and
+     * interval rules stay.
+     */
+    ownerTask?: boolean;
   },
   callerSignal?: AbortSignal,
 ): Promise<string> {
@@ -63,7 +70,7 @@ export async function callGateway(
           ...usage,
           model: GEMINI_TEXT_MODEL,
           requestHash,
-          limit: limitRow,
+          limit: usage.ownerTask ? ownerTaskLimit(limitRow) : limitRow,
           abandonedReleased: true,
         })
       : null;
@@ -155,4 +162,24 @@ export function parseJson<T>(raw: string, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+/** The operation's limits without the per-person daily and monthly quota (ownerTask). */
+const OWNER_TASK_QUOTA = 100_000;
+function ownerTaskLimit<
+  T extends {
+    daily_limit: number;
+    monthly_limit: number;
+    premium_daily_limit: number;
+    premium_monthly_limit: number;
+  },
+>(limit: T | null): T | null {
+  if (!limit) return limit;
+  return {
+    ...limit,
+    daily_limit: OWNER_TASK_QUOTA,
+    monthly_limit: OWNER_TASK_QUOTA,
+    premium_daily_limit: OWNER_TASK_QUOTA,
+    premium_monthly_limit: OWNER_TASK_QUOTA,
+  };
 }
