@@ -867,9 +867,10 @@ function Dashboard() {
                       </span>
                       {/* Shorts right after the jewel (owner request, 2026-10-31). */}
                       <ShortsHeaderButton userId={profile.id} level={profile.level} translate={t} />
-                      {/* Weather before the tomato on phones (owner request, 2026-10-31). */}
-                      <WeatherTalk translate={t} placement="mobile" />
+                      {/* Tomato before the weather on phones (user request; the swap
+                        of 2026-10-31 was reverted by the owner). */}
                       <FocusHeaderButton translate={t} placement="mobile" />
+                      <WeatherTalk translate={t} placement="mobile" />
                       <DashboardNotifications
                         indicators={indicators}
                         reviewCount={reviewCount}
