@@ -1,4 +1,4 @@
-import { newShortPush } from "@/lib/newShortPush";
+import { newShortPush, type NewShortPushResult } from "@/lib/newShortPush";
 
 /**
  * Sends the "new short" push to every student of the level with a device
@@ -7,11 +7,18 @@ import { newShortPush } from "@/lib/newShortPush";
  * stale are removed, as the daily push does. Never throws: the short is
  * already saved, so a failed push is only logged.
  */
-export async function notifyNewShort(level: string, videoTitle: string) {
+export async function notifyNewShort(
+  level: string,
+  videoTitle: string,
+): Promise<NewShortPushResult> {
+  const empty = { students: 0, devices: 0, sent: 0 };
   try {
     const { fcmCredentials, sendFcm } = await import("@/lib/fcm.server");
     const credentials = fcmCredentials();
-    if (!credentials) return { devices: 0, sent: 0 };
+    if (!credentials) {
+      console.error("New short push skipped: FCM credentials are missing");
+      return { ...empty, problem: "as credenciais do Firebase (FCM) não estão configuradas" };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { profileIsPremium } = await import("@/lib/billing/subscriptionView");
 
@@ -52,9 +59,12 @@ export async function notifyNewShort(level: string, videoTitle: string) {
     };
     await Promise.all(Array.from({ length: Math.min(6, tokens.length) }, worker));
     if (stale.length) await supabaseAdmin.from("push_tokens").delete().in("token", stale);
-    return { devices: tokens.length, sent };
+    if (tokens.length > 0 && sent === 0)
+      console.error(`New short push reached no device (${tokens.length} tried)`);
+    return { students: ids.length, devices: tokens.length, sent, problem: null };
   } catch (error) {
-    console.error(`New short push failed: ${error instanceof Error ? error.message : ""}`);
-    return { devices: 0, sent: 0 };
+    const message = error instanceof Error ? error.message : "";
+    console.error(`New short push failed: ${message}`);
+    return { ...empty, problem: `erro ao enviar (${message.slice(0, 120)})` };
   }
 }
