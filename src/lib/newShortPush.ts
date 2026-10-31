@@ -15,3 +15,11 @@ export function newShortPush(videoTitle: string, premium: boolean) {
     path: NEW_SHORT_PATH,
   };
 }
+
+export type NewShortPushResult = {
+  students: number;
+  devices: number;
+  sent: number;
+  /** Why nothing could be sent, in the Admin's language; null when it ran. */
+  problem: string | null;
+};

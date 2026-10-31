@@ -1,11 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Crown, Loader2, Save, Trash2 } from "lucide-react";
+import { Bell, Crown, Loader2, Save, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { deletePremiumVideo, getPremiumVideosAdmin, savePremiumVideo } from "@/lib/admin.functions";
+import {
+  deletePremiumVideo,
+  getPremiumVideosAdmin,
+  notifyPremiumShort,
+  savePremiumVideo,
+} from "@/lib/admin.functions";
+import type { NewShortPushResult } from "@/lib/newShortPush";
 import { PREMIUM_VIDEO_LEVELS, premiumVideoList } from "@/lib/premiumVideos";
 
 const LEVELS = PREMIUM_VIDEO_LEVELS;
@@ -46,14 +52,18 @@ export function AdminPremiumVideos() {
       await refresh();
       setUrl("");
       setTitle("");
-      toast.success(
-        result.notified === null
-          ? "Vídeo extra salvo."
-          : `Short salvo. Notificação enviada a ${result.notified} aparelho(s) de alunos do nível.`,
-      );
+      if (!result.push) toast.success("Vídeo extra salvo.");
+      else showPushResult(result.push, "Short salvo.");
     },
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "Não foi possível salvar."),
+  });
+  const notify = useServerFn(notifyPremiumShort);
+  const notifyMutation = useMutation({
+    mutationFn: (id: string) => notify({ data: { id } }),
+    onSuccess: (push) => showPushResult(push, "Aviso do Short."),
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Não foi possível notificar."),
   });
   const deleteMutation = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
@@ -187,19 +197,35 @@ export function AdminPremiumVideos() {
                       {video.url}
                     </a>
                   </span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 justify-self-start text-destructive hover:text-destructive sm:justify-self-end"
-                    disabled={deleteMutation.isPending}
-                    aria-label={`Remover vídeo extra: ${video.title}`}
-                    onClick={() => {
-                      if (window.confirm(`Remover o vídeo extra "${video.title}"?`))
-                        deleteMutation.mutate(video.id);
-                    }}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <span className="flex items-center gap-1 justify-self-start sm:justify-self-end">
+                    {video.kind === "short" ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 gap-1.5"
+                        disabled={notifyMutation.isPending}
+                        aria-label={`Notificar os alunos do nível: ${video.title}`}
+                        title="Enviar a notificação deste Short aos alunos do nível"
+                        onClick={() => notifyMutation.mutate(video.id)}
+                      >
+                        <Bell className="size-4" />
+                        Notificar
+                      </Button>
+                    ) : null}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 text-destructive hover:text-destructive"
+                      disabled={deleteMutation.isPending}
+                      aria-label={`Remover vídeo extra: ${video.title}`}
+                      onClick={() => {
+                        if (window.confirm(`Remover o vídeo extra "${video.title}"?`))
+                          deleteMutation.mutate(video.id);
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </span>
                 </li>
               ))}
             </ul>
@@ -208,4 +234,19 @@ export function AdminPremiumVideos() {
       )}
     </section>
   );
+}
+
+/** What happened to a short's push, so the owner sees why nobody got it. */
+function showPushResult(push: NewShortPushResult, prefix: string) {
+  if (push.problem) toast.error(`${prefix} Notificação não enviada: ${push.problem}.`);
+  else if (push.students === 0)
+    toast.warning(`${prefix} Nenhum aluno está neste nível, então ninguém foi notificado.`);
+  else if (push.devices === 0)
+    toast.warning(
+      `${prefix} ${push.students} aluno(s) no nível, mas nenhum ativou as notificações no aparelho.`,
+    );
+  else
+    toast.success(
+      `${prefix} Notificação enviada a ${push.sent} de ${push.devices} aparelho(s) (${push.students} aluno(s) do nível).`,
+    );
 }

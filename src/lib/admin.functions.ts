@@ -1312,9 +1312,24 @@ export const savePremiumVideo = createServerFn({ method: "POST" })
     if (data.kind === "short") {
       const { notifyNewShort } = await import("@/lib/newShortPush.server");
       const push = await notifyNewShort(data.level, data.title);
-      return { ok: true, url, notified: push.sent };
+      return { ok: true, url, push };
     }
-    return { ok: true, url, notified: null as number | null };
+    return { ok: true, url, push: null };
+  });
+
+/** Sends a short's "new short" push again (Admin → Summary videos, "Notificar"). */
+export const notifyPremiumShort = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { selectPremiumVideos } = await import("@/lib/premiumVideos.server");
+    const { data: videos } = await selectPremiumVideos();
+    const video = (videos ?? []).find((row) => row.id === data.id);
+    if (!video) throw new Error("Vídeo não encontrado.");
+    if (video.kind !== "short") throw new Error("Só Shorts enviam notificação.");
+    const { notifyNewShort } = await import("@/lib/newShortPush.server");
+    return notifyNewShort(video.level, video.title);
   });
 
 export const deletePremiumVideo = createServerFn({ method: "POST" })
