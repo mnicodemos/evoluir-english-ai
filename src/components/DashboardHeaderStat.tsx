@@ -124,7 +124,11 @@ export function DashboardHeaderStat({
   if (!to)
     return (
       <div
-        className={cn(cell, opens && "group transition-colors hover:bg-foreground/[0.03]")}
+        className={cn(
+          cell,
+          opens &&
+            "group transition-[color,background-color,box-shadow] hover:bg-foreground/[0.03] hover:ring-1 hover:ring-inset hover:ring-white/20",
+        )}
         title={hint}
       >
         {body}
@@ -137,7 +141,9 @@ export function DashboardHeaderStat({
       title={hint}
       className={cn(
         cell,
-        "group transition-colors hover:bg-foreground/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-green/60",
+        // The whole cell is the button (owner request, 2026-11-01): a thin ring on
+        // hover, like Keep improving's rows, and the focus ring around the cell.
+        "group transition-[color,background-color,box-shadow] hover:bg-foreground/[0.03] hover:ring-1 hover:ring-inset hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-green/60",
       )}
     >
       {body}
