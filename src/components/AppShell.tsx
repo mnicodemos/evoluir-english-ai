@@ -599,7 +599,7 @@ function AppShellContent({
             !dashboardLayout && "flex-1",
             desktopOneScreen && "xl:flex xl:min-h-0 xl:flex-col",
             dashboardLayout &&
-              "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-[5px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
+              "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-[5px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:flex xl:flex-1 xl:flex-col xl:px-5 xl:py-2",
           )}
         >
           {children}
