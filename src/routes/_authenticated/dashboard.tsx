@@ -799,7 +799,7 @@ function Dashboard() {
             lang={lang === "pt" ? "pt" : "en"}
             translate={t}
           />
-          <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(16.45rem,min-content)_minmax(min-content,1fr)_minmax(7.59rem,auto)] xl:gap-5 xl:pb-3">
+          <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3">
             <header className="animate-rise min-w-0 xl:h-16">
               <EvoDailyReflection
                 userId={profile.id}
@@ -954,7 +954,7 @@ function Dashboard() {
               </div>
             </div>
 
-            <div className="order-2 flex min-h-0 min-w-0 flex-1 flex-col gap-[5px] lg:order-none lg:grid lg:grid-cols-12 lg:gap-3 xl:[min-height:auto]">
+            <div className="order-2 flex min-h-0 min-w-0 flex-1 flex-col gap-[5px] lg:order-none lg:grid lg:grid-cols-12 lg:gap-3 xl:min-h-[17.5rem]">
               <section className="flex min-h-0 min-w-0 flex-1 flex-col lg:col-span-9 lg:block xl:h-full">
                 <NextStepCard compact />
               </section>
@@ -1161,7 +1161,7 @@ function Dashboard() {
 function DashboardSkeleton() {
   return (
     <div
-      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(16.45rem,min-content)_minmax(min-content,1fr)_minmax(7.59rem,auto)] xl:gap-5 xl:pb-3"
+      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3"
       aria-busy="true"
     >
       <div className="flex min-w-0 items-center justify-between gap-3 xl:h-16">
@@ -1185,8 +1185,8 @@ function DashboardSkeleton() {
         <Skeleton className="hidden min-h-[12rem] rounded-xl lg:col-span-3 lg:block xl:h-full" />
       </div>
       <div className="hidden min-w-0 gap-3 lg:grid lg:grid-cols-12">
-        <Skeleton className="min-h-[7.59rem] rounded-xl lg:col-span-8" />
-        <Skeleton className="min-h-[7.59rem] rounded-xl lg:col-span-4" />
+        <Skeleton className="min-h-[6.5rem] rounded-xl lg:col-span-8" />
+        <Skeleton className="min-h-[6.5rem] rounded-xl lg:col-span-4" />
       </div>
     </div>
   );
