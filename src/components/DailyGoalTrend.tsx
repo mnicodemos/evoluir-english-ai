@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { useTodayActivities } from "@/components/DailyGoalCard";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { dailyGoalTrend, GOAL_TREND_DAYS, trendDayStart } from "@/lib/dailyGoalTrend";
 import { countsAsLearningMinutes, LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
@@ -8,9 +9,10 @@ import { countsAsLearningMinutes, LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay
 /**
  * The daily goal over the last seven days, under Today's Progress on desktop
  * (owner request, 2026-11-01: the taller card left an empty band there). One
- * line of the share of the minutes goal reached each day, the average beside
- * the title, today as the solid last dot (live, from Today's Progress' own
- * query). Earlier days are read once a minute.
+ * evolution bar of the average share of the minutes goal reached over the last
+ * seven days, every activity that counts minutes included (owner review, the
+ * same day: a bar instead of a line), today live from Today's Progress' own
+ * query. Earlier days are read once a minute; each day's share shows on hover.
  */
 export function DailyGoalTrend({
   userId,
@@ -49,18 +51,13 @@ export function DailyGoalTrend({
   }));
   const { days, average } = dailyGoalTrend([...earlier, ...todayRows], goalMinutes, now);
 
-  // Points in a 100 x 100 box; the svg stretches to the row, the dots are HTML
-  // so they stay round.
-  const points = days.map((d, i) => ({
-    x: (i / (days.length - 1)) * 100,
-    y: 100 - d.percent,
-    day: d,
-  }));
-  const line = points.map((p) => `${p.x},${p.y}`).join(" ");
   const weekday = new Intl.DateTimeFormat(locale, { weekday: "short" });
 
   return (
-    <div className="w-full">
+    <div
+      className="w-full"
+      title={days.map((d) => `${weekday.format(d.date)} ${d.percent}%`).join(" · ")}
+    >
       <div className="flex items-baseline justify-between text-[11px] leading-none">
         <span className="font-semibold uppercase tracking-[0.08em] text-muted-foreground">
           {t("Last 7 days")}
@@ -70,49 +67,14 @@ export function DailyGoalTrend({
           <span className="font-semibold tabular-nums text-brand-green">{average}%</span>
         </span>
       </div>
-      <div className="relative mt-2 h-9">
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="absolute inset-0 size-full overflow-visible"
-          aria-hidden="true"
-        >
-          <line
-            x1="0"
-            x2="100"
-            y1="100"
-            y2="100"
-            className="stroke-white/10"
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-          <polygon points={`0,100 ${line} 100,100`} className="fill-brand-green/10" />
-          <polyline
-            points={line}
-            fill="none"
-            className="stroke-brand-green/80"
-            strokeWidth="2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-        {points.map((p, i) => {
-          const isToday = i === points.length - 1;
-          return (
-            <span
-              key={p.day.key}
-              title={`${weekday.format(p.day.date)} · ${p.day.percent}%`}
-              className={
-                isToday
-                  ? "absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green ring-2 ring-background"
-                  : "absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green/70"
-              }
-              style={{ left: `${p.x}%`, top: `${p.y}%` }}
-            />
-          );
-        })}
-      </div>
+      {/* One evolution bar, the average share of the daily goal over the last
+          seven days (owner review, 2026-11-01: a bar reads better than a line). */}
+      <Progress
+        value={average}
+        fillIn
+        className="mt-2 h-2.5 bg-white/[0.07]"
+        aria-label={`${t("Last 7 days")}: ${t("Average")} ${average}%`}
+      />
       <span className="sr-only">
         {days.map((d) => `${weekday.format(d.date)} ${d.percent}%`).join(", ")}
       </span>
