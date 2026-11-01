@@ -65,7 +65,7 @@ const mobileSheetNav = [
   { to: "/life", label: "Life+ AI", icon: Sprout },
   { to: "/learning", label: "Learning", icon: GraduationCap },
   // Shorts are one of the app's flagships (owner request, 2026-11-01).
-  { to: "/learning/videos", label: "Shorts", icon: Clapperboard },
+  { to: "/shorts", label: "Shorts", icon: Clapperboard },
   { to: "/business", label: "Business English", icon: Briefcase },
   { to: "/listening", label: "Listening", icon: Headphones },
   { to: "/reading", label: "Reading", icon: BookOpenText },
@@ -94,19 +94,11 @@ const dashboardSidebarNav = [
   { to: "/mistakes", label: "My mistakes", icon: SpellCheck },
   // Shorts open the With EVO group (owner request, 2026-11-01: one of the
   // app's flagships, so it gets its own sidebar row).
-  { to: "/learning/videos", label: "Shorts", icon: Clapperboard, group: "With EVO" },
+  { to: "/shorts", label: "Shorts", icon: Clapperboard, group: "With EVO" },
   { to: "/coach", label: "AI Speaking", icon: MessageSquareText },
   { to: "/call", label: "Video call", icon: Video },
   { to: "/teacher", label: "AI Teacher", icon: Sparkles },
 ] as const;
-
-/**
- * Learning's lesson pages keep its row lit, but Shorts (/learning/videos) has
- * its own row, so Learning stays unlit there.
- */
-function inactiveLearning(pathname: string, to: string) {
-  return to === "/learning" && pathname.startsWith("/learning/videos");
-}
 
 /** The Goals screen is a Life+ AI tab, so the Life+ AI menu item stays lit there. */
 function lifeTabOpen(pathname: string, to: string) {
@@ -271,11 +263,7 @@ export function MobileNavigationMenu({
                   <Link
                     to={item.to}
                     className="grid min-h-11 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-lg px-2.5 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                    activeProps={{
-                      className: inactiveLearning(pathname, item.to)
-                        ? "text-sidebar-foreground/75"
-                        : "bg-sidebar-accent text-brand-green",
-                    }}
+                    activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
                     inactiveProps={{
                       className: lifeTabOpen(pathname, item.to)
                         ? "bg-sidebar-accent text-brand-green"
@@ -537,11 +525,7 @@ function AppShellContent({
                   aria-label={translate(item.label)}
                   className="grid h-10 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                   // Just a soft background and green text: no border or side bar.
-                  activeProps={{
-                    className: inactiveLearning(location.pathname, item.to)
-                      ? "text-sidebar-foreground/70"
-                      : "bg-sidebar-accent text-brand-green",
-                  }}
+                  activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
                   inactiveProps={{
                     className: lifeTabOpen(location.pathname, item.to)
                       ? "bg-sidebar-accent text-brand-green"

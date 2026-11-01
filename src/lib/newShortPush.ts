@@ -3,7 +3,7 @@
  * (owner request, 2026-10-31). Premium students are invited to watch it; free
  * students see it is part of Premium, since the link opens a locked list.
  */
-export const NEW_SHORT_PATH = "/learning/videos";
+export const NEW_SHORT_PATH = "/shorts?play=1";
 
 export function newShortPush(videoTitle: string, premium: boolean) {
   const title = videoTitle.trim().slice(0, 80);
