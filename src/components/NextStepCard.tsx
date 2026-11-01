@@ -605,7 +605,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   alt=""
                   width={1580}
                   height={1180}
-                  className="block h-full w-full rounded-lg object-cover object-center"
+                  // Phones crop the landscape image to a tall slot: a light zoom on
+                  // EVO's face keeps the corner light streak out (owner image,
+                  // 2026-11-01); sm and up show the whole composition.
+                  className="block h-full w-full rounded-lg object-cover object-center max-sm:origin-[75%_80%] max-sm:scale-[1.15]"
                   onError={(event) => {
                     event.currentTarget.style.visibility = "hidden";
                   }}
