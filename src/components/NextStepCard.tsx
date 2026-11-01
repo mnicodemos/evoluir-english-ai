@@ -609,10 +609,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   // a 1:1 file in a tall phone slot and a wide desktop slot).
                   // Phones: a light zoom, applied to the window after the crop
                   // (so any image ratio), keeps the corner light streak out.
-                  // sm and up: anchored to the top, so EVO's hair stays whole
-                  // (owner review of the 1184x846 image, 2026-11-01: 30%, then
-                  // 15% from the top, still cut the top of her hair).
-                  className="block h-full w-full rounded-lg object-cover object-center max-sm:origin-[75%_80%] max-sm:scale-[1.15] sm:object-top"
+                  // sm and up: anchored 7% from the top, which splits the little
+                  // room the wide slot leaves between hair and chin (owner review
+                  // of the 1600x1143 image, 2026-11-01: 15% cut her hair, the top
+                  // edge (0%) left her chin touching the bottom).
+                  className="block h-full w-full rounded-lg object-cover object-center max-sm:origin-[75%_80%] max-sm:scale-[1.15] sm:object-[50%_7%]"
                   onError={(event) => {
                     event.currentTarget.style.visibility = "hidden";
                   }}
