@@ -269,7 +269,7 @@ export function SmartReviewCard({
           }`}
         >
           {showWordReviews && (
-            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
+            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
               <img src={reviewWords} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
@@ -284,12 +284,7 @@ export function SmartReviewCard({
                   {t("Their review date has arrived: a quick review keeps them in memory.")}
                 </p>
               </div>
-              <Button
-                asChild
-                variant="ghost"
-                size="icon"
-                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
-              >
+              <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
                 <Link to={wordReview.to} aria-label={`${t("Review now")}: ${t("Vocabulary")}`}>
                   <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
@@ -297,7 +292,7 @@ export function SmartReviewCard({
             </li>
           )}
           {showMistakes && (
-            <li className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-warning/35 bg-warning/[0.07] p-1 pr-2">
+            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-warning/35 bg-warning/[0.07] p-1 pr-2">
               <img src={reviewMistakes} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("My mistakes")} />
@@ -312,12 +307,7 @@ export function SmartReviewCard({
                   {t("Fix them now so they do not become habits.")}
                 </p>
               </div>
-              <Button
-                asChild
-                variant="ghost"
-                size="icon"
-                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
-              >
+              <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
                 <Link to="/mistakes" aria-label={`${t("Review now")}: ${t("My mistakes")}`}>
                   <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
@@ -329,7 +319,7 @@ export function SmartReviewCard({
             return (
               <li
                 key={item.skill}
-                className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-border bg-secondary/45 p-1 pr-2"
+                className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-border bg-secondary/45 p-1 pr-2"
               >
                 {SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO] ? (
                   <img
@@ -359,12 +349,7 @@ export function SmartReviewCard({
                     {t(SMART_REVIEW_REASON_TEXT[item.category])}
                   </p>
                 </div>
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="icon"
-                  className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
-                >
+                <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
                   {item.resource.params ? (
                     <Link
                       to="/learning/$lessonId"
@@ -385,7 +370,7 @@ export function SmartReviewCard({
           {newRows.map((row) => (
             <li
               key={row.key}
-              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
+              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
             >
               <img src={SKILL_PHOTO[row.key]} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
@@ -398,12 +383,7 @@ export function SmartReviewCard({
                   {t(row.line)}
                 </p>
               </div>
-              <Button
-                asChild
-                variant="ghost"
-                size="icon"
-                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
-              >
+              <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
                 <Link to={row.to} aria-label={`${t("Start now")}: ${t(row.title)}`}>
                   <ArrowRight className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
@@ -413,7 +393,7 @@ export function SmartReviewCard({
           {keepGoing.map((row) => (
             <li
               key={row.key}
-              className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border border-border bg-secondary/30 p-1 pr-2"
+              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-border bg-secondary/30 p-1 pr-2"
             >
               <ContinueTile rowKey={row.key} />
               <div className="min-w-0">
@@ -425,12 +405,7 @@ export function SmartReviewCard({
                   {t(row.line)}
                 </p>
               </div>
-              <Button
-                asChild
-                variant="ghost"
-                size="icon"
-                className="size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white"
-              >
+              <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
                 <Link to={row.to} aria-label={`${t("Start now")}: ${t(row.title)}`}>
                   <ArrowRight className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
@@ -600,6 +575,15 @@ function RowTag({
  * sized (h-0), then the row's full height (min-h-full, self-stretch).
  */
 const ROW_PHOTO = "h-0 min-h-full w-16 self-stretch rounded-md object-cover";
+
+/**
+ * The row's action keeps its icon on the right, and its link covers the whole
+ * row (owner request, 2026-11-01: the card itself is the button): a stretched
+ * ::after over the row (the li is relative, the button static), the focus ring
+ * drawn on that cover, the icon lighting up while the row is hovered.
+ */
+const ROW_ACTION =
+  "static size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white group-hover:text-white after:absolute after:inset-0 after:rounded-lg after:content-[''] focus-visible:ring-0 focus-visible:after:ring-2 focus-visible:after:ring-brand-green/60";
 
 /**
  * With three rows, each row's note keeps one line, and on desktop screens up
