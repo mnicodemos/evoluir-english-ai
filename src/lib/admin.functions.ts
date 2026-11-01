@@ -987,10 +987,12 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
     desktop: string | null;
     evoAvatar: string | null;
     videoCall: string | null;
+    league: string | null;
   } = {
     desktop: null,
     evoAvatar: null,
     videoCall: null,
+    league: null,
   };
   for (const row of data ?? []) {
     if (row.setting_key === "desktop") {
@@ -999,6 +1001,8 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
       result.evoAvatar = row.image_url;
     } else if (row.setting_key === "video-call") {
       result.videoCall = row.image_url;
+    } else if (row.setting_key === "league") {
+      result.league = row.image_url;
     }
   }
   return result;
@@ -1009,7 +1013,7 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   .inputValidator((data) =>
     z
       .object({
-        target: z.enum(["desktop", "evo-avatar", "video-call"]),
+        target: z.enum(["desktop", "evo-avatar", "video-call", "league"]),
         dataUrl: z.string().min(100).max(4_300_000),
         mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
       })
@@ -1059,6 +1063,13 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
       console.error(
         `Home image could not be published: ${saveError.code ?? "?"} ${saveError.message ?? ""}`,
       );
+      // The weekly league key needs migration 0105 (owner request, 2026-11-01);
+      // until it runs, the table's check refuses it.
+      if (saveError.code === "23514") {
+        throw new Error(
+          "Esta imagem precisa da migração 0105_home_media_league_key.sql. Peça ao chat do Lovable para rodá-la.",
+        );
+      }
       throw new Error("The image was uploaded but could not be published.");
     }
     return { ok: true, url: publicData.publicUrl };

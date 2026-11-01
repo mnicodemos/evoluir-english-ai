@@ -1,15 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, Monitor, Save, UserRound, Video } from "lucide-react";
+import { ImagePlus, Loader2, Monitor, Save, Trophy, UserRound, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import evoGuide from "@/assets/evo-guide.webp";
+import evoLeagueSymbol from "@/assets/evo-liga-simbolo.webp";
 import evoVideoCall from "@/assets/evo-video-call.jpg";
 import { Button } from "@/components/ui/button";
 import { AdminLessonAudioImage } from "@/components/AdminLessonAudioImage";
 import { ADMIN_IMAGE_MAX_WIDTH, compressImageFile, dataUrlBytes } from "@/lib/imageCompress";
 import { getHomeDashboardImages, saveHomeDashboardImage } from "@/lib/admin.functions";
 
-type Target = "desktop" | "evo-avatar" | "video-call";
+type Target = "desktop" | "evo-avatar" | "video-call" | "league";
 type DraftImage = { name: string; dataUrl: string; mimeType: string };
 
 const TARGETS: {
@@ -29,6 +30,13 @@ const TARGETS: {
     title: "EVO mascot avatar",
     description: "Shared round portrait wherever the EVO avatar is used.",
     Icon: UserRound,
+  },
+  {
+    key: "league",
+    title: "Weekly league image",
+    description:
+      "The weekly league page: its header symbol and the empty ranking, shown in a circle. Use a square image (about 640 × 640 px) with the subject in the centre.",
+    Icon: Trophy,
   },
   {
     key: "video-call",
@@ -71,7 +79,9 @@ export function AdminHomeMedia() {
           ? "Desktop image published."
           : variables.target === "evo-avatar"
             ? "EVO mascot avatar published."
-            : "AI Video Call image published.",
+            : variables.target === "league"
+              ? "Weekly league image published."
+              : "AI Video Call image published.",
       );
       await queryClient.invalidateQueries({ queryKey: ["home-dashboard-images"] });
       await queryClient.invalidateQueries({ queryKey: ["home-dashboard-image-public"] });
@@ -144,9 +154,11 @@ export function AdminHomeMedia() {
             const current =
               key === "evo-avatar"
                 ? (imagesQuery.data?.evoAvatar ?? evoGuide)
-                : key === "video-call"
-                  ? (imagesQuery.data?.videoCall ?? evoVideoCall)
-                  : imagesQuery.data?.[key];
+                : key === "league"
+                  ? (imagesQuery.data?.league ?? evoLeagueSymbol)
+                  : key === "video-call"
+                    ? (imagesQuery.data?.videoCall ?? evoVideoCall)
+                    : imagesQuery.data?.[key];
             const saving = mutation.isPending && mutation.variables?.target === key;
 
             return (
@@ -161,7 +173,7 @@ export function AdminHomeMedia() {
                 <p className="text-sm text-muted-foreground">{description}</p>
                 <div
                   className={
-                    key === "evo-avatar"
+                    key === "evo-avatar" || key === "league"
                       ? "flex justify-center rounded-lg border border-border bg-muted p-4"
                       : key === "video-call"
                         ? "mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-lg border border-border bg-muted"
@@ -176,7 +188,7 @@ export function AdminHomeMedia() {
                         event.currentTarget.style.visibility = "hidden";
                       }}
                       className={
-                        key === "evo-avatar"
+                        key === "evo-avatar" || key === "league"
                           ? "size-32 rounded-full object-cover ring-2 ring-brand-green/60"
                           : key === "video-call"
                             ? "block size-full scale-[1.1] object-cover [object-position:50%_30%]"
@@ -189,7 +201,7 @@ export function AdminHomeMedia() {
                     <div
                       aria-hidden="true"
                       className={
-                        key === "evo-avatar"
+                        key === "evo-avatar" || key === "league"
                           ? "size-32 rounded-full bg-muted animate-pulse"
                           : key === "video-call"
                             ? "aspect-square w-full animate-pulse bg-muted"

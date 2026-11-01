@@ -10,6 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { ProofOfProgressMission } from "@/components/league/ProofOfProgressMission";
 import { useWeeklyLeagueStanding, weekXpLine } from "@/components/WeeklyLeagueSummary";
 import { Button } from "@/components/ui/button";
+import { useHomeImages } from "@/hooks/useHomeImages";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { findLevel, leagueLevelOf } from "@/lib/level";
@@ -39,6 +40,10 @@ const XP_RULES = [
 
 function League() {
   const { data: profile } = useProfile();
+  // The owner can change it in Admin → Conteúdo → Home images (owner request,
+  // 2026-11-01); the built-in artwork stays as the fallback.
+  const { data: homeImages } = useHomeImages();
+  const leagueImage = homeImages?.league ?? evoLeagueSymbol;
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
 
@@ -87,7 +92,7 @@ function League() {
       <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,1fr)] lg:items-start lg:gap-4 lg:space-y-0">
         <header className="animate-rise flex items-center gap-3 lg:col-span-2">
           <img
-            src={evoLeagueSymbol}
+            src={leagueImage}
             alt=""
             width={320}
             height={320}
@@ -134,7 +139,7 @@ function League() {
           ) : ranking.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-4 text-center">
               <img
-                src={evoLeagueSymbol}
+                src={leagueImage}
                 alt="EVO, a mascote da liga"
                 width={320}
                 height={320}

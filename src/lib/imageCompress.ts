@@ -11,6 +11,8 @@ export const ADMIN_IMAGE_MAX_WIDTH = {
   "evo-avatar": 384,
   "video-call": 1200,
   "lesson-audio": 1200,
+  // The weekly league symbol: a 160 px circle at most, so 640 covers sharp screens.
+  league: 640,
 } as const;
 
 export const ADMIN_IMAGE_QUALITY = 0.82;
