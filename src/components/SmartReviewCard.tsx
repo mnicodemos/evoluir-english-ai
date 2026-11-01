@@ -269,7 +269,7 @@ export function SmartReviewCard({
           }`}
         >
           {showWordReviews && (
-            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
+            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-[box-shadow,filter] hover:ring-1 hover:ring-white/40 hover:brightness-110 border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
               <img src={reviewWords} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
@@ -292,7 +292,7 @@ export function SmartReviewCard({
             </li>
           )}
           {showMistakes && (
-            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-warning/35 bg-warning/[0.07] p-1 pr-2">
+            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-[box-shadow,filter] hover:ring-1 hover:ring-white/40 hover:brightness-110 border border-warning/35 bg-warning/[0.07] p-1 pr-2">
               <img src={reviewMistakes} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("My mistakes")} />
@@ -319,7 +319,7 @@ export function SmartReviewCard({
             return (
               <li
                 key={item.skill}
-                className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-border bg-secondary/45 p-1 pr-2"
+                className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-[box-shadow,filter] hover:ring-1 hover:ring-white/40 hover:brightness-110 border border-border bg-secondary/45 p-1 pr-2"
               >
                 {SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO] ? (
                   <img
@@ -370,7 +370,7 @@ export function SmartReviewCard({
           {newRows.map((row) => (
             <li
               key={row.key}
-              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
+              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-[box-shadow,filter] hover:ring-1 hover:ring-white/40 hover:brightness-110 border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
             >
               <img src={SKILL_PHOTO[row.key]} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
@@ -393,7 +393,7 @@ export function SmartReviewCard({
           {keepGoing.map((row) => (
             <li
               key={row.key}
-              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-shadow hover:ring-1 hover:ring-white/20 border border-border bg-secondary/30 p-1 pr-2"
+              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-[box-shadow,filter] hover:ring-1 hover:ring-white/40 hover:brightness-110 border border-border bg-secondary/30 p-1 pr-2"
             >
               <ContinueTile rowKey={row.key} />
               <div className="min-w-0">
