@@ -559,6 +559,35 @@ export type Database = {
         }
         Relationships: []
       }
+      diamond_cycles: {
+        Row: {
+          cycle: number
+          granted_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          cycle: number
+          granted_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          cycle?: number
+          granted_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diamond_cycles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       entitlements: {
         Row: {
           created_at: string
@@ -1396,6 +1425,176 @@ export type Database = {
           starts_at?: string
         }
         Relationships: []
+      }
+      premium_lesson_videos: {
+        Row: {
+          curriculum_key: string
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+          video_url: string
+        }
+        Insert: {
+          curriculum_key: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          video_url: string
+        }
+        Update: {
+          curriculum_key?: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
+      premium_level_videos: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          level: string
+          title: string
+          updated_by: string | null
+          video_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          level: string
+          title: string
+          updated_by?: string | null
+          video_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          level?: string
+          title?: string
+          updated_by?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
+      premium_video_comment_reports: {
+        Row: {
+          comment_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_video_comment_reports_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "premium_video_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      premium_video_comments: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          author_name: string
+          body: string
+          created_at?: string
+          id?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_video_comments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "premium_level_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      premium_video_likes: {
+        Row: {
+          created_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_video_likes_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "premium_level_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      premium_video_views: {
+        Row: {
+          created_at: string
+          day: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_video_views_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "premium_level_videos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
