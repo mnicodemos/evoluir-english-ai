@@ -605,10 +605,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   alt=""
                   width={1580}
                   height={1180}
-                  // Phones crop the landscape image to a tall slot: a light zoom on
-                  // EVO's face keeps the corner light streak out (owner image,
-                  // 2026-11-01); sm and up show the whole composition.
-                  className="block h-full w-full rounded-lg object-cover object-center max-sm:origin-[75%_80%] max-sm:scale-[1.15]"
+                  // One image serves two window shapes (owner note, 2026-11-01:
+                  // a 1:1 file in a tall phone slot and a wide desktop slot).
+                  // Phones: a light zoom, applied to the window after the crop
+                  // (so any image ratio), keeps the corner light streak out.
+                  // sm and up: anchored 30% from the top, so a square image
+                  // keeps EVO's hair instead of cutting it evenly.
+                  className="block h-full w-full rounded-lg object-cover object-center max-sm:origin-[75%_80%] max-sm:scale-[1.15] sm:object-[50%_30%]"
                   onError={(event) => {
                     event.currentTarget.style.visibility = "hidden";
                   }}
