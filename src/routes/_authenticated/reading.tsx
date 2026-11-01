@@ -787,7 +787,7 @@ function ReadingPage() {
           right column holds the reading week, the topic picker and the
           questions, so the questions stay beside the text while the student
           looks back for the answer. Phones and lg stack as before. */}
-      <div className="xl:flex xl:h-[calc(100dvh-3rem)] xl:min-h-[40rem] xl:flex-col">
+      <div className="xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
         <PageHeader
           className="xl:shrink-0"
           guide="reading"

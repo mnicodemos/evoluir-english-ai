@@ -93,10 +93,7 @@ function LifePage() {
         {/* Same shapes as the page, one screen tall from xl like it (owner
             report, 2026-11-01: the old two rows of three boxes, with the
             footer under them, jumped into the real layout when it loaded). */}
-        <div
-          className="xl:flex xl:h-[calc(100dvh-3rem)] xl:min-h-[44rem] xl:flex-col"
-          aria-busy="true"
-        >
+        <div className="xl:flex xl:min-h-0 xl:flex-1 xl:flex-col" aria-busy="true">
           <LifeHeader />
           <div className="grid gap-4 lg:grid-cols-2 xl:shrink-0 xl:grid-cols-3 xl:gap-5">
             <Skeleton className="h-56 rounded-xl xl:h-[17.5rem]" />
@@ -129,7 +126,7 @@ function LifePage() {
           the tab below takes the rest, its cards scrolling inside (the Life
           Coach scrolls its messages and keeps the field in view). Shorter
           screens than 44rem, lg and phones scroll the page as before. */}
-      <div className="xl:flex xl:h-[calc(100dvh-3rem)] xl:min-h-[44rem] xl:flex-col">
+      <div className="xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
         <LifeHeader />
         {/* Four bands (user request, 2026-10-22): the measures on top (Your
           day, Evolution score, Focus), then Today and Plan (the priority of
