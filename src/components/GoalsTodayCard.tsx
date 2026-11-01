@@ -18,6 +18,7 @@ import {
   useHomeChoice,
   useLifeActions,
 } from "@/components/LifeHomeSlots";
+import { LifeHomeExtraSlot } from "@/components/LifeHomeExtraSlot";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { haptic } from "@/lib/haptics";
@@ -131,7 +132,7 @@ export function GoalsTodayCard() {
       ) : (
         // One goal, one task and one habit (user request); when there are more,
         // the student picks which one shows here.
-        <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1">
+        <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 2xl:grid-cols-4">
           {shownGoal ? (
             <GoalTile
               key={shownGoal.id}
@@ -298,6 +299,9 @@ export function GoalsTodayCard() {
               hash="habits"
             />
           )}
+          {/* From 2xl the card is wide enough for a fourth slot: an open
+              decision, or else today's Focus (owner decision, 2026-11-01). */}
+          <LifeHomeExtraSlot translate={t} />
         </ul>
       )}
     </section>
