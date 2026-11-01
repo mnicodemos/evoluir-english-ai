@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
 import { CoachSection } from "@/components/life/CoachSection";
+import { DecisionsWorkspace } from "@/components/life/Decisions";
 import { FocusSection } from "@/components/life/FocusSection";
 import { GoalsSection } from "@/components/life/GoalsSection";
 import { HabitsSection } from "@/components/life/HabitsSection";
@@ -20,6 +21,8 @@ import { useFocusLog } from "@/hooks/useFocusLog";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { FOCUS_DAILY_TARGET, focusSummary, lifeDayProgress } from "@/lib/life";
+import { openDecisionCount } from "@/lib/lifeDecisions";
+import { loadLifeDecisions } from "@/lib/lifeDecisions.functions";
 import { loadPlus } from "@/lib/plus.functions";
 import { cn } from "@/lib/utils";
 
@@ -56,13 +59,26 @@ function LifePage() {
     staleTime: 30 * 1000,
   });
 
-  // The planning addresses (#goals, #routine, #habits) open the Plan tab.
-  const [tab, setTab] = useState<"today" | "plan">(() =>
-    typeof window !== "undefined" &&
-    ["#goals", "#routine", "#habits"].includes(window.location.hash)
-      ? "plan"
-      : "today",
-  );
+  // Decisions sit in their own tab (owner request, 2026-11-01: students
+  // forgot the header capsule); the tab counts the decisions still open.
+  const loadDecisions = useServerFn(loadLifeDecisions);
+  const { data: decisions } = useQuery({
+    queryKey: ["life-decisions", profile?.id ?? null],
+    enabled: !!profile,
+    queryFn: () => loadDecisions(),
+    staleTime: 30 * 1000,
+  });
+  const openDecisions =
+    decisions?.premium && decisions.available ? openDecisionCount(decisions.decisions) : 0;
+
+  // The planning addresses (#goals, #routine, #habits) open the Plan tab,
+  // #decisions the Decisions tab.
+  const [tab, setTab] = useState<"today" | "plan" | "decisions">(() => {
+    if (typeof window === "undefined") return "today";
+    if (["#goals", "#routine", "#habits"].includes(window.location.hash)) return "plan";
+    if (window.location.hash === "#decisions") return "decisions";
+    return "today";
+  });
   // Old tab addresses arrive with #goals, #routine, #habits or #coach: scroll
   // there once the sections exist (they render after the data loads).
   const ready = !!data;
@@ -179,7 +195,9 @@ function LifePage() {
           invitation. */}
       <Tabs
         value={tab}
-        onValueChange={(value) => setTab(value === "plan" ? "plan" : "today")}
+        onValueChange={(value) =>
+          setTab(value === "plan" || value === "decisions" ? value : "today")
+        }
         className="mt-4 xl:mt-5"
       >
         <TabsList className="h-10 lg:h-10">
@@ -188,6 +206,17 @@ function LifePage() {
           </TabsTrigger>
           <TabsTrigger value="plan" className="min-h-8 px-4">
             {t("Planning")}
+          </TabsTrigger>
+          <TabsTrigger value="decisions" className="min-h-8 gap-1.5 px-4">
+            {t("Decisions")}
+            {openDecisions > 0 ? (
+              <span
+                className="grid min-w-5 place-items-center rounded-full bg-violet-400/20 px-1.5 text-[11px] font-semibold tabular-nums text-violet-200"
+                aria-label={`${openDecisions} ${t("open")}`}
+              >
+                {openDecisions}
+              </span>
+            ) : null}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="today" className="mt-4">
@@ -224,6 +253,9 @@ function LifePage() {
               </div>
             )}
           </div>
+        </TabsContent>
+        <TabsContent value="decisions" id="decisions" className="mt-4 scroll-mt-4">
+          <DecisionsWorkspace variant="tab" />
         </TabsContent>
       </Tabs>
 

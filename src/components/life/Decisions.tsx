@@ -79,6 +79,20 @@ const RATINGS = Array.from(
  * like Routine and Habits; one page with a list, an editor and a detail view.
  */
 export function DecisionsPage() {
+  return (
+    <AppShell>
+      <DecisionsWorkspace variant="page" />
+    </AppShell>
+  );
+}
+
+/**
+ * The decisions themselves: list, editor and detail. The /life/decisions page
+ * shows them under its PageHeader; the /life page shows them in its Decisions
+ * tab (owner request, 2026-11-01: students forgot the header capsule), under a
+ * section title with the same New decision button.
+ */
+export function DecisionsWorkspace({ variant }: { variant: "page" | "tab" }) {
   const { t } = useLifeT();
   const { data: profile } = useProfile();
   const load = useServerFn(loadLifeDecisions);
@@ -92,45 +106,58 @@ export function DecisionsPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["life-decisions"] });
   const [view, setView] = useState<View>({ kind: "list" });
 
-  const header = (
-    <PageHeader
-      icon={Scale}
-      accent="violet"
-      eyebrow="Life+ AI"
-      title={t("Decisions")}
-      description={t("Compare your options with clear criteria and decide with more confidence.")}
-      actions={
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm" className="gap-1.5">
-            <Link to="/life" aria-label={t("Back to Life+ AI")}>
-              <ArrowLeft className="size-4" aria-hidden="true" />
-              <span className="hidden sm:inline">{t("Life+ AI")}</span>
-            </Link>
-          </Button>
-          {data?.premium && data.available && view.kind === "list" ? (
-            <Button
-              size="sm"
-              className="gap-1.5 bg-brand-green text-sidebar hover:bg-brand-green/90"
-              onClick={() => setView({ kind: "edit", id: null })}
-            >
-              <Plus className="size-4" aria-hidden="true" />
-              {t("New decision")}
+  const newButton =
+    data?.premium && data.available && view.kind === "list" ? (
+      <Button
+        size="sm"
+        className="gap-1.5 bg-brand-green text-sidebar hover:bg-brand-green/90"
+        onClick={() => setView({ kind: "edit", id: null })}
+      >
+        <Plus className="size-4" aria-hidden="true" />
+        {t("New decision")}
+      </Button>
+    ) : null;
+  const header =
+    variant === "tab" ? (
+      <LifeSectionTitle
+        id="decisions-title"
+        icon={Scale}
+        accent="violet"
+        title={t("Decisions")}
+        subtitle={t("Compare your options with clear criteria and decide with more confidence.")}
+      >
+        {newButton ? <div className="ml-auto">{newButton}</div> : null}
+      </LifeSectionTitle>
+    ) : (
+      <PageHeader
+        icon={Scale}
+        accent="violet"
+        eyebrow="Life+ AI"
+        title={t("Decisions")}
+        description={t("Compare your options with clear criteria and decide with more confidence.")}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link to="/life" aria-label={t("Back to Life+ AI")}>
+                <ArrowLeft className="size-4" aria-hidden="true" />
+                <span className="hidden sm:inline">{t("Life+ AI")}</span>
+              </Link>
             </Button>
-          ) : null}
-        </div>
-      }
-    />
-  );
+            {newButton}
+          </div>
+        }
+      />
+    );
 
   if (isLoading || !data) {
     return (
-      <AppShell>
+      <>
         {header}
         <div className="mt-4 grid gap-4 lg:grid-cols-2" aria-busy="true">
           <Skeleton className="h-40 rounded-xl" />
           <Skeleton className="h-40 rounded-xl" />
         </div>
-      </AppShell>
+      </>
     );
   }
 
@@ -140,7 +167,7 @@ export function DecisionsPage() {
       : (data.decisions.find((decision) => decision.id === view.id) ?? null);
 
   return (
-    <AppShell>
+    <>
       {header}
       <div className="mt-4">
         {!data.premium ? (
@@ -186,7 +213,7 @@ export function DecisionsPage() {
           />
         )}
       </div>
-    </AppShell>
+    </>
   );
 }
 
