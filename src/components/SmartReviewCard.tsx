@@ -350,7 +350,9 @@ export function SmartReviewCard({
                     label={t("To review")}
                     detail={item.resource.params ? `${t("Learning")} · ${skillLabel}` : skillLabel}
                   />
-                  <p className="truncate text-sm font-semibold">{t(item.resource.title)}</p>
+                  <p className="truncate text-sm font-semibold">
+                    {t(reviewRowTitle(item.resource))}
+                  </p>
                   <p
                     className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
                   >
@@ -542,6 +544,25 @@ const SKILL_TILE = {
  * from earlier work, "New today" with sparkles in brand green for today's new
  * activities, which also get a dashed green border.
  */
+/**
+ * A review row names an action, not the feature again (owner review,
+ * 2026-11-01: the tag read "Writing" over a title "Writing"). Lesson rows
+ * (params) keep the lesson's own title.
+ */
+const REVIEW_ROW_ACTION: Record<string, string> = {
+  "/writing": "Write a short text",
+  "/listening": "Train your ear",
+  "/vocabulary": "Practise new words",
+  "/coach": "Talk to EVO",
+  "/teacher": "Practise with the AI Teacher",
+  "/reading": "Read today's text",
+};
+
+function reviewRowTitle(resource: { title: string; to: string; params?: unknown }): string {
+  if (resource.params) return resource.title;
+  return REVIEW_ROW_ACTION[resource.to] ?? resource.title;
+}
+
 function RowTag({
   kind,
   label,
