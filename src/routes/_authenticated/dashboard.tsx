@@ -799,7 +799,7 @@ function Dashboard() {
             lang={lang === "pt" ? "pt" : "en"}
             translate={t}
           />
-          <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3">
+          <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3">
             <header className="animate-rise min-w-0 xl:h-16">
               <EvoDailyReflection
                 userId={profile.id}
@@ -1166,7 +1166,7 @@ function Dashboard() {
 function DashboardSkeleton() {
   return (
     <div
-      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3"
+      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3"
       aria-busy="true"
     >
       <div className="flex min-w-0 items-center justify-between gap-3 xl:h-16">
