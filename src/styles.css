@@ -299,13 +299,16 @@
   }
 }
 
-/* Desktop Dashboard fills one screen; the screen height is a minimum, so a row
+/* Desktop Dashboard fills one screen: AppShell's main is a flex column there
+   and the grid takes all of its height, so the footer ends at the screen's
+   bottom edge, as on the other one-screen pages (owner report, 2026-11-01: a
+   fixed calc(100dvh - 4.125rem) left the footer a few pixels off, so it moved
+   when switching from Life+ AI or Reading). The height is a minimum, so a row
    whose cards need more room grows (and the page scrolls) instead of letting
    its cards run over the next row. */
 @media (min-width: 80rem) {
   .dashboard-one-screen {
-    min-height: calc(100vh - 4.125rem);
-    min-height: calc(100dvh - 4.125rem);
+    flex: 1 0 auto;
   }
 }
 
