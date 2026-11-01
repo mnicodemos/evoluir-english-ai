@@ -763,7 +763,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             <div className="mt-3 hidden sm:block xl:mt-4 xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
               {/* A short heading tells the student what these two extras are. */}
               <div className="flex items-center gap-2">
-                <Dumbbell className="size-[1.375rem] shrink-0 text-warning" aria-hidden="true" />
+                {/* Same 22 px slot as the lightbulb above, the dumbbell drawn at 18 px:
+                    its diagonal fills the whole box, so at full size it sat left of
+                    the column edge and closer to the text than the lightbulb
+                    (owner report, 2026-11-01). */}
+                <span
+                  className="grid size-[1.375rem] shrink-0 place-items-center"
+                  aria-hidden="true"
+                >
+                  <Dumbbell className="size-[1.125rem] text-warning" />
+                </span>
                 <h3 className="text-[13px] font-semibold text-sidebar-foreground">
                   {t("Extra practice")}
                 </h3>
