@@ -336,7 +336,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 max-sm:text-[11px] min-[380px]:max-sm:text-xs text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left group transition-[box-shadow,filter] sm:hover:ring-1 sm:hover:ring-inset sm:hover:ring-white/40 hover:brightness-110 focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        className="h-8 min-w-0 px-2 max-sm:text-[11px] min-[380px]:max-sm:text-xs text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left group transition-[color,background-color,box-shadow] sm:hover:ring-1 sm:hover:ring-inset sm:hover:ring-brand-green/60 sm:active:ring-1 sm:active:ring-inset sm:active:ring-brand-green/60 focus-visible:ring-2 focus-visible:ring-brand-green/60"
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
@@ -383,7 +383,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         asChild
         variant="ghost"
         size="sm"
-        className="h-8 min-w-0 px-2 max-sm:text-[11px] min-[380px]:max-sm:text-xs text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left group transition-[box-shadow,filter] sm:hover:ring-1 sm:hover:ring-inset sm:hover:ring-white/40 hover:brightness-110 focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        className="h-8 min-w-0 px-2 max-sm:text-[11px] min-[380px]:max-sm:text-xs text-sidebar-foreground hover:bg-sidebar-accent max-sm:min-w-max max-sm:flex-auto max-sm:justify-center max-sm:gap-1.5 max-sm:h-10 max-sm:rounded-full max-sm:border max-sm:border-white/10 max-sm:bg-white/[0.05] max-sm:px-1.5 max-sm:whitespace-nowrap sm:h-auto sm:min-h-0 sm:flex-1 sm:items-start sm:rounded-lg sm:px-2 sm:py-1.5 xl:py-1 sm:whitespace-normal sm:text-left group transition-[color,background-color,box-shadow] sm:hover:ring-1 sm:hover:ring-inset sm:hover:ring-brand-green/60 sm:active:ring-1 sm:active:ring-inset sm:active:ring-brand-green/60 focus-visible:ring-2 focus-visible:ring-brand-green/60"
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
