@@ -134,11 +134,11 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
       id={part === "score" ? undefined : "goals"}
       className={cn(
         "grid h-full scroll-mt-4 gap-4",
-        part === "both" ? "grid-rows-[auto_1fr]" : "grid-rows-[1fr]",
+        part === "both" ? "grid-rows-[auto_1fr]" : "grid-rows-[minmax(0,1fr)]",
       )}
     >
       {part === "steps" ? null : (
-        <section className="card-soft p-4 sm:p-5 xl:p-6" aria-labelledby="evolution-score-title">
+        <section className="card-soft p-4 sm:p-5" aria-labelledby="evolution-score-title">
           <div className="flex items-center gap-4">
             <ScoreRing value={score.score} />
             <div className="min-w-0">

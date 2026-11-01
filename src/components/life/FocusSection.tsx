@@ -83,11 +83,7 @@ export function FocusSection() {
   const weekMax = Math.max(1, ...summary.week.map((row) => row.minutes));
 
   return (
-    <section
-      id="focus"
-      className="card-soft scroll-mt-4 p-4 sm:p-5 xl:p-6"
-      aria-labelledby="focus-title"
-    >
+    <section id="focus" className="card-soft scroll-mt-4 p-4 sm:p-5" aria-labelledby="focus-title">
       <LifeSectionTitle
         id="focus-title"
         icon={Timer}
@@ -108,9 +104,9 @@ export function FocusSection() {
         </Button>
       </LifeSectionTitle>
 
-      <div className="mt-4 grid items-center gap-5 sm:grid-cols-[auto_minmax(0,1fr)]">
+      <div className="mt-4 grid items-center gap-5 sm:grid-cols-[auto_minmax(0,1fr)] xl:mt-3 xl:gap-4">
         {/* The countdown ring: pink while focusing, green during the break. */}
-        <div className="relative mx-auto grid size-36 place-items-center">
+        <div className="relative mx-auto grid size-36 place-items-center xl:size-28">
           <svg viewBox="0 0 80 80" className="absolute inset-0 -rotate-90" aria-hidden="true">
             <circle
               cx="40"
@@ -137,7 +133,9 @@ export function FocusSection() {
             />
           </svg>
           <div className="text-center" role="timer" aria-live="off">
-            <p className="font-display text-3xl font-bold tabular-nums">{focusClock(leftMs)}</p>
+            <p className="font-display text-3xl font-bold tabular-nums xl:text-2xl">
+              {focusClock(leftMs)}
+            </p>
             <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
               {state.phase === "break"
                 ? t("Break")
@@ -293,9 +291,12 @@ export function FocusSection() {
       ) : null}
 
       {/* The last seven days, one bar per day, today on the right. */}
-      <div className="mt-4 border-t border-white/10 pt-3">
+      <div className="mt-4 border-t border-white/10 pt-3 xl:mt-3 xl:pt-2">
         <div className="flex items-end justify-between gap-3">
-          <ol className="flex h-12 flex-1 items-end gap-1.5" aria-label={t("Focus this week")}>
+          <ol
+            className="flex h-12 flex-1 items-end gap-1.5 xl:h-10"
+            aria-label={t("Focus this week")}
+          >
             {summary.week.map((row) => (
               <li key={row.day} className="flex flex-1 flex-col items-center gap-1">
                 <span

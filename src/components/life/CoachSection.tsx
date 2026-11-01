@@ -132,7 +132,7 @@ export function CoachSection() {
         subtitle={t("Plan your day and goals with EVO")}
       />
       {/* One page (user request): the conversation scrolls inside the card. */}
-      <div className="flex max-h-[32rem] flex-col gap-4 overflow-y-auto pr-1">
+      <div className="scroll-quiet flex max-h-[32rem] flex-col gap-4 overflow-y-auto pr-1 xl:min-h-0 xl:max-h-none xl:flex-1">
         {messages.length === 0 ? (
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">

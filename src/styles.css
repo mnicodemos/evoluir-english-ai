@@ -483,6 +483,13 @@
   background-image: var(--gradient-growth);
 }
 
+/* A thin, quiet scrollbar for cards that scroll inside a one-screen page
+   (Life+ AI on desktop). */
+@utility scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(1 0 0 / 0.16) transparent;
+}
+
 @utility card-soft {
   border-radius: var(--radius-xl);
   background-color: var(--color-card);
