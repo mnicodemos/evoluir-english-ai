@@ -83,11 +83,23 @@ async function page(event) {
     }
     return response;
   } catch (error) {
+    // A failed request is not proof of being offline (owner report, 2026-11-01:
+    // "Você está offline" with a working connection, e.g. while a new version
+    // is published or a request drops). With the device online, try once more
+    // straight from the network before showing any notice.
+    if (self.navigator.onLine !== false) {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1200));
+        return await fetch(event.request.url, { credentials: "same-origin", cache: "reload" });
+      } catch {
+        // fall through to the notice
+      }
+    }
     const cache = await caches.open(OFFLINE_CACHE);
     const shell = await cache.match(OFFLINE_PAGE);
     const path = new URL(event.request.url).pathname;
     if (shell && path === OFFLINE_PAGE) return shell;
-    return offlineNotice(Boolean(shell));
+    return offlineNotice(Boolean(shell), self.navigator.onLine !== false);
   }
 }
 
@@ -142,25 +154,38 @@ async function vocabularyScreenFiles(shellFiles) {
   }
 }
 
-function offlineNotice(hasSavedWords) {
+function offlineNotice(hasSavedWords, online) {
   const link = hasSavedWords
-    ? '<a href="/vocabulary">Abrir palavras salvas · Open saved words</a>'
+    ? '<a class="ghost" href="/vocabulary">Abrir palavras salvas · Open saved words</a>'
     : "";
+  // Online but the app did not answer: say so, and keep retrying on its own,
+  // instead of calling it offline.
+  const title = online
+    ? "Não foi possível abrir o app · Could not open the app"
+    : "Você está offline · You are offline";
+  const text = online
+    ? "Sua internet parece estar funcionando, mas o app não respondeu agora. Tentando de novo em alguns segundos…<br>Your connection looks fine, but the app did not answer. Retrying in a few seconds…"
+    : "Esta tela precisa de internet. As palavras do vocabulário salvas neste aparelho continuam disponíveis.<br>This screen needs a connection. Vocabulary saved on this device is still available.";
   const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Evoluir+ English AI · Offline</title>
+<title>Evoluir+ English AI</title>
 <style>
 body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b1117;color:#e6edf3;
 font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;text-align:center;padding:24px}
 h1{font-size:1.25rem;margin:0 0 8px}p{color:#9fb0c0;margin:0 0 20px;line-height:1.5}
-a{display:inline-block;background:#2ee6c5;color:#06201b;font-weight:700;text-decoration:none;
-padding:12px 20px;border-radius:12px}
+a,button{display:inline-block;background:#2ee6c5;color:#06201b;font:inherit;font-weight:700;
+text-decoration:none;border:0;padding:12px 20px;border-radius:12px;margin:4px;cursor:pointer}
+a.ghost{background:transparent;color:#e6edf3;border:1px solid rgba(255,255,255,.2)}
 </style></head><body><main>
-<h1>Você está offline · You are offline</h1>
-<p>Esta tela precisa de internet. As palavras do vocabulário salvas neste aparelho continuam disponíveis.<br>
-This screen needs a connection. Vocabulary saved on this device is still available.</p>
+<h1>${title}</h1>
+<p>${text}</p>
+<button type="button" onclick="location.reload()">Tentar novamente · Try again</button>
 ${link}
-</main></body></html>`;
+</main>
+<script>
+var wait=5000;function retry(){if(navigator.onLine)location.reload();else setTimeout(retry,wait);}
+setTimeout(retry,wait);window.addEventListener("online",function(){location.reload();});
+</script></body></html>`;
   return new Response(html, {
     status: 503,
     headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
