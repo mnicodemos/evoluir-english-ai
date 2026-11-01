@@ -72,7 +72,7 @@ export function BusinessDashboardCard() {
       </div>
       <div className="mt-2 flex min-w-0 flex-1 flex-col justify-center gap-1.5">
         {/* Room on the right for the BIZ chip. */}
-        <div className="flex min-w-0 items-center gap-3 pr-[calc((100%_-_112px)/6_+_1rem)] 2xl:pr-[calc((100%_-_132px)/6_+_1rem)]">
+        <div className="flex min-w-0 items-center gap-3 pr-[calc((100%_-_112px)/6_+_1rem)] 2xl:pr-[calc((100%*4/3_-_128px)/6_+_1rem)]">
           {next ? (
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
@@ -122,12 +122,16 @@ export function BusinessDashboardCard() {
       </div>
       {/* The track's own chip, the same shape and width as a level chip in the
           header (user request), on the right edge and centred between the
-          Premium badge above and the Continue link below. Both cards are 4 of
-          12 columns, so a level chip is (card - 112 px) / 6: 32 px padding,
-          48 px icon, 12 px gap and 5 x 4 px between chips (132 px from 2xl). */}
+          Premium badge above and the Continue link below. Below 2xl both cards
+          are 4 of 12 columns, so a level chip is (card - 112 px) / 6: 32 px
+          padding, 48 px icon, 12 px gap and 5 x 4 px between chips. From 2xl
+          the Business card is 3 columns under the right column (owner request,
+          2026-11-01) while the level card stays 4, so the level card is 4/3 of
+          this card plus 4 px, and its chip (level card - 132 px) / 6 reads
+          (4/3 x card - 128 px) / 6. */}
       <span
         className={cn(
-          "absolute right-3 top-1/2 inline-flex h-6 w-[calc((100%_-_112px)/6)] -translate-y-1/2 items-center justify-center gap-0.5 rounded-full border text-[10px] font-semibold xl:right-4 2xl:w-[calc((100%_-_132px)/6)] 2xl:text-[11px]",
+          "absolute right-3 top-1/2 inline-flex h-6 w-[calc((100%_-_112px)/6)] -translate-y-1/2 items-center justify-center gap-0.5 rounded-full border text-[10px] font-semibold xl:right-4 2xl:w-[calc((100%*4/3_-_128px)/6)] 2xl:text-[11px]",
           // Every lesson done: the same look as a conquered level chip (user request).
           trackDone
             ? "border-brand-green/25 bg-brand-green/[0.07] text-brand-green/90"

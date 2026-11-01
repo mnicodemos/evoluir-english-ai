@@ -889,14 +889,19 @@ function Dashboard() {
 
             {/* The level selector has its own card, apart from the three
               indicators (user request), with the same gap as the cards below. */}
+            {/* From 2xl the weekly league sits in the right column, over Today's
+              Progress and the Rhythm card, and Business under them (owner request,
+              2026-11-01: one column edge from top to bottom). The 16 and 11 column
+              grids inside the 8 columns keep the same gap, so their edges land on
+              the page's 12 columns: plan and jewels share 5, the league takes 3. */}
             <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
               {/* As wide as the Business English card (4 of 12 columns; user request). */}
               <div className="card-soft min-w-0 overflow-hidden lg:col-span-4">
                 <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
               </div>
 
-              <div className="grid min-w-0 grid-cols-[6fr_10fr] gap-3 lg:col-span-8">
-                <div className="card-soft min-w-0 overflow-hidden rounded-2xl">
+              <div className="grid min-w-0 grid-cols-[6fr_10fr] gap-3 lg:col-span-8 2xl:grid-cols-16">
+                <div className="card-soft min-w-0 overflow-hidden rounded-2xl 2xl:col-span-5">
                   {/* Your Week comes first; the combined streak/league block follows it. */}
                   <PlanTodaySummary
                     next={planNext}
@@ -904,8 +909,8 @@ function Dashboard() {
                     translate={t}
                   />
                 </div>
-                <div className="grid h-full min-w-0 grid-cols-2 items-stretch gap-3">
-                  <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
+                <div className="grid h-full min-w-0 grid-cols-2 items-stretch gap-3 2xl:col-span-11 2xl:grid-cols-11">
+                  <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl 2xl:col-span-5">
                     {/* Opens the ten jewels in a popover (owner request, 2026-10-31). */}
                     <JewelsPopover
                       translate={t}
@@ -947,7 +952,7 @@ function Dashboard() {
                       />
                     </JewelsPopover>
                   </div>
-                  <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl">
+                  <div className="card-soft h-full min-w-0 overflow-hidden rounded-2xl 2xl:col-span-6">
                     <WeeklyLeagueSummary profile={profile} translate={t} />
                   </div>
                 </div>
@@ -1136,11 +1141,11 @@ function Dashboard() {
                 showBusinessCard ? "lg:grid lg:grid-cols-12" : "lg:block"
               }`}
             >
-              <div className="min-w-0 lg:col-span-8 xl:h-full xl:min-h-0">
+              <div className="min-w-0 lg:col-span-8 xl:h-full xl:min-h-0 2xl:col-span-9">
                 <GoalsTodayCard />
               </div>
               {showBusinessCard && (
-                <div className="min-w-0 lg:col-span-4 xl:h-full xl:min-h-0">
+                <div className="min-w-0 lg:col-span-4 xl:h-full xl:min-h-0 2xl:col-span-3">
                   <BusinessDashboardCard />
                 </div>
               )}
