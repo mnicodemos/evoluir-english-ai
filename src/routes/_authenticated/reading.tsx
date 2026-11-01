@@ -376,6 +376,12 @@ function shortDate(day: string, lang: string) {
  * isolated): the last seven days, done ones in green with their score, today
  * outlined; an earlier day with a stored text opens again as practice.
  */
+/** Where each block sits from xl (the one-screen layout); below it the grid
+ *  stacks them, with the week and the picker across both lg columns. */
+const SIDE_ROW_1 = "lg:col-span-2 xl:col-span-1 xl:col-start-2 xl:row-start-1";
+const SIDE_ROW_2 = "lg:col-span-2 xl:col-span-1 xl:col-start-2 xl:row-start-2";
+const TEXT_AREA = "xl:col-start-1 xl:row-span-3 xl:row-start-1 xl:min-h-0";
+
 function ReadingWeek({
   week,
   openDay,
@@ -392,7 +398,7 @@ function ReadingWeek({
   const doneCount = week.filter((entry) => entry.done).length;
   const today = week[week.length - 1]?.day;
   return (
-    <section className="card-soft mt-5 p-3 sm:p-4" aria-labelledby="reading-week-title">
+    <section className="card-soft p-3 sm:p-4" aria-labelledby="reading-week-title">
       <h2 id="reading-week-title" className="text-xs font-semibold text-muted-foreground">
         <span>{t("Your reading week")}</span> <span>·</span>{" "}
         <span className="text-foreground">{doneCount}</span> <span>{t("of")}</span> <span>7</span>{" "}
@@ -474,7 +480,7 @@ function ReadingPicker({
     return (
       <button
         type="button"
-        className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         aria-expanded={false}
         onClick={() => setOpen(true)}
       >
@@ -485,7 +491,7 @@ function ReadingPicker({
     );
   }
   return (
-    <section className="card-soft mt-5 p-3 sm:p-4" aria-labelledby="reading-picker-title">
+    <section className="card-soft p-3 sm:p-4" aria-labelledby="reading-picker-title">
       <h2 id="reading-picker-title" className="text-xs font-semibold text-muted-foreground">
         {t("What do you want to read?")}
       </h2>
@@ -775,422 +781,462 @@ function ReadingPage() {
   const allAnswered = chosen.length > 0 && chosen.every((value) => value !== null);
 
   return (
-    <AppShell>
-      <PageHeader
-        guide="reading"
-        icon={BookOpenText}
-        accent="amber"
-        eyebrow={t("Reading practice")}
-        title={t("Daily reading")}
-        description={t(
-          "A short text at your level every day, with audio, key words and questions.",
-        )}
-      />
-
-      {week ? (
-        <ReadingWeek
-          week={week}
-          openDay={pastDay?.day ?? null}
-          onOpen={openDay}
-          lang={lang}
-          t={t}
+    <AppShell desktopOneScreen>
+      {/* One screen on desktop (owner request, 2026-11-01, like Life+ AI):
+          from xl the text fills the left column and scrolls inside, and the
+          right column holds the reading week, the topic picker and the
+          questions, so the questions stay beside the text while the student
+          looks back for the answer. Phones and lg stack as before. */}
+      <div className="xl:flex xl:h-[calc(100dvh-3rem)] xl:min-h-[40rem] xl:flex-col">
+        <PageHeader
+          className="xl:shrink-0"
+          guide="reading"
+          icon={BookOpenText}
+          accent="amber"
+          eyebrow={t("Reading practice")}
+          title={t("Daily reading")}
+          description={t(
+            "A short text at your level every day, with audio, key words and questions.",
+          )}
         />
-      ) : null}
 
-      {pastDay ? (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-400/30 bg-amber-400/[0.06] px-3 py-2 text-xs sm:text-sm">
-          <span>
-            <span>{t("Reading again from")}</span> <span>{shortDate(pastDay.day, lang)}</span>{" "}
-            <span className="text-muted-foreground">
-              · {t("practice: today's study day is not changed.")}
-            </span>
-          </span>
-          <Button type="button" size="sm" variant="outline" onClick={() => openDay(null)}>
-            {t("Back to today")}
-          </Button>
-        </div>
-      ) : (
-        <ReadingPicker choice={choice} onChange={pick} t={t} />
-      )}
-
-      {isLoading || !reading ? (
-        <div className="mt-5 space-y-3">
-          <Skeleton className="h-8 w-2/3" />
-          <Skeleton className="h-40 w-full" />
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-            {choice ? t("EVO is writing your text…") : t("Preparing today's reading…")}
-          </p>
-        </div>
-      ) : (
-        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <section className="card-soft p-4 sm:p-6" aria-labelledby="reading-title">
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="rounded-full bg-amber-400/12 px-2.5 py-1 font-medium text-amber-400">
-                {readingKindLabel(reading, t)}
-              </span>
-              <span className="rounded-full bg-secondary px-2.5 py-1 font-medium uppercase">
-                {reading.level}
-              </span>
-              <ReadingSize reading={reading} t={t} />
+        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_24rem] xl:grid-rows-[auto_auto_minmax(0,1fr)]">
+          {week ? (
+            <div className={SIDE_ROW_1}>
+              <ReadingWeek
+                week={week}
+                openDay={pastDay?.day ?? null}
+                onOpen={openDay}
+                lang={lang}
+                t={t}
+              />
             </div>
-            <h2
-              id="reading-title"
-              translate="no"
-              lang="en"
-              className="font-display mt-3 text-xl font-semibold sm:text-2xl"
-            >
-              {reading.title}
-            </h2>
+          ) : null}
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant={playing ? "outline" : "default"}
-                className="gap-1.5"
-                onClick={() => void listen(reading)}
-              >
-                {playing ? (
-                  <Square className="size-4" aria-hidden="true" />
-                ) : (
-                  <Volume2 className="size-4" aria-hidden="true" />
-                )}
-                {playing ? t("Stop") : t("Listen to EVO")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className={cn("tabular-nums", slow && "border-brand-green text-brand-green")}
-                aria-pressed={slow}
-                aria-label={t("Slower voice")}
-                title={t("Slower voice")}
-                onClick={toggleSlow}
-              >
-                0.8×
-              </Button>
-              {reading.textPt ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  className="gap-1.5"
-                  aria-pressed={showPt}
-                  onClick={() => setShowPt((value) => !value)}
-                >
-                  <Languages className="size-4" aria-hidden="true" />
-                  {showPt ? t("Hide translation") : t("Show translation")}
-                </Button>
-              ) : null}
-            </div>
-
-            {/* The tip comes before the text (owner request, 2026-10-30: at the
-                bottom it was read too late), until the first word is marked. */}
-            {marked.length === 0 ? (
-              <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <MousePointerClick className="size-3.5 shrink-0" aria-hidden="true" />
-                {t("Tap any word you don't understand to see its translation.")}
-              </p>
-            ) : null}
-
+          {pastDay ? (
             <div
-              translate="no"
-              lang="en"
-              className="mt-4 space-y-3 text-base leading-relaxed sm:text-[1.05rem]"
+              className={cn(
+                SIDE_ROW_2,
+                "flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-400/30 bg-amber-400/[0.06] px-3 py-2 text-xs sm:text-sm",
+              )}
             >
-              {readingParagraphs(reading.text).map((paragraph, index) => (
-                <ReadingParagraph
-                  key={index}
-                  id={`reading-paragraph-${index}`}
-                  highlight={
-                    speakingParagraph === index ? "audio" : answerAt === index ? "answer" : null
-                  }
-                  text={paragraph}
-                  glossary={glossaryTerms}
-                  marked={marked}
-                  selected={selectedWord}
-                  onSelect={selectWord}
-                />
-              ))}
+              <span>
+                <span>{t("Reading again from")}</span> <span>{shortDate(pastDay.day, lang)}</span>{" "}
+                <span className="text-muted-foreground">
+                  · {t("practice: today's study day is not changed.")}
+                </span>
+              </span>
+              <Button type="button" size="sm" variant="outline" onClick={() => openDay(null)}>
+                {t("Back to today")}
+              </Button>
             </div>
-
-            {/* Where the text comes from (user request): every daily reading is
-                an original text by EVO, so the reference says so plainly. */}
-            <p className="mt-4 border-t border-border pt-3 text-[11px] leading-snug text-muted-foreground">
-              <span className="font-semibold uppercase tracking-wide">{t("Source")}</span>{" "}
-              {readingReference(reading, t)}
-            </p>
-            <div className="-ml-2 mt-1 flex flex-wrap items-center gap-1">
-              <CopyButton text={readingShareText(reading, t)} />
-              <EmailButton subject={reading.title} text={readingShareText(reading, t)} />
-              <WhatsAppButton text={readingShareText(reading, t)} />
+          ) : (
+            <div className={SIDE_ROW_2}>
+              <ReadingPicker choice={choice} onChange={pick} t={t} />
             </div>
+          )}
 
-            {selectedWord ? (
-              <WordMeaning term={selectedWord} glossaryPt={glossaryPt.get(selectedWord) ?? null} />
-            ) : null}
+          {isLoading || !reading ? (
+            <div className={cn("space-y-3", TEXT_AREA)}>
+              <Skeleton className="h-8 w-2/3" />
+              <Skeleton className="h-40 w-full" />
+              <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                {choice ? t("EVO is writing your text…") : t("Preparing today's reading…")}
+              </p>
+            </div>
+          ) : (
+            <>
+              <section
+                className={cn("card-soft p-4 sm:p-6 xl:overflow-y-auto xl:scroll-quiet", TEXT_AREA)}
+                aria-labelledby="reading-title"
+              >
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="rounded-full bg-amber-400/12 px-2.5 py-1 font-medium text-amber-400">
+                    {readingKindLabel(reading, t)}
+                  </span>
+                  <span className="rounded-full bg-secondary px-2.5 py-1 font-medium uppercase">
+                    {reading.level}
+                  </span>
+                  <ReadingSize reading={reading} t={t} />
+                </div>
+                <h2
+                  id="reading-title"
+                  translate="no"
+                  lang="en"
+                  className="font-display mt-3 text-xl font-semibold sm:text-2xl"
+                >
+                  {reading.title}
+                </h2>
 
-            {marked.length ? (
-              <div className="mt-4">
-                <p className="text-xs font-medium text-muted-foreground">{t("Words you marked")}</p>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {marked.map((term) => (
-                    <span
-                      key={term}
-                      className={cn(
-                        "inline-flex items-center rounded-full bg-amber-400/15 text-xs",
-                        selectedWord === term && "ring-1 ring-brand-green",
-                      )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={playing ? "outline" : "default"}
+                    className="gap-1.5"
+                    onClick={() => void listen(reading)}
+                  >
+                    {playing ? (
+                      <Square className="size-4" aria-hidden="true" />
+                    ) : (
+                      <Volume2 className="size-4" aria-hidden="true" />
+                    )}
+                    {playing ? t("Stop") : t("Listen to EVO")}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className={cn("tabular-nums", slow && "border-brand-green text-brand-green")}
+                    aria-pressed={slow}
+                    aria-label={t("Slower voice")}
+                    title={t("Slower voice")}
+                    onClick={toggleSlow}
+                  >
+                    0.8×
+                  </Button>
+                  {reading.textPt ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5"
+                      aria-pressed={showPt}
+                      onClick={() => setShowPt((value) => !value)}
                     >
-                      <button
-                        type="button"
-                        translate="no"
-                        lang="en"
-                        className="py-1 pl-2.5 pr-1 font-medium"
-                        onClick={() => setSelectedWord(term)}
-                      >
-                        {term}
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded-full p-1 pr-2 text-muted-foreground hover:text-foreground"
-                        aria-label={`${t("Remove")} ${term}`}
-                        onClick={() => unmark(term)}
-                      >
-                        <X className="size-3" aria-hidden="true" />
-                      </button>
-                    </span>
+                      <Languages className="size-4" aria-hidden="true" />
+                      {showPt ? t("Hide translation") : t("Show translation")}
+                    </Button>
+                  ) : null}
+                </div>
+
+                {/* The tip comes before the text (owner request, 2026-10-30: at the
+                bottom it was read too late), until the first word is marked. */}
+                {marked.length === 0 ? (
+                  <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <MousePointerClick className="size-3.5 shrink-0" aria-hidden="true" />
+                    {t("Tap any word you don't understand to see its translation.")}
+                  </p>
+                ) : null}
+
+                <div
+                  translate="no"
+                  lang="en"
+                  className="mt-4 space-y-3 text-base leading-relaxed sm:text-[1.05rem]"
+                >
+                  {readingParagraphs(reading.text).map((paragraph, index) => (
+                    <ReadingParagraph
+                      key={index}
+                      id={`reading-paragraph-${index}`}
+                      highlight={
+                        speakingParagraph === index ? "audio" : answerAt === index ? "answer" : null
+                      }
+                      text={paragraph}
+                      glossary={glossaryTerms}
+                      marked={marked}
+                      selected={selectedWord}
+                      onSelect={selectWord}
+                    />
                   ))}
                 </div>
-                <SaveMarkedWords reading={reading} marked={marked} glossaryPt={glossaryPt} t={t} />
-              </div>
-            ) : null}
 
-            {showPt && reading.textPt ? (
-              <div
-                translate="no"
-                className="mt-4 space-y-2 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground"
-              >
-                {readingParagraphs(reading.textPt).map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-              </div>
-            ) : null}
-          </section>
+                {/* Where the text comes from (user request): every daily reading is
+                an original text by EVO, so the reference says so plainly. */}
+                <p className="mt-4 border-t border-border pt-3 text-[11px] leading-snug text-muted-foreground">
+                  <span className="font-semibold uppercase tracking-wide">{t("Source")}</span>{" "}
+                  {readingReference(reading, t)}
+                </p>
+                <div className="-ml-2 mt-1 flex flex-wrap items-center gap-1">
+                  <CopyButton text={readingShareText(reading, t)} />
+                  <EmailButton subject={reading.title} text={readingShareText(reading, t)} />
+                  <WhatsAppButton text={readingShareText(reading, t)} />
+                </div>
 
-          <section className="card-soft p-4 sm:p-5" aria-labelledby="questions-title">
-            <h2 id="questions-title" className="font-display text-base font-semibold">
-              {t("Did you understand?")}
-            </h2>
-            {/* One question at a time behind numbered tabs (user request: the
-                five questions made this block much taller than the text). */}
-            <div className="mt-3 flex flex-wrap gap-1.5" role="tablist" aria-label={t("Questions")}>
-              {reading.questions.map((question, qIndex) => {
-                const answered = chosen[qIndex] !== null && chosen[qIndex] !== undefined;
-                const right = checked && chosen[qIndex] === question.answer;
-                const wrong = checked && answered && chosen[qIndex] !== question.answer;
-                return (
-                  <button
-                    key={qIndex}
-                    type="button"
-                    role="tab"
-                    aria-selected={current === qIndex}
-                    aria-label={`${t("Question")} ${qIndex + 1}`}
-                    onClick={() => {
-                      setCurrent(qIndex);
-                      setAnswerAt(null);
-                    }}
-                    className={cn(
-                      "grid size-8 place-items-center rounded-full border text-xs font-semibold tabular-nums transition-colors",
-                      right
-                        ? "border-brand-green bg-brand-green/15 text-brand-green"
-                        : wrong
-                          ? "border-destructive/60 bg-destructive/10 text-destructive"
-                          : answered
-                            ? "border-brand-green/50 bg-brand-green/10 text-foreground"
-                            : "border-border text-muted-foreground",
-                      current === qIndex &&
-                        "ring-2 ring-brand-green/60 ring-offset-1 ring-offset-background",
-                    )}
-                  >
-                    {right ? (
-                      <Check className="size-3.5" aria-hidden="true" />
-                    ) : wrong ? (
-                      <X className="size-3.5" aria-hidden="true" />
-                    ) : (
-                      qIndex + 1
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {(() => {
-              const qIndex = Math.min(current, reading.questions.length - 1);
-              const question = reading.questions[qIndex];
-              if (!question) return null;
-              return (
-                <div className="mt-3" role="tabpanel">
-                  <p translate="no" lang="en" className="text-sm font-medium">
-                    {qIndex + 1}. {question.question}
-                  </p>
-                  <div className="mt-2 grid gap-1.5">
-                    {question.options.map((option, oIndex) => {
-                      const picked = chosen[qIndex] === oIndex;
-                      const right = checked && oIndex === question.answer;
-                      const wrong = checked && picked && oIndex !== question.answer;
-                      return (
-                        <button
-                          key={oIndex}
-                          type="button"
-                          disabled={checked}
-                          aria-pressed={picked}
-                          onClick={() => {
-                            const next = chosen.map((value, index) =>
-                              index === qIndex ? oIndex : value,
-                            );
-                            setChosen(next);
-                            // On to the next open question, so answering flows.
-                            const open = next.findIndex(
-                              (value, index) => index > qIndex && value === null,
-                            );
-                            if (open >= 0) window.setTimeout(() => setCurrent(open), 250);
-                          }}
+                {selectedWord ? (
+                  <WordMeaning
+                    term={selectedWord}
+                    glossaryPt={glossaryPt.get(selectedWord) ?? null}
+                  />
+                ) : null}
+
+                {marked.length ? (
+                  <div className="mt-4">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {t("Words you marked")}
+                    </p>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {marked.map((term) => (
+                        <span
+                          key={term}
                           className={cn(
-                            "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
-                            picked && !checked
-                              ? "border-brand-green bg-brand-green/10"
-                              : "border-border hover:bg-secondary/60",
-                            right && "border-brand-green bg-brand-green/10 text-brand-green",
-                            wrong && "border-destructive/60 bg-destructive/10",
+                            "inline-flex items-center rounded-full bg-amber-400/15 text-xs",
+                            selectedWord === term && "ring-1 ring-brand-green",
                           )}
                         >
-                          {right ? (
-                            <Check className="size-4 shrink-0" aria-hidden="true" />
-                          ) : wrong ? (
-                            <X className="size-4 shrink-0" aria-hidden="true" />
-                          ) : null}
-                          <span translate="no" lang="en">
-                            {option}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {checked && question.explanation_pt ? (
-                    <p translate="no" className="mt-1.5 text-xs text-muted-foreground">
-                      {question.explanation_pt}
-                    </p>
-                  ) : null}
-                  {checked
-                    ? (() => {
-                        // Where the answer is, once the answers are checked.
-                        const at = answerParagraph(reading.text, question);
-                        return at === null ? null : (
                           <button
                             type="button"
-                            className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 underline-offset-2 hover:underline"
-                            onClick={() => seeInText(at)}
+                            translate="no"
+                            lang="en"
+                            className="py-1 pl-2.5 pr-1 font-medium"
+                            onClick={() => setSelectedWord(term)}
                           >
-                            <TextSearch className="size-3.5" aria-hidden="true" />
-                            {t("See in the text")}
+                            {term}
                           </button>
-                        );
-                      })()
-                    : null}
-                  <div className="mt-3 flex items-center justify-between">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      className="gap-1"
-                      disabled={qIndex === 0}
-                      onClick={() => {
-                        setCurrent(qIndex - 1);
-                        setAnswerAt(null);
-                      }}
-                    >
-                      <ChevronLeft className="size-4" aria-hidden="true" />
-                      {t("Previous")}
-                    </Button>
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {qIndex + 1}/{reading.questions.length}
-                    </span>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      className="gap-1"
-                      disabled={qIndex >= reading.questions.length - 1}
-                      onClick={() => {
-                        setCurrent(qIndex + 1);
-                        setAnswerAt(null);
-                      }}
-                    >
-                      {t("Next")}
-                      <ChevronRight className="size-4" aria-hidden="true" />
-                    </Button>
+                          <button
+                            type="button"
+                            className="rounded-full p-1 pr-2 text-muted-foreground hover:text-foreground"
+                            aria-label={`${t("Remove")} ${term}`}
+                            onClick={() => unmark(term)}
+                          >
+                            <X className="size-3" aria-hidden="true" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <SaveMarkedWords
+                      reading={reading}
+                      marked={marked}
+                      glossaryPt={glossaryPt}
+                      t={t}
+                    />
                   </div>
-                </div>
-              );
-            })()}
+                ) : null}
 
-            {result ? (
-              <p className="mt-4 rounded-lg bg-secondary/60 px-3 py-2 text-sm font-medium">
-                <span>{t("You got")}</span> {result.right}/{result.total} <span>{t("right.")}</span>
-              </p>
-            ) : checked ? null : (
-              <Button
-                type="button"
-                className="mt-4 w-full"
-                disabled={!allAnswered}
-                onClick={() => {
-                  setEngaged(true);
-                  setChecked(true);
-                  // Today's study day already counts: this text is practice.
-                  if (practice) return;
-                  finish.mutate({
-                    answers: chosen.map((value) => value ?? 0),
-                    fallback: reading.fallback,
-                    choice: reading.choice,
-                  });
-                }}
+                {showPt && reading.textPt ? (
+                  <div
+                    translate="no"
+                    className="mt-4 space-y-2 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground"
+                  >
+                    {readingParagraphs(reading.textPt).map((paragraph, index) => (
+                      <p key={index}>{paragraph}</p>
+                    ))}
+                  </div>
+                ) : null}
+              </section>
+
+              <section
+                className="card-soft p-4 sm:p-5 xl:col-start-2 xl:row-start-3 xl:min-h-0 xl:overflow-y-auto xl:scroll-quiet"
+                aria-labelledby="questions-title"
               >
-                {t("Check answers")}
-              </Button>
-            )}
-            {reading.past ? (
-              <p className="mt-3 text-xs text-muted-foreground">
-                {doneHere
-                  ? t("Your answers from that day.")
-                  : t("Practice: answers checked here, today's study day is not changed.")}
-              </p>
-            ) : practice ? (
-              <p className="mt-3 text-xs text-muted-foreground">
-                {t("Extra practice: today's reading already counts as a study day.")}
-              </p>
-            ) : finish.isSuccess || doneHere ? (
-              <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-brand-green">
-                <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
-                {t("Reading done: today counts as a study day.")}
-              </p>
-            ) : finish.isError ? (
-              <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-destructive">
-                <span>{t("Your answers could not be saved.")}</span>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={finish.isPending}
-                  onClick={() => finish.variables && finish.mutate(finish.variables)}
+                <h2 id="questions-title" className="font-display text-base font-semibold">
+                  {t("Did you understand?")}
+                </h2>
+                {/* One question at a time behind numbered tabs (user request: the
+                five questions made this block much taller than the text). */}
+                <div
+                  className="mt-3 flex flex-wrap gap-1.5"
+                  role="tablist"
+                  aria-label={t("Questions")}
                 >
-                  {t("Try again")}
-                </Button>
-              </p>
-            ) : null}
-          </section>
+                  {reading.questions.map((question, qIndex) => {
+                    const answered = chosen[qIndex] !== null && chosen[qIndex] !== undefined;
+                    const right = checked && chosen[qIndex] === question.answer;
+                    const wrong = checked && answered && chosen[qIndex] !== question.answer;
+                    return (
+                      <button
+                        key={qIndex}
+                        type="button"
+                        role="tab"
+                        aria-selected={current === qIndex}
+                        aria-label={`${t("Question")} ${qIndex + 1}`}
+                        onClick={() => {
+                          setCurrent(qIndex);
+                          setAnswerAt(null);
+                        }}
+                        className={cn(
+                          "grid size-8 place-items-center rounded-full border text-xs font-semibold tabular-nums transition-colors",
+                          right
+                            ? "border-brand-green bg-brand-green/15 text-brand-green"
+                            : wrong
+                              ? "border-destructive/60 bg-destructive/10 text-destructive"
+                              : answered
+                                ? "border-brand-green/50 bg-brand-green/10 text-foreground"
+                                : "border-border text-muted-foreground",
+                          current === qIndex &&
+                            "ring-2 ring-brand-green/60 ring-offset-1 ring-offset-background",
+                        )}
+                      >
+                        {right ? (
+                          <Check className="size-3.5" aria-hidden="true" />
+                        ) : wrong ? (
+                          <X className="size-3.5" aria-hidden="true" />
+                        ) : (
+                          qIndex + 1
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                {(() => {
+                  const qIndex = Math.min(current, reading.questions.length - 1);
+                  const question = reading.questions[qIndex];
+                  if (!question) return null;
+                  return (
+                    <div className="mt-3" role="tabpanel">
+                      <p translate="no" lang="en" className="text-sm font-medium">
+                        {qIndex + 1}. {question.question}
+                      </p>
+                      <div className="mt-2 grid gap-1.5">
+                        {question.options.map((option, oIndex) => {
+                          const picked = chosen[qIndex] === oIndex;
+                          const right = checked && oIndex === question.answer;
+                          const wrong = checked && picked && oIndex !== question.answer;
+                          return (
+                            <button
+                              key={oIndex}
+                              type="button"
+                              disabled={checked}
+                              aria-pressed={picked}
+                              onClick={() => {
+                                const next = chosen.map((value, index) =>
+                                  index === qIndex ? oIndex : value,
+                                );
+                                setChosen(next);
+                                // On to the next open question, so answering flows.
+                                const open = next.findIndex(
+                                  (value, index) => index > qIndex && value === null,
+                                );
+                                if (open >= 0) window.setTimeout(() => setCurrent(open), 250);
+                              }}
+                              className={cn(
+                                "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                                picked && !checked
+                                  ? "border-brand-green bg-brand-green/10"
+                                  : "border-border hover:bg-secondary/60",
+                                right && "border-brand-green bg-brand-green/10 text-brand-green",
+                                wrong && "border-destructive/60 bg-destructive/10",
+                              )}
+                            >
+                              {right ? (
+                                <Check className="size-4 shrink-0" aria-hidden="true" />
+                              ) : wrong ? (
+                                <X className="size-4 shrink-0" aria-hidden="true" />
+                              ) : null}
+                              <span translate="no" lang="en">
+                                {option}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {checked && question.explanation_pt ? (
+                        <p translate="no" className="mt-1.5 text-xs text-muted-foreground">
+                          {question.explanation_pt}
+                        </p>
+                      ) : null}
+                      {checked
+                        ? (() => {
+                            // Where the answer is, once the answers are checked.
+                            const at = answerParagraph(reading.text, question);
+                            return at === null ? null : (
+                              <button
+                                type="button"
+                                className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 underline-offset-2 hover:underline"
+                                onClick={() => seeInText(at)}
+                              >
+                                <TextSearch className="size-3.5" aria-hidden="true" />
+                                {t("See in the text")}
+                              </button>
+                            );
+                          })()
+                        : null}
+                      <div className="mt-3 flex items-center justify-between">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="gap-1"
+                          disabled={qIndex === 0}
+                          onClick={() => {
+                            setCurrent(qIndex - 1);
+                            setAnswerAt(null);
+                          }}
+                        >
+                          <ChevronLeft className="size-4" aria-hidden="true" />
+                          {t("Previous")}
+                        </Button>
+                        <span className="text-xs tabular-nums text-muted-foreground">
+                          {qIndex + 1}/{reading.questions.length}
+                        </span>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="gap-1"
+                          disabled={qIndex >= reading.questions.length - 1}
+                          onClick={() => {
+                            setCurrent(qIndex + 1);
+                            setAnswerAt(null);
+                          }}
+                        >
+                          {t("Next")}
+                          <ChevronRight className="size-4" aria-hidden="true" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {result ? (
+                  <p className="mt-4 rounded-lg bg-secondary/60 px-3 py-2 text-sm font-medium">
+                    <span>{t("You got")}</span> {result.right}/{result.total}{" "}
+                    <span>{t("right.")}</span>
+                  </p>
+                ) : checked ? null : (
+                  <Button
+                    type="button"
+                    className="mt-4 w-full"
+                    disabled={!allAnswered}
+                    onClick={() => {
+                      setEngaged(true);
+                      setChecked(true);
+                      // Today's study day already counts: this text is practice.
+                      if (practice) return;
+                      finish.mutate({
+                        answers: chosen.map((value) => value ?? 0),
+                        fallback: reading.fallback,
+                        choice: reading.choice,
+                      });
+                    }}
+                  >
+                    {t("Check answers")}
+                  </Button>
+                )}
+                {reading.past ? (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {doneHere
+                      ? t("Your answers from that day.")
+                      : t("Practice: answers checked here, today's study day is not changed.")}
+                  </p>
+                ) : practice ? (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {t("Extra practice: today's reading already counts as a study day.")}
+                  </p>
+                ) : finish.isSuccess || doneHere ? (
+                  <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-brand-green">
+                    <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+                    {t("Reading done: today counts as a study day.")}
+                  </p>
+                ) : finish.isError ? (
+                  <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-destructive">
+                    <span>{t("Your answers could not be saved.")}</span>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={finish.isPending}
+                      onClick={() => finish.variables && finish.mutate(finish.variables)}
+                    >
+                      {t("Try again")}
+                    </Button>
+                  </p>
+                ) : null}
+              </section>
+            </>
+          )}
         </div>
-      )}
+      </div>
     </AppShell>
   );
 }

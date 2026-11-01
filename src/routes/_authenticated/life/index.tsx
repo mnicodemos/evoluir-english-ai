@@ -89,19 +89,24 @@ function LifePage() {
 
   if (isLoading || !data) {
     return (
-      <AppShell>
-        <LifeHeader />
-        {/* Same shapes as the page (user request: no spinner, no jump). */}
-        <div className="space-y-4" aria-busy="true">
-          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            <Skeleton className="h-56 rounded-xl" />
-            <Skeleton className="h-56 rounded-xl" />
-            <Skeleton className="hidden h-56 rounded-xl xl:block" />
+      <AppShell desktopOneScreen>
+        {/* Same shapes as the page, one screen tall from xl like it (owner
+            report, 2026-11-01: the old two rows of three boxes, with the
+            footer under them, jumped into the real layout when it loaded). */}
+        <div
+          className="xl:flex xl:h-[calc(100dvh-3rem)] xl:min-h-[44rem] xl:flex-col"
+          aria-busy="true"
+        >
+          <LifeHeader />
+          <div className="grid gap-4 lg:grid-cols-2 xl:shrink-0 xl:grid-cols-3 xl:gap-5">
+            <Skeleton className="h-56 rounded-xl xl:h-[17.5rem]" />
+            <Skeleton className="h-56 rounded-xl xl:h-[17.5rem]" />
+            <Skeleton className="h-56 rounded-xl lg:col-span-2 xl:col-span-1 xl:h-[17.5rem]" />
           </div>
-          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            <Skeleton className="h-80 rounded-xl" />
-            <Skeleton className="h-80 rounded-xl" />
-            <Skeleton className="hidden h-80 rounded-xl xl:block" />
+          <Skeleton className="mt-4 h-10 w-72 shrink-0 rounded-lg" />
+          <div className="mt-4 grid gap-4 lg:grid-cols-5 xl:min-h-0 xl:flex-1 xl:gap-5">
+            <Skeleton className="h-80 rounded-xl lg:col-span-3 xl:h-auto" />
+            <Skeleton className="h-80 rounded-xl lg:col-span-2 xl:h-auto" />
           </div>
         </div>
       </AppShell>
