@@ -47,6 +47,7 @@ import {
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import {
   NEXT_STEP_ACTION_TEXT,
+  NEXT_STEP_BENEFIT_TEXT,
   NEXT_STEP_PRIORITY_TEXT,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
@@ -275,6 +276,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const priorityText = t(NEXT_STEP_PRIORITY_TEXT)
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
+  const benefitText = t(NEXT_STEP_BENEFIT_TEXT[data.prioritySkill ?? "speaking"] ?? "");
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   // "Writing · Writing" when the skill and the place share a name: say it once.
   const questSkillLabel = data.quest
@@ -735,10 +737,21 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* One sentence with the reason; the main column already says what
                 happened ("You have not practiced this skill yet"). */}
             {/* Wraps before the Continuous badge's left edge (user request). */}
-            {/* At most two lines, so it never runs into Extra practice (user request). */}
-            <p className="mt-2 line-clamp-2 text-[13px] leading-snug text-sidebar-foreground/80">
-              {priorityText}
-            </p>
+            {/* Two bullets (owner request, 2026-11-01: the taller card has room):
+                what needs practice, then what that practice brings. Each is one
+                short line in English and Portuguese (under 38 characters), and
+                truncates rather than wrap, so it never runs into Extra practice. */}
+            <ul className="mt-2 space-y-1.5 text-[13px] leading-snug text-sidebar-foreground/80">
+              {[priorityText, benefitText].filter(Boolean).map((line) => (
+                <li key={line} className="flex gap-2">
+                  <span
+                    aria-hidden="true"
+                    className="mt-[0.45em] size-1.5 shrink-0 rounded-full bg-warning"
+                  />
+                  <span className="min-w-0 truncate">{line}</span>
+                </li>
+              ))}
+            </ul>
             {/* Always there (user request): when today's extras are done the
                 block stays with a done state, like Keep improving, instead of
                 leaving a hole in the card. */}

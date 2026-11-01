@@ -520,6 +520,21 @@ export const NEXT_STEP_WHY_NOW_TEXT: Record<NextStepReason, string> = {
 export const NEXT_STEP_PRIORITY_TEXT = "{skill} needs practice.";
 
 /**
+ * Second bullet of "Why this matters now" (owner request, 2026-11-01: the taller
+ * card holds two lines, as bullets): what practising the priority skill brings.
+ * Fixed per skill, never a score or a new decision.
+ */
+export const NEXT_STEP_BENEFIT_TEXT: Record<string, string> = {
+  grammar: "Clearer sentences, fewer mistakes.",
+  vocabulary: "More words to say what you mean.",
+  reading: "Builds vocabulary and confidence.",
+  listening: "Follow real conversations better.",
+  writing: "Shows your mistakes so you fix them.",
+  speaking: "Builds fluency and confidence.",
+  pronunciation: "Be understood the first time.",
+};
+
+/**
  * Evidence line for the same block: the real cause that produced the priority,
  * one entry per reason. Same decision, no score, no confidence, no technical
  * reason names, and never a repeated action (the buttons execute; this explains).
