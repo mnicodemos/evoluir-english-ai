@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -33,6 +33,7 @@ import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useFlashcardsDue } from "@/hooks/useFlashcardsDue";
 import { wordReviewTarget } from "@/lib/wordReview";
+import { ACTIVITY_CHART_COLORS } from "@/lib/activityChartColors";
 import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import { continueRows, goFurtherRow, newTodayRows } from "@/lib/keepImprovingNew";
@@ -269,7 +270,10 @@ export function SmartReviewCard({
           }`}
         >
           {showWordReviews && (
-            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
+            <li
+              className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`}
+              style={rowTint("vocabulary")}
+            >
               <img src={reviewWords} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
@@ -292,7 +296,10 @@ export function SmartReviewCard({
             </li>
           )}
           {showMistakes && (
-            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-warning/35 bg-warning/[0.07] p-1 pr-2">
+            <li
+              className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`}
+              style={rowTint("mistakes")}
+            >
               <img src={reviewMistakes} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("My mistakes")} />
@@ -319,7 +326,8 @@ export function SmartReviewCard({
             return (
               <li
                 key={item.skill}
-                className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-border bg-secondary/45 p-1 pr-2"
+                className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`}
+                style={rowTint(item.skill)}
               >
                 {SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO] ? (
                   <img
@@ -370,7 +378,8 @@ export function SmartReviewCard({
           {newRows.map((row) => (
             <li
               key={row.key}
-              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
+              className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} border-dashed p-1 pr-2`}
+              style={rowTint(row.key)}
             >
               <img src={SKILL_PHOTO[row.key]} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
@@ -393,7 +402,8 @@ export function SmartReviewCard({
           {keepGoing.map((row) => (
             <li
               key={row.key}
-              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-border bg-secondary/30 p-1 pr-2"
+              className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`}
+              style={rowTint(row.key)}
             >
               <ContinueTile rowKey={row.key} />
               <div className="min-w-0">
@@ -574,6 +584,31 @@ function RowTag({
  * pushed the Dashboard past one screen): no height of its own while the row is
  * sized (h-0), then the row's full height (min-h-full, self-stretch).
  */
+/* Each row takes its activity's colour from the progress charts (owner request,
+   2026-11-01: the card's colour follows the activity, like the evolution chart;
+   ACTIVITY_CHART_COLORS): a soft outline and tint, the full colour on hover or
+   press. Mistakes keep the warning amber (no chart series of their own). */
+const ROW_COLOR: Record<string, string> = {
+  listening: ACTIVITY_CHART_COLORS.Listening,
+  reading: ACTIVITY_CHART_COLORS.Reading,
+  speaking: ACTIVITY_CHART_COLORS.Talking,
+  pronunciation: ACTIVITY_CHART_COLORS.Talking,
+  coach: ACTIVITY_CHART_COLORS.Talking,
+  writing: ACTIVITY_CHART_COLORS.Writing,
+  grammar: ACTIVITY_CHART_COLORS.Grammar,
+  teacher: ACTIVITY_CHART_COLORS.Grammar,
+  vocabulary: ACTIVITY_CHART_COLORS.Vocabulary,
+  learning: ACTIVITY_CHART_COLORS.Lessons,
+  mistakes: "var(--color-warning)",
+};
+
+function rowTint(key: string): CSSProperties {
+  return { "--row": ROW_COLOR[key] ?? "var(--color-border)" } as CSSProperties;
+}
+
+const ROW_TINT =
+  "border transition-colors [border-color:color-mix(in_oklab,var(--row)_45%,transparent)] [background-color:color-mix(in_oklab,var(--row)_7%,transparent)] any-hover:[border-color:var(--row)] any-hover:[background-color:color-mix(in_oklab,var(--row)_14%,transparent)] active:[border-color:var(--row)] active:[background-color:color-mix(in_oklab,var(--row)_14%,transparent)]";
+
 const ROW_PHOTO = "h-0 min-h-full w-16 self-stretch rounded-md object-cover";
 
 /**

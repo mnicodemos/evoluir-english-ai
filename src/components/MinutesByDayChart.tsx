@@ -95,7 +95,7 @@ export function MinutesByDayChart({ userId, level }: Props) {
               labelClassName="text-foreground"
             />
             <Legend wrapperStyle={{ fontSize: "12px" }} iconSize={10} />
-            <Bar dataKey="Lessons" stackId="min" fill="#EC4899" />
+            <Bar dataKey="Lessons" stackId="min" fill={ACTIVITY_CHART_COLORS.Lessons} />
             <Bar dataKey="Vocabulary" stackId="min" fill={ACTIVITY_CHART_COLORS.Vocabulary} />
             <Bar dataKey="Listening" stackId="min" fill={ACTIVITY_CHART_COLORS.Listening} />
             <Bar dataKey="Reading" stackId="min" fill={ACTIVITY_CHART_COLORS.Reading} />
