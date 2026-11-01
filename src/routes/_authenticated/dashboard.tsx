@@ -800,7 +800,7 @@ function Dashboard() {
             lang={lang === "pt" ? "pt" : "en"}
             translate={t}
           />
-          <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3">
+          <div className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_6.75rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3">
             <header className="animate-rise min-w-0 xl:h-16">
               <EvoDailyReflection
                 userId={profile.id}
@@ -895,7 +895,7 @@ function Dashboard() {
               2026-11-01: one column edge from top to bottom). The 16 and 11 column
               grids inside the 8 columns keep the same gap, so their edges land on
               the page's 12 columns: jewels and league share 5, your week takes 3. */}
-            <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
+            <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-12 xl:h-[6.75rem]">
               {/* As wide as the Business English card (4 of 12 columns; user request). */}
               <div className="card-soft min-w-0 overflow-hidden lg:col-span-4">
                 <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
@@ -1091,11 +1091,13 @@ function Dashboard() {
                 </div>
                 {/* The daily goal over the last seven days (owner request, 2026-11-01:
                   the taller card left an empty band between the lines and the button). */}
-                {/* pt-7: room under the gauge (drawn 8 px lower, lg:translate-y-2), so its "0/15 min"
-                  would touch the bar with less room above it. my-auto and pb-3 centre the
-                  bar in the free height, so it never crowds My progress below (owner
-                  review, 2026-11-01: 13 px under the bar, far more above it). */}
-                <div className="my-auto hidden pb-3 pt-7 lg:block">
+                {/* pt-5: room under the gauge (drawn 8 px lower, lg:translate-y-2), so its
+                  "0/15 min" keeps 12 px above the bar. my-auto centres the bar in the free
+                  height (owner review, 2026-11-01). The fixed paddings stay small (pt-5,
+                  pb-2): they set the card's minimum height, and with the caption under
+                  the bar a taller minimum pushed the Dashboard past one screen (owner
+                  report, 2026-11-01). */}
+                <div className="my-auto hidden pb-2 pt-5 lg:block">
                   <DailyGoalTrend
                     userId={profile.id}
                     goalMinutes={profile.daily_minutes ?? 0}
@@ -1105,7 +1107,7 @@ function Dashboard() {
                 </div>
                 {/* Desktop-only secondary action to My Progress, styled like the
                   app's other buttons (not a status pill). */}
-                <div className="hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5 min-[1680px]:gap-1.5 min-[1680px]:pt-3">
+                <div className="hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5">
                   {/* The study plan has its own header slot; this button opens My Progress,
                     which left the sidebar. A secondary glass button (owner review,
                     2026-10-31: two solid turquoise buttons side by side competed), so
@@ -1182,7 +1184,7 @@ function Dashboard() {
 function DashboardSkeleton() {
   return (
     <div
-      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3"
+      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_6.75rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3"
       aria-busy="true"
     >
       <div className="flex min-w-0 items-center justify-between gap-3 xl:h-16">
@@ -1192,9 +1194,9 @@ function DashboardSkeleton() {
         </div>
         <Skeleton className="h-10 w-32 rounded-full lg:h-11 lg:w-72" />
       </div>
-      <div className="hidden min-w-0 gap-3 lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
-        <Skeleton className="h-full min-h-[7.59rem] rounded-xl lg:col-span-4" />
-        <Skeleton className="h-full min-h-[7.59rem] rounded-xl lg:col-span-8" />
+      <div className="hidden min-w-0 gap-3 lg:grid lg:grid-cols-12 xl:h-[6.75rem]">
+        <Skeleton className="h-full min-h-[6.75rem] rounded-xl lg:col-span-4" />
+        <Skeleton className="h-full min-h-[6.75rem] rounded-xl lg:col-span-8" />
       </div>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[7px] lg:grid lg:grid-cols-12 lg:gap-3">
         <Skeleton className="min-h-[13rem] flex-1 rounded-xl lg:col-span-9 lg:min-h-[16.45rem]" />

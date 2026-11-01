@@ -72,13 +72,13 @@ export function DailyGoalTrend({
       <Progress
         value={average}
         fillIn
-        className="mt-2 h-2.5 bg-white/[0.07]"
+        className="mt-1.5 h-2.5 bg-white/[0.07]"
         aria-label={`${t("Last 7 days")}: ${t("Average")} ${average}%`}
       />
       {/* What the number is (owner request, 2026-11-01: students must know where
           it comes from): the share of the daily minutes goal reached each day,
           averaged over the seven days, every activity that counts minutes. */}
-      <p className="mt-1.5 line-clamp-2 text-[10.5px] leading-tight text-muted-foreground">
+      <p className="mt-1 line-clamp-2 text-[10.5px] leading-tight text-muted-foreground">
         {t("Share of your {minutes} min goal reached per day, all activities.").replace(
           "{minutes}",
           String(goalMinutes),
