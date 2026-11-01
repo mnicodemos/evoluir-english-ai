@@ -144,7 +144,7 @@ function LifeGuidePage() {
       title: "Meditations in English",
       what: "Relax and train your listening.",
       steps: [
-        "Choose a session; EVO reads it slowly.",
+        "Open Meditations at the top of Life+ AI and choose a session; EVO reads it slowly.",
         "Follow the text and see the translation if you need it.",
         "Finish with five key words and one question.",
       ],

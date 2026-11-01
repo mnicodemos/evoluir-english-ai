@@ -82,7 +82,8 @@ const baseUiPt: Record<string, string> = {
     "A EVO responde pensando nas suas metas e hábitos.",
   "Add its suggestions with one tap.": "Adicione as sugestões com um toque.",
   "Relax and train your listening.": "Relaxe e treine sua escuta.",
-  "Choose a session; EVO reads it slowly.": "Escolha uma sessão; a EVO lê devagar.",
+  "Open Meditations at the top of Life+ AI and choose a session; EVO reads it slowly.":
+    "Abra Meditações no topo do Life+ AI e escolha uma sessão; a EVO lê devagar.",
   "Focus blocks with short breaks, Pomodoro style.":
     "Blocos de foco com pausas curtas, no estilo Pomodoro.",
   "Choose 15, 25 or 50 minutes and start; a long break comes after every fourth block.":
@@ -1077,6 +1078,8 @@ const baseUiPt: Record<string, string> = {
   "Shorts are part of Premium. Subscribe to watch every one of them.":
     "Os Shorts fazem parte do Premium. Assine para assistir a todos.",
   "EVO · Shorts": "EVO · Shorts",
+  Meditations: "Meditações",
+  "Listen and relax": "Ouça e relaxe",
   "Write a short text": "Escreva um texto curto",
   "Practise new words": "Pratique palavras novas",
   "Practise with the AI Teacher": "Pratique com o Professor de IA",

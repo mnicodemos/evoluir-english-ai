@@ -10,7 +10,6 @@ import { DecisionsWorkspace } from "@/components/life/Decisions";
 import { FocusSection } from "@/components/life/FocusSection";
 import { GoalsSection } from "@/components/life/GoalsSection";
 import { HabitsSection } from "@/components/life/HabitsSection";
-import { MeditationSection } from "@/components/life/MeditationSection";
 import { LifeHeader, LifePremiumGate, useLifeT } from "@/components/life/LifeNav";
 import { RoutineSection } from "@/components/life/RoutineSection";
 import { LifeToday } from "@/components/life/LifeToday";
@@ -258,10 +257,6 @@ function LifePage() {
           <DecisionsWorkspace variant="tab" />
         </TabsContent>
       </Tabs>
-
-      <div className="mt-4 xl:mt-5">
-        <MeditationSection />
-      </div>
     </AppShell>
   );
 }

@@ -2,22 +2,26 @@ import { Link } from "@tanstack/react-router";
 import {
   BookMarked,
   Check,
+  ChevronDown,
   ChevronRight,
+  Flower2,
   Crown,
   Plus,
-  Scale,
   Sprout,
   type LucideIcon,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
+import { MeditationSection } from "@/components/life/MeditationSection";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { ACCENTS } from "@/lib/accents";
+import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 
 export function useLifeT() {
@@ -49,30 +53,13 @@ export function LifeHeader() {
       }
       description={t("Evolve one day at a time.")}
       actions={
-        // Decisions in a glass capsule like the Dashboard's Weather talk, in
-        // the same top-right corner, with the guide in its own grey circle at
-        // the end like the bell (user request, 2026-10-23). Phones keep the
-        // icons only, so the title keeps its room.
+        // Meditations in a glass capsule like the Dashboard's Weather talk
+        // (owner request, 2026-11-01: it replaced Decisions, which moved to
+        // its own tab, and opens a dropdown to pick and hear a session right
+        // there), with the guide in its own grey circle at the end like the
+        // bell. Phones keep the icons only, so the title keeps its room.
         <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
-          <Link
-            to="/life/decisions"
-            aria-label={`${t("Decisions")} · ${t("Compare your options")}`}
-            className="group flex h-9 shrink-0 items-center gap-2.5 rounded-full text-left transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 sm:pr-3"
-          >
-            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
-              <Scale className="size-[1.15rem]" aria-hidden="true" />
-            </span>
-            <span className="hidden leading-tight sm:block">
-              <span className="block text-xs font-semibold text-foreground">{t("Decisions")}</span>
-              <span className="block text-[10.5px] text-muted-foreground">
-                {t("Compare your options")}
-              </span>
-            </span>
-            <ChevronRight
-              className="hidden size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 sm:block"
-              aria-hidden="true"
-            />
-          </Link>
+          <MeditationsMenu />
           {/* A label on hover names the guide (user request, 2026-10-23). */}
           <TooltipProvider delayDuration={150}>
             <Tooltip>
@@ -93,6 +80,72 @@ export function LifeHeader() {
         </div>
       }
     />
+  );
+}
+
+/**
+ * The header's Meditations dropdown (owner request, 2026-11-01: the
+ * meditations left the page body; the student picks and hears a session right
+ * here), in the notifications popover's frosted graphite. While a session
+ * plays, a click outside does not close it (closing stops the voice); Stop,
+ * Escape or the capsule do.
+ */
+function MeditationsMenu() {
+  const { t } = useLifeT();
+  const [open, setOpen] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  // #meditation (the Focus break's "Two-minute break" link) opens the menu.
+  useEffect(() => {
+    const check = () => {
+      if (window.location.hash === "#meditation") setOpen(true);
+    };
+    check();
+    window.addEventListener("hashchange", check);
+    return () => window.removeEventListener("hashchange", check);
+  }, []);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={`${t("Meditations")} · ${t("Listen and relax")}`}
+          className="group flex h-9 shrink-0 items-center gap-2.5 rounded-full text-left transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 sm:pr-3"
+        >
+          <span className="relative grid size-9 shrink-0 place-items-center rounded-full bg-rose-400/15 text-rose-300">
+            <Flower2 className="size-[1.15rem]" aria-hidden="true" />
+            {playing ? (
+              <span
+                className="absolute right-0.5 top-0.5 size-2 rounded-full bg-brand-green ring-2 ring-background"
+                aria-hidden="true"
+              />
+            ) : null}
+          </span>
+          <span className="hidden leading-tight sm:block">
+            <span className="block text-xs font-semibold text-foreground">{t("Meditations")}</span>
+            <span className="block text-[10.5px] text-muted-foreground">
+              {t("Listen and relax")}
+            </span>
+          </span>
+          <ChevronDown
+            className={cn(
+              "hidden size-3.5 shrink-0 text-muted-foreground transition-transform sm:block",
+              open && "rotate-180",
+            )}
+            aria-hidden="true"
+          />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        sideOffset={8}
+        onInteractOutside={(event) => {
+          if (playing) event.preventDefault();
+        }}
+        className={`dashboard-shell dark w-[min(24rem,calc(100vw-1.5rem))] p-1 ${graphitePanelClass}`}
+      >
+        <MeditationSection variant="menu" onPlayingChange={setPlaying} />
+      </PopoverContent>
+    </Popover>
   );
 }
 

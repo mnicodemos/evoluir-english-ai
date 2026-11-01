@@ -287,7 +287,7 @@ export function MobileNavigationMenu({
               activeProps={{ className: "text-brand-green" }}
               inactiveProps={{ className: "text-sidebar-foreground/70" }}
             >
-              <BookMarked className="size-5 shrink-0" />
+              <BookMarked className="size-5 shrink-0 text-sky-400" />
               <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
             </Link>
           </SheetClose>
@@ -298,7 +298,7 @@ export function MobileNavigationMenu({
               activeProps={{ className: "text-brand-green" }}
               inactiveProps={{ className: "text-sidebar-foreground/70" }}
             >
-              <Crown className="size-5 shrink-0" />
+              <Crown className="size-5 shrink-0 text-amber-400" />
               <span className="min-w-0 truncate text-left">{translate("My Subscription")}</span>
             </Link>
           </SheetClose>
@@ -308,7 +308,7 @@ export function MobileNavigationMenu({
               className="h-11 w-full justify-start gap-2 rounded-lg px-2 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               onClick={signOut}
             >
-              <LogOut className="size-5" />
+              <LogOut className="size-5 text-rose-400" />
               {translate("Sign out")}
             </Button>
           </SheetClose>
@@ -548,7 +548,7 @@ function AppShellContent({
                 activeProps={{ className: "text-brand-green" }}
                 inactiveProps={{ className: "text-sidebar-foreground/70" }}
               >
-                <BookMarked className="size-5 shrink-0" />
+                <BookMarked className="size-5 shrink-0 text-sky-400" />
                 <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
               </Link>
               <Link
@@ -557,7 +557,7 @@ function AppShellContent({
                 activeProps={{ className: "text-brand-green" }}
                 inactiveProps={{ className: "text-sidebar-foreground/70" }}
               >
-                <Crown className="size-5 shrink-0" />
+                <Crown className="size-5 shrink-0 text-amber-400" />
                 <span className="min-w-0 truncate text-left">{translate("My Subscription")}</span>
               </Link>
               <Button
@@ -566,7 +566,7 @@ function AppShellContent({
                 className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 onClick={signOut}
               >
-                <LogOut className="size-5 shrink-0" />
+                <LogOut className="size-5 shrink-0 text-rose-400" />
                 <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
               </Button>
             </div>

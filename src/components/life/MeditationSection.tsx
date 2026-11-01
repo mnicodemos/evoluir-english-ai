@@ -27,7 +27,15 @@ type Phase = "list" | "playing" | "done";
  * on request); the minutes count toward the day's goal (activity
  * "meditation"). Calm breathing is free; the other sessions are Premium.
  */
-export function MeditationSection() {
+export function MeditationSection({
+  variant = "section",
+  onPlayingChange,
+}: {
+  /** "menu": inside the /life header's Meditations dropdown (owner request,
+   *  2026-11-01), a compact header and one column, no card of its own. */
+  variant?: "section" | "menu";
+  onPlayingChange?: (playing: boolean) => void;
+} = {}) {
   const { t } = useLifeT();
   const { data: profile } = useProfile();
   const { data: life } = useLife();
@@ -120,13 +128,18 @@ export function MeditationSection() {
   }
 
   const premium = !!life?.premium;
+  const menu = variant === "menu";
+  useEffect(() => {
+    onPlayingChange?.(phase === "playing");
+  }, [phase, onPlayingChange]);
+  const frame = menu ? "p-2" : "card-soft scroll-mt-4 p-4 sm:p-5 xl:p-6";
 
   if (session && phase !== "list") {
     const lines = session.lines[tier];
     return (
       <section
-        id="meditation"
-        className="card-soft scroll-mt-4 p-4 sm:p-5 xl:p-6"
+        id={menu ? undefined : "meditation"}
+        className={frame}
         aria-labelledby="meditation-title"
       >
         {/* Stop sits on top and the text scrolls inside the block (user
@@ -161,7 +174,10 @@ export function MeditationSection() {
           </div>
         </LifeSectionTitle>
 
-        <div ref={scroller} className="relative mt-3 max-h-56 overflow-y-auto pr-1">
+        <div
+          ref={scroller}
+          className={cn("relative mt-3 overflow-y-auto pr-1", menu ? "max-h-72" : "max-h-56")}
+        >
           <ol className="space-y-2" translate="no">
             {lines.map((line, index) => (
               <li
@@ -241,21 +257,33 @@ export function MeditationSection() {
 
   return (
     <section
-      id="meditation"
-      className="card-soft scroll-mt-4 p-4 sm:p-5 xl:p-6"
+      id={menu ? undefined : "meditation"}
+      className={frame}
       aria-labelledby="meditation-title"
     >
-      <LifeSectionTitle
-        id="meditation-title"
-        icon={Flower2}
-        accent="rose"
-        title={t("Meditations in English")}
-        subtitle={t(
-          "Relax and train your listening: EVO guides you slowly, with the text on screen.",
-        )}
-      />
-      {/* Side by side in the wide row under Routine and the Life Coach. */}
-      <ul className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      {menu ? (
+        // The notifications popover's header: one title line and a short line.
+        <div className="px-1 pb-1">
+          <p id="meditation-title" className="font-display text-sm font-semibold">
+            {t("Meditations in English")}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {t("Relax and train your listening: EVO guides you slowly, with the text on screen.")}
+          </p>
+        </div>
+      ) : (
+        <LifeSectionTitle
+          id="meditation-title"
+          icon={Flower2}
+          accent="rose"
+          title={t("Meditations in English")}
+          subtitle={t(
+            "Relax and train your listening: EVO guides you slowly, with the text on screen.",
+          )}
+        />
+      )}
+      {/* Side by side in a wide row; one column in the header's menu. */}
+      <ul className={cn("mt-4 grid gap-2", menu ? "mt-2 gap-1" : "sm:grid-cols-2 xl:grid-cols-3")}>
         {MEDITATIONS.map((item) => {
           const locked = !item.free && !premium;
           const minutes = meditationMinutes(item.lines[tier], rate);
