@@ -90,6 +90,7 @@ import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { WeatherTalk } from "@/components/WeatherTalk";
 import { FirstWeekGuide } from "@/components/FirstWeekGuide";
 import { WeeklyLeagueSummary } from "@/components/WeeklyLeagueSummary";
+import { DailyGoalTrend } from "@/components/DailyGoalTrend";
 import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
 import { graphitePanelClass } from "@/lib/surfaces";
@@ -1088,9 +1089,19 @@ function Dashboard() {
                     </div>
                   </div>
                 </div>
-                {/* Desktop-only secondary action to the Study Plan, styled like the
-                  app's other buttons (not a status pill), above a quiet closing line. */}
-                <div className="mt-auto hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5 min-[1680px]:gap-1.5 min-[1680px]:pt-3">
+                {/* The daily goal over the last seven days (owner request, 2026-11-01:
+                  the taller card left an empty band between the lines and the button). */}
+                <div className="mt-auto hidden pt-3 lg:block">
+                  <DailyGoalTrend
+                    userId={profile.id}
+                    goalMinutes={profile.daily_minutes ?? 0}
+                    translate={t}
+                    locale={lang === "pt" ? "pt-BR" : "en-US"}
+                  />
+                </div>
+                {/* Desktop-only secondary action to My Progress, styled like the
+                  app's other buttons (not a status pill). */}
+                <div className="hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5 min-[1680px]:gap-1.5 min-[1680px]:pt-3">
                   {/* The study plan has its own header slot; this button opens My Progress,
                     which left the sidebar. A secondary glass button (owner review,
                     2026-10-31: two solid turquoise buttons side by side competed), so

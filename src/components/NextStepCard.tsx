@@ -652,11 +652,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 EVO · {t("Your AI Learning Coach")}
               </span>
             </p>
-            {/* From xl the priority block sits at the bottom: Practice now ends
-                level with the bottom of the challenge's last text line in the Extra
-                practice column (24 px from the card edge: the aside's 12 px
-                padding, the row border and its 10 px padding; user request);
-                the coach label stays at the top. */}
+            {/* From xl Practice now sits at the bottom, level with the bottom of
+                the challenge's last text line in the Extra practice column (24 px
+                from the card edge; user request), the coach label stays at the
+                top, and the free height is split in three equal gaps: under the
+                label, under the priority and above the button (auto margins on
+                the priority, the reason line and the button; owner request,
+                2026-11-01: one empty band under the label read as a hole). */}
             {/* Phones: the same padding above the coach label and below the last
                 line, so EVO sits as far from the image as the reason line from the
                 card's bottom, with a little more room under the label (user request). */}
@@ -680,7 +682,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </div>
               </div>
             </div>
-            <p className="mt-1 text-[11px] leading-snug text-sidebar-foreground/70 sm:mt-3 sm:whitespace-nowrap sm:text-[clamp(0.625rem,0.85vw,0.75rem)]">
+            <p className="mt-1 text-[11px] leading-snug text-sidebar-foreground/70 sm:mt-3 xl:mt-auto sm:whitespace-nowrap sm:text-[clamp(0.625rem,0.85vw,0.75rem)]">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
             <p className="mt-1 line-clamp-2 text-xs text-sidebar-foreground/85 sm:mt-1 sm:line-clamp-1 sm:text-sm">
@@ -689,7 +691,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {mainAvailable && (
               <Button
                 asChild
-                className="mt-2 flex h-9 w-full max-w-full shrink-0 rounded-xl bg-brand-green text-sm font-bold text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-2 sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold lg:w-[90%] xl:mx-auto xl:w-[90%]"
+                className="mt-2 flex h-9 w-full max-w-full shrink-0 rounded-xl bg-brand-green text-sm font-bold text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-2 xl:mt-auto sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold lg:w-[90%] xl:mx-auto xl:w-[90%]"
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
@@ -755,10 +757,22 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* Always there (user request): when today's extras are done the
                 block stays with a done state, like Keep improving, instead of
                 leaving a hole in the card. */}
-            <div className="mt-3 hidden sm:block xl:mt-auto">
+            {/* From xl the block fills the column under the reasons and its two
+                rows share that height, content centred (owner request, 2026-11-01:
+                the taller card left an empty band above it), like Keep improving. */}
+            <div className="mt-3 hidden sm:block xl:mt-4 xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
               {/* A short heading tells the student what these two extras are. */}
               <div className="flex items-center gap-2">
-                <Dumbbell className="size-[1.375rem] shrink-0 text-warning" aria-hidden="true" />
+                {/* Same 22 px slot as the lightbulb above, the dumbbell drawn at 18 px:
+                    its diagonal fills the whole box, so at full size it sat left of
+                    the column edge and closer to the text than the lightbulb
+                    (owner report, 2026-11-01). */}
+                <span
+                  className="grid size-[1.375rem] shrink-0 place-items-center"
+                  aria-hidden="true"
+                >
+                  <Dumbbell className="size-[1.125rem] text-warning" />
+                </span>
                 <h3 className="text-[13px] font-semibold text-sidebar-foreground">
                   {t("Extra practice")}
                 </h3>
@@ -769,7 +783,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     {t("Two short options beyond today's priority.")}
                   </p>
                   {/* Stacked, one full-width option per row, each with its description. */}
-                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5">
+                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5 xl:flex-1 xl:auto-rows-fr xl:[&>*]:items-center">
                     {quickWinButton}
                     {challengeButton}
                     {!(quickWinButton && challengeButton) && (
@@ -782,7 +796,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   </div>
                 </>
               ) : (
-                <div className="mt-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border px-3 text-center">
+                <div className="mt-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border px-3 text-center xl:flex-1">
                   <DoneSeal />
                   <p className="text-sm font-semibold">{t("Extra practice done for today")}</p>
                   <p className="text-[11px] text-muted-foreground">
