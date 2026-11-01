@@ -1091,7 +1091,9 @@ function Dashboard() {
                 </div>
                 {/* The daily goal over the last seven days (owner request, 2026-11-01:
                   the taller card left an empty band between the lines and the button). */}
-                <div className="mt-auto hidden pt-3 lg:block">
+                {/* pt-7: the gauge is drawn 20 px lower (lg:translate-y-5), so its "0/15 min"
+                  would touch the bar with less room above it. */}
+                <div className="mt-auto hidden pt-7 lg:block">
                   <DailyGoalTrend
                     userId={profile.id}
                     goalMinutes={profile.daily_minutes ?? 0}

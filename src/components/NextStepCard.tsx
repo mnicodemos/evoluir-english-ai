@@ -655,10 +655,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {/* From xl Practice now sits at the bottom, level with the bottom of
                 the challenge's last text line in the Extra practice column (24 px
                 from the card edge; user request), the coach label stays at the
-                top, and the free height is split in three equal gaps: under the
-                label, under the priority and above the button (auto margins on
-                the priority, the reason line and the button; owner request,
-                2026-11-01: one empty band under the label read as a hole). */}
+                top, and the priority with its reason and How to practice lines
+                stays one group centred between them: two equal gaps, under the
+                label and above the button (auto margins on the priority and the
+                button; owner reviews, 2026-11-01: one band under the label read as
+                a hole, and a gap between the priority and its reason split them). */}
             {/* Phones: the same padding above the coach label and below the last
                 line, so EVO sits as far from the image as the reason line from the
                 card's bottom, with a little more room under the label (user request). */}
@@ -682,7 +683,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </div>
               </div>
             </div>
-            <p className="mt-1 text-[11px] leading-snug text-sidebar-foreground/70 sm:mt-3 xl:mt-auto sm:whitespace-nowrap sm:text-[clamp(0.625rem,0.85vw,0.75rem)]">
+            <p className="mt-1 text-[11px] leading-snug text-sidebar-foreground/70 sm:mt-3 sm:whitespace-nowrap sm:text-[clamp(0.625rem,0.85vw,0.75rem)]">
               {t(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
             <p className="mt-1 line-clamp-2 text-xs text-sidebar-foreground/85 sm:mt-1 sm:line-clamp-1 sm:text-sm">
