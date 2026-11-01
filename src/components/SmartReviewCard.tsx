@@ -269,7 +269,7 @@ export function SmartReviewCard({
           }`}
         >
           {showWordReviews && (
-            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors hover:border-brand-green/70 hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
+            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-brand-green/35 bg-brand-green/[0.07] p-1 pr-2">
               <img src={reviewWords} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
@@ -292,7 +292,7 @@ export function SmartReviewCard({
             </li>
           )}
           {showMistakes && (
-            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors hover:border-brand-green/70 hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-warning/35 bg-warning/[0.07] p-1 pr-2">
+            <li className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-warning/35 bg-warning/[0.07] p-1 pr-2">
               <img src={reviewMistakes} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("My mistakes")} />
@@ -319,7 +319,7 @@ export function SmartReviewCard({
             return (
               <li
                 key={item.skill}
-                className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors hover:border-brand-green/70 hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-border bg-secondary/45 p-1 pr-2"
+                className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-border bg-secondary/45 p-1 pr-2"
               >
                 {SKILL_PHOTO[item.skill as keyof typeof SKILL_PHOTO] ? (
                   <img
@@ -370,7 +370,7 @@ export function SmartReviewCard({
           {newRows.map((row) => (
             <li
               key={row.key}
-              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors hover:border-brand-green/70 hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
+              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-dashed border-brand-green/45 bg-brand-green/[0.04] p-1 pr-2"
             >
               <img src={SKILL_PHOTO[row.key]} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
@@ -393,7 +393,7 @@ export function SmartReviewCard({
           {keepGoing.map((row) => (
             <li
               key={row.key}
-              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors hover:border-brand-green/70 hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-border bg-secondary/30 p-1 pr-2"
+              className="group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg transition-colors any-hover:border-brand-green/70 any-hover:bg-white/[0.06] active:border-brand-green/70 active:bg-white/[0.06] border border-border bg-secondary/30 p-1 pr-2"
             >
               <ContinueTile rowKey={row.key} />
               <div className="min-w-0">
@@ -583,7 +583,7 @@ const ROW_PHOTO = "h-0 min-h-full w-16 self-stretch rounded-md object-cover";
  * drawn on that cover, the icon lighting up while the row is hovered.
  */
 const ROW_ACTION =
-  "stretched-link static size-9 shrink-0 text-white/70 hover:bg-white/10 hover:text-white group-hover:text-white after:absolute after:inset-0 after:rounded-lg after:content-[''] focus-visible:ring-0 focus-visible:after:ring-2 focus-visible:after:ring-brand-green/60";
+  "stretched-link static size-9 shrink-0 text-white/70 any-hover:bg-white/10 any-hover:text-white group-any-hover:text-white after:absolute after:inset-0 after:rounded-lg after:content-[''] focus-visible:ring-0 focus-visible:after:ring-2 focus-visible:after:ring-brand-green/60";
 
 /**
  * With three rows, each row's note keeps one line, and on desktop screens up

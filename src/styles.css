@@ -4,6 +4,25 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Hover wherever a mouse exists (owner report, 2026-11-01): Tailwind's hover:
+   needs (hover: hover), the PRIMARY pointer, so a tablet with a mouse never
+   showed the clickable cards' hover. any-hover: also fires when a mouse is
+   only one of the pointers. */
+@custom-variant any-hover {
+  @media (any-hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+@custom-variant group-any-hover {
+  @media (any-hover: hover) {
+    &:is(:where(.group):hover *) {
+      @slot;
+    }
+  }
+}
+
 /*
  * Evoluir+ English AI design system.
  * Deep navy (trust/technology), growth green (progress), clean white.
