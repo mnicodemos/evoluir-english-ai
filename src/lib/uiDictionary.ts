@@ -1063,6 +1063,12 @@ const baseUiPt: Record<string, string> = {
   "Share of your {minutes} min goal reached per day, all activities.":
     "Quanto da meta de {minutes} min você cumpriu por dia, somando tudo.",
   "Last 7 days": "Últimos 7 dias",
+  Focusing: "Focando",
+  "Focus block": "Bloco de foco",
+  "Focus blocks today": "Blocos de foco hoje",
+  "Open decision": "Decisão em aberto",
+  "Scores filled": "Notas preenchidas",
+  Decide: "Decidir",
   "Write a short text": "Escreva um texto curto",
   "Practise new words": "Pratique palavras novas",
   "Practise with the AI Teacher": "Pratique com o Professor de IA",

@@ -7,9 +7,11 @@ import {
   decisionGoalTitle,
   decisionInputSchema,
   decisionResult,
+  openDecisionForHome,
   ratingKey,
   starterDecision,
   type DecisionInput,
+  type LifeDecision,
 } from "./lifeDecisions";
 
 const career: DecisionInput = {
@@ -138,5 +140,39 @@ describe("EVO's analysis", () => {
   it("names the goal after the chosen option", () => {
     expect(decisionGoalTitle("  Open my consultancy ")).toBe("Open my consultancy");
     expect(decisionGoalTitle("A")).toBe("A ✓");
+  });
+});
+
+describe("openDecisionForHome", () => {
+  const base = (
+    id: string,
+    updatedAt: string,
+    extra: Partial<LifeDecision> = {},
+  ): LifeDecision => ({
+    ...career,
+    id,
+    status: "active",
+    chosenOptionId: null,
+    analysis: null,
+    createdAt: updatedAt,
+    updatedAt,
+    ...extra,
+  });
+
+  it("is null when every decision is made", () => {
+    expect(openDecisionForHome([])).toBeNull();
+    expect(
+      openDecisionForHome([base("d1", "2026-11-01", { status: "decided", chosenOptionId: "a1" })]),
+    ).toBeNull();
+    expect(openDecisionForHome([base("d1", "2026-11-01", { chosenOptionId: "a1" })])).toBeNull();
+  });
+
+  it("takes the open decision edited last and counts its filled scores", () => {
+    const result = openDecisionForHome([
+      base("old", "2026-10-20"),
+      base("new", "2026-10-30", { ratings: { "a1:c1": 9, "a2:c1": 6, "zz:c1": 3 } }),
+      base("done", "2026-10-31", { chosenOptionId: "a2" }),
+    ]);
+    expect(result).toEqual({ id: "new", title: career.title, rated: 2, total: 8 });
   });
 });

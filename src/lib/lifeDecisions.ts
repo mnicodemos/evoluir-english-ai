@@ -244,3 +244,19 @@ export function starterDecision(t: (label: string) => string): DecisionInput {
     ratings: {},
   };
 }
+
+/**
+ * The decision the Dashboard's Life+ AI card shows (owner decision, 2026-11-01):
+ * the most recently edited one still open (no option chosen), with how many of
+ * its scores are filled. Null when every decision is made, so the slot shows
+ * Focus instead of an empty Decisions box.
+ */
+export function openDecisionForHome(decisions: readonly LifeDecision[]) {
+  const open = decisions
+    .filter((decision) => decision.status === "active" && !decision.chosenOptionId)
+    .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0))[0];
+  if (!open) return null;
+  const total = open.options.length * open.criteria.length;
+  const rated = Object.keys(cleanRatings(open)).length;
+  return { id: open.id, title: open.title, rated, total };
+}

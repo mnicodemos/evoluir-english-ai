@@ -992,7 +992,7 @@ function Dashboard() {
                   <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                     <div
                       className={cn(
-                        "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:translate-y-5 lg:size-24 lg:justify-self-start 2xl:size-30",
+                        "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:translate-y-2 lg:size-24 lg:justify-self-start 2xl:size-30",
                         celebrateGoal && "animate-celebrate",
                       )}
                     >
@@ -1022,7 +1022,7 @@ function Dashboard() {
                   </div>
                   <div className="grid min-w-0 gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                     {!hasProgressToday && (
-                      <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground">
+                      <div className="flex min-h-[5.75rem] translate-y-4 flex-col lg:translate-y-1 items-center justify-center gap-1 text-center text-muted-foreground">
                         <DoneSeal icon={ClockHands} />
                         <p className="text-[11px] font-bold leading-tight">
                           {t("Nothing yet today")}
@@ -1037,7 +1037,7 @@ function Dashboard() {
                     )}
                     <div
                       className={cn(
-                        `${hasProgressToday ? "grid" : "hidden"} gap-1 self-center lg:translate-y-[42px] xl:gap-1 2xl:gap-2`,
+                        `${hasProgressToday ? "grid" : "hidden"} gap-1 self-center lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
                       )}
                     >
                       {learningCards.map((card) => {
@@ -1091,7 +1091,7 @@ function Dashboard() {
                 </div>
                 {/* The daily goal over the last seven days (owner request, 2026-11-01:
                   the taller card left an empty band between the lines and the button). */}
-                {/* pt-7: the gauge is drawn 20 px lower (lg:translate-y-5), so its "0/15 min"
+                {/* pt-7: room under the gauge (drawn 8 px lower, lg:translate-y-2), so its "0/15 min"
                   would touch the bar with less room above it. my-auto and pb-3 centre the
                   bar in the free height, so it never crowds My progress below (owner
                   review, 2026-11-01: 13 px under the bar, far more above it). */}
