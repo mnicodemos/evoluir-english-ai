@@ -259,8 +259,8 @@ export const appGuidePt: Record<string, string> = {
     "Minha assinatura, no menu, mostra o seu plano; a primeira assinatura Premium começa com 7 dias grátis, e você pode cancelar ali.",
   "Start here, on top of the path, has the presentation video of your level (Business English has its own).":
     "O Comece aqui, no topo da trilha, tem o vídeo de apresentação do seu nível (o Business English tem o dele).",
-  "Extra videos (Premium), at the top of the path, go deeper into the lessons of each level; the Shorts tab has quick vertical videos and Reels, in a full-screen feed where you can like and comment.":
-    "Os vídeos extras (Premium), no topo da trilha, aprofundam as lições de cada nível; a aba Shorts traz vídeos verticais rápidos e Reels, num feed em tela cheia onde você curte e comenta.",
+  "Extra videos (Premium), at the top of the path, go deeper into the lessons of each level. Shorts have their own page in the menu: quick vertical videos and Reels in a full-screen feed where you can like and comment.":
+    "Os vídeos extras (Premium), no topo da trilha, aprofundam as lições de cada nível. Os Shorts têm página própria no menu: vídeos verticais rápidos e Reels em tela cheia, com curtidas e comentários.",
   "The search box above the units finds a lesson of your level by its name; locked lessons stay locked.":
     "A busca acima das unidades encontra uma lição do seu nível pelo nome; lições bloqueadas continuam bloqueadas.",
   Organize: "Organize",

@@ -29,7 +29,9 @@ export function useExtraVideosNews(userId: string | undefined) {
     staleTime: 10 * 60 * 1000,
     queryFn: () => fetchVideos(),
   });
-  const total = data?.videos.length ?? 0;
+  // Regular videos only: shorts have their own page and their own dot
+  // (useShortsShortcut; owner request, 2026-11-01).
+  const total = (data?.videos ?? []).filter((video) => video.kind !== "short").length;
   const [seen, setSeen] = useState<number | null>(null);
   useEffect(() => {
     if (userId) setSeen(readSeen(userId));

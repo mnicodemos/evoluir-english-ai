@@ -1070,6 +1070,13 @@ const baseUiPt: Record<string, string> = {
   "Open decision": "Decisão em aberto",
   "Scores filled": "Notas preenchidas",
   Decide: "Decidir",
+  "Quick English, one minute at a time.": "Inglês rápido, um minuto de cada vez.",
+  shorts: "shorts",
+  likes: "curtidas",
+  Likes: "Curtidas",
+  "Shorts are part of Premium. Subscribe to watch every one of them.":
+    "Os Shorts fazem parte do Premium. Assine para assistir a todos.",
+  "EVO · Shorts": "EVO · Shorts",
   "Write a short text": "Escreva um texto curto",
   "Practise new words": "Pratique palavras novas",
   "Practise with the AI Teacher": "Pratique com o Professor de IA",

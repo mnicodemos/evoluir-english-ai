@@ -87,20 +87,15 @@ authenticated("authenticated smoke", () => {
     await expect(row).toBeVisible();
   });
 
-  test("extra videos page has the Videos and Shorts tabs", async ({ page }) => {
+  test("extra videos and Shorts have their own pages", async ({ page }) => {
     await page.goto("/learning/videos", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { level: 1, name: "Extra lesson videos" })).toBeVisible({
       timeout: 20_000,
     });
-    const tabs = page.getByRole("tablist", { name: "Video type" });
-    await expect(tabs).toBeVisible({ timeout: 20_000 });
-    const shorts = tabs.getByRole("tab", { name: /^Shorts/ });
-    await shorts.click();
-    await expect(shorts).toHaveAttribute("aria-selected", "true");
-    await expect(tabs.getByRole("tab", { name: /^Videos/ })).toHaveAttribute(
-      "aria-selected",
-      "false",
-    );
+    await page.goto("/shorts", { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { level: 1, name: "Shorts" })).toBeVisible({
+      timeout: 20_000,
+    });
   });
 
   test("flashcard review opens", async ({ page }) => {
