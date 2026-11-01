@@ -257,6 +257,7 @@ const baseUiPt: Record<string, string> = {
   Copy: "Copiar",
   Copied: "Copiado",
   Decisions: "Decisões",
+  open: "em aberto",
   "Write the decision, your options and the criteria that matter, each with a weight.":
     "Escreva a decisão, suas opções e os critérios que importam, cada um com um peso.",
   "Score each option; the best one comes first, and What if? tests other weights.":

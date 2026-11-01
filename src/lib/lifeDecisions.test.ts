@@ -7,6 +7,7 @@ import {
   decisionGoalTitle,
   decisionInputSchema,
   decisionResult,
+  openDecisionCount,
   openDecisionForHome,
   ratingKey,
   starterDecision,
@@ -174,5 +175,30 @@ describe("openDecisionForHome", () => {
       base("done", "2026-10-31", { chosenOptionId: "a2" }),
     ]);
     expect(result).toEqual({ id: "new", title: career.title, rated: 2, total: 8 });
+  });
+});
+
+describe("openDecisionCount", () => {
+  it("counts only decisions with no option chosen", () => {
+    const make = (
+      id: string,
+      chosen: string | null,
+      status: "active" | "decided",
+    ): LifeDecision => ({
+      ...career,
+      id,
+      status,
+      chosenOptionId: chosen,
+      analysis: null,
+      createdAt: "2026-11-01",
+      updatedAt: "2026-11-01",
+    });
+    expect(
+      openDecisionCount([
+        make("a", null, "active"),
+        make("b", "a1", "decided"),
+        make("c", null, "active"),
+      ]),
+    ).toBe(2);
   });
 });

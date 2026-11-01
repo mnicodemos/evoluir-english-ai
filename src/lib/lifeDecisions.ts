@@ -260,3 +260,9 @@ export function openDecisionForHome(decisions: readonly LifeDecision[]) {
   const rated = Object.keys(cleanRatings(open)).length;
   return { id: open.id, title: open.title, rated, total };
 }
+
+/** How many decisions are still open (no option chosen): the /life tab's count. */
+export function openDecisionCount(decisions: readonly LifeDecision[]) {
+  return decisions.filter((decision) => decision.status === "active" && !decision.chosenOptionId)
+    .length;
+}
