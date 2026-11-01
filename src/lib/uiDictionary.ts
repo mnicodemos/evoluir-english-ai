@@ -1059,6 +1059,9 @@ const baseUiPt: Record<string, string> = {
   "Practise it in English with EVO": "Praticar em inglês com a EVO",
   Practise: "Praticar",
   "Practise in English": "Praticar em inglês",
+  "Daily goal · last 7 days": "Meta diária · últimos 7 dias",
+  "Share of your {minutes} min goal reached per day, all activities.":
+    "Quanto da meta de {minutes} min você cumpriu por dia, somando tudo.",
   "Last 7 days": "Últimos 7 dias",
   "Write a short text": "Escreva um texto curto",
   "Practise new words": "Pratique palavras novas",

@@ -53,6 +53,8 @@ import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { removeStorage, writeStorage } from "@/lib/safeStorage";
 
+const LESSON_TABS = new Set(["summary", "audio", "flashcards", "quiz"]);
+
 export const Route = createFileRoute("/_authenticated/learning/$lessonId")({
   head: () => ({
     meta: [
@@ -127,6 +129,10 @@ function LessonPage() {
   useEffect(() => {
     if (repairPlan?.isReviewTest) {
       setActiveTab("quiz");
+    } else if (!LESSON_TABS.has(activeTab)) {
+      // A tab remembered from an older version (the old "video" tab) no longer
+      // exists; without this the lesson opened with nothing selected.
+      setActiveTab("summary");
     } else if (isReviewUnit && (activeTab === "audio" || activeTab === "flashcards")) {
       setActiveTab("summary");
     }
