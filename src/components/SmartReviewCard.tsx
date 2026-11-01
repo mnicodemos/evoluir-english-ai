@@ -11,7 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import reviewListening from "@/assets/review-listening.jpg.asset.json";
+import reviewListening from "@/assets/review-listening.webp";
 import reviewGrammar from "@/assets/review-grammar.webp";
 import reviewLesson from "@/assets/review-lesson.webp";
 import reviewMistakes from "@/assets/review-mistakes.webp";
@@ -19,7 +19,7 @@ import reviewPronunciation from "@/assets/review-pronunciation.webp";
 import reviewReading from "@/assets/review-reading.webp";
 import reviewSpeaking from "@/assets/review-speaking.webp";
 import reviewWords from "@/assets/review-words.webp";
-import reviewWriting from "@/assets/review-writing.jpg.asset.json";
+import reviewWriting from "@/assets/review-writing.webp";
 
 import { EvoGuide } from "@/components/EvoGuide";
 import { LearningMomentum } from "@/components/LearningMomentum";
@@ -523,12 +523,12 @@ export function SmartReviewCard({
 // The owner's photos (user request); a skill without one falls back to its icon.
 const SKILL_PHOTO = {
   grammar: reviewGrammar,
-  listening: reviewListening.url,
+  listening: reviewListening,
   pronunciation: reviewPronunciation,
   reading: reviewReading,
   speaking: reviewSpeaking,
   vocabulary: reviewWords,
-  writing: reviewWriting.url,
+  writing: reviewWriting,
 } as const;
 
 const SKILL_TILE = {
