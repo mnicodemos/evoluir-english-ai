@@ -331,7 +331,8 @@ export function AppShell({
   dashboardLayout?: boolean;
   /** Opt-in: drops the page footer on mobile so the screen fits one viewport. */
   mobileOneScreen?: boolean;
-  /** Opt-in: drops the page footer from xl, for pages drawn one screen tall there. */
+  /** Opt-in: from xl the shell is one screen tall (footer included) and main
+   *  hands its height to the page, which fills it (xl:flex-1 xl:min-h-0). */
   desktopOneScreen?: boolean;
 }) {
   return (
@@ -504,6 +505,7 @@ function AppShellContent({
             ? "h-dvh overflow-hidden lg:h-auto lg:overflow-visible lg:pb-0"
             : "pb-[calc(4.275rem+_env(safe-area-inset-bottom))] lg:pb-0",
           "lg:pl-[13.2rem]",
+          desktopOneScreen && "xl:h-dvh xl:min-h-[48rem]",
         )}
       >
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
@@ -595,6 +597,7 @@ function AppShellContent({
           className={cn(
             "animate-page-in w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
             !dashboardLayout && "flex-1",
+            desktopOneScreen && "xl:flex xl:min-h-0 xl:flex-col",
             dashboardLayout &&
               "h-[calc(100dvh-4.275rem)] overflow-hidden py-3 pb-[5px] lg:h-auto lg:overflow-visible lg:py-6 lg:pb-6 xl:px-5 xl:py-2",
           )}
@@ -644,7 +647,6 @@ function AppShellContent({
             "mb-0",
             dashboardLayout && "hidden lg:block",
             mobileOneScreen && "hidden sm:block",
-            desktopOneScreen && "xl:hidden",
           )}
         >
           <Footer
