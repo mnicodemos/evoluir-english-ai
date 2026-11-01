@@ -325,14 +325,21 @@ export function AppShell({
   children,
   dashboardLayout = false,
   mobileOneScreen = false,
+  desktopOneScreen = false,
 }: {
   children: ReactNode;
   dashboardLayout?: boolean;
   /** Opt-in: drops the page footer on mobile so the screen fits one viewport. */
   mobileOneScreen?: boolean;
+  /** Opt-in: drops the page footer from xl, for pages drawn one screen tall there. */
+  desktopOneScreen?: boolean;
 }) {
   return (
-    <AppShellContent dashboardLayout={dashboardLayout} mobileOneScreen={mobileOneScreen}>
+    <AppShellContent
+      dashboardLayout={dashboardLayout}
+      mobileOneScreen={mobileOneScreen}
+      desktopOneScreen={desktopOneScreen}
+    >
       {children}
     </AppShellContent>
   );
@@ -342,10 +349,12 @@ function AppShellContent({
   children,
   dashboardLayout,
   mobileOneScreen,
+  desktopOneScreen,
 }: {
   children: ReactNode;
   dashboardLayout: boolean;
   mobileOneScreen: boolean;
+  desktopOneScreen: boolean;
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -635,6 +644,7 @@ function AppShellContent({
             "mb-0",
             dashboardLayout && "hidden lg:block",
             mobileOneScreen && "hidden sm:block",
+            desktopOneScreen && "xl:hidden",
           )}
         >
           <Footer

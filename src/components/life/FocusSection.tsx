@@ -96,11 +96,14 @@ export function FocusSection() {
         <Button
           variant="outline"
           size="sm"
-          className="h-7 gap-1.5 text-xs"
+          className="h-7 gap-1.5 text-xs xl:w-7 xl:px-0"
           onClick={openFocusWidget}
+          title={t("Floating timer")}
+          aria-label={t("Floating timer")}
         >
           <PictureInPicture2 aria-hidden="true" />
-          {t("Floating timer")}
+          {/* An icon from xl, so the title keeps one row in the one-screen band. */}
+          <span className="xl:sr-only">{t("Floating timer")}</span>
         </Button>
       </LifeSectionTitle>
 
