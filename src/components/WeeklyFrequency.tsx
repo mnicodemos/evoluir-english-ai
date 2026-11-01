@@ -99,18 +99,23 @@ export function WeeklyFrequency({
         {/* One size on the line, only the count in bold, the dot in its own
             span (user request, 2026-10-24: it read misaligned). */}
         <p className="col-span-7 mb-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] leading-none text-muted-foreground">
-          <span>{lang === "pt" ? "Esta semana" : "This week"}</span>
-          <span className="text-muted-foreground/50" aria-hidden="true">
-            ·
-          </span>
+          {/* Once the plan is reached the line is only the plan pill and the
+              total, so it never wraps to a second line (owner request,
+              2026-11-01); "This week · n days" returns while the week is
+              in progress. */}
+          {allStudied ? null : (
+            <>
+              <span>{lang === "pt" ? "Esta semana" : "This week"}</span>
+              <span className="text-muted-foreground/50" aria-hidden="true">
+                ·
+              </span>
+            </>
+          )}
           {/* The week's count beside its plan, then the all-time total last
               (owner report, 2026-10-30: "42 total study days of 7 planned"
               read the plan as the total's). */}
           {allStudied ? (
             <>
-              <span className="font-semibold text-foreground">
-                {studiedCount} {studiedCount === 1 ? (lang === "pt" ? "dia" : "day") : daysLabel}
-              </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-semibold text-brand-green">
                 <Check className="size-3" strokeWidth={3} aria-hidden="true" />
                 {lang === "pt" ? `Plano de ${weeklyGoal} batido` : `Plan of ${weeklyGoal} reached`}
