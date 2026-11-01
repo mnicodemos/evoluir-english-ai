@@ -60,7 +60,7 @@ export function DailyGoalTrend({
     >
       <div className="flex items-baseline justify-between text-[11px] leading-none">
         <span className="font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          {t("Last 7 days")}
+          {t("Daily goal · last 7 days")}
         </span>
         <span className="text-muted-foreground">
           {t("Average")}{" "}
@@ -75,6 +75,15 @@ export function DailyGoalTrend({
         className="mt-2 h-2.5 bg-white/[0.07]"
         aria-label={`${t("Last 7 days")}: ${t("Average")} ${average}%`}
       />
+      {/* What the number is (owner request, 2026-11-01: students must know where
+          it comes from): the share of the daily minutes goal reached each day,
+          averaged over the seven days, every activity that counts minutes. */}
+      <p className="mt-1.5 line-clamp-2 text-[10.5px] leading-tight text-muted-foreground">
+        {t("Share of your {minutes} min goal reached per day, all activities.").replace(
+          "{minutes}",
+          String(goalMinutes),
+        )}
+      </p>
       <span className="sr-only">
         {days.map((d) => `${weekday.format(d.date)} ${d.percent}%`).join(", ")}
       </span>
