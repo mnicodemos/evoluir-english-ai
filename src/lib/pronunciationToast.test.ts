@@ -5,6 +5,7 @@ vi.mock("sonner", () => ({
     success: vi.fn(),
     warning: vi.fn(),
     error: vi.fn(),
+    custom: vi.fn(),
     dismiss: vi.fn(),
   }),
 }));

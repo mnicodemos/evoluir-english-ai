@@ -18,6 +18,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast, type ExternalToast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
+import { PronunciationResultToast } from "@/components/vocabulary/PronunciationResultToast";
+import { haptic } from "@/lib/haptics";
 import { StudyDayCounter } from "@/components/StudyDayCounter";
 import { AppShell } from "@/components/AppShell";
 import { OfflineVocabulary } from "@/components/vocabulary/OfflineVocabulary";
@@ -401,26 +403,30 @@ function VocabularyOnline() {
           console.warn("Pronunciation preview differed from the authoritative result");
         const pt = lang === "pt";
         if (score >= 70) {
-          toastPronunciation(
-            "success",
-            pt
-              ? `Pronúncia OK — ${score}%. Próxima palavra!`
-              : `Pronunciation OK — ${score}%. Next word!`,
+          haptic("success");
+          pronunciationToasts.current.custom(
+            (id) => (
+              <PronunciationResultToast toastId={id} score={score} word={word.word} pt={pt} />
+            ),
+            { duration: 3500 },
           );
           await markPronouncedKnown(word.id);
           return true;
         } else {
           // A low score is coaching, not a failure: amber "try again", not a red error.
-          toastPronunciation(
-            "warning",
-            pt
-              ? `${score}% — abaixo de 70%. Ouvi “${spoken}”. Repita a palavra.`
-              : `${score}% — below 70%. I heard “${spoken}”. Please repeat the word.`,
-            {
-              // Which part of the word came out different, not only the percentage.
-              description: <PronunciationHint target={word.word} spoken={spoken} pt={pt} />,
-              duration: 8000,
-            },
+          haptic("tap");
+          pronunciationToasts.current.custom(
+            (id) => (
+              <PronunciationResultToast
+                toastId={id}
+                score={score}
+                word={word.word}
+                heard={spoken}
+                pt={pt}
+                hint={<PronunciationHint target={word.word} spoken={spoken} pt={pt} />}
+              />
+            ),
+            { duration: 8000 },
           );
           // A clear miss on a due review counts as a failed review.
           if (score < 55) await markForgotten(word.id);

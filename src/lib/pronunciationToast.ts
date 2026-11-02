@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { toast, type ExternalToast } from "sonner";
 
 /** Every pronunciation-evaluation toast shares this id, so leaving the
@@ -28,6 +29,11 @@ export function createPronunciationToaster() {
       else if (kind === "warning") toast.warning(message, opts);
       else if (kind === "error") toast.error(message, opts);
       else toast(message, opts);
+    },
+    /** Rich result card (score badge, what EVO heard), same id and page lock. */
+    custom(render: (id: string | number) => ReactElement, options?: ExternalToast) {
+      if (!active) return;
+      toast.custom(render, { id: PRONUNCIATION_TOAST_ID, ...options });
     },
   };
 }
