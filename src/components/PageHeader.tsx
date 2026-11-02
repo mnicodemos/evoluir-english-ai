@@ -23,6 +23,7 @@ export function PageHeader({
   description,
   descriptionClassName,
   actions,
+  actionsClassName,
   guide,
   className,
   children,
@@ -34,6 +35,8 @@ export function PageHeader({
   description?: ReactNode;
   descriptionClassName?: string;
   actions?: ReactNode;
+  /** Opt-in layout for the actions (e.g. a full-width row under the title on phones). */
+  actionsClassName?: string;
   /** An App guide section id (src/lib/appGuide.ts). */
   guide?: string;
   className?: string;
@@ -77,7 +80,7 @@ export function PageHeader({
           <span className="min-w-0 truncate font-display text-sm font-semibold">{title}</span>
         </div>
       </div>
-      <header ref={ref} className={cn("animate-rise flex items-start gap-3 sm:gap-4", className)}>
+      <header ref={ref} className={cn("animate-rise flex flex-wrap items-start gap-3 sm:flex-nowrap sm:gap-4", className)}>
         <span
           className={cn(
             "grid size-9 shrink-0 place-items-center rounded-xl ring-1 sm:size-12 sm:rounded-2xl lg:size-14",
@@ -104,7 +107,7 @@ export function PageHeader({
           {children}
         </div>
         {actions || guide ? (
-          <div className="flex shrink-0 items-center gap-2">
+          <div className={cn("flex shrink-0 items-center gap-2", actionsClassName)}>
             {actions}
             {guide ? (
               <Link
