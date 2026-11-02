@@ -332,15 +332,17 @@ function VocabularyOnline() {
     }
   }
 
-  async function togglePronunciation(word: Word) {
+  /** Records or checks a word; resolves true when the pronunciation passed
+   *  (>= 70%), so the review session moves on to the next word. */
+  async function togglePronunciation(word: Word): Promise<boolean> {
     if (pronunciationGate.current.isBusy()) {
       toast(t("The check is already running."));
-      return;
+      return false;
     }
 
     if (recordingId === word.id) {
       const attempt = pronunciationGate.current.begin();
-      if (attempt === null) return;
+      if (attempt === null) return false;
       const controller = new AbortController();
       pronunciationAbort.current = controller;
       setRecordingId(null);
@@ -371,7 +373,7 @@ function VocabularyOnline() {
           },
         });
         // A late answer from an older attempt must never change the screen.
-        if (!pronunciationGate.current.isCurrent(attempt)) return;
+        if (!pronunciationGate.current.isCurrent(attempt)) return false;
         const score = authoritative.score;
         if (score !== previewScore)
           console.warn("Pronunciation preview differed from the authoritative result");
@@ -383,6 +385,7 @@ function VocabularyOnline() {
               : `Pronunciation OK — ${score}%. Next word!`,
           );
           await markPronouncedKnown(word.id);
+          return true;
         } else {
           // A low score is coaching, not a failure: amber "try again", not a red error.
           toast.warning(
@@ -411,7 +414,7 @@ function VocabularyOnline() {
         pronunciationGate.current.end(attempt);
         setCheckingId(null);
       }
-      return;
+      return false;
     }
 
     // Another card was left recording: release it before starting a new one.
@@ -447,6 +450,7 @@ function VocabularyOnline() {
           : "Microphone access is needed to test pronunciation.",
       );
     }
+    return false;
   }
 
   const all = words ?? [];
