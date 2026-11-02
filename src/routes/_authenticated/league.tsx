@@ -275,12 +275,14 @@ function YourWeek({ week }: { week: WeekXpSummary }) {
       <dl className="grid grid-cols-2 gap-2 text-sm">
         <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
           <dt className="text-xs text-muted-foreground">{t("Last week")}</dt>
-          <dd className="mt-0.5 font-semibold tabular-nums">{week.lastWeek} XP</dd>
+          <dd className="mt-0.5 font-semibold tabular-nums">
+            {week.known ? `${week.lastWeek} XP` : "—"}
+          </dd>
         </div>
         <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
           <dt className="text-xs text-muted-foreground">{t("Your best week")}</dt>
           <dd className="mt-0.5 font-semibold tabular-nums">
-            {Math.max(week.best, week.thisWeek)} XP
+            {week.known ? `${Math.max(week.best, week.thisWeek)} XP` : "—"}
           </dd>
         </div>
       </dl>
