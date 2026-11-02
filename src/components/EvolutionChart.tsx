@@ -18,7 +18,7 @@ const SERIES_COLORS: Record<string, string> = {
   Reading: ACTIVITY_CHART_COLORS.Reading,
   Talking: ACTIVITY_CHART_COLORS.Talking,
   Writing: ACTIVITY_CHART_COLORS.Writing,
-  Grammar: "#EC4899",
+  Grammar: ACTIVITY_CHART_COLORS.Grammar,
   Vocabulary: ACTIVITY_CHART_COLORS.Vocabulary,
 };
 

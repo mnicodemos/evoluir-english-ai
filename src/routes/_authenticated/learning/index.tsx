@@ -61,6 +61,7 @@ function LearningCenter() {
         <PageHeader
           guide="learning"
           icon={GraduationCap}
+          accent="lessons"
           eyebrow={<>Learning Center</>}
           title={
             reviewLevel ? <span>Review an earlier level</span> : <span>Your learning path</span>

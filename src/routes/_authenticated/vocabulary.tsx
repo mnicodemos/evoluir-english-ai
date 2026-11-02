@@ -549,7 +549,7 @@ function VocabularyOnline() {
       <PageHeader
         guide="vocabulary"
         icon={BookOpen}
-        accent="violet"
+        accent="vocabulary"
         title={<>Vocabulary Builder</>}
         description={
           <>

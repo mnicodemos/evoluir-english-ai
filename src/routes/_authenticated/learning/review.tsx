@@ -119,7 +119,7 @@ function ReviewPage() {
         <PageHeader
           guide="vocabulary"
           icon={Repeat}
-          accent="violet"
+          accent="vocabulary"
           eyebrow={<>Word review</>}
           title={<>Your hardest words first</>}
           description={
