@@ -77,10 +77,8 @@ function LearningCenter() {
               <span>: AI practice, words and the weekly league are not affected.</span>
             </p>
           ) : (
-            <p className="mt-2 max-w-xl text-sm text-muted-foreground lg:hidden">
-              A complete course for your level: 30 core lessons plus 3 optional review lessons, with
-              video, summary, flashcards, quiz and guided practice. Each lesson unlocks when you
-              finish the one before it.
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+              A complete course for your level with summary, lesson audio, flashcards and quiz.
             </p>
           )}
 
