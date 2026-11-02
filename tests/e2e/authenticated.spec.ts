@@ -15,7 +15,7 @@ authenticated("authenticated smoke", () => {
     const routes = [
       ["/dashboard", /Good (morning|afternoon|evening)|Hello/i],
       ["/progress", /My Progress/i],
-      ["/vocabulary", /Vocabulary/i],
+      ["/vocabulary", /Vocabulary Builder/i],
       ["/listening", /Train your ear/i],
       ["/writing", /Writing/i],
       ["/teacher", /AI Teacher/i],
