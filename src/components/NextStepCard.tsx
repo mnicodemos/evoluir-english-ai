@@ -340,11 +340,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-            <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
+            <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+              {/* One line (owner request, 2026-11-02): cut with an ellipsis, the
+                  whole text on hover. */}
+              <span
+                className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:truncate sm:text-xs sm:font-normal"
+                title={`${t(quickWin.cta)} · ${t(quickWin.activity.title)}`}
+              >
                 {t(quickWin.cta)} · {t(quickWin.activity.title)}
               </span>
             </span>
@@ -358,11 +363,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </Link>
         ) : (
           <Link to={quickWin.activity.to}>
-            <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
+            <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+              {/* One line (owner request, 2026-11-02): cut with an ellipsis, the
+                  whole text on hover. */}
+              <span
+                className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:truncate sm:text-xs sm:font-normal"
+                title={`${t(quickWin.cta)} · ${t(quickWin.activity.title)}`}
+              >
                 {t(quickWin.cta)} · {t(quickWin.activity.title)}
               </span>
             </span>

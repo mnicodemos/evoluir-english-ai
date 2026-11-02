@@ -10,6 +10,7 @@ describe("weekXpSummary", () => {
       best: 200,
       delta: 40,
       record: false,
+      known: true,
     });
   });
 
@@ -22,6 +23,7 @@ describe("weekXpSummary", () => {
   it("prefers the live XP of this week when given", () => {
     expect(weekXpSummary([{ xp: 10 }, { xp: 30 }], 45).delta).toBe(15);
     expect(weekXpSummary([]).thisWeek).toBe(0);
+    expect(weekXpSummary([]).known).toBe(false);
   });
 });
 

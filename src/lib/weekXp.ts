@@ -16,6 +16,10 @@ export type WeekXpSummary = {
   delta: number;
   /** A new personal best: more XP than every earlier week, and some XP. */
   record: boolean;
+  /** Whether the earlier weeks were read (weekly_league_history answered).
+   *  False while it loads or fails (owner report, 2026-11-02: before migration
+   *  0078 the page read "Last week 0 XP" for a week with study). */
+  known: boolean;
 };
 
 export function weekXpSummary(weeks: { xp: number }[], currentXp?: number): WeekXpSummary {
@@ -29,6 +33,7 @@ export function weekXpSummary(weeks: { xp: number }[], currentXp?: number): Week
     best,
     delta: thisWeek - lastWeek,
     record: thisWeek > 0 && earlier.some((xp) => xp > 0) && thisWeek > best,
+    known: weeks.length > 0,
   };
 }
 
