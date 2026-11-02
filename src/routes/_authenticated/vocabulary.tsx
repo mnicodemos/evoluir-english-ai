@@ -38,6 +38,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { createAttemptGate } from "@/lib/attemptGate";
+import { createPronunciationToaster } from "@/lib/pronunciationToast";
 import {
   vocabularyGenerationFailureKey,
   vocabularyGenerationRecentlyFailed,
