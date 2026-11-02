@@ -2618,6 +2618,7 @@ const baseUiPt: Record<string, string> = {
   "New words arrive with your next lesson.": "Palavras novas chegam com a sua próxima lição.",
   "Open your next lesson": "Abrir a próxima lição",
   "Search your words...": "Busque nas suas palavras...",
+  Beat: "Supere",
   "Remember, check and say your words: ten new ones with every new lesson.":
     "Lembre, confira e fale suas palavras: dez novas a cada nova lição.",
 };
