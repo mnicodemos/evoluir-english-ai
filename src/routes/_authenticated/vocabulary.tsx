@@ -73,6 +73,8 @@ import { STUDY_DAY_RULE } from "@/lib/studyDay";
 import { cn } from "@/lib/utils";
 import { studyDayStartIso } from "@/lib/today";
 
+const PRONUNCIATION_TOAST_ID = "vocabulary-pronunciation-result";
+
 const LEARNED_SOURCE_LABEL = {
   all: "All",
   lessons: "From lessons",
@@ -144,6 +146,15 @@ function VocabularyOnline() {
   // or pronounced on this visit.
   const minutesSpent = useTimeSpent();
   const workedOnWords = useRef(false);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      toast.dismiss(PRONUNCIATION_TOAST_ID);
+    };
+  }, []);
 
   const { data: words, isLoading } = useQuery({
     queryKey: ["vocabulary"],
@@ -336,7 +347,7 @@ function VocabularyOnline() {
    *  (>= 70%), so the review session moves on to the next word. */
   async function togglePronunciation(word: Word): Promise<boolean> {
     if (pronunciationGate.current.isBusy()) {
-      toast(t("The check is already running."));
+      toast(t("The check is already running."), { id: PRONUNCIATION_TOAST_ID });
       return false;
     }
 
@@ -379,16 +390,17 @@ function VocabularyOnline() {
           console.warn("Pronunciation preview differed from the authoritative result");
         const pt = lang === "pt";
         if (score >= 70) {
-          toast.success(
+          if (isMounted.current) toast.success(
             pt
               ? `Pronúncia OK — ${score}%. Próxima palavra!`
               : `Pronunciation OK — ${score}%. Next word!`,
+            { id: PRONUNCIATION_TOAST_ID },
           );
           await markPronouncedKnown(word.id);
           return true;
         } else {
           // A low score is coaching, not a failure: amber "try again", not a red error.
-          toast.warning(
+          if (isMounted.current) toast.warning(
             pt
               ? `${score}% — abaixo de 70%. Ouvi “${spoken}”. Repita a palavra.`
               : `${score}% — below 70%. I heard “${spoken}”. Please repeat the word.`,
@@ -396,6 +408,7 @@ function VocabularyOnline() {
               // Which part of the word came out different, not only the percentage.
               description: <PronunciationHint target={word.word} spoken={spoken} pt={pt} />,
               duration: 8000,
+              id: PRONUNCIATION_TOAST_ID,
             },
           );
           // A clear miss on a due review counts as a failed review.
@@ -403,9 +416,10 @@ function VocabularyOnline() {
         }
       } catch (error) {
         const cancelled = error instanceof Error && error.name === "AbortError";
-        if (!cancelled && pronunciationGate.current.isCurrent(attempt))
+        if (!cancelled && isMounted.current && pronunciationGate.current.isCurrent(attempt))
           toast.error(
             error instanceof Error ? error.message : "Could not check that pronunciation.",
+            { id: PRONUNCIATION_TOAST_ID },
           );
       } finally {
         // Success, error, cancel: the attempt always ends and frees the button.
