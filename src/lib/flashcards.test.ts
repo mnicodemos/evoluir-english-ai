@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isFlashcardDue, lessonStarted, reversedCard } from "./flashcards";
+import { isFlashcardDue, lessonStarted, reversedCard, sessionCardState } from "./flashcards";
 
 const card = { card_type: "word", translation: "casa" };
 
@@ -49,5 +49,46 @@ describe("isFlashcardDue (one rule for the count and the deck)", () => {
     );
     expect(lessonStarted({ video_progress: 0, progress: 0, completed_at: null })).toBe(false);
     expect(lessonStarted({ video_progress: 0, progress: 10, completed_at: null })).toBe(true);
+  });
+});
+
+describe("sessionCardState (session ends at 10/10, the Again queue keeps showing)", () => {
+  const cards = Array.from({ length: 10 }, (_, i) => ({ id: `c${i + 1}` }));
+
+  it("shows the next main-deck card before the end", () => {
+    const state = sessionCardState(cards, { index: 3, done: false }, []);
+    expect(state.card?.id).toBe("c4");
+    expect(state.relearning).toBe(false);
+    expect(state.position).toBe(3);
+  });
+
+  it("shows no card when the last card is done and nothing waits in the Again queue", () => {
+    const state = sessionCardState(cards, { index: 9, done: true }, []);
+    expect(state.card).toBeUndefined();
+    expect(state.relearning).toBe(false);
+  });
+
+  it("keeps the last card from coming back at 10/10, even with a stale index", () => {
+    const state = sessionCardState(cards, { index: 9, done: true }, []);
+    expect(state.inMainDeck).toBe(false);
+    expect(state.card).toBeUndefined();
+  });
+
+  it("shows the next Again card once the main deck is done", () => {
+    const state = sessionCardState(cards, { index: 9, done: true }, ["c2", "c7"]);
+    expect(state.relearning).toBe(true);
+    expect(state.card?.id).toBe("c2");
+    expect(state.position).toBe(11);
+  });
+
+  it("ends the session only when the Again queue is empty", () => {
+    expect(sessionCardState(cards, { index: 9, done: true }, ["c7"]).card?.id).toBe("c7");
+    expect(sessionCardState(cards, { index: 9, done: true }, []).card).toBeUndefined();
+  });
+
+  it("restart state shows the first card again", () => {
+    const state = sessionCardState(cards, { index: 0, done: false }, []);
+    expect(state.card?.id).toBe("c1");
+    expect(state.inMainDeck).toBe(true);
   });
 });

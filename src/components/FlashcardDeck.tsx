@@ -11,7 +11,7 @@ import {
   type UserFlashcard,
 } from "@/hooks/useLearning";
 import { usePersistentState } from "@/hooks/usePersistentState";
-import { reversedCard } from "@/lib/flashcards";
+import { reversedCard, sessionCardState } from "@/lib/flashcards";
 import { speakEnglish } from "@/lib/speech";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
@@ -59,11 +59,7 @@ export function FlashcardDeck({
   const { lang } = useUiLang();
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
 
-  const index = Math.min(saved.index, Math.max(0, cards.length - 1));
-  const inMainDeck = !saved.done && index < cards.length;
-  const relearning = !inMainDeck && again.length > 0;
-  const card = relearning ? cards.find((item) => item.id === again[0]) : cards[index];
-  const position = relearning ? cards.length + 1 : index;
+  const { index, relearning, card, position } = sessionCardState(cards, saved, again);
 
   async function speak(text: string) {
     if (isPlaying) return;
