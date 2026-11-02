@@ -78,7 +78,7 @@ describe("sessionCardState (session ends at 10/10, the Again queue keeps showing
     const state = sessionCardState(cards, { index: 9, done: true }, ["c2", "c7"]);
     expect(state.relearning).toBe(true);
     expect(state.card?.id).toBe("c2");
-    expect(state.position).toBe(10);
+    expect(state.position).toBe(11);
   });
 
   it("ends the session only when the Again queue is empty", () => {

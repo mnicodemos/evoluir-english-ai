@@ -41,8 +41,8 @@ export function isFlashcardDue(
  * finished session shows the next Again card while the queue has one, and no
  * card at all once the queue is empty.
  */
-export function sessionCardState(
-  cards: ReadonlyArray<{ id: string }>,
+export function sessionCardState<T extends { id: string }>(
+  cards: ReadonlyArray<T>,
   saved: { index: number; done: boolean },
   again: readonly string[],
 ) {
