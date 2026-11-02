@@ -625,6 +625,7 @@ function VocabularyOnline() {
     <AppShell mobileOneScreen>
       <PageHeader
         guide="vocabulary"
+        actionsClassName="max-sm:basis-full"
         icon={BookOpen}
         accent="vocabulary"
         title={<>Vocabulary Builder</>}
