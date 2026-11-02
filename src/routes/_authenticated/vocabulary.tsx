@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast, type ExternalToast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
 import { StudyDayCounter } from "@/components/StudyDayCounter";
@@ -38,6 +38,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useTimeSpent } from "@/hooks/useTimeSpent";
 import { supabase } from "@/integrations/supabase/client";
 import { createAttemptGate } from "@/lib/attemptGate";
+import { createPronunciationToaster } from "@/lib/pronunciationToast";
 import {
   vocabularyGenerationFailureKey,
   vocabularyGenerationRecentlyFailed,
@@ -332,11 +333,32 @@ function VocabularyOnline() {
     }
   }
 
+  // Pronunciation toasts are restricted to this page: they stop being shown
+  // the moment the student leaves, so a late async answer never pops up on
+  // another screen. Re-entering the page re-enables them (see the effect).
+  const pronunciationToasts = useRef(createPronunciationToaster());
+  useEffect(() => {
+    const toasts = pronunciationToasts.current;
+    toasts.setActive(true);
+    return () => {
+      toasts.setActive(false);
+      toasts.dismiss();
+    };
+  }, []);
+
+  function toastPronunciation(
+    kind: "info" | "success" | "warning" | "error",
+    message: string,
+    options?: ExternalToast,
+  ) {
+    pronunciationToasts.current.notify(kind, message, options);
+  }
+
   /** Records or checks a word; resolves true when the pronunciation passed
    *  (>= 70%), so the review session moves on to the next word. */
   async function togglePronunciation(word: Word): Promise<boolean> {
     if (pronunciationGate.current.isBusy()) {
-      toast(t("The check is already running."));
+      toastPronunciation("info", t("The check is already running."));
       return false;
     }
 
@@ -379,7 +401,8 @@ function VocabularyOnline() {
           console.warn("Pronunciation preview differed from the authoritative result");
         const pt = lang === "pt";
         if (score >= 70) {
-          toast.success(
+          toastPronunciation(
+            "success",
             pt
               ? `Pronúncia OK — ${score}%. Próxima palavra!`
               : `Pronunciation OK — ${score}%. Next word!`,
@@ -388,7 +411,8 @@ function VocabularyOnline() {
           return true;
         } else {
           // A low score is coaching, not a failure: amber "try again", not a red error.
-          toast.warning(
+          toastPronunciation(
+            "warning",
             pt
               ? `${score}% — abaixo de 70%. Ouvi “${spoken}”. Repita a palavra.`
               : `${score}% — below 70%. I heard “${spoken}”. Please repeat the word.`,
@@ -404,7 +428,8 @@ function VocabularyOnline() {
       } catch (error) {
         const cancelled = error instanceof Error && error.name === "AbortError";
         if (!cancelled && pronunciationGate.current.isCurrent(attempt))
-          toast.error(
+          toastPronunciation(
+            "error",
             error instanceof Error ? error.message : "Could not check that pronunciation.",
           );
       } finally {
@@ -444,7 +469,8 @@ function VocabularyOnline() {
       minutesSpent.stop();
       cancelVoiceRecording();
       cancelBrowserRecognition();
-      toast.error(
+      toastPronunciation(
+        "error",
         error instanceof Error
           ? error.message
           : "Microphone access is needed to test pronunciation.",
