@@ -32,7 +32,14 @@ export type TodayLine = {
   state: TodayLineState;
 };
 
-export type TodayActivityRow = { activity_type: string; duration_minutes: number | null };
+import { pronunciationQuickWinCount } from "./dailyChallenge";
+
+export type TodayActivityRow = {
+  activity_type: string;
+  duration_minutes: number | null;
+  /** Pronunciations carry the word, so a repeated word counts once. */
+  title?: string | null;
+};
 
 /** Accuracy at or above this shows as done; below it (but above 0) needs attention. */
 export const TODAY_ACCURACY_DONE = 70;
@@ -144,11 +151,13 @@ export function todayProgressLines(input: {
       };
     })(),
     (() => {
-      const count = countOf(rows, ["vocabulary"]);
+      // Different words said today, the same count as the Quick Win's
+      // "n/5 words" (owner report, 2026-11-02: 5 attempts here beside 2/5 there).
+      const count = pronunciationQuickWinCount(rows);
       return {
         key: "pronunciation",
         icon: "pronunciation" as const,
-        label: count === 1 ? "pronunciation practice" : "pronunciation practices",
+        label: count === 1 ? "word pronounced" : "words pronounced",
         value: String(count),
         state: count > 0 ? ("done" as const) : ("empty" as const),
         active: count > 0,

@@ -1142,6 +1142,8 @@ const baseUiPt: Record<string, string> = {
   "flashcard reviews": "revisões de flashcards",
   "pronunciation practice": "prática de pronúncia",
   "pronunciation practices": "práticas de pronúncia",
+  "word pronounced": "palavra pronunciada",
+  "words pronounced": "palavras pronunciadas",
   accuracy: "de acerto",
   "min on lessons": "min nas lições",
   // Daily challenge goal units (dailyChallengeGoal)

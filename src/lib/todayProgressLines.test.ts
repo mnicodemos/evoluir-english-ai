@@ -5,6 +5,15 @@ import { todayProgressLines } from "./todayProgressLines";
 const empty = { lessonsCompleted: 0, wordsMastered: 0, accuracy: 0, activities: [] };
 
 describe("today's progress lines", () => {
+  it("counts each pronounced word once, like the Quick Win", () => {
+    const say = (title: string) => ({ activity_type: "vocabulary", duration_minutes: 0, title });
+    const line = todayProgressLines({
+      ...empty,
+      activities: ["hello", "hello", "world", "world", "hello"].map(say),
+    }).find((l) => l.key === "pronunciation");
+    expect(line?.value).toBe("2");
+    expect(line?.label).toBe("words pronounced");
+  });
   it("keeps lessons, words and accuracy when nothing happened today", () => {
     expect(todayProgressLines(empty).map((line) => [line.key, line.state])).toEqual([
       ["lessons", "empty"],
