@@ -84,7 +84,8 @@ export function dailyChallengeGoal(
  *  after a misheard attempt, counts once (user report, 2026-10-24: it was
  *  done before five words were said). */
 export const QUICK_WIN_PRONUNCIATIONS = 5;
-export function pronunciationQuickWinDone(activities: ChallengeActivityRow[]): boolean {
+/** Different words pronounced today (the Quick Win's "n/5 words" counter). */
+export function pronunciationQuickWinCount(activities: ChallengeActivityRow[]): number {
   const words = new Set<string>();
   let untitled = 0;
   for (const row of activities) {
@@ -93,7 +94,10 @@ export function pronunciationQuickWinDone(activities: ChallengeActivityRow[]): b
     if (word) words.add(word);
     else untitled += 1;
   }
-  return words.size + untitled >= QUICK_WIN_PRONUNCIATIONS;
+  return words.size + untitled;
+}
+export function pronunciationQuickWinDone(activities: ChallengeActivityRow[]): boolean {
+  return pronunciationQuickWinCount(activities) >= QUICK_WIN_PRONUNCIATIONS;
 }
 
 /** League XP the destination's activity earns, as a short English label. */

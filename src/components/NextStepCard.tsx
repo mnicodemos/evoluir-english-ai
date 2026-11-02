@@ -36,8 +36,10 @@ import { useProfile } from "@/hooks/useProfile";
 import { useTodayActivities } from "@/components/DailyGoalCard";
 import {
   dailyChallengeGoal,
+  pronunciationQuickWinCount,
   pronunciationQuickWinDone,
   practiceXpLabel,
+  QUICK_WIN_PRONUNCIATIONS,
 } from "@/lib/dailyChallenge";
 import {
   LEAGUE_MEDAL_TEXT,
@@ -293,6 +295,20 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     ? actionAvailable(quickWin.activity.to, activityIndicators) &&
       !(quickWin.cta === "Say 5 words out loud" && pronunciationQuickWinDone(todayActivities))
     : false;
+  // "Say 5 words out loud - 2/5 words" (owner request, 2026-11-02): the words
+  // already said today, separate text nodes so uiPt translates "words".
+  const quickWinCounter =
+    quickWin?.cta === "Say 5 words out loud" ? (
+      <>
+        {" "}
+        <span>-</span>{" "}
+        <span>
+          {Math.min(pronunciationQuickWinCount(todayActivities), QUICK_WIN_PRONUNCIATIONS)}/
+          {QUICK_WIN_PRONUNCIATIONS}
+        </span>{" "}
+        <span>{t("words")}</span>
+      </>
+    ) : null;
   // The challenge has a goal for the day (user request): it shows the progress
   // and leaves once the goal is reached (dailyChallengeGoal).
   const challengeGoal = data.quest
@@ -348,6 +364,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   action ("Say 5 words out loud"), which already names it. */}
               <span className="hidden w-full whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(quickWin.cta)}
+                {quickWinCounter}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,
@@ -368,6 +385,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   action ("Say 5 words out loud"), which already names it. */}
               <span className="hidden w-full whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(quickWin.cta)}
+                {quickWinCounter}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,

@@ -188,7 +188,7 @@ export function JewelsPopover({
         <button
           type="button"
           aria-label={label}
-          className="block h-full w-full rounded-2xl text-left transition-colors hover:bg-foreground/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-green/60"
+          className="block h-full w-full rounded-2xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-green/60"
         >
           {children}
         </button>

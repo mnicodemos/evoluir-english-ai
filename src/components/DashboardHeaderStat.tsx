@@ -111,7 +111,7 @@ export function DashboardHeaderStat({
   );
   const circle = (glyph: ReactNode) => (
     <span
-      className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition-colors group-any-hover:border-brand-green/50 group-any-hover:text-brand-green group-focus-visible:text-brand-green"
+      className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-muted-foreground group-focus-visible:text-brand-green"
       aria-hidden="true"
     >
       {glyph}
@@ -126,8 +126,8 @@ export function DashboardHeaderStat({
       <div
         className={cn(
           cell,
-          opens &&
-            "group rounded-xl transition-[color,background-color,box-shadow] any-hover:bg-white/[0.05] any-hover:ring-1 any-hover:ring-inset any-hover:ring-brand-green/60 active:bg-white/[0.05] active:ring-1 active:ring-inset active:ring-brand-green/60",
+          // No button look (owner request, 2026-11-02): the magnifier says it opens.
+          opens && "group cursor-pointer rounded-xl",
         )}
         title={hint}
       >
@@ -141,9 +141,9 @@ export function DashboardHeaderStat({
       title={hint}
       className={cn(
         cell,
-        // The whole cell is the button (owner request, 2026-11-01): a thin ring on
-        // hover, like Keep improving's rows, and the focus ring around the cell.
-        "group rounded-xl transition-[color,background-color,box-shadow] any-hover:bg-white/[0.05] any-hover:ring-1 any-hover:ring-inset any-hover:ring-brand-green/60 active:bg-white/[0.05] active:ring-1 active:ring-inset active:ring-brand-green/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-green/60",
+        // The whole cell opens its page, with no button look on hover or press
+        // (owner request, 2026-11-02); only the keyboard focus ring stays.
+        "group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-green/60",
       )}
     >
       {body}
