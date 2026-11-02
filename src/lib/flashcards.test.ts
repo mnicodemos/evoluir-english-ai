@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { getSessionFlashcard, isFlashcardDue, lessonStarted, reversedCard } from "./flashcards";
 import type { Flashcard } from "@/hooks/useLearning";
+import { getSessionFlashcard, isFlashcardDue, lessonStarted, reversedCard } from "./flashcards";
 
 const card = { card_type: "word", translation: "casa" };
 
@@ -53,9 +53,23 @@ describe("isFlashcardDue (one rule for the count and the deck)", () => {
   });
 });
 
-
 describe("getSessionFlashcard", () => {
-  const deck = [{ id: "1" }, { id: "2" }] as Flashcard[];
+  const makeCard = (id: string): Flashcard => ({
+    id,
+    lesson_id: null,
+    word: id,
+    translation: "",
+    definition: "",
+    pronunciation: "",
+    example: "",
+    difficulty: "",
+    prompt: null,
+    answer: null,
+    card_type: "word",
+    listen_text: null,
+    sort_order: null,
+  });
+  const deck = [makeCard("1"), makeCard("2")];
 
   it("shows the next main-deck card before completion", () => {
     expect(getSessionFlashcard(deck, 1, false, [])?.id).toBe("2");
