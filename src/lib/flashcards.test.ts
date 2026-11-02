@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isFlashcardDue, lessonStarted, reversedCard } from "./flashcards";
+import { isFlashcardDue, lessonStarted, reversedCard, sessionCardState } from "./flashcards";
 
 const card = { card_type: "word", translation: "casa" };
 
