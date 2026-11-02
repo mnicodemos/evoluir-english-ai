@@ -127,7 +127,6 @@ function StudyPlanPage() {
         <PageHeader
           guide="plan"
           icon={CalendarDays}
-          accent="pink"
           className="xl:col-span-2"
           title={<>Your study plan</>}
           description={

@@ -134,7 +134,6 @@ function GuidePage() {
     <AppShell>
       <PageHeader
         icon={BookMarked}
-        accent="sky"
         title={t("App guide")}
         description={t("How to use each part of Evoluir+, step by step.")}
       />

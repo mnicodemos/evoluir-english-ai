@@ -521,7 +521,7 @@ function ListeningPage() {
         <PageHeader
           guide="listening"
           icon={Headphones}
-          accent="sky"
+          accent="listening"
           eyebrow={
             <>
               <span>Listening Practice</span>

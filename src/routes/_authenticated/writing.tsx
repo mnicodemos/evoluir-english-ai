@@ -328,7 +328,7 @@ function Writing() {
       <PageHeader
         guide="writing"
         icon={PenLine}
-        accent="sky"
+        accent="writing"
         eyebrow={<>Writing Practice</>}
         title={<>Writing AI Corrector</>}
         description={

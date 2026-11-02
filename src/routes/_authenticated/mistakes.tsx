@@ -274,7 +274,7 @@ function Mistakes() {
         <PageHeader
           guide="mistakes"
           icon={SpellCheck}
-          accent="amber"
+          accent="mistakes"
           className="lg:col-span-2"
           title={<>My mistakes</>}
           descriptionClassName="hidden sm:block"

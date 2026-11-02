@@ -264,6 +264,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
         <PageHeader
           guide="teacher"
           icon={Sparkles}
+          accent="grammar"
           className="min-w-0"
           title={t("AI Teacher")}
           description={t("Practice English with your personal AI teacher")}

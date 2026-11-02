@@ -792,7 +792,7 @@ function ReadingPage() {
           className="xl:shrink-0"
           guide="reading"
           icon={BookOpenText}
-          accent="amber"
+          accent="reading"
           eyebrow={t("Reading practice")}
           title={t("Daily reading")}
           description={t(

@@ -131,7 +131,6 @@ export function DecisionsWorkspace({ variant }: { variant: "page" | "tab" }) {
     ) : (
       <PageHeader
         icon={Scale}
-        accent="violet"
         eyebrow="Life+ AI"
         title={t("Decisions")}
         description={t("Compare your options with clear criteria and decide with more confidence.")}

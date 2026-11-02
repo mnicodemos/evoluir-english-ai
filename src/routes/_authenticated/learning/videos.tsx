@@ -128,7 +128,6 @@ function ExtraVideosPage() {
 
         <PageHeader
           icon={Clapperboard}
-          accent="amber"
           eyebrow={<>Premium extras</>}
           title={<>Extra lesson videos</>}
           description={<>Short videos that go deeper into the lessons of your path.</>}
