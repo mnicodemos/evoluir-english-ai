@@ -18,6 +18,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast, type ExternalToast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
+import { PronunciationResultToast } from "@/components/vocabulary/PronunciationResultToast";
+import { haptic } from "@/lib/haptics";
 import { StudyDayCounter } from "@/components/StudyDayCounter";
 import { AppShell } from "@/components/AppShell";
 import { OfflineVocabulary } from "@/components/vocabulary/OfflineVocabulary";
