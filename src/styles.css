@@ -622,3 +622,14 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Pronunciation HUD toast draws its own rounded card: the Sonner wrapper
+   behind it must stay invisible, or its square edges show at the corners. */
+[data-sonner-toast]:has(> .pronunciation-hud) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
