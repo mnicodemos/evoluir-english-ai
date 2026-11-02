@@ -15,6 +15,10 @@
     }
   }
 }
+/* Desktop screens up to 62rem tall (a 1920x960 browser window, a laptop): the
+   Dashboard tightens there so it stays one screen (owner report, 2026-11-02). */
+@custom-variant short-desk (@media (min-width: 80rem) and (max-height: 62rem));
+
 @custom-variant group-any-hover {
   @media (any-hover: hover) {
     &:is(:where(.group):hover *) {
@@ -335,7 +339,7 @@
    the gaps between rows tighten from 20 px to 12 px, so the same cards fit. */
 @media (min-width: 80rem) and (max-height: 62rem) {
   .dashboard-one-screen {
-    row-gap: 0.75rem;
+    row-gap: 0.625rem;
     padding-bottom: 0.25rem;
   }
 }

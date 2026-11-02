@@ -290,7 +290,7 @@ export function WeeklyFrequency({
         <div className="mt-1 grid w-full flex-1 grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 py-1 pl-4 lg:pl-0 2xl:grid-cols-[7.5rem_minmax(0,1fr)]">
           <div
             className={cn(
-              "relative grid size-24 place-items-center text-brand-green 2xl:size-30",
+              "relative grid size-24 place-items-center text-brand-green 2xl:size-30 2xl:short-desk:size-26",
               celebrateWeek && "animate-celebrate",
             )}
           >

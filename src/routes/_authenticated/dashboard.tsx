@@ -992,7 +992,7 @@ function Dashboard() {
                   <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                     <div
                       className={cn(
-                        "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:translate-y-2 lg:size-24 lg:justify-self-start 2xl:size-30",
+                        "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:translate-y-2 lg:size-24 lg:justify-self-start 2xl:size-30 2xl:short-desk:size-26",
                         celebrateGoal && "animate-celebrate",
                       )}
                     >
@@ -1097,7 +1097,7 @@ function Dashboard() {
                   pb-2): they set the card's minimum height, and with the caption under
                   the bar a taller minimum pushed the Dashboard past one screen (owner
                   report, 2026-11-01). */}
-                <div className="my-auto hidden pb-2 pt-5 lg:block">
+                <div className="my-auto hidden pb-2 pt-5 lg:block short-desk:pb-1 short-desk:pt-3">
                   <DailyGoalTrend
                     userId={profile.id}
                     goalMinutes={profile.daily_minutes ?? 0}
