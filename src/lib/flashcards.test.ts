@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { isFlashcardDue, lessonStarted, reversedCard } from "./flashcards";
+import { getSessionFlashcard, isFlashcardDue, lessonStarted, reversedCard } from "./flashcards";
+import type { Flashcard } from "@/hooks/useLearning";
 
 const card = { card_type: "word", translation: "casa" };
 
@@ -49,5 +50,26 @@ describe("isFlashcardDue (one rule for the count and the deck)", () => {
     );
     expect(lessonStarted({ video_progress: 0, progress: 0, completed_at: null })).toBe(false);
     expect(lessonStarted({ video_progress: 0, progress: 10, completed_at: null })).toBe(true);
+  });
+});
+
+
+describe("getSessionFlashcard", () => {
+  const deck = [{ id: "1" }, { id: "2" }] as Flashcard[];
+
+  it("shows the next main-deck card before completion", () => {
+    expect(getSessionFlashcard(deck, 1, false, [])?.id).toBe("2");
+  });
+
+  it("shows no card after the final card when there are no retries", () => {
+    expect(getSessionFlashcard(deck, 1, true, [])).toBeUndefined();
+  });
+
+  it("keeps the retry queue available after the main deck is complete", () => {
+    expect(getSessionFlashcard(deck, 1, true, ["1"])?.id).toBe("1");
+  });
+
+  it("ends the session after the retry queue is cleared", () => {
+    expect(getSessionFlashcard(deck, 1, true, [])).toBeUndefined();
   });
 });
