@@ -627,6 +627,7 @@
    rounded to match its content, so only one rounded edge shows. */
 @layer utilities {
   [data-sonner-toast]:has(.pronunciation-hud) {
+    width: var(--width) !important;
     border-radius: 1rem !important;
     overflow: hidden;
     padding: 0 !important;
