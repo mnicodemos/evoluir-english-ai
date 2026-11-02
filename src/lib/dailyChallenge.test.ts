@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { dailyChallengeGoal, practiceXpLabel, pronunciationQuickWinDone } from "./dailyChallenge";
+import {
+  dailyChallengeGoal,
+  practiceXpLabel,
+  pronunciationQuickWinCount,
+  pronunciationQuickWinDone,
+} from "./dailyChallenge";
 
 describe("daily challenge goal", () => {
   it("counts today's texts toward a Writing challenge and is reached at three", () => {
@@ -45,6 +50,7 @@ describe("pronunciation Quick Win", () => {
   it("is done once five different words were pronounced today", () => {
     expect(pronunciationQuickWinDone(["a", "b", "c", "d"].map(say))).toBe(false);
     expect(pronunciationQuickWinDone(["a", "b", "c", "d", "e"].map(say))).toBe(true);
+    expect(pronunciationQuickWinCount(["a", "a", "b"].map(say))).toBe(2);
     expect(
       pronunciationQuickWinDone([
         ...["a", "b", "c", "d"].map(say),

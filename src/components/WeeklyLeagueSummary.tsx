@@ -66,10 +66,14 @@ export function useWeeklyLeagueStanding(profile: LeagueProfile | null | undefine
 export function weekXpLine(
   week: { lastWeek: number; delta: number; record: boolean },
   translate: (label: string) => string,
+  /** The Dashboard cell's short form (owner report, 2026-11-02: "1507 XP to beat
+   *  last w…" was cut): the target to reach, "Beat 1557 XP". */
+  compact = false,
 ): string {
   if (week.record) return translate("Your best week so far");
   if (week.lastWeek <= 0) return translate("Every activity earns XP");
   if (week.delta >= 0) return `+${week.delta} XP ${translate("vs last week")}`;
+  if (compact) return `${translate("Beat")} ${week.lastWeek} XP`;
   return `${-week.delta} XP ${translate("to beat last week")}`;
 }
 
@@ -109,7 +113,7 @@ export function WeeklyLeagueSummary({
         tone={weekXpRising(week) ? "green" : "grey"}
         label={translate("Weekly league")}
         value={`${week.thisWeek} XP`}
-        detail={weekXpLine(week, translate)}
+        detail={weekXpLine(week, translate, true)}
         to="/league"
       />
     );

@@ -111,92 +111,99 @@ function League() {
           <ProofOfProgressMission />
         </div>
 
-        {!showRanking && !isLoading && !loadError ? <YourWeek week={week} /> : null}
+        {/* Left column: this week, the ranking and the history under them
+            (owner request, 2026-11-02: the history filled the empty space under
+            Weekly XP instead of lengthening the right column). */}
+        <div className="space-y-3 lg:space-y-4">
+          {!showRanking && !isLoading && !loadError ? <YourWeek week={week} /> : null}
 
-        <section
-          className={cn(
-            "card-soft space-y-2 p-3 sm:p-5",
-            !showRanking && !isLoading && !loadError && "hidden",
-          )}
-        >
-          <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
-            <Trophy className="size-4 text-amber-400 sm:size-5" />
-            Ranking
-          </h2>
-          {loadError ? (
-            <p className="py-6 text-center text-sm text-destructive">
-              <span>The league is not available right now.</span>{" "}
-              <span className="block text-xs text-muted-foreground">
-                {(loadError as { message?: string }).message ?? ""}
-              </span>
-            </p>
-          ) : isLoading ? (
-            <div className="space-y-2 py-1" aria-busy="true">
-              {[0, 1, 2, 3, 4].map((row) => (
-                <Skeleton key={row} className="h-12 w-full rounded-lg" />
-              ))}
-            </div>
-          ) : ranking.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-4 text-center">
-              <img
-                src={leagueImage}
-                alt="EVO, a mascote da liga"
-                width={320}
-                height={320}
-                loading="lazy"
-                className="size-40 rounded-full object-cover"
-              />
-              <p className="text-sm text-muted-foreground">
-                No one at your level joined the league this week yet.
+          <section
+            className={cn(
+              "card-soft space-y-2 p-3 sm:p-5",
+              !showRanking && !isLoading && !loadError && "hidden",
+            )}
+          >
+            <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
+              <Trophy className="size-4 text-amber-400 sm:size-5" />
+              Ranking
+            </h2>
+            {loadError ? (
+              <p className="py-6 text-center text-sm text-destructive">
+                <span>The league is not available right now.</span>{" "}
+                <span className="block text-xs text-muted-foreground">
+                  {(loadError as { message?: string }).message ?? ""}
+                </span>
               </p>
-              {!joined && (
-                <p className="text-sm font-medium text-foreground">
-                  Join now and be the first in the ranking!
+            ) : isLoading ? (
+              <div className="space-y-2 py-1" aria-busy="true">
+                {[0, 1, 2, 3, 4].map((row) => (
+                  <Skeleton key={row} className="h-12 w-full rounded-lg" />
+                ))}
+              </div>
+            ) : ranking.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-4 text-center">
+                <img
+                  src={leagueImage}
+                  alt="EVO, a mascote da liga"
+                  width={320}
+                  height={320}
+                  loading="lazy"
+                  className="size-40 rounded-full object-cover"
+                />
+                <p className="text-sm text-muted-foreground">
+                  No one at your level joined the league this week yet.
                 </p>
-              )}
-            </div>
-          ) : (
-            <ol className="max-h-[55vh] space-y-1.5 overflow-y-auto pr-1">
-              {ranking.map((row) => (
-                <li
-                  key={`${row.rank_position}-${row.display_name}-${row.is_me}`}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg border px-3 py-2 text-sm",
-                    row.is_me ? "border-brand-green/50 bg-brand-green/10" : "border-border",
-                  )}
-                >
-                  <span
+                {!joined && (
+                  <p className="text-sm font-medium text-foreground">
+                    Join now and be the first in the ranking!
+                  </p>
+                )}
+              </div>
+            ) : (
+              <ol className="max-h-[55vh] space-y-1.5 overflow-y-auto pr-1">
+                {ranking.map((row) => (
+                  <li
+                    key={`${row.rank_position}-${row.display_name}-${row.is_me}`}
                     className={cn(
-                      "grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold",
-                      row.rank_position === 1
-                        ? "bg-amber-400 text-black"
-                        : row.rank_position === 2
-                          ? "bg-slate-300 text-black"
-                          : row.rank_position === 3
-                            ? "bg-orange-400 text-black"
-                            : "bg-secondary",
+                      "flex items-center gap-3 rounded-lg border px-3 py-2 text-sm",
+                      row.is_me ? "border-brand-green/50 bg-brand-green/10" : "border-border",
                     )}
                   >
-                    {row.rank_position}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate font-medium">
-                    {row.display_name || "—"}
-                    {row.is_me && <span className="ml-1 text-xs text-brand-green">(you)</span>}
-                  </span>
-                  <span className="font-display font-bold">{row.xp} XP</span>
-                </li>
-              ))}
-            </ol>
-          )}
-          {/* Alone in the ranking: say why the others are not here (user report:
+                    <span
+                      className={cn(
+                        "grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold",
+                        row.rank_position === 1
+                          ? "bg-amber-400 text-black"
+                          : row.rank_position === 2
+                            ? "bg-slate-300 text-black"
+                            : row.rank_position === 3
+                              ? "bg-orange-400 text-black"
+                              : "bg-secondary",
+                      )}
+                    >
+                      {row.rank_position}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate font-medium">
+                      {row.display_name || "—"}
+                      {row.is_me && <span className="ml-1 text-xs text-brand-green">(you)</span>}
+                    </span>
+                    <span className="font-display font-bold">{row.xp} XP</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {/* Alone in the ranking: say why the others are not here (user report:
               the league groups students by level). */}
-          {!isLoading && !loadError && ranking.length === 1 && ranking[0]?.is_me && (
-            <p className="pt-1 text-center text-xs text-muted-foreground">
-              You are the only one in your level&apos;s league this week. Each level has its own
-              league, so students at other levels compete in theirs.
-            </p>
-          )}
-        </section>
+            {!isLoading && !loadError && ranking.length === 1 && ranking[0]?.is_me && (
+              <p className="pt-1 text-center text-xs text-muted-foreground">
+                You are the only one in your level&apos;s league this week. Each level has its own
+                league, so students at other levels compete in theirs.
+              </p>
+            )}
+          </section>
+
+          <LeagueHistory userId={profile?.id ?? null} joined={joined} />
+        </div>
 
         <aside className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
           <section className="card-soft space-y-2 p-4">
@@ -228,8 +235,6 @@ function League() {
               {joined ? "Leave the league" : "Join the league"}
             </Button>
           </section>
-
-          <LeagueHistory userId={profile?.id ?? null} joined={joined} />
 
           <section className="card-soft p-4">
             <h2 className="font-display text-sm font-semibold">How to earn XP</h2>

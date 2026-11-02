@@ -5,9 +5,11 @@ import {
   BookOpen,
   Check,
   CheckCircle2,
+  ChevronRight,
   Languages,
   Layers,
   Loader2,
+  Play,
   RotateCcw,
   Search,
   X,
@@ -20,10 +22,12 @@ import { StudyDayCounter } from "@/components/StudyDayCounter";
 import { AppShell } from "@/components/AppShell";
 import { OfflineVocabulary } from "@/components/vocabulary/OfflineVocabulary";
 import {
+  VocabularySession,
   VocabularyWordList,
   type VocabularyListContext,
   type Word,
 } from "@/components/vocabulary/VocabularyWordList";
+import { ClockHands, DoneSeal } from "@/components/DoneSeal";
 import { Button } from "@/components/ui/button";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,6 +72,12 @@ import { useOnline } from "@/hooks/useOnline";
 import { STUDY_DAY_RULE } from "@/lib/studyDay";
 import { cn } from "@/lib/utils";
 import { studyDayStartIso } from "@/lib/today";
+
+const LEARNED_SOURCE_LABEL = {
+  all: "All",
+  lessons: "From lessons",
+  reading: "From reading",
+} as const;
 
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
@@ -117,6 +127,10 @@ function VocabularyOnline() {
   const resetWords = useServerFn(resetVocabularyWords);
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState<string | null>(null);
+  // Review session: the words frozen when it starts (null while the lists show).
+  const [session, setSession] = useState<Word[] | null>(null);
+  const [learnedQuery, setLearnedQuery] = useState("");
+  const [learnedSource, setLearnedSource] = useState<"all" | "lessons" | "reading">("all");
   const [recordingId, setRecordingId] = useState<string | null>(null);
   const [checkingId, setCheckingId] = useState<string | null>(null);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
@@ -493,6 +507,7 @@ function VocabularyOnline() {
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
   // Learned words (e.g. passed pronunciation) move out of Today into the Learned tab.
   const todayOpen = today.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) < LEARNED_MASTERY);
+  const todayToDo = todayOpen.filter((w) => !knownNow(w.id));
 
   // Spaced reviews: earlier words whose review date has arrived come back here,
   // most overdue first. Words reviewed today stay visible (dimmed) until tomorrow.
@@ -514,6 +529,28 @@ function VocabularyOnline() {
       ),
     )
     .slice(0, DAILY_REVIEW_LIMIT);
+  // Lists with only what is still to do; words rated today fold into "Done today".
+  const reviewOpen = reviewItems.filter((w) => !knownNow(w.id));
+  const doneToday = [...reviewItems, ...todayOpen].filter((w) => knownNow(w.id));
+  // The session's queue: due reviews first, then today's new words.
+  const sessionQueue = [...reviewOpen, ...todayToDo];
+  // Learned tab: search, source filter, and the words coming back soonest first.
+  const learnedNeedle = learnedQuery.trim().toLowerCase();
+  const learnedShown = learned
+    .filter((w) =>
+      learnedSource === "all" ? true : (w.category === "reading") === (learnedSource === "reading"),
+    )
+    .filter(
+      (w) =>
+        !learnedNeedle ||
+        w.word.toLowerCase().includes(learnedNeedle) ||
+        w.translation.toLowerCase().includes(learnedNeedle),
+    )
+    .sort((a, b) =>
+      (byWord.get(a.id)?.next_review_at ?? "9").localeCompare(
+        byWord.get(b.id)?.next_review_at ?? "9",
+      ),
+    );
 
   // Keep what is on screen (today's words, then due reviews) for offline use.
   const offlineWords = [...today, ...reviewItems];
@@ -551,60 +588,37 @@ function VocabularyOnline() {
         icon={BookOpen}
         accent="vocabulary"
         title={<>Vocabulary Builder</>}
-        description={
-          <>
-            Ten new words every time you start a new lesson, chosen from your learning path, with
-            meaning, examples and a microphone to test your pronunciation.
-          </>
+        description={<>Remember, check and say your words: ten new ones with every new lesson.</>}
+        actions={
+          // The built-in translator, compact (owner request, 2026-11-02: a lookup
+          // tool, not the page's task, so it left the big card above the words).
+          <div className="relative w-full sm:w-72" title={t("Built-in English translator")}>
+            <Languages
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[oklch(0.62_0.18_300)]"
+              aria-hidden="true"
+            />
+            <input
+              id="vocab-search"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("Translate an English word...")}
+              aria-label={t("Built-in English translator")}
+              className="h-10 w-full rounded-full border border-white/15 bg-white/[0.04] pl-9 pr-9 text-sm outline-none transition focus:border-[oklch(0.62_0.18_300)] focus:ring-2 focus:ring-[oklch(0.62_0.18_300)]/30"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label={t("Clear search")}
+                className="absolute right-0 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
         }
       />
-      <section
-        aria-labelledby="vocab-search-title"
-        className="mt-4 rounded-2xl border border-brand-green/40 bg-brand-green/5 p-4 shadow-sm sm:p-5"
-      >
-        <div className="flex items-start gap-3">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-green/15 text-brand-green">
-            <Languages className="size-5" aria-hidden="true" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 id="vocab-search-title" className="font-display text-base font-semibold">
-              Built-in English translator
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Look up an English word or phrase and see its meaning in Portuguese without leaving
-              Evoluir+.
-            </p>
-            <label
-              htmlFor="vocab-search"
-              className="mt-3 block text-sm font-semibold text-foreground"
-            >
-              Search in English
-            </label>
-            <div className="relative mt-1.5">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-brand-green" />
-              <input
-                id="vocab-search"
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Enter an English word or phrase..."
-                aria-label="Search in English with the built-in translator"
-                className="h-11 w-full rounded-xl border border-brand-green/40 bg-background pl-10 pr-10 text-sm outline-none transition focus:border-brand-green focus:ring-2 focus:ring-brand-green/30"
-              />
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => setQuery("")}
-                  aria-label="Clear search"
-                  className="absolute right-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-muted-foreground hover:text-foreground"
-                >
-                  <X className="size-4" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
       <StudyDayCounter
         label={t("Words reviewed today")}
         value={reviewedToday}
@@ -679,73 +693,143 @@ function VocabularyOnline() {
                     </Button>
                   </div>
                 ) : null}
-                {reviewItems.length > 0 && (
-                  <section aria-label={t("Review due")} className="mt-4">
-                    <h2 className="font-display text-sm font-semibold">
-                      {t("Review due")} ({reviewItems.filter((w) => !knownNow(w.id)).length})
-                    </h2>
-                    <VocabularyWordList items={reviewItems} highlightKnown {...listProps} />
-                  </section>
-                )}
-                {cardsDue > 0 && (
-                  <section
-                    aria-label={t("Lesson cards to review")}
-                    className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-sky-400/30 bg-sky-400/[0.06] p-3"
-                  >
-                    <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-sky-400/15 text-sky-300">
-                      <Layers className="size-5" aria-hidden="true" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <h2 className="font-display text-sm font-semibold">
-                        <span>{t("Lesson cards to review")}</span> <span>({cardsDue})</span>
-                      </h2>
-                      <p className="text-xs text-muted-foreground">
-                        {t("Your lessons' words as flashcards: part of the same word review.")}
-                      </p>
-                    </div>
-                    <Button asChild size="sm" variant="outline" className="shrink-0">
-                      <Link to="/learning/review">{t("Review cards")}</Link>
-                    </Button>
-                  </section>
-                )}
-                {today.length > 0 ? (
+                {session ? (
+                  <VocabularySession
+                    queue={session}
+                    cardsDue={cardsDue}
+                    onClose={() => setSession(null)}
+                    {...listProps}
+                  />
+                ) : (
                   <>
-                    {allTodayKnown ? (
+                    {sessionQueue.length > 0 ? (
+                      <section className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[oklch(0.62_0.18_300)]/35 bg-[oklch(0.62_0.18_300)]/[0.07] p-4">
+                        <div className="min-w-0 flex-1">
+                          <h2 className="font-display text-base font-semibold">
+                            <span>{sessionQueue.length}</span>{" "}
+                            <span>
+                              {sessionQueue.length === 1
+                                ? t("word to remember now")
+                                : t("words to remember now")}
+                            </span>
+                          </h2>
+                          <p className="text-xs text-muted-foreground">
+                            {t("One word at a time: remember it, check the meaning, then rate it.")}
+                          </p>
+                        </div>
+                        <Button
+                          className="min-h-11 shrink-0"
+                          onClick={() => setSession(sessionQueue)}
+                        >
+                          <Play className="size-4" /> {t("Start review")}
+                        </Button>
+                      </section>
+                    ) : today.length > 0 && allTodayKnown ? (
                       <p className="mt-4 flex items-center gap-2 text-sm font-medium text-success">
                         <Check className="size-4" aria-hidden />{" "}
                         {t("All words known today. Nice work!")}
                       </p>
-                    ) : (
-                      <div className="mt-4">
-                        <p className="text-sm text-muted-foreground">
-                          {t("This lesson's words: {n} of {total} known")
-                            .replace("{n}", String(todayKnownCount))
-                            .replace("{total}", String(today.length))}
-                        </p>
-                        <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-secondary">
-                          <div
-                            className="h-full rounded-full bg-success transition-all"
-                            style={{
-                              width: `${Math.round((todayKnownCount / today.length) * 100)}%`,
-                            }}
-                          />
+                    ) : null}
+                    {cardsDue > 0 && (
+                      <section
+                        aria-label={t("Lesson cards to review")}
+                        className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3"
+                      >
+                        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[oklch(0.62_0.18_300)]/15 text-[oklch(0.62_0.18_300)]">
+                          <Layers className="size-5" aria-hidden="true" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <h2 className="font-display text-sm font-semibold">
+                            <span>{t("Lesson cards to review")}</span> <span>({cardsDue})</span>
+                          </h2>
+                          <p className="text-xs text-muted-foreground">
+                            {t("Your lessons' words as flashcards: part of the same word review.")}
+                          </p>
                         </div>
+                        <Button asChild size="sm" variant="outline" className="shrink-0">
+                          <Link to="/learning/review">{t("Review cards")}</Link>
+                        </Button>
+                      </section>
+                    )}
+                    {reviewOpen.length > 0 && (
+                      <section aria-label={t("Review due")} className="mt-5">
+                        <h2 className="font-display text-sm font-semibold">
+                          <span>{t("Review due")}</span> <span>({reviewOpen.length})</span>
+                        </h2>
+                        <VocabularyWordList items={reviewOpen} highlightKnown {...listProps} />
+                      </section>
+                    )}
+                    {todayToDo.length > 0 && (
+                      <section aria-label={t("New words")} className="mt-5">
+                        <h2 className="font-display text-sm font-semibold">
+                          <span>{t("New words")}</span> <span>({todayToDo.length})</span>
+                        </h2>
+                        <VocabularyWordList items={todayToDo} highlightKnown {...listProps} />
+                      </section>
+                    )}
+                    {doneToday.length > 0 && (
+                      // Words already rated today fold away (owner request,
+                      // 2026-11-02: dimmed cards in the list read as noise).
+                      <details className="group mt-5">
+                        <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+                          <ChevronRight
+                            className="size-4 transition-transform group-open:rotate-90"
+                            aria-hidden
+                          />
+                          <span>{t("Done today")}</span> <span>({doneToday.length})</span>
+                        </summary>
+                        <VocabularyWordList items={doneToday} highlightKnown {...listProps} />
+                      </details>
+                    )}
+                    {today.length === 0 && !generating && !genFailed && (
+                      <div className="mt-6 flex flex-col items-center gap-2 rounded-xl border border-dashed border-white/15 p-6 text-center">
+                        <DoneSeal icon={ClockHands} />
+                        <p className="text-sm text-muted-foreground">
+                          {t("New words arrive with your next lesson.")}
+                        </p>
+                        <Button asChild size="sm" variant="outline">
+                          <Link to="/learning">{t("Open your next lesson")}</Link>
+                        </Button>
                       </div>
                     )}
-                    {todayOpen.length > 0 && (
-                      <VocabularyWordList items={todayOpen} highlightKnown {...listProps} />
-                    )}
                   </>
-                ) : !generating && !genFailed ? (
-                  <p className="mt-6 text-sm text-muted-foreground">
-                    {t("No new words available right now. Please try again later.")}
-                  </p>
-                ) : null}
+                )}
               </>
             )}
           </TabsContent>
           <TabsContent value="learned">
-            <VocabularyWordList items={learned} showActions={false} {...listProps} />
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <div className="relative min-w-0 flex-1 sm:max-w-xs">
+                <Search
+                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                  aria-hidden
+                />
+                <input
+                  type="search"
+                  value={learnedQuery}
+                  onChange={(e) => setLearnedQuery(e.target.value)}
+                  placeholder={t("Search your words...")}
+                  aria-label={t("Search your words...")}
+                  className="h-10 w-full rounded-full border border-white/15 bg-white/[0.04] pl-9 pr-3 text-sm outline-none focus:border-[oklch(0.62_0.18_300)]"
+                />
+              </div>
+              {(["all", "lessons", "reading"] as const).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setLearnedSource(key)}
+                  className={cn(
+                    "h-9 rounded-full border px-3 text-xs font-medium transition-colors",
+                    learnedSource === key
+                      ? "border-[oklch(0.62_0.18_300)]/60 bg-[oklch(0.62_0.18_300)]/15 text-foreground"
+                      : "border-white/10 text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {t(LEARNED_SOURCE_LABEL[key])}
+                </button>
+              ))}
+            </div>
+            <VocabularyWordList items={learnedShown} showActions={false} {...listProps} />
           </TabsContent>
         </Tabs>
       )}

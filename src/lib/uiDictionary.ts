@@ -2594,6 +2594,33 @@ const baseUiPt: Record<string, string> = {
   "words learned": "palavras aprendidas",
   "Every 63 more days in a row adds another Diamond cycle.":
     "A cada mais 63 dias seguidos, você ganha mais um ciclo do Diamante.",
+  // Vocabulary review session and page (owner request, 2026-11-02).
+  "Show meaning": "Mostrar significado",
+  "Try to remember what it means, then check.": "Tente lembrar o que significa e depois confira.",
+  "From reading": "Da leitura",
+  "From lessons": "Das lições",
+  "Back for review in": "Volta para revisão em",
+  Skip: "Pular",
+  Word: "Palavra",
+  "Words you knew": "Palavras que você sabia",
+  "Review done": "Revisão concluída",
+  "Back to the list": "Voltar para a lista",
+  "End review": "Encerrar revisão",
+  "Review session": "Sessão de revisão",
+  "Translate an English word...": "Traduza uma palavra em inglês...",
+  "word to remember now": "palavra para lembrar agora",
+  "words to remember now": "palavras para lembrar agora",
+  "One word at a time: remember it, check the meaning, then rate it.":
+    "Uma palavra por vez: lembre, confira o significado e avalie.",
+  "Start review": "Começar revisão",
+  "New words": "Palavras novas",
+  "Done today": "Feitas hoje",
+  "New words arrive with your next lesson.": "Palavras novas chegam com a sua próxima lição.",
+  "Open your next lesson": "Abrir a próxima lição",
+  "Search your words...": "Busque nas suas palavras...",
+  Beat: "Supere",
+  "Remember, check and say your words: ten new ones with every new lesson.":
+    "Lembre, confira e fale suas palavras: dez novas a cada nova lição.",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.

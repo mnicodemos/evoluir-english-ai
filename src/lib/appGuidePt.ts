@@ -310,4 +310,12 @@ export const appGuidePt: Record<string, string> = {
   "Next:": "Próxima:",
   "day left": "dia restante",
   "See the jewels": "Ver as joias",
+  "Tap Start review: one word at a time, try to remember its meaning, then tap Show meaning.":
+    "Toque em Começar revisão: uma palavra por vez, tente lembrar o significado e depois toque em Mostrar significado.",
+  "Rate it: I know it sends it up the review ladder, Not yet brings it back sooner.":
+    "Avalie: Já sei leva a palavra para o próximo degrau da revisão, Ainda não faz ela voltar mais cedo.",
+  "Listen to each word and tap the microphone to say it out loud.":
+    "Ouça cada palavra e toque no microfone para falá-la em voz alta.",
+  "Ten reviewed words complete a study day; your lesson cards due show right under them, and the translator sits at the top.":
+    "Dez palavras revisadas completam um dia de estudo; os cartões das lições a revisar aparecem logo abaixo, e o tradutor fica no topo.",
 };
