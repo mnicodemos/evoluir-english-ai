@@ -285,6 +285,10 @@ function VocabularyOnline() {
 
   /** "I know it" moves the word one step up the spaced review ladder. */
   async function markKnown(wordId: string) {
+    // Acting on the word clears any notification on screen at once
+    // (owner request, 2026-11-02): a stale pronunciation result must not
+    // linger above the card while the student rates the next one.
+    pronunciationToasts.current.dismissAll();
     // Not due yet: marking again must not skip steps of the ladder.
     if (!canAdvance(byWord.get(wordId))) return;
     await saveReview(wordId, "known", { timed: true });

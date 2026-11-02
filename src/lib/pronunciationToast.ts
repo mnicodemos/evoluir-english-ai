@@ -22,6 +22,11 @@ export function createPronunciationToaster() {
     dismiss() {
       toast.dismiss(PRONUNCIATION_TOAST_ID);
     },
+    /** Clears whatever notification is on screen (owner request, 2026-11-02:
+     *  pressing "I know it" must not leave a stale alert above the card). */
+    dismissAll() {
+      toast.dismiss();
+    },
     notify(kind: PronunciationToastKind, message: string, options?: ExternalToast) {
       if (!active) return;
       const opts: ExternalToast = { id: PRONUNCIATION_TOAST_ID, ...options };
