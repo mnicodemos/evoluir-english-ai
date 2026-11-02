@@ -11,7 +11,7 @@ import {
   type UserFlashcard,
 } from "@/hooks/useLearning";
 import { usePersistentState } from "@/hooks/usePersistentState";
-import { reversedCard } from "@/lib/flashcards";
+import { reversedCard, sessionCardState } from "@/lib/flashcards";
 import { speakEnglish } from "@/lib/speech";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
