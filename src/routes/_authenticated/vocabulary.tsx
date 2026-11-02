@@ -79,10 +79,6 @@ const LEARNED_SOURCE_LABEL = {
   reading: "From reading",
 } as const;
 
-/** Every pronunciation-evaluation toast shares this id, so leaving the page
- *  dismisses whatever is visible and no late answer can reshow it elsewhere. */
-const PRONUNCIATION_TOAST_ID = "vocabulary-pronunciation-result";
-
 export const Route = createFileRoute("/_authenticated/vocabulary")({
   head: () => ({
     meta: [
@@ -339,12 +335,13 @@ function VocabularyOnline() {
   // Pronunciation toasts are restricted to this page: they stop being shown
   // the moment the student leaves, so a late async answer never pops up on
   // another screen. Re-entering the page re-enables them (see the effect).
-  const pronunciationActive = useRef(true);
+  const pronunciationToasts = useRef(createPronunciationToaster());
   useEffect(() => {
-    pronunciationActive.current = true;
+    const toasts = pronunciationToasts.current;
+    toasts.setActive(true);
     return () => {
-      pronunciationActive.current = false;
-      toast.dismiss(PRONUNCIATION_TOAST_ID);
+      toasts.setActive(false);
+      toasts.dismiss();
     };
   }, []);
 
@@ -353,12 +350,7 @@ function VocabularyOnline() {
     message: string,
     options?: ExternalToast,
   ) {
-    if (!pronunciationActive.current) return;
-    const opts: ExternalToast = { id: PRONUNCIATION_TOAST_ID, ...options };
-    if (kind === "success") toast.success(message, opts);
-    else if (kind === "warning") toast.warning(message, opts);
-    else if (kind === "error") toast.error(message, opts);
-    else toast(message, opts);
+    pronunciationToasts.current.notify(kind, message, options);
   }
 
   /** Records or checks a word; resolves true when the pronunciation passed
