@@ -632,3 +632,19 @@
     padding: 0 !important;
   }
 }
+
+/* Every toast: a 1px light line on top in the colour of its meaning,
+   the same accent as the pronunciation HUD. */
+@layer utilities {
+  [data-sonner-toast].app-toast {
+    --toast-accent: rgb(255 255 255 / 0.18);
+    background-image: linear-gradient(90deg, transparent 1.5rem, var(--toast-accent), transparent calc(100% - 1.5rem));
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+    background-position: top;
+  }
+  [data-sonner-toast].app-toast[data-type="success"] { --toast-accent: color-mix(in oklab, var(--brand-green) 70%, transparent); }
+  [data-sonner-toast].app-toast[data-type="warning"] { --toast-accent: rgb(251 191 36 / 0.7); }
+  [data-sonner-toast].app-toast[data-type="error"] { --toast-accent: rgb(248 113 113 / 0.7); }
+  [data-sonner-toast].app-toast[data-type="info"] { --toast-accent: rgb(56 189 248 / 0.7); }
+}
