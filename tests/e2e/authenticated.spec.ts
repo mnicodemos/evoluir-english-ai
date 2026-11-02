@@ -25,9 +25,11 @@ authenticated("authenticated smoke", () => {
     for (const [route, title] of routes) {
       await page.goto(route, { waitUntil: "domcontentloaded" });
       await expect(page).toHaveURL(new RegExp(route));
-      await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible({
-        timeout: 20_000,
-      });
+      const heading = page.getByRole("heading", { level: 1, name: title });
+      // Mobile PageHeader collapses into a compact top bar after scrolling.
+      // Bring the actual h1 back into view before asserting it is visible.
+      await heading.scrollIntoViewIfNeeded();
+      await expect(heading).toBeVisible({ timeout: 20_000 });
     }
   });
 
