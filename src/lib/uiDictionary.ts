@@ -1239,8 +1239,8 @@ const baseUiPt: Record<string, string> = {
   "Lessons, videos, flashcards and quizzes": "Lições, vídeos, flashcards e quizzes",
   "Lessons, videos, flashcards and quizzes in one learning path.":
     "Lições, vídeos, flashcards e quizzes em uma única trilha.",
-  "A complete course for your level: 30 core lessons plus 3 optional review lessons, with video, summary, flashcards, quiz and guided practice. Each lesson unlocks when you finish the one before it.":
-    "Um curso completo para o seu nível: 30 lições principais e 3 lições opcionais de revisão, com vídeo, resumo, flashcards, quiz e prática guiada. Cada lição é liberada quando você conclui a anterior.",
+  "A complete course for your level with summary, lesson audio, flashcards and quiz.":
+    "Um curso completo para o seu nível com resumo, áudio da lição, flashcards e quiz.",
   Course: "Curso",
   "33 lessons in 6 units, including an optional review unit with a 10-question test.":
     "33 lições em 6 unidades, incluindo uma unidade opcional de revisão com um teste de 10 questões.",
