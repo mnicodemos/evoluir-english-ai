@@ -25,7 +25,31 @@ authenticated("authenticated smoke", () => {
     for (const [route, title] of routes) {
       await page.goto(route, { waitUntil: "domcontentloaded" });
       await expect(page).toHaveURL(new RegExp(route));
-      await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible({
+      const heading = page.getByRole("heading", { level: 1, name: title });
+      const visibility = await heading.evaluate((element) => {
+        const chain: Array<Record<string, unknown>> = [];
+        let node: HTMLElement | null = element as HTMLElement;
+        while (node && chain.length < 8) {
+          const style = getComputedStyle(node);
+          const rect = node.getBoundingClientRect();
+          chain.push({
+            tag: node.tagName,
+            className: typeof node.className === "string" ? node.className : "",
+            display: style.display,
+            visibility: style.visibility,
+            opacity: style.opacity,
+            contentVisibility: style.contentVisibility,
+            animationName: style.animationName,
+            rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+            clientRects: node.getClientRects().length,
+            checkVisibility: node.checkVisibility(),
+          });
+          node = node.parentElement;
+        }
+        return chain;
+      });
+      console.log(`[authenticated-smoke] ${route} heading geometry:`, JSON.stringify(visibility));
+      await expect(heading).toBeVisible({
         timeout: 20_000,
       });
     }
