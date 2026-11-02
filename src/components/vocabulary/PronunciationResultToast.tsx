@@ -81,7 +81,7 @@ export function PronunciationResultToast({
   return (
     <div
       role="status"
-      className="pronunciation-hud relative w-full overflow-hidden rounded-2xl p-3.5 text-slate-100"
+      className="pronunciation-hud relative w-[min(34rem,calc(100vw-2rem))] max-[600px]:w-full overflow-hidden rounded-2xl p-3.5 text-slate-100"
     >
       <span
         aria-hidden
