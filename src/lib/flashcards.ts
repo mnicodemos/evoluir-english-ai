@@ -1,5 +1,16 @@
 import type { Flashcard } from "@/hooks/useLearning";
 
+/** Returns no card after the main deck and retry queue are both complete. */
+export function getSessionFlashcard(
+  cards: Flashcard[],
+  index: number,
+  done: boolean,
+  again: string[],
+): Flashcard | undefined {
+  if (done) return again.length > 0 ? cards.find((card) => card.id === again[0]) : undefined;
+  return cards[index];
+}
+
 /**
  * Whether a card asks from Portuguese to English: at A1-A2, every other card
  * with a translation (owner request, 2026-10-30: recalling an English
