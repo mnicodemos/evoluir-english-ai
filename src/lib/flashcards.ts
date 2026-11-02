@@ -34,6 +34,30 @@ export function isFlashcardDue(
   return !state || state.next_review_date <= today;
 }
 
+/**
+ * Which card the deck shows, one rule for the card, the counter and the
+ * finished state (owner report: at 10/10 the last card stayed on screen,
+ * since the selection looked only at the Again queue, not at `done`): a
+ * finished session shows the next Again card while the queue has one, and no
+ * card at all once the queue is empty.
+ */
+export function sessionCardState(
+  cards: ReadonlyArray<{ id: string }>,
+  saved: { index: number; done: boolean },
+  again: readonly string[],
+) {
+  const index = Math.min(saved.index, Math.max(0, cards.length - 1));
+  const inMainDeck = !saved.done && index < cards.length;
+  const relearning = !inMainDeck && again.length > 0;
+  const card = relearning
+    ? cards.find((item) => item.id === again[0])
+    : inMainDeck
+      ? cards[index]
+      : undefined;
+  const position = relearning ? cards.length + 1 : index;
+  return { index, inMainDeck, relearning, card, position };
+}
+
 /** A lesson the student opened or answered, whose cards join the review. */
 export function lessonStarted(lesson: {
   video_progress: number | null;
