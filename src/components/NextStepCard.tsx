@@ -344,13 +344,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
-              {/* One line (owner request, 2026-11-02): cut with an ellipsis, the
-                  whole text on hover. */}
-              <span
-                className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:truncate sm:text-xs sm:font-normal"
-                title={`${t(quickWin.cta)} · ${t(quickWin.activity.title)}`}
-              >
-                {t(quickWin.cta)} · {t(quickWin.activity.title)}
+              {/* One line, never cut (owner request, 2026-11-02): only the
+                  action ("Say 5 words out loud"), which already names it. */}
+              <span className="hidden w-full whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+                {t(quickWin.cta)}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,
@@ -367,13 +364,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
-              {/* One line (owner request, 2026-11-02): cut with an ellipsis, the
-                  whole text on hover. */}
-              <span
-                className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:truncate sm:text-xs sm:font-normal"
-                title={`${t(quickWin.cta)} · ${t(quickWin.activity.title)}`}
-              >
-                {t(quickWin.cta)} · {t(quickWin.activity.title)}
+              {/* One line, never cut (owner request, 2026-11-02): only the
+                  action ("Say 5 words out loud"), which already names it. */}
+              <span className="hidden w-full whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+                {t(quickWin.cta)}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,

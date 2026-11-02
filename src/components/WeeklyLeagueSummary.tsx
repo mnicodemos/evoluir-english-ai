@@ -35,7 +35,9 @@ export function useWeeklyLeagueStanding(profile: LeagueProfile | null | undefine
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       // Not in the generated Supabase types until Lovable regenerates them.
-      const rpc = supabase.rpc as unknown as (
+      // Bound: an unbound supabase.rpc loses its client and throws (owner
+      // report, 2026-11-02: Last week read 0, then "—", and Your history hid).
+      const rpc = supabase.rpc.bind(supabase) as unknown as (
         name: string,
         args: { p_weeks: number },
       ) => Promise<{ data: { xp: number }[] | null; error: { message: string } | null }>;
