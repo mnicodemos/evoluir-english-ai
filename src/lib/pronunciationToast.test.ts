@@ -58,4 +58,11 @@ describe("pronunciation toasts restricted to the Vocabulary page", () => {
     expect(toast.dismiss).toHaveBeenCalledWith(PRONUNCIATION_TOAST_ID);
     expect(toast.dismiss).toHaveBeenCalledTimes(1);
   });
+
+  it("dismissAll clears whatever notification is visible, with no id filter", () => {
+    const t = createPronunciationToaster();
+    t.dismissAll();
+    expect(toast.dismiss).toHaveBeenCalledWith();
+    expect(toast.dismiss).toHaveBeenCalledTimes(1);
+  });
 });
