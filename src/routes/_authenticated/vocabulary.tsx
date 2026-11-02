@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast, type ExternalToast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
 import { StudyDayCounter } from "@/components/StudyDayCounter";
