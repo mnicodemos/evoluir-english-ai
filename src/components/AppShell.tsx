@@ -595,7 +595,7 @@ function AppShellContent({
           onTouchStart={handleMainTouchStart}
           onTouchEnd={handleMainTouchEnd}
           className={cn(
-            "animate-page-in w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
+            "w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
             !dashboardLayout && "flex-1",
             desktopOneScreen && "xl:flex xl:min-h-0 xl:flex-col",
             dashboardLayout &&
