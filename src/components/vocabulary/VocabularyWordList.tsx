@@ -31,7 +31,8 @@ export type VocabularyListContext = {
   onSpeak: (key: string, word: string) => void | Promise<void>;
   onMarkKnown: (wordId: string) => void | Promise<void>;
   onMarkForgotten: (wordId: string) => void | Promise<void>;
-  onTogglePronunciation: (word: Word) => void | Promise<void>;
+  /** Resolves true when the pronunciation passed (>= 70%). */
+  onTogglePronunciation: (word: Word) => void | Promise<boolean | void>;
 };
 
 /**
@@ -325,6 +326,14 @@ export function VocabularySession({
             next();
           }}
           onSkip={next}
+          // A passed pronunciation also knows the word: on to the next one
+          // (owner request, 2026-11-02), as the "Next word!" toast says.
+          onTogglePronunciation={async (w) => {
+            if (await ctx.onTogglePronunciation(w)) {
+              setRated((n) => n + 1);
+              next();
+            }
+          }}
         />
         <button
           type="button"
