@@ -390,27 +390,31 @@ function VocabularyOnline() {
           console.warn("Pronunciation preview differed from the authoritative result");
         const pt = lang === "pt";
         if (score >= 70) {
-          if (isMounted.current) toast.success(
-            pt
-              ? `Pronúncia OK — ${score}%. Próxima palavra!`
-              : `Pronunciation OK — ${score}%. Next word!`,
-            { id: PRONUNCIATION_TOAST_ID },
-          );
+          if (isMounted.current) {
+            toast.success(
+              pt
+                ? `Pronúncia OK — ${score}%. Próxima palavra!`
+                : `Pronunciation OK — ${score}%. Next word!`,
+              { id: PRONUNCIATION_TOAST_ID },
+            );
+          }
           await markPronouncedKnown(word.id);
           return true;
         } else {
           // A low score is coaching, not a failure: amber "try again", not a red error.
-          if (isMounted.current) toast.warning(
-            pt
-              ? `${score}% — abaixo de 70%. Ouvi “${spoken}”. Repita a palavra.`
-              : `${score}% — below 70%. I heard “${spoken}”. Please repeat the word.`,
-            {
-              // Which part of the word came out different, not only the percentage.
-              description: <PronunciationHint target={word.word} spoken={spoken} pt={pt} />,
-              duration: 8000,
-              id: PRONUNCIATION_TOAST_ID,
-            },
-          );
+          if (isMounted.current) {
+            toast.warning(
+              pt
+                ? `${score}% — abaixo de 70%. Ouvi “${spoken}”. Repita a palavra.`
+                : `${score}% — below 70%. I heard “${spoken}”. Please repeat the word.`,
+              {
+                // Which part of the word came out different, not only the percentage.
+                description: <PronunciationHint target={word.word} spoken={spoken} pt={pt} />,
+                duration: 8000,
+                id: PRONUNCIATION_TOAST_ID,
+              },
+            );
+          }
           // A clear miss on a due review counts as a failed review.
           if (score < 55) await markForgotten(word.id);
         }
