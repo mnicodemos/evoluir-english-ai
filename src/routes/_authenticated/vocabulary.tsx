@@ -323,6 +323,8 @@ function VocabularyOnline() {
   }
 
   async function speak(key: string, word: string) {
+    // Tapping the speaker clears any pronunciation notice at once.
+    pronunciationToasts.current.dismiss();
     setPlayingKey(key);
     minutesSpent.start();
     try {
@@ -359,6 +361,8 @@ function VocabularyOnline() {
   /** Records or checks a word; resolves true when the pronunciation passed
    *  (>= 70%), so the review session moves on to the next word. */
   async function togglePronunciation(word: Word): Promise<boolean> {
+    // Tapping the microphone clears any pronunciation notice at once.
+    pronunciationToasts.current.dismiss();
     if (pronunciationGate.current.isBusy()) {
       toastPronunciation("info", t("The check is already running."));
       return false;

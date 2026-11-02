@@ -6,4 +6,4 @@
 - [x] Transparência no painel de notificações (tema claro e escuro)
 - [ ] Testar "Marcar como lida" no aparelho (aguardando Marcelo)
 - [ ] Teste end-to-end do push diário; revisar fallback de alguns níveis
-- [ ] Vocabulary: dismiss pronunciation toast on mic/speaker tap
+- [x] Vocabulary: dismiss pronunciation toast on mic/speaker tap
