@@ -132,7 +132,7 @@ export function GoalsTodayCard() {
       ) : (
         // One goal, one task and one habit (user request); when there are more,
         // the student picks which one shows here.
-        <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 2xl:grid-cols-4">
+        <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-4">
           {shownGoal ? (
             <GoalTile
               key={shownGoal.id}
