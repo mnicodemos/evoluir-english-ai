@@ -76,7 +76,7 @@ describe("floating window on Ready", () => {
     focusStart();
     const key = getFocusSnapshot().state.key;
     vi.setSystemTime(new Date("2026-10-17T12:18:40Z"));
-    expect(focusStop()).toMatchObject({ minutes: 18, key, preset: "classic", startedAt: Date.now() - 18 * 60_000, endedAt: Date.now() });
+    expect(focusStop()).toMatchObject({ minutes: 18, key, preset: "classic", startedAt: new Date("2026-10-17T12:00:00Z").getTime(), endedAt: Date.now() });
     expect(getFocusSnapshot().state.phase).toBe("idle");
     focusStart();
     vi.setSystemTime(new Date("2026-10-17T12:19:20Z"));
