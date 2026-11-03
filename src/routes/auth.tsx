@@ -12,6 +12,7 @@ import { EvoAvatar } from "@/components/EvoAvatar";
 import { GOOGLE_SIGN_IN_ENABLED } from "@/lib/authProviders";
 import { authErrorMessage } from "@/lib/authErrors";
 import { uiPt } from "@/lib/uiDictionary";
+import { useUiLang } from "@/lib/uiLang";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,9 +43,8 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
-  // Login screen is always in Portuguese — no language option here.
-  const lang = "pt" as const;
-  const t = (label: string) => uiPt[label] ?? label;
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup">(
     search.mode === "signup" ? "signup" : "signin",
@@ -346,7 +346,7 @@ function AuthPage() {
                         onChange={(e) => setName(e.target.value)}
                         autoComplete="name"
                         className="scroll-mt-20"
-                        placeholder="Como você quer ser chamado"
+                        placeholder={t("Como você quer ser chamado")}
                         required
                       />
                     </div>
@@ -363,7 +363,7 @@ function AuthPage() {
                       autoCapitalize="none"
                       spellCheck={false}
                       className="scroll-mt-20"
-                      placeholder="seu@email.com"
+                      placeholder={t("seu@email.com")}
                       required
                     />
                   </div>
@@ -443,19 +443,19 @@ function AuthPage() {
                   )}
                   {mode === "signup" && !forgot ? (
                     <p className="text-center text-xs leading-relaxed text-muted-foreground">
-                      Ao criar uma conta, você concorda com os{" "}
+                      {t("Ao criar uma conta, você concorda com os")}{" "}
                       <Link
                         to="/terms"
                         className="font-medium text-foreground underline underline-offset-4"
                       >
-                        Termos de Uso
+                        {t("Termos de Uso")}
                       </Link>{" "}
-                      e a{" "}
+                      {t("e a")}{" "}
                       <Link
                         to="/privacy"
                         className="font-medium text-foreground underline underline-offset-4"
                       >
-                        Política de Privacidade
+                        {t("Política de Privacidade")}
                       </Link>
                       .
                     </p>

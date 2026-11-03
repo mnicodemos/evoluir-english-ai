@@ -3,6 +3,37 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  // Admin push diagnostics
+  Push: "Notificações push",
+  "Push notifications": "Notificações push",
+  "Each phone or browser registers itself only after tapping “Notifications” on that device and allowing them. The test goes only to your own devices.":
+    "Cada celular ou navegador é registrado somente depois que você toca em “Notificações” nesse dispositivo e autoriza. O teste é enviado apenas aos seus próprios dispositivos.",
+  "Check devices": "Verificar dispositivos",
+  "Send test notification to my devices": "Enviar notificação de teste aos meus dispositivos",
+  "The check could not run.": "Não foi possível realizar a verificação.",
+  "Server push setup:": "Configuração do envio push:",
+  configured: "configurado",
+  "missing (LOVABLE_API_KEY / FIREBASE_MESSAGING_API_KEY)":
+    "ausente (LOVABLE_API_KEY / FIREBASE_MESSAGING_API_KEY)",
+  "Registered devices:": "Dispositivos registrados:",
+  "students.": "alunos.",
+  "Your devices:": "Seus dispositivos:",
+  " — none: open the app on your phone, tap Notifications and allow them.":
+    " — nenhum: abra o app no celular, toque em Notificações e autorize.",
+  "last seen": "visto por último",
+  "sent ✓": "enviado ✓",
+  failed: "falhou",
+  " (device no longer valid)": " (dispositivo não é mais válido)",
+  "“sent ✓” but nothing on the phone: the phone or browser is blocking it (for example, Brave needs “Use Google services for push messaging” turned on, and Android needs the app’s notifications allowed). Test arrives but no daily push: the daily job is not running.":
+    "“enviado ✓”, mas nada aparece no celular: o aparelho ou navegador está bloqueando a notificação (por exemplo, no Brave é preciso ativar “Usar serviços do Google para mensagens push”, e no Android permitir as notificações do app). Se o teste chega, mas o push diário não, o processo diário não está sendo executado.",
+  // Authentication
+  "Como você quer ser chamado": "What should we call you?",
+  "seu@email.com": "you@example.com",
+  "Ao criar uma conta, você concorda com os": "By creating an account, you agree to the",
+  "Termos de Uso": "Terms of Use",
+  "e a": "and the",
+  "Política de Privacidade": "Privacy Policy",
+
   "Start Focus for your study?": "Quer iniciar o Focus para estudar?",
   "EVO invites you to focus": "A EVO convida você a entrar em foco.",
   "Start a {minutes}-minute focus block?": "Iniciar um bloco de foco de {minutes} minutos?",
