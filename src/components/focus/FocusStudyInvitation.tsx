@@ -33,7 +33,7 @@ export function FocusStudyInvitation() {
       if (!claimOffer(profile.id, current)) return;
       pendingOffer.current = false;
       const minutes = FOCUS_PRESETS[current.preset].focus;
-      toast(t("Start Focus for your study?"), {
+      toast(t("EVO invites you to focus"), {
         id: TOAST_ID,
         icon: <TomatoIcon className="size-5 text-brand-green" />,
         description: t("Start a {minutes}-minute focus block?").replace(
