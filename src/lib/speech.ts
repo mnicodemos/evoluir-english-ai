@@ -432,10 +432,7 @@ const queuedPreparations = new Set<string>();
  * parallel generations. Duplicate queued lines are ignored, and a failed
  * preparation never poisons the queue for later lines.
  */
-export function prepareSpeech(
-  text: string,
-  options: Pick<SpeechOptions, "cache" | "voice"> = {},
-) {
+export function prepareSpeech(text: string, options: Pick<SpeechOptions, "cache" | "voice"> = {}) {
   const value = text?.trim();
   if (!value || typeof window === "undefined" || !window.AudioContext) return;
   const voice = options.voice ?? "evo";
