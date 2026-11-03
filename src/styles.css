@@ -340,6 +340,17 @@
   }
 }
 
+/* A desktop breakpoint is not proof that the browser has enough vertical
+   space for a one-screen composition. On compact desktop viewports, let the
+   shell grow with its content instead of enforcing a fixed viewport height
+   and a 48rem minimum that can push content below the visible area. */
+@media (min-width: 80rem) and (max-height: 52.5rem) {
+  .desktop-one-screen {
+    height: auto;
+    min-height: 100dvh;
+  }
+}
+
 @keyframes weather-icon-change {
   from {
     opacity: 0;

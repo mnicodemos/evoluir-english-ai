@@ -85,11 +85,17 @@ export function PronunciationResultToast({
     >
       <span
         aria-hidden
-        className={cn("absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent to-transparent", s.line)}
+        className={cn(
+          "absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent to-transparent",
+          s.line,
+        )}
       />
       <span
         aria-hidden
-        className={cn("pointer-events-none absolute -left-8 -top-8 size-24 rounded-full blur-2xl", s.glow)}
+        className={cn(
+          "pointer-events-none absolute -left-8 -top-8 size-24 rounded-full blur-2xl",
+          s.glow,
+        )}
       />
       <div className="relative flex items-start gap-3">
         <span
@@ -127,8 +133,15 @@ export function PronunciationResultToast({
               </p>
             </div>
           ) : null}
-          {band !== "pass" && hint ? <div className="mt-2 text-xs text-slate-300">{hint}</div> : null}
-          <p className={cn("mt-2 text-xs font-medium", band === "pass" ? s.accent : "text-slate-300")}>
+          {band !== "pass" && hint ? (
+            <div className="mt-2 text-xs text-slate-300">{hint}</div>
+          ) : null}
+          <p
+            className={cn(
+              "mt-2 text-xs font-medium",
+              band === "pass" ? s.accent : "text-slate-300",
+            )}
+          >
             {footer}
           </p>
         </div>
