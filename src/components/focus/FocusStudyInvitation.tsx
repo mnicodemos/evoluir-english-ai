@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
-import { showAppNotification } from "@/components/ui/AppNotificationToast";
-import { toast } from "sonner";
 import { TomatoIcon } from "./TomatoIcon";
+import { showAppNotification } from "@/components/ui/AppNotificationToast";
+import { EvoAvatar } from "@/components/EvoAvatar";
+import { toast } from "sonner";
 import { useLifeT } from "@/components/life/LifeNav";
 import { useProfile } from "@/hooks/useProfile";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
@@ -48,7 +49,8 @@ export function FocusStudyInvitation() {
           String(minutes),
         ),
         variant: "info",
-        icon: <TomatoIcon className="size-5 text-brand-green" />,
+        icon: <EvoAvatar className="size-9 ring-1 ring-brand-green/60" decorative />,
+        cornerIcon: <TomatoIcon className="size-5 text-rose-400" />,
         duration: 15000,
         action: {
           label: t("Start Focus"),
