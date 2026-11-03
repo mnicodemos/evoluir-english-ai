@@ -10,7 +10,8 @@ import {
   createFocusOfferGate,
   STUDY_STARTED_EVENT,
 } from "@/lib/focusStudyOffer";
-import { focusStart, getFocusSnapshot, openFocusWidget } from "@/lib/focusTimer";
+import { focusSetActivity, focusStart, getFocusSnapshot, openFocusWidget } from "@/lib/focusTimer";
+import type { FocusActivity } from "@/lib/life";
 import { FOCUS_PRESETS } from "@/lib/life";
 
 const claimOffer = createFocusOfferGate();
@@ -22,9 +23,12 @@ export function FocusStudyInvitation() {
   const { t } = useLifeT();
   const { state } = useFocusTimer();
   const pendingOffer = useRef(false);
+  const pendingActivity = useRef<FocusActivity | null>(null);
 
   useEffect(() => {
-    const offer = () => {
+    const offer = (event?: Event) => {
+      const activity = (event as CustomEvent<{ activity?: FocusActivity }> | undefined)?.detail?.activity;
+      if (activity) pendingActivity.current = activity;
       if (!profile?.id) {
         pendingOffer.current = true;
         return;
@@ -45,6 +49,7 @@ export function FocusStudyInvitation() {
           label: t("Start Focus"),
           onClick: () => {
             if (!canStartOfferedFocus(getFocusSnapshot().state)) return;
+            focusSetActivity(pendingActivity.current);
             focusStart();
             openFocusWidget();
           },
