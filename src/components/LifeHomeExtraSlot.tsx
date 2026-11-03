@@ -36,7 +36,7 @@ export function LifeHomeExtraSlot({ translate: t }: { translate: (label: string)
 
   if (decision) {
     return (
-      <li className="hidden min-w-0 2xl:block">
+      <li className="hidden min-w-0 xl:block">
         <Link
           to="/life/decisions"
           className="flex h-full min-w-0 flex-col justify-between gap-0.5 rounded-lg bg-secondary/60 px-2.5 py-1.5 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
@@ -85,7 +85,7 @@ function FocusSlot({ translate: t }: { translate: (label: string) => string }) {
   };
 
   return (
-    <li className="hidden min-w-0 flex-col justify-between gap-0.5 rounded-lg bg-secondary/60 px-2.5 py-1.5 2xl:flex">
+    <li className="hidden min-w-0 flex-col justify-between gap-0.5 rounded-lg bg-secondary/60 px-2.5 py-1.5 xl:flex">
       <div className="flex min-w-0 items-center gap-2">
         <p className="flex min-w-0 flex-1 items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
           <TomatoIcon className="size-3 text-red-400" />
