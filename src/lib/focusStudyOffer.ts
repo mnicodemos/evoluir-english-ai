@@ -10,10 +10,13 @@ export function isStudyInteraction(target: Element | null): boolean {
   return !!target?.closest("main") && !target.closest("header, nav, a, [role='dialog']");
 }
 
-export function announceStudyInteraction(target: Element | null, activity: FocusActivity) {
-  if (isStudyInteraction(target)) {
-    window.dispatchEvent(new CustomEvent(STUDY_STARTED_EVENT, { detail: { activity } }));
-  }
+export function announceStudyInteraction(target: Element | null, activity?: FocusActivity) {
+  if (!isStudyInteraction(target)) return;
+  window.dispatchEvent(
+    activity
+      ? new CustomEvent(STUDY_STARTED_EVENT, { detail: { activity } })
+      : new Event(STUDY_STARTED_EVENT),
+  );
 }
 
 export function canStartOfferedFocus(state: Pick<FocusState, "phase">) {
