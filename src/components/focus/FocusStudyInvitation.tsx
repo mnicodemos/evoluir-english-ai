@@ -50,6 +50,7 @@ export function FocusStudyInvitation() {
         ),
         variant: "info",
         icon: <EvoAvatar className="size-9 ring-1 ring-brand-green/60" decorative />,
+        iconShape: "circle",
         cornerIcon: <TomatoIcon className="size-5 text-rose-400" />,
         duration: 15000,
         action: {

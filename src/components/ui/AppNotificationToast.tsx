@@ -17,6 +17,7 @@ type AppNotificationOptions = {
   description?: string;
   variant?: AppNotificationVariant;
   icon?: ReactNode;
+  iconShape?: "rounded" | "circle";
   cornerIcon?: ReactNode;
   duration?: number;
   action?: NotificationAction;
@@ -54,6 +55,7 @@ function AppNotificationToast({
   description,
   variant = "info",
   icon,
+  iconShape = "rounded",
   cornerIcon,
   action,
   cancel,
@@ -88,7 +90,8 @@ function AppNotificationToast({
       <div className={cn("relative flex items-start gap-3", cornerIcon && "pr-7")}>
         <span
           className={cn(
-            "mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-white/[0.06] ring-1 ring-white/10",
+            "mt-0.5 grid size-9 shrink-0 place-items-center bg-white/[0.06] ring-1 ring-white/10",
+            iconShape === "circle" ? "rounded-full" : "rounded-xl",
             style.accent,
           )}
         >

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
 import evoGuideOfficial from "@/assets/evo-dashboard-final.jpg.asset.json";
+import { useHomeImages } from "@/hooks/useHomeImages";
 import { cn } from "@/lib/utils";
 
 type EvoGuideProps = {
@@ -24,6 +25,11 @@ export function EvoGuide({
   image = "official",
   contrast = "default",
 }: EvoGuideProps) {
+  const { data: homeImages } = useHomeImages();
+  // Use the exact image configured for the Dashboard everywhere EVO appears.
+  // The avatar setting and bundled official image remain safe fallbacks.
+  const evoImage = homeImages?.desktop ?? homeImages?.evoAvatar ?? evoGuideOfficial.url;
+
   if (image === "avatar") {
     return (
       <div className={cn("flex min-w-0 items-center gap-3 sm:gap-4", className)}>
@@ -84,7 +90,7 @@ export function EvoGuide({
         )}
       >
         <img
-          src={evoGuideOfficial.url}
+          src={evoImage}
           alt="EVO, sua companheira de evolução em inglês"
           width={1536}
           height={1024}
