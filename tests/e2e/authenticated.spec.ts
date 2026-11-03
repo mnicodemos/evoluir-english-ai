@@ -68,10 +68,10 @@ authenticated("authenticated smoke", () => {
   test("lesson search finds a lesson by name and hides the units", async ({ page }) => {
     await page.goto("/learning", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: /Your learning path/i })).toBeVisible();
-    // A lesson row of the path (its button is named by the lesson title).
-    const row = page.locator("main li > button[aria-label][title]").first();
-    await expect(row).toBeVisible({ timeout: 20_000 });
-    const title = (await row.getAttribute("aria-label")) ?? "";
+    // Use the visible Next lesson card as the source of truth. A broad
+    // main-level selector can pick a hidden row from another rendered path.
+    const nextLesson = page.getByRole("region", { name: "Next lesson" });
+    const title = (await nextLesson.getByRole("heading", { level: 3 }).textContent())?.trim() ?? "";
     expect(title.length).toBeGreaterThan(0);
 
     const search = page.getByRole("searchbox", { name: "Search a lesson by name" });
@@ -84,7 +84,7 @@ authenticated("authenticated smoke", () => {
 
     await search.fill("");
     await expect(results).toHaveCount(0);
-    await expect(row).toBeVisible();
+    await expect(nextLesson.getByRole("heading", { level: 3 })).toHaveText(title);
   });
 
   test("extra videos and Shorts have their own pages", async ({ page }) => {
