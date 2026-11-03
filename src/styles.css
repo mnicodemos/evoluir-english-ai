@@ -588,8 +588,11 @@
    and a full-width explanation/practice column. Narrow screens keep their
    existing composition; uploaded desktop images fill the same image slot. */
 @media (min-width: 1280px) {
+  /* Contain the inline axis only. Size containment also removes the card's
+     intrinsic block-size contribution to the Dashboard grid, which can
+     collapse the entire EVO row at large desktop resolutions. */
   .dashboard-focus {
-    container-type: size;
+    container-type: inline-size;
   }
   .dashboard-evo-grid {
     grid-template-columns: minmax(0, 45fr) minmax(0, 28fr) minmax(0, 27fr);
