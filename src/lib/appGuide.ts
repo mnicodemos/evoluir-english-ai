@@ -254,6 +254,7 @@ export const APP_GUIDE: GuideSection[] = [
     ],
     more: [
       "Give a goal a deadline and milestones to see how far you are.",
+      "When you start interacting with study content, the app offers Focus once a day on this device. Choose Start Focus or Not now; the timer never starts on its own.",
       "Change a goal, task or habit with its pencil (Edit).",
       "Tick a habit like Study English automatically on your English study days, so it keeps the same run as your streak.",
       "Stuck between options? Open Decisions: list the options and the criteria that matter, give each a weight and a score, and see the best option, test other weights in What if?, ask EVO for an analysis and turn your choice into a goal.",

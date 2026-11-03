@@ -124,6 +124,8 @@ export const appGuidePt: Record<string, string> = {
     "O sininho da Home lista o que ainda está aberto hoje: seu plano, as revisões, a leitura do dia, os passos das metas, os hábitos e, quando liberar, a Prova Final.",
   "Use Focus for blocks of 15, 25 or 50 minutes, with two minutes of English in each break.":
     "Use o Foco em blocos de 15, 25 ou 50 minutos, com dois minutos de inglês em cada pausa.",
+  "When you start interacting with study content, the app offers Focus once a day on this device. Choose Start Focus or Not now; the timer never starts on its own.":
+    "Ao começar a interagir com o conteúdo de estudo, o app oferece o Focus uma vez por dia neste dispositivo. Escolha Iniciar Focus ou Agora não; o cronômetro nunca começa sozinho.",
   "Add 1 to 3 goals: EVO gives you one small step for each goal every day.":
     "Adicione de 1 a 3 metas: a EVO dá um pequeno passo para cada meta todo dia.",
   "Give a goal a deadline and milestones to see how far you are.":
