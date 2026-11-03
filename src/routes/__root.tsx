@@ -12,6 +12,7 @@ import {
 import { useEffect, useLayoutEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { UiLangProvider, useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
@@ -172,6 +173,14 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const location = useLocation();
+
+  // In-app notifications belong to the page that triggered them. Dismiss every
+  // visible toast when the student navigates to a different route so a message
+  // from My Mistakes, Vocabulary, Focus, etc. cannot linger on another screen.
+  useEffect(() => {
+    toast.dismiss();
+  }, [location.pathname]);
 
   useEffect(() => {
     initSentry();
