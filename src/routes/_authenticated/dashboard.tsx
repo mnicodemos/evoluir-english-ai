@@ -800,7 +800,7 @@ function Dashboard() {
             lang={lang === "pt" ? "pt" : "en"}
             translate={t}
           />
-          <div className="dashboard-one-screen dashboard-home-layout flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_6.75rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3">
+          <div className="dashboard-one-screen dashboard-home-layout flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3">
             <header className="animate-rise min-w-0 xl:h-16">
               <EvoDailyReflection
                 userId={profile.id}
@@ -895,7 +895,7 @@ function Dashboard() {
               2026-11-01: one column edge from top to bottom). The 16 and 11 column
               grids inside the 8 columns keep the same gap, so their edges land on
               the page's 12 columns: jewels and league share 5, your week takes 3. */}
-            <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-12 xl:h-[6.75rem]">
+            <div className="order-1 hidden min-w-0 gap-3 lg:order-none lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
               {/* As wide as the Business English card (4 of 12 columns; user request). */}
               <div className="card-soft min-w-0 overflow-hidden lg:col-span-4">
                 <LevelCard level={profile.level} maxLevel={profile.max_level} compact />
@@ -1181,7 +1181,7 @@ function Dashboard() {
 function DashboardSkeleton() {
   return (
     <div
-      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_6.75rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3"
+      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3"
       aria-busy="true"
     >
       <div className="flex min-w-0 items-center justify-between gap-3 xl:h-16">
@@ -1191,9 +1191,9 @@ function DashboardSkeleton() {
         </div>
         <Skeleton className="h-10 w-32 rounded-full lg:h-11 lg:w-72" />
       </div>
-      <div className="hidden min-w-0 gap-3 lg:grid lg:grid-cols-12 xl:h-[6.75rem]">
-        <Skeleton className="h-full min-h-[6.75rem] rounded-xl lg:col-span-4" />
-        <Skeleton className="h-full min-h-[6.75rem] rounded-xl lg:col-span-8" />
+      <div className="hidden min-w-0 gap-3 lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
+        <Skeleton className="h-full min-h-[7.59rem] rounded-xl lg:col-span-4" />
+        <Skeleton className="h-full min-h-[7.59rem] rounded-xl lg:col-span-8" />
       </div>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[7px] lg:grid lg:grid-cols-12 lg:gap-3">
         <Skeleton className="min-h-[13rem] flex-1 rounded-xl lg:col-span-9 lg:min-h-[16.45rem]" />
