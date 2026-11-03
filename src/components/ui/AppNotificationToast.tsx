@@ -85,7 +85,7 @@ function AppNotificationToast({
           {cornerIcon}
         </span>
       ) : null}
-      <div className={cn("relative flex items-start gap-3", cornerIcon && "pr-7")} >
+      <div className={cn("relative flex items-start gap-3", cornerIcon && "pr-7")}>
         <span
           className={cn(
             "mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-white/[0.06] ring-1 ring-white/10",
