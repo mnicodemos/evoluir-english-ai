@@ -317,7 +317,7 @@ function ListeningPage() {
     : 0;
 
   async function play(slow = false) {
-    announceStudyInteraction(document.querySelector("main"));
+    announceStudyInteraction(document.querySelector("main"), "listening");
     setPlaying(true);
     try {
       // Lower levels practise word by word; from B1 the sentence stays whole,
@@ -359,7 +359,7 @@ function ListeningPage() {
 
   /** Plays the sentence while recording, so the student speaks along with it. */
   async function shadow() {
-    announceStudyInteraction(document.querySelector("main"));
+    announceStudyInteraction(document.querySelector("main"), "listening");
     setShadowResult(null);
     try {
       await startVoiceRecording();
@@ -387,7 +387,7 @@ function ListeningPage() {
 
   /** Starts recording the student repeating the sentence. */
   async function startRepeat() {
-    announceStudyInteraction(document.querySelector("main"));
+    announceStudyInteraction(document.querySelector("main"), "listening");
     try {
       await startVoiceRecording();
       setRecording(true);
