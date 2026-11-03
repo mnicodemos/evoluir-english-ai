@@ -11,13 +11,13 @@ import {
 } from "./blackFriday";
 
 const during = new Date("2026-11-27T12:00:00Z");
-const before = new Date("2026-11-23T02:59:00Z");
+const before = new Date("2026-11-21T02:59:00Z");
 const after = new Date("2026-12-01T03:00:00Z");
 
 describe("Black Friday offer", () => {
-  it("runs from 23/11 to 30/11 in São Paulo", () => {
+  it("runs from 21/11 to 30/11 in São Paulo", () => {
     expect(blackFridayActive(before)).toBe(false);
-    expect(blackFridayActive(new Date("2026-11-23T03:00:00Z"))).toBe(true);
+    expect(blackFridayActive(new Date("2026-11-21T03:00:00Z"))).toBe(true);
     expect(blackFridayActive(during)).toBe(true);
     expect(blackFridayActive(after)).toBe(false);
   });
@@ -32,10 +32,13 @@ describe("Black Friday offer", () => {
     expect(returning.couponId).not.toBeNull();
   });
 
-  it("leaves the yearly plan and the dates outside the campaign unchanged", () => {
+  it("does not activate the offer during warm-up or outside the campaign", () => {
+    const warmupStart = new Date("2026-11-03T03:00:00Z");
+    const warmupEnd = new Date("2026-11-21T02:59:59Z");
+    expect(checkoutOffer("monthly", [], warmupStart)).toEqual({ trialDays: 7, couponId: null });
+    expect(checkoutOffer("monthly", [], warmupEnd)).toEqual({ trialDays: 7, couponId: null });
     expect(checkoutOffer("yearly", [], during)).toEqual({ trialDays: 7, couponId: null });
     expect(checkoutOffer("monthly", [], after)).toEqual({ trialDays: 7, couponId: null });
-    expect(checkoutOffer("monthly", [], before).couponId).toBeNull();
     expect(formatBrl(offerPriceCents("yearly", checkoutOffer("yearly", [], during)))).toBe(
       "R$ 799,90",
     );
@@ -43,26 +46,27 @@ describe("Black Friday offer", () => {
 });
 
 describe("Black Friday warm-up and pushes", () => {
-  it("announces the offer in the 21 days before it starts", () => {
-    expect(blackFridayPhase(new Date("2026-11-02T02:59:00Z"))).toBeNull();
-    expect(blackFridayPhase(new Date("2026-11-02T03:00:00Z"))).toBe("warmup");
-    expect(daysUntilBlackFriday(new Date("2026-11-02T12:00:00Z"))).toBe(21);
-    expect(daysUntilBlackFriday(new Date("2026-11-22T23:00:00Z"))).toBe(1);
-    // The warm-up runs through Sunday 22/11, right up to the offer.
-    expect(blackFridayPhase(new Date("2026-11-22T23:00:00Z"))).toBe("warmup");
-    expect(blackFridayPhase(new Date("2026-11-23T03:00:00Z"))).toBe("live");
+  it("shows warm-up from 03/11 through 20/11 and the offer from 21/11", () => {
+    expect(blackFridayPhase(new Date("2026-11-03T02:59:00Z"))).toBeNull();
+    expect(blackFridayPhase(new Date("2026-11-03T03:00:00Z"))).toBe("warmup");
+    expect(daysUntilBlackFriday(new Date("2026-11-03T12:00:00Z"))).toBe(18);
+    expect(blackFridayPhase(new Date("2026-11-20T23:59:59Z"))).toBe("warmup");
+    expect(daysUntilBlackFriday(new Date("2026-11-20T12:00:00Z"))).toBe(1);
+    expect(blackFridayPhase(new Date("2026-11-21T02:59:59Z"))).toBe("warmup");
+    expect(blackFridayPhase(new Date("2026-11-21T03:00:00Z"))).toBe("live");
     expect(blackFridayPhase(during)).toBe("live");
     expect(blackFridayPhase(after)).toBeNull();
   });
 
-  it("pushes the offer on the first and the last day only", () => {
-    expect(blackFridayPush("2026-11-23")?.title).toContain("começou");
-    expect(blackFridayPush("2026-11-23")?.body).toContain("Até 30/11");
+  it("pushes the warm-up announcement and offer launch on their first days", () => {
+    expect(blackFridayPush("2026-11-03")?.title).toContain("vem aí");
+    expect(blackFridayPush("2026-11-03")?.body).toContain("Esquenta Black Friday");
+    expect(blackFridayPush("2026-11-03")?.body).toContain("21/11");
+    expect(blackFridayPush("2026-11-20")).toBeNull();
+    expect(blackFridayPush("2026-11-21")?.title).toContain("começou");
+    expect(blackFridayPush("2026-11-21")?.body).toContain("Até 30/11");
     expect(blackFridayPush("2026-11-30")?.title).toContain("Último dia");
     expect(blackFridayPush("2026-11-25")).toBeNull();
-    expect(blackFridayPush("2026-11-02")?.title).toContain("vem aí");
-    expect(blackFridayPush("2026-11-02")?.body).toContain("De 23/11 a 30/11");
-    expect(blackFridayPush("2026-11-03")).toBeNull();
     expect(blackFridayPush("2026-12-01")).toBeNull();
   });
 });

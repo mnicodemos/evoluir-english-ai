@@ -11,9 +11,9 @@ import type { BillingInterval } from "./stripeMapping";
 import { TRIAL_DAYS, trialEligible } from "./trial";
 
 export const BLACK_FRIDAY = {
-  /** 23/11/2026 00:00 in São Paulo (UTC-3). */
-  startsAt: "2026-11-23T03:00:00Z",
-  /** Exclusive: the offer runs through 30/11 (Cyber Monday), São Paulo. */
+  /** 21/11/2026 00:00 in São Paulo (UTC-3): start of the actual offer. */
+  startsAt: "2026-11-21T03:00:00Z",
+  /** Exclusive: the offer runs through 30/11, São Paulo. */
   endsAt: "2026-12-01T03:00:00Z",
   /** The last day shown on the Premium page. */
   lastDay: "2026-11-30T15:00:00Z",
@@ -22,12 +22,11 @@ export const BLACK_FRIDAY = {
   discountMonths: 3,
   monthlyTrialDays: 15,
   /**
-   * Warm-up (owner decision, 2026-10-31): Monday 02/11 through Sunday 22/11,
-   * São Paulo, right up to the offer.
+   * Esquenta Black Friday: 03/11 through 20/11, São Paulo.
+   * The exclusive end is midnight at the start of 21/11.
    */
-  warmupStartsAt: "2026-11-02T03:00:00Z",
-  /** Exclusive: the warm-up's last day is 22/11, the eve of the offer. */
-  warmupEndsAt: "2026-11-23T03:00:00Z",
+  warmupStartsAt: "2026-11-03T03:00:00Z",
+  warmupEndsAt: "2026-11-21T03:00:00Z",
   /** Stripe coupon, created on first use (ensureBlackFridayCoupon). */
   couponId: "EVOLUIR_BF2026_MONTHLY30X3",
 } as const;
@@ -54,7 +53,7 @@ function saoPauloDay(time: number): string {
 /** The first and last days of the offer, in São Paulo. */
 export const BLACK_FRIDAY_FIRST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.startsAt));
 export const BLACK_FRIDAY_LAST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.endsAt) - 1);
-/** The first day of the warm-up, in São Paulo (02/11 with the current dates). */
+/** The first day of the warm-up, in São Paulo (03/11). */
 export const BLACK_FRIDAY_WARMUP_FIRST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.warmupStartsAt));
 
 /** A São Paulo day as DD/MM. */
@@ -63,8 +62,8 @@ export function dayMonth(day: string): string {
 }
 
 /**
- * Where the campaign stands: the warm-up (the days before, when the app
- * announces it to bring sign-ups in early), live, or nothing.
+ * Where the campaign stands: the warm-up (03/11-20/11), live (21/11-30/11),
+ * or nothing.
  */
 export function blackFridayPhase(now: Date = new Date()): "warmup" | "live" | null {
   const time = now.getTime();
@@ -85,10 +84,8 @@ export function daysUntilBlackFriday(now: Date = new Date()): number {
 }
 
 /**
- * The morning push to free students on the warm-up's first day (owner
- * decision, 2026-10-31: announce it early) and on the offer's first and last
- * days (owner decision, 2026-10-24), in place of the word of the day; null
- * other days.
+ * The morning push to free students on the warm-up's first day and on the
+ * offer's first and last days, in place of the word of the day; null other days.
  */
 export function blackFridayPush(
   today: string,
@@ -97,7 +94,7 @@ export function blackFridayPush(
   if (today === BLACK_FRIDAY_WARMUP_FIRST_DAY) {
     return {
       title: "🖤 A Black Friday do Evoluir+ vem aí",
-      body: `De ${dayMonth(BLACK_FRIDAY_FIRST_DAY)} a ${dayMonth(BLACK_FRIDAY_LAST_DAY)}: ${offer}. Já marque na agenda!`,
+      body: `Esquenta Black Friday: de ${dayMonth(BLACK_FRIDAY_WARMUP_FIRST_DAY)} a 20/11. A oferta começa em 21/11: ${offer}. Já marque na agenda!`,
       path: "/premium",
     };
   }
