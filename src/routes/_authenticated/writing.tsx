@@ -36,6 +36,7 @@ import {
   type WritingLevelConfig,
 } from "@/lib/writingLevels";
 import { studyDayStartIso, studyToday } from "@/lib/today";
+import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 import { DoneSeal } from "@/components/DoneSeal";
 
 export const Route = createFileRoute("/_authenticated/writing")({
@@ -359,7 +360,10 @@ function Writing() {
               return (
                 <button
                   key={p}
-                  onClick={() => selectPrompt(p)}
+                  onClick={() => {
+                    announceStudyInteraction(document.querySelector("main"));
+                    selectPrompt(p);
+                  }}
                   title={isDone ? "Checked — click to redo" : undefined}
                   className={`card-soft flex h-full flex-col gap-1.5 p-2.5 text-left transition-colors sm:p-4 ${
                     isDone
