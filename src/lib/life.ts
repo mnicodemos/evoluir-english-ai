@@ -398,7 +398,8 @@ export const FOCUS_DAILY_TARGET = 4;
 
 /** A finished block, or (partial) the minutes of a block stopped early: they add to
  * the minutes but never to the day's 🍅 count (user decision). */
-export type FocusActivity = "learning" | "listening" | "reading" | "writing" | "vocabulary" | "speaking";
+export type FocusActivity =
+  "learning" | "listening" | "reading" | "writing" | "vocabulary" | "speaking";
 export type FocusSessionLog = {
   day: string;
   minutes: number;
