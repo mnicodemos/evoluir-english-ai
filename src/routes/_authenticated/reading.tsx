@@ -59,6 +59,7 @@ import { lookupWord } from "@/lib/dictionary.functions";
 import { saveReadingWords } from "@/lib/readingWords.functions";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
+import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
@@ -924,6 +925,7 @@ function ReadingPage() {
                   translate="no"
                   lang="en"
                   className="mt-4 space-y-3 text-base leading-relaxed sm:text-[1.05rem]"
+                  onClick={() => announceStudyInteraction(document.querySelector("main"))}
                 >
                   {readingParagraphs(reading.text).map((paragraph, index) => (
                     <ReadingParagraph

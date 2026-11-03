@@ -28,6 +28,7 @@ import { useLogTimeOnExit, useTimeSpent } from "@/hooks/useTimeSpent";
 import { findLevel } from "@/lib/level";
 import { STUDY_DAY_RULE } from "@/lib/studyDay";
 import { studyDayStartIso, studyToday } from "@/lib/today";
+import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import {
@@ -316,6 +317,7 @@ function ListeningPage() {
     : 0;
 
   async function play(slow = false) {
+    announceStudyInteraction(document.querySelector("main"));
     setPlaying(true);
     try {
       // Lower levels practise word by word; from B1 the sentence stays whole,
@@ -357,6 +359,7 @@ function ListeningPage() {
 
   /** Plays the sentence while recording, so the student speaks along with it. */
   async function shadow() {
+    announceStudyInteraction(document.querySelector("main"));
     setShadowResult(null);
     try {
       await startVoiceRecording();
@@ -384,6 +387,7 @@ function ListeningPage() {
 
   /** Starts recording the student repeating the sentence. */
   async function startRepeat() {
+    announceStudyInteraction(document.querySelector("main"));
     try {
       await startVoiceRecording();
       setRecording(true);

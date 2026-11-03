@@ -4,6 +4,7 @@ import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
   "Start Focus for your study?": "Quer iniciar o Focus para estudar?",
+  "EVO invites you to focus": "A EVO convida você a entrar em foco.",
   "Start a {minutes}-minute focus block?": "Iniciar um bloco de foco de {minutes} minutos?",
   "Start Focus": "Iniciar Focus",
   "Not now": "Agora não",

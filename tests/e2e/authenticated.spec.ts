@@ -68,10 +68,12 @@ authenticated("authenticated smoke", () => {
   test("lesson search finds a lesson by name and hides the units", async ({ page }) => {
     await page.goto("/learning", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: /Your learning path/i })).toBeVisible();
-    // A lesson row of the path (its button is named by the lesson title).
-    const row = page.locator("main li > button[aria-label][title]").first();
+    // Search for the actual next unlocked lesson. The first rendered unit row
+    // may be locked and is intentionally excluded from search results.
+    const nextLesson = page.getByRole("region", { name: "Next lesson" });
+    const row = nextLesson.getByRole("heading", { level: 3 });
     await expect(row).toBeVisible({ timeout: 20_000 });
-    const title = (await row.getAttribute("aria-label")) ?? "";
+    const title = (await row.textContent())?.trim() ?? "";
     expect(title.length).toBeGreaterThan(0);
 
     const search = page.getByRole("searchbox", { name: "Search a lesson by name" });
