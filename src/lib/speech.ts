@@ -422,27 +422,44 @@ async function speakWithBrowser(value: string, rate = 1): Promise<void> {
 
 /** Audio being prepared ahead of playback, one request at a time. */
 let prepareChain: Promise<unknown> = Promise.resolve();
+/** Prevent repeated play/pause actions from queuing the same voice line twice. */
+const queuedPreparations = new Set<string>();
 
 /**
- * Starts generating the audio for `text` before it is played, so a reply's
- * next block is ready when the previous one ends instead of being requested
- * only then. Requests run one after another (the audio service allows one per
- * student) and share the cache, so speakEnglish later finds them ready or
- * already in flight. Failures are ignored: playback simply requests again.
+ * Starts preparing the next dialogue line before it is played. Preparation is
+ * deliberately limited to the caller's next line: it reuses the same audio
+ * request the student would otherwise make at playback time, not extra
+ * parallel generations. Duplicate queued lines are ignored, and a failed
+ * preparation never poisons the queue for later lines.
  */
 export function prepareSpeech(text: string, options: Pick<SpeechOptions, "cache" | "voice"> = {}) {
   const value = text?.trim();
   if (!value || typeof window === "undefined" || !window.AudioContext) return;
-  const blocks = splitForFirstAudio(value);
-  prepareChain = prepareChain.then(async () => {
+  const voice = options.voice ?? "evo";
+  const blocks = splitForFirstAudio(value).filter((block) => {
+    const key = `${voice}:${block.toLocaleLowerCase("en-US")}`;
+    if (queuedPreparations.has(key)) return false;
+    queuedPreparations.add(key);
+    return true;
+  });
+  if (blocks.length === 0) return;
+
+  prepareChain = prepareChain.catch(() => undefined).then(async () => {
     for (const block of blocks) {
-      await requestSpeech(
-        block,
-        undefined,
-        options.cache ?? "memory",
-        undefined,
-        options.voice,
-      ).catch(() => undefined);
+      const key = `${voice}:${block.toLocaleLowerCase("en-US")}`;
+      try {
+        await requestSpeech(
+          block,
+          undefined,
+          options.cache ?? "memory",
+          undefined,
+          voice,
+        );
+      } catch {
+        // Playback will make its normal request if preparation failed.
+      } finally {
+        queuedPreparations.delete(key);
+      }
     }
   });
 }
