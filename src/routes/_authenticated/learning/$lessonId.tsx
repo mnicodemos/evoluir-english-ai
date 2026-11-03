@@ -244,7 +244,13 @@ function LessonPage() {
     queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
     queryClient.invalidateQueries({ queryKey: ["lesson", lessonId] });
 
-    showAppNotification({ id: "learning-lesson-completed", title: t("Lesson completed"), description: t("Your score: {score}%").replace("{score}", String(score)), variant: "success", duration: 6000 });
+    showAppNotification({
+      id: "learning-lesson-completed",
+      title: t("Lesson completed"),
+      description: t("Your score: {score}%").replace("{score}", String(score)),
+      variant: "success",
+      duration: 6000,
+    });
 
     // Only a newly completed lesson unlocks a batch. Generate it now so the
     // Dashboard can advertise saved words before Vocabulary is ever opened.
