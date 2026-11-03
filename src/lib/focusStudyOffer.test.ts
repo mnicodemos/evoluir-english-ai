@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { canStartOfferedFocus, createFocusOfferGate, isStudyInteraction } from "./focusStudyOffer";
+import { announceStudyInteraction, canStartOfferedFocus, createFocusOfferGate, isStudyInteraction, STUDY_STARTED_EVENT } from "./focusStudyOffer";
 
 describe("Focus study invitation", () => {
   it("offers once per student and day, including when declined", () => {
@@ -28,6 +28,15 @@ describe("Focus study invitation", () => {
     expect(claim(undefined, { phase: "idle" })).toBe(false);
     expect(claim("student", { phase: "idle" })).toBe(true);
     expect(claim("student", { phase: "idle" })).toBe(false);
+  });
+
+  it("announces a real study interaction from the main content", () => {
+    const listener = vi.fn();
+    window.addEventListener(STUDY_STARTED_EVENT, listener);
+    const main = document.createElement("main");
+    announceStudyInteraction(main);
+    window.removeEventListener(STUDY_STARTED_EVENT, listener);
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 
   it("requires study content, not navigation or header controls", () => {
