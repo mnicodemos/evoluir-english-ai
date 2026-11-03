@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useLocation } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { TomatoIcon } from "./TomatoIcon";
@@ -22,12 +21,17 @@ export function FocusStudyInvitation() {
   const { data: profile } = useProfile();
   const { t } = useLifeT();
   const { state } = useFocusTimer();
-  const pathname = useLocation().pathname;
+  const pendingOffer = useRef(false);
 
   useEffect(() => {
     const offer = () => {
+      if (!profile?.id) {
+        pendingOffer.current = true;
+        return;
+      }
       const current = getFocusSnapshot().state;
-      if (!claimOffer(profile?.id, current)) return;
+      if (!claimOffer(profile.id, current)) return;
+      pendingOffer.current = false;
       const minutes = FOCUS_PRESETS[current.preset].focus;
       toast(t("Start Focus for your study?"), {
         id: TOAST_ID,
@@ -49,11 +53,11 @@ export function FocusStudyInvitation() {
       });
     };
     window.addEventListener(STUDY_STARTED_EVENT, offer);
+    if (pendingOffer.current) offer();
     return () => {
       window.removeEventListener(STUDY_STARTED_EVENT, offer);
-      toast.dismiss(TOAST_ID);
     };
-  }, [profile?.id, pathname, t]);
+  }, [profile?.id, t]);
 
   useEffect(() => {
     if (state.phase !== "idle") toast.dismiss(TOAST_ID);
