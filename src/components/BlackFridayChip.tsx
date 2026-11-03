@@ -21,10 +21,7 @@ export function BlackFridayChip({
   const phase = blackFridayPhase();
   if (premium !== false || !phase) return null;
   const days = daysUntilBlackFriday();
-  const label =
-    phase === "live"
-      ? `Black Friday · ${BLACK_FRIDAY.monthlyPercentOff}% ${translate("off Premium")}`
-      : `${translate("Black Friday in")} ${days} ${translate(days === 1 ? "day" : "days")}`;
+  const label = "ESQUENTA BLACK FRIDAY JÁ ESTÁ NO AR";
   return placement === "desktop" ? (
     <Link
       to="/premium"
