@@ -42,7 +42,7 @@ describe("Focus study invitation", () => {
     const main = {
       closest: (selector: string) => (selector === "main" ? {} : null),
     } as unknown as Element;
-    announceStudyInteraction(main);
+    announceStudyInteraction(main, "reading");
     expect(dispatchEvent).toHaveBeenCalledTimes(1);
     expect(dispatchEvent.mock.calls[0]?.[0]).toBeInstanceOf(Event);
     vi.unstubAllGlobals();
