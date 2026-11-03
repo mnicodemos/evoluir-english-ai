@@ -23,15 +23,24 @@ export function canStartOfferedFocus(state: Pick<FocusState, "phase">) {
   return state.phase === "idle";
 }
 
-/** One invitation per student / São Paulo day, with an in-memory storage fallback. */
+/**
+ * One invitation per student, activity and São Paulo day. Reopening the same
+ * activity does not nag the student, but moving to another activity can offer
+ * Focus again. The in-memory map preserves the gate when browser storage fails.
+ */
 export function createFocusOfferGate(read = readStorage, write = writeStorage) {
-  const offered = new Map<string, string>();
-  return (userId: string | undefined, state: Pick<FocusState, "phase">, day = studyToday()) => {
+  const offered = new Set<string>();
+  return (
+    userId: string | undefined,
+    state: Pick<FocusState, "phase">,
+    day = studyToday(),
+    activityKey = "general",
+  ) => {
     if (!userId || !canStartOfferedFocus(state)) return false;
-    const key = `evoluir-focus-offered:${userId}`;
-    if (offered.get(key) === day || read(key) === day) return false;
-    offered.set(key, day);
-    write(key, day);
+    const key = `evoluir-focus-offered:${userId}:${day}:${encodeURIComponent(activityKey)}`;
+    if (offered.has(key) || read(key) === "1") return false;
+    offered.add(key);
+    write(key, "1");
     return true;
   };
 }
