@@ -208,7 +208,10 @@ export function MusicLabSection({ level, levelLabel }: Props) {
   }
 
   return (
-    <section className="music-lab-section card-soft h-full space-y-5 p-5 sm:p-6" aria-labelledby="music-lab-title">
+    <section
+      className="music-lab-section card-soft h-full space-y-5 p-5 sm:p-6"
+      aria-labelledby="music-lab-title"
+    >
       <div className="flex items-start gap-3">
         <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-green/10 text-brand-green">
           <Music2 className="size-5" aria-hidden="true" />
