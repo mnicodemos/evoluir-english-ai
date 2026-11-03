@@ -448,14 +448,14 @@ function AuthPage() {
                         to="/terms"
                         className="font-medium text-foreground underline underline-offset-4"
                       >
-                        Termos de Uso
+                        {t("Termos de Uso")}
                       </Link>{" "}
                       {t("e a")}{" "}
                       <Link
                         to="/privacy"
                         className="font-medium text-foreground underline underline-offset-4"
                       >
-                        Política de Privacidade
+                        {t("Política de Privacidade")}
                       </Link>
                       .
                     </p>
