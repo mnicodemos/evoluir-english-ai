@@ -58,7 +58,10 @@ export function Footer({
 
   if (minimal) {
     return (
-      <footer translate="no" className="bg-background text-foreground dark:bg-[#0B0B0C] dark:text-[#E4E4E7]">
+      <footer
+        translate="no"
+        className="bg-background text-foreground dark:bg-[#0B0B0C] dark:text-[#E4E4E7]"
+      >
         <div className="border-t border-border dark:border-white/10">
           {/* One compact footer on every page: rights on the left, links and
               social icons on the right, on one line just under the divider. */}
