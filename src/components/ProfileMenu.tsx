@@ -239,10 +239,16 @@ export function ProfileMenu({
       setWhatsAppCode(result.code);
       setWhatsAppCodeExpiresAt(result.expiresAt);
       setWhatsAppCodeCopied(false);
-      showAppNotification({ title: translate("WhatsApp connection", lang), variant: "success" });
+      showAppNotification({
+        title: translate("WhatsApp connection", lang),
+        variant: "success",
+      });
     },
     onError: () => {
-      showAppNotification({ title: translate("Could not generate a connection code. Please try again.", lang), variant: "error" });
+      showAppNotification({
+        title: translate("Could not generate a connection code. Please try again.", lang),
+        variant: "error",
+      });
     },
   });
 
@@ -514,7 +520,10 @@ export function ProfileMenu({
                           setWhatsAppCodeCopied(true);
                           showAppNotification({ title: translate("Code copied.", lang), variant: "success" });
                         } catch {
-                          showAppNotification({ title: translate("The text could not be copied.", lang), variant: "error" });
+                          showAppNotification({
+                            title: translate("The text could not be copied.", lang),
+                            variant: "error",
+                          });
                         }
                       }}
                     >
