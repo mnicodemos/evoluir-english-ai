@@ -132,7 +132,10 @@ function AppNotificationToast({
           type="button"
           onClick={() => toast.dismiss(toastId)}
           aria-label="Close notification"
-          className={cn("grid size-7 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-100", cornerIcon ? "self-end mt-7 -mr-1" : "-mr-1 -mt-1") }
+          className={cn(
+            "grid size-7 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-100",
+            cornerIcon ? "self-end mt-7 -mr-1" : "-mr-1 -mt-1",
+          )}
         >
           <X className="size-4" />
         </button>
