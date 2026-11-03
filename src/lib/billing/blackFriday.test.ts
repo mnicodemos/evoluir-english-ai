@@ -35,7 +35,10 @@ describe("Black Friday offer", () => {
   it("activates the offer from 03/11 and leaves annual/out-of-campaign pricing unchanged", () => {
     const warmupStart = new Date("2026-11-03T03:00:00Z");
     const warmupEnd = new Date("2026-11-21T02:59:59Z");
-    expect(checkoutOffer("monthly", [], warmupStart)).toEqual({ trialDays: 15, couponId: "EVOLUIR_BF2026_MONTHLY30X3" });
+    expect(checkoutOffer("monthly", [], warmupStart)).toEqual({
+      trialDays: 15,
+      couponId: "EVOLUIR_BF2026_MONTHLY30X3",
+    });
     expect(checkoutOffer("monthly", [], warmupEnd)).toEqual({ trialDays: 15, couponId: "EVOLUIR_BF2026_MONTHLY30X3" });
     expect(checkoutOffer("yearly", [], during)).toEqual({ trialDays: 7, couponId: null });
     expect(checkoutOffer("monthly", [], after)).toEqual({ trialDays: 7, couponId: null });
@@ -61,7 +64,7 @@ describe("Black Friday warm-up and pushes", () => {
   it("announces the live offer on 03/11 and the last day on 30/11", () => {
     expect(blackFridayPush("2026-11-03")?.title).toContain("começou");
     expect(blackFridayPush("2026-11-03")?.body).toContain("30% off");
-    
+
     expect(blackFridayPush("2026-11-20")).toBeNull();
     expect(blackFridayPush("2026-11-21")).toBeNull();
     expect(blackFridayPush("2026-11-21")?.body).toContain("Até 30/11");
