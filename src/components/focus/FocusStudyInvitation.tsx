@@ -4,8 +4,17 @@ import { TomatoIcon } from "./TomatoIcon";
 import { useLifeT } from "@/components/life/LifeNav";
 import { useProfile } from "@/hooks/useProfile";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
-import { canStartOfferedFocus, createFocusOfferGate, STUDY_STARTED_EVENT } from "@/lib/focusStudyOffer";
-import { focusSetActivity, focusStart, getFocusSnapshot, openFocusWidget } from "@/lib/focusTimer";
+import {
+  canStartOfferedFocus,
+  createFocusOfferGate,
+  STUDY_STARTED_EVENT,
+} from "@/lib/focusStudyOffer";
+import {
+  focusSetActivity,
+  focusStart,
+  getFocusSnapshot,
+  openFocusWidget,
+} from "@/lib/focusTimer";
 import type { FocusActivity } from "@/lib/life";
 import { FOCUS_PRESETS } from "@/lib/life";
 
@@ -22,9 +31,12 @@ export function FocusStudyInvitation() {
 
   useEffect(() => {
     const offer = (event?: Event) => {
-      const detail = (event as CustomEvent<{ activity?: FocusActivity }> | undefined)?.detail;
+      const detail = (event as CustomEvent<{ activity?: FocusActivity }> | undefined)
+        ?.detail;
       if (detail?.activity) pendingActivity.current = detail.activity;
-      if (event) pendingActivityKey.current = `${window.location.pathname}${window.location.search}`;
+      if (event) {
+        pendingActivityKey.current = `${window.location.pathname}${window.location.search}`;
+      }
       if (!profile?.id) {
         pendingOffer.current = true;
         return;
@@ -36,7 +48,10 @@ export function FocusStudyInvitation() {
       toast(t("EVO invites you to focus"), {
         id: TOAST_ID,
         icon: <TomatoIcon className="size-5 text-brand-green" />,
-        description: t("Start a {minutes}-minute focus block?").replace("{minutes}", String(minutes)),
+        description: t("Start a {minutes}-minute focus block?").replace(
+          "{minutes}",
+          String(minutes),
+        ),
         duration: 15000,
         action: {
           label: t("Start Focus"),
