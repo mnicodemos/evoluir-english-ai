@@ -20,8 +20,7 @@ export function AdminPushTest() {
     <section className="mt-2 border-t border-border pt-4">
       <h3 className="font-semibold">{t("Push notifications")}</h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        Each phone or browser registers itself only after tapping “Notifications” on that device and
-        allowing them. The test goes only to your own devices.
+        {t("Each phone or browser registers itself only after tapping “Notifications” on that device and allowing them. The test goes only to your own devices.")}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Button variant="outline" onClick={() => run.mutate(false)} disabled={run.isPending}>
@@ -35,17 +34,17 @@ export function AdminPushTest() {
 
       {run.isError && (
         <p className="mt-3 text-sm text-red-400">
-          {run.error instanceof Error ? run.error.message : "{t("The check could not run.")}"}
+          {run.error instanceof Error ? run.error.message : t("The check could not run.")}
         </p>
       )}
       {data && (
         <div className="mt-4 grid gap-2 text-sm">
           <p>
             {t("Server push setup:")}{" "}
-            <strong className={data.{t("configured")} ? "text-emerald-400" : "text-red-400"}>
-              {data.{t("configured")}
-                ? "{t("configured")}"
-                : "{t("missing (LOVABLE_API_KEY / FIREBASE_MESSAGING_API_KEY)")}"}
+            <strong className={data.configured ? "text-emerald-400" : "text-red-400"}>
+              {data.configured
+                ? t("configured")
+                : t("missing (LOVABLE_API_KEY / FIREBASE_MESSAGING_API_KEY)")}
             </strong>
           </p>
           <p>
@@ -55,7 +54,7 @@ export function AdminPushTest() {
           <p>
             {t("Your devices:")} <strong>{data.myDevices.length}</strong>
             {data.myDevices.length === 0 &&
-              "{t(" — none: open the app on your phone, tap Notifications and allow them.")}"}
+              t(" — none: open the app on your phone, tap Notifications and allow them.")}
           </p>
           {data.myDevices.length > 0 && (
             <ul className="grid gap-1">
@@ -68,8 +67,8 @@ export function AdminPushTest() {
                       className={`ml-2 font-semibold ${device.result.ok ? "text-emerald-400" : "text-red-400"}`}
                     >
                       {device.result.ok
-                        ? "{t("sent ✓")}"
-                        : `{t("failed")} ${device.result.status ?? ""}${device.result.stale ? "{t(" (device no longer valid)")}" : ""}`}
+                        ? t("sent ✓")
+                        : `${t("failed")} ${device.result.status ?? ""}${device.result.stale ? t(" (device no longer valid)") : ""}`}
                     </span>
                   )}
                   {device.result && !device.result.ok && device.result.detail && (
@@ -80,10 +79,7 @@ export function AdminPushTest() {
             </ul>
           )}
           <p className="text-xs text-muted-foreground">
-            “{t("sent ✓")}” but nothing on the phone: the phone or browser is blocking it (for example,
-            Brave needs “Use Google services for push messaging” turned on, and Android needs the
-            app’s notifications allowed). Test arrives but no daily push: the daily job is not
-            running.
+            {t("“sent ✓” but nothing on the phone: the phone or browser is blocking it (for example, Brave needs “Use Google services for push messaging” turned on, and Android needs the app’s notifications allowed). Test arrives but no daily push: the daily job is not running.")}
           </p>
         </div>
       )}
