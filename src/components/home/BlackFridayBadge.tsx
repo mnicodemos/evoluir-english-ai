@@ -32,7 +32,7 @@ export function BlackFridayBadge({ className = "" }: { className?: string }) {
       <Tag className="size-3.5 shrink-0" aria-hidden="true" />
       {phase === "live"
         ? `Black Friday: ${offer} · até ${dayMonth(BLACK_FRIDAY_LAST_DAY)}`
-        : `Black Friday de ${dayMonth(BLACK_FRIDAY_FIRST_DAY)} a ${dayMonth(BLACK_FRIDAY_LAST_DAY)} · ${offer}`}
+        : `ESQUENTA BLACKFRIDAY · ${dayMonth(BLACK_FRIDAY_FIRST_DAY)} a ${dayMonth(BLACK_FRIDAY_LAST_DAY)}`}
     </Link>
   );
 }
