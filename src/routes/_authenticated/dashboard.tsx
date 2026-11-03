@@ -849,8 +849,8 @@ function Dashboard() {
                           <span
                             className="grid h-8 w-7 place-items-center"
                             role="img"
-                            title={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
-                            aria-label={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")}`}
+                            title={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? "-"}`}
+                            aria-label={`${lang === "pt" ? "Suas Joias" : "Your Jewels"}: ${permanentJewelName ?? "-"}`}
                           >
                             <Gem
                               className="size-5 shrink-0"
@@ -920,10 +920,7 @@ function Dashboard() {
                             : getLeague(permanentJewelIndex * 7).from
                         }
                         label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
-                        value={
-                          permanentJewelBaseName ??
-                          (lang === "pt" ? "Nenhuma ainda" : "Not earned yet")
-                        }
+                        value={permanentJewelBaseName ?? "-"}
                         detail={nextJewelDetail}
                         detailIcon={
                           <ArrowUpRight
