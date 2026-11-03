@@ -137,7 +137,7 @@ function AppNotificationToast({
 export function showAppNotification(options: AppNotificationOptions) {
   const { id, duration = 5000 } = options;
   return toast.custom((toastId) => <AppNotificationToast {...options} toastId={toastId} />, {
-    id,
+    ...(id !== undefined ? { id } : {}),
     duration,
   });
 }
