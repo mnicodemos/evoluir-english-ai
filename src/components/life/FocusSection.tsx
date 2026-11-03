@@ -341,6 +341,7 @@ export function FocusSection() {
           </ol>
         </div>
       ) : null}
+      </div>
     </section>
   );
 }
