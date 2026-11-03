@@ -22,9 +22,9 @@ export function FocusStudyInvitation() {
 
   useEffect(() => {
     const offer = (event?: Event) => {
-      const detail = (event as CustomEvent<{ activity?: FocusActivity; activityKey?: string }> | undefined)?.detail;
+      const detail = (event as CustomEvent<{ activity?: FocusActivity }> | undefined)?.detail;
       if (detail?.activity) pendingActivity.current = detail.activity;
-      if (detail?.activityKey) pendingActivityKey.current = detail.activityKey;
+      if (event) pendingActivityKey.current = `${window.location.pathname}${window.location.search}`;
       if (!profile?.id) {
         pendingOffer.current = true;
         return;
