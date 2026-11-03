@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { showAppNotification } from "@/components/ui/AppNotificationToast";
+import { toast } from "sonner";
 import { TomatoIcon } from "./TomatoIcon";
 import { useLifeT } from "@/components/life/LifeNav";
 import { useProfile } from "@/hooks/useProfile";
