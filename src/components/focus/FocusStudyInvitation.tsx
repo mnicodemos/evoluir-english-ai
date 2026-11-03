@@ -49,7 +49,7 @@ export function FocusStudyInvitation() {
           String(minutes),
         ),
         variant: "info",
-        icon: <EvoAvatar className="size-9 sm:size-9 ring-1 ring-brand-green/60" decorative />,
+        icon: <EvoAvatar className="size-9 sm:size-9" decorative />,
         iconShape: "circle",
         cornerIcon: <TomatoIcon className="size-5 text-rose-400" />,
         duration: 15000,
