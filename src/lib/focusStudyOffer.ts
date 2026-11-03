@@ -11,7 +11,9 @@ export function isStudyInteraction(target: Element | null): boolean {
 }
 
 export function announceStudyInteraction(target: Element | null, activity: FocusActivity) {
-  if (isStudyInteraction(target)) window.dispatchEvent(new CustomEvent(STUDY_STARTED_EVENT, { detail: { activity } }));
+  if (isStudyInteraction(target)) {
+    window.dispatchEvent(new CustomEvent(STUDY_STARTED_EVENT, { detail: { activity } }));
+  }
 }
 
 export function canStartOfferedFocus(state: Pick<FocusState, "phase">) {
