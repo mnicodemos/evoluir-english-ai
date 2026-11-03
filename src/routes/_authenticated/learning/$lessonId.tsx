@@ -52,6 +52,7 @@ import { useUiLang } from "@/lib/uiLang";
 import { dailyWords } from "@/lib/vocabularyPlan.functions";
 import { vocabularySingleFlight } from "@/lib/vocabularySingleFlight";
 import { removeStorage, writeStorage } from "@/lib/safeStorage";
+import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 
 const LESSON_TABS = new Set(["summary", "audio", "flashcards", "quiz"]);
 
@@ -401,7 +402,15 @@ function LessonPage() {
           </section>
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => {
+            if (value === "audio" || value === "flashcards" || value === "quiz") {
+              announceStudyInteraction(document.querySelector("main"));
+            }
+            setActiveTab(value);
+          }}
+        >
           <TabsList
             className={`relative z-10 grid h-auto min-h-12 w-full ${repairPlan?.isReviewTest ? "grid-cols-1" : isReviewUnit ? "grid-cols-2" : "grid-cols-4"} gap-1 p-1 sm:gap-2`}
           >
