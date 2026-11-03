@@ -333,7 +333,7 @@
 
 /* Shorter desktop screens (user report: the goals row made the page scroll):
    the gaps between rows tighten from 20 px to 12 px, so the same cards fit. */
-@media (min-width: 80rem) and (max-height: 62rem) {
+@media (min-width: 80rem) and (max-height: 50rem) {
   .dashboard-one-screen {
     row-gap: 0.75rem;
     padding-bottom: 0.25rem;
@@ -730,7 +730,7 @@
    content height. The previous fixed grid tracks compressed intrinsic card
    content and the EVO action could be clipped by its own card. Keep this
    exception scoped to the Dashboard; other authenticated pages are untouched. */
-@media (min-width: 80rem) and (max-height: 62rem) {
+@media (min-width: 80rem) and (max-height: 50rem) {
   .dashboard-shell > main:has(.dashboard-one-screen.dashboard-home-layout) {
     height: auto;
     min-height: 0;
@@ -750,14 +750,7 @@
 
   .dashboard-one-screen.dashboard-home-layout > header + div {
     height: auto;
-    min-height: 6.75rem;
-  }
-
-  .dashboard-one-screen.dashboard-home-layout > header + div + div,
-  .dashboard-one-screen.dashboard-home-layout > header + div + div > section:first-child,
-  .dashboard-one-screen.dashboard-home-layout .dashboard-focus {
-    height: auto;
-    min-height: min-content;
+    min-height: 7.59rem;
   }
 
   .dashboard-one-screen.dashboard-home-layout > header + div + div + div,
