@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { addDays } from "@/lib/life";
+import { addDays, type FocusSessionLog } from "@/lib/life";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { studyToday } from "@/lib/today";
 
-// The focus blocks of the last 14 days, kept on this device only (user
+// The focus blocks of the last 30 days, kept on this device only (user
 // decision, 2026-10-17: simpler than the database), finished or stopped early
 // (partial: minutes only). Each block carries the key of its run, so it is
 // never counted twice.
