@@ -501,6 +501,7 @@ function AppShellContent({
       <div
         className={cn(
           "dashboard-shell dark flex min-h-screen flex-col bg-background",
+          desktopOneScreen && "desktop-one-screen",
           dashboardLayout
             ? "h-dvh overflow-hidden lg:h-auto lg:overflow-visible lg:pb-0"
             : "pb-[calc(4.275rem+_env(safe-area-inset-bottom))] lg:pb-0",
