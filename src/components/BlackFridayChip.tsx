@@ -20,7 +20,7 @@ export function BlackFridayChip({
   const premium = useIsPremium();
   const phase = blackFridayPhase();
   if (premium !== false || !phase) return null;
-  const label = translate("ESQUENTA BLACK FRIDAY JÁ ESTÁ NO AR");
+  const label = translate("BLACK FRIDAY WARM-UP IS NOW LIVE");
   return placement === "desktop" ? (
     <Link
       to="/premium"
