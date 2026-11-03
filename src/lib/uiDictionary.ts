@@ -3,6 +3,9 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Start Focus for your study?": "Quer iniciar o Focus para estudar?",
+  "Start a {minutes}-minute focus block?": "Iniciar um bloco de foco de {minutes} minutos?",
+  "Start Focus": "Iniciar Focus",
   "End and return to dashboard": "Encerrar e voltar ao painel",
   End: "Encerrar",
   "End call and return to dashboard": "Encerrar a chamada e voltar ao painel",

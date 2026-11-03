@@ -4,6 +4,7 @@ import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react
 import { toast } from "sonner";
 
 import { stopFocusSaving } from "@/components/focus/stopFocus";
+import { FocusStudyInvitation } from "@/components/focus/FocusStudyInvitation";
 import { TomatoIcon } from "@/components/focus/TomatoIcon";
 import { useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
@@ -99,7 +100,7 @@ export function FocusController() {
     };
   }, [state.phase, state.endsAt, now]);
 
-  return widget.open ? <FocusWidget /> : null;
+  return <><FocusStudyInvitation />{widget.open ? <FocusWidget /> : null}</>;
 }
 
 const MARGIN = 8;

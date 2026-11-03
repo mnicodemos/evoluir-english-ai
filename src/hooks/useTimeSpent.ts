@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import { logPracticeTelemetry } from "@/lib/legacyActivity.functions";
+import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 
 const IDLE_MS = 60_000;
 
@@ -33,6 +34,19 @@ export function useTimeSpent(options?: { manual?: boolean }): TimeSpent {
   const activeMs = useRef(0);
   const startedAt = useRef<number | null>(manual ? null : Date.now());
   const reportedMs = useRef(0);
+
+  // Separate from time accounting: never announce on mount or automatic resume.
+  useEffect(() => {
+    const onStudy = (event: Event) => {
+      if (!event.isTrusted || document.visibilityState === "hidden") return;
+      announceStudyInteraction(event.target instanceof Element ? event.target : null);
+    };
+    const events = ["click", "input", "keydown", "scroll"] as const;
+    for (const event of events) document.addEventListener(event, onStudy, { passive: true, capture: true });
+    return () => {
+      for (const event of events) document.removeEventListener(event, onStudy, true);
+    };
+  }, []);
 
   const flush = useCallback(() => {
     if (startedAt.current !== null) {
