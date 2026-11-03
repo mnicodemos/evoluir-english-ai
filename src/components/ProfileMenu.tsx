@@ -596,13 +596,12 @@ export function ProfileMenu({
     </>
   );
 
-  // One card (user request: the loose rows looked cramped), in the desktop
-  // sidebar and the phone menu alike: the photo, name and plan on top, then
-  // the gear, language and bell as three equal buttons under a divider.
+  // One card in the desktop sidebar and phone menu: profile details above,
+  // with the gear, language and bell aligned below without an internal divider.
   const profileCard = (trigger: ReactNode) => (
     <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/25 p-1.5">
       {trigger}
-      <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-sidebar-border pt-1.5">
+      <div className="mt-1.5 grid grid-cols-3 gap-1 pt-1.5">
         <Button
           ref={gearRef}
           variant="ghost"
