@@ -82,6 +82,11 @@ export function FocusController() {
         day: studyToday(new Date(ended.endedAt)),
         minutes: ended.minutes,
         key: ended.key,
+        startedAt: ended.startedAt,
+        endedAt: ended.endedAt,
+        preset: ended.preset,
+        taskId: ended.taskId,
+        activity: ended.activity,
       });
       haptic("success");
       toast.success(t("Focus block done! Time for a break."));
