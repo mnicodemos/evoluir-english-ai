@@ -80,7 +80,13 @@ export function PageHeader({
           <span className="min-w-0 truncate font-display text-sm font-semibold">{title}</span>
         </div>
       </div>
-      <header ref={ref} className={cn("animate-rise flex flex-wrap items-start gap-3 sm:flex-nowrap sm:gap-4", className)}>
+      <header
+        ref={ref}
+        className={cn(
+          "animate-rise flex flex-wrap items-start gap-3 sm:flex-nowrap sm:gap-4",
+          className,
+        )}
+      >
         <span
           className={cn(
             "grid size-9 shrink-0 place-items-center rounded-xl ring-1 sm:size-12 sm:rounded-2xl lg:size-14",
