@@ -920,9 +920,7 @@ function Dashboard() {
                             : getLeague(permanentJewelIndex * 7).from
                         }
                         label={lang === "pt" ? "Suas Joias" : "Your Jewels"}
-                        value={
-                          permanentJewelBaseName ?? "-"
-                        }
+                        value={permanentJewelBaseName ?? "-"}
                         detail={nextJewelDetail}
                         detailIcon={
                           <ArrowUpRight
