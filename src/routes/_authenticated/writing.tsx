@@ -325,7 +325,6 @@ function Writing() {
 
   return (
     <AppShell mobileOneScreen>
-      <div className="writing-page-layout">
       <PageHeader
         guide="writing"
         icon={PenLine}
@@ -585,7 +584,6 @@ function Writing() {
             <ChevronRight className="size-4 text-muted-foreground" />
           </Link>
         </aside>
-      </div>
       </div>
     </AppShell>
   );
