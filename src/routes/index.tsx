@@ -26,7 +26,7 @@ import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { bumpLandingStat } from "@/lib/landingStats";
-import { BLACK_FRIDAY, BLACK_FRIDAY_FIRST_DAY, BLACK_FRIDAY_LAST_DAY, blackFridayPhase, dayMonth, formatBrl, offerPriceCents } from "@/lib/billing/blackFriday";
+import { BLACK_FRIDAY, BLACK_FRIDAY_FIRST_DAY, BLACK_FRIDAY_LAST_DAY, blackFridayPhase, dayMonth, formatBrl, offerPriceCents, PLAN_PRICE_CENTS } from "@/lib/billing/blackFriday";
 
 const SITE_URL = "https://evoluirmaisenglishai.com/";
 const OG_IMAGE = `${SITE_URL}og-image.jpg`;
@@ -168,7 +168,7 @@ function BlackFridayLandingOffer() {
     trialDays: BLACK_FRIDAY.monthlyTrialDays,
     couponId: BLACK_FRIDAY.couponId,
   }));
-  const fullPrice = formatBrl(7990);
+  const fullPrice = formatBrl(PLAN_PRICE_CENTS.monthly);
   const dates = dayMonth(BLACK_FRIDAY_FIRST_DAY) + " a " + dayMonth(BLACK_FRIDAY_LAST_DAY);
 
   return (
@@ -186,7 +186,7 @@ function BlackFridayLandingOffer() {
       <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Depois, {fullPrice}/mês. + {BLACK_FRIDAY.monthlyTrialDays} dias grátis na primeira assinatura.</p>
       {phase === "warmup" && <p className="mt-2 text-xs font-medium text-amber-200">A oferta começa em {dayMonth(BLACK_FRIDAY_FIRST_DAY)}. O plano anual permanece no preço normal.</p>}
       <Link to="/auth" search={{ mode: "signup" }} onClick={countSignupClick} className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-[#17130A] transition-colors hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-        {phase === "live" ? "Quero aproveitar" : "Quero ser avisado"}
+        {phase === "live" ? "Quero aproveitar" : "Começar grátis"}
         <ArrowRight className="size-4" aria-hidden="true" />
       </Link>
     </aside>
