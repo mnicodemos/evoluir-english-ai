@@ -175,9 +175,7 @@ export function focusResume() {
  * it ran (at least 1), so the caller saves them as a partial block: they count
  * in the minutes but not as a 🍅 (user decision); a break returns null.
  */
-export function focusStop(
-  now: number = Date.now(),
-): {
+export function focusStop(now: number = Date.now()): {
   minutes: number;
   key: string;
   startedAt: number;
