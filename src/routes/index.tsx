@@ -28,10 +28,7 @@ import { Button } from "@/components/ui/button";
 import { bumpLandingStat } from "@/lib/landingStats";
 import {
   BLACK_FRIDAY,
-  BLACK_FRIDAY_FIRST_DAY,
-  BLACK_FRIDAY_LAST_DAY,
   blackFridayPhase,
-  dayMonth,
   formatBrl,
   offerPriceCents,
   PLAN_PRICE_CENTS,
@@ -182,7 +179,6 @@ function BlackFridayLandingOffer() {
     }),
   );
   const fullPrice = formatBrl(PLAN_PRICE_CENTS.monthly);
-  const dates = `${dayMonth(BLACK_FRIDAY_FIRST_DAY)} a ${dayMonth(BLACK_FRIDAY_LAST_DAY)}`;
 
   return (
     <aside
@@ -193,7 +189,7 @@ function BlackFridayLandingOffer() {
         <span className="rounded-full bg-amber-400/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-300">
           {phase === "live" ? "BLACK FRIDAY NO AR" : "ESQUENTA BLACKFRIDAY"}
         </span>
-        <span className="text-xs text-muted-foreground">{dates} · plano mensal</span>
+        <span className="text-xs text-muted-foreground">Plano mensal</span>
       </div>
       <div className="mt-3 flex flex-wrap items-end gap-x-3 gap-y-1">
         <strong className="text-3xl font-extrabold tracking-tight text-amber-300 sm:text-4xl">
@@ -207,19 +203,13 @@ function BlackFridayLandingOffer() {
         Depois, {fullPrice}/mês. + {BLACK_FRIDAY.monthlyTrialDays} dias grátis na primeira
         assinatura.
       </p>
-      {phase === "warmup" && (
-        <p className="mt-2 text-xs font-medium text-amber-200">
-          A oferta começa em {dayMonth(BLACK_FRIDAY_FIRST_DAY)}. O plano anual permanece no preço
-          normal.
-        </p>
-      )}
       <Link
         to="/auth"
         search={{ mode: "signup" }}
         onClick={countSignupClick}
         className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-[#17130A] transition-colors hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
-        {phase === "live" ? "Quero aproveitar" : "Começar grátis"}
+        Quero aproveitar
         <ArrowRight className="size-4" aria-hidden="true" />
       </Link>
     </aside>

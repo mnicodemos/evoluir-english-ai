@@ -11,8 +11,8 @@ import type { BillingInterval } from "./stripeMapping";
 import { TRIAL_DAYS, trialEligible } from "./trial";
 
 export const BLACK_FRIDAY = {
-  /** 21/11/2026 00:00 in São Paulo (UTC-3): start of the actual offer. */
-  startsAt: "2026-11-21T03:00:00Z",
+  /** 03/11/2026 00:00 in São Paulo (UTC-3): offer activation. */
+  startsAt: "2026-11-03T03:00:00Z",
   /** Exclusive: the offer runs through 30/11, São Paulo. */
   endsAt: "2026-12-01T03:00:00Z",
   /** The last day shown on the Premium page. */
@@ -22,11 +22,11 @@ export const BLACK_FRIDAY = {
   discountMonths: 3,
   monthlyTrialDays: 15,
   /**
-   * Esquenta Black Friday: 03/11 through 20/11, São Paulo.
+   * The offer is live from 03/11; no warm-up phase.
    * The exclusive end is midnight at the start of 21/11.
    */
   warmupStartsAt: "2026-11-03T03:00:00Z",
-  warmupEndsAt: "2026-11-21T03:00:00Z",
+  warmupEndsAt: "2026-11-03T03:00:00Z",
   /** Stripe coupon, created on first use (ensureBlackFridayCoupon). */
   couponId: "EVOLUIR_BF2026_MONTHLY30X3",
 } as const;
@@ -62,8 +62,7 @@ export function dayMonth(day: string): string {
 }
 
 /**
- * Where the campaign stands: the warm-up (03/11-20/11), live (21/11-30/11),
- * or nothing.
+ * Where the campaign stands: live (03/11-30/11), or nothing.
  */
 export function blackFridayPhase(now: Date = new Date()): "warmup" | "live" | null {
   const time = now.getTime();
@@ -84,14 +83,14 @@ export function daysUntilBlackFriday(now: Date = new Date()): number {
 }
 
 /**
- * The morning push to free students on the warm-up's first day and on the
- * offer's first and last days, in place of the word of the day; null other days.
+ * The morning push to free students on the offer's first and last days,
+ * in place of the word of the day; null other days.
  */
 export function blackFridayPush(
   today: string,
 ): { title: string; body: string; path: string } | null {
   const offer = `${BLACK_FRIDAY.monthlyPercentOff}% off no Premium mensal por ${BLACK_FRIDAY.discountMonths} meses + ${BLACK_FRIDAY.monthlyTrialDays} dias grátis na primeira assinatura`;
-  if (today === BLACK_FRIDAY_WARMUP_FIRST_DAY) {
+  if (today === BLACK_FRIDAY_WARMUP_FIRST_DAY && today !== BLACK_FRIDAY_FIRST_DAY) {
     return {
       title: "🖤 A Black Friday do Evoluir+ vem aí",
       body: `Esquenta Black Friday: de ${dayMonth(BLACK_FRIDAY_WARMUP_FIRST_DAY)} a 20/11. A oferta começa em 21/11: ${offer}. Já marque na agenda!`,

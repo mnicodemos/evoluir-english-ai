@@ -174,6 +174,7 @@ const baseUiPt: Record<string, string> = {
     "Nada é cobrado hoje. Cancele antes do fim do teste e você não paga nada.",
   "Start free trial": "Começar teste grátis",
   "Black Friday": "Black Friday",
+  "BLACK FRIDAY WARM-UP IS NOW LIVE": "ESQUENTA BLACK FRIDAY JÁ ESTÁ NO AR",
   "Black Friday:": "Black Friday:",
   "off the monthly plan for": "de desconto no plano mensal por",
   "days free on the monthly plan": "dias grátis no plano mensal",
