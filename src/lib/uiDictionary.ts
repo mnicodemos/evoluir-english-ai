@@ -835,6 +835,8 @@ const baseUiPt: Record<string, string> = {
   "You have not practiced this skill yet.": "Você ainda não praticou essa habilidade.",
   "Start anywhere and we will personalise your next step.":
     "Comece por onde quiser e personalizamos seu próximo passo.",
+  "Start and we will personalise your next step.":
+    "Comece e vamos personalizar seu próximo passo.",
   "Your recent practice shows opportunities to improve in this area.":
     "Sua prática recente mostra oportunidades de melhoria nessa área.",
   "More {skill} evidence will help EVO understand your current level.":
