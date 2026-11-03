@@ -1,4 +1,10 @@
-import { FOCUS_PRESET_IDS, FOCUS_PRESETS, focusBreakMinutes, type FocusActivity, type FocusPresetId } from "@/lib/life";
+import {
+  FOCUS_PRESET_IDS,
+  FOCUS_PRESETS,
+  focusBreakMinutes,
+  type FocusActivity,
+  type FocusPresetId,
+} from "@/lib/life";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 
 /**
@@ -169,17 +175,44 @@ export function focusResume() {
  * it ran (at least 1), so the caller saves them as a partial block: they count
  * in the minutes but not as a 🍅 (user decision); a break returns null.
  */
-export function focusStop(now: number = Date.now()): { minutes: number; key: string; startedAt: number; endedAt: number; preset: FocusPresetId; taskId: string | null; activity: FocusActivity | null } | null {
+export function focusStop(
+  now: number = Date.now(),
+): {
+  minutes: number;
+  key: string;
+  startedAt: number;
+  endedAt: number;
+  preset: FocusPresetId;
+  taskId: string | null;
+  activity: FocusActivity | null;
+} | null {
   const { state } = snapshot;
   setState({ ...FOCUS_IDLE, preset: state.preset, taskId: state.taskId });
   if (state.phase !== "focus") return null;
   const left = state.endsAt !== null ? Math.max(0, state.endsAt - now) : (state.left ?? 0);
   const minutes = Math.floor((FOCUS_PRESETS[state.preset].focus * 60_000 - left) / 60_000);
-  return minutes >= 1 ? { minutes, key: state.key ?? String(now), startedAt: state.startedAt ?? now - minutes * 60_000, endedAt: now, preset: state.preset, taskId: state.taskId, activity: state.activity } : null;
+  return minutes >= 1
+    ? {
+        minutes,
+        key: state.key ?? String(now),
+        startedAt: state.startedAt ?? now - minutes * 60_000,
+        endedAt: now,
+        preset: state.preset,
+        taskId: state.taskId,
+        activity: state.activity,
+      }
+    : null;
 }
 
 export function focusSkipBreak() {
-  setState({ ...snapshot.state, phase: "idle", endsAt: null, left: null, activity: null, startedAt: null });
+  setState({
+    ...snapshot.state,
+    phase: "idle",
+    endsAt: null,
+    left: null,
+    activity: null,
+    startedAt: null,
+  });
 }
 
 export function focusSetPreset(preset: FocusPresetId) {
@@ -199,7 +232,16 @@ export function focusClearLastTask() {
 }
 
 export type FocusEnded =
-  | { kind: "focus"; minutes: number; key: string; startedAt: number; endedAt: number; preset: FocusPresetId; taskId: string | null; activity: FocusActivity | null }
+  | {
+      kind: "focus";
+      minutes: number;
+      key: string;
+      startedAt: number;
+      endedAt: number;
+      preset: FocusPresetId;
+      taskId: string | null;
+      activity: FocusActivity | null;
+    }
   | { kind: "break" };
 
 /**
