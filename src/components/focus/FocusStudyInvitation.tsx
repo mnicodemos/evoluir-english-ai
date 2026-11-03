@@ -9,12 +9,7 @@ import {
   createFocusOfferGate,
   STUDY_STARTED_EVENT,
 } from "@/lib/focusStudyOffer";
-import {
-  focusSetActivity,
-  focusStart,
-  getFocusSnapshot,
-  openFocusWidget,
-} from "@/lib/focusTimer";
+import { focusSetActivity, focusStart, getFocusSnapshot, openFocusWidget } from "@/lib/focusTimer";
 import type { FocusActivity } from "@/lib/life";
 import { FOCUS_PRESETS } from "@/lib/life";
 
@@ -31,8 +26,7 @@ export function FocusStudyInvitation() {
 
   useEffect(() => {
     const offer = (event?: Event) => {
-      const detail = (event as CustomEvent<{ activity?: FocusActivity }> | undefined)
-        ?.detail;
+      const detail = (event as CustomEvent<{ activity?: FocusActivity }> | undefined)?.detail;
       if (detail?.activity) pendingActivity.current = detail.activity;
       if (event) {
         pendingActivityKey.current = `${window.location.pathname}${window.location.search}`;
