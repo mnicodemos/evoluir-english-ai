@@ -17,6 +17,7 @@ type AppNotificationOptions = {
   description?: string;
   variant?: AppNotificationVariant;
   icon?: ReactNode;
+  cornerIcon?: ReactNode;
   duration?: number;
   action?: NotificationAction;
   cancel?: NotificationAction;
@@ -53,6 +54,7 @@ function AppNotificationToast({
   description,
   variant = "info",
   icon,
+  cornerIcon,
   action,
   cancel,
 }: AppNotificationOptions & { toastId: string | number }) {
@@ -78,7 +80,12 @@ function AppNotificationToast({
           style.glow,
         )}
       />
-      <div className="relative flex items-start gap-3">
+      {cornerIcon ? (
+        <span className="absolute right-3 top-2 z-10 grid size-7 place-items-center text-rose-400">
+          {cornerIcon}
+        </span>
+      ) : null}
+      <div className={cn("relative flex items-start gap-3", cornerIcon && "pr-7")} >
         <span
           className={cn(
             "mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-white/[0.06] ring-1 ring-white/10",
@@ -125,7 +132,7 @@ function AppNotificationToast({
           type="button"
           onClick={() => toast.dismiss(toastId)}
           aria-label="Close notification"
-          className="-mr-1 -mt-1 grid size-7 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-100"
+          className={cn("grid size-7 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-100", cornerIcon ? "self-end mt-7 -mr-1" : "-mr-1 -mt-1") }
         >
           <X className="size-4" />
         </button>
