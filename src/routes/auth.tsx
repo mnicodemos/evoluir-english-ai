@@ -242,7 +242,7 @@ function AuthPage() {
             </Link>
             {/* Phones have no side panel, so EVO greets here. */}
             <div className="mb-6 flex items-center gap-3 lg:hidden">
-              <EvoAvatar decorative className="size-12 ring-2 ring-primary/40" />
+              <EvoAvatar decorative className="size-12" />
               <p className="text-sm text-muted-foreground">
                 {t("EVO is ready for your next conversation.")}
               </p>
