@@ -162,7 +162,7 @@ function RootShell({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        {children}
+        <UiLangProvider>{children}</UiLangProvider>
         <Scripts />
       </body>
     </html>
@@ -214,10 +214,8 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ScrollToTop />
-      <UiLangProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </UiLangProvider>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
       <Toaster className="dashboard-shell dark" position="top-center" />
     </QueryClientProvider>
   );
