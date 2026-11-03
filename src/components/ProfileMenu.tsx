@@ -9,7 +9,7 @@ import {
   type ChangeEvent,
   type ReactNode,
 } from "react";
-import { toast } from "sonner";
+import { showAppNotification } from "@/components/ui/AppNotificationToast";
 
 import { AdminPanelButton } from "@/components/AdminPanelButton";
 import { Button } from "@/components/ui/button";
@@ -239,10 +239,10 @@ export function ProfileMenu({
       setWhatsAppCode(result.code);
       setWhatsAppCodeExpiresAt(result.expiresAt);
       setWhatsAppCodeCopied(false);
-      toast.success(translate("WhatsApp connection", lang));
+      showAppNotification({ title: translate("WhatsApp connection", lang), variant: "success" });
     },
     onError: () => {
-      toast.error(translate("Could not generate a connection code. Please try again.", lang));
+      showAppNotification({ title: translate("Could not generate a connection code. Please try again.", lang), variant: "error" });
     },
   });
 
@@ -272,12 +272,12 @@ export function ProfileMenu({
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      toast.error(translate("Choose an image file.", lang));
+      showAppNotification({ title: translate("Choose an image file.", lang), variant: "error" });
       event.target.value = "";
       return;
     }
     if (file.size > MAX_AVATAR_SIZE) {
-      toast.error(translate("Choose a photo up to 5 MB.", lang));
+      showAppNotification({ title: translate("Choose a photo up to 5 MB.", lang), variant: "error" });
       event.target.value = "";
       return;
     }
@@ -323,9 +323,13 @@ export function ProfileMenu({
       if (avatarPath) queryClient.invalidateQueries({ queryKey: ["avatar-url", avatarPath] });
       setOpen(false);
       setAvatarFile(null);
-      toast.success(translate("Profile updated", lang));
+      showAppNotification({ title: translate("Profile updated", lang), variant: "success" });
     },
-    onError: () => toast.error(translate("Could not save your profile. Please try again.", lang)),
+    onError: () =>
+      showAppNotification({
+        title: translate("Could not save your profile. Please try again.", lang),
+        variant: "error",
+      }),
   });
 
   const displayName = profile?.name || profile?.email || "User";
@@ -508,9 +512,9 @@ export function ProfileMenu({
                         try {
                           await navigator.clipboard.writeText(whatsAppCode);
                           setWhatsAppCodeCopied(true);
-                          toast.success(translate("Code copied.", lang));
+                          showAppNotification({ title: translate("Code copied.", lang), variant: "success" });
                         } catch {
-                          toast.error(translate("The text could not be copied.", lang));
+                          showAppNotification({ title: translate("The text could not be copied.", lang), variant: "error" });
                         }
                       }}
                     >
