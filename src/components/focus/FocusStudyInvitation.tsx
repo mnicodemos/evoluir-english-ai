@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { toast } from "sonner";
+import { showAppNotification } from "@/components/ui/AppNotificationToast";
 import { TomatoIcon } from "./TomatoIcon";
 import { useLifeT } from "@/components/life/LifeNav";
 import { useProfile } from "@/hooks/useProfile";
@@ -39,13 +39,15 @@ export function FocusStudyInvitation() {
       if (!claimOffer(profile.id, current, undefined, pendingActivityKey.current)) return;
       pendingOffer.current = false;
       const minutes = FOCUS_PRESETS[current.preset].focus;
-      toast(t("EVO invites you to focus"), {
+      showAppNotification({
         id: TOAST_ID,
-        icon: <TomatoIcon className="size-5 text-brand-green" />,
+        title: t("EVO invites you to focus"),
         description: t("Start a {minutes}-minute focus block?").replace(
           "{minutes}",
           String(minutes),
         ),
+        variant: "info",
+        icon: <TomatoIcon className="size-5 text-brand-green" />,
         duration: 15000,
         action: {
           label: t("Start Focus"),
