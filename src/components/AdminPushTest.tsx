@@ -11,7 +11,7 @@ import { useUiLang } from "@/lib/uiLang";
 
 export function AdminPushTest() {
   const { lang } = useUiLang();
-  const t = (label: string) => (lang === "pt" ? uiPt[label] ?? label : label);
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const diagnose = useServerFn(pushDiagnostics);
   const run = useMutation({ mutationFn: (send: boolean) => diagnose({ data: { send } }) });
   const data = run.data;
@@ -20,7 +20,9 @@ export function AdminPushTest() {
     <section className="mt-2 border-t border-border pt-4">
       <h3 className="font-semibold">{t("Push notifications")}</h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        {t("Each phone or browser registers itself only after tapping “Notifications” on that device and allowing them. The test goes only to your own devices.")}
+        {t(
+          "Each phone or browser registers itself only after tapping “Notifications” on that device and allowing them. The test goes only to your own devices.",
+        )}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Button variant="outline" onClick={() => run.mutate(false)} disabled={run.isPending}>
@@ -79,7 +81,9 @@ export function AdminPushTest() {
             </ul>
           )}
           <p className="text-xs text-muted-foreground">
-            {t("“sent ✓” but nothing on the phone: the phone or browser is blocking it (for example, Brave needs “Use Google services for push messaging” turned on, and Android needs the app’s notifications allowed). Test arrives but no daily push: the daily job is not running.")}
+            {t(
+              "“sent ✓” but nothing on the phone: the phone or browser is blocking it (for example, Brave needs “Use Google services for push messaging” turned on, and Android needs the app’s notifications allowed). Test arrives but no daily push: the daily job is not running.",
+            )}
           </p>
         </div>
       )}
