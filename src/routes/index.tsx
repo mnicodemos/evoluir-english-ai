@@ -209,7 +209,7 @@ function BlackFridayLandingOffer() {
         onClick={countSignupClick}
         className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-[#17130A] transition-colors hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
-        "Quero aproveitar"
+        Quero aproveitar
         <ArrowRight className="size-4" aria-hidden="true" />
       </Link>
     </aside>
