@@ -2150,6 +2150,7 @@ const baseUiPt: Record<string, string> = {
   "Your best week": "Sua melhor semana",
   "Your best week so far": "Sua melhor semana até agora",
   "Every activity earns XP": "Toda atividade vale XP",
+  "Earn XP": "Ganhe XP",
   "vs last week": "a mais que na semana passada",
   "to beat last week": "para superar a semana passada",
   "The ranking with other students opens when your level's league has":
