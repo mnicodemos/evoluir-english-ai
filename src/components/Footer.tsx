@@ -113,7 +113,10 @@ export function Footer({
   }
 
   return (
-    <footer translate="no" className="bg-background text-foreground dark:bg-[#0B0B0C] dark:text-[#E4E4E7]">
+    <footer
+      translate="no"
+      className="bg-background text-foreground dark:bg-[#0B0B0C] dark:text-[#E4E4E7]"
+    >
       <div className={cn(containerBase, "py-16", containerClassName)}>
         <div className="flex flex-col items-start gap-8">
           {/* Brand & Social */}
