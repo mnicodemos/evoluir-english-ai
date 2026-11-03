@@ -11,8 +11,8 @@ import type { BillingInterval } from "./stripeMapping";
 import { TRIAL_DAYS, trialEligible } from "./trial";
 
 export const BLACK_FRIDAY = {
-  /** 23/11/2026 00:00 in São Paulo (UTC-3). */
-  startsAt: "2026-11-23T03:00:00Z",
+  /** 03/11/2026 00:00 in São Paulo (UTC-3). */
+  startsAt: "2026-11-03T03:00:00Z",
   /** Exclusive: the offer runs through 30/11 (Cyber Monday), São Paulo. */
   endsAt: "2026-12-01T03:00:00Z",
   /** The last day shown on the Premium page. */
@@ -22,12 +22,12 @@ export const BLACK_FRIDAY = {
   discountMonths: 3,
   monthlyTrialDays: 15,
   /**
-   * Warm-up (owner decision, 2026-10-31): Monday 02/11 through Sunday 22/11,
+   * Warm-up (owner decision, 2026-10-31): Monday 02/11 only,
    * São Paulo, right up to the offer.
    */
   warmupStartsAt: "2026-11-02T03:00:00Z",
   /** Exclusive: the warm-up's last day is 22/11, the eve of the offer. */
-  warmupEndsAt: "2026-11-23T03:00:00Z",
+  warmupEndsAt: "2026-11-03T03:00:00Z",
   /** Stripe coupon, created on first use (ensureBlackFridayCoupon). */
   couponId: "EVOLUIR_BF2026_MONTHLY30X3",
 } as const;
