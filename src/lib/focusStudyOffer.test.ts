@@ -31,12 +31,13 @@ describe("Focus study invitation", () => {
   });
 
   it("announces a real study interaction from the main content", () => {
-    const listener = vi.fn();
-    window.addEventListener(STUDY_STARTED_EVENT, listener);
-    const main = document.createElement("main");
+    const dispatchEvent = vi.fn();
+    vi.stubGlobal("window", { dispatchEvent });
+    const main = { closest: (selector: string) => selector === "main" ? {} : null } as unknown as Element;
     announceStudyInteraction(main);
-    window.removeEventListener(STUDY_STARTED_EVENT, listener);
-    expect(listener).toHaveBeenCalledTimes(1);
+    expect(dispatchEvent).toHaveBeenCalledTimes(1);
+    expect(dispatchEvent.mock.calls[0]?.[0]).toBeInstanceOf(Event);
+    vi.unstubAllGlobals();
   });
 
   it("requires study content, not navigation or header controls", () => {
