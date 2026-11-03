@@ -270,6 +270,7 @@ function Writing() {
       toast.error("Write at least a couple of sentences.");
       return;
     }
+    announceStudyInteraction(document.querySelector("main"));
     setLoading(true);
     const stableOperationKey = operationKey.current ?? crypto.randomUUID();
     operationKey.current = stableOperationKey;
