@@ -33,6 +33,7 @@ import {
 } from "@/lib/voice-recorder";
 import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 import { refreshAfterActivity } from "@/lib/refreshKeys";
 import { transcribeAudio } from "@/lib/transcribe";
 import {
@@ -158,6 +159,7 @@ export function VoiceCoach({
 
   async function beginCall() {
     if (callStartRequested.current) return;
+    announceStudyInteraction(document.querySelector("main"));
     callStartRequested.current = true;
     setCallStarted(true);
 
@@ -235,6 +237,7 @@ export function VoiceCoach({
 
   /** Starts a real-life role-play; its fixed opener plays right away. */
   function startRolePlay(play: RolePlay) {
+    announceStudyInteraction(document.querySelector("main"));
     cancelVoiceRecording();
     stopSpeaking();
     setRolePlay(play);
@@ -246,6 +249,7 @@ export function VoiceCoach({
 
   /** Starts a conversation with a subject picked by the AI. `offset` asks for another subject. */
   async function start(offset = 0) {
+    announceStudyInteraction(document.querySelector("main"));
     const selected = scenarioOfTheDay(offset);
     stopSpeaking();
     setRolePlay(null);
