@@ -25,14 +25,14 @@ function readFocusLog(): FocusLogEntry[] {
 export function addFocusLog(entry: FocusLogEntry) {
   const log = readFocusLog();
   if (log.some((item) => item.key === entry.key)) return;
-  const since = addDays(studyToday(), -13);
+  const since = addDays(studyToday(), -29);
   writeStorage(LOG_KEY, JSON.stringify([...log.filter((item) => item.day >= since), entry]));
   window.dispatchEvent(new Event(LOG_EVENT));
 }
 
 /** This device's focus blocks, kept in step with the timer and other tabs. */
-export function useFocusLog(): FocusSessionLog[] {
-  const [log, setLog] = useState<FocusSessionLog[]>([]);
+export function useFocusLog(): FocusLogEntry[] {
+  const [log, setLog] = useState<FocusLogEntry[]>([]);
   useEffect(() => {
     const sync = () => setLog(readFocusLog());
     sync();
