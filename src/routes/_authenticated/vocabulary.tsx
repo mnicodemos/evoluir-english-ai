@@ -75,6 +75,7 @@ import { useOnline } from "@/hooks/useOnline";
 import { STUDY_DAY_RULE } from "@/lib/studyDay";
 import { cn } from "@/lib/utils";
 import { studyDayStartIso } from "@/lib/today";
+import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 
 const LEARNED_SOURCE_LABEL = {
   all: "All",
@@ -764,7 +765,10 @@ function VocabularyOnline() {
                         </div>
                         <Button
                           className="min-h-11 shrink-0"
-                          onClick={() => setSession(sessionQueue)}
+                          onClick={() => {
+                            announceStudyInteraction(document.querySelector("main"));
+                            setSession(sessionQueue);
+                          }}
                         >
                           <Play className="size-4" /> {t("Start review")}
                         </Button>
