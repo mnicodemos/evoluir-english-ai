@@ -925,7 +925,7 @@ function ReadingPage() {
                   translate="no"
                   lang="en"
                   className="mt-4 space-y-3 text-base leading-relaxed sm:text-[1.05rem]"
-                  onClick={() => announceStudyInteraction(document.querySelector("main"))}
+                  onClick={() => announceStudyInteraction(document.querySelector("main"), "reading")}
                 >
                   {readingParagraphs(reading.text).map((paragraph, index) => (
                     <ReadingParagraph
