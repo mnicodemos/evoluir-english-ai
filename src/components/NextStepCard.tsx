@@ -706,7 +706,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               />
               <span className="truncate xl:whitespace-normal">
                 EVO · {t("Your AI Coach")}
-              </span>
+</span>
             </p>
             {/* From xl Practice now sits at the bottom, level with the bottom of
                 the challenge's last text line in the Extra practice column (24 px
