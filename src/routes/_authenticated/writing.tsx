@@ -325,6 +325,7 @@ function Writing() {
 
   return (
     <AppShell mobileOneScreen>
+      <div className="writing-page-layout">
       <PageHeader
         guide="writing"
         icon={PenLine}
@@ -349,9 +350,9 @@ function Writing() {
 
       {/* Wide desktop: practice on the left, session status and level focus on
           the right (like Listening); below the practice on smaller screens. */}
-      <div className="mt-4 grid items-start gap-5 sm:mt-7 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,1fr)]">
+      <div className="writing-practice-grid mt-4 grid items-start gap-5 sm:mt-7 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,1fr)]">
         <div className="min-w-0">
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="writing-prompt-list grid grid-cols-3 gap-2 sm:gap-3">
             {prompts.map((p, index) => {
               const category = WRITING_CATEGORIES[index]!;
               const isDone = done.includes(p);
@@ -361,7 +362,7 @@ function Writing() {
                   key={p}
                   onClick={() => selectPrompt(p)}
                   title={isDone ? "Checked — click to redo" : undefined}
-                  className={`card-soft flex h-full flex-col gap-1.5 p-2.5 text-left transition-colors sm:p-4 ${
+                  className={`writing-prompt-card card-soft flex h-full flex-col gap-1.5 p-2.5 text-left transition-colors sm:p-4 ${
                     isDone
                       ? "opacity-70 hover:bg-accent/50"
                       : isActive
@@ -388,7 +389,7 @@ function Writing() {
             })}
           </div>
 
-          <section className="card-soft mt-3 p-4 sm:mt-5 sm:p-6">
+          <section className="writing-editor-card card-soft mt-3 p-4 sm:mt-5 sm:p-6">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
               <label className="min-w-0 break-words text-sm font-medium">
                 {allDone ? <span>Today's tasks</span> : prompt}
@@ -447,7 +448,7 @@ function Writing() {
                   }}
                   rows={9}
                   placeholder="Write your answer in English…"
-                  className="mt-4 min-h-44 scroll-mb-40 text-base sm:mt-5 sm:min-h-52"
+                  className="writing-editor-input mt-4 min-h-44 scroll-mb-40 text-base sm:mt-5 sm:min-h-52"
                 />
                 <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-sm text-muted-foreground">
@@ -584,6 +585,7 @@ function Writing() {
             <ChevronRight className="size-4 text-muted-foreground" />
           </Link>
         </aside>
+      </div>
       </div>
     </AppShell>
   );
