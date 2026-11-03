@@ -60,7 +60,7 @@ export function DailyGoalTrend({
     >
       <div className="flex items-baseline justify-between text-[11px] leading-none">
         <span className="font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          {t("Daily goal · last 7 days")}
+          {t("Daily goal in 7 days")}
         </span>
         <span className="text-muted-foreground">
           {t("Average")}{" "}
