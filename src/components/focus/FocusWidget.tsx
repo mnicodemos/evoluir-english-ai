@@ -1,8 +1,8 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { GripHorizontal, Maximize2, Minus, Pause, Play, Square, X } from "lucide-react";
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
-import { toast } from "sonner";
 
+import { showAppNotification } from "@/components/ui/AppNotificationToast";
 import { stopFocusSaving } from "@/components/focus/stopFocus";
 import { FocusStudyInvitation } from "@/components/focus/FocusStudyInvitation";
 import { TomatoIcon } from "@/components/focus/TomatoIcon";
@@ -89,10 +89,10 @@ export function FocusController() {
         activity: ended.activity,
       });
       haptic("success");
-      toast.success(t("Focus block done! Time for a break."));
+      showAppNotification({ id: "focus-block-completed", title: t("Focus block done!"), description: t("Time for a break."), variant: "success", duration: 6000 });
     } else {
       haptic("tap");
-      toast(t("Break over. Ready for the next focus block?"));
+      showAppNotification({ id: "focus-break-completed", title: t("Break over."), description: t("Ready for the next focus block?"), variant: "info", duration: 6000 });
     }
   }, [now, state, t]);
 
