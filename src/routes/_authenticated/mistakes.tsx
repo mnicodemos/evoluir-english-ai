@@ -194,7 +194,7 @@ function Mistakes() {
       // (user report, 2026-10-23: it stayed until the page was reloaded).
       void queryClient.invalidateQueries({ queryKey: ["mistakes-due"] });
     } catch {
-      toast.error("Could not check your answer. Try again.");
+      toast.error("Could not check your answer. Try again.", { id: "mistake-check-error" });
     } finally {
       setChecking(false);
     }
@@ -218,9 +218,9 @@ function Mistakes() {
       }
       await queryClient.invalidateQueries({ queryKey: ["mistakes", profile?.id] });
       void queryClient.invalidateQueries({ queryKey: ["mistakes-due"] });
-      toast.success("Mistake deleted.");
+      toast.success("Mistake deleted.", { id: "mistake-deleted" });
     } catch {
-      toast.error("Could not delete this mistake. Please try again.");
+      toast.error("Could not delete this mistake. Please try again.", { id: "mistake-delete-error" });
     } finally {
       setDeletingId(null);
     }
@@ -258,9 +258,10 @@ function Mistakes() {
         deleted === 1
           ? t("1 mistake deleted.")
           : t("{n} mistakes deleted.").replace("{n}", String(deleted)),
+        { id: "mistakes-bulk-deleted" },
       );
     } catch {
-      toast.error(t("Could not delete these mistakes. Please try again."));
+      toast.error(t("Could not delete these mistakes. Please try again."), { id: "mistakes-bulk-delete-error" });
     } finally {
       setDeletingMany(false);
     }
