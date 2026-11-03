@@ -179,7 +179,7 @@ export function focusStop(now: number = Date.now()): { minutes: number; key: str
 }
 
 export function focusSkipBreak() {
-  setState({ ...snapshot.state, phase: "idle", endsAt: null, left: null });
+  setState({ ...snapshot.state, phase: "idle", endsAt: null, left: null, activity: null, startedAt: null });
 }
 
 export function focusSetPreset(preset: FocusPresetId) {
@@ -233,7 +233,7 @@ export function focusCompleteDue(now: number): FocusEnded | null {
       activity: state.activity,
     };
   }
-  setState({ ...state, phase: "idle", endsAt: null, left: null });
+  setState({ ...state, phase: "idle", endsAt: null, left: null, activity: null, startedAt: null });
   return { kind: "break" };
 }
 
