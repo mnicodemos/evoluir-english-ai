@@ -11,7 +11,7 @@ import type { BillingInterval } from "./stripeMapping";
 import { TRIAL_DAYS, trialEligible } from "./trial";
 
 export const BLACK_FRIDAY = {
-  /** 21/11/2026 00:00 in São Paulo (UTC-3): start of the actual offer. */
+  /** 03/11/2026 00:00 in São Paulo (UTC-3): offer activation. */
   startsAt: "2026-11-03T03:00:00Z",
   /** Exclusive: the offer runs through 30/11, São Paulo. */
   endsAt: "2026-12-01T03:00:00Z",
@@ -22,7 +22,7 @@ export const BLACK_FRIDAY = {
   discountMonths: 3,
   monthlyTrialDays: 15,
   /**
-   * Esquenta Black Friday: 03/11 through 20/11, São Paulo.
+   * The offer is live from 03/11; no warm-up phase.
    * The exclusive end is midnight at the start of 21/11.
    */
   warmupStartsAt: "2026-11-03T03:00:00Z",
@@ -62,8 +62,7 @@ export function dayMonth(day: string): string {
 }
 
 /**
- * Where the campaign stands: the warm-up (03/11-20/11), live (21/11-30/11),
- * or nothing.
+ * Where the campaign stands: live (03/11-30/11), or nothing.
  */
 export function blackFridayPhase(now: Date = new Date()): "warmup" | "live" | null {
   const time = now.getTime();
@@ -84,8 +83,8 @@ export function daysUntilBlackFriday(now: Date = new Date()): number {
 }
 
 /**
- * The morning push to free students on the warm-up's first day and on the
- * offer's first and last days, in place of the word of the day; null other days.
+ * The morning push to free students on the offer's first and last days,
+ * in place of the word of the day; null other days.
  */
 export function blackFridayPush(
   today: string,
