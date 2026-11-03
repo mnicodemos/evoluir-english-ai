@@ -705,7 +705,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 aria-hidden="true"
               />
               <span className="truncate xl:whitespace-normal">
-                EVO · {t("Your AI Learning Coach")}
+                EVO · {t("Your AI Coach")}
               </span>
             </p>
             {/* From xl Practice now sits at the bottom, level with the bottom of
