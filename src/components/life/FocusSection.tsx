@@ -323,7 +323,24 @@ export function FocusSection() {
             {t("in 7 days")}
           </p>
         </div>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
+        <div className="rounded-lg bg-secondary/50 p-2.5"><span className="block text-muted-foreground">{t("Completed sessions")}</span><strong className="mt-1 block font-display text-lg tabular-nums">{summary.completedCount}</strong></div>
+        <div className="rounded-lg bg-secondary/50 p-2.5"><span className="block text-muted-foreground">{t("Completion rate")}</span><strong className="mt-1 block font-display text-lg tabular-nums">{summary.completionRate}%</strong></div>
+        <div className="rounded-lg bg-secondary/50 p-2.5"><span className="block text-muted-foreground">{t("Partial sessions")}</span><strong className="mt-1 block font-display text-lg tabular-nums">{summary.partialCount}</strong></div>
       </div>
+      {focusLog.length ? (
+        <div className="mt-4 border-t border-white/10 pt-3">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("Recent focus sessions")}</h3>
+          <ol className="mt-2 space-y-2">
+            {[...focusLog].sort((a, b) => (b.endedAt ?? 0) - (a.endedAt ?? 0)).slice(0, 5).map((session) => (
+              <li key={session.key} className="flex items-center justify-between gap-3 rounded-lg bg-secondary/40 px-3 py-2 text-xs">
+                <span className="min-w-0"><span className="block font-medium">{session.activity ? t(session.activity) : session.taskId ? t("Life task") : t("Independent focus")}</span><span className="block text-muted-foreground">{session.endedAt ? new Date(session.endedAt).toLocaleString(lang === "pt" ? "pt-BR" : "en-US", { dateStyle: "short", timeStyle: "short" }) : session.day}</span></span>
+                <span className="shrink-0 text-right tabular-nums"><strong>{session.minutes} min</strong><span className="block text-muted-foreground">{session.partial ? t("Stopped early") : t("Completed")}</span></span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
     </section>
   );
 }
