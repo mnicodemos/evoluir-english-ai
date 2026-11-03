@@ -343,7 +343,10 @@ export function LessonPodcast({
           <Button
             size="sm"
             variant="outline"
-            className={cn("shrink-0 whitespace-nowrap px-3 tabular-nums", slow && "border-brand-green text-brand-green")}
+            className={cn(
+              "shrink-0 whitespace-nowrap px-3 tabular-nums",
+              slow && "border-brand-green text-brand-green",
+            )}
             aria-pressed={slow}
             aria-label={t("Slower voice")}
             title={t("Slower voice")}
@@ -354,7 +357,10 @@ export function LessonPodcast({
           <Button
             size="sm"
             variant="outline"
-            className={cn("shrink-0 whitespace-nowrap px-3", shadow && "border-brand-green text-brand-green")}
+            className={cn(
+              "shrink-0 whitespace-nowrap px-3",
+              shadow && "border-brand-green text-brand-green",
+            )}
             aria-pressed={shadow}
             title={t("A pause after each line to repeat it out loud")}
             onClick={toggleShadow}
