@@ -27,7 +27,8 @@ export function FocusStudyInvitation() {
 
   useEffect(() => {
     const offer = (event?: Event) => {
-      const activity = (event as CustomEvent<{ activity?: FocusActivity }> | undefined)?.detail?.activity;
+      const activity = (event as CustomEvent<{ activity?: FocusActivity }> | undefined)?.detail
+        ?.activity;
       if (activity) pendingActivity.current = activity;
       if (!profile?.id) {
         pendingOffer.current = true;
