@@ -73,13 +73,33 @@ authenticated("authenticated smoke", () => {
     const nextLesson = page.getByRole("region", { name: "Next lesson" });
     const row = nextLesson.getByRole("heading", { level: 3 });
     await expect(row).toBeVisible({ timeout: 20_000 });
-    const title = (await row.textContent())?.trim() ?? "";
-    expect(title.length).toBeGreaterThan(0);
+
+    // Profile and curriculum queries can resolve in separate requests. Wait
+    // until the suggested lesson title is stable before using it as a search
+    // fixture, otherwise a late profile update can replace the title mid-test.
+    let title = "";
+    await expect
+      .poll(
+        async () => {
+          const first = (await row.textContent())?.trim() ?? "";
+          await page.waitForTimeout(300);
+          const second = (await row.textContent())?.trim() ?? "";
+          if (first && first === second) {
+            title = second;
+            return second;
+          }
+          return "";
+        },
+        { timeout: 15_000 },
+      )
+      .not.toBe("");
 
     const search = page.getByRole("searchbox", { name: "Search a lesson by name" });
-    await search.fill(title.toUpperCase());
     const results = page.getByRole("region", { name: "Search results" });
-    await expect(results.getByRole("button", { name: title, exact: true })).toBeVisible();
+    await search.fill(title.toUpperCase());
+    await expect(results.getByRole("button", { name: title, exact: true })).toBeVisible({
+      timeout: 15_000,
+    });
 
     await search.fill("zzqqxx");
     await expect(results.getByText("No lesson with this name. Try another word.")).toBeVisible();
