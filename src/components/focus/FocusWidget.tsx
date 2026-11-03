@@ -89,10 +89,22 @@ export function FocusController() {
         activity: ended.activity,
       });
       haptic("success");
-      showAppNotification({ id: "focus-block-completed", title: t("Focus block done!"), description: t("Time for a break."), variant: "success", duration: 6000 });
+      showAppNotification({
+        id: "focus-block-completed",
+        title: t("Focus block done!"),
+        description: t("Time for a break."),
+        variant: "success",
+        duration: 6000,
+      });
     } else {
       haptic("tap");
-      showAppNotification({ id: "focus-break-completed", title: t("Break over."), description: t("Ready for the next focus block?"), variant: "info", duration: 6000 });
+      showAppNotification({
+        id: "focus-break-completed",
+        title: t("Break over."),
+        description: t("Ready for the next focus block?"),
+        variant: "info",
+        duration: 6000,
+      });
     }
   }, [now, state, t]);
 
