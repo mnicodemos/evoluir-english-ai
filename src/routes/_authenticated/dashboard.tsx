@@ -787,7 +787,7 @@ function Dashboard() {
   );
 
   return (
-    <AppShell dashboardLayout>
+    <AppShell dashboardLayout desktopOneScreen>
       {isLoading || !profile ? (
         <DashboardSkeleton />
       ) : (
