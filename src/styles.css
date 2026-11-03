@@ -345,7 +345,7 @@
    compact-height grid overrides that caused card sizing and footer issues. */
 @media (min-width: 80rem) and (max-height: 62rem) {
   .dashboard-one-screen.dashboard-home-layout {
-    row-gap: 0.75rem;
+    row-gap: 0.875rem;
   }
 }
 
