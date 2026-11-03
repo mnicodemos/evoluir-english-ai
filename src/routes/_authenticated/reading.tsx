@@ -59,6 +59,7 @@ import { lookupWord } from "@/lib/dictionary.functions";
 import { saveReadingWords } from "@/lib/readingWords.functions";
 import { prepareSpeech, speakEnglish, stopSpeaking } from "@/lib/speech";
 import { studyToday } from "@/lib/today";
+import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
