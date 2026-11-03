@@ -283,7 +283,10 @@ export function ProfileMenu({
       return;
     }
     if (file.size > MAX_AVATAR_SIZE) {
-      showAppNotification({ title: translate("Choose a photo up to 5 MB.", lang), variant: "error" });
+      showAppNotification({
+        title: translate("Choose a photo up to 5 MB.", lang),
+        variant: "error",
+      });
       event.target.value = "";
       return;
     }
@@ -518,7 +521,10 @@ export function ProfileMenu({
                         try {
                           await navigator.clipboard.writeText(whatsAppCode);
                           setWhatsAppCodeCopied(true);
-                          showAppNotification({ title: translate("Code copied.", lang), variant: "success" });
+                          showAppNotification({
+                            title: translate("Code copied.", lang),
+                            variant: "success",
+                          });
                         } catch {
                           showAppNotification({
                             title: translate("The text could not be copied.", lang),
