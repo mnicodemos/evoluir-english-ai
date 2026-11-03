@@ -12,9 +12,10 @@ export function isStudyInteraction(target: Element | null): boolean {
 
 export function announceStudyInteraction(target: Element | null, activity?: FocusActivity) {
   if (!isStudyInteraction(target)) return;
-  const activityKey = `${window.location.pathname}${window.location.search}`;
   window.dispatchEvent(
-    new CustomEvent(STUDY_STARTED_EVENT, { detail: { activity, activityKey } }),
+    activity
+      ? new CustomEvent(STUDY_STARTED_EVENT, { detail: { activity } })
+      : new Event(STUDY_STARTED_EVENT),
   );
 }
 
