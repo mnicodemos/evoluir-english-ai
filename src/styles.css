@@ -730,16 +730,6 @@
    content height. The previous fixed grid tracks compressed intrinsic card
    content and the EVO action could be clipped by its own card. Keep this
    exception scoped to the Dashboard; other authenticated pages are untouched. */
-/* At the approved 2880×1920 capture's effective browser height, the
-   compact natural-flow layout applies, but the 2rem short-screen footer
-   clearance leaves an unintended band below the final Dashboard cards.
-   Keep that larger clearance only for genuinely short desktop viewports. */
-@media (min-width: 80rem) and (min-height: 52.5625rem) and (max-height: 62rem) {
-  .dashboard-one-screen.dashboard-home-layout {
-    padding-bottom: 0.25rem;
-  }
-}
-
 @media (min-width: 80rem) and (max-height: 62rem) {
   .dashboard-shell > main:has(.dashboard-one-screen.dashboard-home-layout) {
     height: auto;
@@ -760,6 +750,7 @@
 
   .dashboard-one-screen.dashboard-home-layout > header + div {
     height: auto;
+    min-height: 6.75rem;
   }
 
   .dashboard-one-screen.dashboard-home-layout > header + div + div,
