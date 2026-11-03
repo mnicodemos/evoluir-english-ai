@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { addDays, type FocusSessionLog } from "@/lib/life";
+import { addDays } from "@/lib/life";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { studyToday } from "@/lib/today";
 
