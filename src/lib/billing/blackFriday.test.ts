@@ -39,7 +39,10 @@ describe("Black Friday offer", () => {
       trialDays: 15,
       couponId: "EVOLUIR_BF2026_MONTHLY30X3",
     });
-    expect(checkoutOffer("monthly", [], warmupEnd)).toEqual({ trialDays: 15, couponId: "EVOLUIR_BF2026_MONTHLY30X3" });
+    expect(checkoutOffer("monthly", [], warmupEnd)).toEqual({
+      trialDays: 15,
+      couponId: "EVOLUIR_BF2026_MONTHLY30X3",
+    });
     expect(checkoutOffer("yearly", [], during)).toEqual({ trialDays: 7, couponId: null });
     expect(checkoutOffer("monthly", [], after)).toEqual({ trialDays: 7, couponId: null });
     expect(formatBrl(offerPriceCents("yearly", checkoutOffer("yearly", [], during)))).toBe(
@@ -67,7 +70,7 @@ describe("Black Friday warm-up and pushes", () => {
 
     expect(blackFridayPush("2026-11-20")).toBeNull();
     expect(blackFridayPush("2026-11-21")).toBeNull();
-    expect(blackFridayPush("2026-11-21")?.body).toContain("Até 30/11");
+    expect(blackFridayPush("2026-11-03")?.body).toContain("Até 30/11");
     expect(blackFridayPush("2026-11-30")?.title).toContain("Último dia");
     expect(blackFridayPush("2026-11-25")).toBeNull();
     expect(blackFridayPush("2026-12-01")).toBeNull();
