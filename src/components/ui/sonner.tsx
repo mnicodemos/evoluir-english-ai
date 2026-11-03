@@ -31,7 +31,7 @@ const Toaster = ({ className, style, ...props }: ToasterProps) => {
           toast:
             "group toast app-toast rounded-2xl! gap-3! p-3.5! border-white/10! bg-[rgb(26_28_32/0.82)]! text-slate-100! backdrop-blur-[18px] backdrop-saturate-150 shadow-[0_18px_48px_-12px_rgb(0_0_0/0.75)]!",
           title: "text-slate-100! font-display text-[15px]! font-semibold! leading-tight!",
-          icon: "size-9! shrink-0 grid! place-items-center rounded-xl bg-white/[0.06] ring-1 ring-white/10 m-0! [&_svg]:size-[18px]! [&_svg]:m-0!",
+          icon: "size-9! shrink-0 flex! items-center! justify-center! rounded-xl bg-white/[0.06] ring-1 ring-white/10 m-0! [&_svg]:block! [&_svg]:size-[18px]! [&_svg]:shrink-0! [&_svg]:m-0!",
           // Icon colour by meaning: amber = try again, red = something failed.
           warning: "[&_[data-icon]]:text-amber-400!",
           error: "[&_[data-icon]]:text-red-400!",
