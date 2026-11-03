@@ -1136,7 +1136,7 @@ const baseUiPt: Record<string, string> = {
   "My Progress": "Meu progresso",
   "My progress": "Minha evolução",
   "My Subscription": "Minha assinatura",
-  "Your AI Learning Coach": "Sua mentora de IA",
+  "Your AI Coach": "Sua Coach de IA",
   "Overall average": "Média geral",
   Overall: "Geral",
   Talking: "Fala",
