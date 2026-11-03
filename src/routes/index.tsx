@@ -191,7 +191,7 @@ function BlackFridayLandingOffer() {
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-amber-400/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-300">
-          {phase === "live" ? "Black Friday no ar" : "Prepare-se para a Black Friday"}
+          {phase === "live" ? "BLACK FRIDAY NO AR" : "ESQUENTA BLACKFRIDAY"}
         </span>
         <span className="text-xs text-muted-foreground">{dates} · plano mensal</span>
       </div>
