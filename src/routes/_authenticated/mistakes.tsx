@@ -220,7 +220,9 @@ function Mistakes() {
       void queryClient.invalidateQueries({ queryKey: ["mistakes-due"] });
       toast.success("Mistake deleted.", { id: "mistake-deleted" });
     } catch {
-      toast.error("Could not delete this mistake. Please try again.", { id: "mistake-delete-error" });
+      toast.error("Could not delete this mistake. Please try again.", {
+        id: "mistake-delete-error",
+      });
     } finally {
       setDeletingId(null);
     }
@@ -261,7 +263,9 @@ function Mistakes() {
         { id: "mistakes-bulk-deleted" },
       );
     } catch {
-      toast.error(t("Could not delete these mistakes. Please try again."), { id: "mistakes-bulk-delete-error" });
+      toast.error(t("Could not delete these mistakes. Please try again."), {
+        id: "mistakes-bulk-delete-error",
+      });
     } finally {
       setDeletingMany(false);
     }
