@@ -700,13 +700,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 the priority below; desktop matches "Why this matters now". */}
             <p className="flex items-center gap-1 whitespace-nowrap font-display text-[10.5px] font-semibold leading-tight text-sidebar-foreground min-[380px]:text-[11px] min-[400px]:text-xs sm:gap-2 sm:text-base sm:leading-snug">
               <Sparkles
-                className="size-3.5 shrink-0 text-brand-green sm:size-[1.375rem]"
+                className="size-5 shrink-0 text-brand-green"
                 strokeWidth={2.4}
                 aria-hidden="true"
               />
               <span className="flex min-w-0 flex-col leading-tight">
-                <span className="font-display font-semibold">EVO</span>
-                <span className="text-[9px] font-medium text-sidebar-foreground/70 sm:text-[11px]">
+                <span className="font-display text-base font-semibold">EVO</span>
+                <span className="text-xs font-medium text-sidebar-foreground/70">
                   {t("Your AI Coach")}
                 </span>
               </span>
