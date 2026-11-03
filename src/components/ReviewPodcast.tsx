@@ -329,9 +329,9 @@ export function LessonPodcast({
             </p>
           </div>
         </div>
-        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto sm:justify-end">
           <Button
-            className="min-w-0 flex-1 sm:flex-none"
+            className="shrink-0 whitespace-nowrap px-3"
             size="sm"
             variant="outline"
             onClick={() => setShowPt((value) => !value)}
@@ -343,7 +343,7 @@ export function LessonPodcast({
           <Button
             size="sm"
             variant="outline"
-            className={cn("tabular-nums", slow && "border-brand-green text-brand-green")}
+            className={cn("shrink-0 whitespace-nowrap px-3 tabular-nums", slow && "border-brand-green text-brand-green")}
             aria-pressed={slow}
             aria-label={t("Slower voice")}
             title={t("Slower voice")}
@@ -354,7 +354,7 @@ export function LessonPodcast({
           <Button
             size="sm"
             variant="outline"
-            className={cn(shadow && "border-brand-green text-brand-green")}
+            className={cn("shrink-0 whitespace-nowrap px-3", shadow && "border-brand-green text-brand-green")}
             aria-pressed={shadow}
             title={t("A pause after each line to repeat it out loud")}
             onClick={toggleShadow}
@@ -362,12 +362,12 @@ export function LessonPodcast({
             <Repeat className="size-4 shrink-0" aria-hidden="true" /> {t("Repeat after")}
           </Button>
           {playing ? (
-            <Button className="min-w-0 flex-1 sm:flex-none" size="sm" onClick={pause}>
+            <Button className="shrink-0 whitespace-nowrap px-3" size="sm" onClick={pause}>
               <Pause className="size-4 shrink-0" aria-hidden="true" /> {t("Pause")}
             </Button>
           ) : (
             <Button
-              className="min-w-0 flex-1 sm:flex-none"
+              className="shrink-0 whitespace-nowrap px-3"
               size="sm"
               onClick={() =>
                 turn !== null
