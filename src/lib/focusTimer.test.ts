@@ -27,7 +27,13 @@ describe("focus timer store", () => {
 
     const end = started.endsAt!;
     const ended = focusCompleteDue(end);
-    expect(ended).toMatchObject({ kind: "focus", minutes: 25, key: started.key, preset: "classic", startedAt: started.startedAt });
+    expect(ended).toMatchObject({
+      kind: "focus",
+      minutes: 25,
+      key: started.key,
+      preset: "classic",
+      startedAt: started.startedAt,
+    });
     expect(focusCompleteDue(end)).toBeNull();
     const breakState = getFocusSnapshot().state;
     expect(breakState.phase).toBe("break");
@@ -76,7 +82,13 @@ describe("floating window on Ready", () => {
     focusStart();
     const key = getFocusSnapshot().state.key;
     vi.setSystemTime(new Date("2026-10-17T12:18:40Z"));
-    expect(focusStop()).toMatchObject({ minutes: 18, key, preset: "classic", startedAt: new Date("2026-10-17T12:00:00Z").getTime(), endedAt: Date.now() });
+    expect(focusStop()).toMatchObject({
+      minutes: 18,
+      key,
+      preset: "classic",
+      startedAt: new Date("2026-10-17T12:00:00Z").getTime(),
+      endedAt: Date.now(),
+    });
     expect(getFocusSnapshot().state.phase).toBe("idle");
     focusStart();
     vi.setSystemTime(new Date("2026-10-17T12:19:20Z"));
