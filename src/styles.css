@@ -660,3 +660,36 @@
   [data-sonner-toast].app-toast[data-type="error"] { --toast-accent: rgb(248 113 113 / 0.7); }
   [data-sonner-toast].app-toast[data-type="info"] { --toast-accent: rgb(56 189 248 / 0.7); }
 }
+
+/* Dashboard Phase 2: the 1280px width breakpoint also catches compact
+   laptops. Give the five dashboard bands a measured, dashboard-only compact
+   rhythm below 840px tall; card contents and mobile / tall-desktop layouts
+   remain unchanged. The shell can still grow naturally if content needs it. */
+@media (min-width: 80rem) and (max-height: 52.5rem) {
+  .dashboard-one-screen.dashboard-home-layout {
+    grid-template-rows: 3.5rem 5.75rem minmax(16rem, 1fr) minmax(6.5rem, auto) minmax(5.5rem, auto);
+    row-gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .dashboard-one-screen.dashboard-home-layout > header {
+    min-height: 3.5rem;
+  }
+
+  .dashboard-one-screen.dashboard-home-layout > header + div {
+    min-height: 5.75rem;
+  }
+
+  .dashboard-one-screen.dashboard-home-layout > header + div + div {
+    min-height: 16rem;
+  }
+
+  .dashboard-one-screen.dashboard-home-layout > header + div + div + div {
+    min-height: 6.5rem;
+  }
+
+  .dashboard-one-screen.dashboard-home-layout > header + div + div + div + div {
+    min-height: 5.5rem;
+  }
+}
+
