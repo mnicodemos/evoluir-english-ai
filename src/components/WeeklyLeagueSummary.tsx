@@ -113,7 +113,11 @@ export function WeeklyLeagueSummary({
         tone={weekXpRising(week) ? "green" : "grey"}
         label={translate("Weekly league")}
         value={`${week.thisWeek} XP`}
-        detail={weekXpLine(week, translate, true)}
+        detail={
+          week.lastWeek <= 0 && week.thisWeek <= 0
+            ? translate("Earn XP")
+            : weekXpLine(week, translate, true)
+        }
         to="/league"
       />
     );
