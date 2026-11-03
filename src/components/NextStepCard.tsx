@@ -96,6 +96,12 @@ type LeagueSummary = {
 export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  // Keep the new-student EVO message explicit at the point of rendering as a
+  // safeguard: this exact pedagogical copy must never leak in Portuguese.
+  const tNextStepReason = (label: string) =>
+    lang === "pt" && label === "Start and we will personalise your next step."
+      ? "Comece e vamos personalizar seu próximo passo."
+      : t(label);
 
   // Key the cache by the current CEFR level: when the level changes, the
   // previous level's insight (confidence, reasons) is never reused.
@@ -270,7 +276,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     .replaceAll("{strongest}", strongestLabel ?? skillLabel);
   // "Why now?" explains the real reason that won the SAME server-side priority
   // decision — never a parallel logic, never score or confidence.
-  const whyNowText = t(NEXT_STEP_WHY_NOW_TEXT[data.reason])
+  const whyNowText = tNextStepReason(NEXT_STEP_WHY_NOW_TEXT[data.reason])
     .replaceAll("{skill}", skillLabel)
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
   // "Why this matters now": one sentence from the SAME server-side decision,
@@ -734,7 +740,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </div>
             </div>
             <p className="mt-1 max-w-full text-[11px] leading-snug text-sidebar-foreground/70 sm:mt-3 sm:whitespace-normal sm:text-[clamp(0.625rem,0.85vw,0.75rem)]">
-              {t(NEXT_STEP_REASON_TEXT[data.reason])}
+              {tNextStepReason(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
             <p className="mt-1 line-clamp-2 text-xs text-sidebar-foreground/85 sm:mt-1 sm:line-clamp-1 sm:text-sm">
               {t("How to practice")}: <span className="font-semibold">{data.activity.title}</span>
@@ -881,7 +887,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <h2 className="text-lg font-semibold">{t("Your next step")}</h2>
               <p className="mt-0.5 font-medium">{skillLabel}</p>
               <p className="text-sm text-muted-foreground">
-                {t(NEXT_STEP_REASON_TEXT[data.reason])}
+                {tNextStepReason(NEXT_STEP_REASON_TEXT[data.reason])}
               </p>
               <p className="mt-2 text-sm">
                 {t("How to practice")}: <span className="font-medium">{data.activity.title}</span>
