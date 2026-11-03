@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { announceStudyInteraction, canStartOfferedFocus, createFocusOfferGate, isStudyInteraction, STUDY_STARTED_EVENT } from "./focusStudyOffer";
+import {
+  announceStudyInteraction,
+  canStartOfferedFocus,
+  createFocusOfferGate,
+  isStudyInteraction,
+  STUDY_STARTED_EVENT,
+} from "./focusStudyOffer";
 
 describe("Focus study invitation", () => {
   it("offers once per student and day, including when declined", () => {
@@ -33,7 +39,9 @@ describe("Focus study invitation", () => {
   it("announces a real study interaction from the main content", () => {
     const dispatchEvent = vi.fn();
     vi.stubGlobal("window", { dispatchEvent });
-    const main = { closest: (selector: string) => selector === "main" ? {} : null } as unknown as Element;
+    const main = {
+      closest: (selector: string) => (selector === "main" ? {} : null),
+    } as unknown as Element;
     announceStudyInteraction(main);
     expect(dispatchEvent).toHaveBeenCalledTimes(1);
     expect(dispatchEvent.mock.calls[0]?.[0]).toBeInstanceOf(Event);
