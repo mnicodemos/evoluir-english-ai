@@ -704,7 +704,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 strokeWidth={2.4}
                 aria-hidden="true"
               />
-              <span className="truncate xl:whitespace-normal">EVO · {t("Your AI Coach")}</span>
+              <span className="flex min-w-0 flex-col leading-tight">
+                <span className="font-display font-semibold">EVO</span>
+                <span className="text-[9px] font-medium text-sidebar-foreground/70 sm:text-[11px]">
+                  {t("Your AI Coach")}
+                </span>
+              </span>
             </p>
             {/* From xl Practice now sits at the bottom, level with the bottom of
                 the challenge's last text line in the Extra practice column (24 px
