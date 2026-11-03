@@ -406,7 +406,7 @@ function LessonPage() {
           value={activeTab}
           onValueChange={(value) => {
             if (value === "audio" || value === "flashcards" || value === "quiz") {
-              announceStudyInteraction(document.querySelector("main"));
+              announceStudyInteraction(document.querySelector("main"), "learning");
             }
             setActiveTab(value);
           }}

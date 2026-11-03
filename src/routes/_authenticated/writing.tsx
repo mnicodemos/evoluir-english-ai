@@ -270,7 +270,7 @@ function Writing() {
       toast.error("Write at least a couple of sentences.");
       return;
     }
-    announceStudyInteraction(document.querySelector("main"));
+    announceStudyInteraction(document.querySelector("main"), "writing");
     setLoading(true);
     const stableOperationKey = operationKey.current ?? crypto.randomUUID();
     operationKey.current = stableOperationKey;
@@ -362,7 +362,7 @@ function Writing() {
                 <button
                   key={p}
                   onClick={() => {
-                    announceStudyInteraction(document.querySelector("main"));
+                    announceStudyInteraction(document.querySelector("main"), "writing");
                     selectPrompt(p);
                   }}
                   title={isDone ? "Checked — click to redo" : undefined}

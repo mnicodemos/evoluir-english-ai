@@ -766,7 +766,7 @@ function VocabularyOnline() {
                         <Button
                           className="min-h-11 shrink-0"
                           onClick={() => {
-                            announceStudyInteraction(document.querySelector("main"));
+                            announceStudyInteraction(document.querySelector("main"), "vocabulary");
                             setSession(sessionQueue);
                           }}
                         >

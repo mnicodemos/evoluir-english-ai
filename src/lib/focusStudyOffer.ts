@@ -1,3 +1,4 @@
+import type { FocusActivity } from "./life";
 import type { FocusState } from "./focusTimer";
 import { readStorage, writeStorage } from "./safeStorage";
 import { studyToday } from "./today";
@@ -9,8 +10,13 @@ export function isStudyInteraction(target: Element | null): boolean {
   return !!target?.closest("main") && !target.closest("header, nav, a, [role='dialog']");
 }
 
-export function announceStudyInteraction(target: Element | null) {
-  if (isStudyInteraction(target)) window.dispatchEvent(new Event(STUDY_STARTED_EVENT));
+export function announceStudyInteraction(target: Element | null, activity?: FocusActivity) {
+  if (!isStudyInteraction(target)) return;
+  window.dispatchEvent(
+    activity
+      ? new CustomEvent(STUDY_STARTED_EVENT, { detail: { activity } })
+      : new Event(STUDY_STARTED_EVENT),
+  );
 }
 
 export function canStartOfferedFocus(state: Pick<FocusState, "phase">) {

@@ -129,7 +129,7 @@ export function VoiceCoach({
   useEffect(() => {
     if (presentation === "call" || !lessonTopic || scenario) return;
     const opener = `Great, you just finished the lesson "${lessonTopic}". Let's practise it in a real conversation. Can you use what you learned in a sentence about your week?`;
-    announceStudyInteraction(document.querySelector("main"));
+    announceStudyInteraction(document.querySelector("main"), "speaking");
     setScenario("everyday");
     setMessages([{ role: "assistant", content: opener }]);
     void playResponse(opener);
@@ -160,7 +160,7 @@ export function VoiceCoach({
 
   async function beginCall() {
     if (callStartRequested.current) return;
-    announceStudyInteraction(document.querySelector("main"));
+    announceStudyInteraction(document.querySelector("main"), "speaking");
     callStartRequested.current = true;
     setCallStarted(true);
 
@@ -238,7 +238,7 @@ export function VoiceCoach({
 
   /** Starts a real-life role-play; its fixed opener plays right away. */
   function startRolePlay(play: RolePlay) {
-    announceStudyInteraction(document.querySelector("main"));
+    announceStudyInteraction(document.querySelector("main"), "speaking");
     cancelVoiceRecording();
     stopSpeaking();
     setRolePlay(play);
@@ -250,7 +250,7 @@ export function VoiceCoach({
 
   /** Starts a conversation with a subject picked by the AI. `offset` asks for another subject. */
   async function start(offset = 0) {
-    announceStudyInteraction(document.querySelector("main"));
+    announceStudyInteraction(document.querySelector("main"), "speaking");
     const selected = scenarioOfTheDay(offset);
     stopSpeaking();
     setRolePlay(null);

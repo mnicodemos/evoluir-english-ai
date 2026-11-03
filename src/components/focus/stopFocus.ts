@@ -12,6 +12,16 @@ import { studyToday } from "@/lib/today";
 export function stopFocusSaving(t: (label: string) => string) {
   const stopped = focusStop();
   if (!stopped) return;
-  addFocusLog({ day: studyToday(), minutes: stopped.minutes, key: stopped.key, partial: true });
+  addFocusLog({
+    day: studyToday(new Date(stopped.endedAt)),
+    minutes: stopped.minutes,
+    key: stopped.key,
+    partial: true,
+    startedAt: stopped.startedAt,
+    endedAt: stopped.endedAt,
+    preset: stopped.preset,
+    taskId: stopped.taskId,
+    activity: stopped.activity,
+  });
   toast(`${stopped.minutes} ${t("min saved; a stopped block does not count as a 🍅.")}`);
 }

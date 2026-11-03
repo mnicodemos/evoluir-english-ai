@@ -2629,6 +2629,13 @@ const baseUiPt: Record<string, string> = {
   Beat: "Supere",
   "Remember, check and say your words: ten new ones with every new lesson.":
     "Lembre, confira e fale suas palavras: dez novas a cada nova lição.",
+  "Completed sessions": "Sessões concluídas",
+  "Completion rate": "Taxa de conclusão",
+  "Partial sessions": "Sessões parciais",
+  "Recent focus sessions": "Sessões recentes de foco",
+  "Life task": "Tarefa do Life+",
+  "Independent focus": "Foco independente",
+  "Stopped early": "Interrompida antes do fim",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.
