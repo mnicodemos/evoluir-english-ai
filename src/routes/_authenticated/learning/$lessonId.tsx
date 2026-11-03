@@ -16,6 +16,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { showAppNotification } from "@/components/ui/AppNotificationToast";
 import { EvoGuide } from "@/components/EvoGuide";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { LessonQuiz } from "@/components/LessonQuiz";
@@ -243,7 +244,13 @@ function LessonPage() {
     queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
     queryClient.invalidateQueries({ queryKey: ["lesson", lessonId] });
 
-    toast.success(`Lesson completed with ${score}%`);
+    showAppNotification({
+      id: "learning-lesson-completed",
+      title: t("Lesson completed"),
+      description: t("Your score: {score}%").replace("{score}", String(score)),
+      variant: "success",
+      duration: 6000,
+    });
 
     // Only a newly completed lesson unlocks a batch. Generate it now so the
     // Dashboard can advertise saved words before Vocabulary is ever opened.

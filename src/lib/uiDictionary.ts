@@ -2634,6 +2634,12 @@ const baseUiPt: Record<string, string> = {
   "words learned": "palavras aprendidas",
   "Every 63 more days in a row adds another Diamond cycle.":
     "A cada mais 63 dias seguidos, você ganha mais um ciclo do Diamante.",
+  // Learning and Focus completion notifications.
+  "Focus block done!": "Bloco de foco concluído!",
+  "Time for a break.": "Hora de fazer uma pausa.",
+  "Break over.": "Pausa encerrada.",
+  "Ready for the next focus block?": "Pronto para o próximo bloco de foco?",
+  "Your score: {score}%": "Sua pontuação: {score}%",
   // Vocabulary review session and page (owner request, 2026-11-02).
   "Show meaning": "Mostrar significado",
   "Try to remember what it means, then check.": "Tente lembrar o que significa e depois confira.",
