@@ -100,7 +100,12 @@ export function FocusController() {
     };
   }, [state.phase, state.endsAt, now]);
 
-  return <><FocusStudyInvitation />{widget.open ? <FocusWidget /> : null}</>;
+  return (
+    <>
+      <FocusStudyInvitation />
+      {widget.open ? <FocusWidget /> : null}
+    </>
+  );
 }
 
 const MARGIN = 8;

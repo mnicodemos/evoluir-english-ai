@@ -42,7 +42,8 @@ export function useTimeSpent(options?: { manual?: boolean }): TimeSpent {
       announceStudyInteraction(event.target instanceof Element ? event.target : null);
     };
     const events = ["click", "input", "keydown", "scroll"] as const;
-    for (const event of events) document.addEventListener(event, onStudy, { passive: true, capture: true });
+    for (const event of events)
+      document.addEventListener(event, onStudy, { passive: true, capture: true });
     return () => {
       for (const event of events) document.removeEventListener(event, onStudy, true);
     };

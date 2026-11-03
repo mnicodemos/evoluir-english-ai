@@ -18,10 +18,7 @@ export function canStartOfferedFocus(state: Pick<FocusState, "phase">) {
 }
 
 /** One invitation per student / São Paulo day, with an in-memory storage fallback. */
-export function createFocusOfferGate(
-  read = readStorage,
-  write = writeStorage,
-) {
+export function createFocusOfferGate(read = readStorage, write = writeStorage) {
   const offered = new Map<string, string>();
   return (userId: string | undefined, state: Pick<FocusState, "phase">, day = studyToday()) => {
     if (!userId || !canStartOfferedFocus(state)) return false;

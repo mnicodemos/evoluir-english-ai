@@ -6,7 +6,11 @@ import { TomatoIcon } from "./TomatoIcon";
 import { useLifeT } from "@/components/life/LifeNav";
 import { useProfile } from "@/hooks/useProfile";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
-import { canStartOfferedFocus, createFocusOfferGate, STUDY_STARTED_EVENT } from "@/lib/focusStudyOffer";
+import {
+  canStartOfferedFocus,
+  createFocusOfferGate,
+  STUDY_STARTED_EVENT,
+} from "@/lib/focusStudyOffer";
 import { focusStart, getFocusSnapshot, openFocusWidget } from "@/lib/focusTimer";
 import { FOCUS_PRESETS } from "@/lib/life";
 
@@ -28,7 +32,10 @@ export function FocusStudyInvitation() {
       toast(t("Start Focus for your study?"), {
         id: TOAST_ID,
         icon: <TomatoIcon className="size-5 text-brand-green" />,
-        description: t("Start a {minutes}-minute focus block?").replace("{minutes}", String(minutes)),
+        description: t("Start a {minutes}-minute focus block?").replace(
+          "{minutes}",
+          String(minutes),
+        ),
         duration: 15000,
         action: {
           label: t("Start Focus"),
