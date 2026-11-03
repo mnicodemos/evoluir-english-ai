@@ -118,13 +118,13 @@ function ProgressPage() {
     <AppShell mobileOneScreen>
       <PageHeader guide="progress" icon={TrendingUp} title={t("My Progress")} />
 
-      <div className="mt-3 sm:mt-4">
+      <div className="progress-page-layout mt-3 sm:mt-4">
         {isLoading ? (
           <Skeleton className="mt-4 h-72 w-full sm:mt-7" />
         ) : (
           <>
             <div className="mt-3 grid gap-3 sm:mt-6 sm:gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:grid-rows-[auto_auto]">
-              <section className="card-soft p-3 sm:p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
+              <section className="progress-metric-card card-soft p-3 sm:p-5 xl:col-start-1 xl:row-span-2 xl:row-start-1">
                 <h2 className="font-display text-base font-semibold sm:text-lg">
                   {t("Frequency")}
                 </h2>
@@ -136,7 +136,7 @@ function ProgressPage() {
                 </div>
               </section>
 
-              <section className="card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
+              <section className="progress-metric-card card-soft p-3 sm:p-5 xl:col-start-2 xl:row-start-1">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h2 className="font-display text-base font-semibold sm:text-lg">
                     {shownLevel
@@ -205,7 +205,7 @@ function ProgressPage() {
               </section>
 
               <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:col-start-2 xl:row-start-2">
-                <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
+                <section className="progress-metric-card card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
                   <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
                     <CheckCircle2 className="size-4 text-[oklch(0.6_0.14_158)]" />
                     {t("Strengths")}
@@ -222,7 +222,7 @@ function ProgressPage() {
                     )}
                   </ul>
                 </section>
-                <section className="card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
+                <section className="progress-metric-card card-soft flex flex-col justify-center p-3 sm:min-h-32 sm:p-6">
                   <h2 className="font-display flex items-center gap-2 text-sm font-semibold sm:text-base">
                     <TriangleAlert className="size-4 text-[oklch(0.7_0.15_75)]" />
                     {t("To improve")}

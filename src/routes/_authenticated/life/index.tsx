@@ -126,7 +126,7 @@ function LifePage() {
           the tab below takes the rest, its cards scrolling inside (the Life
           Coach scrolls its messages and keeps the field in view). Shorter
           screens than 44rem, lg and phones scroll the page as before. */}
-      <div className="xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
+      <div className="life-page-layout xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
         <LifeHeader />
         {/* Four bands (user request, 2026-10-22): the measures on top (Your
           day, Evolution score, Focus), then Today and Plan (the priority of
