@@ -324,7 +324,10 @@ export function LessonPodcast({
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-green">
               {t("Lesson audio")}
             </p>
-            <p className="whitespace-normal break-words font-display text-base font-semibold leading-snug" translate="no">
+            <p
+              className="whitespace-normal break-words font-display text-base font-semibold leading-snug"
+              translate="no"
+            >
               {query.data.title}
             </p>
           </div>
