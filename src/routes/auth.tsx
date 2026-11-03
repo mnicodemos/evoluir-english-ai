@@ -44,7 +44,7 @@ function AuthPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { lang } = useUiLang();
-  const t = (label: string) => (lang === "pt" ? uiPt[label] ?? label : label);
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup">(
     search.mode === "signup" ? "signup" : "signin",
