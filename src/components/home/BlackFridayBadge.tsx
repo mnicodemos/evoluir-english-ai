@@ -2,10 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Tag } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import {
-  BLACK_FRIDAY,
-  blackFridayPhase,
-} from "@/lib/billing/blackFriday";
+import { BLACK_FRIDAY, blackFridayPhase } from "@/lib/billing/blackFriday";
 import { bumpLandingStat } from "@/lib/landingStats";
 
 /**
