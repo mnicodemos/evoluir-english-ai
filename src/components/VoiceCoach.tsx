@@ -129,6 +129,7 @@ export function VoiceCoach({
   useEffect(() => {
     if (presentation === "call" || !lessonTopic || scenario) return;
     const opener = `Great, you just finished the lesson "${lessonTopic}". Let's practise it in a real conversation. Can you use what you learned in a sentence about your week?`;
+    announceStudyInteraction(document.querySelector("main"));
     setScenario("everyday");
     setMessages([{ role: "assistant", content: opener }]);
     void playResponse(opener);
