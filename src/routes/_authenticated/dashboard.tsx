@@ -1156,11 +1156,11 @@ function Dashboard() {
                 showBusinessCard ? "lg:grid lg:grid-cols-12" : "lg:block"
               }`}
             >
-              <div className="min-w-0 lg:col-span-8 xl:h-full xl:min-h-0 2xl:col-span-9">
+              <div className="min-w-0 lg:col-span-8 xl:col-span-9 xl:h-full xl:min-h-0">
                 <GoalsTodayCard />
               </div>
               {showBusinessCard && (
-                <div className="min-w-0 lg:col-span-4 xl:h-full xl:min-h-0 2xl:col-span-3">
+                <div className="min-w-0 lg:col-span-4 xl:col-span-3 xl:h-full xl:min-h-0">
                   <BusinessDashboardCard />
                 </div>
               )}
