@@ -15,7 +15,7 @@ export function EvoAvatar({
 
   return (
     <img
-      src={data?.desktop ?? data?.evoAvatar ?? evoGuide}
+      src={data?.evoAvatar ?? evoGuide}
       alt={decorative ? "" : "EVO"}
       width={192}
       height={192}
