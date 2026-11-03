@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -26,6 +26,7 @@ import { BrandName } from "@/components/BrandName";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { bumpLandingStat } from "@/lib/landingStats";
+import { BLACK_FRIDAY, BLACK_FRIDAY_FIRST_DAY, BLACK_FRIDAY_LAST_DAY, blackFridayPhase, dayMonth, formatBrl, offerPriceCents } from "@/lib/billing/blackFriday";
 
 const SITE_URL = "https://evoluirmaisenglishai.com/";
 const OG_IMAGE = `${SITE_URL}og-image.jpg`;
@@ -157,6 +158,41 @@ const faq = [
 
 const countSignupClick = () => bumpLandingStat("signup_click");
 
+/** Detailed public-home offer; dates and commercial terms come from billing config. */
+function BlackFridayLandingOffer() {
+  const [phase, setPhase] = useState<ReturnType<typeof blackFridayPhase>>(null);
+  useEffect(() => setPhase(blackFridayPhase()), []);
+  if (!phase) return null;
+
+  const monthlyPrice = formatBrl(offerPriceCents("monthly", {
+    trialDays: BLACK_FRIDAY.monthlyTrialDays,
+    couponId: BLACK_FRIDAY.couponId,
+  }));
+  const fullPrice = formatBrl(7990);
+  const dates = dayMonth(BLACK_FRIDAY_FIRST_DAY) + " a " + dayMonth(BLACK_FRIDAY_LAST_DAY);
+
+  return (
+    <aside aria-label="Oferta Black Friday Evoluir+" className="mb-5 max-w-xl rounded-2xl border border-amber-400/35 bg-amber-400/[0.08] p-4 shadow-lg shadow-black/10 sm:p-5">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-amber-400/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-300">
+          {phase === "live" ? "Black Friday no ar" : "Prepare-se para a Black Friday"}
+        </span>
+        <span className="text-xs text-muted-foreground">{dates} · plano mensal</span>
+      </div>
+      <div className="mt-3 flex flex-wrap items-end gap-x-3 gap-y-1">
+        <strong className="text-3xl font-extrabold tracking-tight text-amber-300 sm:text-4xl">{BLACK_FRIDAY.monthlyPercentOff}% OFF</strong>
+        <span className="pb-1 text-sm font-semibold text-foreground">{monthlyPrice}/mês por {BLACK_FRIDAY.discountMonths} meses</span>
+      </div>
+      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Depois, {fullPrice}/mês. + {BLACK_FRIDAY.monthlyTrialDays} dias grátis na primeira assinatura.</p>
+      {phase === "warmup" && <p className="mt-2 text-xs font-medium text-amber-200">A oferta começa em {dayMonth(BLACK_FRIDAY_FIRST_DAY)}. O plano anual permanece no preço normal.</p>}
+      <Link to="/auth" search={{ mode: "signup" }} onClick={countSignupClick} className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-[#17130A] transition-colors hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+        {phase === "live" ? "Quero aproveitar" : "Quero ser avisado"}
+        <ArrowRight className="size-4" aria-hidden="true" />
+      </Link>
+    </aside>
+  );
+}
+
 function CommercialLanding() {
   useEffect(() => bumpLandingStat("visit"), []);
   return (
@@ -212,6 +248,7 @@ function CommercialLanding() {
             <div className="z-10 max-w-2xl pb-2 lg:pb-0">
               <LaunchCampaignBadge className="mb-4" />
               <BlackFridayBadge className="mb-4" />
+              <BlackFridayLandingOffer />
               <h1 className="text-[2.15rem] font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
                 Fale inglês sem travar.
                 <span className="mt-2 block text-gradient-growth">
