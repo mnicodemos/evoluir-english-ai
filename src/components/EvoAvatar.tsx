@@ -20,7 +20,7 @@ export function EvoAvatar({
       width={192}
       height={192}
       className={cn(
-        "size-12 shrink-0 rounded-full object-cover object-[50%_15%] ring-2 ring-brand-green/60 sm:size-14",
+        "size-12 shrink-0 rounded-full object-cover object-[50%_15%] sm:size-14",
         className,
       )}
     />
