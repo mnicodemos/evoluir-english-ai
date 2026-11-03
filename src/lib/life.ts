@@ -389,7 +389,7 @@ export const FOCUS_PRESETS: Record<
 > = {
   short: { focus: 15, shortBreak: 3, longBreak: 10 },
   classic: { focus: 25, shortBreak: 5, longBreak: 15 },
-  deep: { focus: 50, shortBreak: 10, longBreak: 20 },
+  deep: { focus: 45, shortBreak: 10, longBreak: 20 },
 };
 export const FOCUS_PRESET_IDS = Object.keys(FOCUS_PRESETS) as FocusPresetId[];
 export const FOCUS_LONG_BREAK_EVERY = 4;
@@ -398,7 +398,17 @@ export const FOCUS_DAILY_TARGET = 4;
 
 /** A finished block, or (partial) the minutes of a block stopped early: they add to
  * the minutes but never to the day's 🍅 count (user decision). */
-export type FocusSessionLog = { day: string; minutes: number; partial?: boolean };
+export type FocusActivity = "learning" | "listening" | "reading" | "writing" | "vocabulary" | "speaking";
+export type FocusSessionLog = {
+  day: string;
+  minutes: number;
+  partial?: boolean;
+  startedAt?: number;
+  endedAt?: number;
+  preset?: FocusPresetId;
+  taskId?: string | null;
+  activity?: FocusActivity | null;
+};
 
 /** The break after the n-th focus block of a run (1-based): long after every fourth. */
 export function focusBreakMinutes(preset: FocusPresetId, blocksInRun: number): number {
@@ -418,11 +428,17 @@ export function focusSummary(sessions: FocusSessionLog[], today: string) {
     };
   });
   const todayRow = week[6]!;
+  const completedCount = sessions.filter((session) => !session.partial).length;
+  const partialCount = sessions.filter((session) => session.partial).length;
+  const totalCount = completedCount + partialCount;
   return {
     todayCount: todayRow.count,
     todayMinutes: todayRow.minutes,
     week,
     weekMinutes: week.reduce((sum, row) => sum + row.minutes, 0),
+    completedCount,
+    partialCount,
+    completionRate: totalCount ? Math.round((completedCount / totalCount) * 100) : 0,
   };
 }
 
