@@ -722,3 +722,70 @@
     padding: 0.75rem;
   }
 }
+
+
+/* Responsive Phase 4: scoped compact-height desktop tuning for Listening and
+   Writing. Keep the existing card order and controls; reduce only excess
+   vertical spacing so the microphone action and Music Lab are easier to reach.
+   The page remains naturally scrollable when real content exceeds the viewport. */
+@media (min-width: 80rem) and (max-height: 52.5rem) {
+  .listening-page-layout {
+    gap: 0.75rem;
+  }
+
+  .listening-practice-grid {
+    gap: 0.75rem;
+  }
+
+  .listening-practice-stage {
+    gap: 0.75rem;
+    padding: 0.875rem;
+  }
+
+  .listening-practice-center {
+    gap: 0.75rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .music-lab-section {
+    gap: 0.75rem;
+    padding: 0.875rem;
+  }
+
+  .music-lab-section > div[role="note"] {
+    padding: 0.625rem;
+  }
+
+  .music-lab-section form {
+    gap: 0.75rem;
+  }
+
+  .writing-page-layout .writing-practice-grid {
+    gap: 0.875rem;
+    margin-top: 0.75rem;
+  }
+
+  .writing-page-layout .writing-prompt-list {
+    gap: 0.5rem;
+  }
+
+  .writing-page-layout .writing-prompt-card {
+    gap: 0.375rem;
+    padding: 0.625rem;
+  }
+
+  .writing-page-layout .writing-editor-card {
+    margin-top: 0.625rem;
+    padding: 0.875rem;
+  }
+
+  .writing-page-layout .writing-editor-input {
+    min-height: 8.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .writing-page-layout .writing-editor-card > div + div {
+    margin-top: 0.75rem;
+  }
+}
