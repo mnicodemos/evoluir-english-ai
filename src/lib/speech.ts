@@ -432,7 +432,10 @@ const queuedPreparations = new Set<string>();
  * parallel generations. Duplicate queued lines are ignored, and a failed
  * preparation never poisons the queue for later lines.
  */
-export function prepareSpeech(text: string, options: Pick<SpeechOptions, "cache" | "voice"> = {}) {
+export function prepareSpeech(
+  text: string,
+  options: Pick<SpeechOptions, "cache" | "voice"> = {},
+) {
   const value = text?.trim();
   if (!value || typeof window === "undefined" || !window.AudioContext) return;
   const voice = options.voice ?? "evo";
@@ -444,24 +447,20 @@ export function prepareSpeech(text: string, options: Pick<SpeechOptions, "cache"
   });
   if (blocks.length === 0) return;
 
-  prepareChain = prepareChain.catch(() => undefined).then(async () => {
-    for (const block of blocks) {
-      const key = `${voice}:${block.toLocaleLowerCase("en-US")}`;
-      try {
-        await requestSpeech(
-          block,
-          undefined,
-          options.cache ?? "memory",
-          undefined,
-          voice,
-        );
-      } catch {
-        // Playback will make its normal request if preparation failed.
-      } finally {
-        queuedPreparations.delete(key);
+  prepareChain = prepareChain
+    .catch(() => undefined)
+    .then(async () => {
+      for (const block of blocks) {
+        const key = `${voice}:${block.toLocaleLowerCase("en-US")}`;
+        try {
+          await requestSpeech(block, undefined, options.cache ?? "memory", undefined, voice);
+        } catch {
+          // Playback will make its normal request if preparation failed.
+        } finally {
+          queuedPreparations.delete(key);
+        }
       }
-    }
-  });
+    });
 }
 
 /**
