@@ -17,6 +17,7 @@ import {
   Flame,
   Flower2,
   Gem,
+  GraduationCap,
   Headphones,
   Layers,
   ListChecks,
