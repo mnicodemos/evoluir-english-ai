@@ -657,20 +657,69 @@
   }
 }
 
-/* Every toast: a 1px light line on top in the colour of its meaning,
-   the same accent as the pronunciation HUD. */
-@layer utilities {
-  [data-sonner-toast].app-toast {
-    --toast-accent: rgb(255 255 255 / 0.18);
-    background-image: linear-gradient(90deg, transparent 1.5rem, var(--toast-accent), transparent calc(100% - 1.5rem));
-    background-size: 100% 1px;
-    background-repeat: no-repeat;
-    background-position: top;
-  }
-  [data-sonner-toast].app-toast[data-type="success"] { --toast-accent: color-mix(in oklab, var(--brand-green) 70%, transparent); }
-  [data-sonner-toast].app-toast[data-type="warning"] { --toast-accent: rgb(251 191 36 / 0.7); }
-  [data-sonner-toast].app-toast[data-type="error"] { --toast-accent: rgb(248 113 113 / 0.7); }
-  [data-sonner-toast].app-toast[data-type="info"] { --toast-accent: rgb(56 189 248 / 0.7); }
+/* Toast-only tokens match the Vocabulary HUD without changing page themes.
+   Background layers leave Sonner's swipe/stack pseudo-elements untouched. */
+[data-sonner-toaster] {
+  --toast-info: rgb(56 189 248);
+  --toast-warning: rgb(251 191 36);
+  --toast-error: rgb(251 113 133);
+  --toast-muted: rgb(148 163 184);
+  --toast-text: rgb(241 245 249);
+  --toast-tile: rgb(255 255 255 / 0.06);
+  --toast-tile-border: rgb(255 255 255 / 0.1);
+  --toast-hover: rgb(255 255 255 / 0.1);
+}
+[data-sonner-toast].app-toast[data-styled="true"] {
+  --toast-color: var(--toast-info);
+  --toast-accent: color-mix(in oklab, var(--toast-color) 70%, transparent);
+  background-image:
+    linear-gradient(90deg, transparent 1.5rem, var(--toast-accent), transparent calc(100% - 1.5rem)),
+    radial-gradient(circle at 1rem 1rem, color-mix(in oklab, var(--toast-color) 15%, transparent), transparent 4rem);
+  background-size: 100% 1px, 100% 100%;
+  background-repeat: no-repeat;
+  background-position: top;
+  align-items: flex-start;
+  padding-inline-end: 2.75rem !important;
+}
+[data-sonner-toast].app-toast[data-type="success"] { --toast-color: var(--brand-green); }
+[data-sonner-toast].app-toast[data-type="warning"] { --toast-color: var(--toast-warning); }
+[data-sonner-toast].app-toast[data-type="error"] { --toast-color: var(--toast-error); }
+[data-sonner-toast].app-toast [data-icon] {
+  color: var(--toast-color);
+  background: var(--toast-tile);
+  box-shadow: 0 0 0 1px var(--toast-tile-border);
+}
+[data-sonner-toast].app-toast[data-styled="true"] [data-close-button] {
+  inset-inline-start: auto;
+  inset-inline-end: 0.625rem;
+  top: 0.625rem;
+  transform: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--toast-muted);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+[data-sonner-toast].app-toast[data-styled="true"] [data-close-button] svg {
+  width: 1rem;
+  height: 1rem;
+}
+[data-sonner-toast].app-toast[data-styled="true"]:hover [data-close-button]:hover {
+  background: var(--toast-hover);
+  color: var(--toast-text);
+}
+[data-sonner-toast].app-toast [data-close-button]:focus-visible {
+  outline: 2px solid var(--toast-color);
+  outline-offset: 2px;
+}
+[data-sonner-toast].app-toast .app-toast-cancel {
+  background: var(--toast-hover) !important;
+  color: var(--toast-text) !important;
+}
+/* Custom HUDs already contain their own close control and accent layers. */
+[data-sonner-toast]:has(.pronunciation-hud) > [data-close-button] {
+  display: none;
 }
 
 /* Dashboard Phase 2: the 1280px width breakpoint also catches compact

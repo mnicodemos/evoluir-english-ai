@@ -23,5 +23,5 @@ export function stopFocusSaving(t: (label: string) => string) {
     taskId: stopped.taskId,
     activity: stopped.activity,
   });
-  toast(`${stopped.minutes} ${t("min saved; a stopped block does not count as a 🍅.")}`);
+  toast.info(`${stopped.minutes} ${t("min saved; a stopped block does not count as a 🍅.")}`);
 }

@@ -737,7 +737,7 @@ function DecisionDetail({
         void queryClient.invalidateQueries({ queryKey: ["plus"] });
         toast.success(t("Goal created in Life+ AI. EVO will give you a step every day."));
       } else if (outcome.goal === "full") {
-        toast(t("You already have 3 goals. Finish or archive one to add this choice as a goal."));
+        toast.info(t("You already have 3 goals. Finish or archive one to add this choice as a goal."));
       } else if (input.optionId) toast.success(t("Choice saved."));
     },
     onError: (error) =>

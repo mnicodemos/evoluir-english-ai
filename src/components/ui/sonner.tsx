@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { AlertCircle, CheckCircle2, Info, RefreshCw } from "lucide-react";
 import { Toaster as Sonner } from "sonner";
 
 import { GRAPHITE } from "@/lib/surfaces";
@@ -20,6 +21,13 @@ const Toaster = ({ className, style, ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="dark"
+      closeButton
+      icons={{
+        success: <CheckCircle2 strokeWidth={2.25} />,
+        error: <AlertCircle strokeWidth={2.25} />,
+        warning: <RefreshCw strokeWidth={2.25} />,
+        info: <Info strokeWidth={2.25} />,
+      }}
       className={`toaster group ${className ?? ""}`}
       style={{ ...graphiteVars, ...style }}
       toastOptions={{
@@ -29,17 +37,13 @@ const Toaster = ({ className, style, ...props }: ToasterProps) => {
           // Same HUD card as the pronunciation result: rounded-2xl, icon in a tinted
           // tile, display title (one standard for every notification in the app).
           toast:
-            "group toast app-toast rounded-2xl! gap-3! p-3.5! border-white/10! bg-[rgb(26_28_32/0.82)]! text-slate-100! backdrop-blur-[18px] backdrop-saturate-150 shadow-[0_18px_48px_-12px_rgb(0_0_0/0.75)]!",
-          title: "text-slate-100! font-display text-[15px]! font-semibold! leading-tight!",
-          icon: "size-9! shrink-0 flex! items-center! justify-center! rounded-xl bg-white/[0.06] ring-1 ring-white/10 m-0! [&_svg]:block! [&_svg]:size-[18px]! [&_svg]:shrink-0! [&_svg]:m-0!",
-          // Icon colour by meaning: amber = try again, red = something failed.
-          warning: "[&_[data-icon]]:text-amber-400!",
-          error: "[&_[data-icon]]:text-red-400!",
-          success: "[&_[data-icon]]:text-brand-green!",
-          info: "[&_[data-icon]]:text-sky-400!",
-          description: "text-slate-300! text-xs! mt-0.5",
+            "group toast app-toast rounded-2xl! gap-3! p-3.5!",
+          title: "font-display text-[15px]! font-semibold! leading-tight!",
+          icon: "size-9! shrink-0 flex! items-center! justify-center! rounded-xl m-0! [&_svg]:block! [&_svg]:size-[18px]! [&_svg]:shrink-0! [&_svg]:m-0!",
+          description: "text-xs! mt-0.5",
+          closeButton: "app-toast-close",
           actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton: "group-[.toast]:bg-white/10 group-[.toast]:text-slate-200",
+          cancelButton: "app-toast-cancel",
         },
       }}
       {...props}
