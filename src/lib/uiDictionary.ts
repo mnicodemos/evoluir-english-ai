@@ -41,6 +41,9 @@ const baseUiPt: Record<string, string> = {
   "Start Focus": "Iniciar Focus",
   "Not now": "Agora não",
   "EVO Focus suggestions": "Sugestões de Focus da EVO",
+  "Push notifications": "Notificações push",
+  "Allow Evoluir+ to send reminders and learning updates to this device.": "Permitir que o Evoluir+ envie lembretes e atualizações de estudo para este dispositivo.",
+  Language: "Idioma",
   "Allow EVO to suggest starting a Focus session when you begin studying.":
     "Permitir que a EVO sugira iniciar uma sessão de Focus quando você começar a estudar.",
   "Could not update this preference. Please try again.":
