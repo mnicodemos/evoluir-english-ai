@@ -1,5 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Bell, Camera, Check, Copy, Loader2, MessageCircle, UserRound } from "lucide-react";
+import {
+  ArrowRight,
+  Bell,
+  Camera,
+  Check,
+  Copy,
+  Loader2,
+  MessageCircle,
+  UserRound,
+} from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -446,7 +455,11 @@ export function ProfileMenu({
               </span>
             )}
           </span>
-          <ArrowRight className="size-4 shrink-0 text-sidebar-foreground/60 transition-colors group-hover:translate-x-0.5 group-hover:text-sidebar-foreground" strokeWidth={2.25} aria-hidden="true" />
+          <ArrowRight
+            className="size-4 shrink-0 text-sidebar-foreground/60 transition-colors group-hover:translate-x-0.5 group-hover:text-sidebar-foreground"
+            strokeWidth={2.25}
+            aria-hidden="true"
+          />
         </>
       )}
     </Button>
@@ -648,7 +661,10 @@ export function ProfileMenu({
             {translate("Push notifications", lang)}
           </h3>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            {translate("Allow Evoluir+ to send reminders and learning updates to this device.", lang)}
+            {translate(
+              "Allow Evoluir+ to send reminders and learning updates to this device.",
+              lang,
+            )}
           </p>
         </div>
         <Switch
@@ -692,9 +708,7 @@ export function ProfileMenu({
   const profileCard = (trigger: ReactNode) => (
     <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/25 p-1.5">
       {trigger}
-      <div className="mt-1.5 border-t border-sidebar-border/60 pt-1.5">
-        {toolbar}
-      </div>
+      <div className="mt-1.5 border-t border-sidebar-border/60 pt-1.5">{toolbar}</div>
     </div>
   );
 
