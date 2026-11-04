@@ -157,11 +157,13 @@ function LifePage() {
           day, Evolution score, Focus), then Today and Plan (the priority of
           the day was removed, user decision 2026-10-24), then the
           meditations. Phones stack everything in this order. */}
-        <div className="grid gap-4 lg:grid-cols-2 xl:shrink-0 xl:grid-cols-3 xl:gap-5">
-          <section
-            className="card-soft relative overflow-hidden p-4 sm:p-5"
-            aria-label={t("Your day")}
-          >
+        <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-12 xl:items-stretch xl:gap-5">
+          <section className="card-soft grid gap-4 p-4 sm:p-5 lg:col-span-2 xl:col-span-5 xl:grid-cols-2 xl:gap-5" aria-label={t("Daily overview")}>
+            <div className="relative min-w-0 overflow-hidden">
+              <div
+                className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
+                aria-hidden="true"
+              />
             <div
               className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
               aria-hidden="true"
@@ -210,12 +212,20 @@ function LifePage() {
                 tone="bg-pink-400"
               />
             </dl>
+            </div>
+            <div className="min-w-0 border-t border-border/70 pt-4 xl:border-l xl:border-t-0 xl:pl-5 xl:pt-0">
+              <GoalsSection part="score" embedded />
+            </div>
           </section>
-          <div className="flex flex-col [&>div]:flex-1">
-            <GoalsSection part="score" />
-          </div>
-          <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
+          <div className="min-w-0 lg:col-span-1 xl:col-span-3">
             <FocusSection />
+          </div>
+          <div className="min-w-0 lg:col-span-1 xl:col-span-4">
+            {data.premium ? (
+              <CoachSection />
+            ) : (
+              <LifePremiumGate feature="Routine, habits and Life Coach" />
+            )}
           </div>
         </div>
 
@@ -252,17 +262,8 @@ function LifePage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="today" className="mt-4">
-            <div className="grid gap-4 lg:grid-cols-5 xl:gap-5">
-              <div className="flex flex-col lg:col-span-3 [&>section]:flex-1">
-                <LifeToday />
-              </div>
-              <div className="flex flex-col lg:col-span-2 [&>section]:flex-1">
-                {data.premium ? (
-                  <CoachSection />
-                ) : (
-                  <LifePremiumGate feature="Routine, habits and Life Coach" />
-                )}
-              </div>
+            <div className="min-w-0">
+              <LifeToday />
             </div>
           </TabsContent>
           <TabsContent value="plan" className="mt-4">
