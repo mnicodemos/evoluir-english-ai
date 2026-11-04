@@ -261,11 +261,7 @@ function LifePage() {
               )}
             </div>
           </TabsContent>
-          <TabsContent
-            value="decisions"
-            id="decisions"
-            className="scroll-quiet mt-4 scroll-mt-4"
-          >
+          <TabsContent value="decisions" id="decisions" className="scroll-quiet mt-4 scroll-mt-4">
             <DecisionsWorkspace variant="tab" />
           </TabsContent>
         </Tabs>
