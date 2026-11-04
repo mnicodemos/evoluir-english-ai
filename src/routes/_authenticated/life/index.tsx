@@ -252,7 +252,11 @@ function LifePage() {
               </TabsContent>
             </Tabs>
           </section>
-          <section id="decisions" className="min-w-0 scroll-mt-4 xl:col-span-5" aria-label={t("Decisions")}>
+          <section
+            id="decisions"
+            className="min-w-0 scroll-mt-4 xl:col-span-5"
+            aria-label={t("Decisions")}
+          >
             <DecisionsWorkspace variant="tab" />
           </section>
         </div>
