@@ -162,10 +162,6 @@ function LifePage() {
             aria-label={t("Daily overview")}
           >
             <div className="relative min-w-0 overflow-hidden">
-              <div
-                className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
-                aria-hidden="true"
-              />
               <div className="relative flex items-center gap-4">
                 <DayRing percent={progress.percent} />
                 <div className="min-w-0 flex-1">
