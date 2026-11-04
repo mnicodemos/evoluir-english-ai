@@ -692,7 +692,7 @@ export function ProfileMenu({
   const profileCard = (trigger: ReactNode) => (
     <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/25 p-1.5">
       {trigger}
-      <div className="mt-1.5 grid grid-cols-2 gap-1 pt-1.5">
+      <div className="mt-1.5 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-1 pt-1.5">
         <Button
           ref={gearRef}
           variant="ghost"
