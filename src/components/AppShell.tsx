@@ -401,7 +401,7 @@ function AppShellContent({
   const hasNewActivity =
     activityIndicators.listening || activityIndicators.writing || activityIndicators.vocabulary;
   useEffect(() => {
-    if (!hasNewActivity || pushPreference.data === false) return;
+    if (!hasNewActivity || pushPreference.data !== true) return;
     const today = studyToday();
     try {
       if (localStorage.getItem("push-token") === null) return;
@@ -425,7 +425,7 @@ function AppShellContent({
   // Writing and Listening tasks, so new words were never announced.
   const { data: lessonRound } = useLessonRound();
   useEffect(() => {
-    if (!activityIndicators.vocabulary || lessonRound === undefined || pushPreference.data === false) return;
+    if (!activityIndicators.vocabulary || lessonRound === undefined || pushPreference.data !== true) return;
     const round = String(lessonRound);
     if (readStorage("push-token") === null) return;
     if (readStorage("push-vocabulary-notified") === round) return;
