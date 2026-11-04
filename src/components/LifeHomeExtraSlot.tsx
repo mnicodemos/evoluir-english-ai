@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronRight, Play, Scale } from "lucide-react";
+import { ArrowRight, Play, Scale } from "lucide-react";
 
 import { TomatoIcon } from "@/components/focus/TomatoIcon";
 import { useFocusLog } from "@/hooks/useFocusLog";
@@ -39,7 +39,7 @@ export function LifeHomeExtraSlot({ translate: t }: { translate: (label: string)
       <li className="hidden min-w-0 xl:block">
         <Link
           to="/life/decisions"
-          className="flex h-full min-w-0 flex-col justify-between gap-0.5 rounded-lg bg-secondary/60 px-2.5 py-1.5 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+          className="group flex h-full min-w-0 flex-col justify-between gap-0.5 rounded-lg bg-secondary/60 px-2.5 py-1.5 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
         >
           <span className="flex min-w-0 items-center gap-2">
             <span className="flex min-w-0 flex-1 items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -62,7 +62,7 @@ export function LifeHomeExtraSlot({ translate: t }: { translate: (label: string)
             </span>
             <span className="inline-flex shrink-0 items-center text-[11px] font-semibold text-brand-green">
               {t("Decide")}
-              <ChevronRight className="size-3.5" aria-hidden="true" />
+              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} aria-hidden="true" />
             </span>
           </span>
         </Link>
