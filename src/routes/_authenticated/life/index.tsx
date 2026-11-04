@@ -121,19 +121,12 @@ function LifePage() {
 
   const hour = new Date().getHours();
   const greeting =
-    hour < 12
-      ? t("Good morning")
-      : hour < 18
-        ? t("Good afternoon")
-        : t("Good evening");
+    hour < 12 ? t("Good morning") : hour < 18 ? t("Good afternoon") : t("Good evening");
   const daySummary =
     progress.percent === 100
       ? t("You completed everything planned for today.")
       : t("You have {done} of {total} planned items completed.")
-          .replace(
-            "{done}",
-            String(progress.stepsDone + progress.tasksDone + progress.habitsDone),
-          )
+          .replace("{done}", String(progress.stepsDone + progress.tasksDone + progress.habitsDone))
           .replace(
             "{total}",
             String(progress.stepsTotal + progress.tasksTotal + progress.habitsDue),
