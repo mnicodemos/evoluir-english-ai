@@ -1115,7 +1115,7 @@ function Dashboard() {
                   >
                     <ChartLine className="size-4 shrink-0" aria-hidden="true" />
                     {t("My progress")}
-                    <ChevronRight className="size-4 shrink-0" aria-hidden="true" />
+                    <ChevronRight className="size-4 shrink-0" strokeWidth={2.25} aria-hidden="true" />
                   </Link>
                 </div>
                 <WeeklyFrequency

@@ -751,19 +751,19 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
             {mainAvailable && (
               <Button
                 asChild
-                className="mt-2 flex h-9 w-full max-w-full shrink-0 rounded-xl bg-brand-green text-sm font-bold text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-2 xl:mt-auto sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold lg:w-[90%] xl:mx-auto xl:w-[90%]"
+                className="mt-2 flex h-9 w-full max-w-full shrink-0 rounded-xl bg-brand-green text-sm font-bold text-sidebar [word-spacing:0.1em] hover:bg-brand-green/90 sm:mt-2 xl:mt-auto sm:h-10 sm:w-fit sm:rounded-xl sm:px-5 sm:text-sm sm:font-bold lg:w-full xl:w-full"
               >
                 {data.activity.params ? (
                   <Link to="/learning/$lessonId" params={data.activity.params}>
                     <PriorityIcon className="size-4 shrink-0" aria-hidden="true" />
                     {t("Practice now")}
-                    <ChevronRight strokeWidth={3} aria-hidden="true" />
+                    <ChevronRight strokeWidth={2.25} aria-hidden="true" />
                   </Link>
                 ) : (
                   <Link to={data.activity.to}>
                     <PriorityIcon className="size-4 shrink-0" aria-hidden="true" />
                     {t("Practice now")}
-                    <ChevronRight strokeWidth={3} aria-hidden="true" />
+                    <ChevronRight strokeWidth={2.25} aria-hidden="true" />
                   </Link>
                 )}
               </Button>
