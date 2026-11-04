@@ -240,11 +240,7 @@ const SECTIONS: GuideSection[] = [
     topics: [
       {
         heading: "Recursos Free",
-        bullets: [
-          "Metas e micro-passos da EVO.",
-          "Foco Pomodoro.",
-          "Meditação Respiração Calma.",
-        ],
+        bullets: ["Metas e micro-passos da EVO.", "Foco Pomodoro.", "Meditação Respiração Calma."],
       },
       {
         heading: "Recursos Premium",
