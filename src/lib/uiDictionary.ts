@@ -2699,4 +2699,5 @@ export const uiPt: Record<string, string> = {
   "You have {done} of {total} planned items completed.":
     "Você concluiu {done} de {total} itens planejados.",
   "Focus today": "Foco hoje",
+  "Download Life+ AI manual": "Baixar manual do Life+ AI",
 };
