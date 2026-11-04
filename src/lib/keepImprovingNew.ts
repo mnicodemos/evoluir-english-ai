@@ -107,7 +107,7 @@ export function continueRows(input: {
   /** Destinations already shown or opened by another Dashboard button. */
   taken: readonly string[];
   /** The daily reading is complete: do not suggest another text as a pending step. */
-  readingDone?: boolean;
+  readingDone?: boolean | undefined;
   slots: number;
 }): ContinueRow[] {
   if (input.goalReached || input.slots <= 0) return [];
