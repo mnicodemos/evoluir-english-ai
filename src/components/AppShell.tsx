@@ -441,7 +441,9 @@ function AppShellContent({
   // Writing and Listening tasks, so new words were never announced.
   const { data: lessonRound } = useLessonRound();
   useEffect(() => {
-    if (!activityIndicators.vocabulary || lessonRound === undefined || pushPreference.data !== true) return;
+    if (!activityIndicators.vocabulary || lessonRound === undefined || pushPreference.data !== true) {
+      return;
+    }
     const round = String(lessonRound);
     if (readStorage("push-token") === null) return;
     if (readStorage("push-vocabulary-notified") === round) return;
