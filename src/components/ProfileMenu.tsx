@@ -203,7 +203,6 @@ export function ProfileMenu({
   /** Desktop sidebar and phone menu: the icon buttons beside the gear in the profile card. */
   toolbar?: ReactNode;
 }) {
-  const gearRef = useRef<HTMLButtonElement>(null);
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
   const { data: profile } = useProfile();
@@ -447,6 +446,7 @@ export function ProfileMenu({
               </span>
             )}
           </span>
+          <ChevronRight className="size-4 shrink-0 text-sidebar-foreground/50" aria-hidden="true" />
         </>
       )}
     </Button>
@@ -687,22 +687,12 @@ export function ProfileMenu({
     </>
   );
 
-  // One card in the desktop sidebar and phone menu: profile details above,
-  // with the gear and language control aligned below without an internal divider.
+  // One profile entry point: the photo/name row opens the profile; language
+  // selection is the only control in the lower row.
   const profileCard = (trigger: ReactNode) => (
     <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/25 p-1.5">
       {trigger}
-      <div className="mt-1.5 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-1 pt-1.5">
-        <Button
-          ref={gearRef}
-          variant="ghost"
-          aria-label={translate("Edit profile", lang)}
-          title={translate("Edit profile", lang)}
-          className="h-9 w-full rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-          onClick={() => setOpen((value) => !value)}
-        >
-          <Settings className="size-[1.15rem]" aria-hidden="true" />
-        </Button>
+      <div className="mt-1.5 border-t border-sidebar-border/60 pt-1.5">
         {toolbar}
       </div>
     </div>
@@ -722,9 +712,6 @@ export function ProfileMenu({
           onKeyDown={resetCloseTimer}
           onClick={resetCloseTimer}
           // The gear toggles the popover itself; its click is not "outside".
-          onInteractOutside={(event) => {
-            if (gearRef.current?.contains(event.target as Node)) event.preventDefault();
-          }}
           className={cn(
             "dashboard-shell dark max-h-[calc(100dvh-2rem)] w-[min(21rem,calc(100vw-2rem))] space-y-4 overflow-y-auto p-5",
             graphitePanelClass,
