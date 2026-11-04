@@ -806,7 +806,7 @@ function Dashboard() {
             lang={lang === "pt" ? "pt" : "en"}
             translate={t}
           />
-          <div className="dashboard-one-screen dashboard-home-layout flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-5">
+          <div className="dashboard-one-screen dashboard-home-layout flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-5 2xl:gap-y-3 2xl:pb-2">
             <header className="animate-rise min-w-0 xl:h-16">
               <EvoDailyReflection
                 userId={profile.id}
@@ -1098,9 +1098,9 @@ function Dashboard() {
                   <Link
                     to="/progress"
                     aria-label={t("My progress")}
-                    className="group relative grid min-h-[4.772rem] min-w-0 grid-cols-[4.42rem_minmax(0,1fr)_auto] items-center gap-[0.35rem] overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-[0.33rem] pr-[0.55rem] transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[4.955rem]"
+                    className="group relative grid min-h-[4.677rem] min-w-0 grid-cols-[4.42rem_minmax(0,1fr)_auto] items-center gap-[0.35rem] overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-[0.33rem] pr-[0.55rem] transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[4.856rem]"
                   >
-                    <span className="grid h-full min-h-[3.448rem] place-items-center overflow-hidden rounded-lg bg-[#06272a]">
+                    <span className="grid h-full min-h-[3.379rem] place-items-center overflow-hidden rounded-lg bg-[#06272a]">
                       <img
                         src="/my-progress-growth.webp"
                         alt=""
