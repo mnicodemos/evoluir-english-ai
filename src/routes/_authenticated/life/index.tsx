@@ -153,13 +153,12 @@ function LifePage() {
             {t("Focus today")}: {focusToday}/{FOCUS_DAILY_TARGET}
           </p>
         </section>
-        {/* Four bands (user request, 2026-10-22): the measures on top (Your
-          day, Evolution score, Focus), then Today and Plan (the priority of
-          the day was removed, user decision 2026-10-24), then the
-          meditations. Phones stack everything in this order. */}
-        <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-12 xl:items-stretch xl:gap-5">
+        {/* Compact one-page composition: Your day and Evolution score are
+          stacked in one card; Focus and Life Coach share the same row.
+          The Today, Planning and Decisions tabs remain available below. */}
+        <div className="life-overview-grid grid gap-3 lg:grid-cols-2 xl:grid-cols-12 xl:items-stretch xl:gap-4">
           <section
-            className="card-soft grid gap-4 p-4 sm:p-5 lg:col-span-2 xl:col-span-5 xl:grid-cols-2 xl:gap-5"
+            className="card-soft grid min-w-0 gap-3 p-3 sm:p-4 lg:col-span-2 xl:col-span-4 xl:grid-cols-1 xl:gap-3"
             aria-label={t("Daily overview")}
           >
             <div className="relative min-w-0 overflow-hidden">
@@ -167,7 +166,7 @@ function LifePage() {
                 className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
                 aria-hidden="true"
               />
-              <div className="relative flex items-center gap-5">
+              <div className="relative flex items-center gap-4">
                 <DayRing percent={progress.percent} />
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-green">
@@ -180,7 +179,7 @@ function LifePage() {
                   </h2>
                 </div>
               </div>
-              <dl className="relative mt-4 grid gap-2">
+              <dl className="relative mt-3 grid gap-1.5">
                 <DayStat
                   label={t("Goal steps")}
                   done={progress.stepsDone}
@@ -211,14 +210,14 @@ function LifePage() {
                 />
               </dl>
             </div>
-            <div className="min-w-0 border-t border-border/70 pt-4 xl:border-l xl:border-t-0 xl:pl-5 xl:pt-0">
+            <div className="min-w-0 border-t border-border/70 pt-3 xl:border-l-0 xl:border-t xl:pl-0 xl:pt-3">
               <GoalsSection part="score" embedded />
             </div>
           </section>
           <div className="min-w-0 lg:col-span-1 xl:col-span-3">
             <FocusSection />
           </div>
-          <div className="min-w-0 lg:col-span-1 xl:col-span-4">
+          <div className="min-w-0 lg:col-span-1 xl:col-span-5">
             {data.premium ? (
               <CoachSection />
             ) : (
