@@ -107,7 +107,10 @@ export function LifeToday() {
       refresh();
     },
     onError: (error) =>
-      notifyLife(t(error instanceof Error ? error.message : "The goal could not be saved."), "error"),
+      notifyLife(
+        t(error instanceof Error ? error.message : "The goal could not be saved."),
+        "error",
+      ),
   });
   const submitGoal = (title: string) => {
     const clean = title.trim();
