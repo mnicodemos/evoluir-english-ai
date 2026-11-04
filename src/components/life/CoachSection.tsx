@@ -1,6 +1,18 @@
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Flag, ListChecks, Loader2, Plus, Repeat, Send, Sparkles } from "lucide-react";
+import {
+  Check,
+  Flag,
+  Flower2,
+  ListChecks,
+  Loader2,
+  Plus,
+  Repeat,
+  Scale,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -16,11 +28,28 @@ import { addGoalMilestone, addLifeHabit, askLifeCoach, saveLifeTask } from "@/li
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 
 const STORAGE_KEY = "life-coach-chat";
-const SUGGESTIONS = [
-  "Break my main goal into small steps",
-  "Help me choose today's three priorities",
-  "Suggest one habit to start this week",
-];
+const QUICK_PROMPTS = [
+  {
+    label: "What should I prioritize today?",
+    prompt:
+      "Look at my current goals, tasks and habits. Tell me the most important thing to prioritize today, explain briefly why, and give me one realistic first action.",
+  },
+  {
+    label: "Break my goal into steps",
+    prompt:
+      "Help me break my most important active goal into small, realistic steps. Use my goals and today's context, and suggest the first action I can take today.",
+  },
+  {
+    label: "I'm short on time today",
+    prompt:
+      "I am short on time today. Help me choose a realistic minimum version of my plan: one essential action, what can wait, and a short time estimate for each.",
+  },
+  {
+    label: "Feedback on a real situation",
+    prompt:
+      "I want feedback on a real situation. Ask me one focused question about what happened, then help me understand my options and choose a constructive next step. Do not assume details I have not shared.",
+  },
+] as const;
 
 type ChatEntry = LifeCoachMessage & { actions?: LifeCoachAction[] };
 
@@ -141,19 +170,6 @@ export function CoachSection() {
                 {t("Hi! I am EVO, your Life Coach. What would you like to plan or improve today?")}
               </p>
             </div>
-            <div className="grid gap-2">
-              {SUGGESTIONS.map((suggestion) => (
-                <Button
-                  key={suggestion}
-                  variant="outline"
-                  disabled={turn.isPending}
-                  onClick={() => send(t(suggestion))}
-                  className="h-auto min-h-11 justify-start whitespace-normal py-2.5 text-left"
-                >
-                  {t(suggestion)}
-                </Button>
-              ))}
-            </div>
           </div>
         ) : null}
 
@@ -216,6 +232,39 @@ export function CoachSection() {
           </p>
         ) : null}
       </div>
+
+      <nav
+        aria-label={t("Life Coach quick actions")}
+        className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {QUICK_PROMPTS.map((item) => (
+          <Button
+            key={item.label}
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={turn.isPending}
+            onClick={() => send(item.prompt)}
+            className="h-9 shrink-0 whitespace-nowrap rounded-full px-3 text-xs"
+          >
+            {t(item.label)}
+          </Button>
+        ))}
+        <a
+          href="#meditation"
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Flower2 className="size-3.5" aria-hidden="true" />
+          {t("2-minute breathing before focus")}
+        </a>
+        <Link
+          to="/life/decisions"
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Scale className="size-3.5" aria-hidden="true" />
+          {t("Help me make a decision")}
+        </Link>
+      </nav>
 
       <form
         className="flex items-end gap-2 border-t border-border pt-4"
