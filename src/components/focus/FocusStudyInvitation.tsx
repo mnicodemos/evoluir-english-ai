@@ -41,9 +41,12 @@ export function FocusStudyInvitation() {
       if (event) {
         pendingActivityKey.current = `${window.location.pathname}${window.location.search}`;
       }
-      if (focusInvitation.data === false) return;
-      if (!profile?.id) {
+      if (!profile?.id || focusInvitation.isLoading) {
         pendingOffer.current = true;
+        return;
+      }
+      if (focusInvitation.data === false) {
+        pendingOffer.current = false;
         return;
       }
       const current = getFocusSnapshot().state;
@@ -77,7 +80,7 @@ export function FocusStudyInvitation() {
     window.addEventListener(STUDY_STARTED_EVENT, offer);
     if (pendingOffer.current) offer();
     return () => window.removeEventListener(STUDY_STARTED_EVENT, offer);
-  }, [profile?.id, focusInvitation.data, t]);
+  }, [profile?.id, focusInvitation.data, focusInvitation.isLoading, t]);
 
   useEffect(() => {
     if (state.phase !== "idle") toast.dismiss(TOAST_ID);
