@@ -1,8 +1,6 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
-  Bell,
-  BellOff,
   BookMarked,
   BookOpen,
   BookOpenText,
@@ -13,7 +11,6 @@ import {
   GraduationCap,
   Headphones,
   House,
-  Languages,
   LogOut,
   Menu,
   MessageSquareText,
@@ -30,7 +27,6 @@ import { Fragment, useEffect, useRef, type ReactNode, type TouchEvent } from "re
 
 import { FocusController } from "@/components/focus/FocusWidget";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Logo } from "@/components/Logo";
 import { BrandName } from "@/components/BrandName";
@@ -56,7 +52,8 @@ import { cn } from "@/lib/utils";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useProfile } from "@/hooks/useProfile";
+import { getPushNotificationsEnabled } from "@/lib/focusInvitationPreference";
 import { studyToday } from "@/lib/today";
 
 // Mobile sheet menu: excludes the four items already in the bottom navigation bar.
@@ -109,69 +106,25 @@ function lifeTabOpen(pathname: string, to: string) {
 // block: one home in the sidebar (desktop) and the sheet menu (mobile).
 function UtilityButtons() {
   const { lang, setLang } = useUiLang();
-  const push = usePushNotifications();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
-  const pushOn = push.state === "enabled";
-  const pushLabel = pushOn ? t("Notifications on") : t("Notifications off");
 
   function toggleLang() {
     setLang(lang === "pt" ? "en" : "pt");
   }
 
-  async function togglePush() {
-    if (pushOn) {
-      await push.disable();
-      toast.info(t("Notifications off"));
-      return;
-    }
-    const result = await push.enable();
-    if (result === "enabled") {
-      toast.info(t("Notifications on"));
-    } else if (result === "disabled") {
-      // Browser-level causes: iframe preview or denied permission.
-      if (window.top !== window.self) {
-        toast.info(t("Open the app in its own tab to enable notifications"));
-      } else {
-        toast.info(
-          t(
-            "Notifications are blocked in this browser. Allow them in the site settings (the icon next to the address) and try again.",
-          ),
-        );
-      }
-    } else if (result === "unsupported") {
-      toast.info(t("Notifications are not supported on this device"));
-    }
-  }
-
-  // Two equal cells of the profile card's icon row (ProfileMenu, desktop
-  // sidebar and phone menu), the language with its short code beside the
-  // icon, not over it.
+  // Push settings live inside Profile; this is the clearly labelled language control.
   return (
-    <>
-      <Button
-        variant="ghost"
-        aria-label={`${t("Change language")}: ${lang === "pt" ? "Português" : "English"}`}
-        title={lang === "pt" ? "Português" : "English"}
-        className="h-9 w-full gap-1 rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-        onClick={toggleLang}
-      >
-        <Languages className="size-[1.15rem]" />
-        <span className="text-[10px] font-bold">{lang === "pt" ? "PT" : "EN"}</span>
-      </Button>
-      <Button
-        variant="ghost"
-        aria-label={pushLabel}
-        title={pushLabel}
-        aria-pressed={pushOn}
-        className={cn(
-          "h-9 w-full rounded-lg px-0 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-          pushOn ? "text-brand-green" : "text-sidebar-foreground/70",
-        )}
-        onClick={() => void togglePush()}
-      >
-        {pushOn ? <Bell className="size-[1.15rem]" /> : <BellOff className="size-[1.15rem]" />}
-      </Button>
-    </>
+    <Button
+      variant="ghost"
+      aria-label={`${t("Change language")}: ${lang === "pt" ? "Português" : "English"}`}
+      title={lang === "pt" ? "Português" : "English"}
+      className="h-9 w-full min-w-0 justify-center rounded-lg px-1 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+      onClick={toggleLang}
+    >
+      <span className="min-w-0 truncate text-[11px] font-semibold tracking-tight">
+        {lang === "pt" ? "PT · Português" : "EN · English"}
+      </span>
+    </Button>
   );
 }
 
@@ -361,6 +314,13 @@ function AppShellContent({
   const location = useLocation();
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
+  const { data: profile } = useProfile();
+  const pushPreference = useQuery({
+    queryKey: ["push-notifications-enabled", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: () => getPushNotificationsEnabled(profile!.id),
+    staleTime: 60_000,
+  });
   const activityIndicators = useActivityIndicators();
   const translate = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
 
@@ -439,7 +399,7 @@ function AppShellContent({
   const hasNewActivity =
     activityIndicators.listening || activityIndicators.writing || activityIndicators.vocabulary;
   useEffect(() => {
-    if (!hasNewActivity) return;
+    if (!hasNewActivity || pushPreference.data !== true) return;
     const today = studyToday();
     try {
       if (localStorage.getItem("push-token") === null) return;
@@ -456,14 +416,14 @@ function AppShellContent({
       },
     }).catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasNewActivity]);
+  }, [hasNewActivity, pushPreference.data]);
 
   // A finished lesson's vocabulary batch gets its own push, once per lesson
   // round: the daily push above is usually spent earlier by the day's new
   // Writing and Listening tasks, so new words were never announced.
   const { data: lessonRound } = useLessonRound();
   useEffect(() => {
-    if (!activityIndicators.vocabulary || lessonRound === undefined) return;
+    if (!activityIndicators.vocabulary || lessonRound === undefined || pushPreference.data !== true) return;
     const round = String(lessonRound);
     if (readStorage("push-token") === null) return;
     if (readStorage("push-vocabulary-notified") === round) return;
@@ -476,7 +436,7 @@ function AppShellContent({
       },
     }).catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activityIndicators.vocabulary, lessonRound]);
+  }, [activityIndicators.vocabulary, lessonRound, pushPreference.data]);
 
   async function signOut() {
     await queryClient.cancelQueries();

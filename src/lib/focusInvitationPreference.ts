@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 
 const FOCUS_INVITATION_KEY = "evo_focus_invitation_enabled";
+const PUSH_NOTIFICATIONS_KEY = "push_notifications_enabled";
 
 function asPreferences(value: Json | null | undefined): Record<string, Json | undefined> {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -46,6 +47,45 @@ export async function setFocusInvitationEnabled(
         .from("learning_profile")
         .insert({ user_id: userId, learning_preferences: learningPreferences });
 
+  if (result.error) throw result.error;
+  return enabled;
+}
+
+/** Defaults to enabled to preserve the existing push experience for current students. */
+export async function getPushNotificationsEnabled(userId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("learning_profile")
+    .select("learning_preferences")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return asPreferences(data?.learning_preferences)[PUSH_NOTIFICATIONS_KEY] !== false;
+}
+
+/** Saves the student's push preference without changing other learning preferences. */
+export async function setPushNotificationsEnabled(
+  userId: string,
+  enabled: boolean,
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("learning_profile")
+    .select("learning_preferences")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+
+  const learningPreferences = {
+    ...asPreferences(data?.learning_preferences),
+    [PUSH_NOTIFICATIONS_KEY]: enabled,
+  };
+  const result = data
+    ? await supabase
+        .from("learning_profile")
+        .update({ learning_preferences: learningPreferences })
+        .eq("user_id", userId)
+    : await supabase
+        .from("learning_profile")
+        .insert({ user_id: userId, learning_preferences: learningPreferences });
   if (result.error) throw result.error;
   return enabled;
 }
