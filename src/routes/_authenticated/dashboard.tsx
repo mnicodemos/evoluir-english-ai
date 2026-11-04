@@ -996,7 +996,7 @@ function Dashboard() {
                   </Link>
                 </div>
                 <div className="mb-5 mt-3 grid h-[7.1rem] w-full flex-none grid-cols-[6.5rem_minmax(0,1fr)] items-center justify-center gap-x-1 gap-y-1.5 lg:mb-0 lg:mt-2 lg:h-auto lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
-                  <div className="flex -translate-y-3 flex-col items-center lg:mx-auto lg:translate-y-0 xl:mx-0">
+                  <div className="flex translate-y-1 flex-col items-center lg:mx-auto lg:translate-y-0 xl:mx-0">
                     <div
                       className={cn(
                         "relative grid size-[6.52rem] place-items-center justify-self-center text-brand-green lg:translate-y-2 lg:size-24 lg:justify-self-start 2xl:size-30",
