@@ -2,8 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Crown, Flower2, Languages, Play, Square, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { useLife } from "@/hooks/useLife";
@@ -100,7 +100,7 @@ export function MeditationSection({
         await speakEnglish(lines[index]!.en, { cache: "persistent", rate });
       } catch {
         if (run.current !== id) return;
-        toast.error(t("Audio is unavailable right now."));
+        notifyLife(t("Audio is unavailable right now."), "error");
         stop();
         return;
       }
