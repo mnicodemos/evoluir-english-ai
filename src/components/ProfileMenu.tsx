@@ -614,7 +614,10 @@ export function ProfileMenu({
         <div className="min-w-0 space-y-1">
           <h3 className="text-sm font-semibold">{translate("EVO Focus suggestions", lang)}</h3>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            {translate("Allow EVO to suggest starting a Focus session when you begin studying.", lang)}
+            {translate(
+              "Allow EVO to suggest starting a Focus session when you begin studying.",
+              lang,
+            )}
           </p>
         </div>
         <Switch
