@@ -120,12 +120,24 @@ function LifePage() {
   });
 
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? t("Good morning") : hour < 18 ? t("Good afternoon") : t("Good evening");
-  const daySummary = progress.percent === 100
-    ? t("You completed everything planned for today.")
-    : t("You have {done} of {total} planned items completed.")
-        .replace("{done}", String(progress.stepsDone + progress.tasksDone + progress.habitsDone))
-        .replace("{total}", String(progress.stepsTotal + progress.tasksTotal + progress.habitsDue));
+  const greeting =
+    hour < 12
+      ? t("Good morning")
+      : hour < 18
+        ? t("Good afternoon")
+        : t("Good evening");
+  const daySummary =
+    progress.percent === 100
+      ? t("You completed everything planned for today.")
+      : t("You have {done} of {total} planned items completed.")
+          .replace(
+            "{done}",
+            String(progress.stepsDone + progress.tasksDone + progress.habitsDone),
+          )
+          .replace(
+            "{total}",
+            String(progress.stepsTotal + progress.tasksTotal + progress.habitsDue),
+          );
 
   return (
     <AppShell desktopOneScreen>
@@ -136,7 +148,10 @@ function LifePage() {
           screens than 44rem, lg and phones scroll the page as before. */}
       <div className="life-page-layout xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
         <LifeHeader />
-        <section className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border border-brand-green/20 bg-brand-green/[0.045] px-4 py-2.5" aria-label={t("Morning briefing")}>
+        <section
+          className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border border-brand-green/20 bg-brand-green/[0.045] px-4 py-2.5"
+          aria-label={t("Morning briefing")}
+        >
           <div className="min-w-0">
             <p className="font-display text-sm font-semibold">{greeting}</p>
             <p className="text-xs text-muted-foreground">{daySummary}</p>
