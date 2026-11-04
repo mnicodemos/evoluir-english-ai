@@ -1110,7 +1110,11 @@ function Dashboard() {
                     </span>
                     <span className="min-w-0 self-center">
                       <span className="flex min-w-0 items-center gap-1">
-                        <ChartLine className="size-4 shrink-0 text-dashboard-cyan" strokeWidth={2.4} aria-hidden="true" />
+                        <ChartLine
+                          className="size-4 shrink-0 text-dashboard-cyan"
+                          strokeWidth={2.4}
+                          aria-hidden="true"
+                        />
                         <span className="shrink-0 rounded-full border border-dashboard-cyan/45 bg-dashboard-cyan/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-dashboard-cyan">
                           {t("My progress")}
                         </span>
@@ -1121,9 +1125,16 @@ function Dashboard() {
                       {progressToImprove.length > 0 ? (
                         <span className="mt-1 grid gap-1 sm:grid-cols-2">
                           {progressToImprove.map((skill) => (
-                            <span key={skill.skill} className="flex min-w-0 items-center justify-between gap-2 text-[11px] leading-tight">
-                              <span className="truncate text-muted-foreground">{t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}</span>
-                              <span className="shrink-0 font-semibold tabular-nums text-foreground">{skill.value}%</span>
+                            <span
+                              key={skill.skill}
+                              className="flex min-w-0 items-center justify-between gap-2 text-[11px] leading-tight"
+                            >
+                              <span className="truncate text-muted-foreground">
+                                {t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}
+                              </span>
+                              <span className="shrink-0 font-semibold tabular-nums text-foreground">
+                                {skill.value}%
+                              </span>
                             </span>
                           ))}
                         </span>
