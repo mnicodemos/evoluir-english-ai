@@ -850,6 +850,7 @@ const baseUiPt: Record<string, string> = {
     "Ainda temos poucos dados sobre essa habilidade.",
   "This is your lowest skill score right now.":
     "Esta é a sua menor pontuação por habilidade agora.",
+  "Lowest skill score.": "Menor pontuação entre habilidades.",
   "You have not practised this recently.": "Você não praticou isso recentemente.",
   "You have not practiced this skill yet.": "Você ainda não praticou essa habilidade.",
   "Start anywhere and we will personalise your next step.":
