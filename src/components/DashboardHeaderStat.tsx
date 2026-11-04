@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Search } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -117,7 +117,9 @@ export function DashboardHeaderStat({
       {glyph}
     </span>
   );
-  const chevron = circle(<ChevronRight className="size-4" strokeWidth={2.4} />);
+  const chevron = circle(
+    <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} />,
+  );
   // A cell that opens a popover shows a magnifier, like the Life+ AI slots.
   const magnifier = circle(<Search className="size-3.5" strokeWidth={2.4} />);
   const cell = "flex h-full min-w-0 items-center gap-3 px-4 py-3 2xl:gap-4 2xl:px-6";
