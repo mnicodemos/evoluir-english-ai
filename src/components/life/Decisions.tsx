@@ -742,7 +742,7 @@ function DecisionDetail({
       } else if (input.optionId) notifyLife(t("Choice saved."), "success");
     },
     onError: (error) =>
-      toast.error(t(error instanceof Error ? error.message : "The decision could not be saved.")),
+      notifyLife(t(error instanceof Error ? error.message : "The decision could not be saved."), "error"),
   });
   const deletion = useMutation({
     mutationFn: () => remove({ data: { id: decision.id } }),
