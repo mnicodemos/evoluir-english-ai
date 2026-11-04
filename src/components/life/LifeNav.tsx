@@ -98,7 +98,7 @@ export function LifeHeader({
           </div>
           <div
             aria-label={t("Morning briefing")}
-            className="mt-3 flex h-10 w-[calc(100%+10rem)] max-w-[calc(100vw-2.5rem)] min-w-0 items-center justify-between gap-3 rounded-full border border-brand-green/25 bg-brand-green/[0.07] px-4 sm:hidden"
+            className="mt-3 ml-[-5.125rem] flex h-10 w-[calc(100%+5.125rem)] max-w-[calc(100vw-2.5rem)] min-w-0 items-center justify-between gap-3 rounded-full border border-brand-green/25 bg-brand-green/[0.07] px-4 sm:hidden"
           >
             <span className="min-w-0 whitespace-nowrap text-xs font-semibold text-foreground">
               {briefing.greeting}
