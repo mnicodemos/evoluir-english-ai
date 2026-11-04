@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Unificar os Toasts com a referência do Vocabulary, mantendo mensagens e ações
+
 - [ ] Oferecer Focus no início de uma interação de estudo, com escolha do aluno e sem convites repetidos no dia
 
 - [x] Arredondar a imagem desktop da EVO como Why this matters, sem mudar tamanho ou posição
