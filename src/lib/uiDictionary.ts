@@ -180,6 +180,7 @@ const baseUiPt: Record<string, string> = {
   "Try a meditation in English to relax and train your listening.":
     "Experimente uma meditação em inglês para relaxar e treinar a escuta.",
   // Life+ AI (phase 1)
+  "Daily overview": "Visão geral do dia",
   "Life+ AI": "Life+ AI",
   "Evolve one day at a time.": "Evolua um dia de cada vez.",
   Tomorrow: "Amanhã",
