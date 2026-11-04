@@ -1128,7 +1128,7 @@ function Dashboard() {
                           {progressToImprove.map((skill) => (
                             <span
                               key={skill.skill}
-                              className="flex min-w-0 items-center justify-between gap-1 text-[11px] leading-tight"
+                              className="flex min-w-0 items-center justify-between gap-0 text-[11px] leading-tight"
                             >
                               <span className="truncate text-muted-foreground">
                                 {t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}
