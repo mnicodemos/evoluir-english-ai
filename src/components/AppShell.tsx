@@ -122,9 +122,25 @@ function UtilityButtons() {
       onClick={toggleLang}
     >
       <span className="flex min-w-0 items-center justify-center gap-2 text-[11px] font-semibold tracking-tight">
-        <span aria-hidden="true" className={cn("rounded px-1 py-0.5", lang === "pt" ? "bg-sidebar-accent text-sidebar-foreground" : "opacity-50")}>🇧🇷 PT</span>
+        <span
+          aria-hidden="true"
+          className={cn(
+            "rounded px-1 py-0.5",
+            lang === "pt" ? "bg-sidebar-accent text-sidebar-foreground" : "opacity-50",
+          )}
+        >
+          🇧🇷 PT
+        </span>
         <span className="text-sidebar-foreground/35">·</span>
-        <span aria-hidden="true" className={cn("rounded px-1 py-0.5", lang === "en" ? "bg-sidebar-accent text-sidebar-foreground" : "opacity-50")}>🇺🇸 EN</span>
+        <span
+          aria-hidden="true"
+          className={cn(
+            "rounded px-1 py-0.5",
+            lang === "en" ? "bg-sidebar-accent text-sidebar-foreground" : "opacity-50",
+          )}
+        >
+          🇺🇸 EN
+        </span>
       </span>
     </Button>
   );
