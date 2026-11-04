@@ -7,6 +7,7 @@ import {
   Check,
   ChevronRight,
   Crown,
+  Download,
   Flame,
   Flower2,
   ListChecks,
@@ -24,6 +25,7 @@ import { AppShell } from "@/components/AppShell";
 import { useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { downloadLifeGuidePdf } from "@/lib/lifeGuidePdf";
 
 export const Route = createFileRoute("/_authenticated/life/guide")({
   head: () => ({
@@ -179,6 +181,17 @@ function LifeGuidePage() {
       <p className="mt-1 text-sm text-muted-foreground">
         {t("Your goals, routine and habits in one place, with EVO as your Life Coach.")}
       </p>
+      <div className="mt-3">
+        <Button
+          type="button"
+          variant="outline"
+          className="gap-2"
+          onClick={() => void downloadLifeGuidePdf()}
+        >
+          <Download className="size-4" aria-hidden="true" />
+          {t("Download Life+ AI manual")}
+        </Button>
+      </div>
 
       <section className="card-soft mt-4 p-4 sm:p-5" aria-labelledby="cycle-title">
         <h2 id="cycle-title" className="font-display text-base font-semibold">
