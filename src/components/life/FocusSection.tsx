@@ -111,9 +111,9 @@ export function FocusSection() {
         </Button>
       </LifeSectionTitle>
 
-      <div className="mt-4 grid items-center gap-5 sm:grid-cols-[auto_minmax(0,1fr)] xl:mt-3 xl:gap-4">
+      <div className="mt-3 grid items-center gap-4 sm:grid-cols-[auto_minmax(0,1fr)] xl:mt-2 xl:gap-3">
         {/* The countdown ring: pink while focusing, green during the break. */}
-        <div className="relative mx-auto grid size-36 place-items-center xl:size-28">
+        <div className="relative mx-auto grid size-32 place-items-center xl:size-24">
           <svg viewBox="0 0 80 80" className="absolute inset-0 -rotate-90" aria-hidden="true">
             <circle
               cx="40"
@@ -298,10 +298,10 @@ export function FocusSection() {
       ) : null}
 
       {/* The last seven days, one bar per day, today on the right. */}
-      <div className="mt-4 border-t border-white/10 pt-3 xl:mt-3 xl:pt-2">
+      <div className="mt-3 border-t border-white/10 pt-2.5 xl:mt-2 xl:pt-2">
         <div className="flex items-end justify-between gap-3">
           <ol
-            className="flex h-12 flex-1 items-end gap-1.5 xl:h-10"
+            className="flex h-10 flex-1 items-end gap-1.5 xl:h-8"
             aria-label={t("Focus this week")}
           >
             {summary.week.map((row) => (
@@ -327,20 +327,20 @@ export function FocusSection() {
             {t("in 7 days")}
           </p>
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
-          <div className="rounded-lg bg-secondary/50 p-2.5">
+        <div className="mt-2 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
+          <div className="rounded-lg bg-secondary/50 p-2">
             <span className="block text-muted-foreground">{t("Completed sessions")}</span>
             <strong className="mt-1 block font-display text-lg tabular-nums">
               {summary.completedCount}
             </strong>
           </div>
-          <div className="rounded-lg bg-secondary/50 p-2.5">
+          <div className="rounded-lg bg-secondary/50 p-2">
             <span className="block text-muted-foreground">{t("Completion rate")}</span>
             <strong className="mt-1 block font-display text-lg tabular-nums">
               {summary.completionRate}%
             </strong>
           </div>
-          <div className="rounded-lg bg-secondary/50 p-2.5">
+          <div className="rounded-lg bg-secondary/50 p-2">
             <span className="block text-muted-foreground">{t("Partial sessions")}</span>
             <strong className="mt-1 block font-display text-lg tabular-nums">
               {summary.partialCount}
@@ -348,7 +348,7 @@ export function FocusSection() {
           </div>
         </div>
         {focusLog.length ? (
-          <div className="mt-4 border-t border-white/10 pt-3">
+          <div className="mt-3 border-t border-white/10 pt-2.5">
             <button
               type="button"
               aria-expanded={historyExpanded}

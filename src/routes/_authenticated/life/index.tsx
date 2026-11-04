@@ -95,7 +95,7 @@ function LifePage() {
             footer under them, jumped into the real layout when it loaded). */}
         <div className="xl:flex xl:min-h-0 xl:flex-1 xl:flex-col" aria-busy="true">
           <LifeHeader />
-          <div className="grid gap-4 lg:grid-cols-2 xl:shrink-0 xl:grid-cols-3 xl:gap-5">
+          <div className="grid gap-3 lg:grid-cols-2 xl:shrink-0 xl:grid-cols-3 xl:gap-4">
             <Skeleton className="h-56 rounded-xl xl:h-[17.5rem]" />
             <Skeleton className="h-56 rounded-xl xl:h-[17.5rem]" />
             <Skeleton className="h-56 rounded-xl lg:col-span-2 xl:col-span-1 xl:h-[17.5rem]" />
