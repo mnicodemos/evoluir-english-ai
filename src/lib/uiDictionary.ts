@@ -463,6 +463,13 @@ const baseUiPt: Record<string, string> = {
   "Break my main goal into small steps": "Divida minha meta principal em passos pequenos",
   "Help me choose today's three priorities": "Me ajude a escolher as três prioridades de hoje",
   "Suggest one habit to start this week": "Sugira um hábito para começar esta semana",
+  "Life Coach quick actions": "Ações rápidas da Life Coach",
+  "What should I prioritize today?": "O que devo priorizar hoje?",
+  "Break my goal into steps": "Divida minha meta em etapas",
+  "I'm short on time today": "Estou com pouco tempo hoje",
+  "Feedback on a real situation": "Feedback sobre uma situação real",
+  "2-minute breathing before focus": "Respiração de 2 minutos antes do foco",
+  "Help me make a decision": "Ajude-me a tomar uma decisão",
   // Your Goals (/goals)
   "Your Goals": "Suas metas",
   "Goals today": "Metas de hoje",
