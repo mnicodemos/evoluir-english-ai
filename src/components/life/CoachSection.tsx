@@ -14,8 +14,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { CopyButton, WhatsAppButton } from "@/components/ShareActions";
@@ -101,12 +101,13 @@ export function CoachSection() {
     },
     onError: (error) => {
       setInput((value) => value || "");
-      toast.error(
+      notifyLife(
         t(
           error instanceof Error && /busy|running|wait/i.test(error.message)
             ? "Your previous message is still being answered. Wait a few seconds and send it again."
             : "EVO could not answer this message. Please send it again.",
         ),
+        "error",
       );
     },
   });
@@ -126,7 +127,7 @@ export function CoachSection() {
       refresh();
     },
     onError: (error) =>
-      toast.error(t(error instanceof Error ? error.message : "It could not be added.")),
+      notifyLife(t(error instanceof Error ? error.message : "It could not be added."), "error"),
   });
 
   const send = (text: string) => {
