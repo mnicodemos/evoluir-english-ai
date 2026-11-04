@@ -1114,17 +1114,41 @@ function Dashboard() {
                     className="group relative flex h-[58px] min-w-0 items-center gap-2 overflow-hidden rounded-xl border border-dashboard-cyan/80 bg-gradient-to-r from-dashboard-cyan/10 via-brand-green/[0.06] to-transparent px-2.5 transition-colors hover:border-dashboard-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60"
                   >
                     <span className="relative grid h-10 w-[4.25rem] shrink-0 place-items-center overflow-hidden rounded-lg bg-[#06272a]">
-                      <svg viewBox="0 0 100 64" className="absolute inset-0 h-full w-full" aria-hidden="true">
+                      <svg
+                        viewBox="0 0 100 64"
+                        className="absolute inset-0 h-full w-full"
+                        aria-hidden="true"
+                      >
                         <defs>
                           <linearGradient id="progress-card-glow" x1="0" y1="0" x2="1" y2="1">
                             <stop offset="0" stopColor="#5fffea" stopOpacity=".8" />
                             <stop offset="1" stopColor="#087d83" stopOpacity=".08" />
                           </linearGradient>
                         </defs>
-                        <path d="M8 50 50 9 92 50" fill="none" stroke="url(#progress-card-glow)" strokeWidth="2" />
-                        <path d="M16 48h68l-5 8H21z" fill="#0b4145" stroke="#36d9ca" strokeOpacity=".65" />
-                        <path d="M24 39h52l-5 8H29z" fill="#102d34" stroke="#56d9d0" strokeOpacity=".7" />
-                        <path d="m25 26 25-13 25 13-25 12z" fill="#071c25" stroke="#8bfff0" strokeWidth="1.6" />
+                        <path
+                          d="M8 50 50 9 92 50"
+                          fill="none"
+                          stroke="url(#progress-card-glow)"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M16 48h68l-5 8H21z"
+                          fill="#0b4145"
+                          stroke="#36d9ca"
+                          strokeOpacity=".65"
+                        />
+                        <path
+                          d="M24 39h52l-5 8H29z"
+                          fill="#102d34"
+                          stroke="#56d9d0"
+                          strokeOpacity=".7"
+                        />
+                        <path
+                          d="m25 26 25-13 25 13-25 12z"
+                          fill="#071c25"
+                          stroke="#8bfff0"
+                          strokeWidth="1.6"
+                        />
                         <path d="M50 38v9" stroke="#8bfff0" strokeWidth="1.5" />
                         <path d="M75 26v12" stroke="#8bfff0" strokeWidth="1.3" />
                         <circle cx="75" cy="40" r="2" fill="#8bfff0" />
@@ -1134,10 +1158,14 @@ function Dashboard() {
                       <span className="flex items-center gap-1 text-[13px] font-bold leading-tight text-dashboard-cyan">
                         <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
                         {t("My progress")}
-                        <ChevronRight className="ml-auto size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                        <ChevronRight
+                          className="ml-auto size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
+                          aria-hidden="true"
+                        />
                       </span>
                       <span className="mt-1 block truncate text-[10px] leading-tight text-muted-foreground">
-                        {profile.level.toUpperCase()} · {minutesToday}/{profile.daily_minutes ?? 0} min
+                        {profile.level.toUpperCase()} ·{" "}
+                        {minutesToday}/{profile.daily_minutes ?? 0} min
                       </span>
                     </span>
                   </Link>
