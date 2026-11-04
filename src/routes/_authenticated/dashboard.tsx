@@ -1137,7 +1137,7 @@ function Dashboard() {
                         <ChevronRight className="ml-auto size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                       </span>
                       <span className="mt-1 block truncate text-[10px] leading-tight text-muted-foreground">
-                        {profile.level.toUpperCase()} · {minutesToday}/{profile.daily_minutes ?? 0} {t("min today")}
+                        {profile.level.toUpperCase()} · {minutesToday}/{profile.daily_minutes ?? 0} min
                       </span>
                     </span>
                   </Link>
