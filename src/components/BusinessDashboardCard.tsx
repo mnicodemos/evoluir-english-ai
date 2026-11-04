@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Briefcase, Check, ChevronRight } from "lucide-react";
+import { ArrowRight, BookOpen, Briefcase, Check } from "lucide-react";
 import { useMemo } from "react";
 
 import { FILL_IN_TRANSITION, useFillIn } from "@/hooks/useFillIn";
@@ -116,7 +116,11 @@ export function BusinessDashboardCard() {
           >
             {!locked && <BookOpen className="size-3.5 shrink-0" aria-hidden="true" />}
             {locked ? t("See plans") : completed > 0 ? t("Continue") : t("Start")}
-            <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+            <ArrowRight
+              className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
+              strokeWidth={2.25}
+              aria-hidden="true"
+            />
           </Link>
         </div>
       </div>

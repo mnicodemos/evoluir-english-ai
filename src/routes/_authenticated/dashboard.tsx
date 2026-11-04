@@ -988,7 +988,10 @@ function Dashboard() {
                   >
                     <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
                     {t("My progress")}
-                    <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
+                    <ArrowRight
+                      className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    />
                   </Link>
                 </div>
                 <div className="mb-2.5 mt-3 grid h-[6.52rem] w-full flex-none grid-cols-[6.5rem_minmax(0,1fr)] items-center justify-center gap-x-0 gap-y-1.5 lg:mb-0 lg:mt-2 lg:h-auto lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
@@ -1146,8 +1149,9 @@ function Dashboard() {
                         </span>
                       )}
                     </span>
-                    <ChevronRight
+                    <ArrowRight
                       className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                      strokeWidth={2.25}
                       aria-hidden="true"
                     />
                   </Link>
