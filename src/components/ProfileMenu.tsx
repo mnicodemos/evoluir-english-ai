@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useUiLang } from "@/lib/uiLang";
@@ -32,6 +33,10 @@ import { uiPt } from "@/lib/uiDictionary";
 import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
+import {
+  getFocusInvitationEnabled,
+  setFocusInvitationEnabled,
+} from "@/lib/focusInvitationPreference";
 import {
   createWhatsAppStudyLinkCode,
   getWhatsAppStudyConnectionStatus,
@@ -225,6 +230,25 @@ export function ProfileMenu({
   const [whatsAppCode, setWhatsAppCode] = useState<string | null>(null);
   const [whatsAppCodeExpiresAt, setWhatsAppCodeExpiresAt] = useState<string | null>(null);
   const [whatsAppCodeCopied, setWhatsAppCodeCopied] = useState(false);
+
+  const focusInvitation = useQuery({
+    queryKey: ["focus-invitation-enabled", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: () => getFocusInvitationEnabled(profile!.id),
+    staleTime: 60_000,
+  });
+  const updateFocusInvitation = useMutation({
+    mutationFn: (enabled: boolean) => setFocusInvitationEnabled(profile!.id, enabled),
+    onSuccess: (enabled) => {
+      queryClient.setQueryData(["focus-invitation-enabled", profile?.id], enabled);
+    },
+    onError: () => {
+      showAppNotification({
+        title: translate("Could not update this preference. Please try again.", lang),
+        variant: "error",
+      });
+    },
+  });
 
   const whatsAppStatus = useQuery({
     queryKey: ["whatsapp-study-connection", profile?.id],
@@ -585,6 +609,21 @@ export function ProfileMenu({
           )}
         </section>
       ) : null}
+
+      <section className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background/40 p-3">
+        <div className="min-w-0 space-y-1">
+          <h3 className="text-sm font-semibold">{translate("EVO Focus suggestions", lang)}</h3>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {translate("Allow EVO to suggest starting a Focus session when you begin studying.", lang)}
+          </p>
+        </div>
+        <Switch
+          checked={focusInvitation.data ?? true}
+          disabled={!profile?.id || focusInvitation.isLoading || updateFocusInvitation.isPending}
+          onCheckedChange={(enabled) => updateFocusInvitation.mutate(enabled)}
+          aria-label={translate("EVO Focus suggestions", lang)}
+        />
+      </section>
 
       <div className="flex flex-row items-center justify-between gap-2">
         <AdminPanelButton showLabel className="mr-auto" />
