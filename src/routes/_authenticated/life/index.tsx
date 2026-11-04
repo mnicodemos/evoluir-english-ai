@@ -133,7 +133,7 @@ function LifePage() {
           );
 
   return (
-    <AppShell desktopOneScreen>
+    <AppShell>
       {/* One page on desktop (owner request, 2026-11-01): from xl the page is
           one screen tall, the header and the measures keep their height and
           the tab below takes the rest, its cards scrolling inside (the Life
@@ -164,10 +164,6 @@ function LifePage() {
                 className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
                 aria-hidden="true"
               />
-            <div
-              className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
-              aria-hidden="true"
-            />
             <div className="relative flex items-center gap-5">
               <DayRing percent={progress.percent} />
               <div className="min-w-0 flex-1">
@@ -229,12 +225,9 @@ function LifePage() {
           </div>
         </div>
 
-        {/* Today and Plan (user request, 2026-10-24: a new student should feel
-          a professional app): Today is one list of what to do now (goal
-          steps, tasks, habits) beside the Life Coach; Plan holds the three
-          tools to set them up. Old #goals, #routine and #habits addresses
-          open Plan. Free students get the goal steps and the Premium
-          invitation. */}
+        {/* Today now uses the full content width because Life Coach moved
+          into the upper summary row beside Focus. Planning keeps the setup
+          tools, and old section addresses continue to open the right tab. */}
         <Tabs
           value={tab}
           onValueChange={(value) =>
