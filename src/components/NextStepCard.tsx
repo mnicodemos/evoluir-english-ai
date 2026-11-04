@@ -741,8 +741,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 </div>
               </div>
             </div>
-            <p className="mt-1 max-w-full text-[11px] leading-snug text-sidebar-foreground/70 sm:mt-3 sm:whitespace-normal sm:text-[clamp(0.625rem,0.85vw,0.75rem)]">
-              {tNextStepReason(NEXT_STEP_REASON_TEXT[data.reason])}
+            <p
+              className={
+                data.reason === "lowest_score"
+                  ? "mt-1 max-w-full whitespace-nowrap text-[10px] leading-tight text-sidebar-foreground/70 sm:mt-3 sm:text-[clamp(0.625rem,0.85vw,0.75rem)]"
+                  : "mt-1 max-w-full text-[11px] leading-snug text-sidebar-foreground/70 sm:mt-3 sm:whitespace-normal sm:text-[clamp(0.625rem,0.85vw,0.75rem)]"
+              }
+            >
+              {data.reason === "lowest_score"
+                ? t("Lowest skill score.")
+                : tNextStepReason(NEXT_STEP_REASON_TEXT[data.reason])}
             </p>
             <p className="mt-1 line-clamp-2 text-xs text-sidebar-foreground/85 sm:mt-1 sm:line-clamp-1 sm:text-sm">
               {t("How to practice")}: <span className="font-semibold">{data.activity.title}</span>
