@@ -36,8 +36,7 @@ const Toaster = ({ className, style, ...props }: ToasterProps) => {
           // own stylesheet is injected after ours.
           // Same HUD card as the pronunciation result: rounded-2xl, icon in a tinted
           // tile, display title (one standard for every notification in the app).
-          toast:
-            "group toast app-toast rounded-2xl! gap-3! p-3.5!",
+          toast: "group toast app-toast rounded-2xl! gap-3! p-3.5!",
           title: "font-display text-[15px]! font-semibold! leading-tight!",
           icon: "size-9! shrink-0 flex! items-center! justify-center! rounded-xl m-0! [&_svg]:block! [&_svg]:size-[18px]! [&_svg]:shrink-0! [&_svg]:m-0!",
           description: "text-xs! mt-0.5",
