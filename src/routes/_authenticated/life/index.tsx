@@ -89,7 +89,7 @@ function LifePage() {
 
   if (isLoading || !data) {
     return (
-      <AppShell desktopOneScreen>
+      <AppShell>
         {/* Same shapes as the page, one screen tall from xl like it (owner
             report, 2026-11-01: the old two rows of three boxes, with the
             footer under them, jumped into the real layout when it loaded). */}
@@ -126,7 +126,7 @@ function LifePage() {
           the tab below takes the rest, its cards scrolling inside (the Life
           Coach scrolls its messages and keeps the field in view). Shorter
           screens than 44rem, lg and phones scroll the page as before. */}
-      <div className="life-page-layout xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
+      <div className="life-page-layout">
         <LifeHeader />
         {/* Four bands (user request, 2026-10-22): the measures on top (Your
           day, Evolution score, Focus), then Today and Plan (the priority of
@@ -205,7 +205,7 @@ function LifePage() {
           onValueChange={(value) =>
             setTab(value === "plan" || value === "decisions" ? value : "today")
           }
-          className="mt-4 xl:mt-4 xl:flex xl:min-h-0 xl:flex-1 xl:flex-col xl:gap-0"
+          className="mt-4"
         >
           <TabsList className="h-10 shrink-0 self-start lg:h-10">
             <TabsTrigger value="today" className="min-h-8 px-4">
@@ -226,12 +226,12 @@ function LifePage() {
               ) : null}
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="today" className="mt-4 xl:min-h-0 xl:flex-1">
-            <div className="grid gap-4 lg:grid-cols-5 xl:h-full xl:gap-5">
-              <div className="flex flex-col lg:col-span-3 xl:min-h-0 [&>section]:flex-1 xl:[&>section]:min-h-0 xl:[&>section]:overflow-y-auto xl:[&>section]:scroll-quiet">
+          <TabsContent value="today" className="mt-4">
+            <div className="grid gap-4 lg:grid-cols-5 xl:gap-5">
+              <div className="flex flex-col lg:col-span-3 [&>section]:flex-1">
                 <LifeToday />
               </div>
-              <div className="flex flex-col lg:col-span-2 xl:min-h-0 [&>section]:flex-1 xl:[&>section]:min-h-0 xl:[&>section]:overflow-y-auto xl:[&>section]:scroll-quiet">
+              <div className="flex flex-col lg:col-span-2 [&>section]:flex-1">
                 {data.premium ? (
                   <CoachSection />
                 ) : (
@@ -240,32 +240,28 @@ function LifePage() {
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="plan" className="mt-4 xl:min-h-0 xl:flex-1">
-            <div className="grid gap-4 lg:grid-cols-2 xl:h-full xl:grid-cols-3 xl:gap-5">
-              <div className="flex flex-col xl:min-h-0 [&>div]:flex-1 xl:[&>div]:min-h-0 xl:[&>div>section]:min-h-0 xl:[&>div>section]:overflow-y-auto xl:[&>div>section]:scroll-quiet xl:min-h-0">
+          <TabsContent value="plan" className="mt-4">
+            <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-5">
+              <div className="flex flex-col [&>div]:flex-1">
                 <GoalsSection part="steps" />
               </div>
               {data.premium ? (
                 <>
-                  <div className="flex flex-col xl:min-h-0 [&>section]:flex-1 xl:[&>section]:min-h-0 xl:[&>section]:overflow-y-auto xl:[&>section]:scroll-quiet">
+                  <div className="flex flex-col [&>section]:flex-1">
                     <RoutineSection />
                   </div>
-                  <div className="flex flex-col lg:col-span-2 xl:col-span-1 xl:min-h-0 [&>section]:flex-1 xl:[&>section]:min-h-0 xl:[&>section]:overflow-y-auto xl:[&>section]:scroll-quiet">
+                  <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
                     <HabitsSection />
                   </div>
                 </>
               ) : (
-                <div className="xl:col-span-2 xl:min-h-0 xl:overflow-y-auto xl:scroll-quiet">
+                <div className="xl:col-span-2">
                   <LifePremiumGate feature="Routine, habits and Life Coach" />
                 </div>
               )}
             </div>
           </TabsContent>
-          <TabsContent
-            value="decisions"
-            id="decisions"
-            className="scroll-quiet mt-4 scroll-mt-4 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:pr-1"
-          >
+          <TabsContent value="decisions" id="decisions" className="scroll-quiet mt-4 scroll-mt-4">
             <DecisionsWorkspace variant="tab" />
           </TabsContent>
         </Tabs>
