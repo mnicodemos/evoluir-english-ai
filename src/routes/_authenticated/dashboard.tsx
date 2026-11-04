@@ -67,6 +67,7 @@ import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 import { useFlashcardsDue } from "@/hooks/useFlashcardsDue";
 import { wordReviewTarget } from "@/lib/wordReview";
 import { useMistakesDue } from "@/hooks/useMistakesDue";
+import { skillMeterRows, PROGRESS_SKILLS, SKILL_STRONG_AT } from "@/lib/pedagogy/skillMeter";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -662,6 +663,12 @@ function Dashboard() {
     !!profile &&
     (businessLevelAllowed(profile.max_level || profile.level) || !profileIsPremium(profile));
   const streakDays = profile ? effectiveStreak(profile) : 0;
+  const { data: progressNextStep } = useNextStep({ enabled: !!profile?.id });
+  const progressSkillRows = skillMeterRows(progressNextStep?.skills, null, PROGRESS_SKILLS);
+  const progressToImprove = progressSkillRows
+    .filter((skill) => skill.value !== null && skill.value < SKILL_STRONG_AT)
+    .sort((a, b) => (a.value ?? 100) - (b.value ?? 100))
+    .slice(0, 2);
   const { data: permanentJewelIndex = null } = useQuery({
     queryKey: ["permanent-jewels", profile?.id],
     enabled: !!profile?.id,
@@ -1085,32 +1092,58 @@ function Dashboard() {
                     </div>
                   </div>
                 </div>
-                {/* Match the Keep Improving review-row treatment: existing cap icon,
-                  compact image slot, label and supporting text. No weekly goal bar here. */}
+                {/* My Progress uses the supplied growth artwork and the same skill
+                  snapshots as the dedicated Progress page; no duplicated level/streak. */}
                 <div className="mt-auto hidden pt-2 lg:block">
                   <Link
                     to="/progress"
                     aria-label={t("My progress")}
-                    className="group relative grid min-h-[4.25rem] min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-1.5 pr-2 transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60"
+                    className="group relative grid min-h-[7.25rem] min-w-0 grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-2 pr-3 transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[7.5rem]"
                   >
-                    <span className="grid h-full min-h-14 place-items-center overflow-hidden rounded-lg bg-[#06272a] text-dashboard-cyan">
-                      <GraduationCap className="size-9" strokeWidth={1.7} aria-hidden="true" />
+                    <span className="grid h-full min-h-24 place-items-center overflow-hidden rounded-lg bg-[#06272a]">
+                      <img
+                        src="/my-progress-growth.webp"
+                        alt=""
+                        aria-hidden="true"
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
                     </span>
-                    <span className="min-w-0">
+                    <span className="min-w-0 self-center">
                       <span className="flex min-w-0 items-center gap-1">
+                        <ChartLine
+                          className="size-4 shrink-0 text-dashboard-cyan"
+                          strokeWidth={2.4}
+                          aria-hidden="true"
+                        />
                         <span className="shrink-0 rounded-full border border-dashboard-cyan/45 bg-dashboard-cyan/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-dashboard-cyan">
                           {t("My progress")}
                         </span>
-                        <span className="truncate text-[10px] text-muted-foreground">
-                          {t("Your English level")}
+                      </span>
+                      <span className="mt-2 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t("To improve")}
+                      </span>
+                      {progressToImprove.length > 0 ? (
+                        <span className="mt-1 grid gap-1 sm:grid-cols-2">
+                          {progressToImprove.map((skill) => (
+                            <span
+                              key={skill.skill}
+                              className="flex min-w-0 items-center justify-between gap-2 text-[11px] leading-tight"
+                            >
+                              <span className="truncate text-muted-foreground">
+                                {t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}
+                              </span>
+                              <span className="shrink-0 font-semibold tabular-nums text-foreground">
+                                {skill.value}%
+                              </span>
+                            </span>
+                          ))}
                         </span>
-                      </span>
-                      <span className="mt-0.5 block truncate text-sm font-semibold leading-tight">
-                        {t("Level")} {profile.level.toUpperCase()}
-                      </span>
-                      <span className="block truncate text-[10px] leading-tight text-muted-foreground">
-                        {t("Streak")} {streakDays} {t("days")}
-                      </span>
+                      ) : (
+                        <span className="mt-1 block text-[11px] leading-tight text-muted-foreground">
+                          {t("Keep going to find your weak spots.")}
+                        </span>
+                      )}
                     </span>
                     <ChevronRight
                       className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
