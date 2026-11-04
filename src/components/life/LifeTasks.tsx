@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { LifeCheckMark, LifeEmpty, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,12 +54,12 @@ export function LifeTaskList({
       if (input.done) haptic("tap");
     },
     onSuccess: onChange,
-    onError: () => toast.error(t("The task could not be saved.")),
+    onError: () => notifyLife(t("The task could not be saved."), "error"),
   });
   const drop = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
     onSuccess: onChange,
-    onError: () => toast.error(t("The task could not be removed.")),
+    onError: () => notifyLife(t("The task could not be removed."), "error"),
   });
 
   const sorted = [...tasks].sort(
@@ -188,7 +188,7 @@ export function LifeTaskForm({
       setTitle("");
       onChange();
     },
-    onError: () => toast.error(t("The task could not be saved.")),
+    onError: () => notifyLife(t("The task could not be saved."), "error"),
   });
 
   return (
