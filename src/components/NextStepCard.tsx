@@ -5,7 +5,6 @@ import {
   ArrowRight,
   BookOpen,
   Check,
-  
   Compass,
   GraduationCap,
   Dumbbell,
