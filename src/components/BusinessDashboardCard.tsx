@@ -116,7 +116,11 @@ export function BusinessDashboardCard() {
           >
             {!locked && <BookOpen className="size-3.5 shrink-0" aria-hidden="true" />}
             {locked ? t("See plans") : completed > 0 ? t("Continue") : t("Start")}
-            <ArrowRight className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} aria-hidden="true" />
+            <ArrowRight
+              className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
+              strokeWidth={2.25}
+              aria-hidden="true"
+            />
           </Link>
         </div>
       </div>
