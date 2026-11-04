@@ -852,7 +852,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               {quickWinButton || challengeButton ? (
                 <>
                   <p
-                    className="mt-0.5 w-full min-w-0 truncate whitespace-nowrap text-xs text-sidebar-foreground/70"
+                    className="mt-0.5 hidden w-full min-w-0 truncate whitespace-nowrap text-xs text-sidebar-foreground/70 sm:block xl:hidden"
                     title={t("Two activities for your development.")}
                   >
                     {t("Two activities for your development.")}
