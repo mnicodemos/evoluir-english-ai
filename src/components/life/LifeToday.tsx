@@ -13,8 +13,8 @@ import {
   Target,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { LifeHabitForm } from "@/components/life/LifeHabits";
 import { LifeAddPanel, LifeCheckMark, LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
@@ -84,20 +84,20 @@ export function LifeToday() {
     mutationFn: (input: { id: string; done: boolean }) => setStep({ data: input }),
     onMutate: onTick,
     onSuccess: refresh,
-    onError: () => toast.error(t("The step could not be saved.")),
+    onError: () => notifyLife(t("The step could not be saved."), "error"),
   });
   const task = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setTask({ data: input }),
     onMutate: onTick,
     onSuccess: refresh,
-    onError: () => toast.error(t("The task could not be saved.")),
+    onError: () => notifyLife(t("The task could not be saved."), "error"),
   });
   const habit = useMutation({
     mutationFn: (input: { habitId: string; day: string; done: boolean }) =>
       setHabit({ data: input }),
     onMutate: onTick,
     onSuccess: refresh,
-    onError: () => toast.error(t("The habit could not be saved.")),
+    onError: () => notifyLife(t("The habit could not be saved."), "error"),
   });
   const addGoal = useMutation({
     mutationFn: (title: string) => add({ data: { title } }),
@@ -107,7 +107,7 @@ export function LifeToday() {
       refresh();
     },
     onError: (error) =>
-      toast.error(t(error instanceof Error ? error.message : "The goal could not be saved.")),
+      notifyLife(t(error instanceof Error ? error.message : "The goal could not be saved."), "error"),
   });
   const submitGoal = (title: string) => {
     const clean = title.trim();
