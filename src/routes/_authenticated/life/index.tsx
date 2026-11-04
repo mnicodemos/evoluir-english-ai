@@ -20,8 +20,6 @@ import { useFocusLog } from "@/hooks/useFocusLog";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { FOCUS_DAILY_TARGET, focusSummary, lifeDayProgress } from "@/lib/life";
-import { openDecisionCount } from "@/lib/lifeDecisions";
-import { loadLifeDecisions } from "@/lib/lifeDecisions.functions";
 import { loadPlus } from "@/lib/plus.functions";
 import { cn } from "@/lib/utils";
 
@@ -58,24 +56,11 @@ function LifePage() {
     staleTime: 30 * 1000,
   });
 
-  // Decisions sit in their own tab (owner request, 2026-11-01: students
-  // forgot the header capsule); the tab counts the decisions still open.
-  const loadDecisions = useServerFn(loadLifeDecisions);
-  const { data: decisions } = useQuery({
-    queryKey: ["life-decisions", profile?.id ?? null],
-    enabled: !!profile,
-    queryFn: () => loadDecisions(),
-    staleTime: 30 * 1000,
-  });
-  const openDecisions =
-    decisions?.premium && decisions.available ? openDecisionCount(decisions.decisions) : 0;
-
-  // The planning addresses (#goals, #routine, #habits) open the Plan tab,
-  // #decisions the Decisions tab.
-  const [tab, setTab] = useState<"today" | "plan" | "decisions">(() => {
+  // Today and Planning stay together on the left; Decisions has a
+  // dedicated right-hand column in the lower workspace.
+  const [tab, setTab] = useState<"today" | "plan">(() => {
     if (typeof window === "undefined") return "today";
     if (["#goals", "#routine", "#habits"].includes(window.location.hash)) return "plan";
-    if (window.location.hash === "#decisions") return "decisions";
     return "today";
   });
   // Old tab addresses arrive with #goals, #routine, #habits or #coach: scroll
@@ -222,65 +207,55 @@ function LifePage() {
           </div>
         </div>
 
-        {/* Today now uses the full content width because Life Coach moved
-          into the upper summary row beside Focus. Planning keeps the setup
-          tools, and old section addresses continue to open the right tab. */}
-        <Tabs
-          value={tab}
-          onValueChange={(value) =>
-            setTab(value === "plan" || value === "decisions" ? value : "today")
-          }
-          className="mt-4"
-        >
-          <TabsList className="h-10 shrink-0 self-start lg:h-10">
-            <TabsTrigger value="today" className="min-h-8 px-4">
-              {t("Today")}
-            </TabsTrigger>
-            <TabsTrigger value="plan" className="min-h-8 px-4">
-              {t("Planning")}
-            </TabsTrigger>
-            <TabsTrigger value="decisions" className="min-h-8 gap-1.5 px-4">
-              {t("Decisions")}
-              {openDecisions > 0 ? (
-                <span
-                  className="grid min-w-5 place-items-center rounded-full bg-violet-400/20 px-1.5 text-[11px] font-semibold tabular-nums text-violet-200"
-                  aria-label={`${openDecisions} ${t("open")}`}
-                >
-                  {openDecisions}
-                </span>
-              ) : null}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="today" className="mt-4">
-            <div className="min-w-0">
-              <LifeToday />
-            </div>
-          </TabsContent>
-          <TabsContent value="plan" className="mt-4">
-            <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-5">
-              <div className="flex flex-col [&>div]:flex-1">
-                <GoalsSection part="steps" />
-              </div>
-              {data.premium ? (
-                <>
-                  <div className="flex flex-col [&>section]:flex-1">
-                    <RoutineSection />
-                  </div>
-                  <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
-                    <HabitsSection />
-                  </div>
-                </>
-              ) : (
-                <div className="xl:col-span-2">
-                  <LifePremiumGate feature="Routine, habits and Life Coach" />
+        {/* Keep Today and Planning in the left column and place Decisions
+          in the right column, matching the upper overview's two-sided layout. */}
+        <div className="mt-4 grid min-w-0 items-start gap-4 xl:grid-cols-12 xl:gap-5">
+          <section className="min-w-0 xl:col-span-7" aria-label={t("Today and Planning")}>
+            <Tabs
+              value={tab}
+              onValueChange={(value) => setTab(value === "plan" ? "plan" : "today")}
+              className="min-w-0"
+            >
+              <TabsList className="h-10 shrink-0 self-start lg:h-10">
+                <TabsTrigger value="today" className="min-h-8 px-4">
+                  {t("Today")}
+                </TabsTrigger>
+                <TabsTrigger value="plan" className="min-h-8 px-4">
+                  {t("Planning")}
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="today" className="mt-4">
+                <div className="min-w-0">
+                  <LifeToday />
                 </div>
-              )}
-            </div>
-          </TabsContent>
-          <TabsContent value="decisions" id="decisions" className="scroll-quiet mt-4 scroll-mt-4">
+              </TabsContent>
+              <TabsContent value="plan" className="mt-4">
+                <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-2 xl:gap-5">
+                  <div className="flex flex-col [&>div]:flex-1">
+                    <GoalsSection part="steps" />
+                  </div>
+                  {data.premium ? (
+                    <>
+                      <div className="flex flex-col [&>section]:flex-1">
+                        <RoutineSection />
+                      </div>
+                      <div className="flex flex-col lg:col-span-2 xl:col-span-2 [&>section]:flex-1">
+                        <HabitsSection />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="lg:col-span-2">
+                      <LifePremiumGate feature="Routine, habits and Life Coach" />
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </section>
+          <section id="decisions" className="min-w-0 scroll-mt-4 xl:col-span-5" aria-label={t("Decisions")}>
             <DecisionsWorkspace variant="tab" />
-          </TabsContent>
-        </Tabs>
+          </section>
+        </div>
       </div>
     </AppShell>
   );
