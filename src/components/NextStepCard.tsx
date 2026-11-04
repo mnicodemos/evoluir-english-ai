@@ -701,8 +701,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 strokeWidth={2.4}
                 aria-hidden="true"
               />
-              <span className="flex min-w-0 flex-col leading-tight">
+              <span className="flex min-w-0 flex-col leading-tight max-sm:flex-row max-sm:items-center max-sm:gap-2">
                 <span className="font-display text-base font-semibold">EVO</span>
+                <span
+                  aria-hidden="true"
+                  className="hidden h-4 w-px shrink-0 bg-sidebar-foreground/35 max-sm:block"
+                />
                 <span className="text-xs font-medium text-sidebar-foreground/70">
                   {t("Your AI Coach")}
                 </span>
