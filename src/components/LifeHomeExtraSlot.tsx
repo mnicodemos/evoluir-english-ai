@@ -62,7 +62,11 @@ export function LifeHomeExtraSlot({ translate: t }: { translate: (label: string)
             </span>
             <span className="inline-flex shrink-0 items-center text-[11px] font-semibold text-brand-green">
               {t("Decide")}
-              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" strokeWidth={2.25} aria-hidden="true" />
+              <ArrowRight
+                className="size-3.5 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={2.25}
+                aria-hidden="true"
+              />
             </span>
           </span>
         </Link>
