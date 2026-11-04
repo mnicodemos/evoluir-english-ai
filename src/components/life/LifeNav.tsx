@@ -57,7 +57,8 @@ export function LifeHeader({
       }
       description={t("Evolve one day at a time.")}
       actions={
-        // Compact daily briefing pill sits in the header instead of a full-width banner.
+        <>
+        {/* Compact daily briefing pill sits in the header instead of a full-width banner.
         <div className="flex min-w-0 items-center gap-2">
           {briefing ? (
             <div
@@ -74,7 +75,7 @@ export function LifeHeader({
             </div>
           ) : null}
         </div>
-        // Meditations in a glass capsule like the Dashboard's Weather talk
+        {/* Meditations in a glass capsule like the Dashboard's Weather talk
         // (owner request, 2026-11-01: it replaced Decisions, which moved to
         // its own tab, and opens a dropdown to pick and hear a session right
         // there), with the guide in its own grey circle at the end like the
@@ -99,6 +100,7 @@ export function LifeHeader({
             </Tooltip>
           </TooltipProvider>
         </div>
+        </>
       }
     />
   );
