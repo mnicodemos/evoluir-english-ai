@@ -96,7 +96,10 @@ export function GoalsSection({
       refresh();
     },
     onError: (error) =>
-      notifyLife(t(error instanceof Error ? error.message : "The goal could not be saved."), "error"),
+      notifyLife(
+        t(error instanceof Error ? error.message : "The goal could not be saved."),
+        "error",
+      ),
   });
   const removeGoal = useMutation({
     mutationFn: (id: string) => archive({ data: { id } }),
