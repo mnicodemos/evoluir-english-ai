@@ -40,6 +40,11 @@ const baseUiPt: Record<string, string> = {
   "Start a {minutes}-minute focus block?": "Iniciar um bloco de foco de {minutes} minutos?",
   "Start Focus": "Iniciar Focus",
   "Not now": "Agora não",
+  "EVO Focus suggestions": "Sugestões de Focus da EVO",
+  "Allow EVO to suggest starting a Focus session when you begin studying.":
+    "Permitir que a EVO sugira iniciar uma sessão de Focus quando você começar a estudar.",
+  "Could not update this preference. Please try again.":
+    "Não foi possível atualizar esta preferência. Tente novamente.",
   "End and return to dashboard": "Encerrar e voltar ao painel",
   End: "Encerrar",
   "End call and return to dashboard": "Encerrar a chamada e voltar ao painel",

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { TomatoIcon } from "./TomatoIcon";
 import { showAppNotification } from "@/components/ui/AppNotificationToast";
 import { EvoAvatar } from "@/components/EvoAvatar";
@@ -14,12 +15,19 @@ import {
 import { focusSetActivity, focusStart, getFocusSnapshot, openFocusWidget } from "@/lib/focusTimer";
 import type { FocusActivity } from "@/lib/life";
 import { FOCUS_PRESETS } from "@/lib/life";
+import { getFocusInvitationEnabled } from "@/lib/focusInvitationPreference";
 
 const claimOffer = createFocusOfferGate();
 const TOAST_ID = "focus-study-invitation";
 
 export function FocusStudyInvitation() {
   const { data: profile } = useProfile();
+  const focusInvitation = useQuery({
+    queryKey: ["focus-invitation-enabled", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: () => getFocusInvitationEnabled(profile!.id),
+    staleTime: 60_000,
+  });
   const { t } = useLifeT();
   const { state } = useFocusTimer();
   const pendingOffer = useRef(false);
@@ -33,8 +41,12 @@ export function FocusStudyInvitation() {
       if (event) {
         pendingActivityKey.current = `${window.location.pathname}${window.location.search}`;
       }
-      if (!profile?.id) {
+      if (!profile?.id || focusInvitation.isLoading) {
         pendingOffer.current = true;
+        return;
+      }
+      if (focusInvitation.data === false) {
+        pendingOffer.current = false;
         return;
       }
       const current = getFocusSnapshot().state;
@@ -68,7 +80,7 @@ export function FocusStudyInvitation() {
     window.addEventListener(STUDY_STARTED_EVENT, offer);
     if (pendingOffer.current) offer();
     return () => window.removeEventListener(STUDY_STARTED_EVENT, offer);
-  }, [profile?.id, t]);
+  }, [profile?.id, focusInvitation.data, focusInvitation.isLoading, t]);
 
   useEffect(() => {
     if (state.phase !== "idle") toast.dismiss(TOAST_ID);
