@@ -58,48 +58,43 @@ export function LifeHeader({
       description={t("Evolve one day at a time.")}
       actions={
         <>
-        {/* Compact daily briefing pill sits in the header instead of a full-width banner.
-        <div className="flex min-w-0 items-center gap-2">
           {briefing ? (
             <div
               aria-label={t("Morning briefing")}
               className="flex h-10 min-w-0 max-w-[min(22rem,42vw)] items-center gap-3 rounded-full border border-brand-green/25 bg-brand-green/[0.07] px-3 sm:px-4"
             >
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-xs font-semibold text-foreground">{briefing.greeting}</span>
-                <span className="hidden truncate text-[10px] text-muted-foreground sm:block">{briefing.summary}</span>
+                <span className="block truncate text-xs font-semibold text-foreground">
+                  {briefing.greeting}
+                </span>
+                <span className="hidden truncate text-[10px] text-muted-foreground sm:block">
+                  {briefing.summary}
+                </span>
               </span>
               <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-1 text-[10px] font-medium tabular-nums text-muted-foreground">
                 {t("Focus today")} {briefing.focus}
               </span>
             </div>
           ) : null}
-        </div>
-        {/* Meditations in a glass capsule like the Dashboard's Weather talk
-        // (owner request, 2026-11-01: it replaced Decisions, which moved to
-        // its own tab, and opens a dropdown to pick and hear a session right
-        // there), with the guide in its own grey circle at the end like the
-        // bell. Phones keep the icons only, so the title keeps its room.
-        <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
-          <MeditationsMenu />
-          {/* A label on hover names the guide (user request, 2026-10-23). */}
-          <TooltipProvider delayDuration={150}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  to="/life/guide"
-                  aria-label={t("How Life+ AI works")}
-                  className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
-                >
-                  <BookMarked className="size-4" aria-hidden="true" />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="end" sideOffset={8}>
-                {t("How Life+ AI works")}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+          <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
+            <MeditationsMenu />
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/life/guide"
+                    aria-label={t("How Life+ AI works")}
+                    className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
+                  >
+                    <BookMarked className="size-4" aria-hidden="true" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="end" sideOffset={8}>
+                  {t("How Life+ AI works")}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </>
       }
     />
