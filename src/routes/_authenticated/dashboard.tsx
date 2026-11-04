@@ -1072,7 +1072,7 @@ function Dashboard() {
                           // ring as from the number (user request, 2026-10-24).
                           <div
                             key={card.key}
-                            className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-1 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
+                            className="grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-2 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
                           >
                             <Icon
                               className={`size-4 shrink-0 justify-self-center lg:justify-self-auto ${iconClass}`}
