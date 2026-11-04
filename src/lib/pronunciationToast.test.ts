@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), {
     success: vi.fn(),
+    info: vi.fn(),
     warning: vi.fn(),
     error: vi.fn(),
     custom: vi.fn(),
@@ -47,7 +48,7 @@ describe("pronunciation toasts restricted to the Vocabulary page", () => {
     t.setActive(false);
     t.setActive(true);
     t.notify("info", "The check is already running.");
-    expect(toast).toHaveBeenCalledWith("The check is already running.", {
+    expect(toast.info).toHaveBeenCalledWith("The check is already running.", {
       id: PRONUNCIATION_TOAST_ID,
     });
   });
