@@ -125,19 +125,9 @@ function LifePage() {
           Coach scrolls its messages and keeps the field in view). Shorter
           screens than 44rem, lg and phones scroll the page as before. */}
       <div className="life-page-layout">
-        <LifeHeader />
-        <section
-          className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border border-brand-green/20 bg-brand-green/[0.045] px-4 py-2.5"
-          aria-label={t("Morning briefing")}
-        >
-          <div className="min-w-0">
-            <p className="font-display text-sm font-semibold">{greeting}</p>
-            <p className="text-xs text-muted-foreground">{daySummary}</p>
-          </div>
-          <p className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
-            {t("Focus today")}: {focusToday}/{FOCUS_DAILY_TARGET}
-          </p>
-        </section>
+        <LifeHeader
+          briefing={{ greeting, summary: daySummary, focus: `${focusToday}/${FOCUS_DAILY_TARGET}` }}
+        />
         {/* Compact one-page composition: Your day and Evolution score are
           stacked in one card; Focus and Life Coach share the same row.
           The Today, Planning and Decisions tabs remain available below. */}
