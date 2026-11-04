@@ -995,7 +995,7 @@ function Dashboard() {
                     />
                   </Link>
                 </div>
-                <div className="mt-3 grid h-[7.1rem] w-full flex-none grid-cols-[6.5rem_minmax(0,1fr)] items-center justify-center gap-x-1 gap-y-1.5 lg:mb-0 lg:mt-2 lg:h-auto lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
+                <div className="mt-3 grid h-[7.1rem] w-full flex-none -translate-y-2 grid-cols-[6.5rem_minmax(0,1fr)] items-center justify-center gap-x-1 gap-y-1.5 lg:mb-0 lg:mt-2 lg:h-auto lg:translate-y-0 lg:justify-normal lg:gap-x-2 lg:pl-0 lg:grid-cols-1 lg:items-center lg:gap-2 xl:min-h-0 xl:mt-1 xl:grid-cols-[5.5rem_minmax(0,1fr)] xl:gap-4 xl:gap-x-4 2xl:mt-2 2xl:grid-cols-[7rem_minmax(0,1fr)]">
                   <div className="flex flex-col items-center lg:mx-auto xl:mx-0">
                     <div
                       className={cn(
@@ -1027,7 +1027,7 @@ function Dashboard() {
                       </GaugeRing>
                     </div>
                   </div>
-                  <div className="grid min-w-0 grid-rows-3 content-center gap-1 self-center lg:h-auto lg:grid-rows-none lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
+                  <div className="flex min-w-0 flex-col items-start justify-center gap-1 self-stretch lg:h-auto lg:flex-row lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                     {!hasProgressToday && (
                       <div className="flex min-h-[5.75rem] translate-y-4 flex-col lg:translate-y-1 items-center justify-center gap-1 text-center text-muted-foreground">
                         <DoneSeal icon={ClockHands} />
@@ -1044,7 +1044,7 @@ function Dashboard() {
                     )}
                     <div
                       className={cn(
-                        `${hasProgressToday ? "grid" : "hidden"} gap-1 self-center lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
+                        `${hasProgressToday ? "flex" : "hidden"} flex-col justify-center gap-1 self-center lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
                       )}
                     >
                       {learningCards.map((card) => {
