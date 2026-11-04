@@ -289,11 +289,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const questSkillLabel = data.quest
     ? t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)
     : "";
-  const questPlaceLabel = data.quest ? t(data.quest.resource.title) : "";
-  const questDetail =
-    questSkillLabel === questPlaceLabel
-      ? questSkillLabel
-      : `${questSkillLabel} · ${questPlaceLabel}`;
+  // Keep the challenge detail concise: the skill plus its daily progress
+  // is enough context and fits on one complete line in the card.
+  const questDetail = questSkillLabel;
   const quickWin = data.quickWin;
   const mainAvailable = actionAvailable(data.activity.to, activityIndicators);
   const quickWinAvailable = quickWin
@@ -418,7 +416,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
-              <span className="hidden w-full min-w-0 truncate overflow-hidden whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+              <span className="hidden w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:block sm:font-normal">
                 {questDetail}
                 {challengeProgress}
               </span>
@@ -437,7 +435,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
-              <span className="hidden w-full min-w-0 truncate overflow-hidden whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+              <span className="hidden w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:block sm:font-normal">
                 {questDetail}
                 {challengeProgress}
               </span>
