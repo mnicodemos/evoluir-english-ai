@@ -5,7 +5,6 @@ import {
   ArrowRight,
   BookOpen,
   Check,
-  ChevronRight,
   Compass,
   GraduationCap,
   Dumbbell,
@@ -757,7 +756,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   <Link to="/learning/$lessonId" params={data.activity.params}>
                     <PriorityIcon className="size-4 shrink-0" aria-hidden="true" />
                     {t("Practice now")}
-                    <ChevronRight strokeWidth={2.25} aria-hidden="true" />
+                    <ArrowRight strokeWidth={2.25} aria-hidden="true" />
                   </Link>
                 ) : (
                   <Link to={data.activity.to}>

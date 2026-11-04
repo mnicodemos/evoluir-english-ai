@@ -121,8 +121,26 @@ function UtilityButtons() {
       className="h-9 w-full min-w-0 justify-center rounded-lg px-1 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
       onClick={toggleLang}
     >
-      <span className="min-w-0 truncate text-[11px] font-semibold tracking-tight">
-        {lang === "pt" ? "PT · Português" : "EN · English"}
+      <span className="flex min-w-0 items-center justify-center gap-2 text-[11px] font-semibold tracking-tight">
+        <span
+          aria-hidden="true"
+          className={cn(
+            "rounded px-1 py-0.5",
+            lang === "pt" ? "bg-sidebar-accent text-sidebar-foreground" : "opacity-50",
+          )}
+        >
+          🇧🇷 PT
+        </span>
+        <span className="text-sidebar-foreground/35">·</span>
+        <span
+          aria-hidden="true"
+          className={cn(
+            "rounded px-1 py-0.5",
+            lang === "en" ? "bg-sidebar-accent text-sidebar-foreground" : "opacity-50",
+          )}
+        >
+          🇺🇸 EN
+        </span>
       </span>
     </Button>
   );
@@ -423,7 +441,13 @@ function AppShellContent({
   // Writing and Listening tasks, so new words were never announced.
   const { data: lessonRound } = useLessonRound();
   useEffect(() => {
-    if (!activityIndicators.vocabulary || lessonRound === undefined || pushPreference.data !== true) return;
+    if (
+      !activityIndicators.vocabulary ||
+      lessonRound === undefined ||
+      pushPreference.data !== true
+    ) {
+      return;
+    }
     const round = String(lessonRound);
     if (readStorage("push-token") === null) return;
     if (readStorage("push-vocabulary-notified") === round) return;
