@@ -1111,9 +1111,9 @@ function Dashboard() {
                     Practice now stays the Dashboard's one solid action. */}
                   <Link
                     to="/progress"
-                    className="inline-flex h-[38px] items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-5 text-sm font-semibold text-foreground [word-spacing:0.1em] transition-colors hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                    className="inline-flex h-[38px] items-center gap-2 rounded-xl border border-brand-green/30 bg-brand-green/[0.06] px-5 text-sm font-semibold text-brand-green [word-spacing:0.1em] transition-colors hover:border-brand-green/50 hover:bg-brand-green/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
                   >
-                    <ChartLine className="size-4 shrink-0 text-brand-green/80" aria-hidden="true" />
+                    <ChartLine className="size-4 shrink-0" aria-hidden="true" />
                     {t("My progress")}
                     <ChevronRight
                       className="size-4 shrink-0"
