@@ -119,12 +119,11 @@ function UtilityButtons() {
       variant="ghost"
       aria-label={`${t("Change language")}: ${lang === "pt" ? "Português" : "English"}`}
       title={lang === "pt" ? "Português" : "English"}
-      className="h-9 w-full justify-center gap-2 rounded-lg px-2 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+      className="h-9 w-full min-w-0 justify-center rounded-lg px-1 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
       onClick={toggleLang}
     >
-      <Languages className="size-[1.05rem]" />
-      <span className="text-xs font-medium">
-        {t("Language")}: {lang === "pt" ? "Português" : "English"}
+      <span className="min-w-0 truncate text-[11px] font-semibold tracking-tight">
+        {lang === "pt" ? "PT · Português" : "EN · English"}
       </span>
     </Button>
   );
