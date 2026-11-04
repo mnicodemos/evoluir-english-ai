@@ -1086,89 +1086,42 @@ function Dashboard() {
                     </div>
                   </div>
                 </div>
-                {/* The daily goal over the last seven days (owner request, 2026-11-01:
-                  the taller card left an empty band between the lines and the button). */}
-                {/* pt-5: room under the gauge (drawn 8 px lower, lg:translate-y-2), so its
-                  "0/15 min" keeps 12 px above the bar. my-auto centres the bar in the free
-                  height (owner review, 2026-11-01). The fixed paddings stay small (pt-5,
-                  pb-2): they set the card's minimum height, and with the caption under
-                  the bar a taller minimum pushed the Dashboard past one screen (owner
-                  report, 2026-11-01). */}
-                <div className="my-auto hidden pb-1 pt-3 lg:block">
-                  <DailyGoalTrend
-                    userId={profile.id}
-                    goalMinutes={profile.daily_minutes ?? 0}
-                    translate={t}
-                    locale={lang === "pt" ? "pt-BR" : "en-US"}
-                  />
-                </div>
-                {/* Desktop-only secondary action to My Progress, styled like the
-                  app's other buttons (not a status pill). */}
-                <div className="hidden lg:block xl:pt-1">
-                  {/* Compact visual card: the existing progress metrics above remain
-                    authoritative; this card surfaces the student's real level and
-                    today's minutes without changing the parent panel's height. */}
+                {/* One integrated My Progress card replaces the separate trend and
+                  button, keeping the Today's Progress panel at its existing height. */}
+                <div className="mt-auto hidden pt-2 lg:block">
                   <Link
                     to="/progress"
                     aria-label={t("My progress")}
-                    className="group relative flex h-[58px] min-w-0 items-center gap-2 overflow-hidden rounded-xl border border-dashboard-cyan/80 bg-gradient-to-r from-dashboard-cyan/10 via-brand-green/[0.06] to-transparent px-2.5 transition-colors hover:border-dashboard-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60"
+                    className="group block min-w-0 rounded-xl border border-dashboard-cyan/80 bg-gradient-to-br from-dashboard-cyan/10 via-brand-green/[0.06] to-transparent p-2.5 transition-colors hover:border-dashboard-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60"
                   >
-                    <span className="relative grid h-10 w-[4.25rem] shrink-0 place-items-center overflow-hidden rounded-lg bg-[#06272a]">
-                      <svg
-                        viewBox="0 0 100 64"
-                        className="absolute inset-0 h-full w-full"
-                        aria-hidden="true"
-                      >
-                        <defs>
-                          <linearGradient id="progress-card-glow" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0" stopColor="#5fffea" stopOpacity=".8" />
-                            <stop offset="1" stopColor="#087d83" stopOpacity=".08" />
-                          </linearGradient>
-                        </defs>
-                        <path
-                          d="M8 50 50 9 92 50"
-                          fill="none"
-                          stroke="url(#progress-card-glow)"
-                          strokeWidth="2"
-                        />
-                        <path
-                          d="M16 48h68l-5 8H21z"
-                          fill="#0b4145"
-                          stroke="#36d9ca"
-                          strokeOpacity=".65"
-                        />
-                        <path
-                          d="M24 39h52l-5 8H29z"
-                          fill="#102d34"
-                          stroke="#56d9d0"
-                          strokeOpacity=".7"
-                        />
-                        <path
-                          d="m25 26 25-13 25 13-25 12z"
-                          fill="#071c25"
-                          stroke="#8bfff0"
-                          strokeWidth="1.6"
-                        />
-                        <path d="M50 38v9" stroke="#8bfff0" strokeWidth="1.5" />
-                        <path d="M75 26v12" stroke="#8bfff0" strokeWidth="1.3" />
-                        <circle cx="75" cy="40" r="2" fill="#8bfff0" />
-                      </svg>
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-1 text-[13px] font-bold leading-tight text-dashboard-cyan">
-                        <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
-                        {t("My progress")}
-                        <ChevronRight
-                          className="ml-auto size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
-                          aria-hidden="true"
-                        />
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-dashboard-cyan/10 text-dashboard-cyan">
+                        <GraduationCap className="size-7" strokeWidth={1.9} aria-hidden="true" />
                       </span>
-                      <span className="mt-1 block truncate text-[10px] leading-tight text-muted-foreground">
-                        {profile.level.toUpperCase()}
-                        {" · "}
-                        {minutesToday}/{profile.daily_minutes ?? 0} min
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-1 text-[13px] font-bold leading-tight text-dashboard-cyan">
+                          <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
+                          {t("My progress")}
+                          <ChevronRight
+                            className="ml-auto size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
+                            aria-hidden="true"
+                          />
+                        </span>
+                        <span className="mt-0.5 block truncate text-[10px] leading-tight text-muted-foreground">
+                          {t("Level")} {profile.level.toUpperCase()}
+                          {" · "}
+                          {t("Streak")} {streakDays} {t("days")}
+                        </span>
                       </span>
                     </span>
+                    <div className="mt-2 border-t border-dashboard-cyan/15 pt-2">
+                      <DailyGoalTrend
+                        userId={profile.id}
+                        goalMinutes={profile.daily_minutes ?? 0}
+                        translate={t}
+                        locale={lang === "pt" ? "pt-BR" : "en-US"}
+                      />
+                    </div>
                   </Link>
                 </div>
                 <WeeklyFrequency
