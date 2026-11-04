@@ -785,6 +785,7 @@ const baseUiPt: Record<string, string> = {
   "Next challenge": "Próximo desafio",
   "Practise now": "Praticar agora",
   "Practice now": "Praticar agora",
+  "Practice this step in English": "Praticar este passo em inglês",
   "Quick practice": "Prática rápida",
   "Take the challenge": "Aceitar o desafio",
   "Your trail": "Sua trilha",
