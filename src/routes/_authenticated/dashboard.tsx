@@ -1098,9 +1098,9 @@ function Dashboard() {
                   <Link
                     to="/progress"
                     aria-label={t("My progress")}
-                    className="group relative grid min-h-[6.045rem] min-w-0 grid-cols-[5rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-1.5 pr-2.5 transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[6.2775rem]"
+                    className="group relative grid min-h-[5.622rem] min-w-0 grid-cols-[5rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-1.5 pr-2.5 transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[5.838rem]"
                   >
-                    <span className="grid h-full min-h-[4.65rem] place-items-center overflow-hidden rounded-lg bg-[#06272a]">
+                    <span className="grid h-full min-h-[4.325rem] place-items-center overflow-hidden rounded-lg bg-[#06272a]">
                       <img
                         src="/my-progress-growth.webp"
                         alt=""
@@ -1128,7 +1128,7 @@ function Dashboard() {
                           {progressToImprove.map((skill) => (
                             <span
                               key={skill.skill}
-                              className="flex min-w-0 items-center justify-between gap-2 text-[11px] leading-tight"
+                              className="flex min-w-0 items-center justify-between gap-1 text-[11px] leading-tight"
                             >
                               <span className="truncate text-muted-foreground">
                                 {t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}
