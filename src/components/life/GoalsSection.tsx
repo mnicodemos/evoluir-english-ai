@@ -43,7 +43,7 @@ import { cn } from "@/lib/utils";
  * /life shows them in different bands (user request, 2026-10-22), so `part`
  * picks one; both share the same data and actions.
  */
-export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "steps" }) {
+export function GoalsSection({\n  part = "both",\n  embedded = false,\n}: {\n  part?: "both" | "score" | "steps";\n  embedded?: boolean;\n}) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const { data: profile } = useProfile();
@@ -138,7 +138,7 @@ export function GoalsSection({ part = "both" }: { part?: "both" | "score" | "ste
       )}
     >
       {part === "steps" ? null : (
-        <section className="card-soft p-4 sm:p-5" aria-labelledby="evolution-score-title">
+        <section\n          className={cn(embedded ? "p-0" : "card-soft p-4 sm:p-5")}\n          aria-labelledby="evolution-score-title"\n        >
           <div className="flex items-center gap-4">
             <ScoreRing value={score.score} />
             <div className="min-w-0">
