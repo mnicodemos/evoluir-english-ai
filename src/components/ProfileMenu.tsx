@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Camera, Check, Copy, Loader2, MessageCircle, Settings, UserRound } from "lucide-react";
+import { Bell, Camera, Check, Copy, Loader2, MessageCircle, Settings, UserRound } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -27,6 +27,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useProfile } from "@/hooks/useProfile";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
@@ -36,6 +37,8 @@ import { profileIsPremium } from "@/lib/billing/subscriptionView";
 import {
   getFocusInvitationEnabled,
   setFocusInvitationEnabled,
+  getPushNotificationsEnabled,
+  setPushNotificationsEnabled,
 } from "@/lib/focusInvitationPreference";
 import {
   createWhatsAppStudyLinkCode,
@@ -204,6 +207,7 @@ export function ProfileMenu({
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
   const { data: profile } = useProfile();
+  const push = usePushNotifications();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_path);
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -241,6 +245,33 @@ export function ProfileMenu({
     mutationFn: (enabled: boolean) => setFocusInvitationEnabled(profile!.id, enabled),
     onSuccess: (enabled) => {
       queryClient.setQueryData(["focus-invitation-enabled", profile?.id], enabled);
+    },
+    onError: () => {
+      showAppNotification({
+        title: translate("Could not update this preference. Please try again.", lang),
+        variant: "error",
+      });
+    },
+  });
+
+  const pushPreference = useQuery({
+    queryKey: ["push-notifications-enabled", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: () => getPushNotificationsEnabled(profile!.id),
+    staleTime: 60_000,
+  });
+  const updatePushPreference = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      if (enabled) {
+        const result = await push.enable();
+        if (result !== "enabled") throw new Error(result);
+      } else {
+        await push.disable();
+      }
+      return setPushNotificationsEnabled(profile!.id, enabled);
+    },
+    onSuccess: (enabled) => {
+      queryClient.setQueryData(["push-notifications-enabled", profile?.id], enabled);
     },
     onError: () => {
       showAppNotification({
@@ -612,6 +643,24 @@ export function ProfileMenu({
 
       <section className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background/40 p-3">
         <div className="min-w-0 space-y-1">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <Bell className="size-4" aria-hidden="true" />
+            {translate("Push notifications", lang)}
+          </h3>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {translate("Allow Evoluir+ to send reminders and learning updates to this device.", lang)}
+          </p>
+        </div>
+        <Switch
+          checked={pushPreference.data ?? true}
+          disabled={!profile?.id || pushPreference.isLoading || updatePushPreference.isPending}
+          onCheckedChange={(enabled) => updatePushPreference.mutate(enabled)}
+          aria-label={translate("Push notifications", lang)}
+        />
+      </section>
+
+      <section className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background/40 p-3">
+        <div className="min-w-0 space-y-1">
           <h3 className="text-sm font-semibold">{translate("EVO Focus suggestions", lang)}</h3>
           <p className="text-xs leading-relaxed text-muted-foreground">
             {translate(
@@ -639,11 +688,11 @@ export function ProfileMenu({
   );
 
   // One card in the desktop sidebar and phone menu: profile details above,
-  // with the gear, language and bell aligned below without an internal divider.
+  // with the gear and language control aligned below without an internal divider.
   const profileCard = (trigger: ReactNode) => (
     <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/25 p-1.5">
       {trigger}
-      <div className="mt-1.5 grid grid-cols-3 gap-1 pt-1.5">
+      <div className="mt-1.5 grid grid-cols-2 gap-1 pt-1.5">
         <Button
           ref={gearRef}
           variant="ghost"
