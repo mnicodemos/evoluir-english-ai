@@ -289,7 +289,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const questSkillLabel = data.quest
     ? t(NEXT_STEP_SKILL_TEXT[data.quest.skill] ?? data.quest.skill)
     : "";
-  const questPlaceLabel = data.quest ? t(data.quest.resource.title) : "";
   // Keep the challenge detail concise: the skill plus its daily progress
   // is enough context and fits on one complete line in the card.
   const questDetail = questSkillLabel;
