@@ -11,7 +11,6 @@ import {
   GraduationCap,
   Headphones,
   House,
-  Languages,
   LogOut,
   Menu,
   MessageSquareText,
