@@ -286,7 +286,10 @@ export function LifeHabitForm({
       onChange();
     },
     onError: (error) =>
-      notifyLife(t(error instanceof Error ? error.message : "The habit could not be saved."), "error"),
+      notifyLife(
+        t(error instanceof Error ? error.message : "The habit could not be saved."),
+        "error",
+      ),
   });
 
   return (
