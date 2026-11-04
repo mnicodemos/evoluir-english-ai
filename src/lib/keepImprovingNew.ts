@@ -106,11 +106,15 @@ export function continueRows(input: {
   goalReached: boolean;
   /** Destinations already shown or opened by another Dashboard button. */
   taken: readonly string[];
+  /** The daily reading is complete: do not suggest another text as a pending step. */
+  readingDone?: boolean;
   slots: number;
 }): ContinueRow[] {
   if (input.goalReached || input.slots <= 0) return [];
   const taken = new Set(input.taken.map((to) => to.split("?")[0]));
-  return CONTINUE_ROWS.filter((row) => !taken.has(row.to)).slice(0, input.slots);
+  return CONTINUE_ROWS.filter(
+    (row) => !taken.has(row.to) && !(row.key === "reading" && input.readingDone),
+  ).slice(0, input.slots);
 }
 
 /** The one optional link under the done state: EVO first, else the AI Teacher. */
