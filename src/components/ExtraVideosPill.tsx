@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Clapperboard } from "lucide-react";
+import { ArrowRight, Clapperboard } from "lucide-react";
 
 import { useProfile } from "@/hooks/useProfile";
 import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
