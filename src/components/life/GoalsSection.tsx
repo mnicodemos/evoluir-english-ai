@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Flame, Loader2, MoreHorizontal, Pencil, Plus, Target, X } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { GoalPlan } from "@/components/life/GoalPlan";
 import { LifeCheckMark, LifeSectionTitle } from "@/components/life/LifeNav";
 import { EvoAvatar } from "@/components/EvoAvatar";
@@ -96,12 +96,15 @@ export function GoalsSection({
       refresh();
     },
     onError: (error) =>
-      toast.error(t(error instanceof Error ? error.message : "The goal could not be saved.")),
+      notifyLife(
+        t(error instanceof Error ? error.message : "The goal could not be saved."),
+        "error",
+      ),
   });
   const removeGoal = useMutation({
     mutationFn: (id: string) => archive({ data: { id } }),
     onSuccess: refresh,
-    onError: () => toast.error(t("The goal could not be removed.")),
+    onError: () => notifyLife(t("The goal could not be removed."), "error"),
   });
   const renameGoal = useMutation({
     mutationFn: (input: { id: string; title: string }) => rename({ data: input }),
@@ -110,7 +113,7 @@ export function GoalsSection({
       refresh();
       refreshLife();
     },
-    onError: () => toast.error(t("The goal could not be saved.")),
+    onError: () => notifyLife(t("The goal could not be saved."), "error"),
   });
   const toggleStep = useMutation({
     mutationFn: (input: { id: string; done: boolean }) => setDone({ data: input }),
@@ -118,7 +121,7 @@ export function GoalsSection({
       if (input.done) haptic("tap");
     },
     onSuccess: refresh,
-    onError: () => toast.error(t("The step could not be saved.")),
+    onError: () => notifyLife(t("The step could not be saved."), "error"),
   });
 
   const goals = data?.goals ?? [];
