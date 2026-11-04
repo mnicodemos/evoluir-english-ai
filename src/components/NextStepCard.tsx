@@ -367,7 +367,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </span>
               {/* One line, never cut (owner request, 2026-11-02): only the
                   action ("Say 5 words out loud"), which already names it. */}
-              <span className="hidden w-full whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+              <span className="hidden w-full min-w-0 truncate overflow-hidden whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(quickWin.cta)}
                 {quickWinCounter}
               </span>
@@ -388,7 +388,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </span>
               {/* One line, never cut (owner request, 2026-11-02): only the
                   action ("Say 5 words out loud"), which already names it. */}
-              <span className="hidden w-full whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+              <span className="hidden w-full min-w-0 truncate overflow-hidden whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {t(quickWin.cta)}
                 {quickWinCounter}
               </span>
@@ -418,7 +418,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+              <span className="hidden w-full min-w-0 truncate overflow-hidden whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {questDetail}
                 {challengeProgress}
               </span>
@@ -437,7 +437,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
-              <span className="hidden w-full text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
+              <span className="hidden w-full min-w-0 truncate overflow-hidden whitespace-nowrap text-left text-[9.5px] leading-tight text-sidebar-foreground/70 sm:block sm:text-xs sm:font-normal">
                 {questDetail}
                 {challengeProgress}
               </span>
