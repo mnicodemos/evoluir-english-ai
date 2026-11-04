@@ -730,7 +730,9 @@
   .dashboard-one-screen.dashboard-home-layout {
     grid-template-rows: 3.5rem 5.75rem minmax(16rem, 1fr) minmax(6.5rem, auto) minmax(5.5rem, auto);
     row-gap: 0.75rem;
-    padding-bottom: 0.5rem;
+    /* Keep the final card row's distance to the footer equal to the 12px
+       vertical rhythm between the dashboard rows. */
+    padding-bottom: 0.75rem;
   }
 
   .dashboard-one-screen.dashboard-home-layout > header {
