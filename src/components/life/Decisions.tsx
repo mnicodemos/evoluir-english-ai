@@ -19,8 +19,8 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { AppShell } from "@/components/AppShell";
 import { EvoAvatar } from "@/components/EvoAvatar";
@@ -355,11 +355,11 @@ function DecisionEditor({
         },
       }),
     onSuccess: async ({ id }) => {
-      toast.success(t("Decision saved."));
+      notifyLife(t("Decision saved."), "success");
       await onSaved(id);
     },
     onError: (error) =>
-      toast.error(t(error instanceof Error ? error.message : "The decision could not be saved.")),
+      notifyLife(t(error instanceof Error ? error.message : "The decision could not be saved."), "error"),
   });
 
   const setRating = (optionId: string, criterionId: string, value: number | null) => {
@@ -719,12 +719,13 @@ function DecisionDetail({
     mutationFn: () => analyze({ data: { id: decision.id, lang } }),
     onSuccess: () => onChanged(),
     onError: (error) =>
-      toast.error(
+      notifyLife(
         t(
           error instanceof Error && /busy|running|wait/i.test(error.message)
             ? "Your previous message is still being answered. Wait a few seconds and send it again."
             : "EVO could not analyse this decision. Please try again.",
         ),
+        "error",
       ),
   });
   const choice = useMutation({
@@ -735,12 +736,10 @@ function DecisionDetail({
       if (outcome.goal === "created") {
         void queryClient.invalidateQueries({ queryKey: ["life"] });
         void queryClient.invalidateQueries({ queryKey: ["plus"] });
-        toast.success(t("Goal created in Life+ AI. EVO will give you a step every day."));
+        notifyLife(t("Goal created in Life+ AI. EVO will give you a step every day."), "success");
       } else if (outcome.goal === "full") {
-        toast.info(
-          t("You already have 3 goals. Finish or archive one to add this choice as a goal."),
-        );
-      } else if (input.optionId) toast.success(t("Choice saved."));
+        notifyLife(t("You already have 3 goals. Finish or archive one to add this choice as a goal."), "info");
+      } else if (input.optionId) notifyLife(t("Choice saved."), "success");
     },
     onError: (error) =>
       toast.error(t(error instanceof Error ? error.message : "The decision could not be saved.")),
@@ -748,10 +747,10 @@ function DecisionDetail({
   const deletion = useMutation({
     mutationFn: () => remove({ data: { id: decision.id } }),
     onSuccess: () => {
-      toast.success(t("Decision deleted."));
+      notifyLife(t("Decision deleted."), "success");
       onDeleted();
     },
-    onError: () => toast.error(t("The decision could not be deleted.")),
+    onError: () => notifyLife(t("The decision could not be deleted."), "error"),
   });
 
   return (
