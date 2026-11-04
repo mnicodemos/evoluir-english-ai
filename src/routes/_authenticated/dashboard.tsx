@@ -1098,9 +1098,9 @@ function Dashboard() {
                   <Link
                     to="/progress"
                     aria-label={t("My progress")}
-                    className="group relative grid min-h-[5.285rem] min-w-0 grid-cols-[4.7rem_minmax(0,1fr)_auto] items-center gap-1.5 overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-[0.35rem] pr-[0.5875rem] transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[5.488rem]"
+                    className="group relative grid min-h-[4.968rem] min-w-0 grid-cols-[4.42rem_minmax(0,1fr)_auto] items-center gap-[0.09rem] overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-[0.33rem] pr-[0.55rem] transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[5.159rem]"
                   >
-                    <span className="grid h-full min-h-[3.82rem] place-items-center overflow-hidden rounded-lg bg-[#06272a]">
+                    <span className="grid h-full min-h-[3.59rem] place-items-center overflow-hidden rounded-lg bg-[#06272a]">
                       <img
                         src="/my-progress-growth.webp"
                         alt=""
@@ -1120,15 +1120,15 @@ function Dashboard() {
                           {t("My progress")}
                         </span>
                       </span>
-                      <span className="mt-[0.45rem] block text-[13px] font-semibold normal-case tracking-normal text-white">
+                      <span className="mt-[0.42rem] block text-[12px] font-semibold normal-case tracking-normal text-white">
                         {t("To improve")}
                       </span>
                       {progressToImprove.length > 0 ? (
-                        <span className="mt-[0.23rem] grid gap-[0.23rem] sm:grid-cols-2">
+                        <span className="mt-[0.22rem] grid gap-[0.22rem] sm:grid-cols-2">
                           {progressToImprove.map((skill) => (
                             <span
                               key={skill.skill}
-                              className="flex min-w-0 items-center justify-between gap-0 text-[10px] leading-tight"
+                              className="flex min-w-0 items-center justify-start gap-0 text-[9px] leading-tight"
                             >
                               <span className="truncate text-muted-foreground">
                                 {t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}
