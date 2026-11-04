@@ -821,7 +821,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 the taller card left an empty band above it), like Keep improving. */}
             <div className="mt-3 hidden sm:block xl:mt-4 xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
               {/* A short heading tells the student what these two extras are. */}
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 {/* Same 22 px slot as the lightbulb above, the dumbbell drawn at 18 px:
                     its diagonal fills the whole box, so at full size it sat left of
                     the column edge and closer to the text than the lightbulb
@@ -833,7 +833,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   <Dumbbell className="size-[1.125rem] text-warning" />
                 </span>
                 <h3
-                  className="min-w-0 truncate whitespace-nowrap text-[13px] font-semibold text-sidebar-foreground"
+                  className="min-w-0 flex-1 truncate whitespace-nowrap text-[13px] font-semibold text-sidebar-foreground"
                   title={t("Extra practice")}
                 >
                   {t("Extra practice")}
@@ -841,7 +841,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               </div>
               {quickWinButton || challengeButton ? (
                 <>
-                  <p className="mt-0.5 text-xs text-sidebar-foreground/70">
+                  <p
+                    className="mt-0.5 w-full min-w-0 truncate whitespace-nowrap text-xs text-sidebar-foreground/70"
+                    title={t("Two short options beyond today's priority.")}
+                  >
                     {t("Two short options beyond today's priority.")}
                   </p>
                   {/* Stacked, one full-width option per row, each with its description. */}
