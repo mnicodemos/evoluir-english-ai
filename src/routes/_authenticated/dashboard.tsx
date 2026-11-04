@@ -90,7 +90,6 @@ import { useStudySnapshot } from "@/hooks/useStudyContext";
 import { WeatherTalk } from "@/components/WeatherTalk";
 import { FirstWeekGuide } from "@/components/FirstWeekGuide";
 import { WeeklyLeagueSummary } from "@/components/WeeklyLeagueSummary";
-import { DailyGoalTrend } from "@/components/DailyGoalTrend";
 import { DashboardHeaderStat } from "@/components/DashboardHeaderStat";
 import { supabase } from "@/integrations/supabase/client";
 import { graphitePanelClass } from "@/lib/surfaces";
@@ -1086,42 +1085,37 @@ function Dashboard() {
                     </div>
                   </div>
                 </div>
-                {/* One integrated My Progress card replaces the separate trend and
-                  button, keeping the Today's Progress panel at its existing height. */}
+                {/* Match the Keep Improving review-row treatment: existing cap icon,
+                  compact image slot, label and supporting text. No weekly goal bar here. */}
                 <div className="mt-auto hidden pt-2 lg:block">
                   <Link
                     to="/progress"
                     aria-label={t("My progress")}
-                    className="group block min-w-0 rounded-xl border border-dashboard-cyan/80 bg-gradient-to-br from-dashboard-cyan/10 via-brand-green/[0.06] to-transparent p-2.5 transition-colors hover:border-dashboard-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60"
+                    className="group relative grid min-h-[4.25rem] min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-1.5 pr-2 transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60"
                   >
-                    <span className="flex min-w-0 items-center gap-2">
-                      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-dashboard-cyan/10 text-dashboard-cyan">
-                        <GraduationCap className="size-7" strokeWidth={1.9} aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-center gap-1 text-[13px] font-bold leading-tight text-dashboard-cyan">
-                          <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
+                    <span className="grid h-full min-h-14 place-items-center overflow-hidden rounded-lg bg-[#06272a] text-dashboard-cyan">
+                      <GraduationCap className="size-9" strokeWidth={1.7} aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="flex min-w-0 items-center gap-1">
+                        <span className="shrink-0 rounded-full border border-dashboard-cyan/45 bg-dashboard-cyan/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-dashboard-cyan">
                           {t("My progress")}
-                          <ChevronRight
-                            className="ml-auto size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
-                            aria-hidden="true"
-                          />
                         </span>
-                        <span className="mt-0.5 block truncate text-[10px] leading-tight text-muted-foreground">
-                          {t("Level")} {profile.level.toUpperCase()}
-                          {" · "}
-                          {t("Streak")} {streakDays} {t("days")}
+                        <span className="truncate text-[10px] text-muted-foreground">
+                          {t("Your English level")}
                         </span>
+                      </span>
+                      <span className="mt-0.5 block truncate text-sm font-semibold leading-tight">
+                        {t("Level")} {profile.level.toUpperCase()}
+                      </span>
+                      <span className="block truncate text-[10px] leading-tight text-muted-foreground">
+                        {t("Streak")} {streakDays} {t("days")}
                       </span>
                     </span>
-                    <div className="mt-2 border-t border-dashboard-cyan/15 pt-2">
-                      <DailyGoalTrend
-                        userId={profile.id}
-                        goalMinutes={profile.daily_minutes ?? 0}
-                        translate={t}
-                        locale={lang === "pt" ? "pt-BR" : "en-US"}
-                      />
-                    </div>
+                    <ChevronRight
+                      className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    />
                   </Link>
                 </div>
                 <WeeklyFrequency
