@@ -1120,7 +1120,7 @@ function Dashboard() {
                           {t("My progress")}
                         </span>
                       </span>
-                      <span className="mt-2 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <span className="mt-2 block text-sm font-semibold normal-case tracking-normal text-white">
                         {t("To improve")}
                       </span>
                       {progressToImprove.length > 0 ? (
