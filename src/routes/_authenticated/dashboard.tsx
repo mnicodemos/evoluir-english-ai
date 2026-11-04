@@ -1108,9 +1108,9 @@ function Dashboard() {
                           />
                         </span>
                         <span className="mt-0.5 block truncate text-[10px] leading-tight text-muted-foreground">
-                          {t("CEFR level")} {profile.level.toUpperCase()}
+                          {t("Level")} {profile.level.toUpperCase()}
                           {" · "}
-                          {streakDays} {t("day streak")}
+                          {t("Streak")} {streakDays} {t("days")}
                         </span>
                       </span>
                     </span>
