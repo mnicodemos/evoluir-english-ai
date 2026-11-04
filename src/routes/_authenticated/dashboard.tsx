@@ -17,7 +17,6 @@ import {
   Flame,
   Flower2,
   Gem,
-  GraduationCap,
   Headphones,
   Layers,
   ListChecks,
@@ -1081,7 +1080,18 @@ function Dashboard() {
                               >
                                 {card.value}
                               </span>
-                              {                {/* My Progress uses the supplied growth artwork and the same skill
+                              {/* Margin, not a space character: the value and its label
+                                never touch, whatever the font. */}
+                              <span className="ml-1.5">{t(card.label)}</span>
+                            </p>
+                            <span className="sr-only">{sr}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {/* My Progress uses the supplied growth artwork and the same skill
                   snapshots as the dedicated Progress page; no duplicated level/streak. */}
                 <div className="mt-auto hidden pt-2 lg:block">
                   <Link
@@ -1099,7 +1109,7 @@ function Dashboard() {
                       />
                     </span>
                     <span className="min-w-0 self-center">
-                      <span className="flex min-w-0 items-center gap-1.5">
+                      <span className="flex min-w-0 items-center gap-1">
                         <ChartLine className="size-4 shrink-0 text-dashboard-cyan" strokeWidth={2.4} aria-hidden="true" />
                         <span className="shrink-0 rounded-full border border-dashboard-cyan/45 bg-dashboard-cyan/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-dashboard-cyan">
                           {t("My progress")}
@@ -1128,7 +1138,7 @@ function Dashboard() {
                       aria-hidden="true"
                     />
                   </Link>
-                </div>         </div>
+                </div>
                 <WeeklyFrequency
                   userId={profile.id}
                   daysPerWeek={profile.study_days_per_week ?? 7}
