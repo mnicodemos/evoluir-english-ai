@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarClock, Check, ChevronDown, Flag, Loader2, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +41,7 @@ export function GoalPlan({
   const tick = useServerFn(setGoalMilestoneDone);
   const remove = useServerFn(deleteGoalMilestone);
   const onError = (fallback: string) => (error: unknown) =>
-    toast.error(t(error instanceof Error ? error.message : fallback));
+    notifyLife(t(error instanceof Error ? error.message : fallback), "error");
 
   const details = useMutation({
     mutationFn: (value: string) =>
