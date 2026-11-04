@@ -1094,7 +1094,7 @@ function Dashboard() {
                   pb-2): they set the card's minimum height, and with the caption under
                   the bar a taller minimum pushed the Dashboard past one screen (owner
                   report, 2026-11-01). */}
-                <div className="my-auto hidden pb-2 pt-5 lg:block">
+                <div className="my-auto hidden pb-1 pt-3 lg:block">
                   <DailyGoalTrend
                     userId={profile.id}
                     goalMinutes={profile.daily_minutes ?? 0}
@@ -1104,22 +1104,71 @@ function Dashboard() {
                 </div>
                 {/* Desktop-only secondary action to My Progress, styled like the
                   app's other buttons (not a status pill). */}
-                <div className="hidden flex-col items-center gap-1.5 pt-3 lg:flex xl:gap-1 xl:pt-1.5">
-                  {/* The study plan has its own header slot; this button opens My Progress,
-                    which left the sidebar. A secondary glass button (owner review,
-                    2026-10-31: two solid turquoise buttons side by side competed), so
-                    Practice now stays the Dashboard's one solid action. */}
+                <div className="hidden lg:block xl:pt-1">
+                  {/* Compact visual card: the existing progress metrics above remain
+                    authoritative; this card surfaces the student's real level and
+                    today's minutes without changing the parent panel's height. */}
                   <Link
                     to="/progress"
-                    className="inline-flex h-[38px] items-center gap-2 rounded-xl border border-brand-green/30 bg-brand-green/[0.06] px-5 text-sm font-semibold text-brand-green [word-spacing:0.1em] transition-colors hover:border-brand-green/50 hover:bg-brand-green/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                    aria-label={t("My progress")}
+                    className="group relative flex h-[58px] min-w-0 items-center gap-2 overflow-hidden rounded-xl border border-dashboard-cyan/80 bg-gradient-to-r from-dashboard-cyan/10 via-brand-green/[0.06] to-transparent px-2.5 transition-colors hover:border-dashboard-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60"
                   >
-                    <ChartLine className="size-4 shrink-0" aria-hidden="true" />
-                    {t("My progress")}
-                    <ChevronRight
-                      className="size-4 shrink-0"
-                      strokeWidth={2.25}
-                      aria-hidden="true"
-                    />
+                    <span className="relative grid h-10 w-[4.25rem] shrink-0 place-items-center overflow-hidden rounded-lg bg-[#06272a]">
+                      <svg
+                        viewBox="0 0 100 64"
+                        className="absolute inset-0 h-full w-full"
+                        aria-hidden="true"
+                      >
+                        <defs>
+                          <linearGradient id="progress-card-glow" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stopColor="#5fffea" stopOpacity=".8" />
+                            <stop offset="1" stopColor="#087d83" stopOpacity=".08" />
+                          </linearGradient>
+                        </defs>
+                        <path
+                          d="M8 50 50 9 92 50"
+                          fill="none"
+                          stroke="url(#progress-card-glow)"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M16 48h68l-5 8H21z"
+                          fill="#0b4145"
+                          stroke="#36d9ca"
+                          strokeOpacity=".65"
+                        />
+                        <path
+                          d="M24 39h52l-5 8H29z"
+                          fill="#102d34"
+                          stroke="#56d9d0"
+                          strokeOpacity=".7"
+                        />
+                        <path
+                          d="m25 26 25-13 25 13-25 12z"
+                          fill="#071c25"
+                          stroke="#8bfff0"
+                          strokeWidth="1.6"
+                        />
+                        <path d="M50 38v9" stroke="#8bfff0" strokeWidth="1.5" />
+                        <path d="M75 26v12" stroke="#8bfff0" strokeWidth="1.3" />
+                        <circle cx="75" cy="40" r="2" fill="#8bfff0" />
+                      </svg>
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1 text-[13px] font-bold leading-tight text-dashboard-cyan">
+                        <ChartLine className="size-3.5 shrink-0" aria-hidden="true" />
+                        {t("My progress")}
+                        <ChevronRight
+                          className="ml-auto size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
+                          aria-hidden="true"
+                        />
+                      </span>
+                      <span className="mt-1 block truncate text-[10px] leading-tight text-muted-foreground">
+                        {profile.level.toUpperCase()}
+                        {" · "}
+                        {minutesToday}/{profile.daily_minutes ?? 0} min
+                      </span>
+                    </span>
                   </Link>
                 </div>
                 <WeeklyFrequency
