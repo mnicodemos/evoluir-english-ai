@@ -57,47 +57,61 @@ export function LifeHeader({
       }
       description={t("Evolve one day at a time.")}
       actions={
+        <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
+          <MeditationsMenu />
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  to="/life/guide"
+                  aria-label={t("How Life+ AI works")}
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
+                >
+                  <BookMarked className="size-4" aria-hidden="true" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="end" sideOffset={8}>
+                {t("How Life+ AI works")}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      }
+    >
+      {briefing ? (
         <>
-          {briefing ? (
-            <div
-              aria-label={t("Morning briefing")}
-              className="flex h-10 min-w-0 max-w-[min(22rem,42vw)] items-center gap-3 rounded-full border border-brand-green/25 bg-brand-green/[0.07] px-3 sm:px-4"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-xs font-semibold text-foreground">
-                  {briefing.greeting}
-                </span>
-                <span className="hidden truncate text-[10px] text-muted-foreground sm:block">
-                  {briefing.summary}
-                </span>
+          <div
+            aria-label={t("Morning briefing")}
+            className="hidden h-10 w-fit max-w-full items-center gap-3 rounded-full border border-brand-green/25 bg-brand-green/[0.07] px-3 sm:flex"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-xs font-semibold text-foreground">
+                {briefing.greeting}
+              </span>
+              <span className="block truncate text-[10px] text-muted-foreground">
+                {briefing.summary}
+              </span>
+            </span>
+            <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-1 text-[10px] font-medium tabular-nums text-muted-foreground">
+              {t("Focus today")} {briefing.focus}
+            </span>
+          </div>
+          <div
+            aria-label={t("Morning briefing")}
+            className="mt-3 flex h-10 w-fit max-w-full items-center gap-3 rounded-full border border-brand-green/25 bg-brand-green/[0.07] px-3 sm:hidden"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-xs font-semibold text-foreground">
+                {briefing.greeting}
               </span>
               <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-1 text-[10px] font-medium tabular-nums text-muted-foreground">
                 {t("Focus today")} {briefing.focus}
               </span>
-            </div>
-          ) : null}
-          <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
-            <MeditationsMenu />
-            <TooltipProvider delayDuration={150}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    to="/life/guide"
-                    aria-label={t("How Life+ AI works")}
-                    className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
-                  >
-                    <BookMarked className="size-4" aria-hidden="true" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="end" sideOffset={8}>
-                  {t("How Life+ AI works")}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            </span>
           </div>
         </>
-      }
-    />
+      ) : null}
+    </PageHeader>
   );
 }
 
