@@ -76,6 +76,7 @@ export function LifeToday() {
   const setHabit = useServerFn(setLifeHabitDone);
   const add = useServerFn(addPlusGoal);
   const [goalTitle, setGoalTitle] = useState("");
+  const [taskFormOpen, setTaskFormOpen] = useState(false);
 
   const onTick = (input: { done: boolean }) => {
     if (input.done) haptic("tap");
@@ -193,7 +194,7 @@ export function LifeToday() {
   }).format(new Date(`${today}T00:00:00Z`));
 
   return (
-    <section className="card-soft p-4 sm:p-5 xl:p-6" aria-labelledby="life-today-title">
+    <section className="card-soft p-3 sm:p-4 xl:p-4" aria-labelledby="life-today-title">
       <LifeSectionTitle
         id="life-today-title"
         icon={CalendarCheck}
@@ -201,7 +202,34 @@ export function LifeToday() {
         title={t("Today")}
         subtitle={<span className="capitalize">{dateLine}</span>}
         meta={items.length ? `${doneCount}/${items.length}` : undefined}
-      />
+      >
+        {premium ? (
+          <Button
+            type="button"
+            size="sm"
+            className="h-8 shrink-0 gap-1 px-3 text-xs"
+            onClick={() => setTaskFormOpen((open) => !open)}
+            aria-expanded={taskFormOpen}
+          >
+            <Plus className="size-3.5" aria-hidden="true" />
+            {t("Add a task for today")}
+          </Button>
+        ) : null}
+      </LifeSectionTitle>
+
+      {taskFormOpen ? (
+        <div className="mt-3 rounded-xl border border-border p-3">
+          <LifeTaskForm
+            day={today}
+            goals={life.goals}
+            onChange={() => {
+              setTaskFormOpen(false);
+              refresh();
+            }}
+            onCancel={() => setTaskFormOpen(false)}
+          />
+        </div>
+      ) : null}
 
       {stepsLoading ? (
         <div className="mt-4 space-y-2" aria-busy="true">
@@ -267,7 +295,7 @@ export function LifeToday() {
       ) : null}
 
       {items.length ? (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-3 space-y-1.5">
           {items.map((item) => (
             <li key={item.key} className="space-y-1.5">
               <button
@@ -279,7 +307,7 @@ export function LifeToday() {
                 }
                 onClick={item.toggle}
                 className={cn(
-                  "flex w-full items-start gap-3 rounded-xl p-3 text-left text-sm transition-colors disabled:cursor-default",
+                  "flex w-full items-start gap-3 rounded-xl p-2.5 text-left text-sm transition-colors disabled:cursor-default",
                   item.done ? "bg-brand-green/10" : "bg-secondary/60 hover:bg-secondary",
                 )}
               >
@@ -320,20 +348,7 @@ export function LifeToday() {
       ) : null}
 
       {premium ? (
-        <div className="mt-3 space-y-2">
-          <LifeAddPanel label={t("Add a task for today")}>
-            {(close) => (
-              <LifeTaskForm
-                day={today}
-                goals={life.goals}
-                onChange={() => {
-                  close();
-                  refresh();
-                }}
-                onCancel={close}
-              />
-            )}
-          </LifeAddPanel>
+        <div className="mt-2 space-y-2">
           {life.habits.length === 0 ? (
             <LifeAddPanel label={t("Start a habit, e.g. Read 10 pages")}>
               {(close) => (
