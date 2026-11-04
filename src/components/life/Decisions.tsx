@@ -359,7 +359,10 @@ function DecisionEditor({
       await onSaved(id);
     },
     onError: (error) =>
-      notifyLife(t(error instanceof Error ? error.message : "The decision could not be saved."), "error"),
+      notifyLife(
+        t(error instanceof Error ? error.message : "The decision could not be saved."),
+        "error",
+      ),
   });
 
   const setRating = (optionId: string, criterionId: string, value: number | null) => {
@@ -742,7 +745,10 @@ function DecisionDetail({
       } else if (input.optionId) notifyLife(t("Choice saved."), "success");
     },
     onError: (error) =>
-      notifyLife(t(error instanceof Error ? error.message : "The decision could not be saved."), "error"),
+      notifyLife(
+        t(error instanceof Error ? error.message : "The decision could not be saved."),
+        "error",
+      ),
   });
   const deletion = useMutation({
     mutationFn: () => remove({ data: { id: decision.id } }),
