@@ -33,7 +33,7 @@ export function createPronunciationToaster() {
       if (kind === "success") toast.success(message, opts);
       else if (kind === "warning") toast.warning(message, opts);
       else if (kind === "error") toast.error(message, opts);
-      else toast(message, opts);
+      else toast.info(message, opts);
     },
     /** Rich result card (score badge, what EVO heard), same id and page lock. */
     custom(render: (id: string | number) => ReactElement, options?: ExternalToast) {

@@ -121,25 +121,25 @@ function UtilityButtons() {
   async function togglePush() {
     if (pushOn) {
       await push.disable();
-      toast(t("Notifications off"));
+      toast.info(t("Notifications off"));
       return;
     }
     const result = await push.enable();
     if (result === "enabled") {
-      toast(t("Notifications on"));
+      toast.info(t("Notifications on"));
     } else if (result === "disabled") {
       // Browser-level causes: iframe preview or denied permission.
       if (window.top !== window.self) {
-        toast(t("Open the app in its own tab to enable notifications"));
+        toast.info(t("Open the app in its own tab to enable notifications"));
       } else {
-        toast(
+        toast.info(
           t(
             "Notifications are blocked in this browser. Allow them in the site settings (the icon next to the address) and try again.",
           ),
         );
       }
     } else if (result === "unsupported") {
-      toast(t("Notifications are not supported on this device"));
+      toast.info(t("Notifications are not supported on this device"));
     }
   }
 
