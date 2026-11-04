@@ -409,7 +409,7 @@ export function ProfileMenu({
       aria-label={translate("Edit profile", lang)}
       className={cn(
         inCard
-          ? "h-auto w-full justify-start gap-3 rounded-lg px-1.5 py-1.5 text-sidebar-foreground hover:bg-sidebar-accent/60"
+          ? "group h-auto w-full justify-start gap-3 rounded-lg px-1.5 py-1.5 text-sidebar-foreground hover:bg-sidebar-accent/60"
           : "size-10 rounded-lg p-0 text-sidebar-foreground/70",
         className,
       )}
