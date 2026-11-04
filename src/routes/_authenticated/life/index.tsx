@@ -157,74 +157,79 @@ function LifePage() {
           day, Evolution score, Focus), then Today and Plan (the priority of
           the day was removed, user decision 2026-10-24), then the
           meditations. Phones stack everything in this order. */}
-        <div className="grid gap-4 lg:grid-cols-2 xl:shrink-0 xl:grid-cols-3 xl:gap-5">
+        <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-12 xl:items-stretch xl:gap-5">
           <section
-            className="card-soft relative overflow-hidden p-4 sm:p-5"
-            aria-label={t("Your day")}
+            className="card-soft grid gap-4 p-4 sm:p-5 lg:col-span-2 xl:col-span-5 xl:grid-cols-2 xl:gap-5"
+            aria-label={t("Daily overview")}
           >
-            <div
-              className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
-              aria-hidden="true"
-            />
-            <div className="relative flex items-center gap-5">
-              <DayRing percent={progress.percent} />
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-green">
-                  {t("Your day")}
-                </p>
-                <h2 className="mt-0.5 font-display text-lg font-semibold leading-tight">
-                  {progress.percent === 100
-                    ? t("Everything done today!")
-                    : t("Keep going, one step at a time.")}
-                </h2>
+            <div className="relative min-w-0 overflow-hidden">
+              <div
+                className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-green/10 blur-3xl"
+                aria-hidden="true"
+              />
+              <div className="relative flex items-center gap-5">
+                <DayRing percent={progress.percent} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-green">
+                    {t("Your day")}
+                  </p>
+                  <h2 className="mt-0.5 font-display text-lg font-semibold leading-tight">
+                    {progress.percent === 100
+                      ? t("Everything done today!")
+                      : t("Keep going, one step at a time.")}
+                  </h2>
+                </div>
               </div>
+              <dl className="relative mt-4 grid gap-2">
+                <DayStat
+                  label={t("Goal steps")}
+                  done={progress.stepsDone}
+                  total={progress.stepsTotal}
+                  tone="bg-brand-green"
+                />
+                {data.premium ? (
+                  <>
+                    <DayStat
+                      label={t("Tasks")}
+                      done={progress.tasksDone}
+                      total={progress.tasksTotal}
+                      tone="bg-sky-400"
+                    />
+                    <DayStat
+                      label={t("Habits")}
+                      done={progress.habitsDone}
+                      total={progress.habitsDue}
+                      tone="bg-violet-400"
+                    />
+                  </>
+                ) : null}
+                <DayStat
+                  label={t("Focus")}
+                  done={focusToday}
+                  total={FOCUS_DAILY_TARGET}
+                  tone="bg-pink-400"
+                />
+              </dl>
             </div>
-            <dl className="relative mt-4 grid gap-2">
-              <DayStat
-                label={t("Goal steps")}
-                done={progress.stepsDone}
-                total={progress.stepsTotal}
-                tone="bg-brand-green"
-              />
-              {data.premium ? (
-                <>
-                  <DayStat
-                    label={t("Tasks")}
-                    done={progress.tasksDone}
-                    total={progress.tasksTotal}
-                    tone="bg-sky-400"
-                  />
-                  <DayStat
-                    label={t("Habits")}
-                    done={progress.habitsDone}
-                    total={progress.habitsDue}
-                    tone="bg-violet-400"
-                  />
-                </>
-              ) : null}
-              {/* Focus blocks of today (free): the bar fills at four. */}
-              <DayStat
-                label={t("Focus")}
-                done={focusToday}
-                total={FOCUS_DAILY_TARGET}
-                tone="bg-pink-400"
-              />
-            </dl>
+            <div className="min-w-0 border-t border-border/70 pt-4 xl:border-l xl:border-t-0 xl:pl-5 xl:pt-0">
+              <GoalsSection part="score" embedded />
+            </div>
           </section>
-          <div className="flex flex-col [&>div]:flex-1">
-            <GoalsSection part="score" />
-          </div>
-          <div className="flex flex-col lg:col-span-2 xl:col-span-1 [&>section]:flex-1">
+          <div className="min-w-0 lg:col-span-1 xl:col-span-3">
             <FocusSection />
+          </div>
+          <div className="min-w-0 lg:col-span-1 xl:col-span-4">
+            {data.premium ? (
+              <CoachSection />
+            ) : (
+              <LifePremiumGate feature="Routine, habits and Life Coach" />
+            )}
           </div>
         </div>
 
-        {/* Today and Plan (user request, 2026-10-24: a new student should feel
-          a professional app): Today is one list of what to do now (goal
-          steps, tasks, habits) beside the Life Coach; Plan holds the three
-          tools to set them up. Old #goals, #routine and #habits addresses
-          open Plan. Free students get the goal steps and the Premium
-          invitation. */}
+        {/* Today now uses the full content width because Life Coach moved
+          into the upper summary row beside Focus. Planning keeps the setup
+          tools, and old section addresses continue to open the right tab. */}
         <Tabs
           value={tab}
           onValueChange={(value) =>
@@ -252,17 +257,8 @@ function LifePage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="today" className="mt-4">
-            <div className="grid gap-4 lg:grid-cols-5 xl:gap-5">
-              <div className="flex flex-col lg:col-span-3 [&>section]:flex-1">
-                <LifeToday />
-              </div>
-              <div className="flex flex-col lg:col-span-2 [&>section]:flex-1">
-                {data.premium ? (
-                  <CoachSection />
-                ) : (
-                  <LifePremiumGate feature="Routine, habits and Life Coach" />
-                )}
-              </div>
+            <div className="min-w-0">
+              <LifeToday />
             </div>
           </TabsContent>
           <TabsContent value="plan" className="mt-4">
