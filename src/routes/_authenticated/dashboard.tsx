@@ -1164,7 +1164,9 @@ function Dashboard() {
                         />
                       </span>
                       <span className="mt-1 block truncate text-[10px] leading-tight text-muted-foreground">
-                        {profile.level.toUpperCase()} · {minutesToday}/{profile.daily_minutes ?? 0} min
+                        {profile.level.toUpperCase()}
+                        {" · "}
+                        {minutesToday}/{profile.daily_minutes ?? 0} min
                       </span>
                     </span>
                   </Link>
