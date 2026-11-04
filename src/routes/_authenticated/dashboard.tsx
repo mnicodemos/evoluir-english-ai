@@ -1098,9 +1098,9 @@ function Dashboard() {
                   <Link
                     to="/progress"
                     aria-label={t("My progress")}
-                    className="group relative grid min-h-[4.968rem] min-w-0 grid-cols-[4.42rem_minmax(0,1fr)_auto] items-center gap-[0.09rem] overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-[0.33rem] pr-[0.55rem] transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[5.159rem]"
+                    className="group relative grid min-h-[4.869rem] min-w-0 grid-cols-[4.42rem_minmax(0,1fr)_auto] items-center gap-[0.09rem] overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-[0.33rem] pr-[0.55rem] transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[5.056rem]"
                   >
-                    <span className="grid h-full min-h-[3.59rem] place-items-center overflow-hidden rounded-lg bg-[#06272a]">
+                    <span className="grid h-full min-h-[3.518rem] place-items-center overflow-hidden rounded-lg bg-[#06272a]">
                       <img
                         src="/my-progress-growth.webp"
                         alt=""
@@ -1131,8 +1131,7 @@ function Dashboard() {
                               className="flex min-w-0 items-center justify-start gap-0 text-[9px] leading-tight"
                             >
                               <span className="truncate text-muted-foreground">
-                                {t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}
-                              </span>
+                                {t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}:\n                              </span>
                               <span className="shrink-0 font-semibold tabular-nums text-foreground">
                                 {skill.value}%
                               </span>

@@ -141,9 +141,9 @@ function LifePage() {
         {/* Compact one-page composition: Your day and Evolution score are
           stacked in one card; Focus and Life Coach share the same row.
           The Today, Planning and Decisions tabs remain available below. */}
-        <div className="life-overview-grid grid gap-3 lg:grid-cols-2 xl:grid-cols-12 xl:items-stretch xl:gap-4">
+        <div className="life-overview-grid grid gap-2 lg:grid-cols-2 xl:grid-cols-12 xl:items-stretch xl:gap-3">
           <section
-            className="card-soft grid min-w-0 gap-3 p-3 sm:p-4 lg:col-span-2 xl:col-span-4 xl:grid-cols-1 xl:gap-3"
+            className="card-soft grid min-w-0 gap-2 p-2.5 sm:p-3 lg:col-span-2 xl:col-span-4 xl:grid-cols-1 xl:gap-2"
             aria-label={t("Daily overview")}
           >
             <div className="relative min-w-0 overflow-hidden">
@@ -191,7 +191,7 @@ function LifePage() {
                 />
               </dl>
             </div>
-            <div className="min-w-0 border-t border-border/70 pt-3 xl:border-l-0 xl:border-t xl:pl-0 xl:pt-3">
+            <div className="min-w-0 border-t border-border/70 pt-2 xl:border-l-0 xl:border-t xl:pl-0 xl:pt-2">
               <GoalsSection part="score" embedded />
             </div>
           </section>
@@ -209,7 +209,7 @@ function LifePage() {
 
         {/* Keep Today and Planning in the left column and place Decisions
           in the right column, matching the upper overview's two-sided layout. */}
-        <div className="mt-4 grid min-w-0 items-start gap-4 xl:grid-cols-12 xl:gap-5">
+        <div className="mt-2 grid min-w-0 items-start gap-2 xl:grid-cols-12 xl:gap-3">
           <section className="min-w-0 xl:col-span-7" aria-label={t("Today and Planning")}>
             <Tabs
               value={tab}
