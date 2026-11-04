@@ -184,6 +184,7 @@ export function SmartReviewCard({
   const keepGoing = compact
     ? continueRows({
         goalReached,
+        readingDone,
         taken: [...taken, ...newRows.map((row) => row.to)],
         slots: suggestionSlots - shownItems.length - newRows.length,
       })
