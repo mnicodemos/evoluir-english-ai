@@ -58,24 +58,24 @@ export function LifeHeader({
       description={t("Evolve one day at a time.")}
       actions={
         <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
-            <MeditationsMenu />
-            <TooltipProvider delayDuration={150}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    to="/life/guide"
-                    aria-label={t("How Life+ AI works")}
-                    className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
-                  >
-                    <BookMarked className="size-4" aria-hidden="true" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="end" sideOffset={8}>
-                  {t("How Life+ AI works")}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <MeditationsMenu />
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  to="/life/guide"
+                  aria-label={t("How Life+ AI works")}
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
+                >
+                  <BookMarked className="size-4" aria-hidden="true" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="end" sideOffset={8}>
+                {t("How Life+ AI works")}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       }
     >
       {briefing ? (
