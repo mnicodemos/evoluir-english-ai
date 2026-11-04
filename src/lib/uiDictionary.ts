@@ -2686,4 +2686,15 @@ const baseUiPt: Record<string, string> = {
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.
-export const uiPt: Record<string, string> = { ...appGuidePt, ...baseUiPt };
+export const uiPt: Record<string, string> = {
+  ...appGuidePt,
+  ...baseUiPt,
+  "Good morning": "Bom dia",
+  "Good afternoon": "Boa tarde",
+  "Good evening": "Boa noite",
+  "Morning briefing": "Resumo do dia",
+  "You completed everything planned for today.": "Você concluiu tudo o que planejou para hoje.",
+  "You have {done} of {total} planned items completed.":
+    "Você concluiu {done} de {total} itens planejados.",
+  "Focus today": "Foco hoje",
+};

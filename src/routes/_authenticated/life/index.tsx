@@ -119,6 +119,19 @@ function LifePage() {
     goalSteps: plus?.todaySteps ?? [],
   });
 
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? t("Good morning") : hour < 18 ? t("Good afternoon") : t("Good evening");
+  const daySummary =
+    progress.percent === 100
+      ? t("You completed everything planned for today.")
+      : t("You have {done} of {total} planned items completed.")
+          .replace("{done}", String(progress.stepsDone + progress.tasksDone + progress.habitsDone))
+          .replace(
+            "{total}",
+            String(progress.stepsTotal + progress.tasksTotal + progress.habitsDue),
+          );
+
   return (
     <AppShell desktopOneScreen>
       {/* One page on desktop (owner request, 2026-11-01): from xl the page is
@@ -128,6 +141,18 @@ function LifePage() {
           screens than 44rem, lg and phones scroll the page as before. */}
       <div className="life-page-layout">
         <LifeHeader />
+        <section
+          className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border border-brand-green/20 bg-brand-green/[0.045] px-4 py-2.5"
+          aria-label={t("Morning briefing")}
+        >
+          <div className="min-w-0">
+            <p className="font-display text-sm font-semibold">{greeting}</p>
+            <p className="text-xs text-muted-foreground">{daySummary}</p>
+          </div>
+          <p className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+            {t("Focus today")}: {focusToday}/{FOCUS_DAILY_TARGET}
+          </p>
+        </section>
         {/* Four bands (user request, 2026-10-22): the measures on top (Your
           day, Evolution score, Focus), then Today and Plan (the priority of
           the day was removed, user decision 2026-10-24), then the
