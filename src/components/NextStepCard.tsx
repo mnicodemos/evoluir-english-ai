@@ -832,7 +832,10 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 >
                   <Dumbbell className="size-[1.125rem] text-warning" />
                 </span>
-                <h3 className="min-w-0 truncate whitespace-nowrap text-[13px] font-semibold text-sidebar-foreground" title={t("Extra practice")}>
+                <h3
+                  className="min-w-0 truncate whitespace-nowrap text-[13px] font-semibold text-sidebar-foreground"
+                  title={t("Extra practice")}
+                >
                   {t("Extra practice")}
                 </h3>
               </div>
