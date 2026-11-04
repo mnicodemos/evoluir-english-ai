@@ -74,7 +74,7 @@ function LifePage() {
 
   if (isLoading || !data) {
     return (
-      <AppShell>
+      <AppShell desktopOneScreen>
         {/* Same shapes as the page, one screen tall from xl like it (owner
             report, 2026-11-01: the old two rows of three boxes, with the
             footer under them, jumped into the real layout when it loaded). */}
@@ -118,7 +118,7 @@ function LifePage() {
           );
 
   return (
-    <AppShell>
+    <AppShell desktopOneScreen>
       {/* One page on desktop (owner request, 2026-11-01): from xl the page is
           one screen tall, the header and the measures keep their height and
           the tab below takes the rest, its cards scrolling inside (the Life
