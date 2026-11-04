@@ -7,6 +7,7 @@ import {
   Flame,
   ListChecks,
   Loader2,
+  Mic,
   Plus,
   Repeat,
   Target,
@@ -42,6 +43,8 @@ type TodayItem = {
   detail: React.ReactNode;
   /** A habit ticked by the English study day cannot be ticked by hand. */
   locked?: boolean;
+  /** Goal that owns this step; opens contextual English practice. */
+  goalId?: string;
   order: number;
   toggle: () => void;
 };
@@ -121,6 +124,7 @@ export function LifeToday() {
     ...(plus?.todaySteps ?? []).map((item, index) => ({
       key: `step:${item.id}`,
       kind: "step" as const,
+      goalId: item.goalId,
       text: item.text,
       done: !!item.doneAt,
       detail: (
@@ -262,7 +266,7 @@ export function LifeToday() {
       {items.length ? (
         <ul className="mt-4 space-y-2">
           {items.map((item) => (
-            <li key={item.key}>
+            <li key={item.key} className="space-y-1.5">
               <button
                 type="button"
                 aria-pressed={item.done}
@@ -290,6 +294,16 @@ export function LifeToday() {
                   </span>
                 </span>
               </button>
+              {item.kind === "step" && item.goalId ? (
+                <Link
+                  to="/coach"
+                  search={{ goal: item.goalId }}
+                  className="ml-11 inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-brand-green transition-colors hover:bg-brand-green/10 hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                >
+                  <Mic className="size-3.5" aria-hidden="true" />
+                  {t("Practice this step in English")}
+                </Link>
+              ) : null}
             </li>
           ))}
         </ul>
