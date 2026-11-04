@@ -47,7 +47,7 @@ export function ExtraVideosPill() {
             {t("Lessons on video, Premium")}
           </span>
         </span>
-        <ChevronRight
+        <ArrowRight
           className="hidden size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 sm:block"
           aria-hidden="true"
         />

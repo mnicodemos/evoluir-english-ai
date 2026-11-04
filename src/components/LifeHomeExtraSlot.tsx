@@ -128,7 +128,7 @@ function FocusSlot({ translate: t }: { translate: (label: string) => string }) {
           )}
         >
           {active ? (
-            <ChevronRight className="size-3.5" aria-hidden="true" />
+            <ArrowRight className="size-3.5" aria-hidden="true" />
           ) : (
             <Play className="size-3 fill-current" aria-hidden="true" />
           )}

@@ -41,7 +41,7 @@ const baseUiPt: Record<string, string> = {
   "Start Focus": "Iniciar Focus",
   "Not now": "Agora não",
   "EVO Focus suggestions": "Sugestões de Focus da EVO",
-  "Push notifications": "Notificações push",
+
   "Allow Evoluir+ to send reminders and learning updates to this device.":
     "Permitir que o Evoluir+ envie lembretes e atualizações de estudo para este dispositivo.",
   Language: "Idioma",
@@ -2709,4 +2709,6 @@ export const uiPt: Record<string, string> = {
     "Você concluiu {done} de {total} itens planejados.",
   "Focus today": "Foco hoje",
   "Download Life+ AI manual": "Baixar manual do Life+ AI",
+  "🇧🇷 PT": "🇧🇷 PT",
+  "🇺🇸 EN": "🇺🇸 EN",
 };
