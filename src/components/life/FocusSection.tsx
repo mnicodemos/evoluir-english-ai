@@ -14,8 +14,8 @@ import {
   Square,
   Timer,
 } from "lucide-react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { stopFocusSaving } from "@/components/focus/stopFocus";
 import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
@@ -258,7 +258,7 @@ export function FocusSection() {
                       focusClearLastTask();
                       refresh();
                     })
-                    .catch(() => toast.error(t("The task could not be saved.")))
+                    .catch(() => notifyLife(t("The task could not be saved."), "error"))
                 }
               >
                 <Check aria-hidden="true" />
