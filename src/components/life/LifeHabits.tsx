@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Flame, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { notifyLife } from "@/components/life/LifeNotification";
 import { LifeCheckMark, LifeEmpty, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,7 +52,7 @@ function useHabitToggle(onChange: () => void) {
       if (input.done) haptic("tap");
     },
     onSuccess: onChange,
-    onError: () => toast.error(t("The habit could not be saved.")),
+    onError: () => notifyLife(t("The habit could not be saved."), "error"),
   });
 }
 
@@ -131,7 +131,7 @@ export function LifeHabitBoard({
   const remove = useMutation({
     mutationFn: (id: string) => archive({ data: { id } }),
     onSuccess: onChange,
-    onError: () => toast.error(t("The habit could not be removed.")),
+    onError: () => notifyLife(t("The habit could not be removed."), "error"),
   });
   const days = Array.from({ length: 7 }, (_, index) => addDays(today, index - 6));
 
@@ -286,7 +286,7 @@ export function LifeHabitForm({
       onChange();
     },
     onError: (error) =>
-      toast.error(t(error instanceof Error ? error.message : "The habit could not be saved.")),
+      notifyLife(t(error instanceof Error ? error.message : "The habit could not be saved."), "error"),
   });
 
   return (
