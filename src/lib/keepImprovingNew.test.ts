@@ -38,6 +38,26 @@ describe("Keep improving continue rows", () => {
     expect(rows.map((row) => row.to)).toEqual(["/teacher", "/reading"]);
   });
 
+  it("does not suggest another text after today's reading is complete", () => {
+    const rows = continueRows({
+      goalReached: false,
+      readingDone: true,
+      taken: ["/coach"],
+      slots: 3,
+    });
+    expect(rows.map((row) => row.to)).toEqual(["/teacher", "/learning"]);
+  });
+
+  it("keeps another text available before today's reading is complete", () => {
+    const rows = continueRows({
+      goalReached: false,
+      readingDone: false,
+      taken: ["/coach"],
+      slots: 2,
+    });
+    expect(rows.map((row) => row.to)).toEqual(["/teacher", "/reading"]);
+  });
+
   it("adds nothing once today's goal is met", () => {
     expect(continueRows({ goalReached: true, taken: [], slots: 3 })).toEqual([]);
   });
