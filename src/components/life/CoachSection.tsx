@@ -1,7 +1,18 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Flag, Flower2, ListChecks, Loader2, Plus, Repeat, Scale, Send, Sparkles } from "lucide-react";
+import {
+  Check,
+  Flag,
+  Flower2,
+  ListChecks,
+  Loader2,
+  Plus,
+  Repeat,
+  Scale,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -159,7 +170,6 @@ export function CoachSection() {
                 {t("Hi! I am EVO, your Life Coach. What would you like to plan or improve today?")}
               </p>
             </div>
-
           </div>
         ) : null}
 
