@@ -608,7 +608,7 @@ const baseUiPt: Record<string, string> = {
   "The other part of your word review, in Vocabulary.":
     "A outra parte da sua revisão de palavras, no Vocabulário.",
   "Extra practice": "Prática extra",
-  "Two short options beyond today's priority.": "Duas opções curtas além da prioridade de hoje.",
+  "Two short options beyond today's priority.": "Duas atividades para seu desenvolvimento.",
   "Compete with students at your level": "Dispute com alunos do seu nível",
   "this week": "nesta semana",
   "Leading this week": "Liderando nesta semana",
