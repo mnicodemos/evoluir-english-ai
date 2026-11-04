@@ -87,7 +87,7 @@ export function FocusSection() {
   const weekMax = Math.max(1, ...summary.week.map((row) => row.minutes));
 
   return (
-    <section id="focus" className="card-soft scroll-mt-4 p-4 sm:p-5" aria-labelledby="focus-title">
+    <section id="focus" className="card-soft scroll-mt-4 p-3 sm:p-4" aria-labelledby="focus-title">
       <LifeSectionTitle
         id="focus-title"
         icon={Timer}
@@ -111,7 +111,7 @@ export function FocusSection() {
         </Button>
       </LifeSectionTitle>
 
-      <div className="mt-3 grid items-center gap-4 sm:grid-cols-[auto_minmax(0,1fr)] xl:mt-2 xl:gap-3">
+      <div className="mt-2 grid items-center gap-3 sm:grid-cols-[auto_minmax(0,1fr)] xl:mt-1.5 xl:gap-2">
         {/* The countdown ring: pink while focusing, green during the break. */}
         <div className="relative mx-auto grid size-32 place-items-center xl:size-24">
           <svg viewBox="0 0 80 80" className="absolute inset-0 -rotate-90" aria-hidden="true">
@@ -153,7 +153,7 @@ export function FocusSection() {
           </div>
         </div>
 
-        <div className="min-w-0 space-y-3">
+        <div className="min-w-0 space-y-2">
           <div className="flex flex-wrap gap-1.5" role="group" aria-label={t("Block length")}>
             {FOCUS_PRESET_IDS.map((id) => (
               <button
@@ -238,7 +238,7 @@ export function FocusSection() {
       </div>
 
       {state.phase === "break" ? (
-        <div className="mt-4 space-y-3 rounded-xl border border-brand-green/25 bg-brand-green/[0.06] p-3">
+        <div className="mt-3 space-y-2 rounded-xl border border-brand-green/25 bg-brand-green/[0.06] p-2.5">
           {lastTask ? (
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <span className="min-w-0">
