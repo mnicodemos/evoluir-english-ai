@@ -1131,7 +1131,10 @@ function Dashboard() {
                               className="flex min-w-0 items-center justify-start gap-0 text-[9px] leading-tight"
                             >
                               <span className="truncate text-muted-foreground">
-                                {t(skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1))}:{" "}                              </span>
+                                {t(
+                                  skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1),
+                                )}:{" "}
+                              </span>
                               <span className="shrink-0 font-semibold tabular-nums text-foreground">
                                 {skill.value}%
                               </span>
