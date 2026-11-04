@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   BookMarked,
@@ -53,7 +53,6 @@ import { cn } from "@/lib/utils";
 import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useLessonRound } from "@/hooks/useLessonRound";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
-import { useQuery } from "@tanstack/react-query";
 import { useProfile } from "@/hooks/useProfile";
 import { getPushNotificationsEnabled } from "@/lib/focusInvitationPreference";
 import { studyToday } from "@/lib/today";
@@ -114,8 +113,7 @@ function UtilityButtons() {
     setLang(lang === "pt" ? "en" : "pt");
   }
 
-
-  // Clear language control in the profile card; push settings live inside Profile.
+  // Push settings live inside Profile; this is the clearly labelled language control.
   return (
     <Button
       variant="ghost"
@@ -125,34 +123,10 @@ function UtilityButtons() {
       onClick={toggleLang}
     >
       <Languages className="size-[1.05rem]" />
-      <span className="text-xs font-medium">{t("Language")}: {lang === "pt" ? "Português" : "English"}</span>
+      <span className="text-xs font-medium">
+        {t("Language")}: {lang === "pt" ? "Português" : "English"}
+      </span>
     </Button>
-  );
-    <>
-      <Button
-        variant="ghost"
-        aria-label={`${t("Change language")}: ${lang === "pt" ? "Português" : "English"}`}
-        title={lang === "pt" ? "Português" : "English"}
-        className="h-9 w-full gap-1 rounded-lg px-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-        onClick={toggleLang}
-      >
-        <Languages className="size-[1.15rem]" />
-        <span className="text-[10px] font-bold">{lang === "pt" ? "PT" : "EN"}</span>
-      </Button>
-      <Button
-        variant="ghost"
-        aria-label={pushLabel}
-        title={pushLabel}
-        aria-pressed={pushOn}
-        className={cn(
-          "h-9 w-full rounded-lg px-0 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-          pushOn ? "text-brand-green" : "text-sidebar-foreground/70",
-        )}
-        onClick={() => void togglePush()}
-      >
-        {pushOn ? <Bell className="size-[1.15rem]" /> : <BellOff className="size-[1.15rem]" />}
-      </Button>
-    </>
   );
 }
 
