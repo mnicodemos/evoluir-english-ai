@@ -1098,9 +1098,9 @@ function Dashboard() {
                   <Link
                     to="/progress"
                     aria-label={t("My progress")}
-                    className="group relative grid min-h-[7.25rem] min-w-0 grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-2 pr-3 transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[7.5rem]"
+                    className="group relative grid min-h-[6.5rem] min-w-0 grid-cols-[5rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-xl border border-dashboard-cyan/35 bg-dashboard-cyan/[0.06] p-1.5 pr-2.5 transition-colors hover:border-dashboard-cyan/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-cyan/60 xl:min-h-[6.75rem]"
                   >
-                    <span className="grid h-full min-h-24 place-items-center overflow-hidden rounded-lg bg-[#06272a]">
+                    <span className="grid h-full min-h-20 place-items-center overflow-hidden rounded-lg bg-[#06272a]">
                       <img
                         src="/my-progress-growth.webp"
                         alt=""
@@ -1110,13 +1110,13 @@ function Dashboard() {
                       />
                     </span>
                     <span className="min-w-0 self-center">
-                      <span className="flex min-w-0 items-center gap-1">
-                        <ChartLine
-                          className="size-4 shrink-0 text-dashboard-cyan"
-                          strokeWidth={2.4}
-                          aria-hidden="true"
-                        />
-                        <span className="shrink-0 rounded-full border border-dashboard-cyan/45 bg-dashboard-cyan/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-dashboard-cyan">
+                      <span className="flex min-w-0 items-center">
+                        <span className="inline-flex min-w-0 items-center gap-1 rounded-full border border-dashboard-cyan/45 bg-dashboard-cyan/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-dashboard-cyan">
+                          <ChartLine
+                            className="size-3.5 shrink-0"
+                            strokeWidth={2.4}
+                            aria-hidden="true"
+                          />
                           {t("My progress")}
                         </span>
                       </span>
