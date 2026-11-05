@@ -84,13 +84,13 @@ export function WordCard({
     ? Math.ceil((new Date(state.next_review_at).getTime() - Date.now()) / 86_400_000)
     : null;
   return (
-    <article className={cn("card-soft p-4 xl:p-3", isKnown && "opacity-60", className)}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <article className={cn("group relative overflow-hidden rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md xl:p-3", isKnown && "opacity-65", className)}>
+      <div className="flex flex-wrap items-start justify-between gap-2.5">
         <div className="min-w-0 flex-1 break-words" translate="no">
-          <h3 className="text-lg font-semibold">{w.word}</h3>
+          <h3 className="text-[1.05rem] font-semibold tracking-tight transition-colors group-hover:text-primary">{w.word}</h3>
           {!hidden && <p className="text-sm text-muted-foreground">{w.translation}</p>}
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1">
           {isKnown && (
             <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-medium text-success">
               <Check className="size-3" aria-hidden /> {t("Known")}
@@ -106,7 +106,7 @@ export function WordCard({
               {t("From reading")}
             </span>
           )}
-          <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
+          <span className="rounded-full border border-border/60 bg-secondary/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-secondary-foreground">
             {w.difficulty}
           </span>
           <Button
@@ -148,13 +148,13 @@ export function WordCard({
         </div>
       </div>
       {hidden ? (
-        <div className="mt-3 rounded-lg border border-dashed border-white/15 p-3 text-center">
+        <div className="mt-3 rounded-xl border border-dashed border-primary/20 bg-primary/[0.035] p-3.5 text-center transition-colors">
           <p className="text-xs text-muted-foreground">
             {t("Try to remember what it means, then check.")}
           </p>
           <Button
             variant="outline"
-            className="mt-2 min-h-11 w-full"
+            className="mt-2 min-h-10 w-full rounded-xl border-primary/20 bg-background/70 text-sm transition-all hover:border-primary/40 hover:bg-primary/[0.06]"
             onClick={() => setRevealed(true)}
           >
             <Eye className="size-4" /> {t("Show meaning")}
@@ -163,9 +163,9 @@ export function WordCard({
       ) : (
         <>
           <div translate="no">
-            <p className="mt-1.5 text-sm">{w.meaning}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{w.pronunciation}</p>
-            <p className="mt-1.5 rounded-lg bg-secondary/70 px-3 py-1.5 text-xs italic line-clamp-2">
+            <p className="mt-2 text-sm leading-relaxed">{w.meaning}</p>
+            <p className="mt-1.5 text-xs font-medium tracking-wide text-muted-foreground">{w.pronunciation}</p>
+            <p className="mt-2.5 rounded-xl border border-border/50 bg-secondary/45 px-3 py-2 text-xs leading-relaxed italic text-muted-foreground line-clamp-2">
               "{highlightWord(w.example, w.word)}"
             </p>
           </div>
@@ -182,10 +182,10 @@ export function WordCard({
             </p>
           )}
           {showActions && !isKnown && (
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 flex gap-2 border-t border-border/50 pt-3">
               <Button
                 size="sm"
-                className="min-h-11 flex-1"
+                className="min-h-10 flex-1 rounded-xl text-sm shadow-sm"
                 disabled={locked}
                 onClick={() => onMarkKnown(w.id)}
               >
@@ -195,7 +195,7 @@ export function WordCard({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="min-h-11 flex-1"
+                  className="min-h-10 flex-1 rounded-xl text-sm"
                   disabled={locked}
                   onClick={() => (due ? onMarkForgotten(w.id) : onSkip?.())}
                 >
