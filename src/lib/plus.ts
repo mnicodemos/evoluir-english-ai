@@ -280,7 +280,9 @@ export function evolutionScoreComposition(
     englishWeight,
     goalsWeight,
     englishContribution:
-      score.english === null || englishWeight === null ? null : (score.english * englishWeight) / 100,
+      score.english === null || englishWeight === null
+        ? null
+        : (score.english * englishWeight) / 100,
     goalsContribution:
       score.goals === null || goalsWeight === null ? null : (score.goals * goalsWeight) / 100,
   };
