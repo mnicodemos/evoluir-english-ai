@@ -208,41 +208,13 @@ async function buildDailyWords(
   }
 
   const exclude = new Set(usedWords);
-  // An unreadable first answer is retried below with the wider prompt instead
-  // of failing the whole batch.
-  let first: AiWord[] = [];
-  try {
-    first = await askAi(exclude);
-  } catch (error) {
-    console.error("[vocabulary] first generation attempt failed", (error as Error).message);
-  }
-  // Saving fewer than ten words is fine; the batch is never padded with existing words.
-  let fresh = selectNewWords(first, usedWords, missing);
-
-  // The model sometimes repeats known words: when the first answer does not fill
-  // the batch, one retry asks for the rest, with every word already seen
-  // (owned, repeated or just picked) excluded, so a completed lesson leaves ten
-  // words instead of a partial batch. The pause respects the usage limiter,
-  // which would otherwise reject a second call fired immediately.
-  if (fresh.length < missing) {
-    for (const w of first)
-      exclude.add(
-        String(w.word ?? "")
-          .trim()
-          .toLowerCase(),
-      );
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 6_000));
-      const taken = new Set([
-        ...usedWords,
-        ...fresh.map((w) => String(w.word).trim().toLowerCase()),
-      ]);
-      const more = selectNewWords(await askAi(exclude, true), taken, missing - fresh.length);
-      fresh = [...fresh, ...more];
-    } catch (error) {
-      console.error("[vocabulary] widened generation attempt failed", (error as Error).message);
-    }
-  }
+  // Keep the student-facing request to one Gemini round trip. A second
+  // sequential call (plus a six-second limiter wait) could exceed the host's
+  // request deadline and show a timeout even when the first batch was usable.
+  // The first prompt already asks for spare candidates; persist every valid,
+  // genuinely new word returned and let a later lesson unlock the next batch.
+  const first = await askAi(exclude);
+  const fresh = selectNewWords(first, usedWords, missing);
 
   if (!fresh.length) {
     if (todays.length) return todays;
