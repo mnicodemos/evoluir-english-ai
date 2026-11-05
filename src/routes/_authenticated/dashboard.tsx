@@ -199,7 +199,10 @@ function DashboardNotifications({
   const extraVideos = useExtraVideosNews(profile?.id);
   // Reuse EVO’s server-side decision; the bell does not derive new pedagogy.
   const { data: nextStep } = useNextStep({ enabled: !!profile?.id });
-  const { data: todayActivities = [], isLoading: isTodayActivitiesLoading } = useTodayActivities(profile?.id);
+  const {
+    data: todayActivities = [],
+    isLoading: isTodayActivitiesLoading,
+  } = useTodayActivities(profile?.id);
   const quickWin = nextStep?.quickWin;
   const quickWinVisible =
     !!quickWin &&
@@ -787,7 +790,8 @@ function Dashboard() {
   // Minutes in the ring always come with at least one line beside them.
   const hasProgressToday = minutesToday > 0 || learningCards.some((card) => card.state !== "empty");
   // Do not briefly show the empty-state message while the three sources are loading.
-  const isTodayProgressLoading = isSnapshotLoading || isMinutesTodayLoading || isTodayActivitiesLoading;
+  const isTodayProgressLoading =
+    isSnapshotLoading || isMinutesTodayLoading || isTodayActivitiesLoading;
   const minutesToGoal = Math.max(profile?.daily_minutes ?? 0, 0) - minutesToday;
   // The first time today the student sees the daily goal reached (user request).
   const celebrateGoal = useCelebrate(
