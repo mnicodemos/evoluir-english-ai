@@ -46,7 +46,6 @@ export function selectNewWords<T extends SuggestedWord>(
   return picked;
 }
 
-
 export type LessonTemplateRow = {
   curriculum_key: string;
   content: unknown;
@@ -85,8 +84,7 @@ export function templateVocabularyCandidates(
       if (!item || typeof item !== "object") continue;
       const card = item as Record<string, unknown>;
       const word = typeof card["word"] === "string" ? card["word"].trim() : "";
-      const translation =
-        typeof card["translation"] === "string" ? card["translation"].trim() : "";
+      const translation = typeof card["translation"] === "string" ? card["translation"].trim() : "";
       const meaning = typeof card["definition"] === "string" ? card["definition"].trim() : "";
       const example = typeof card["example"] === "string" ? card["example"].trim() : "";
       const key = word.toLowerCase();
