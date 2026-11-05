@@ -762,7 +762,6 @@ async function loadGoalRolePlay(goalId: string) {
   }
 }
 
-
 async function loadTaskRolePlay(taskId: string) {
   try {
     const { data: taskRow } = await supabase
