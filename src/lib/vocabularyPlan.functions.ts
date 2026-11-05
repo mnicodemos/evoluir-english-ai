@@ -237,7 +237,13 @@ async function buildDailyWords(
   }
 
   const exclude = new Set(usedWords);
-  for (const word of templateWords) exclude.add(String(word.word ?? "").trim().toLowerCase());
+  for (const word of templateWords) {
+    exclude.add(
+      String(word.word ?? "")
+        .trim()
+        .toLowerCase(),
+    );
+  }
 
   // Keep the student-facing request to one Gemini round trip. A second
   // sequential call (plus a six-second limiter wait) could exceed the host's
@@ -253,7 +259,8 @@ async function buildDailyWords(
   }
 
   const byTitle = new Map(lessonList.map((l) => [l.title.toLowerCase(), l]));
-  const lessonForWord = (word: AiWord) => byTitle.get(String(word.lesson_title ?? "").toLowerCase());
+  const lessonForWord = (word: AiWord) =>
+    byTitle.get(String(word.lesson_title ?? "").toLowerCase());
   const rows = fresh.map((w) => {
     const lesson = lessonForWord(w);
     return {
