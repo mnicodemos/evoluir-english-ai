@@ -108,6 +108,15 @@ export const loadPlus = createServerFn({ method: "POST" })
     if (stepsResult.error) throw new Error("Steps could not be loaded");
     const active = ((goalsResult.data ?? []) as GoalRow[]).map(toGoal);
     let history = ((stepsResult.data ?? []) as StepRow[]).map(toStep);
+    const readSteps = async () => {
+      const { data: rows, error: stepsError } = await steps()
+        .select("id, goal_id, day, text, done_at")
+        .eq("user_id", context.userId)
+        .gte("day", addDays(since, -7))
+        .order("day", { ascending: false });
+      if (stepsError) throw new Error("Steps could not be loaded");
+      return ((rows ?? []) as StepRow[]).map(toStep);
+    };
     const missing = active.filter(
       (goal) => !history.some((step) => step.goalId === goal.id && step.day === today),
     );
