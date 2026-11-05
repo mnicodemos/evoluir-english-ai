@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Pencil, Plus, Timer, Trash2 } from "lucide-react";
+import { Check, Loader2, Mic, Pencil, Plus, Timer, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { notifyLife } from "@/components/life/LifeNotification";
@@ -131,6 +132,15 @@ export function LifeTaskList({
                 ) : null}
               </p>
             </div>
+            <Link
+              to="/coach"
+              search={{ task: task.id }}
+              aria-label={`${t("Practise this task in English")} · ${task.title}`}
+              title={t("Practise this task in English")}
+              className="grid size-7 shrink-0 place-items-center rounded-md text-brand-green hover:bg-brand-green/10"
+            >
+              <Mic className="size-3.5" aria-hidden="true" />
+            </Link>
             <button
               type="button"
               aria-label={`${t("Focus")} · ${task.title}`}
