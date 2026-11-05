@@ -1079,3 +1079,19 @@
     height: clamp(6rem, 17dvh, 9rem) !important;
   }
 }
+
+/* Keep notifications clear of the phone's status bar on mobile.
+   Desktop retains the existing bottom-right toast placement. */
+@media (max-width: 600px) {
+  [data-sonner-toaster].dashboard-shell {
+    top: calc(env(safe-area-inset-top) + 0.75rem) !important;
+    bottom: auto !important;
+  }
+}
+
+@media (min-width: 601px) {
+  [data-sonner-toaster].dashboard-shell {
+    top: auto !important;
+    bottom: 2rem !important;
+  }
+}

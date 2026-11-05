@@ -226,7 +226,11 @@ function RootComponent() {
       <ScrollToTop />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <Toaster className="dashboard-shell dark" position="bottom-right" mobileOffset={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }} />
+      <Toaster
+        className="dashboard-shell dark"
+        position="top-right"
+        mobileOffset={{ top: "calc(env(safe-area-inset-top) + 0.75rem)" }}
+      />
     </QueryClientProvider>
   );
 }
