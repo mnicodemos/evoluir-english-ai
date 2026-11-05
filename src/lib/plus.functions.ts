@@ -112,17 +112,23 @@ export const loadPlus = createServerFn({ method: "POST" })
       (goal) => !history.some((step) => step.goalId === goal.id && step.day === today),
     );
     if (missing.length) {
-      const { error: insertError } = await steps().upsert(
-        missing.map((goal) => ({
-          goal_id: goal.id,
-          user_id: context.userId,
-          day: today,
-          text: fallbackPlusStep(goal.area, today, data.lang as PlusLang),
-        })),
-        { onConflict: "goal_id,day", ignoreDuplicates: true },
-      );
+      const { data: insertedRows, error: insertError } = await steps()
+        .upsert(
+          missing.map((goal) => ({
+            goal_id: goal.id,
+            user_id: context.userId,
+            day: today,
+            text: fallbackPlusStep(goal.area, today, data.lang as PlusLang),
+          })),
+          { onConflict: "goal_id,day", ignoreDuplicates: true },
+        )
+        .select("id, goal_id, day, text, done_at");
       if (insertError) throw new Error("Steps could not be saved");
-      history = await readSteps();
+      const inserted = ((insertedRows ?? []) as StepRow[]).map(toStep);
+      history = [...history, ...inserted];
+      // Only pay for a follow-up read when a concurrent request won the
+      // unique-key race and Postgres therefore returned fewer rows than sent.
+      if (inserted.length < missing.length) history = await readSteps();
     }
 
     const activeIds = new Set(active.map((goal) => goal.id));
