@@ -265,17 +265,18 @@
   --width: min(34rem, calc(100vw - 2rem)) !important;
 }
 
-/* Toasts (sonner) render in a portal with their own stylesheet: the same
-   frosted graphite glass as the popovers (user request: one material), always
-   dark, 85% on desktop and phones alike (user request),
-   with an 18 px blur. */
+/* One premium notification surface for every Sonner toast on desktop
+   and mobile: high-opacity graphite glass keeps text crisp while retaining
+   a restrained backdrop blur and subtle edge definition. */
 .dashboard-shell [data-sonner-toast] {
-  background-color: rgb(26 28 32 / 0.85) !important;
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  background-color: rgb(16 20 25 / 0.94) !important;
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
   color: rgb(241 245 249) !important;
-  border: 1px solid rgb(255 255 255 / 0.1) !important;
-  box-shadow: 0 18px 48px -12px rgb(0 0 0 / 0.7) !important;
+  border: 1px solid rgb(255 255 255 / 0.13) !important;
+  box-shadow:
+    0 18px 48px -12px rgb(0 0 0 / 0.78),
+    inset 0 1px 0 rgb(255 255 255 / 0.035) !important;
 }
 
 .dashboard-shell [data-sonner-toast] [data-description] {
