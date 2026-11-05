@@ -770,9 +770,9 @@ function VocabularyOnline() {
                             className="min-h-11 shrink-0"
                             onClick={() => {
                               announceStudyInteraction(
-                                  document.querySelector("main"),
-                                  "vocabulary",
-                                );
+                                document.querySelector("main"),
+                                "vocabulary",
+                              );
                               setSession(sessionQueue);
                             }}
                           >
