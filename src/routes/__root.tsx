@@ -148,6 +148,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <head>
+        <style>{`html { background-color: #02060a; } body { background-color: transparent; }`}</style>
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
