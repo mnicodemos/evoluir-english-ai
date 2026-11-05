@@ -36,7 +36,7 @@ vi.mock("./gemini.server", () => ({
 }));
 
 const { callGateway } = await import("./ai-gateway.server");
-const { dictionaryCacheKey, meaningsFromRaw } = await import("./dictionary.functions");
+const { REVERSO_TIMEOUT_MS, dictionaryCacheKey, meaningsFromRaw } = await import("./dictionary.functions");
 
 const msgs = [{ role: "user" as const, content: "Word: hello" }];
 const run = (userId: string, key: string, checked: boolean) =>
@@ -102,5 +102,12 @@ describe("dictionary cache flow", () => {
     await callGateway(msgs, true, { userId: "u", operation: "dictionary" });
     expect(spy.reads).toBe(1);
     expect(spy.writes).toEqual(["messages-hash"]);
+  });
+});
+
+
+describe("Reverso lookup deadline", () => {
+  it("keeps the external lookup bounded to 1.2 seconds before the Gemini fallback", () => {
+    expect(REVERSO_TIMEOUT_MS).toBe(1200);
   });
 });
