@@ -13,6 +13,7 @@ import {
   Plus,
   Repeat,
   Target,
+  Timer,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -27,7 +28,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { useNextStep } from "@/hooks/useNextStep";
+import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { haptic } from "@/lib/haptics";
+import { focusSetTask, openFocusWidget } from "@/lib/focusTimer";
 import { habitsDueToday, habitStreak, type LifePriorityLevel } from "@/lib/life";
 import { setLifeHabitDone, setLifeTaskDone } from "@/lib/life.functions";
 import { PLUS_GOAL_EXAMPLES } from "@/lib/plus";
@@ -65,6 +68,7 @@ export function LifeToday() {
   const { t, lang } = useLifeT();
   const { data: profile } = useProfile();
   const { data: nextStep } = useNextStep();
+  const { state: focusState } = useFocusTimer();
   const queryClient = useQueryClient();
   const { data: life, refresh } = useLife();
   const load = useServerFn(loadPlus);
@@ -373,6 +377,22 @@ export function LifeToday() {
                   </span>
                 </span>
               </button>
+              {item.kind === "task" ? (
+                <button
+                  type="button"
+                  disabled={focusState.phase !== "idle" || item.done}
+                  onClick={() => {
+                    focusSetTask(item.key.slice("task:".length));
+                    openFocusWidget();
+                  }}
+                  aria-label={`${t('Focus')} · ${item.text}`}
+                  title={t("Focus")}
+                  className="ml-11 inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-pink-300 transition-colors hover:bg-pink-400/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <Timer className="size-3.5" aria-hidden="true" />
+                  {t("Focus")}
+                </button>
+              ) : null}
               {item.kind === "step" && item.goalId ? (
                 <Link
                   to="/coach"
