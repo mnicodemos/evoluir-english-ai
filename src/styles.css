@@ -914,3 +914,28 @@
     padding: 0.75rem;
   }
 }
+
+
+/* Life+ Planning is a naturally flowing page: its goals, tasks and habits
+   can extend beyond one viewport. Let the document scroll and keep the global
+   footer after the final card instead of overlaying the content. Today keeps
+   its compact one-screen desktop composition. */
+@media (min-width: 80rem) {
+  .life-page-layout--planning {
+    display: block;
+    min-height: auto;
+    flex: 0 0 auto;
+    gap: 0;
+  }
+
+  .life-page-layout--planning .life-overview-grid {
+    height: auto;
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .life-page-layout--planning > .mt-2.grid {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+}
