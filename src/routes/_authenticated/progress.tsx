@@ -115,7 +115,7 @@ function ProgressPage() {
     .slice(0, 2);
 
   return (
-    <AppShell mobileOneScreen>
+    <AppShell mobileOneScreen desktopOneScreen>
       <PageHeader guide="progress" icon={TrendingUp} title={t("My Progress")} />
 
       <div className="progress-page-layout mt-3 sm:mt-4">
