@@ -84,10 +84,18 @@ export function WordCard({
     ? Math.ceil((new Date(state.next_review_at).getTime() - Date.now()) / 86_400_000)
     : null;
   return (
-    <article className={cn("group relative overflow-hidden rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md xl:p-3", isKnown && "opacity-65", className)}>
+    <article
+      className={cn(
+        "group relative overflow-hidden rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md xl:p-3",
+        isKnown && "opacity-65",
+        className,
+      )}
+    >
       <div className="flex flex-wrap items-start justify-between gap-2.5">
         <div className="min-w-0 flex-1 break-words" translate="no">
-          <h3 className="text-[1.05rem] font-semibold tracking-tight transition-colors group-hover:text-primary">{w.word}</h3>
+          <h3 className="text-[1.05rem] font-semibold tracking-tight transition-colors group-hover:text-primary">
+            {w.word}
+          </h3>
           {!hidden && <p className="text-sm text-muted-foreground">{w.translation}</p>}
         </div>
         <div className="flex shrink-0 items-center gap-1">
@@ -164,7 +172,9 @@ export function WordCard({
         <>
           <div translate="no">
             <p className="mt-2 text-sm leading-relaxed">{w.meaning}</p>
-            <p className="mt-1.5 text-xs font-medium tracking-wide text-muted-foreground">{w.pronunciation}</p>
+            <p className="mt-1.5 text-xs font-medium tracking-wide text-muted-foreground">
+              {w.pronunciation}
+            </p>
             <p className="mt-2.5 rounded-xl border border-border/50 bg-secondary/45 px-3 py-2 text-xs leading-relaxed italic text-muted-foreground line-clamp-2">
               "{highlightWord(w.example, w.word)}"
             </p>
