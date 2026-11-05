@@ -265,13 +265,14 @@ export function evolutionScoreComposition(
 ): EvolutionScoreComposition {
   const hasEnglish = score.english !== null;
   const hasGoals = score.goals !== null;
-  const mode = hasEnglish && hasGoals
-    ? "balanced"
-    : hasEnglish
-      ? "english_only"
-      : hasGoals
-        ? "goals_only"
-        : "empty";
+  const mode =
+    hasEnglish && hasGoals
+      ? "balanced"
+      : hasEnglish
+        ? "english_only"
+        : hasGoals
+          ? "goals_only"
+          : "empty";
   const englishWeight = hasEnglish ? (hasGoals ? 50 : 100) : null;
   const goalsWeight = hasGoals ? (hasEnglish ? 50 : 100) : null;
   return {
@@ -279,13 +280,9 @@ export function evolutionScoreComposition(
     englishWeight,
     goalsWeight,
     englishContribution:
-      score.english === null || englishWeight === null
-        ? null
-        : (score.english * englishWeight) / 100,
+      score.english === null || englishWeight === null ? null : (score.english * englishWeight) / 100,
     goalsContribution:
-      score.goals === null || goalsWeight === null
-        ? null
-        : (score.goals * goalsWeight) / 100,
+      score.goals === null || goalsWeight === null ? null : (score.goals * goalsWeight) / 100,
   };
 }
 
