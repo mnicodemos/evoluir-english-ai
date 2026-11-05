@@ -139,18 +139,18 @@ export function GoalsTodayCard() {
             too, so three goal checks read as the whole card). */}
       </div>
 
-      {isLoading ? (
-        <p className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-          {t("EVO is preparing today's steps…")}
-        </p>
-      ) : isError ? (
-        <p className="mt-2 text-xs text-muted-foreground">{t("Your goals could not be loaded.")}</p>
-      ) : (
-        // One goal, one task and one habit (user request); when there are more,
-        // the student picks which one shows here.
-        <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-4">
-          {shownGoal ? (
+      {/* Render independent routine slots while the goal query is still loading. */}
+      <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-4">
+          {isLoading ? (
+            <li className="flex min-h-24 items-center gap-2 rounded-lg bg-secondary/40 px-3 text-xs text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              {t("EVO is preparing today's steps…")}
+            </li>
+          ) : isError ? (
+            <li className="rounded-lg bg-secondary/40 px-3 py-3 text-xs text-muted-foreground">
+              {t("Your goals could not be loaded.")}
+            </li>
+          ) : shownGoal ? (
             <GoalTile
               key={shownGoal.id}
               title={shownGoal.title}
@@ -319,8 +319,7 @@ export function GoalsTodayCard() {
           {/* From 2xl the card is wide enough for a fourth slot: an open
               decision, or else today's Focus (owner decision, 2026-11-01). */}
           <LifeHomeExtraSlot translate={t} />
-        </ul>
-      )}
+      </ul>
     </section>
   );
 }
