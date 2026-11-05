@@ -1044,7 +1044,7 @@ function Dashboard() {
                     )}
                     <div
                       className={cn(
-                        `${hasProgressToday ? "flex" : "hidden"} flex-col justify-center gap-1 self-center lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
+                        `${hasProgressToday ? "flex" : "hidden"} -translate-x-6 flex-col justify-center gap-1 self-center lg:translate-x-0 lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
                       )}
                     >
                       {learningCards.map((card) => {
