@@ -11,6 +11,7 @@ import {
   PLUS_AREAS,
   PLUS_MAX_GOALS,
   PLUS_SCORE_DAYS,
+  plusScoreProgress,
   PLUS_WEEK_DAYS,
   type PlusArea,
   type PlusGoal,
@@ -162,13 +163,13 @@ export const loadPlus = createServerFn({ method: "POST" })
     }
 
     const activeIds = new Set(active.map((goal) => goal.id));
-    const window = history.filter((step) => step.day >= since);
+    const scoreProgress = plusScoreProgress(history, activeIds, since, today);
     return {
       today,
       goals: active,
       todaySteps: history.filter((step) => step.day === today && activeIds.has(step.goalId)),
-      stepsGiven: window.length,
-      stepsDone: window.filter((step) => step.doneAt !== null).length,
+      stepsGiven: scoreProgress.stepsGiven,
+      stepsDone: scoreProgress.stepsDone,
       recentSteps: history.filter(
         (step) => activeIds.has(step.goalId) && step.day >= addDays(today, -(PLUS_WEEK_DAYS - 1)),
       ),
