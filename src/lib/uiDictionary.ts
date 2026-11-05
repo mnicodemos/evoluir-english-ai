@@ -2696,6 +2696,22 @@ const baseUiPt: Record<string, string> = {
   "Life task": "Tarefa do Life+",
   "Independent focus": "Foco independente",
   "Stopped early": "Interrompida antes do fim",
+  "How your score is calculated": "Como seu score é calculado",
+  "English reflects your measured skill profile. Goals count active-goal steps over the last":
+    "O Inglês reflete seu perfil de habilidades medido. Metas contam os passos das metas ativas nos últimos",
+  "days, ending today.": "dias, até hoje.",
+  "Measured English skills": "Habilidades de inglês medidas",
+  "simple average": "média simples",
+  "Completed steps in active goals": "Passos concluídos em metas ativas",
+  "Both dimensions count equally: English × 50% + Goals × 50%.":
+    "As duas dimensões têm o mesmo peso: Inglês × 50% + Metas × 50%.",
+  "Only the measured dimension counts: 100% of the score.":
+    "A única dimensão medida representa 100% do score.",
+  "Your score appears when at least one dimension has valid data.":
+    "Seu score aparece quando pelo menos uma dimensão tem dados válidos.",
+  "Not measured": "Não medido",
+  weight: "de peso",
+  points: "pontos",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.

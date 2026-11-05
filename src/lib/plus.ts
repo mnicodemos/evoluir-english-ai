@@ -251,6 +251,41 @@ export type EvolutionScore = {
   goals: number | null;
 };
 
+export type EvolutionScoreComposition = {
+  mode: "balanced" | "english_only" | "goals_only" | "empty";
+  englishWeight: number | null;
+  goalsWeight: number | null;
+  englishContribution: number | null;
+  goalsContribution: number | null;
+};
+
+/** Exact contribution of each measured dimension to the displayed score. */
+export function evolutionScoreComposition(
+  score: Pick<EvolutionScore, "english" | "goals">,
+): EvolutionScoreComposition {
+  const hasEnglish = score.english !== null;
+  const hasGoals = score.goals !== null;
+  const mode =
+    hasEnglish && hasGoals
+      ? "balanced"
+      : hasEnglish
+        ? "english_only"
+        : hasGoals
+          ? "goals_only"
+          : "empty";
+  const englishWeight = hasEnglish ? (hasGoals ? 50 : 100) : null;
+  const goalsWeight = hasGoals ? (hasEnglish ? 50 : 100) : null;
+  return {
+    mode,
+    englishWeight,
+    goalsWeight,
+    englishContribution:
+      score.english === null || englishWeight === null ? null : (score.english * englishWeight) / 100,
+    goalsContribution:
+      score.goals === null || goalsWeight === null ? null : (score.goals * goalsWeight) / 100,
+  };
+}
+
 /**
  * One evolution score across Evoluir+: the English skills and the goal steps
  * weigh the same; when only one is measured, the score is that one.

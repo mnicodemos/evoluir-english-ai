@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Flame, Loader2, MoreHorizontal, Pencil, Plus, Target, X } from "lucide-react";
+import { Check, ChevronDown, Flame, Loader2, MoreHorizontal, Pencil, Plus, Target, X } from "lucide-react";
 import { useState } from "react";
 
 import { notifyLife } from "@/components/life/LifeNotification";
@@ -20,7 +20,7 @@ import { useLife } from "@/hooks/useLife";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { skillMeterRows } from "@/lib/pedagogy/skillMeter";
-import { evolutionScore, PLUS_GOAL_EXAMPLES, PLUS_MAX_GOALS, plusDayComplete } from "@/lib/plus";
+import { evolutionScore, evolutionScoreComposition, PLUS_GOAL_EXAMPLES, PLUS_MAX_GOALS, PLUS_SCORE_DAYS, plusDayComplete } from "@/lib/plus";
 import {
   addPlusGoal,
   archivePlusGoal,
@@ -58,6 +58,7 @@ export function GoalsSection({
   // With goals already set, "+ New goal" opens the form (user request,
   // 2026-10-24); with none, the form and its examples show at once.
   const [adding, setAdding] = useState(false);
+  const [showScoreDetails, setShowScoreDetails] = useState(false);
 
   const load = useServerFn(loadPlus);
   const add = useServerFn(addPlusGoal);
@@ -127,11 +128,16 @@ export function GoalsSection({
   const goals = data?.goals ?? [];
   const todaySteps = data?.todaySteps ?? [];
   const allDone = plusDayComplete(todaySteps);
+  const skillRows = skillMeterRows(nextStep?.skills, null);
+  const measuredSkillCount = skillRows.filter((row) => row.value !== null).length;
+  const stepsGiven = data?.stepsGiven ?? 0;
+  const stepsDone = data?.stepsDone ?? 0;
   const score = evolutionScore({
-    englishSkills: skillMeterRows(nextStep?.skills, null).map((row) => row.value),
-    stepsGiven: data?.stepsGiven ?? 0,
-    stepsDone: data?.stepsDone ?? 0,
+    englishSkills: skillRows.map((row) => row.value),
+    stepsGiven,
+    stepsDone,
   });
+  const composition = evolutionScoreComposition(score);
   const canAdd = goals.length < PLUS_MAX_GOALS;
   const submit = (goal: string) => {
     const clean = goal.trim();
@@ -176,6 +182,54 @@ export function GoalsSection({
           <p className="mt-3 text-xs text-muted-foreground">
             {t("Finishing all of today's steps also counts for your streak.")}
           </p>
+          <button
+            type="button"
+            aria-expanded={showScoreDetails}
+            aria-controls="evolution-score-details"
+            onClick={() => setShowScoreDetails((open) => !open)}
+            className="mt-3 inline-flex min-h-9 items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+          >
+            {t("How your score is calculated")}
+            <ChevronDown
+              className={cn("size-4 transition-transform", showScoreDetails && "rotate-180")}
+              aria-hidden="true"
+            />
+          </button>
+          {showScoreDetails ? (
+            <div
+              id="evolution-score-details"
+              className="mt-2 space-y-3 rounded-xl border border-border bg-secondary/30 p-3"
+            >
+              <p className="text-xs text-muted-foreground">
+                {t("English reflects your measured skill profile. Goals count active-goal steps over the last")} {PLUS_SCORE_DAYS} {t("days, ending today.")}
+              </p>
+              <div className="space-y-3">
+                <ScoreExplanationRow
+                  label={t("English")}
+                  description={`${t("Measured English skills")}: ${measuredSkillCount}/5 · ${t("simple average")}`}
+                  value={score.english}
+                  weight={composition.englishWeight}
+                  contribution={composition.englishContribution}
+                  t={t}
+                />
+                <ScoreExplanationRow
+                  label={t("Goals")}
+                  description={`${t("Completed steps in active goals")}: ${stepsDone}/${stepsGiven}`}
+                  value={score.goals}
+                  weight={composition.goalsWeight}
+                  contribution={composition.goalsContribution}
+                  t={t}
+                />
+              </div>
+              <p className="border-t border-border pt-2 text-xs font-medium">
+                {composition.mode === "balanced"
+                  ? t("Both dimensions count equally: English × 50% + Goals × 50%.")
+                  : composition.mode === "english_only" || composition.mode === "goals_only"
+                    ? t("Only the measured dimension counts: 100% of the score.")
+                    : t("Your score appears when at least one dimension has valid data.")}
+              </p>
+            </div>
+          ) : null}
         </section>
       )}
 
@@ -452,6 +506,42 @@ function ScoreRing({ value }: { value: number | null }) {
         />
       </svg>
       <span className="text-2xl font-bold">{value === null ? "—" : value}</span>
+    </div>
+  );
+}
+
+function ScoreExplanationRow({
+  label,
+  description,
+  value,
+  weight,
+  contribution,
+  t,
+}: {
+  label: string;
+  description: string;
+  value: number | null;
+  weight: number | null;
+  contribution: number | null;
+  t: (label: string) => string;
+}) {
+  const points =
+    contribution === null ? "—" : Number(contribution.toFixed(1)).toString();
+  return (
+    <div className="flex items-start justify-between gap-3 text-xs">
+      <div className="min-w-0">
+        <p className="font-semibold">{label}</p>
+        <p className="mt-0.5 text-muted-foreground">{description}</p>
+      </div>
+      <div className="shrink-0 text-right tabular-nums">
+        <p className="font-semibold">{value === null ? "—" : `${value}%`}</p>
+        <p className="mt-0.5 text-muted-foreground">
+          {weight === null ? t("Not measured") : `${weight}% ${t("weight")}`}
+        </p>
+        <p className="text-muted-foreground">
+          {contribution === null ? "—" : `${points} ${t("points")}`}
+        </p>
+      </div>
     </div>
   );
 }
