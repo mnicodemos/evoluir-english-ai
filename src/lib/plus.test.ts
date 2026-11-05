@@ -270,3 +270,74 @@ describe("evolutionScoreSkillContribution", () => {
     ).toBeNull();
   });
 });
+
+describe("Evolution Score end-to-end validation", () => {
+  it("keeps the balanced score consistent with its displayed contributions", () => {
+    const score = evolutionScore({
+      englishSkills: [80, 60, null, 85],
+      stepsGiven: 8,
+      stepsDone: 6,
+    });
+    const composition = evolutionScoreComposition(score);
+
+    expect(score).toEqual({ score: 75, english: 75, goals: 75 });
+    expect(composition.englishContribution).toBe(37.5);
+    expect(composition.goalsContribution).toBe(37.5);
+    expect((composition.englishContribution ?? 0) + (composition.goalsContribution ?? 0)).toBe(
+      score.score,
+    );
+  });
+
+  it("rounds measured skill averages and goal completion using the same score contract", () => {
+    expect(evolutionScore({ englishSkills: [70, 71], stepsGiven: 3, stepsDone: 2 })).toEqual({
+      score: 69,
+      english: 71,
+      goals: 67,
+    });
+  });
+
+  it("caps completed goal steps at the number of eligible steps", () => {
+    expect(evolutionScore({ englishSkills: [], stepsGiven: 4, stepsDone: 7 })).toEqual({
+      score: 100,
+      english: null,
+      goals: 100,
+    });
+  });
+
+  it("ignores unavailable and non-finite skill measurements without fabricating data", () => {
+    expect(
+      evolutionScore({
+        englishSkills: [null, Number.NaN, Number.POSITIVE_INFINITY],
+        stepsGiven: 0,
+        stepsDone: 0,
+      }),
+    ).toEqual({ score: null, english: null, goals: null });
+  });
+
+  it("does not count future, expired-window, or archived-goal steps in the score input", () => {
+    const progress = plusScoreProgress(
+      [
+        { goalId: "active", day: "2026-10-01", doneAt: "2026-10-01T12:00:00Z" },
+        { goalId: "active", day: "2026-10-02", doneAt: null },
+        { goalId: "active", day: "2026-10-16", doneAt: "2026-10-16T12:00:00Z" },
+        { goalId: "archived", day: "2026-10-10", doneAt: "2026-10-10T12:00:00Z" },
+      ],
+      new Set(["active"]),
+      "2026-10-02",
+      "2026-10-15",
+    );
+
+    expect(progress).toEqual({ stepsGiven: 1, stepsDone: 0 });
+    expect(evolutionScore({ englishSkills: [], ...progress })).toEqual({
+      score: 0,
+      english: null,
+      goals: 0,
+    });
+  });
+
+  it("keeps an unavailable score distinct from a measured zero score", () => {
+    expect(evolutionScore({ englishSkills: [], stepsGiven: 0, stepsDone: 0 }).score).toBeNull();
+    expect(evolutionScore({ englishSkills: [0], stepsGiven: 0, stepsDone: 0 }).score).toBe(0);
+    expect(evolutionScore({ englishSkills: [], stepsGiven: 2, stepsDone: 0 }).score).toBe(0);
+  });
+});
