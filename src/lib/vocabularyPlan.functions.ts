@@ -7,8 +7,8 @@ import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { callGateway } from "./ai-gateway.server";
-import { studyToday } from "./today";
 import { getCurriculum } from "./curriculum";
+import { studyToday } from "./today";
 import {
   lessonBatchKey,
   ownedWordSet,
@@ -253,9 +253,7 @@ async function buildDailyWords(
   }
 
   const byTitle = new Map(lessonList.map((l) => [l.title.toLowerCase(), l]));
-  const lessonForWord = (word: AiWord) =>
-    byTitle.get(String(word.lesson_title ?? "").toLowerCase()) ??
-    lessonList.find((lesson) => lesson.title === word.lesson_title);
+  const lessonForWord = (word: AiWord) => byTitle.get(String(word.lesson_title ?? "").toLowerCase());
   const rows = fresh.map((w) => {
     const lesson = lessonForWord(w);
     return {
