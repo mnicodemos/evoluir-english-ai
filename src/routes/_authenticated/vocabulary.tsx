@@ -138,6 +138,8 @@ function VocabularyOnline() {
   const [recordingId, setRecordingId] = useState<string | null>(null);
   const [checkingId, setCheckingId] = useState<string | null>(null);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
+  // A passed local pronunciation is reflected immediately while the server writes it.
+  const [optimisticPronounced, setOptimisticPronounced] = useState<Set<string>>(() => new Set());
   // One pronunciation check at a time; every attempt ends and frees the button.
   const pronunciationGate = useRef(createAttemptGate());
   const pronunciationAbort = useRef<AbortController | null>(null);
@@ -295,11 +297,6 @@ function VocabularyOnline() {
     await saveReview(wordId, "known", { timed: true });
   }
 
-  /** Passed pronunciation (>= 70%): the word goes straight to the Learned tab. */
-  async function markPronouncedKnown(wordId: string) {
-    await saveReview(wordId, "pronounced");
-  }
-
   /** A failed review sends the word back two steps and due again tomorrow. */
   async function markForgotten(wordId: string) {
     const existing = byWord.get(wordId);
@@ -394,33 +391,26 @@ function VocabularyOnline() {
         }
         const previewScore = Math.round(pronunciationScore(word.word, spoken) * 100);
         workedOnWords.current = true;
-        const authoritative = await savePronunciation({
-          data: {
-            operationKey: crypto.randomUUID(),
-            wordId: word.id,
-            transcript: spoken,
-            // No 1-minute floor: a 5-second attempt used to add a whole minute,
-            // so ten quick words read as ten minutes (audit, 2026-10-24). The
-            // manual clock carries the seconds over to the next attempt.
-            minutes: minutesSpent(0),
-          },
-        });
-        // A late answer from an older attempt must never change the screen.
+        const operationKey = crypto.randomUUID();
+        const minutes = minutesSpent(0);
+        // The local scorer uses the same deterministic rubric as the server. Show
+        // its result now; persistence and the authoritative review run independently.
         if (!pronunciationGate.current.isCurrent(attempt)) return false;
-        const score = authoritative.score;
-        if (score !== previewScore)
-          console.warn("Pronunciation preview differed from the authoritative result");
         const pt = lang === "pt";
-        if (score >= 70) {
+        if (previewScore >= 70) {
+          setOptimisticPronounced((current) => new Set(current).add(word.id));
           haptic("success");
           pronunciationToasts.current.custom(
             (id) => (
-              <PronunciationResultToast toastId={id} score={score} word={word.word} pt={pt} />
+              <PronunciationResultToast
+                toastId={id}
+                score={previewScore}
+                word={word.word}
+                pt={pt}
+              />
             ),
             { duration: 3500 },
           );
-          await markPronouncedKnown(word.id);
-          return true;
         } else {
           // A low score is coaching, not a failure: amber "try again", not a red error.
           haptic("tap");
@@ -428,7 +418,7 @@ function VocabularyOnline() {
             (id) => (
               <PronunciationResultToast
                 toastId={id}
-                score={score}
+                score={previewScore}
                 word={word.word}
                 heard={spoken}
                 pt={pt}
@@ -437,9 +427,35 @@ function VocabularyOnline() {
             ),
             { duration: 8000 },
           );
-          // A clear miss on a due review counts as a failed review.
-          if (score < 55) await markForgotten(word.id);
         }
+
+        // Do not hold the microphone state, button, or review-session queue open
+        // for database round trips. The server remains authoritative for both writes.
+        void (async () => {
+          try {
+            const authoritative = await savePronunciation({
+              data: { operationKey, wordId: word.id, transcript: spoken, minutes },
+            });
+            if (authoritative.score >= 70) {
+              await reviewWord({ data: { wordId: word.id, action: "pronounced" } });
+            } else if (authoritative.score < 55) {
+              await reviewWord({ data: { wordId: word.id, action: "forgotten" } });
+            }
+            await invalidateVocabulary();
+          } catch {
+            // A transient failure must not interrupt practice. Re-read the server
+            // state so an optimistic Learned placement is not treated as persisted.
+            await invalidateVocabulary().catch(() => undefined);
+          } finally {
+            setOptimisticPronounced((current) => {
+              if (!current.has(word.id)) return current;
+              const next = new Set(current);
+              next.delete(word.id);
+              return next;
+            });
+          }
+        })();
+        return previewScore >= 70;
       } catch (error) {
         const cancelled = error instanceof Error && error.name === "AbortError";
         if (!cancelled && pronunciationGate.current.isCurrent(attempt))
@@ -500,9 +516,13 @@ function VocabularyOnline() {
   // full word list was cut off by the row limit.
   const learnedPool = new Map(all.map((w) => [w.id, w]));
   for (const w of daily ?? []) learnedPool.set(w.id, w);
-  const learned = [...learnedPool.values()].filter(
-    (w) => (byWord.get(w.id)?.mastery_level ?? 0) >= LEARNED_MASTERY,
-  );
+  function isLearnedWord(wordId: string) {
+    return (
+      optimisticPronounced.has(wordId) ||
+      (byWord.get(wordId)?.mastery_level ?? 0) >= LEARNED_MASTERY
+    );
+  }
+  const learned = [...learnedPool.values()].filter((w) => isLearnedWord(w.id));
 
   // Dictionary search: answers come from context.reverso.net, not from the lessons.
   const { query, setQuery, q, entry, searching } = useDictionarySearch(minutesSpent);
@@ -543,6 +563,7 @@ function VocabularyOnline() {
   // A word counts as known for now once it has climbed a step and its next review
   // has not arrived yet; it stays in the list, dimmed with a badge.
   const knownNow = (id: string) => {
+    if (optimisticPronounced.has(id)) return true;
     const s = byWord.get(id);
     return (s?.mastery_level ?? 0) > 0 && !canAdvance(s);
   };
@@ -551,7 +572,13 @@ function VocabularyOnline() {
   const todayKnownCount = today.filter((w) => knownNow(w.id)).length;
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
   // Learned words (e.g. passed pronunciation) move out of Today into the Learned tab.
-  const todayOpen = today.filter((w) => (byWord.get(w.id)?.mastery_level ?? 0) < LEARNED_MASTERY);
+  function isTodayOpenWord(wordId: string) {
+    return (
+      !optimisticPronounced.has(wordId) &&
+      (byWord.get(wordId)?.mastery_level ?? 0) < LEARNED_MASTERY
+    );
+  }
+  const todayOpen = today.filter((w) => isTodayOpenWord(w.id));
   const todayToDo = todayOpen.filter((w) => !knownNow(w.id));
 
   // Spaced reviews: earlier words whose review date has arrived come back here,
@@ -563,6 +590,8 @@ function VocabularyOnline() {
     .filter((w) => !todayIds.has(w.id))
     .filter((w) => {
       const s = byWord.get(w.id);
+      // Optimistically passed words leave Review immediately, even if they were due.
+      if (optimisticPronounced.has(w.id)) return false;
       if (isDue(s)) return true;
       // Words that reached Learned leave Today and live in the Learned tab.
       if ((s?.mastery_level ?? 0) >= LEARNED_MASTERY) return false;
