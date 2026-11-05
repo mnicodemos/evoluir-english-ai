@@ -42,7 +42,7 @@ export function trimSilence(source: Float32Array, sampleRate: number): Float32Ar
   return source.subarray(from, to);
 }
 
-function encodeWav(chunks: Float32Array[], sourceRate: number): Blob {
+export function encodeWav(chunks: Float32Array[], sourceRate: number): Blob {
   const sourceLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
   const merged = new Float32Array(sourceLength);
   let sourceOffset = 0;
