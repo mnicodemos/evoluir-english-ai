@@ -140,7 +140,6 @@ export const loadPlus = createServerFn({ method: "POST" })
     };
   });
 
-
 /**
  * Generates today's EVO steps after the overview has rendered. The overview
  * itself only reads persisted data, so AI latency never blocks the Home card.
@@ -201,7 +200,10 @@ export const generatePlusSteps = createServerFn({ method: "POST" })
         },
         AbortSignal.timeout(15_000),
       );
-      written = parsePlusSteps(raw, pending.map(({ goal }) => goal.id));
+      written = parsePlusSteps(
+        raw,
+        pending.map(({ goal }) => goal.id),
+      );
     } catch (aiError) {
       console.warn("Plus steps fell back to ready-made ones", aiError);
     }
