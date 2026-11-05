@@ -2731,7 +2731,6 @@ const baseUiPt: Record<string, string> = {
   "More evidence is needed": "É preciso reunir mais evidências",
   "This is the lowest measured skill": "Esta é a habilidade medida com menor resultado",
   "Not practised in the last 7 days": "Não praticada nos últimos 7 dias",
-  "Not measured yet": "Ainda não medida",
   "Start building your learning evidence": "Comece a construir suas evidências de aprendizagem",
   "Build your first learning evidence": "Comece a gerar suas primeiras evidências de aprendizagem",
   "Open recommended practice": "Abrir prática recomendada",
