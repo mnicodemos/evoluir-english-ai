@@ -1027,7 +1027,7 @@ function Dashboard() {
                       </GaugeRing>
                     </div>
                   </div>
-                  <div className="flex min-w-0 flex-col items-start justify-center gap-1 self-stretch lg:h-auto lg:flex-row lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
+                  <div className="flex min-w-0 translate-x-3 flex-col items-start justify-center gap-1 self-stretch lg:h-auto lg:translate-x-0 lg:flex-row lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                     {!hasProgressToday && (
                       <div className="flex min-h-[5.75rem] translate-y-4 flex-col lg:translate-y-1 items-center justify-center gap-1 text-center text-muted-foreground">
                         <DoneSeal icon={ClockHands} />
