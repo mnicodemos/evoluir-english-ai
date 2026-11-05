@@ -271,8 +271,6 @@ describe("evolutionScoreSkillContribution", () => {
   });
 });
 
-
-
 describe("Evolution Score end-to-end validation", () => {
   it("keeps the balanced score consistent with its displayed contributions", () => {
     const score = evolutionScore({
@@ -291,15 +289,19 @@ describe("Evolution Score end-to-end validation", () => {
   });
 
   it("rounds measured skill averages and goal completion using the same score contract", () => {
-    expect(
-      evolutionScore({ englishSkills: [70, 71], stepsGiven: 3, stepsDone: 2 }),
-    ).toEqual({ score: 69, english: 71, goals: 67 });
+    expect(evolutionScore({ englishSkills: [70, 71], stepsGiven: 3, stepsDone: 2 })).toEqual({
+      score: 69,
+      english: 71,
+      goals: 67,
+    });
   });
 
   it("caps completed goal steps at the number of eligible steps", () => {
-    expect(
-      evolutionScore({ englishSkills: [], stepsGiven: 4, stepsDone: 7 }),
-    ).toEqual({ score: 100, english: null, goals: 100 });
+    expect(evolutionScore({ englishSkills: [], stepsGiven: 4, stepsDone: 7 })).toEqual({
+      score: 100,
+      english: null,
+      goals: 100,
+    });
   });
 
   it("ignores unavailable and non-finite skill measurements without fabricating data", () => {
