@@ -26,7 +26,6 @@ describe("trimSilence", () => {
   });
 });
 
-
 describe("encodeWav", () => {
   it("downsamples to 16 kHz, mono, 16-bit PCM and keeps a one-second clip near 32 KB", async () => {
     const samples = new Float32Array(44100);
