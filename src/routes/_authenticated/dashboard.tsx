@@ -199,9 +199,6 @@ function DashboardNotifications({
   const extraVideos = useExtraVideosNews(profile?.id);
   // Reuse EVO’s server-side decision; the bell does not derive new pedagogy.
   const { data: nextStep } = useNextStep({ enabled: !!profile?.id });
-  const { data: todayActivities = [], isLoading: isTodayActivitiesLoading } = useTodayActivities(
-    profile?.id,
-  );
   const quickWin = nextStep?.quickWin;
   const quickWinVisible =
     !!quickWin &&
@@ -773,7 +770,9 @@ function Dashboard() {
           ? "Todas as 10 joias conquistadas"
           : "All 10 jewels earned";
   const { data: minutesToday = 0, isLoading: isMinutesTodayLoading } = useMinutesToday(profile?.id);
-  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
+  const { data: todayActivities = [], isLoading: isTodayActivitiesLoading } = useTodayActivities(
+    profile?.id,
+  );
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
