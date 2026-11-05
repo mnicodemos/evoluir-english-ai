@@ -435,7 +435,7 @@ function VocabularyOnline() {
                 hint={<PronunciationHint target={word.word} spoken={spoken} pt={pt} />}
               />
             ),
-            { duration: 8000 },
+            { duration: 8000, position: "bottom-right" },
           );
           // A clear miss on a due review counts as a failed review.
           if (score < 55) await markForgotten(word.id);
