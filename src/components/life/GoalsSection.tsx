@@ -245,7 +245,9 @@ export function GoalsSection({
                         key={row.skill}
                         className="flex items-center justify-between gap-3 text-xs"
                       >
-                        <span className="text-muted-foreground">{t(row.skill[0]!.toUpperCase() + row.skill.slice(1))}</span>
+                        <span className="text-muted-foreground">
+                          {t(row.skill.charAt(0).toUpperCase() + row.skill.slice(1))}
+                        </span>
                         <span className="shrink-0 text-right tabular-nums">
                           {row.value === null ? t("Not measured") : `${row.value}%${level}`}
                           {" · "}
@@ -255,9 +257,19 @@ export function GoalsSection({
                     );
                   })}
                   <div className="space-y-1 border-t border-border pt-2 text-[11px] text-muted-foreground">
-                    <p>{t("A skill needs at least 2 valid evidence items and an effective weight of 0.5 to be measured.")}</p>
-                    <p>{t("Effective weight is sample weight × evidence quality × source reliability. Evidence weight halves every 30 days for the skill score.")}</p>
-                    <p>{t("Reading uses daily reading evidence only; lesson quizzes are excluded.")}</p>
+                    <p>
+                      {t(
+                        "A skill needs at least 2 valid evidence items and an effective weight of at least 0.5 to be measured.",
+                      )}
+                    </p>
+                    <p>
+                      {t(
+                        "Effective weight is sample weight × evidence quality × source reliability. Evidence weight halves every 30 days for the skill score.",
+                      )}
+                    </p>
+                    <p>
+                      {t("Reading uses daily reading evidence only; lesson quizzes are excluded.")}
+                    </p>
                   </div>
                 </div>
                 <ScoreExplanationRow
@@ -269,7 +281,9 @@ export function GoalsSection({
                   t={t}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  {t("Only steps from active goals dated within this 14-day window count. Future steps and archived goals are excluded.")}
+                  {t(
+                    "Only steps from active goals dated within this 14-day window count. Future steps and archived goals are excluded.",
+                  )}
                 </p>
               </div>
               <p className="border-t border-border pt-2 text-xs font-medium">
