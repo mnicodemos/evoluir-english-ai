@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Flame, Loader2, Sprout } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import {
@@ -23,7 +23,7 @@ import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import { haptic } from "@/lib/haptics";
 import { plusDayComplete, plusGoalWeek, type PlusGoalWeek, type PlusStep } from "@/lib/plus";
-import { loadPlus, setPlusStepDone } from "@/lib/plus.functions";
+import { generatePlusSteps, loadPlus, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { PRIORITY_DOT } from "@/components/life/LifeTasks";
@@ -43,6 +43,8 @@ export function GoalsTodayCard() {
   const queryClient = useQueryClient();
   const load = useServerFn(loadPlus);
   const setDone = useServerFn(setPlusStepDone);
+  const generate = useServerFn(generatePlusSteps);
+  const generationKey = useRef<string | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["plus", profile?.id ?? null, lang],
@@ -50,6 +52,21 @@ export function GoalsTodayCard() {
     queryFn: () => load({ data: { lang } }),
     staleTime: 30 * 1000,
   });
+  const generateSteps = useMutation({
+    mutationFn: () => generate({ data: { lang } }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["plus", profile?.id ?? null, lang] });
+    },
+  });
+
+  useEffect(() => {
+    if (!data || !profile?.id || data.goals.length === 0) return;
+    const key = `${profile.id}:${data.today}:${lang}`;
+    if (generationKey.current === key) return;
+    generationKey.current = key;
+    generateSteps.mutate();
+  }, [data, profile?.id, lang]);
+
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ["plus"] });
     void queryClient.invalidateQueries({ queryKey: ["profile"] });
