@@ -118,13 +118,13 @@ function LifePage() {
           );
 
   return (
-    <AppShell desktopOneScreen>
+    <AppShell desktopOneScreen={tab !== "plan"}>
       {/* One page on desktop (owner request, 2026-11-01): from xl the page is
           one screen tall, the header and the measures keep their height and
           the tab below takes the rest, its cards scrolling inside (the Life
           Coach scrolls its messages and keeps the field in view). Shorter
           screens than 44rem, lg and phones scroll the page as before. */}
-      <div className="life-page-layout">
+      <div className={cn("life-page-layout", tab === "plan" && "life-page-layout--planning")}>
         <LifeHeader
           briefing={{ greeting, summary: daySummary, focus: `${focusToday}/${FOCUS_DAILY_TARGET}` }}
         />
