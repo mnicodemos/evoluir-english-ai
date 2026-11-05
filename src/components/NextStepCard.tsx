@@ -359,7 +359,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         {quickWin.activity.params ? (
           <Link to="/learning/$lessonId" params={quickWin.activity.params}>
-            <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
+            <span className="flex min-w-0 flex-1 flex-col items-start gap-2 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
@@ -380,7 +380,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </Link>
         ) : (
           <Link to={quickWin.activity.to}>
-            <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
+            <span className="flex min-w-0 flex-1 flex-col items-start gap-2 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {quickWinIcon} {t("Quick Win")} {xpChip(quickWin.activity.to)}
               </span>
