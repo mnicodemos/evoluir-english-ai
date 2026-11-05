@@ -124,7 +124,7 @@ export function WordCard({
             aria-label={t("Listen")}
             className={
               playingKey === `daily-${w.id}`
-                ? "bg-success text-success-foreground hover:bg-success/90"
+                ? "bg-success text-slate-950 hover:bg-success/90 [&_svg]:text-slate-950"
                 : ""
             }
           >
