@@ -20,6 +20,7 @@ import {
 } from "@/components/LifeHomeSlots";
 import { LifeHomeExtraSlot } from "@/components/LifeHomeExtraSlot";
 import { useLife } from "@/hooks/useLife";
+import { useLifeSessionUserId } from "@/hooks/useLifeSessionUserId";
 import { useProfile } from "@/hooks/useProfile";
 import { haptic } from "@/lib/haptics";
 import { plusDayComplete, plusGoalWeek, type PlusGoalWeek, type PlusStep } from "@/lib/plus";
@@ -40,6 +41,7 @@ export function GoalsTodayCard() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const { data: profile } = useProfile();
+  const sessionUserId = useLifeSessionUserId();
   const queryClient = useQueryClient();
   const load = useServerFn(loadPlus);
   const setDone = useServerFn(setPlusStepDone);
@@ -47,25 +49,25 @@ export function GoalsTodayCard() {
   const generationKey = useRef<string | null>(null);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["plus", profile?.id ?? null, lang],
-    enabled: !!profile,
+    queryKey: ["plus", sessionUserId ?? null, lang],
+    enabled: !!sessionUserId,
     queryFn: () => load({ data: { lang } }),
     staleTime: 30 * 1000,
   });
   const generateSteps = useMutation({
     mutationFn: () => generate({ data: { lang } }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["plus", profile?.id ?? null, lang] });
+      void queryClient.invalidateQueries({ queryKey: ["plus", sessionUserId ?? null, lang] });
     },
   });
 
   useEffect(() => {
-    if (!data || !profile?.id || data.goals.length === 0) return;
-    const key = `${profile.id}:${data.today}:${lang}`;
+    if (!data || !sessionUserId || data.goals.length === 0) return;
+    const key = `${sessionUserId}:${data.today}:${lang}`;
     if (generationKey.current === key) return;
     generationKey.current = key;
     generateSteps.mutate();
-  }, [data, profile?.id, lang, generateSteps.mutate]);
+  }, [data, sessionUserId, lang, generateSteps.mutate]);
 
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ["plus"] });
