@@ -638,7 +638,7 @@ function PlanTodaySummary({
 function Dashboard() {
   const { data: profile, isLoading } = useProfile();
   const navigate = useNavigate();
-  const { data: snapshot } = useStudySnapshot();
+  const { data: snapshot, isLoading: isSnapshotLoading } = useStudySnapshot();
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
@@ -770,8 +770,10 @@ function Dashboard() {
         : lang === "pt"
           ? "Todas as 10 joias conquistadas"
           : "All 10 jewels earned";
-  const { data: minutesToday = 0 } = useMinutesToday(profile?.id);
-  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
+  const { data: minutesToday = 0, isLoading: isMinutesTodayLoading } = useMinutesToday(profile?.id);
+  const { data: todayActivities = [], isLoading: isTodayActivitiesLoading } = useTodayActivities(
+    profile?.id,
+  );
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
@@ -786,6 +788,9 @@ function Dashboard() {
   });
   // Minutes in the ring always come with at least one line beside them.
   const hasProgressToday = minutesToday > 0 || learningCards.some((card) => card.state !== "empty");
+  // Do not briefly show the empty-state message while the three sources are loading.
+  const isTodayProgressLoading =
+    isSnapshotLoading || isMinutesTodayLoading || isTodayActivitiesLoading;
   const minutesToGoal = Math.max(profile?.daily_minutes ?? 0, 0) - minutesToday;
   // The first time today the student sees the daily goal reached (user request).
   const celebrateGoal = useCelebrate(
@@ -1028,7 +1033,7 @@ function Dashboard() {
                     </div>
                   </div>
                   <div className="flex min-w-0 translate-x-12 flex-col items-start justify-center gap-1 self-stretch lg:h-auto lg:translate-x-0 lg:flex-row lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
-                    {!hasProgressToday && (
+                    {!hasProgressToday && !isTodayProgressLoading && (
                       <div className="flex min-h-[5.75rem] translate-y-4 flex-col lg:translate-y-1 items-center justify-center gap-1 text-center text-muted-foreground">
                         <DoneSeal icon={ClockHands} />
                         <p className="text-[11px] font-bold leading-tight">
@@ -1044,7 +1049,7 @@ function Dashboard() {
                     )}
                     <div
                       className={cn(
-                        `${hasProgressToday ? "flex" : "hidden"} -translate-x-6 flex-col justify-center gap-1 self-center lg:translate-x-0 lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
+                        `${hasProgressToday ? "flex" : "hidden"} -translate-x-12 flex-col justify-center gap-1 self-center lg:translate-x-0 lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
                       )}
                     >
                       {learningCards.map((card) => {
