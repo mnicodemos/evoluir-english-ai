@@ -412,7 +412,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       >
         {data.quest.resource.params ? (
           <Link to="/learning/$lessonId" params={data.quest.resource.params}>
-            <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
+            <span className="flex min-w-0 flex-col items-start gap-2 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
@@ -431,7 +431,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           </Link>
         ) : (
           <Link to={data.quest.resource.to}>
-            <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
+            <span className="flex min-w-0 flex-col items-start gap-2 text-left">
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
