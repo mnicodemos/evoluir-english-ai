@@ -86,7 +86,7 @@ export function WordCard({
   return (
     <article
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md xl:p-3",
+        "group relative min-w-0 overflow-hidden rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md xl:p-3",
         isKnown && "opacity-65",
         className,
       )}
@@ -241,7 +241,7 @@ export function VocabularyWordList({
       </p>
     );
   return (
-    <div className="mt-4 grid gap-3 md:grid-cols-2">
+    <div className="mt-4 grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
       {items.map((w) => (
         <WordCard
           key={w.id}

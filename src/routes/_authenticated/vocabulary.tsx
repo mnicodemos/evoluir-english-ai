@@ -435,7 +435,7 @@ function VocabularyOnline() {
                 hint={<PronunciationHint target={word.word} spoken={spoken} pt={pt} />}
               />
             ),
-            { duration: 8000 },
+            { duration: 8000, position: "bottom-right" },
           );
           // A clear miss on a due review counts as a failed review.
           if (score < 55) await markForgotten(word.id);
@@ -628,260 +628,269 @@ function VocabularyOnline() {
 
   return (
     <AppShell mobileOneScreen>
-      <PageHeader
-        guide="vocabulary"
-        actionsClassName="max-sm:basis-full"
-        icon={BookOpen}
-        accent="vocabulary"
-        title={<>Vocabulary Builder</>}
-        description={<>Remember, check and say your words: ten new ones with every new lesson.</>}
-        actions={
-          // The built-in translator, compact (owner request, 2026-11-02: a lookup
-          // tool, not the page's task, so it left the big card above the words).
-          <div className="relative w-full sm:w-72" title={t("Built-in English translator")}>
-            <Languages
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[oklch(0.62_0.18_300)]"
-              aria-hidden="true"
-            />
-            <input
-              id="vocab-search"
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("Translate an English word...")}
-              aria-label={t("Built-in English translator")}
-              className="h-10 w-full rounded-full border border-white/15 bg-white/[0.04] pl-9 pr-9 text-sm outline-none transition focus:border-[oklch(0.62_0.18_300)] focus:ring-2 focus:ring-[oklch(0.62_0.18_300)]/30"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                aria-label={t("Clear search")}
-                className="absolute right-0 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-muted-foreground hover:text-foreground"
-              >
-                <X className="size-4" />
-              </button>
-            )}
-          </div>
-        }
-      />
-      <StudyDayCounter
-        label={t("Words reviewed today")}
-        value={reviewedToday}
-        goal={reviewGoal}
-        doneText={t("Study day counted")}
-        hint={t("10 reviewed words complete your study day.")}
-        action={
-          (daily?.length ?? 0) > 0 ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 shrink-0 px-2 text-[11px]"
-              disabled={busy === "redo"}
-              onClick={redoTodayWords}
-            >
-              <RotateCcw className="mr-1.5 size-3.5" /> Redo words
-            </Button>
-          ) : undefined
-        }
-      />
-
-      {q.length >= 2 ? (
-        <DictionaryResult
-          q={q}
-          searching={searching}
-          entry={entry}
-          playing={entry?.found ? playingKey === `dict-${entry.word}` : false}
-          onSpeak={(word) => void speak(`dict-${word}`, word)}
-        />
-      ) : isLoading ? (
-        <div className="mt-7 space-y-4">
-          <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-40 w-full" />
-        </div>
-      ) : (
-        <Tabs defaultValue="today" className="mt-4">
-          <TabsList>
-            {/* A real gap: the triggers are flex boxes, which drop a leading space
-                ("Today(7)", user report). */}
-            <TabsTrigger value="today" className="gap-1">
-              <span>Today</span>
-              <span>({todayOpen.length})</span>
-            </TabsTrigger>
-            {/* A real gap: the triggers are flex boxes, which drop a leading space
-                ("Today(7)", user report). */}
-            <TabsTrigger value="learned" className="gap-1">
-              <span>Learned</span>
-              <span>({learned.length})</span>
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="today">
-            {dailyLoading ? (
-              <div className="mt-5 space-y-4">
-                <Skeleton className="h-40 w-full" />
-                <Skeleton className="h-40 w-full" />
-              </div>
-            ) : (
-              <>
-                {generating ? (
-                  <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="size-4 animate-spin" /> {t("Preparing new words…")}
-                  </p>
-                ) : genFailed && (daily?.length ?? 0) < 10 ? (
-                  <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    <span>
-                      {genError instanceof Error && genError.message
-                        ? genError.message
-                        : t("No new words available right now. Please try again later.")}
-                    </span>
-                    <Button variant="outline" size="sm" onClick={retryGeneration}>
-                      <RotateCcw className="size-4" /> {t("Try again")}
-                    </Button>
-                  </div>
-                ) : null}
-                {session ? (
-                  <VocabularySession
-                    queue={session}
-                    cardsDue={cardsDue}
-                    onClose={() => setSession(null)}
-                    {...listProps}
-                  />
-                ) : (
-                  <>
-                    {sessionQueue.length > 0 ? (
-                      <section className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[oklch(0.62_0.18_300)]/35 bg-[oklch(0.62_0.18_300)]/[0.07] p-4">
-                        <div className="min-w-0 flex-1">
-                          <h2 className="font-display text-base font-semibold">
-                            <span>{sessionQueue.length}</span>{" "}
-                            <span>
-                              {sessionQueue.length === 1
-                                ? t("word to remember now")
-                                : t("words to remember now")}
-                            </span>
-                          </h2>
-                          <p className="text-xs text-muted-foreground">
-                            {t("One word at a time: remember it, check the meaning, then rate it.")}
-                          </p>
-                        </div>
-                        <Button
-                          className="min-h-11 shrink-0"
-                          onClick={() => {
-                            announceStudyInteraction(document.querySelector("main"), "vocabulary");
-                            setSession(sessionQueue);
-                          }}
-                        >
-                          <Play className="size-4" /> {t("Start review")}
-                        </Button>
-                      </section>
-                    ) : today.length > 0 && allTodayKnown ? (
-                      <p className="mt-4 flex items-center gap-2 text-sm font-medium text-success">
-                        <Check className="size-4" aria-hidden />{" "}
-                        {t("All words known today. Nice work!")}
-                      </p>
-                    ) : null}
-                    {cardsDue > 0 && (
-                      <section
-                        aria-label={t("Lesson cards to review")}
-                        className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3"
-                      >
-                        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[oklch(0.62_0.18_300)]/15 text-[oklch(0.62_0.18_300)]">
-                          <Layers className="size-5" aria-hidden="true" />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <h2 className="font-display text-sm font-semibold">
-                            <span>{t("Lesson cards to review")}</span> <span>({cardsDue})</span>
-                          </h2>
-                          <p className="text-xs text-muted-foreground">
-                            {t("Your lessons' words as flashcards: part of the same word review.")}
-                          </p>
-                        </div>
-                        <Button asChild size="sm" variant="outline" className="shrink-0">
-                          <Link to="/learning/review">{t("Review cards")}</Link>
-                        </Button>
-                      </section>
-                    )}
-                    {reviewOpen.length > 0 && (
-                      <section aria-label={t("Review due")} className="mt-5">
-                        <h2 className="font-display text-sm font-semibold">
-                          <span>{t("Review due")}</span> <span>({reviewOpen.length})</span>
-                        </h2>
-                        <VocabularyWordList items={reviewOpen} highlightKnown {...listProps} />
-                      </section>
-                    )}
-                    {todayToDo.length > 0 && (
-                      <section aria-label={t("New words")} className="mt-5">
-                        <h2 className="font-display text-sm font-semibold">
-                          <span>{t("New words")}</span> <span>({todayToDo.length})</span>
-                        </h2>
-                        <VocabularyWordList items={todayToDo} highlightKnown {...listProps} />
-                      </section>
-                    )}
-                    {doneToday.length > 0 && (
-                      // Words already rated today fold away (owner request,
-                      // 2026-11-02: dimmed cards in the list read as noise).
-                      <details className="group mt-5">
-                        <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
-                          <ChevronRight
-                            className="size-4 transition-transform group-open:rotate-90"
-                            aria-hidden
-                          />
-                          <span>{t("Done today")}</span> <span>({doneToday.length})</span>
-                        </summary>
-                        <VocabularyWordList items={doneToday} highlightKnown {...listProps} />
-                      </details>
-                    )}
-                    {today.length === 0 && !generating && !genFailed && (
-                      <div className="mt-6 flex flex-col items-center gap-2 rounded-xl border border-dashed border-white/15 p-6 text-center">
-                        <DoneSeal icon={ClockHands} />
-                        <p className="text-sm text-muted-foreground">
-                          {t("New words arrive with your next lesson.")}
-                        </p>
-                        <Button asChild size="sm" variant="outline">
-                          <Link to="/learning">{t("Open your next lesson")}</Link>
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-          </TabsContent>
-          <TabsContent value="learned">
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <div className="relative min-w-0 flex-1 sm:max-w-xs">
-                <Search
-                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden
-                />
-                <input
-                  type="search"
-                  value={learnedQuery}
-                  onChange={(e) => setLearnedQuery(e.target.value)}
-                  placeholder={t("Search your words...")}
-                  aria-label={t("Search your words...")}
-                  className="h-10 w-full rounded-full border border-white/15 bg-white/[0.04] pl-9 pr-3 text-sm outline-none focus:border-[oklch(0.62_0.18_300)]"
-                />
-              </div>
-              {(["all", "lessons", "reading"] as const).map((key) => (
+      <div className="vocabulary-page min-w-0 w-full overflow-x-clip">
+        <PageHeader
+          guide="vocabulary"
+          actionsClassName="max-sm:basis-full"
+          icon={BookOpen}
+          accent="vocabulary"
+          title={<>Vocabulary Builder</>}
+          description={<>Remember, check and say your words: ten new ones with every new lesson.</>}
+          actions={
+            // The built-in translator, compact (owner request, 2026-11-02: a lookup
+            // tool, not the page's task, so it left the big card above the words).
+            <div className="relative w-full sm:w-72" title={t("Built-in English translator")}>
+              <Languages
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[oklch(0.62_0.18_300)]"
+                aria-hidden="true"
+              />
+              <input
+                id="vocab-search"
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t("Translate an English word...")}
+                aria-label={t("Built-in English translator")}
+                className="h-10 w-full rounded-full border border-white/15 bg-white/[0.04] pl-9 pr-9 text-sm outline-none transition focus:border-[oklch(0.62_0.18_300)] focus:ring-2 focus:ring-[oklch(0.62_0.18_300)]/30"
+              />
+              {query && (
                 <button
-                  key={key}
                   type="button"
-                  onClick={() => setLearnedSource(key)}
-                  className={cn(
-                    "h-9 rounded-full border px-3 text-xs font-medium transition-colors",
-                    learnedSource === key
-                      ? "border-[oklch(0.62_0.18_300)]/60 bg-[oklch(0.62_0.18_300)]/15 text-foreground"
-                      : "border-white/10 text-muted-foreground hover:text-foreground",
-                  )}
+                  onClick={() => setQuery("")}
+                  aria-label={t("Clear search")}
+                  className="absolute right-0 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-muted-foreground hover:text-foreground"
                 >
-                  {t(LEARNED_SOURCE_LABEL[key])}
+                  <X className="size-4" />
                 </button>
-              ))}
+              )}
             </div>
-            <VocabularyWordList items={learnedShown} showActions={false} {...listProps} />
-          </TabsContent>
-        </Tabs>
-      )}
+          }
+        />
+        <StudyDayCounter
+          label={t("Words reviewed today")}
+          value={reviewedToday}
+          goal={reviewGoal}
+          doneText={t("Study day counted")}
+          hint={t("10 reviewed words complete your study day.")}
+          action={
+            (daily?.length ?? 0) > 0 ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 shrink-0 px-2 text-[11px]"
+                disabled={busy === "redo"}
+                onClick={redoTodayWords}
+              >
+                <RotateCcw className="mr-1.5 size-3.5" /> Redo words
+              </Button>
+            ) : undefined
+          }
+        />
+
+        {q.length >= 2 ? (
+          <DictionaryResult
+            q={q}
+            searching={searching}
+            entry={entry}
+            playing={entry?.found ? playingKey === `dict-${entry.word}` : false}
+            onSpeak={(word) => void speak(`dict-${word}`, word)}
+          />
+        ) : isLoading ? (
+          <div className="mt-7 space-y-4">
+            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-40 w-full" />
+          </div>
+        ) : (
+          <Tabs defaultValue="today" className="mt-4">
+            <TabsList>
+              {/* A real gap: the triggers are flex boxes, which drop a leading space
+                  ("Today(7)", user report). */}
+              <TabsTrigger value="today" className="gap-1">
+                <span>Today</span>
+                <span>({todayOpen.length})</span>
+              </TabsTrigger>
+              {/* A real gap: the triggers are flex boxes, which drop a leading space
+                  ("Today(7)", user report). */}
+              <TabsTrigger value="learned" className="gap-1">
+                <span>Learned</span>
+                <span>({learned.length})</span>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="today">
+              {dailyLoading ? (
+                <div className="mt-5 space-y-4">
+                  <Skeleton className="h-40 w-full" />
+                  <Skeleton className="h-40 w-full" />
+                </div>
+              ) : (
+                <>
+                  {generating ? (
+                    <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="size-4 animate-spin" /> {t("Preparing new words…")}
+                    </p>
+                  ) : genFailed && (daily?.length ?? 0) < 10 ? (
+                    <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                      <span>
+                        {genError instanceof Error && genError.message
+                          ? genError.message
+                          : t("No new words available right now. Please try again later.")}
+                      </span>
+                      <Button variant="outline" size="sm" onClick={retryGeneration}>
+                        <RotateCcw className="size-4" /> {t("Try again")}
+                      </Button>
+                    </div>
+                  ) : null}
+                  {session ? (
+                    <VocabularySession
+                      queue={session}
+                      cardsDue={cardsDue}
+                      onClose={() => setSession(null)}
+                      {...listProps}
+                    />
+                  ) : (
+                    <>
+                      {sessionQueue.length > 0 ? (
+                        <section className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[oklch(0.62_0.18_300)]/35 bg-[oklch(0.62_0.18_300)]/[0.07] p-4">
+                          <div className="min-w-0 flex-1">
+                            <h2 className="font-display text-base font-semibold">
+                              <span>{sessionQueue.length}</span>{" "}
+                              <span>
+                                {sessionQueue.length === 1
+                                  ? t("word to remember now")
+                                  : t("words to remember now")}
+                              </span>
+                            </h2>
+                            <p className="text-xs text-muted-foreground">
+                              {t(
+                                "One word at a time: remember it, check the meaning, then rate it.",
+                              )}
+                            </p>
+                          </div>
+                          <Button
+                            className="min-h-11 shrink-0"
+                            onClick={() => {
+                              announceStudyInteraction(
+                                document.querySelector("main"),
+                                "vocabulary",
+                              );
+                              setSession(sessionQueue);
+                            }}
+                          >
+                            <Play className="size-4" /> {t("Start review")}
+                          </Button>
+                        </section>
+                      ) : today.length > 0 && allTodayKnown ? (
+                        <p className="mt-4 flex items-center gap-2 text-sm font-medium text-success">
+                          <Check className="size-4" aria-hidden />{" "}
+                          {t("All words known today. Nice work!")}
+                        </p>
+                      ) : null}
+                      {cardsDue > 0 && (
+                        <section
+                          aria-label={t("Lesson cards to review")}
+                          className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3"
+                        >
+                          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[oklch(0.62_0.18_300)]/15 text-[oklch(0.62_0.18_300)]">
+                            <Layers className="size-5" aria-hidden="true" />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <h2 className="font-display text-sm font-semibold">
+                              <span>{t("Lesson cards to review")}</span> <span>({cardsDue})</span>
+                            </h2>
+                            <p className="text-xs text-muted-foreground">
+                              {t(
+                                "Your lessons' words as flashcards: part of the same word review.",
+                              )}
+                            </p>
+                          </div>
+                          <Button asChild size="sm" variant="outline" className="shrink-0">
+                            <Link to="/learning/review">{t("Review cards")}</Link>
+                          </Button>
+                        </section>
+                      )}
+                      {reviewOpen.length > 0 && (
+                        <section aria-label={t("Review due")} className="mt-5">
+                          <h2 className="font-display text-sm font-semibold">
+                            <span>{t("Review due")}</span> <span>({reviewOpen.length})</span>
+                          </h2>
+                          <VocabularyWordList items={reviewOpen} highlightKnown {...listProps} />
+                        </section>
+                      )}
+                      {todayToDo.length > 0 && (
+                        <section aria-label={t("New words")} className="mt-5">
+                          <h2 className="font-display text-sm font-semibold">
+                            <span>{t("New words")}</span> <span>({todayToDo.length})</span>
+                          </h2>
+                          <VocabularyWordList items={todayToDo} highlightKnown {...listProps} />
+                        </section>
+                      )}
+                      {doneToday.length > 0 && (
+                        // Words already rated today fold away (owner request,
+                        // 2026-11-02: dimmed cards in the list read as noise).
+                        <details className="group mt-5">
+                          <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+                            <ChevronRight
+                              className="size-4 transition-transform group-open:rotate-90"
+                              aria-hidden
+                            />
+                            <span>{t("Done today")}</span> <span>({doneToday.length})</span>
+                          </summary>
+                          <VocabularyWordList items={doneToday} highlightKnown {...listProps} />
+                        </details>
+                      )}
+                      {today.length === 0 && !generating && !genFailed && (
+                        <div className="mt-6 flex flex-col items-center gap-2 rounded-xl border border-dashed border-white/15 p-6 text-center">
+                          <DoneSeal icon={ClockHands} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("New words arrive with your next lesson.")}
+                          </p>
+                          <Button asChild size="sm" variant="outline">
+                            <Link to="/learning">{t("Open your next lesson")}</Link>
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </TabsContent>
+            <TabsContent value="learned">
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <div className="relative min-w-0 flex-1 sm:max-w-xs">
+                  <Search
+                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                    aria-hidden
+                  />
+                  <input
+                    type="search"
+                    value={learnedQuery}
+                    onChange={(e) => setLearnedQuery(e.target.value)}
+                    placeholder={t("Search your words...")}
+                    aria-label={t("Search your words...")}
+                    className="h-10 w-full rounded-full border border-white/15 bg-white/[0.04] pl-9 pr-3 text-sm outline-none focus:border-[oklch(0.62_0.18_300)]"
+                  />
+                </div>
+                {(["all", "lessons", "reading"] as const).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setLearnedSource(key)}
+                    className={cn(
+                      "h-9 rounded-full border px-3 text-xs font-medium transition-colors",
+                      learnedSource === key
+                        ? "border-[oklch(0.62_0.18_300)]/60 bg-[oklch(0.62_0.18_300)]/15 text-foreground"
+                        : "border-white/10 text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {t(LEARNED_SOURCE_LABEL[key])}
+                  </button>
+                ))}
+              </div>
+              <VocabularyWordList items={learnedShown} showActions={false} {...listProps} />
+            </TabsContent>
+          </Tabs>
+        )}
+      </div>
     </AppShell>
   );
 }
