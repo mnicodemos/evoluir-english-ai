@@ -223,6 +223,25 @@ export function plusGoalWeek(
   return { days, doneCount: days.filter((item) => item.done).length, streak };
 }
 
+/**
+ * Counts only steps belonging to currently active goals and dated inside the
+ * completed score window (from its first day through today).
+ */
+export function plusScoreProgress(
+  steps: readonly Pick<PlusStep, "goalId" | "day" | "doneAt">[],
+  activeGoalIds: ReadonlySet<string>,
+  since: string,
+  today: string,
+) {
+  const eligible = steps.filter(
+    (step) => activeGoalIds.has(step.goalId) && step.day >= since && step.day <= today,
+  );
+  return {
+    stepsGiven: eligible.length,
+    stepsDone: eligible.filter((step) => step.doneAt !== null).length,
+  };
+}
+
 export type EvolutionScore = {
   /** 0–100, or null before there is anything to measure. */
   score: number | null;
