@@ -301,14 +301,21 @@ export function GoalsSection({
                 <div className="space-y-2 rounded-lg border border-border bg-background/60 p-3">
                   <p className="text-xs font-semibold">{t("How activities affect your score")}</p>
                   <p className="text-[11px] text-muted-foreground">
-                    {t("An activity does not add points by itself. It can affect English when it creates valid assessment evidence; recent activity history also helps EVO choose what to practise next.")}
+                    {t(
+                      "An activity does not add points by itself. It can affect English when it creates valid assessment evidence; recent activity history also helps EVO choose what to practise next.",
+                    )}
                   </p>
                   {nextStep && nextStepHref ? (
                     <div className="border-t border-border pt-2">
-                      <p className="text-[11px] font-semibold">{t("Your next recommended action")}</p>
+                      <p className="text-[11px] font-semibold">
+                        {t("Your next recommended action")}
+                      </p>
                       <p className="mt-1 text-xs">
                         {nextStep.prioritySkill
-                          ? t(nextStep.prioritySkill.charAt(0).toUpperCase() + nextStep.prioritySkill.slice(1))
+                          ? t(
+                              nextStep.prioritySkill.charAt(0).toUpperCase() +
+                                nextStep.prioritySkill.slice(1),
+                            )
                           : t("Build your first learning evidence")}
                         {" · "}
                         {t(priorityReasonLabels[nextStep.reason])}
