@@ -2712,6 +2712,16 @@ const baseUiPt: Record<string, string> = {
   "Not measured": "Não medido",
   weight: "de peso",
   points: "pontos",
+  "Evidence by skill": "Evidências por habilidade",
+  "evidence items": "registros de evidência",
+  "A skill needs at least 2 valid evidence items and an effective weight of 0.5 to be measured.":
+    "Uma habilidade precisa de pelo menos 2 registros válidos e peso efetivo de 0,5 para ser medida.",
+  "Effective weight is sample weight × evidence quality × source reliability. Evidence weight halves every 30 days for the skill score.":
+    "O peso efetivo é peso da amostra × qualidade da evidência × confiabilidade da fonte. No score da habilidade, o peso da evidência cai pela metade a cada 30 dias.",
+  "Reading uses daily reading evidence only; lesson quizzes are excluded.":
+    "Reading considera apenas evidências da leitura diária; quizzes de lições não entram.",
+  "Only steps from active goals dated within this 14-day window count. Future steps and archived goals are excluded.":
+    "Contam apenas passos de metas ativas dentro desta janela de 14 dias. Passos futuros e metas arquivadas ficam de fora.",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.
