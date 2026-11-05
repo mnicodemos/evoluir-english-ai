@@ -35,6 +35,24 @@ describe("Evolution Score evidence criteria", () => {
     });
   });
 
+  it("does not measure a skill when its effective weight is below 0.5", () => {
+    const result = aggregateSkillEvidence(
+      "grammar",
+      [
+        evidence({ sampleWeight: 0.2 }),
+        evidence({ sampleWeight: 0.2, rawScore: 90 }),
+      ],
+      undefined,
+      Date.parse("2026-11-05T12:00:00.000Z"),
+    );
+
+    expect(result).toMatchObject({
+      score: null,
+      cefr: "insufficient_evidence",
+      evidenceCount: 2,
+    });
+  });
+
   it("measures a skill when both evidence thresholds are met", () => {
     const result = aggregateSkillEvidence(
       "grammar",
