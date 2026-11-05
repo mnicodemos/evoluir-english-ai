@@ -158,7 +158,6 @@ describe("plusGoalWeek", () => {
   });
 });
 
-
 describe("plusScoreProgress", () => {
   it("counts only active-goal steps from the first score day through today", () => {
     const progress = plusScoreProgress(
