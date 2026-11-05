@@ -393,6 +393,16 @@ export function LifeToday() {
                   {t("Focus")}
                 </button>
               ) : null}
+              {item.kind === "task" ? (
+                <Link
+                  to="/coach"
+                  search={{ task: item.key.slice("task:".length) }}
+                  className="ml-11 inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-brand-green transition-colors hover:bg-brand-green/10 hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+                >
+                  <Mic className="size-3.5" aria-hidden="true" />
+                  {t("Practise this task in English")}
+                </Link>
+              ) : null}
               {item.kind === "step" && item.goalId ? (
                 <Link
                   to="/coach"
