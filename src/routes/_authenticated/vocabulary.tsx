@@ -628,6 +628,7 @@ function VocabularyOnline() {
 
   return (
     <AppShell mobileOneScreen>
+      <div className="vocabulary-page min-w-0 w-full overflow-x-clip">
       <PageHeader
         guide="vocabulary"
         actionsClassName="max-sm:basis-full"
@@ -882,6 +883,7 @@ function VocabularyOnline() {
           </TabsContent>
         </Tabs>
       )}
+      </div>
     </AppShell>
   );
 }
