@@ -65,7 +65,7 @@ export function GoalsTodayCard() {
     if (generationKey.current === key) return;
     generationKey.current = key;
     generateSteps.mutate();
-  }, [data, profile?.id, lang]);
+  }, [data, profile?.id, lang, generateSteps.mutate]);
 
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ["plus"] });
