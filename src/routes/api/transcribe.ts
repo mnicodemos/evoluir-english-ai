@@ -145,7 +145,8 @@ export const Route = createFileRoute("/api/transcribe")({
             { status: 413 },
           );
         }
-        if (audio.type !== "audio/wav") {
+        const audioMimeType = audio.type.split(";")[0]?.trim().toLowerCase();
+        if (audioMimeType !== "audio/wav" && audioMimeType !== "audio/webm") {
           return Response.json({ message: "This audio format is not supported." }, { status: 415 });
         }
 
@@ -215,7 +216,7 @@ export const Route = createFileRoute("/api/transcribe")({
                     {
                       text: "Transcribe this English speech exactly. Return only the transcript, with no commentary or quotation marks.",
                     },
-                    { inlineData: { mimeType: "audio/wav", data: audioBase64 } },
+                    { inlineData: { mimeType: audioMimeType, data: audioBase64 } },
                   ],
                 },
               ],
