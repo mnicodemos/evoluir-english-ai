@@ -228,10 +228,7 @@ async function readOverview(userId: string): Promise<LifeOverview> {
         .select("habit_id, day")
         .eq("user_id", userId)
         .gte("day", addDays(today, -LIFE_HABIT_HISTORY_DAYS)),
-      prioritiesTable
-        .select("text, day, done_at")
-        .eq("user_id", userId)
-        .maybeSingle(),
+      prioritiesTable.select("text, day, done_at").eq("user_id", userId).maybeSingle(),
       studyDaysTable
         .select("day")
         .eq("user_id", userId)
