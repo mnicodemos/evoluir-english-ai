@@ -969,6 +969,32 @@
 }
 
 
+/* Life+ always follows its content height on desktop. The compact
+   fixed-height composition squeezed the Today/Decisions workspace and let
+   the global footer visually collide with the final rows. */
+@media (min-width: 64rem) {
+  .dashboard-shell > main:has(.life-page-layout) {
+    height: auto;
+    min-height: 0;
+    flex: 1 0 auto;
+    overflow: visible;
+  }
+
+  .life-page-layout {
+    display: block;
+    height: auto;
+    min-height: auto;
+    flex: 0 0 auto;
+  }
+
+  .life-page-layout .life-overview-grid,
+  .life-page-layout > .mt-2.grid {
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+  }
+}
+
 /* My Progress — compact-height desktop layout.
    Tighten the vertical rhythm across the summary and analytics bands so the
    global footer remains visible without covering the charts. Mobile and
