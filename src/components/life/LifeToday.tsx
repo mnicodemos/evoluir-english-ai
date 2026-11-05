@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  ArrowRight,
+  BookOpen,
   CalendarCheck,
   Crown,
   Flame,
@@ -24,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
+import { useNextStep } from "@/hooks/useNextStep";
 import { haptic } from "@/lib/haptics";
 import { habitsDueToday, habitStreak, type LifePriorityLevel } from "@/lib/life";
 import { setLifeHabitDone, setLifeTaskDone } from "@/lib/life.functions";
@@ -61,6 +64,7 @@ type TodayItem = {
 export function LifeToday() {
   const { t, lang } = useLifeT();
   const { data: profile } = useProfile();
+  const { data: nextStep } = useNextStep();
   const queryClient = useQueryClient();
   const { data: life, refresh } = useLife();
   const load = useServerFn(loadPlus);
@@ -216,6 +220,50 @@ export function LifeToday() {
           </Button>
         ) : null}
       </LifeSectionTitle>
+
+      {nextStep?.activity ? (
+        <section
+          className="mt-3 rounded-xl border border-brand-green/30 bg-brand-green/[0.06] p-3"
+          aria-label={lang === "pt" ? "Prática de inglês" : "English practice"}
+        >
+          <div className="flex items-center gap-2">
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-green/15 text-brand-green">
+              <BookOpen className="size-4" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-green">
+                {lang === "pt" ? "Prática de inglês" : "English practice"}
+              </p>
+              <p className="mt-0.5 text-sm font-semibold">
+                {lang === "pt"
+                  ? "Próxima atividade recomendada pela EVO"
+                  : "EVO's recommended next activity"}
+              </p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                {nextStep.activity.title}
+              </p>
+            </div>
+          </div>
+          {nextStep.activity.params ? (
+            <Link
+              to="/learning/$lessonId"
+              params={nextStep.activity.params}
+              className="mt-2 inline-flex min-h-9 items-center gap-2 rounded-lg px-2 text-xs font-semibold text-brand-green transition-colors hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+            >
+              {lang === "pt" ? "Começar prática" : "Start practice"}
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          ) : (
+            <Link
+              to={nextStep.activity.to}
+              className="mt-2 inline-flex min-h-9 items-center gap-2 rounded-lg px-2 text-xs font-semibold text-brand-green transition-colors hover:bg-brand-green/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+            >
+              {lang === "pt" ? "Começar prática" : "Start practice"}
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          )}
+        </section>
+      ) : null}
 
       {taskFormOpen ? (
         <div className="mt-3 rounded-xl border border-border p-3">
