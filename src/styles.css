@@ -910,6 +910,40 @@
 }
 
 
+/* Life+ Today — on shorter desktop viewports, do not compress the lower
+   workspace underneath the global footer. Let the shell and main grow with
+   the cards so the footer follows the content instead of covering it. */
+@media (min-width: 80rem) and (max-height: 56.25rem) {
+  .dashboard-shell:has(.life-page-layout) {
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  .dashboard-shell > main:has(.life-page-layout) {
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  .life-page-layout {
+    display: block;
+    min-height: auto;
+    flex: 0 0 auto;
+  }
+
+  .life-page-layout .life-overview-grid {
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+  }
+
+  .life-page-layout > .mt-2.grid {
+    min-height: 0;
+    flex: 0 0 auto;
+  }
+}
+
 /* Life+ Planning is a naturally flowing page: its goals, tasks and habits
    can extend beyond one viewport. Let the document scroll and keep the global
    footer after the final card instead of overlaying the content. Today keeps
