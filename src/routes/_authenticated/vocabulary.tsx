@@ -761,13 +761,18 @@ function VocabularyOnline() {
                               </span>
                             </h2>
                             <p className="text-xs text-muted-foreground">
-                              {t("One word at a time: remember it, check the meaning, then rate it.")}
+                              {t(
+                                "One word at a time: remember it, check the meaning, then rate it.",
+                              )}
                             </p>
                           </div>
                           <Button
                             className="min-h-11 shrink-0"
                             onClick={() => {
-                              announceStudyInteraction(document.querySelector("main"), "vocabulary");
+                              announceStudyInteraction(
+                                  document.querySelector("main"),
+                                  "vocabulary",
+                                );
                               setSession(sessionQueue);
                             }}
                           >
@@ -793,7 +798,9 @@ function VocabularyOnline() {
                               <span>{t("Lesson cards to review")}</span> <span>({cardsDue})</span>
                             </h2>
                             <p className="text-xs text-muted-foreground">
-                              {t("Your lessons' words as flashcards: part of the same word review.")}
+                              {t(
+                                "Your lessons' words as flashcards: part of the same word review.",
+                              )}
                             </p>
                           </div>
                           <Button asChild size="sm" variant="outline" className="shrink-0">
@@ -883,7 +890,6 @@ function VocabularyOnline() {
             </TabsContent>
           </Tabs>
         )}
-
       </div>
     </AppShell>
   );
