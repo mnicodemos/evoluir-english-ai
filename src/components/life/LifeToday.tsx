@@ -222,7 +222,10 @@ export function LifeToday() {
       </LifeSectionTitle>
 
       {nextStep?.activity ? (
-        <section className="mt-3 rounded-xl border border-brand-green/30 bg-brand-green/[0.06] p-3" aria-label={lang === "pt" ? "Prática de inglês" : "English practice"}>
+        <section
+          className="mt-3 rounded-xl border border-brand-green/30 bg-brand-green/[0.06] p-3"
+          aria-label={lang === "pt" ? "Prática de inglês" : "English practice"}
+        >
           <div className="flex items-center gap-2">
             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-green/15 text-brand-green">
               <BookOpen className="size-4" aria-hidden="true" />
@@ -232,9 +235,13 @@ export function LifeToday() {
                 {lang === "pt" ? "Prática de inglês" : "English practice"}
               </p>
               <p className="mt-0.5 text-sm font-semibold">
-                {lang === "pt" ? "Próxima atividade recomendada pela EVO" : "EVO's recommended next activity"}
+                {lang === "pt"
+                  ? "Próxima atividade recomendada pela EVO"
+                  : "EVO's recommended next activity"}
               </p>
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">{nextStep.activity.title}</p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                {nextStep.activity.title}
+              </p>
             </div>
           </div>
           {nextStep.activity.params ? (
