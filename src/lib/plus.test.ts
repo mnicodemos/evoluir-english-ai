@@ -272,6 +272,7 @@ describe("evolutionScoreSkillContribution", () => {
 });
 
 
+
 describe("Evolution Score end-to-end validation", () => {
   it("keeps the balanced score consistent with its displayed contributions", () => {
     const score = evolutionScore({
@@ -284,9 +285,9 @@ describe("Evolution Score end-to-end validation", () => {
     expect(score).toEqual({ score: 75, english: 75, goals: 75 });
     expect(composition.englishContribution).toBe(37.5);
     expect(composition.goalsContribution).toBe(37.5);
-    expect(
-      (composition.englishContribution ?? 0) + (composition.goalsContribution ?? 0),
-    ).toBe(score.score);
+    expect((composition.englishContribution ?? 0) + (composition.goalsContribution ?? 0)).toBe(
+      score.score,
+    );
   });
 
   it("rounds measured skill averages and goal completion using the same score contract", () => {
