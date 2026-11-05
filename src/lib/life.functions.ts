@@ -156,8 +156,11 @@ const toMilestone = (row: MilestoneRow): LifeMilestone => ({
 
 async function readOverview(userId: string): Promise<LifeOverview> {
   const today = studyToday();
-  const premium = await hasPremium(userId);
-  const goalsTable = await table("plus_goals");
+
+  // Premium entitlement and goals are independent reads. Start both together
+  // so the Home card does not pay the latency of these requests in sequence.
+  const [premium, goalsTable] = await Promise.all([hasPremium(userId), table("plus_goals")]);
+
   // Before migration 0068 the new columns are missing: read the old ones.
   let goalRead = await goalsTable
     .select("id, title, area, deadline, description")
@@ -180,44 +183,64 @@ async function readOverview(userId: string): Promise<LifeOverview> {
   }));
 
   const goalIds = goals.map((goal) => goal.id);
-  const milestoneRead = goalIds.length
-    ? await (
-        await table("plus_goal_milestones")
-      )
-        .select("id, goal_id, title, position, done_at")
-        .in("goal_id", goalIds)
-        .order("position", { ascending: true })
-    : { data: [], error: null };
-  const milestones = milestoneRead.error
-    ? []
-    : ((milestoneRead.data ?? []) as MilestoneRow[]).map(toMilestone);
-
   if (!premium) {
+    const milestoneRead = goalIds.length
+      ? await (
+          await table("plus_goal_milestones")
+        )
+          .select("id, goal_id, title, position, done_at")
+          .in("goal_id", goalIds)
+          .order("position", { ascending: true })
+      : { data: [], error: null };
+    const milestones = milestoneRead.error
+      ? []
+      : ((milestoneRead.data ?? []) as MilestoneRow[]).map(toMilestone);
     return { today, premium, goals, milestones, tasks: [], habits: [], logs: [], priority: null };
   }
 
-  const [taskRead, habitRead, logRead, priorityRead, studyDayRead] = await Promise.all([
-    (await table("life_tasks"))
-      .select("id, title, day, priority, goal_id, done_at")
-      .eq("user_id", userId)
-      .gte("day", addDays(today, -7))
-      .lte("day", addDays(today, 30))
-      .order("created_at", { ascending: true }),
-    readHabits(userId),
-    (await table("life_habit_logs"))
-      .select("habit_id, day")
-      .eq("user_id", userId)
-      .gte("day", addDays(today, -LIFE_HABIT_HISTORY_DAYS)),
-    (await table("life_priorities"))
-      .select("text, day, done_at")
-      .eq("user_id", userId)
-      .maybeSingle(),
-    // Linked habits take their check-ins from the study days (migration 0071).
-    (await table("study_days"))
-      .select("day")
-      .eq("user_id", userId)
-      .gte("day", addDays(today, -LIFE_HABIT_HISTORY_DAYS)),
-  ]);
+  // All independent Premium reads start together. Resolve table handles in
+  // parallel too, avoiding a chain of server-side dynamic-import awaits.
+  const [milestonesTable, tasksTable, logsTable, prioritiesTable, studyDaysTable] =
+    await Promise.all([
+      table("plus_goal_milestones"),
+      table("life_tasks"),
+      table("life_habit_logs"),
+      table("life_priorities"),
+      table("study_days"),
+    ]);
+
+  const [milestoneRead, taskRead, habitRead, logRead, priorityRead, studyDayRead] =
+    await Promise.all([
+      goalIds.length
+        ? milestonesTable
+            .select("id, goal_id, title, position, done_at")
+            .in("goal_id", goalIds)
+            .order("position", { ascending: true })
+        : Promise.resolve({ data: [], error: null }),
+      tasksTable
+        .select("id, title, day, priority, goal_id, done_at")
+        .eq("user_id", userId)
+        .gte("day", addDays(today, -7))
+        .lte("day", addDays(today, 30))
+        .order("created_at", { ascending: true }),
+      readHabits(userId),
+      logsTable
+        .select("habit_id, day")
+        .eq("user_id", userId)
+        .gte("day", addDays(today, -LIFE_HABIT_HISTORY_DAYS)),
+      prioritiesTable
+        .select("text, day, done_at")
+        .eq("user_id", userId)
+        .maybeSingle(),
+      studyDaysTable
+        .select("day")
+        .eq("user_id", userId)
+        .gte("day", addDays(today, -LIFE_HABIT_HISTORY_DAYS)),
+    ]);
+
+  const milestones = milestoneRead.error
+    ? []
+    : ((milestoneRead.data ?? []) as MilestoneRow[]).map(toMilestone);
   const habits = ((habitRead.data ?? []) as HabitRow[]).map(toHabit);
   const studyDays = studyDayRead.error
     ? []
@@ -227,6 +250,7 @@ async function readOverview(userId: string): Promise<LifeOverview> {
     day: string;
     done_at: string | null;
   } | null;
+
   return {
     today,
     premium,
