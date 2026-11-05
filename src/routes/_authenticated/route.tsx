@@ -5,6 +5,17 @@ import { storedOfflineUser } from "@/lib/offlineVocabulary";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
+  pendingMs: 0,
+  pendingMinMs: 250,
+  pendingComponent: () => (
+    <div className="dashboard-shell dark flex min-h-[100dvh] items-center justify-center">
+      <div
+        aria-label="Loading"
+        role="status"
+        className="size-8 animate-spin rounded-full border-2 border-white/15 border-t-cyan-300"
+      />
+    </div>
+  ),
   head: () => ({
     meta: [{ name: "robots", content: "noindex, nofollow" }],
   }),
