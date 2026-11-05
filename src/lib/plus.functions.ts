@@ -81,8 +81,7 @@ export type PlusOverview = {
 
 /**
  * The Plus page: active goals and today's step for each. A goal without a step
- * today gets one now, written by EVO, or a ready-made one when the AI is slow
- * or unavailable, so a goal is never left without its step.
+ * today gets a ready-made step immediately; EVO personalizes it afterward.
  */
 export const loadPlus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -110,6 +109,22 @@ export const loadPlus = createServerFn({ method: "POST" })
       return ((rows ?? []) as StepRow[]).map(toStep);
     };
     let history = await readSteps();
+    const missing = active.filter(
+      (goal) => !history.some((step) => step.goalId === goal.id && step.day === today),
+    );
+    if (missing.length) {
+      const { error: insertError } = await steps().upsert(
+        missing.map((goal) => ({
+          goal_id: goal.id,
+          user_id: context.userId,
+          day: today,
+          text: fallbackPlusStep(goal.area, today, data.lang as PlusLang),
+        })),
+        { onConflict: "goal_id,day", ignoreDuplicates: true },
+      );
+      if (insertError) throw new Error("Steps could not be saved");
+      history = await readSteps();
+    }
 
     const activeIds = new Set(active.map((goal) => goal.id));
     const scoreProgress = plusScoreProgress(history, activeIds, since, today);
@@ -151,10 +166,15 @@ export const generatePlusSteps = createServerFn({ method: "POST" })
       .order("day", { ascending: false });
     if (stepsError) throw new Error("Steps could not be loaded");
     const history = ((rows ?? []) as StepRow[]).map(toStep);
-    const missing = active.filter(
-      (goal) => !history.some((step) => step.goalId === goal.id && step.day === today),
-    );
-    if (!missing.length) return { created: 0 };
+    const pending = active.flatMap((goal) => {
+      const step = history.find((item) => item.goalId === goal.id && item.day === today);
+      return step &&
+        !step.doneAt &&
+        step.text === fallbackPlusStep(goal.area, today, data.lang as PlusLang)
+        ? [{ goal, step }]
+        : [];
+    });
+    if (!pending.length) return { generated: 0 };
 
     let written = new Map<string, string>();
     try {
@@ -166,7 +186,7 @@ export const generatePlusSteps = createServerFn({ method: "POST" })
         plusStepsPrompt({
           lang: data.lang as PlusLang,
           englishLevel: profile?.level ?? "b1",
-          goals: missing.map((goal) => ({
+          goals: pending.map(({ goal }) => ({
             ...goal,
             recent: history.filter((step) => step.goalId === goal.id).map((step) => step.text),
           })),
@@ -175,28 +195,30 @@ export const generatePlusSteps = createServerFn({ method: "POST" })
         {
           userId: context.userId,
           operation: "chat",
-          cacheKey: `plus-steps:${context.userId}:${today}:${missing.map((goal) => goal.id).join(",")}`,
+          cacheKey: `plus-steps:${context.userId}:${today}:${pending.map(({ goal }) => goal.id).join(",")}`,
           fast: true,
           maxOutputTokens: 600,
         },
         AbortSignal.timeout(15_000),
       );
-      written = parsePlusSteps(raw, missing.map((goal) => goal.id));
+      written = parsePlusSteps(raw, pending.map(({ goal }) => goal.id));
     } catch (aiError) {
       console.warn("Plus steps fell back to ready-made ones", aiError);
     }
 
-    const { error: insertError } = await steps().upsert(
-      missing.map((goal) => ({
-        goal_id: goal.id,
-        user_id: context.userId,
-        day: today,
-        text: written.get(goal.id) ?? fallbackPlusStep(goal.area, today, data.lang as PlusLang),
-      })),
-      { onConflict: "goal_id,day", ignoreDuplicates: true },
+    await Promise.all(
+      pending.map(async ({ goal, step }) => {
+        const generated = written.get(goal.id);
+        if (!generated) return;
+        const { error: updateError } = await steps()
+          .update({ text: generated })
+          .eq("id", step.id)
+          .eq("user_id", context.userId)
+          .is("done_at", null);
+        if (updateError) throw new Error("Steps could not be updated");
+      }),
     );
-    if (insertError) throw new Error("Steps could not be saved");
-    return { created: missing.length };
+    return { generated: written.size };
   });
 
 export const addPlusGoal = createServerFn({ method: "POST" })
