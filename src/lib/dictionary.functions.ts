@@ -4,6 +4,8 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callGateway, parseJson } from "./ai-gateway.server";
 
+export const REVERSO_TIMEOUT_MS = 1_200;
+
 export type DictionaryEntry = {
   found: boolean;
   word: string;
@@ -132,6 +134,7 @@ export const lookupWord = createServerFn({ method: "GET" })
 
     try {
       const res = await fetch(sourceUrl, {
+        signal: AbortSignal.timeout(REVERSO_TIMEOUT_MS),
         headers: {
           "user-agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
