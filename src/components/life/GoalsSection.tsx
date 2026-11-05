@@ -206,7 +206,7 @@ export function GoalsSection({
               <div className="space-y-3">
                 <ScoreExplanationRow
                   label={t("English")}
-                  description={`${measuredSkillCount}/5 ${t("skills measured; simple average.")}`}
+                  description={`${t("Measured English skills")}: ${measuredSkillCount}/5 · ${t("simple average")}`}
                   value={score.english}
                   weight={composition.englishWeight}
                   contribution={composition.englishContribution}
@@ -214,7 +214,7 @@ export function GoalsSection({
                 />
                 <ScoreExplanationRow
                   label={t("Goals")}
-                  description={`${stepsDone}/${stepsGiven} ${t("steps completed in active goals.")}`}
+                  description={`${t("Completed steps in active goals")}: ${stepsDone}/${stepsGiven}`}
                   value={score.goals}
                   weight={composition.goalsWeight}
                   contribution={composition.goalsContribution}
