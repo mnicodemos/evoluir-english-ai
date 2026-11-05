@@ -16,10 +16,7 @@ export function useLifeSessionUserId() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      queryClient.setQueryData(
-        LIFE_SESSION_QUERY_KEY,
-        session?.user.id ?? null,
-      );
+      queryClient.setQueryData(LIFE_SESSION_QUERY_KEY, session?.user.id ?? null);
     });
 
     return () => subscription.unsubscribe();
