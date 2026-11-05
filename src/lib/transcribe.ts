@@ -9,7 +9,20 @@ import { pronunciationSimilarity } from "@/lib/legacyScores";
 export const TRANSCRIBE_CLIENT_TIMEOUT_MS = 25_000;
 export const TRANSCRIBE_TIMEOUT_MESSAGE = "This is taking too long. Please try again.";
 
-/** Sends a recorded WAV blob to the transcription endpoint and returns the recognized English text. */
+export type TranscriptionAudioFormat = {
+  mimeType: "audio/wav" | "audio/webm";
+  extension: "wav" | "webm";
+};
+
+/** Accepts compact WAV or browser Opus/WebM recordings without re-encoding the payload. */
+export function getTranscriptionAudioFormat(audio: Blob): TranscriptionAudioFormat {
+  const mimeType = audio.type.split(";")[0]?.trim().toLowerCase();
+  if (mimeType === "audio/wav") return { mimeType, extension: "wav" };
+  if (mimeType === "audio/webm") return { mimeType, extension: "webm" };
+  throw new Error("This audio format is not supported.");
+}
+
+/** Sends a compact WAV or WebM/Opus blob and returns the recognized English text. */
 export async function transcribeAudio(audio: Blob, signal?: AbortSignal): Promise<string> {
   const controller = new AbortController();
   let timedOut = false;
@@ -36,8 +49,9 @@ async function transcribeOnce(audio: Blob, signal: AbortSignal): Promise<string>
   const token = data.session?.access_token;
   if (!token) throw new Error("Please sign in again to use the microphone.");
 
+  const format = getTranscriptionAudioFormat(audio);
   const form = new FormData();
-  form.append("file", audio, "recording.wav");
+  form.append("file", audio, `recording.${format.extension}`);
   const response = await fetch("/api/transcribe", {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
