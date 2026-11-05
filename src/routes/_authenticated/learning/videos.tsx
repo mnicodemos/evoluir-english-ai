@@ -221,11 +221,7 @@ function ExtraVideosPage() {
                     ) : (
                       <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-slate-900 via-slate-950 to-black">
                         {premium && embed ? (
-                          <Button
-                            size="lg"
-                            className="gap-2"
-                            onClick={() => watch(video.id)}
-                          >
+                          <Button size="lg" className="gap-2" onClick={() => watch(video.id)}>
                             <PlayCircle className="size-5" /> Watch video
                           </Button>
                         ) : (
