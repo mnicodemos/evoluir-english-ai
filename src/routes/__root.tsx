@@ -228,8 +228,8 @@ function RootComponent() {
       <Outlet />
       <Toaster
         className="dashboard-shell dark"
-        position="bottom-right"
-        mobileOffset={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
+        position="top-right"
+        mobileOffset={{ top: "calc(env(safe-area-inset-top) + 0.75rem)" }}
       />
     </QueryClientProvider>
   );
