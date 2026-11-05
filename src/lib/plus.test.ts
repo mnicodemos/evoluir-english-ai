@@ -8,6 +8,7 @@ import {
   parsePlusSteps,
   plusDayComplete,
   plusGoalWeek,
+  plusScoreProgress,
 } from "./plus";
 
 describe("guessPlusArea", () => {
@@ -154,5 +155,31 @@ describe("plusGoalWeek", () => {
 
   it("starts at zero for a new goal", () => {
     expect(plusGoalWeek([], "g", "2026-10-09")).toMatchObject({ doneCount: 0, streak: 0 });
+  });
+});
+
+describe("plusScoreProgress", () => {
+  it("counts only active-goal steps from the first score day through today", () => {
+    const progress = plusScoreProgress(
+      [
+        { goalId: "active", day: "2026-10-01", doneAt: "2026-10-01T12:00:00Z" },
+        { goalId: "active", day: "2026-10-02", doneAt: null },
+        { goalId: "active", day: "2026-10-15", doneAt: "2026-10-15T12:00:00Z" },
+        { goalId: "active", day: "2026-10-16", doneAt: "2026-10-16T12:00:00Z" },
+        { goalId: "archived", day: "2026-10-15", doneAt: "2026-10-15T12:00:00Z" },
+      ],
+      new Set(["active"]),
+      "2026-10-02",
+      "2026-10-15",
+    );
+
+    expect(progress).toEqual({ stepsGiven: 2, stepsDone: 1 });
+  });
+
+  it("returns zero when there are no eligible steps", () => {
+    expect(plusScoreProgress([], new Set(["active"]), "2026-10-02", "2026-10-15")).toEqual({
+      stepsGiven: 0,
+      stepsDone: 0,
+    });
   });
 });
