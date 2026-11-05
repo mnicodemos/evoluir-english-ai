@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { Check, Loader2, Pencil, Plus, Timer, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { notifyLife } from "@/components/life/LifeNotification";
@@ -16,6 +16,8 @@ import {
 import type { LifeGoal } from "@/lib/life.functions";
 import { LIFE_PRIORITIES, type LifePriorityLevel, type LifeTask } from "@/lib/life";
 import { haptic } from "@/lib/haptics";
+import { useFocusTimer } from "@/hooks/useFocusTimer";
+import { focusSetTask, openFocusWidget } from "@/lib/focusTimer";
 import { cn } from "@/lib/utils";
 
 export const PRIORITY_LABEL: Record<LifePriorityLevel, string> = {
@@ -45,6 +47,7 @@ export function LifeTaskList({
   emptyText: string;
 }) {
   const { t } = useLifeT();
+  const { state: focusState } = useFocusTimer();
   const setDone = useServerFn(setLifeTaskDone);
   const remove = useServerFn(deleteLifeTask);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -128,6 +131,19 @@ export function LifeTaskList({
                 ) : null}
               </p>
             </div>
+            <button
+              type="button"
+              aria-label={`${t('Focus')} · ${task.title}`}
+              title={t("Focus")}
+              disabled={done || focusState.phase !== "idle"}
+              onClick={() => {
+                focusSetTask(task.id);
+                openFocusWidget();
+              }}
+              className="grid size-7 shrink-0 place-items-center rounded-md text-pink-300 hover:bg-pink-400/10 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Timer className="size-3.5" aria-hidden="true" />
+            </button>
             <button
               type="button"
               aria-label={t("Edit task")}
