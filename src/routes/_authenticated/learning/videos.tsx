@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { useProfile } from "@/hooks/useProfile";
+import { useUiLang } from "@/lib/uiLang";
+import { uiPt } from "@/lib/uiDictionary";
 import { findLevel, isReviewLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
@@ -53,6 +55,8 @@ export const Route = createFileRoute("/_authenticated/learning/videos")({
  * toward the checklist, the study day or the Final Test.
  */
 function ExtraVideosPage() {
+  const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data: profile } = useProfile();
   const fetchVideos = useServerFn(loadPremiumVideos);
   const query = useQuery({
@@ -222,7 +226,7 @@ function ExtraVideosPage() {
                       <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-slate-900 via-slate-950 to-black">
                         {premium && embed ? (
                           <Button size="lg" className="gap-2" onClick={() => watch(video.id)}>
-                            <PlayCircle className="size-5" /> Watch video
+                            <PlayCircle className="size-5" /> {t("Watch video")}
                           </Button>
                         ) : (
                           <span className="grid size-14 place-items-center rounded-full border border-white/15 bg-white/10 text-white">
