@@ -36,11 +36,8 @@ vi.mock("./gemini.server", () => ({
 }));
 
 const { callGateway } = await import("./ai-gateway.server");
-const {
-  REVERSO_TIMEOUT_MS,
-  dictionaryCacheKey,
-  meaningsFromRaw,
-} = await import("./dictionary.functions");
+const { REVERSO_TIMEOUT_MS, dictionaryCacheKey, meaningsFromRaw } =
+  await import("./dictionary.functions");
 
 const msgs = [{ role: "user" as const, content: "Word: hello" }];
 const run = (userId: string, key: string, checked: boolean) =>
