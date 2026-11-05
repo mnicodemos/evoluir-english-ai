@@ -8,10 +8,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { callGateway } from "./ai-gateway.server";
 import { studyToday } from "./today";
+import { getCurriculum } from "./curriculum";
 import {
   lessonBatchKey,
   ownedWordSet,
   selectNewWords,
+  templateVocabularyCandidates,
   VOCABULARY_BATCH_SIZE,
 } from "./vocabularyBatch";
 
@@ -137,7 +139,7 @@ async function buildDailyWords(
   // toward another level when the student changes level.
   const { data: lessons } = await supabase
     .from("lessons")
-    .select("id, title, category, objective")
+    .select("id, title, category, objective, curriculum_key")
     .eq("created_by", userId)
     .like("curriculum_key", `${data.level}-%`)
     .order("sort_order")
@@ -147,6 +149,7 @@ async function buildDailyWords(
     title: string;
     category: string;
     objective: string;
+    curriculum_key: string | null;
   }[];
 
   // Duplicate check is scoped to THIS student at this level: global sample words and
@@ -160,9 +163,35 @@ async function buildDailyWords(
   const usedWords = ownedWordSet((known ?? []) as { word: string }[]);
 
   const missing = DAILY_COUNT - todays.length;
-  // The model often repeats words the student already owns, so it is asked for
-  // spare candidates: the extras absorb the repeats and the batch still fills.
-  const askCount = Math.min(missing + 6, 20);
+
+  // Reuse complete, translated flashcards from the shared lesson catalogue first.
+  // This path is a fast database read; Gemini is only needed for the remaining slots.
+  const curriculum = getCurriculum(data.level);
+  const lessonTitles = new Map(curriculum.map((lesson) => [lesson.key, lesson.title]));
+  let templateCandidates: AiWord[] = [];
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: templates } = await supabaseAdmin
+      .from("lesson_content_templates")
+      .select("curriculum_key, content")
+      .in(
+        "curriculum_key",
+        curriculum.map((lesson) => lesson.key),
+      )
+      .order("created_at", { ascending: false })
+      .limit(120);
+    templateCandidates = templateVocabularyCandidates(
+      (templates ?? []) as { curriculum_key: string; content: unknown }[],
+      lessonTitles,
+    );
+  } catch {
+    // The shared catalogue is an optimisation; the existing AI path remains available.
+  }
+  const templateWords = selectNewWords(templateCandidates, usedWords, missing);
+  const remaining = Math.max(0, missing - templateWords.length);
+  // The model often repeats words the student already owns, so ask for a few
+  // spare candidates only when the shared templates cannot fill the batch.
+  const askCount = Math.min(remaining + 6, 20);
 
   // When the literal lesson words are exhausted (the model keeps returning words the
   // student already owns), the retry widens the source to the lessons' topics and
@@ -208,13 +237,15 @@ async function buildDailyWords(
   }
 
   const exclude = new Set(usedWords);
+  for (const word of templateWords) exclude.add(String(word.word ?? "").trim().toLowerCase());
+
   // Keep the student-facing request to one Gemini round trip. A second
   // sequential call (plus a six-second limiter wait) could exceed the host's
   // request deadline and show a timeout even when the first batch was usable.
-  // The first prompt already asks for spare candidates; persist every valid,
-  // genuinely new word returned and let a later lesson unlock the next batch.
-  const first = await askAi(exclude);
-  const fresh = selectNewWords(first, usedWords, missing);
+  // Skip Gemini entirely when shared lesson templates already fill the batch.
+  const aiWords = remaining > 0 ? await askAi(exclude) : [];
+  const aiFresh = selectNewWords(aiWords, exclude, remaining);
+  const fresh = [...templateWords, ...aiFresh];
 
   if (!fresh.length) {
     if (todays.length) return todays;
@@ -222,8 +253,11 @@ async function buildDailyWords(
   }
 
   const byTitle = new Map(lessonList.map((l) => [l.title.toLowerCase(), l]));
+  const lessonForWord = (word: AiWord) =>
+    byTitle.get(String(word.lesson_title ?? "").toLowerCase()) ??
+    lessonList.find((lesson) => lesson.title === word.lesson_title);
   const rows = fresh.map((w) => {
-    const lesson = byTitle.get(String(w.lesson_title ?? "").toLowerCase());
+    const lesson = lessonForWord(w);
     return {
       word: String(w.word).slice(0, 120),
       translation: String(w.translation).slice(0, 200),
