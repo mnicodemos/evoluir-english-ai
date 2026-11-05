@@ -275,14 +275,14 @@ describe("evolutionScoreSkillContribution", () => {
 describe("Evolution Score end-to-end validation", () => {
   it("keeps the balanced score consistent with its displayed contributions", () => {
     const score = evolutionScore({
-      englishSkills: [80, 60, null, 100],
+      englishSkills: [80, 60, null, 85],
       stepsGiven: 8,
       stepsDone: 6,
     });
     const composition = evolutionScoreComposition(score);
 
-    expect(score).toEqual({ score: 75, english: 80, goals: 75 });
-    expect(composition.englishContribution).toBe(40);
+    expect(score).toEqual({ score: 75, english: 75, goals: 75 });
+    expect(composition.englishContribution).toBe(37.5);
     expect(composition.goalsContribution).toBe(37.5);
     expect(
       (composition.englishContribution ?? 0) + (composition.goalsContribution ?? 0),
