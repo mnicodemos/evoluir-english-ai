@@ -267,9 +267,10 @@
 
 /* Toasts (sonner) render in a portal with their own stylesheet: the same
    frosted graphite glass as the popovers (user request: one material), always
-   dark, 70% on desktop and 62% on phones, with an 18 px blur. */
+   dark, 85% on desktop and 78% on phones (user request: less transparency),
+   with an 18 px blur. */
 .dashboard-shell [data-sonner-toast] {
-  background-color: rgb(26 28 32 / 0.7) !important;
+  background-color: rgb(26 28 32 / 0.85) !important;
   backdrop-filter: blur(18px) saturate(150%);
   -webkit-backdrop-filter: blur(18px) saturate(150%);
   color: rgb(241 245 249) !important;
@@ -283,7 +284,7 @@
 
 @media (max-width: 1023.98px) {
   .dashboard-shell [data-sonner-toast] {
-    background-color: rgb(26 28 32 / 0.62) !important;
+    background-color: rgb(26 28 32 / 0.78) !important;
   }
 }
 
