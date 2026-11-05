@@ -222,9 +222,7 @@ export function GoalsTodayCard() {
                 done={!!shownTask.doneAt}
                 disabled={actions.task.isPending}
                 label={shownTask.doneAt ? t("Mark as not done") : t("Mark as done")}
-                onToggle={() =>
-                  actions.task.mutate({ id: shownTask.id, done: !shownTask.doneAt })
-                }
+                onToggle={() => actions.task.mutate({ id: shownTask.id, done: !shownTask.doneAt })}
               />
             }
           />
