@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { lessonBatchKey, ownedWordSet, selectNewWords } from "./vocabularyBatch";
+import {
+  lessonBatchKey,
+  ownedWordSet,
+  selectNewWords,
+  templateVocabularyCandidates,
+} from "./vocabularyBatch";
 
 const w = (word: string) => ({ word, translation: "tradução" });
 
@@ -38,5 +43,90 @@ describe("vocabulary batch selection", () => {
     expect(lessonBatchKey(3)).toBe("completed-3");
     expect(lessonBatchKey(3)).toBe(lessonBatchKey(3));
     expect(lessonBatchKey(4)).not.toBe(lessonBatchKey(3));
+  });
+});
+
+describe("shared lesson vocabulary templates", () => {
+  it("extracts complete translated flashcards and maps their lesson title", () => {
+    const candidates = templateVocabularyCandidates(
+      [
+        {
+          curriculum_key: "b2-u1-l1",
+          content: {
+            flashcards: [
+              {
+                word: "negotiate",
+                translation: "negociar",
+                definition: "discuss to reach an agreement",
+                pronunciation: "nɪˈɡəʊʃieɪt",
+                example: "We need to negotiate the terms.",
+                difficulty: "hard",
+              },
+            ],
+          },
+        },
+      ],
+      new Map([["b2-u1-l1", "Listening to a Debate"]]),
+    );
+
+    expect(candidates).toEqual([
+      {
+        word: "negotiate",
+        translation: "negociar",
+        meaning: "discuss to reach an agreement",
+        pronunciation: "nɪˈɡəʊʃieɪt",
+        example: "We need to negotiate the terms.",
+        lesson_title: "Listening to a Debate",
+        difficulty: "hard",
+      },
+    ]);
+  });
+
+  it("ignores untranslated or incomplete flashcards and duplicate words", () => {
+    const candidates = templateVocabularyCandidates(
+      [
+        {
+          curriculum_key: "b1-u1-l1",
+          content: {
+            flashcards: [
+              {
+                word: "meeting",
+                translation: "",
+                definition: "a work discussion",
+                example: "The meeting starts at 9.",
+              },
+              {
+                word: "meeting",
+                translation: "reunião",
+                definition: "a work discussion",
+                example: "The meeting starts at 9.",
+              },
+              {
+                word: "Meeting",
+                translation: "encontro",
+                definition: "a work discussion",
+                example: "We had a meeting.",
+              },
+              {
+                word: "deadline",
+                translation: "prazo",
+                definition: "the latest time to finish",
+                example: "The deadline is Friday.",
+              },
+            ],
+          },
+        },
+      ],
+      new Map(),
+    );
+
+    expect(candidates.map((candidate) => candidate.word)).toEqual(["meeting", "deadline"]);
+    expect(candidates[0]?.lesson_title).toBe("");
+  });
+
+  it("returns an empty list for malformed template content", () => {
+    expect(
+      templateVocabularyCandidates([{ curriculum_key: "b1-u1-l1", content: null }], new Map()),
+    ).toEqual([]);
   });
 });
