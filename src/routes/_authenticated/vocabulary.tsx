@@ -440,7 +440,7 @@ function VocabularyOnline() {
           } catch {
             // A transient failure must not interrupt practice. Re-read the server
             // state so an optimistic Learned placement is not treated as persisted.
-            void invalidateVocabulary().catch(() => undefined);
+            await invalidateVocabulary().catch(() => undefined);
           } finally {
             setOptimisticPronounced((current) => {
               if (!current.has(word.id)) return current;
@@ -577,9 +577,11 @@ function VocabularyOnline() {
     .filter((w) => !todayIds.has(w.id))
     .filter((w) => {
       const s = byWord.get(w.id);
+      // Optimistically passed words leave Review immediately, even if they were due.
+      if (optimisticPronounced.has(w.id)) return false;
       if (isDue(s)) return true;
       // Words that reached Learned leave Today and live in the Learned tab.
-      if (optimisticPronounced.has(w.id) || (s?.mastery_level ?? 0) >= LEARNED_MASTERY) return false;
+      if ((s?.mastery_level ?? 0) >= LEARNED_MASTERY) return false;
       return Boolean(s?.next_review_at && localDay(s.last_reviewed_at) === todayKey);
     })
     .sort((a, b) =>
