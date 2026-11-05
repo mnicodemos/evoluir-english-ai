@@ -9,12 +9,34 @@ vi.mock("@/integrations/supabase/client", () => ({
 import {
   TRANSCRIBE_CLIENT_TIMEOUT_MS,
   TRANSCRIBE_TIMEOUT_MESSAGE,
+  getTranscriptionAudioFormat,
   transcribeAudio,
 } from "./transcribe";
 
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+});
+
+describe("transcription audio payload", () => {
+  it("keeps compact WAV uploads in their native format", () => {
+    expect(getTranscriptionAudioFormat(new Blob(["wav"], { type: "audio/wav" }))).toEqual({
+      mimeType: "audio/wav",
+      extension: "wav",
+    });
+  });
+
+  it("supports WebM/Opus without converting it to a larger WAV payload", () => {
+    expect(
+      getTranscriptionAudioFormat(new Blob(["opus"], { type: "audio/webm;codecs=opus" })),
+    ).toEqual({ mimeType: "audio/webm", extension: "webm" });
+  });
+
+  it("rejects unsupported audio formats before upload", () => {
+    expect(() => getTranscriptionAudioFormat(new Blob(["mp3"], { type: "audio/mpeg" }))).toThrow(
+      "This audio format is not supported.",
+    );
+  });
 });
 
 describe("transcribeAudio timeout", () => {
