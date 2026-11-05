@@ -90,10 +90,30 @@ describe("shared lesson vocabulary templates", () => {
           curriculum_key: "b1-u1-l1",
           content: {
             flashcards: [
-              { word: "meeting", translation: "", definition: "a work discussion", example: "The meeting starts at 9." },
-              { word: "meeting", translation: "reunião", definition: "a work discussion", example: "The meeting starts at 9." },
-              { word: "Meeting", translation: "encontro", definition: "a work discussion", example: "We had a meeting." },
-              { word: "deadline", translation: "prazo", definition: "the latest time to finish", example: "The deadline is Friday." },
+              {
+                word: "meeting",
+                translation: "",
+                definition: "a work discussion",
+                example: "The meeting starts at 9.",
+              },
+              {
+                word: "meeting",
+                translation: "reunião",
+                definition: "a work discussion",
+                example: "The meeting starts at 9.",
+              },
+              {
+                word: "Meeting",
+                translation: "encontro",
+                definition: "a work discussion",
+                example: "We had a meeting.",
+              },
+              {
+                word: "deadline",
+                translation: "prazo",
+                definition: "the latest time to finish",
+                example: "The deadline is Friday.",
+              },
             ],
           },
         },
@@ -107,10 +127,7 @@ describe("shared lesson vocabulary templates", () => {
 
   it("returns an empty list for malformed template content", () => {
     expect(
-      templateVocabularyCandidates(
-        [{ curriculum_key: "b1-u1-l1", content: null }],
-        new Map(),
-      ),
+      templateVocabularyCandidates([{ curriculum_key: "b1-u1-l1", content: null }], new Map()),
     ).toEqual([]);
   });
 });
