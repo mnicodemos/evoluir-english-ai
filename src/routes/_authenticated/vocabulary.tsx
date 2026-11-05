@@ -516,9 +516,10 @@ function VocabularyOnline() {
   // full word list was cut off by the row limit.
   const learnedPool = new Map(all.map((w) => [w.id, w]));
   for (const w of daily ?? []) learnedPool.set(w.id, w);
-  const learned = [...learnedPool.values()].filter(
-    (w) => optimisticPronounced.has(w.id) || (byWord.get(w.id)?.mastery_level ?? 0) >= LEARNED_MASTERY,
-  );
+  const isLearnedWord = (wordId: string) =>
+    optimisticPronounced.has(wordId) ||
+    (byWord.get(wordId)?.mastery_level ?? 0) >= LEARNED_MASTERY;
+  const learned = [...learnedPool.values()].filter((w) => isLearnedWord(w.id));
 
   // Dictionary search: answers come from context.reverso.net, not from the lessons.
   const { query, setQuery, q, entry, searching } = useDictionarySearch(minutesSpent);
@@ -568,9 +569,10 @@ function VocabularyOnline() {
   const todayKnownCount = today.filter((w) => knownNow(w.id)).length;
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
   // Learned words (e.g. passed pronunciation) move out of Today into the Learned tab.
-  const todayOpen = today.filter(
-    (w) => !optimisticPronounced.has(w.id) && (byWord.get(w.id)?.mastery_level ?? 0) < LEARNED_MASTERY,
-  );
+  const isTodayOpenWord = (wordId: string) =>
+    !optimisticPronounced.has(wordId) &&
+    (byWord.get(wordId)?.mastery_level ?? 0) < LEARNED_MASTERY;
+  const todayOpen = today.filter((w) => isTodayOpenWord(w.id));
   const todayToDo = todayOpen.filter((w) => !knownNow(w.id));
 
   // Spaced reviews: earlier words whose review date has arrived come back here,
