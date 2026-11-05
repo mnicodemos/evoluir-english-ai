@@ -385,7 +385,7 @@ export function LifeToday() {
                     focusSetTask(item.key.slice("task:".length));
                     openFocusWidget();
                   }}
-                  aria-label={`${t('Focus')} · ${item.text}`}
+                  aria-label={`${t("Focus")} · ${item.text}`}
                   title={t("Focus")}
                   className="ml-11 inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-pink-300 transition-colors hover:bg-pink-400/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
