@@ -1140,18 +1140,12 @@
   }
 }
 
-/* Keep notifications clear of the phone's status bar on mobile.
-   Desktop retains the existing bottom-right toast placement. */
+/* Keep every app notification in the same top-right position.
+   The root Toaster already declares top-right; do not override it to bottom
+   on desktop. Phones add the status-bar safe area without changing the corner. */
 @media (max-width: 600px) {
   [data-sonner-toaster].dashboard-shell {
     top: calc(env(safe-area-inset-top) + 0.75rem) !important;
     bottom: auto !important;
-  }
-}
-
-@media (min-width: 601px) {
-  [data-sonner-toaster].dashboard-shell {
-    top: auto !important;
-    bottom: 2rem !important;
   }
 }
