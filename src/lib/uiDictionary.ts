@@ -2697,7 +2697,7 @@ const baseUiPt: Record<string, string> = {
   "Independent focus": "Foco independente",
   "Stopped early": "Interrompida antes do fim",
   "How your score is calculated": "Como seu score é calculado",
-  "The score uses the last": "O score considera os últimos",
+  "English reflects your measured skill profile. Goals count active-goal steps over the last": "O Inglês reflete seu perfil de habilidades medido. Metas contam os passos das metas ativas nos últimos",
   "days, ending today.": "dias, até hoje.",
   "Measured English skills": "Habilidades de inglês medidas",
   "simple average": "média simples",
