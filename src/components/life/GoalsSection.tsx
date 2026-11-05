@@ -258,25 +258,27 @@ export function GoalsSection({
                         <span className="text-muted-foreground">
                           {t(row.skill.charAt(0).toUpperCase() + row.skill.slice(1))}
                         </span>
-                        <span className="shrink-0 text-right tabular-nums">
-                          {row.value === null ? t("Not measured") : `${row.value}%${level}`}
-                          {" · "}
-                          {row.evidenceCount} {t("evidence items")}
-                        </span>
-                        {evolutionScoreSkillContribution({
-                          skillScore: row.value,
-                          measuredSkillCount,
-                          englishWeight: composition.englishWeight,
-                        }) !== null ? (
-                          <span className="block text-right text-[10px] text-muted-foreground">
-                            {evolutionScoreSkillContribution({
-                              skillScore: row.value,
-                              measuredSkillCount,
-                              englishWeight: composition.englishWeight,
-                            })!.toFixed(1)}{" "}
-                            {t("score points")}
+                        <div className="shrink-0 text-right tabular-nums">
+                          <span className="block">
+                            {row.value === null ? t("Not measured") : `${row.value}%${level}`}
+                            {" · "}
+                            {row.evidenceCount} {t("evidence items")}
                           </span>
-                        ) : null}
+                          {evolutionScoreSkillContribution({
+                            skillScore: row.value,
+                            measuredSkillCount,
+                            englishWeight: composition.englishWeight,
+                          }) !== null ? (
+                            <span className="block text-[10px] text-muted-foreground">
+                              {evolutionScoreSkillContribution({
+                                skillScore: row.value,
+                                measuredSkillCount,
+                                englishWeight: composition.englishWeight,
+                              })!.toFixed(1)}{" "}
+                              {t("score points")}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
                     );
                   })}
