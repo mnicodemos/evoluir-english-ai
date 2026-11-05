@@ -33,6 +33,7 @@ import { skillMeterRows } from "@/lib/pedagogy/skillMeter";
 import {
   evolutionScore,
   evolutionScoreComposition,
+  evolutionScoreSkillContribution,
   PLUS_GOAL_EXAMPLES,
   PLUS_MAX_GOALS,
   PLUS_SCORE_DAYS,
@@ -155,6 +156,17 @@ export function GoalsSection({
     stepsDone,
   });
   const composition = evolutionScoreComposition(score);
+  const priorityReasonLabels = {
+    recent_errors: "Recent learning errors",
+    low_confidence: "More evidence is needed",
+    lowest_score: "This is the lowest measured skill",
+    not_practised_recently: "Not practised in the last 7 days",
+    not_measured_yet: "Not measured yet",
+    no_data: "Start building your learning evidence",
+  } as const;
+  const nextStepHref = nextStep?.activity.params?.lessonId
+    ? `/learning/${encodeURIComponent(nextStep.activity.params.lessonId)}`
+    : nextStep?.activity.to;
   const canAdd = goals.length < PLUS_MAX_GOALS;
   const submit = (goal: string) => {
     const clean = goal.trim();
@@ -246,11 +258,27 @@ export function GoalsSection({
                         <span className="text-muted-foreground">
                           {t(row.skill.charAt(0).toUpperCase() + row.skill.slice(1))}
                         </span>
-                        <span className="shrink-0 text-right tabular-nums">
-                          {row.value === null ? t("Not measured") : `${row.value}%${level}`}
-                          {" · "}
-                          {row.evidenceCount} {t("evidence items")}
-                        </span>
+                        <div className="shrink-0 text-right tabular-nums">
+                          <span className="block">
+                            {row.value === null ? t("Not measured") : `${row.value}%${level}`}
+                            {" · "}
+                            {row.evidenceCount} {t("evidence items")}
+                          </span>
+                          {evolutionScoreSkillContribution({
+                            skillScore: row.value,
+                            measuredSkillCount,
+                            englishWeight: composition.englishWeight,
+                          }) !== null ? (
+                            <span className="block text-[10px] text-muted-foreground">
+                              {evolutionScoreSkillContribution({
+                                skillScore: row.value,
+                                measuredSkillCount,
+                                englishWeight: composition.englishWeight,
+                              })!.toFixed(1)}{" "}
+                              {t("score points")}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
                     );
                   })}
@@ -269,6 +297,37 @@ export function GoalsSection({
                       {t("Reading uses daily reading evidence only; lesson quizzes are excluded.")}
                     </p>
                   </div>
+                </div>
+                <div className="space-y-2 rounded-lg border border-border bg-background/60 p-3">
+                  <p className="text-xs font-semibold">{t("How activities affect your score")}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {t(
+                      "An activity does not add points by itself. It can affect English when it creates valid assessment evidence; recent activity history also helps EVO choose what to practise next.",
+                    )}
+                  </p>
+                  {nextStep && nextStepHref ? (
+                    <div className="border-t border-border pt-2">
+                      <p className="text-[11px] font-semibold">
+                        {t("Your next recommended action")}
+                      </p>
+                      <p className="mt-1 text-xs">
+                        {nextStep.prioritySkill
+                          ? t(
+                              nextStep.prioritySkill.charAt(0).toUpperCase() +
+                                nextStep.prioritySkill.slice(1),
+                            )
+                          : t("Build your first learning evidence")}
+                        {" · "}
+                        {t(priorityReasonLabels[nextStep.reason])}
+                      </p>
+                      <a
+                        href={nextStepHref}
+                        className="mt-2 inline-flex min-h-8 items-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                      >
+                        {t("Open recommended practice")}: {nextStep.activity.title}
+                      </a>
+                    </div>
+                  ) : null}
                 </div>
                 <ScoreExplanationRow
                   label={t("Goals")}

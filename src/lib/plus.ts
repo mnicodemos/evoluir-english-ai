@@ -289,6 +289,27 @@ export function evolutionScoreComposition(
 }
 
 /**
+ * A measured English skill's exact share of the overall Evolution Score.
+ * Skills share the English dimension equally; the dimension keeps its existing
+ * 50/50 (or 100% when alone) weight. This is attribution, not a new score.
+ */
+export function evolutionScoreSkillContribution(input: {
+  skillScore: number | null;
+  measuredSkillCount: number;
+  englishWeight: number | null;
+}): number | null {
+  if (
+    input.skillScore === null ||
+    !Number.isFinite(input.skillScore) ||
+    input.measuredSkillCount < 1 ||
+    input.englishWeight === null
+  ) {
+    return null;
+  }
+  return (input.skillScore / input.measuredSkillCount) * (input.englishWeight / 100);
+}
+
+/**
  * One evolution score across Evoluir+: the English skills and the goal steps
  * weigh the same; when only one is measured, the score is that one.
  */

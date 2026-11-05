@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   evolutionScore,
   evolutionScoreComposition,
+  evolutionScoreSkillContribution,
   goalsReport,
   fallbackPlusStep,
   guessPlusArea,
@@ -221,5 +222,51 @@ describe("evolutionScoreComposition", () => {
       englishContribution: null,
       goalsContribution: null,
     });
+  });
+});
+
+describe("evolutionScoreSkillContribution", () => {
+  it("splits the English dimension equally across measured skills", () => {
+    expect(
+      evolutionScoreSkillContribution({
+        skillScore: 80,
+        measuredSkillCount: 4,
+        englishWeight: 50,
+      }),
+    ).toBe(10);
+  });
+
+  it("uses the full score weight when English is the only measured dimension", () => {
+    expect(
+      evolutionScoreSkillContribution({
+        skillScore: 80,
+        measuredSkillCount: 4,
+        englishWeight: 100,
+      }),
+    ).toBe(20);
+  });
+
+  it("does not invent a contribution for unmeasured or unavailable skills", () => {
+    expect(
+      evolutionScoreSkillContribution({
+        skillScore: null,
+        measuredSkillCount: 4,
+        englishWeight: 50,
+      }),
+    ).toBeNull();
+    expect(
+      evolutionScoreSkillContribution({
+        skillScore: 80,
+        measuredSkillCount: 0,
+        englishWeight: 50,
+      }),
+    ).toBeNull();
+    expect(
+      evolutionScoreSkillContribution({
+        skillScore: 80,
+        measuredSkillCount: 4,
+        englishWeight: null,
+      }),
+    ).toBeNull();
   });
 });

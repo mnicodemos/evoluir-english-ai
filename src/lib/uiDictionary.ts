@@ -2722,6 +2722,18 @@ const baseUiPt: Record<string, string> = {
     "Reading considera apenas evidências da leitura diária; quizzes de lições não entram.",
   "Only steps from active goals dated within this 14-day window count. Future steps and archived goals are excluded.":
     "Contam apenas passos de metas ativas dentro desta janela de 14 dias. Passos futuros e metas arquivadas ficam de fora.",
+  "score points": "pontos no score",
+  "How activities affect your score": "Como as atividades afetam seu score",
+  "An activity does not add points by itself. It can affect English when it creates valid assessment evidence; recent activity history also helps EVO choose what to practise next.":
+    "Uma atividade não adiciona pontos por si só. Ela pode afetar o Inglês quando gera evidência válida de avaliação; o histórico recente também ajuda a EVO a escolher o que praticar em seguida.",
+  "Your next recommended action": "Sua próxima ação recomendada",
+  "Recent learning errors": "Erros recentes de aprendizagem",
+  "More evidence is needed": "É preciso reunir mais evidências",
+  "This is the lowest measured skill": "Esta é a habilidade medida com menor resultado",
+  "Not practised in the last 7 days": "Não praticada nos últimos 7 dias",
+  "Start building your learning evidence": "Comece a construir suas evidências de aprendizagem",
+  "Build your first learning evidence": "Comece a gerar suas primeiras evidências de aprendizagem",
+  "Open recommended practice": "Abrir prática recomendada",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.
