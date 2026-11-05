@@ -141,184 +141,184 @@ export function GoalsTodayCard() {
 
       {/* Render independent routine slots while the goal query is still loading. */}
       <ul className="mt-1.5 grid gap-2 sm:grid-cols-3 xl:min-h-0 xl:flex-1 xl:grid-cols-4">
-          {isLoading ? (
-            <li className="flex min-h-24 items-center gap-2 rounded-lg bg-secondary/40 px-3 text-xs text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-              {t("EVO is preparing today's steps…")}
-            </li>
-          ) : isError ? (
-            <li className="rounded-lg bg-secondary/40 px-3 py-3 text-xs text-muted-foreground">
-              {t("Your goals could not be loaded.")}
-            </li>
-          ) : shownGoal ? (
-            <GoalTile
-              key={shownGoal.id}
-              title={shownGoal.title}
-              step={shownStep}
-              week={plusGoalWeek(recent, shownGoal.id, data?.today ?? "")}
-              dayComplete={allDone}
-              stepsLeft={steps.filter((item) => !item.doneAt).length}
-              celebrate={!!shownStep && justDone === shownStep.id}
-              busy={toggle.isPending}
-              onToggle={(done) => shownStep && toggle.mutate({ id: shownStep.id, done })}
-              chooser={
-                <SlotChooser
-                  items={goals}
-                  current={shownGoal.id}
-                  onChoose={(id) => choose("goal", id)}
-                  t={t}
+        {isLoading ? (
+          <li className="flex min-h-24 items-center gap-2 rounded-lg bg-secondary/40 px-3 text-xs text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            {t("EVO is preparing today's steps…")}
+          </li>
+        ) : isError ? (
+          <li className="rounded-lg bg-secondary/40 px-3 py-3 text-xs text-muted-foreground">
+            {t("Your goals could not be loaded.")}
+          </li>
+        ) : shownGoal ? (
+          <GoalTile
+            key={shownGoal.id}
+            title={shownGoal.title}
+            step={shownStep}
+            week={plusGoalWeek(recent, shownGoal.id, data?.today ?? "")}
+            dayComplete={allDone}
+            stepsLeft={steps.filter((item) => !item.doneAt).length}
+            celebrate={!!shownStep && justDone === shownStep.id}
+            busy={toggle.isPending}
+            onToggle={(done) => shownStep && toggle.mutate({ id: shownStep.id, done })}
+            chooser={
+              <SlotChooser
+                items={goals}
+                current={shownGoal.id}
+                onChoose={(id) => choose("goal", id)}
+                t={t}
+              />
+            }
+            t={t}
+          />
+        ) : (
+          <EmptySlot
+            kind={t("Add a goal")}
+            text={t("Choose 1 to 3 goals and I will give you one small step a day.")}
+            to="/life"
+            hash="goals"
+          />
+        )}
+        {!life ? (
+          <li className="rounded-lg bg-secondary/40" aria-hidden="true" />
+        ) : !life.premium ? (
+          <EmptySlot
+            kind={t("Routine")}
+            text={t("Plan the tasks of your day with Premium.")}
+            to="/premium"
+            premium
+          />
+        ) : shownTask ? (
+          <LifeSlot
+            kind={t("Task today")}
+            icon={SLOT_ICONS.task}
+            title={shownTask.title}
+            done={!!shownTask.doneAt}
+            // The task's urgency right on the Home (user request), as on /life.
+            badge={
+              <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-semibold text-muted-foreground">
+                <span
+                  className={cn("size-1.5 rounded-full", PRIORITY_DOT[shownTask.priority])}
+                  aria-hidden="true"
                 />
-              }
-              t={t}
-            />
-          ) : (
-            <EmptySlot
-              kind={t("Add a goal")}
-              text={t("Choose 1 to 3 goals and I will give you one small step a day.")}
-              to="/life"
-              hash="goals"
-            />
-          )}
-          {!life ? (
-            <li className="rounded-lg bg-secondary/40" aria-hidden="true" />
-          ) : !life.premium ? (
-            <EmptySlot
-              kind={t("Routine")}
-              text={t("Plan the tasks of your day with Premium.")}
-              to="/premium"
-              premium
-            />
-          ) : shownTask ? (
-            <LifeSlot
-              kind={t("Task today")}
-              icon={SLOT_ICONS.task}
-              title={shownTask.title}
-              done={!!shownTask.doneAt}
-              // The task's urgency right on the Home (user request), as on /life.
-              badge={
-                <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-semibold text-muted-foreground">
-                  <span
-                    className={cn("size-1.5 rounded-full", PRIORITY_DOT[shownTask.priority])}
-                    aria-hidden="true"
-                  />
-                  {t(PRIORITY_TEXT[shownTask.priority])}
-                </span>
-              }
-              details={
-                <p className="text-sm text-muted-foreground">
-                  {t("Priority")}: {t(PRIORITY_TEXT[shownTask.priority])}
-                </p>
-              }
-              chooser={
-                <SlotChooser
-                  items={todayTasks}
-                  current={shownTask.id}
-                  onChoose={(id) => choose("task", id)}
-                  t={t}
-                />
-              }
-              action={
-                <DoneCheck
-                  done={!!shownTask.doneAt}
-                  disabled={actions.task.isPending}
-                  label={shownTask.doneAt ? t("Mark as not done") : t("Mark as done")}
-                  onToggle={() =>
-                    actions.task.mutate({ id: shownTask.id, done: !shownTask.doneAt })
-                  }
-                />
-              }
-            />
-          ) : (
-            <EmptySlot
-              kind={t("Add a task")}
-              text={t("No tasks for this day yet.")}
-              to="/life"
-              hash="routine"
-            />
-          )}
-          {!life ? (
-            <li className="rounded-lg bg-secondary/40" aria-hidden="true" />
-          ) : !life.premium ? (
-            <EmptySlot
-              kind={t("Habits")}
-              text={t("Build habits one check-in a day with Premium.")}
-              to="/premium"
-              premium
-            />
-          ) : shownHabit ? (
-            <LifeSlot
-              kind={t("Habit today")}
-              icon={SLOT_ICONS.habit}
-              title={shownHabit.title}
-              done={habitDoneToday(life, shownHabit.id)}
-              details={
-                <div className="space-y-3">
-                  {shownHabit.category ? (
-                    <p className="text-sm text-muted-foreground" translate="no">
-                      {shownHabit.category}
-                    </p>
-                  ) : null}
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span>{t("Last 7 days")}</span>
-                      <div className="flex items-center gap-1" aria-label={t("Last 7 days")}>
-                        {habitHistory.map((item) => (
-                          <span
-                            key={item.day}
-                            className={cn(
-                              "size-2.5 rounded-full border",
-                              item.done
-                                ? "border-brand-green bg-brand-green"
-                                : "border-transparent bg-muted-foreground/30",
-                            )}
-                            title={`${item.day}: ${item.done ? t("Completed") : t("Not completed")}`}
-                            aria-label={`${item.day}: ${item.done ? t("Completed") : t("Not completed")}`}
-                          />
-                        ))}
-                      </div>
-                      <span>
-                        {habitHistory.filter((item) => item.done).length} {t("of")} 7 {t("days")}
-                      </span>
+                {t(PRIORITY_TEXT[shownTask.priority])}
+              </span>
+            }
+            details={
+              <p className="text-sm text-muted-foreground">
+                {t("Priority")}: {t(PRIORITY_TEXT[shownTask.priority])}
+              </p>
+            }
+            chooser={
+              <SlotChooser
+                items={todayTasks}
+                current={shownTask.id}
+                onChoose={(id) => choose("task", id)}
+                t={t}
+              />
+            }
+            action={
+              <DoneCheck
+                done={!!shownTask.doneAt}
+                disabled={actions.task.isPending}
+                label={shownTask.doneAt ? t("Mark as not done") : t("Mark as done")}
+                onToggle={() =>
+                  actions.task.mutate({ id: shownTask.id, done: !shownTask.doneAt })
+                }
+              />
+            }
+          />
+        ) : (
+          <EmptySlot
+            kind={t("Add a task")}
+            text={t("No tasks for this day yet.")}
+            to="/life"
+            hash="routine"
+          />
+        )}
+        {!life ? (
+          <li className="rounded-lg bg-secondary/40" aria-hidden="true" />
+        ) : !life.premium ? (
+          <EmptySlot
+            kind={t("Habits")}
+            text={t("Build habits one check-in a day with Premium.")}
+            to="/premium"
+            premium
+          />
+        ) : shownHabit ? (
+          <LifeSlot
+            kind={t("Habit today")}
+            icon={SLOT_ICONS.habit}
+            title={shownHabit.title}
+            done={habitDoneToday(life, shownHabit.id)}
+            details={
+              <div className="space-y-3">
+                {shownHabit.category ? (
+                  <p className="text-sm text-muted-foreground" translate="no">
+                    {shownHabit.category}
+                  </p>
+                ) : null}
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <span>{t("Last 7 days")}</span>
+                    <div className="flex items-center gap-1" aria-label={t("Last 7 days")}>
+                      {habitHistory.map((item) => (
+                        <span
+                          key={item.day}
+                          className={cn(
+                            "size-2.5 rounded-full border",
+                            item.done
+                              ? "border-brand-green bg-brand-green"
+                              : "border-transparent bg-muted-foreground/30",
+                          )}
+                          title={`${item.day}: ${item.done ? t("Completed") : t("Not completed")}`}
+                          aria-label={`${item.day}: ${item.done ? t("Completed") : t("Not completed")}`}
+                        />
+                      ))}
                     </div>
+                    <span>
+                      {habitHistory.filter((item) => item.done).length} {t("of")} 7 {t("days")}
+                    </span>
                   </div>
                 </div>
-              }
-              chooser={
-                <SlotChooser
-                  items={dueHabits}
-                  current={shownHabit.id}
-                  onChoose={(id) => choose("habit", id)}
-                  t={t}
-                />
-              }
-              action={
-                <DoneCheck
-                  done={habitDoneToday(life, shownHabit.id)}
-                  disabled={actions.habit.isPending || shownHabit.linked === "study_day"}
-                  label={
-                    habitDoneToday(life, shownHabit.id) ? t("Mark as not done") : t("Mark as done")
-                  }
-                  onToggle={() =>
-                    actions.habit.mutate({
-                      habitId: shownHabit.id,
-                      day: life.today,
-                      done: !habitDoneToday(life, shownHabit.id),
-                    })
-                  }
-                />
-              }
-            />
-          ) : (
-            <EmptySlot
-              kind={t("Add a habit")}
-              text={t("No habits due today.")}
-              to="/life"
-              hash="habits"
-            />
-          )}
-          {/* From 2xl the card is wide enough for a fourth slot: an open
-              decision, or else today's Focus (owner decision, 2026-11-01). */}
-          <LifeHomeExtraSlot translate={t} />
+              </div>
+            }
+            chooser={
+              <SlotChooser
+                items={dueHabits}
+                current={shownHabit.id}
+                onChoose={(id) => choose("habit", id)}
+                t={t}
+              />
+            }
+            action={
+              <DoneCheck
+                done={habitDoneToday(life, shownHabit.id)}
+                disabled={actions.habit.isPending || shownHabit.linked === "study_day"}
+                label={
+                  habitDoneToday(life, shownHabit.id) ? t("Mark as not done") : t("Mark as done")
+                }
+                onToggle={() =>
+                  actions.habit.mutate({
+                    habitId: shownHabit.id,
+                    day: life.today,
+                    done: !habitDoneToday(life, shownHabit.id),
+                  })
+                }
+              />
+            }
+          />
+        ) : (
+          <EmptySlot
+            kind={t("Add a habit")}
+            text={t("No habits due today.")}
+            to="/life"
+            hash="habits"
+          />
+        )}
+        {/* From 2xl the card is wide enough for a fourth slot: an open
+            decision, or else today's Focus (owner decision, 2026-11-01). */}
+        <LifeHomeExtraSlot translate={t} />
       </ul>
     </section>
   );
