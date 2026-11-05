@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   evolutionScore,
+  evolutionScoreComposition,
   goalsReport,
   fallbackPlusStep,
   guessPlusArea,
@@ -180,6 +181,46 @@ describe("plusScoreProgress", () => {
     expect(plusScoreProgress([], new Set(["active"]), "2026-10-02", "2026-10-15")).toEqual({
       stepsGiven: 0,
       stepsDone: 0,
+    });
+  });
+});
+
+
+describe("evolutionScoreComposition", () => {
+  it("splits the score equally when both dimensions are measured", () => {
+    expect(evolutionScoreComposition({ english: 80, goals: 60 })).toEqual({
+      mode: "balanced",
+      englishWeight: 50,
+      goalsWeight: 50,
+      englishContribution: 40,
+      goalsContribution: 30,
+    });
+  });
+
+  it("gives the only measured dimension the full weight", () => {
+    expect(evolutionScoreComposition({ english: 72, goals: null })).toMatchObject({
+      mode: "english_only",
+      englishWeight: 100,
+      goalsWeight: null,
+      englishContribution: 72,
+      goalsContribution: null,
+    });
+    expect(evolutionScoreComposition({ english: null, goals: 45 })).toMatchObject({
+      mode: "goals_only",
+      englishWeight: null,
+      goalsWeight: 100,
+      englishContribution: null,
+      goalsContribution: 45,
+    });
+  });
+
+  it("does not invent contributions when neither dimension is measured", () => {
+    expect(evolutionScoreComposition({ english: null, goals: null })).toEqual({
+      mode: "empty",
+      englishWeight: null,
+      goalsWeight: null,
+      englishContribution: null,
+      goalsContribution: null,
     });
   });
 });
