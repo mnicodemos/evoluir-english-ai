@@ -133,7 +133,7 @@ export function LifeTaskList({
             </div>
             <button
               type="button"
-              aria-label={`${t('Focus')} · ${task.title}`}
+              aria-label={`${t("Focus")} · ${task.title}`}
               title={t("Focus")}
               disabled={done || focusState.phase !== "idle"}
               onClick={() => {
