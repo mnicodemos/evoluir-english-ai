@@ -46,7 +46,6 @@ describe("vocabulary batch selection", () => {
   });
 });
 
-
 describe("shared lesson vocabulary templates", () => {
   it("extracts complete translated flashcards and maps their lesson title", () => {
     const candidates = templateVocabularyCandidates(
