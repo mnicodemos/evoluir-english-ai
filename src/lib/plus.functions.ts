@@ -91,24 +91,23 @@ export const loadPlus = createServerFn({ method: "POST" })
     const today = studyToday();
     const since = addDays(today, -(PLUS_SCORE_DAYS - 1));
 
-    const { data: goalRows, error } = await goals()
-      .select("id, title, area, created_at")
-      .eq("user_id", context.userId)
-      .is("archived_at", null)
-      .order("created_at", { ascending: true });
-    if (error) throw new Error("Goals could not be loaded");
-    const active = ((goalRows ?? []) as GoalRow[]).map(toGoal);
-
-    const readSteps = async () => {
-      const { data: rows, error: stepsError } = await steps()
+    // These reads are independent; avoid serial network round-trips on Home.
+    const [goalsResult, stepsResult] = await Promise.all([
+      goals()
+        .select("id, title, area, created_at")
+        .eq("user_id", context.userId)
+        .is("archived_at", null)
+        .order("created_at", { ascending: true }),
+      steps()
         .select("id, goal_id, day, text, done_at")
         .eq("user_id", context.userId)
         .gte("day", addDays(since, -7))
-        .order("day", { ascending: false });
-      if (stepsError) throw new Error("Steps could not be loaded");
-      return ((rows ?? []) as StepRow[]).map(toStep);
-    };
-    let history = await readSteps();
+        .order("day", { ascending: false }),
+    ]);
+    if (goalsResult.error) throw new Error("Goals could not be loaded");
+    if (stepsResult.error) throw new Error("Steps could not be loaded");
+    const active = ((goalsResult.data ?? []) as GoalRow[]).map(toGoal);
+    let history = ((stepsResult.data ?? []) as StepRow[]).map(toStep);
     const missing = active.filter(
       (goal) => !history.some((step) => step.goalId === goal.id && step.day === today),
     );
