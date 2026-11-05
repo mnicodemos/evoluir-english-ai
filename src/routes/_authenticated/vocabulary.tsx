@@ -402,7 +402,12 @@ function VocabularyOnline() {
           haptic("success");
           pronunciationToasts.current.custom(
             (id) => (
-              <PronunciationResultToast toastId={id} score={previewScore} word={word.word} pt={pt} />
+              <PronunciationResultToast
+                toastId={id}
+                score={previewScore}
+                word={word.word}
+                pt={pt}
+              />
             ),
             { duration: 3500 },
           );
@@ -512,7 +517,9 @@ function VocabularyOnline() {
   const learnedPool = new Map(all.map((w) => [w.id, w]));
   for (const w of daily ?? []) learnedPool.set(w.id, w);
   const learned = [...learnedPool.values()].filter(
-    (w) => optimisticPronounced.has(w.id) || (byWord.get(w.id)?.mastery_level ?? 0) >= LEARNED_MASTERY,
+    (w) =>
+      optimisticPronounced.has(w.id) ||
+      (byWord.get(w.id)?.mastery_level ?? 0) >= LEARNED_MASTERY,
   );
 
   // Dictionary search: answers come from context.reverso.net, not from the lessons.
@@ -564,7 +571,9 @@ function VocabularyOnline() {
   const allTodayKnown = today.length > 0 && todayKnownCount === today.length;
   // Learned words (e.g. passed pronunciation) move out of Today into the Learned tab.
   const todayOpen = today.filter(
-    (w) => !optimisticPronounced.has(w.id) && (byWord.get(w.id)?.mastery_level ?? 0) < LEARNED_MASTERY,
+    (w) =>
+      !optimisticPronounced.has(w.id) &&
+      (byWord.get(w.id)?.mastery_level ?? 0) < LEARNED_MASTERY,
   );
   const todayToDo = todayOpen.filter((w) => !knownNow(w.id));
 
