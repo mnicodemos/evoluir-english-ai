@@ -1,6 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronDown, Flame, Loader2, MoreHorizontal, Pencil, Plus, Target, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  Flame,
+  Loader2,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Target,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 
 import { notifyLife } from "@/components/life/LifeNotification";
@@ -20,7 +30,14 @@ import { useLife } from "@/hooks/useLife";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { skillMeterRows } from "@/lib/pedagogy/skillMeter";
-import { evolutionScore, evolutionScoreComposition, PLUS_GOAL_EXAMPLES, PLUS_MAX_GOALS, PLUS_SCORE_DAYS, plusDayComplete } from "@/lib/plus";
+import {
+  evolutionScore,
+  evolutionScoreComposition,
+  PLUS_GOAL_EXAMPLES,
+  PLUS_MAX_GOALS,
+  PLUS_SCORE_DAYS,
+  plusDayComplete,
+} from "@/lib/plus";
 import {
   addPlusGoal,
   archivePlusGoal,
@@ -201,7 +218,10 @@ export function GoalsSection({
               className="mt-2 space-y-3 rounded-xl border border-border bg-secondary/30 p-3"
             >
               <p className="text-xs text-muted-foreground">
-                {t("English reflects your measured skill profile. Goals count active-goal steps over the last")} {PLUS_SCORE_DAYS} {t("days, ending today.")}
+                {t(
+                  "English reflects your measured skill profile. Goals count active-goal steps over the last",
+                )}{" "}
+                {PLUS_SCORE_DAYS} {t("days, ending today.")}
               </p>
               <div className="space-y-3">
                 <ScoreExplanationRow
@@ -212,6 +232,44 @@ export function GoalsSection({
                   contribution={composition.englishContribution}
                   t={t}
                 />
+                <div className="space-y-2 rounded-lg bg-background/60 p-3">
+                  <p className="text-xs font-semibold">{t("Evidence by skill")}</p>
+                  {skillRows.map((row) => {
+                    const snapshot = nextStep?.skills?.find((item) => item.skill === row.skill);
+                    const level =
+                      row.value !== null && snapshot?.cefrLevel ? ` · ${snapshot.cefrLevel}` : "";
+                    return (
+                      <div
+                        key={row.skill}
+                        className="flex items-center justify-between gap-3 text-xs"
+                      >
+                        <span className="text-muted-foreground">
+                          {t(row.skill.charAt(0).toUpperCase() + row.skill.slice(1))}
+                        </span>
+                        <span className="shrink-0 text-right tabular-nums">
+                          {row.value === null ? t("Not measured") : `${row.value}%${level}`}
+                          {" · "}
+                          {row.evidenceCount} {t("evidence items")}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  <div className="space-y-1 border-t border-border pt-2 text-[11px] text-muted-foreground">
+                    <p>
+                      {t(
+                        "A skill needs at least 2 valid evidence items and an effective weight of at least 0.5 to be measured.",
+                      )}
+                    </p>
+                    <p>
+                      {t(
+                        "Effective weight is sample weight × evidence quality × source reliability. Evidence weight halves every 30 days for the skill score.",
+                      )}
+                    </p>
+                    <p>
+                      {t("Reading uses daily reading evidence only; lesson quizzes are excluded.")}
+                    </p>
+                  </div>
+                </div>
                 <ScoreExplanationRow
                   label={t("Goals")}
                   description={`${t("Completed steps in active goals")}: ${stepsDone}/${stepsGiven}`}
@@ -220,6 +278,11 @@ export function GoalsSection({
                   contribution={composition.goalsContribution}
                   t={t}
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  {t(
+                    "Only steps from active goals dated within this 14-day window count. Future steps and archived goals are excluded.",
+                  )}
+                </p>
               </div>
               <p className="border-t border-border pt-2 text-xs font-medium">
                 {composition.mode === "balanced"
@@ -525,8 +588,7 @@ function ScoreExplanationRow({
   contribution: number | null;
   t: (label: string) => string;
 }) {
-  const points =
-    contribution === null ? "—" : Number(contribution.toFixed(1)).toString();
+  const points = contribution === null ? "—" : Number(contribution.toFixed(1)).toString();
   return (
     <div className="flex items-start justify-between gap-3 text-xs">
       <div className="min-w-0">
