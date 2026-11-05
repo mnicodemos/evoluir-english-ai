@@ -237,8 +237,7 @@ export function GoalsSection({
                   {skillRows.map((row) => {
                     const snapshot = nextStep?.skills?.find((item) => item.skill === row.skill);
                     const level =
-                      row.value !== null && snapshot?.cefrLevel
-                        ? ` · ${snapshot.cefrLevel}`
+                      row.value !== null && snapshot?.cefrLevel ? ` · ${snapshot.cefrLevel}`
                         : "";
                     return (
                       <div
