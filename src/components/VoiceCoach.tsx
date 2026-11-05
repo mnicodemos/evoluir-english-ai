@@ -48,7 +48,7 @@ import { EvoAvatar } from "@/components/EvoAvatar";
 import { SpeakingReport } from "@/components/coach/SpeakingReport";
 import { VideoCallStage } from "@/components/coach/VideoCallStage";
 import { findBusinessRolePlay } from "@/lib/businessCourse";
-import { goalRolePlay } from "@/lib/goalPractice";
+import { goalRolePlay, taskRolePlay } from "@/lib/goalPractice";
 import { studyToday } from "@/lib/today";
 import { isPlaceKind, placeRolePlay } from "@/lib/aroundYou";
 import { isWeatherCondition, weatherRolePlay } from "@/lib/weatherTalk";
@@ -61,6 +61,7 @@ export function VoiceCoach({
   weather,
   business,
   goal,
+  task,
   place,
   presentation = "chat",
 }: {
@@ -73,6 +74,7 @@ export function VoiceCoach({
   business?: string | undefined;
   /** Opens a conversation about one of the student's Goals by its id. */
   goal?: string | undefined;
+  task?: string | undefined;
   /** Acts out a situation at a place near the student (aroundYou.ts). */
   place?: string | undefined;
 }) {
@@ -144,7 +146,14 @@ export function VoiceCoach({
     if (businessPlay) startRolePlay(businessPlay);
     else if (isWeatherCondition(weather)) startRolePlay(weatherRolePlay(weather));
     else if (isPlaceKind(place)) startRolePlay(placeRolePlay(place));
-    else if (goal) {
+    else if (task) {
+      setVoiceState("thinking");
+      void loadTaskRolePlay(task).then((play) => {
+        if (!mounted.current) return;
+        if (play) startRolePlay(play);
+        else void start(0);
+      });
+    } else if (goal) {
       setVoiceState("thinking");
       // A goal that cannot be read (removed, another student's) falls back to a free chat.
       void loadGoalRolePlay(goal).then((play) => {
@@ -179,6 +188,12 @@ export function VoiceCoach({
       startRolePlay(weatherRolePlay(weather));
     } else if (isPlaceKind(place)) {
       startRolePlay(placeRolePlay(place));
+    } else if (task) {
+      setVoiceState("thinking");
+      const play = await loadTaskRolePlay(task);
+      if (!mounted.current) return;
+      if (play) startRolePlay(play);
+      else void start(0);
     } else if (goal) {
       setVoiceState("thinking");
       const play = await loadGoalRolePlay(goal);
@@ -742,6 +757,20 @@ async function loadGoalRolePlay(goalId: string) {
     ]);
     if (!goalRow) return null;
     return goalRolePlay({ id: goalRow.id, title: goalRow.title, step: stepRow?.text ?? null });
+  } catch {
+    return null;
+  }
+}
+
+async function loadTaskRolePlay(taskId: string) {
+  try {
+    const { data: taskRow } = await supabase
+      .from("life_tasks")
+      .select("id, title")
+      .eq("id", taskId)
+      .maybeSingle();
+    if (!taskRow) return null;
+    return taskRolePlay({ id: taskRow.id, title: taskRow.title });
   } catch {
     return null;
   }

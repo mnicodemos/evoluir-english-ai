@@ -4,6 +4,7 @@ import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
   "Today and Planning": "Hoje e planejamento",
+  "Practise this task in English": "Praticar esta tarefa em inglês",
   // Admin push diagnostics
   Push: "Notificações push",
   "Push notifications": "Notificações push",

@@ -16,6 +16,7 @@ export const Route = createFileRoute("/_authenticated/coach")({
     weather?: string;
     business?: string;
     goal?: string;
+    task?: string;
     place?: string;
   } => ({
     ...(typeof search["lesson"] === "string" ? { lesson: search["lesson"] } : {}),
@@ -29,6 +30,9 @@ export const Route = createFileRoute("/_authenticated/coach")({
     // One of the student's Goals (GoalsTodayCard), practised in English.
     ...(typeof search["goal"] === "string" && UUID.test(search["goal"])
       ? { goal: search["goal"] }
+      : {}),
+    ...(typeof search["task"] === "string" && UUID.test(search["task"])
+      ? { task: search["task"] }
       : {}),
   }),
   head: () => ({
@@ -51,7 +55,7 @@ export const Route = createFileRoute("/_authenticated/coach")({
 });
 
 function Coach() {
-  const { lesson: lessonTopic, weather, business, goal, place } = Route.useSearch();
+  const { lesson: lessonTopic, weather, business, goal, task, place } = Route.useSearch();
   return (
     <AppShell mobileOneScreen>
       <VoiceCoach
@@ -59,6 +63,7 @@ function Coach() {
         weather={weather}
         business={business}
         goal={goal}
+        task={task}
         place={place}
       />
     </AppShell>
