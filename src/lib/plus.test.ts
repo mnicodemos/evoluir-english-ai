@@ -185,7 +185,6 @@ describe("plusScoreProgress", () => {
   });
 });
 
-
 describe("evolutionScoreComposition", () => {
   it("splits the score equally when both dimensions are measured", () => {
     expect(evolutionScoreComposition({ english: 80, goals: 60 })).toEqual({
