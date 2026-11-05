@@ -45,3 +45,69 @@ export function selectNewWords<T extends SuggestedWord>(
   }
   return picked;
 }
+
+
+export type LessonTemplateRow = {
+  curriculum_key: string;
+  content: unknown;
+};
+
+export type TemplateVocabularyWord = {
+  word: string;
+  translation: string;
+  meaning: string;
+  pronunciation: string;
+  example: string;
+  lesson_title: string;
+  difficulty: string;
+};
+
+/**
+ * Extracts complete vocabulary candidates from shared lesson templates.
+ * Incomplete flashcards are ignored; the caller can fill any remaining slots with AI.
+ */
+export function templateVocabularyCandidates(
+  templates: LessonTemplateRow[],
+  lessonTitles: Map<string, string>,
+): TemplateVocabularyWord[] {
+  const candidates: TemplateVocabularyWord[] = [];
+  const seen = new Set<string>();
+
+  for (const template of templates) {
+    const content =
+      template.content && typeof template.content === "object"
+        ? (template.content as Record<string, unknown>)
+        : null;
+    const flashcards = Array.isArray(content?.["flashcards"]) ? content["flashcards"] : [];
+    const lessonTitle = lessonTitles.get(template.curriculum_key) ?? "";
+
+    for (const item of flashcards) {
+      if (!item || typeof item !== "object") continue;
+      const card = item as Record<string, unknown>;
+      const word = typeof card["word"] === "string" ? card["word"].trim() : "";
+      const translation =
+        typeof card["translation"] === "string" ? card["translation"].trim() : "";
+      const meaning = typeof card["definition"] === "string" ? card["definition"].trim() : "";
+      const example = typeof card["example"] === "string" ? card["example"].trim() : "";
+      const key = word.toLowerCase();
+
+      if (!word || !translation || !meaning || !example || seen.has(key)) continue;
+      seen.add(key);
+      candidates.push({
+        word,
+        translation,
+        meaning,
+        pronunciation:
+          typeof card["pronunciation"] === "string" ? card["pronunciation"].trim() : "",
+        example,
+        lesson_title: lessonTitle,
+        difficulty:
+          card["difficulty"] === "easy" || card["difficulty"] === "hard"
+            ? card["difficulty"]
+            : "medium",
+      });
+    }
+  }
+
+  return candidates;
+}
