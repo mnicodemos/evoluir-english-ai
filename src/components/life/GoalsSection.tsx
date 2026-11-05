@@ -201,7 +201,7 @@ export function GoalsSection({
               className="mt-2 space-y-3 rounded-xl border border-border bg-secondary/30 p-3"
             >
               <p className="text-xs text-muted-foreground">
-                {t("The score uses the last")} {PLUS_SCORE_DAYS} {t("days, ending today.")}
+                {t("English reflects your measured skill profile. Goals count active-goal steps over the last")} {PLUS_SCORE_DAYS} {t("days, ending today.")}
               </p>
               <div className="space-y-3">
                 <ScoreExplanationRow
