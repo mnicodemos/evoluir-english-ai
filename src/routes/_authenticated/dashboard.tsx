@@ -199,6 +199,7 @@ function DashboardNotifications({
   const extraVideos = useExtraVideosNews(profile?.id);
   // Reuse EVO’s server-side decision; the bell does not derive new pedagogy.
   const { data: nextStep } = useNextStep({ enabled: !!profile?.id });
+  const { data: todayActivities = [] } = useTodayActivities(profile?.id);
   const quickWin = nextStep?.quickWin;
   const quickWinVisible =
     !!quickWin &&
