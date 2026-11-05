@@ -596,10 +596,9 @@ function AppShellContent({
         <nav
           className={cn(
             "fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-white/10 bg-sidebar/80 px-0.5 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur-xl lg:hidden",
-            // Life+ header briefing occupies an additional mobile row; keep
-            // its bottom tabs clear of Android's gesture/navigation area.
-            location.pathname.startsWith("/life") &&
-              "bottom-[calc(env(safe-area-inset-bottom)+1.5rem)]",
+            // Keep the tab bar anchored to the viewport on every route.
+            // The shell's bottom padding already reserves its height and the
+            // safe-area inset; lifting Life+ separately left a floating gap.
           )}
           aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
         >
