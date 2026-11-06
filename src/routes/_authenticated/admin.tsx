@@ -258,7 +258,6 @@ function AdminPage() {
               </FolderTabs>
             </TabsContent>
 
-
             <TabsContent value="communication" className="mt-4">
               <FolderTabs tabs={[{ value: "push", label: t("Push") }]}>
                 <TabsContent value="push">
