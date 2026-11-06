@@ -111,7 +111,9 @@ authenticated("authenticated smoke", () => {
 
   test("extra videos and Shorts have their own pages", async ({ page }) => {
     await page.goto("/learning/videos", { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { level: 1, name: "Extra lesson videos" })).toBeVisible({
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Extra learning videos" }),
+    ).toBeVisible({
       timeout: 20_000,
     });
     await page.goto("/shorts", { waitUntil: "domcontentloaded" });

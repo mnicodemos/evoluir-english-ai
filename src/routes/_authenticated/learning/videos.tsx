@@ -133,7 +133,7 @@ function ExtraVideosPage() {
         <PageHeader
           icon={Clapperboard}
           eyebrow={<>Premium extras</>}
-          title={<>Extra lesson videos</>}
+          title={<>Extra learning videos</>}
           description={<>Short videos that go deeper into the lessons of your path.</>}
           actions={<PremiumBadge />}
         >
