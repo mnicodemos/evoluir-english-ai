@@ -3,6 +3,7 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Help EVO welcome the guests and match their name cards.": "Ajude a EVO a receber os convidados e combinar os cartões de identificação.",
   "A1 adventure introduction": "Uma aventura para praticar apresentações, nomes, países e profissões.",
   "Choose your response": "Escolha sua resposta",
   "EVO hint label": "Dica da EVO:",
