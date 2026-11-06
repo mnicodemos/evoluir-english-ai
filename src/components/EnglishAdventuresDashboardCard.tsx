@@ -21,7 +21,7 @@ export function EnglishAdventuresDashboardCard() {
 
   return (
     <section
-      className={`card-soft relative flex h-[calc(100%-1px)] min-h-0 min-w-0 flex-col overflow-hidden p-3 xl:min-h-0 xl:px-4 xl:py-3 ${locked ? "[&>*:not(:first-child)]:opacity-50" : ""}`}
+      className={`card-soft relative flex h-[calc(100%-2px)] min-h-0 min-w-0 flex-col overflow-hidden p-3 xl:min-h-0 xl:px-4 xl:py-3 ${locked ? "[&>*:not(:first-child)]:opacity-50" : ""}`}
       aria-labelledby="adventures-card-title"
     >
       <div className="flex min-h-[1.65rem] items-center gap-2">
