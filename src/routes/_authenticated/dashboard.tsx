@@ -47,6 +47,7 @@ import { getLevelState } from "@/lib/level";
 import { useLearningPath } from "@/hooks/useCurriculum";
 import { useCelebrate } from "@/hooks/useCelebrate";
 import { useLife } from "@/hooks/useLife";
+import { usePlus } from "@/hooks/usePlus";
 import { useMinutesToday, useTodayActivities } from "@/components/DailyGoalCard";
 import { EvoDailyReflection } from "@/components/EvoDailyReflection";
 import { LevelCard } from "@/components/LevelCard";
@@ -637,6 +638,10 @@ function PlanTodaySummary({
 
 function Dashboard() {
   const { data: profile, isLoading } = useProfile();
+  // Start Life+ AI alongside the profile, not after GoalsTodayCard and the
+  // notifications mount. Their shared query keys deduplicate these reads.
+  usePlus();
+  useLife();
   const navigate = useNavigate();
   const { data: snapshot, isLoading: isSnapshotLoading } = useStudySnapshot();
   const { lang } = useUiLang();

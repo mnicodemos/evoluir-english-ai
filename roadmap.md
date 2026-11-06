@@ -1,5 +1,10 @@
 # Roadmap
 
+- [x] Antecipar as leituras do Life+ AI na Home, preservando dados e ações; 57 testes passaram
+- [ ] Medir o carregamento real do Life+ AI na Home desktop — aguardando sessão do aluno no preview
+- [x] Explicar Life+ AI e sua integração com o estudo de inglês
+- [x] Entregar roteiro de aproximadamente 30 segundos para HeyGen
+
 - [x] Unificar os Toasts com a referência do Vocabulary, mantendo mensagens e ações
 
 - [ ] Oferecer Focus no início de uma interação de estudo, com escolha do aluno e sem convites repetidos no dia
