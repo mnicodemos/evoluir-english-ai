@@ -243,7 +243,7 @@ function ShortsPage() {
           </div>
         ) : null}
 
-        <div className="mt-5 border-t border-white/10 pt-0.5">
+        <div className="mt-5">
           {query.isPending ? (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-1">
               {Array.from({ length: 6 }, (_, index) => (
