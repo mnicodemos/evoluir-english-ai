@@ -385,9 +385,7 @@ function AppShellContent({
   useEffect(() => {
     const pageTitle = browserTitleForPath(location.pathname, translate);
     document.title =
-      pageTitle === "Evoluir+ English AI"
-        ? pageTitle
-        : `${pageTitle} | Evoluir+ English AI`;
+      pageTitle === "Evoluir+ English AI" ? pageTitle : `${pageTitle} | Evoluir+ English AI`;
   }, [location.pathname, lang]);
 
   // Mobile swipe between the four destinations already shown in the bottom bar.
