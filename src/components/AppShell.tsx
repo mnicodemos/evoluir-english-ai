@@ -7,6 +7,7 @@ import {
   Briefcase,
   Clapperboard,
   CalendarCheck,
+  Compass,
   Crown,
   GraduationCap,
   Headphones,
