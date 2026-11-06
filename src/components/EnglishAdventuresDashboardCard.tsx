@@ -36,6 +36,9 @@ export function EnglishAdventuresDashboardCard() {
           <p className="truncate text-sm font-semibold" translate="no" lang="en">
             {title}
           </p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            {t("A1 adventure introduction")}
+          </p>
         </div>
       </div>
       <Link
