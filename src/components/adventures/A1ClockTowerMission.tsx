@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
