@@ -19,7 +19,9 @@ export function AdventureMusicControl() {
 
   useEffect(() => {
     try {
-      setMuted(window.localStorage.getItem("adventures-music-muted") !== "false");
+      const storedMuted = window.localStorage.getItem("adventures-music-muted") !== "false";
+      setMuted(storedMuted);
+      setStarted(!storedMuted);
     } catch {
       setMuted(true);
     }
