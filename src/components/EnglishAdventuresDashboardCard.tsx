@@ -21,7 +21,7 @@ export function EnglishAdventuresDashboardCard() {
 
   return (
     <section
-      className={`card-soft relative flex h-full min-w-0 flex-col overflow-hidden p-3 xl:min-h-0 xl:px-4 xl:py-3 ${locked ? "[&>*:not(:first-child)]:opacity-50" : ""}`}
+      className={`card-soft relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden p-3 xl:min-h-0 xl:px-4 xl:py-3 ${locked ? "[&>*:not(:first-child)]:opacity-50" : ""}`}
       aria-labelledby="adventures-card-title"
     >
       <div className="flex min-h-[1.65rem] items-center gap-2">
@@ -31,8 +31,8 @@ export function EnglishAdventuresDashboardCard() {
         </h2>
         <PremiumBadge className="ml-auto" />
       </div>
-      <div className="mt-2 flex min-w-0 flex-1 items-center gap-3">
-        <EvoAvatar decorative className="size-12 sm:size-14" />
+      <div className="mt-1 flex min-h-0 min-w-0 flex-1 items-center gap-2.5">
+        <EvoAvatar decorative className="size-10 shrink-0" />
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
             {level.toUpperCase()} · {t("A story with EVO")}
@@ -40,12 +40,12 @@ export function EnglishAdventuresDashboardCard() {
           <p className="truncate text-sm font-semibold" translate="no" lang="en">
             {title}
           </p>
-          <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{t(teaser)}</p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">{t(teaser)}</p>
         </div>
       </div>
       <Link
         to={locked ? "/premium" : "/adventures"}
-        className="mt-2 inline-flex min-h-8 items-center justify-end gap-1.5 text-xs font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        className="mt-1 inline-flex min-h-7 items-center justify-end gap-1.5 text-xs font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
       >
         {locked ? t("See plans") : t("Let's explore!")}
         <ArrowRight className="size-3.5" aria-hidden="true" />
