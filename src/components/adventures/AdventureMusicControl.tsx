@@ -14,7 +14,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   const audioRef = useRef<HTMLAudioElement>(null);
   const welcomeSequenceRef = useRef(false);
   const [muted, setMuted] = useState(true);
-  const [showHint, setShowHint] = useState(false);
+  const [showHint, setShowHint] = useState(true);
   const getWelcomeAudio = useServerFn(getAdventureWelcomeAudio);
   const welcomeQuery = useQuery({
     queryKey: ["adventure-welcome-audio", welcomeVoice],
@@ -33,10 +33,8 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     try {
       // Playback must still be confirmed by a user gesture in browsers that block autoplay.
       setMuted(window.localStorage.getItem("adventures-music-muted") !== "false");
-      setShowHint(window.localStorage.getItem("adventures-music-hint-v2-seen") !== "true");
     } catch {
       setMuted(true);
-      setShowHint(true);
     }
   }, []);
 
@@ -108,11 +106,6 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       audio.onended = null;
     }
     setShowHint(false);
-    try {
-      window.localStorage.setItem("adventures-music-hint-v2-seen", "true");
-    } catch {
-      // The hint can still be dismissed for this visit when storage is unavailable.
-    }
 
     if (muted) {
       audio.volume = 0.12;
