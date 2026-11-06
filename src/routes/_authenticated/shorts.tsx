@@ -255,7 +255,7 @@ function ShortsPage() {
               No shorts here yet. New ones are added over time.
             </p>
           ) : (
-            <ul className="grid grid-cols-3 gap-0.5 sm:gap-1">
+            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-1">
               {levelShorts.map((video) => (
                 <ShortTile
                   key={video.id}
