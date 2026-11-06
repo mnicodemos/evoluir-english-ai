@@ -14,10 +14,6 @@ export function EnglishAdventuresDashboardCard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const level = (profile?.max_level || profile?.level || "a1").toLowerCase();
   const title = level === "a2" ? "The Surprise Delivery" : "The Welcome Mix-Up";
-  const teaser =
-    level === "a2"
-      ? "A delivery arrives with an unexpected surprise. What will you do?"
-      : "Help EVO welcome the guests and match their name cards.";
 
   return (
     <section
@@ -40,7 +36,6 @@ export function EnglishAdventuresDashboardCard() {
           <p className="truncate text-sm font-semibold" translate="no" lang="en">
             {title}
           </p>
-          <p className="mt-0.5 truncate text-xs text-muted-foreground">{t(teaser)}</p>
         </div>
       </div>
       <Link
