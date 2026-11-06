@@ -35,7 +35,7 @@ export function EnglishAdventuresDashboardCard() {
         <EvoAvatar decorative className="size-10 shrink-0" />
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
-            {level.toUpperCase()} · {t("A story with EVO")}
+            {t("Adventures with EVO")}
           </p>
           <p className="truncate text-sm font-semibold" translate="no" lang="en">
             {title}
