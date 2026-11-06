@@ -3,7 +3,7 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
-  "Music": "Música",
+  Music: "Música",
   "Help EVO welcome the guests and match their name cards.":
     "Ajude a EVO a receber os convidados e combinar os cartões de identificação.",
   "A1 adventure introduction": "Introdução à aventura A1",
