@@ -194,7 +194,9 @@ function EnglishAdventuresPage() {
           </Link>
           <section className="card-soft space-y-3 p-6 text-center">
             <Lock className="mx-auto size-8 text-warning" aria-hidden="true" />
-            <h1 className="font-display text-xl font-semibold">English Adventures is a Premium feature</h1>
+            <h1 className="font-display text-xl font-semibold">
+              English Adventures is a Premium feature
+            </h1>
             <p className="text-sm text-muted-foreground">
               Unlock the stories with EVO and keep exploring your English.
             </p>
