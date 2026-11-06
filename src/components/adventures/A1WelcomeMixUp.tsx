@@ -346,7 +346,7 @@ export function A1WelcomeMixUp() {
               {t("An adventure to practise introductions, names, countries and jobs.")}
             </p>
           </div>
-          <div className="col-start-2 row-start-2 justify-self-end sm:ml-auto sm:col-auto sm:row-auto">
+          <div className="col-span-2 row-start-2 w-full min-w-0 sm:ml-auto sm:col-auto sm:row-auto sm:w-auto">
             <AdventureMusicControl welcomeVoice="roberta" />
           </div>
         </header>
