@@ -1073,11 +1073,11 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
       console.error(
         `Home image could not be published: ${saveError.code ?? "?"} ${saveError.message ?? ""}`,
       );
-      // The weekly league key needs migration 0105 (owner request, 2026-11-01);
-      // until it runs, the table's check refuses it.
+-- Replace the stale 0105-only error with the migration that actually includes
+      // both optional media keys. PostgreSQL 23514 is the CHECK constraint failure.
       if (saveError.code === "23514") {
         throw new Error(
-          "Esta imagem precisa da migração 0105_home_media_league_key.sql. Peça ao chat do Lovable para rodá-la.",
+          "A configuração do banco ainda não aceita esta imagem. Execute a migração 0106_home_media_adventure_avatar_key.sql no SQL Editor.",
         );
       }
       throw new Error("The image was uploaded but could not be published.");
