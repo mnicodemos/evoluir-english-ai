@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Compass, Lock, RotateCcw, Sparkles } from "lucid
 import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { A1WelcomeMixUp } from "@/components/adventures/A1WelcomeMixUp";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
@@ -208,6 +209,8 @@ function EnglishAdventuresPage() {
       </AppShell>
     );
   }
+
+  if (key === "a1") return <A1WelcomeMixUp />;
 
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
   if (!scene) return null;

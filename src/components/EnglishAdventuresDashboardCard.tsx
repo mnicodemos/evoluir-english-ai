@@ -13,11 +13,11 @@ export function EnglishAdventuresDashboardCard() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const level = (profile?.max_level || profile?.level || "a1").toLowerCase();
-  const title = level === "a2" ? "The Surprise Delivery" : "The Missing Bag";
+  const title = level === "a2" ? "The Surprise Delivery" : "The Welcome Mix-Up";
   const teaser =
     level === "a2"
       ? "A delivery arrives with an unexpected surprise. What will you do?"
-      : "Oh no! Something is missing! Can you help find it?";
+      : "Help EVO welcome the guests and match their name cards.";
 
   return (
     <section
