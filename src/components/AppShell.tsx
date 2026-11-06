@@ -102,6 +102,45 @@ function lifeTabOpen(pathname: string, to: string) {
   return to === "/life" && pathname.startsWith("/goals");
 }
 
+const browserPageTitles: Array<[string, string]> = [
+  ["/learning/videos", "Extra learning videos"],
+  ["/learning/review", "Flashcard review"],
+  ["/learning/final-test", "Final Test"],
+  ["/learning/unit-test", "Unit test"],
+  ["/learning/", "Learning"],
+  ["/dashboard", "Home"],
+  ["/life/coach", "Life Coach"],
+  ["/life/habits", "Habits"],
+  ["/life/routine", "Routine"],
+  ["/life/decisions", "Decisions"],
+  ["/life/guide", "Life+ AI guide"],
+  ["/life", "Life+ AI"],
+  ["/goals", "Life+ AI"],
+  ["/study-plan", "Study Plan"],
+  ["/learning", "Learning"],
+  ["/vocabulary", "Vocabulary"],
+  ["/listening", "Listening"],
+  ["/reading", "Reading"],
+  ["/writing", "Writing"],
+  ["/mistakes", "My mistakes"],
+  ["/shorts", "Shorts"],
+  ["/coach", "AI Speaking"],
+  ["/call", "Video call"],
+  ["/teacher", "AI Teacher"],
+  ["/guide", "App guide"],
+  ["/premium", "My Subscription"],
+  ["/business", "Business English"],
+  ["/league", "Weekly league"],
+  ["/progress", "My Progress"],
+];
+
+function browserTitleForPath(pathname: string, translate: (label: string) => string) {
+  const match = browserPageTitles.find(
+    ([path]) => pathname === path || (path.endsWith("/") && pathname.startsWith(path)),
+  );
+  return match ? translate(match[1]) : "Evoluir+ English AI";
+}
+
 // Translation and notification controls moved here from the dashboard reflection
 // block: one home in the sidebar (desktop) and the sheet menu (mobile).
 function UtilityButtons() {
@@ -341,6 +380,15 @@ function AppShellContent({
   });
   const activityIndicators = useActivityIndicators();
   const translate = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+
+  // Keep the browser tab synchronized with the current page and sidebar naming.
+  useEffect(() => {
+    const pageTitle = browserTitleForPath(location.pathname, translate);
+    document.title =
+      pageTitle === "Evoluir+ English AI"
+        ? pageTitle
+        : `${pageTitle} | Evoluir+ English AI`;
+  }, [location.pathname, lang]);
 
   // Mobile swipe between the four destinations already shown in the bottom bar.
   // Keep navigation route-driven so the bottom bar stays in sync.
