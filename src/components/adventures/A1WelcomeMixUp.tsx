@@ -331,11 +331,11 @@ export function A1WelcomeMixUp() {
           <ArrowLeft className="size-4" aria-hidden="true" />
           {t("Back to home")}
         </Link>
-        <header className="flex items-center gap-4">
-          <EnglishAdventuresAvatar className="size-16 sm:size-20" />
-          <div className="min-w-0">
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
-              <Compass className="size-3.5" aria-hidden="true" />
+        <header className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-3 sm:flex sm:gap-4">
+          <EnglishAdventuresAvatar className="size-16 shrink-0 sm:size-20" />
+          <div className="min-w-0 sm:flex-1">
+            <p className="flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
+              <Compass className="size-3.5 shrink-0" aria-hidden="true" />
               {t("English Adventures")} · A1
             </p>
             <h1 className="font-display text-2xl font-bold sm:text-3xl" translate="no" lang="en">
@@ -346,7 +346,9 @@ export function A1WelcomeMixUp() {
               {t("An adventure to practise introductions, names, countries and jobs.")}
             </p>
           </div>
-          <AdventureMusicControl />
+          <div className="col-start-2 row-start-2 justify-self-end sm:ml-auto sm:col-auto sm:row-auto">
+            <AdventureMusicControl />
+          </div>
         </header>
 
         {!completed ? (
