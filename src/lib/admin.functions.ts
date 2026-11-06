@@ -1112,9 +1112,7 @@ export const getSharedMusicAsset = createServerFn({ method: "GET" })
       .from(SHARED_MUSIC_BUCKET)
       .createSignedUrl(storedPath, SHARED_MUSIC_URL_TTL_SECONDS);
     if (signedError || !signedData?.signedUrl) {
-      console.error(
-        `Shared music signed URL failed: ${signedError?.message ?? "URL unavailable"}`,
-      );
+      console.error(`Shared music signed URL failed: ${signedError?.message ?? "URL unavailable"}`);
       throw new Error(
         "The shared music file could not be accessed. Check that it exists in the private evoluir-shared-audio bucket.",
       );
