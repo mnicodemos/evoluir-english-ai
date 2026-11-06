@@ -1132,13 +1132,11 @@ export const saveSharedMusicAsset = createServerFn({ method: "POST" })
       .from("dashboard-home-images")
       .getPublicUrl(path);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: saveError } = await (supabaseAdmin as any)
-      .from("home_media_settings")
-      .upsert({
-        setting_key: "music-library-main",
-        image_url: publicData.publicUrl,
-        updated_at: new Date().toISOString(),
-      });
+    const { error: saveError } = await (supabaseAdmin as any).from("home_media_settings").upsert({
+      setting_key: "music-library-main",
+      image_url: publicData.publicUrl,
+      updated_at: new Date().toISOString(),
+    });
     if (saveError) {
       throw new Error(
         "The MP3 was uploaded but its shared setting could not be published. Check migration 0107.",
