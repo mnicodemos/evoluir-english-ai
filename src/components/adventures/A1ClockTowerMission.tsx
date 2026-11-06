@@ -223,7 +223,7 @@ export function A1ClockTowerMission() {
             </span>
             <h2 className="font-display text-xl font-semibold">{t("Adventure complete!")}</h2>
             <p className="text-sm leading-relaxed text-muted-foreground" translate="no" lang="en">
-              You completed 10 challenges and helped the town repair the clock tower before the parade.
+              {t("You completed 10 challenges and helped the town repair the clock tower before the parade.")}
             </p>
             <p className="text-sm font-medium">{t("A1 adventure learning recap")}</p>
             <p className="text-sm text-muted-foreground">
