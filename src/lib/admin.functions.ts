@@ -1092,9 +1092,9 @@ export const getEnglishAdventuresMusic = createServerFn({ method: "GET" }).handl
   const { data, error } = await (supabaseAdmin as any)
     .from("home_media_settings")
     .select("image_url")
-    .eq("setting_key", "english-adventures-music")
+    .eq("setting_key", "music-library-main")
     .maybeSingle();
-  if (error) throw new Error("The English Adventures music setting could not be loaded.");
+  if (error) throw new Error("The shared music setting could not be loaded.");
   return { url: data?.image_url ?? null };
 });
 
@@ -1119,7 +1119,7 @@ export const saveEnglishAdventuresMusic = createServerFn({ method: "POST" })
     const { data: publicData } = supabaseAdmin.storage.from("dashboard-home-images").getPublicUrl(path);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: saveError } = await (supabaseAdmin as any).from("home_media_settings").upsert({
-      setting_key: "english-adventures-music", image_url: publicData.publicUrl, updated_at: new Date().toISOString(),
+      setting_key: "music-library-main", image_url: publicData.publicUrl, updated_at: new Date().toISOString(),
     });
     if (saveError) throw new Error("The MP3 was uploaded but its shared setting could not be published. Check migration 0107.");
     return { ok: true, url: publicData.publicUrl };
