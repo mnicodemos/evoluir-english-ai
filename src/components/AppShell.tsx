@@ -683,9 +683,13 @@ function AppShellContent({
           />
         </nav>
 
+        {/* mt-auto keeps the footer at the shell's bottom edge even when the
+            page is shorter than the screen (the compact-height Dashboard), so
+            the sidebar's reserved band always lines up with the footer's
+            divider instead of the card dipping under it. */}
         <div
           className={cn(
-            "mb-0",
+            "mb-0 mt-auto",
             dashboardLayout && "hidden lg:block",
             mobileOneScreen && "hidden sm:block",
           )}
