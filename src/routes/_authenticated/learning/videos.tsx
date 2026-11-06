@@ -84,16 +84,10 @@ function ExtraVideosPage() {
   // Level chips as on the learning path (owner request, 2026-10-31): "My level"
   // first, always, then the other levels that have videos, conquered ones with
   // a check.
-  const otherLevels = useMemo(() => {
-    const available = new Set(levels);
-    const highestIndex = LEVELS.findIndex((item) => item.value === highest);
-    return LEVELS.filter(
-      (item) =>
-        item.value !== studentLevel &&
-        available.has(item.value) &&
-        LEVELS.findIndex((levelItem) => levelItem.value === item.value) <= highestIndex,
-    ).map((item) => item.value);
-  }, [levels, studentLevel, highest]);
+  const otherLevels = useMemo(
+    () => LEVELS.map((item) => item.value).filter((value) => value !== studentLevel),
+    [studentLevel],
+  );
   const level = picked ?? (profile ? studentLevel : (levels[0] ?? null));
   const [playing, setPlaying] = useState<string | null>(null);
   const pickLevel = (value: string) => {
@@ -167,14 +161,20 @@ function ExtraVideosPage() {
               </span>
               {otherLevels.map((value) => {
                 const active = value === level;
+                const locked =
+                  LEVELS.findIndex((item) => item.value === value) >
+                  LEVELS.findIndex((item) => item.value === highest);
                 return (
                   <button
                     key={value}
                     type="button"
                     aria-current={active ? "page" : undefined}
+                    aria-disabled={locked}
+                    disabled={locked}
                     onClick={() => pickLevel(value)}
                     className={cn(
                       LEVEL_CHIP,
+                      locked && "cursor-not-allowed opacity-35",
                       active
                         ? "border-brand-green/60 bg-brand-green/15 text-brand-green"
                         : "border-brand-green/25 text-brand-green/85 hover:border-brand-green/60 hover:bg-brand-green/10",
