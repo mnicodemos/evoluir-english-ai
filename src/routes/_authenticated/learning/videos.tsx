@@ -13,7 +13,7 @@ import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { useProfile } from "@/hooks/useProfile";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
-import { findLevel, isReviewLevel } from "@/lib/level";
+import { findLevel, isReviewLevel, LEVELS } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { recordVideoView } from "@/lib/premiumVideoSocial.functions";
@@ -84,7 +84,16 @@ function ExtraVideosPage() {
   // Level chips as on the learning path (owner request, 2026-10-31): "My level"
   // first, always, then the other levels that have videos, conquered ones with
   // a check.
-  const otherLevels = levels.filter((value) => value !== studentLevel);
+  const otherLevels = useMemo(() => {
+    const available = new Set(levels);
+    const highestIndex = LEVELS.findIndex((item) => item.value === highest);
+    return LEVELS.filter(
+      (item) =>
+        item.value !== studentLevel &&
+        available.has(item.value) &&
+        LEVELS.findIndex((levelItem) => levelItem.value === item.value) <= highestIndex,
+    ).map((item) => item.value);
+  }, [levels, studentLevel, highest]);
   const level = picked ?? (profile ? studentLevel : (levels[0] ?? null));
   const [playing, setPlaying] = useState<string | null>(null);
   const pickLevel = (value: string) => {
