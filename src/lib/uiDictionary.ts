@@ -7,6 +7,10 @@ const baseUiPt: Record<string, string> = {
     "Ajude a EVO a receber os convidados e combinar os cartões de identificação.",
   "A1 adventure introduction":
     "Uma aventura para praticar apresentações, nomes, países e profissões.",
+  "The Neighbourhood Mystery": "O mistério da vizinhança",
+  "You completed 10 challenges and helped Ben and Lucy solve the neighbourhood mystery.":
+    "Você concluiu 10 desafios e ajudou Ben e Lucy a resolver o mistério da vizinhança.",
+  "Next adventure · A1.2": "Próxima aventura · A1.2",
   "EVO hint label": "Dica da EVO:",
   "A1 adventure learning recap":
     "Você praticou nomes, países, profissões, o verbo to be e apresentações.",
