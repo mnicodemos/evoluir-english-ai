@@ -11,8 +11,7 @@ type Voice = "roberta" | "arabella";
 
 function WelcomeAudioSlot({ voice, label }: { voice: Voice; label: string }) {
   const { lang } = useUiLang();
-  const t = (value: string) =>
-    lang === "pt" ? (uiPt[value] ?? value) : value;
+  const t = (value: string) => (lang === "pt" ? (uiPt[value] ?? value) : value);
   const queryClient = useQueryClient();
   const getAudio = useServerFn(getAdventureWelcomeAudio);
   const saveAudio = useServerFn(saveAdventureWelcomeAudio);
@@ -26,7 +25,8 @@ function WelcomeAudioSlot({ voice, label }: { voice: Voice; label: string }) {
     retry: false,
   });
   const mutation = useMutation({
-    mutationFn: (dataUrl: string) => saveAudio({ data: { voice, dataUrl, mimeType: "audio/mpeg" } }),
+    mutationFn: (dataUrl: string) =>
+      saveAudio({ data: { voice, dataUrl, mimeType: "audio/mpeg" } }),
     onSuccess: async () => {
       setFile(null);
       setPreviewUrl(null);
