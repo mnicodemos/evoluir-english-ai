@@ -663,10 +663,8 @@ function Dashboard() {
   });
   const planNext =
     studyPlan?.plan.nextIndex != null ? studyPlan.plan.days[studyPlan.plan.nextIndex] : null;
-  // Business English: from B1 for Premium students; free students always see
-  // the card, disabled with the Premium badge (user request).
-  const showBusinessCard =
-    !!profile && businessLevelAllowed(profile.max_level || profile.level);
+  // Business English offer is shown only when the student's level is B1 or higher.
+  const showBusinessCard = !!profile && businessLevelAllowed(profile.max_level || profile.level);
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const { data: progressNextStep } = useNextStep({ enabled: !!profile?.id });
   const progressSkillRows = skillMeterRows(progressNextStep?.skills, null, PROGRESS_SKILLS);
