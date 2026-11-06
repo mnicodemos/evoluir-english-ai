@@ -233,6 +233,7 @@ function AdminPage() {
                 tabs={[
                   { value: "summary-videos", label: t("Summary videos") },
                   { value: "home", label: t("Home images") },
+                  { value: "adventures", label: t("English Adventures") },
                   { value: "lesson-test", label: t("Lesson test") },
                 ]}
               >
@@ -245,17 +246,16 @@ function AdminPage() {
                 <TabsContent value="home">
                   <AdminHomeMedia />
                 </TabsContent>
+                <TabsContent value="adventures">
+                  <section className="card-soft p-3 sm:p-5">
+                    <AdminEnglishAdventuresAvatar />
+                  </section>
+                </TabsContent>
                 <TabsContent value="lesson-test">
                   <AdminLessonAudioPrep />
                   <AdminLessonCompare />
                 </TabsContent>
               </FolderTabs>
-            </TabsContent>
-
-            <TabsContent value="adventures" className="mt-4">
-              <section className="card-soft p-3 sm:p-5">
-                <AdminEnglishAdventuresAvatar />
-              </section>
             </TabsContent>
 
             <TabsContent value="communication" className="mt-4">
@@ -309,7 +309,6 @@ const ADMIN_FOLDERS = [
   { value: "students", label: "Students", icon: Users },
   { value: "ai", label: "AI and costs", icon: Bot },
   { value: "content", label: "Content", icon: BookOpen },
-  { value: "adventures", label: "English Adventures", icon: Compass },
   { value: "communication", label: "Communication", icon: Megaphone },
   { value: "system", label: "System", icon: ShieldCheck },
 ] as const;
