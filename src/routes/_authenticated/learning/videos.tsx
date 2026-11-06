@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { useProfile } from "@/hooks/useProfile";
+import { useUiLang } from "@/lib/uiLang";
+import { uiPt } from "@/lib/uiDictionary";
 import { findLevel, isReviewLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
@@ -53,6 +55,8 @@ export const Route = createFileRoute("/_authenticated/learning/videos")({
  * toward the checklist, the study day or the Final Test.
  */
 function ExtraVideosPage() {
+  const { lang } = useUiLang();
+  const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data: profile } = useProfile();
   const fetchVideos = useServerFn(loadPremiumVideos);
   const query = useQuery({
@@ -208,59 +212,50 @@ function ExtraVideosPage() {
               const open = playing === video.id && embed;
               return (
                 <li key={video.id} className="card-soft overflow-hidden">
-                  {open ? (
-                    <div className="relative bg-black">
+                  <div className="relative aspect-video w-full overflow-hidden bg-black">
+                    {open && embed ? (
                       <iframe
-                        className="aspect-video w-full"
+                        className="absolute inset-0 size-full"
                         src={`${cleanVimeoPlayerUrl(embed)}&autoplay=1`}
                         title={video.title}
                         referrerPolicy="strict-origin-when-cross-origin"
                         allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                         allowFullScreen
                       />
-                    </div>
-                  ) : null}
-                  <div className="flex items-center gap-3 p-3">
-                    <span
-                      className={cn(
-                        "grid size-10 shrink-0 place-items-center rounded-xl",
-                        premium ? "bg-warning/12 text-warning" : "bg-muted text-muted-foreground",
-                      )}
-                      aria-hidden="true"
-                    >
-                      {premium ? <PlayCircle className="size-5" /> : <Lock className="size-4" />}
-                    </span>
-                    <span className="min-w-0 flex-1">
+                    ) : (
+                      <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-slate-900 via-slate-950 to-black">
+                        {premium && embed ? (
+                          <Button size="lg" className="gap-2" onClick={() => watch(video.id)}>
+                            <PlayCircle className="size-5" /> {t("Watch video")}
+                          </Button>
+                        ) : (
+                          <span className="grid size-14 place-items-center rounded-full border border-white/15 bg-white/10 text-white">
+                            <Lock className="size-6" />
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex min-w-0 items-center justify-between gap-3 p-3">
+                    <span className="min-w-0">
                       <span className="block truncate font-semibold" translate="no">
                         {video.title}
                       </span>
-                      <span className="block truncate text-xs text-muted-foreground">
+                      <span className="block text-xs text-muted-foreground">
                         <span>Level</span> <span>{video.level.toUpperCase()}</span>
                       </span>
                     </span>
-                    {premium && embed ? (
-                      open ? (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="shrink-0"
-                          aria-label="Close video"
-                          onClick={() => setPlaying(null)}
-                        >
-                          <X className="size-4" />
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          className="shrink-0 gap-1.5"
-                          onClick={() => watch(video.id)}
-                        >
-                          <PlayCircle className="size-4" /> Watch
-                        </Button>
-                      )
-                    ) : (
-                      <Lock className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                    )}
+                    {open ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="shrink-0"
+                        aria-label="Close video"
+                        onClick={() => setPlaying(null)}
+                      >
+                        <X className="size-4" />
+                      </Button>
+                    ) : null}
                   </div>
                 </li>
               );
