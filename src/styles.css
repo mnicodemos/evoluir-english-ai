@@ -94,6 +94,11 @@
 
 :root {
   --notification-border: #ffffff;
+  /* The compact footer band: 10 px of padding + the 32 px social icons + the
+     1 px divider = 53 px, measured at 1366, 1600 and 2880 px wide. The desktop
+     sidebar stops above it, so its profile card never hangs below the footer's
+     divider line (owner report, 2026-11-06: that read as unfinished). */
+  --app-footer-height: 3.3125rem;
   --radius: 0.9rem;
   --background: oklch(0.975 0.003 250);
   --foreground: oklch(0.24 0.005 250);
