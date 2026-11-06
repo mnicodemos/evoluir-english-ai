@@ -3,6 +3,10 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "A1 adventure introduction": "Uma aventura para praticar apresentações, nomes, países e profissões.",
+  "Choose your response": "Escolha sua resposta",
+  "A1 adventure learning recap": "Você praticou nomes, países, profissões, o verbo to be e apresentações.",
+  "A1 adventure recovery recap": "Respostas revistas com a ajuda da EVO: {count}.",
   "English Adventures": "Aventuras em inglês",
   "A story with EVO": "Uma história com a EVO",
   "Let's explore!": "Vamos explorar!",
