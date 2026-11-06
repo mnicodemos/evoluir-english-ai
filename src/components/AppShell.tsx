@@ -61,6 +61,7 @@ import { studyToday } from "@/lib/today";
 const mobileSheetNav = [
   { to: "/life", label: "Life+ AI", icon: Sprout },
   { to: "/learning", label: "Learning", icon: GraduationCap },
+  { to: "/adventures", label: "English Adventures", icon: Sparkles },
   // Shorts are one of the app's flagships (owner request, 2026-11-01).
   { to: "/shorts", label: "Shorts", icon: Clapperboard },
   { to: "/business", label: "Business English", icon: Briefcase },
