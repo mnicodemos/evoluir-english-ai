@@ -988,11 +988,13 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
     evoAvatar: string | null;
     videoCall: string | null;
     league: string | null;
+    englishAdventuresAvatar: string | null;
   } = {
     desktop: null,
     evoAvatar: null,
     videoCall: null,
     league: null,
+    englishAdventuresAvatar: null,
   };
   for (const row of data ?? []) {
     if (row.setting_key === "desktop") {
@@ -1003,6 +1005,8 @@ export const getHomeDashboardImages = createServerFn({ method: "GET" }).handler(
       result.videoCall = row.image_url;
     } else if (row.setting_key === "league") {
       result.league = row.image_url;
+    } else if (row.setting_key === "english-adventures-avatar") {
+      result.englishAdventuresAvatar = row.image_url;
     }
   }
   return result;
@@ -1013,7 +1017,13 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   .inputValidator((data) =>
     z
       .object({
-        target: z.enum(["desktop", "evo-avatar", "video-call", "league"]),
+        target: z.enum([
+          "desktop",
+          "evo-avatar",
+          "video-call",
+          "league",
+          "english-adventures-avatar",
+        ]),
         dataUrl: z.string().min(100).max(4_300_000),
         mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
       })

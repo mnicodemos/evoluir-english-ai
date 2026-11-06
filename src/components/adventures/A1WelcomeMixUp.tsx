@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-reac
 import { Link } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
-import { EvoAvatar } from "@/components/EvoAvatar";
+import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -331,7 +331,7 @@ export function A1WelcomeMixUp() {
           {t("Back to home")}
         </Link>
         <header className="flex items-center gap-4">
-          <EvoAvatar className="size-16 sm:size-20" />
+          <EnglishAdventuresAvatar className="size-16 sm:size-20" />
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
               <Compass className="size-3.5" aria-hidden="true" />

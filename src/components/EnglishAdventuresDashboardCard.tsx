@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Compass } from "lucide-react";
 
-import { EvoAvatar } from "@/components/EvoAvatar";
+import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { PremiumBadge, useIsPremium } from "@/components/PremiumBadge";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
@@ -14,10 +14,6 @@ export function EnglishAdventuresDashboardCard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const level = (profile?.max_level || profile?.level || "a1").toLowerCase();
   const title = level === "a2" ? "The Surprise Delivery" : "The Welcome Mix-Up";
-  const teaser =
-    level === "a2"
-      ? "A delivery arrives with an unexpected surprise. What will you do?"
-      : "Help EVO welcome the guests and match their name cards.";
 
   return (
     <section
@@ -32,7 +28,7 @@ export function EnglishAdventuresDashboardCard() {
         <PremiumBadge className="ml-auto" />
       </div>
       <div className="mt-1 flex min-h-0 min-w-0 flex-1 items-center gap-2.5">
-        <EvoAvatar decorative className="size-10 shrink-0" />
+        <EnglishAdventuresAvatar decorative className="size-10 shrink-0" />
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
             {t("Adventures with EVO")}
@@ -40,7 +36,9 @@ export function EnglishAdventuresDashboardCard() {
           <p className="truncate text-sm font-semibold" translate="no" lang="en">
             {title}
           </p>
-          <p className="mt-0.5 truncate text-xs text-muted-foreground">{t(teaser)}</p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            {t("A1 adventure introduction")}
+          </p>
         </div>
       </div>
       <Link

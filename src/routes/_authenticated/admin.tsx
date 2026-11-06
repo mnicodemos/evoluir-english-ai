@@ -5,7 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Bot, Loader2, Megaphone, ShieldCheck, Users } from "lucide-react";
+import { BookOpen, Bot, Compass, Loader2, Megaphone, ShieldCheck, Users } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { AdminAiUsage } from "@/components/AdminAiUsage";
@@ -24,6 +24,7 @@ import { AdminPremiumVideos } from "@/components/AdminPremiumVideos";
 import { AdminVideoComments } from "@/components/AdminVideoComments";
 import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager";
 import { AdminHomeMedia } from "@/components/AdminHomeMedia";
+import { AdminEnglishAdventuresAvatar } from "@/components/AdminEnglishAdventuresAvatar";
 import { AdminRecoveryPoints } from "@/components/AdminRecoveryPoints";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -120,7 +121,7 @@ function AdminPage() {
           {/* Folders by type of control (owner request, 2026-10-29), each with
               its own tabs; the alerts above stay visible in every folder. */}
           <Tabs value={folder} onValueChange={chooseFolder} className="mt-4 min-w-0">
-            <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-5">
+            <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-6">
               {ADMIN_FOLDERS.map((item) => (
                 <TabsTrigger
                   key={item.value}
@@ -251,6 +252,12 @@ function AdminPage() {
               </FolderTabs>
             </TabsContent>
 
+            <TabsContent value="adventures" className="mt-4">
+              <section className="card-soft p-3 sm:p-5">
+                <AdminEnglishAdventuresAvatar />
+              </section>
+            </TabsContent>
+
             <TabsContent value="communication" className="mt-4">
               <FolderTabs tabs={[{ value: "push", label: t("Push") }]}>
                 <TabsContent value="push">
@@ -302,6 +309,7 @@ const ADMIN_FOLDERS = [
   { value: "students", label: "Students", icon: Users },
   { value: "ai", label: "AI and costs", icon: Bot },
   { value: "content", label: "Content", icon: BookOpen },
+  { value: "adventures", label: "English Adventures", icon: Compass },
   { value: "communication", label: "Communication", icon: Megaphone },
   { value: "system", label: "System", icon: ShieldCheck },
 ] as const;
