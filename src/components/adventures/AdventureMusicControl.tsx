@@ -10,6 +10,7 @@ export function AdventureMusicControl() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [muted, setMuted] = useState(true);
   const [started, setStarted] = useState(false);
+  const [showMusicHint, setShowMusicHint] = useState(true);
   const query = useQuery({
     queryKey: ["shared-music-asset"],
     queryFn: () => getMusic(),
@@ -20,8 +21,12 @@ export function AdventureMusicControl() {
   useEffect(() => {
     try {
       setMuted(window.localStorage.getItem("adventures-music-muted") !== "false");
+      setShowMusicHint(
+        window.localStorage.getItem("adventures-music-hint-seen") !== "true",
+      );
     } catch {
       setMuted(true);
+      setShowMusicHint(true);
     }
   }, []);
 
@@ -37,18 +42,25 @@ export function AdventureMusicControl() {
   function toggleMusic() {
     const nextMuted = !muted;
     setMuted(nextMuted);
+    setShowMusicHint(false);
     if (!nextMuted) setStarted(true);
     try {
       window.localStorage.setItem("adventures-music-muted", String(nextMuted));
+      window.localStorage.setItem("adventures-music-hint-seen", "true");
     } catch {
       // Audio control remains usable when browser storage is unavailable.
     }
   }
 
   return (
-    <div className="flex shrink-0 items-center">
+    <div className="flex shrink-0 items-center gap-2">
       {query.data?.url ? (
         <audio ref={audioRef} src={query.data.url} loop preload="none" />
+      ) : null}
+      {showMusicHint && query.data?.url ? (
+        <span className="whitespace-nowrap text-xs font-medium text-cyan-400">
+          {muted ? "Tap to enjoy the soundtrack" : "Soundtrack on"}
+        </span>
       ) : null}
       <button
         type="button"
