@@ -2793,7 +2793,7 @@ export const uiPt: Record<string, string> = {
   "Arabella · Mysterious welcome": "Arabella · Boas-vindas misteriosas",
   "Choose an MP3 audio file.": "Escolha um arquivo de áudio MP3.",
   "The MP3 must be 10 MB or smaller.": "O arquivo MP3 deve ter no máximo 10 MB.",
-  "Published": "Publicado",
+  Published: "Publicado",
   "Not published yet": "Ainda não publicado",
   "Select the welcome MP3": "Selecione o MP3 de boas-vindas",
   "Not published": "Não publicado",
