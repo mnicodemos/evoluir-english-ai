@@ -164,7 +164,7 @@ export function A1NeighbourhoodMystery() {
             <p className="text-sm text-muted-foreground">{t("A1 adventure introduction")}</p>
           </div>
           <div className="col-start-2 row-start-2 justify-self-end sm:ml-auto sm:col-auto sm:row-auto">
-            <AdventureMusicControl />
+            <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
         {!complete ? (

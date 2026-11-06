@@ -347,7 +347,7 @@ export function A1WelcomeMixUp() {
             </p>
           </div>
           <div className="col-start-2 row-start-2 justify-self-end sm:ml-auto sm:col-auto sm:row-auto">
-            <AdventureMusicControl />
+            <AdventureMusicControl welcomeVoice="roberta" />
           </div>
         </header>
 

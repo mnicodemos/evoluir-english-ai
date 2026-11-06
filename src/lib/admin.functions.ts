@@ -1120,6 +1120,60 @@ export const getSharedMusicAsset = createServerFn({ method: "GET" })
     return { url: signedData.signedUrl, expiresIn: SHARED_MUSIC_URL_TTL_SECONDS };
   });
 
+type AdventureWelcomeVoice = "roberta" | "arabella";
+
+const ADVENTURE_WELCOME_PATHS: Record<AdventureWelcomeVoice, string> = {
+  roberta: "adventures/welcome-roberta.mp3",
+  arabella: "adventures/welcome-arabella.mp3",
+};
+
+export const getAdventureWelcomeAudio = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ voice: z.enum(["roberta", "arabella"]) }).parse(data))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signedData, error } = await supabaseAdmin.storage
+      .from(SHARED_MUSIC_BUCKET)
+      .createSignedUrl(ADVENTURE_WELCOME_PATHS[data.voice], SHARED_MUSIC_URL_TTL_SECONDS);
+    if (error || !signedData?.signedUrl) {
+      throw new Error("The selected EVO welcome audio has not been published yet.");
+    }
+    return { url: signedData.signedUrl, expiresIn: SHARED_MUSIC_URL_TTL_SECONDS };
+  });
+
+export const saveAdventureWelcomeAudio = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        voice: z.enum(["roberta", "arabella"]),
+        dataUrl: z.string().min(100).max(14_000_000),
+        mimeType: z.literal("audio/mpeg"),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const match = data.dataUrl.match(/^data:audio\/mpeg;base64,([A-Za-z0-9+/=]+)$/);
+    if (!match?.[1]) throw new Error("Choose a valid MP3 audio file.");
+    const bytes = Uint8Array.from(atob(match[1]), (character) => character.charCodeAt(0));
+    if (bytes.byteLength > 10 * 1024 * 1024) throw new Error("The MP3 must be 10 MB or smaller.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.storage
+      .from(SHARED_MUSIC_BUCKET)
+      .upload(ADVENTURE_WELCOME_PATHS[data.voice], bytes, {
+        contentType: "audio/mpeg",
+        cacheControl: "3600",
+        upsert: true,
+      });
+    if (error) {
+      console.error(`EVO welcome audio upload failed: ${error.message}`);
+      throw new Error("The EVO welcome audio could not be published to the shared audio bucket.");
+    }
+    return { ok: true };
+  });
+
 export const saveSharedMusicAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
