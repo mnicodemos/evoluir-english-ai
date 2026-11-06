@@ -1151,9 +1151,7 @@ export const saveSharedMusicAsset = createServerFn({ method: "POST" })
         upsert: false,
       });
     if (uploadError) {
-      console.error(
-        `Shared music upload failed: ${uploadError.code ?? "?"} ${uploadError.message}`,
-      );
+      console.error(`Shared music upload failed: ${uploadError.message}`);
       throw new Error(
         "The MP3 could not be uploaded to evoluir-shared-audio. Check the bucket and file-size settings.",
       );
