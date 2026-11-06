@@ -17,7 +17,10 @@ export function EnglishAdventuresAvatar({
       alt={decorative ? "" : "EVO"}
       width={192}
       height={192}
-      className={cn("size-12 shrink-0 rounded-full object-cover object-[50%_15%] sm:size-14", className)}
+      className={cn(
+        "size-12 shrink-0 rounded-full object-cover object-[50%_15%] sm:size-14",
+        className,
+      )}
     />
   );
 }
