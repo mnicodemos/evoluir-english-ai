@@ -13,7 +13,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useShortsShortcut } from "@/hooks/useShortsShortcut";
 import { useVideoSocial } from "@/hooks/useVideoSocial";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
-import { findLevel, isReviewLevel } from "@/lib/level";
+import { findLevel, isReviewLevel, LEVELS } from "@/lib/level";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
@@ -68,8 +68,8 @@ function ShortsPage() {
   const studentLevel = findLevel(profile?.level).value;
   const highest = findLevel(profile?.max_level || profile?.level).value;
   const otherLevels = useMemo(
-    () => [...new Set(shorts.map((video) => video.level))].filter((v) => v !== studentLevel),
-    [shorts, studentLevel],
+    () => LEVELS.map((item) => item.value).filter((value) => value !== studentLevel),
+    [studentLevel],
   );
   const [picked, setPicked] = useState<string | null>(null);
   const level = picked ?? studentLevel;
@@ -200,13 +200,21 @@ function ShortsPage() {
           >
             {levels.map((value, index) => {
               const active = value === level;
+              const locked =
+                LEVELS.findIndex((item) => item.value === value) >
+                LEVELS.findIndex((item) => item.value === highest);
               return (
                 <button
                   key={value}
                   type="button"
                   aria-current={active ? "page" : undefined}
+                  aria-disabled={locked}
+                  disabled={locked}
                   onClick={() => setPicked(value)}
-                  className="flex w-16 shrink-0 flex-col items-center gap-1.5 focus-visible:outline-none"
+                  className={cn(
+                    "flex w-16 shrink-0 flex-col items-center gap-1.5 focus-visible:outline-none",
+                    locked && "cursor-not-allowed opacity-35",
+                  )}
                 >
                   <span
                     className={cn("rounded-full p-[2.5px]", active ? STORY_RING : "bg-white/15")}
