@@ -22,7 +22,7 @@ export function ExtraVideosPill() {
     <div className="flex h-11 items-center rounded-full border border-white/10 bg-white/[0.04] p-1">
       <Link
         to="/learning/videos"
-        aria-label={`${t("Extra videos")} · ${t("Lessons on video, Premium")}${hasNew ? ` · ${t("Just added")}` : ""}`}
+        aria-label={`${t("Extra learning videos")} · ${t("Lessons on video, Premium")}${hasNew ? ` · ${t("Just added")}` : ""}`}
         className="group flex h-9 shrink-0 items-center gap-2.5 rounded-full text-left transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 sm:pr-3"
       >
         <span className="relative grid size-9 shrink-0 place-items-center rounded-full bg-warning/15 text-warning">
