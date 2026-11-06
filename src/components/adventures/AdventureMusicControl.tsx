@@ -93,7 +93,7 @@ export function AdventureMusicControl() {
   return (
     <div className="flex shrink-0 items-center gap-2">
       {query.data?.url ? <audio ref={audioRef} src={query.data.url} loop preload="none" /> : null}
-      {showHint && query.data?.url ? (
+      {showHint ? (
         <span className="inline-flex max-w-40 items-center gap-1.5 text-right text-[11px] leading-tight text-cyan-300">
           <Music2 className="size-3 shrink-0" aria-hidden="true" />
           There’s a soundtrack waiting for you
