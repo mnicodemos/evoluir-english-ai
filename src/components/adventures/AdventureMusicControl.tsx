@@ -141,20 +141,20 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   }
 
   return (
-    <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+    <div className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
       {query.data?.url ? <audio ref={audioRef} src={query.data.url} loop preload="none" /> : null}
       <button
         type="button"
         onClick={playWelcome}
         disabled={!query.data?.url || !welcomeQuery.data?.url}
-        className="inline-flex h-10 items-center gap-1.5 rounded-full border border-brand-green/40 bg-brand-green/10 px-3 text-xs font-semibold text-brand-green transition hover:bg-brand-green/15 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+        className="inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-brand-green/40 bg-brand-green/10 px-3 text-xs font-semibold text-brand-green transition hover:bg-brand-green/15 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
         aria-label={t("Play EVO welcome")}
       >
         <Play className="size-3.5" aria-hidden="true" />
         {t("Meet EVO")}
       </button>
       {showHint ? (
-        <span className="inline-flex max-w-40 items-center gap-1.5 text-right text-[11px] leading-tight text-cyan-300">
+        <span className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 text-center text-[11px] leading-tight text-cyan-300 sm:max-w-40">
           <Music2 className="size-3 shrink-0" aria-hidden="true" />
           {t("There’s a soundtrack waiting for you")}
         </span>
@@ -166,7 +166,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         aria-label={muted ? "Play adventure soundtrack" : "Mute adventure soundtrack"}
         aria-pressed={!muted}
         title={muted ? "Play soundtrack" : "Mute soundtrack"}
-        className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-background/80 text-muted-foreground transition hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+        className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-background/80 text-muted-foreground transition hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
       >
         {muted ? (
           <VolumeX className="size-4" aria-hidden="true" />
