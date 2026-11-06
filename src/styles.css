@@ -361,6 +361,30 @@
   }
 }
 
+/* The desktop sidebar ends where the page beside it ends (owner report,
+   2026-11-06: the profile card hung below the footer's divider line and the
+   base read as unfinished). Its bottom padding reserves the footer band
+   (--app-footer-height, 53 px) plus the gap the Dashboard's last card row keeps
+   above that divider at the same width: 24 px of main padding below xl,
+   20 px of grid padding + 8 px of main padding from xl, 8 + 8 px from 2xl. */
+@media (min-width: 64rem) {
+  .dashboard-shell > aside {
+    padding-bottom: calc(var(--app-footer-height) + 1.5rem);
+  }
+}
+
+@media (min-width: 80rem) {
+  .dashboard-shell > aside {
+    padding-bottom: calc(var(--app-footer-height) + 1.75rem);
+  }
+}
+
+@media (min-width: 96rem) {
+  .dashboard-shell > aside {
+    padding-bottom: calc(var(--app-footer-height) + 1rem);
+  }
+}
+
 @keyframes weather-icon-change {
   from {
     opacity: 0;
