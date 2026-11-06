@@ -189,7 +189,7 @@ function UtilityButtons() {
 
 type MobileNavigationMenuProps = {
   translate: (label: string) => string;
-  studentLevel?: string | null;
+  studentLevel?: string | null | undefined;
   className?: string;
   presentation?: "menu" | "bottom-tab";
   bottomLabel?: string;
