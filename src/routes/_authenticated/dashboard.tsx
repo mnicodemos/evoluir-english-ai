@@ -667,7 +667,9 @@ function Dashboard() {
   // the card, disabled with the Premium badge (user request).
   const showBusinessCard =
     !!profile &&
-    (businessLevelAllowed(profile.max_level || profile.level) || !profileIsPremium(profile));
+    (businessLevelAllowed(profile.level) ||
+      businessLevelAllowed(profile.max_level) ||
+      !profileIsPremium(profile));
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const { data: progressNextStep } = useNextStep({ enabled: !!profile?.id });
   const progressSkillRows = skillMeterRows(progressNextStep?.skills, null, PROGRESS_SKILLS);
