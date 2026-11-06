@@ -53,7 +53,7 @@ const adventures: Record<
           },
           {
             label: "“Your bag is in the kitchen.”",
-            response: "Mia laughs. “Let\'s check the bench first. It looks promising!”",
+            response: "Mia laughs. “Let's check the bench first. It looks promising!”",
           },
           {
             label: "“I saw a small blue bag.”",
