@@ -6,7 +6,8 @@ const baseUiPt: Record<string, string> = {
   "English Adventures": "Aventuras em inglês",
   "A story with EVO": "Uma história com a EVO",
   "Let's explore!": "Vamos explorar!",
-  "English Adventures is a Premium feature": "English Adventures é um recurso Premium",
+  "English Adventures is a Premium feature":
+    "English Adventures é um recurso Premium",
   "Unlock the stories with EVO and keep exploring your English.": "Desbloqueie as histórias com a EVO e continue evoluindo no inglês.",
   "Finish adventure": "Concluir aventura",
   "Continue the story": "Continuar a história",
