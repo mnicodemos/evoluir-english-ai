@@ -4,7 +4,7 @@ import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
   "English Adventures": "Aventuras em Inglês",
-  "Bonus": "Bônus",
+  Bonus: "Bônus",
   "A story with EVO": "Uma história com a EVO",
   "Let's explore!": "Vamos explorar!",
   "Finish adventure": "Finalizar aventura",
