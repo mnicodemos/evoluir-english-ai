@@ -22,6 +22,12 @@ export function vimeoVideoId(url: string | null | undefined): string | null {
   }
 }
 
+/** Builds a lightweight Vimeo poster URL for social-style video previews. */
+export function vimeoThumbnailUrl(url: string | null | undefined): string | null {
+  const id = vimeoVideoId(url);
+  return id ? `https://vumbnail.com/${id}.jpg` : null;
+}
+
 /** Builds the Vimeo player URL and preserves the privacy hash for unlisted videos. */
 export function vimeoEmbedUrl(url: string | null | undefined): string | null {
   const id = vimeoVideoId(url);
