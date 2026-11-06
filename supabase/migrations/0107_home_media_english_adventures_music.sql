@@ -1,4 +1,4 @@
--- Allow one shared background-music setting for all English Adventures.
+-- Allow one reusable shared background-music library setting.
 DO $$
 DECLARE existing record;
 BEGIN
@@ -19,7 +19,7 @@ BEGIN
     ADD CONSTRAINT home_media_settings_setting_key_check
     CHECK (setting_key IN (
       'desktop', 'mobile', 'evo-avatar', 'lesson-audio', 'video-call',
-      'league', 'english-adventures-avatar', 'english-adventures-music'
+      'league', 'english-adventures-avatar', 'music-library-main'
     ));
 END $$;
 
