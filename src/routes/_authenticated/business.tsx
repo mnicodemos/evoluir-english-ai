@@ -167,6 +167,7 @@ function BusinessPage() {
         <PageHeader
           guide="business"
           icon={Briefcase}
+          eyebrow={<>Premium extras</>}
           title={<>Business English</>}
           description={
             <>
