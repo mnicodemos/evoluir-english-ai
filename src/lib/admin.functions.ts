@@ -1086,7 +1086,7 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   });
 
 /** Shared background track for all four English Adventures blocks. */
-export const getEnglishAdventuresMusic = createServerFn({ method: "GET" }).handler(async () => {
+export const getSharedMusicAsset = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabaseAdmin as any)
@@ -1098,7 +1098,7 @@ export const getEnglishAdventuresMusic = createServerFn({ method: "GET" }).handl
   return { url: data?.image_url ?? null };
 });
 
-export const saveEnglishAdventuresMusic = createServerFn({ method: "POST" })
+export const saveSharedMusicAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({
     dataUrl: z.string().min(100).max(14_000_000),
