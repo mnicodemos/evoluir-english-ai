@@ -8,6 +8,10 @@ const baseUiPt: Record<string, string> = {
   "A1 adventure introduction":
     "Uma aventura para praticar apresentações, nomes, países e profissões.",
   "The Neighbourhood Mystery": "O mistério da vizinhança",
+  "The Clock Tower Mission": "A missão da torre do relógio",
+  "You completed 10 challenges and helped the town repair the clock tower before the parade.":
+    "Você concluiu 10 desafios e ajudou a cidade a consertar a torre do relógio antes do desfile.",
+  "Next adventure · A1.3": "Próxima aventura · A1.3",
   "You completed 10 challenges and helped Ben and Lucy solve the neighbourhood mystery.":
     "Você concluiu 10 desafios e ajudou Ben e Lucy a resolver o mistério da vizinhança.",
   "Next adventure · A1.2": "Próxima aventura · A1.2",
