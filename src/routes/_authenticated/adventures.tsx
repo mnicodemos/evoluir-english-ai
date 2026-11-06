@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Compass, Lock, RotateCcw, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { EvoAvatar } from "@/components/EvoAvatar";
+import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
@@ -170,6 +171,7 @@ export const Route = createFileRoute("/_authenticated/adventures")({
 
 function EnglishAdventuresPage() {
   const { data: profile } = useProfile();
+  const premium = useIsPremium();
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const level = (profile?.max_level || profile?.level || "a1").toLowerCase();
@@ -178,6 +180,35 @@ function EnglishAdventuresPage() {
   const [sceneIndex, setSceneIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [finished, setFinished] = useState(false);
+
+  if (premium === false) {
+    return (
+      <AppShell>
+        <div className="mx-auto w-full max-w-3xl space-y-5">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            {t("Back to home")}
+          </Link>
+          <section className="card-soft space-y-3 p-6 text-center">
+            <Lock className="mx-auto size-8 text-warning" aria-hidden="true" />
+            <h1 className="font-display text-xl font-semibold">
+              {t("English Adventures is a Premium feature")}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {t("Unlock the stories with EVO and keep exploring your English.")}
+            </p>
+            <Button asChild>
+              <Link to="/premium">{t("See plans")}</Link>
+            </Button>
+          </section>
+        </div>
+      </AppShell>
+    );
+  }
+
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
   if (!scene) return null;
 
@@ -213,7 +244,7 @@ function EnglishAdventuresPage() {
           <EvoAvatar className="size-16 sm:size-20" />
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
-              <Compass className="size-3.5" aria-hidden="true" /> English Adventures ·{" "}
+              <Compass className="size-3.5" aria-hidden="true" /> {t("English Adventures")} ·{" "}
               {key.toUpperCase()}
             </p>
             <h1 className="font-display text-2xl font-bold sm:text-3xl">{adventure.title}</h1>

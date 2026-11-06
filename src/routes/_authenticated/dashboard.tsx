@@ -57,7 +57,9 @@ import { useDiamondLevel } from "@/hooks/useDiamondCycles";
 import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { daysToNextDiamond, diamondName } from "@/lib/diamondCycles";
 import { getLeague } from "@/components/LeagueBadge";
+import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
 import { EnglishAdventuresDashboardCard } from "@/components/EnglishAdventuresDashboardCard";
+import { businessLevelAllowed } from "@/lib/businessCourse";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
 import { BLACK_FRIDAY, blackFridayPhase, daysUntilBlackFriday } from "@/lib/billing/blackFriday";
@@ -662,9 +664,11 @@ function Dashboard() {
   });
   const planNext =
     studyPlan?.plan.nextIndex != null ? studyPlan.plan.days[studyPlan.plan.nextIndex] : null;
-  // English Adventures currently ships for A1 and A2; show the bonus only when a story exists.
+  // Keep Business English for B1+; Adventures occupies the same slot only for A1–A2.
   const adventureLevel = (profile?.max_level || profile?.level || "").toLowerCase();
   const showAdventureCard = !!profile && (adventureLevel === "a1" || adventureLevel === "a2");
+  const showBusinessCard = !!profile && businessLevelAllowed(profile.max_level || profile.level);
+  const showSideCard = showAdventureCard || showBusinessCard;
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const { data: progressNextStep } = useNextStep({ enabled: !!profile?.id });
   const progressSkillRows = skillMeterRows(progressNextStep?.skills, null, PROGRESS_SKILLS);
@@ -1195,18 +1199,23 @@ function Dashboard() {
 
             {/* Desktop: the Quick Access row repeated the sidebar; today's goal
               steps took its place. */}
-            {/* English Adventures (A1–A2 launch) sits beside today's goals. */}
+            {/* A1–A2: English Adventures. B1+: restore Business English in the same slot. */}
             <div
-              className={`order-4 hidden min-w-0 gap-3 lg:order-none xl:h-full xl:min-h-0 ${
-                showAdventureCard ? "lg:grid lg:grid-cols-12" : "lg:block"
+              className={`order-4 hidden min-w-0 gap-3 lg:order-none lg:items-stretch xl:h-full xl:min-h-0 ${
+                showSideCard ? "lg:grid lg:grid-cols-12" : "lg:block"
               }`}
             >
-              <div className="min-w-0 lg:col-span-8 xl:col-span-9 xl:h-full xl:min-h-0">
+              <div className="h-full min-w-0 lg:col-span-8 xl:col-span-9 xl:min-h-0">
                 <GoalsTodayCard />
               </div>
               {showAdventureCard && (
-                <div className="min-w-0 lg:col-span-4 xl:col-span-3 xl:h-full xl:min-h-0">
+                <div className="h-full min-w-0 lg:col-span-4 xl:col-span-3 xl:min-h-0">
                   <EnglishAdventuresDashboardCard />
+                </div>
+              )}
+              {showBusinessCard && (
+                <div className="h-full min-w-0 lg:col-span-4 xl:col-span-3 xl:min-h-0">
+                  <BusinessDashboardCard />
                 </div>
               )}
             </div>
