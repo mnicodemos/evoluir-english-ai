@@ -32,8 +32,7 @@ const adventures: Record<
           },
           {
             label: "“Where is the train station?”",
-            response:
-              "Mia points outside. “The station is over there. But first, let's find my bag!”",
+            response: "Mia points outside. “The station is over there. But first, let\'s find my bag!”",
           },
           {
             label: "“Don't worry. I can help.”",
@@ -53,8 +52,7 @@ const adventures: Record<
           },
           {
             label: "“Your bag is in the kitchen.”",
-            response:
-              "Mia laughs. “Let's check the bench first. It looks promising!”",
+            response: "Mia laughs. “Let\'s check the bench first. It looks promising!”",
           },
           {
             label: "“I saw a small blue bag.”",
@@ -102,8 +100,7 @@ const adventures: Record<
           },
           {
             label: "“I received the wrong weather.”",
-            response:
-              "The delivery agent looks confused. Try describing the package and the problem.",
+            response: "The delivery agent looks confused. Try describing the package and the problem.",
           },
           {
             label: "“Could you help me with this order?”",
@@ -119,13 +116,11 @@ const adventures: Record<
         choices: [
           {
             label: "“The box was wet and one corner was crushed.”",
-            response:
-              "“Thank you. That helps us understand the problem,” says the agent.",
+            response: "“Thank you. That helps us understand the problem,” says the agent.",
           },
           {
             label: "“I bought it last year.”",
-            response:
-              "The agent asks if you can share details about this delivery instead.",
+            response: "The agent asks if you can share details about this delivery instead.",
           },
           {
             label: "“I would like a replacement, please.”",
@@ -157,8 +152,7 @@ const adventures: Record<
         evo: "You explained the issue, asked for what you needed and confirmed the next step. Nicely handled!",
       },
     ],
-    ending:
-      "You turned an unexpected problem into a clear conversation and a practical solution.",
+    ending: "You turned an unexpected problem into a clear conversation and a practical solution.",
   },
 };
 
@@ -222,9 +216,7 @@ function EnglishAdventuresPage() {
               <Compass className="size-3.5" aria-hidden="true" /> English Adventures ·{" "}
               {key.toUpperCase()}
             </p>
-            <h1 className="font-display text-2xl font-bold sm:text-3xl">
-              {adventure.title}
-            </h1>
+            <h1 className="font-display text-2xl font-bold sm:text-3xl">{adventure.title}</h1>
             <p className="text-sm text-muted-foreground">{t(adventure.subtitle)}</p>
           </div>
         </header>
@@ -289,15 +281,9 @@ function EnglishAdventuresPage() {
             <span className="mx-auto grid size-14 place-items-center rounded-full bg-brand-green/10 text-brand-green">
               <Sparkles className="size-7" aria-hidden="true" />
             </span>
-            <h2 className="font-display text-xl font-semibold">
-              {t("Adventure complete!")}
-            </h2>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {t(adventure.ending)}
-            </p>
-            <p className="text-sm font-medium">
-              {t("Your English. Your world. New experiences.")}
-            </p>
+            <h2 className="font-display text-xl font-semibold">{t("Adventure complete!")}</h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">{t(adventure.ending)}</p>
+            <p className="text-sm font-medium">{t("Your English. Your world. New experiences.")}</p>
             <div className="flex flex-wrap justify-center gap-2">
               <Button onClick={restart}>
                 <RotateCcw className="mr-1 size-4" />
