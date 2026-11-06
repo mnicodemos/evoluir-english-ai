@@ -17,6 +17,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdventuresRouteImport } from './routes/_authenticated/adventures'
 import { Route as AuthenticatedBillingSuccessRouteImport } from './routes/_authenticated/billing-success'
 import { Route as AuthenticatedBusinessRouteImport } from './routes/_authenticated/business'
 import { Route as AuthenticatedCallRouteImport } from './routes/_authenticated/call'
@@ -95,6 +96,11 @@ const TermsRoute = TermsRouteImport.update({
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdventuresRoute = AuthenticatedAdventuresRouteImport.update({
+  id: '/adventures',
+  path: '/adventures',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedBillingSuccessRoute =
@@ -317,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/adventures': typeof AuthenticatedAdventuresRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/business': typeof AuthenticatedBusinessRoute
   '/call': typeof AuthenticatedCallRoute
@@ -417,6 +424,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/adventures': typeof AuthenticatedAdventuresRoute
   '/_authenticated/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/_authenticated/business': typeof AuthenticatedBusinessRoute
   '/_authenticated/call': typeof AuthenticatedCallRoute
@@ -683,6 +691,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/adventures': {
+      id: '/_authenticated/adventures'
+      path: '/adventures'
+      fullPath: '/adventures'
+      preLoaderRoute: typeof AuthenticatedAdventuresRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/billing-success': {
@@ -970,6 +985,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdventuresRoute: typeof AuthenticatedAdventuresRoute
   AuthenticatedBillingSuccessRoute: typeof AuthenticatedBillingSuccessRoute
   AuthenticatedBusinessRoute: typeof AuthenticatedBusinessRoute
   AuthenticatedCallRoute: typeof AuthenticatedCallRoute
@@ -1006,6 +1022,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdventuresRoute: AuthenticatedAdventuresRoute,
   AuthenticatedBillingSuccessRoute: AuthenticatedBillingSuccessRoute,
   AuthenticatedBusinessRoute: AuthenticatedBusinessRoute,
   AuthenticatedCallRoute: AuthenticatedCallRoute,
