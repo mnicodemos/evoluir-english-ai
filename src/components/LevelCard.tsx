@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import {
-  Check,
-  ChartNoAxesColumnIncreasing,
-  Download,
-  GraduationCap,
-  Undo2,
-} from "lucide-react";
+import { Check, ChartNoAxesColumnIncreasing, Download, GraduationCap, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -108,7 +102,11 @@ export function LevelCard({
           <li key={l.value}>
             <span
               aria-current={active ? "step" : undefined}
-              title={active ? `${l.label} · ${t("current level")}` : `${l.label} · ${t("not reached yet")}`}
+              title={
+                active
+                  ? `${l.label} · ${t("current level")}`
+                  : `${l.label} · ${t("not reached yet")}`
+              }
               className={cn(
                 chip,
                 active &&
