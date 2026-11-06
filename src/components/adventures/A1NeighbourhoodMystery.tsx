@@ -223,7 +223,8 @@ export function A1NeighbourhoodMystery() {
             <p className="text-sm text-muted-foreground">{t("A1 adventure recovery recap").replace("{count}", String(recovered))}</p>
             <div className="flex flex-wrap justify-center gap-2">
               <Button onClick={restart}><RotateCcw className="mr-1 size-4" />{t("Explore again")}</Button>
-              <Button asChild variant="outline"><Link to="/dashboard">{t("Back to home")}</Link></Button>
+              <Button asChild variant="outline"><Link to="/adventures" search={{ story: "clock-tower-mission" }}>{t("Next adventure · A1.3")}</Link></Button>
+              <Button asChild variant="ghost"><Link to="/dashboard">{t("Back to home")}</Link></Button>
             </div>
           </section>
         )}
