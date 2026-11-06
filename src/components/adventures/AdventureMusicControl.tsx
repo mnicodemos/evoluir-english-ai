@@ -21,7 +21,7 @@ export function AdventureMusicControl() {
     try {
       // Playback must still be confirmed by a user gesture in browsers that block autoplay.
       setMuted(window.localStorage.getItem("adventures-music-muted") !== "false");
-      setShowHint(window.localStorage.getItem("adventures-music-hint-seen") !== "true");
+      setShowHint(window.localStorage.getItem("adventures-music-hint-v2-seen") !== "true");
     } catch {
       setMuted(true);
       setShowHint(true);
@@ -52,7 +52,7 @@ export function AdventureMusicControl() {
     if (!audio) return;
     setShowHint(false);
     try {
-      window.localStorage.setItem("adventures-music-hint-seen", "true");
+      window.localStorage.setItem("adventures-music-hint-v2-seen", "true");
     } catch {
       // The hint can still be dismissed for this visit when storage is unavailable.
     }
@@ -91,8 +91,14 @@ export function AdventureMusicControl() {
   }
 
   return (
-    <div className="flex shrink-0 items-center">
+    <div className="flex shrink-0 items-center gap-2">
       {query.data?.url ? <audio ref={audioRef} src={query.data.url} loop preload="none" /> : null}
+      {showHint && query.data?.url ? (
+        <span className="inline-flex max-w-40 items-center gap-1.5 text-right text-[11px] leading-tight text-cyan-300">
+          <Music2 className="size-3 shrink-0" aria-hidden="true" />
+          There’s a soundtrack waiting for you
+        </span>
+      ) : null}
       <button
         type="button"
         onClick={toggleMusic}
