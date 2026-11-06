@@ -36,7 +36,7 @@ export function ExtraVideosPill() {
         </span>
         <span className="hidden leading-tight sm:block">
           <span className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
-            {t("Extra videos")}
+            {t("Extra learning videos")}
             {hasNew ? (
               <span className="rounded-full bg-brand-green/15 px-1.5 text-[9.5px] font-bold uppercase tracking-wide text-brand-green">
                 {t("Just added")}
