@@ -38,7 +38,9 @@ export function EnglishAdventuresDashboardCard() {
           <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
             {level.toUpperCase()} · {t("A story with EVO")}
           </p>
-          <p className="truncate text-sm font-semibold" translate="no" lang="en">{title}</p>
+          <p className="truncate text-sm font-semibold" translate="no" lang="en">
+            {title}
+          </p>
           <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{t(teaser)}</p>
         </div>
       </div>
