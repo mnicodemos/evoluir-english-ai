@@ -310,7 +310,12 @@ function ShortTile({
         className="group relative block aspect-[9/16] w-full overflow-hidden bg-black bg-[radial-gradient(circle_at_50%_30%,rgb(34_211_238/0.22),transparent_60%),radial-gradient(circle_at_80%_90%,rgb(236_72_153/0.18),transparent_55%)] text-left disabled:cursor-default"
       >
         {poster ? (
-          <img src={poster} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
+          <img
+            src={poster}
+            alt=""
+            loading="lazy"
+            className="absolute inset-0 size-full object-cover"
+          />
         ) : reelUrl ? (
           <iframe
             src={reelUrl}
