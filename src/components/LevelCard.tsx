@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import {
-  Check,
-  ChartNoAxesColumnIncreasing,
-  Download,
-  GraduationCap,
-  Lock,
-  Undo2,
-} from "lucide-react";
+import { Check, ChartNoAxesColumnIncreasing, Download, GraduationCap, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -109,7 +102,11 @@ export function LevelCard({
           <li key={l.value}>
             <span
               aria-current={active ? "step" : undefined}
-              title={active ? `${l.label} · ${t("current level")}` : `${l.label} · ${t("locked")}`}
+              title={
+                active
+                  ? `${l.label} · ${t("current level")}`
+                  : `${l.label} · ${t("not reached yet")}`
+              }
               className={cn(
                 chip,
                 active &&
@@ -117,12 +114,6 @@ export function LevelCard({
                 locked && "border-border/50 text-muted-foreground/45",
               )}
             >
-              {locked && (
-                <Lock
-                  className={cn("size-3 shrink-0", compact && "hidden 2xl:block")}
-                  aria-hidden="true"
-                />
-              )}
               {code}
             </span>
           </li>
@@ -149,7 +140,7 @@ export function LevelCard({
       <a
         href={studyBookHref}
         download
-        className="group inline-flex items-center gap-1.5 rounded transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        className="group inline-flex items-center gap-1.5 rounded font-medium text-brand-green/90 transition-colors hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
         aria-label={`Download study book ${current.value.toUpperCase()}`}
       >
         {/* As tall as the text (owner request: aligned with it). */}

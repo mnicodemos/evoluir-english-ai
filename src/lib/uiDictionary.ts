@@ -86,6 +86,7 @@ const baseUiPt: Record<string, string> = {
     "Não foi possível excluir este erro. Tente novamente.",
   Delete: "Excluir",
   "Download study book": "Baixar guia de estudos",
+  "not reached yet": "ainda não alcançado",
   "Listen to EVO and LEO explore this lesson before you practise.":
     "Ouça EVO e LEO explorarem esta lição antes de praticar.",
   "click here": "clique aqui",
