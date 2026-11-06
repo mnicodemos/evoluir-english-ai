@@ -25,7 +25,7 @@ import { AdminVideoComments } from "@/components/AdminVideoComments";
 import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager";
 import { AdminHomeMedia } from "@/components/AdminHomeMedia";
 import { AdminEnglishAdventuresAvatar } from "@/components/AdminEnglishAdventuresAvatar";
-import { AdminEnglishAdventuresMusic } from "@/components/AdminEnglishAdventuresMusic";
+import { AdminMusicLibrary } from "@/components/AdminMusicLibrary";
 import { AdminRecoveryPoints } from "@/components/AdminRecoveryPoints";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -235,6 +235,7 @@ function AdminPage() {
                   { value: "summary-videos", label: t("Summary videos") },
                   { value: "home", label: t("Home images") },
                   { value: "adventures", label: t("English Adventures") },
+                  { value: "music", label: t("Music") },
                   { value: "lesson-test", label: t("Lesson test") },
                 ]}
               >
@@ -250,7 +251,11 @@ function AdminPage() {
                 <TabsContent value="adventures">
                   <section className="card-soft p-3 sm:p-5">
                     <AdminEnglishAdventuresAvatar />
-                    <AdminEnglishAdventuresMusic />
+                  </section>
+                </TabsContent>
+                <TabsContent value="music">
+                  <section className="card-soft p-3 sm:p-5">
+                    <AdminMusicLibrary />
                   </section>
                 </TabsContent>
                 <TabsContent value="lesson-test">
