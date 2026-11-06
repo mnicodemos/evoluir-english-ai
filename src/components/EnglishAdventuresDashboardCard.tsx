@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Compass } from "lucide-react";
 
-import { EvoAvatar } from "@/components/EvoAvatar";
+import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { PremiumBadge, useIsPremium } from "@/components/PremiumBadge";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
@@ -32,7 +32,7 @@ export function EnglishAdventuresDashboardCard() {
         <PremiumBadge className="ml-auto" />
       </div>
       <div className="mt-1 flex min-h-0 min-w-0 flex-1 items-center gap-2.5">
-        <EvoAvatar decorative className="size-10 shrink-0" />
+        <EnglishAdventuresAvatar decorative className="size-10 shrink-0" />
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
             {t("Adventures with EVO")}
