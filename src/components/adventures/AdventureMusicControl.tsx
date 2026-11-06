@@ -21,9 +21,7 @@ export function AdventureMusicControl() {
   useEffect(() => {
     try {
       setMuted(window.localStorage.getItem("adventures-music-muted") !== "false");
-      setShowMusicHint(
-        window.localStorage.getItem("adventures-music-hint-seen") !== "true",
-      );
+      setShowMusicHint(window.localStorage.getItem("adventures-music-hint-seen") !== "true");
     } catch {
       setMuted(true);
       setShowMusicHint(true);
@@ -54,9 +52,7 @@ export function AdventureMusicControl() {
 
   return (
     <div className="flex shrink-0 items-center gap-2">
-      {query.data?.url ? (
-        <audio ref={audioRef} src={query.data.url} loop preload="none" />
-      ) : null}
+      {query.data?.url ? <audio ref={audioRef} src={query.data.url} loop preload="none" /> : null}
       {showMusicHint && query.data?.url ? (
         <span className="whitespace-nowrap text-xs font-medium text-cyan-400">
           {muted ? "Tap to enjoy the soundtrack" : "Soundtrack on"}
@@ -71,7 +67,11 @@ export function AdventureMusicControl() {
         title={muted ? "Turn music on" : "Mute music"}
         className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-background/80 text-muted-foreground transition hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
       >
-        {muted ? <VolumeX className="size-4" aria-hidden="true" /> : <Volume2 className="size-4" aria-hidden="true" />}
+        {muted ? (
+          <VolumeX className="size-4" aria-hidden="true" />
+        ) : (
+          <Volume2 className="size-4" aria-hidden="true" />
+        )}
       </button>
     </div>
   );
