@@ -1,13 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Compass, Sparkles } from "lucide-react";
+import { ArrowRight, Compass } from "lucide-react";
 
 import { EvoAvatar } from "@/components/EvoAvatar";
+import { PremiumBadge, useIsPremium } from "@/components/PremiumBadge";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
 export function EnglishAdventuresDashboardCard() {
   const { data: profile } = useProfile();
+  const locked = useIsPremium() === false;
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const level = (profile?.max_level || profile?.level || "a1").toLowerCase();
@@ -19,7 +21,7 @@ export function EnglishAdventuresDashboardCard() {
 
   return (
     <section
-      className="card-soft relative flex min-w-0 flex-col overflow-hidden p-3 xl:h-full xl:min-h-0 xl:px-4 xl:py-3"
+      className={`card-soft relative flex h-full min-w-0 flex-col overflow-hidden p-3 xl:min-h-0 xl:px-4 xl:py-3 ${locked ? "[&>*:not(:first-child)]:opacity-50" : ""}`}
       aria-labelledby="adventures-card-title"
     >
       <div className="flex min-h-[1.65rem] items-center gap-2">
@@ -27,10 +29,7 @@ export function EnglishAdventuresDashboardCard() {
         <h2 id="adventures-card-title" className="font-display text-sm font-semibold">
           English Adventures
         </h2>
-        <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-brand-green/30 bg-brand-green/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-brand-green">
-          <Sparkles className="size-3" aria-hidden="true" />
-          {t("Bonus")}
-        </span>
+        <PremiumBadge className="ml-auto" />
       </div>
       <div className="mt-2 flex min-w-0 flex-1 items-center gap-3">
         <EvoAvatar decorative className="size-12 sm:size-14" />
@@ -45,10 +44,10 @@ export function EnglishAdventuresDashboardCard() {
         </div>
       </div>
       <Link
-        to="/adventures"
+        to={locked ? "/premium" : "/adventures"}
         className="mt-2 inline-flex min-h-8 items-center justify-end gap-1.5 text-xs font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
       >
-        {t("Let's explore!")}
+        {locked ? t("See plans") : t("Let's explore!")}
         <ArrowRight className="size-3.5" aria-hidden="true" />
       </Link>
     </section>
