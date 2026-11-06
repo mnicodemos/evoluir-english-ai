@@ -3,6 +3,7 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Extra learning videos": "Vídeos extras de aprendizagem",
   "Watch video": "Assistir ao vídeo",
   "Today and Planning": "Hoje e planejamento",
   "Practise this task in English": "Praticar esta tarefa em inglês",
