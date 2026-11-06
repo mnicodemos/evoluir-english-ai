@@ -25,7 +25,8 @@ export function AdminMusicLibrary() {
       setNotice("Music published to the shared library.");
       await queryClient.invalidateQueries({ queryKey: ["shared-music-asset"] });
     },
-    onError: (error) => setNotice(error instanceof Error ? error.message : "Music could not be published."),
+    onError: (error) =>
+      setNotice(error instanceof Error ? error.message : "Music could not be published."),
   });
 
   async function choose(next?: File) {
@@ -93,18 +94,18 @@ export function AdminMusicLibrary() {
         className="w-full gap-2"
         disabled={!file || mutation.isPending}
         onClick={async () => {
-        if (!file) return;
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () =>
-            typeof reader.result === "string"
-              ? resolve(reader.result)
-              : reject(new Error("Could not read MP3."));
-          reader.onerror = () => reject(new Error("Could not read MP3."));
-          reader.readAsDataURL(file);
-        });
-        mutation.mutate({ dataUrl, mimeType: "audio/mpeg" });
-      }}
+          if (!file) return;
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () =>
+              typeof reader.result === "string"
+                ? resolve(reader.result)
+                : reject(new Error("Could not read MP3."));
+            reader.onerror = () => reject(new Error("Could not read MP3."));
+            reader.readAsDataURL(file);
+          });
+          mutation.mutate({ dataUrl, mimeType: "audio/mpeg" });
+        }}
       >
         {mutation.isPending ? (
           <Loader2 className="size-4 animate-spin" />
