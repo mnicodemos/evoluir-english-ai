@@ -209,8 +209,7 @@ export function MobileNavigationMenu({
   const isA1A2 = normalizedLevel === "A1" || normalizedLevel === "A2";
   const isB1ToC2 = ["B1", "B2", "C1", "C2"].includes(normalizedLevel ?? "");
   const visibleMobileSheetNav = mobileSheetNav.filter(
-    (item) =>
-      !(item.to === "/business" && isA1A2) &&
+    (item) => !(item.to === "/business" && isA1A2) &&
       !(item.to === "/adventures" && isB1ToC2),
   );
   // The More button lights up when the current route belongs to one of its
