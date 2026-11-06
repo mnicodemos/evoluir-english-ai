@@ -26,6 +26,7 @@ import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager"
 import { AdminHomeMedia } from "@/components/AdminHomeMedia";
 import { AdminEnglishAdventuresAvatar } from "@/components/AdminEnglishAdventuresAvatar";
 import { AdminMusicLibrary } from "@/components/AdminMusicLibrary";
+import { AdminAdventureWelcomeAudio } from "@/components/AdminAdventureWelcomeAudio";
 import { AdminRecoveryPoints } from "@/components/AdminRecoveryPoints";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -256,6 +257,7 @@ function AdminPage() {
                 <TabsContent value="music">
                   <section className="card-soft p-3 sm:p-5">
                     <AdminMusicLibrary />
+                    <AdminAdventureWelcomeAudio />
                   </section>
                 </TabsContent>
                 <TabsContent value="lesson-test">
