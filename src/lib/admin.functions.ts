@@ -1017,7 +1017,13 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
   .inputValidator((data) =>
     z
       .object({
-        target: z.enum(["desktop", "evo-avatar", "video-call", "league", "english-adventures-avatar"]),
+        target: z.enum([
+          "desktop",
+          "evo-avatar",
+          "video-call",
+          "league",
+          "english-adventures-avatar",
+        ]),
         dataUrl: z.string().min(100).max(4_300_000),
         mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
       })
