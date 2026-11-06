@@ -46,13 +46,18 @@ export function AdminEnglishAdventuresAvatar() {
       setNotice("Choose a JPG, PNG or WebP image.");
       return;
     }
-    const compressed = await compressImageFile(file, ADMIN_IMAGE_MAX_WIDTH["english-adventures-avatar"]);
+    const compressed = await compressImageFile(
+      file,
+      ADMIN_IMAGE_MAX_WIDTH["english-adventures-avatar"],
+    );
     const dataUrl =
       compressed?.dataUrl ??
       (await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () =>
-          typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Could not read image."));
+          typeof reader.result === "string"
+            ? resolve(reader.result)
+            : reject(new Error("Could not read image."));
         reader.onerror = () => reject(new Error("Could not read image."));
         reader.readAsDataURL(file);
       }));
@@ -73,7 +78,8 @@ export function AdminEnglishAdventuresAvatar() {
           <ImagePlus className="size-4" /> English Adventures avatar
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          This image is used only in the English Adventures Dashboard card and the English Adventures page. It does not change EVO's global avatar.
+          This image is used only in the English Adventures Dashboard card and the
+          English Adventures page. It does not change EVO's global avatar.
         </p>
       </div>
       {images.isPending ? (
@@ -90,7 +96,11 @@ export function AdminEnglishAdventuresAvatar() {
             <p className="text-sm font-medium">Currently published</p>
             <div className="flex min-h-48 items-center justify-center rounded-lg border border-border bg-muted p-4">
               {current ? (
-                <img src={current} alt="Published English Adventures EVO avatar" className="size-40 rounded-full object-cover ring-2 ring-brand-green/60" />
+                <img
+                  src={current}
+                  alt="Published English Adventures EVO avatar"
+                  className="size-40 rounded-full object-cover ring-2 ring-brand-green/60"
+                />
               ) : (
                 <p className="text-sm text-muted-foreground">No dedicated image published yet.</p>
               )}
@@ -100,12 +110,20 @@ export function AdminEnglishAdventuresAvatar() {
             <p className="text-sm font-medium">New image preview</p>
             <div className="flex min-h-48 items-center justify-center rounded-lg border border-border bg-muted p-4">
               {draft ? (
-                <img src={draft.dataUrl} alt={`Preview: ${draft.name}`} className="size-40 rounded-full object-cover ring-2 ring-brand-green/60" />
+                <img
+                  src={draft.dataUrl}
+                  alt={`Preview: ${draft.name}`}
+                  className="size-40 rounded-full object-cover ring-2 ring-brand-green/60"
+                />
               ) : (
                 <p className="text-sm text-muted-foreground">Choose an image to preview it here.</p>
               )}
             </div>
-            {draft ? <p className="truncate text-xs text-muted-foreground">{draft.name} · not published yet</p> : null}
+            {draft ? (
+              <p className="truncate text-xs text-muted-foreground">
+                {draft.name} · not published yet
+              </p>
+            ) : null}
           </div>
         </div>
       )}
@@ -119,11 +137,24 @@ export function AdminEnglishAdventuresAvatar() {
         />
       </label>
       <p className="text-xs text-muted-foreground">JPG, PNG or WebP · maximum 3 MB</p>
-      <Button type="button" className="w-full gap-2" disabled={!draft || mutation.isPending} onClick={() => draft && mutation.mutate(draft)}>
-        {mutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+      <Button
+        type="button"
+        className="w-full gap-2"
+        disabled={!draft || mutation.isPending}
+        onClick={() => draft && mutation.mutate(draft)}
+      >
+        {mutation.isPending ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Save className="size-4" />
+        )}
         {mutation.isPending ? "Publishing…" : "Publish English Adventures avatar"}
       </Button>
-      {notice ? <p role="status" className="text-sm text-muted-foreground">{notice}</p> : null}
+      {notice ? (
+        <p role="status" className="text-sm text-muted-foreground">
+          {notice}
+        </p>
+      ) : null}
     </section>
   );
 }
