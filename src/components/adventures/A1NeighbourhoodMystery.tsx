@@ -154,16 +154,18 @@ export function A1NeighbourhoodMystery() {
         <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-4" aria-hidden="true" /> {t("Back to home")}
         </Link>
-        <header className="flex items-center gap-4">
-          <EvoAvatar className="size-16 sm:size-20" />
-          <div className="min-w-0">
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
-              <Compass className="size-3.5" aria-hidden="true" /> {t("English Adventures")} · A1 · 02
+        <header className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-3 sm:flex sm:gap-4">
+          <EvoAvatar className="size-16 shrink-0 sm:size-20" />
+          <div className="min-w-0 sm:flex-1">
+            <p className="flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
+              <Compass className="size-3.5 shrink-0" aria-hidden="true" /> {t("English Adventures")} · A1 · 02
             </p>
             <h1 className="font-display text-2xl font-bold sm:text-3xl">{t("The Neighbourhood Mystery")}</h1>
             <p className="text-sm text-muted-foreground">{t("A1 adventure introduction")}</p>
           </div>
-          <AdventureMusicControl />
+          <div className="col-start-2 row-start-2 justify-self-end sm:ml-auto sm:col-auto sm:row-auto">
+            <AdventureMusicControl />
+          </div>
         </header>
         {!complete ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
