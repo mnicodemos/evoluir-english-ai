@@ -1,0 +1,35 @@
+-- Allow the dedicated English Adventures avatar in the shared home media settings.
+-- Migration 0105 added the weekly league key, but the dedicated adventure avatar
+-- was introduced with a separate key and was missing from that CHECK constraint.
+-- Idempotent: safe to apply more than once.
+DO $$
+DECLARE
+  existing record;
+BEGIN
+  FOR existing IN
+    SELECT c.conname
+    FROM pg_constraint c
+    JOIN pg_class t ON t.oid = c.conrelid
+    JOIN pg_namespace n ON n.oid = t.relnamespace
+    WHERE n.nspname = 'public'
+      AND t.relname = 'home_media_settings'
+      AND c.contype = 'c'
+      AND pg_get_constraintdef(c.oid) ILIKE '%setting_key%'
+  LOOP
+    EXECUTE format('ALTER TABLE public.home_media_settings DROP CONSTRAINT %I', existing.conname);
+  END LOOP;
+
+  ALTER TABLE public.home_media_settings
+    ADD CONSTRAINT home_media_settings_setting_key_check
+    CHECK (setting_key IN (
+      'desktop',
+      'mobile',
+      'evo-avatar',
+      'lesson-audio',
+      'video-call',
+      'league',
+      'english-adventures-avatar'
+    ));
+END $$;
+
+NOTIFY pgrst, 'reload schema';
