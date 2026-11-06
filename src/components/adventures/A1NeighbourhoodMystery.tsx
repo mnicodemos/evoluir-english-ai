@@ -163,7 +163,7 @@ export function A1NeighbourhoodMystery() {
             <h1 className="font-display text-2xl font-bold sm:text-3xl">{t("The Neighbourhood Mystery")}</h1>
             <p className="text-sm text-muted-foreground">{t("A1 adventure introduction")}</p>
           </div>
-          <div className="col-start-2 row-start-2 justify-self-end sm:ml-auto sm:col-auto sm:row-auto">
+          <div className="col-span-2 row-start-2 w-full min-w-0 sm:ml-auto sm:col-auto sm:row-auto sm:w-auto">
             <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
