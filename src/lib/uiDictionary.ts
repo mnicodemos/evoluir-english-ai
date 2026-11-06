@@ -7,7 +7,6 @@ const baseUiPt: Record<string, string> = {
     "Ajude a EVO a receber os convidados e combinar os cartões de identificação.",
   "A1 adventure introduction":
     "Uma aventura para praticar apresentações, nomes, países e profissões.",
-  "Choose your response": "Escolha sua resposta",
   "EVO hint label": "Dica da EVO:",
   "A1 adventure learning recap":
     "Você praticou nomes, países, profissões, o verbo to be e apresentações.",
