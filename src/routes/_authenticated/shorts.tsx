@@ -67,16 +67,10 @@ function ShortsPage() {
   const premium = query.data?.premium ?? false;
   const studentLevel = findLevel(profile?.level).value;
   const highest = findLevel(profile?.max_level || profile?.level).value;
-  const otherLevels = useMemo(() => {
-    const available = new Set(shorts.map((video) => video.level));
-    const highestIndex = LEVELS.findIndex((item) => item.value === highest);
-    return LEVELS.filter(
-      (item) =>
-        item.value !== studentLevel &&
-        available.has(item.value) &&
-        LEVELS.findIndex((levelItem) => levelItem.value === item.value) <= highestIndex,
-    ).map((item) => item.value);
-  }, [shorts, studentLevel, highest]);
+  const otherLevels = useMemo(
+    () => LEVELS.map((item) => item.value).filter((value) => value !== studentLevel),
+    [studentLevel],
+  );
   const [picked, setPicked] = useState<string | null>(null);
   const level = picked ?? studentLevel;
   const levelShorts = useMemo(
@@ -206,13 +200,21 @@ function ShortsPage() {
           >
             {levels.map((value, index) => {
               const active = value === level;
+              const locked =
+                LEVELS.findIndex((item) => item.value === value) >
+                LEVELS.findIndex((item) => item.value === highest);
               return (
                 <button
                   key={value}
                   type="button"
                   aria-current={active ? "page" : undefined}
+                  aria-disabled={locked}
+                  disabled={locked}
                   onClick={() => setPicked(value)}
-                  className="flex w-16 shrink-0 flex-col items-center gap-1.5 focus-visible:outline-none"
+                  className={cn(
+                    "flex w-16 shrink-0 flex-col items-center gap-1.5 focus-visible:outline-none",
+                    locked && "cursor-not-allowed opacity-35",
+                  )}
                 >
                   <span
                     className={cn("rounded-full p-[2.5px]", active ? STORY_RING : "bg-white/15")}
