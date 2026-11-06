@@ -13,6 +13,7 @@ const baseUiPt: Record<string, string> = {
   "A1 adventure recovery recap": "Respostas revistas com a ajuda da EVO: {count}.",
   "English Adventures": "Aventuras em inglês",
   "A story with EVO": "Uma história com a EVO",
+  "Adventures with EVO": "Aventuras com a EVO",
   "Let's explore!": "Vamos explorar!",
   "English Adventures is a Premium feature": "English Adventures é um recurso Premium",
   "Unlock the stories with EVO and keep exploring your English.":
