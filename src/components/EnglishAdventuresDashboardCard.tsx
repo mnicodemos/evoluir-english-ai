@@ -27,7 +27,7 @@ export function EnglishAdventuresDashboardCard() {
       <div className="flex min-h-[1.65rem] items-center gap-2">
         <Compass className="size-[1.35rem] shrink-0 text-brand-green" aria-hidden="true" />
         <h2 id="adventures-card-title" className="font-display text-sm font-semibold">
-          English Adventures
+          {t("English Adventures")}
         </h2>
         <PremiumBadge className="ml-auto" />
       </div>
