@@ -187,7 +187,10 @@ export function A1WelcomeMixUp() {
         {!completed ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-brand-green" translate="no" lang="en">
+              <span className="text-xs font-semibold uppercase tracking-wider text-brand-green"
+                translate="no"
+                lang="en"
+              >
                 {scene.place}
               </span>
               <span className="text-xs text-muted-foreground">
@@ -218,21 +221,30 @@ export function A1WelcomeMixUp() {
                       : "border-border hover:border-brand-green/50 hover:bg-secondary/50"
                   }`}
                 >
-                  <span className="font-medium" translate="no" lang="en">{option.label}</span>
+                  <span className="font-medium" translate="no" lang="en">
+                    {option.label}
+                  </span>
                 </button>
               ))}
             </div>
             {choice && (
               <div className="rounded-xl bg-brand-green/10 p-3">
-                <p className="text-sm leading-relaxed" translate="no" lang="en">{choice.response}</p>
+                <p className="text-sm leading-relaxed" translate="no" lang="en">
+                  {choice.response}
+                </p>
                 {!choice.correct && (
                   <p className="mt-2 text-sm text-muted-foreground" translate="no" lang="en">
                     {t("EVO hint label")} {choice.hint}
                   </p>
                 )}
                 <div className="mt-3 flex items-start gap-2 border-t border-brand-green/20 pt-3">
-                  <Sparkles className="mt-0.5 size-4 shrink-0 text-brand-green" aria-hidden="true" />
-                  <p className="text-sm text-muted-foreground" translate="no" lang="en">{scene.evo}</p>
+                  <Sparkles
+                    className="mt-0.5 size-4 shrink-0 text-brand-green"
+                    aria-hidden="true"
+                  />
+                  <p className="text-sm text-muted-foreground" translate="no" lang="en">
+                    {scene.evo}
+                  </p>
                 </div>
               </div>
             )}
@@ -253,7 +265,9 @@ export function A1WelcomeMixUp() {
               {completionText}
             </p>
             <p className="text-sm font-medium">{t("A1 adventure learning recap")}</p>
-            <p className="text-sm text-muted-foreground">{t("A1 adventure recovery recap").replace("{count}", String(recovered))}</p>
+            <p className="text-sm text-muted-foreground">
+              {t("A1 adventure recovery recap").replace("{count}", String(recovered))}
+            </p>
             <div className="flex flex-wrap justify-center gap-2">
               <Button onClick={restart}>
                 <RotateCcw className="mr-1 size-4" />
