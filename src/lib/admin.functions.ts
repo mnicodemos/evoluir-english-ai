@@ -1085,6 +1085,46 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
     return { ok: true, url: publicData.publicUrl };
   });
 
+/** Shared background track for all four English Adventures blocks. */
+export const getEnglishAdventuresMusic = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabaseAdmin as any)
+    .from("home_media_settings")
+    .select("image_url")
+    .eq("setting_key", "english-adventures-music")
+    .maybeSingle();
+  if (error) throw new Error("The English Adventures music setting could not be loaded.");
+  return { url: data?.image_url ?? null };
+});
+
+export const saveEnglishAdventuresMusic = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({
+    dataUrl: z.string().min(100).max(14_000_000),
+    mimeType: z.literal("audio/mpeg"),
+  }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const match = data.dataUrl.match(/^data:audio\/mpeg;base64,([A-Za-z0-9+/=]+)$/);
+    if (!match?.[1]) throw new Error("Choose a valid MP3 file.");
+    const bytes = Uint8Array.from(atob(match[1]), (character) => character.charCodeAt(0));
+    if (bytes.byteLength > 10 * 1024 * 1024) throw new Error("The MP3 must be 10 MB or smaller.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const path = `english-adventures/background-${Date.now()}.mp3`;
+    const { error: uploadError } = await supabaseAdmin.storage.from("dashboard-home-images").upload(path, bytes, {
+      contentType: "audio/mpeg", cacheControl: "31536000", upsert: false,
+    });
+    if (uploadError) throw new Error("The MP3 could not be uploaded. Please try again.");
+    const { data: publicData } = supabaseAdmin.storage.from("dashboard-home-images").getPublicUrl(path);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: saveError } = await (supabaseAdmin as any).from("home_media_settings").upsert({
+      setting_key: "english-adventures-music", image_url: publicData.publicUrl, updated_at: new Date().toISOString(),
+    });
+    if (saveError) throw new Error("The MP3 was uploaded but its shared setting could not be published. Check migration 0107.");
+    return { ok: true, url: publicData.publicUrl };
+  });
+
 /**
  * Why the recovery points table could not be used, in the owner's words: the
  * table missing or not granted to the server (migration 0095 not applied yet)
