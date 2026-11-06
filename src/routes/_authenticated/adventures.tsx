@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { A1WelcomeMixUp } from "@/components/adventures/A1WelcomeMixUp";
-import { EvoAvatar } from "@/components/EvoAvatar";
+import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
@@ -244,7 +244,7 @@ function EnglishAdventuresPage() {
           {t("Back to home")}
         </Link>
         <header className="flex items-center gap-4">
-          <EvoAvatar className="size-16 sm:size-20" />
+          <EnglishAdventuresAvatar className="size-16 sm:size-20" />
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
               <Compass className="size-3.5" aria-hidden="true" /> {t("English Adventures")} ·{" "}
