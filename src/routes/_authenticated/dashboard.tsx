@@ -57,9 +57,8 @@ import { useDiamondLevel } from "@/hooks/useDiamondCycles";
 import { useExtraVideosNews } from "@/hooks/useExtraVideosNews";
 import { daysToNextDiamond, diamondName } from "@/lib/diamondCycles";
 import { getLeague } from "@/components/LeagueBadge";
-import { BusinessDashboardCard } from "@/components/BusinessDashboardCard";
+import { EnglishAdventuresDashboardCard } from "@/components/EnglishAdventuresDashboardCard";
 import { GoalsTodayCard } from "@/components/GoalsTodayCard";
-import { businessLevelAllowed } from "@/lib/businessCourse";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
 import { BLACK_FRIDAY, blackFridayPhase, daysUntilBlackFriday } from "@/lib/billing/blackFriday";
 import { PathProgressCard } from "@/components/PathProgressCard";
@@ -663,8 +662,9 @@ function Dashboard() {
   });
   const planNext =
     studyPlan?.plan.nextIndex != null ? studyPlan.plan.days[studyPlan.plan.nextIndex] : null;
-  // Business English offer is shown only when the student's level is B1 or higher.
-  const showBusinessCard = !!profile && businessLevelAllowed(profile.max_level || profile.level);
+  // English Adventures currently ships for A1 and A2; show the bonus only when a story exists.
+  const adventureLevel = (profile?.max_level || profile?.level || "").toLowerCase();
+  const showAdventureCard = !!profile && (adventureLevel === "a1" || adventureLevel === "a2");
   const streakDays = profile ? effectiveStreak(profile) : 0;
   const { data: progressNextStep } = useNextStep({ enabled: !!profile?.id });
   const progressSkillRows = skillMeterRows(progressNextStep?.skills, null, PROGRESS_SKILLS);
@@ -1195,19 +1195,18 @@ function Dashboard() {
 
             {/* Desktop: the Quick Access row repeated the sidebar; today's goal
               steps took its place. */}
-            {/* Business English (Premium bonus from B1) sits beside today's
-              goals; below B1 the goals keep the whole row. */}
+            {/* English Adventures (A1–A2 launch) sits beside today's goals. */}
             <div
               className={`order-4 hidden min-w-0 gap-3 lg:order-none xl:h-full xl:min-h-0 ${
-                showBusinessCard ? "lg:grid lg:grid-cols-12" : "lg:block"
+                showAdventureCard ? "lg:grid lg:grid-cols-12" : "lg:block"
               }`}
             >
               <div className="min-w-0 lg:col-span-8 xl:col-span-9 xl:h-full xl:min-h-0">
                 <GoalsTodayCard />
               </div>
-              {showBusinessCard && (
+              {showAdventureCard && (
                 <div className="min-w-0 lg:col-span-4 xl:col-span-3 xl:h-full xl:min-h-0">
-                  <BusinessDashboardCard />
+                  <EnglishAdventuresDashboardCard />
                 </div>
               )}
             </div>
