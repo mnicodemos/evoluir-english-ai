@@ -59,7 +59,8 @@ const scenes: Scene[] = [
     choices: [
       {
         label: "“Are you from Canada?”",
-        response: "“Yes, I am. I'm from Canada,” Maya confirms. You can now match her name and country.",
+        response:
+          "“Yes, I am. I'm from Canada,” Maya confirms. You can now match her name and country.",
         correct: true,
         hint: "Use the country Maya already told you. Check it with a short question.",
       },
@@ -111,7 +112,8 @@ const scenes: Scene[] = [
     choices: [
       {
         label: "“Nice to meet you, Maya!”",
-        response: "“Nice to meet you too!” Maya joins the festival. The welcome desk is back on track.",
+        response:
+          "“Nice to meet you too!” Maya joins the festival. The welcome desk is back on track.",
         correct: true,
         hint: "A friendly first meeting often ends with “Nice to meet you”.",
       },
@@ -187,7 +189,8 @@ export function A1WelcomeMixUp() {
         {!completed ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-brand-green"
+              <span
+                className="text-xs font-semibold uppercase tracking-wider text-brand-green"
                 translate="no"
                 lang="en"
               >
