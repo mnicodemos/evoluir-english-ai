@@ -178,7 +178,8 @@ function EnglishAdventuresPage() {
   const [sceneIndex, setSceneIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [finished, setFinished] = useState(false);
-  const scene = adventure.scenes[sceneIndex];
+  const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
+  if (!scene) return null;
 
   function choose(index: number) {
     setSelected(index);
