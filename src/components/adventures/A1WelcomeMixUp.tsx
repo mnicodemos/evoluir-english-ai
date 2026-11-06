@@ -218,7 +218,8 @@ const scenes: Scene[] = [
         label: "Ana — Brazil — student; Leo — Italy — designer",
         response: "The first two cards match the guests. Maya's card is already ready!",
         correct: true,
-        hint: "Check each name, country and job as a group. This choice matches Ana and Leo.",
+        hint:
+          "Check each name, country and job as a group. This choice matches Ana and Leo.",
       },
       {
         label: "Ana — Italy — designer; Leo — Brazil — student",
