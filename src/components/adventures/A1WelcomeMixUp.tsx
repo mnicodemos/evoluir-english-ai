@@ -435,6 +435,11 @@ export function A1WelcomeMixUp() {
                 {t("Explore again")}
               </Button>
               <Button asChild variant="outline">
+                <Link to="/adventures" search={{ story: "neighbourhood-mystery" }}>
+                  {t("Next adventure · A1.2")}
+                </Link>
+              </Button>
+              <Button asChild variant="ghost">
                 <Link to="/dashboard">{t("Back to home")}</Link>
               </Button>
             </div>

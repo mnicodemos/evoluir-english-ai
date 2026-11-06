@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { A1WelcomeMixUp } from "@/components/adventures/A1WelcomeMixUp";
+import { A1NeighbourhoodMystery } from "@/components/adventures/A1NeighbourhoodMystery";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
@@ -158,6 +159,9 @@ const adventures: Record<
 };
 
 export const Route = createFileRoute("/_authenticated/adventures")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    story: typeof search["story"] === "string" ? search["story"] : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "English Adventures - Evoluir+ English AI" },
@@ -171,6 +175,7 @@ export const Route = createFileRoute("/_authenticated/adventures")({
 });
 
 function EnglishAdventuresPage() {
+  const { story } = Route.useSearch();
   const { data: profile } = useProfile();
   const premium = useIsPremium();
   const { lang } = useUiLang();
@@ -210,6 +215,7 @@ function EnglishAdventuresPage() {
     );
   }
 
+  if (story === "neighbourhood-mystery") return <A1NeighbourhoodMystery />;
   if (key === "a1") return <A1WelcomeMixUp />;
 
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
