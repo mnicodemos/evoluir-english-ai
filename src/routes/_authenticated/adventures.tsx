@@ -32,7 +32,8 @@ const adventures: Record<
           },
           {
             label: "“Where is the train station?”",
-            response: "Mia points outside. “The station is over there. But first, let\'s find my bag!”",
+            response:
+              "Mia points outside. “The station is over there. But first, let's find my bag!”",
           },
           {
             label: "“Don't worry. I can help.”",
@@ -95,12 +96,12 @@ const adventures: Record<
         choices: [
           {
             label: "“The package arrived damaged.”",
-            response:
-              "That is clear and helpful. You explain exactly what happened.",
+            response: "That is clear and helpful. You explain exactly what happened.",
           },
           {
             label: "“I received the wrong weather.”",
-            response: "The delivery agent looks confused. Try describing the package and the problem.",
+            response:
+              "The delivery agent looks confused. Try describing the package and the problem.",
           },
           {
             label: "“Could you help me with this order?”",
@@ -136,13 +137,11 @@ const adventures: Record<
         choices: [
           {
             label: "“A replacement would be perfect, thank you.”",
-            response:
-              "“No problem. We will send another lamp and email the details.”",
+            response: "“No problem. We will send another lamp and email the details.”",
           },
           {
             label: "“I don't want any solution.”",
-            response:
-              "The agent waits. You can tell them what would make things right.",
+            response: "The agent waits. You can tell them what would make things right.",
           },
           {
             label: "“When can I expect the new one?”",
