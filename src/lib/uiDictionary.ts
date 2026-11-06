@@ -5,7 +5,8 @@ import { appGuidePt } from "./appGuidePt";
 const baseUiPt: Record<string, string> = {
   "Help EVO welcome the guests and match their name cards.":
     "Ajude a EVO a receber os convidados e combinar os cartões de identificação.",
-  "A1 adventure introduction":
+  "A1 adventure introduction": "Introdução à aventura A1",
+  "An adventure to practise introductions, names, countries and jobs.":
     "Uma aventura para praticar apresentações, nomes, países e profissões.",
   "The Neighbourhood Mystery": "O mistério da vizinhança",
   "You completed 10 challenges and helped Ben and Lucy solve the neighbourhood mystery.":

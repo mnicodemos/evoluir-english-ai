@@ -341,6 +341,9 @@ export function A1WelcomeMixUp() {
               {adventureTitle}
             </h1>
             <p className="text-sm text-muted-foreground">{t("A1 adventure introduction")}</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              {t("An adventure to practise introductions, names, countries and jobs.")}
+            </p>
           </div>
         </header>
 
