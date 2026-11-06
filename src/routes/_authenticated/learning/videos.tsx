@@ -213,26 +213,24 @@ function ExtraVideosPage() {
               return (
                 <li key={video.id} className="card-soft overflow-hidden">
                   <div className="relative aspect-video w-full overflow-hidden bg-black">
-                    {open && embed ? (
+                    {premium && embed ? (
                       <iframe
                         className="absolute inset-0 size-full"
-                        src={`${cleanVimeoPlayerUrl(embed)}&autoplay=1`}
+                        src={cleanVimeoPlayerUrl(embed)}
                         title={video.title}
+                        loading="lazy"
                         referrerPolicy="strict-origin-when-cross-origin"
                         allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                         allowFullScreen
+                        onLoad={() => {
+                          if (!playing) watch(video.id);
+                        }}
                       />
                     ) : (
-                      <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-slate-900 via-slate-950 to-black">
-                        {premium && embed ? (
-                          <Button size="lg" className="gap-2" onClick={() => watch(video.id)}>
-                            <PlayCircle className="size-5" /> {t("Watch video")}
-                          </Button>
-                        ) : (
-                          <span className="grid size-14 place-items-center rounded-full border border-white/15 bg-white/10 text-white">
-                            <Lock className="size-6" />
-                          </span>
-                        )}
+                      <div className="absolute inset-0 grid place-items-center bg-black">
+                        <span className="grid size-14 place-items-center rounded-full border border-white/15 bg-white/10 text-white">
+                          <Lock className="size-6" />
+                        </span>
                       </div>
                     )}
                   </div>
