@@ -159,7 +159,7 @@ export function A1NeighbourhoodMystery() {
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
               <Compass className="size-3.5" aria-hidden="true" /> {t("English Adventures")} · A1 · 02
             </p>
-            <h1 className="font-display text-2xl font-bold sm:text-3xl" translate="no" lang="en">The Neighbourhood Mystery</h1>
+            <h1 className="font-display text-2xl font-bold sm:text-3xl">{t("The Neighbourhood Mystery")}</h1>
             <p className="text-sm text-muted-foreground">{t("A1 adventure introduction")}</p>
           </div>
         </header>
@@ -218,7 +218,7 @@ export function A1NeighbourhoodMystery() {
               <Sparkles className="size-7" aria-hidden="true" />
             </span>
             <h2 className="font-display text-xl font-semibold">{t("Adventure complete!")}</h2>
-            <p className="text-sm leading-relaxed text-muted-foreground" translate="no" lang="en">You completed 10 challenges and helped Ben and Lucy solve the neighbourhood mystery.</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">{t("You completed 10 challenges and helped Ben and Lucy solve the neighbourhood mystery.")}</p>
             <p className="text-sm font-medium"> {t("A1 adventure learning recap")}</p>
             <p className="text-sm text-muted-foreground">{t("A1 adventure recovery recap").replace("{count}", String(recovered))}</p>
             <div className="flex flex-wrap justify-center gap-2">
