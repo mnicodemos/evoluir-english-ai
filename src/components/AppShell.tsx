@@ -539,7 +539,12 @@ function AppShellContent({
           desktopOneScreen && "xl:h-dvh xl:min-h-[48rem]",
         )}
       >
-        <aside className="fixed inset-y-0 left-0 z-30 hidden h-dvh w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
+        {/* The sidebar ends where the page beside it ends: its bottom padding,
+            set in src/styles.css, reserves the footer band plus the gap the
+            Dashboard's last card row keeps above the footer's divider, so the
+            profile card sits level with the content column instead of dipping
+            under the line (owner report, 2026-11-06). */}
+        <aside className="fixed inset-y-0 left-0 z-30 hidden h-dvh w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 text-sidebar-foreground lg:flex">
           <Link
             to="/dashboard"
             aria-label={translate("Home")}
@@ -678,9 +683,13 @@ function AppShellContent({
           />
         </nav>
 
+        {/* mt-auto keeps the footer at the shell's bottom edge even when the
+            page is shorter than the screen (the compact-height Dashboard), so
+            the sidebar's reserved band always lines up with the footer's
+            divider instead of the card dipping under it. */}
         <div
           className={cn(
-            "mb-0",
+            "mb-0 mt-auto",
             dashboardLayout && "hidden lg:block",
             mobileOneScreen && "hidden sm:block",
           )}

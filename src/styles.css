@@ -94,6 +94,11 @@
 
 :root {
   --notification-border: #ffffff;
+  /* The compact footer band: 10 px of padding + the 32 px social icons + the
+     1 px divider = 53 px, measured at 1366, 1600 and 2880 px wide. The desktop
+     sidebar stops above it, so its profile card never hangs below the footer's
+     divider line (owner report, 2026-11-06: that read as unfinished). */
+  --app-footer-height: 3.3125rem;
   --radius: 0.9rem;
   --background: oklch(0.975 0.003 250);
   --foreground: oklch(0.24 0.005 250);
@@ -353,6 +358,30 @@
   .desktop-one-screen {
     height: auto;
     min-height: 100dvh;
+  }
+}
+
+/* The desktop sidebar ends where the page beside it ends (owner report,
+   2026-11-06: the profile card hung below the footer's divider line and the
+   base read as unfinished). Its bottom padding reserves the footer band
+   (--app-footer-height, 53 px) plus the gap the Dashboard's last card row keeps
+   above that divider at the same width: 24 px of main padding below xl,
+   20 px of grid padding + 8 px of main padding from xl, 8 + 8 px from 2xl. */
+@media (min-width: 64rem) {
+  .dashboard-shell > aside {
+    padding-bottom: calc(var(--app-footer-height) + 1.5rem);
+  }
+}
+
+@media (min-width: 80rem) {
+  .dashboard-shell > aside {
+    padding-bottom: calc(var(--app-footer-height) + 1.75rem);
+  }
+}
+
+@media (min-width: 96rem) {
+  .dashboard-shell > aside {
+    padding-bottom: calc(var(--app-footer-height) + 1rem);
   }
 }
 
