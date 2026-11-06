@@ -3,23 +3,23 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Music2, Save, Volume2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getEnglishAdventuresMusic, saveEnglishAdventuresMusic } from "@/lib/admin.functions";
+import { getSharedMusicAsset, saveSharedMusicAsset } from "@/lib/admin.functions";
 
 export function AdminMusicLibrary() {
   const queryClient = useQueryClient();
-  const getMusic = useServerFn(getEnglishAdventuresMusic);
-  const saveMusic = useServerFn(saveEnglishAdventuresMusic);
+  const getMusic = useServerFn(getSharedMusicAsset);
+  const saveMusic = useServerFn(saveSharedMusicAsset);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
-  const query = useQuery({ queryKey: ["english-adventures-music"], queryFn: () => getMusic(), retry: false });
+  const query = useQuery({ queryKey: ["shared-music-asset"], queryFn: () => getMusic(), retry: false });
   const mutation = useMutation({
     mutationFn: (data: { dataUrl: string; mimeType: "audio/mpeg" }) => saveMusic({ data }),
     onSuccess: async () => {
       setFile(null);
       setPreviewUrl(null);
       setNotice("Music published to the shared library.");
-      await queryClient.invalidateQueries({ queryKey: ["english-adventures-music"] });
+      await queryClient.invalidateQueries({ queryKey: ["shared-music-asset"] });
     },
     onError: (error) => setNotice(error instanceof Error ? error.message : "Music could not be published."),
   });
