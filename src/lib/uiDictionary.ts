@@ -2780,4 +2780,5 @@ export const uiPt: Record<string, string> = {
   "Download Life+ AI manual": "Baixar manual do Life+ AI",
   "🇧🇷 PT": "🇧🇷 PT",
   "🇺🇸 EN": "🇺🇸 EN",
+  "There’s a soundtrack waiting for you": "Há uma trilha sonora esperando por você",
 };
