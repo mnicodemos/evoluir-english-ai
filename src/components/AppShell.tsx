@@ -530,7 +530,7 @@ function AppShellContent({
     <TooltipProvider delayDuration={200}>
       <div
         className={cn(
-          "dashboard-shell dark flex min-h-screen flex-col overflow-x-clip bg-background",
+          "dashboard-shell dark relative flex min-h-screen flex-col overflow-x-clip bg-background",
           desktopOneScreen && "desktop-one-screen",
           dashboardLayout
             ? "h-dvh overflow-hidden lg:h-auto lg:overflow-visible lg:pb-0"
@@ -539,7 +539,7 @@ function AppShellContent({
           desktopOneScreen && "xl:h-dvh xl:min-h-[48rem]",
         )}
       >
-        <aside className="fixed inset-y-0 left-0 z-30 hidden w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
+        <aside className="absolute inset-y-0 left-0 z-30 hidden w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
           <Link
             to="/dashboard"
             aria-label={translate("Home")}
