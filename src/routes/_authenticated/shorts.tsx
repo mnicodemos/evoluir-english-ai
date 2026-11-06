@@ -245,7 +245,7 @@ function ShortsPage() {
 
         <div className="mt-5 border-t border-white/10 pt-0.5">
           {query.isPending ? (
-            <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-1">
               {Array.from({ length: 6 }, (_, index) => (
                 <Skeleton key={index} className="aspect-[9/16] rounded-none" />
               ))}
