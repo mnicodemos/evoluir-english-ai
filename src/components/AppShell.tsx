@@ -7,6 +7,7 @@ import {
   Briefcase,
   Clapperboard,
   CalendarCheck,
+  Compass,
   Crown,
   GraduationCap,
   Headphones,
@@ -61,7 +62,7 @@ import { studyToday } from "@/lib/today";
 const mobileSheetNav = [
   { to: "/life", label: "Life+ AI", icon: Sprout },
   { to: "/learning", label: "Learning", icon: GraduationCap },
-  { to: "/adventures", label: "English Adventures", icon: Sparkles },
+  { to: "/adventures", label: "English Adventures", icon: Compass },
   // Shorts are one of the app's flagships (owner request, 2026-11-01).
   { to: "/shorts", label: "Shorts", icon: Clapperboard },
   { to: "/business", label: "Business English", icon: Briefcase },
