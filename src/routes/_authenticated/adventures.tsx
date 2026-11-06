@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { A1WelcomeMixUp } from "@/components/adventures/A1WelcomeMixUp";
 import { A1NeighbourhoodMystery } from "@/components/adventures/A1NeighbourhoodMystery";
+import { A1ClockTowerMission } from "@/components/adventures/A1ClockTowerMission";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
@@ -216,6 +217,7 @@ function EnglishAdventuresPage() {
   }
 
   if (story === "neighbourhood-mystery") return <A1NeighbourhoodMystery />;
+  if (story === "clock-tower-mission") return <A1ClockTowerMission />;
   if (key === "a1") return <A1WelcomeMixUp />;
 
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
