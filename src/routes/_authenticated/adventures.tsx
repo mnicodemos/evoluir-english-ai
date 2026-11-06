@@ -195,10 +195,10 @@ function EnglishAdventuresPage() {
           <section className="card-soft space-y-3 p-6 text-center">
             <Lock className="mx-auto size-8 text-warning" aria-hidden="true" />
             <h1 className="font-display text-xl font-semibold">
-              English Adventures is a Premium feature
+              {t("English Adventures is a Premium feature")}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Unlock the stories with EVO and keep exploring your English.
+              {t("Unlock the stories with EVO and keep exploring your English.")}
             </p>
             <Button asChild>
               <Link to="/premium">{t("See plans")}</Link>
@@ -244,7 +244,7 @@ function EnglishAdventuresPage() {
           <EvoAvatar className="size-16 sm:size-20" />
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
-              <Compass className="size-3.5" aria-hidden="true" /> English Adventures ·{" "}
+              <Compass className="size-3.5" aria-hidden="true" /> {t("English Adventures")} ·{" "}
               {key.toUpperCase()}
             </p>
             <h1 className="font-display text-2xl font-bold sm:text-3xl">{adventure.title}</h1>
