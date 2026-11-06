@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Volume2, VolumeX } from "lucide-react";
+import { Music2, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { getSharedMusicAsset } from "@/lib/admin.functions";
 
@@ -9,6 +9,7 @@ export function AdventureMusicControl() {
   const getMusic = useServerFn(getSharedMusicAsset);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [muted, setMuted] = useState(true);
+  const [showHint, setShowHint] = useState(false);
   const query = useQuery({
     queryKey: ["shared-music-asset"],
     queryFn: () => getMusic(),
@@ -20,8 +21,10 @@ export function AdventureMusicControl() {
     try {
       // Playback must still be confirmed by a user gesture in browsers that block autoplay.
       setMuted(window.localStorage.getItem("adventures-music-muted") !== "false");
+      setShowHint(window.localStorage.getItem("adventures-music-hint-seen") !== "true");
     } catch {
       setMuted(true);
+      setShowHint(true);
     }
   }, []);
 
@@ -47,6 +50,12 @@ export function AdventureMusicControl() {
   function toggleMusic() {
     const audio = audioRef.current;
     if (!audio) return;
+    setShowHint(false);
+    try {
+      window.localStorage.setItem("adventures-music-hint-seen", "true");
+    } catch {
+      // The hint can still be dismissed for this visit when storage is unavailable.
+    }
 
     if (muted) {
       audio.volume = 0.12;
