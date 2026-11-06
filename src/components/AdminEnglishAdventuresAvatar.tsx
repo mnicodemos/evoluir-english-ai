@@ -78,8 +78,8 @@ export function AdminEnglishAdventuresAvatar() {
           <ImagePlus className="size-4" /> English Adventures avatar
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          This image is used only in the English Adventures Dashboard card and the
-          English Adventures page. It does not change EVO's global avatar.
+          This image is used only in the English Adventures Dashboard card and the English
+          Adventures page. It does not change EVO's global avatar.
         </p>
       </div>
       {images.isPending ? (
