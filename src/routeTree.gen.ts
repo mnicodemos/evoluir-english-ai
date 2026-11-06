@@ -373,6 +373,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/adventures': typeof AuthenticatedAdventuresRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
   '/business': typeof AuthenticatedBusinessRoute
   '/call': typeof AuthenticatedCallRoute
