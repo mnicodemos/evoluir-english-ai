@@ -13,7 +13,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useShortsShortcut } from "@/hooks/useShortsShortcut";
 import { useVideoSocial } from "@/hooks/useVideoSocial";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
-import { findLevel, isReviewLevel } from "@/lib/level";
+import { findLevel, isReviewLevel, LEVELS } from "@/lib/level";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
@@ -67,10 +67,16 @@ function ShortsPage() {
   const premium = query.data?.premium ?? false;
   const studentLevel = findLevel(profile?.level).value;
   const highest = findLevel(profile?.max_level || profile?.level).value;
-  const otherLevels = useMemo(
-    () => [...new Set(shorts.map((video) => video.level))].filter((v) => v !== studentLevel),
-    [shorts, studentLevel],
-  );
+  const otherLevels = useMemo(() => {
+    const available = new Set(shorts.map((video) => video.level));
+    const highestIndex = LEVELS.findIndex((item) => item.value === highest);
+    return LEVELS.filter(
+      (item) =>
+        item.value !== studentLevel &&
+        available.has(item.value) &&
+        LEVELS.findIndex((levelItem) => levelItem.value === item.value) <= highestIndex,
+    ).map((item) => item.value);
+  }, [shorts, studentLevel, highest]);
   const [picked, setPicked] = useState<string | null>(null);
   const level = picked ?? studentLevel;
   const levelShorts = useMemo(
