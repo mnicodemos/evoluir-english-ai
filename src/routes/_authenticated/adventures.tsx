@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { A1WelcomeMixUp } from "@/components/adventures/A1WelcomeMixUp";
 import { A1NeighbourhoodMystery } from "@/components/adventures/A1NeighbourhoodMystery";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
+import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
@@ -259,6 +260,7 @@ function EnglishAdventuresPage() {
             <h1 className="font-display text-2xl font-bold sm:text-3xl">{adventure.title}</h1>
             <p className="text-sm text-muted-foreground">{t(adventure.subtitle)}</p>
           </div>
+          <AdventureMusicControl />
         </header>
 
         {!finished ? (
