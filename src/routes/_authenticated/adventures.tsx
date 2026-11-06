@@ -160,7 +160,7 @@ const adventures: Record<
 
 export const Route = createFileRoute("/_authenticated/adventures")({
   validateSearch: (search: Record<string, unknown>) => ({
-    story: typeof search.story === "string" ? search.story : undefined,
+    story: typeof search["story"] === "string" ? search["story"] : undefined,
   }),
   head: () => ({
     meta: [
