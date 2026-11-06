@@ -15,6 +15,7 @@ import { useVideoSocial } from "@/hooks/useVideoSocial";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { findLevel, isReviewLevel } from "@/lib/level";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
+import { vimeoThumbnailUrl } from "@/lib/lessonVideoDisplay";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { recordVideoView, type VideoSocialCounts } from "@/lib/premiumVideoSocial.functions";
 import { studyToday } from "@/lib/today";
@@ -297,7 +298,8 @@ function ShortTile({
   onOpen: () => void;
 }) {
   const playable = premium && !!video.url;
-  const reel = !!(video.url && reelEmbedUrl(video.url));
+  const reelUrl = video.url ? reelEmbedUrl(video.url) : null;
+  const poster = video.url ? vimeoThumbnailUrl(video.url) : null;
   return (
     <li>
       <button
@@ -307,6 +309,20 @@ function ShortTile({
         aria-label={video.title}
         className="group relative block aspect-[9/16] w-full overflow-hidden bg-black bg-[radial-gradient(circle_at_50%_30%,rgb(34_211_238/0.22),transparent_60%),radial-gradient(circle_at_80%_90%,rgb(236_72_153/0.18),transparent_55%)] text-left disabled:cursor-default"
       >
+        {poster ? (
+          <img src={poster} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
+        ) : reelUrl ? (
+          <iframe
+            src={reelUrl}
+            title={video.title}
+            loading="lazy"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 size-full scale-[1.08] object-cover"
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        ) : null}
+        <span className="absolute inset-0 bg-black/15" />
         <span
           className={cn(
             "absolute left-1/2 top-[42%] grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/15 backdrop-blur transition-transform group-hover:scale-110",
@@ -320,7 +336,7 @@ function ShortTile({
             <Lock className="size-4 text-white/80" />
           )}
         </span>
-        {reel ? (
+        {reelUrl ? (
           <span className="absolute right-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[9px] font-semibold text-white/85">
             Reel
           </span>
