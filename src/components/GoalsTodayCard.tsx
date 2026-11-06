@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Flame, Loader2, Sprout } from "lucide-react";
@@ -22,9 +22,10 @@ import { LifeHomeExtraSlot } from "@/components/LifeHomeExtraSlot";
 import { useLife } from "@/hooks/useLife";
 import { useLifeSessionUserId } from "@/hooks/useLifeSessionUserId";
 import { useProfile } from "@/hooks/useProfile";
+import { usePlus } from "@/hooks/usePlus";
 import { haptic } from "@/lib/haptics";
 import { plusDayComplete, plusGoalWeek, type PlusGoalWeek, type PlusStep } from "@/lib/plus";
-import { generatePlusSteps, loadPlus, setPlusStepDone } from "@/lib/plus.functions";
+import { generatePlusSteps, setPlusStepDone } from "@/lib/plus.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { PRIORITY_DOT } from "@/components/life/LifeTasks";
@@ -43,17 +44,11 @@ export function GoalsTodayCard() {
   const { data: profile } = useProfile();
   const sessionUserId = useLifeSessionUserId();
   const queryClient = useQueryClient();
-  const load = useServerFn(loadPlus);
   const setDone = useServerFn(setPlusStepDone);
   const generate = useServerFn(generatePlusSteps);
   const generationKey = useRef<string | null>(null);
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["plus", sessionUserId ?? null, lang],
-    enabled: !!sessionUserId,
-    queryFn: () => load({ data: { lang } }),
-    staleTime: 30 * 1000,
-  });
+  const { data, isLoading, isError } = usePlus();
   const generateSteps = useMutation({
     mutationFn: () => generate({ data: { lang } }),
     onSuccess: () => {
