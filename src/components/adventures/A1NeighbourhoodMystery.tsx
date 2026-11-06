@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-reac
 import { Link } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
+import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
 import { uiPt } from "@/lib/uiDictionary";
@@ -162,6 +163,7 @@ export function A1NeighbourhoodMystery() {
             <h1 className="font-display text-2xl font-bold sm:text-3xl">{t("The Neighbourhood Mystery")}</h1>
             <p className="text-sm text-muted-foreground">{t("A1 adventure introduction")}</p>
           </div>
+          <AdventureMusicControl />
         </header>
         {!complete ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">

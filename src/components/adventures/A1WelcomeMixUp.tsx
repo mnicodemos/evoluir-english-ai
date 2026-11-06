@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-reac
 import { Link } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
+import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
 import { uiPt } from "@/lib/uiDictionary";
@@ -345,6 +346,7 @@ export function A1WelcomeMixUp() {
               {t("An adventure to practise introductions, names, countries and jobs.")}
             </p>
           </div>
+          <AdventureMusicControl />
         </header>
 
         {!completed ? (

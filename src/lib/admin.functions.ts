@@ -1085,18 +1085,40 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
     return { ok: true, url: publicData.publicUrl };
   });
 
-/** Shared background track for all four English Adventures blocks. */
-export const getSharedMusicAsset = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabaseAdmin as any)
-    .from("home_media_settings")
-    .select("image_url")
-    .eq("setting_key", "music-library-main")
-    .maybeSingle();
-  if (error) throw new Error("The shared music setting could not be loaded.");
-  return { url: data?.image_url ?? null };
-});
+/** Shared background track stored in the private Lovable Cloud bucket. */
+const SHARED_MUSIC_BUCKET = "evoluir-shared-audio";
+const DEFAULT_SHARED_MUSIC_PATH = "Journey of Discovery.mp3";
+const SHARED_MUSIC_URL_TTL_SECONDS = 60 * 60;
+
+export const getSharedMusicAsset = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin as any)
+      .from("home_media_settings")
+      .select("image_url")
+      .eq("setting_key", "music-library-main")
+      .maybeSingle();
+    if (error) throw new Error("The shared music setting could not be loaded.");
+
+    // Store object paths, never permanent public URLs. The existing uploaded
+    // track is the fallback until an Admin publishes a replacement.
+    const storedPath =
+      typeof data?.image_url === "string" && data.image_url.length > 0
+        ? data.image_url
+        : DEFAULT_SHARED_MUSIC_PATH;
+    const { data: signedData, error: signedError } = await supabaseAdmin.storage
+      .from(SHARED_MUSIC_BUCKET)
+      .createSignedUrl(storedPath, SHARED_MUSIC_URL_TTL_SECONDS);
+    if (signedError || !signedData?.signedUrl) {
+      console.error(`Shared music signed URL failed: ${signedError?.message ?? "URL unavailable"}`);
+      throw new Error(
+        "The shared music file could not be accessed. Check that it exists in the private evoluir-shared-audio bucket.",
+      );
+    }
+    return { url: signedData.signedUrl, expiresIn: SHARED_MUSIC_URL_TTL_SECONDS };
+  });
 
 export const saveSharedMusicAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -1118,31 +1140,42 @@ export const saveSharedMusicAsset = createServerFn({ method: "POST" })
     if (bytes.byteLength > 10 * 1024 * 1024) {
       throw new Error("The MP3 must be 10 MB or smaller.");
     }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const path = `english-adventures/background-${Date.now()}.mp3`;
+    const path = `tracks/${Date.now()}.mp3`;
     const { error: uploadError } = await supabaseAdmin.storage
-      .from("dashboard-home-images")
+      .from(SHARED_MUSIC_BUCKET)
       .upload(path, bytes, {
         contentType: "audio/mpeg",
-        cacheControl: "31536000",
+        cacheControl: "3600",
         upsert: false,
       });
-    if (uploadError) throw new Error("The MP3 could not be uploaded. Please try again.");
-    const { data: publicData } = supabaseAdmin.storage
-      .from("dashboard-home-images")
-      .getPublicUrl(path);
+    if (uploadError) {
+      console.error(
+        `Shared music upload failed: ${uploadError.code ?? "?"} ${uploadError.message}`,
+      );
+      throw new Error(
+        "The MP3 could not be uploaded to evoluir-shared-audio. Check the bucket and file-size settings.",
+      );
+    }
+
+    // Keep the private object path in the existing setting. Playback URLs are
+    // short-lived and generated on demand for authenticated users.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: saveError } = await (supabaseAdmin as any).from("home_media_settings").upsert({
       setting_key: "music-library-main",
-      image_url: publicData.publicUrl,
+      image_url: path,
       updated_at: new Date().toISOString(),
     });
     if (saveError) {
+      console.error(
+        `Shared music setting failed: ${saveError.code ?? "?"} ${saveError.message ?? ""}`,
+      );
       throw new Error(
-        "The MP3 was uploaded but its shared setting could not be published. Check migration 0107.",
+        "The MP3 was uploaded, but the shared music setting could not be saved. Check migration 0107.",
       );
     }
-    return { ok: true, url: publicData.publicUrl };
+    return { ok: true };
   });
 
 /**
