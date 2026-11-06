@@ -189,6 +189,7 @@ function UtilityButtons() {
 
 type MobileNavigationMenuProps = {
   translate: (label: string) => string;
+  studentLevel?: string | null | undefined;
   className?: string;
   presentation?: "menu" | "bottom-tab";
   bottomLabel?: string;
@@ -196,6 +197,7 @@ type MobileNavigationMenuProps = {
 
 export function MobileNavigationMenu({
   translate,
+  studentLevel,
   className,
   presentation = "menu",
   bottomLabel = "More",
@@ -203,12 +205,17 @@ export function MobileNavigationMenu({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const pathname = useLocation().pathname;
+  const normalizedLevel = studentLevel?.trim().toUpperCase();
+  const isA1A2 = normalizedLevel === "A1" || normalizedLevel === "A2";
+  const visibleMobileSheetNav = mobileSheetNav.filter(
+    (item) => !(item.to === "/business" && isA1A2),
+  );
   // The More button lights up when the current route belongs to one of its
   // own sections (the four bottom tabs stay responsible for themselves).
   const moreActive =
     pathname.startsWith("/premium") ||
     pathname.startsWith("/goals") ||
-    mobileSheetNav.some((item) => pathname.startsWith(item.to));
+    visibleMobileSheetNav.some((item) => pathname.startsWith(item.to));
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -268,7 +275,7 @@ export function MobileNavigationMenu({
           </SheetTitle>
         </SheetHeader>
         <nav className="grid gap-1 overflow-y-auto pb-3 pt-1">
-          {mobileSheetNav.map((item) => {
+          {visibleMobileSheetNav.map((item) => {
             return (
               <div key={item.to}>
                 <SheetClose asChild>
@@ -674,6 +681,7 @@ function AppShellContent({
           ))}
           <MobileNavigationMenu
             translate={translate}
+            studentLevel={profile?.level ?? profile?.max_level}
             presentation="bottom-tab"
             bottomLabel={lang === "pt" ? "Mais" : "More"}
             className="w-full hover:bg-transparent hover:text-brand-green"
