@@ -15,7 +15,7 @@ import { useVideoSocial } from "@/hooks/useVideoSocial";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { findLevel, isReviewLevel } from "@/lib/level";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
-import { vimeoThumbnailUrl } from "@/lib/lessonVideoDisplay";
+import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { recordVideoView, type VideoSocialCounts } from "@/lib/premiumVideoSocial.functions";
 import { studyToday } from "@/lib/today";
@@ -299,7 +299,7 @@ function ShortTile({
 }) {
   const playable = premium && !!video.url;
   const reelUrl = video.url ? reelEmbedUrl(video.url) : null;
-  const poster = video.url ? vimeoThumbnailUrl(video.url) : null;
+  const vimeoUrl = !reelUrl && video.url ? vimeoEmbedUrl(video.url) : null;
   return (
     <li>
       <button
@@ -309,12 +309,16 @@ function ShortTile({
         aria-label={video.title}
         className="group relative block aspect-[9/16] w-full overflow-hidden bg-black bg-[radial-gradient(circle_at_50%_30%,rgb(34_211_238/0.22),transparent_60%),radial-gradient(circle_at_80%_90%,rgb(236_72_153/0.18),transparent_55%)] text-left disabled:cursor-default"
       >
-        {poster ? (
-          <img
-            src={poster}
-            alt=""
+        {vimeoUrl ? (
+          <iframe
+            src={`${cleanVimeoPlayerUrl(vimeoUrl)}&controls=0&autoplay=0&playsinline=1`}
+            title={video.title}
             loading="lazy"
-            className="absolute inset-0 size-full object-cover"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 size-full"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allow="fullscreen; picture-in-picture"
           />
         ) : reelUrl ? (
           <iframe
@@ -323,7 +327,7 @@ function ShortTile({
             loading="lazy"
             tabIndex={-1}
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 size-full scale-[1.08] object-cover"
+            className="pointer-events-none absolute inset-0 size-full"
             referrerPolicy="strict-origin-when-cross-origin"
           />
         ) : null}
