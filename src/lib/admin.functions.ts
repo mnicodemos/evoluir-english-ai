@@ -1073,8 +1073,8 @@ export const saveHomeDashboardImage = createServerFn({ method: "POST" })
       console.error(
         `Home image could not be published: ${saveError.code ?? "?"} ${saveError.message ?? ""}`,
       );
--- Replace the stale 0105-only error with the migration that actually includes
-      // both optional media keys. PostgreSQL 23514 is the CHECK constraint failure.
+      // The 0106 migration includes the dedicated English Adventures avatar key.
+      // PostgreSQL 23514 indicates the database CHECK constraint rejected the key.
       if (saveError.code === "23514") {
         throw new Error(
           "A configuração do banco ainda não aceita esta imagem. Execute a migração 0106_home_media_adventure_avatar_key.sql no SQL Editor.",
