@@ -9,8 +9,6 @@ export function AdventureMusicControl() {
   const getMusic = useServerFn(getSharedMusicAsset);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [muted, setMuted] = useState(true);
-  const [started, setStarted] = useState(false);
-  const [showMusicHint, setShowMusicHint] = useState(true);
   const query = useQuery({
     queryKey: ["shared-music-asset"],
     queryFn: () => getMusic(),
@@ -20,11 +18,10 @@ export function AdventureMusicControl() {
 
   useEffect(() => {
     try {
+      // Playback must still be confirmed by a user gesture in browsers that block autoplay.
       setMuted(window.localStorage.getItem("adventures-music-muted") !== "false");
-      setShowMusicHint(window.localStorage.getItem("adventures-music-hint-seen") !== "true");
     } catch {
       setMuted(true);
-      setShowMusicHint(true);
     }
   }, []);
 
@@ -33,38 +30,67 @@ export function AdventureMusicControl() {
     if (!audio) return;
     audio.volume = 0.12;
     audio.muted = muted;
-    if (muted) audio.pause();
-    else if (started && query.data?.url) void audio.play().catch(() => setMuted(true));
-  }, [muted, started, query.data?.url]);
+    if (muted) {
+      audio.pause();
+    } else {
+      void audio.play().catch(() => {
+        setMuted(true);
+        try {
+          window.localStorage.setItem("adventures-music-muted", "true");
+        } catch {
+          // Audio control remains usable when browser storage is unavailable.
+        }
+      });
+    }
+  }, [muted, query.data?.url]);
 
   function toggleMusic() {
-    const nextMuted = !muted;
-    setMuted(nextMuted);
-    setShowMusicHint(false);
-    if (!nextMuted) setStarted(true);
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (muted) {
+      audio.volume = 0.12;
+      audio.muted = false;
+      // Call play synchronously in the click handler to preserve the browser's user activation.
+      const playback = audio.play();
+      setMuted(false);
+      void playback.catch(() => {
+        setMuted(true);
+        audio.muted = true;
+        try {
+          window.localStorage.setItem("adventures-music-muted", "true");
+        } catch {
+          // Audio control remains usable when browser storage is unavailable.
+        }
+      });
+      try {
+        window.localStorage.setItem("adventures-music-muted", "false");
+      } catch {
+        // Audio control remains usable when browser storage is unavailable.
+      }
+      return;
+    }
+
+    audio.pause();
+    audio.muted = true;
+    setMuted(true);
     try {
-      window.localStorage.setItem("adventures-music-muted", String(nextMuted));
-      window.localStorage.setItem("adventures-music-hint-seen", "true");
+      window.localStorage.setItem("adventures-music-muted", "true");
     } catch {
       // Audio control remains usable when browser storage is unavailable.
     }
   }
 
   return (
-    <div className="flex shrink-0 items-center gap-2">
+    <div className="flex shrink-0 items-center">
       {query.data?.url ? <audio ref={audioRef} src={query.data.url} loop preload="none" /> : null}
-      {showMusicHint && query.data?.url ? (
-        <span className="whitespace-nowrap text-xs font-medium text-cyan-400">
-          {muted ? "Tap to enjoy the soundtrack" : "Soundtrack on"}
-        </span>
-      ) : null}
       <button
         type="button"
         onClick={toggleMusic}
         disabled={!query.data?.url}
-        aria-label={muted ? "Turn adventure music on" : "Mute adventure music"}
+        aria-label={muted ? "Play adventure soundtrack" : "Mute adventure soundtrack"}
         aria-pressed={!muted}
-        title={muted ? "Turn music on" : "Mute music"}
+        title={muted ? "Play soundtrack" : "Mute soundtrack"}
         className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-background/80 text-muted-foreground transition hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
       >
         {muted ? (
