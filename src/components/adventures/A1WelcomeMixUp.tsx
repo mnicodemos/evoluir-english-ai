@@ -23,7 +23,8 @@ type Scene = {
 };
 
 const adventureTitle = "The Welcome Mix-Up";
-const completionText = "You completed 10 challenges, checked the guests’ details and helped Maya join the festival.";
+const completionText =
+  "You completed 10 challenges, checked the guests’ details and helped Maya join the festival.";
 
 const scenes: Scene[] = [
   {
@@ -218,12 +219,12 @@ const scenes: Scene[] = [
         label: "Ana — Brazil — student; Leo — Italy — designer",
         response: "The first two cards match the guests. Maya's card is already ready!",
         correct: true,
-        hint:
-          "Check each name, country and job as a group. This choice matches Ana and Leo.",
+        hint: "Check each name, country and job as a group. This choice matches Ana and Leo.",
       },
       {
         label: "Ana — Italy — designer; Leo — Brazil — student",
-        response: "Those details belong to the other guest. Compare the country and job clues again.",
+        response:
+          "Those details belong to the other guest. Compare the country and job clues again.",
         correct: false,
         hint: "Ana told you Brazil and student. Leo told you Italy and designer.",
       },
