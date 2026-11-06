@@ -22,6 +22,9 @@ type Scene = {
   evo: string;
 };
 
+const adventureTitle = "The Welcome Mix-Up";
+const completionText = "You solved the welcome mix-up and helped Maya join the festival.";
+
 const scenes: Scene[] = [
   {
     place: "The welcome desk",
@@ -174,7 +177,7 @@ export function A1WelcomeMixUp() {
               {t("English Adventures")} · A1
             </p>
             <h1 className="font-display text-2xl font-bold sm:text-3xl" translate="no" lang="en">
-              The Welcome Mix-Up
+              {adventureTitle}
             </h1>
             <p className="text-sm text-muted-foreground">{t("A1 adventure introduction")}</p>
           </div>
@@ -223,7 +226,7 @@ export function A1WelcomeMixUp() {
                 <p className="text-sm leading-relaxed" translate="no" lang="en">{choice.response}</p>
                 {!choice.correct && (
                   <p className="mt-2 text-sm text-muted-foreground" translate="no" lang="en">
-                    EVO's hint: {choice.hint}
+                    {t("EVO hint label")} {choice.hint}
                   </p>
                 )}
                 <div className="mt-3 flex items-start gap-2 border-t border-brand-green/20 pt-3">
@@ -246,7 +249,7 @@ export function A1WelcomeMixUp() {
             </span>
             <h2 className="font-display text-xl font-semibold">{t("Adventure complete!")}</h2>
             <p className="text-sm leading-relaxed text-muted-foreground" translate="no" lang="en">
-              You solved the welcome mix-up and helped Maya join the festival.
+              {completionText}
             </p>
             <p className="text-sm font-medium">{t("A1 adventure learning recap")}</p>
             <p className="text-sm text-muted-foreground">{t("A1 adventure recovery recap").replace("{count}", String(recovered))}</p>
