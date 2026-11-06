@@ -578,6 +578,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms'
     | '/_authenticated/admin'
+    | '/_authenticated/adventures'
     | '/_authenticated/billing-success'
     | '/_authenticated/business'
     | '/_authenticated/call'
