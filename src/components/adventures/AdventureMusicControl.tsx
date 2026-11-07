@@ -200,4 +200,3 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     </div>
   );
 }
-}
