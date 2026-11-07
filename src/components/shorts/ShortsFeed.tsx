@@ -270,9 +270,7 @@ function ShortSlide({
   const [paused, setPaused] = useState(false);
   const [burst, setBurst] = useState(0);
   const [captionText, setCaptionText] = useState("");
-  const [captionAvailable, setCaptionAvailable] = useState(false);
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
-  const [captionLoading, setCaptionLoading] = useState(false);
   const lastTap = useRef(0);
   const tapTimer = useRef<number | null>(null);
 
@@ -312,7 +310,6 @@ function ShortSlide({
   useEffect(() => {
     if (!active || !vimeo || !frame.current) {
       setCaptionText("");
-      setCaptionAvailable(false);
       setCaptionsEnabled(false);
       return;
     }
@@ -325,9 +322,7 @@ function ShortSlide({
         .join("\n");
       setCaptionText(next);
     };
-    setCaptionLoading(true);
     setCaptionText("");
-    setCaptionAvailable(false);
     setCaptionsEnabled(false);
     void loadVimeoCaptionSdk()
       .then(async (sdk) => {
@@ -343,22 +338,14 @@ function ShortSlide({
           tracks.find((item) => item.language.toLowerCase().startsWith(preferredLanguage)) ??
           tracks[0];
         if (!track) {
-          setCaptionLoading(false);
           return;
         }
-        setCaptionAvailable(true);
         await player.enableTextTrack(track.language, track.kind, false);
         if (!cancelled) {
           setCaptionsEnabled(true);
-          setCaptionLoading(false);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setCaptionLoading(false);
-          setCaptionAvailable(false);
-        }
-      });
+      .catch(() => undefined);
     return () => {
       cancelled = true;
       if (player) {
@@ -367,30 +354,6 @@ function ShortSlide({
       }
     };
   }, [active, vimeo, video.level]);
-
-  const toggleCaptions = () => {
-    if (!frame.current || !captionAvailable) return;
-    void loadVimeoCaptionSdk()
-      .then(async (sdk) => {
-        const player = new sdk.Player(frame.current!);
-        if (captionsEnabled) {
-          await player.disableTextTrack();
-          setCaptionsEnabled(false);
-          setCaptionText("");
-        } else {
-          const tracks = await player.getTextTracks();
-          const preferredLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
-          const track =
-            tracks.find((item) => item.language.toLowerCase().startsWith(preferredLanguage)) ??
-            tracks[0];
-          if (track) {
-            await player.enableTextTrack(track.language, track.kind, false);
-            setCaptionsEnabled(true);
-          }
-        }
-      })
-      .catch(() => undefined);
-  };
 
   // One tap pauses or plays; a double tap likes (and never unlikes), like Instagram.
   const onTap = () => {
@@ -457,19 +420,6 @@ function ShortSlide({
                 <Play className="size-8 fill-current" aria-hidden="true" />
               </span>
             ) : null}
-          </button>
-        ) : null}
-
-        {active && vimeo ? (
-          <button
-            type="button"
-            onClick={toggleCaptions}
-            disabled={!captionAvailable || captionLoading}
-            aria-label={captionsEnabled ? t("Turn captions off") : t("Turn captions on")}
-            aria-pressed={captionsEnabled}
-            className="absolute bottom-4 left-3 z-30 rounded-full border border-white/30 bg-black/65 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur disabled:opacity-60"
-          >
-            {captionLoading ? `${t("Captions")}…` : t("Captions")}
           </button>
         ) : null}
 
