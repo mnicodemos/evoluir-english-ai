@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
-import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import { useAdventureActivityTimer, useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -75,6 +75,56 @@ const scenes: Scene[] = [
       { label: "“Thanks for your help. Have a good day!”", response: "The agent thanks you too. The conversation ends on a friendly note.", coaching: "A polite closing helps keep customer conversations positive.", consequence: "polite" },
     ],
     evo: "Before you finish, check that you know what will happen next and when.",
+  },
+  {
+    place: "Preparing for the replacement",
+    story: "The shop confirms that a replacement speaker will arrive tomorrow. You need to return the damaged one. The agent asks whether you have the original packaging. What do you explain?",
+    choices: [
+      { label: "“I still have the original box and all the accessories.”", response: "“Perfect. Please put the speaker and the accessories in the box,” the agent explains.", coaching: "Use “still have” to say that something remains in your possession.", consequence: "replacement" },
+      { label: "“I have threw the box away.”", response: "The agent asks whether you can use another safe box for the return.", coaching: "The present perfect is “I have thrown”, not “I have threw”.", consequence: "more-info" },
+      { label: "“The box is more damaged that the speaker.”", response: "The agent asks you to describe the condition of both items.", coaching: "Use “than” in comparisons: “more damaged than”.", consequence: "follow-up" },
+    ],
+    evo: "When you explain what you still have, the other person can tell you exactly how to proceed.",
+  },
+  {
+    place: "Arranging collection",
+    story: "The courier can collect the damaged speaker on Friday morning or Friday afternoon. You will be at work in the morning. Which option do you choose?",
+    choices: [
+      { label: "“Friday afternoon would be more convenient for me.”", response: "The courier books the collection for Friday afternoon.", coaching: "“Would be more convenient” is a polite way to express a preference.", consequence: "replacement" },
+      { label: "“I am available in the morning yesterday.”", response: "The courier asks you to confirm whether you mean this Friday.", coaching: "Use “will be available” for a future arrangement, not “yesterday”.", consequence: "follow-up" },
+      { label: "“You collect it whenever.”", response: "The courier asks for a time window so the collection can be arranged.", coaching: "Give a clear time preference when arranging an appointment.", consequence: "more-info" },
+    ],
+    evo: "Clear availability makes appointments easier to arrange.",
+  },
+  {
+    place: "An unexpected update",
+    story: "On Friday, the courier sends a message saying the collection will be one hour late. You have another appointment. What do you reply?",
+    choices: [
+      { label: "“Thanks for letting me know. Could we choose another time?”", response: "The courier offers a new collection window for the next morning.", coaching: "“Thanks for letting me know” acknowledges an update. “Could we…?” opens a polite negotiation.", consequence: "follow-up" },
+      { label: "“You are late always.”", response: "The courier asks what alternative time would work for you.", coaching: "Use “You are always late” for a general complaint, but a specific request is more useful here.", consequence: "more-info" },
+      { label: "“I don't need the collection never.”", response: "The courier checks whether you want to cancel the return or change the time.", coaching: "Use “I don't need the collection anymore” to say that something is no longer necessary.", consequence: "refund" },
+    ],
+    evo: "A calm, specific request can solve a scheduling problem without creating another one.",
+  },
+  {
+    place: "The new speaker arrives",
+    story: "The replacement arrives. You open the box and test the speaker. The sound is clear, the cable is included and everything works. How do you update the shop?",
+    choices: [
+      { label: "“The replacement has arrived, and everything is working properly now.”", response: "The agent is pleased to hear that the replacement solved the problem.", coaching: "Use the present perfect to report a recent result that matters now: “has arrived”.", consequence: "replacement" },
+      { label: "“The speaker don't works.”", response: "The agent asks whether you are reporting a new problem or confirming the delivery.", coaching: "Say “The speaker doesn't work” or “The speaker works”. Do not add -s after “doesn't”.", consequence: "more-info" },
+      { label: "“I am receive the speaker tomorrow.”", response: "The agent checks the delivery record and asks you to confirm the date.", coaching: "Say “I received the speaker” for a completed event or “I will receive it” for the future.", consequence: "follow-up" },
+    ],
+    evo: "You can now describe the result clearly and close the conversation with confidence.",
+  },
+  {
+    place: "Closing the case",
+    story: "The shop asks whether you are happy with the solution. You want to thank the agent and explain what made the service helpful. What do you say?",
+    choices: [
+      { label: "“Thank you for your help. The updates made the process much easier.”", response: "The agent thanks you for the feedback and closes the support request.", coaching: "Use the past simple “made” to describe how the updates affected the process.", consequence: "polite" },
+      { label: "“The updates was very useful.”", response: "The agent understands your feedback and appreciates the comment.", coaching: "Use “were” with the plural subject “updates”.", consequence: "more-info" },
+      { label: "“I am happy because you helped me yesterday and tomorrow.”", response: "The agent asks which part of the service you found most helpful.", coaching: "Keep the time reference consistent. You can say “You helped me throughout the process”.", consequence: "follow-up" },
+    ],
+    evo: "You explained a problem, negotiated a solution, arranged a collection and evaluated the result. Well done!",
   },
 ];
 
@@ -160,7 +210,8 @@ export function A2SurpriseDelivery() {
   const [lastConsequence, setLastConsequence] = useState<Choice["consequence"]>("polite");
   const [completed, setCompleted] = useState(false);
   const [decisions, setDecisions] = useState<string[]>([]);
-  const { markCompleted } = useEnglishAdventuresProgress();
+  const { markCompleted, markActivityCompleted } = useEnglishAdventuresProgress();
+  useAdventureActivityTimer(completed ? null : "a2-surprise-delivery:" + index);
   const scene = scenes[index];
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];
@@ -169,6 +220,7 @@ export function A2SurpriseDelivery() {
     if (!choice) return;
     setLastConsequence(choice.consequence);
     setDecisions((items) => [...items, choice.consequence]);
+    markActivityCompleted("a2-surprise-delivery:" + index);
     if (index === scenes.length - 1) {
       setCompleted(true);
       markCompleted("a2-surprise-delivery");
@@ -276,6 +328,7 @@ export function A2SurpriseDelivery() {
             <p className="text-sm font-medium">{t("Your choices shaped the conversation. There is more than one way to find a good solution.")}</p>
             <div className="flex flex-wrap justify-center gap-2">
               <Button onClick={restart}><RotateCcw className="mr-1 size-4" />{t("Explore again")}</Button>
+              <Button asChild><Link to="/adventures" search={{ story: "a2-2" }}>{t("Next adventure · A2.2")}</Link></Button>
               <Button asChild variant="outline"><Link to="/dashboard">{t("Back to home")}</Link></Button>
             </div>
           </section>

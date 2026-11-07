@@ -2766,6 +2766,19 @@ const baseUiPt: Record<string, string> = {
   "Open recommended practice": "Abrir prática recomendada",
 
   "The Surprise Delivery": "A entrega surpresa",
+  "Next adventure · A2.2": "Próxima aventura · A2.2",
+  "Study time": "Tempo de estudo",
+  "The Community Festival": "O festival comunitário",
+  "An adventure about planning a community festival, solving problems and working as a team.":
+    "Uma aventura sobre organizar um festival comunitário, resolver problemas e trabalhar em equipe.",
+  "An adventure to practise making suggestions, organising an event, giving directions and adapting to changes.":
+    "Uma aventura para praticar sugestões, organização de eventos, orientações e adaptação a mudanças.",
+  "You planned a community event, shared responsibilities, handled changes and helped the festival succeed.":
+    "Você planejou um evento comunitário, dividiu responsabilidades, lidou com mudanças e ajudou o festival a dar certo.",
+  "You practised making suggestions, asking polite questions, giving directions and talking about past events.":
+    "Você praticou como fazer sugestões, formular perguntas educadas, dar orientações e falar sobre acontecimentos passados.",
+  "Every good adventure is built one decision at a time.":
+    "Toda boa aventura é construída uma decisão de cada vez.",
   "An adventure about deliveries, problems and finding a solution.":
     "Uma aventura sobre entregas, problemas e como encontrar uma solução.",
   "An adventure to practise describing problems, making polite requests and choosing solutions.":

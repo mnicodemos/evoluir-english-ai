@@ -13,6 +13,7 @@ describe("English Adventures progress", () => {
       completed: 4,
       total: 40,
       percent: 10,
+      minutes: 0,
     });
   });
 

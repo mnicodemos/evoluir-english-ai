@@ -6,7 +6,10 @@ import { AppShell } from "@/components/AppShell";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
-import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import {
+  useAdventureActivityTimer,
+  useEnglishAdventuresProgress,
+} from "@/hooks/useEnglishAdventuresProgress";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -301,7 +304,8 @@ export function A1WelcomeMixUp() {
   const [selected, setSelected] = useState<number | null>(null);
   const [completed, setCompleted] = useState(false);
   const [recovered, setRecovered] = useState(0);
-  const { markCompleted } = useEnglishAdventuresProgress();
+  const { markCompleted, markActivityCompleted } = useEnglishAdventuresProgress();
+  useAdventureActivityTimer(completed ? null : "a1-welcome-mix-up:" + sceneIndex);
   const scene = scenes[sceneIndex] ?? scenes[0];
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];
@@ -309,6 +313,7 @@ export function A1WelcomeMixUp() {
 
   function continueStory() {
     if (!canContinue) return;
+    markActivityCompleted("a1-welcome-mix-up:" + sceneIndex);
     if (sceneIndex === scenes.length - 1) {
       setCompleted(true);
       markCompleted("a1-welcome-mix-up");
