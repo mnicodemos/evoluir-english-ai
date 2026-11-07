@@ -872,6 +872,36 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_video_captions: {
+        Row: {
+          created_at: string
+          curriculum_key: string
+          id: string
+          language: string
+          updated_at: string
+          updated_by: string | null
+          vtt_content: string
+        }
+        Insert: {
+          created_at?: string
+          curriculum_key: string
+          id?: string
+          language: string
+          updated_at?: string
+          updated_by?: string | null
+          vtt_content: string
+        }
+        Update: {
+          created_at?: string
+          curriculum_key?: string
+          id?: string
+          language?: string
+          updated_at?: string
+          updated_by?: string | null
+          vtt_content?: string
+        }
+        Relationships: []
+      }
       lesson_videos: {
         Row: {
           approved_at: string

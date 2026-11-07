@@ -242,7 +242,7 @@ export function A1NeighbourhoodMystery() {
         )}
         <EnglishAdventureJourneyMap
           adventureId="a1-neighbourhood-mystery"
-          activityIndex=index
+          activityIndex={index}
           isComplete={complete}
         />
       </div>
