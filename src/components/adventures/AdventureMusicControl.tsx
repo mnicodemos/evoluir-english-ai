@@ -6,7 +6,7 @@ import { getAdventureWelcomeAudio, getSharedMusicAsset } from "@/lib/admin.funct
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
-/** Persistent, opt-in soundtrack control shared by English Adventures. */
+/** Welcomes students automatically when permitted, with an accessible manual fallback. */
 export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta" | "arabella" }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -14,7 +14,9 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   const audioRef = useRef<HTMLAudioElement>(null);
   const welcomeSequenceRef = useRef(false);
   const [muted, setMuted] = useState(true);
+  const [preferenceLoaded, setPreferenceLoaded] = useState(false);
   const [showHint, setShowHint] = useState(true);
+  const autoWelcomeAttemptedRef = useRef(false);
   const getWelcomeAudio = useServerFn(getAdventureWelcomeAudio);
   const welcomeQuery = useQuery({
     queryKey: ["adventure-welcome-audio", welcomeVoice],
@@ -32,30 +34,57 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   useEffect(() => {
     try {
       // Playback must still be confirmed by a user gesture in browsers that block autoplay.
-      setMuted(window.localStorage.getItem("adventures-music-muted") !== "false");
+      setMuted(window.localStorage.getItem("adventures-music-muted") === "true");
     } catch {
-      setMuted(true);
+      setMuted(false);
+    } finally {
+      setPreferenceLoaded(true);
     }
   }, []);
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || welcomeSequenceRef.current) return;
+    const musicUrl = query.data?.url;
+    const welcomeUrl = welcomeQuery.data?.url;
+    if (!audio || !musicUrl || !welcomeUrl || !preferenceLoaded || autoWelcomeAttemptedRef.current) return;
+
+    autoWelcomeAttemptedRef.current = true;
+    if (muted) return;
+
+    welcomeSequenceRef.current = true;
+    audio.pause();
     audio.volume = 0.12;
-    audio.muted = muted;
-    if (muted) {
-      audio.pause();
-    } else {
-      void audio.play().catch(() => {
-        setMuted(true);
-        try {
-          window.localStorage.setItem("adventures-music-muted", "true");
-        } catch {
-          // Audio control remains usable when browser storage is unavailable.
-        }
-      });
+    audio.muted = false;
+    audio.loop = false;
+    audio.src = welcomeUrl;
+    audio.onended = () => {
+      welcomeSequenceRef.current = false;
+      audio.onended = null;
+      audio.src = musicUrl;
+      audio.loop = true;
+      audio.currentTime = 0;
+      void audio.play().catch(() => handleAutoplayBlocked(audio));
+    };
+    void audio.play().catch(() => {
+      welcomeSequenceRef.current = false;
+      audio.onended = null;
+      audio.src = musicUrl;
+      audio.loop = true;
+      handleAutoplayBlocked(audio);
+    });
+  }, [muted, preferenceLoaded, query.data?.url, welcomeQuery.data?.url]);
+
+  function handleAutoplayBlocked(audio: HTMLAudioElement) {
+    audio.pause();
+    audio.muted = true;
+    setMuted(true);
+    setShowHint(true);
+    try {
+      window.localStorage.setItem("adventures-music-muted", "true");
+    } catch {
+      // The manual start control remains available when storage is unavailable.
     }
-  }, [muted, query.data?.url]);
+  }
 
   function playWelcome() {
     const audio = audioRef.current;
@@ -88,8 +117,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       audio.onended = null;
       audio.src = musicUrl;
       audio.loop = true;
-      setMuted(true);
-      audio.muted = true;
+      handleAutoplayBlocked(audio);
     });
     try {
       window.localStorage.setItem("adventures-music-muted", "false");
@@ -156,7 +184,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       {showHint ? (
         <span className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 text-center text-[11px] leading-tight text-cyan-300 sm:max-w-40">
           <Music2 className="size-3 shrink-0" aria-hidden="true" />
-          {t("There’s a soundtrack waiting for you")}
+          {t("Audio starts automatically when your browser allows it. Tap Meet EVO if it does not start.")}
         </span>
       ) : null}
       <button
