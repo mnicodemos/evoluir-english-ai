@@ -46,13 +46,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     const audio = audioRef.current;
     const musicUrl = query.data?.url;
     const welcomeUrl = welcomeQuery.data?.url;
-    if (
-      !audio ||
-      !musicUrl ||
-      !welcomeUrl ||
-      !preferenceLoaded ||
-      autoWelcomeAttemptedRef.current
-    ) return;
+    if (!audio || !musicUrl || !welcomeUrl || !preferenceLoaded || autoWelcomeAttemptedRef.current) return;
 
     autoWelcomeAttemptedRef.current = true;
     if (muted) return;
