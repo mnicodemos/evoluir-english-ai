@@ -4,6 +4,8 @@ import { Music2, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getAdventureWelcomeAudio, getSharedMusicAsset } from "@/lib/admin.functions";
+import { Button } from "@/components/ui/button";
+import { ADVENTURE_MUSIC_VOLUME, playAdventureMusic } from "@/lib/adventureAudio";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -19,15 +21,24 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   const welcomeAttemptingRef = useRef(false);
   const welcomeFinishedRef = useRef(false);
   const musicStartedRef = useRef(false);
+  const musicAttemptingRef = useRef(false);
+  const mutedRef = useRef(false);
   const removeInteractionListenersRef = useRef<(() => void) | null>(null);
   const fadeFrameRef = useRef<number | null>(null);
-  const [muted, setMuted] = useState(() => {
+  const [muted, setMuted] = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const [preferenceReady, setPreferenceReady] = useState(false);
+  useEffect(() => {
+    let savedMuted = false;
     try {
-      return window.localStorage.getItem("adventures-music-muted") === "true";
+      savedMuted = window.localStorage.getItem("adventures-music-muted") === "true";
     } catch {
-      return false;
+      // Use the default when browser storage is unavailable.
     }
-  });
+    mutedRef.current = savedMuted;
+    setMuted(savedMuted);
+    setPreferenceReady(true);
+  }, []);
 
   const welcomeQuery = useQuery({
     queryKey: ["adventure-welcome-audio", welcomeVoice],
@@ -65,7 +76,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
 
   const startWelcome = useCallback(() => {
     const audio = evoAudioRef.current;
-    if (!audio || !welcomeUrl || welcomeStartedRef.current) return;
+    if (!audio || !welcomeUrl || welcomeStartedRef.current || welcomeAttemptingRef.current) return;
     audio.currentTime = 0;
     audio.volume = 1;
     audio.muted = false;
@@ -76,7 +87,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         welcomeStartedRef.current = true;
         welcomeAttemptingRef.current = false;
         welcomeFinishedRef.current = false;
-        if (musicAudioRef.current && !muted) fadeMusicTo(0.03);
+        if (musicAudioRef.current && !mutedRef.current) fadeMusicTo(0.03);
         if (musicStartedRef.current) removeInteractionListenersRef.current?.();
       })
       .catch(() => {
@@ -84,30 +95,20 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         welcomeStartedRef.current = false;
         welcomeAttemptingRef.current = false;
       });
-  }, [fadeMusicTo, muted, welcomeUrl]);
+  }, [fadeMusicTo, welcomeUrl]);
 
   const startMusic = useCallback(() => {
     const audio = musicAudioRef.current;
-    if (!audio || !musicUrl || muted) return;
-    audio.loop = true;
-    audio.volume =
-      (welcomeUrl && !welcomeFinishedRef.current) ||
-      welcomeStartedRef.current ||
-      welcomeAttemptingRef.current
-        ? 0.03
-        : 0.12;
-    audio.muted = false;
-    void audio
-      .play()
-      .then(() => {
-        musicStartedRef.current = true;
-        if (welcomeStartedRef.current) removeInteractionListenersRef.current?.();
-      })
-      .catch(() => {
-        musicStartedRef.current = false;
-        // A blocked autoplay can be retried from the next user interaction.
+    if (!audio || !musicUrl || mutedRef.current || musicAttemptingRef.current) return;
+    musicAttemptingRef.current = true;
+    void playAdventureMusic(audio, mutedRef.current, Boolean(welcomeUrl), welcomeFinishedRef.current)
+      .then((started) => {
+        musicAttemptingRef.current = false;
+        musicStartedRef.current = started && !audio.paused;
+        setMusicPlaying(musicStartedRef.current);
+        if (musicStartedRef.current && welcomeStartedRef.current) removeInteractionListenersRef.current?.();
       });
-  }, [musicUrl, muted, welcomeUrl]);
+  }, [musicUrl, welcomeUrl]);
 
   const startExperienceAudio = useCallback(() => {
     startWelcome();
@@ -115,15 +116,15 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   }, [startMusic, startWelcome]);
 
   useEffect(() => {
-    if (welcomeUrl || musicUrl) startExperienceAudio();
-  }, [musicUrl, startExperienceAudio, welcomeUrl]);
+    if (preferenceReady && (welcomeUrl || musicUrl)) startExperienceAudio();
+  }, [musicUrl, preferenceReady, startExperienceAudio, welcomeUrl]);
 
   useEffect(() => {
     const retryFromInteraction = (event: Event) => {
       const target = event.target;
       if (target instanceof Element && target.closest("[data-adventure-audio-control]")) return;
       if (!welcomeStartedRef.current) startWelcome();
-      if (!muted && !musicStartedRef.current) startMusic();
+      if (!mutedRef.current && !musicStartedRef.current) startMusic();
     };
     const removeListeners = () => {
       window.removeEventListener("pointerdown", retryFromInteraction, true);
@@ -134,7 +135,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     window.addEventListener("pointerdown", retryFromInteraction, true);
     window.addEventListener("keydown", retryFromInteraction, true);
     return removeListeners;
-  }, [muted, startMusic, startWelcome]);
+  }, [startMusic, startWelcome]);
 
   useEffect(() => {
     return () => {
@@ -153,7 +154,9 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   function toggleMusic() {
     const audio = musicAudioRef.current;
     if (!audio || !musicUrl) return;
-    const nextMuted = !muted;
+    // A rejected autoplay is stopped, not muted: this tap must play, not mute it.
+    const nextMuted = musicPlaying && !muted;
+    mutedRef.current = nextMuted;
     setMuted(nextMuted);
     audio.muted = nextMuted;
     try {
@@ -163,6 +166,8 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     }
     if (nextMuted) {
       audio.pause();
+      musicStartedRef.current = false;
+      setMusicPlaying(false);
       if (fadeFrameRef.current !== null) {
         window.cancelAnimationFrame(fadeFrameRef.current);
         fadeFrameRef.current = null;
@@ -186,68 +191,72 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
             welcomeFinishedRef.current = true;
             welcomeAttemptingRef.current = false;
             const music = musicAudioRef.current;
-            if (muted || !music || !musicUrl) return;
+            if (mutedRef.current || !music || !musicUrl) return;
 
             // The soundtrack may have been blocked while EVO's voice was playing.
             // Retry at the voice-completion boundary before fading it up.
             if (music.paused) {
               music.loop = true;
               music.muted = false;
+              music.volume = ADVENTURE_MUSIC_VOLUME;
               void music
                 .play()
                 .then(() => {
                   musicStartedRef.current = true;
-                  fadeMusicTo(0.12);
+                  setMusicPlaying(true);
+                  fadeMusicTo(ADVENTURE_MUSIC_VOLUME);
                   removeInteractionListenersRef.current?.();
                 })
                 .catch(() => {
                   musicStartedRef.current = false;
+                  setMusicPlaying(false);
                   // Keep the explicit soundtrack control available as a fallback.
                 });
               return;
             }
 
             musicStartedRef.current = true;
-            fadeMusicTo(0.12);
+            setMusicPlaying(true);
+            fadeMusicTo(ADVENTURE_MUSIC_VOLUME);
             removeInteractionListenersRef.current?.();
           }}
         />
       ) : null}
-      {musicUrl ? <audio ref={musicAudioRef} src={musicUrl} loop preload="auto" /> : null}
+      {musicUrl ? <audio ref={musicAudioRef} src={musicUrl} loop preload="auto" onPlaying={() => setMusicPlaying(true)} onPause={() => { musicStartedRef.current = false; setMusicPlaying(false); }} /> : null}
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
         <Music2 className="size-4" aria-hidden="true" />
       </span>
       <span className="flex min-w-0 flex-1 flex-col justify-center leading-tight">
-        <button
+        <Button variant="ghost"
           type="button"
           onClick={playWelcome}
           disabled={!welcomeUrl}
-          className="w-fit text-left text-xs font-semibold text-foreground transition-colors hover:text-brand-green disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+          className="h-auto w-fit justify-start whitespace-normal p-0 text-left text-xs font-semibold text-foreground transition-colors hover:bg-transparent hover:text-brand-green disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
           aria-label={t("Meet EVO")}
         >
           {t("Meet EVO")}
-        </button>
+        </Button>
         <span className="truncate text-[10.5px] text-muted-foreground">
           {lang === "pt"
             ? "Boas-vindas da EVO · trilha sonora"
             : "A welcome from EVO · adventure soundtrack"}
         </span>
       </span>
-      <button
+      <Button variant="ghost"
         type="button"
         onClick={toggleMusic}
         disabled={!musicUrl}
-        aria-label={muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")}
-        aria-pressed={!muted}
-        title={muted ? t("Play soundtrack") : t("Mute soundtrack")}
-        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+        aria-label={!musicPlaying || muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")}
+        aria-pressed={musicPlaying && !muted}
+        title={!musicPlaying || muted ? t("Play soundtrack") : t("Mute soundtrack")}
+        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full p-0 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
       >
-        {muted ? (
+        {muted || !musicPlaying ? (
           <VolumeX className="size-4" aria-hidden="true" />
         ) : (
           <Volume2 className="size-4 text-brand-green" aria-hidden="true" />
         )}
-      </button>
+      </Button>
     </div>
   );
 }
