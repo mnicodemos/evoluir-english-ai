@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Bell, Crown, Loader2, Pencil, Save, Trash2, Upload } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -423,7 +423,9 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const [pt, setPt] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<16 | 20 | 24>(20);
   const rows = query.data?.captions ?? [];
-  const selectedFontSize = query.data?.fontSize ?? fontSize;
+  useEffect(() => {
+    if (query.data?.fontSize) setFontSize(query.data.fontSize as 16 | 20 | 24);
+  }, [query.data?.fontSize]);
   const values = {
     en: en ?? rows.find((row) => row.language === "en")?.vtt_content ?? "",
     pt: pt ?? rows.find((row) => row.language === "pt")?.vtt_content ?? "",
@@ -431,7 +433,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const setters = { en: setEn, pt: setPt };
   const save = useMutation({
     mutationFn: (value: { language: "en" | "pt"; content: string }) =>
-      saveCaption({ data: { videoId, ...value, fontSize: selectedFontSize } }),
+      saveCaption({ data: { videoId, ...value, fontSize } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] });
       toast.success("Legenda salva.");
@@ -466,7 +468,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
       </div>
       <div className="sm:col-span-2 flex flex-wrap items-center gap-3">
         <label className="text-xs font-semibold" htmlFor={`short-caption-size-${videoId}`}>Tamanho da legenda no vídeo</label>
-        <select id={`short-caption-size-${videoId}`} className={field + " w-36"} value={selectedFontSize} onChange={(event) => setFontSize(Number(event.target.value) as 16 | 20 | 24)}>
+        <select id={`short-caption-size-${videoId}`} className={field + " w-36"} value={fontSize} onChange={(event) => setFontSize(Number(event.target.value) as 16 | 20 | 24)}>
           <option value={16}>Pequeno · 16 px</option>
           <option value={20}>Médio · 20 px</option>
           <option value={24}>Grande · 24 px</option>
