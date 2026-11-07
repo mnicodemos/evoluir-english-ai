@@ -2,7 +2,8 @@ import type { PremiumVideoRow } from "@/lib/premiumVideos";
 
 type Result<T> = Promise<{ data: T | null; error: { message: string; code?: string } | null }>;
 
-export const PREMIUM_VIDEO_COLUMNS = "id, level, title, video_url, created_at";\nconst PREMIUM_VIDEO_COLUMNS_WITH_ORDER = `${PREMIUM_VIDEO_COLUMNS}, sort_order`;
+export const PREMIUM_VIDEO_COLUMNS = "id, level, title, video_url, created_at";
+const PREMIUM_VIDEO_COLUMNS_WITH_ORDER = `${PREMIUM_VIDEO_COLUMNS}, sort_order`;
 const PREMIUM_VIDEO_COLUMNS_WITH_KIND = `${PREMIUM_VIDEO_COLUMNS}, kind`;
 
 /** The premium_level_videos table (migration 0101), not in the generated types yet. */
