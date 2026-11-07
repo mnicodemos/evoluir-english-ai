@@ -292,7 +292,7 @@ function ShortSlide({
   const src = reel
     ? reel
     : vimeo
-      ? `${(video.level.toLowerCase() === "a1" || video.level.toLowerCase() === "a2" ? vimeoTextTrackUrl(vimeo, "pt") : cleanVimeoPlayerUrl(vimeo))}&autoplay=1&controls=0&playsinline=1&loop=1`
+      ? `${video.level.toLowerCase() === "a1" || video.level.toLowerCase() === "a2" ? vimeoTextTrackUrl(vimeo, "pt") : cleanVimeoPlayerUrl(vimeo)}&autoplay=1&controls=0&playsinline=1&loop=1`
       : null;
 
   return (
