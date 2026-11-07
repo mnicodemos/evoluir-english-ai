@@ -97,14 +97,17 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         ? 0.03
         : 0.12;
     audio.muted = false;
-    void audio.play().then(() => {
-      musicStartedRef.current = true;
-      if (welcomeStartedRef.current) removeInteractionListenersRef.current?.();
-    }).catch(() => {
-      musicStartedRef.current = false;
-      // A blocked autoplay can be retried from the next user interaction.
-    });
-  }, [musicUrl, muted]);
+    void audio
+      .play()
+      .then(() => {
+        musicStartedRef.current = true;
+        if (welcomeStartedRef.current) removeInteractionListenersRef.current?.();
+      })
+      .catch(() => {
+        musicStartedRef.current = false;
+        // A blocked autoplay can be retried from the next user interaction.
+      });
+  }, [musicUrl, muted, welcomeUrl]);
 
   const startExperienceAudio = useCallback(() => {
     startWelcome();
