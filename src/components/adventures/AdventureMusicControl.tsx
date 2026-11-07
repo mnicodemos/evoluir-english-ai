@@ -300,7 +300,8 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
             : "A welcome from EVO · adventure soundtrack"}
         </span>
       </span>
-      <Button variant="ghost"
+      <Button
+        variant="ghost"
         type="button"
         onClick={toggleMusic}
         disabled={!musicUrl}
