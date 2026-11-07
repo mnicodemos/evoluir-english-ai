@@ -77,6 +77,70 @@ const scenes: Scene[] = [
   },
 ];
 
+
+const portugueseTranslations: Record<string, string> = {
+  "A delivery at the door": "Uma entrega à porta",
+  "EVO is waiting with you for a package. You ordered a portable speaker for the neighbourhood music afternoon. The delivery driver arrives, but the box is wet and one corner is badly damaged. “Here you are,” he says. What do you say?": "EVO está esperando com você por uma encomenda. Você pediu uma caixa de som portátil para a tarde musical do bairro. O entregador chega, mas a caixa está molhada e um dos cantos está bastante danificado. “Aqui está”, ele diz. O que você responde?",
+  "“I'm afraid the package is damaged. Could you take a look?”": "“Receio que a encomenda esteja danificada. Você poderia dar uma olhada?”",
+  "“This is not what I ordered!”": "“Não foi isso que eu pedi!”",
+  "“I'll accept it and contact the shop later.”": "“Vou aceitar e entrar em contato com a loja depois.”",
+  "The driver checks the box with you. “You're right. I can make a note of the damage before you accept it.”": "O entregador verifica a caixa com você. “Você tem razão. Posso registrar o dano antes de você aceitar a encomenda.”",
+  "The driver understands that you're unhappy, but he cannot see what is wrong yet. He asks you to explain.": "O entregador percebe que você está insatisfeito, mas ainda não consegue identificar o problema. Ele pede que você explique.",
+  "The driver leaves. You take a photo of the wet box before opening it, just in case you need to report the damage.": "O entregador vai embora. Você tira uma foto da caixa molhada antes de abri-la, caso precise comunicar o dano.",
+  "“I'm afraid…” softens a problem. “Could you…?” makes a polite request.": "“I'm afraid…” suaviza a maneira de apresentar um problema. “Could you…?” é uma forma educada de fazer um pedido.",
+  "Your message is understandable. Add a specific detail so the other person knows what happened.": "Sua mensagem é compreensível. Acrescente um detalhe específico para que a outra pessoa saiba o que aconteceu.",
+  "You chose to collect evidence first. A photo and the order details can help when you contact the shop.": "Você escolheu reunir provas primeiro. Uma foto e os dados do pedido podem ajudar quando entrar em contato com a loja.",
+  "There isn't just one way to handle a problem. Your choice changes how the conversation begins.": "Não existe apenas uma maneira de resolver um problema. Sua escolha muda a forma como a conversa começa.",
+  "What happened inside?": "O que aconteceu dentro da embalagem?",
+  "You open the package. The speaker turns on, but the sound is distorted and the charging cable is missing. EVO asks: “How shall we explain the problem to customer support?”": "Você abre a embalagem. A caixa de som liga, mas o som está distorcido e o cabo de carregamento está faltando. EVO pergunta: “Como devemos explicar o problema ao atendimento ao cliente?”",
+  "“The speaker doesn't work properly, and the cable is missing.”": "“A caixa de som não funciona direito e o cabo está faltando.”",
+  "“The speaker was perfect and everything is here.”": "“A caixa de som estava perfeita e está tudo aqui.”",
+  "“I received it yesterday, but I haven't tested it until now.”": "“Recebi ontem, mas só testei agora.”",
+  "EVO nods. “That's clear. You described two separate problems.”": "EVO concorda. “Está claro. Você descreveu dois problemas diferentes.”",
+  "The support agent would think there is no problem. You decide to check the package again and explain honestly what you found.": "O atendente pensaria que não há nenhum problema. Você decide verificar a embalagem novamente e explicar com sinceridade o que encontrou.",
+  "The agent understands when you received the package and when you tested it. They ask what happened during the test.": "O atendente entende quando você recebeu a encomenda e quando a testou. Ele pergunta o que aconteceu durante o teste.",
+  "Use the present simple with “doesn't” to describe how a product works. “Is missing” describes something that isn't there.": "Use o presente simples com “doesn't” para descrever como um produto funciona. “Is missing” descreve algo que está faltando.",
+  "Be accurate when describing a problem. Say what works and what doesn't.": "Seja preciso ao descrever um problema. Diga o que funciona e o que não funciona.",
+  "“I received” tells when it arrived. “I haven't tested” connects the past with the situation now.": "“I received” informa quando chegou. “I haven't tested” conecta o passado à situação atual.",
+  "Useful detail makes a complaint easier to understand: say what is wrong, what is missing and when you noticed it.": "Detalhes úteis tornam uma reclamação mais fácil de entender: diga o que está errado, o que está faltando e quando você percebeu.",
+  "A message to the shop": "Uma mensagem para a loja",
+  "The shop replies: “We're sorry about that. Could you send us the order number and tell us what you would prefer?” You and EVO look at the options.": "A loja responde: “Sentimos muito por isso. Você poderia nos enviar o número do pedido e dizer qual seria sua preferência?” Você e EVO analisam as opções.",
+  "“I'd prefer a replacement, please. I still need the speaker.”": "“Eu preferiria uma substituição, por favor. Ainda preciso da caixa de som.”",
+  "“A refund would be better for me, please.”": "“Um reembolso seria melhor para mim, por favor.”",
+  "“Could you tell me what my options are?”": "“Você poderia me dizer quais são as minhas opções?”",
+  "The agent checks the stock and says a new speaker is available. They explain that it can be sent tomorrow.": "O atendente verifica o estoque e diz que há uma nova caixa de som disponível. Ele explica que ela pode ser enviada amanhã.",
+  "The agent explains the refund process and asks you to confirm the payment method.": "O atendente explica o processo de reembolso e pede que você confirme a forma de pagamento.",
+  "The agent explains the replacement and refund options, including how long each one takes.": "O atendente explica as opções de substituição e reembolso, incluindo quanto tempo cada uma leva.",
+  "“I'd prefer…” is a natural way to say which option you want. “I still need…” explains why.": "“I'd prefer…” é uma forma natural de dizer qual opção você deseja. “I still need…” explica o motivo.",
+  "“Would be better for me” is a polite way to express a preference.": "“Would be better for me” é uma forma educada de expressar uma preferência.",
+  "When you need more information, “Could you tell me…?” keeps the conversation polite.": "Quando precisar de mais informações, “Could you tell me…?” mantém a conversa educada.",
+  "You can ask for what you need, choose an option or request more information. Each is a useful real-life strategy.": "Você pode pedir o que precisa, escolher uma opção ou solicitar mais informações. Todas são estratégias úteis para situações reais.",
+  "A small complication": "Uma pequena complicação",
+  "There is one more detail. The music afternoon is on Saturday, and today is Thursday. The shop says a replacement usually takes two to four working days. What would you like to ask?": "Há mais um detalhe. A tarde musical será no sábado e hoje é quinta-feira. A loja informa que uma substituição normalmente leva de dois a quatro dias úteis. O que você gostaria de perguntar?",
+  "“Is there any chance it could arrive by Saturday?”": "“Existe alguma possibilidade de chegar até sábado?”",
+  "“Could you confirm the delivery date before I decide?”": "“Você poderia confirmar a data de entrega antes de eu decidir?”",
+  "“That's fine. I can wait a few more days.”": "“Tudo bem. Posso esperar mais alguns dias.”",
+  "The agent checks express delivery. “We can try, but I can't promise it.”": "O atendente verifica a opção de entrega expressa. “Podemos tentar, mas não posso garantir.”",
+  "The agent checks the delivery options and gives you a clearer estimate before you make your decision.": "O atendente verifica as opções de entrega e fornece uma previsão mais clara antes de você tomar sua decisão.",
+  "The agent appreciates your flexibility and confirms the standard delivery window.": "O atendente agradece sua flexibilidade e confirma o prazo normal de entrega.",
+  "“Is there any chance…?” is a tactful way to ask about a possibility.": "“Is there any chance…?” é uma maneira cuidadosa de perguntar sobre uma possibilidade.",
+  "“Could you confirm…?” asks for specific information before you choose.": "“Could you confirm…?” solicita uma informação específica antes de você escolher.",
+  "“I can wait” communicates that the proposed time is acceptable.": "“I can wait” comunica que o prazo proposto é aceitável.",
+  "A good conversation includes checking dates and expectations, not only choosing a product.": "Uma boa conversa inclui confirmar datas e expectativas, não apenas escolher um produto.",
+  "The final confirmation": "A confirmação final",
+  "The agent is ready to close the request. Before ending the conversation, you want to make sure the next step is clear. What do you say?": "O atendente está pronto para concluir a solicitação. Antes de encerrar a conversa, você quer ter certeza de que a próxima etapa está clara. O que você diz?",
+  "“Thank you. Could you email me the confirmation, please?”": "“Obrigado. Você poderia me enviar a confirmação por e-mail, por favor?”",
+  "“So, what happens next?”": "“Então, o que acontece agora?”",
+  "“Thanks for your help. Have a good day!”": "“Obrigado pela ajuda. Tenha um bom dia!”",
+  "“Of course. You'll receive an email with the details shortly,” the agent replies.": "“Claro. Você receberá um e-mail com os detalhes em breve”, responde o atendente.",
+  "The agent summarises the next step and tells you when to expect an update.": "O atendente resume a próxima etapa e informa quando você pode esperar uma atualização.",
+  "The agent thanks you too. The conversation ends on a friendly note.": "O atendente também agradece. A conversa termina de maneira cordial.",
+  "Ask for written confirmation so you can check the details later.": "Peça uma confirmação por escrito para poder consultar os detalhes depois.",
+  "This is a simple, natural question when you need the next step explained.": "Esta é uma pergunta simples e natural quando você precisa que expliquem a próxima etapa.",
+  "A polite closing helps keep customer conversations positive.": "Um encerramento educado ajuda a manter positivas as conversas com clientes.",
+  "Before you finish, check that you know what will happen next and when.": "Antes de terminar, confirme se você sabe o que acontecerá em seguida e quando."
+};
+
 const outcomeText: Record<string, string> = {
   replacement: "The shop arranged a replacement speaker. You received the confirmation and can follow the delivery.",
   refund: "The shop processed your refund. You have the confirmation and can choose another speaker later.",
@@ -90,6 +154,8 @@ export function A2SurpriseDelivery() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const translated = (text: string) => portugueseTranslations[text];
   const [lastConsequence, setLastConsequence] = useState<Choice["consequence"]>("polite");
   const [completed, setCompleted] = useState(false);
   const [decisions, setDecisions] = useState<string[]>([]);
@@ -105,12 +171,14 @@ export function A2SurpriseDelivery() {
     else {
       setIndex((value) => value + 1);
       setSelected(null);
+      setShowTranslation(false);
     }
   }
 
   function restart() {
     setIndex(0);
     setSelected(null);
+    setShowTranslation(false);
     setLastConsequence("polite");
     setCompleted(false);
     setDecisions([]);
@@ -154,6 +222,10 @@ export function A2SurpriseDelivery() {
               <span className="text-xs text-muted-foreground">{index + 1} / {scenes.length}</span>
             </div>
             <p className="text-base leading-relaxed sm:text-lg" translate="no" lang="en">{scene.story}</p>
+            <button type="button" onClick={() => setShowTranslation((value) => !value)} aria-expanded={showTranslation} className="inline-flex items-center rounded-lg py-1 text-sm font-medium text-brand-green underline-offset-4 hover:underline">
+              {showTranslation ? "Ocultar tradução" : "Ver tradução"}
+            </button>
+            {showTranslation && <p className="rounded-lg bg-secondary/60 p-3 text-sm leading-relaxed text-muted-foreground" lang="pt">{translated(scene.story)}</p>}
             <p className="text-sm font-semibold">{t("What would you say?")}</p>
             <div className="grid gap-2">
               {scene.choices.map((option, optionIndex) => (
@@ -164,17 +236,21 @@ export function A2SurpriseDelivery() {
                   aria-pressed={selected === optionIndex}
                   className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${selected === optionIndex ? "border-brand-green bg-brand-green/10" : "border-border hover:border-brand-green/50 hover:bg-secondary/50"}`}
                 >
-                  <span className="font-medium" translate="no" lang="en">{option.label}</span>
+                  <span className="block font-medium" translate="no" lang="en">{option.label}</span>
+                  {showTranslation && <span className="mt-1 block text-xs text-muted-foreground" lang="pt">{translated(option.label)}</span>}
                 </button>
               ))}
             </div>
             {choice && (
               <div className="rounded-xl bg-brand-green/10 p-3">
                 <p className="text-sm leading-relaxed" translate="no" lang="en">{choice.response}</p>
+                {showTranslation && <p className="mt-1 text-sm text-muted-foreground" lang="pt">{translated(choice.response)}</p>}
                 <p className="mt-2 text-sm text-muted-foreground" translate="no" lang="en">{choice.coaching}</p>
+                {showTranslation && <p className="mt-1 text-sm text-muted-foreground" lang="pt">{translated(choice.coaching)}</p>}
                 <div className="mt-3 flex items-start gap-2 border-t border-brand-green/20 pt-3">
                   <Sparkles className="mt-0.5 size-4 shrink-0 text-brand-green" aria-hidden="true" />
-                  <p className="text-sm text-muted-foreground" translate="no" lang="en">{scene.evo}</p>
+                  <div><p className="text-sm text-muted-foreground" translate="no" lang="en">{scene.evo}</p>
+                  {showTranslation && <p className="mt-1 text-sm text-muted-foreground" lang="pt">{translated(scene.evo)}</p>}</div>
                 </div>
               </div>
             )}
