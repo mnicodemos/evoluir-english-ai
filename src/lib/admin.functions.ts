@@ -1749,31 +1749,131 @@ export const prepareLevelPodcasts = createServerFn({ method: "POST" })
     };
   });
 
-type PremiumShortCaptionRow = { language: "en" | "pt"; vtt_content: string; updated_at: string };
-type PremiumShortCaptionTable = { select: (columns: string) => { eq: (column: string, value: string) => Promise<{ data: PremiumShortCaptionRow[] | null; error: { message: string } | null }> }; upsert: (values: Record<string, unknown>, options: { onConflict: string }) => Promise<{ error: { message: string } | null }>; delete: () => { eq: (column: string, value: string) => { eq: (column: string, value: string) => Promise<{ error: { message: string } | null }> } }; };
-type PremiumShortCaptionClient = { from: (table: string) => PremiumShortCaptionTable };
-export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).inputValidator((data) => z.object({ videoId: z.string().uuid() }).parse(data)).handler(async ({ context, data }) => {
-  if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const table = (supabaseAdmin as unknown as PremiumShortCaptionClient).from("premium_video_captions");
-  const { data: rows, error } = await table.select("language, vtt_content, updated_at").eq("video_id", data.videoId);
-  if (error) { if (/does not exist|relation .* not found/i.test(error.message)) return { missingMigration: true, captions: [] as PremiumShortCaptionRow[] }; throw new Error("Não foi possível carregar as legendas do Short."); }
-  return { missingMigration: false, captions: rows ?? [] };
-});
-export const savePremiumShortCaption = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((data) => z.object({ videoId: z.string().uuid(), language: z.enum(["en", "pt"]), content: z.string().min(20).max(500_000) }).parse(data)).handler(async ({ context, data }) => {
-  if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
-  if (!/^WEBVTT(?:\\s|$)/.test(data.content) || !/(?:^|\\n)(?:\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}\\s+-->\\s+(?:\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}/m.test(data.content)) throw new Error("O conteúdo precisa ser WebVTT válido, com marcações de tempo.");
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const table = (supabaseAdmin as unknown as PremiumShortCaptionClient).from("premium_video_captions");
-  const { error } = await table.upsert({ video_id: data.videoId, language: data.language, vtt_content: data.content, updated_at: new Date().toISOString(), updated_by: context.userId }, { onConflict: "video_id,language" });
-  if (error) throw new Error("Não foi possível salvar. Verifique se a migração 20261107180000 foi aplicada."); return { ok: true };
-});
-export const deletePremiumShortCaption = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((data) => z.object({ videoId: z.string().uuid(), language: z.enum(["en", "pt"]) }).parse(data)).handler(async ({ context, data }) => {
-  if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const table = (supabaseAdmin as unknown as PremiumShortCaptionClient).from("premium_video_captions");
-  const { error } = await table.delete().eq("video_id", data.videoId).eq("language", data.language); if (error) throw new Error("Não foi possível remover a legenda."); return { ok: true };
-});
+type PremiumShortCaptionRow = {
+  language: "en" | "pt";
+  vtt_content: string;
+  updated_at: string;
+};
+type PremiumShortCaptionTable = {
+  select: (columns: string) => {
+    eq: (
+      column: string,
+      value: string,
+    ) => Promise<{
+      data: PremiumShortCaptionRow[] | null;
+      error: { message: string } | null;
+    }>;
+  };
+  upsert: (
+    values: Record<string, unknown>,
+    options: { onConflict: string },
+  ) => Promise<{ error: { message: string } | null }>;
+  delete: () => {
+    eq: (
+      column: string,
+      value: string,
+    ) => {
+      eq: (
+        column: string,
+        value: string,
+      ) => Promise<{ error: { message: string } | null }>;
+    };
+  };
+};
+type PremiumShortCaptionClient = {
+  from: (table: string) => PremiumShortCaptionTable;
+};
+
+/** Admin-managed WebVTT tracks attached to an individual Short. */
+export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ videoId: z.string().uuid() }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const table = (
+      supabaseAdmin as unknown as PremiumShortCaptionClient
+    ).from("premium_video_captions");
+    const { data: rows, error } = await table
+      .select("language, vtt_content, updated_at")
+      .eq("video_id", data.videoId);
+    if (error) {
+      if (/does not exist|relation .* not found/i.test(error.message)) {
+        return { missingMigration: true, captions: [] as PremiumShortCaptionRow[] };
+      }
+      throw new Error("Não foi possível carregar as legendas do Short.");
+    }
+    return { missingMigration: false, captions: rows ?? [] };
+  });
+
+export const savePremiumShortCaption = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        videoId: z.string().uuid(),
+        language: z.enum(["en", "pt"]),
+        content: z.string().min(20).max(500_000),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    if (
+      !/^WEBVTT(?:\\s|$)/.test(data.content) ||
+      !/(?:^|\\n)(?:\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}\\s+-->\\s+(?:\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}/m.test(
+        data.content,
+      )
+    ) {
+      throw new Error("O conteúdo precisa ser WebVTT válido, com marcações de tempo.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const table = (
+      supabaseAdmin as unknown as PremiumShortCaptionClient
+    ).from("premium_video_captions");
+    const { error } = await table.upsert(
+      {
+        video_id: data.videoId,
+        language: data.language,
+        vtt_content: data.content,
+        updated_at: new Date().toISOString(),
+        updated_by: context.userId,
+      },
+      { onConflict: "video_id,language" },
+    );
+    if (error) {
+      throw new Error(
+        "Não foi possível salvar. Verifique se a migração 20261107180000 foi aplicada.",
+      );
+    }
+    return { ok: true };
+  });
+
+export const deletePremiumShortCaption = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ videoId: z.string().uuid(), language: z.enum(["en", "pt"]) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const table = (
+      supabaseAdmin as unknown as PremiumShortCaptionClient
+    ).from("premium_video_captions");
+    const { error } = await table
+      .delete()
+      .eq("video_id", data.videoId)
+      .eq("language", data.language);
+    if (error) throw new Error("Não foi possível remover a legenda.");
+    return { ok: true };
+  });
+
 type LessonVideoCaptionAdminTable = {
   upsert: (
     values: {
