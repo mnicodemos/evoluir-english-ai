@@ -46,7 +46,12 @@ import { useLessonAudioImage } from "@/hooks/useHomeImages";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
-import { cleanVimeoPlayerUrl, lessonVideoEmbedUrl, vimeoVideoId } from "@/lib/lessonVideoDisplay";
+import {
+  cleanVimeoPlayerUrl,
+  lessonVideoEmbedUrl,
+  vimeoTextTrackUrl,
+  vimeoVideoId,
+} from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -569,7 +574,9 @@ function LessonPage() {
                       className="h-full w-full"
                       src={
                         vimeoVideoId(summaryVideoEmbedUrl)
-                          ? cleanVimeoPlayerUrl(summaryVideoEmbedUrl)
+                          ? ["a1", "a2"].includes(lesson.level.toLowerCase())
+                            ? vimeoTextTrackUrl(summaryVideoEmbedUrl, "pt")
+                            : cleanVimeoPlayerUrl(summaryVideoEmbedUrl)
                           : summaryVideoEmbedUrl
                       }
                       title={lesson?.title ?? "Lesson video reinforcement"}
@@ -589,6 +596,13 @@ function LessonPage() {
                     <p className="text-sm text-muted-foreground">
                       Watch the video, then read the guide below and take the quiz.
                     </p>
+                    {lesson.level.toLowerCase() === "b1" ? (
+                      <p className="text-xs text-muted-foreground">
+                        {lang === "pt"
+                          ? "A tradução em português está disponível nas legendas (CC)."
+                          : "Portuguese translation is available in captions (CC)."}
+                      </p>
+                    ) : null}
                   </div>
                 </section>
               ) : null}

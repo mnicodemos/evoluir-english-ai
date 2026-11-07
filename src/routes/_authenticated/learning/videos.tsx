@@ -14,7 +14,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { findLevel, isReviewLevel, LEVELS } from "@/lib/level";
-import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
+import { cleanVimeoPlayerUrl, vimeoEmbedUrl, vimeoTextTrackUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { recordVideoView } from "@/lib/premiumVideoSocial.functions";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
@@ -225,7 +225,11 @@ function ExtraVideosPage() {
                     {premium && embed ? (
                       <iframe
                         className="absolute inset-0 size-full"
-                        src={cleanVimeoPlayerUrl(embed)}
+                        src={
+                          ["a1", "a2"].includes(video.level.toLowerCase())
+                            ? vimeoTextTrackUrl(embed, "pt")
+                            : cleanVimeoPlayerUrl(embed)
+                        }
                         title={video.title}
                         loading="lazy"
                         referrerPolicy="strict-origin-when-cross-origin"

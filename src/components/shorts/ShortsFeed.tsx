@@ -16,7 +16,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
-import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
+import { cleanVimeoPlayerUrl, vimeoEmbedUrl, vimeoTextTrackUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { COMMENT_MAX_LENGTH, DOUBLE_TAP_MS, shortTap } from "@/lib/premiumVideoSocial";
 import {
@@ -292,7 +292,7 @@ function ShortSlide({
   const src = reel
     ? reel
     : vimeo
-      ? `${cleanVimeoPlayerUrl(vimeo)}&autoplay=1&controls=0&playsinline=1&loop=1`
+      ? `${video.level.toLowerCase() === "a1" || video.level.toLowerCase() === "a2" ? vimeoTextTrackUrl(vimeo, "pt") : cleanVimeoPlayerUrl(vimeo)}&autoplay=1&controls=0&playsinline=1&loop=1`
       : null;
 
   return (
