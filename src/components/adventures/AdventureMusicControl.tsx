@@ -67,14 +67,16 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     audio.volume = 1;
     audio.muted = false;
     const playback = audio.play();
-    void playback.then(() => {
-      welcomeStartedRef.current = true;
-      welcomeFinishedRef.current = false;
-      if (musicAudioRef.current && !muted) fadeMusicTo(0.03);
-    }).catch(() => {
-      // Keep the welcome eligible for the next genuine user interaction.
-      welcomeStartedRef.current = false;
-    });
+    void playback
+      .then(() => {
+        welcomeStartedRef.current = true;
+        welcomeFinishedRef.current = false;
+        if (musicAudioRef.current && !muted) fadeMusicTo(0.03);
+      })
+      .catch(() => {
+        // Keep the welcome eligible for the next genuine user interaction.
+        welcomeStartedRef.current = false;
+      });
   }, [fadeMusicTo, muted, welcomeUrl]);
 
   const startMusic = useCallback(() => {
