@@ -1773,10 +1773,7 @@ type PremiumShortCaptionTable = {
       column: string,
       value: string,
     ) => {
-      eq: (
-        column: string,
-        value: string,
-      ) => Promise<{ error: { message: string } | null }>;
+      eq: (column: string, value: string) => Promise<{ error: { message: string } | null }>;
     };
   };
 };
@@ -1793,9 +1790,9 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
       throw new Error("Forbidden");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const table = (
-      supabaseAdmin as unknown as PremiumShortCaptionClient
-    ).from("premium_video_captions");
+    const table = (supabaseAdmin as unknown as PremiumShortCaptionClient).from(
+      "premium_video_captions",
+    );
     const { data: rows, error } = await table
       .select("language, vtt_content, updated_at")
       .eq("video_id", data.videoId);
@@ -1832,9 +1829,9 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
       throw new Error("O conteúdo precisa ser WebVTT válido, com marcações de tempo.");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const table = (
-      supabaseAdmin as unknown as PremiumShortCaptionClient
-    ).from("premium_video_captions");
+    const table = (supabaseAdmin as unknown as PremiumShortCaptionClient).from(
+      "premium_video_captions",
+    );
     const { error } = await table.upsert(
       {
         video_id: data.videoId,
@@ -1863,9 +1860,9 @@ export const deletePremiumShortCaption = createServerFn({ method: "POST" })
       throw new Error("Forbidden");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const table = (
-      supabaseAdmin as unknown as PremiumShortCaptionClient
-    ).from("premium_video_captions");
+    const table = (supabaseAdmin as unknown as PremiumShortCaptionClient).from(
+      "premium_video_captions",
+    );
     const { error } = await table
       .delete()
       .eq("video_id", data.videoId)
