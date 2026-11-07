@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bell, Crown, Loader2, Pencil, Save, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Bell, Crown, Loader2, Pencil, Save, Trash2, Upload } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -421,7 +421,11 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   });
   const [en, setEn] = useState<string | null>(null);
   const [pt, setPt] = useState<string | null>(null);
+  const [fontSize, setFontSize] = useState<16 | 20 | 24>(20);
   const rows = query.data?.captions ?? [];
+  useEffect(() => {
+    if (query.data?.fontSize) setFontSize(query.data.fontSize as 16 | 20 | 24);
+  }, [query.data?.fontSize]);
   const values = {
     en: en ?? rows.find((row) => row.language === "en")?.vtt_content ?? "",
     pt: pt ?? rows.find((row) => row.language === "pt")?.vtt_content ?? "",
@@ -429,7 +433,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const setters = { en: setEn, pt: setPt };
   const save = useMutation({
     mutationFn: (value: { language: "en" | "pt"; content: string }) =>
-      saveCaption({ data: { videoId, ...value } }),
+      saveCaption({ data: { videoId, ...value, fontSize } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] });
       toast.success("Legenda salva.");
@@ -453,7 +457,8 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold">Legendas do Short (WebVTT)</p>
         <p className="text-xs text-muted-foreground">
-          Legendas vinculadas somente a este Short. Cole o conteúdo do arquivo .vtt.
+          Legendas vinculadas somente a este Short. Envie um arquivo .vtt ou edite o conteúdo
+          abaixo.
         </p>
         {query.isPending ? <p className="text-xs text-muted-foreground">Carregando…</p> : null}
         {query.data?.missingMigration ? (
@@ -462,10 +467,58 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
           </p>
         ) : null}
       </div>
+      <div className="sm:col-span-2 flex flex-wrap items-center gap-3">
+        <label className="text-xs font-semibold" htmlFor={`short-caption-size-${videoId}`}>
+          Tamanho da legenda no vídeo
+        </label>
+        <select
+          id={`short-caption-size-${videoId}`}
+          className={field + " w-36"}
+          value={fontSize}
+          onChange={(event) => setFontSize(Number(event.target.value) as 16 | 20 | 24)}
+        >
+          <option value={16}>Pequeno · 16 px</option>
+          <option value={20}>Médio · 20 px</option>
+          <option value={24}>Grande · 24 px</option>
+        </select>
+        <span className="text-xs text-muted-foreground">
+          A escolha é salva junto com a legenda.
+        </span>
+      </div>
       {(["en", "pt"] as const).map((language) => (
         <div key={language} className="min-w-0 space-y-1.5">
           <label className="text-xs font-semibold">
             {language === "en" ? "English" : "Português"}
+          </label>
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium hover:bg-muted">
+            <Upload className="size-3.5" /> Enviar arquivo .vtt
+            <input
+              type="file"
+              accept=".vtt,text/vtt"
+              className="sr-only"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                if (file.size > 500_000) {
+                  toast.error("O arquivo .vtt deve ter até 500 KB.");
+                  event.target.value = "";
+                  return;
+                }
+                const content = await file.text();
+                const hasTiming =
+                  /(?:^|\n)(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}\s+-->\s+(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}/m.test(
+                    content,
+                  );
+                if (!content.startsWith("WEBVTT") || !hasTiming) {
+                  toast.error("Arquivo inválido: selecione um WebVTT com marcações de tempo.");
+                  event.target.value = "";
+                  return;
+                }
+                (language === "en" ? setEn : setPt)(content);
+                toast.success(`Arquivo ${file.name} carregado para prévia.`);
+                event.target.value = "";
+              }}
+            />
           </label>
           <textarea
             className={field + " h-36 w-full min-w-0 py-2 font-mono text-xs"}
