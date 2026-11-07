@@ -1761,7 +1761,10 @@ type LessonVideoCaptionAdminTable = {
     options: { onConflict: string },
   ) => Promise<{ error: { message: string } | null }>;
   delete: () => {
-    eq: (column: string, value: string) => {
+    eq: (
+      column: string,
+      value: string,
+    ) => {
       eq: (column: string, value: string) => Promise<{ error: { message: string } | null }>;
     };
   };
