@@ -23,6 +23,7 @@ import { AdminLessonAudioPrep } from "@/components/AdminLessonAudioPrep";
 import { AdminPremiumVideos } from "@/components/AdminPremiumVideos";
 import { AdminVideoComments } from "@/components/AdminVideoComments";
 import { AdminSummaryVideoManager } from "@/components/AdminSummaryVideoManager";
+import { AdminLessonCaptions } from "@/components/AdminLessonCaptions";
 import { AdminHomeMedia } from "@/components/AdminHomeMedia";
 import { AdminEnglishAdventuresAvatar } from "@/components/AdminEnglishAdventuresAvatar";
 import { AdminMusicLibrary } from "@/components/AdminMusicLibrary";
@@ -245,6 +246,7 @@ function AdminPage() {
                   <AdminPremiumVideos />
                   <AdminVideoComments />
                   <AdminSummaryVideoManager />
+                  <AdminLessonCaptions />
                 </TabsContent>
                 <TabsContent value="home">
                   <AdminHomeMedia />

@@ -1748,3 +1748,128 @@ export const prepareLevelPodcasts = createServerFn({ method: "POST" })
       done: readyCount === lessons.length,
     };
   });
+
+type LessonVideoCaptionAdminTable = {
+  upsert: (
+    values: {
+      curriculum_key: string;
+      language: "en" | "pt";
+      vtt_content: string;
+      updated_at: string;
+      updated_by: string;
+    },
+    options: { onConflict: string },
+  ) => Promise<{ error: { message: string } | null }>;
+  delete: () => {
+    eq: (
+      column: string,
+      value: string,
+    ) => {
+      eq: (column: string, value: string) => Promise<{ error: { message: string } | null }>;
+    };
+  };
+  select: (columns: string) => {
+    eq: (
+      column: string,
+      value: string,
+    ) => Promise<{
+      data: { language: string; updated_at: string }[] | null;
+      error: { message: string } | null;
+    }>;
+  };
+};
+type LessonVideoCaptionAdminClient = {
+  from: (table: string) => LessonVideoCaptionAdminTable;
+};
+
+/** Admin-managed WebVTT tracks for the custom A1–B1 lesson caption player. */
+export const saveLessonVideoCaption = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        key: z.string().min(3).max(40),
+        language: z.enum(["en", "pt"]),
+        content: z.string().min(20).max(500_000),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    if (!/^WEBVTT(?:\s|$)/.test(data.content)) {
+      throw new Error("O arquivo precisa estar no formato WebVTT (.vtt).");
+    }
+    const hasTimestamp =
+      /(?:^|\n)(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}\s+-->\s+(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}/m.test(
+        data.content,
+      );
+    if (!hasTimestamp) {
+      throw new Error("O arquivo VTT não contém marcações de tempo válidas.");
+    }
+    const { findCurriculumLesson } = await import("@/lib/curriculum");
+    if (!findCurriculumLesson(data.key)) throw new Error("Unknown lesson");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const table = (supabaseAdmin as unknown as LessonVideoCaptionAdminClient).from(
+      "lesson_video_captions",
+    );
+    const { error } = await table.upsert(
+      {
+        curriculum_key: data.key,
+        language: data.language,
+        vtt_content: data.content,
+        updated_at: new Date().toISOString(),
+        updated_by: context.userId,
+      },
+      { onConflict: "curriculum_key,language" },
+    );
+    if (error) {
+      throw new Error(
+        "Não foi possível salvar a legenda. Verifique se a migração 20261107170000 foi aplicada.",
+      );
+    }
+    return { ok: true };
+  });
+
+export const deleteLessonVideoCaption = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ key: z.string().min(3).max(40), language: z.enum(["en", "pt"]) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const table = (supabaseAdmin as unknown as LessonVideoCaptionAdminClient).from(
+      "lesson_video_captions",
+    );
+    const { error } = await table
+      .delete()
+      .eq("curriculum_key", data.key)
+      .eq("language", data.language);
+    if (error) throw new Error("Não foi possível remover a legenda.");
+    return { ok: true };
+  });
+
+export const getLessonVideoCaptionAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ key: z.string().min(3).max(40) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const table = (supabaseAdmin as unknown as LessonVideoCaptionAdminClient).from(
+      "lesson_video_captions",
+    );
+    const { data: rows, error } = await table
+      .select("language, updated_at")
+      .eq("curriculum_key", data.key);
+    if (error) return { missingMigration: true, languages: [] as string[] };
+    return {
+      missingMigration: false,
+      languages: (rows ?? []).map((row) => row.language),
+    };
+  });
