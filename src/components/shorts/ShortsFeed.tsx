@@ -38,8 +38,6 @@ type VimeoCaptionPlayer = {
   ready(): Promise<void>;
   disableTextTrack(): Promise<void>;
   getCurrentTime(): Promise<number>;
-  on(event: "cuechange", callback: (data: { cues?: VimeoCaptionCue[] }) => void): void;
-  off(event: "cuechange", callback: (data: { cues?: VimeoCaptionCue[] }) => void): void;
 };
 type VimeoCaptionSdk = { Player: new (iframe: HTMLIFrameElement) => VimeoCaptionPlayer };
 
