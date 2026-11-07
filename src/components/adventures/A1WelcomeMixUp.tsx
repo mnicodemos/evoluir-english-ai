@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdventureJourneyMap";
 import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
+import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdventureJourneyMap";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
