@@ -72,14 +72,26 @@ export function DashboardHeaderStat({
     if (!labelElement || !availableSpace) return;
 
     const fitLabel = () => {
-      // Measure against the actual card column, not the viewport width.
-      labelElement.style.fontSize = "10.5px";
+      // Measure the uncompressed, uppercase text independently of the clipped
+      // label element. scrollWidth is affected by its own constrained layout.
       const availableWidth = availableSpace.clientWidth;
-      const naturalWidth = labelElement.scrollWidth;
-      if (!availableWidth || !naturalWidth) return;
+      if (!availableWidth) return;
+
+      const styles = window.getComputedStyle(labelElement);
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      const baseFontSize = 10.5;
+      context.font = `${styles.fontWeight} ${baseFontSize}px ${styles.fontFamily}`;
+      const text = labelElement.textContent?.toLocaleUpperCase() ?? "";
+      const letterSpacing = Number.parseFloat(styles.letterSpacing) || 0;
+      const naturalWidth =
+        context.measureText(text).width + Math.max(0, text.length - 1) * letterSpacing;
+      if (!naturalWidth) return;
 
       const scale = Math.min(1, availableWidth / naturalWidth);
-      labelElement.style.fontSize = `${Math.max(6, 10.5 * scale)}px`;
+      labelElement.style.fontSize = `${Math.max(5, baseFontSize * scale)}px`;
     };
 
     const observer = new ResizeObserver(fitLabel);
