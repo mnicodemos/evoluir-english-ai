@@ -1824,8 +1824,8 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
       throw new Error("Forbidden");
     }
     if (
-      !/^WEBVTT(?:\\s|$)/.test(data.content) ||
-      !/(?:^|\\n)(?:\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}\\s+-->\\s+(?:\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}/m.test(
+      !/^WEBVTT(?:\s|$)/.test(data.content) ||
+      !/(?:^|\n)(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}\s+-->\s+(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}/m.test(
         data.content,
       )
     ) {
