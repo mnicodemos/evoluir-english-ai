@@ -166,12 +166,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       className="flex h-11 w-full min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-2.5 pr-2 shadow-sm transition-colors hover:bg-white/[0.06] sm:w-[min(24rem,100%)]"
     >
       {query.data?.url || welcomeQuery.data?.url ? (
-        <audio
-          ref={audioRef}
-          src={query.data?.url ?? welcomeQuery.data?.url}
-          loop
-          preload="none"
-        />
+        <audio ref={audioRef} src={query.data?.url ?? welcomeQuery.data?.url} loop preload="none" />
       ) : null}
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
         <Music2 className="size-4" aria-hidden="true" />
@@ -196,9 +191,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         type="button"
         onClick={toggleMusic}
         disabled={!query.data?.url}
-        aria-label={
-          muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")
-        }
+        aria-label={muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")}
         aria-pressed={!muted}
         title={muted ? t("Play soundtrack") : t("Mute soundtrack")}
         className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
