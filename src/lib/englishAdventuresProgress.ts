@@ -7,7 +7,7 @@ export function completedAdventureIds(ids: string[], adventureId: string): strin
 }
 
 export function englishAdventureProgress(ids: string[]) {
-  const completed = Math.min(new Set(ids).size, ENGLISH_ADVENTURES_TOTAL);
+  const completed = Math.min(new Set(ids).size, ENGLISH_ADVENTURES_TOTAL / 10) * 10;
   return {
     completed,
     total: ENGLISH_ADVENTURES_TOTAL,
