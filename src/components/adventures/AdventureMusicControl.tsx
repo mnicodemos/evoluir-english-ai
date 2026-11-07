@@ -46,7 +46,13 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     const audio = audioRef.current;
     const musicUrl = query.data?.url;
     const welcomeUrl = welcomeQuery.data?.url;
-    if (!audio || !musicUrl || !welcomeUrl || !preferenceLoaded || autoWelcomeAttemptedRef.current) return;
+    if (
+      !audio ||
+      !musicUrl ||
+      !welcomeUrl ||
+      !preferenceLoaded ||
+      autoWelcomeAttemptedRef.current
+    ) return;
 
     autoWelcomeAttemptedRef.current = true;
     if (muted) return;
@@ -180,7 +186,9 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       {showHint ? (
         <span className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 text-center text-[11px] leading-tight text-cyan-300 sm:max-w-40">
           <Music2 className="size-3 shrink-0" aria-hidden="true" />
-          {lang === "pt" ? "Se o áudio não começar, toque em Meet EVO." : "If audio does not start, tap Meet EVO."}
+          {lang === "pt"
+            ? "Se o áudio não começar, toque em Meet EVO."
+            : "If audio does not start, tap Meet EVO."}
         </span>
       ) : null}
       <button
