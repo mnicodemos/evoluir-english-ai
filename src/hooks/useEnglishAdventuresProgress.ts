@@ -22,30 +22,41 @@ export function useEnglishAdventuresProgress() {
       setSeconds(0);
       return;
     }
+
     const sync = () => {
       setIds(readCompletedActivities(userId));
       setSeconds(readStudySeconds(userId));
     };
+
     sync();
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
   }, [userId]);
 
-  const markCompleted = useCallback((adventureId: string) => {
-    if (!userId) return;
-    saveCompletedAdventure(userId, adventureId);
-    setIds(readCompletedActivities(userId));
-  }, [userId]);
+  const markCompleted = useCallback(
+    (adventureId: string) => {
+      if (!userId) return;
+      saveCompletedAdventure(userId, adventureId);
+      setIds(readCompletedActivities(userId));
+    },
+    [userId],
+  );
 
-  const markActivityCompleted = useCallback((activityId: string) => {
-    if (!userId) return;
-    setIds(markActivityComplete(userId, activityId));
-  }, [userId]);
+  const markActivityCompleted = useCallback(
+    (activityId: string) => {
+      if (!userId) return;
+      setIds(markActivityComplete(userId, activityId));
+    },
+    [userId],
+  );
 
-  const recordStudySeconds = useCallback((elapsed: number) => {
-    if (!userId || elapsed <= 0) return;
-    setSeconds(addStudySeconds(userId, elapsed));
-  }, [userId]);
+  const recordStudySeconds = useCallback(
+    (elapsed: number) => {
+      if (!userId || elapsed <= 0) return;
+      setSeconds(addStudySeconds(userId, elapsed));
+    },
+    [userId],
+  );
 
   return {
     ...englishAdventureProgress(ids, seconds),
@@ -57,8 +68,10 @@ export function useEnglishAdventuresProgress() {
 
 export function useAdventureActivityTimer(activityId: string | null) {
   const { recordStudySeconds } = useEnglishAdventuresProgress();
+
   useEffect(() => {
     if (!activityId) return;
+
     let last = Date.now();
     const timer = window.setInterval(() => {
       const now = Date.now();
@@ -67,6 +80,7 @@ export function useAdventureActivityTimer(activityId: string | null) {
       }
       last = now;
     }, 15000);
+
     return () => {
       window.clearInterval(timer);
       if (document.visibilityState === "visible") {
