@@ -114,10 +114,6 @@ describe("video kinds", () => {
       true,
     );
 
-    expect(shortsNewestFirst(list).map((video) => video.id)).toEqual([
-      "newest",
-      "middle",
-      "older",
-    ]);
+    expect(shortsNewestFirst(list).map((video) => video.id)).toEqual(["newest", "middle", "older"]);
   });
 });
