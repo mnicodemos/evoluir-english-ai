@@ -38,6 +38,37 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     }
   }, []);
 
+  function startSoundtrackAfterWelcome(audio: HTMLAudioElement) {
+    const musicUrl = query.data?.url;
+    if (!musicUrl) return;
+
+    try {
+      if (window.localStorage.getItem("adventures-music-muted") === "true") {
+        setMuted(true);
+        audio.muted = true;
+        return;
+      }
+    } catch {
+      // Continue with playback when storage is unavailable.
+    }
+
+    audio.src = musicUrl;
+    audio.currentTime = 0;
+    audio.volume = 0.12;
+    audio.muted = false;
+    audio.loop = true;
+    void audio
+      .play()
+      .then(() => {
+        setMuted(false);
+      })
+      .catch(() => {
+        audio.pause();
+        audio.muted = true;
+        setMuted(true);
+      });
+  }
+
   useEffect(() => {
     const welcomeUrl = welcomeQuery.data?.url;
     if (!welcomeUrl || autoWelcomeAttemptedRef.current) return;
@@ -64,10 +95,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
           audio.onended = () => {
             welcomeSequenceRef.current = false;
             audio.onended = null;
-            if (query.data?.url) {
-              audio.src = query.data.url;
-              audio.loop = true;
-            }
+            startSoundtrackAfterWelcome(audio);
           };
         })
         .catch(() => {
@@ -101,10 +129,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     audio.onended = () => {
       welcomeSequenceRef.current = false;
       audio.onended = null;
-      if (query.data?.url) {
-        audio.src = query.data.url;
-        audio.loop = true;
-      }
+      startSoundtrackAfterWelcome(audio);
     };
 
     void audio.play().catch(() => {
