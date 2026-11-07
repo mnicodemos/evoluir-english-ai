@@ -45,7 +45,14 @@ export function EnglishAdventuresDashboardCard() {
         to={locked ? "/premium" : "/adventures"}
         className="mt-1 inline-flex min-h-7 items-center justify-end gap-1.5 text-xs font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
       >
-        {locked ? t("See plans") : <><Map className="size-3.5" aria-hidden="true" />{t("Let's explore!")}</>}
+        {locked ? (
+          t("See plans")
+        ) : (
+          <>
+            <Map className="size-3.5" aria-hidden="true" />
+            {t("Let's explore!")}
+          </>
+        )}
         <ArrowRight className="size-3.5" aria-hidden="true" />
       </Link>
     </section>
