@@ -1456,6 +1456,7 @@ export type Database = {
           id: string
           kind: string
           level: string
+          sort_order: number
           title: string
           updated_by: string | null
           video_url: string
@@ -1465,6 +1466,7 @@ export type Database = {
           id?: string
           kind?: string
           level: string
+          sort_order?: number
           title: string
           updated_by?: string | null
           video_url: string
@@ -1474,6 +1476,7 @@ export type Database = {
           id?: string
           kind?: string
           level?: string
+          sort_order?: number
           title?: string
           updated_by?: string | null
           video_url?: string
