@@ -27,6 +27,7 @@ export type PremiumVideo = {
   level: PremiumVideoLevel;
   title: string;
   kind: PremiumVideoKind;
+  createdAt: string;
   /** Null for a free student: the link is handed out only to Premium. */
   url: string | null;
   sortOrder: number;
@@ -51,9 +52,15 @@ export function premiumVideoList(rows: PremiumVideoRow[], withLinks: boolean): P
       level: row.level as PremiumVideoLevel,
       title: row.title,
       kind: row.kind === "short" ? "short" : "video",
+      createdAt: row.created_at,
       url: withLinks ? row.video_url : null,
       sortOrder: row.sort_order ?? 0,
     }));
+}
+
+/** Every level's Shorts grid and feed show the most recently published first. */
+export function shortsNewestFirst(videos: PremiumVideo[]): PremiumVideo[] {
+  return [...videos].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 const REEL_PATH = /^\/(?:[A-Za-z0-9_.]+\/)?(?:reels?|p)\/([A-Za-z0-9_-]{5,40})\/?/;
