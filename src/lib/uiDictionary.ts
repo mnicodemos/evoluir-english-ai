@@ -2765,12 +2765,15 @@ const baseUiPt: Record<string, string> = {
   "Open recommended practice": "Abrir prática recomendada",
 
   "The Surprise Delivery": "A entrega surpresa",
-  "An adventure about deliveries, problems and finding a solution.": "Uma aventura sobre entregas, problemas e como encontrar uma solução.",
-  "An adventure to practise describing problems, making polite requests and choosing solutions.": "Uma aventura para praticar como descrever problemas, fazer pedidos educados e escolher soluções.",
+  "An adventure about deliveries, problems and finding a solution.":
+    "Uma aventura sobre entregas, problemas e como encontrar uma solução.",
+  "An adventure to practise describing problems, making polite requests and choosing solutions.":
+    "Uma aventura para praticar como descrever problemas, fazer pedidos educados e escolher soluções.",
   "What would you say?": "O que você diria?",
-  "You practised describing a problem, making polite requests, comparing options and confirming next steps.": "Você praticou como descrever um problema, fazer pedidos educados, comparar opções e confirmar os próximos passos.",
-  "Your choices shaped the conversation. There is more than one way to find a good solution.": "Suas escolhas moldaram a conversa. Existe mais de uma maneira de encontrar uma boa solução.",
-
+  "You practised describing a problem, making polite requests, comparing options and confirming next steps.":
+    "Você praticou como descrever um problema, fazer pedidos educados, comparar opções e confirmar os próximos passos.",
+  "Your choices shaped the conversation. There is more than one way to find a good solution.":
+    "Suas escolhas moldaram a conversa. Existe mais de uma maneira de encontrar uma boa solução.",
 };
 
 // The app guide's lines live in their own file; the app's own terms win on a clash.
