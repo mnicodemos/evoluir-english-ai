@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
-import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import { useAdventureActivityTimer, useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -141,13 +141,15 @@ export function A2CommunityFestival() {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
-  const { markCompleted } = useEnglishAdventuresProgress();
+  const { markCompleted, markActivityCompleted } = useEnglishAdventuresProgress();
+  useAdventureActivityTimer(completed ? null : "a2-community-festival:" + index);
   const completed = index >= activities.length;
   const activity = activities[Math.min(index, activities.length - 1)];
   if (!activity) return null;
 
   function continueStory() {
     if (selected === null) return;
+    markActivityCompleted("a2-community-festival:" + index);
     if (index === activities.length - 1) {
       markCompleted("a2-community-festival");
       setIndex(activities.length);

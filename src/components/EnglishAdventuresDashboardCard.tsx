@@ -60,6 +60,9 @@ export function EnglishAdventuresDashboardCard() {
         >
           {progress.percent}%
         </span>
+        <span className="shrink-0 text-[10px] text-muted-foreground" title={t("Study time")}>
+          {progress.minutes} {t("min")}
+        </span>
         <Link
           to={locked ? "/premium" : "/adventures"}
           {...(!locked && level === "a2" ? { search: { story: "a2-1" } } : {})}
