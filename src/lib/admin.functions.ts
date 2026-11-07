@@ -1535,6 +1535,33 @@ export const notifyPremiumShort = createServerFn({ method: "POST" })
     return notifyNewShort(video.level, video.title);
   });
 
+export const updatePremiumVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({
+      id: z.string().uuid(),
+      level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]),
+      url: z.string().trim().min(10).max(300),
+      title: z.string().trim().min(1).max(120),
+      kind: z.enum(["video", "short"]),
+      sortOrder: z.number().int().min(1).max(9999),
+    }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
+    const { canonicalReelUrl } = await import("@/lib/premiumVideos");
+    const url = canonicalVimeoUrl(data.url) ?? (data.kind === "short" ? canonicalReelUrl(data.url) : null);
+    if (!url) throw new Error("Link inválido para o tipo de conteúdo selecionado.");
+    const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
+    const { error } = await (await premiumVideoTable()).update({
+      level: data.level, title: data.title.trim(), video_url: url, kind: data.kind,
+      sort_order: data.sortOrder, updated_by: context.userId,
+    }).eq("id", data.id);
+    if (error) throw new Error("Não foi possível atualizar o vídeo. Confira se a migração 0105 foi aplicada.");
+    return { ok: true };
+  });
+
 export const deletePremiumVideo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
