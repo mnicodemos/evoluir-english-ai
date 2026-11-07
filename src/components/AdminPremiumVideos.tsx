@@ -467,13 +467,25 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
         ) : null}
       </div>
       <div className="sm:col-span-2 flex flex-wrap items-center gap-3">
-        <label className="text-xs font-semibold" htmlFor={`short-caption-size-${videoId}`}>Tamanho da legenda no vídeo</label>
-        <select id={`short-caption-size-${videoId}`} className={field + " w-36"} value={fontSize} onChange={(event) => setFontSize(Number(event.target.value) as 16 | 20 | 24)}>
+        <label
+          className="text-xs font-semibold"
+          htmlFor={`short-caption-size-${videoId}`}
+        >
+          Tamanho da legenda no vídeo
+        </label>
+        <select
+          id={`short-caption-size-${videoId}`}
+          className={field + " w-36"}
+          value={fontSize}
+          onChange={(event) => setFontSize(Number(event.target.value) as 16 | 20 | 24)}
+        >
           <option value={16}>Pequeno · 16 px</option>
           <option value={20}>Médio · 20 px</option>
           <option value={24}>Grande · 24 px</option>
         </select>
-        <span className="text-xs text-muted-foreground">A escolha é salva junto com a legenda.</span>
+        <span className="text-xs text-muted-foreground">
+          A escolha é salva junto com a legenda.
+        </span>
       </div>
       {(["en", "pt"] as const).map((language) => (
         <div key={language} className="min-w-0 space-y-1.5">
@@ -482,25 +494,33 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
           </label>
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium hover:bg-muted">
             <Upload className="size-3.5" /> Enviar arquivo .vtt
-            <input type="file" accept=".vtt,text/vtt" className="sr-only" onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              if (file.size > 500_000) {
-                toast.error("O arquivo .vtt deve ter até 500 KB.");
+            <input
+              type="file"
+              accept=".vtt,text/vtt"
+              className="sr-only"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                if (file.size > 500_000) {
+                  toast.error("O arquivo .vtt deve ter até 500 KB.");
+                  event.target.value = "";
+                  return;
+                }
+                const content = await file.text();
+                const hasTiming =
+                  /(?:^|\n)(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}\s+-->\s+(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}/m.test(
+                    content,
+                  );
+                if (!content.startsWith("WEBVTT") || !hasTiming) {
+                  toast.error("Arquivo inválido: selecione um WebVTT com marcações de tempo.");
+                  event.target.value = "";
+                  return;
+                }
+                (language === "en" ? setEn : setPt)(content);
+                toast.success(`Arquivo ${file.name} carregado para prévia.`);
                 event.target.value = "";
-                return;
-              }
-              const content = await file.text();
-              const hasTiming = /(?:^|\\n)(?:\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}\\s+-->\\s+(?:\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}/m.test(content);
-              if (!content.startsWith("WEBVTT") || !hasTiming) {
-                toast.error("Arquivo inválido: selecione um WebVTT com marcações de tempo.");
-                event.target.value = "";
-                return;
-              }
-              (language === "en" ? setEn : setPt)(content);
-              toast.success(`Arquivo ${file.name} carregado para prévia.`);
-              event.target.value = "";
-            }} />
+              }}
+            />
           </label>
           <textarea
             className={field + " h-36 w-full min-w-0 py-2 font-mono text-xs"}
