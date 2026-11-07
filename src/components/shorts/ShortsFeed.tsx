@@ -339,17 +339,14 @@ function ShortSlide({
           tracks.find((item) => item.language.toLowerCase().startsWith(preferredLanguage)) ??
           tracks[0];
         if (!track) {
-                return;
+          return;
         }
         await player.enableTextTrack(track.language, track.kind, false);
         if (!cancelled) {
           setCaptionsEnabled(true);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-        }
-      });
+      .catch(() => undefined);
     return () => {
       cancelled = true;
       if (player) {
