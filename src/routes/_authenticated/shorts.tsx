@@ -61,7 +61,8 @@ function ShortsPage() {
     queryFn: () => fetchVideos(),
   });
   const shorts = useMemo(
-    () => (query.data?.videos ?? []).filter((video) => video.kind === "short"),
+    () =>
+      shortsNewestFirst((query.data?.videos ?? []).filter((video) => video.kind === "short")),
     [query.data?.videos],
   );
   const premium = query.data?.premium ?? false;

@@ -82,4 +82,42 @@ describe("video kinds", () => {
     );
     expect(list.map((video) => video.kind)).toEqual(["video", "short"]);
   });
+
+  it("shows each level's Shorts from newest to oldest", () => {
+    const list = premiumVideoList(
+      [
+        {
+          id: "older",
+          level: "a1",
+          title: "Older",
+          video_url: "https://vimeo.com/1",
+          created_at: "2026-11-01T10:00:00Z",
+          kind: "short",
+        },
+        {
+          id: "newest",
+          level: "a1",
+          title: "Newest",
+          video_url: "https://vimeo.com/2",
+          created_at: "2026-11-07T10:00:00Z",
+          kind: "short",
+        },
+        {
+          id: "middle",
+          level: "a1",
+          title: "Middle",
+          video_url: "https://vimeo.com/3",
+          created_at: "2026-11-04T10:00:00Z",
+          kind: "short",
+        },
+      ],
+      true,
+    );
+
+    expect(shortsNewestFirst(list).map((video) => video.id)).toEqual([
+      "newest",
+      "middle",
+      "older",
+    ]);
+  });
 });
