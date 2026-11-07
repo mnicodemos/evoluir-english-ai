@@ -33,13 +33,9 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
-type VimeoCaptionTrack = { language: string; kind: string };
-type VimeoCaptionCue = { text?: string };
 type VttCue = { start: number; end: number; text: string };
 type VimeoCaptionPlayer = {
   ready(): Promise<void>;
-  getTextTracks(): Promise<VimeoCaptionTrack[]>;
-  enableTextTrack(language: string, kind?: string, showing?: boolean): Promise<unknown>;
   disableTextTrack(): Promise<void>;
   getCurrentTime(): Promise<number>;
   on(event: "cuechange", callback: (data: { cues?: VimeoCaptionCue[] }) => void): void;
@@ -317,7 +313,8 @@ function ShortSlide({
       "https://player.vimeo.com",
     );
 
-  // Use Vimeo text-track cues as data and render them with the app's fixed CC style.
+  // Vimeo's native caption tracks are always disabled. Only the WebVTT
+  // saved in Evoluir+ is parsed and synchronized against the Vimeo playhead.
   useEffect(() => {
     if (!active || !vimeo || !frame.current) {
       setCaptionText("");
@@ -334,17 +331,9 @@ function ShortSlide({
         const seconds = await player.getCurrentTime();
         const cue = customCues.find((item) => seconds >= item.start && seconds < item.end);
         setCaptionText(cue?.text ?? "");
-        setCaptionsEnabled(true);
       } catch {
         /* player may be transitioning */
       }
-    };
-    const onCueChange = (data: { cues?: VimeoCaptionCue[] }) => {
-      const next = (data.cues ?? [])
-        .map((cue) => (cue.text ?? "").replace(/<[^>]*>/g, "").trim())
-        .filter(Boolean)
-        .join("\n");
-      setCaptionText(next);
     };
     setCaptionText("");
     setCaptionsEnabled(false);
@@ -354,37 +343,23 @@ function ShortSlide({
         player = new sdk.Player(frame.current);
         await player.ready();
         if (cancelled || !player) return;
-        if (customCues.length) {
-          timer = window.setInterval(() => {
-            void onTimeUpdate();
-          }, 250);
-          return;
-        }
-        player.on("cuechange", onCueChange);
-        const tracks = await player.getTextTracks();
-        if (cancelled) return;
-        const preferredLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
-        const track =
-          tracks.find((item) => item.language.toLowerCase().startsWith(preferredLanguage)) ??
-          tracks[0];
-        if (!track) {
-          return;
-        }
-        await player.enableTextTrack(track.language, track.kind, false);
-        if (!cancelled) {
-          setCaptionsEnabled(true);
-        }
+        // Explicitly turn off every native Vimeo text track, even when no
+        // Evoluir+ VTT exists. Never fall back to captions hosted by Vimeo.
+        await player.disableTextTrack().catch(() => undefined);
+        if (cancelled || !customCues.length) return;
+        setCaptionsEnabled(true);
+        await onTimeUpdate();
+        timer = window.setInterval(() => {
+          void onTimeUpdate();
+        }, 250);
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
       if (timer !== null) window.clearInterval(timer);
-      if (player) {
-        player.off("cuechange", onCueChange);
-        void player.disableTextTrack().catch(() => undefined);
-      }
+      if (player) void player.disableTextTrack().catch(() => undefined);
     };
-  }, [active, vimeo, video.level, captionQuery.data?.content]);
+  }, [active, vimeo, captionQuery.data?.content]);
 
   // One tap pauses or plays; a double tap likes (and never unlikes), like Instagram.
   const onTap = () => {
