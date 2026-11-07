@@ -622,3 +622,14 @@ export const NEXT_STEP_BENEFIT_TEXT_SHORT: Record<string, string> = {
   speaking: "More fluent, confident speech.",
   pronunciation: "Speak clearly the first time.",
 };
+
+/** Ultra-short localized fallback for narrow layouts; translations live in uiDictionary. */
+export const NEXT_STEP_BENEFIT_TEXT_COMPACT: Record<string, string> = {
+  grammar: "Clear sentences.",
+  vocabulary: "More vocabulary.",
+  reading: "Read with confidence.",
+  listening: "Follow conversations.",
+  writing: "Fix mistakes.",
+  speaking: "Speak fluently.",
+  pronunciation: "Speak clearly.",
+};
