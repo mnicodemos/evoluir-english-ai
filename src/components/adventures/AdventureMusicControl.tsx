@@ -283,13 +283,13 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
         <Music2 className="size-4" aria-hidden="true" />
       </span>
-      <span className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 overflow-hidden py-0.5">
+      <span className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 overflow-hidden">
         <Button
           variant="ghost"
           type="button"
           onClick={playWelcome}
           disabled={!welcomeUrl}
-          className="h-auto min-h-0 w-fit justify-start whitespace-normal p-0 text-left text-xs font-semibold leading-[14px] text-foreground transition-colors hover:bg-transparent hover:text-brand-green disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+          className="h-auto min-h-0 w-fit shrink-0 justify-start whitespace-nowrap p-0 text-left text-xs font-semibold leading-[14px] text-foreground transition-colors hover:bg-transparent hover:text-brand-green disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green sm:h-auto"
           aria-label={t("Meet EVO")}
         >
           {t("Meet EVO")}
