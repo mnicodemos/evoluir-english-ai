@@ -1749,7 +1749,6 @@ export const prepareLevelPodcasts = createServerFn({ method: "POST" })
     };
   });
 
-
 type LessonVideoCaptionAdminTable = {
   upsert: (
     values: {
@@ -1763,10 +1762,7 @@ type LessonVideoCaptionAdminTable = {
   ) => Promise<{ error: { message: string } | null }>;
   delete: () => {
     eq: (column: string, value: string) => {
-      eq: (
-        column: string,
-        value: string,
-      ) => Promise<{ error: { message: string } | null }>;
+      eq: (column: string, value: string) => Promise<{ error: { message: string } | null }>;
     };
   };
   select: (columns: string) => {
@@ -1836,9 +1832,7 @@ export const saveLessonVideoCaption = createServerFn({ method: "POST" })
 export const deleteLessonVideoCaption = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z
-      .object({ key: z.string().min(3).max(40), language: z.enum(["en", "pt"]) })
-      .parse(data),
+    z.object({ key: z.string().min(3).max(40), language: z.enum(["en", "pt"]) }).parse(data),
   )
   .handler(async ({ context, data }) => {
     if (!(await hasAdminRole(context.supabase, context.userId))) {
