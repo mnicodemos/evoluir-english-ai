@@ -551,7 +551,7 @@ function AppShellContent({
           desktopOneScreen && "xl:h-dvh xl:min-h-[48rem]",
         )}
       >
-        <aside className="absolute inset-y-0 left-0 z-30 hidden w-[13.2rem] flex-col items-stretch overflow-y-auto border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
+        <aside className="fixed inset-y-0 left-0 z-30 hidden h-dvh w-[13.2rem] flex-col items-stretch overflow-hidden border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
           <Link
             to="/dashboard"
             aria-label={translate("Home")}
@@ -562,7 +562,7 @@ function AppShellContent({
             <BrandName className="min-w-0 whitespace-nowrap text-base" />
           </Link>
 
-          <nav className="mt-3 flex flex-1 flex-col gap-0.5">
+          <nav className="mt-3 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain">
             {dashboardSidebarNav.map((item) => (
               <Fragment key={item.to}>
                 {"group" in item ? (
@@ -593,7 +593,7 @@ function AppShellContent({
             ))}
           </nav>
 
-          <div className="flex flex-col items-stretch gap-1">
+          <div className="flex shrink-0 flex-col items-stretch gap-1">
             <div className="flex flex-col items-stretch gap-0.5 border-t border-sidebar-border pb-1 pt-2">
               {/* The app guide ("Diário de bordo", user request). */}
               <Link
