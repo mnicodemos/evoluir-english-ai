@@ -112,6 +112,7 @@ export function WeeklyLeagueSummary({
         icon={<TrendingUp className="size-6" strokeWidth={2.2} />}
         tone={weekXpRising(week) ? "green" : "grey"}
         label={translate("Weekly league")}
+        labelClassName="whitespace-nowrap text-[clamp(8px,2.4vw,10px)] tracking-[0.03em]"
         value={`${week.thisWeek} XP`}
         detail={
           week.lastWeek <= 0 && week.thisWeek <= 0
