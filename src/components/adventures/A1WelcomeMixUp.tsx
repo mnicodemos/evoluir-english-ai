@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdventureJourneyMap";
 import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
@@ -359,6 +360,8 @@ export function A1WelcomeMixUp() {
             <AdventureMusicControl welcomeVoice="roberta" />
           </div>
         </header>
+        <EnglishAdventureJourneyMap adventureId="a1-welcome-mix-up" activityIndex={sceneIndex} isComplete={completed} />
+
 
         {!completed ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
