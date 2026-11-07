@@ -1452,13 +1452,16 @@ export const savePremiumVideo = createServerFn({ method: "POST" })
           ? "Cole um link válido do Vimeo ou de um Reel do Instagram."
           : "Cole um link válido do Vimeo.",
       );
-    const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
+    const { premiumVideoTable, selectPremiumVideos } = await import("@/lib/premiumVideos.server");
+    const { data: existingVideos } = await selectPremiumVideos();
+    const nextOrder = Math.max(0, ...(existingVideos ?? []).filter((video) => (video.kind === "short" ? "short" : "video") === data.kind).map((video) => video.sort_order ?? 0)) + 1;
     const { error } = await (
       await premiumVideoTable()
     ).insert({
       level: data.level,
       title: data.title,
       video_url: url,
+      sort_order: nextOrder,
       updated_by: context.userId,
       // A regular video leaves the column to its default, so it saves before 0102 too.
       ...(data.kind === "short" ? { kind: "short" } : {}),
