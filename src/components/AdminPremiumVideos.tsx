@@ -202,9 +202,10 @@ export function AdminPremiumVideos() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Defina a posição de cada item ao editar. A ordem é independente para Shorts e Vídeos extras. Shorts são vídeos verticais
-            (9:16): um vídeo do Vimeo ou um Reel público do Instagram, e ficam na aba "Shorts" da
-            página. Você pode editar título, link, nível, tipo e posição sem excluir o cadastro.
+            Defina a posição de cada item ao editar. A ordem é independente para Shorts e Vídeos
+            extras. Shorts são vídeos verticais (9:16): um vídeo do Vimeo ou um Reel público do
+            Instagram, e ficam na aba "Shorts" da página. Você pode editar título, link, nível, tipo
+            e posição sem excluir o cadastro.
           </p>
 
           {saved.length === 0 ? (
@@ -219,33 +220,126 @@ export function AdminPremiumVideos() {
                   <div className="min-w-0 space-y-2">
                     <div>
                       <span className="font-semibold">{video.level.toUpperCase()}</span>
-                      <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold">#{video.sortOrder || "—"}</span>
+                      <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold">
+                        #{video.sortOrder || "—"}
+                      </span>
                       {video.kind === "short" ? (
-                        <span className="ml-1.5 rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-semibold text-warning">SHORT</span>
+                        <span className="ml-1.5 rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-semibold text-warning">
+                          SHORT
+                        </span>
                       ) : null}{" "}
                       — {video.title}
-                      <a href={video.url ?? undefined} target="_blank" rel="noopener noreferrer" className="ml-2 text-xs text-brand-green underline-offset-2 hover:underline">{video.url}</a>
+                      <a
+                        href={video.url ?? undefined}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 text-xs text-brand-green underline-offset-2 hover:underline"
+                      >
+                        {video.url}
+                      </a>
                     </div>
                     {editing?.id === video.id ? (
                       <div className="grid gap-2 rounded-md bg-muted/40 p-2 sm:grid-cols-[5rem_7rem_minmax(0,1fr)_minmax(0,1fr)_5rem_auto]">
-                        <select className={field} value={editing.level} onChange={(event) => setEditing({ ...editing, level: event.target.value as (typeof LEVELS)[number] })}>
-                          {LEVELS.map((value) => <option key={value} value={value}>{value.toUpperCase()}</option>)}
+                        <select
+                          className={field}
+                          value={editing.level}
+                          onChange={(event) =>
+                            setEditing({
+                              ...editing,
+                              level: event.target.value as (typeof LEVELS)[number],
+                            })
+                          }
+                        >
+                          {LEVELS.map((value) => (
+                            <option key={value} value={value}>
+                              {value.toUpperCase()}
+                            </option>
+                          ))}
                         </select>
-                        <select className={field} value={editing.kind} onChange={(event) => setEditing({ ...editing, kind: event.target.value as "video" | "short" })}>
-                          <option value="video">Vídeo</option><option value="short">Short</option>
+                        <select
+                          className={field}
+                          value={editing.kind}
+                          onChange={(event) =>
+                            setEditing({
+                              ...editing,
+                              kind: event.target.value as "video" | "short",
+                            })
+                          }
+                        >
+                          <option value="video">Vídeo</option>
+                          <option value="short">Short</option>
                         </select>
-                        <input className={field} aria-label="Link do vídeo" value={editing.url} onChange={(event) => setEditing({ ...editing, url: event.target.value })} />
-                        <input className={field} aria-label="Título" maxLength={120} value={editing.title} onChange={(event) => setEditing({ ...editing, title: event.target.value })} />
-                        <input className={field} aria-label="Posição na lista" type="number" min={1} max={9999} value={editing.sortOrder} onChange={(event) => setEditing({ ...editing, sortOrder: Number(event.target.value) })} />
+                        <input
+                          className={field}
+                          aria-label="Link do vídeo"
+                          value={editing.url}
+                          onChange={(event) => setEditing({ ...editing, url: event.target.value })}
+                        />
+                        <input
+                          className={field}
+                          aria-label="Título"
+                          maxLength={120}
+                          value={editing.title}
+                          onChange={(event) =>
+                            setEditing({ ...editing, title: event.target.value })
+                          }
+                        />
+                        <input
+                          className={field}
+                          aria-label="Posição na lista"
+                          type="number"
+                          min={1}
+                          max={9999}
+                          value={editing.sortOrder}
+                          onChange={(event) =>
+                            setEditing({
+                              ...editing,
+                              sortOrder: Number(event.target.value),
+                            })
+                          }
+                        />
                         <span className="flex gap-1">
-                          <Button size="sm" className="h-9" disabled={updateMutation.isPending || !editing.title.trim() || !editing.url.trim() || editing.sortOrder < 1} onClick={() => updateMutation.mutate()}><Save className="size-4" /> Salvar</Button>
-                          <Button size="sm" variant="ghost" className="h-9" onClick={() => setEditing(null)}>Cancelar</Button>
+                          <Button
+                            size="sm"
+                            className="h-9"
+                            disabled={
+                              updateMutation.isPending ||
+                              !editing.title.trim() ||
+                              !editing.url.trim() ||
+                              editing.sortOrder < 1
+                            }
+                            onClick={() => updateMutation.mutate()}
+                          >
+                            <Save className="size-4" /> Salvar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-9"
+                            onClick={() => setEditing(null)}
+                          >
+                            Cancelar
+                          </Button>
                         </span>
                       </div>
                     ) : null}
                   </div>
                   <span className="flex items-center gap-1 justify-self-start sm:justify-self-end">
-                    <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setEditing({ id: video.id, level: video.level, title: video.title, url: video.url ?? "", kind: video.kind, sortOrder: video.sortOrder || 1 })}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 text-xs"
+                      onClick={() =>
+                        setEditing({
+                          id: video.id,
+                          level: video.level,
+                          title: video.title,
+                          url: video.url ?? "",
+                          kind: video.kind,
+                          sortOrder: video.sortOrder || 1,
+                        })
+                      }
+                    >
                       <Pencil className="size-3.5" /> Editar
                     </Button>
                     {query.data?.kindReady ? (
