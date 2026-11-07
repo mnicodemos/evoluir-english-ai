@@ -276,6 +276,7 @@ export function A2SurpriseDelivery() {
             <p className="text-sm font-medium">{t("Your choices shaped the conversation. There is more than one way to find a good solution.")}</p>
             <div className="flex flex-wrap justify-center gap-2">
               <Button onClick={restart}><RotateCcw className="mr-1 size-4" />{t("Explore again")}</Button>
+              <Button asChild><Link to="/adventures" search={{ story: "a2-2" }}>{t("Next adventure · A2.2")}</Link></Button>
               <Button asChild variant="outline"><Link to="/dashboard">{t("Back to home")}</Link></Button>
             </div>
           </section>

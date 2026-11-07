@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { A1WelcomeMixUp } from "@/components/adventures/A1WelcomeMixUp";
 import { A1NeighbourhoodMystery } from "@/components/adventures/A1NeighbourhoodMystery";
 import { A2SurpriseDelivery } from "@/components/adventures/A2SurpriseDelivery";
+import { A2CommunityFestival } from "@/components/adventures/A2CommunityFestival";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { useIsPremium } from "@/components/PremiumBadge";
@@ -225,6 +226,7 @@ function EnglishAdventuresPage() {
 
   if (story === "neighbourhood-mystery") return <A1NeighbourhoodMystery />;
   if (key === "a2" && story === "a2-1") return <A2SurpriseDelivery />;
+  if (key === "a2" && story === "a2-2") return <A2CommunityFestival />;
   if (key === "a1") return <A1WelcomeMixUp />;
 
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
