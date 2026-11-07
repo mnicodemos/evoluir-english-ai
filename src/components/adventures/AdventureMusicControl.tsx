@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getAdventureWelcomeAudio, getSharedMusicAsset } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
-import { ADVENTURE_MUSIC_VOLUME, playAdventureMusic } from "@/lib/adventureAudio";
+import { ADVENTURE_MUSIC_VOLUME, getAdventureMusicVolume, playAdventureMusic, prepareAdventureMusic, releaseAdventureMusic, setAdventureMusicVolume } from "@/lib/adventureAudio";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -62,12 +62,12 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     if (fadeFrameRef.current !== null) {
       window.cancelAnimationFrame(fadeFrameRef.current);
     }
-    const startVolume = audio.volume;
+    const startVolume = getAdventureMusicVolume(audio);
     const startTime = performance.now();
     const duration = 600;
     const step = (now: number) => {
       const progress = Math.min((now - startTime) / duration, 1);
-      audio.volume = startVolume + (target - startVolume) * progress;
+      setAdventureMusicVolume(audio, startVolume + (target - startVolume) * progress);
       if (progress < 1) fadeFrameRef.current = window.requestAnimationFrame(step);
       else fadeFrameRef.current = null;
     };
@@ -111,6 +111,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   }, [musicUrl, welcomeUrl]);
 
   const startExperienceAudio = useCallback(() => {
+    if (musicAudioRef.current) prepareAdventureMusic(musicAudioRef.current);
     startWelcome();
     startMusic();
   }, [startMusic, startWelcome]);
@@ -123,6 +124,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     const retryFromInteraction = (event: Event) => {
       const target = event.target;
       if (target instanceof Element && target.closest("[data-adventure-audio-control]")) return;
+      if (musicAudioRef.current) prepareAdventureMusic(musicAudioRef.current);
       if (!welcomeStartedRef.current) startWelcome();
       if (!mutedRef.current && !musicStartedRef.current) startMusic();
     };
@@ -138,15 +140,18 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   }, [startMusic, startWelcome]);
 
   useEffect(() => {
+    const music = musicAudioRef.current;
     return () => {
       if (fadeFrameRef.current !== null) window.cancelAnimationFrame(fadeFrameRef.current);
+      if (music) releaseAdventureMusic(music);
     };
-  }, []);
+  }, [musicUrl]);
 
   function playWelcome() {
     welcomeStartedRef.current = false;
     welcomeAttemptingRef.current = false;
     welcomeFinishedRef.current = false;
+    if (musicAudioRef.current) prepareAdventureMusic(musicAudioRef.current);
     startWelcome();
     if (!muted && musicAudioRef.current?.paused) startMusic();
   }
@@ -198,7 +203,8 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
             if (music.paused) {
               music.loop = true;
               music.muted = false;
-              music.volume = ADVENTURE_MUSIC_VOLUME;
+              prepareAdventureMusic(music);
+              setAdventureMusicVolume(music, ADVENTURE_MUSIC_VOLUME);
               void music
                 .play()
                 .then(() => {
