@@ -3,6 +3,8 @@ import { ArrowRight, Compass, Map } from "lucide-react";
 
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { PremiumBadge, useIsPremium } from "@/components/PremiumBadge";
+import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import { FILL_IN_TRANSITION, useFillIn } from "@/hooks/useFillIn";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";

@@ -10,6 +10,7 @@ import { AdventureMusicControl } from "@/components/adventures/AdventureMusicCon
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
+import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
