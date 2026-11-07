@@ -197,7 +197,7 @@ export function A2CommunityFestival() {
             </div>
             <p className="text-base leading-relaxed sm:text-lg" translate="no" lang="en">{activity.story}</p>
             <button type="button" onClick={() => setShowTranslation((value) => !value)} aria-expanded={showTranslation} className="inline-flex items-center rounded-lg py-1 text-sm font-medium text-brand-green underline-offset-4 hover:underline">
-              {showTranslation ? t("Ocultar tradução") : t("Ver tradução")}
+              {showTranslation ? t("Hide translation") : t("Show translation")}
             </button>
             {showTranslation && <p className="rounded-lg bg-secondary/60 p-3 text-sm leading-relaxed text-muted-foreground" lang="pt">{translations[activity.story] ?? "A tradução deste trecho estará disponível em breve."}</p>}
             <p className="text-sm font-semibold">{t("What would you say?")}</p>
