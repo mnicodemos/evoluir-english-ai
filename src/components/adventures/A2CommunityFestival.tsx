@@ -246,7 +246,7 @@ export function A2CommunityFestival() {
         <EnglishAdventureJourneyMap
           adventureId="a2-community-festival"
           activityIndex=index
-          isComplete=completed
+          isComplete={completed}
         />
       </div>
     </AppShell>
