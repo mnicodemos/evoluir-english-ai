@@ -1753,6 +1753,8 @@ type PremiumShortCaptionRow = {
   language: "en" | "pt";
   vtt_content: string;
   font_size: number;
+  text_color: string;
+  background_color: string;
   updated_at: string;
 };
 type PremiumShortCaptionTable = {
@@ -1795,15 +1797,27 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
       "premium_video_captions",
     );
     const { data: rows, error } = await table
-      .select("language, vtt_content, font_size, updated_at")
+      .select("language, vtt_content, font_size, text_color, background_color, updated_at")
       .eq("video_id", data.videoId);
     if (error) {
       if (/does not exist|relation .* not found/i.test(error.message)) {
-        return { missingMigration: true, captions: [] as PremiumShortCaptionRow[], fontSize: 20 };
+        return {
+          missingMigration: true,
+          captions: [] as PremiumShortCaptionRow[],
+          fontSize: 20,
+          textColor: "#FFFFFF",
+          backgroundColor: "#000000",
+        };
       }
       throw new Error("Não foi possível carregar as legendas do Short.");
     }
-    return { missingMigration: false, captions: rows ?? [], fontSize: rows?.[0]?.font_size ?? 20 };
+    return {
+      missingMigration: false,
+      captions: rows ?? [],
+      fontSize: rows?.[0]?.font_size ?? 20,
+      textColor: rows?.[0]?.text_color ?? "#FFFFFF",
+      backgroundColor: rows?.[0]?.background_color ?? "#000000",
+    };
   });
 
 export const savePremiumShortCaption = createServerFn({ method: "POST" })
@@ -1815,6 +1829,14 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
         language: z.enum(["en", "pt"]),
         content: z.string().min(20).max(500_000),
         fontSize: z.union([z.literal(16), z.literal(20), z.literal(24)]).default(20),
+        textColor: z
+          .string()
+          .regex(/^#[0-9A-Fa-f]{6}$/)
+          .default("#FFFFFF"),
+        backgroundColor: z
+          .string()
+          .regex(/^#[0-9A-Fa-f]{6}$/)
+          .default("#000000"),
       })
       .parse(data),
   )
@@ -1840,6 +1862,8 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
         language: data.language,
         vtt_content: data.content,
         font_size: data.fontSize,
+        text_color: data.textColor.toUpperCase(),
+        background_color: data.backgroundColor.toUpperCase(),
         updated_at: new Date().toISOString(),
         updated_by: context.userId,
       },

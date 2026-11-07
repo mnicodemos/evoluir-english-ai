@@ -422,10 +422,14 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const [en, setEn] = useState<string | null>(null);
   const [pt, setPt] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<16 | 20 | 24>(20);
+  const [textColor, setTextColor] = useState("#FFFFFF");
+  const [backgroundColor, setBackgroundColor] = useState("#000000");
   const rows = query.data?.captions ?? [];
   useEffect(() => {
     if (query.data?.fontSize) setFontSize(query.data.fontSize as 16 | 20 | 24);
-  }, [query.data?.fontSize]);
+    if (query.data?.textColor) setTextColor(query.data.textColor);
+    if (query.data?.backgroundColor) setBackgroundColor(query.data.backgroundColor);
+  }, [query.data?.fontSize, query.data?.textColor, query.data?.backgroundColor]);
   const values = {
     en: en ?? rows.find((row) => row.language === "en")?.vtt_content ?? "",
     pt: pt ?? rows.find((row) => row.language === "pt")?.vtt_content ?? "",
@@ -433,7 +437,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const setters = { en: setEn, pt: setPt };
   const save = useMutation({
     mutationFn: (value: { language: "en" | "pt"; content: string }) =>
-      saveCaption({ data: { videoId, ...value, fontSize } }),
+      saveCaption({ data: { videoId, ...value, fontSize, textColor, backgroundColor } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] });
       toast.success("Legenda salva.");
@@ -481,8 +485,28 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
           <option value={20}>Médio · 20 px</option>
           <option value={24}>Grande · 24 px</option>
         </select>
+        <label className="flex items-center gap-2 text-xs font-semibold">
+          Cor da fonte
+          <input
+            aria-label="Cor da fonte da legenda"
+            type="color"
+            className="h-9 w-12 cursor-pointer rounded border border-border bg-background p-1"
+            value={textColor}
+            onChange={(event) => setTextColor(event.target.value.toUpperCase())}
+          />
+        </label>
+        <label className="flex items-center gap-2 text-xs font-semibold">
+          Cor do fundo
+          <input
+            aria-label="Cor de fundo da legenda"
+            type="color"
+            className="h-9 w-12 cursor-pointer rounded border border-border bg-background p-1"
+            value={backgroundColor}
+            onChange={(event) => setBackgroundColor(event.target.value.toUpperCase())}
+          />
+        </label>
         <span className="text-xs text-muted-foreground">
-          A escolha é salva junto com a legenda.
+          Tamanho e cores são aplicados aos dois idiomas e salvos junto com cada legenda.
         </span>
       </div>
       {(["en", "pt"] as const).map((language) => (
