@@ -15,7 +15,6 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   const welcomeSequenceRef = useRef(false);
   const [muted, setMuted] = useState(true);
   const [preferenceLoaded, setPreferenceLoaded] = useState(false);
-  const [showHint, setShowHint] = useState(true);
   const autoWelcomeAttemptedRef = useRef(false);
   const getWelcomeAudio = useServerFn(getAdventureWelcomeAudio);
   const welcomeQuery = useQuery({
@@ -80,7 +79,6 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     audio.pause();
     audio.muted = true;
     setMuted(true);
-    setShowHint(true);
     // Do not persist an autoplay restriction as a user mute preference.
   }
 
@@ -91,7 +89,6 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     if (!audio || !musicUrl || !welcomeUrl) return;
 
     welcomeSequenceRef.current = true;
-    setShowHint(false);
     setMuted(false);
     audio.pause();
     audio.loop = false;
@@ -131,7 +128,6 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       welcomeSequenceRef.current = false;
       audio.onended = null;
     }
-    setShowHint(false);
 
     if (muted) {
       audio.volume = 0.12;
@@ -167,39 +163,40 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   }
 
   return (
-    <div className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
+    <div className="flex h-11 w-full min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-2.5 pr-2 shadow-sm transition-colors hover:bg-white/[0.06] sm:w-[min(24rem,100%)]">
       {query.data?.url ? <audio ref={audioRef} src={query.data.url} loop preload="none" /> : null}
-      <button
-        type="button"
-        onClick={playWelcome}
-        disabled={!query.data?.url || !welcomeQuery.data?.url}
-        className="inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-brand-green/40 bg-brand-green/10 px-3 text-xs font-semibold text-brand-green transition hover:bg-brand-green/15 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
-        aria-label={t("Play EVO welcome")}
-      >
-        <Play className="size-3.5" aria-hidden="true" />
-        {t("Meet EVO")}
-      </button>
-      {showHint ? (
-        <span className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 text-center text-[11px] leading-tight text-cyan-300 sm:max-w-40">
-          <Music2 className="size-3 shrink-0" aria-hidden="true" />
+      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
+        <Music2 className="size-4" aria-hidden="true" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col justify-center leading-tight">
+        <button
+          type="button"
+          onClick={playWelcome}
+          disabled={!query.data?.url || !welcomeQuery.data?.url}
+          className="w-fit text-left text-xs font-semibold text-foreground transition-colors hover:text-brand-green disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+          aria-label={t("Meet EVO")}
+        >
+          {t("Meet EVO")}
+        </button>
+        <span className="truncate text-[10.5px] text-muted-foreground">
           {lang === "pt"
-            ? "Se o áudio não começar, toque em Meet EVO."
-            : "If audio does not start, tap Meet EVO."}
+            ? "Boas-vindas da EVO · trilha sonora"
+            : "A welcome from EVO · adventure soundtrack"}
         </span>
-      ) : null}
+      </span>
       <button
         type="button"
         onClick={toggleMusic}
         disabled={!query.data?.url}
-        aria-label={muted ? "Play adventure soundtrack" : "Mute adventure soundtrack"}
+        aria-label={muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")}
         aria-pressed={!muted}
-        title={muted ? "Play soundtrack" : "Mute soundtrack"}
-        className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-background/80 text-muted-foreground transition hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+        title={muted ? t("Play soundtrack") : t("Mute soundtrack")}
+        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
       >
         {muted ? (
           <VolumeX className="size-4" aria-hidden="true" />
         ) : (
-          <Volume2 className="size-4" aria-hidden="true" />
+          <Volume2 className="size-4 text-brand-green" aria-hidden="true" />
         )}
       </button>
     </div>
