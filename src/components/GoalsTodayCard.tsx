@@ -171,7 +171,7 @@ export function GoalsTodayCard() {
         ) : (
           <EmptySlot
             kind={t("Add a goal")}
-            text={t("Choose 1 to 3 goals and I will give you one small step a day.")}
+            text={t("Give you one small step a day.")}
             to="/life"
             hash="goals"
           />
