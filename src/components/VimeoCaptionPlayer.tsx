@@ -13,7 +13,8 @@ function parseTimestamp(value: string): number {
 }
 
 function parseVtt(content: string): Cue[] {
-  return content.replace(/^\uFEFF?WEBVTT[^\n]*\n/i, "")
+  const normalized = content.replace(/\r\n?/g, "\n");
+  return normalized.replace(/^\uFEFF?WEBVTT[^\n]*\n/i, "")
     .split(/\n{2,}/)
     .flatMap((block) => {
       const lines = block.trim().split(/\r?\n/);
