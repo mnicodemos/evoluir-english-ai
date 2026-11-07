@@ -104,3 +104,10 @@ export function cleanVimeoPlayerUrl(embed: string): string {
   url.searchParams.set("dnt", "1");
   return url.toString();
 }
+
+/** Selects an existing Vimeo caption track without changing other player options. */
+export function vimeoTextTrackUrl(embed: string, language: string): string {
+  const url = new URL(cleanVimeoPlayerUrl(embed));
+  url.searchParams.set("texttrack", language);
+  return url.toString();
+}
