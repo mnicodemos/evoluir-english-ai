@@ -523,8 +523,9 @@ function parseShortVtt(content: string): VttCue[] {
     .flatMap((block) => {
       const lines = block.split(/\r?\n/);
       const index = lines.findIndex((line) => line.includes("-->"));
-      if (index < 0) return [];
-      const parts = lines[index].split("-->").map((value) => value.trim().split(/\s+/)[0]);
+      const timingLine = lines[index];
+      if (index < 0 || !timingLine) return [];
+      const parts = timingLine.split("-->").map((value) => value.trim().split(/\s+/)[0]);
       const text = lines
         .slice(index + 1)
         .join("\n")
