@@ -322,7 +322,6 @@ function ShortSlide({
         .join("\n");
       setCaptionText(next);
     };
-    setCaptionLoading(true);
     setCaptionText("");
     setCaptionsEnabled(false);
     void loadVimeoCaptionSdk()
