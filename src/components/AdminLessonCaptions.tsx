@@ -18,9 +18,7 @@ type Language = "en" | "pt";
 export function AdminLessonCaptions() {
   const [level, setLevel] = useState<Level>("a1");
   const [lessonKey, setLessonKey] = useState("");
-  const [files, setFiles] = useState<
-    Partial<Record<Language, { name: string; content: string }>>
-  >({});
+  const [files, setFiles] = useState<Partial<Record<Language, { name: string; content: string }>>>({});
   const [notice, setNotice] = useState("");
   const queryClient = useQueryClient();
   const getLinks = useServerFn(getSummaryVideoLinks);
@@ -104,9 +102,7 @@ export function AdminLessonCaptions() {
           <FileText className="size-5" aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-display text-base font-semibold">
-            Legendas personalizadas (A1–B1)
-          </h2>
+          <h2 className="font-display text-base font-semibold">Legendas personalizadas (A1–B1)</h2>
           <p className="text-sm text-muted-foreground">
             Envie faixas WebVTT em inglês e português por aula. O aluno verá as legendas dentro do
             player, com tamanho inicial de 75% e controles próprios, sem depender do CC do Vimeo.
@@ -159,13 +155,11 @@ export function AdminLessonCaptions() {
           <Loader2 className="size-4 animate-spin" /> Carregando aulas e legendas…
         </p>
       ) : lessonsQuery.isError ? (
-        <p className="text-sm text-destructive">
-          Não foi possível carregar as aulas deste nível.
-        </p>
+        <p className="text-sm text-destructive">Não foi possível carregar as aulas deste nível.</p>
       ) : statusQuery.data?.missingMigration ? (
         <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-          Aplique a migração{" "}
-          <code>20261107170000_lesson_video_captions.sql</code> para habilitar o envio das legendas.
+          Aplique a migração <code>20261107170000_lesson_video_captions.sql</code> para habilitar
+          o envio das legendas.
         </p>
       ) : selectedKey ? (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -205,10 +199,9 @@ export function AdminLessonCaptions() {
                   <Button
                     size="sm"
                     disabled={!draft || busy}
-                    onClick={() =>
-                      draft &&
-                      saveMutation.mutate({ language, content: draft.content })
-                    }
+                    onClick={() => {
+                      if (draft) saveMutation.mutate({ language, content: draft.content });
+                    }}
                   >
                     {saveMutation.isPending && saveMutation.variables?.language === language ? (
                       <Loader2 className="mr-1 size-4 animate-spin" />
@@ -224,9 +217,7 @@ export function AdminLessonCaptions() {
                       disabled={busy}
                       onClick={() => {
                         if (
-                          window.confirm(
-                            `Remover a legenda ${language.toUpperCase()} desta aula?`,
-                          )
+                          window.confirm(`Remover a legenda ${language.toUpperCase()} desta aula?`)
                         ) {
                           deleteMutation.mutate(language);
                         }
@@ -241,9 +232,7 @@ export function AdminLessonCaptions() {
           })}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          Nenhuma aula cadastrada para este nível.
-        </p>
+        <p className="text-sm text-muted-foreground">Nenhuma aula cadastrada para este nível.</p>
       )}
       <p className="text-xs text-muted-foreground">
         Formato WebVTT · até 500 KB por idioma e aula. A legenda pode ser substituída a qualquer
