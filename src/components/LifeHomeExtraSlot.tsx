@@ -135,6 +135,7 @@ function FocusSlot({ translate: t }: { translate: (label: string) => string }) {
             )}
           </button>
         </div>
+      </div>
     </li>
   );
 }
