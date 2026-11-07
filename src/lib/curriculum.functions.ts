@@ -407,5 +407,22 @@ export const getSummaryVideoForLesson = createServerFn({ method: "GET" })
       .limit(1)
       .maybeSingle();
     if (error) throw new Error("The shared Summary video could not be loaded");
-    return { url: row?.video_url ?? null };
+    const level = (findCurriculumLesson(data.key)?.level ?? "").toLowerCase();
+    let captions: { language: "en" | "pt"; content: string }[] = [];
+    if (["a1", "a2", "b1"].includes(level)) {
+      const { data: tracks, error: captionsError } = await (supabaseAdmin as any)
+        .from("lesson_video_captions")
+        .select("language, vtt_content")
+        .eq("curriculum_key", data.key);
+      if (!captionsError && tracks) {
+        captions = tracks
+          .filter((track: { language: string; vtt_content: string }) =>
+            ["en", "pt"].includes(track.language) && typeof track.vtt_content === "string")
+          .map((track: { language: "en" | "pt"; vtt_content: string }) => ({
+            language: track.language,
+            content: track.vtt_content,
+          }));
+      }
+    }
+    return { url: row?.video_url ?? null, captions };
   });
