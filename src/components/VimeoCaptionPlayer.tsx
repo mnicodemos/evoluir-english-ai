@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
-import { cleanVimeoPlayerUrl, vimeoVideoId } from "@/lib/lessonVideoDisplay";
+import { cleanVimeoPlayerUrl } from "@/lib/lessonVideoDisplay";
 
 type CaptionTrack = { language: "en" | "pt"; content: string };
 type Cue = { start: number; end: number; text: string };
@@ -13,15 +13,15 @@ function parseTimestamp(value: string): number {
 }
 
 function parseVtt(content: string): Cue[] {
-  return content.replace(/^\\uFEFF?WEBVTT[^\\n]*\\n/i, "")
-    .split(/\\n{2,}/)
+  return content.replace(/^\uFEFF?WEBVTT[^\n]*\n/i, "")
+    .split(/\n{2,}/)
     .flatMap((block) => {
-      const lines = block.trim().split(/\\r?\\n/);
+      const lines = block.trim().split(/\r?\n/);
       const timingIndex = lines.findIndex((line) => line.includes("-->"));
       if (timingIndex < 0) return [];
-      const match = lines[timingIndex].match(/(\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}\\s+-->\\s+(\\d{2}:)?\\d{2}:\\d{2}[.,]\\d{3}/);
+      const match = lines[timingIndex].match(/(\d{2}:)?\d{2}:\d{2}[.,]\d{3}\s+-->\s+(\d{2}:)?\d{2}:\d{2}[.,]\d{3}/);
       if (!match) return [];
-      const [start, end] = lines[timingIndex].split("-->").map((part) => part.trim().split(/\\s+/)[0]);
+      const [start, end] = lines[timingIndex].split("-->").map((part) => part.trim().split(/\s+/)[0]);
       const cueText = lines.slice(timingIndex + 1).join(" ").replace(/<[^>]*>/g, "").trim();
       const from = parseTimestamp(start);
       const to = parseTimestamp(end);
@@ -51,8 +51,6 @@ export function VimeoCaptionPlayer({
   const track = captions.find((item) => item.language === language);
   const cues = useMemo(() => track ? parseVtt(track.content) : [], [track]);
   const activeCue = cues.find((cue) => seconds >= cue.start && seconds < cue.end);
-  if (!vimeoVideoId(url)) return <div className="aspect-video w-full bg-black" />;
-
   useEffect(() => {
     function onMessage(event: MessageEvent) {
       if (event.source !== frameRef.current?.contentWindow || event.origin !== "https://player.vimeo.com") return;
