@@ -1752,6 +1752,7 @@ export const prepareLevelPodcasts = createServerFn({ method: "POST" })
 type PremiumShortCaptionRow = {
   language: "en" | "pt";
   vtt_content: string;
+  font_size: number;
   updated_at: string;
 };
 type PremiumShortCaptionTable = {
@@ -1802,7 +1803,7 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
       }
       throw new Error("Não foi possível carregar as legendas do Short.");
     }
-    return { missingMigration: false, captions: rows ?? [] };
+    return { missingMigration: false, captions: rows ?? [], fontSize: rows?.[0]?.font_size ?? 20 };
   });
 
 export const savePremiumShortCaption = createServerFn({ method: "POST" })
@@ -1812,7 +1813,8 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
       .object({
         videoId: z.string().uuid(),
         language: z.enum(["en", "pt"]),
-        content: z.string().min(20).max(500_000),\n        fontSize: z.union([z.literal(16), z.literal(20), z.literal(24)]).default(20),
+        content: z.string().min(20).max(500_000),
+        fontSize: z.union([z.literal(16), z.literal(20), z.literal(24)]).default(20),
       })
       .parse(data),
   )
@@ -1837,6 +1839,7 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
         video_id: data.videoId,
         language: data.language,
         vtt_content: data.content,
+        font_size: data.fontSize,
         updated_at: new Date().toISOString(),
         updated_by: context.userId,
       },
