@@ -360,7 +360,7 @@ export function A1WelcomeMixUp() {
             <AdventureMusicControl welcomeVoice="roberta" />
           </div>
         </header>
-        
+
         {!completed ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
             <div className="flex items-center justify-between gap-3">
