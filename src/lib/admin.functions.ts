@@ -1563,8 +1563,7 @@ export const updatePremiumVideo = createServerFn({ method: "POST" })
     const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
     const { canonicalReelUrl } = await import("@/lib/premiumVideos");
     const url =
-      canonicalVimeoUrl(data.url) ??
-      (data.kind === "short" ? canonicalReelUrl(data.url) : null);
+      canonicalVimeoUrl(data.url) ?? (data.kind === "short" ? canonicalReelUrl(data.url) : null);
     if (!url) throw new Error("Link inválido para o tipo de conteúdo selecionado.");
     const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
     const { error } = await (
