@@ -17,6 +17,7 @@ export type PremiumVideoRow = {
   title: string;
   video_url: string;
   created_at: string;
+  sort_order?: number | null;
   /** Missing before migration 0102: every row is then a regular video. */
   kind?: string | null;
 };
@@ -28,6 +29,7 @@ export type PremiumVideo = {
   kind: PremiumVideoKind;
   /** Null for a free student: the link is handed out only to Premium. */
   url: string | null;
+  sortOrder: number;
 };
 
 export function isPremiumVideoLevel(level: string): level is PremiumVideoLevel {
@@ -50,6 +52,7 @@ export function premiumVideoList(rows: PremiumVideoRow[], withLinks: boolean): P
       title: row.title,
       kind: row.kind === "short" ? "short" : "video",
       url: withLinks ? row.video_url : null,
+      sortOrder: row.sort_order ?? 0,
     }));
 }
 

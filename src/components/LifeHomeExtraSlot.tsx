@@ -91,50 +91,50 @@ function FocusSlot({ translate: t }: { translate: (label: string) => string }) {
   return (
     <li className="hidden min-w-0 flex-col justify-center rounded-lg bg-secondary/60 px-2.5 py-1.5 xl:flex">
       <div className="flex flex-none flex-col gap-1">
-      <div className="flex min-w-0 items-center gap-2">
-        <p className="flex min-w-0 flex-1 items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-          <TomatoIcon className="size-3 text-red-400" />
-          {t("Focus")}
-        </p>
-        <span
-          className="shrink-0 text-[10px] font-semibold tabular-nums text-muted-foreground"
-          title={t("Focus blocks today")}
-        >
-          🍅 {today.todayCount}/{FOCUS_DAILY_TARGET}
-        </span>
-      </div>
-      <div className="flex min-w-0 items-center gap-2">
-        <p className="min-w-0 flex-1 truncate text-xs font-semibold leading-snug">
-          {active ? (
-            <span className={state.phase === "break" ? "text-brand-green" : "text-pink-400"}>
-              {state.phase === "break" ? t("Break") : t("Focusing")} · {focusClock(view.leftMs)}
-            </span>
-          ) : (
-            <>
-              {t("Focus block")} · {minutes} min
-            </>
-          )}
-        </p>
-        <button
-          type="button"
-          onClick={start}
-          aria-label={active ? t("Floating timer") : t("Start focus")}
-          title={active ? t("Floating timer") : t("Start focus")}
-          className={cn(
-            "grid size-6 shrink-0 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60",
-            active
-              ? "bg-white/10 text-foreground hover:bg-white/15"
-              : // Not a solid brand button: Practice now stays the Dashboard's only one.
-                "bg-brand-green/15 text-brand-green ring-1 ring-brand-green/30 hover:bg-brand-green/25",
-          )}
-        >
-          {active ? (
-            <ArrowRight className="size-3.5" aria-hidden="true" />
-          ) : (
-            <Play className="size-3 fill-current" aria-hidden="true" />
-          )}
-        </button>
-      </div>
+        <div className="flex min-w-0 items-center gap-2">
+          <p className="flex min-w-0 flex-1 items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <TomatoIcon className="size-3 text-red-400" />
+            {t("Focus")}
+          </p>
+          <span
+            className="shrink-0 text-[10px] font-semibold tabular-nums text-muted-foreground"
+            title={t("Focus blocks today")}
+          >
+            🍅 {today.todayCount}/{FOCUS_DAILY_TARGET}
+          </span>
+        </div>
+        <div className="flex min-w-0 items-center gap-2">
+          <p className="min-w-0 flex-1 truncate text-xs font-semibold leading-snug">
+            {active ? (
+              <span className={state.phase === "break" ? "text-brand-green" : "text-pink-400"}>
+                {state.phase === "break" ? t("Break") : t("Focusing")} · {focusClock(view.leftMs)}
+              </span>
+            ) : (
+              <>
+                {t("Focus block")} · {minutes} min
+              </>
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={start}
+            aria-label={active ? t("Floating timer") : t("Start focus")}
+            title={active ? t("Floating timer") : t("Start focus")}
+            className={cn(
+              "grid size-6 shrink-0 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60",
+              active
+                ? "bg-white/10 text-foreground hover:bg-white/15"
+                : // Not a solid brand button: Practice now stays the Dashboard's only one.
+                  "bg-brand-green/15 text-brand-green ring-1 ring-brand-green/30 hover:bg-brand-green/25",
+            )}
+          >
+            {active ? (
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            ) : (
+              <Play className="size-3 fill-current" aria-hidden="true" />
+            )}
+          </button>
+        </div>
       </div>
     </li>
   );

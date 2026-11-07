@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bell, Crown, Loader2, Save, Trash2 } from "lucide-react";
+import { Bell, Crown, Loader2, Pencil, Save, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +11,7 @@ import {
   notifyPremiumShort,
   savePremiumVideo,
   setPremiumVideoKind,
+  updatePremiumVideo,
 } from "@/lib/admin.functions";
 import type { NewShortPushResult } from "@/lib/newShortPush";
 import { PREMIUM_VIDEO_LEVELS, premiumVideoList } from "@/lib/premiumVideos";
@@ -34,6 +35,15 @@ export function AdminPremiumVideos() {
   // Shorts are what the owner adds most now, so the form starts on them
   // (owner report, 2026-10-31: a short saved as "Vídeo" sent no push).
   const [kind, setKind] = useState<"video" | "short">("short");
+  const [editing, setEditing] = useState<{
+    id: string;
+    level: (typeof LEVELS)[number];
+    title: string;
+    url: string;
+    kind: "video" | "short";
+    sortOrder: number;
+  } | null>(null);
+  const update = useServerFn(updatePremiumVideo);
 
   const query = useQuery({
     queryKey: ["admin-premium-videos"],
@@ -60,6 +70,19 @@ export function AdminPremiumVideos() {
     },
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "Não foi possível salvar."),
+  });
+  const updateMutation = useMutation({
+    mutationFn: () => {
+      if (!editing) throw new Error("Selecione um vídeo.");
+      return update({ data: editing });
+    },
+    onSuccess: async () => {
+      await refresh();
+      setEditing(null);
+      toast.success("Vídeo atualizado e ordem salva.");
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Não foi possível atualizar."),
   });
   const notify = useServerFn(notifyPremiumShort);
   const notifyMutation = useMutation({
@@ -180,9 +203,10 @@ export function AdminPremiumVideos() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Os vídeos aparecem na ordem em que foram cadastrados. Shorts são vídeos verticais
-            (9:16): um vídeo do Vimeo ou um Reel público do Instagram, e ficam na aba "Shorts" da
-            página. Para trocar um vídeo, remova e cadastre de novo.
+            Defina a posição de cada item ao editar. A ordem é independente para Shorts e Vídeos
+            extras. Shorts são vídeos verticais (9:16): um vídeo do Vimeo ou um Reel público do
+            Instagram, e ficam na aba "Shorts" da página. Você pode editar título, link, nível, tipo
+            e posição sem excluir o cadastro.
           </p>
 
           {saved.length === 0 ? (
@@ -194,24 +218,131 @@ export function AdminPremiumVideos() {
                   key={video.id}
                   className="grid gap-2 rounded-lg border border-border/60 p-2 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 >
-                  <span className="min-w-0">
-                    <span className="font-semibold">{video.level.toUpperCase()}</span>
-                    {video.kind === "short" ? (
-                      <span className="ml-1.5 rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-semibold text-warning">
-                        SHORT
+                  <div className="min-w-0 space-y-2">
+                    <div>
+                      <span className="font-semibold">{video.level.toUpperCase()}</span>
+                      <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold">
+                        #{video.sortOrder || "—"}
                       </span>
-                    ) : null}{" "}
-                    — {video.title}
-                    <a
-                      href={video.url ?? undefined}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-xs text-brand-green underline-offset-2 hover:underline"
-                    >
-                      {video.url}
-                    </a>
-                  </span>
+                      {video.kind === "short" ? (
+                        <span className="ml-1.5 rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-semibold text-warning">
+                          SHORT
+                        </span>
+                      ) : null}{" "}
+                      — {video.title}
+                      <a
+                        href={video.url ?? undefined}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 text-xs text-brand-green underline-offset-2 hover:underline"
+                      >
+                        {video.url}
+                      </a>
+                    </div>
+                    {editing?.id === video.id ? (
+                      <div className="grid gap-2 rounded-md bg-muted/40 p-2 sm:grid-cols-[5rem_7rem_minmax(0,1fr)_minmax(0,1fr)_5rem_auto]">
+                        <select
+                          className={field}
+                          value={editing.level}
+                          onChange={(event) =>
+                            setEditing({
+                              ...editing,
+                              level: event.target.value as (typeof LEVELS)[number],
+                            })
+                          }
+                        >
+                          {LEVELS.map((value) => (
+                            <option key={value} value={value}>
+                              {value.toUpperCase()}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          className={field}
+                          value={editing.kind}
+                          onChange={(event) =>
+                            setEditing({
+                              ...editing,
+                              kind: event.target.value as "video" | "short",
+                            })
+                          }
+                        >
+                          <option value="video">Vídeo</option>
+                          <option value="short">Short</option>
+                        </select>
+                        <input
+                          className={field}
+                          aria-label="Link do vídeo"
+                          value={editing.url}
+                          onChange={(event) => setEditing({ ...editing, url: event.target.value })}
+                        />
+                        <input
+                          className={field}
+                          aria-label="Título"
+                          maxLength={120}
+                          value={editing.title}
+                          onChange={(event) =>
+                            setEditing({ ...editing, title: event.target.value })
+                          }
+                        />
+                        <input
+                          className={field}
+                          aria-label="Posição na lista"
+                          type="number"
+                          min={1}
+                          max={9999}
+                          value={editing.sortOrder}
+                          onChange={(event) =>
+                            setEditing({
+                              ...editing,
+                              sortOrder: Number(event.target.value),
+                            })
+                          }
+                        />
+                        <span className="flex gap-1">
+                          <Button
+                            size="sm"
+                            className="h-9"
+                            disabled={
+                              updateMutation.isPending ||
+                              !editing.title.trim() ||
+                              !editing.url.trim() ||
+                              editing.sortOrder < 1
+                            }
+                            onClick={() => updateMutation.mutate()}
+                          >
+                            <Save className="size-4" /> Salvar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-9"
+                            onClick={() => setEditing(null)}
+                          >
+                            Cancelar
+                          </Button>
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
                   <span className="flex items-center gap-1 justify-self-start sm:justify-self-end">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 text-xs"
+                      onClick={() =>
+                        setEditing({
+                          id: video.id,
+                          level: video.level,
+                          title: video.title,
+                          url: video.url ?? "",
+                          kind: video.kind,
+                          sortOrder: video.sortOrder || 1,
+                        })
+                      }
+                    >
+                      <Pencil className="size-3.5" /> Editar
+                    </Button>
                     {query.data?.kindReady ? (
                       <Button
                         size="sm"
