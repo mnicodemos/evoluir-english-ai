@@ -16,7 +16,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
-import { cleanVimeoPlayerUrl, vimeoEmbedUrl, vimeoTextTrackUrl } from "@/lib/lessonVideoDisplay";
+import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { COMMENT_MAX_LENGTH, DOUBLE_TAP_MS, shortTap } from "@/lib/premiumVideoSocial";
 import {
