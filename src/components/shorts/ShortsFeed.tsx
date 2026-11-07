@@ -429,8 +429,12 @@ function ShortSlide({
 
         {active && vimeo && captionsEnabled && captionText ? (
           <div
-            className="pointer-events-none absolute inset-x-3 bottom-[4.5rem] z-20 mx-auto w-fit max-w-[88%] whitespace-pre-line rounded-sm bg-white px-2 py-1 text-center font-semibold leading-snug text-black shadow"
-            style={{ fontSize: `${captionQuery.data?.fontSize ?? 20}px` }}
+            className="pointer-events-none absolute inset-x-3 bottom-[4.5rem] z-20 mx-auto w-fit max-w-[88%] whitespace-pre-line rounded-sm px-2 py-1 text-center font-semibold leading-snug shadow"
+            style={{
+              fontSize: `${captionQuery.data?.fontSize ?? 20}px`,
+              color: captionQuery.data?.textColor ?? "#FFFFFF",
+              backgroundColor: captionQuery.data?.backgroundColor ?? "#000000",
+            }}
             aria-live="polite"
             aria-atomic="true"
           >
