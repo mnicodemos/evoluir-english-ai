@@ -410,17 +410,94 @@ export function AdminPremiumVideos() {
 
 /** What happened to a short's push, so the owner sees why nobody got it. */
 function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string }) {
- const fetchCaptions = useServerFn(getPremiumShortCaptionsAdmin), saveCaption = useServerFn(savePremiumShortCaption), removeCaption = useServerFn(deletePremiumShortCaption), queryClient = useQueryClient();
- const query = useQuery({ queryKey: ["admin-short-captions", videoId], queryFn: () => fetchCaptions({ data: { videoId } }), retry: false });
- const [en, setEn] = useState<string | null>(null), [pt, setPt] = useState<string | null>(null);
- const rows = query.data?.captions ?? [], values = { en: en ?? rows.find((r) => r.language === "en")?.vtt_content ?? "", pt: pt ?? rows.find((r) => r.language === "pt")?.vtt_content ?? "" };
- const setters = { en: setEn, pt: setPt };
- const save = useMutation({ mutationFn: (v: { language: "en" | "pt"; content: string }) => saveCaption({ data: { videoId, ...v } }), onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] }); toast.success("Legenda salva."); }, onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao salvar legenda.") });
- const remove = useMutation({ mutationFn: (language: "en" | "pt") => removeCaption({ data: { videoId, language } }), onSuccess: async () => { setEn(null); setPt(null); await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] }); toast.success("Legenda removida."); }, onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao remover legenda.") });
- return <div className="mt-2 grid gap-3 rounded-md border border-border/60 bg-background p-3 sm:grid-cols-2"><div className="sm:col-span-2"><p className="text-sm font-semibold">Legendas do Short (WebVTT)</p><p className="text-xs text-muted-foreground">Legendas vinculadas somente a este Short. Cole o conteúdo do arquivo .vtt.</p>{query.isPending ? <p className="text-xs text-muted-foreground">Carregando…</p> : null}{query.data?.missingMigration ? <p className="text-xs text-warning">Aplique a migração 20261107180000_premium_video_captions.sql.</p> : null}</div>
- {(["en", "pt"] as const).map((language) => <div key={language} className="space-y-1.5"><label className="text-xs font-semibold">{language === "en" ? "English" : "Português"}</label><textarea className={field + " h-36 py-2 font-mono text-xs"} value={values[language]} onChange={(e) => setters[language](e.target.value)} placeholder={"WEBVTT\n\n00:00:01.000 --> 00:00:03.000\nCaption text"} /><div className="flex gap-2"><Button size="sm" disabled={save.isPending || values[language].trim().length < 20} onClick={() => save.mutate({ language, content: values[language] })}>Salvar legenda</Button>{rows.some((r) => r.language === language) ? <Button size="sm" variant="ghost" disabled={remove.isPending} onClick={() => remove.mutate(language)}>Remover</Button> : null}</div></div>)}
- </div>;
+  const fetchCaptions = useServerFn(getPremiumShortCaptionsAdmin);
+  const saveCaption = useServerFn(savePremiumShortCaption);
+  const removeCaption = useServerFn(deletePremiumShortCaption);
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ["admin-short-captions", videoId],
+    queryFn: () => fetchCaptions({ data: { videoId } }),
+    retry: false,
+  });
+  const [en, setEn] = useState<string | null>(null);
+  const [pt, setPt] = useState<string | null>(null);
+  const rows = query.data?.captions ?? [];
+  const values = {
+    en: en ?? rows.find((row) => row.language === "en")?.vtt_content ?? "",
+    pt: pt ?? rows.find((row) => row.language === "pt")?.vtt_content ?? "",
+  };
+  const setters = { en: setEn, pt: setPt };
+  const save = useMutation({
+    mutationFn: (value: { language: "en" | "pt"; content: string }) =>
+      saveCaption({ data: { videoId, ...value } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] });
+      toast.success("Legenda salva.");
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Falha ao salvar legenda."),
+  });
+  const remove = useMutation({
+    mutationFn: (language: "en" | "pt") => removeCaption({ data: { videoId, language } }),
+    onSuccess: async () => {
+      setEn(null);
+      setPt(null);
+      await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] });
+      toast.success("Legenda removida.");
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Falha ao remover legenda."),
+  });
+  return (
+    <div className="mt-2 grid gap-3 rounded-md border border-border/60 bg-background p-3 sm:grid-cols-2">
+      <div className="sm:col-span-2">
+        <p className="text-sm font-semibold">Legendas do Short (WebVTT)</p>
+        <p className="text-xs text-muted-foreground">
+          Legendas vinculadas somente a este Short. Cole o conteúdo do arquivo .vtt.
+        </p>
+        {query.isPending ? <p className="text-xs text-muted-foreground">Carregando…</p> : null}
+        {query.data?.missingMigration ? (
+          <p className="text-xs text-warning">
+            Aplique a migração 20261107180000_premium_video_captions.sql.
+          </p>
+        ) : null}
+      </div>
+      {(["en", "pt"] as const).map((language) => (
+        <div key={language} className="space-y-1.5">
+          <label className="text-xs font-semibold">
+            {language === "en" ? "English" : "Português"}
+          </label>
+          <textarea
+            className={field + " h-36 py-2 font-mono text-xs"}
+            value={values[language]}
+            onChange={(event) => setters[language](event.target.value)}
+            placeholder={"WEBVTT\\n\\n00:00:01.000 --> 00:00:03.000\\nCaption text"}
+          />
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              disabled={save.isPending || values[language].trim().length < 20}
+              onClick={() => save.mutate({ language, content: values[language] })}
+            >
+              Salvar legenda
+            </Button>
+            {rows.some((row) => row.language === language) ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={remove.isPending}
+                onClick={() => remove.mutate(language)}
+              >
+                Remover
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
+
 function showPushResult(push: NewShortPushResult, prefix: string) {
   if (push.problem) toast.error(`${prefix} Notificação não enviada: ${push.problem}.`);
   else if (push.students === 0)
