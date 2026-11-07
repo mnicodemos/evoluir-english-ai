@@ -141,7 +141,8 @@ export function A2CommunityFestival() {
   const [selected, setSelected] = useState<number | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
   const { markCompleted } = useEnglishAdventuresProgress();
-  const activity = activities[index];
+  const completed = index >= activities.length;
+  const activity = activities[Math.min(index, activities.length - 1)];
   if (!activity) return null;
 
   function continueStory() {
@@ -162,7 +163,6 @@ export function A2CommunityFestival() {
     setShowTranslation(false);
   }
 
-  const completed = index === activities.length;
   const selectedChoice = selected === null ? null : activity.choices[selected];
 
   return (
