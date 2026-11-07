@@ -1793,3 +1793,16 @@ export const deleteLessonVideoCaption = createServerFn({ method: "POST" })
     if (error) throw new Error("Não foi possível remover a legenda.");
     return { ok: true };
   });
+
+
+export const getLessonVideoCaptionAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ key: z.string().min(3).max(40) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await (supabaseAdmin as any).from("lesson_video_captions")
+      .select("language, updated_at").eq("curriculum_key", data.key);
+    if (error) return { missingMigration: true, languages: [] as string[] };
+    return { missingMigration: false, languages: (rows ?? []).map((row: { language: string }) => row.language) };
+  });
