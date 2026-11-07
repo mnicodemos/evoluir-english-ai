@@ -81,7 +81,7 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) {
       if (/does not exist|relation .* not found/i.test(error.message)) {
-        return { content: null };
+        return { content: null, fontSize: 20 };
       }
       throw new Error("Could not load Short captions");
     }
