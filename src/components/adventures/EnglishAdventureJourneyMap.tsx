@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import { useUiLang } from "@/lib/uiLang";
 
 const ROUTE = [
   { id: "a1-welcome-mix-up", title: "The Welcome Mix-Up", level: "A1", start: 0 },
@@ -45,6 +46,8 @@ export function EnglishAdventureJourneyMap({
   isComplete?: boolean;
 }) {
   const { completedActivityIds, completed, total, percent } = useEnglishAdventuresProgress();
+  const { lang } = useUiLang();
+  const isPortuguese = lang === "pt";
   const points = useMemo(() => routePoints(), []);
   const currentAdventure = ROUTE.find((item) => item.id === adventureId) ?? ROUTE[0];
   const currentIndex = Math.min(
@@ -64,18 +67,20 @@ export function EnglishAdventureJourneyMap({
 
   return (
     <section
-      aria-label="Seu mapa das 40 atividades"
+      aria-label={isPortuguese ? "Seu mapa das 40 atividades" : "Your map of 40 activities"}
       className="overflow-hidden rounded-2xl border border-border/70 bg-card/80 p-3 shadow-sm sm:p-4"
     >
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-green">
-            Your adventure map
+            {isPortuguese ? "Mapa da sua jornada" : "Your adventure map"}
           </p>
           <p className="text-sm font-semibold">
             {isComplete && completed >= TOTAL_STEPS
-              ? "Jornada concluída!"
-              : `Atividade ${activityNumber} de ${TOTAL_STEPS}`}
+              ? (isPortuguese ? "Jornada concluída!" : "Journey complete!")
+              : (isPortuguese
+                ? `Atividade ${activityNumber} de ${TOTAL_STEPS}`
+                : `Activity ${activityNumber} of ${TOTAL_STEPS}`)}
           </p>
         </div>
         <div className="text-right">
@@ -90,7 +95,9 @@ export function EnglishAdventureJourneyMap({
         <svg
           viewBox="0 0 780 238"
           role="img"
-          aria-label={`${completed} atividades concluídas de ${TOTAL_STEPS}; ${remaining} restantes`}
+          aria-label={isPortuguese
+            ? `${completed} atividades concluídas de ${TOTAL_STEPS}; ${remaining} restantes`
+            : `${completed} of ${TOTAL_STEPS} activities completed; ${remaining} remaining`}
           className="block h-auto w-full overflow-visible"
         >
           <polyline
@@ -191,7 +198,7 @@ export function EnglishAdventureJourneyMap({
               </p>
               <p className="truncate text-xs font-medium">{item.title}</p>
               <p className="text-[10px] tabular-nums text-muted-foreground">
-                {Math.min(10, doneCount)}/10 concluídas
+                {Math.min(10, doneCount)}/10 {isPortuguese ? "concluídas" : "completed"}
               </p>
             </div>
           );
@@ -201,14 +208,16 @@ export function EnglishAdventureJourneyMap({
       <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-brand-green" />
-          Caminho percorrido
+          {isPortuguese ? "Caminho percorrido" : "Path completed"}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-current opacity-30" />
-          A fazer: {remaining}
+          {isPortuguese ? "A fazer" : "To go"}: {remaining}
         </span>
         <span className="font-medium text-foreground">
-          {isComplete ? "Etapa finalizada" : `Você está aqui · ${activityNumber}/40`}
+          {isComplete
+            ? (isPortuguese ? "Etapa finalizada" : "Step completed")
+            : (isPortuguese ? `Você está aqui · ${activityNumber}/40` : `You are here · ${activityNumber}/40`)}
         </span>
       </div>
     </section>
