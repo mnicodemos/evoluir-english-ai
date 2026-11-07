@@ -1829,8 +1829,14 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
         language: z.enum(["en", "pt"]),
         content: z.string().min(20).max(500_000),
         fontSize: z.union([z.literal(16), z.literal(20), z.literal(24)]).default(20),
-        textColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).default("#FFFFFF"),
-        backgroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).default("#000000"),
+        textColor: z
+          .string()
+          .regex(/^#[0-9A-Fa-f]{6}$/)
+          .default("#FFFFFF"),
+        backgroundColor: z
+          .string()
+          .regex(/^#[0-9A-Fa-f]{6}$/)
+          .default("#000000"),
       })
       .parse(data),
   )
