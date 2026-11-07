@@ -47,10 +47,7 @@ import { useLessonAudioImage } from "@/hooks/useHomeImages";
 import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
-import {
-  lessonVideoEmbedUrl,
-  vimeoVideoId,
-} from "@/lib/lessonVideoDisplay";
+import { lessonVideoEmbedUrl, vimeoVideoId } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
