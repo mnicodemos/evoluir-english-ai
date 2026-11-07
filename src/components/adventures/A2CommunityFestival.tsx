@@ -142,8 +142,8 @@ export function A2CommunityFestival() {
   const [selected, setSelected] = useState<number | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
   const { markCompleted, markActivityCompleted } = useEnglishAdventuresProgress();
-  useAdventureActivityTimer(completed ? null : "a2-community-festival:" + index);
   const completed = index >= activities.length;
+  useAdventureActivityTimer(completed ? null : "a2-community-festival:" + index);
   const activity = activities[Math.min(index, activities.length - 1)];
   if (!activity) return null;
 
