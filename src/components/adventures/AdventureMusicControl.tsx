@@ -14,7 +14,6 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   const audioRef = useRef<HTMLAudioElement>(null);
   const welcomeSequenceRef = useRef(false);
   const [muted, setMuted] = useState(true);
-  const [preferenceLoaded, setPreferenceLoaded] = useState(false);
   const [showHint, setShowHint] = useState(true);
   const autoWelcomeAttemptedRef = useRef(false);
   const getWelcomeAudio = useServerFn(getAdventureWelcomeAudio);
@@ -37,8 +36,6 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       setMuted(window.localStorage.getItem("adventures-music-muted") === "true");
     } catch {
       setMuted(false);
-    } finally {
-      setPreferenceLoaded(true);
     }
   }, []);
 
