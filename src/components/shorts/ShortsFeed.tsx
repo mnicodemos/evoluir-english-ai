@@ -512,17 +512,33 @@ function ShortSlide({
 
 function parseShortVtt(content: string): VttCue[] {
   if (!content.startsWith("WEBVTT")) return [];
-  const seconds = (stamp: string) => stamp.replace(",", ".").split(":").reduce((total, part) => total * 60 + Number(part), 0);
-  return content.replace(/^WEBVTT[^\\n]*\\n/, "").split(/\\n\\s*\\n/).flatMap((block) => {
-    const lines = block.split(/\\r?\\n/), index = lines.findIndex((line) => line.includes("-->"));
-    if (index < 0) return [];
-    const parts = lines[index].split("-->").map((value) => value.trim().split(/\\s+/)[0]);
-    const text = lines.slice(index + 1).join("\\n").replace(/<[^>]*>/g, "").trim();
-    if (!parts[0] || !parts[1] || !text) return [];
-    const start = seconds(parts[0]), end = seconds(parts[1]);
-    return Number.isFinite(start) && Number.isFinite(end) && end > start ? [{ start, end, text }] : [];
-  });
+  const seconds = (stamp: string) =>
+    stamp
+      .replace(",", ".")
+      .split(":")
+      .reduce((total, part) => total * 60 + Number(part), 0);
+  return content
+    .replace(/^WEBVTT[^\\n]*\\n/, "")
+    .split(/\\n\\s*\\n/)
+    .flatMap((block) => {
+      const lines = block.split(/\\r?\\n/);
+      const index = lines.findIndex((line) => line.includes("-->"));
+      if (index < 0) return [];
+      const parts = lines[index].split("-->").map((value) => value.trim().split(/\\s+/)[0]);
+      const text = lines
+        .slice(index + 1)
+        .join("\\n")
+        .replace(/<[^>]*>/g, "")
+        .trim();
+      if (!parts[0] || !parts[1] || !text) return [];
+      const start = seconds(parts[0]);
+      const end = seconds(parts[1]);
+      return Number.isFinite(start) && Number.isFinite(end) && end > start
+        ? [{ start, end, text }]
+        : [];
+    });
 }
+
 function RailButton({
   label,
   count,
