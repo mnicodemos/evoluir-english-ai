@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdventureJourneyMap";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -188,6 +189,8 @@ export function A2CommunityFestival() {
             <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
+        <EnglishAdventureJourneyMap adventureId="a2-community-festival" activityIndex={index} isComplete={completed} />
+
 
         {!completed ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
