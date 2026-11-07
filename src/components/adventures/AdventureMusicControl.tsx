@@ -179,7 +179,9 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
           {t("Meet EVO")}
         </button>
         <span className="truncate text-[10.5px] text-muted-foreground">
-          {lang === "pt" ? "Boas-vindas da EVO · trilha sonora" : "A welcome from EVO · adventure soundtrack"}
+          {lang === "pt"
+            ? "Boas-vindas da EVO · trilha sonora"
+            : "A welcome from EVO · adventure soundtrack"}
         </span>
       </span>
       <button
