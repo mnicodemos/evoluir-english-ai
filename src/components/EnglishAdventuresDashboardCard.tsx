@@ -36,13 +36,11 @@ export function EnglishAdventuresDashboardCard() {
           <p className="truncate text-sm font-semibold" translate="no" lang="en">
             {title}
           </p>
-          <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {t(
-              level === "a2"
-                ? "An adventure about deliveries, problems and finding a solution."
-                : "A1 adventure introduction",
-            )}
-          </p>
+          {level === "a2" ? (
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+              {t("An adventure about deliveries, problems and finding a solution.")}
+            </p>
+          ) : null}
         </div>
       </div>
       <Link
