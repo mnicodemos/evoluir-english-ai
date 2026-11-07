@@ -276,7 +276,12 @@ function ShortSlide({
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
   const getCaption = useServerFn(loadPremiumShortCaption);
   const captionLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
-  const captionQuery = useQuery({ queryKey: ["premium-short-caption", video.id, captionLanguage], queryFn: () => getCaption({ data: { videoId: video.id, language: captionLanguage } }), enabled: active && Boolean(vimeo), retry: false });
+  const captionQuery = useQuery({
+    queryKey: ["premium-short-caption", video.id, captionLanguage],
+    queryFn: () => getCaption({ data: { videoId: video.id, language: captionLanguage } }),
+    enabled: active && Boolean(vimeo),
+    retry: false,
+  });
   const lastTap = useRef(0);
   const tapTimer = useRef<number | null>(null);
 
@@ -323,7 +328,17 @@ function ShortSlide({
     let player: VimeoCaptionPlayer | null = null;
     const customCues = parseShortVtt(captionQuery.data?.content ?? "");
     let timer: number | null = null;
-    const onTimeUpdate = async () => { if (!player || !customCues.length) return; try { const seconds = await player.getCurrentTime(); const cue = customCues.find((item) => seconds >= item.start && seconds < item.end); setCaptionText(cue?.text ?? ""); setCaptionsEnabled(true); } catch { /* player may be transitioning */ } };
+    const onTimeUpdate = async () => {
+      if (!player || !customCues.length) return;
+      try {
+        const seconds = await player.getCurrentTime();
+        const cue = customCues.find((item) => seconds >= item.start && seconds < item.end);
+        setCaptionText(cue?.text ?? "");
+        setCaptionsEnabled(true);
+      } catch {
+        /* player may be transitioning */
+      }
+    };
     const onCueChange = (data: { cues?: VimeoCaptionCue[] }) => {
       const next = (data.cues ?? [])
         .map((cue) => (cue.text ?? "").replace(/<[^>]*>/g, "").trim())
@@ -339,7 +354,12 @@ function ShortSlide({
         player = new sdk.Player(frame.current);
         await player.ready();
         if (cancelled || !player) return;
-        if (customCues.length) { timer = window.setInterval(() => { void onTimeUpdate(); }, 250); return; }
+        if (customCues.length) {
+          timer = window.setInterval(() => {
+            void onTimeUpdate();
+          }, 250);
+          return;
+        }
         player.on("cuechange", onCueChange);
         const tracks = await player.getTextTracks();
         if (cancelled) return;
