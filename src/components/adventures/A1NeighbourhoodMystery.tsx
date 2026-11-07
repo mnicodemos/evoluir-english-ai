@@ -154,7 +154,7 @@ export function A1NeighbourhoodMystery() {
         <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-4" aria-hidden="true" /> {t("Back to home")}
         </Link>
-        <header className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-3 sm:flex sm:gap-4">
+        <header className="relative grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-3 sm:flex sm:gap-4">
           <EvoAvatar className="size-16 shrink-0 sm:size-20" />
           <div className="min-w-0 sm:flex-1">
             <p className="flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
@@ -163,7 +163,7 @@ export function A1NeighbourhoodMystery() {
             <h1 className="font-display text-2xl font-bold sm:text-3xl">{t("The Neighbourhood Mystery")}</h1>
             <p className="text-sm text-muted-foreground">{t("A1 adventure introduction")}</p>
           </div>
-          <div className="col-span-2 row-start-2 w-full min-w-0 sm:ml-auto sm:col-auto sm:row-auto sm:w-auto">
+          <div className="col-span-2 row-start-2 w-full min-w-0 sm:absolute sm:right-0 sm:top-[-3.5rem] sm:col-auto sm:row-auto sm:w-auto">
             <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
