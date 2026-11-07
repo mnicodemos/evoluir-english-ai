@@ -11,6 +11,7 @@ import {
   notifyPremiumShort,
   savePremiumVideo,
   setPremiumVideoKind,
+  updatePremiumVideo,
 } from "@/lib/admin.functions";
 import type { NewShortPushResult } from "@/lib/newShortPush";
 import { PREMIUM_VIDEO_LEVELS, premiumVideoList } from "@/lib/premiumVideos";
