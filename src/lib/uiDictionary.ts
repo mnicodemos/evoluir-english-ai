@@ -2768,8 +2768,6 @@ const baseUiPt: Record<string, string> = {
   "The Surprise Delivery": "A entrega surpresa",
   "Next adventure · A2.2": "Próxima aventura · A2.2",
   "Study time": "Tempo de estudo",
-  "Hide translation": "Ocultar tradução",
-  "Show translation": "Ver tradução",
   "The Community Festival": "O festival comunitário",
   "An adventure about planning a community festival, solving problems and working as a team.":
     "Uma aventura sobre organizar um festival comunitário, resolver problemas e trabalhar em equipe.",
