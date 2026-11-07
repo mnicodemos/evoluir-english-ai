@@ -518,16 +518,16 @@ function parseShortVtt(content: string): VttCue[] {
       .split(":")
       .reduce((total, part) => total * 60 + Number(part), 0);
   return content
-    .replace(/^WEBVTT[^\\n]*\\n/, "")
-    .split(/\\n\\s*\\n/)
+    .replace(/^WEBVTT[^\n]*\n/, "")
+    .split(/\n\s*\n/)
     .flatMap((block) => {
-      const lines = block.split(/\\r?\\n/);
+      const lines = block.split(/\r?\n/);
       const index = lines.findIndex((line) => line.includes("-->"));
       if (index < 0) return [];
-      const parts = lines[index].split("-->").map((value) => value.trim().split(/\\s+/)[0]);
+      const parts = lines[index].split("-->").map((value) => value.trim().split(/\s+/)[0]);
       const text = lines
         .slice(index + 1)
-        .join("\\n")
+        .join("\n")
         .replace(/<[^>]*>/g, "")
         .trim();
       if (!parts[0] || !parts[1] || !text) return [];
