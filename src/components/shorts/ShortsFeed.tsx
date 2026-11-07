@@ -32,6 +32,43 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
+
+type VimeoCaptionTrack = { language: string; kind: string };
+type VimeoCaptionCue = { text?: string };
+type VimeoCaptionPlayer = {
+  ready(): Promise<void>;
+  getTextTracks(): Promise<VimeoCaptionTrack[]>;
+  enableTextTrack(language: string, kind?: string, showing?: boolean): Promise<unknown>;
+  disableTextTrack(): Promise<void>;
+  on(event: "cuechange", callback: (data: { cues?: VimeoCaptionCue[] }) => void): void;
+  off(event: "cuechange", callback: (data: { cues?: VimeoCaptionCue[] }) => void): void;
+};
+type VimeoCaptionSdk = { Player: new (iframe: HTMLIFrameElement) => VimeoCaptionPlayer };
+
+let vimeoCaptionSdkPromise: Promise<VimeoCaptionSdk> | null = null;
+function loadVimeoCaptionSdk(): Promise<VimeoCaptionSdk> {
+  const sdk = (window as Window & { Vimeo?: VimeoCaptionSdk }).Vimeo;
+  if (sdk) return Promise.resolve(sdk);
+  if (!vimeoCaptionSdkPromise) {
+    vimeoCaptionSdkPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://player.vimeo.com/api/player.js";
+      script.async = true;
+      script.onload = () => {
+        const loaded = (window as Window & { Vimeo?: VimeoCaptionSdk }).Vimeo;
+        if (loaded) resolve(loaded);
+        else reject(new Error("Vimeo Player SDK unavailable"));
+      };
+      script.onerror = () => {
+        vimeoCaptionSdkPromise = null;
+        reject(new Error("Could not load Vimeo Player SDK"));
+      };
+      document.head.appendChild(script);
+    });
+  }
+  return vimeoCaptionSdkPromise;
+}
+
 type Props = {
   videos: PremiumVideo[];
   startIndex: number;
@@ -233,6 +270,10 @@ function ShortSlide({
   const frame = useRef<HTMLIFrameElement>(null);
   const [paused, setPaused] = useState(false);
   const [burst, setBurst] = useState(0);
+  const [captionText, setCaptionText] = useState("");
+  const [captionAvailable, setCaptionAvailable] = useState(false);
+  const [captionsEnabled, setCaptionsEnabled] = useState(false);
+  const [captionLoading, setCaptionLoading] = useState(false);
   const lastTap = useRef(0);
   const tapTimer = useRef<number | null>(null);
 
@@ -268,6 +309,86 @@ function ShortSlide({
       "https://player.vimeo.com",
     );
 
+  // Use Vimeo text-track cues as data and render them with the app's fixed CC style.
+  useEffect(() => {
+    if (!active || !vimeo || !frame.current) {
+      setCaptionText("");
+      setCaptionAvailable(false);
+      setCaptionsEnabled(false);
+      return;
+    }
+    let cancelled = false;
+    let player: VimeoCaptionPlayer | null = null;
+    const onCueChange = (data: { cues?: VimeoCaptionCue[] }) => {
+      const next = (data.cues ?? [])
+        .map((cue) => (cue.text ?? "").replace(/<[^>]*>/g, "").trim())
+        .filter(Boolean)
+        .join("\\n");
+      setCaptionText(next);
+    };
+    setCaptionLoading(true);
+    setCaptionText("");
+    setCaptionAvailable(false);
+    setCaptionsEnabled(false);
+    void loadVimeoCaptionSdk().then(async (sdk) => {
+      if (cancelled || !frame.current) return;
+      player = new sdk.Player(frame.current);
+      await player.ready();
+      if (cancelled || !player) return;
+      player.on("cuechange", onCueChange);
+      const tracks = await player.getTextTracks();
+      if (cancelled) return;
+      const preferredLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
+      const track =
+        tracks.find((item) => item.language.toLowerCase().startsWith(preferredLanguage)) ??
+        tracks[0];
+      if (!track) {
+        setCaptionLoading(false);
+        return;
+      }
+      setCaptionAvailable(true);
+      await player.enableTextTrack(track.language, track.kind, false);
+      if (!cancelled) {
+        setCaptionsEnabled(true);
+        setCaptionLoading(false);
+      }
+    }).catch(() => {
+      if (!cancelled) {
+        setCaptionLoading(false);
+        setCaptionAvailable(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+      if (player) {
+        player.off("cuechange", onCueChange);
+        void player.disableTextTrack().catch(() => undefined);
+      }
+    };
+  }, [active, vimeo, video.level]);
+
+  const toggleCaptions = () => {
+    if (!frame.current || !captionAvailable) return;
+    void loadVimeoCaptionSdk().then(async (sdk) => {
+      const player = new sdk.Player(frame.current!);
+      if (captionsEnabled) {
+        await player.disableTextTrack();
+        setCaptionsEnabled(false);
+        setCaptionText("");
+      } else {
+        const tracks = await player.getTextTracks();
+        const preferredLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
+        const track =
+          tracks.find((item) => item.language.toLowerCase().startsWith(preferredLanguage)) ??
+          tracks[0];
+        if (track) {
+          await player.enableTextTrack(track.language, track.kind, false);
+          setCaptionsEnabled(true);
+        }
+      }
+    }).catch(() => undefined);
+  };
+
   // One tap pauses or plays; a double tap likes (and never unlikes), like Instagram.
   const onTap = () => {
     const now = Date.now();
@@ -292,7 +413,7 @@ function ShortSlide({
   const src = reel
     ? reel
     : vimeo
-      ? `${video.level.toLowerCase() === "a1" || video.level.toLowerCase() === "a2" ? vimeoTextTrackUrl(vimeo, "pt") : cleanVimeoPlayerUrl(vimeo)}&autoplay=1&controls=0&playsinline=1&loop=1`
+      ? `${cleanVimeoPlayerUrl(vimeo)}&autoplay=1&controls=0&playsinline=1&loop=1`
       : null;
 
   return (
@@ -334,6 +455,29 @@ function ShortSlide({
               </span>
             ) : null}
           </button>
+        ) : null}
+
+        {active && vimeo ? (
+          <button
+            type="button"
+            onClick={toggleCaptions}
+            disabled={!captionAvailable || captionLoading}
+            aria-label={captionsEnabled ? t("Turn captions off") : t("Turn captions on")}
+            aria-pressed={captionsEnabled}
+            className="absolute bottom-4 left-3 z-30 rounded-full border border-white/30 bg-black/65 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur disabled:opacity-60"
+          >
+            CC{captionLoading ? "…" : ""}
+          </button>
+        ) : null}
+
+        {active && vimeo && captionsEnabled && captionText ? (
+          <div
+            className="pointer-events-none absolute inset-x-3 bottom-[4.5rem] z-20 mx-auto w-fit max-w-[88%] whitespace-pre-line rounded-sm bg-white px-2 py-1 text-center text-[50%] font-semibold leading-snug text-black shadow"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {captionText}
+          </div>
         ) : null}
 
         {burst > 0 ? (
