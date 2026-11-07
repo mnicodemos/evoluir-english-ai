@@ -449,7 +449,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
       toast.error(error instanceof Error ? error.message : "Falha ao remover legenda."),
   });
   return (
-    <div className="mt-2 grid gap-3 rounded-md border border-border/60 bg-background p-3 sm:grid-cols-2">
+    <div className="mt-2 grid w-full min-w-0 gap-3 rounded-md border border-border/60 bg-background p-3 sm:col-span-full sm:grid-cols-2">
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold">Legendas do Short (WebVTT)</p>
         <p className="text-xs text-muted-foreground">
@@ -463,12 +463,12 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
         ) : null}
       </div>
       {(["en", "pt"] as const).map((language) => (
-        <div key={language} className="space-y-1.5">
+        <div key={language} className="min-w-0 space-y-1.5">
           <label className="text-xs font-semibold">
             {language === "en" ? "English" : "Português"}
           </label>
           <textarea
-            className={field + " h-36 py-2 font-mono text-xs"}
+            className={field + " h-36 w-full min-w-0 py-2 font-mono text-xs"}
             value={values[language]}
             onChange={(event) => setters[language](event.target.value)}
             placeholder={"WEBVTT\\n\\n00:00:01.000 --> 00:00:03.000\\nCaption text"}
