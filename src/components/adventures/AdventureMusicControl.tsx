@@ -128,7 +128,6 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       welcomeSequenceRef.current = false;
       audio.onended = null;
     }
-    setShowHint(false);
 
     if (muted) {
       audio.volume = 0.12;
