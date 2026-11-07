@@ -111,7 +111,7 @@ export function FocusSection() {
         </Button>
       </LifeSectionTitle>
 
-      <div className="mt-2 grid items-center gap-3 sm:grid-cols-[auto_minmax(0,1fr)] xl:mt-1.5 xl:gap-2">
+      <div className="mt-2 grid min-w-0 items-center gap-3 sm:grid-cols-[6rem_minmax(0,1fr)] xl:mt-1.5 xl:grid-cols-[6rem_minmax(0,1fr)] xl:gap-2">
         {/* The countdown ring: pink while focusing, green during the break. */}
         <div className="relative mx-auto grid size-32 place-items-center xl:size-24">
           <svg viewBox="0 0 80 80" className="absolute inset-0 -rotate-90" aria-hidden="true">
