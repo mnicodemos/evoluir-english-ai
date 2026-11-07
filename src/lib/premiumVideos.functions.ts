@@ -56,8 +56,14 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" })
       supabaseAdmin as unknown as {
         from: (name: string) => {
           select: (columns: string) => {
-            eq: (column: string, value: string) => {
-              eq: (column: string, value: string) => {
+            eq: (
+              column: string,
+              value: string,
+            ) => {
+              eq: (
+                column: string,
+                value: string,
+              ) => {
                 maybeSingle: () => Promise<{
                   data: { vtt_content: string } | null;
                   error: { message: string } | null;
