@@ -2831,4 +2831,5 @@ export const uiPt: Record<string, string> = {
   "Idioma da legenda": "Idioma da legenda",
   Tamanho: "Tamanho",
   "Tamanho das legendas": "Tamanho das legendas",
+  "Earns XP": "Ganha XP",
 };
