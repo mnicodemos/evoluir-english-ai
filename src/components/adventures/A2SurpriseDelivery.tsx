@@ -339,7 +339,7 @@ export function A2SurpriseDelivery() {
         <EnglishAdventureJourneyMap
           adventureId="a2-surprise-delivery"
           activityIndex=index
-          isComplete=completed
+          isComplete={completed}
         />
       </div>
     </AppShell>
