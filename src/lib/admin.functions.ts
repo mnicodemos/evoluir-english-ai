@@ -1748,3 +1748,48 @@ export const prepareLevelPodcasts = createServerFn({ method: "POST" })
       done: readyCount === lessons.length,
     };
   });
+
+
+/** Admin-managed WebVTT tracks for the custom A1–B1 lesson caption player. */
+export const saveLessonVideoCaption = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({
+      key: z.string().min(3).max(40),
+      language: z.enum(["en", "pt"]),
+      content: z.string().min(20).max(500_000),
+    }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    if (!/^WEBVTT(?:\\s|$)/.test(data.content)) throw new Error("O arquivo precisa estar no formato WebVTT (.vtt).");
+    if (!/(?:^|\\n)\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\s+-->\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d{3}/m.test(data.content)) {
+      throw new Error("O arquivo VTT não contém marcações de tempo válidas.");
+    }
+    const { findCurriculumLesson } = await import("@/lib/curriculum");
+    if (!findCurriculumLesson(data.key)) throw new Error("Unknown lesson");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as any).from("lesson_video_captions").upsert({
+      curriculum_key: data.key,
+      language: data.language,
+      vtt_content: data.content,
+      updated_at: new Date().toISOString(),
+      updated_by: context.userId,
+    }, { onConflict: "curriculum_key,language" });
+    if (error) throw new Error("Não foi possível salvar a legenda. Verifique se a migração 20261107170000 foi aplicada.");
+    return { ok: true };
+  });
+
+export const deleteLessonVideoCaption = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ key: z.string().min(3).max(40), language: z.enum(["en", "pt"]) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as any).from("lesson_video_captions")
+      .delete().eq("curriculum_key", data.key).eq("language", data.language);
+    if (error) throw new Error("Não foi possível remover a legenda.");
+    return { ok: true };
+  });
