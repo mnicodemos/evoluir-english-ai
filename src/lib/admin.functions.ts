@@ -1554,7 +1554,8 @@ export const updatePremiumVideo = createServerFn({ method: "POST" })
       title: z.string().trim().min(1).max(120),
       kind: z.enum(["video", "short"]),
       sortOrder: z.number().int().min(1).max(9999),
-    }).parse(data),
+    })
+      .parse(data),
   )
   .handler(async ({ context, data }) => {
     if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
@@ -1575,10 +1576,9 @@ export const updatePremiumVideo = createServerFn({ method: "POST" })
         updated_by: context.userId,
       })
       .eq("id", data.id);
-    if (error)
-      throw new Error(
-        "Não foi possível atualizar o vídeo. Confira se a migração 0105 foi aplicada.",
-      );
+    if (error) {
+      throw new Error("Não foi possível atualizar o vídeo. Confira se a migração 0105 foi aplicada.");
+    }
     return { ok: true };
   });
 
