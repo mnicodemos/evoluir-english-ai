@@ -1547,14 +1547,15 @@ export const notifyPremiumShort = createServerFn({ method: "POST" })
 export const updatePremiumVideo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z.object({
-      id: z.string().uuid(),
-      level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]),
-      url: z.string().trim().min(10).max(300),
-      title: z.string().trim().min(1).max(120),
-      kind: z.enum(["video", "short"]),
-      sortOrder: z.number().int().min(1).max(9999),
-    })
+    z
+      .object({
+        id: z.string().uuid(),
+        level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]),
+        url: z.string().trim().min(10).max(300),
+        title: z.string().trim().min(1).max(120),
+        kind: z.enum(["video", "short"]),
+        sortOrder: z.number().int().min(1).max(9999),
+      })
       .parse(data),
   )
   .handler(async ({ context, data }) => {
@@ -1566,7 +1567,9 @@ export const updatePremiumVideo = createServerFn({ method: "POST" })
       (data.kind === "short" ? canonicalReelUrl(data.url) : null);
     if (!url) throw new Error("Link inválido para o tipo de conteúdo selecionado.");
     const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
-    const { error } = await (await premiumVideoTable())
+    const { error } = await (
+      await premiumVideoTable()
+    )
       .update({
         level: data.level,
         title: data.title.trim(),
@@ -1577,7 +1580,9 @@ export const updatePremiumVideo = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) {
-      throw new Error("Não foi possível atualizar o vídeo. Confira se a migração 0105 foi aplicada.");
+      throw new Error(
+        "Não foi possível atualizar o vídeo. Confira se a migração 0105 foi aplicada.",
+      );
     }
     return { ok: true };
   });
