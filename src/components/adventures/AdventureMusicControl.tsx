@@ -5,7 +5,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getAdventureWelcomeAudio, getSharedMusicAsset } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
-import { ADVENTURE_MUSIC_VOLUME, ADVENTURE_WELCOME_MUSIC_VOLUME, getAdventureMusicVolume, playAdventureMusic, prepareAdventureMusic, releaseAdventureMusic, setAdventureMusicVolume } from "@/lib/adventureAudio";
+import {
+  ADVENTURE_MUSIC_VOLUME,
+  ADVENTURE_WELCOME_MUSIC_VOLUME,
+  getAdventureMusicVolume,
+  playAdventureMusic,
+  prepareAdventureMusic,
+  releaseAdventureMusic,
+  setAdventureMusicVolume,
+} from "@/lib/adventureAudio";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -107,13 +115,18 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     const audio = musicAudioRef.current;
     if (!audio || !musicUrl || mutedRef.current || musicAttemptingRef.current) return;
     musicAttemptingRef.current = true;
-    void playAdventureMusic(audio, mutedRef.current, Boolean(welcomeUrl), welcomeFinishedRef.current)
-      .then((started) => {
-        musicAttemptingRef.current = false;
-        musicStartedRef.current = started && !audio.paused;
-        setMusicPlaying(musicStartedRef.current);
-        if (musicStartedRef.current && welcomeStartedRef.current) removeInteractionListenersRef.current?.();
-      });
+    void playAdventureMusic(
+      audio,
+      mutedRef.current,
+      Boolean(welcomeUrl),
+      welcomeFinishedRef.current,
+    ).then((started) => {
+      musicAttemptingRef.current = false;
+      musicStartedRef.current = started && !audio.paused;
+      setMusicPlaying(musicStartedRef.current);
+      if (musicStartedRef.current && welcomeStartedRef.current)
+        removeInteractionListenersRef.current?.();
+    });
   }, [musicUrl, welcomeUrl]);
 
   const startExperienceAudio = useCallback(() => {
@@ -231,8 +244,16 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
                   evo.loop = true;
                   evo.volume = ADVENTURE_MUSIC_VOLUME;
                   void evo.play().then(
-                    () => { musicStartedRef.current = true; setMusicPlaying(true); removeInteractionListenersRef.current?.(); },
-                    () => { musicOnEvoRef.current = false; musicStartedRef.current = false; setMusicPlaying(false); },
+                    () => {
+                      musicStartedRef.current = true;
+                      setMusicPlaying(true);
+                      removeInteractionListenersRef.current?.();
+                    },
+                    () => {
+                      musicOnEvoRef.current = false;
+                      musicStartedRef.current = false;
+                      setMusicPlaying(false);
+                    },
                   );
                 });
               return;
@@ -245,12 +266,26 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
           }}
         />
       ) : null}
-      {musicUrl ? <audio ref={musicAudioRef} crossOrigin="anonymous" src={musicUrl} loop preload="auto" onPlaying={() => setMusicPlaying(true)} onPause={() => { musicStartedRef.current = false; setMusicPlaying(false); }} /> : null}
+      {musicUrl ? (
+        <audio
+          ref={musicAudioRef}
+          crossOrigin="anonymous"
+          src={musicUrl}
+          loop
+          preload="auto"
+          onPlaying={() => setMusicPlaying(true)}
+          onPause={() => {
+            musicStartedRef.current = false;
+            setMusicPlaying(false);
+          }}
+        />
+      ) : null}
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
         <Music2 className="size-4" aria-hidden="true" />
       </span>
       <span className="flex min-w-0 flex-1 flex-col justify-center leading-tight">
-        <Button variant="ghost"
+        <Button
+          variant="ghost"
           type="button"
           onClick={playWelcome}
           disabled={!welcomeUrl}
@@ -269,7 +304,9 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         type="button"
         onClick={toggleMusic}
         disabled={!musicUrl}
-        aria-label={!musicPlaying || muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")}
+        aria-label={
+          !musicPlaying || muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")
+        }
         aria-pressed={musicPlaying && !muted}
         title={!musicPlaying || muted ? t("Play soundtrack") : t("Mute soundtrack")}
         className="inline-flex size-8 shrink-0 items-center justify-center rounded-full p-0 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
