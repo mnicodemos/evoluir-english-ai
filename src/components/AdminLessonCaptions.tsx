@@ -14,11 +14,12 @@ import {
 const LEVELS = ["a1", "a2", "b1"] as const;
 type Level = (typeof LEVELS)[number];
 type Language = "en" | "pt";
+type CaptionFile = { name: string; content: string };
 
 export function AdminLessonCaptions() {
   const [level, setLevel] = useState<Level>("a1");
   const [lessonKey, setLessonKey] = useState("");
-  const [files, setFiles] = useState<Partial<Record<Language, { name: string; content: string }>>>({});
+  const [files, setFiles] = useState<Partial<Record<Language, CaptionFile>>>({});
   const [notice, setNotice] = useState("");
   const queryClient = useQueryClient();
   const getLinks = useServerFn(getSummaryVideoLinks);
@@ -158,8 +159,8 @@ export function AdminLessonCaptions() {
         <p className="text-sm text-destructive">Não foi possível carregar as aulas deste nível.</p>
       ) : statusQuery.data?.missingMigration ? (
         <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-          Aplique a migração <code>20261107170000_lesson_video_captions.sql</code> para habilitar
-          o envio das legendas.
+          Aplique a migração <code>20261107170000_lesson_video_captions.sql</code> para habilitar o
+          envio das legendas.
         </p>
       ) : selectedKey ? (
         <div className="grid gap-3 sm:grid-cols-2">
