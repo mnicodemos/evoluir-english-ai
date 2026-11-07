@@ -16,6 +16,8 @@ export function EnglishAdventuresDashboardCard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const level = (profile?.max_level || profile?.level || "a1").toLowerCase();
   const title = level === "a2" ? "The Surprise Delivery" : "The Welcome Mix-Up";
+  const progress = useEnglishAdventuresProgress();
+  const barPercent = useFillIn(progress.percent);
 
   return (
     <section

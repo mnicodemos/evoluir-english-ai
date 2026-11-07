@@ -301,6 +301,7 @@ export function A1WelcomeMixUp() {
   const [selected, setSelected] = useState<number | null>(null);
   const [completed, setCompleted] = useState(false);
   const [recovered, setRecovered] = useState(0);
+  const { markCompleted } = useEnglishAdventuresProgress();
   const scene = scenes[sceneIndex] ?? scenes[0];
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];

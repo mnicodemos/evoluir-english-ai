@@ -128,6 +128,7 @@ export function A1NeighbourhoodMystery() {
   const [selected, setSelected] = useState<number | null>(null);
   const [recovered, setRecovered] = useState(0);
   const [complete, setComplete] = useState(false);
+  const { markCompleted } = useEnglishAdventuresProgress();
   const challenge = challenges[index];
   if (!challenge) return null;
   const choice = selected === null ? null : challenge.choices[selected];

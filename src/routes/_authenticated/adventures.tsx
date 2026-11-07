@@ -193,6 +193,7 @@ function EnglishAdventuresPage() {
   const [sceneIndex, setSceneIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [finished, setFinished] = useState(false);
+  const { markCompleted } = useEnglishAdventuresProgress();
 
   if (premium === false) {
     return (

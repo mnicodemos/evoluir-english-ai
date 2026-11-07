@@ -160,6 +160,7 @@ export function A2SurpriseDelivery() {
   const [lastConsequence, setLastConsequence] = useState<Choice["consequence"]>("polite");
   const [completed, setCompleted] = useState(false);
   const [decisions, setDecisions] = useState<string[]>([]);
+  const { markCompleted } = useEnglishAdventuresProgress();
   const scene = scenes[index];
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];
