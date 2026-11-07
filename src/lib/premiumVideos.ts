@@ -50,6 +50,7 @@ export function premiumVideoList(rows: PremiumVideoRow[], withLinks: boolean): P
       title: row.title,
       kind: row.kind === "short" ? "short" : "video",
       url: withLinks ? row.video_url : null,
+      sortOrder: row.sort_order ?? 0,
     }));
 }
 
