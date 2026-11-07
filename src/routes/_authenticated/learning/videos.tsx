@@ -225,7 +225,11 @@ function ExtraVideosPage() {
                     {premium && embed ? (
                       <iframe
                         className="absolute inset-0 size-full"
-                        src={["a1", "a2"].includes(video.level.toLowerCase()) ? vimeoTextTrackUrl(embed, "pt") : cleanVimeoPlayerUrl(embed)}
+                        src={
+                          ["a1", "a2"].includes(video.level.toLowerCase())
+                            ? vimeoTextTrackUrl(embed, "pt")
+                            : cleanVimeoPlayerUrl(embed)
+                        }
                         title={video.title}
                         loading="lazy"
                         referrerPolicy="strict-origin-when-cross-origin"
