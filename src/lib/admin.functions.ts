@@ -1761,14 +1761,14 @@ type LessonVideoCaptionAdminTable = {
     },
     options: { onConflict: string },
   ) => Promise<{ error: { message: string } | null }>;
-  delete: () => ({
-    eq: (column: string, value: string) => ({
+  delete: () => {
+    eq: (column: string, value: string) => {
       eq: (
         column: string,
         value: string,
       ) => Promise<{ error: { message: string } | null }>;
-    });
-  });
+    };
+  };
   select: (columns: string) => {
     eq: (
       column: string,
@@ -1779,7 +1779,6 @@ type LessonVideoCaptionAdminTable = {
     }>;
   };
 };
-
 type LessonVideoCaptionAdminClient = {
   from: (table: string) => LessonVideoCaptionAdminTable;
 };
