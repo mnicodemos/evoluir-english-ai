@@ -1799,7 +1799,7 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
       .eq("video_id", data.videoId);
     if (error) {
       if (/does not exist|relation .* not found/i.test(error.message)) {
-        return { missingMigration: true, captions: [] as PremiumShortCaptionRow[] };
+        return { missingMigration: true, captions: [] as PremiumShortCaptionRow[], fontSize: 20 };
       }
       throw new Error("Não foi possível carregar as legendas do Short.");
     }
