@@ -20,6 +20,7 @@ import { showAppNotification } from "@/components/ui/AppNotificationToast";
 import { EvoGuide } from "@/components/EvoGuide";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { LessonQuiz } from "@/components/LessonQuiz";
+import { VimeoCaptionPlayer } from "@/components/VimeoCaptionPlayer";
 import { LessonPodcast } from "@/components/ReviewPodcast";
 import { RealLifeChallengeCard } from "@/components/RealLifeChallengeCard";
 import { Button } from "@/components/ui/button";
@@ -47,10 +48,7 @@ import { hasLessonPodcast } from "@/lib/reviewPodcast";
 import { lessonChecklist } from "@/lib/lessonChecklist";
 import { buildLessonGuide } from "@/lib/lessonGuide";
 import {
-  cleanVimeoPlayerUrl,
   lessonVideoEmbedUrl,
-  vimeoTextTrackUrl,
-  vimeoVideoId,
 } from "@/lib/lessonVideoDisplay";
 import { finalizeLessonQuiz, lessonCompletionUnlocksVocabulary } from "@/lib/quizCompletion";
 import { uiPt } from "@/lib/uiDictionary";
@@ -570,21 +568,24 @@ function LessonPage() {
                   aria-labelledby="summary-video-title"
                 >
                   <div className="aspect-video w-full overflow-hidden rounded-xl bg-black shadow-[0_18px_40px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
-                    <iframe
-                      className="h-full w-full"
-                      src={
-                        vimeoVideoId(summaryVideoEmbedUrl)
-                          ? ["a1", "a2"].includes(lesson.level.toLowerCase())
-                            ? vimeoTextTrackUrl(summaryVideoEmbedUrl, "pt")
-                            : cleanVimeoPlayerUrl(summaryVideoEmbedUrl)
-                          : summaryVideoEmbedUrl
-                      }
-                      title={lesson?.title ?? "Lesson video reinforcement"}
-                      loading="lazy"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
+                    {["a1", "a2", "b1"].includes(lesson.level.toLowerCase()) &&
+                    vimeoVideoId(summaryVideoEmbedUrl) ? (
+                      <VimeoCaptionPlayer
+                        url={summaryVideoEmbedUrl}
+                        title={lesson?.title ?? "Lesson video reinforcement"}
+                        captions={summaryVideoQuery.data?.captions ?? []}
+                      />
+                    ) : (
+                      <iframe
+                        className="h-full w-full"
+                        src={summaryVideoEmbedUrl}
+                        title={lesson?.title ?? "Lesson video reinforcement"}
+                        loading="lazy"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    )}
                   </div>
                   <div className="space-y-2">
                     <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-brand-green">
