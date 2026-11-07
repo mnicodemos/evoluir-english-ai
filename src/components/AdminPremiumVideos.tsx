@@ -34,7 +34,14 @@ export function AdminPremiumVideos() {
   // Shorts are what the owner adds most now, so the form starts on them
   // (owner report, 2026-10-31: a short saved as "Vídeo" sent no push).
   const [kind, setKind] = useState<"video" | "short">("short");
-  const [editing, setEditing] = useState<{ id: string; level: (typeof LEVELS)[number]; title: string; url: string; kind: "video" | "short"; sortOrder: number } | null>(null);
+  const [editing, setEditing] = useState<{
+    id: string;
+    level: (typeof LEVELS)[number];
+    title: string;
+    url: string;
+    kind: "video" | "short";
+    sortOrder: number;
+  } | null>(null);
   const update = useServerFn(updatePremiumVideo);
 
   const query = useQuery({
@@ -64,9 +71,17 @@ export function AdminPremiumVideos() {
       toast.error(error instanceof Error ? error.message : "Não foi possível salvar."),
   });
   const updateMutation = useMutation({
-    mutationFn: () => { if (!editing) throw new Error("Selecione um vídeo."); return update({ data: editing }); },
-    onSuccess: async () => { await refresh(); setEditing(null); toast.success("Vídeo atualizado e ordem salva."); },
-    onError: (error) => toast.error(error instanceof Error ? error.message : "Não foi possível atualizar."),
+    mutationFn: () => {
+      if (!editing) throw new Error("Selecione um vídeo.");
+      return update({ data: editing });
+    },
+    onSuccess: async () => {
+      await refresh();
+      setEditing(null);
+      toast.success("Vídeo atualizado e ordem salva.");
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Não foi possível atualizar."),
   });
   const notify = useServerFn(notifyPremiumShort);
   const notifyMutation = useMutation({
