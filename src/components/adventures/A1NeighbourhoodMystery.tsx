@@ -174,7 +174,7 @@ export function A1NeighbourhoodMystery() {
             <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
-        <EnglishAdventureJourneyMap adventureId="a1-neighbourhood-mystery" activityIndex={index} isComplete={complete} />
+        
 
         {!complete ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
@@ -240,6 +240,11 @@ export function A1NeighbourhoodMystery() {
             </div>
           </section>
         )}
+        <EnglishAdventureJourneyMap
+          adventureId="a1-neighbourhood-mystery"
+          activityIndex=index
+          isComplete=complete
+        />
       </div>
     </AppShell>
   );
