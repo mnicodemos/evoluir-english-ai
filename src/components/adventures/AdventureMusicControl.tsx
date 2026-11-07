@@ -185,7 +185,31 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
           onEnded={() => {
             welcomeFinishedRef.current = true;
             welcomeAttemptingRef.current = false;
-            if (!muted) fadeMusicTo(0.12);
+            const music = musicAudioRef.current;
+            if (muted || !music || !musicUrl) return;
+
+            // The soundtrack may have been blocked while EVO's voice was playing.
+            // Retry at the voice-completion boundary before fading it up.
+            if (music.paused) {
+              music.loop = true;
+              music.muted = false;
+              void music
+                .play()
+                .then(() => {
+                  musicStartedRef.current = true;
+                  fadeMusicTo(0.12);
+                  removeInteractionListenersRef.current?.();
+                })
+                .catch(() => {
+                  musicStartedRef.current = false;
+                  // Keep the explicit soundtrack control available as a fallback.
+                });
+              return;
+            }
+
+            musicStartedRef.current = true;
+            fadeMusicTo(0.12);
+            removeInteractionListenersRef.current?.();
           }}
         />
       ) : null}
