@@ -365,7 +365,6 @@ export function A1WelcomeMixUp() {
           activityIndex={sceneIndex}
           isComplete={completed}
         />
-
         {!completed ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
             <div className="flex items-center justify-between gap-3">
