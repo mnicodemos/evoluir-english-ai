@@ -42,12 +42,41 @@ async function watchedVideoToday(userId: string): Promise<boolean> {
 }
 
 /** Premium-only WebVTT track for the active Short. */
-export const loadPremiumShortCaption = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).inputValidator((data) => z.object({ videoId: z.string().uuid(), language: z.enum(["en", "pt"]) }).parse(data)).handler(async ({ context, data }) => {
-  const { hasPremium } = await import("@/lib/premium.server");
-  if (!(await hasPremium(context.userId))) throw new Error("Premium required");
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const table = (supabaseAdmin as unknown as { from: (name: string) => { select: (columns: string) => { eq: (column: string, value: string) => { eq: (column: string, value: string) => { maybeSingle: () => Promise<{ data: { vtt_content: string } | null; error: { message: string } | null }> } } } } }).from("premium_video_captions");
-  const { data: row, error } = await table.select("vtt_content").eq("video_id", data.videoId).eq("language", data.language).maybeSingle();
-  if (error) { if (/does not exist|relation .* not found/i.test(error.message)) return { content: null }; throw new Error("Could not load Short captions"); }
-  return { content: row?.vtt_content ?? null };
-});
+export const loadPremiumShortCaption = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ videoId: z.string().uuid(), language: z.enum(["en", "pt"]) }).parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    const { hasPremium } = await import("@/lib/premium.server");
+    if (!(await hasPremium(context.userId))) throw new Error("Premium required");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const table = (
+      supabaseAdmin as unknown as {
+        from: (name: string) => {
+          select: (columns: string) => {
+            eq: (column: string, value: string) => {
+              eq: (column: string, value: string) => {
+                maybeSingle: () => Promise<{
+                  data: { vtt_content: string } | null;
+                  error: { message: string } | null;
+                }>;
+              };
+            };
+          };
+        };
+      }
+    ).from("premium_video_captions");
+    const { data: row, error } = await table
+      .select("vtt_content")
+      .eq("video_id", data.videoId)
+      .eq("language", data.language)
+      .maybeSingle();
+    if (error) {
+      if (/does not exist|relation .* not found/i.test(error.message)) {
+        return { content: null };
+      }
+      throw new Error("Could not load Short captions");
+    }
+    return { content: row?.vtt_content ?? null };
+  });
