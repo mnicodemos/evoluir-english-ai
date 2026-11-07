@@ -30,6 +30,7 @@ export function DashboardHeaderStat({
   icon,
   tone,
   label,
+  labelClassName,
   value,
   detail,
   detailStyle,
@@ -44,6 +45,8 @@ export function DashboardHeaderStat({
   icon: ReactNode;
   tone: keyof typeof TONES;
   label: string;
+  /** Optional responsive label sizing for compact dashboard cells. */
+  labelClassName?: string;
   value: string;
   detail?: string | null;
   detailStyle?: CSSProperties | undefined;
@@ -77,7 +80,7 @@ export function DashboardHeaderStat({
         {icon}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="line-clamp-2 text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground">
+        <span className={cn("line-clamp-2 text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground", labelClassName)}>
           {label}
         </span>
         {singleLine ? (
