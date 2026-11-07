@@ -1,21 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Music2, Play, Volume2, VolumeX } from "lucide-react";
+import { Music2, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { getAdventureWelcomeAudio, getSharedMusicAsset } from "@/lib/admin.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
-/** Welcomes students automatically when permitted, with an accessible manual fallback. */
 export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta" | "arabella" }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const getMusic = useServerFn(getSharedMusicAsset);
   const audioRef = useRef<HTMLAudioElement>(null);
   const welcomeSequenceRef = useRef(false);
-  const [muted, setMuted] = useState(true);
-  const [showHint, setShowHint] = useState(true);
   const autoWelcomeAttemptedRef = useRef(false);
+  const [muted, setMuted] = useState(true);
   const getWelcomeAudio = useServerFn(getAdventureWelcomeAudio);
   const welcomeQuery = useQuery({
     queryKey: ["adventure-welcome-audio", welcomeVoice],
@@ -31,21 +29,16 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   });
 
   useEffect(() => {
-    try {
-      // Playback must still be confirmed by a user gesture in browsers that block autoplay.
-      setMuted(window.localStorage.getItem("adventures-music-muted") === "true");
-    } catch {
-      setMuted(false);
-    }
+    try { setMuted(window.localStorage.getItem("adventures-music-muted") === "true"); }
+    catch { setMuted(false); }
   }, []);
 
   useEffect(() => {
     const welcomeUrl = welcomeQuery.data?.url;
     if (!welcomeUrl || autoWelcomeAttemptedRef.current) return;
-
-    // Browsers often block autoplay until the learner interacts with the page.
-    // Use that first interaction to play EVO's greeting, independently of music preference.
-    const startWelcome = () => {
+    const startWelcome = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest("[data-adventure-audio-control]")) return;
       const audio = audioRef.current;
       if (!audio || autoWelcomeAttemptedRef.current) return;
       autoWelcomeAttemptedRef.current = true;
@@ -56,47 +49,32 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       audio.muted = false;
       audio.loop = false;
       welcomeSequenceRef.current = true;
-      setShowHint(false);
       void audio.play().then(() => {
         audio.onended = () => {
           welcomeSequenceRef.current = false;
           audio.onended = null;
-          if (query.data?.url) {
-            audio.src = query.data.url;
-            audio.loop = true;
-          }
+          if (query.data?.url) { audio.src = query.data.url; audio.loop = true; }
         };
       }).catch(() => {
         welcomeSequenceRef.current = false;
-        handleAutoplayBlocked(audio);
+        audio.pause();
+        audio.muted = true;
       });
     };
-
-    window.addEventListener("pointerdown", startWelcome, { once: true });
-    window.addEventListener("keydown", startWelcome, { once: true });
+    window.addEventListener("pointerdown", startWelcome);
+    window.addEventListener("keydown", startWelcome);
     return () => {
       window.removeEventListener("pointerdown", startWelcome);
       window.removeEventListener("keydown", startWelcome);
     };
   }, [welcomeQuery.data?.url, query.data?.url]);
 
-
-  function handleAutoplayBlocked(audio: HTMLAudioElement) {
-    audio.pause();
-    audio.muted = true;
-    setMuted(true);
-    setShowHint(true);
-    // Do not persist an autoplay restriction as a user mute preference.
-  }
-
   function playWelcome() {
     const audio = audioRef.current;
     const welcomeUrl = welcomeQuery.data?.url;
     if (!audio || !welcomeUrl) return;
-
     autoWelcomeAttemptedRef.current = true;
     welcomeSequenceRef.current = true;
-    setShowHint(false);
     audio.pause();
     audio.src = welcomeUrl;
     audio.currentTime = 0;
@@ -106,95 +84,63 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     audio.onended = () => {
       welcomeSequenceRef.current = false;
       audio.onended = null;
-      if (query.data?.url) {
-        audio.src = query.data.url;
-        audio.loop = true;
-      }
+      if (query.data?.url) { audio.src = query.data.url; audio.loop = true; }
     };
     void audio.play().catch(() => {
       welcomeSequenceRef.current = false;
-      handleAutoplayBlocked(audio);
+      audio.pause();
+      audio.muted = true;
     });
   }
 
   function toggleMusic() {
     const audio = audioRef.current;
-    if (!audio) return;
+    const musicUrl = query.data?.url;
+    if (!audio || !musicUrl) return;
     if (welcomeSequenceRef.current) {
       welcomeSequenceRef.current = false;
       audio.onended = null;
     }
-    setShowHint(false);
-
     if (muted) {
-      if (query.data?.url) audio.src = query.data.url;
+      audio.pause();
+      audio.src = musicUrl;
+      audio.currentTime = 0;
+      audio.loop = true;
       audio.volume = 0.12;
       audio.muted = false;
-      // Call play synchronously in the click handler to preserve the browser's user activation.
       const playback = audio.play();
       setMuted(false);
       void playback.catch(() => {
         setMuted(true);
         audio.muted = true;
-        try {
-          window.localStorage.setItem("adventures-music-muted", "true");
-        } catch {
-          // Audio control remains usable when browser storage is unavailable.
-        }
+        try { window.localStorage.setItem("adventures-music-muted", "true"); } catch { /* storage optional */ }
       });
-      try {
-        window.localStorage.setItem("adventures-music-muted", "false");
-      } catch {
-        // Audio control remains usable when browser storage is unavailable.
-      }
+      try { window.localStorage.setItem("adventures-music-muted", "false"); } catch { /* storage optional */ }
       return;
     }
-
     audio.pause();
     audio.muted = true;
     setMuted(true);
-    try {
-      window.localStorage.setItem("adventures-music-muted", "true");
-    } catch {
-      // Audio control remains usable when browser storage is unavailable.
-    }
+    try { window.localStorage.setItem("adventures-music-muted", "true"); } catch { /* storage optional */ }
   }
 
   return (
-    <div className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
+    <div data-adventure-audio-control className="flex h-11 w-full min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-2.5 pr-2 shadow-sm transition-colors hover:bg-white/[0.06] sm:w-[min(24rem,100%)]">
       {query.data?.url || welcomeQuery.data?.url ? <audio ref={audioRef} src={query.data?.url ?? welcomeQuery.data?.url} loop preload="none" /> : null}
-      <button
-        type="button"
-        onClick={playWelcome}
-        disabled={!welcomeQuery.data?.url}
-        className="inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-brand-green/40 bg-brand-green/10 px-3 text-xs font-semibold text-brand-green transition hover:bg-brand-green/15 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
-        aria-label={t("Play EVO welcome")}
-      >
-        <Play className="size-3.5" aria-hidden="true" />
-        {t("Meet EVO")}
-      </button>
-      {showHint ? (
-        <span className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 text-center text-[11px] leading-tight text-cyan-300 sm:max-w-40">
-          <Music2 className="size-3 shrink-0" aria-hidden="true" />
-          {lang === "pt"
-            ? "Se o áudio não começar, toque em Meet EVO."
-            : "If audio does not start, tap Meet EVO."}
+      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green"><Music2 className="size-4" aria-hidden="true" /></span>
+      <span className="flex min-w-0 flex-1 flex-col justify-center leading-tight">
+        <button type="button" onClick={playWelcome} disabled={!welcomeQuery.data?.url}
+          className="w-fit text-left text-xs font-semibold text-foreground transition-colors hover:text-brand-green disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+          aria-label={t("Meet EVO")}>{t("Meet EVO")}</button>
+        <span className="truncate text-[10.5px] text-muted-foreground">
+          {lang === "pt" ? "Boas-vindas da EVO · trilha sonora" : "A welcome from EVO · adventure soundtrack"}
         </span>
-      ) : null}
-      <button
-        type="button"
-        onClick={toggleMusic}
-        disabled={!query.data?.url}
-        aria-label={muted ? "Play adventure soundtrack" : "Mute adventure soundtrack"}
-        aria-pressed={!muted}
-        title={muted ? "Play soundtrack" : "Mute soundtrack"}
-        className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-background/80 text-muted-foreground transition hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
-      >
-        {muted ? (
-          <VolumeX className="size-4" aria-hidden="true" />
-        ) : (
-          <Volume2 className="size-4" aria-hidden="true" />
-        )}
+      </span>
+      <button type="button" onClick={toggleMusic} disabled={!query.data?.url}
+        aria-label={muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")}
+        aria-pressed={!muted} title={muted ? t("Play soundtrack") : t("Mute soundtrack")}
+        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green">
+        {muted ? <VolumeX className="size-4" aria-hidden="true" /> : <Volume2 className="size-4 text-brand-green" aria-hidden="true" />}
       </button>
     </div>
   );
