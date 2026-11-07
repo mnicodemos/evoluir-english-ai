@@ -40,6 +40,7 @@ export function DashboardHeaderStat({
   opens,
   singleLine,
   hint,
+  labelClassName,
 }: {
   icon: ReactNode;
   tone: keyof typeof TONES;
@@ -59,6 +60,8 @@ export function DashboardHeaderStat({
   singleLine?: boolean;
   /** Shown on hover: how the number works (e.g. the jewels rule). */
   hint?: string;
+  /** Optional responsive styling for labels in narrow dashboard cells. */
+  labelClassName?: string;
 }) {
   const body = (
     <>
@@ -77,7 +80,12 @@ export function DashboardHeaderStat({
         {icon}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="line-clamp-2 text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground">
+        <span
+          className={cn(
+            "line-clamp-2 text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground",
+            labelClassName,
+          )}
+        >
           {label}
         </span>
         {singleLine ? (

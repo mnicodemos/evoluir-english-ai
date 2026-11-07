@@ -71,7 +71,7 @@ export function weekXpLine(
   compact = false,
 ): string {
   if (week.record) return translate("Your best week so far");
-  if (week.lastWeek <= 0) return translate("Every activity earns XP");
+  if (week.lastWeek <= 0) return translate(compact ? "Earns XP" : "Every activity earns XP");
   if (week.delta >= 0) return `+${week.delta} XP ${translate("vs last week")}`;
   if (compact) return `${translate("Beat")} ${week.lastWeek} XP`;
   return `${-week.delta} XP ${translate("to beat last week")}`;
@@ -129,6 +129,7 @@ export function WeeklyLeagueSummary({
       icon={<Medal className="size-6" strokeWidth={2.2} />}
       tone={leagueMedal({ joined, rank })}
       label={translate("Weekly league")}
+      labelClassName="whitespace-nowrap text-[clamp(8px,2.4vw,10px)] tracking-[0.03em]"
       value={
         joined
           ? total > 1
