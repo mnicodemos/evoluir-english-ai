@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bell, Crown, Loader2, Pencil, Save, Trash2 } from "lucide-react";
+import { Bell, Crown, Loader2, Pencil, Save, Trash2, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -421,7 +421,9 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   });
   const [en, setEn] = useState<string | null>(null);
   const [pt, setPt] = useState<string | null>(null);
+  const [fontSize, setFontSize] = useState<16 | 20 | 24>(20);
   const rows = query.data?.captions ?? [];
+  const selectedFontSize = query.data?.fontSize ?? fontSize;
   const values = {
     en: en ?? rows.find((row) => row.language === "en")?.vtt_content ?? "",
     pt: pt ?? rows.find((row) => row.language === "pt")?.vtt_content ?? "",
@@ -429,7 +431,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const setters = { en: setEn, pt: setPt };
   const save = useMutation({
     mutationFn: (value: { language: "en" | "pt"; content: string }) =>
-      saveCaption({ data: { videoId, ...value } }),
+      saveCaption({ data: { videoId, ...value, fontSize: selectedFontSize } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] });
       toast.success("Legenda salva.");
@@ -462,7 +464,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
           </p>
         ) : null}
       </div>
-      {(["en", "pt"] as const).map((language) => (
+      <div className="sm:col-span-2 flex flex-wrap items-center gap-3">\n        <label className="text-xs font-semibold" htmlFor={`short-caption-size-${videoId}`}>Tamanho da legenda no vídeo</label>\n        <select id={`short-caption-size-${videoId}`} className={field + " w-36"} value={selectedFontSize} onChange={(event) => setFontSize(Number(event.target.value) as 16 | 20 | 24)}>\n          <option value={16}>Pequeno · 16 px</option><option value={20}>Médio · 20 px</option><option value={24}>Grande · 24 px</option>\n        </select>\n        <span className="text-xs text-muted-foreground">A escolha é salva junto com a legenda.</span>\n      </div>\n      {(["en", "pt"] as const).map((language) => (
         <div key={language} className="min-w-0 space-y-1.5">
           <label className="text-xs font-semibold">
             {language === "en" ? "English" : "Português"}
