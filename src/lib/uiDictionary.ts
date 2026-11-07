@@ -3,9 +3,6 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
-  "Turn captions off": "Desativar legendas",
-  "Turn captions on": "Ativar legendas",
-  Captions: "Legendas",
   Music: "Música",
   "Help EVO welcome the guests and match their name cards.":
     "Ajude a EVO a receber os convidados e combinar os cartões de identificação.",
