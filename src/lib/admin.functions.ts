@@ -1766,18 +1766,18 @@ type LessonVideoCaptionAdminTable = {
       eq: (
         column: string,
         value: string,
-      ) => Promise<{ error: { message: string } | null }>,
-    }),
+      ) => Promise<{ error: { message: string } | null }>;
+    });
   });
-  select: (columns: string) => ({
+  select: (columns: string) => {
     eq: (
       column: string,
       value: string,
     ) => Promise<{
       data: { language: string; updated_at: string }[] | null;
       error: { message: string } | null;
-    }>,
-  });
+    }>;
+  };
 };
 
 type LessonVideoCaptionAdminClient = {
