@@ -611,3 +611,14 @@ export const NEXT_STEP_SKILL_TEXT: Record<string, string> = {
   speaking: "Speaking",
   pronunciation: "Pronunciation",
 };
+
+/** Short equivalents used only when the second Why this matters bullet would overflow. */
+export const NEXT_STEP_BENEFIT_TEXT_SHORT: Record<string, string> = {
+  grammar: "Clearer sentences.",
+  vocabulary: "More words to express yourself.",
+  reading: "More vocabulary, more confidence.",
+  listening: "Understand conversations better.",
+  writing: "Spot and fix mistakes.",
+  speaking: "More fluent, confident speech.",
+  pronunciation: "Speak clearly the first time.",
+};
