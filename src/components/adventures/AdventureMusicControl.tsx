@@ -228,7 +228,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
           }}
         />
       ) : null}
-      {musicUrl ? <audio ref={musicAudioRef} src={musicUrl} loop preload="auto" onPlaying={() => setMusicPlaying(true)} onPause={() => { musicStartedRef.current = false; setMusicPlaying(false); }} /> : null}
+      {musicUrl ? <audio ref={musicAudioRef} crossOrigin="anonymous" src={musicUrl} loop preload="auto" onPlaying={() => setMusicPlaying(true)} onPause={() => { musicStartedRef.current = false; setMusicPlaying(false); }} /> : null}
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
         <Music2 className="size-4" aria-hidden="true" />
       </span>
