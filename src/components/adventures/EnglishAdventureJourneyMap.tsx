@@ -55,7 +55,7 @@ export function EnglishAdventureJourneyMap({
   const activeIndex = isComplete ? -1 : currentIndex;
   const completedSet = new Set(completedActivityIds);
   const activityIdAt = (index: number) => {
-    const route = ROUTE[Math.floor(index / 10)];
+    const route = ROUTE[Math.floor(index / 10)] ?? ROUTE[0];
     return `${route.id}:${index - route.start}`;
   };
   const firstIncomplete = points.find((point) => !completedSet.has(activityIdAt(point.index)));
@@ -131,7 +131,7 @@ export function EnglishAdventureJourneyMap({
 
           {points.map((point) => {
             const row = Math.floor(point.index / 10);
-            const route = ROUTE[row];
+            const route = ROUTE[row] ?? ROUTE[0];
             const localIndex = point.index - route.start;
             const isDone = completedSet.has(`${route.id}:${localIndex}`);
             const isCurrent = point.index === activeIndex;
