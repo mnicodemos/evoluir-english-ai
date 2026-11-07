@@ -410,16 +410,32 @@ export const getSummaryVideoForLesson = createServerFn({ method: "GET" })
     const level = (findCurriculumLesson(data.key)?.level ?? "").toLowerCase();
     let captions: { language: "en" | "pt"; content: string }[] = [];
     if (["a1", "a2", "b1"].includes(level)) {
-      const { data: tracks, error: captionsError } = await (supabaseAdmin as any)
-        .from("lesson_video_captions")
+      const captionTable = (
+        supabaseAdmin as unknown as {
+          from: (table: string) => {
+            select: (columns: string) => {
+              eq: (
+                column: string,
+                value: string,
+              ) => Promise<{
+                data: { language: string; vtt_content: string }[] | null;
+                error: unknown;
+              }>;
+            };
+          };
+        }
+      ).from("lesson_video_captions");
+      const { data: tracks, error: captionsError } = await captionTable
         .select("language, vtt_content")
         .eq("curriculum_key", data.key);
       if (!captionsError && tracks) {
         captions = tracks
-          .filter((track: { language: string; vtt_content: string }) =>
-            ["en", "pt"].includes(track.language) && typeof track.vtt_content === "string")
-          .map((track: { language: "en" | "pt"; vtt_content: string }) => ({
-            language: track.language,
+          .filter(
+            (track) =>
+              ["en", "pt"].includes(track.language) && typeof track.vtt_content === "string",
+          )
+          .map((track) => ({
+            language: track.language as "en" | "pt",
             content: track.vtt_content,
           }));
       }
