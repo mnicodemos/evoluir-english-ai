@@ -325,8 +325,10 @@ export function AdminPremiumVideos() {
                             Cancelar
                           </Button>
                         </span>
+                        {editing.kind === "short" ? (
+                          <ShortCaptionEditor videoId={editing.id} field={field} />
+                        ) : null}
                       </div>
-                      {editing.kind === "short" ? <ShortCaptionEditor videoId={editing.id} field={field} /> : null}
                     ) : null}
                   </div>
                   <span className="flex items-center gap-1 justify-self-start sm:justify-self-end">
