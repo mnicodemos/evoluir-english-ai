@@ -2828,4 +2828,7 @@ export const uiPt: Record<string, string> = {
   "The audio could not be published.": "Não foi possível publicar o áudio.",
   "MP3 only · maximum 10 MB per file.": "Somente MP3 · máximo de 10 MB por arquivo.",
   "There’s a soundtrack waiting for you": "Há uma trilha sonora esperando por você",
+  "Idioma da legenda": "Idioma da legenda",
+  "Tamanho": "Tamanho",
+  "Tamanho das legendas": "Tamanho das legendas",
 };
