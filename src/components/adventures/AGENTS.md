@@ -1,1 +1,1 @@
-- Adventure soundtrack uses a lazily created Web Audio gain graph, unlocked alongside both media play calls in a user gesture, with native playback fallback and cleanup; this preserves mobile volume control and the welcome-to-music transition.
+- Adventure soundtrack uses a lazily created native element volume (no Web Audio graph); if the soundtrack is blocked when EVO ends, it continues on her gesture-unlocked element; this preserves mobile volume control and the welcome-to-music transition.

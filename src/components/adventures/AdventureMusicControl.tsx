@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getAdventureWelcomeAudio, getSharedMusicAsset } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
-import { ADVENTURE_MUSIC_VOLUME, getAdventureMusicVolume, playAdventureMusic, prepareAdventureMusic, releaseAdventureMusic, setAdventureMusicVolume } from "@/lib/adventureAudio";
+import { ADVENTURE_MUSIC_VOLUME, ADVENTURE_WELCOME_MUSIC_VOLUME, getAdventureMusicVolume, playAdventureMusic, prepareAdventureMusic, releaseAdventureMusic, setAdventureMusicVolume } from "@/lib/adventureAudio";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -93,7 +93,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         welcomeStartedRef.current = true;
         welcomeAttemptingRef.current = false;
         welcomeFinishedRef.current = false;
-        if (musicAudioRef.current && !mutedRef.current) fadeMusicTo(0.03);
+        if (musicAudioRef.current && !mutedRef.current) fadeMusicTo(ADVENTURE_WELCOME_MUSIC_VOLUME);
         if (musicStartedRef.current) removeInteractionListenersRef.current?.();
       })
       .catch(() => {
