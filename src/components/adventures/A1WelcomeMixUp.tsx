@@ -309,8 +309,10 @@ export function A1WelcomeMixUp() {
 
   function continueStory() {
     if (!canContinue) return;
-    if (sceneIndex === scenes.length - 1) setCompleted(true);
-    else {
+    if (sceneIndex === scenes.length - 1) {
+      setCompleted(true);
+      markCompleted("a1-welcome-mix-up");
+    } else {
       setSceneIndex((value) => value + 1);
       setSelected(null);
     }

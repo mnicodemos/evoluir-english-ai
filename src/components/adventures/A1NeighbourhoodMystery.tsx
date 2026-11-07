@@ -136,8 +136,10 @@ export function A1NeighbourhoodMystery() {
 
   function continueStory() {
     if (!canContinue) return;
-    if (index === challenges.length - 1) setComplete(true);
-    else {
+    if (index === challenges.length - 1) {
+      setComplete(true);
+      markCompleted("a1-neighbourhood-mystery");
+    } else {
       setIndex((value) => value + 1);
       setSelected(null);
     }

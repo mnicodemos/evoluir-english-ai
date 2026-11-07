@@ -169,8 +169,10 @@ export function A2SurpriseDelivery() {
     if (!choice) return;
     setLastConsequence(choice.consequence);
     setDecisions((items) => [...items, choice.consequence]);
-    if (index === scenes.length - 1) setCompleted(true);
-    else {
+    if (index === scenes.length - 1) {
+      setCompleted(true);
+      markCompleted("a2-surprise-delivery");
+    } else {
       setIndex((value) => value + 1);
       setSelected(null);
       setShowTranslation(false);

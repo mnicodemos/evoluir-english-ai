@@ -47,21 +47,29 @@ export function EnglishAdventuresDashboardCard() {
           ) : null}
         </div>
       </div>
-      <Link
-        to={locked ? "/premium" : "/adventures"}
-        {...(!locked && level === "a2" ? { search: { story: "a2-1" } } : {})}
-        className="mt-1 inline-flex min-h-7 items-center justify-end gap-1.5 text-xs font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-      >
-        {locked ? (
-          t("See plans")
-        ) : (
-          <>
-            <Map className="size-3.5" aria-hidden="true" />
-            {t("Let's explore!")}
-          </>
-        )}
-        <ArrowRight className="size-3.5" aria-hidden="true" />
-      </Link>
+      <div className="mt-1 flex min-h-7 items-center gap-2">
+        <div className="h-1.5 min-w-0 flex-1 rounded-full bg-secondary" aria-hidden="true">
+          <div
+            className={`h-full rounded-full bg-brand-green transition-[width] ${FILL_IN_TRANSITION}`}
+            style={{ width: `${barPercent}%` }}
+          />
+        </div>
+        <span
+          className="shrink-0 text-[11px] font-semibold text-muted-foreground"
+          title={`${progress.completed}/${progress.total}`}
+        >
+          {progress.percent}%
+        </span>
+        <Link
+          to={locked ? "/premium" : "/adventures"}
+          {...(!locked && level === "a2" ? { search: { story: "a2-1" } } : {})}
+          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[11px] font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
+        >
+          {!locked && <Map className="size-3.5" aria-hidden="true" />}
+          {locked ? t("See plans") : t("Let's explore!")}
+          <ArrowRight className="size-3.5" aria-hidden="true" />
+        </Link>
+      </div>
     </section>
   );
 }

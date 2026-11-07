@@ -235,8 +235,10 @@ function EnglishAdventuresPage() {
   }
 
   function continueStory() {
-    if (sceneIndex === adventure.scenes.length - 1) setFinished(true);
-    else {
+    if (sceneIndex === adventure.scenes.length - 1) {
+      setFinished(true);
+      markCompleted(key === "a2" ? "a2-surprise-delivery" : "a1-missing-bag");
+    } else {
       setSceneIndex((value) => value + 1);
       setSelected(null);
     }
