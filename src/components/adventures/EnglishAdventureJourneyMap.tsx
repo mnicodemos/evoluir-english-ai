@@ -55,13 +55,18 @@ export function EnglishAdventureJourneyMap({
     currentAdventure.start + Math.max(0, activityIndex),
   );
   const activeIndex = isComplete ? -1 : currentIndex;
-  const travelledThrough = isComplete ? currentIndex : currentIndex;
+  const completedSet = new Set(completedActivityIds);
+  const activityIdAt = (index: number) => {
+    const route = ROUTE[Math.floor(index / 10)];
+    return `${route.id}:${index - route.start}`;
+  };
+  const firstIncomplete = points.find((point) => !completedSet.has(activityIdAt(point.index)));
+  const travelledThrough = Math.min(currentIndex, firstIncomplete?.index ?? TOTAL_STEPS - 1);
   const fullPath = points.map((point) => `${point.x},${point.y}`).join(" ");
   const travelledPath = points
     .slice(0, travelledThrough + 1)
     .map((point) => `${point.x},${point.y}`)
     .join(" ");
-  const completedSet = new Set(completedActivityIds);
   const remaining = Math.max(0, total - completed);
   const activityNumber = Math.min(TOTAL_STEPS, currentIndex + 1);
 
@@ -86,7 +91,7 @@ export function EnglishAdventureJourneyMap({
         <div className="text-right">
           <p className="text-lg font-bold tabular-nums text-brand-green">{percent}%</p>
           <p className="text-[11px] text-muted-foreground">
-            {completed}/{total} concluídas
+            {completed}/{total} {isPortuguese ? "concluídas" : "completed"}
           </p>
         </div>
       </div>
@@ -196,7 +201,7 @@ export function EnglishAdventureJourneyMap({
               <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                 {item.level} · {index + 1}
               </p>
-              <p className="truncate text-xs font-medium">{item.title}</p>
+              <p className="truncate text-xs font-medium">{isPortuguese ? ["Acolhida confusa", "Mistério no bairro", "Entrega surpresa", "Festival comunitário"][index] : item.title}</p>
               <p className="text-[10px] tabular-nums text-muted-foreground">
                 {Math.min(10, doneCount)}/10 {isPortuguese ? "concluídas" : "completed"}
               </p>
