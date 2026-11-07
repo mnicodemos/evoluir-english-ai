@@ -23,7 +23,10 @@ describe("adventure soundtrack sequence", () => {
     expect(audio.play).not.toHaveBeenCalled();
   });
   it("allows a blocked autoplay to be retried on interaction", async () => {
-    const play = vi.fn().mockRejectedValueOnce(new Error("NotAllowedError")).mockResolvedValue(undefined);
+    const play = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("NotAllowedError"))
+      .mockResolvedValue(undefined);
     const audio = track(play);
     expect(await playAdventureMusic(audio, false, true, true)).toBe(false);
     expect(await playAdventureMusic(audio, false, true, true)).toBe(true);
