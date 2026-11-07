@@ -245,7 +245,7 @@ export function A2CommunityFestival() {
         )}
         <EnglishAdventureJourneyMap
           adventureId="a2-community-festival"
-          activityIndex=index
+          activityIndex={index}
           isComplete={completed}
         />
       </div>
