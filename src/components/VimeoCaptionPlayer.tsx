@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { cleanVimeoPlayerUrl, vimeoVideoId } from "@/lib/lessonVideoDisplay";
 
@@ -41,7 +41,7 @@ export function VimeoCaptionPlayer({
   captions: CaptionTrack[];
 }) {
   const frameRef = useRef<HTMLIFrameElement>(null);
-  const playerId = useMemo(() => `evoluir-caption-${Math.random().toString(36).slice(2)}`, []);
+  const playerId = `evoluir-caption-${useId().replace(/:/g, "")}`;
   const [seconds, setSeconds] = useState(0);
   const [enabled, setEnabled] = useState(captions.length > 0);
   const [language, setLanguage] = useState<"en" | "pt">(
@@ -51,7 +51,7 @@ export function VimeoCaptionPlayer({
   const track = captions.find((item) => item.language === language);
   const cues = useMemo(() => track ? parseVtt(track.content) : [], [track]);
   const activeCue = cues.find((cue) => seconds >= cue.start && seconds < cue.end);
-  const id = vimeoVideoId(url);
+  if (!vimeoVideoId(url)) return <div className="aspect-video w-full bg-black" />;
 
   useEffect(() => {
     function onMessage(event: MessageEvent) {
@@ -102,7 +102,7 @@ export function VimeoCaptionPlayer({
         <div
           aria-live="off"
           className="pointer-events-none absolute inset-x-3 bottom-14 z-10 mx-auto w-fit max-w-[92%] rounded-md bg-black/85 px-3 py-2 text-center font-semibold leading-snug text-white shadow-lg"
-          style={{ fontSize: `clamp(12px, 2.2vw, 24px) * ${size / 75}` }}
+          style={{ fontSize: `${size}%` }}
         >
           {activeCue.text}
         </div>
