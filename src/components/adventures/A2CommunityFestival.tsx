@@ -189,7 +189,7 @@ export function A2CommunityFestival() {
             <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
-        <EnglishAdventureJourneyMap adventureId="a2-community-festival" activityIndex={index} isComplete={completed} />
+        
 
 
         {!completed ? (
@@ -243,6 +243,11 @@ export function A2CommunityFestival() {
             </div>
           </section>
         )}
+        <EnglishAdventureJourneyMap
+          adventureId="a2-community-festival"
+          activityIndex=index
+          isComplete={completed}
+        />
       </div>
     </AppShell>
   );

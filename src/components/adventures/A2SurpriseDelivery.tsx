@@ -271,7 +271,7 @@ export function A2SurpriseDelivery() {
             <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
-        <EnglishAdventureJourneyMap adventureId="a2-surprise-delivery" activityIndex={index} isComplete={completed} />
+        
 
 
         {!completed ? (
@@ -336,6 +336,11 @@ export function A2SurpriseDelivery() {
             </div>
           </section>
         )}
+        <EnglishAdventureJourneyMap
+          adventureId="a2-surprise-delivery"
+          activityIndex=index
+          isComplete={completed}
+        />
       </div>
     </AppShell>
   );
