@@ -129,6 +129,7 @@ export function WeeklyLeagueSummary({
       icon={<Medal className="size-6" strokeWidth={2.2} />}
       tone={leagueMedal({ joined, rank })}
       label={translate("Weekly league")}
+      labelClassName="whitespace-nowrap text-[clamp(8px,2.4vw,10px)] tracking-[0.03em]"
       value={
         joined
           ? total > 1
