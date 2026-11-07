@@ -1794,7 +1794,7 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
       "premium_video_captions",
     );
     const { data: rows, error } = await table
-      .select("language, vtt_content, updated_at")
+      .select("language, vtt_content, font_size, updated_at")
       .eq("video_id", data.videoId);
     if (error) {
       if (/does not exist|relation .* not found/i.test(error.message)) {
@@ -1812,7 +1812,7 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
       .object({
         videoId: z.string().uuid(),
         language: z.enum(["en", "pt"]),
-        content: z.string().min(20).max(500_000),
+        content: z.string().min(20).max(500_000),\n        fontSize: z.union([z.literal(16), z.literal(20), z.literal(24)]).default(20),
       })
       .parse(data),
   )
