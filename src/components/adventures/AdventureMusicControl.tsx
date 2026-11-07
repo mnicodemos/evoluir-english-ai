@@ -16,7 +16,10 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   const evoAudioRef = useRef<HTMLAudioElement>(null);
   const musicAudioRef = useRef<HTMLAudioElement>(null);
   const welcomeStartedRef = useRef(false);
+  const welcomeAttemptingRef = useRef(false);
   const welcomeFinishedRef = useRef(false);
+  const musicStartedRef = useRef(false);
+  const removeInteractionListenersRef = useRef<(() => void) | null>(null);
   const fadeFrameRef = useRef<number | null>(null);
   const [muted, setMuted] = useState(() => {
     try {
@@ -66,16 +69,20 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     audio.currentTime = 0;
     audio.volume = 1;
     audio.muted = false;
+    welcomeAttemptingRef.current = true;
     const playback = audio.play();
     void playback
       .then(() => {
         welcomeStartedRef.current = true;
+        welcomeAttemptingRef.current = false;
         welcomeFinishedRef.current = false;
         if (musicAudioRef.current && !muted) fadeMusicTo(0.03);
+        if (musicStartedRef.current) removeInteractionListenersRef.current?.();
       })
       .catch(() => {
         // Keep the welcome eligible for the next genuine user interaction.
         welcomeStartedRef.current = false;
+        welcomeAttemptingRef.current = false;
       });
   }, [fadeMusicTo, muted, welcomeUrl]);
 
@@ -83,12 +90,24 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     const audio = musicAudioRef.current;
     if (!audio || !musicUrl || muted) return;
     audio.loop = true;
-    audio.volume = welcomeStartedRef.current && !welcomeFinishedRef.current ? 0.03 : 0.12;
+    audio.volume =
+      (welcomeUrl && !welcomeFinishedRef.current) ||
+      welcomeStartedRef.current ||
+      welcomeAttemptingRef.current
+        ? 0.03
+        : 0.12;
     audio.muted = false;
-    void audio.play().catch(() => {
-      // A blocked autoplay can be retried from the next user interaction.
-    });
-  }, [musicUrl, muted]);
+    void audio
+      .play()
+      .then(() => {
+        musicStartedRef.current = true;
+        if (welcomeStartedRef.current) removeInteractionListenersRef.current?.();
+      })
+      .catch(() => {
+        musicStartedRef.current = false;
+        // A blocked autoplay can be retried from the next user interaction.
+      });
+  }, [musicUrl, muted, welcomeUrl]);
 
   const startExperienceAudio = useCallback(() => {
     startWelcome();
@@ -103,26 +122,19 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     const retryFromInteraction = (event: Event) => {
       const target = event.target;
       if (target instanceof Element && target.closest("[data-adventure-audio-control]")) return;
-      startExperienceAudio();
+      if (!welcomeStartedRef.current) startWelcome();
+      if (!muted && !musicStartedRef.current) startMusic();
     };
-    window.addEventListener("pointerdown", retryFromInteraction, true);
-    window.addEventListener("keydown", retryFromInteraction, true);
-    return () => {
+    const removeListeners = () => {
       window.removeEventListener("pointerdown", retryFromInteraction, true);
       window.removeEventListener("keydown", retryFromInteraction, true);
+      removeInteractionListenersRef.current = null;
     };
-  }, [startExperienceAudio]);
-
-  useEffect(() => {
-    const audio = evoAudioRef.current;
-    if (!audio) return;
-    const handleEnded = () => {
-      welcomeFinishedRef.current = true;
-      if (!muted) fadeMusicTo(0.12);
-    };
-    audio.addEventListener("ended", handleEnded);
-    return () => audio.removeEventListener("ended", handleEnded);
-  }, [fadeMusicTo, muted]);
+    removeInteractionListenersRef.current = removeListeners;
+    window.addEventListener("pointerdown", retryFromInteraction, true);
+    window.addEventListener("keydown", retryFromInteraction, true);
+    return removeListeners;
+  }, [muted, startMusic, startWelcome]);
 
   useEffect(() => {
     return () => {
@@ -132,8 +144,10 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
 
   function playWelcome() {
     welcomeStartedRef.current = false;
+    welcomeAttemptingRef.current = false;
     welcomeFinishedRef.current = false;
     startWelcome();
+    if (!muted && musicAudioRef.current?.paused) startMusic();
   }
 
   function toggleMusic() {
@@ -163,7 +177,18 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       data-adventure-audio-control
       className="flex h-11 w-full min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-2.5 pr-2 shadow-sm transition-colors hover:bg-white/[0.06] sm:w-[min(24rem,100%)]"
     >
-      {welcomeUrl ? <audio ref={evoAudioRef} src={welcomeUrl} preload="auto" /> : null}
+      {welcomeUrl ? (
+        <audio
+          ref={evoAudioRef}
+          src={welcomeUrl}
+          preload="auto"
+          onEnded={() => {
+            welcomeFinishedRef.current = true;
+            welcomeAttemptingRef.current = false;
+            if (!muted) fadeMusicTo(0.12);
+          }}
+        />
+      ) : null}
       {musicUrl ? <audio ref={musicAudioRef} src={musicUrl} loop preload="auto" /> : null}
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
         <Music2 className="size-4" aria-hidden="true" />
