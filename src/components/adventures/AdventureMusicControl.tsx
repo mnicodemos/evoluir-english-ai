@@ -1,22 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Music2, Volume2, VolumeX } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getAdventureWelcomeAudio, getSharedMusicAsset } from "@/lib/admin.functions";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
-/** Plays EVO's welcome on the first permitted interaction, independently of soundtrack settings. */
+/** Plays EVO's welcome and the adventure soundtrack on independent audio channels. */
 export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta" | "arabella" }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const getMusic = useServerFn(getSharedMusicAsset);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const welcomeSequenceRef = useRef(false);
-  const autoWelcomeAttemptedRef = useRef(false);
-  const [muted, setMuted] = useState(true);
   const getWelcomeAudio = useServerFn(getAdventureWelcomeAudio);
+  const evoAudioRef = useRef<HTMLAudioElement>(null);
+  const musicAudioRef = useRef<HTMLAudioElement>(null);
+  const welcomeStartedRef = useRef(false);
+  const welcomeFinishedRef = useRef(false);
+  const fadeFrameRef = useRef<number | null>(null);
+  const [muted, setMuted] = useState(() => {
+    try {
+      return window.localStorage.getItem("adventures-music-muted") === "true";
+    } catch {
+      return false;
+    }
+  });
+
   const welcomeQuery = useQuery({
     queryKey: ["adventure-welcome-audio", welcomeVoice],
     queryFn: () => getWelcomeAudio({ data: { voice: welcomeVoice } }),
@@ -30,158 +39,122 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     staleTime: 45 * 60 * 1000,
   });
 
-  useEffect(() => {
-    try {
-      setMuted(window.localStorage.getItem("adventures-music-muted") === "true");
-    } catch {
-      setMuted(false);
+  const welcomeUrl = welcomeQuery.data?.url;
+  const musicUrl = query.data?.url;
+
+  const fadeMusicTo = useCallback((target: number) => {
+    const audio = musicAudioRef.current;
+    if (!audio) return;
+    if (fadeFrameRef.current !== null) {
+      window.cancelAnimationFrame(fadeFrameRef.current);
     }
+    const startVolume = audio.volume;
+    const startTime = performance.now();
+    const duration = 600;
+    const step = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      audio.volume = startVolume + (target - startVolume) * progress;
+      if (progress < 1) fadeFrameRef.current = window.requestAnimationFrame(step);
+      else fadeFrameRef.current = null;
+    };
+    fadeFrameRef.current = window.requestAnimationFrame(step);
   }, []);
 
-  function startSoundtrackAfterWelcome(audio: HTMLAudioElement) {
-    const musicUrl = query.data?.url;
-    if (!musicUrl) return;
-
-    try {
-      if (window.localStorage.getItem("adventures-music-muted") === "true") {
-        setMuted(true);
-        audio.muted = true;
-        return;
-      }
-    } catch {
-      // Continue with playback when storage is unavailable.
-    }
-
-    audio.src = musicUrl;
+  const startWelcome = useCallback(() => {
+    const audio = evoAudioRef.current;
+    if (!audio || !welcomeUrl || welcomeStartedRef.current) return;
     audio.currentTime = 0;
-    audio.volume = 0.12;
-    audio.muted = false;
-    audio.loop = true;
-    void audio
-      .play()
-      .then(() => {
-        setMuted(false);
-      })
-      .catch(() => {
-        audio.pause();
-        audio.muted = true;
-        setMuted(true);
-      });
-  }
-
-  useEffect(() => {
-    const welcomeUrl = welcomeQuery.data?.url;
-    if (!welcomeUrl || autoWelcomeAttemptedRef.current) return;
-
-    const startWelcome = (event: Event) => {
-      const target = event.target;
-      if (target instanceof Element && target.closest("[data-adventure-audio-control]")) return;
-
-      const audio = audioRef.current;
-      if (!audio || autoWelcomeAttemptedRef.current) return;
-
-      autoWelcomeAttemptedRef.current = true;
-      audio.pause();
-      audio.src = welcomeUrl;
-      audio.currentTime = 0;
-      audio.volume = 1;
-      audio.muted = false;
-      audio.loop = false;
-      welcomeSequenceRef.current = true;
-
-      void audio
-        .play()
-        .then(() => {
-          audio.onended = () => {
-            welcomeSequenceRef.current = false;
-            audio.onended = null;
-            startSoundtrackAfterWelcome(audio);
-          };
-        })
-        .catch(() => {
-          welcomeSequenceRef.current = false;
-          audio.pause();
-          audio.muted = true;
-        });
-    };
-
-    window.addEventListener("pointerdown", startWelcome);
-    window.addEventListener("keydown", startWelcome);
-    return () => {
-      window.removeEventListener("pointerdown", startWelcome);
-      window.removeEventListener("keydown", startWelcome);
-    };
-  }, [welcomeQuery.data?.url, query.data?.url]);
-
-  function playWelcome() {
-    const audio = audioRef.current;
-    const welcomeUrl = welcomeQuery.data?.url;
-    if (!audio || !welcomeUrl) return;
-
-    autoWelcomeAttemptedRef.current = true;
-    welcomeSequenceRef.current = true;
-    audio.pause();
-    audio.src = welcomeUrl;
-    audio.currentTime = 0;
-    audio.loop = false;
     audio.volume = 1;
     audio.muted = false;
-    audio.onended = () => {
-      welcomeSequenceRef.current = false;
-      audio.onended = null;
-      startSoundtrackAfterWelcome(audio);
-    };
+    const playback = audio.play();
+    void playback
+      .then(() => {
+        welcomeStartedRef.current = true;
+        welcomeFinishedRef.current = false;
+        if (musicAudioRef.current && !muted) fadeMusicTo(0.03);
+      })
+      .catch(() => {
+        // Keep the welcome eligible for the next genuine user interaction.
+        welcomeStartedRef.current = false;
+      });
+  }, [fadeMusicTo, muted, welcomeUrl]);
 
+  const startMusic = useCallback(() => {
+    const audio = musicAudioRef.current;
+    if (!audio || !musicUrl || muted) return;
+    audio.loop = true;
+    audio.volume = welcomeStartedRef.current && !welcomeFinishedRef.current ? 0.03 : 0.12;
+    audio.muted = false;
     void audio.play().catch(() => {
-      welcomeSequenceRef.current = false;
-      audio.pause();
-      audio.muted = true;
+      // A blocked autoplay can be retried from the next user interaction.
     });
+  }, [musicUrl, muted]);
+
+  const startExperienceAudio = useCallback(() => {
+    startWelcome();
+    startMusic();
+  }, [startMusic, startWelcome]);
+
+  useEffect(() => {
+    if (welcomeUrl || musicUrl) startExperienceAudio();
+  }, [musicUrl, startExperienceAudio, welcomeUrl]);
+
+  useEffect(() => {
+    const retryFromInteraction = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest("[data-adventure-audio-control]")) return;
+      startExperienceAudio();
+    };
+    window.addEventListener("pointerdown", retryFromInteraction, true);
+    window.addEventListener("keydown", retryFromInteraction, true);
+    return () => {
+      window.removeEventListener("pointerdown", retryFromInteraction, true);
+      window.removeEventListener("keydown", retryFromInteraction, true);
+    };
+  }, [startExperienceAudio]);
+
+  useEffect(() => {
+    const audio = evoAudioRef.current;
+    if (!audio) return;
+    const handleEnded = () => {
+      welcomeFinishedRef.current = true;
+      if (!muted) fadeMusicTo(0.12);
+    };
+    audio.addEventListener("ended", handleEnded);
+    return () => audio.removeEventListener("ended", handleEnded);
+  }, [fadeMusicTo, muted]);
+
+  useEffect(() => {
+    return () => {
+      if (fadeFrameRef.current !== null) window.cancelAnimationFrame(fadeFrameRef.current);
+    };
+  }, []);
+
+  function playWelcome() {
+    welcomeStartedRef.current = false;
+    welcomeFinishedRef.current = false;
+    startWelcome();
   }
 
   function toggleMusic() {
-    const audio = audioRef.current;
-    const musicUrl = query.data?.url;
+    const audio = musicAudioRef.current;
     if (!audio || !musicUrl) return;
-
-    if (welcomeSequenceRef.current) {
-      welcomeSequenceRef.current = false;
-      audio.onended = null;
-    }
-
-    if (muted) {
-      audio.pause();
-      audio.src = musicUrl;
-      audio.currentTime = 0;
-      audio.loop = true;
-      audio.volume = 0.12;
-      audio.muted = false;
-      const playback = audio.play();
-      setMuted(false);
-      void playback.catch(() => {
-        setMuted(true);
-        audio.muted = true;
-        try {
-          window.localStorage.setItem("adventures-music-muted", "true");
-        } catch {
-          // Audio control remains usable when browser storage is unavailable.
-        }
-      });
-      try {
-        window.localStorage.setItem("adventures-music-muted", "false");
-      } catch {
-        // Audio control remains usable when browser storage is unavailable.
-      }
-      return;
-    }
-
-    audio.pause();
-    audio.muted = true;
-    setMuted(true);
+    const nextMuted = !muted;
+    setMuted(nextMuted);
+    audio.muted = nextMuted;
     try {
-      window.localStorage.setItem("adventures-music-muted", "true");
+      window.localStorage.setItem("adventures-music-muted", String(nextMuted));
     } catch {
-      // Audio control remains usable when browser storage is unavailable.
+      // Audio controls remain usable when browser storage is unavailable.
+    }
+    if (nextMuted) {
+      audio.pause();
+      if (fadeFrameRef.current !== null) {
+        window.cancelAnimationFrame(fadeFrameRef.current);
+        fadeFrameRef.current = null;
+      }
+    } else {
+      startMusic();
     }
   }
 
@@ -190,9 +163,8 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       data-adventure-audio-control
       className="flex h-11 w-full min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-2.5 pr-2 shadow-sm transition-colors hover:bg-white/[0.06] sm:w-[min(24rem,100%)]"
     >
-      {query.data?.url || welcomeQuery.data?.url ? (
-        <audio ref={audioRef} src={query.data?.url ?? welcomeQuery.data?.url} loop preload="none" />
-      ) : null}
+      {welcomeUrl ? <audio ref={evoAudioRef} src={welcomeUrl} preload="auto" /> : null}
+      {musicUrl ? <audio ref={musicAudioRef} src={musicUrl} loop preload="auto" /> : null}
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green/15 text-brand-green">
         <Music2 className="size-4" aria-hidden="true" />
       </span>
@@ -200,7 +172,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         <button
           type="button"
           onClick={playWelcome}
-          disabled={!welcomeQuery.data?.url}
+          disabled={!welcomeUrl}
           className="w-fit text-left text-xs font-semibold text-foreground transition-colors hover:text-brand-green disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
           aria-label={t("Meet EVO")}
         >
@@ -215,7 +187,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
       <button
         type="button"
         onClick={toggleMusic}
-        disabled={!query.data?.url}
+        disabled={!musicUrl}
         aria-label={muted ? t("Play adventure soundtrack") : t("Mute adventure soundtrack")}
         aria-pressed={!muted}
         title={muted ? t("Play soundtrack") : t("Mute soundtrack")}
