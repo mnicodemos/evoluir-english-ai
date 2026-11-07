@@ -13,8 +13,8 @@ const ROUTE = [
 const TOTAL_STEPS = 40;
 const X_START = 34;
 const X_END = 746;
-const Y_START = 38;
-const ROW_GAP = 54;
+const Y_START = 30;
+const ROW_GAP = 32;
 
 type AdventureId = (typeof ROUTE)[number]["id"];
 
@@ -98,7 +98,7 @@ export function EnglishAdventureJourneyMap({
 
       <div className="relative">
         <svg
-          viewBox="0 0 780 238"
+          viewBox="0 0 780 150"
           role="img"
           aria-label={
             isPortuguese
@@ -112,7 +112,7 @@ export function EnglishAdventureJourneyMap({
             fill="none"
             stroke="currentColor"
             strokeOpacity="0.17"
-            strokeWidth="5"
+            strokeWidth="3.5"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeDasharray="2 10"
@@ -141,7 +141,7 @@ export function EnglishAdventureJourneyMap({
                   <circle
                     cx={point.x}
                     cy={point.y}
-                    r="17"
+                    r="13"
                     fill="var(--brand-green, #20b58a)"
                     opacity="0.2"
                     className="animate-ping"
@@ -150,7 +150,7 @@ export function EnglishAdventureJourneyMap({
                 <circle
                   cx={point.x}
                   cy={point.y}
-                  r={isCurrent ? 12 : 9}
+                  r={isCurrent ? 10 : 7}
                   fill={
                     isDone
                       ? "var(--brand-green, #20b58a)"
@@ -160,13 +160,13 @@ export function EnglishAdventureJourneyMap({
                   }
                   fillOpacity={isDone || isCurrent ? 1 : 0.22}
                   stroke={isCurrent ? "currentColor" : "none"}
-                  strokeWidth={isCurrent ? 2 : 0}
+                  strokeWidth={isCurrent ? 1.5 : 0}
                 />
                 <text
                   x={point.x}
-                  y={point.y + 3.5}
+                  y={point.y + 3}
                   textAnchor="middle"
-                  fontSize="9"
+                  fontSize="8"
                   fontWeight="700"
                   fill={isDone || isCurrent ? "#ffffff" : "currentColor"}
                   fillOpacity={isDone || isCurrent ? 1 : 0.65}
@@ -178,7 +178,7 @@ export function EnglishAdventureJourneyMap({
                     d={`M ${point.x - 4} ${point.y - 19} L ${point.x} ${point.y - 26} L ${point.x + 4} ${point.y - 19}`}
                     fill="none"
                     stroke="var(--brand-green, #20b58a)"
-                    strokeWidth="2.5"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
