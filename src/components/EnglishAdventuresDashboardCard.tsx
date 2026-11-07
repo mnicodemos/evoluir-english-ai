@@ -37,7 +37,11 @@ export function EnglishAdventuresDashboardCard() {
             {title}
           </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {t(level === "a2" ? "An adventure about deliveries, problems and finding a solution." : "A1 adventure introduction")}
+            {t(
+              level === "a2"
+                ? "An adventure about deliveries, problems and finding a solution."
+                : "A1 adventure introduction",
+            )}
           </p>
         </div>
       </div>
