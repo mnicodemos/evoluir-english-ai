@@ -50,6 +50,7 @@ import {
   NEXT_STEP_ACTION_TEXT,
   NEXT_STEP_BENEFIT_TEXT,
   NEXT_STEP_BENEFIT_TEXT_SHORT,
+  NEXT_STEP_BENEFIT_TEXT_COMPACT,
   NEXT_STEP_PRIORITY_TEXT,
   NEXT_STEP_REASON_TEXT,
   NEXT_STEP_SITUATION_TEXT,
@@ -82,34 +83,57 @@ type MobilePill = {
   params?: { lessonId: string };
   label: string;
 };
-function ResponsiveBenefitText({ fullText, shortText }: { fullText: string; shortText: string }) {
+function ResponsiveBenefitText({
+  fullText,
+  shortText,
+  compactText,
+}: {
+  fullText: string;
+  shortText: string;
+  compactText: string;
+}) {
   const containerRef = useRef<HTMLSpanElement>(null);
   const measureRef = useRef<HTMLSpanElement>(null);
-  const [useShort, setUseShort] = useState(false);
+  const [fit, setFit] = useState<"full" | "short" | "compact">("full");
 
   useEffect(() => {
     const measure = () => {
       const container = containerRef.current;
       const content = measureRef.current;
       if (!container || !content) return;
-      setUseShort(content.scrollWidth > container.clientWidth + 1);
+      const available = container.clientWidth;
+      if (!available) return;
+
+      // Measure the actual localized strings (EN or PT) at their rendered font.
+      content.textContent = fullText;
+      if (content.getBoundingClientRect().width <= available + 1) {
+        setFit("full");
+        return;
+      }
+      content.textContent = shortText;
+      if (content.getBoundingClientRect().width <= available + 1) {
+        setFit("short");
+        return;
+      }
+      setFit("compact");
     };
+
     const observer = new ResizeObserver(measure);
     if (containerRef.current) observer.observe(containerRef.current);
     measure();
     return () => observer.disconnect();
-  }, [fullText, shortText]);
+  }, [fullText, shortText, compactText]);
+
+  const visibleText = fit === "full" ? fullText : fit === "short" ? shortText : compactText;
 
   return (
     <span ref={containerRef} className="relative block min-w-0 flex-1">
       <span
         ref={measureRef}
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 block w-full overflow-hidden whitespace-nowrap opacity-0"
-      >
-        {fullText}
-      </span>
-      <span className="block truncate">{useShort ? shortText : fullText}</span>
+        className="pointer-events-none absolute left-0 top-0 w-max whitespace-nowrap opacity-0"
+      />
+      <span className="block truncate">{visibleText}</span>
     </span>
   );
 }
@@ -318,6 +342,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
   const benefitText = t(NEXT_STEP_BENEFIT_TEXT[data.prioritySkill ?? "speaking"] ?? "");
   const benefitShortText = t(NEXT_STEP_BENEFIT_TEXT_SHORT[data.prioritySkill ?? "speaking"] ?? "");
+  const benefitCompactText = t(
+    NEXT_STEP_BENEFIT_TEXT_COMPACT[data.prioritySkill ?? "speaking"] ?? "",
+  );
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   // "Writing · Writing" when the skill and the place share a name: say it once.
   const questSkillLabel = data.quest
@@ -854,7 +881,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     className="mt-[0.45em] size-1.5 shrink-0 rounded-full bg-warning"
                   />
                   {line === benefitText ? (
-                    <ResponsiveBenefitText fullText={benefitText} shortText={benefitShortText} />
+                    <ResponsiveBenefitText
+                      fullText={benefitText}
+                      shortText={benefitShortText}
+                      compactText={benefitCompactText}
+                    />
                   ) : (
                     <span className="min-w-0 flex-1 truncate">{line}</span>
                   )}
