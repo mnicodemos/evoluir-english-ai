@@ -33,7 +33,9 @@ export function AdminPremiumVideos() {
   const [title, setTitle] = useState("");
   // Shorts are what the owner adds most now, so the form starts on them
   // (owner report, 2026-10-31: a short saved as "Vídeo" sent no push).
-  const [kind, setKind] = useState<"video" | "short">("short");\n  const [editing, setEditing] = useState<{ id: string; level: (typeof LEVELS)[number]; title: string; url: string; kind: "video" | "short"; sortOrder: number } | null>(null);\n  const update = useServerFn(updatePremiumVideo);
+  const [kind, setKind] = useState<"video" | "short">("short");
+  const [editing, setEditing] = useState<{ id: string; level: (typeof LEVELS)[number]; title: string; url: string; kind: "video" | "short"; sortOrder: number } | null>(null);
+  const update = useServerFn(updatePremiumVideo);
 
   const query = useQuery({
     queryKey: ["admin-premium-videos"],
@@ -61,7 +63,12 @@ export function AdminPremiumVideos() {
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "Não foi possível salvar."),
   });
-  const updateMutation = useMutation({\n    mutationFn: () => { if (!editing) throw new Error("Selecione um vídeo."); return update({ data: editing }); },\n    onSuccess: async () => { await refresh(); setEditing(null); toast.success("Vídeo atualizado e ordem salva."); },\n    onError: (error) => toast.error(error instanceof Error ? error.message : "Não foi possível atualizar."),\n  });\n  const notify = useServerFn(notifyPremiumShort);
+  const updateMutation = useMutation({
+    mutationFn: () => { if (!editing) throw new Error("Selecione um vídeo."); return update({ data: editing }); },
+    onSuccess: async () => { await refresh(); setEditing(null); toast.success("Vídeo atualizado e ordem salva."); },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Não foi possível atualizar."),
+  });
+  const notify = useServerFn(notifyPremiumShort);
   const notifyMutation = useMutation({
     mutationFn: (id: string) => notify({ data: { id } }),
     onSuccess: (push) => showPushResult(push, "Aviso do Short."),
