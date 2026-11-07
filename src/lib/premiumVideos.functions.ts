@@ -46,8 +46,8 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" }).middlew
   const { hasPremium } = await import("@/lib/premium.server");
   if (!(await hasPremium(context.userId))) throw new Error("Premium required");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const table = (supabaseAdmin as unknown as { from: (name: string) => { select: (columns: string) => { eq: (column: string, value: string) => { eq: (column: string, value: string) => Promise<{ data: { vtt_content: string } | null; error: { message: string } | null }> } } } }).from("premium_video_captions");
-  const { data: row, error } = await table.select("vtt_content").eq("video_id", data.videoId).eq("language", data.language);
+  const table = (supabaseAdmin as unknown as { from: (name: string) => { select: (columns: string) => { eq: (column: string, value: string) => { eq: (column: string, value: string) => { maybeSingle: () => Promise<{ data: { vtt_content: string } | null; error: { message: string } | null }> } } } } }).from("premium_video_captions");
+  const { data: row, error } = await table.select("vtt_content").eq("video_id", data.videoId).eq("language", data.language).maybeSingle();
   if (error) { if (/does not exist|relation .* not found/i.test(error.message)) return { content: null }; throw new Error("Could not load Short captions"); }
   return { content: row?.vtt_content ?? null };
 });
