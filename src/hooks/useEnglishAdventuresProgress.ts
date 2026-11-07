@@ -60,6 +60,7 @@ export function useEnglishAdventuresProgress() {
 
   return {
     ...englishAdventureProgress(ids, seconds),
+    completedActivityIds: ids,
     markCompleted,
     markActivityCompleted,
     recordStudySeconds,

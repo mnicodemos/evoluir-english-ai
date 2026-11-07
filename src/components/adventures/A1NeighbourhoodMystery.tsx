@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-reac
 import { Link } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
+import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdventureJourneyMap";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
@@ -173,6 +174,8 @@ export function A1NeighbourhoodMystery() {
             <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
+        <EnglishAdventureJourneyMap adventureId="a1-neighbourhood-mystery" activityIndex={index} isComplete={complete} />
+
         {!complete ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
             <div className="flex items-center justify-between gap-3">

@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-reac
 import { Link } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
+import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdventureJourneyMap";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
@@ -188,6 +189,8 @@ export function A2CommunityFestival() {
             <AdventureMusicControl welcomeVoice="arabella" />
           </div>
         </header>
+        <EnglishAdventureJourneyMap adventureId="a2-community-festival" activityIndex={index} isComplete={completed} />
+
 
         {!completed ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
