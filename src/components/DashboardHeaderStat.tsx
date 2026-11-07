@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Search } from "lucide-react";
+import { useEffect, useRef } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -63,6 +64,31 @@ export function DashboardHeaderStat({
   /** Optional responsive styling for labels in narrow dashboard cells. */
   labelClassName?: string;
 }) {
+  const labelRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const labelElement = labelRef.current;
+    const availableSpace = labelElement?.parentElement;
+    if (!labelElement || !availableSpace) return;
+
+    const fitLabel = () => {
+      // Measure against the actual card column, not the viewport width.
+      labelElement.style.fontSize = "10.5px";
+      const availableWidth = availableSpace.clientWidth;
+      const naturalWidth = labelElement.scrollWidth;
+      if (!availableWidth || !naturalWidth) return;
+
+      const scale = Math.min(1, availableWidth / naturalWidth);
+      labelElement.style.fontSize = `${Math.max(6, 10.5 * scale)}px`;
+    };
+
+    const observer = new ResizeObserver(fitLabel);
+    observer.observe(availableSpace);
+    fitLabel();
+    document.fonts?.ready.then(fitLabel);
+    return () => observer.disconnect();
+  }, [label]);
+
   const body = (
     <>
       <span
@@ -81,8 +107,9 @@ export function DashboardHeaderStat({
       </span>
       <span className="min-w-0 flex-1">
         <span
+          ref={labelRef}
           className={cn(
-            "block truncate whitespace-nowrap text-[clamp(7px,2.3vw,10.5px)] font-semibold uppercase leading-snug tracking-[0.02em] text-muted-foreground",
+            "block w-full overflow-hidden whitespace-nowrap text-[10.5px] font-semibold uppercase leading-snug tracking-[0.02em] text-muted-foreground",
             labelClassName,
           )}
         >
