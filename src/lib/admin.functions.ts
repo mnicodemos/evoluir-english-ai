@@ -1454,7 +1454,13 @@ export const savePremiumVideo = createServerFn({ method: "POST" })
       );
     const { premiumVideoTable, selectPremiumVideos } = await import("@/lib/premiumVideos.server");
     const { data: existingVideos } = await selectPremiumVideos();
-    const nextOrder = Math.max(0, ...(existingVideos ?? []).filter((video) => (video.kind === "short" ? "short" : "video") === data.kind).map((video) => video.sort_order ?? 0)) + 1;
+    const nextOrder =
+      Math.max(
+        0,
+        ...(existingVideos ?? [])
+          .filter((video) => (video.kind === "short" ? "short" : "video") === data.kind)
+          .map((video) => video.sort_order ?? 0),
+      ) + 1;
     const { error } = await (
       await premiumVideoTable()
     ).insert({
@@ -1554,14 +1560,25 @@ export const updatePremiumVideo = createServerFn({ method: "POST" })
     if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
     const { canonicalVimeoUrl } = await import("@/lib/lessonVideoReport");
     const { canonicalReelUrl } = await import("@/lib/premiumVideos");
-    const url = canonicalVimeoUrl(data.url) ?? (data.kind === "short" ? canonicalReelUrl(data.url) : null);
+    const url =
+      canonicalVimeoUrl(data.url) ??
+      (data.kind === "short" ? canonicalReelUrl(data.url) : null);
     if (!url) throw new Error("Link inválido para o tipo de conteúdo selecionado.");
     const { premiumVideoTable } = await import("@/lib/premiumVideos.server");
-    const { error } = await (await premiumVideoTable()).update({
-      level: data.level, title: data.title.trim(), video_url: url, kind: data.kind,
-      sort_order: data.sortOrder, updated_by: context.userId,
-    }).eq("id", data.id);
-    if (error) throw new Error("Não foi possível atualizar o vídeo. Confira se a migração 0105 foi aplicada.");
+    const { error } = await (await premiumVideoTable())
+      .update({
+        level: data.level,
+        title: data.title.trim(),
+        video_url: url,
+        kind: data.kind,
+        sort_order: data.sortOrder,
+        updated_by: context.userId,
+      })
+      .eq("id", data.id);
+    if (error)
+      throw new Error(
+        "Não foi possível atualizar o vídeo. Confira se a migração 0105 foi aplicada.",
+      );
     return { ok: true };
   });
 
