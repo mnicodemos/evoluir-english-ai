@@ -341,7 +341,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     .replaceAll("{level}", cefrLevel ?? t("your current level"));
   const benefitText = t(NEXT_STEP_BENEFIT_TEXT[data.prioritySkill ?? "speaking"] ?? "");
   const benefitShortText = t(NEXT_STEP_BENEFIT_TEXT_SHORT[data.prioritySkill ?? "speaking"] ?? "");
-  const benefitCompactText = t(NEXT_STEP_BENEFIT_TEXT_COMPACT[data.prioritySkill ?? "speaking"] ?? "");
+  const benefitCompactText = t(
+    NEXT_STEP_BENEFIT_TEXT_COMPACT[data.prioritySkill ?? "speaking"] ?? "",
+  );
   const actionText = t(NEXT_STEP_ACTION_TEXT[data.action]);
   // "Writing · Writing" when the skill and the place share a name: say it once.
   const questSkillLabel = data.quest
