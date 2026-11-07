@@ -7,6 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
+import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -159,6 +160,7 @@ export function A2SurpriseDelivery() {
   const [lastConsequence, setLastConsequence] = useState<Choice["consequence"]>("polite");
   const [completed, setCompleted] = useState(false);
   const [decisions, setDecisions] = useState<string[]>([]);
+  const { markCompleted } = useEnglishAdventuresProgress();
   const scene = scenes[index];
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];
@@ -167,8 +169,10 @@ export function A2SurpriseDelivery() {
     if (!choice) return;
     setLastConsequence(choice.consequence);
     setDecisions((items) => [...items, choice.consequence]);
-    if (index === scenes.length - 1) setCompleted(true);
-    else {
+    if (index === scenes.length - 1) {
+      setCompleted(true);
+      markCompleted("a2-surprise-delivery");
+    } else {
       setIndex((value) => value + 1);
       setSelected(null);
       setShowTranslation(false);

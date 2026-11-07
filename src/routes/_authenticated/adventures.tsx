@@ -10,6 +10,7 @@ import { AdventureMusicControl } from "@/components/adventures/AdventureMusicCon
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
+import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -192,6 +193,7 @@ function EnglishAdventuresPage() {
   const [sceneIndex, setSceneIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [finished, setFinished] = useState(false);
+  const { markCompleted } = useEnglishAdventuresProgress();
 
   if (premium === false) {
     return (
@@ -233,8 +235,10 @@ function EnglishAdventuresPage() {
   }
 
   function continueStory() {
-    if (sceneIndex === adventure.scenes.length - 1) setFinished(true);
-    else {
+    if (sceneIndex === adventure.scenes.length - 1) {
+      setFinished(true);
+      markCompleted(key === "a2" ? "a2-surprise-delivery" : "a1-missing-bag");
+    } else {
       setSceneIndex((value) => value + 1);
       setSelected(null);
     }
