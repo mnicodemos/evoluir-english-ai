@@ -43,38 +43,46 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   }, []);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    const musicUrl = query.data?.url;
     const welcomeUrl = welcomeQuery.data?.url;
-    const canAutoPlay =
-      audio && musicUrl && welcomeUrl && preferenceLoaded && !autoWelcomeAttemptedRef.current;
-    if (!canAutoPlay) return;
+    if (!welcomeUrl || autoWelcomeAttemptedRef.current) return;
 
-    autoWelcomeAttemptedRef.current = true;
-    if (muted) return;
-
-    welcomeSequenceRef.current = true;
-    audio.pause();
-    audio.volume = 0.12;
-    audio.muted = false;
-    audio.loop = false;
-    audio.src = welcomeUrl;
-    audio.onended = () => {
-      welcomeSequenceRef.current = false;
-      audio.onended = null;
-      audio.src = musicUrl;
-      audio.loop = true;
+    // Browsers often block autoplay until the learner interacts with the page.
+    // Use that first interaction to play EVO's greeting, independently of music preference.
+    const startWelcome = () => {
+      const audio = audioRef.current;
+      if (!audio || autoWelcomeAttemptedRef.current) return;
+      autoWelcomeAttemptedRef.current = true;
+      audio.pause();
+      audio.src = welcomeUrl;
       audio.currentTime = 0;
-      void audio.play().catch(() => handleAutoplayBlocked(audio));
+      audio.volume = 1;
+      audio.muted = false;
+      audio.loop = false;
+      welcomeSequenceRef.current = true;
+      setShowHint(false);
+      void audio.play().then(() => {
+        audio.onended = () => {
+          welcomeSequenceRef.current = false;
+          audio.onended = null;
+          if (query.data?.url) {
+            audio.src = query.data.url;
+            audio.loop = true;
+          }
+        };
+      }).catch(() => {
+        welcomeSequenceRef.current = false;
+        handleAutoplayBlocked(audio);
+      });
     };
-    void audio.play().catch(() => {
-      welcomeSequenceRef.current = false;
-      audio.onended = null;
-      audio.src = musicUrl;
-      audio.loop = true;
-      handleAutoplayBlocked(audio);
-    });
-  }, [muted, preferenceLoaded, query.data?.url, welcomeQuery.data?.url]);
+
+    window.addEventListener("pointerdown", startWelcome, { once: true });
+    window.addEventListener("keydown", startWelcome, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", startWelcome);
+      window.removeEventListener("keydown", startWelcome);
+    };
+  }, [welcomeQuery.data?.url, query.data?.url]);
+
 
   function handleAutoplayBlocked(audio: HTMLAudioElement) {
     audio.pause();
@@ -86,42 +94,30 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
 
   function playWelcome() {
     const audio = audioRef.current;
-    const musicUrl = query.data?.url;
     const welcomeUrl = welcomeQuery.data?.url;
-    if (!audio || !musicUrl || !welcomeUrl) return;
+    if (!audio || !welcomeUrl) return;
 
+    autoWelcomeAttemptedRef.current = true;
     welcomeSequenceRef.current = true;
     setShowHint(false);
-    setMuted(false);
     audio.pause();
+    audio.src = welcomeUrl;
+    audio.currentTime = 0;
     audio.loop = false;
-    audio.volume = 0.12;
+    audio.volume = 1;
     audio.muted = false;
     audio.onended = () => {
       welcomeSequenceRef.current = false;
       audio.onended = null;
-      audio.src = musicUrl;
-      audio.loop = true;
-      audio.currentTime = 0;
-      void audio.play().catch(() => {
-        setMuted(true);
-        audio.muted = true;
-      });
+      if (query.data?.url) {
+        audio.src = query.data.url;
+        audio.loop = true;
+      }
     };
-    audio.src = welcomeUrl;
-    audio.currentTime = 0;
     void audio.play().catch(() => {
       welcomeSequenceRef.current = false;
-      audio.onended = null;
-      audio.src = musicUrl;
-      audio.loop = true;
       handleAutoplayBlocked(audio);
     });
-    try {
-      window.localStorage.setItem("adventures-music-muted", "false");
-    } catch {
-      // Playback remains available when browser storage is unavailable.
-    }
   }
 
   function toggleMusic() {
@@ -134,6 +130,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     setShowHint(false);
 
     if (muted) {
+      if (query.data?.url) audio.src = query.data.url;
       audio.volume = 0.12;
       audio.muted = false;
       // Call play synchronously in the click handler to preserve the browser's user activation.
@@ -168,11 +165,11 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
 
   return (
     <div className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
-      {query.data?.url ? <audio ref={audioRef} src={query.data.url} loop preload="none" /> : null}
+      {query.data?.url || welcomeQuery.data?.url ? <audio ref={audioRef} src={query.data?.url ?? welcomeQuery.data?.url} loop preload="none" /> : null}
       <button
         type="button"
         onClick={playWelcome}
-        disabled={!query.data?.url || !welcomeQuery.data?.url}
+        disabled={!welcomeQuery.data?.url}
         className="inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-brand-green/40 bg-brand-green/10 px-3 text-xs font-semibold text-brand-green transition hover:bg-brand-green/15 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
         aria-label={t("Play EVO welcome")}
       >
