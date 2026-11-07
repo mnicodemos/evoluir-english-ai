@@ -18,6 +18,7 @@ import { toast } from "sonner";
 
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
+import { loadPremiumShortCaption } from "@/lib/premiumVideos.functions";
 import { COMMENT_MAX_LENGTH, DOUBLE_TAP_MS, shortTap } from "@/lib/premiumVideoSocial";
 import {
   addVideoComment,
@@ -34,11 +35,13 @@ import { cn } from "@/lib/utils";
 
 type VimeoCaptionTrack = { language: string; kind: string };
 type VimeoCaptionCue = { text?: string };
+type VttCue = { start: number; end: number; text: string };
 type VimeoCaptionPlayer = {
   ready(): Promise<void>;
   getTextTracks(): Promise<VimeoCaptionTrack[]>;
   enableTextTrack(language: string, kind?: string, showing?: boolean): Promise<unknown>;
   disableTextTrack(): Promise<void>;
+  getCurrentTime(): Promise<number>;
   on(event: "cuechange", callback: (data: { cues?: VimeoCaptionCue[] }) => void): void;
   off(event: "cuechange", callback: (data: { cues?: VimeoCaptionCue[] }) => void): void;
 };
@@ -271,6 +274,9 @@ function ShortSlide({
   const [burst, setBurst] = useState(0);
   const [captionText, setCaptionText] = useState("");
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
+  const getCaption = useServerFn(loadPremiumShortCaption);
+  const captionLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
+  const captionQuery = useQuery({ queryKey: ["premium-short-caption", video.id, captionLanguage], queryFn: () => getCaption({ data: { videoId: video.id, language: captionLanguage } }), enabled: active && Boolean(vimeo), retry: false });
   const lastTap = useRef(0);
   const tapTimer = useRef<number | null>(null);
 
@@ -315,6 +321,9 @@ function ShortSlide({
     }
     let cancelled = false;
     let player: VimeoCaptionPlayer | null = null;
+    const customCues = parseShortVtt(captionQuery.data?.content ?? "");
+    let timer: number | null = null;
+    const onTimeUpdate = async () => { if (!player || !customCues.length) return; try { const seconds = await player.getCurrentTime(); const cue = customCues.find((item) => seconds >= item.start && seconds < item.end); setCaptionText(cue?.text ?? ""); setCaptionsEnabled(true); } catch { /* player may be transitioning */ } };
     const onCueChange = (data: { cues?: VimeoCaptionCue[] }) => {
       const next = (data.cues ?? [])
         .map((cue) => (cue.text ?? "").replace(/<[^>]*>/g, "").trim())
@@ -330,6 +339,7 @@ function ShortSlide({
         player = new sdk.Player(frame.current);
         await player.ready();
         if (cancelled || !player) return;
+        if (customCues.length) { timer = window.setInterval(() => { void onTimeUpdate(); }, 250); return; }
         player.on("cuechange", onCueChange);
         const tracks = await player.getTextTracks();
         if (cancelled) return;
@@ -348,12 +358,13 @@ function ShortSlide({
       .catch(() => undefined);
     return () => {
       cancelled = true;
+      if (timer !== null) window.clearInterval(timer);
       if (player) {
         player.off("cuechange", onCueChange);
         void player.disableTextTrack().catch(() => undefined);
       }
     };
-  }, [active, vimeo, video.level]);
+  }, [active, vimeo, video.level, captionQuery.data?.content]);
 
   // One tap pauses or plays; a double tap likes (and never unlikes), like Instagram.
   const onTap = () => {
@@ -479,6 +490,19 @@ function ShortSlide({
   );
 }
 
+function parseShortVtt(content: string): VttCue[] {
+  if (!content.startsWith("WEBVTT")) return [];
+  const seconds = (stamp: string) => stamp.replace(",", ".").split(":").reduce((total, part) => total * 60 + Number(part), 0);
+  return content.replace(/^WEBVTT[^\\n]*\\n/, "").split(/\\n\\s*\\n/).flatMap((block) => {
+    const lines = block.split(/\\r?\\n/), index = lines.findIndex((line) => line.includes("-->"));
+    if (index < 0) return [];
+    const parts = lines[index].split("-->").map((value) => value.trim().split(/\\s+/)[0]);
+    const text = lines.slice(index + 1).join("\\n").replace(/<[^>]*>/g, "").trim();
+    if (!parts[0] || !parts[1] || !text) return [];
+    const start = seconds(parts[0]), end = seconds(parts[1]);
+    return Number.isFinite(start) && Number.isFinite(end) && end > start ? [{ start, end, text }] : [];
+  });
+}
 function RailButton({
   label,
   count,
