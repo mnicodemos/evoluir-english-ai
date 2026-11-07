@@ -431,6 +431,7 @@ function ShortSlide({
           <div
             className="pointer-events-none absolute inset-x-3 bottom-[4.5rem] z-20 mx-auto w-fit max-w-[88%] whitespace-pre-line rounded-sm px-2 py-1 text-center font-semibold leading-snug shadow"
             style={{
+              fontFamily: "inherit",
               fontSize: `${captionQuery.data?.fontSize ?? 20}px`,
               color: captionQuery.data?.textColor ?? "#FFFFFF",
               backgroundColor: captionQuery.data?.backgroundColor ?? "#000000",
