@@ -531,6 +531,8 @@ const baseUiPt: Record<string, string> = {
   "EVO is preparing today's steps…": "A EVO está preparando os passos de hoje…",
   "Your goals could not be loaded.": "Não foi possível carregar suas metas.",
   "Give you one small step a day.": "Vou oferecer um pequeno passo por dia.",
+  "Choose 1 to 3 goals and I will give you one small step a day.":
+    "Escolha de 1 a 3 metas e eu te dou um pequeno passo por dia.",
   "Remove goal": "Remover meta",
   "Remove this goal?": "Remover esta meta?",
   "All of today's steps are done. Today counts for your streak!":
