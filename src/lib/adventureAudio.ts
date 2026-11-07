@@ -34,5 +34,8 @@ export function playAdventureMusic(
   audio.loop = true;
   setAdventureMusicVolume(audio, adventureMusicVolume(welcomeAvailable, welcomeFinished));
   audio.muted = false;
-  return audio.play().then(() => true, () => false);
+  return audio.play().then(
+    () => true,
+    () => false,
+  );
 }
