@@ -27,9 +27,7 @@ function routePoints(): Point[] {
     const reverse = row % 2 === 1;
     const fraction = position / 9;
     return {
-      x: reverse
-        ? X_END - fraction * (X_END - X_START)
-        : X_START + fraction * (X_END - X_START),
+      x: reverse ? X_END - fraction * (X_END - X_START) : X_START + fraction * (X_END - X_START),
       y: Y_START + row * ROW_GAP,
       index,
     };
@@ -82,10 +80,12 @@ export function EnglishAdventureJourneyMap({
           </p>
           <p className="text-sm font-semibold">
             {isComplete && completed >= TOTAL_STEPS
-              ? (isPortuguese ? "Jornada concluída!" : "Journey complete!")
-              : (isPortuguese
+              ? isPortuguese
+                ? "Jornada concluída!"
+                : "Journey complete!"
+              : isPortuguese
                 ? `Atividade ${activityNumber} de ${TOTAL_STEPS}`
-                : `Activity ${activityNumber} of ${TOTAL_STEPS}`)}
+                : `Activity ${activityNumber} of ${TOTAL_STEPS}`}
           </p>
         </div>
         <div className="text-right">
@@ -100,9 +100,11 @@ export function EnglishAdventureJourneyMap({
         <svg
           viewBox="0 0 780 238"
           role="img"
-          aria-label={isPortuguese
-            ? `${completed} atividades concluídas de ${TOTAL_STEPS}; ${remaining} restantes`
-            : `${completed} of ${TOTAL_STEPS} activities completed; ${remaining} remaining`}
+          aria-label={
+            isPortuguese
+              ? `${completed} atividades concluídas de ${TOTAL_STEPS}; ${remaining} restantes`
+              : `${completed} of ${TOTAL_STEPS} activities completed; ${remaining} remaining`
+          }
           className="block h-auto w-full overflow-visible"
         >
           <polyline
@@ -201,7 +203,16 @@ export function EnglishAdventureJourneyMap({
               <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                 {item.level} · {index + 1}
               </p>
-              <p className="truncate text-xs font-medium">{isPortuguese ? ["Acolhida confusa", "Mistério no bairro", "Entrega surpresa", "Festival comunitário"][index] : item.title}</p>
+              <p className="truncate text-xs font-medium">
+                {isPortuguese
+                  ? [
+                      "Acolhida confusa",
+                      "Mistério no bairro",
+                      "Entrega surpresa",
+                      "Festival comunitário",
+                    ][index]
+                  : item.title}
+              </p>
               <p className="text-[10px] tabular-nums text-muted-foreground">
                 {Math.min(10, doneCount)}/10 {isPortuguese ? "concluídas" : "completed"}
               </p>
@@ -221,8 +232,12 @@ export function EnglishAdventureJourneyMap({
         </span>
         <span className="font-medium text-foreground">
           {isComplete
-            ? (isPortuguese ? "Etapa finalizada" : "Step completed")
-            : (isPortuguese ? `Você está aqui · ${activityNumber}/40` : `You are here · ${activityNumber}/40`)}
+            ? isPortuguese
+              ? "Etapa finalizada"
+              : "Step completed"
+            : isPortuguese
+              ? `Você está aqui · ${activityNumber}/40`
+              : `You are here · ${activityNumber}/40`}
         </span>
       </div>
     </section>
