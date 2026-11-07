@@ -360,11 +360,7 @@ export function A1WelcomeMixUp() {
             <AdventureMusicControl welcomeVoice="roberta" />
           </div>
         </header>
-        <EnglishAdventureJourneyMap
-          adventureId="a1-welcome-mix-up"
-          activityIndex={sceneIndex}
-          isComplete={completed}
-        />
+        
         {!completed ? (
           <section className="card-soft space-y-4 p-4 sm:p-6" aria-live="polite">
             <div className="flex items-center justify-between gap-3">
@@ -466,6 +462,11 @@ export function A1WelcomeMixUp() {
             </div>
           </section>
         )}
+        <EnglishAdventureJourneyMap
+          adventureId="a1-welcome-mix-up"
+          activityIndex=sceneIndex
+          isComplete=completed
+        />
       </div>
     </AppShell>
   );
