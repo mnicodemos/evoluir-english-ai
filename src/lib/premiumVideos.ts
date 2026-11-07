@@ -27,6 +27,7 @@ export type PremiumVideo = {
   level: PremiumVideoLevel;
   title: string;
   kind: PremiumVideoKind;
+  createdAt: string;
   /** Null for a free student: the link is handed out only to Premium. */
   url: string | null;
   sortOrder: number;

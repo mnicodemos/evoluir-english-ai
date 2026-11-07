@@ -14,7 +14,7 @@ import { useShortsShortcut } from "@/hooks/useShortsShortcut";
 import { useVideoSocial } from "@/hooks/useVideoSocial";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { findLevel, isReviewLevel, LEVELS } from "@/lib/level";
-import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
+import { reelEmbedUrl, shortsNewestFirst, type PremiumVideo } from "@/lib/premiumVideos";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { recordVideoView, type VideoSocialCounts } from "@/lib/premiumVideoSocial.functions";

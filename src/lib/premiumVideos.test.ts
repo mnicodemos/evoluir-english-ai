@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { premiumVideoList } from "./premiumVideos";
+import { premiumVideoList, shortsNewestFirst } from "./premiumVideos";
 
 describe("premium extra videos (by level)", () => {
   const rows = [
