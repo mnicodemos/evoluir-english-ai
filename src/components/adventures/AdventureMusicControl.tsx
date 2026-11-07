@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getAdventureWelcomeAudio, getSharedMusicAsset } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
-import { ADVENTURE_MUSIC_VOLUME, getAdventureMusicVolume, playAdventureMusic, prepareAdventureMusic, releaseAdventureMusic, setAdventureMusicVolume } from "@/lib/adventureAudio";
+import { ADVENTURE_MUSIC_VOLUME, ADVENTURE_WELCOME_MUSIC_VOLUME, getAdventureMusicVolume, playAdventureMusic, prepareAdventureMusic, releaseAdventureMusic, setAdventureMusicVolume } from "@/lib/adventureAudio";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -23,6 +23,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   const musicStartedRef = useRef(false);
   const musicAttemptingRef = useRef(false);
   const mutedRef = useRef(false);
+  const musicOnEvoRef = useRef(false);
   const removeInteractionListenersRef = useRef<(() => void) | null>(null);
   const fadeFrameRef = useRef<number | null>(null);
   const [muted, setMuted] = useState(false);
@@ -77,6 +78,11 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
   const startWelcome = useCallback(() => {
     const audio = evoAudioRef.current;
     if (!audio || !welcomeUrl || welcomeStartedRef.current || welcomeAttemptingRef.current) return;
+    if (musicOnEvoRef.current) {
+      musicOnEvoRef.current = false;
+      audio.loop = false;
+      audio.src = welcomeUrl;
+    }
     audio.currentTime = 0;
     audio.volume = 1;
     audio.muted = false;
@@ -87,7 +93,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
         welcomeStartedRef.current = true;
         welcomeAttemptingRef.current = false;
         welcomeFinishedRef.current = false;
-        if (musicAudioRef.current && !mutedRef.current) fadeMusicTo(0.03);
+        if (musicAudioRef.current && !mutedRef.current) fadeMusicTo(ADVENTURE_WELCOME_MUSIC_VOLUME);
         if (musicStartedRef.current) removeInteractionListenersRef.current?.();
       })
       .catch(() => {
@@ -171,6 +177,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     }
     if (nextMuted) {
       audio.pause();
+      if (musicOnEvoRef.current) evoAudioRef.current?.pause();
       musicStartedRef.current = false;
       setMusicPlaying(false);
       if (fadeFrameRef.current !== null) {
@@ -193,6 +200,7 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
           src={welcomeUrl}
           preload="auto"
           onEnded={() => {
+            if (musicOnEvoRef.current) return;
             welcomeFinishedRef.current = true;
             welcomeAttemptingRef.current = false;
             const music = musicAudioRef.current;
@@ -214,9 +222,18 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
                   removeInteractionListenersRef.current?.();
                 })
                 .catch(() => {
-                  musicStartedRef.current = false;
-                  setMusicPlaying(false);
-                  // Keep the explicit soundtrack control available as a fallback.
+                  // Phones block play() outside a gesture, but EVO's element was
+                  // unlocked by the tap: continue the soundtrack on it.
+                  const evo = evoAudioRef.current;
+                  if (!evo || mutedRef.current) return;
+                  musicOnEvoRef.current = true;
+                  evo.src = musicUrl;
+                  evo.loop = true;
+                  evo.volume = ADVENTURE_MUSIC_VOLUME;
+                  void evo.play().then(
+                    () => { musicStartedRef.current = true; setMusicPlaying(true); removeInteractionListenersRef.current?.(); },
+                    () => { musicOnEvoRef.current = false; musicStartedRef.current = false; setMusicPlaying(false); },
+                  );
                 });
               return;
             }
