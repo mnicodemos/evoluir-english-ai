@@ -57,13 +57,16 @@ export function AdventureMusicControl({ welcomeVoice }: { welcomeVoice: "roberta
     audio.volume = 0.12;
     audio.muted = false;
     audio.loop = true;
-    void audio.play().then(() => {
-      setMuted(false);
-    }).catch(() => {
-      audio.pause();
-      audio.muted = true;
-      setMuted(true);
-    });
+    void audio
+      .play()
+      .then(() => {
+        setMuted(false);
+      })
+      .catch(() => {
+        audio.pause();
+        audio.muted = true;
+        setMuted(true);
+      });
   }
 
   useEffect(() => {
