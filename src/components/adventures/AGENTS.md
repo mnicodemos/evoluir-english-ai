@@ -1,0 +1,1 @@
+- Adventure soundtrack uses a lazily created Web Audio gain graph, unlocked alongside both media play calls in a user gesture, with native playback fallback and cleanup; this preserves mobile volume control and the welcome-to-music transition.
