@@ -80,7 +80,12 @@ export function DashboardHeaderStat({
         {icon}
       </span>
       <span className="min-w-0 flex-1">
-        <span className={cn("line-clamp-2 text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground", labelClassName)}>
+        <span
+          className={cn(
+            "line-clamp-2 text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground",
+            labelClassName,
+          )}
+        >
           {label}
         </span>
         {singleLine ? (
