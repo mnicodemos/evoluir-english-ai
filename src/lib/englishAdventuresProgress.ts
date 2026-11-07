@@ -7,7 +7,7 @@ const secondsKey = (userId: string) => `${storageKey(userId)}:seconds`;
 const legacyActivityIds: Record<string, number> = {
   "a1-welcome-mix-up": 10,
   "a1-neighbourhood-mystery": 10,
-  "a2-surprise-delivery": 10,
+  "a2-surprise-delivery": 5,
   "a2-community-festival": 10,
 };
 
