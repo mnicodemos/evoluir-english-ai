@@ -37,12 +37,13 @@ export function EnglishAdventuresDashboardCard() {
             {title}
           </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {t("A1 adventure introduction")}
+            {t(level === "a2" ? "An adventure about deliveries, problems and finding a solution." : "A1 adventure introduction")}
           </p>
         </div>
       </div>
       <Link
         to={locked ? "/premium" : "/adventures"}
+        search={locked || level !== "a2" ? undefined : { story: "a2-1" }}
         className="mt-1 inline-flex min-h-7 items-center justify-end gap-1.5 text-xs font-semibold text-brand-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
       >
         {locked ? t("See plans") : t("Let's explore!")}
