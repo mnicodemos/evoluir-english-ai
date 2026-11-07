@@ -457,7 +457,8 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold">Legendas do Short (WebVTT)</p>
         <p className="text-xs text-muted-foreground">
-          Legendas vinculadas somente a este Short. Envie um arquivo .vtt ou edite o conteúdo abaixo.
+          Legendas vinculadas somente a este Short. Envie um arquivo .vtt ou edite o conteúdo
+          abaixo.
         </p>
         {query.isPending ? <p className="text-xs text-muted-foreground">Carregando…</p> : null}
         {query.data?.missingMigration ? (
@@ -467,10 +468,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
         ) : null}
       </div>
       <div className="sm:col-span-2 flex flex-wrap items-center gap-3">
-        <label
-          className="text-xs font-semibold"
-          htmlFor={`short-caption-size-${videoId}`}
-        >
+        <label className="text-xs font-semibold" htmlFor={`short-caption-size-${videoId}`}>
           Tamanho da legenda no vídeo
         </label>
         <select
