@@ -48,8 +48,16 @@ export function VimeoCaptionPlayer({
     captions.some((track) => track.language === "pt") ? "pt" : "en",
   );
   const [size, setSize] = useState(75);
+  useEffect(() => {
+    if (captions.length > 0) {
+      setEnabled(true);
+      if (!captions.some((item) => item.language === language)) {
+        setLanguage(captions.some((item) => item.language === "pt") ? "pt" : "en");
+      }
+    }
+  }, [captions, language]);
   const track = captions.find((item) => item.language === language);
-  const cues = useMemo(() => track ? parseVtt(track.content) : [], [track]);
+  const cues = useMemo(() => (track ? parseVtt(track.content) : []), [track]);
   const activeCue = cues.find((cue) => seconds >= cue.start && seconds < cue.end);
   useEffect(() => {
     function onMessage(event: MessageEvent) {
