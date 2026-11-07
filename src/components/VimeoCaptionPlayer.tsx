@@ -24,14 +24,9 @@ function parseVtt(content: string): Cue[] {
       const timingIndex = lines.findIndex((line) => line.includes("-->"));
       if (timingIndex < 0) return [];
       const timing = lines[timingIndex];
-      const validTiming =
-        /(\d{2}:)?\d{2}:\d{2}[.,]\d{3}\s+-->\s+(\d{2}:)?\d{2}:\d{2}[.,]\d{3}/.test(
-          timing,
-        );
+      const validTiming = /(\d{2}:)?\d{2}:\d{2}[.,]\d{3}\s+-->\s+(\d{2}:)?\d{2}:\d{2}[.,]\d{3}/.test(timing);
       if (!validTiming) return [];
-      const [start, end] = timing
-        .split("-->")
-        .map((part) => part.trim().split(/\s+/)[0]);
+      const [start, end] = timing.split("-->").map((part) => part.trim().split(/\s+/)[0]);
       const cueText = lines
         .slice(timingIndex + 1)
         .join(" ")
