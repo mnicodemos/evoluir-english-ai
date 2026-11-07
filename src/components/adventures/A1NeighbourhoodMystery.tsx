@@ -243,7 +243,7 @@ export function A1NeighbourhoodMystery() {
         <EnglishAdventureJourneyMap
           adventureId="a1-neighbourhood-mystery"
           activityIndex=index
-          isComplete=complete
+          isComplete={complete}
         />
       </div>
     </AppShell>
