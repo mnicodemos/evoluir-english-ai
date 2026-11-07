@@ -464,8 +464,8 @@ export function A1WelcomeMixUp() {
         )}
         <EnglishAdventureJourneyMap
           adventureId="a1-welcome-mix-up"
-          activityIndex=sceneIndex
-          isComplete=completed
+          activityIndex={sceneIndex}
+          isComplete={completed}
         />
       </div>
     </AppShell>
