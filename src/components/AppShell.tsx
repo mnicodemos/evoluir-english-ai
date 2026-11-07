@@ -626,11 +626,13 @@ function AppShellContent({
             </div>
             {/* The profile: icons on top (gear, language, notifications), the
                 photo, name and plan below (user request). */}
-            <ProfileMenu
-              presentation="dashboard-sidebar"
-              className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              toolbar={<UtilityButtons />}
-            />
+            <div className="translate-y-[13px]">
+              <ProfileMenu
+                presentation="dashboard-sidebar"
+                className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                toolbar={<UtilityButtons />}
+              />
+            </div>
           </div>
         </aside>
 
