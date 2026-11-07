@@ -6,7 +6,10 @@ import { AppShell } from "@/components/AppShell";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
-import { useAdventureActivityTimer, useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import {
+  useAdventureActivityTimer,
+  useEnglishAdventuresProgress,
+} from "@/hooks/useEnglishAdventuresProgress";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
