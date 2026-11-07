@@ -65,7 +65,7 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" })
                 value: string,
               ) => {
                 maybeSingle: () => Promise<{
-                  data: { vtt_content: string } | null;
+                  data: { vtt_content: string; font_size: number } | null;
                   error: { message: string } | null;
                 }>;
               };
@@ -75,7 +75,7 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" })
       }
     ).from("premium_video_captions");
     const { data: row, error } = await table
-      .select("vtt_content")
+      .select("vtt_content, font_size")
       .eq("video_id", data.videoId)
       .eq("language", data.language)
       .maybeSingle();
@@ -85,5 +85,5 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" })
       }
       throw new Error("Could not load Short captions");
     }
-    return { content: row?.vtt_content ?? null };
+    return { content: row?.vtt_content ?? null, fontSize: row?.font_size ?? 20 };
   });
