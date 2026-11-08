@@ -35,6 +35,8 @@ ALTER TABLE public.english_adventure_checkpoints ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.english_adventure_checkpoints FROM PUBLIC, anon, authenticated;
 GRANT ALL ON public.english_adventure_checkpoints TO service_role;
 
+DROP FUNCTION IF EXISTS public.save_english_adventure_checkpoint(uuid, text, integer, jsonb, jsonb, integer, text[], boolean, integer);
+
 CREATE OR REPLACE FUNCTION public.save_english_adventure_checkpoint(
   p_user_id uuid,
   p_adventure_id text,
@@ -75,8 +77,6 @@ BEGIN
   THEN
     RAISE EXCEPTION 'Invalid English Adventure checkpoint';
   END IF;
-
-  DROP FUNCTION IF EXISTS public.save_english_adventure_checkpoint(uuid, text, integer, jsonb, jsonb, integer, text[], boolean, integer);
 
   INSERT INTO public.english_adventure_checkpoints AS existing (
     user_id, adventure_id, current_step, choices, decisions,
