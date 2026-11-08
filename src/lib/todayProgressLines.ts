@@ -84,7 +84,7 @@ export function todayProgressLines(input: {
       return {
         key: "english-adventures",
         icon: "adventures" as const,
-        label: "min in English Adventures",
+        label: "adventures",
         value: String(minutes),
         state: minutes > 0 ? ("done" as const) : ("empty" as const),
         active: minutes > 0,
