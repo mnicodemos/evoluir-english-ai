@@ -78,7 +78,12 @@ export function EnglishAdventureJourneyMap({
     .join(" ");
   const remaining = Math.max(0, total - completed);
   const activityNumber = Math.min(journeyTotal, currentIndex + 1);
-  const titlesPt = ["Acolhida confusa", "Mistério no bairro", "Entrega surpresa", "Festival comunitário"];
+  const titlesPt = [
+    "Acolhida confusa",
+    "Mistério no bairro",
+    "Entrega surpresa",
+    "Festival comunitário",
+  ];
 
   return (
     <section
@@ -92,8 +97,12 @@ export function EnglishAdventureJourneyMap({
           </p>
           <p className="text-sm font-semibold">
             {isComplete && completed >= journeyTotal
-              ? isPortuguese ? "Jornada concluída!" : "Journey complete!"
-              : isPortuguese ? `Atividade ${activityNumber} de ${journeyTotal}` : `Activity ${activityNumber} of ${journeyTotal}`}
+              ? isPortuguese
+                ? "Jornada concluída!"
+                : "Journey complete!"
+              : isPortuguese
+                ? `Atividade ${activityNumber} de ${journeyTotal}`
+                : `Activity ${activityNumber} of ${journeyTotal}`}
           </p>
         </div>
         <div className="text-right">
@@ -191,7 +200,9 @@ export function EnglishAdventureJourneyMap({
       <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1.5">
         {levelRoute.map((item, index) => {
           const active = item.id === adventureId;
-          const doneCount = completedActivityIds.filter((id) => id.startsWith(`${item.id}:`)).length;
+          const doneCount = completedActivityIds.filter((id) =>
+            id.startsWith(`${item.id}:`),
+          ).length;
           const titleIndex = ROUTE.findIndex((route) => route.id === item.id);
           return (
             <div
@@ -223,8 +234,12 @@ export function EnglishAdventureJourneyMap({
         </span>
         <span className="font-medium text-foreground">
           {isComplete
-            ? isPortuguese ? "Etapa finalizada" : "Step completed"
-            : isPortuguese ? `Você está aqui · ${activityNumber}/${journeyTotal}` : `You are here · ${activityNumber}/${journeyTotal}`}
+            ? isPortuguese
+              ? "Etapa finalizada"
+              : "Step completed"
+            : isPortuguese
+              ? `Você está aqui · ${activityNumber}/${journeyTotal}`
+              : `You are here · ${activityNumber}/${journeyTotal}`}
         </span>
       </div>
     </section>
