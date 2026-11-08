@@ -269,9 +269,7 @@ function ShortSlide({
   const [captionText, setCaptionText] = useState("");
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
   const getCaption = useServerFn(loadPremiumShortCaption);
-  const preferredCaptionLanguage = ["a1", "a2"].includes(video.level.toLowerCase())
-    ? "pt"
-    : "en";
+  const preferredCaptionLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
   const captionQuery = useQuery({
     queryKey: ["premium-short-caption", video.id],
     queryFn: async () => {
@@ -283,8 +281,7 @@ function ShortSlide({
       ]);
       const preferred = preferredCaptionLanguage === "pt" ? portuguese : english;
       const fallback = preferredCaptionLanguage === "pt" ? english : portuguese;
-      const selected =
-        parseShortVtt(preferred.content ?? "").length > 0 ? preferred : fallback;
+      const selected = parseShortVtt(preferred.content ?? "").length > 0 ? preferred : fallback;
       return selected;
     },
     enabled: active && Boolean(vimeo),
