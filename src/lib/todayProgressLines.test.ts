@@ -67,6 +67,19 @@ describe("today's progress lines", () => {
     });
   });
 
+  it("shows reading without the minutes prefix", () => {
+    const lines = todayProgressLines({
+      ...empty,
+      activities: [{ activity_type: "reading", duration_minutes: 6 }],
+    });
+    expect(lines[0]).toMatchObject({
+      key: "reading",
+      label: "reading",
+      value: "6",
+      state: "done",
+    });
+  });
+
   it("marks a low accuracy as needing attention", () => {
     const accuracy = todayProgressLines({ ...empty, accuracy: 43 }).find(
       (line) => line.key === "accuracy",
