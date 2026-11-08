@@ -1,0 +1,1 @@
+- Dashboard daily progress reads daily evidence through `useTodayStudyMetrics` and reuses `todayStudyMetrics`; keep cumulative AI context separate to avoid catalogue reads delaying daily indicators.

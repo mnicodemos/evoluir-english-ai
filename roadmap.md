@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Stabilize Today's Progress daily reads and fit its three labels without changing card height, icons or gauge positions.
+- [x] Stabilize Today's Progress daily reads and fit its three labels; authenticated slow-network and 360/390/411/1368/1920 px checks passed, card height and gauge preserved.
 
 - [x] Antecipar as leituras do Life+ AI na Home, preservando dados e ações; 57 testes passaram
 - [ ] Medir o carregamento real do Life+ AI na Home desktop — aguardando sessão do aluno no preview
