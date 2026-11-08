@@ -1598,7 +1598,7 @@ const baseUiPt: Record<string, string> = {
   "Check answers": "Conferir respostas",
   "A new reading arrives every day, matching your level.":
     "Uma nova leitura chega todos os dias, no seu nível.",
-  "reading": "leitura",
+  reading: "leitura",
   "Ticked automatically on your English study days":
     "Marcado automaticamente nos seus dias de estudo de inglês",
   "Automatic: English study days": "Automático: dias de estudo de inglês",
