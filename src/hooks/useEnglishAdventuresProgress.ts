@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useProfile } from "@/hooks/useProfile";
 import { loadEnglishAdventureCheckpoints } from "@/lib/englishAdventureCheckpoint.functions";
@@ -16,7 +17,21 @@ import {
 
 export function useEnglishAdventuresProgress(level?: AdventureLevel) {
   const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
   const userId = profile?.id;
+  const persistAdventureMinute = useCallback(async () => {
+    if (!userId) return;
+    await logPracticeTelemetry({
+      data: {
+        operationKey: crypto.randomUUID(),
+        activityType: "english_adventures",
+        minutes: 1,
+      },
+    });
+    // Refresh the same server-backed query used by the Home daily goal as soon
+    // as the minute is persisted; do not wait for polling or Realtime delivery.
+    await queryClient.invalidateQueries({ queryKey: ["minutes-today", userId] });
+  }, [queryClient, userId]);
   const [ids, setIds] = useState<string[]>([]);
   const [seconds, setSeconds] = useState(0);
 
@@ -73,13 +88,7 @@ export function useEnglishAdventuresProgress(level?: AdventureLevel) {
         // Completion and local progress must still succeed without storage.
       }
       if (pending > 0) {
-        void logPracticeTelemetry({
-          data: {
-            operationKey: crypto.randomUUID(),
-            activityType: "english_adventures",
-            minutes: 1,
-          },
-        }).catch(() => {
+        void persistAdventureMinute().catch(() => {
           try {
             window.localStorage.setItem(pendingKey, String(pending));
           } catch {
@@ -88,7 +97,7 @@ export function useEnglishAdventuresProgress(level?: AdventureLevel) {
         });
       }
     },
-    [userId],
+    [persistAdventureMinute, userId],
   );
 
   const markActivityCompleted = useCallback(
@@ -122,13 +131,7 @@ export function useEnglishAdventuresProgress(level?: AdventureLevel) {
       }
 
       for (let index = 0; index < wholeMinutes; index += 1) {
-        void logPracticeTelemetry({
-          data: {
-            operationKey: crypto.randomUUID(),
-            activityType: "english_adventures",
-            minutes: 1,
-          },
-        }).catch(() => {
+        void persistAdventureMinute().catch(() => {
           try {
             const current = Number(window.localStorage.getItem(pendingKey) ?? 0);
             window.localStorage.setItem(pendingKey, String(current + 60));
@@ -138,7 +141,7 @@ export function useEnglishAdventuresProgress(level?: AdventureLevel) {
         });
       }
     },
-    [userId],
+    [persistAdventureMinute, userId],
   );
 
   return {
