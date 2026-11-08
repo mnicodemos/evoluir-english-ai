@@ -20,14 +20,11 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  v_prefix text;
   v_completed integer;
 BEGIN
   IF p_user_id IS NULL OR p_level NOT IN ('a1', 'a2') THEN
     RAISE EXCEPTION 'Invalid English Adventures reward request';
   END IF;
-
-  v_prefix := CASE WHEN p_level = 'a1' THEN 'a1-' ELSE 'a2-' END;
 
   SELECT count(*) INTO v_completed
   FROM public.english_adventure_checkpoints
