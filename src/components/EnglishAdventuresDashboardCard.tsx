@@ -30,7 +30,10 @@ export function EnglishAdventuresDashboardCard() {
         <h2 id="adventures-card-title" className="font-display text-sm font-semibold">
           {t("English Adventures")}
         </h2>
-        <PremiumBadge className="ml-auto" />
+        <span className="ml-auto inline-flex shrink-0 items-center rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-400">
+          +50 XP
+        </span>
+        <PremiumBadge />
       </div>
       <div className="mt-1 flex min-h-0 min-w-0 flex-1 items-center gap-2.5">
         <EnglishAdventuresAvatar decorative className="size-10 shrink-0" />
