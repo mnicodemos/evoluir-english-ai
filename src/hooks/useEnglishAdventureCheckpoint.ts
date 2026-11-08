@@ -98,7 +98,10 @@ function mergeCheckpoints(
 ): EnglishAdventureCheckpoint {
   return {
     currentStep: Math.max(local.currentStep, remote.currentStep),
-    choices: { ...remote.choices, ...local.choices },
+    choices:
+      local.currentStep >= remote.currentStep
+        ? { ...remote.choices, ...local.choices }
+        : { ...local.choices, ...remote.choices },
     decisions:
       local.decisions.length >= remote.decisions.length ? local.decisions : remote.decisions,
     recovered: Math.max(local.recovered, remote.recovered),
