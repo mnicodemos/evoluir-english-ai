@@ -39,6 +39,31 @@ export function useEnglishAdventuresProgress() {
       if (!userId) return;
       saveCompletedAdventure(userId, adventureId);
       setIds(readCompletedActivities(userId));
+
+      // Credit the final partial minute when the student completes the story.
+      const pendingKey = `evoluir-english-adventures:${userId}:pending-telemetry-seconds`;
+      let pending = 0;
+      try {
+        pending = Math.max(0, Number(window.localStorage.getItem(pendingKey) ?? 0));
+        if (pending > 0) window.localStorage.setItem(pendingKey, "0");
+      } catch {
+        // Completion and local progress must still succeed without storage.
+      }
+      if (pending > 0) {
+        void logPracticeTelemetry({
+          data: {
+            operationKey: crypto.randomUUID(),
+            activityType: "english_adventures",
+            minutes: 1,
+          },
+        }).catch(() => {
+          try {
+            window.localStorage.setItem(pendingKey, String(pending));
+          } catch {
+            // Keep the completion state even if telemetry cannot be retried.
+          }
+        });
+      }
     },
     [userId],
   );
