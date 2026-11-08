@@ -222,7 +222,7 @@ export function useEnglishAdventureCheckpoint(
   }, [adventureId, publish, syncRemote, userId]);
 
   const persist = useCallback(
-    (next: EnglishAdventureCheckpoint) => {
+    (next: EnglishAdventureCheckpoint, restart = false) => {
       publish(next);
       if (userId) {
         writeLocalCheckpoint(userId, adventureId, next);
@@ -253,6 +253,7 @@ export function useEnglishAdventureCheckpoint(
                 completedActivityIds: snapshot.completedActivityIds,
                 completed: snapshot.completed,
                 expectedRevision: revisionRef.current,
+                restart,
               },
             });
             const saved = fromRow(result.checkpoint as CheckpointRow);
@@ -312,7 +313,7 @@ export function useEnglishAdventureCheckpoint(
       ...EMPTY_CHECKPOINT,
       completedActivityIds: current.completedActivityIds,
       revision: current.revision,
-    });
+    }, true);
   }, [persist]);
 
   return {
