@@ -85,6 +85,20 @@ export const saveEnglishAdventureCheckpoint = createServerFn({ method: "POST" })
     if (error || !result || (result.saved && !result.checkpoint)) {
       throw new Error("English Adventure progress could not be saved");
     }
+
+    // A level reward is considered only after the server has persisted a completed story.
+    // The database function verifies both stories and enforces one award per user/level.
+    if (data.completed) {
+      const level = data.adventureId.startsWith("a1-") ? "a1" : "a2";
+      const { error: rewardError } = await db.rpc("award_english_adventure_completion_xp", {
+        p_user_id: context.userId,
+        p_level: level,
+      });
+      if (rewardError) {
+        throw new Error("English Adventure completion reward could not be recorded");
+      }
+    }
+
     return result as {
       saved: boolean;
       conflict: boolean;
