@@ -227,6 +227,8 @@ function EnglishAdventuresPage() {
   if (story === "neighbourhood-mystery") return <A1NeighbourhoodMystery />;
   if (key === "a2" && story === "a2-1") return <A2SurpriseDelivery />;
   if (key === "a2" && story === "a2-2") return <A2CommunityFestival />;
+  // A2 without a story opens the first saved A2 adventure, never a disconnected fallback.
+  if (key === "a2") return <A2SurpriseDelivery />;
   if (key === "a1") return <A1WelcomeMixUp />;
 
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
@@ -267,7 +269,7 @@ function EnglishAdventuresPage() {
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
               <Compass className="size-3.5" aria-hidden="true" /> {t("English Adventures")} ·{" "}
-              {key.toUpperCase()}
+              {String(key).toUpperCase()}
             </p>
             <h1 className="font-display text-2xl font-bold sm:text-3xl">{adventure.title}</h1>
             <p className="text-sm text-muted-foreground">{t(adventure.subtitle)}</p>

@@ -82,12 +82,13 @@ export const saveEnglishAdventureCheckpoint = createServerFn({ method: "POST" })
       p_restart: data.restart,
     });
 
-    if (error || !result?.checkpoint) {
+    if (error || !result || (result.saved && !result.checkpoint)) {
       throw new Error("English Adventure progress could not be saved");
     }
     return result as {
       saved: boolean;
-      checkpoint: {
+      conflict: boolean;
+      checkpoint: null | {
         adventure_id: string;
         current_step: number;
         choices: Record<string, number>;
