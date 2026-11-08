@@ -311,13 +311,13 @@ export function WeeklyFrequency({
               )}
             </GaugeRing>
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             {/* Third line (user request), moved above the day count and in
                 capitals, in the header cells' supporting font. */}
-            <p className="text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground">
+            <p className="min-w-0 text-[10.5px] font-semibold uppercase leading-snug tracking-[0.08em] text-muted-foreground">
               {lang === "pt" ? "Continue aprendendo" : "Keep learning"}
             </p>
-            <p className="mt-0.5 text-sm font-semibold">
+            <p className="mt-0.5 min-w-0 whitespace-nowrap text-[13px] font-semibold 2xl:text-sm">
               {studiedCount}{" "}
               {lang === "pt"
                 ? studiedCount === 1
