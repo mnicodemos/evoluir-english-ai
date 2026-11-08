@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
@@ -7,10 +6,8 @@ import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdven
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
-import {
-  useAdventureActivityTimer,
-  useEnglishAdventuresProgress,
-} from "@/hooks/useEnglishAdventuresProgress";
+import { useAdventureActivityTimer } from "@/hooks/useEnglishAdventuresProgress";
+import { useEnglishAdventureCheckpoint } from "@/hooks/useEnglishAdventureCheckpoint";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -301,34 +298,25 @@ const scenes: Scene[] = [
 export function A1WelcomeMixUp() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
-  const [sceneIndex, setSceneIndex] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [completed, setCompleted] = useState(false);
-  const [recovered, setRecovered] = useState(0);
-  const { markCompleted, markActivityCompleted } = useEnglishAdventuresProgress();
+  const progress = useEnglishAdventureCheckpoint("a1-welcome-mix-up", scenes.length);
+  const sceneIndex = progress.currentStep;
+  const selected = progress.selectedChoice;
+  const completed = progress.completed;
+  const recovered = progress.recovered;
   useAdventureActivityTimer(completed ? null : "a1-welcome-mix-up:" + sceneIndex);
-  const scene = scenes[sceneIndex] ?? scenes[0];
+  const scene = scenes[Math.min(sceneIndex, scenes.length - 1)];
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];
   const canContinue = choice?.correct === true;
+  if (!progress.ready) return null;
 
   function continueStory() {
     if (!canContinue) return;
-    markActivityCompleted("a1-welcome-mix-up:" + sceneIndex);
-    if (sceneIndex === scenes.length - 1) {
-      setCompleted(true);
-      markCompleted("a1-welcome-mix-up");
-    } else {
-      setSceneIndex((value) => value + 1);
-      setSelected(null);
-    }
+    progress.continueStep();
   }
 
   function restart() {
-    setSceneIndex(0);
-    setSelected(null);
-    setCompleted(false);
-    setRecovered(0);
+    progress.restart();
   }
 
   return (
@@ -385,10 +373,11 @@ export function A1WelcomeMixUp() {
                   key={option.label}
                   type="button"
                   onClick={() => {
-                    if (selected !== null && !scene.choices[selected]?.correct && option.correct) {
-                      setRecovered((value) => value + 1);
-                    }
-                    setSelected(index);
+                    const recoveredDelta =
+                      selected !== null && !scene.choices[selected]?.correct && option.correct
+                        ? 1
+                        : 0;
+                    progress.choose(index, recoveredDelta);
                   }}
                   aria-pressed={selected === index}
                   className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${
@@ -464,7 +453,7 @@ export function A1WelcomeMixUp() {
         )}
         <EnglishAdventureJourneyMap
           adventureId="a1-welcome-mix-up"
-          activityIndex={sceneIndex}
+          activityIndex={completed ? Math.max(0, sceneIndex - 1) : sceneIndex}
           isComplete={completed}
         />
       </div>

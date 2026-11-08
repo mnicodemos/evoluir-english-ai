@@ -8,7 +8,8 @@ import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdven
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
-import { useAdventureActivityTimer, useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import { useAdventureActivityTimer } from "@/hooks/useEnglishAdventuresProgress";
+import { useEnglishAdventureCheckpoint } from "@/hooks/useEnglishAdventureCheckpoint";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -139,31 +140,24 @@ const translations: Record<string, string> = {
 export function A2CommunityFestival() {
   const { lang } = useUiLang();
   const t = (value: string) => (lang === "pt" ? (uiPt[value] ?? translations[value] ?? value) : value);
-  const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
-  const { markCompleted, markActivityCompleted } = useEnglishAdventuresProgress();
-  const completed = index >= activities.length;
+  const progress = useEnglishAdventureCheckpoint("a2-community-festival", activities.length);
+  const index = progress.currentStep;
+  const selected = progress.selectedChoice;
+  const completed = progress.completed;
   useAdventureActivityTimer(completed ? null : "a2-community-festival:" + index);
   const activity = activities[Math.min(index, activities.length - 1)];
   if (!activity) return null;
+  if (!progress.ready) return null;
 
   function continueStory() {
     if (selected === null) return;
-    markActivityCompleted("a2-community-festival:" + index);
-    if (index === activities.length - 1) {
-      markCompleted("a2-community-festival");
-      setIndex(activities.length);
-      return;
-    }
-    setIndex((current) => current + 1);
-    setSelected(null);
+    progress.continueStep();
     setShowTranslation(false);
   }
 
   function restart() {
-    setIndex(0);
-    setSelected(null);
+    progress.restart();
     setShowTranslation(false);
   }
 
@@ -206,7 +200,7 @@ export function A2CommunityFestival() {
             <p className="text-sm font-semibold">{t("What would you say?")}</p>
             <div className="grid gap-2">
               {activity.choices.map((option, optionIndex) => (
-                <button key={option.label} type="button" onClick={() => setSelected(optionIndex)} aria-pressed={selected === optionIndex} className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${selected === optionIndex ? "border-brand-green bg-brand-green/10" : "border-border hover:border-brand-green/50 hover:bg-secondary/50"}`}>
+                <button key={option.label} type="button" onClick={() => progress.choose(optionIndex)} aria-pressed={selected === optionIndex} className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${selected === optionIndex ? "border-brand-green bg-brand-green/10" : "border-border hover:border-brand-green/50 hover:bg-secondary/50"}`}>
                   <span className="block font-medium" translate="no" lang="en">{option.label}</span>
                 </button>
               ))}
@@ -245,7 +239,7 @@ export function A2CommunityFestival() {
         )}
         <EnglishAdventureJourneyMap
           adventureId="a2-community-festival"
-          activityIndex={index}
+          activityIndex={completed ? Math.max(0, index - 1) : index}
           isComplete={completed}
         />
       </div>
