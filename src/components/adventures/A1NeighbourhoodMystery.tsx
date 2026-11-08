@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-import { useState } from "react";
 import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
@@ -8,7 +7,8 @@ import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdven
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EvoAvatar } from "@/components/EvoAvatar";
 import { Button } from "@/components/ui/button";
-import { useAdventureActivityTimer, useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import { useAdventureActivityTimer } from "@/hooks/useEnglishAdventuresProgress";
+import { useEnglishAdventureCheckpoint } from "@/hooks/useEnglishAdventureCheckpoint";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -125,34 +125,25 @@ const challenges: Challenge[] = [
 export function A1NeighbourhoodMystery() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
-  const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [recovered, setRecovered] = useState(0);
-  const [complete, setComplete] = useState(false);
-  const { markCompleted, markActivityCompleted } = useEnglishAdventuresProgress();
+  const progress = useEnglishAdventureCheckpoint("a1-neighbourhood-mystery", challenges.length);
+  const index = progress.currentStep;
+  const selected = progress.selectedChoice;
+  const recovered = progress.recovered;
+  const complete = progress.completed;
   useAdventureActivityTimer(complete ? null : "a1-neighbourhood-mystery:" + index);
-  const challenge = challenges[index];
+  const challenge = challenges[Math.min(index, challenges.length - 1)];
   if (!challenge) return null;
   const choice = selected === null ? null : challenge.choices[selected];
   const canContinue = choice?.correct === true;
+  if (!progress.ready) return null;
 
   function continueStory() {
     if (!canContinue) return;
-    markActivityCompleted("a1-neighbourhood-mystery:" + index);
-    if (index === challenges.length - 1) {
-      setComplete(true);
-      markCompleted("a1-neighbourhood-mystery");
-    } else {
-      setIndex((value) => value + 1);
-      setSelected(null);
-    }
+    progress.continueStep();
   }
 
   function restart() {
-    setIndex(0);
-    setSelected(null);
-    setRecovered(0);
-    setComplete(false);
+    progress.restart();
   }
 
   return (
@@ -190,10 +181,9 @@ export function A1NeighbourhoodMystery() {
                   key={option.label}
                   type="button"
                   onClick={() => {
-                    if (selected !== null && !challenge.choices[selected]?.correct && option.correct) {
-                      setRecovered((value) => value + 1);
-                    }
-                    setSelected(optionIndex);
+                    const recoveredDelta =
+                      selected !== null && !challenge.choices[selected]?.correct && option.correct ? 1 : 0;
+                    progress.choose(optionIndex, recoveredDelta);
                   }}
                   aria-pressed={selected === optionIndex}
                   className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${
