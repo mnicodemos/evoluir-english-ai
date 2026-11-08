@@ -227,6 +227,8 @@ function EnglishAdventuresPage() {
   if (story === "neighbourhood-mystery") return <A1NeighbourhoodMystery />;
   if (key === "a2" && story === "a2-1") return <A2SurpriseDelivery />;
   if (key === "a2" && story === "a2-2") return <A2CommunityFestival />;
+  // A2 without a story opens the first saved A2 adventure, never a disconnected fallback.
+  if (key === "a2") return <A2SurpriseDelivery />;
   if (key === "a1") return <A1WelcomeMixUp />;
 
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
