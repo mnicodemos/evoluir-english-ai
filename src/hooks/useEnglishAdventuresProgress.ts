@@ -146,7 +146,11 @@ export function useAdventureActivityTimer(activityId: string | null) {
       last = now;
 
       // Ignore long gaps caused by device sleep, browser suspension or throttling.
-      if (document.visibilityState !== "visible" || elapsedMs <= 0 || elapsedMs > MAX_TRUSTED_INTERVAL_MS) {
+      if (
+        document.visibilityState !== "visible" ||
+        elapsedMs <= 0 ||
+        elapsedMs > MAX_TRUSTED_INTERVAL_MS
+      ) {
         return;
       }
 
