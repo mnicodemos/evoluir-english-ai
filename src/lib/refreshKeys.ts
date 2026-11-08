@@ -31,6 +31,9 @@ export const ACTIVITY_REFRESH_KEYS = [
   // The plan's day turns "done" (and leaves the notifications) as soon as
   // the activity is saved, not after the 5-minute cache.
   ["study-plan"],
+  ["weekly-league"],
+  ["weekly-league-history"],
+  ["week-xp-history"],
 ] as const;
 
 /** Data that depends on the CEFR level the student is studying. */
