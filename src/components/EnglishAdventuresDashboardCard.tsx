@@ -3,7 +3,6 @@ import { ArrowRight, Compass, Map } from "lucide-react";
 
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { PremiumBadge, useIsPremium } from "@/components/PremiumBadge";
-import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
 import { FILL_IN_TRANSITION, useFillIn } from "@/hooks/useFillIn";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
@@ -16,7 +15,6 @@ export function EnglishAdventuresDashboardCard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const level = (profile?.max_level || profile?.level || "a1").toLowerCase();
   const title = level === "a2" ? "The Surprise Delivery" : "The Welcome Mix-Up";
-  const progress = useEnglishAdventuresProgress();
   const barPercent = useFillIn(progress.percent);
 
   return (
@@ -59,9 +57,6 @@ export function EnglishAdventuresDashboardCard() {
           title={`${progress.completed}/${progress.total}`}
         >
           {progress.percent}%
-        </span>
-        <span className="shrink-0 text-[10px] text-muted-foreground" title={t("Study time")}>
-          {progress.minutes} {t("min")}
         </span>
         <Link
           to={locked ? "/premium" : "/adventures"}
