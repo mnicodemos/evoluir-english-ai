@@ -349,7 +349,10 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
       const cutoff = new Date();
       cutoff.setHours(0, 0, 0, 0);
       cutoff.setDate(cutoff.getDate() - 30);
-      return (rows ?? []).filter((row) => new Date(`${row.week_start}T00:00:00`).getTime() >= cutoff.getTime());
+      return (rows ?? []).filter(
+        (row) =>
+          new Date(`${row.week_start}T00:00:00`).getTime() >= cutoff.getTime(),
+      );
     },
   });
   if (isError) return null;
@@ -382,15 +385,47 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
           ))}
         </div>
       ) : (
-        <div className="mt-4 grid h-36 items-end gap-2" style={{ gridTemplateColumns: `repeat(${Math.max(rows.length, 1)}, minmax(0, 1fr))` }} role="img" aria-label={t("Weekly XP history bar chart")}>
+        <div
+          className="mt-4 grid h-36 items-end gap-2"
+          style={{
+            gridTemplateColumns: `repeat(${Math.max(rows.length, 1)}, minmax(0, 1fr))`,
+          }}
+          role="img"
+          aria-label={t("Weekly XP history bar chart")}
+        >
           {rows.map((row, index) => (
-            <div key={row.week_start} className="flex h-full min-w-0 flex-col items-center justify-end gap-1">
-              <span className="text-[10px] tabular-nums text-muted-foreground">{row.xp}</span>
+            <div
+              key={row.week_start}
+              className="flex h-full min-w-0 flex-col items-center justify-end gap-1"
+            >
+              <span className="text-[10px] tabular-nums text-muted-foreground">
+                {row.xp}
+              </span>
               <div className="flex w-full flex-1 items-end">
-                <div className={cn("w-full rounded-t-md bg-amber-400/80 transition-all", index === 0 && "bg-brand-green")} style={{ height: `${Math.max(row.xp > 0 ? 8 : 2, Math.round((row.xp / maxXp) * 100))}%` }} title={`${weekLabel(row.week_start)}: ${row.xp} XP`} />
+                <div
+                  className={cn(
+                    "w-full rounded-t-md bg-amber-400/80 transition-all",
+                    index === 0 && "bg-brand-green",
+                  )}
+                  style={{
+                    height: `${Math.max(row.xp > 0 ? 8 : 2, Math.round((row.xp / maxXp) * 100))}%`,
+                  }}
+                  title={`${weekLabel(row.week_start)}: ${row.xp} XP`}
+                />
               </div>
-              <span className={cn("max-w-full truncate text-[10px]", index === 0 ? "font-semibold text-brand-green" : "text-muted-foreground")}>{index === 0 ? t("Now") : weekLabel(row.week_start)}</span>
-              <span className="text-[9px] font-medium tabular-nums text-muted-foreground">{row.rank_position !== null && row.xp > 0 ? `#${row.rank_position}/${row.members}` : "—"}</span>
+              <span
+                className={cn(
+                  "max-w-full truncate text-[10px]",
+                  index === 0 ? "font-semibold text-brand-green" : "text-muted-foreground",
+                )}
+              >
+                {index === 0 ? t("Now") : weekLabel(row.week_start)}
+              </span>
+              <span className="text-[9px] font-medium tabular-nums text-muted-foreground">
+                {row.rank_position !== null && row.xp > 0
+                  ? `#${row.rank_position}/${row.members}`
+                  : "—"}
+              </span>
             </div>
           ))}
         </div>
