@@ -17,7 +17,7 @@ import { findLevel, leagueLevelOf } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
-import { RANKING_MIN_MEMBERS, rankingOpen, weekXpRising, type WeekXpSummary } from "@/lib/weekXp";
+import { rankingOpen, weekXpRising, type WeekXpSummary } from "@/lib/weekXp";
 
 export const Route = createFileRoute("/_authenticated/league")({
   head: () => ({
@@ -124,12 +124,7 @@ function League() {
         <div className="space-y-3 lg:space-y-4">
           {!showRanking && !isLoading && !loadError ? <YourWeek week={week} /> : null}
 
-          <section
-            className={cn(
-              "card-soft space-y-2 p-3 sm:p-5",
-              !showRanking && !isLoading && !loadError && "hidden",
-            )}
-          >
+          <section className="card-soft space-y-2 p-3 sm:p-5">
             <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
               <Trophy className="size-4 text-amber-400 sm:size-5" />
               Ranking
@@ -237,12 +232,6 @@ function League() {
                 ? "Other students at your level see your first name and initial, and your XP."
                 : "You are not in the ranking. Join to appear with your first name and initial."}
             </p>
-            {!showRanking ? (
-              <p className="text-xs text-muted-foreground">
-                <span>The ranking with other students opens when your level&apos;s league has</span>{" "}
-                <span>{RANKING_MIN_MEMBERS}</span> <span>students taking part.</span>
-              </p>
-            ) : null}
             <Button
               size="sm"
               variant={joined ? "outline" : "default"}
