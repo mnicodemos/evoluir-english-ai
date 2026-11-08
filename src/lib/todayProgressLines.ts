@@ -19,7 +19,8 @@ export type TodayLineIcon =
   | "test"
   | "meditation"
   | "reading"
-  | "time";
+  | "time"
+  | "adventures";
 
 export type TodayLineState = "done" | "attention" | "empty";
 
@@ -78,6 +79,17 @@ export function todayProgressLines(input: {
       state: input.lessonsCompleted > 0 ? "done" : "empty",
       active: input.lessonsCompleted > 0,
     },
+    (() => {
+      const minutes = minutesOf(rows, ["english_adventures"]);
+      return {
+        key: "english-adventures",
+        icon: "adventures" as const,
+        label: "min in English Adventures",
+        value: String(minutes),
+        state: minutes > 0 ? ("done" as const) : ("empty" as const),
+        active: minutes > 0,
+      };
+    })(),
     (() => {
       const count = countOf(rows, ["conversation", "video_call"]);
       return {

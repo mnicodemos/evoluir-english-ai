@@ -53,6 +53,20 @@ describe("today's progress lines", () => {
     ]);
   });
 
+  it("shows English Adventures minutes as an active Today's Progress line", () => {
+    const lines = todayProgressLines({
+      ...empty,
+      activities: [{ activity_type: "english_adventures", duration_minutes: 4 }],
+    });
+    expect(lines[0]).toMatchObject({
+      key: "english-adventures",
+      icon: "adventures",
+      label: "min in English Adventures",
+      value: "4",
+      state: "done",
+    });
+  });
+
   it("marks a low accuracy as needing attention", () => {
     const accuracy = todayProgressLines({ ...empty, accuracy: 43 }).find(
       (line) => line.key === "accuracy",

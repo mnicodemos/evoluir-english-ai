@@ -12,6 +12,7 @@ import {
   Check,
   Clapperboard,
   ChevronRight,
+  Compass,
   ClipboardCheck,
   Clock,
   Crown,
@@ -139,6 +140,7 @@ const TODAY_LINE_ICONS: Record<TodayLineIcon, typeof BookOpen> = {
   meditation: Flower2,
   reading: BookOpenText,
   time: Clock,
+  adventures: Compass,
 };
 
 type DashboardNotificationsProps = {

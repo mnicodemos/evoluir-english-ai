@@ -2849,6 +2849,7 @@ export const uiPt: Record<string, string> = {
   Tamanho: "Tamanho",
   "Tamanho das legendas": "Tamanho das legendas",
   "Earns XP": "Ganha XP",
+  "min in English Adventures": "min no English Adventures",
   "Weekly XP history bar chart": "Gráfico de barras do histórico semanal de XP",
   Now: "Agora",
   "Hide captions": "Ocultar legendas",
