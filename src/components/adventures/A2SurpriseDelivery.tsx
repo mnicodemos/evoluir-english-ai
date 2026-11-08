@@ -8,7 +8,8 @@ import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdven
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
-import { useAdventureActivityTimer, useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import { useAdventureActivityTimer } from "@/hooks/useEnglishAdventuresProgress";
+import { useEnglishAdventureCheckpoint } from "@/hooks/useEnglishAdventureCheckpoint";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -204,41 +205,29 @@ const outcomeText: Record<string, string> = {
 export function A2SurpriseDelivery() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
-  const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
   const translated = (text: string) => portugueseTranslations[text];
-  const [lastConsequence, setLastConsequence] = useState<Choice["consequence"]>("polite");
-  const [completed, setCompleted] = useState(false);
-  const [decisions, setDecisions] = useState<string[]>([]);
-  const { markCompleted, markActivityCompleted } = useEnglishAdventuresProgress();
+  const progress = useEnglishAdventureCheckpoint("a2-surprise-delivery", scenes.length);
+  const index = progress.currentStep;
+  const selected = progress.selectedChoice;
+  const completed = progress.completed;
+  const decisions = progress.decisions;
+  const lastConsequence = (decisions.at(-1) as Choice["consequence"] | undefined) ?? "polite";
   useAdventureActivityTimer(completed ? null : "a2-surprise-delivery:" + index);
-  const scene = scenes[index];
+  const scene = scenes[Math.min(index, scenes.length - 1)];
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];
+  if (!progress.ready) return null;
 
   function continueStory() {
     if (!choice) return;
-    setLastConsequence(choice.consequence);
-    setDecisions((items) => [...items, choice.consequence]);
-    markActivityCompleted("a2-surprise-delivery:" + index);
-    if (index === scenes.length - 1) {
-      setCompleted(true);
-      markCompleted("a2-surprise-delivery");
-    } else {
-      setIndex((value) => value + 1);
-      setSelected(null);
-      setShowTranslation(false);
-    }
+    progress.continueStep(choice.consequence);
+    setShowTranslation(false);
   }
 
   function restart() {
-    setIndex(0);
-    setSelected(null);
+    progress.restart();
     setShowTranslation(false);
-    setLastConsequence("polite");
-    setCompleted(false);
-    setDecisions([]);
   }
 
   const finalOutcome = decisions.includes("replacement")
@@ -291,7 +280,7 @@ export function A2SurpriseDelivery() {
                 <button
                   key={option.label}
                   type="button"
-                  onClick={() => setSelected(optionIndex)}
+                  onClick={() => progress.choose(optionIndex)}
                   aria-pressed={selected === optionIndex}
                   className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${selected === optionIndex ? "border-brand-green bg-brand-green/10" : "border-border hover:border-brand-green/50 hover:bg-secondary/50"}`}
                 >
