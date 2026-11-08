@@ -32,7 +32,8 @@ export function useWeeklyLeagueStanding(profile: LeagueProfile | null | undefine
   const { data: weeks } = useQuery({
     queryKey: ["week-xp-history", profile?.id],
     enabled: !!profile?.id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       // Not in the generated Supabase types until Lovable regenerates them.
       // Bound: an unbound supabase.rpc loses its client and throws (owner
