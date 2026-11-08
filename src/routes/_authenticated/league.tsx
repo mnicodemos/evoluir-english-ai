@@ -56,6 +56,9 @@ function League() {
   } = useQuery({
     queryKey: ["weekly-league", profile?.id, profile ? leagueLevelOf(profile) : null],
     enabled: !!profile?.id,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase.rpc("weekly_league");
       if (error) throw error;
@@ -85,6 +88,8 @@ function League() {
     }
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["weekly-league"] }),
+      queryClient.invalidateQueries({ queryKey: ["weekly-league-history"] }),
+      queryClient.invalidateQueries({ queryKey: ["week-xp-history"] }),
       queryClient.invalidateQueries({ queryKey: ["profile"] }),
     ]);
   }
@@ -330,7 +335,9 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
   const { data, isLoading, isError } = useQuery({
     queryKey: ["weekly-league-history", userId, joined],
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60 * 1000,
     queryFn: async () => {
       // Not in the generated Supabase types until Lovable regenerates them.
       // Bound: an unbound supabase.rpc loses its client and throws (owner
