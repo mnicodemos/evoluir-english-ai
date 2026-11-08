@@ -29,8 +29,8 @@ export function TodayProgressText({ value, label, valueClass }: {
     return () => { disposed = true; observer.disconnect(); };
   }, [value, label]);
   return (
-    <p ref={ref} className="min-w-0 whitespace-nowrap text-[11px] leading-[20px] text-muted-foreground lg:leading-[21px] xl:text-[10px] xl:leading-[18px] 2xl:text-[11px] 2xl:leading-[21px]">
-      <span data-content className="inline-block whitespace-nowrap">
+    <p ref={ref} className="min-w-0 h-[19.5px] whitespace-nowrap text-[11px] leading-normal text-muted-foreground lg:h-[21px] xl:h-[18px] xl:text-[10px] xl:leading-tight 2xl:h-[21px] 2xl:text-[11px] 2xl:leading-normal">
+      <span data-content className="whitespace-nowrap">
         <span data-value className={`font-display text-[13px] font-semibold lg:text-sm lg:font-bold ${valueClass}`}>{value}</span>
         <span className="ml-1.5">{label}</span>
       </span>
