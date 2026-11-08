@@ -1038,7 +1038,7 @@ function Dashboard() {
                       </GaugeRing>
                     </div>
                   </div>
-                  <div className="flex w-full min-w-0 flex-col items-start justify-center gap-1 self-stretch lg:h-auto lg:flex-row lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
+                  <div className="flex min-w-0 translate-x-12 flex-col items-start justify-center gap-1 self-stretch lg:h-auto lg:translate-x-0 lg:flex-row lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                     {!hasProgressToday && !isTodayProgressLoading && (
                       <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground lg:translate-y-6">
                         <DoneSeal icon={ClockHands} />
@@ -1055,7 +1055,7 @@ function Dashboard() {
                     )}
                     <div
                       className={cn(
-                        `${hasProgressToday ? "flex" : "hidden"} w-full min-w-0 flex-col justify-center gap-1 self-center lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
+                        `${hasProgressToday ? "flex" : "hidden"} -translate-x-12 flex-col justify-center gap-1 self-center lg:translate-x-0 lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
                       )}
                     >
                       {learningCards.map((card) => {
@@ -1083,14 +1083,14 @@ function Dashboard() {
                           // ring as from the number (user request, 2026-10-24).
                           <div
                             key={card.key}
-                            className="grid min-w-0 grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-1.5 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
+                            className="grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-2 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
                           >
                             <Icon
                               className={`size-4 shrink-0 justify-self-center lg:justify-self-auto ${iconClass}`}
                               strokeWidth={2.4}
                               aria-hidden="true"
                             />
-                            <p className="min-w-0 truncate whitespace-nowrap text-[10px] leading-normal text-muted-foreground sm:text-[10.5px] lg:text-[11px] xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
+                            <p className="min-w-0 truncate whitespace-nowrap text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
                               <span
                                 className={`font-display text-[13px] font-semibold lg:text-sm lg:font-bold ${valueClass}`}
                               >
