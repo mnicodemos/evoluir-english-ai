@@ -55,10 +55,7 @@ function fromRow(row: CheckpointRow): EnglishAdventureCheckpoint {
   };
 }
 
-export function useEnglishAdventureCheckpoint(
-  adventureId: EnglishAdventureId,
-  totalSteps: number,
-) {
+export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, totalSteps: number) {
   const { data: profile } = useProfile();
   const userId = profile?.id;
   const [checkpoint, setCheckpoint] = useState(EMPTY_CHECKPOINT);
