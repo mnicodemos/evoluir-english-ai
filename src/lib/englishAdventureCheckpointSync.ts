@@ -102,6 +102,9 @@ export function advanceCheckpoint(
 }
 
 /** Home progress: union of every adventure's completed ids, never written back. */
-export function consolidateHomeIds(localIds: string[], remoteRows: { completed_activity_ids?: string[] | null }[]) {
+export function consolidateHomeIds(
+  localIds: string[],
+  remoteRows: { completed_activity_ids?: string[] | null }[],
+) {
   return unionIds(localIds, ...remoteRows.map((r) => r.completed_activity_ids ?? []));
 }

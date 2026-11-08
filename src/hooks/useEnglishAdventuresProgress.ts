@@ -59,33 +59,11 @@ export function useEnglishAdventuresProgress() {
   const markCompleted = useCallback(
     (adventureId: string) => {
       if (!userId) return;
+      // Completing a story must not round its leftover seconds up to a minute.
+      // Only recordStudySeconds may emit complete-minute telemetry.
       saveCompletedAdventure(userId, adventureId);
       setIds(readCompletedActivities(userId));
       window.dispatchEvent(new Event("english-adventure-progress-updated"));
-
-      const pendingKey = `evoluir-english-adventures:${userId}:pending-telemetry-seconds`;
-      let pending = 0;
-      try {
-        pending = Math.max(0, Number(window.localStorage.getItem(pendingKey) ?? 0));
-        if (pending > 0) window.localStorage.setItem(pendingKey, "0");
-      } catch {
-        // Completion and local progress must still succeed without storage.
-      }
-      if (pending > 0) {
-        void logPracticeTelemetry({
-          data: {
-            operationKey: crypto.randomUUID(),
-            activityType: "english_adventures",
-            minutes: 1,
-          },
-        }).catch(() => {
-          try {
-            window.localStorage.setItem(pendingKey, String(pending));
-          } catch {
-            // Keep the completion state even if telemetry cannot be retried.
-          }
-        });
-      }
     },
     [userId],
   );
@@ -102,7 +80,9 @@ export function useEnglishAdventuresProgress() {
   const recordStudySeconds = useCallback(
     (elapsed: number) => {
       if (!userId || elapsed <= 0) return;
-      setSeconds(addStudySeconds(userId, elapsed));
+      const wholeSeconds = Math.floor(elapsed);
+      if (wholeSeconds <= 0) return;
+      setSeconds(addStudySeconds(userId, wholeSeconds));
 
       const pendingKey = `evoluir-english-adventures:${userId}:pending-telemetry-seconds`;
       let pending = 0;
@@ -111,7 +91,7 @@ export function useEnglishAdventuresProgress() {
       } catch {
         // The local progress counter remains available if storage is blocked.
       }
-      pending += Math.floor(elapsed);
+      pending += wholeSeconds;
       const wholeMinutes = Math.floor(pending / 60);
       pending %= 60;
       try {
@@ -121,9 +101,10 @@ export function useEnglishAdventuresProgress() {
       }
 
       for (let index = 0; index < wholeMinutes; index += 1) {
+        const operationKey = crypto.randomUUID();
         void logPracticeTelemetry({
           data: {
-            operationKey: crypto.randomUUID(),
+            operationKey,
             activityType: "english_adventures",
             minutes: 1,
           },
@@ -155,20 +136,43 @@ export function useAdventureActivityTimer(activityId: string | null) {
   useEffect(() => {
     if (!activityId) return;
 
+    const MAX_TRUSTED_INTERVAL_MS = 20_000;
     let last = Date.now();
-    const timer = window.setInterval(() => {
+    let fractionalSeconds = 0;
+
+    const flushElapsed = () => {
       const now = Date.now();
-      if (document.visibilityState === "visible") {
-        recordStudySeconds(Math.floor((now - last) / 1000));
-      }
+      const elapsedMs = now - last;
       last = now;
-    }, 15000);
+
+      // Ignore long gaps caused by device sleep, browser suspension or throttling.
+      if (
+        document.visibilityState !== "visible" ||
+        elapsedMs <= 0 ||
+        elapsedMs > MAX_TRUSTED_INTERVAL_MS
+      ) {
+        return;
+      }
+
+      const accumulated = fractionalSeconds + elapsedMs / 1000;
+      const wholeSeconds = Math.floor(accumulated);
+      fractionalSeconds = accumulated - wholeSeconds;
+      if (wholeSeconds > 0) recordStudySeconds(wholeSeconds);
+    };
+
+    const handleVisibilityChange = () => {
+      // Never count time spent with the adventure tab hidden.
+      last = Date.now();
+      fractionalSeconds = 0;
+    };
+
+    const timer = window.setInterval(flushElapsed, 5000);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      flushElapsed();
       window.clearInterval(timer);
-      if (document.visibilityState === "visible") {
-        recordStudySeconds(Math.floor((Date.now() - last) / 1000));
-      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [activityId, recordStudySeconds]);
 }

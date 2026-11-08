@@ -27,7 +27,14 @@ describe("English Adventure checkpoint sync", () => {
   });
 
   it("restart empties the narrative but keeps completed activity IDs", () => {
-    const c = { ...E, currentStep: 6, choices: { "0": 1 }, completed: false, completedActivityIds: [`${A}:0`, `${A}:5`], revision: 4 };
+    const c = {
+      ...E,
+      currentStep: 6,
+      choices: { "0": 1 },
+      completed: false,
+      completedActivityIds: [`${A}:0`, `${A}:5`],
+      revision: 4,
+    };
     const r = restartCheckpoint(c);
     expect(r.currentStep).toBe(0);
     expect(r.choices).toEqual({});
@@ -36,8 +43,20 @@ describe("English Adventure checkpoint sync", () => {
   });
 
   it("a device with an older revision cannot restore narrative after a restart elsewhere", () => {
-    const oldDevice = { ...E, currentStep: 7, choices: { "6": 2 }, revision: 3, dirty: true, completedActivityIds: [`${A}:6`] };
-    const serverAfterRestart = { ...E, currentStep: 0, revision: 5, completedActivityIds: [`${A}:0`] };
+    const oldDevice = {
+      ...E,
+      currentStep: 7,
+      choices: { "6": 2 },
+      revision: 3,
+      dirty: true,
+      completedActivityIds: [`${A}:6`],
+    };
+    const serverAfterRestart = {
+      ...E,
+      currentStep: 0,
+      revision: 5,
+      completedActivityIds: [`${A}:0`],
+    };
     const { checkpoint } = reconcile(oldDevice, serverAfterRestart);
     expect(checkpoint.currentStep).toBe(0);
     expect(checkpoint.revision).toBe(5);
@@ -53,7 +72,10 @@ describe("English Adventure checkpoint sync", () => {
   });
 
   it("cross-device sync: a newer server copy replaces this device's narrative", () => {
-    const { checkpoint } = reconcile({ ...E, currentStep: 1, revision: 1 }, { ...E, currentStep: 8, revision: 9 });
+    const { checkpoint } = reconcile(
+      { ...E, currentStep: 1, revision: 1 },
+      { ...E, currentStep: 8, revision: 9 },
+    );
     expect(checkpoint.currentStep).toBe(8);
   });
 
@@ -64,10 +86,13 @@ describe("English Adventure checkpoint sync", () => {
   });
 
   it("Home percent consolidates every adventure over 40 activities", () => {
-    const ids = consolidateHomeIds(["a1-welcome-mix-up:0"], [
-      { completed_activity_ids: ["a1-welcome-mix-up:0", `${A}:1`] },
-      { completed_activity_ids: null },
-    ]);
+    const ids = consolidateHomeIds(
+      ["a1-welcome-mix-up:0"],
+      [
+        { completed_activity_ids: ["a1-welcome-mix-up:0", `${A}:1`] },
+        { completed_activity_ids: null },
+      ],
+    );
     expect(ids).toHaveLength(2);
     expect(ENGLISH_ADVENTURES_TOTAL).toBe(40);
     expect(englishAdventureProgress(ids).percent).toBe(5);

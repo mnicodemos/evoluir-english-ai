@@ -4,8 +4,10 @@ import {
   completedAdventureIds,
   ENGLISH_ADVENTURES_TOTAL,
   englishAdventureProgress,
+  addStudySeconds,
   markActivityComplete,
   readCompletedActivities,
+  readStudySeconds,
 } from "./englishAdventuresProgress";
 
 function installLocalStorage() {
@@ -32,6 +34,16 @@ describe("English Adventures progress", () => {
       percent: 10,
       minutes: 0,
     });
+  });
+
+  it("keeps study time in seconds and only displays completed minutes", () => {
+    installLocalStorage();
+    expect(addStudySeconds("student-1", 59)).toBe(59);
+    expect(readStudySeconds("student-1")).toBe(59);
+    expect(englishAdventureProgress([], readStudySeconds("student-1")).minutes).toBe(0);
+
+    expect(addStudySeconds("student-1", 1)).toBe(60);
+    expect(englishAdventureProgress([], readStudySeconds("student-1")).minutes).toBe(1);
   });
 
   it("counts a completed adventure only once", () => {
