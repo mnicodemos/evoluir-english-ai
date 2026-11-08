@@ -70,6 +70,7 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" })
                     font_size: number;
                     text_color: string;
                     background_color: string;
+                    background_opacity: number;
                   } | null;
                   error: { message: string } | null;
                 }>;
@@ -80,13 +81,19 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" })
       }
     ).from("premium_video_captions");
     const { data: row, error } = await table
-      .select("vtt_content, font_size, text_color, background_color")
+      .select("vtt_content, font_size, text_color, background_color, background_opacity")
       .eq("video_id", data.videoId)
       .eq("language", data.language)
       .maybeSingle();
     if (error) {
       if (/does not exist|relation .* not found/i.test(error.message)) {
-        return { content: null, fontSize: 20, textColor: "#FFFFFF", backgroundColor: "#000000" };
+        return {
+          content: null,
+          fontSize: 20,
+          textColor: "#FFFFFF",
+          backgroundColor: "#000000",
+          backgroundOpacity: 100,
+        };
       }
       throw new Error("Could not load Short captions");
     }
@@ -95,5 +102,6 @@ export const loadPremiumShortCaption = createServerFn({ method: "GET" })
       fontSize: row?.font_size ?? 20,
       textColor: row?.text_color ?? "#FFFFFF",
       backgroundColor: row?.background_color ?? "#000000",
+      backgroundOpacity: row?.background_opacity ?? 100,
     };
   });

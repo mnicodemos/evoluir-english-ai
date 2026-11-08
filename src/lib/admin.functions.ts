@@ -1755,6 +1755,7 @@ type PremiumShortCaptionRow = {
   font_size: number;
   text_color: string;
   background_color: string;
+  background_opacity: number;
   updated_at: string;
 };
 type PremiumShortCaptionTable = {
@@ -1797,7 +1798,9 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
       "premium_video_captions",
     );
     const { data: rows, error } = await table
-      .select("language, vtt_content, font_size, text_color, background_color, updated_at")
+      .select(
+        "language, vtt_content, font_size, text_color, background_color, background_opacity, updated_at",
+      )
       .eq("video_id", data.videoId);
     if (error) {
       if (/does not exist|relation .* not found/i.test(error.message)) {
@@ -1807,6 +1810,7 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
           fontSize: 20,
           textColor: "#FFFFFF",
           backgroundColor: "#000000",
+          backgroundOpacity: 100,
         };
       }
       throw new Error("Não foi possível carregar as legendas do Short.");
@@ -1817,6 +1821,7 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
       fontSize: rows?.[0]?.font_size ?? 20,
       textColor: rows?.[0]?.text_color ?? "#FFFFFF",
       backgroundColor: rows?.[0]?.background_color ?? "#000000",
+      backgroundOpacity: rows?.[0]?.background_opacity ?? 100,
     };
   });
 
@@ -1837,6 +1842,7 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
           .string()
           .regex(/^#[0-9A-Fa-f]{6}$/)
           .default("#000000"),
+        backgroundOpacity: z.number().int().min(0).max(100).default(100),
       })
       .parse(data),
   )
@@ -1864,6 +1870,7 @@ export const savePremiumShortCaption = createServerFn({ method: "POST" })
         font_size: data.fontSize,
         text_color: data.textColor.toUpperCase(),
         background_color: data.backgroundColor.toUpperCase(),
+        background_opacity: data.backgroundOpacity,
         updated_at: new Date().toISOString(),
         updated_by: context.userId,
       },
