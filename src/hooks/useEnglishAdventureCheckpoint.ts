@@ -143,12 +143,7 @@ export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, t
                   ...latest,
                   revision: remote.revision,
                   dirty: true,
-                  completedActivityIds: [
-                    ...new Set([
-                      ...remote.completedActivityIds,
-                      ...latest.completedActivityIds,
-                    ]),
-                  ],
+                  completedActivityIds: [...new Set([...remote.completedActivityIds, ...latest.completedActivityIds])],
                 },
           );
         } else {
@@ -171,8 +166,7 @@ export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, t
     if (!userId) return;
     const rows = (await loadEnglishAdventureCheckpoints()) as CheckpointRow[];
     const row = rows.find((item) => item.adventure_id === adventureId);
-    const { checkpoint: next, push } = reconcile(
-      checkpointRef.current, row ? fromRow(row) : null);
+    const { checkpoint: next, push } = reconcile(checkpointRef.current, row ? fromRow(row) : null);
     accept(next);
     if (push) await flush();
     setSaveError(false);
