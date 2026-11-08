@@ -211,6 +211,17 @@ function League() {
               <Users className="size-4 text-brand-green" />
               Your participation
             </h2>
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-brand-green/30 bg-brand-green/5 px-3 py-2">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">Your rank</p>
+                <p className="truncate text-sm font-semibold">
+                  {joined ? me?.display_name || profile?.display_name || "Your profile" : "Not ranked"}
+                </p>
+              </div>
+              <p className="shrink-0 font-display text-2xl font-bold tabular-nums text-brand-green">
+                {joined && me?.rank_position != null ? `#${me.rank_position}` : "—"}
+              </p>
+            </div>
             <p className="text-sm">
               <span>This week</span>: <span className="font-bold">{me?.xp ?? 0} XP</span>
             </p>
