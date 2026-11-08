@@ -323,7 +323,7 @@ type HistoryRow = {
 
 /**
  * The student's league weeks (user request, 2026-10-22: see how the position
- * changes over time): the last 8 weeks, newest first, with the XP as a bar and
+ * changes over time): the last 30 days, grouped by week, newest first, with the XP as a bar and
  * the position among the students who take part (weekly_league_history,
  * migration 0078). Hidden until that migration is applied.
  */
@@ -344,9 +344,12 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
         name: string,
         args: { p_weeks: number },
       ) => Promise<{ data: HistoryRow[] | null; error: { message: string } | null }>;
-      const { data: rows, error } = await rpc("weekly_league_history", { p_weeks: 8 });
+      const { data: rows, error } = await rpc("weekly_league_history", { p_weeks: 5 });
       if (error) throw error;
-      return rows ?? [];
+      const cutoff = new Date();
+      cutoff.setHours(0, 0, 0, 0);
+      cutoff.setDate(cutoff.getDate() - 30);
+      return (rows ?? []).filter((row) => new Date(`${row.week_start}T00:00:00`).getTime() >= cutoff.getTime());
     },
   });
   if (isError) return null;
@@ -379,7 +382,7 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
           ))}
         </div>
       ) : (
-        <div className="mt-4 grid h-36 grid-cols-8 items-end gap-2" role="img" aria-label={t("Weekly XP history bar chart")}>
+        <div className="mt-4 grid h-36 items-end gap-2" style={{ gridTemplateColumns: `repeat(${Math.max(rows.length, 1)}, minmax(0, 1fr))` }} role="img" aria-label={t("Weekly XP history bar chart")}>
           {rows.map((row, index) => (
             <div key={row.week_start} className="flex h-full min-w-0 flex-col items-center justify-end gap-1">
               <span className="text-[10px] tabular-nums text-muted-foreground">{row.xp}</span>
