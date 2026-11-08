@@ -55,6 +55,8 @@ export const LEARNING_ACTIVITY_TYPES = [
   "meditation",
   // Daily reading (/reading): minutes only, until it records evidence.
   "reading",
+  // English Adventures with EVO: elapsed visible study time.
+  "english_adventures",
   // Time left when the student leaves mid-activity, written only after a real
   // action (minutes audit, 2026-10-24): AI Speaking after speaking, Writing
   // with a draft of 5+ words, Listening after a sentence, Vocabulary after a
@@ -146,6 +148,7 @@ export const ACTIVITY_SKILL_BUCKETS = {
   teacher: "Writing",
   mistakes_review: "Writing",
   video_call: "Talking",
+  english_adventures: "Lessons",
 } as const satisfies Record<
   string,
   "Listening" | "Reading" | "Talking" | "Writing" | "Lessons" | "Vocabulary"

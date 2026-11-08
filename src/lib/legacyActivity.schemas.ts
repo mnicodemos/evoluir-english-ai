@@ -24,6 +24,8 @@ export const telemetryInputSchema = z
       "meditation",
       // Daily reading (dailyReading.ts): minutes only, until it records evidence.
       "reading",
+      // English Adventures: elapsed learning time, recorded in minute chunks.
+      "english_adventures",
     ]),
     minutes: z.number().int().min(1).max(1440),
   })
