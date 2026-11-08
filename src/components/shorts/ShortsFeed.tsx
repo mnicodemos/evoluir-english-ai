@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  Captions,
   ChevronDown,
   ChevronUp,
   Flag,
@@ -268,6 +269,8 @@ function ShortSlide({
   const [burst, setBurst] = useState(0);
   const [captionText, setCaptionText] = useState("");
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
+  const [captionsVisible, setCaptionsVisible] = useState(true);
+  const canToggleCaptions = ["a1", "a2", "b1"].includes(video.level.toLowerCase());
   const getCaption = useServerFn(loadPremiumShortCaption);
   const captionLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
   const captionQuery = useQuery({
@@ -427,7 +430,24 @@ function ShortSlide({
           </button>
         ) : null}
 
-        {active && vimeo && captionsEnabled && captionText ? (
+        {active && vimeo && canToggleCaptions && captionsEnabled ? (
+          <button
+            type="button"
+            onClick={() => {
+              setCaptionsVisible((visible) => !visible);
+              setCaptionText("");
+            }}
+            className="absolute right-3 top-3 z-30 inline-flex items-center gap-1.5 rounded-full bg-black/65 px-3 py-2 text-xs font-semibold text-white shadow backdrop-blur transition hover:bg-black/80"
+            aria-label={captionsVisible ? t("Hide captions") : t("Show captions")}
+            aria-pressed={captionsVisible}
+            title={captionsVisible ? t("Hide captions") : t("Show captions")}
+          >
+            <Captions className="size-4" aria-hidden="true" />
+            <span>CC</span>
+          </button>
+        ) : null}
+
+        {active && vimeo && captionsEnabled && captionsVisible && captionText ? (
           <div
             className="pointer-events-none absolute inset-x-3 bottom-[4.5rem] z-20 mx-auto w-fit max-w-[88%] whitespace-pre-line rounded-sm px-2 py-1 text-center font-semibold leading-snug shadow"
             style={{

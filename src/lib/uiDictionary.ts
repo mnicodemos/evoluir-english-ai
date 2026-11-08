@@ -2851,4 +2851,7 @@ export const uiPt: Record<string, string> = {
   "Earns XP": "Ganha XP",
   "Weekly XP history bar chart": "Gráfico de barras do histórico semanal de XP",
   Now: "Agora",
+  "Hide captions": "Ocultar legendas",
+  "Show captions": "Mostrar legendas",
+  CC: "CC",
 };
