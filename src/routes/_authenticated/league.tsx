@@ -98,7 +98,7 @@ function League() {
   return (
     <AppShell mobileOneScreen>
       <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,1fr)] lg:items-start lg:gap-4 lg:space-y-0">
-        <header className="animate-rise flex items-center justify-between gap-3 lg:col-span-2">
+        <header className="animate-rise relative flex items-center gap-3 lg:col-span-2">
           <img
             src={leagueImage}
             alt=""
@@ -117,7 +117,7 @@ function League() {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-foreground transition-colors hover:bg-white/[0.08]"
+                className="ml-auto inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-foreground transition-colors hover:bg-white/[0.08]"
                 aria-label={t("How to earn XP")}
               >
                 <Trophy className="size-4 text-amber-400" />
