@@ -40,6 +40,8 @@ const XP_RULES = [
 
 function League() {
   const { data: profile } = useProfile();
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   // The owner can change it in Admin → Conteúdo → Home images (owner request,
   // 2026-11-01); the built-in artwork stays as the fallback.
   const { data: homeImages } = useHomeImages();
@@ -54,6 +56,9 @@ function League() {
   } = useQuery({
     queryKey: ["weekly-league", profile?.id, profile ? leagueLevelOf(profile) : null],
     enabled: !!profile?.id,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase.rpc("weekly_league");
       if (error) throw error;
@@ -83,6 +88,8 @@ function League() {
     }
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["weekly-league"] }),
+      queryClient.invalidateQueries({ queryKey: ["weekly-league-history"] }),
+      queryClient.invalidateQueries({ queryKey: ["week-xp-history"] }),
       queryClient.invalidateQueries({ queryKey: ["profile"] }),
     ]);
   }
@@ -211,6 +218,17 @@ function League() {
               <Users className="size-4 text-brand-green" />
               Your participation
             </h2>
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-brand-green/30 bg-brand-green/5 px-3 py-2">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">{t("Your rank")}</p>
+                <p className="truncate text-sm font-semibold">
+                  {joined ? me?.display_name || t("Your profile") : t("Not ranked")}
+                </p>
+              </div>
+              <p className="shrink-0 font-display text-2xl font-bold tabular-nums text-brand-green">
+                {joined && me?.rank_position != null ? `#${me.rank_position}` : "—"}
+              </p>
+            </div>
             <p className="text-sm">
               <span>This week</span>: <span className="font-bold">{me?.xp ?? 0} XP</span>
             </p>
@@ -317,7 +335,9 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
   const { data, isLoading, isError } = useQuery({
     queryKey: ["weekly-league-history", userId, joined],
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60 * 1000,
     queryFn: async () => {
       // Not in the generated Supabase types until Lovable regenerates them.
       // Bound: an unbound supabase.rpc loses its client and throws (owner
