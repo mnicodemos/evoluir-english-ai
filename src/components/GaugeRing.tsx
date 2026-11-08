@@ -24,6 +24,7 @@ export function GaugeRing({
   value,
   goal,
   unit,
+  loading = false,
   children,
 }: {
   progress: number;
@@ -32,6 +33,8 @@ export function GaugeRing({
   /** The goal and its unit, smaller and muted after the value ("/25 min"). */
   goal: number;
   unit: string;
+  /** Reserve the amount's space without publishing a temporary zero. */
+  loading?: boolean;
   children: ReactNode;
 }) {
   const share = useFillIn(Math.min(1, Math.max(0, progress)));
