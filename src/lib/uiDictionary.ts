@@ -2037,7 +2037,7 @@ const baseUiPt: Record<string, string> = {
   "Train your listening": "Treine sua escuta",
   "Get AI feedback": "Receba feedback da IA",
   "TODAY'S PRIORITY": "PRIORIDADE DE HOJE",
-  "lessons completed": "lições concluídas",
+  "lessons learned": "lições aprendidas",
   "New activity available": "Nova atividade disponível",
   student: "estudante",
   Performance: "Desempenho",
