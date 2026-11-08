@@ -1798,7 +1798,9 @@ export const getPremiumShortCaptionsAdmin = createServerFn({ method: "GET" })
       "premium_video_captions",
     );
     const { data: rows, error } = await table
-      .select("language, vtt_content, font_size, text_color, background_color, background_opacity, updated_at")
+      .select(
+        "language, vtt_content, font_size, text_color, background_color, background_opacity, updated_at",
+      )
       .eq("video_id", data.videoId);
     if (error) {
       if (/does not exist|relation .* not found/i.test(error.message)) {
