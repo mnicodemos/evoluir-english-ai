@@ -197,7 +197,7 @@ export function todayProgressLines(input: {
     {
       key: "reading",
       icon: "reading",
-      label: "min of reading",
+      label: "reading",
       value: String(minutesOf(rows, ["reading"])),
       state: minutesOf(rows, ["reading"]) > 0 ? "done" : "empty",
       active: minutesOf(rows, ["reading"]) > 0,
