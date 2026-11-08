@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useProfile } from "@/hooks/useProfile";
-import { loadEnglishAdventureCheckpoints, saveEnglishAdventureCheckpoint } from "@/lib/englishAdventureCheckpoint.functions";
+import {
+  loadEnglishAdventureCheckpoints,
+  saveEnglishAdventureCheckpoint,
+} from "@/lib/englishAdventureCheckpoint.functions";
 import { logPracticeTelemetry } from "@/lib/legacyActivity.functions";
 import {
   addStudySeconds,
