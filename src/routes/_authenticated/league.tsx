@@ -115,12 +115,19 @@ function League() {
           </div>
           <Popover>
             <PopoverTrigger asChild>
-              <button type="button" className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-foreground transition-colors hover:bg-white/[0.08]" aria-label={t("How to earn XP")}>
+              <button
+                type="button"
+                className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-foreground transition-colors hover:bg-white/[0.08]"
+                aria-label={t("How to earn XP")}
+              >
                 <Trophy className="size-4 text-amber-400" />
                 <span>{t("How to earn XP")}</span>
               </button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-72 border-white/10 bg-[#101820] p-4 text-foreground">
+            <PopoverContent
+              align="end"
+              className="w-72 border-white/10 bg-[#101820] p-4 text-foreground"
+            >
               <h2 className="font-display text-sm font-semibold">{t("How to earn XP")}</h2>
               <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
                 {XP_RULES.map((rule) => (
@@ -223,7 +230,6 @@ function League() {
               </p>
             )}
           </section>
-
         </div>
 
         <aside className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
@@ -350,8 +356,7 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
       cutoff.setHours(0, 0, 0, 0);
       cutoff.setDate(cutoff.getDate() - 30);
       return (rows ?? []).filter(
-        (row) =>
-          new Date(`${row.week_start}T00:00:00`).getTime() >= cutoff.getTime(),
+        (row) => new Date(`${row.week_start}T00:00:00`).getTime() >= cutoff.getTime(),
       );
     },
   });
@@ -398,9 +403,7 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
               key={row.week_start}
               className="flex h-full min-w-0 flex-col items-center justify-end gap-1"
             >
-              <span className="text-[10px] tabular-nums text-muted-foreground">
-                {row.xp}
-              </span>
+              <span className="text-[10px] tabular-nums text-muted-foreground">{row.xp}</span>
               <div className="flex w-full flex-1 items-end">
                 <div
                   className={cn(
