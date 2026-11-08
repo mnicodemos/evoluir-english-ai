@@ -148,6 +148,7 @@ export const ACTIVITY_SKILL_BUCKETS = {
   teacher: "Writing",
   mistakes_review: "Writing",
   video_call: "Talking",
+  english_adventures: "Lessons",
 } as const satisfies Record<
   string,
   "Listening" | "Reading" | "Talking" | "Writing" | "Lessons" | "Vocabulary"
