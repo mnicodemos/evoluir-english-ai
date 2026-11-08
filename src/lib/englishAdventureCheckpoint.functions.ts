@@ -18,9 +18,11 @@ const checkpointSchema = z.object({
   recovered: z.number().int().min(0).max(100).default(0),
   completedActivityIds: z
     .array(
-      z.string().regex(
-        /^(a1-welcome-mix-up|a1-neighbourhood-mystery|a2-surprise-delivery|a2-community-festival):[0-9]$/,
-      ),
+      z
+        .string()
+        .regex(
+          /^(a1-welcome-mix-up|a1-neighbourhood-mystery|a2-surprise-delivery|a2-community-festival):[0-9]$/,
+        ),
     )
     .max(10)
     .default([]),
