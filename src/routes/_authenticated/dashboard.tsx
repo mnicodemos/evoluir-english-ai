@@ -778,20 +778,30 @@ function Dashboard() {
           ? "Todas as 10 joias conquistadas"
           : "All 10 jewels earned";
   const { data: loadedMinutes } = useMinutesToday(profile?.id);
-  const { data: loadedActivities } = useTodayActivities(
-    profile?.id,
-  );
+  const { data: loadedActivities } = useTodayActivities(profile?.id);
   // Publish complete inputs together; retain the previous view during a failed/background read.
   const completeProgress = useRef<{
-    owner: string; day: string; minutes: number;
-    metrics: NonNullable<typeof todayMetrics>; activities: NonNullable<typeof loadedActivities>;
+    owner: string;
+    day: string;
+    minutes: number;
+    metrics: NonNullable<typeof todayMetrics>;
+    activities: NonNullable<typeof loadedActivities>;
   } | null>(null);
   const localDay = new Date().toDateString();
-  if (completeProgress.current?.owner !== profile?.id || completeProgress.current?.day !== localDay) {
+  if (
+    completeProgress.current?.owner !== profile?.id ||
+    completeProgress.current?.day !== localDay
+  ) {
     completeProgress.current = null;
   }
   if (profile && todayMetrics && loadedMinutes !== undefined && loadedActivities !== undefined) {
-    completeProgress.current = { owner: profile.id, day: localDay, minutes: loadedMinutes, metrics: todayMetrics, activities: loadedActivities };
+    completeProgress.current = {
+      owner: profile.id,
+      day: localDay,
+      minutes: loadedMinutes,
+      metrics: todayMetrics,
+      activities: loadedActivities,
+    };
   }
   const progress = completeProgress.current;
   const minutesToday = progress?.minutes ?? 0;
@@ -1108,9 +1118,15 @@ function Dashboard() {
                               aria-hidden="true"
                             />
                             {isTodayProgressLoading ? (
-                              <div className="flex h-5 items-center"><Skeleton className="h-3 w-full" /></div>
+                              <div className="flex h-5 items-center">
+                                  <Skeleton className="h-3 w-full" />
+                                </div>
                             ) : (
-                              <TodayProgressText value={card.value} label={t(card.label)} valueClass={valueClass} />
+                              <TodayProgressText
+                                  value={card.value}
+                                  label={t(card.label)}
+                                  valueClass={valueClass}
+                                />
                             )}
                             <span className="sr-only">{sr}</span>
                           </div>
