@@ -31,7 +31,7 @@ export function EnglishAdventuresDashboardCard() {
           {t("English Adventures")}
         </h2>
         <span className="ml-auto inline-flex shrink-0 items-center rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-400">
-          +50 XP
+          {"+50"} {t("XP")}
         </span>
         <PremiumBadge />
       </div>
