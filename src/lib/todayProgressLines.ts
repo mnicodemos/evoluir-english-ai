@@ -74,7 +74,7 @@ export function todayProgressLines(input: {
     {
       key: "lessons",
       icon: "lesson",
-      label: input.lessonsCompleted === 1 ? "lesson completed" : "lessons completed",
+      label: input.lessonsCompleted === 1 ? "lesson completed" : "lessons learned",
       value: String(input.lessonsCompleted),
       state: input.lessonsCompleted > 0 ? "done" : "empty",
       active: input.lessonsCompleted > 0,
