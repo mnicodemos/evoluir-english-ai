@@ -1067,7 +1067,7 @@ function Dashboard() {
                   </div>
                   <div className="flex min-w-0 translate-x-12 flex-col items-start justify-center gap-1 self-stretch lg:h-auto lg:translate-x-0 lg:flex-row lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                     {!hasProgressToday && !isTodayProgressLoading && (
-                      <div className="flex min-h-[5.75rem] translate-x-3 translate-y-[11px] flex-col items-center justify-center gap-1 text-center text-muted-foreground lg:translate-x-0 lg:translate-y-6">
+                      <div className="flex min-h-[5.75rem] translate-x-5 translate-y-[11px] flex-col items-center justify-center gap-1 text-center text-muted-foreground lg:translate-x-0 lg:translate-y-6">
                         <DoneSeal icon={ClockHands} />
                         <p className="text-[11px] font-bold leading-tight">
                           {t("Nothing yet today")}
