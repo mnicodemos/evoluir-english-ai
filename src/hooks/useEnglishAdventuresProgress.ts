@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useProfile } from "@/hooks/useProfile";
-import {
-  loadEnglishAdventureCheckpoints,
-  saveEnglishAdventureCheckpoint,
-} from "@/lib/englishAdventureCheckpoint.functions";
+import { loadEnglishAdventureCheckpoints } from "@/lib/englishAdventureCheckpoint.functions";
+import { consolidateHomeIds } from "@/lib/englishAdventureCheckpointSync";
 import { logPracticeTelemetry } from "@/lib/legacyActivity.functions";
 import {
   addStudySeconds,
@@ -35,55 +33,12 @@ export function useEnglishAdventuresProgress() {
       setSeconds(readStudySeconds(userId));
       try {
         const rows = (await loadEnglishAdventureCheckpoints()) as Array<{
-          adventure_id: string;
-          current_step: number;
-          choices: Record<string, number>;
-          decisions: string[];
-          recovered: number;
-          completed_activity_ids: string[];
-          completed: boolean;
-          revision: number;
+          completed_activity_ids: string[] | null;
         }>;
         if (!active) return;
-
-        const remoteIds = rows.flatMap((row) => row.completed_activity_ids ?? []);
-        const mergedIds = [...new Set([...localIds, ...remoteIds])];
-        remoteIds.forEach((id) => markActivityComplete(userId, id));
+        // Read-only consolidation: the Home never writes the narrative checkpoint.
+        const mergedIds = consolidateHomeIds(localIds, rows);
         setIds(mergedIds);
-
-        const adventureIds = [
-          "a1-welcome-mix-up",
-          "a1-neighbourhood-mystery",
-          "a2-surprise-delivery",
-          "a2-community-festival",
-        ] as const;
-
-        for (const adventureId of adventureIds) {
-          const legacyIds = mergedIds.filter((id) => id.startsWith(`${adventureId}:`));
-          if (!legacyIds.length) continue;
-          const row = rows.find((item) => item.adventure_id === adventureId);
-          const rowIds = row?.completed_activity_ids ?? [];
-          if (row && legacyIds.every((id) => rowIds.includes(id))) continue;
-
-          let legacyStep = 0;
-          while (legacyIds.includes(`${adventureId}:${legacyStep}`)) legacyStep += 1;
-          const result = await saveEnglishAdventureCheckpoint({
-            data: {
-              adventureId,
-              currentStep: Math.max(row?.current_step ?? 0, legacyStep),
-              choices: row?.choices ?? {},
-              decisions: row?.decisions ?? [],
-              recovered: row?.recovered ?? 0,
-              completedActivityIds: [...new Set([...rowIds, ...legacyIds])],
-              completed: Boolean(row?.completed) || legacyStep >= 10,
-              expectedRevision: row?.revision ?? 0,
-            },
-          });
-          if (!active) return;
-          const savedIds = result.checkpoint.completed_activity_ids ?? [];
-          savedIds.forEach((id: string) => markActivityComplete(userId, id));
-          setIds((current) => [...new Set([...current, ...savedIds])]);
-        }
       } catch {
         if (active) setIds(readCompletedActivities(userId));
       }
