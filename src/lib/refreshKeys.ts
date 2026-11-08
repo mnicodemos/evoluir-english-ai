@@ -9,6 +9,7 @@ import type { QueryClient } from "@tanstack/react-query";
 export const ACTIVITY_REFRESH_KEYS = [
   ["profile"],
   ["study-snapshot"],
+  ["today-study-metrics"],
   ["next-step"],
   ["proof-of-progress"],
   ["user-vocabulary-mastery"],
@@ -24,6 +25,8 @@ export const ACTIVITY_REFRESH_KEYS = [
   ["minutes-today"],
   ["minutes-by-day"],
   ["weekly-frequency"],
+  ["qualified-study-days"],
+  ["total-credited-study-days"],
   ["study-frequency"],
   // The plan's day turns "done" (and leaves the notifications) as soon as
   // the activity is saved, not after the 5-minute cache.

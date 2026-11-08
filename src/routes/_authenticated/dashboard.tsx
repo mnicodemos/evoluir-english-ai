@@ -90,7 +90,8 @@ import { dashboardActionAvailable } from "@/lib/activityIndicators";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import type { StudyPlanDay } from "@/lib/studyPlan";
 import { effectiveStreak, useProfile } from "@/hooks/useProfile";
-import { useStudySnapshot } from "@/hooks/useStudyContext";
+import { useTodayStudyMetrics } from "@/hooks/useTodayStudyMetrics";
+import { TodayProgressText } from "@/components/TodayProgressText";
 import { WeatherTalk } from "@/components/WeatherTalk";
 import { FirstWeekGuide } from "@/components/FirstWeekGuide";
 import { WeeklyLeagueSummary } from "@/components/WeeklyLeagueSummary";
@@ -644,7 +645,7 @@ function Dashboard() {
   usePlus();
   useLife();
   const navigate = useNavigate();
-  const { data: snapshot, isLoading: isSnapshotLoading } = useStudySnapshot();
+  const { data: todayMetrics } = useTodayStudyMetrics(profile?.id);
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
@@ -776,10 +777,25 @@ function Dashboard() {
         : lang === "pt"
           ? "Todas as 10 joias conquistadas"
           : "All 10 jewels earned";
-  const { data: minutesToday = 0, isLoading: isMinutesTodayLoading } = useMinutesToday(profile?.id);
-  const { data: todayActivities = [], isLoading: isTodayActivitiesLoading } = useTodayActivities(
+  const { data: loadedMinutes } = useMinutesToday(profile?.id);
+  const { data: loadedActivities } = useTodayActivities(
     profile?.id,
   );
+  // Publish complete inputs together; retain the previous view during a failed/background read.
+  const completeProgress = useRef<{
+    owner: string; day: string; minutes: number;
+    metrics: NonNullable<typeof todayMetrics>; activities: NonNullable<typeof loadedActivities>;
+  } | null>(null);
+  const localDay = new Date().toDateString();
+  if (completeProgress.current?.owner !== profile?.id || completeProgress.current?.day !== localDay) {
+    completeProgress.current = null;
+  }
+  if (profile && todayMetrics && loadedMinutes !== undefined && loadedActivities !== undefined) {
+    completeProgress.current = { owner: profile.id, day: localDay, minutes: loadedMinutes, metrics: todayMetrics, activities: loadedActivities };
+  }
+  const progress = completeProgress.current;
+  const minutesToday = progress?.minutes ?? 0;
+  const todayActivities = progress?.activities ?? [];
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding", replace: true });
@@ -787,16 +803,15 @@ function Dashboard() {
 
   // The three lines follow what the student did today (todayProgressLines).
   const learningCards = todayProgressLines({
-    lessonsCompleted: snapshot?.todayLessonsCompleted ?? 0,
-    wordsMastered: snapshot?.todayVocabularyMastered ?? 0,
-    accuracy: snapshot?.todayQuizAverage ?? 0,
+    lessonsCompleted: progress?.metrics.lessonsCompleted ?? 0,
+    wordsMastered: progress?.metrics.vocabularyMastered ?? 0,
+    accuracy: progress?.metrics.quizAverage ?? 0,
     activities: todayActivities,
   });
   // Minutes in the ring always come with at least one line beside them.
   const hasProgressToday = minutesToday > 0 || learningCards.some((card) => card.state !== "empty");
   // Do not briefly show the empty-state message while the three sources are loading.
-  const isTodayProgressLoading =
-    isSnapshotLoading || isMinutesTodayLoading || isTodayActivitiesLoading;
+  const isTodayProgressLoading = !progress;
   const minutesToGoal = Math.max(profile?.daily_minutes ?? 0, 0) - minutesToday;
   // The first time today the student sees the daily goal reached (user request).
   const celebrateGoal = useCelebrate(
@@ -1024,7 +1039,9 @@ function Dashboard() {
                         goal={profile.daily_minutes}
                         unit="min"
                       >
-                        {minutesToday >= profile.daily_minutes ? (
+                        {isTodayProgressLoading ? (
+                          <Skeleton className="h-5 w-10" />
+                        ) : minutesToday >= profile.daily_minutes ? (
                           <Check
                             className="size-8 text-brand-green lg:size-9"
                             strokeWidth={3.25}
@@ -1055,7 +1072,7 @@ function Dashboard() {
                     )}
                     <div
                       className={cn(
-                        `${hasProgressToday ? "flex" : "hidden"} -translate-x-12 flex-col justify-center gap-1 self-center lg:translate-x-0 lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
+                        `${hasProgressToday || isTodayProgressLoading ? "flex" : "hidden"} min-w-0 w-full -translate-x-12 flex-col justify-center gap-1 self-center lg:translate-x-0 lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
                       )}
                     >
                       {learningCards.map((card) => {
@@ -1090,16 +1107,11 @@ function Dashboard() {
                               strokeWidth={2.4}
                               aria-hidden="true"
                             />
-                            <p className="min-w-0 truncate whitespace-nowrap text-[11px] leading-normal text-muted-foreground xl:text-[10px] xl:leading-tight 2xl:text-[11px] 2xl:leading-normal">
-                              <span
-                                className={`font-display text-[13px] font-semibold lg:text-sm lg:font-bold ${valueClass}`}
-                              >
-                                {card.value}
-                              </span>
-                              {/* Margin, not a space character: the value and its label
-                                never touch, whatever the font. */}
-                              <span className="ml-1.5">{t(card.label)}</span>
-                            </p>
+                            {isTodayProgressLoading ? (
+                              <div className="flex h-5 items-center"><Skeleton className="h-3 w-full" /></div>
+                            ) : (
+                              <TodayProgressText value={card.value} label={t(card.label)} valueClass={valueClass} />
+                            )}
                             <span className="sr-only">{sr}</span>
                           </div>
                         );
