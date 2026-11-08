@@ -1048,6 +1048,7 @@ function Dashboard() {
                         value={minutesToday}
                         goal={profile.daily_minutes}
                         unit="min"
+                        loading={isTodayProgressLoading}
                       >
                         {isTodayProgressLoading ? (
                           <Skeleton className="h-5 w-10" />

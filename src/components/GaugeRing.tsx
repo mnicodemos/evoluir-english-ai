@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { FILL_IN_TRANSITION, useFillIn } from "@/hooks/useFillIn";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /** Open part of the ring, at the bottom, where the amount is written (degrees). */
 export const GAUGE_GAP_DEGREES = 100;
