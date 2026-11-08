@@ -89,7 +89,7 @@ describe("English Adventure checkpoint sync", () => {
     const ids = consolidateHomeIds(
       ["a1-welcome-mix-up:0"],
       [
-      { completed_activity_ids: ["a1-welcome-mix-up:0", `${A}:1`] },
+        { completed_activity_ids: ["a1-welcome-mix-up:0", `${A}:1`] },
         { completed_activity_ids: null },
       ],
     );
