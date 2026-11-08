@@ -453,7 +453,7 @@ export function A1WelcomeMixUp() {
         )}
         <EnglishAdventureJourneyMap
           adventureId="a1-welcome-mix-up"
-          activityIndex={sceneIndex}
+          activityIndex={completed ? Math.max(0, sceneIndex - 1) : sceneIndex}
           isComplete={completed}
         />
       </div>
