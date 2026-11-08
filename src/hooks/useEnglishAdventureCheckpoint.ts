@@ -5,10 +5,7 @@ import {
   loadEnglishAdventureCheckpoints,
   saveEnglishAdventureCheckpoint,
 } from "@/lib/englishAdventureCheckpoint.functions";
-import {
-  markActivityComplete,
-  saveCompletedAdventure,
-} from "@/lib/englishAdventuresProgress";
+import { markActivityComplete, saveCompletedAdventure } from "@/lib/englishAdventuresProgress";
 
 export type EnglishAdventureId =
   | "a1-welcome-mix-up"
@@ -122,10 +119,7 @@ function hasProgress(checkpoint: EnglishAdventureCheckpoint) {
   );
 }
 
-export function useEnglishAdventureCheckpoint(
-  adventureId: EnglishAdventureId,
-  totalSteps: number,
-) {
+export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, totalSteps: number) {
   const { data: profile } = useProfile();
   const userId = profile?.id;
   const [checkpoint, setCheckpoint] = useState(EMPTY_CHECKPOINT);
@@ -315,11 +309,14 @@ export function useEnglishAdventureCheckpoint(
 
   const restart = useCallback(() => {
     const current = checkpointRef.current;
-    persist({
-      ...EMPTY_CHECKPOINT,
-      completedActivityIds: current.completedActivityIds,
-      revision: current.revision,
-    }, true);
+    persist(
+      {
+        ...EMPTY_CHECKPOINT,
+        completedActivityIds: current.completedActivityIds,
+        revision: current.revision,
+      },
+      true,
+    );
   }, [persist]);
 
   return {
