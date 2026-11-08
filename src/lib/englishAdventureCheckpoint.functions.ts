@@ -16,7 +16,14 @@ const checkpointSchema = z.object({
   choices: z.record(z.string(), z.number().int().min(0).max(2)).default({}),
   decisions: z.array(z.string().max(40)).max(10).default([]),
   recovered: z.number().int().min(0).max(100).default(0),
-  completedActivityIds: z.array(z.string().max(80)).max(10).default([]),
+  completedActivityIds: z
+    .array(
+      z.string().regex(
+        /^(a1-welcome-mix-up|a1-neighbourhood-mystery|a2-surprise-delivery|a2-community-festival):[0-9]$/,
+      ),
+    )
+    .max(10)
+    .default([]),
   completed: z.boolean().default(false),
   expectedRevision: z.number().int().min(0),
 }).strict();
