@@ -68,11 +68,7 @@ export function activitiesForLevel(ids: string[], level: AdventureLevel): string
   return [...new Set(ids)].filter((id) => id.startsWith(prefix));
 }
 
-export function englishAdventureProgress(
-  ids: string[],
-  seconds = 0,
-  level?: AdventureLevel,
-) {
+export function englishAdventureProgress(ids: string[], seconds = 0, level?: AdventureLevel) {
   const scopedIds = level === "a2" ? activitiesForLevel(ids, "a2") : [...new Set(ids)];
   const total = level === "a2" ? ENGLISH_ADVENTURE_LEVEL_TOTAL : ENGLISH_ADVENTURES_TOTAL;
   const completed = Math.min(scopedIds.length, total);
