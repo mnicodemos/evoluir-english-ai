@@ -272,10 +272,21 @@ function ShortSlide({
   const [captionsVisible, setCaptionsVisible] = useState(true);
   const canToggleCaptions = ["a1", "a2", "b1"].includes(video.level.toLowerCase());
   const getCaption = useServerFn(loadPremiumShortCaption);
-  const captionLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
+  const preferredCaptionLanguage = ["a1", "a2"].includes(video.level.toLowerCase()) ? "pt" : "en";
   const captionQuery = useQuery({
-    queryKey: ["premium-short-caption", video.id, captionLanguage],
-    queryFn: () => getCaption({ data: { videoId: video.id, language: captionLanguage } }),
+    queryKey: ["premium-short-caption", video.id],
+    queryFn: async () => {
+      // Load both Admin-managed tracks. Keep the pedagogical default for the
+      // level, but fall back when only the other language was uploaded.
+      const [english, portuguese] = await Promise.all([
+        getCaption({ data: { videoId: video.id, language: "en" } }),
+        getCaption({ data: { videoId: video.id, language: "pt" } }),
+      ]);
+      const preferred = preferredCaptionLanguage === "pt" ? portuguese : english;
+      const fallback = preferredCaptionLanguage === "pt" ? english : portuguese;
+      const selected = parseShortVtt(preferred.content ?? "").length > 0 ? preferred : fallback;
+      return selected;
+    },
     enabled: active && Boolean(vimeo),
     retry: false,
   });
