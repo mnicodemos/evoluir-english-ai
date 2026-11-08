@@ -67,12 +67,15 @@ export function useTodayStudyMetrics(userId?: string) {
           .limit(30),
       ]);
       for (const result of [lessons, cards, words, quizzes]) if (result.error) throw result.error;
-      return todayStudyMetrics({
-        lessons: lessons.data ?? [],
-        cards: cards.data ?? [],
-        words: words.data ?? [],
-        quizzes: quizzes.data ?? [],
-      }, new Date(start));
+      return todayStudyMetrics(
+        {
+          lessons: lessons.data ?? [],
+          cards: cards.data ?? [],
+          words: words.data ?? [],
+          quizzes: quizzes.data ?? [],
+        },
+        new Date(start),
+      );
     },
   });
 }
