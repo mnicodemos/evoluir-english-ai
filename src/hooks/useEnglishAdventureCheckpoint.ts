@@ -143,7 +143,9 @@ export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, t
                   ...latest,
                   revision: remote.revision,
                   dirty: true,
-                  completedActivityIds: [...new Set([...remote.completedActivityIds, ...latest.completedActivityIds])],
+                  completedActivityIds: [
+                    ...new Set([...remote.completedActivityIds, ...latest.completedActivityIds]),
+                  ],
                 },
           );
         } else {
