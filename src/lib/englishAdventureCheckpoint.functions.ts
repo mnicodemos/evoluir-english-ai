@@ -29,6 +29,7 @@ const checkpointSchema = z
       .default([]),
     completed: z.boolean().default(false),
     expectedRevision: z.number().int().min(0),
+    restart: z.boolean().default(false),
   })
   .strict();
 
@@ -78,6 +79,7 @@ export const saveEnglishAdventureCheckpoint = createServerFn({ method: "POST" })
       p_completed_activity_ids: data.completedActivityIds,
       p_completed: data.completed,
       p_expected_revision: data.expectedRevision,
+      p_restart: data.restart,
     });
 
     if (error || !result?.checkpoint) {
