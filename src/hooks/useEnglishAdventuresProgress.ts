@@ -31,6 +31,7 @@ export function useEnglishAdventuresProgress() {
     let active = true;
     const sync = async () => {
       const localIds = readCompletedActivities(userId);
+      setIds(localIds);
       setSeconds(readStudySeconds(userId));
       try {
         const rows = (await loadEnglishAdventureCheckpoints()) as Array<{
@@ -46,7 +47,9 @@ export function useEnglishAdventuresProgress() {
         if (!active) return;
 
         const remoteIds = rows.flatMap((row) => row.completed_activity_ids ?? []);
-        setIds([...new Set([...remoteIds, ...localIds])]);
+        const mergedIds = [...new Set([...localIds, ...remoteIds])];
+        remoteIds.forEach((id) => markActivityComplete(userId, id));
+        setIds(mergedIds);
 
         const adventureIds = [
           "a1-welcome-mix-up",
@@ -56,7 +59,7 @@ export function useEnglishAdventuresProgress() {
         ] as const;
 
         for (const adventureId of adventureIds) {
-          const legacyIds = localIds.filter((id) => id.startsWith(`${adventureId}:`));
+          const legacyIds = mergedIds.filter((id) => id.startsWith(`${adventureId}:`));
           if (!legacyIds.length) continue;
           const row = rows.find((item) => item.adventure_id === adventureId);
           const rowIds = row?.completed_activity_ids ?? [];
@@ -64,7 +67,6 @@ export function useEnglishAdventuresProgress() {
 
           let legacyStep = 0;
           while (legacyIds.includes(`${adventureId}:${legacyStep}`)) legacyStep += 1;
-          const totalSteps = 10;
           const result = await saveEnglishAdventureCheckpoint({
             data: {
               adventureId,
@@ -73,25 +75,28 @@ export function useEnglishAdventuresProgress() {
               decisions: row?.decisions ?? [],
               recovered: row?.recovered ?? 0,
               completedActivityIds: [...new Set([...rowIds, ...legacyIds])],
-              completed: Boolean(row?.completed) || legacyStep >= totalSteps,
+              completed: Boolean(row?.completed) || legacyStep >= 10,
               expectedRevision: row?.revision ?? 0,
             },
           });
           if (!active) return;
           const savedIds = result.checkpoint.completed_activity_ids ?? [];
+          savedIds.forEach((id: string) => markActivityComplete(userId, id));
           setIds((current) => [...new Set([...current, ...savedIds])]);
         }
       } catch {
-        if (active) setIds(localIds);
+        if (active) setIds(readCompletedActivities(userId));
       }
     };
 
     void sync();
     window.addEventListener("storage", sync);
+    window.addEventListener("focus", sync);
     window.addEventListener("english-adventure-progress-updated", sync);
     return () => {
       active = false;
       window.removeEventListener("storage", sync);
+      window.removeEventListener("focus", sync);
       window.removeEventListener("english-adventure-progress-updated", sync);
     };
   }, [userId]);
@@ -103,7 +108,6 @@ export function useEnglishAdventuresProgress() {
       setIds(readCompletedActivities(userId));
       window.dispatchEvent(new Event("english-adventure-progress-updated"));
 
-      // Credit the final partial minute when the student completes the story.
       const pendingKey = `evoluir-english-adventures:${userId}:pending-telemetry-seconds`;
       let pending = 0;
       try {
@@ -145,9 +149,6 @@ export function useEnglishAdventuresProgress() {
       if (!userId || elapsed <= 0) return;
       setSeconds(addStudySeconds(userId, elapsed));
 
-      // Persist each complete minute through the existing authenticated,
-      // idempotent activity pipeline. Keep sub-minute time locally until the
-      // next timer tick so scene changes do not discard it.
       const pendingKey = `evoluir-english-adventures:${userId}:pending-telemetry-seconds`;
       let pending = 0;
       try {
@@ -172,7 +173,6 @@ export function useEnglishAdventuresProgress() {
             minutes: 1,
           },
         }).catch(() => {
-          // Restore the minute for a later retry rather than losing study time.
           try {
             const current = Number(window.localStorage.getItem(pendingKey) ?? 0);
             window.localStorage.setItem(pendingKey, String(current + 60));
