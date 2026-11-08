@@ -588,6 +588,45 @@ export type Database = {
           },
         ]
       }
+      english_adventure_checkpoints: {
+        Row: {
+          adventure_id: string
+          choices: Json
+          completed: boolean
+          completed_activity_ids: string[]
+          current_step: number
+          decisions: Json
+          recovered: number
+          revision: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          adventure_id: string
+          choices?: Json
+          completed?: boolean
+          completed_activity_ids?: string[]
+          current_step?: number
+          decisions?: Json
+          recovered?: number
+          revision?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          adventure_id?: string
+          choices?: Json
+          completed?: boolean
+          completed_activity_ids?: string[]
+          current_step?: number
+          decisions?: Json
+          recovered?: number
+          revision?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       entitlements: {
         Row: {
           created_at: string
@@ -2753,6 +2792,21 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      save_english_adventure_checkpoint: {
+        Args: {
+          p_adventure_id: string
+          p_choices: Json
+          p_completed: boolean
+          p_completed_activity_ids: string[]
+          p_current_step: number
+          p_decisions: Json
+          p_expected_revision: number
+          p_recovered: number
+          p_restart?: boolean
+          p_user_id: string
+        }
+        Returns: Json
       }
       weekly_league: {
         Args: never
