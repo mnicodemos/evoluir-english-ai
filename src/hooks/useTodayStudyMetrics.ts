@@ -18,10 +18,16 @@ export function useTodayStudyMetrics(userId?: string) {
     };
     const channel = supabase.channel(`today-study-metrics-${userId}`);
     for (const table of ["user_lessons", "user_flashcards", "user_vocabulary", "quiz_results"]) {
-      channel.on("postgres_changes", { event: "*", schema: "public", table, filter: `user_id=eq.${userId}` }, refresh);
+      channel.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table, filter: `user_id=eq.${userId}` },
+        refresh,
+      );
     }
     channel.subscribe();
-    return () => { void supabase.removeChannel(channel); };
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [userId, queryClient]);
 
   return useQuery({
@@ -33,21 +39,43 @@ export function useTodayStudyMetrics(userId?: string) {
     queryFn: async () => {
       if (!userId) throw new Error("A signed-in student is required");
       const [lessons, cards, words, quizzes] = await Promise.all([
-        supabase.from("user_lessons").select("completed_at, video_completed_at").eq("user_id", userId)
-          .or(`and(completed_at.gte.${start},completed_at.lt.${end}),and(video_completed_at.gte.${start},video_completed_at.lt.${end})`),
-        supabase.from("user_flashcards").select("mastery_level, times_reviewed, last_reviewed_at").eq("user_id", userId)
-          .gte("last_reviewed_at", start).lt("last_reviewed_at", end),
-        supabase.from("user_vocabulary").select("mastery_level, last_reviewed_at").eq("user_id", userId)
-          .gte("last_reviewed_at", start).lt("last_reviewed_at", end),
+        supabase
+          .from("user_lessons")
+          .select("completed_at, video_completed_at")
+          .eq("user_id", userId)
+          .or(
+            `and(completed_at.gte.${start},completed_at.lt.${end}),and(video_completed_at.gte.${start},video_completed_at.lt.${end})`,
+          ),
+        supabase
+          .from("user_flashcards")
+          .select("mastery_level, times_reviewed, last_reviewed_at")
+          .eq("user_id", userId)
+          .gte("last_reviewed_at", start)
+          .lt("last_reviewed_at", end),
+        supabase
+          .from("user_vocabulary")
+          .select("mastery_level, last_reviewed_at")
+          .eq("user_id", userId)
+          .gte("last_reviewed_at", start)
+          .lt("last_reviewed_at", end),
         // Keep the existing latest-30 quiz window before the daily aggregation.
-        supabase.from("quiz_results").select("score, created_at").eq("user_id", userId)
-          .order("created_at", { ascending: false }).limit(30),
+        supabase
+          .from("quiz_results")
+          .select("score, created_at")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(30),
       ]);
       for (const result of [lessons, cards, words, quizzes]) if (result.error) throw result.error;
-      return todayStudyMetrics({
-        lessons: lessons.data ?? [], cards: cards.data ?? [],
-        words: words.data ?? [], quizzes: quizzes.data ?? [],
-      }, new Date(start));
+      return todayStudyMetrics(
+        {
+          lessons: lessons.data ?? [],
+          cards: cards.data ?? [],
+          words: words.data ?? [],
+          quizzes: quizzes.data ?? [],
+        },
+        new Date(start),
+      );
     },
   });
 }

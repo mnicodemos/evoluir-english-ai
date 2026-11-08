@@ -778,20 +778,30 @@ function Dashboard() {
           ? "Todas as 10 joias conquistadas"
           : "All 10 jewels earned";
   const { data: loadedMinutes } = useMinutesToday(profile?.id);
-  const { data: loadedActivities } = useTodayActivities(
-    profile?.id,
-  );
+  const { data: loadedActivities } = useTodayActivities(profile?.id);
   // Publish complete inputs together; retain the previous view during a failed/background read.
   const completeProgress = useRef<{
-    owner: string; day: string; minutes: number;
-    metrics: NonNullable<typeof todayMetrics>; activities: NonNullable<typeof loadedActivities>;
+    owner: string;
+    day: string;
+    minutes: number;
+    metrics: NonNullable<typeof todayMetrics>;
+    activities: NonNullable<typeof loadedActivities>;
   } | null>(null);
   const localDay = new Date().toDateString();
-  if (completeProgress.current?.owner !== profile?.id || completeProgress.current?.day !== localDay) {
+  if (
+    completeProgress.current?.owner !== profile?.id ||
+    completeProgress.current?.day !== localDay
+  ) {
     completeProgress.current = null;
   }
   if (profile && todayMetrics && loadedMinutes !== undefined && loadedActivities !== undefined) {
-    completeProgress.current = { owner: profile.id, day: localDay, minutes: loadedMinutes, metrics: todayMetrics, activities: loadedActivities };
+    completeProgress.current = {
+      owner: profile.id,
+      day: localDay,
+      minutes: loadedMinutes,
+      metrics: todayMetrics,
+      activities: loadedActivities,
+    };
   }
   const progress = completeProgress.current;
   const minutesToday = progress?.minutes ?? 0;
@@ -1057,7 +1067,7 @@ function Dashboard() {
                   </div>
                   <div className="flex min-w-0 translate-x-12 flex-col items-start justify-center gap-1 self-stretch lg:h-auto lg:translate-x-0 lg:flex-row lg:gap-2 lg:self-start xl:gap-1 2xl:gap-2">
                     {!hasProgressToday && !isTodayProgressLoading && (
-                      <div className="flex min-h-[5.75rem] translate-y-4 flex-col items-center justify-center gap-1 text-center text-muted-foreground lg:translate-y-6">
+                      <div className="flex min-h-[5.75rem] translate-x-5 translate-y-[11px] flex-col items-center justify-center gap-1 text-center text-muted-foreground lg:translate-x-0 lg:translate-y-6">
                         <DoneSeal icon={ClockHands} />
                         <p className="text-[11px] font-bold leading-tight">
                           {t("Nothing yet today")}
@@ -1108,9 +1118,15 @@ function Dashboard() {
                               aria-hidden="true"
                             />
                             {isTodayProgressLoading ? (
-                              <div className="flex h-5 items-center"><Skeleton className="h-3 w-full" /></div>
+                              <div className="flex h-5 items-center">
+                                <Skeleton className="h-3 w-full" />
+                              </div>
                             ) : (
-                              <TodayProgressText value={card.value} label={t(card.label)} valueClass={valueClass} />
+                              <TodayProgressText
+                                value={card.value}
+                                label={t(card.label)}
+                                valueClass={valueClass}
+                              />
                             )}
                             <span className="sr-only">{sr}</span>
                           </div>

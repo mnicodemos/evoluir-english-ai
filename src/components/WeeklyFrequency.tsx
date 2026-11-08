@@ -94,13 +94,21 @@ export function WeeklyFrequency({
 
   if (presentation === "mobile-strip") {
     return (
-      <div className="relative mt-2 grid grid-cols-7 gap-1 border-t border-border pt-2 lg:hidden" aria-busy={!weekReady}>
+      <div
+        className="relative mt-2 grid grid-cols-7 gap-1 border-t border-border pt-2 lg:hidden"
+        aria-busy={!weekReady}
+      >
         {/* The week count lives with its dots (it used to repeat in a box above). */}
         {/* The days studied and the plan beside them (user request: "6 / 5 days"
             read as a mistake once the plan was passed). */}
         {/* One size on the line, only the count in bold, the dot in its own
             span (user request, 2026-10-24: it read misaligned). */}
-        <p className={cn("col-span-7 mb-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] leading-none text-muted-foreground", !weekReady && "invisible")}>
+        <p
+          className={cn(
+            "col-span-7 mb-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] leading-none text-muted-foreground",
+            !weekReady && "invisible",
+          )}
+        >
           {/* Once the plan is reached the line is only the plan pill and the
               total, so it never wraps to a second line (owner request,
               2026-11-01); "This week · n days" returns while the week is
@@ -149,7 +157,10 @@ export function WeeklyFrequency({
           const studied = studyDays?.has(key) ?? false;
           const isToday = key === todayKey;
           return (
-            <div key={key} className={cn("grid justify-items-center gap-1", !weekReady && "invisible")}>
+            <div
+              key={key}
+              className={cn("grid justify-items-center gap-1", !weekReady && "invisible")}
+            >
               <span
                 className={cn(
                   "text-[9px] text-muted-foreground",
@@ -185,7 +196,11 @@ export function WeeklyFrequency({
         {!weekReady && (
           <div className="absolute inset-x-0 top-2 grid gap-3" aria-hidden="true">
             <Skeleton className="h-[11px] w-full" />
-            <div className="grid grid-cols-7 justify-items-center">{weekKeys.map(key => <Skeleton key={key} className="h-[33px] w-5" />)}</div>
+            <div className="grid grid-cols-7 justify-items-center">
+              {weekKeys.map((key) => (
+                <Skeleton key={key} className="h-[33px] w-5" />
+              ))}
+            </div>
           </div>
         )}
       </div>
