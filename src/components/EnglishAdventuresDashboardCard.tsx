@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Compass, Map } from "lucide-react";
 
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
+import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
 import { PremiumBadge, useIsPremium } from "@/components/PremiumBadge";
 import { FILL_IN_TRANSITION, useFillIn } from "@/hooks/useFillIn";
 import { useProfile } from "@/hooks/useProfile";
@@ -15,6 +16,7 @@ export function EnglishAdventuresDashboardCard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const level = (profile?.max_level || profile?.level || "a1").toLowerCase();
   const title = level === "a2" ? "The Surprise Delivery" : "The Welcome Mix-Up";
+  const progress = useEnglishAdventuresProgress();
   const barPercent = useFillIn(progress.percent);
 
   return (
