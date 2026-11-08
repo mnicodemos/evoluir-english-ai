@@ -424,12 +424,20 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const [fontSize, setFontSize] = useState<16 | 20 | 24>(20);
   const [textColor, setTextColor] = useState("#FFFFFF");
   const [backgroundColor, setBackgroundColor] = useState("#000000");
+  const [backgroundOpacity, setBackgroundOpacity] = useState(100);
   const rows = query.data?.captions ?? [];
   useEffect(() => {
     if (query.data?.fontSize) setFontSize(query.data.fontSize as 16 | 20 | 24);
     if (query.data?.textColor) setTextColor(query.data.textColor);
     if (query.data?.backgroundColor) setBackgroundColor(query.data.backgroundColor);
-  }, [query.data?.fontSize, query.data?.textColor, query.data?.backgroundColor]);
+    if (query.data?.backgroundOpacity !== undefined)
+      setBackgroundOpacity(query.data.backgroundOpacity);
+  }, [
+    query.data?.fontSize,
+    query.data?.textColor,
+    query.data?.backgroundColor,
+    query.data?.backgroundOpacity,
+  ]);
   const values = {
     en: en ?? rows.find((row) => row.language === "en")?.vtt_content ?? "",
     pt: pt ?? rows.find((row) => row.language === "pt")?.vtt_content ?? "",
@@ -437,7 +445,7 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const setters = { en: setEn, pt: setPt };
   const save = useMutation({
     mutationFn: (value: { language: "en" | "pt"; content: string }) =>
-      saveCaption({ data: { videoId, ...value, fontSize, textColor, backgroundColor } }),
+      saveCaption({ data: { videoId, ...value, fontSize, textColor, backgroundColor, backgroundOpacity } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] });
       toast.success("Legenda salva.");
@@ -505,8 +513,22 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
             onChange={(event) => setBackgroundColor(event.target.value.toUpperCase())}
           />
         </label>
+        <label className="flex min-w-52 flex-1 items-center gap-2 text-xs font-semibold">
+          Transparência do fundo
+          <input
+            aria-label="Transparência do fundo da legenda"
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            className="min-w-20 flex-1 accent-primary"
+            value={backgroundOpacity}
+            onChange={(event) => setBackgroundOpacity(Number(event.target.value))}
+          />
+          <span className="w-10 text-right tabular-nums">{backgroundOpacity}%</span>
+        </label>
         <span className="text-xs text-muted-foreground">
-          Tamanho e cores são aplicados aos dois idiomas e salvos junto com cada legenda.
+          Tamanho, cores e transparência são aplicados aos dois idiomas e salvos junto com cada legenda.
         </span>
       </div>
       {(["en", "pt"] as const).map((language) => (
