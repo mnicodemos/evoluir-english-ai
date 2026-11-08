@@ -445,7 +445,9 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
   const setters = { en: setEn, pt: setPt };
   const save = useMutation({
     mutationFn: (value: { language: "en" | "pt"; content: string }) =>
-      saveCaption({ data: { videoId, ...value, fontSize, textColor, backgroundColor, backgroundOpacity } }),
+      saveCaption({
+        data: { videoId, ...value, fontSize, textColor, backgroundColor, backgroundOpacity },
+      }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin-short-captions", videoId] });
       toast.success("Legenda salva.");
@@ -528,7 +530,8 @@ function ShortCaptionEditor({ videoId, field }: { videoId: string; field: string
           <span className="w-10 text-right tabular-nums">{backgroundOpacity}%</span>
         </label>
         <span className="text-xs text-muted-foreground">
-          Tamanho, cores e transparência são aplicados aos dois idiomas e salvos junto com cada legenda.
+          Tamanho, cores e transparência são aplicados aos dois idiomas e salvos junto com cada
+          legenda.
         </span>
       </div>
       {(["en", "pt"] as const).map((language) => (
