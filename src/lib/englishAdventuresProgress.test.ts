@@ -1,13 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  activitiesForLevel,
   completedAdventureIds,
   ENGLISH_ADVENTURES_TOTAL,
   englishAdventureProgress,
-  addStudySeconds,
   markActivityComplete,
   readCompletedActivities,
-  readStudySeconds,
 } from "./englishAdventuresProgress";
 
 function installLocalStorage() {
@@ -36,14 +35,26 @@ describe("English Adventures progress", () => {
     });
   });
 
-  it("keeps study time in seconds and only displays completed minutes", () => {
-    installLocalStorage();
-    expect(addStudySeconds("student-1", 59)).toBe(59);
-    expect(readStudySeconds("student-1")).toBe(59);
-    expect(englishAdventureProgress([], readStudySeconds("student-1")).minutes).toBe(0);
+  it("calculates A1 and A2 journeys independently with 20 activities each", () => {
+    const ids = [
+      "a1-welcome-mix-up:0",
+      "a1-neighbourhood-mystery:0",
+      "a2-surprise-delivery:0",
+      "a2-community-festival:0",
+      "a2-community-festival:1",
+    ];
 
-    expect(addStudySeconds("student-1", 1)).toBe(60);
-    expect(englishAdventureProgress([], readStudySeconds("student-1")).minutes).toBe(1);
+    expect(activitiesForLevel(ids, "a1")).toHaveLength(2);
+    expect(englishAdventureProgress(ids, 0, "a1")).toMatchObject({
+      completed: 5,
+      total: 40,
+      percent: 13,
+    });
+    expect(englishAdventureProgress(ids, 0, "a2")).toMatchObject({
+      completed: 3,
+      total: 20,
+      percent: 15,
+    });
   });
 
   it("counts a completed adventure only once", () => {

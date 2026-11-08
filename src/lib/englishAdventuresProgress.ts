@@ -1,4 +1,5 @@
 export const ENGLISH_ADVENTURES_TOTAL = 40;
+export const ENGLISH_ADVENTURE_LEVEL_TOTAL = 20;
 
 const storageKey = (userId: string) => `evoluir-english-adventures:${userId}`;
 const activityKey = (userId: string) => `${storageKey(userId)}:activities`;
@@ -10,6 +11,8 @@ const legacyActivityIds: Record<string, number> = {
   "a2-surprise-delivery": 10,
   "a2-community-festival": 10,
 };
+
+export type AdventureLevel = "a1" | "a2";
 
 export function completedAdventureIds(ids: string[], adventureId: string): string[] {
   return ids.includes(adventureId) ? ids : [...ids, adventureId];
@@ -60,12 +63,19 @@ export function addStudySeconds(userId: string, seconds: number): number {
   return next;
 }
 
-export function englishAdventureProgress(ids: string[], seconds = 0) {
-  const completed = Math.min(new Set(ids).size, ENGLISH_ADVENTURES_TOTAL);
+export function activitiesForLevel(ids: string[], level: AdventureLevel): string[] {
+  const prefix = level === "a1" ? "a1-" : "a2-";
+  return [...new Set(ids)].filter((id) => id.startsWith(prefix));
+}
+
+export function englishAdventureProgress(ids: string[], seconds = 0, level?: AdventureLevel) {
+  const scopedIds = level === "a2" ? activitiesForLevel(ids, "a2") : [...new Set(ids)];
+  const total = level === "a2" ? ENGLISH_ADVENTURE_LEVEL_TOTAL : ENGLISH_ADVENTURES_TOTAL;
+  const completed = Math.min(scopedIds.length, total);
   return {
     completed,
-    total: ENGLISH_ADVENTURES_TOTAL,
-    percent: Math.round((completed / ENGLISH_ADVENTURES_TOTAL) * 100),
+    total,
+    percent: Math.round((completed / total) * 100),
     minutes: Math.floor(seconds / 60),
   };
 }
