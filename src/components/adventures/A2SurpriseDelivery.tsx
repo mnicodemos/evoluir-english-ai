@@ -327,7 +327,7 @@ export function A2SurpriseDelivery() {
         )}
         <EnglishAdventureJourneyMap
           adventureId="a2-surprise-delivery"
-          activityIndex={index}
+          activityIndex={completed ? Math.max(0, index - 1) : index}
           isComplete={completed}
         />
       </div>
