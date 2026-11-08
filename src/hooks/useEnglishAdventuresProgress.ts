@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useProfile } from "@/hooks/useProfile";
+import { loadEnglishAdventureCheckpoints, saveEnglishAdventureCheckpoint } from "@/lib/englishAdventureCheckpoint.functions";
 import { logPracticeTelemetry } from "@/lib/legacyActivity.functions";
 import {
   addStudySeconds,
@@ -24,14 +25,72 @@ export function useEnglishAdventuresProgress() {
       return;
     }
 
-    const sync = () => {
-      setIds(readCompletedActivities(userId));
+    let active = true;
+    const sync = async () => {
+      const localIds = readCompletedActivities(userId);
       setSeconds(readStudySeconds(userId));
+      try {
+        const rows = (await loadEnglishAdventureCheckpoints()) as Array<{
+          adventure_id: string;
+          current_step: number;
+          choices: Record<string, number>;
+          decisions: string[];
+          recovered: number;
+          completed_activity_ids: string[];
+          completed: boolean;
+          revision: number;
+        }>;
+        if (!active) return;
+
+        const remoteIds = rows.flatMap((row) => row.completed_activity_ids ?? []);
+        setIds([...new Set([...remoteIds, ...localIds])]);
+
+        const adventureIds = [
+          "a1-welcome-mix-up",
+          "a1-neighbourhood-mystery",
+          "a2-surprise-delivery",
+          "a2-community-festival",
+        ] as const;
+
+        for (const adventureId of adventureIds) {
+          const legacyIds = localIds.filter((id) => id.startsWith(`${adventureId}:`));
+          if (!legacyIds.length) continue;
+          const row = rows.find((item) => item.adventure_id === adventureId);
+          const rowIds = row?.completed_activity_ids ?? [];
+          if (row && legacyIds.every((id) => rowIds.includes(id))) continue;
+
+          let legacyStep = 0;
+          while (legacyIds.includes(`${adventureId}:${legacyStep}`)) legacyStep += 1;
+          const totalSteps = 10;
+          const result = await saveEnglishAdventureCheckpoint({
+            data: {
+              adventureId,
+              currentStep: Math.max(row?.current_step ?? 0, legacyStep),
+              choices: row?.choices ?? {},
+              decisions: row?.decisions ?? [],
+              recovered: row?.recovered ?? 0,
+              completedActivityIds: [...new Set([...rowIds, ...legacyIds])],
+              completed: Boolean(row?.completed) || legacyStep >= totalSteps,
+              expectedRevision: row?.revision ?? 0,
+            },
+          });
+          if (!active) return;
+          const savedIds = result.checkpoint.completed_activity_ids ?? [];
+          setIds((current) => [...new Set([...current, ...savedIds])]);
+        }
+      } catch {
+        if (active) setIds(localIds);
+      }
     };
 
-    sync();
+    void sync();
     window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    window.addEventListener("english-adventure-progress-updated", sync);
+    return () => {
+      active = false;
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("english-adventure-progress-updated", sync);
+    };
   }, [userId]);
 
   const markCompleted = useCallback(
@@ -39,6 +98,7 @@ export function useEnglishAdventuresProgress() {
       if (!userId) return;
       saveCompletedAdventure(userId, adventureId);
       setIds(readCompletedActivities(userId));
+      window.dispatchEvent(new Event("english-adventure-progress-updated"));
 
       // Credit the final partial minute when the student completes the story.
       const pendingKey = `evoluir-english-adventures:${userId}:pending-telemetry-seconds`;
@@ -72,6 +132,7 @@ export function useEnglishAdventuresProgress() {
     (activityId: string) => {
       if (!userId) return;
       setIds(markActivityComplete(userId, activityId));
+      window.dispatchEvent(new Event("english-adventure-progress-updated"));
     },
     [userId],
   );
