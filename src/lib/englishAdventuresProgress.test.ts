@@ -46,9 +46,9 @@ describe("English Adventures progress", () => {
 
     expect(activitiesForLevel(ids, "a1")).toHaveLength(2);
     expect(englishAdventureProgress(ids, 0, "a1")).toMatchObject({
-      completed: 2,
+      completed: 5,
       total: 40,
-      percent: 5,
+      percent: 13,
     });
     expect(englishAdventureProgress(ids, 0, "a2")).toMatchObject({
       completed: 3,
