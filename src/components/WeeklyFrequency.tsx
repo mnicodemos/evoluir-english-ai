@@ -196,9 +196,11 @@ export function WeeklyFrequency({
         {!weekReady && (
           <div className="absolute inset-x-0 top-2 grid gap-3" aria-hidden="true">
             <Skeleton className="h-[11px] w-full" />
-            <div className="grid grid-cols-7 justify-items-center">{weekKeys.map((key) => (
+            <div className="grid grid-cols-7 justify-items-center">
+              {weekKeys.map((key) => (
                 <Skeleton key={key} className="h-[33px] w-5" />
-              ))}</div>
+              ))}
+            </div>
           </div>
         )}
       </div>
