@@ -10,6 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { ProofOfProgressMission } from "@/components/league/ProofOfProgressMission";
 import { useWeeklyLeagueStanding, weekXpLine } from "@/components/WeeklyLeagueSummary";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useHomeImages } from "@/hooks/useHomeImages";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
@@ -97,7 +98,7 @@ function League() {
   return (
     <AppShell mobileOneScreen>
       <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,1fr)] lg:items-start lg:gap-4 lg:space-y-0">
-        <header className="animate-rise flex items-center gap-3 lg:col-span-2">
+        <header className="animate-rise flex items-center justify-between gap-3 lg:col-span-2">
           <img
             src={leagueImage}
             alt=""
@@ -112,6 +113,32 @@ function League() {
               <span>Monday to Sunday · resets every Monday</span>
             </p>
           </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-foreground transition-colors hover:bg-white/[0.08]"
+                aria-label={t("How to earn XP")}
+              >
+                <Trophy className="size-4 text-amber-400" />
+                <span>{t("How to earn XP")}</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              className="w-72 border-white/10 bg-[#101820] p-4 text-foreground"
+            >
+              <h2 className="font-display text-sm font-semibold">{t("How to earn XP")}</h2>
+              <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                {XP_RULES.map((rule) => (
+                  <li key={rule.label} className="flex justify-between gap-3">
+                    <span>{t(rule.label)}</span>
+                    <span className="shrink-0 font-semibold text-foreground">+{rule.xp}</span>
+                  </li>
+                ))}
+              </ul>
+            </PopoverContent>
+          </Popover>
         </header>
 
         <div className="lg:col-span-2">
@@ -203,8 +230,6 @@ function League() {
               </p>
             )}
           </section>
-
-          <LeagueHistory userId={profile?.id ?? null} joined={joined} />
         </div>
 
         <aside className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
@@ -243,17 +268,7 @@ function League() {
             </Button>
           </section>
 
-          <section className="card-soft p-4">
-            <h2 className="font-display text-sm font-semibold">How to earn XP</h2>
-            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-              {XP_RULES.map((rule) => (
-                <li key={rule.label} className="flex justify-between gap-3">
-                  <span>{rule.label}</span>
-                  <span className="shrink-0 font-semibold text-foreground">+{rule.xp}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <LeagueHistory userId={profile?.id ?? null} joined={joined} />
         </aside>
       </div>
     </AppShell>
@@ -314,7 +329,7 @@ type HistoryRow = {
 
 /**
  * The student's league weeks (user request, 2026-10-22: see how the position
- * changes over time): the last 8 weeks, newest first, with the XP as a bar and
+ * changes over time): the last 30 days, grouped by week, newest first, with the XP as a bar and
  * the position among the students who take part (weekly_league_history,
  * migration 0078). Hidden until that migration is applied.
  */
@@ -335,9 +350,14 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
         name: string,
         args: { p_weeks: number },
       ) => Promise<{ data: HistoryRow[] | null; error: { message: string } | null }>;
-      const { data: rows, error } = await rpc("weekly_league_history", { p_weeks: 8 });
+      const { data: rows, error } = await rpc("weekly_league_history", { p_weeks: 5 });
       if (error) throw error;
-      return rows ?? [];
+      const cutoff = new Date();
+      cutoff.setHours(0, 0, 0, 0);
+      cutoff.setDate(cutoff.getDate() - 30);
+      return (rows ?? []).filter(
+        (row) => new Date(`${row.week_start}T00:00:00`).getTime() >= cutoff.getTime(),
+      );
     },
   });
   if (isError) return null;
@@ -370,45 +390,48 @@ function LeagueHistory({ userId, joined }: { userId: string | null; joined: bool
           ))}
         </div>
       ) : (
-        <ol className="mt-3 space-y-1.5">
+        <div
+          className="mt-4 grid h-36 items-end gap-2"
+          style={{
+            gridTemplateColumns: `repeat(${Math.max(rows.length, 1)}, minmax(0, 1fr))`,
+          }}
+          role="img"
+          aria-label={t("Weekly XP history bar chart")}
+        >
           {rows.map((row, index) => (
-            <li
+            <div
               key={row.week_start}
-              className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-2 text-xs"
+              className="flex h-full min-w-0 flex-col items-center justify-end gap-1"
             >
+              <span className="text-[10px] tabular-nums text-muted-foreground">{row.xp}</span>
+              <div className="flex w-full flex-1 items-end">
+                <div
+                  className={cn(
+                    "w-full rounded-t-md bg-amber-400/80 transition-all",
+                    index === 0 && "bg-brand-green",
+                  )}
+                  style={{
+                    height: `${Math.max(row.xp > 0 ? 8 : 2, Math.round((row.xp / maxXp) * 100))}%`,
+                  }}
+                  title={`${weekLabel(row.week_start)}: ${row.xp} XP`}
+                />
+              </div>
               <span
                 className={cn(
-                  "text-muted-foreground",
-                  index === 0 && "font-semibold text-brand-green",
+                  "max-w-full truncate text-[10px]",
+                  index === 0 ? "font-semibold text-brand-green" : "text-muted-foreground",
                 )}
               >
-                {index === 0 ? t("This week") : weekLabel(row.week_start)}
+                {index === 0 ? t("Now") : weekLabel(row.week_start)}
               </span>
-              <span className="flex min-w-0 items-center gap-2">
-                <span
-                  className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.08]"
-                  aria-hidden="true"
-                >
-                  <span
-                    className="block h-full rounded-full bg-amber-400/80"
-                    style={{ width: `${Math.round((row.xp / maxXp) * 100)}%` }}
-                  />
-                </span>
-                <span className="w-14 shrink-0 text-right tabular-nums">{row.xp} XP</span>
+              <span className="text-[9px] font-medium tabular-nums text-muted-foreground">
+                {row.rank_position !== null && row.xp > 0
+                  ? `#${row.rank_position}/${row.members}`
+                  : "—"}
               </span>
-              <span className="w-14 text-right font-semibold tabular-nums">
-                {row.rank_position !== null && row.xp > 0 ? (
-                  <>
-                    #{row.rank_position}
-                    <span className="font-normal text-muted-foreground">/{row.members}</span>
-                  </>
-                ) : (
-                  <span className="text-muted-foreground">—</span>
-                )}
-              </span>
-            </li>
+            </div>
           ))}
-        </ol>
+        </div>
       )}
       {!joined ? (
         <p className="mt-2 text-[11px] text-muted-foreground">
