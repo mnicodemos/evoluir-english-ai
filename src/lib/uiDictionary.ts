@@ -2231,6 +2231,9 @@ const baseUiPt: Record<string, string> = {
     "Ninguém do seu nível entrou na liga nesta semana ainda.",
   "(you)": "(você)",
   "Your participation": "Sua participação",
+  "Your rank": "Sua posição",
+  "Your profile": "Seu perfil",
+  "Not ranked": "Não está no ranking",
   "This week": "Nesta semana",
   "Other students at your level see your first name and initial, and your XP.":
     "Alunos do seu nível veem seu primeiro nome, a inicial do sobrenome e seu XP.",
