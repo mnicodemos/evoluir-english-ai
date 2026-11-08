@@ -160,7 +160,10 @@ export function useEnglishAdventureCheckpoint(
         merged.completedActivityIds.length > remote.completedActivityIds.length ||
         merged.completed !== remote.completed ||
         Object.keys(merged.choices).length > Object.keys(remote.choices).length ||
-        merged.decisions.length > remote.decisions.length);
+        merged.decisions.length > remote.decisions.length ||
+        merged.recovered > remote.recovered ||
+        JSON.stringify(merged.choices) !== JSON.stringify(remote.choices) ||
+        JSON.stringify(merged.decisions) !== JSON.stringify(remote.decisions));
     if (needsCloudWrite) {
       const result = await saveEnglishAdventureCheckpoint({
         data: {
