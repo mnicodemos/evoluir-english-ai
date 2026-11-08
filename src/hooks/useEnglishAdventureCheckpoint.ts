@@ -138,6 +138,7 @@ export function useEnglishAdventureCheckpoint(
             }
 
             revisionRef.current = result.checkpoint.revision;
+            setCheckpoint((current) => ({ ...current, revision: result.checkpoint.revision }));
             setSaveError(false);
             if (typeof window !== "undefined") {
               window.dispatchEvent(new Event("english-adventure-progress-updated"));
