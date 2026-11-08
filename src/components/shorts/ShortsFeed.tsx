@@ -436,7 +436,8 @@ function ShortSlide({
               color: captionQuery.data?.textColor ?? "#FFFFFF",
               backgroundColor: `${captionQuery.data?.backgroundColor ?? "#000000"}${Math.round(
                 ((captionQuery.data?.backgroundOpacity ?? 100) / 100) * 255,
-              ).toString(16)
+              )
+                .toString(16)
                 .padStart(2, "0")}`.toUpperCase(),
             }}
             aria-live="polite"
