@@ -1048,6 +1048,7 @@ function Dashboard() {
                         value={minutesToday}
                         goal={profile.daily_minutes}
                         unit="min"
+                        loading={isTodayProgressLoading}
                       >
                         {isTodayProgressLoading ? (
                           <Skeleton className="h-5 w-10" />
@@ -1082,56 +1083,66 @@ function Dashboard() {
                     )}
                     <div
                       className={cn(
-                        `${hasProgressToday || isTodayProgressLoading ? "flex" : "hidden"} min-w-0 max-w-full -translate-x-12 flex-col justify-center gap-1 self-center lg:translate-x-0 lg:translate-y-[30px] xl:gap-1 2xl:gap-2`,
+                        hasProgressToday || isTodayProgressLoading ? "flex" : "hidden",
+                        "min-w-0 max-w-full -translate-x-12 flex-col justify-center gap-1 self-center lg:translate-x-0 lg:translate-y-[30px] xl:gap-1 2xl:gap-2",
+                        isTodayProgressLoading && "w-full",
                       )}
+                      aria-busy={isTodayProgressLoading}
                     >
-                      {learningCards.map((card) => {
-                        // Each line has its own activity icon: grey until done today,
-                        // then lit in the ring's colour (accuracy from 70%).
-                        const Icon = TODAY_LINE_ICONS[card.icon];
-                        const iconClass =
-                          card.state === "done"
-                            ? "text-brand-green/75"
-                            : "text-muted-foreground/50";
-                        const sr =
-                          card.state === "done"
-                            ? "Done today."
-                            : card.state === "attention"
-                              ? "Needs attention."
-                              : "Nothing yet.";
-                        const valueClass =
-                          card.state === "attention"
-                            ? "text-warning"
-                            : card.state === "empty"
-                              ? "text-muted-foreground/60"
-                              : "text-foreground";
-                        return (
-                          // Phones: the icon sits centred in its column, as far from the
-                          // ring as from the number (user request, 2026-10-24).
-                          <div
-                            key={card.key}
-                            className="grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-2 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
-                          >
-                            <Icon
-                              className={`size-4 shrink-0 justify-self-center lg:justify-self-auto ${iconClass}`}
-                              strokeWidth={2.4}
+                      {isTodayProgressLoading
+                        ? [0, 1, 2].map((row) => (
+                            <div
+                              key={row}
+                              className="grid w-full min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-2 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
                               aria-hidden="true"
-                            />
-                            {isTodayProgressLoading ? (
-                              <div className="flex h-5 items-center">
+                            >
+                              <Skeleton className="size-4 justify-self-center rounded-full lg:justify-self-auto" />
+                              <div className="flex h-5 min-w-0 items-center">
                                 <Skeleton className="h-3 w-full" />
                               </div>
-                            ) : (
-                              <TodayProgressText
-                                value={card.value}
-                                label={t(card.label)}
-                                valueClass={valueClass}
-                              />
-                            )}
-                            <span className="sr-only">{sr}</span>
-                          </div>
-                        );
-                      })}
+                            </div>
+                          ))
+                        : learningCards.map((card) => {
+                            // Each line has its own activity icon: grey until done today,
+                            // then lit in the ring's colour (accuracy from 70%).
+                            const Icon = TODAY_LINE_ICONS[card.icon];
+                            const iconClass =
+                              card.state === "done"
+                                ? "text-brand-green/75"
+                                : "text-muted-foreground/50";
+                            const sr =
+                              card.state === "done"
+                                ? "Done today."
+                                : card.state === "attention"
+                                  ? "Needs attention."
+                                  : "Nothing yet.";
+                            const valueClass =
+                              card.state === "attention"
+                                ? "text-warning"
+                                : card.state === "empty"
+                                  ? "text-muted-foreground/60"
+                                  : "text-foreground";
+                            return (
+                              // Phones: the icon sits centred in its column, as far from the
+                              // ring as from the number (user request, 2026-10-24).
+                              <div
+                                key={card.key}
+                                className="grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-2 lg:grid-cols-[1.75rem_minmax(0,1fr)] lg:gap-2.5"
+                              >
+                                <Icon
+                                  className={`size-4 shrink-0 justify-self-center lg:justify-self-auto ${iconClass}`}
+                                  strokeWidth={2.4}
+                                  aria-hidden="true"
+                                />
+                                <TodayProgressText
+                                  value={card.value}
+                                  label={t(card.label)}
+                                  valueClass={valueClass}
+                                />
+                                <span className="sr-only">{sr}</span>
+                              </div>
+                            );
+                          })}
                     </div>
                   </div>
                 </div>

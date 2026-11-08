@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { FILL_IN_TRANSITION, useFillIn } from "@/hooks/useFillIn";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /** Open part of the ring, at the bottom, where the amount is written (degrees). */
 export const GAUGE_GAP_DEGREES = 100;
@@ -23,6 +24,7 @@ export function GaugeRing({
   value,
   goal,
   unit,
+  loading = false,
   children,
 }: {
   progress: number;
@@ -31,6 +33,8 @@ export function GaugeRing({
   /** The goal and its unit, smaller and muted after the value ("/25 min"). */
   goal: number;
   unit: string;
+  /** Reserve the amount's space without publishing a temporary zero. */
+  loading?: boolean;
   children: ReactNode;
 }) {
   const share = useFillIn(Math.min(1, Math.max(0, progress)));
@@ -69,10 +73,16 @@ export function GaugeRing({
           the box's bottom edge, just under the arc's ends, where the whole
           width is free, so "120/60 min" never touches the ring. */}
       <span className="absolute inset-x-0 bottom-0 flex items-baseline justify-center whitespace-nowrap leading-none tabular-nums">
-        <span className="text-[15px] font-light text-foreground/90 2xl:text-base">{value}</span>
-        <span className="text-[10px] font-normal text-muted-foreground">
-          /{goal} {unit}
-        </span>
+        {loading ? (
+          <Skeleton className="h-3 w-12" aria-hidden="true" />
+        ) : (
+          <>
+            <span className="text-[15px] font-light text-foreground/90 2xl:text-base">{value}</span>
+            <span className="text-[10px] font-normal text-muted-foreground">
+              /{goal} {unit}
+            </span>
+          </>
+        )}
       </span>
     </>
   );
