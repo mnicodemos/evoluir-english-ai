@@ -5,6 +5,10 @@ import {
   loadEnglishAdventureCheckpoints,
   saveEnglishAdventureCheckpoint,
 } from "@/lib/englishAdventureCheckpoint.functions";
+import {
+  markActivityComplete,
+  saveCompletedAdventure,
+} from "@/lib/englishAdventuresProgress";
 
 export type EnglishAdventureId =
   | "a1-welcome-mix-up"
@@ -43,6 +47,9 @@ const EMPTY_CHECKPOINT: EnglishAdventureCheckpoint = {
   revision: 0,
 };
 
+const localKey = (userId: string, adventureId: EnglishAdventureId) =>
+  `evoluir-english-adventure-checkpoint:${userId}:${adventureId}`;
+
 function fromRow(row: CheckpointRow): EnglishAdventureCheckpoint {
   return {
     currentStep: row.current_step,
@@ -55,21 +62,133 @@ function fromRow(row: CheckpointRow): EnglishAdventureCheckpoint {
   };
 }
 
-export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, totalSteps: number) {
+function readLocalCheckpoint(userId: string, adventureId: EnglishAdventureId) {
+  try {
+    const raw = window.localStorage.getItem(localKey(userId, adventureId));
+    if (!raw) return EMPTY_CHECKPOINT;
+    const value = JSON.parse(raw) as Partial<EnglishAdventureCheckpoint>;
+    return {
+      ...EMPTY_CHECKPOINT,
+      ...value,
+      choices: value.choices ?? {},
+      decisions: value.decisions ?? [],
+      completedActivityIds: value.completedActivityIds ?? [],
+      revision: Number.isInteger(value.revision) ? value.revision! : 0,
+    };
+  } catch {
+    return EMPTY_CHECKPOINT;
+  }
+}
+
+function writeLocalCheckpoint(
+  userId: string,
+  adventureId: EnglishAdventureId,
+  checkpoint: EnglishAdventureCheckpoint,
+) {
+  try {
+    window.localStorage.setItem(localKey(userId, adventureId), JSON.stringify(checkpoint));
+  } catch {
+    // Cloud persistence remains available when browser storage is blocked.
+  }
+}
+
+function mergeCheckpoints(
+  local: EnglishAdventureCheckpoint,
+  remote: EnglishAdventureCheckpoint,
+): EnglishAdventureCheckpoint {
+  return {
+    currentStep: Math.max(local.currentStep, remote.currentStep),
+    choices: { ...remote.choices, ...local.choices },
+    decisions:
+      local.decisions.length >= remote.decisions.length ? local.decisions : remote.decisions,
+    recovered: Math.max(local.recovered, remote.recovered),
+    completedActivityIds: [
+      ...new Set([...remote.completedActivityIds, ...local.completedActivityIds]),
+    ],
+    completed: local.completed || remote.completed,
+    revision: remote.revision,
+  };
+}
+
+function hasProgress(checkpoint: EnglishAdventureCheckpoint) {
+  return (
+    checkpoint.currentStep > 0 ||
+    Object.keys(checkpoint.choices).length > 0 ||
+    checkpoint.completedActivityIds.length > 0 ||
+    checkpoint.completed
+  );
+}
+
+export function useEnglishAdventureCheckpoint(
+  adventureId: EnglishAdventureId,
+  totalSteps: number,
+) {
   const { data: profile } = useProfile();
   const userId = profile?.id;
   const [checkpoint, setCheckpoint] = useState(EMPTY_CHECKPOINT);
   const [ready, setReady] = useState(false);
   const [saveError, setSaveError] = useState(false);
+  const checkpointRef = useRef(EMPTY_CHECKPOINT);
   const revisionRef = useRef(0);
   const pendingRef = useRef<EnglishAdventureCheckpoint | null>(null);
   const savingRef = useRef(false);
 
+  const publish = useCallback((next: EnglishAdventureCheckpoint) => {
+    checkpointRef.current = next;
+    setCheckpoint(next);
+  }, []);
+
+  const syncRemote = useCallback(async () => {
+    if (!userId) return;
+    const rows = (await loadEnglishAdventureCheckpoints()) as CheckpointRow[];
+    const row = rows.find((item) => item.adventure_id === adventureId);
+    const remote = row ? fromRow(row) : EMPTY_CHECKPOINT;
+    const local = readLocalCheckpoint(userId, adventureId);
+    const merged = mergeCheckpoints(local, remote);
+    revisionRef.current = remote.revision;
+    publish(merged);
+    writeLocalCheckpoint(userId, adventureId, merged);
+    merged.completedActivityIds.forEach((id) => markActivityComplete(userId, id));
+
+    const needsCloudWrite =
+      hasProgress(merged) &&
+      (!row ||
+        merged.currentStep > remote.currentStep ||
+        merged.completedActivityIds.length > remote.completedActivityIds.length ||
+        merged.completed !== remote.completed ||
+        Object.keys(merged.choices).length > Object.keys(remote.choices).length ||
+        merged.decisions.length > remote.decisions.length);
+    if (needsCloudWrite) {
+      const result = await saveEnglishAdventureCheckpoint({
+        data: {
+          adventureId,
+          currentStep: merged.currentStep,
+          choices: merged.choices,
+          decisions: merged.decisions,
+          recovered: merged.recovered,
+          completedActivityIds: merged.completedActivityIds,
+          completed: merged.completed,
+          expectedRevision: remote.revision,
+        },
+      });
+      const saved = fromRow(result.checkpoint as CheckpointRow);
+      revisionRef.current = saved.revision;
+      const finalCheckpoint = mergeCheckpoints(merged, saved);
+      publish(finalCheckpoint);
+      writeLocalCheckpoint(userId, adventureId, finalCheckpoint);
+    }
+    setSaveError(false);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("english-adventure-progress-updated"));
+    }
+  }, [adventureId, publish, userId]);
+
   useEffect(() => {
     let active = true;
     setReady(false);
-    setCheckpoint(EMPTY_CHECKPOINT);
-    revisionRef.current = 0;
+    const local = userId ? readLocalCheckpoint(userId, adventureId) : EMPTY_CHECKPOINT;
+    publish(local);
+    revisionRef.current = local.revision;
     pendingRef.current = null;
 
     if (!userId) {
@@ -79,15 +198,7 @@ export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, t
       };
     }
 
-    void loadEnglishAdventureCheckpoints()
-      .then((rows: CheckpointRow[]) => {
-        if (!active) return;
-        const row = rows.find((item) => item.adventure_id === adventureId);
-        const next = row ? fromRow(row) : EMPTY_CHECKPOINT;
-        revisionRef.current = next.revision;
-        setCheckpoint(next);
-        setSaveError(false);
-      })
+    void syncRemote()
       .catch(() => {
         if (active) setSaveError(true);
       })
@@ -95,16 +206,36 @@ export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, t
         if (active) setReady(true);
       });
 
+    const refresh = () => {
+      if (document.visibilityState === "visible") {
+        void syncRemote().catch(() => setSaveError(true));
+      }
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+
     return () => {
       active = false;
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
     };
-  }, [adventureId, userId]);
+  }, [adventureId, publish, syncRemote, userId]);
 
   const persist = useCallback(
     (next: EnglishAdventureCheckpoint) => {
-      setCheckpoint(next);
+      publish(next);
+      if (userId) {
+        writeLocalCheckpoint(userId, adventureId, next);
+        next.completedActivityIds.forEach((id) => markActivityComplete(userId, id));
+        if (next.completed) saveCompletedAdventure(userId, adventureId);
+      }
       pendingRef.current = next;
-      if (!userId || savingRef.current) return;
+      if (!userId || savingRef.current) {
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("english-adventure-progress-updated"));
+        }
+        return;
+      }
 
       savingRef.current = true;
       void (async () => {
@@ -124,22 +255,12 @@ export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, t
                 expectedRevision: revisionRef.current,
               },
             });
-
-            if (!result.saved) {
-              const latest = fromRow(result.checkpoint as CheckpointRow);
-              revisionRef.current = latest.revision;
-              pendingRef.current = null;
-              setCheckpoint(latest);
-              setSaveError(false);
-              break;
-            }
-
-            revisionRef.current = result.checkpoint.revision;
-            setCheckpoint((current) => ({ ...current, revision: result.checkpoint.revision }));
+            const saved = fromRow(result.checkpoint as CheckpointRow);
+            revisionRef.current = saved.revision;
+            const merged = mergeCheckpoints(snapshot, saved);
+            publish(merged);
+            if (userId) writeLocalCheckpoint(userId, adventureId, merged);
             setSaveError(false);
-            if (typeof window !== "undefined") {
-              window.dispatchEvent(new Event("english-adventure-progress-updated"));
-            }
           } catch {
             pendingRef.current = snapshot;
             setSaveError(true);
@@ -147,46 +268,52 @@ export function useEnglishAdventureCheckpoint(adventureId: EnglishAdventureId, t
           }
         }
         savingRef.current = false;
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("english-adventure-progress-updated"));
+        }
       })();
     },
-    [adventureId, userId],
+    [adventureId, publish, userId],
   );
 
   const choose = useCallback(
     (choiceIndex: number, recoveredDelta = 0) => {
-      if (!ready || checkpoint.completed || checkpoint.currentStep >= totalSteps) return;
+      const current = checkpointRef.current;
+      if (!ready || current.completed || current.currentStep >= totalSteps) return;
       persist({
-        ...checkpoint,
-        choices: { ...checkpoint.choices, [String(checkpoint.currentStep)]: choiceIndex },
-        recovered: checkpoint.recovered + Math.max(0, recoveredDelta),
+        ...current,
+        choices: { ...current.choices, [String(current.currentStep)]: choiceIndex },
+        recovered: current.recovered + Math.max(0, recoveredDelta),
       });
     },
-    [checkpoint, persist, ready, totalSteps],
+    [persist, ready, totalSteps],
   );
 
   const continueStep = useCallback(
     (decision?: string) => {
-      if (!ready || checkpoint.completed || checkpoint.currentStep >= totalSteps) return;
-      const activityId = `${adventureId}:${checkpoint.currentStep}`;
-      const nextStep = Math.min(checkpoint.currentStep + 1, totalSteps);
+      const current = checkpointRef.current;
+      if (!ready || current.completed || current.currentStep >= totalSteps) return;
+      const activityId = `${adventureId}:${current.currentStep}`;
+      const nextStep = Math.min(current.currentStep + 1, totalSteps);
       persist({
-        ...checkpoint,
+        ...current,
         currentStep: nextStep,
-        decisions: decision ? [...checkpoint.decisions, decision] : checkpoint.decisions,
-        completedActivityIds: [...new Set([...checkpoint.completedActivityIds, activityId])],
+        decisions: decision ? [...current.decisions, decision] : current.decisions,
+        completedActivityIds: [...new Set([...current.completedActivityIds, activityId])],
         completed: nextStep >= totalSteps,
       });
     },
-    [adventureId, checkpoint, persist, ready, totalSteps],
+    [adventureId, persist, ready, totalSteps],
   );
 
   const restart = useCallback(() => {
+    const current = checkpointRef.current;
     persist({
       ...EMPTY_CHECKPOINT,
-      completedActivityIds: checkpoint.completedActivityIds,
-      revision: checkpoint.revision,
+      completedActivityIds: current.completedActivityIds,
+      revision: current.revision,
     });
-  }, [checkpoint.completedActivityIds, checkpoint.revision, persist]);
+  }, [persist]);
 
   return {
     ...checkpoint,
