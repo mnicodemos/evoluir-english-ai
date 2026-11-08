@@ -6,9 +6,7 @@ import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdven
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { Button } from "@/components/ui/button";
-import {
-  useAdventureActivityTimer,
-} from "@/hooks/useEnglishAdventuresProgress";
+import { useAdventureActivityTimer } from "@/hooks/useEnglishAdventuresProgress";
 import { useEnglishAdventureCheckpoint } from "@/hooks/useEnglishAdventureCheckpoint";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -376,7 +374,9 @@ export function A1WelcomeMixUp() {
                   type="button"
                   onClick={() => {
                     const recoveredDelta =
-                      selected !== null && !scene.choices[selected]?.correct && option.correct ? 1 : 0;
+                      selected !== null && !scene.choices[selected]?.correct && option.correct
+                        ? 1
+                        : 0;
                     progress.choose(index, recoveredDelta);
                   }}
                   aria-pressed={selected === index}
