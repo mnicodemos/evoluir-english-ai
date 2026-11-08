@@ -38,7 +38,17 @@ export const loadEnglishAdventureCheckpoints = createServerFn({ method: "GET" })
     const { data, error } = await db
       .from("english_adventure_checkpoints")
       .select(
-        "adventure_id, current_step, choices, decisions, recovered, completed_activity_ids, completed, revision, updated_at",
+        [
+          "adventure_id",
+          "current_step",
+          "choices",
+          "decisions",
+          "recovered",
+          "completed_activity_ids",
+          "completed",
+          "revision",
+          "updated_at",
+        ].join(", "),
       )
       .eq("user_id", context.userId);
 
