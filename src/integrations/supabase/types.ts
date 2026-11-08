@@ -1513,6 +1513,56 @@ export type Database = {
         }
         Relationships: []
       }
+      premium_video_captions: {
+        Row: {
+          background_color: string
+          background_opacity: number
+          created_at: string
+          font_size: number
+          id: string
+          language: string
+          text_color: string
+          updated_at: string
+          updated_by: string | null
+          video_id: string
+          vtt_content: string
+        }
+        Insert: {
+          background_color?: string
+          background_opacity?: number
+          created_at?: string
+          font_size?: number
+          id?: string
+          language: string
+          text_color?: string
+          updated_at?: string
+          updated_by?: string | null
+          video_id: string
+          vtt_content: string
+        }
+        Update: {
+          background_color?: string
+          background_opacity?: number
+          created_at?: string
+          font_size?: number
+          id?: string
+          language?: string
+          text_color?: string
+          updated_at?: string
+          updated_by?: string | null
+          video_id?: string
+          vtt_content?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_video_captions_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "premium_level_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       premium_video_comment_reports: {
         Row: {
           comment_id: string
