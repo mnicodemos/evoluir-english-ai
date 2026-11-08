@@ -71,8 +71,8 @@ BEGIN
     OR p_expected_revision < 0
     OR EXISTS (
       SELECT 1
-      FROM unnest(COALESCE(p_completed_activity_ids, '{}')) AS item
-      WHERE item !~ ('^' || p_adventure_id || ':[0-9]$')
+      FROM unnest(COALESCE(p_completed_activity_ids, '{}')) AS activities(activity_id)
+      WHERE activity_id !~ ('^' || p_adventure_id || ':[0-9]$')
     )
   THEN
     RAISE EXCEPTION 'Invalid English Adventure checkpoint';
@@ -98,7 +98,7 @@ BEGIN
       recovered = GREATEST(existing.recovered, EXCLUDED.recovered),
       completed_activity_ids = ARRAY(
         SELECT DISTINCT activity_id
-        FROM unnest(existing.completed_activity_ids || EXCLUDED.completed_activity_ids) AS activity_id
+        FROM unnest(existing.completed_activity_ids || EXCLUDED.completed_activity_ids) AS activities(activity_id)
         ORDER BY activity_id
       ),
       completed = CASE WHEN p_restart THEN EXCLUDED.completed ELSE existing.completed OR EXCLUDED.completed END,
