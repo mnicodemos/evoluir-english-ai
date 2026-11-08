@@ -131,13 +131,7 @@ export function useEnglishAdventuresProgress(level?: AdventureLevel) {
       }
 
       for (let index = 0; index < wholeMinutes; index += 1) {
-        void logPracticeTelemetry({
-          data: {
-            operationKey: crypto.randomUUID(),
-            activityType: "english_adventures",
-            minutes: 1,
-          },
-        }).catch(() => {
+        void persistAdventureMinute().catch(() => {
           try {
             const current = Number(window.localStorage.getItem(pendingKey) ?? 0);
             window.localStorage.setItem(pendingKey, String(current + 60));
