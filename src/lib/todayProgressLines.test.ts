@@ -53,7 +53,7 @@ describe("today's progress lines", () => {
     ]);
   });
 
-  it("shows English Adventures minutes as an active Today's Progress line", () => {
+  it("shows adventures as an active Today's Progress line", () => {
     const lines = todayProgressLines({
       ...empty,
       activities: [{ activity_type: "english_adventures", duration_minutes: 4 }],
@@ -61,7 +61,7 @@ describe("today's progress lines", () => {
     expect(lines[0]).toMatchObject({
       key: "english-adventures",
       icon: "adventures",
-      label: "min in English Adventures",
+      label: "adventures",
       value: "4",
       state: "done",
     });
