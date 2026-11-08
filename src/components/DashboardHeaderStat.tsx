@@ -72,26 +72,38 @@ export function DashboardHeaderStat({
     if (!labelElement || !availableSpace) return;
 
     const fitLabel = () => {
-      // Measure the uncompressed, uppercase text independently of the clipped
-      // label element. scrollWidth is affected by its own constrained layout.
       const availableWidth = availableSpace.clientWidth;
       if (!availableWidth) return;
 
       const styles = window.getComputedStyle(labelElement);
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-      if (!context) return;
-
-      const baseFontSize = 10.5;
-      context.font = `${styles.fontWeight} ${baseFontSize}px ${styles.fontFamily}`;
-      const text = labelElement.textContent?.toLocaleUpperCase() ?? "";
-      const letterSpacing = Number.parseFloat(styles.letterSpacing) || 0;
-      const naturalWidth =
-        context.measureText(text).width + Math.max(0, text.length - 1) * letterSpacing;
+      const measure = document.createElement("span");
+      measure.textContent = labelElement.textContent ?? "";
+      Object.assign(measure.style, {
+        position: "fixed",
+        left: "-10000px",
+        top: "0",
+        width: "max-content",
+        maxWidth: "none",
+        whiteSpace: "nowrap",
+        visibility: "hidden",
+        fontFamily: styles.fontFamily,
+        fontWeight: styles.fontWeight,
+        fontStyle: styles.fontStyle,
+        fontVariant: styles.fontVariant,
+        letterSpacing: styles.letterSpacing,
+        textTransform: styles.textTransform,
+        fontSize: "10.5px",
+        lineHeight: styles.lineHeight,
+      });
+      document.body.append(measure);
+      const naturalWidth = measure.getBoundingClientRect().width;
+      measure.remove();
       if (!naturalWidth) return;
 
+      // Measure with the browser's actual font renderer (including loaded web
+      // fonts and tracking), then scale only when the real cell is too narrow.
       const scale = Math.min(1, availableWidth / naturalWidth);
-      labelElement.style.fontSize = `${Math.max(5, baseFontSize * scale)}px`;
+      labelElement.style.fontSize = `${Math.max(5, 10.5 * scale)}px`;
     };
 
     const observer = new ResizeObserver(fitLabel);
