@@ -44,7 +44,8 @@ CREATE OR REPLACE FUNCTION public.save_english_adventure_checkpoint(
   p_recovered integer,
   p_completed_activity_ids text[],
   p_completed boolean,
-  p_expected_revision integer
+  p_expected_revision integer,
+  p_restart boolean DEFAULT false
 )
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -75,6 +76,8 @@ BEGIN
     RAISE EXCEPTION 'Invalid English Adventure checkpoint';
   END IF;
 
+  DROP FUNCTION IF EXISTS public.save_english_adventure_checkpoint(uuid, text, integer, jsonb, jsonb, integer, text[], boolean, integer);
+
   INSERT INTO public.english_adventure_checkpoints AS existing (
     user_id, adventure_id, current_step, choices, decisions,
     recovered, completed_activity_ids, completed, revision, updated_at
@@ -84,9 +87,10 @@ BEGIN
     p_recovered, COALESCE(p_completed_activity_ids, '{}'), p_completed, 1, now()
   )
   ON CONFLICT (user_id, adventure_id) DO UPDATE
-  SET current_step = GREATEST(existing.current_step, EXCLUDED.current_step),
-      choices = existing.choices || EXCLUDED.choices,
+  SET current_step = CASE WHEN p_restart THEN EXCLUDED.current_step ELSE GREATEST(existing.current_step, EXCLUDED.current_step) END,
+      choices = CASE WHEN p_restart THEN EXCLUDED.choices ELSE existing.choices || EXCLUDED.choices END,
       decisions = CASE
+        WHEN p_restart THEN EXCLUDED.decisions
         WHEN jsonb_array_length(EXCLUDED.decisions) >= jsonb_array_length(existing.decisions)
           THEN EXCLUDED.decisions
         ELSE existing.decisions
@@ -97,7 +101,7 @@ BEGIN
         FROM unnest(existing.completed_activity_ids || EXCLUDED.completed_activity_ids) AS activity_id
         ORDER BY activity_id
       ),
-      completed = existing.completed OR EXCLUDED.completed,
+      completed = CASE WHEN p_restart THEN EXCLUDED.completed ELSE existing.completed OR EXCLUDED.completed END,
       revision = existing.revision + 1,
       updated_at = now()
   RETURNING * INTO v_checkpoint;
@@ -111,10 +115,10 @@ END;
 $$;
 
 REVOKE ALL ON FUNCTION public.save_english_adventure_checkpoint(
-  uuid, text, integer, jsonb, jsonb, integer, text[], boolean, integer
+  uuid, text, integer, jsonb, jsonb, integer, text[], boolean, integer, boolean
 ) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.save_english_adventure_checkpoint(
-  uuid, text, integer, jsonb, jsonb, integer, text[], boolean, integer
+  uuid, text, integer, jsonb, jsonb, integer, text[], boolean, integer, boolean
 ) TO service_role;
 
 NOTIFY pgrst, 'reload schema';
