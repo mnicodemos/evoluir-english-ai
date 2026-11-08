@@ -1119,14 +1119,14 @@ function Dashboard() {
                             />
                             {isTodayProgressLoading ? (
                               <div className="flex h-5 items-center">
-                                  <Skeleton className="h-3 w-full" />
-                                </div>
+                                <Skeleton className="h-3 w-full" />
+                              </div>
                             ) : (
                               <TodayProgressText
-                                  value={card.value}
-                                  label={t(card.label)}
-                                  valueClass={valueClass}
-                                />
+                                value={card.value}
+                                label={t(card.label)}
+                                valueClass={valueClass}
+                              />
                             )}
                             <span className="sr-only">{sr}</span>
                           </div>
