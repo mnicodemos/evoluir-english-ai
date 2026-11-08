@@ -14,6 +14,13 @@ describe("today's progress lines", () => {
     expect(line?.value).toBe("2");
     expect(line?.label).toBe("words pronounced");
   });
+  it("labels multiple completed lessons as lessons learned", () => {
+    const line = todayProgressLines({ ...empty, lessonsCompleted: 2 }).find(
+      (item) => item.key === "lessons",
+    );
+    expect(line?.label).toBe("lessons learned");
+  });
+
   it("keeps lessons, words and accuracy when nothing happened today", () => {
     expect(todayProgressLines(empty).map((line) => [line.key, line.state])).toEqual([
       ["lessons", "empty"],
