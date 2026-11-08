@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Stabilize Today's Progress daily reads and fit its three labels without changing card height, icons or gauge positions.
+
 - [x] Antecipar as leituras do Life+ AI na Home, preservando dados e ações; 57 testes passaram
 - [ ] Medir o carregamento real do Life+ AI na Home desktop — aguardando sessão do aluno no preview
 - [x] Explicar Life+ AI e sua integração com o estudo de inglês
