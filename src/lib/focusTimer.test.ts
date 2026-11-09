@@ -4,10 +4,13 @@ import {
   focusCompleteDue,
   focusPause,
   focusResume,
+  focusRestoreState,
   focusStart,
   focusStop,
   focusView,
   getFocusSnapshot,
+  FOCUS_IDLE,
+  openFocusWidget,
   shouldTuckFocusWidget,
 } from "./focusTimer";
 
@@ -42,6 +45,26 @@ describe("focus timer store", () => {
     expect(focusCompleteDue(breakState.endsAt!)).toEqual({ kind: "break" });
     expect(getFocusSnapshot().state.phase).toBe("idle");
     expect(getFocusSnapshot().state.blocks).toBe(1);
+  });
+
+
+  it("restores a cloud timer without changing the device-local widget", () => {
+    openFocusWidget();
+    focusRestoreState({
+      ...FOCUS_IDLE,
+      preset: "deep",
+      phase: "focus",
+      endsAt: Date.now() + 10 * 60_000,
+      key: "cloud-session",
+      startedAt: Date.now() - 35 * 60_000,
+    });
+
+    expect(getFocusSnapshot().state).toMatchObject({
+      preset: "deep",
+      phase: "focus",
+      key: "cloud-session",
+    });
+    expect(getFocusSnapshot().widget.open).toBe(true);
   });
 
   it("pauses and resumes with the time that was left", () => {
