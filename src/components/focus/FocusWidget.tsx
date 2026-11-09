@@ -64,6 +64,8 @@ function focusPhaseLabel(state: FocusState) {
  * the window; closing it never stops the timer).
  */
 export function FocusController() {
+  // Keep cloud synchronization mounted even when the floating widget is closed.
+  useFocusCloudSync();
   const { t } = useLifeT();
   const { state, widget, now } = useFocusTimer();
   const pathname = useLocation().pathname;
