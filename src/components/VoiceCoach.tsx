@@ -257,6 +257,7 @@ export function VoiceCoach({
 
   /** Starts a real-life role-play; its fixed opener plays right away. */
   function beginNewSession() {
+    // Invalidate late transcripts and queued audio from the previous practice.
     sessionGeneration.current += 1;
     replyAbort.current?.abort();
     cancelVoiceRecording();
