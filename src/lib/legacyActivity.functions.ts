@@ -203,7 +203,7 @@ export const getListeningCheckpoint = createServerFn({ method: "GET" })
       p_user_id: context.userId,
     });
     if (error) throw new Error("Listening progress could not be restored");
-    return data as { operation_key: string; result: Record<string, unknown> } | null;
+    return data as { operation_key: string; result: Json } | null;
   });
 
 export const saveListeningCheckpoint = createServerFn({ method: "POST" })
@@ -243,7 +243,7 @@ export const saveListeningCheckpoint = createServerFn({ method: "POST" })
       p_result: result as Json,
     });
     if (error) throw new Error("Listening sentence progress could not be saved");
-    return saved;
+    return saved as Json;
   });
 export const persistListeningLegacy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
