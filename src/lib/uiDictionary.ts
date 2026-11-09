@@ -2855,4 +2855,6 @@ export const uiPt: Record<string, string> = {
   "Hide captions": "Ocultar legendas",
   "Show captions": "Mostrar legendas",
   CC: "CC",
+  "Listen to the sentence and repeat it out loud. One session has 9 sentences. Each completed sentence is saved, and the activity is consolidated every 3, so you can stop and come back later.":
+    "Ouça a frase e repita em voz alta. Cada sessão tem 9 frases. Cada frase concluída é salva, e a atividade é consolidada a cada 3, para que você possa parar e continuar depois.",
 };

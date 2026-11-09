@@ -47,7 +47,11 @@ import {
   startVoiceRecording,
   stopVoiceRecording,
 } from "@/lib/voice-recorder";
-import { persistListeningLegacy } from "@/lib/legacyActivity.functions";
+import {
+  getListeningCheckpoint,
+  persistListeningLegacy,
+  saveListeningCheckpoint,
+} from "@/lib/legacyActivity.functions";
 import { listeningAnswerScore } from "@/lib/legacyScores";
 import { DoneSeal } from "@/components/DoneSeal";
 import { MusicLabSection } from "@/components/listening/MusicLabSection";
@@ -147,6 +151,8 @@ function ListeningPage() {
   const { data: lessons } = useLessons();
   const queryClient = useQueryClient();
   const saveListening = useServerFn(persistListeningLegacy);
+  const saveCheckpoint = useServerFn(saveListeningCheckpoint);
+  const loadCheckpoint = useServerFn(getListeningCheckpoint);
   // Parts saved today (each one "listening" activity of 3 sentences). Parts
   // saved on this screen count at once, before today's activities are read again.
   const { data: todayActivities } = useTodayActivities(profile?.id);
@@ -184,6 +190,9 @@ function ListeningPage() {
     setAnsweredSentences(transcripts.filter((tries) => tries.length > 0).length);
   }, [transcripts]);
   const operationKey = useRef(crypto.randomUUID());
+  const [checkpointSavedIndex, setCheckpointSavedIndex] = useState(-1);
+  const [checkpointSaving, setCheckpointSaving] = useState(false);
+  const restoringCheckpoint = useRef(false);
   // Up to 3 attempts per sentence; the best score is kept. Below 70% forces a retry.
   const [attempts, setAttempts] = useState(0);
   const [best, setBest] = useState(0);
@@ -204,15 +213,80 @@ function ListeningPage() {
 
   useEffect(() => () => cancelVoiceRecording(), []);
 
-  // A session left halfway resumes at its next part, once today's parts are known.
+  const { data: activeCheckpoint, isLoading: checkpointLoading } = useQuery({
+    queryKey: ["listening-active-checkpoint", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: () => loadCheckpoint(),
+  });
   const resumed = useRef(false);
   useEffect(() => {
-    if (resumed.current || todayActivities === undefined) return;
+    if (resumed.current || todayActivities === undefined || checkpointLoading) return;
     resumed.current = true;
     setIndex((partsSavedToday % PARTS_PER_SESSION) * SENTENCES_PER_PART);
-  }, [todayActivities, partsSavedToday]);
+  }, [todayActivities, partsSavedToday, checkpointLoading]);
 
   useEffect(() => {
+    if (!activeCheckpoint?.operation_key) return;
+
+    const checkpoint = activeCheckpoint.result as {
+      sessionSentences?: unknown;
+      currentIndex?: unknown;
+      scores?: unknown;
+      transcripts?: unknown;
+    } | null;
+
+    if (
+      !checkpoint ||
+      !Array.isArray(checkpoint.sessionSentences) ||
+      checkpoint.sessionSentences.length !== SENTENCES_PER_SESSION ||
+      !checkpoint.sessionSentences.every((value) => typeof value === "string") ||
+      typeof checkpoint.currentIndex !== "number" ||
+      checkpoint.currentIndex < 0 ||
+      checkpoint.currentIndex >= SENTENCES_PER_SESSION ||
+      !Array.isArray(checkpoint.scores) ||
+      !Array.isArray(checkpoint.transcripts)
+    ) {
+      return;
+    }
+
+    const checkpointScores = checkpoint.scores as unknown[];
+    const checkpointTranscripts = checkpoint.transcripts as unknown[];
+    const savedScores: number[] = Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => {
+      const value = checkpointScores[at];
+      return typeof value === "number" ? value : 0;
+    });
+    const savedTranscripts: string[][] = Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => {
+      const value = checkpointTranscripts[at];
+      return Array.isArray(value)
+        ? value.filter((item): item is string => typeof item === "string")
+        : [];
+    });
+    const savedIndex = checkpoint.currentIndex as number;
+    const atPartEnd =
+      (savedIndex + 1) % SENTENCES_PER_PART === 0 || savedIndex === SENTENCES_PER_SESSION - 1;
+
+    operationKey.current = activeCheckpoint.operation_key as typeof operationKey.current;
+    restoringCheckpoint.current = true;
+    setFrozenSentences(checkpoint.sessionSentences as string[]);
+    setScores(savedScores);
+    setTranscripts(savedTranscripts);
+    setCheckpointSavedIndex(savedIndex);
+    setIndex(atPartEnd ? savedIndex : savedIndex + 1);
+
+    if (atPartEnd) {
+      const score = savedScores[savedIndex] ?? 0;
+      setChecked(score);
+      setAttempts(3);
+      setBest(score);
+      setAnswer(savedTranscripts[savedIndex]?.at(-1) ?? "");
+    }
+  }, [activeCheckpoint]);
+
+  useEffect(() => {
+    if (restoringCheckpoint.current) {
+      restoringCheckpoint.current = false;
+      return;
+    }
     setRevealed(false);
     setCanReveal(false);
     setAttempts(0);
@@ -357,6 +431,35 @@ function ListeningPage() {
     setHeard(false);
   }, [index, sentence]);
 
+  async function persistSentenceCheckpoint(
+    sentenceIndex = index,
+    scoresToSave = scores,
+    transcriptsToSave = transcripts,
+  ) {
+    if (!profile) throw new Error("Your profile is still loading");
+    const partStart = sentenceIndex - (sentenceIndex % SENTENCES_PER_PART);
+
+    await saveCheckpoint({
+      data: {
+        operationKey: operationKey.current,
+        trackId: track.id as "everyday" | "professional" | "travel",
+        round: lessonCount,
+        minutes: minutesSpent(1),
+        sessionSentences: sentences,
+        currentIndex: sentenceIndex,
+        scores: Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => scoresToSave[at] ?? null),
+        transcripts: Array.from(
+          { length: SENTENCES_PER_SESSION },
+          (_, at) => transcriptsToSave[at] ?? [],
+        ),
+        evidence: sentences.slice(partStart, sentenceIndex + 1).map((expected, offset) => ({
+          expected,
+          transcripts: transcriptsToSave[partStart + offset] ?? [],
+        })),
+      },
+    });
+    setCheckpointSavedIndex(sentenceIndex);
+  }
   /** Plays the sentence while recording, so the student speaks along with it. */
   async function shadow() {
     announceStudyInteraction(document.querySelector("main"), "listening");
@@ -411,18 +514,26 @@ function ListeningPage() {
       const nextAttempts = attempts + 1;
       setAttempts(nextAttempts);
       setBest((prev) => Math.max(prev, value));
-      // Keep only the best score of the attempts for this sentence.
-      setScores((prev) => {
-        const copy = [...prev];
-        copy[index] = Math.max(copy[index] ?? 0, value);
-        return copy;
-      });
-      setTranscripts((prev) => {
-        const copy = prev.map((items) => [...items]);
-        copy[index] = [...(copy[index] ?? []), spoken];
-        return copy;
-      });
-      // After the third attempt, REVEAL stays available for the rest of the sentence.
+      const nextScores = [...scores];
+      nextScores[index] = Math.max(nextScores[index] ?? 0, value);
+      const nextTranscripts = Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => [
+        ...(transcripts[at] ?? []),
+      ]);
+      nextTranscripts[index] = [...(nextTranscripts[index] ?? []), spoken];
+      setScores(nextScores);
+      setTranscripts(nextTranscripts);
+
+      // Save each completed sentence; activity/evidence consolidation remains one per 3.
+      if (value >= 70 || nextAttempts >= 3) {
+        setCheckpointSaving(true);
+        try {
+          await persistSentenceCheckpoint(index, nextScores, nextTranscripts);
+        } catch {
+          toast.error("Sentence progress could not be synced. Press Next to retry.");
+        } finally {
+          setCheckpointSaving(false);
+        }
+      }
       if (nextAttempts >= 3) setCanReveal(true);
     } catch (error) {
       toast.error(
@@ -434,6 +545,18 @@ function ListeningPage() {
   }
 
   async function next() {
+    if (checkpointSaving || saving) return;
+    if (checkpointSavedIndex !== index) {
+      setCheckpointSaving(true);
+      try {
+        await persistSentenceCheckpoint();
+      } catch {
+        toast.error("Sentence progress could not be synced. Please try again before continuing.");
+        return;
+      } finally {
+        setCheckpointSaving(false);
+      }
+    }
     const lastOfPart = (index + 1) % SENTENCES_PER_PART === 0 || index >= sentences.length - 1;
     if (!lastOfPart) {
       setIndex(index + 1);
@@ -475,10 +598,12 @@ function ListeningPage() {
       setPartsSavedHere(partsToday + 1);
       queryClient.invalidateQueries({ queryKey: ["minutes-today"] });
       queryClient.invalidateQueries({ queryKey: ["listening-parts-today"] });
+      queryClient.invalidateQueries({ queryKey: ["listening-active-checkpoint", profile?.id] });
       queryClient.invalidateQueries({ queryKey: ["saved-practice"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     }
     operationKey.current = crypto.randomUUID();
+    setCheckpointSavedIndex(-1);
     setAnswer("");
     setChecked(null);
     if (index < sentences.length - 1) {
@@ -517,6 +642,7 @@ function ListeningPage() {
     setAttempts(0);
     setBest(0);
     operationKey.current = crypto.randomUUID();
+    setCheckpointSavedIndex(-1);
   }
 
   return (
@@ -536,8 +662,9 @@ function ListeningPage() {
           descriptionClassName="max-w-3xl"
           description={
             <>
-              Listen to the sentence and repeat it out loud. One session has 9 sentences and your
-              progress is saved every 3, so you can stop and come back later.
+              Listen to the sentence and repeat it out loud. One session has 9 sentences. Each
+              completed sentence is saved, and the activity is consolidated every 3, so you can stop
+              and come back later.
             </>
           }
         />
