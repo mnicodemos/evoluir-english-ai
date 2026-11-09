@@ -188,13 +188,20 @@ export const persistWritingLegacy = createServerFn({ method: "POST" })
   });
 
 const checkpointRpc = (admin: Awaited<ReturnType<typeof adminClient>>) =>
-  admin as unknown as { rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> };
+  admin as unknown as {
+    rpc: (
+      name: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>;
+  };
 
 export const getListeningCheckpoint = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const admin = await adminClient();
-    const { data, error } = await checkpointRpc(admin).rpc("get_listening_checkpoint", { p_user_id: context.userId });
+    const { data, error } = await checkpointRpc(admin).rpc("get_listening_checkpoint", {
+      p_user_id: context.userId,
+    });
     if (error) throw new Error("Listening progress could not be restored");
     return data as { operation_key: string; result: Record<string, unknown> } | null;
   });
@@ -205,14 +212,36 @@ export const saveListeningCheckpoint = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const admin = await adminClient();
     const { data: lessons } = await admin.from("lessons").select("summary, transcript");
-    const corpus = (lessons ?? []).map((lesson) => `${lesson.summary} ${lesson.transcript}`).join(" ").replace(/\s+/g, " ").toLowerCase();
-    const builtIn = new Set([...STATIC_LISTENING, ...allListeningSentences()].map(normalizeListening));
+    const corpus = (lessons ?? [])
+      .map((lesson) => `${lesson.summary} ${lesson.transcript}`)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+    const builtIn = new Set(
+      [...STATIC_LISTENING, ...allListeningSentences()].map(normalizeListening),
+    );
     for (const item of data.evidence) {
       const expected = normalizeListening(item.expected);
-      if (!builtIn.has(expected) && !corpus.includes(expected)) throw new Error("Listening evidence is not part of the course");
+      if (!builtIn.has(expected) && !corpus.includes(expected)) {
+        throw new Error("Listening evidence is not part of the course");
+      }
     }
-    const result = { round: data.round, sessionSentences: data.sessionSentences, currentIndex: data.currentIndex, scores: data.scores, transcripts: data.transcripts, evidence: data.evidence };
-    const { data: saved, error } = await checkpointRpc(admin).rpc("save_listening_checkpoint", { p_user_id: context.userId, p_operation_key: data.operationKey, p_track_id: data.trackId, p_round: data.round, p_duration_minutes: data.minutes, p_result: result as Json });
+    const result = {
+      round: data.round,
+      sessionSentences: data.sessionSentences,
+      currentIndex: data.currentIndex,
+      scores: data.scores,
+      transcripts: data.transcripts,
+      evidence: data.evidence,
+    };
+    const { data: saved, error } = await checkpointRpc(admin).rpc("save_listening_checkpoint", {
+      p_user_id: context.userId,
+      p_operation_key: data.operationKey,
+      p_track_id: data.trackId,
+      p_round: data.round,
+      p_duration_minutes: data.minutes,
+      p_result: result as Json,
+    });
     if (error) throw new Error("Listening sentence progress could not be saved");
     return saved;
   });
@@ -254,7 +283,10 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
       scores: { listening: score },
       result: { round: data.round, itemScores, evidence: data.evidence },
     });
-    const checkpointClear = await checkpointRpc(admin).rpc("clear_listening_checkpoint", { p_user_id: context.userId, p_operation_key: data.operationKey });
+    const checkpointClear = await checkpointRpc(admin).rpc("clear_listening_checkpoint", {
+      p_user_id: context.userId,
+      p_operation_key: data.operationKey,
+    });
     if (checkpointClear.error) throw new Error("Listening checkpoint could not be finalized");
     // Phase 26: the same measured answers also feed the existing evidence
     // pipeline. A pedagogical failure never breaks the finished activity.
