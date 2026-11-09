@@ -40,30 +40,31 @@ export const loadVideoSocial = createServerFn({ method: "POST" })
     for (const id of data.videoIds) counts[id] = { likes: 0, liked: false, comments: 0 };
     if (data.videoIds.length === 0) return { ready: true, counts };
     const tables = await socialTables();
-    const [likes, comments] = await Promise.all([
-      tables.likes().select("video_id, user_id").in("video_id", data.videoIds).limit(20000),
-      tables.comments().select("id, video_id").in("video_id", data.videoIds).limit(20000),
-    ]);
-    if (likes.error || comments.error) {
-      const missing = missingSocialTables(likes.error) || missingSocialTables(comments.error);
+    const { data: rows, error } = await (await import("@/integrations/supabase/client.server"))
+      .then(({ supabaseAdmin }) =>
+        supabaseAdmin.rpc("load_premium_video_social_counts", {
+          p_video_ids: data.videoIds,
+          p_user_id: context.userId,
+        }),
+      );
+    if (error) {
+      const missing = missingSocialTables(error);
       if (!missing)
-        console.error(
-          `Video social counts failed: ${(likes.error ?? comments.error)?.message ?? ""}`,
-        );
+        console.error(`Video social aggregation failed: ${error.message}`);
       return { ready: false, counts };
     }
-    for (const row of likes.data ?? []) {
-      const entry = counts[row.video_id];
-      if (!entry) continue;
-      entry.likes += 1;
-      if (row.user_id === context.userId) entry.liked = true;
-    }
-    // A comment hidden by reports is not counted (moderation).
-    const commentRows = (comments.data ?? []) as { id: string; video_id: string }[];
-    const reports = await reportCounts(commentRows.map((row) => row.id));
-    for (const row of commentRows) {
-      const entry = counts[row.video_id];
-      if (entry && !hiddenByReports(reports.get(row.id) ?? 0)) entry.comments += 1;
+    for (const row of (rows ?? []) as {
+      video_id: string;
+      likes: number;
+      liked: boolean;
+      comments: number;
+    }[]) {
+      if (!counts[row.video_id]) continue;
+      counts[row.video_id] = {
+        likes: Number(row.likes),
+        liked: row.liked,
+        comments: Number(row.comments),
+      };
     }
     return { ready: true, counts };
   });
