@@ -3,7 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import { useFocusLog, addFocusLog, clearFocusLog } from "@/hooks/useFocusLog";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { useProfile } from "@/hooks/useProfile";
-import { FOCUS_IDLE, focusRestoreState, type FocusState } from "@/lib/focusTimer";
+import {
+  FOCUS_IDLE,
+  focusPause,
+  focusRestoreState,
+  focusResume,
+  getFocusSnapshot,
+  type FocusState,
+} from "@/lib/focusTimer";
 import { loadFocusCloudSnapshot, saveFocusCloudSnapshot } from "@/lib/focusTimer.functions";
 import type { FocusActivity } from "@/lib/life";
 
@@ -40,6 +47,45 @@ export function useFocusCloudSync() {
   const [syncEpoch, setSyncEpoch] = useState(0);
 
   latestState.current = state;
+
+  // Pause when this browser leaves the site; resume only its own auto-pause.
+  useEffect(() => {
+    if (!userId) return;
+    const resumeKey = `evoluir-focus-auto-resume:${userId}`;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        const current = getFocusSnapshot().state;
+        if (current.phase !== "idle" && current.endsAt !== null) {
+          try {
+            window.localStorage.setItem(resumeKey, "1");
+          } catch {
+            // The timer still pauses locally when storage is unavailable.
+          }
+          focusPause();
+        }
+        return;
+      }
+
+      let shouldResume = false;
+      try {
+        shouldResume = window.localStorage.getItem(resumeKey) === "1";
+        if (shouldResume) window.localStorage.removeItem(resumeKey);
+      } catch {
+        // No persisted auto-resume marker is available.
+      }
+
+      const current = getFocusSnapshot().state;
+      if (shouldResume && current.phase !== "idle" && current.endsAt === null) {
+        focusResume();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [userId]);
 
   useEffect(() => {
     if (!userId) {
@@ -85,6 +131,21 @@ export function useFocusCloudSync() {
         // An active local session is kept; otherwise restore the cloud copy.
         if (remoteState && local.phase === "idle") {
           focusRestoreState(remoteState);
+        }
+
+        // A full navigation/reload starts in the visible state, so no
+        // visibilitychange event fires. Resume the session this browser paused.
+        const resumeKey = `evoluir-focus-auto-resume:${userId}`;
+        let shouldResume = false;
+        try {
+          shouldResume = window.localStorage.getItem(resumeKey) === "1";
+          if (shouldResume) window.localStorage.removeItem(resumeKey);
+        } catch {
+          // The cloud-restored timer remains paused if storage is unavailable.
+        }
+        const restored = getFocusSnapshot().state;
+        if (shouldResume && restored.phase !== "idle" && restored.endsAt === null) {
+          focusResume();
         }
       })
       .catch(() => {
