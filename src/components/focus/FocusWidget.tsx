@@ -7,6 +7,7 @@ import { stopFocusSaving } from "@/components/focus/stopFocus";
 import { FocusStudyInvitation } from "@/components/focus/FocusStudyInvitation";
 import { TomatoIcon } from "@/components/focus/TomatoIcon";
 import { useLifeT } from "@/components/life/LifeNav";
+import { useFocusCloudSync } from "@/hooks/useFocusCloudSync";
 import { Button } from "@/components/ui/button";
 import { addFocusLog } from "@/hooks/useFocusLog";
 import { useFocusTimer } from "@/hooks/useFocusTimer";

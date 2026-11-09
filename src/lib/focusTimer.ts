@@ -112,6 +112,11 @@ export function subscribeFocus(listener: () => void) {
 export const getFocusSnapshot = () => snapshot;
 export const getServerFocusSnapshot = () => SERVER_SNAPSHOT;
 
+/** Restore the authenticated cloud timer without changing device-local widget settings. */
+export function focusRestoreState(next: FocusState) {
+  setState({ ...FOCUS_IDLE, ...next });
+}
+
 function setState(next: FocusState) {
   snapshot = { ...snapshot, state: next };
   writeStorage(STATE_KEY, JSON.stringify(next));
