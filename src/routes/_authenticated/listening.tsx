@@ -265,7 +265,7 @@ function ListeningPage() {
     const atPartEnd =
       (savedIndex + 1) % SENTENCES_PER_PART === 0 || savedIndex === SENTENCES_PER_SESSION - 1;
 
-    operationKey.current = activeCheckpoint.operation_key;
+    operationKey.current = activeCheckpoint.operation_key as typeof operationKey.current;
     restoringCheckpoint.current = true;
     setFrozenSentences(checkpoint.sessionSentences as string[]);
     setScores(savedScores);
