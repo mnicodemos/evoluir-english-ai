@@ -11,6 +11,8 @@ import {
   PODCAST_LINE_MAX,
   PODCAST_SPEAKERS,
   podcastLength,
+  podcastMinimumWords,
+  podcastSchemaForLevel,
   reviewOutline,
   reviewPodcastMessages,
   shadowPauseMs,
@@ -69,6 +71,22 @@ describe("lesson audio dialogue", () => {
     expect(lessonPodcastMessages(plan)[0]!.content).toContain("Write 30 to 36 lines");
     expect(lessonPodcastMessages(plan)[0]!.content).toContain("at least 500 spoken English words");
     expect(podcastLength("A2")).toEqual({ lines: "16 to 22", words: 250 });
+  });
+
+
+  it("uses CEFR-specific minimums for beginner and intermediate podcasts", () => {
+    expect(podcastMinimumWords("A1")).toBe(180);
+    expect(podcastMinimumWords("A2")).toBe(180);
+    expect(podcastMinimumWords("B1")).toBe(220);
+    expect(podcastSchemaForLevel("A1").safeParse(episode(12)).success).toBe(true);
+    expect(podcastSchemaForLevel("B1").safeParse(episode(12)).success).toBe(true);
+  });
+
+  it("uses the same CEFR-specific length in review podcast prompts", () => {
+    const a1 = reviewPodcastMessages(findCurriculumLesson("a1-u6-l1")!)[0]!.content;
+    const b1 = reviewPodcastMessages(findCurriculumLesson("b1-u6-l1")!)[0]!.content;
+    expect(a1).toContain("16 to 22 lines and at least 250 spoken English words");
+    expect(b1).toContain("30 to 36 lines and at least 500 spoken English words");
   });
 
   it("keeps a valid mark and drops an unknown one", () => {
