@@ -81,9 +81,22 @@ export function useFocusCloudSync() {
       }
     };
 
+    const handlePageHide = () => {
+      if (document.visibilityState === "hidden") handleVisibilityChange();
+    };
+    const handlePageShow = () => {
+      if (document.visibilityState === "visible") handleVisibilityChange();
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("freeze", handlePageHide);
+    window.addEventListener("pagehide", handlePageHide);
+    window.addEventListener("pageshow", handlePageShow);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("freeze", handlePageHide);
+      window.removeEventListener("pagehide", handlePageHide);
+      window.removeEventListener("pageshow", handlePageShow);
     };
   }, [userId]);
 
