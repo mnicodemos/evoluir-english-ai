@@ -22,6 +22,11 @@ function readFocusLog(): FocusLogEntry[] {
   }
 }
 
+export function clearFocusLog() {
+  writeStorage(LOG_KEY, JSON.stringify([]));
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(LOG_EVENT));
+}
+
 export function addFocusLog(entry: FocusLogEntry) {
   const log = readFocusLog();
   if (log.some((item) => item.key === entry.key)) return;
