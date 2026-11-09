@@ -78,12 +78,18 @@ export function podcastSchemaForLevel(level: string) {
   const minimumWords = podcastMinimumWords(level);
   return z.object({
     title: z.string().trim().min(3).max(120),
-    lines: z.array(lineSchema).min(12).max(36).refine(
-      (lines) => lines.reduce(
-        (total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length, 0,
-      ) >= minimumWords,
-      `The dialogue must contain at least ${minimumWords} spoken words.`,
-    ),
+    lines: z
+      .array(lineSchema)
+      .min(12)
+      .max(36)
+      .refine(
+        (lines) =>
+          lines.reduce(
+            (total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length,
+            0,
+          ) >= minimumWords,
+        `The dialogue must contain at least ${minimumWords} spoken words.`,
+      ),
   });
 }
 
