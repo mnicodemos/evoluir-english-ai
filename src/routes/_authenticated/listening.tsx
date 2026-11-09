@@ -260,9 +260,7 @@ function ListeningPage() {
         : [];
     });
     const savedIndex = checkpoint.currentIndex;
-    const atPartEnd =
-      (savedIndex + 1) % SENTENCES_PER_PART === 0 ||
-      savedIndex === SENTENCES_PER_SESSION - 1;
+    const atPartEnd = (savedIndex + 1) % SENTENCES_PER_PART === 0 || savedIndex === SENTENCES_PER_SESSION - 1;
 
     operationKey.current = activeCheckpoint.operation_key;
     restoringCheckpoint.current = true;
@@ -446,20 +444,15 @@ function ListeningPage() {
         minutes: minutesSpent(1),
         sessionSentences: sentences,
         currentIndex: sentenceIndex,
-        scores: Array.from(
-          { length: SENTENCES_PER_SESSION },
-          (_, at) => scoresToSave[at] ?? null,
-        ),
+        scores: Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => scoresToSave[at] ?? null),
         transcripts: Array.from(
           { length: SENTENCES_PER_SESSION },
           (_, at) => transcriptsToSave[at] ?? [],
         ),
-        evidence: sentences
-          .slice(partStart, sentenceIndex + 1)
-          .map((expected, offset) => ({
-            expected,
-            transcripts: transcriptsToSave[partStart + offset] ?? [],
-          })),
+        evidence: sentences.slice(partStart, sentenceIndex + 1).map((expected, offset) => ({
+          expected,
+          transcripts: transcriptsToSave[partStart + offset] ?? [],
+        })),
       },
     });
     setCheckpointSavedIndex(sentenceIndex);
@@ -520,10 +513,9 @@ function ListeningPage() {
       setBest((prev) => Math.max(prev, value));
       const nextScores = [...scores];
       nextScores[index] = Math.max(nextScores[index] ?? 0, value);
-      const nextTranscripts = Array.from(
-        { length: SENTENCES_PER_SESSION },
-        (_, at) => [...(transcripts[at] ?? [])],
-      );
+      const nextTranscripts = Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => [
+        ...(transcripts[at] ?? []),
+      ]);
       nextTranscripts[index] = [...(nextTranscripts[index] ?? []), spoken];
       setScores(nextScores);
       setTranscripts(nextTranscripts);
@@ -667,8 +659,8 @@ function ListeningPage() {
           descriptionClassName="max-w-3xl"
           description={
             <>
-              Listen to the sentence and repeat it out loud. One session has 9 sentences. Each completed
-              sentence is saved, and the activity is consolidated every 3, so you can stop and come back later.
+              Listen to the sentence and repeat it out loud. One session has 9 sentences. Each completed sentence is saved,
+              and the activity is consolidated every 3, so you can stop and come back later.
             </>
           }
         />
