@@ -1568,6 +1568,9 @@ const baseUiPt: Record<string, string> = {
   "Slower voice": "Voz mais lenta",
   "See in the text": "Ver no texto",
   "Save to my Vocabulary": "Salvar no meu Vocabulário",
+  "new words added": "novas palavras adicionadas",
+  "already in your Vocabulary": "já estavam no seu Vocabulário",
+  "could not be added": "não puderam ser adicionadas",
   "Saved to your Vocabulary reviews.": "Salvas nas suas revisões do Vocabulário.",
   "Open Vocabulary": "Abrir Vocabulário",
   "Could not save the words. Please try again.":

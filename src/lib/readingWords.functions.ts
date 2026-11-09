@@ -57,6 +57,10 @@ export const saveReadingWords = createServerFn({ method: "POST" })
       .in("word", variants);
     const ids = new Map<string, string>();
     for (const row of owned ?? []) ids.set(row.word.toLowerCase(), row.id);
+    const existing = ids.size;
+    let added = 0;
+    let skipped = 0;
+    const skippedWords: string[] = [];
 
     const today = studyToday();
     for (const [key, item] of byKey) {
@@ -81,9 +85,17 @@ export const saveReadingWords = createServerFn({ method: "POST" })
         .maybeSingle();
       // A clash (an old global row with this word) skips only this word.
       if (error && error.code !== "23505") throw new Error("Could not save these words");
-      if (inserted) ids.set(key, inserted.id);
+      if (inserted) {
+        ids.set(key, inserted.id);
+        added += 1;
+      } else if (error?.code === "23505") {
+        // A legacy/global uniqueness conflict is not counted as a new or
+        // already-owned word: it was not added to this student's vocabulary.
+        skipped += 1;
+        skippedWords.push(item.word);
+      }
     }
-    if (!ids.size) return { saved: 0 };
+    if (!ids.size) return { added, existing, skipped, skippedWords };
 
     // Reviews are written only by the server (migration 0061). Words already
     // under review keep their step.
@@ -99,5 +111,5 @@ export const saveReadingWords = createServerFn({ method: "POST" })
       { onConflict: "user_id,word_id", ignoreDuplicates: true },
     );
     if (error) throw new Error("Could not save these words");
-    return { saved: ids.size };
+    return { added, existing, skipped, skippedWords };
   });
