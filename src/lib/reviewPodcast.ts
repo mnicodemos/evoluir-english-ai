@@ -29,7 +29,10 @@ export function podcastLength(level: string) {
   const beginner = ["a1", "a2"].includes(level.toLowerCase());
   return beginner ? { lines: "16 to 22", words: 250 } : { lines: "30 to 36", words: 500 };
 }
-const PODCAST_MIN_WORDS = 220;
+/** Beginner episodes may be concise while retaining the complete teaching arc. */
+export function podcastMinimumWords(level: string) {
+  return ["a1", "a2"].includes(level.toLowerCase()) ? 180 : 220;
+}
 
 /** The line where the listener answers out loud: marked, or said in words (older scripts). */
 export function isChallengeLine(line: { text: string; mark?: string | undefined }) {
@@ -71,21 +74,27 @@ const lineSchema = z.object({
   mark: z.enum(["mistake", "correction", "challenge"]).optional().catch(undefined),
 });
 
-export const podcastSchema = z.object({
-  title: z.string().trim().min(3).max(120),
-  lines: z
-    .array(lineSchema)
-    .min(12)
-    .max(36)
-    .refine(
-      (lines) =>
-        lines.reduce(
-          (total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length,
-          0,
-        ) >= PODCAST_MIN_WORDS,
-      "The dialogue must contain enough spoken words for at least two minutes of audio.",
-    ),
-});
+export function podcastSchemaForLevel(level: string) {
+  const minimumWords = podcastMinimumWords(level);
+  return z.object({
+    title: z.string().trim().min(3).max(120),
+    lines: z
+      .array(lineSchema)
+      .min(12)
+      .max(36)
+      .refine(
+        (lines) =>
+          lines.reduce(
+            (total, line) => total + line.text.trim().split(/\s+/).filter(Boolean).length,
+            0,
+          ) >= minimumWords,
+        `The dialogue must contain at least ${minimumWords} spoken words.`,
+      ),
+  });
+}
+
+/** Default schema retained for callers without a curriculum level. */
+export const podcastSchema = podcastSchemaForLevel("b1");
 
 export type ReviewPodcast = z.infer<typeof podcastSchema>;
 export type PodcastLine = ReviewPodcast["lines"][number];
@@ -123,6 +132,7 @@ export function reviewOutline(plan: CurriculumLesson): string {
 export function reviewPodcastMessages(plan: CurriculumLesson) {
   const level = plan.level.toLowerCase();
   const style = LEVEL_STYLE[level] ?? LEVEL_STYLE["b1"]!;
+  const length = podcastLength(level);
   return [
     {
       role: "system" as const,
@@ -139,7 +149,7 @@ export function reviewPodcastMessages(plan: CurriculumLesson) {
         "5) a quick challenge: EVO asks the listener a question, says 'Pause and answer out loud', then gives a model answer; " +
         "6) a short goodbye that invites the listener to the lesson's quiz. " +
         "Only review what the outline covers: no new grammar. Alternate the speakers naturally, EVO speaks first. " +
-        `Write 30 to 36 lines and at least 500 spoken English words in total. Aim for 15-17 spoken words per line and verify the total reaches 500 before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        `Write ${length.lines} lines and at least ${length.words} spoken English words in total. Aim for 13-17 spoken words per line and verify the total reaches ${length.words} before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
         "For every line add 'pt', a natural Brazilian Portuguese translation. " +
         'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
     },
@@ -209,11 +219,11 @@ function extractPodcastJson(raw: string): string | null {
   return start < 0 || end <= start ? null : raw.slice(start, end + 1);
 }
 
-export function parseReviewPodcast(raw: string): ReviewPodcast | null {
+export function parseReviewPodcast(raw: string, level = "b1"): ReviewPodcast | null {
   const json = extractPodcastJson(raw);
   if (!json) return null;
   try {
-    const parsed = podcastSchema.safeParse(JSON.parse(json));
+    const parsed = podcastSchemaForLevel(level).safeParse(JSON.parse(json));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
@@ -236,7 +246,7 @@ export type PodcastValidationDiagnostic = {
  * Safe failure diagnostics for server logs. Never returns dialogue, translations,
  * titles, raw model output, or Zod messages that could contain submitted values.
  */
-export function diagnoseReviewPodcast(raw: string): PodcastValidationDiagnostic {
+export function diagnoseReviewPodcast(raw: string, level = "b1"): PodcastValidationDiagnostic {
   const json = extractPodcastJson(raw);
   if (!json) {
     return {
@@ -275,7 +285,7 @@ export function diagnoseReviewPodcast(raw: string): PodcastValidationDiagnostic 
       }, 0)
     : null;
 
-  const parsed = podcastSchema.safeParse(candidate);
+  const parsed = podcastSchemaForLevel(level).safeParse(candidate);
   if (parsed.success) {
     return {
       reason: "valid",

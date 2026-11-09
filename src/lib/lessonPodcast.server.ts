@@ -3,14 +3,15 @@ import {
   diagnoseReviewPodcast,
   lessonPodcastMessages,
   parseReviewPodcast,
-  podcastSchema,
+  podcastLength,
+  podcastSchemaForLevel,
   type ReviewPodcast,
 } from "./reviewPodcast";
 
 /** Kept beside the lesson's shared content, under its own prompt hash. */
 const PODCAST_HASH_PREFIX = "podcast-v1:";
 
-async function readSharedPodcast(key: string, promptHash: string) {
+async function readSharedPodcast(key: string, promptHash: string, level: string) {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
@@ -19,7 +20,9 @@ async function readSharedPodcast(key: string, promptHash: string) {
       .eq("curriculum_key", key)
       .eq("prompt_hash", promptHash)
       .maybeSingle();
-    const parsed = podcastSchema.safeParse((data as { content?: unknown } | null)?.content);
+    const parsed = podcastSchemaForLevel(level).safeParse(
+      (data as { content?: unknown } | null)?.content,
+    );
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
@@ -56,7 +59,7 @@ export async function ensureLessonPodcast(
   const { hashAiRequest } = await import("./ai-usage.server");
   const messages = lessonPodcastMessages(plan);
   const promptHash = `${PODCAST_HASH_PREFIX}${await hashAiRequest({ messages, jsonMode: true })}`;
-  const shared = await readSharedPodcast(plan.key, promptHash);
+  const shared = await readSharedPodcast(plan.key, promptHash, plan.level);
   if (shared) return { podcast: shared, generated: false };
 
   const { callGateway } = await import("./ai-gateway.server");
@@ -67,28 +70,28 @@ export async function ensureLessonPodcast(
     ...(ownerTask ? { ownerTask: true } : {}),
   };
   let raw = await callGateway(messages, true, requestOptions);
-  let podcast = parseReviewPodcast(raw);
+  let podcast = parseReviewPodcast(raw, plan.level);
 
   // Retry once only when the response is valid JSON but below the spoken-word minimum.
   // Keep the schema strict and preserve the lesson's level and topic constraints.
-  if (!podcast && diagnoseReviewPodcast(raw).reason === "insufficient_spoken_words") {
+  if (!podcast && diagnoseReviewPodcast(raw, plan.level).reason === "insufficient_spoken_words") {
     const retryMessages = messages.map((message) => ({ ...message }));
     const lastMessage = retryMessages[retryMessages.length - 1];
     if (lastMessage) {
       lastMessage.content +=
         "\n\nRETRY: The previous dialogue was below the required spoken-word minimum. " +
-        "Write a complete replacement dialogue with at least 500 spoken English words across 30-36 lines. " +
-        "Aim for 15-17 spoken words per line, count the spoken words before returning JSON, " +
+        `Write a complete replacement dialogue with at least ${podcastLength(plan.level).words} spoken English words across ${podcastLength(plan.level).lines} lines. ` +
+        "Aim for 13-17 spoken words per line, count the spoken words before returning JSON, " +
         "and keep every line simple, natural, and appropriate to the learner's exact CEFR level and lesson topic.";
     }
     raw = await callGateway(retryMessages, true, requestOptions);
-    podcast = parseReviewPodcast(raw);
+    podcast = parseReviewPodcast(raw, plan.level);
   }
 
   if (!podcast) {
     console.error("Lesson podcast failed validation", {
       lessonKey: plan.key,
-      ...diagnoseReviewPodcast(raw),
+      ...diagnoseReviewPodcast(raw, plan.level),
     });
     throw new Error("EVO could not prepare this lesson audio. Please try again.");
   }
@@ -101,5 +104,5 @@ export async function lessonPodcastReady(plan: CurriculumLesson): Promise<boolea
   const { hashAiRequest } = await import("./ai-usage.server");
   const messages = lessonPodcastMessages(plan);
   const promptHash = `${PODCAST_HASH_PREFIX}${await hashAiRequest({ messages, jsonMode: true })}`;
-  return !!(await readSharedPodcast(plan.key, promptHash));
+  return !!(await readSharedPodcast(plan.key, promptHash, plan.level));
 }
