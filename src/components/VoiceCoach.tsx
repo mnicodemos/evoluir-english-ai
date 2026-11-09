@@ -108,6 +108,7 @@ export function VoiceCoach({
   const [report, setReport] = useState<ConversationReport | null>(null);
   const [finishing, setFinishing] = useState(false);
   const talkingOperationKey = useRef(crypto.randomUUID());
+  const sessionGeneration = useRef(0);
   const finishTalking = useServerFn(finishTalkingLegacy);
   const mounted = useRef(true);
   const topicOffset = useRef(0);
@@ -238,12 +239,13 @@ export function VoiceCoach({
   }
 
   function queueSpeech(text: string) {
+    const generation = sessionGeneration.current;
     // The audio starts generating now, while earlier blocks are still playing,
     // instead of only when its turn to play comes.
     prepareSpeech(text, { cache: "persistent" });
     speechQueue.current = speechQueue.current
       .then(async () => {
-        if (!mounted.current) return;
+        if (!mounted.current || generation !== sessionGeneration.current) return;
         setVoiceState("speaking");
         // Persistent cache: the same sentence is never generated twice, even after a reload.
         await speakEnglish(text, { cache: "persistent", onStart: recordFirstSound });
@@ -255,6 +257,7 @@ export function VoiceCoach({
 
   /** Starts a real-life role-play; its fixed opener plays right away. */
   function beginNewSession() {
+    sessionGeneration.current += 1;
     replyAbort.current?.abort();
     cancelVoiceRecording();
     stopSpeaking();
@@ -283,6 +286,7 @@ export function VoiceCoach({
   /** Starts a conversation with a subject picked by the AI. `offset` asks for another subject. */
   async function start(offset = 0) {
     beginNewSession();
+    const generation = sessionGeneration.current;
     announceStudyInteraction(document.querySelector("main"), "speaking");
     const selected = scenarioOfTheDay(offset);
     stopSpeaking();
@@ -342,7 +346,7 @@ export function VoiceCoach({
       clearTimeout(openerTimer);
     }
     rememberOpener(opener);
-    if (!mounted.current) return;
+    if (!mounted.current || generation !== sessionGeneration.current) return;
     setMessages([{ role: "assistant", content: opener }]);
     await playResponse(opener);
   }
@@ -371,6 +375,7 @@ export function VoiceCoach({
 
     if (answering.current) return;
     answering.current = true;
+    const generation = sessionGeneration.current;
     setVoiceState("sending");
     const marks: TurnMarks = { stoppedAt: performance.now() };
     turnMarks.current = marks;
@@ -378,6 +383,7 @@ export function VoiceCoach({
       const audio = await stopVoiceRecording();
       if (mounted.current) setVoiceState("transcribing");
       const text = await transcribeAudio(audio);
+      if (generation !== sessionGeneration.current) return;
       marks.transcribedAt = performance.now();
       const next: ChatMessage[] = [...messages, { role: "user", content: text }];
       setMessages(next);
@@ -406,7 +412,7 @@ export function VoiceCoach({
               marks.firstTextAt ??= performance.now();
               streamedReply += delta;
               phraseBuffer += delta;
-              if (mounted.current) {
+              if (mounted.current && generation === sessionGeneration.current) {
                 setMessages((current) =>
                   current.map((message, index) =>
                     index === replyIndex ? { ...message, content: streamedReply } : message,
@@ -424,6 +430,7 @@ export function VoiceCoach({
           ),
         { signal: abort.signal },
       );
+      if (generation !== sessionGeneration.current) return;
       const reply = raw.trim();
       if (phraseBuffer.trim()) queueSpeech(phraseBuffer.trim());
 
