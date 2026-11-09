@@ -40,17 +40,19 @@ export const loadVideoSocial = createServerFn({ method: "POST" })
     for (const id of data.videoIds) counts[id] = { likes: 0, liked: false, comments: 0 };
     if (data.videoIds.length === 0) return { ready: true, counts };
     const tables = await socialTables();
-    const { data: rows, error } = await (await import("@/integrations/supabase/client.server"))
-      .then(({ supabaseAdmin }) =>
-        supabaseAdmin.rpc("load_premium_video_social_counts", {
-          p_video_ids: data.videoIds,
-          p_user_id: context.userId,
-        }),
-      );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin.rpc(
+      "load_premium_video_social_counts",
+      {
+        p_video_ids: data.videoIds,
+        p_user_id: context.userId,
+      },
+    );
     if (error) {
       const missing = missingSocialTables(error);
-      if (!missing)
+      if (!missing) {
         console.error(`Video social aggregation failed: ${error.message}`);
+      }
       return { ready: false, counts };
     }
     for (const row of (rows ?? []) as {
