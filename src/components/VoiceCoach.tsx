@@ -32,6 +32,11 @@ import {
   stopVoiceRecording,
 } from "@/lib/voice-recorder";
 import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
+import {
+  clearSpeakingCheckpoint,
+  getSpeakingCheckpoint,
+  saveSpeakingCheckpoint,
+} from "@/lib/speakingSession.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { announceStudyInteraction } from "@/lib/focusStudyOffer";
 import { refreshAfterActivity } from "@/lib/refreshKeys";
@@ -90,6 +95,7 @@ export function VoiceCoach({
   // The video call is an informal chat with EVO; AI Speaking stays a lesson.
   const callStyle = { casual: presentation === "call", name: profile?.name ?? undefined };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [checkpointReady, setCheckpointReady] = useState(false);
   // Video Call remains idle until the student explicitly starts it.
   const [callStarted, setCallStarted] = useState(presentation !== "call");
   const callStartRequested = useRef(presentation !== "call");
@@ -110,6 +116,9 @@ export function VoiceCoach({
   const talkingOperationKey = useRef(crypto.randomUUID());
   const sessionGeneration = useRef(0);
   const finishTalking = useServerFn(finishTalkingLegacy);
+  const getCheckpoint = useServerFn(getSpeakingCheckpoint);
+  const saveCheckpoint = useServerFn(saveSpeakingCheckpoint);
+  const clearCheckpoint = useServerFn(clearSpeakingCheckpoint);
   const mounted = useRef(true);
   const topicOffset = useRef(0);
   const speechQueue = useRef<Promise<void>>(Promise.resolve());
@@ -130,7 +139,35 @@ export function VoiceCoach({
     };
   }, []);
   useEffect(() => {
-    if (presentation === "call" || !lessonTopic || scenario) return;
+    let cancelled = false;
+    if (presentation !== "chat" || lessonTopic) {
+      setCheckpointReady(true);
+      return;
+    }
+    void getCheckpoint()
+      .then((checkpoint) => {
+        if (cancelled) return;
+        if (checkpoint) {
+          talkingOperationKey.current = checkpoint.operationKey;
+          setScenario(checkpoint.scenario);
+          setMessages(checkpoint.messages);
+          setVoiceState("idle");
+          started.current = true;
+        }
+      })
+      .catch(() => {
+        if (!cancelled) toast.error("Your previous AI Speaking session could not be loaded.");
+      })
+      .finally(() => {
+        if (!cancelled) setCheckpointReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [presentation, lessonTopic]);
+
+  useEffect(() => {
+    if (!checkpointReady || presentation === "call" || !lessonTopic || scenario) return;
     const opener = `Great, you just finished the lesson "${lessonTopic}". Let's practise it in a real conversation. Can you use what you learned in a sentence about your week?`;
     beginNewSession();
     announceStudyInteraction(document.querySelector("main"), "speaking");
@@ -141,8 +178,33 @@ export function VoiceCoach({
 
   // The AI always opens the conversation and chooses the subject itself.
   const started = useRef(false);
+
+  // Debounced cloud checkpoint: a browser close or device switch can resume
+  // the latest complete turn. This is separate from learning minutes/evidence.
   useEffect(() => {
-    if (presentation === "call" || lessonTopic || started.current) return;
+    if (
+      !checkpointReady ||
+      presentation !== "chat" ||
+      !scenario ||
+      !["everyday", "professional", "travel"].includes(scenario) ||
+      messages.length === 0
+    )
+      return;
+    const timer = window.setTimeout(() => {
+      void saveCheckpoint({
+        data: {
+          operationKey: talkingOperationKey.current,
+          scenario: scenario as "everyday" | "professional" | "travel",
+          messages,
+        },
+      }).catch(() => {
+        toast.error("AI Speaking could not save this turn. Please check your connection.");
+      });
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [checkpointReady, presentation, scenario, messages, saveCheckpoint]);
+  useEffect(() => {
+    if (!checkpointReady || presentation === "call" || lessonTopic || started.current) return;
     started.current = true;
     const businessPlay = findBusinessRolePlay(business);
     if (businessPlay) startRolePlay(businessPlay);
@@ -167,7 +229,7 @@ export function VoiceCoach({
     // Runs once per screen: `start` is recreated on every render, and the
     // `started` ref already guarantees a single opener.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lessonTopic]);
+  }, [lessonTopic, checkpointReady]);
 
   async function beginCall() {
     if (callStartRequested.current) return;
@@ -480,6 +542,11 @@ export function VoiceCoach({
         },
       });
       setReport(result);
+      try {
+        await clearCheckpoint({ data: { operationKey: talkingOperationKey.current } });
+      } catch {
+        toast.error("Your report was saved, but the resume checkpoint could not be cleared.");
+      }
       const scored = result.fluency > 0 || result.grammar > 0 || result.vocabulary > 0;
       if (!scored)
         toast.error("We could not score this session, so your Speaking progress was not changed.");
