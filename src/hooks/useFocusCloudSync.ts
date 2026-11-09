@@ -7,6 +7,14 @@ import { FOCUS_IDLE, focusRestoreState, type FocusState } from "@/lib/focusTimer
 import { useFocusTimer } from "@/hooks/useFocusTimer";
 import type { FocusActivity } from "@/lib/life";
 
+function focusStateSignature(state: Partial<FocusState> | null) {
+  if (!state) return null;
+  return JSON.stringify([
+    state.preset, state.phase, state.endsAt, state.left, state.blocks,
+    state.taskId, state.key, state.lastTaskId, state.startedAt, state.activity,
+  ]);
+}
+
 /**
  * Keeps the timer and its independent session history available on every
  * signed-in device. Window position/open state intentionally remains local.
@@ -42,7 +50,7 @@ export function useFocusCloudSync() {
     void loadFocusCloudSnapshot()
       .then((remote) => {
         revision.current = remote.revision;
-        lastSyncedState.current = remote.state ? JSON.stringify(remote.state) : null;
+        lastSyncedState.current = remote.state ? focusStateSignature(remote.state as FocusState | null);
         for (const row of remote.sessions) {
           addFocusLog({
             key: String(row.key),
@@ -110,7 +118,7 @@ export function useFocusCloudSync() {
           });
           revision.current = result.revision;
           if (result.saved) {
-            lastSyncedState.current = JSON.stringify(payload);
+            lastSyncedState.current = focusStateSignature(payload);
             break;
           }
           // A second device wrote first: retry against its new revision, with
@@ -138,7 +146,7 @@ export function useFocusCloudSync() {
         if (!active || remote.revision <= revision.current) return;
         const localIsClean =
           lastSyncedState.current === null ||
-          JSON.stringify(latestState.current) === lastSyncedState.current;
+          focusStateSignature(latestState.current) === lastSyncedState.current;
         for (const row of remote.sessions) {
           addFocusLog({
             key: String(row.key),
@@ -154,7 +162,7 @@ export function useFocusCloudSync() {
         }
         if (localIsClean && remote.state) {
           revision.current = remote.revision;
-          lastSyncedState.current = JSON.stringify(remote.state);
+          lastSyncedState.current = focusStateSignature(remote.state as FocusState);
           focusRestoreState(remote.state as FocusState);
         }
       } catch {
