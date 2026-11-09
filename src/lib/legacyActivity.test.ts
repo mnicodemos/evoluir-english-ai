@@ -59,10 +59,7 @@ describe("legacy authoritative contracts", () => {
       trackId: "everyday",
       round: 2,
       minutes: 4,
-      sessionSentences: Array.from(
-        { length: 9 },
-        (_, index) => "Sentence " + (index + 1) + ".",
-      ),
+      sessionSentences: Array.from({ length: 9 }, (_, index) => "Sentence " + (index + 1) + "."),
       currentIndex: 1,
       scores: [92, 85, null, null, null, null, null, null, null],
       transcripts: [["Sentence one"], ["Sentence two"], [], [], [], [], [], [], []],
@@ -72,9 +69,7 @@ describe("legacy authoritative contracts", () => {
       ],
     };
     expect(listeningCheckpointInputSchema.parse(input)).toEqual(input);
-    expect(() =>
-      listeningCheckpointInputSchema.parse({ ...input, currentIndex: 9 }),
-    ).toThrow();
+    expect(() => listeningCheckpointInputSchema.parse({ ...input, currentIndex: 9 })).toThrow();
   });
   it("accepts only a word reference and raw transcript for Pronunciation", () => {
     expect(pronunciationSimilarity("schedule", "schedule")).toBe(1);
