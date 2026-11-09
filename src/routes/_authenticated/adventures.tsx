@@ -12,6 +12,7 @@ import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
 import { useIsPremium } from "@/components/PremiumBadge";
 import { Button } from "@/components/ui/button";
 import { useEnglishAdventuresProgress } from "@/hooks/useEnglishAdventuresProgress";
+import { useEnglishAdventureCheckpoint } from "@/hooks/useEnglishAdventureCheckpoint";
 import { useProfile } from "@/hooks/useProfile";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -185,6 +186,9 @@ export const Route = createFileRoute("/_authenticated/adventures")({
 function EnglishAdventuresPage() {
   const { story } = Route.useSearch();
   const { data: profile } = useProfile();
+  // When /adventures is reopened without a story parameter, resume at A1.2
+  // once A1.1 is already complete instead of showing the old completion screen.
+  const welcomeCheckpoint = useEnglishAdventureCheckpoint("a1-welcome-mix-up", 10);
   const premium = useIsPremium();
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -229,7 +233,13 @@ function EnglishAdventuresPage() {
   if (key === "a2" && story === "a2-2") return <A2CommunityFestival />;
   // A2 without a story opens the first saved A2 adventure, never a disconnected fallback.
   if (key === "a2") return <A2SurpriseDelivery />;
-  if (key === "a1") return <A1WelcomeMixUp />;
+  if (key === "a1") {
+    return welcomeCheckpoint.ready && welcomeCheckpoint.completed ? (
+      <A1NeighbourhoodMystery />
+    ) : (
+      <A1WelcomeMixUp />
+    );
+  }
 
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
   if (!scene) return null;
