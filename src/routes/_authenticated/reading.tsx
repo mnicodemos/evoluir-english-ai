@@ -295,7 +295,8 @@ function SaveMarkedWords({
         {saveSummary ? (
           <span>
             {saveSummary.added} {t("new words added")}
-            {" · "}{saveSummary.existing} {t("already in your Vocabulary")}
+            {" · "}
+            {saveSummary.existing} {t("already in your Vocabulary")}
             {saveSummary.skipped > 0 ? (
               <>
                 {" · "}
@@ -332,7 +333,8 @@ function SaveMarkedWords({
       {saveSummary ? (
         <p className="w-full text-xs text-muted-foreground">
           {saveSummary.added} {t("new words added")}
-          {" · "}{saveSummary.existing} {t("already in your Vocabulary")}
+          {" · "}
+          {saveSummary.existing} {t("already in your Vocabulary")}
           {saveSummary.skipped > 0 ? (
             <>
               {" · "}
