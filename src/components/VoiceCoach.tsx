@@ -186,6 +186,7 @@ export function VoiceCoach({
     if (
       !checkpointReady ||
       presentation !== "chat" ||
+      voiceState !== "idle" ||
       !scenario ||
       !["everyday", "professional", "travel"].includes(scenario) ||
       messages.length === 0
@@ -203,7 +204,7 @@ export function VoiceCoach({
       });
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [checkpointReady, presentation, scenario, messages, saveCheckpoint]);
+  }, [checkpointReady, presentation, voiceState, scenario, messages, saveCheckpoint]);
   useEffect(() => {
     if (!checkpointReady || presentation === "call" || lessonTopic || started.current) return;
     started.current = true;
