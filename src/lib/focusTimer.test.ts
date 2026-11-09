@@ -8,8 +8,8 @@ import {
   focusStart,
   focusStop,
   focusView,
-  getFocusSnapshot,
   FOCUS_IDLE,
+  getFocusSnapshot,
   openFocusWidget,
   shouldTuckFocusWidget,
 } from "./focusTimer";
