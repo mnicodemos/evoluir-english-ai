@@ -18,7 +18,7 @@ const focusStateSchema = z.object({
 
 const focusLogSchema = z.object({
   key: z.string().min(1).max(100),
-  day: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+  day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   minutes: z.number().int().min(1).max(1440),
   partial: z.boolean().optional(),
   startedAt: z.number().nullable().optional(),
