@@ -39,9 +39,7 @@ export const getSpeakingCheckpoint = createServerFn({ method: "GET" })
     if (!data) return null;
     const messages = z.array(messageSchema).safeParse(data.messages);
     if (!messages.success || messages.data.length === 0) return null;
-    const scenario = z
-      .enum(["everyday", "professional", "travel"])
-      .safeParse(data.scenario);
+    const scenario = z.enum(["everyday", "professional", "travel"]).safeParse(data.scenario);
     if (!scenario.success) return null;
     return {
       operationKey: data.id,
@@ -75,8 +73,7 @@ export const saveSpeakingCheckpoint = createServerFn({ method: "POST" })
       .eq("user_id", context.userId)
       .eq("topic", "ai-speaking:active")
       .neq("id", data.operationKey);
-    if (cleanupError)
-      throw new Error("Older AI Speaking checkpoint could not be cleaned up");
+    if (cleanupError) throw new Error("Older AI Speaking checkpoint could not be cleaned up");
     return { saved: true };
   });
 
@@ -94,7 +91,6 @@ export const clearSpeakingCheckpoint = createServerFn({ method: "POST" })
       .eq("id", data.operationKey)
       .eq("user_id", context.userId)
       .eq("topic", "ai-speaking:active");
-    if (error)
-      throw new Error("Completed AI Speaking checkpoint could not be cleared");
+    if (error) throw new Error("Completed AI Speaking checkpoint could not be cleared");
     return { cleared: true };
   });
