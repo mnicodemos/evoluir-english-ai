@@ -82,7 +82,7 @@ DECLARE
   v_inserted integer := 0;
 BEGIN
   IF p_user_id IS NULL OR jsonb_typeof(p_sessions) <> 'array'
-     OR jsonb_array_length(p_sessions) > 100 THEN
+     OR jsonb_array_length(p_sessions) > 500 THEN
     RAISE EXCEPTION 'Invalid Focus session log batch';
   END IF;
 
