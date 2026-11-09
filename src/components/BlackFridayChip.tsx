@@ -6,8 +6,8 @@ import { blackFridayPhase } from "@/lib/billing/blackFriday";
 
 /**
  * Dashboard header chip for the Black Friday campaign (owner decision,
- * 2026-10-31: the warm-up shows on the Dashboard too): free students see
- * the warm-up announcement in yellow, opening /premium. Premium students
+ * 2026-10-31: the live offer appears on the Dashboard): free students see
+ * the live campaign announcement in yellow, opening /premium. Premium students
  * and every other day see nothing.
  */
 export function BlackFridayChip({
@@ -20,7 +20,7 @@ export function BlackFridayChip({
   const premium = useIsPremium();
   const phase = blackFridayPhase();
   if (premium !== false || !phase || placement === "mobile") return null;
-  const label = translate("BLACK FRIDAY WARM-UP IS NOW LIVE");
+  const label = translate("BLACK FRIDAY IS NOW LIVE");
   return placement === "desktop" ? (
     <Link
       to="/premium"
