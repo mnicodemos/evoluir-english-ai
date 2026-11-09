@@ -221,7 +221,11 @@ function SaveMarkedWords({
   const save = useServerFn(saveReadingWords);
   const key = `${markedKey(reading)}:saved`;
   const [saved, setSaved] = useState<string[]>([]);
-  const [saveSummary, setSaveSummary] = useState<{ added: number; existing: number; skipped: number } | null>(null);
+  const [saveSummary, setSaveSummary] = useState<{
+    added: number;
+    existing: number;
+    skipped: number;
+  } | null>(null);
   useEffect(() => {
     try {
       const parsed: unknown = JSON.parse(window.localStorage.getItem(key) ?? "[]");
