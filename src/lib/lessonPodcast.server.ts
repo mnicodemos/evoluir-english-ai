@@ -83,7 +83,7 @@ export async function ensureLessonPodcast(
         "and keep every line simple, natural, and appropriate to the learner's exact CEFR level and lesson topic.";
     }
     raw = await callGateway(retryMessages, true, requestOptions);
-    podcast = parseReviewPodcast(raw);
+    podcast = parseReviewPodcast(raw, plan.level);
   }
 
   if (!podcast) {
@@ -102,5 +102,5 @@ export async function lessonPodcastReady(plan: CurriculumLesson): Promise<boolea
   const { hashAiRequest } = await import("./ai-usage.server");
   const messages = lessonPodcastMessages(plan);
   const promptHash = `${PODCAST_HASH_PREFIX}${await hashAiRequest({ messages, jsonMode: true })}`;
-  return !!(await readSharedPodcast(plan.key, promptHash));
+  return !!(await readSharedPodcast(plan.key, promptHash, plan.level));
 }
