@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { parseConversationReport } from "@/lib/ai-prompts";
 
 async function adminClient() {
   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
@@ -93,4 +94,28 @@ export const clearSpeakingCheckpoint = createServerFn({ method: "POST" })
       .eq("topic", "ai-speaking:active");
     if (error) throw new Error("Completed AI Speaking checkpoint could not be cleared");
     return { cleared: true };
+  });
+
+
+/** Load the most recent completed AI Speaking report for this student. */
+export const getLastSpeakingReport = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const admin = await adminClient();
+    const { data, error } = await admin
+      .from("activities")
+      .select("result")
+      .eq("user_id", context.userId)
+      .eq("source_type", "talking")
+      .not("result", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error("The last AI Speaking report could not be loaded");
+    if (!data?.result) return null;
+    try {
+      return parseConversationReport(JSON.stringify(data.result));
+    } catch {
+      return null;
+    }
   });
