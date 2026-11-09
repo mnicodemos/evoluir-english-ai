@@ -96,7 +96,6 @@ export const clearSpeakingCheckpoint = createServerFn({ method: "POST" })
     return { cleared: true };
   });
 
-
 /** Load the most recent completed AI Speaking report for this student. */
 export const getLastSpeakingReport = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
