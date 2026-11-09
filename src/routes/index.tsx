@@ -62,6 +62,29 @@ const STRUCTURED_DATA = {
   ],
 };
 
+const WEBSITE_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Evoluir+ English AI",
+  alternateName: ["Evoluir English AI", "Evoluir Mais English AI", "evoluirmaisenglishai"],
+  url: SITE_URL,
+};
+
+const ORGANIZATION_LD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Evoluir+ English AI",
+  url: SITE_URL,
+  logo: `${SITE_URL}icon-512.png`,
+  sameAs: [
+    "https://www.instagram.com/evoluirmaisenglishai",
+    "https://www.tiktok.com/@evoluirmaisenglishai",
+    "https://www.youtube.com/@evoluirmaisenglishai",
+    "https://www.threads.net/@evoluirmaisenglishai",
+    "https://x.com/evoluirmaisai",
+  ],
+};
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -80,7 +103,11 @@ export const Route = createFileRoute("/")({
       { name: "twitter:image", content: OG_IMAGE },
     ],
     links: [{ rel: "canonical", href: SITE_URL }],
-    scripts: [{ type: "application/ld+json", children: JSON.stringify(STRUCTURED_DATA) }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(STRUCTURED_DATA) },
+      { type: "application/ld+json", children: JSON.stringify(WEBSITE_LD) },
+      { type: "application/ld+json", children: JSON.stringify(ORGANIZATION_LD) },
+    ],
   }),
   component: CommercialLanding,
 });
