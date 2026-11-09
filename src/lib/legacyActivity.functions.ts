@@ -205,7 +205,7 @@ export const saveListeningCheckpoint = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const admin = await adminClient();
     const { data: lessons } = await admin.from("lessons").select("summary, transcript");
-    const corpus = (lessons ?? []).map((lesson) => `${lesson.summary} ${lesson.transcript}`).join(" ").replace(/\\s+/g, " ").toLowerCase();
+    const corpus = (lessons ?? []).map((lesson) => `${lesson.summary} ${lesson.transcript}`).join(" ").replace(/\s+/g, " ").toLowerCase();
     const builtIn = new Set([...STATIC_LISTENING, ...allListeningSentences()].map(normalizeListening));
     for (const item of data.evidence) {
       const expected = normalizeListening(item.expected);
