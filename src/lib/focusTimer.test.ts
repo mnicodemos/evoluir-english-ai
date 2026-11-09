@@ -17,6 +17,8 @@ import {
 describe("focus timer store", () => {
   afterEach(() => {
     focusStop();
+    // Each test starts from the same preset/state; stopping preserves the last preset.
+    focusRestoreState(FOCUS_IDLE);
     vi.useRealTimers();
   });
 
