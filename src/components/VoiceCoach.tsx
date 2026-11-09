@@ -131,6 +131,7 @@ export function VoiceCoach({
   useEffect(() => {
     if (presentation === "call" || !lessonTopic || scenario) return;
     const opener = `Great, you just finished the lesson "${lessonTopic}". Let's practise it in a real conversation. Can you use what you learned in a sentence about your week?`;
+    beginNewSession();
     announceStudyInteraction(document.querySelector("main"), "speaking");
     setScenario("everyday");
     setMessages([{ role: "assistant", content: opener }]);
@@ -175,6 +176,7 @@ export function VoiceCoach({
 
     if (lessonTopic) {
       const opener = `Great, you just finished the lesson "${lessonTopic}". Let's practise it in a real conversation. Can you use what you learned in a sentence about your week?`;
+      beginNewSession();
       setScenario("everyday");
       setMessages([{ role: "assistant", content: opener }]);
       void playResponse(opener);
@@ -252,7 +254,22 @@ export function VoiceCoach({
   }
 
   /** Starts a real-life role-play; its fixed opener plays right away. */
+  function beginNewSession() {
+    replyAbort.current?.abort();
+    cancelVoiceRecording();
+    stopSpeaking();
+    talkingOperationKey.current = crypto.randomUUID();
+    answering.current = false;
+    turnMarks.current = null;
+    speechQueue.current = Promise.resolve();
+    setMessages([]);
+    setReport(null);
+    setFinishing(false);
+    setVoiceState("idle");
+  }
+
   function startRolePlay(play: RolePlay) {
+    beginNewSession();
     announceStudyInteraction(document.querySelector("main"), "speaking");
     cancelVoiceRecording();
     stopSpeaking();
@@ -265,6 +282,7 @@ export function VoiceCoach({
 
   /** Starts a conversation with a subject picked by the AI. `offset` asks for another subject. */
   async function start(offset = 0) {
+    beginNewSession();
     announceStudyInteraction(document.querySelector("main"), "speaking");
     const selected = scenarioOfTheDay(offset);
     stopSpeaking();

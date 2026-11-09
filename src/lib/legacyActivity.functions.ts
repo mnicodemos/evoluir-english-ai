@@ -321,7 +321,16 @@ export const finishTalkingLegacy = createServerFn({ method: "POST" })
       minutes: data.minutes,
       score,
       scores: { speaking: report.fluency },
-      result: report,
+      // Keep the full, ordered conversation alongside the score so the
+      // completed practice can be reviewed without relying on component state.
+      result: {
+        ...report,
+        scenario: data.scenario,
+        transcript: data.messages.map((message) => ({
+          role: message.role,
+          content: message.content,
+        })),
+      },
     });
     // Phase 26: the speaking report the session already produced becomes
     // evidence, but only when the student really spoke in this conversation.
