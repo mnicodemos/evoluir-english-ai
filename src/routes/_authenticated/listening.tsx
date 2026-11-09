@@ -249,17 +249,19 @@ function ListeningPage() {
       return;
     }
 
-    const savedScores = Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => {
-      const value = checkpoint.scores?.[at];
-      return typeof value === "number" ? value : undefined;
+    const checkpointScores = checkpoint.scores as unknown[];
+    const checkpointTranscripts = checkpoint.transcripts as unknown[];
+    const savedScores: number[] = Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => {
+      const value = checkpointScores[at];
+      return typeof value === "number" ? value : 0;
     });
-    const savedTranscripts = Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => {
-      const value = checkpoint.transcripts?.[at];
+    const savedTranscripts: string[][] = Array.from({ length: SENTENCES_PER_SESSION }, (_, at) => {
+      const value = checkpointTranscripts[at];
       return Array.isArray(value)
         ? value.filter((item): item is string => typeof item === "string")
         : [];
     });
-    const savedIndex = checkpoint.currentIndex;
+    const savedIndex = checkpoint.currentIndex as number;
     const atPartEnd =
       (savedIndex + 1) % SENTENCES_PER_PART === 0 || savedIndex === SENTENCES_PER_SESSION - 1;
 
