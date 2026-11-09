@@ -77,6 +77,31 @@ async function adminClient() {
   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
 }
 
+/** Avoid reading every lesson for evidence already present in built-in drills. */
+async function validateListeningEvidence(
+  admin: Awaited<ReturnType<typeof adminClient>>,
+  expectedSentences: string[],
+) {
+  const builtIn = new Set(
+    [...STATIC_LISTENING, ...allListeningSentences()].map(normalizeListening),
+  );
+  const unmatched = expectedSentences
+    .map(normalizeListening)
+    .filter((expected) => !builtIn.has(expected));
+  if (unmatched.length === 0) return;
+
+  const { data: lessons, error } = await admin.from("lessons").select("summary, transcript");
+  if (error) throw new Error("Listening course content could not be validated");
+  const corpus = (lessons ?? [])
+    .map((lesson) => `${lesson.summary ?? ""} ${lesson.transcript ?? ""}`)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+  if (unmatched.some((expected) => !corpus.includes(expected))) {
+    throw new Error("Listening evidence is not part of the course");
+  }
+}
+
 async function persist(params: {
   userId: string;
   sourceType: "quiz" | "writing" | "listening" | "pronunciation" | "talking" | "telemetry";
@@ -211,21 +236,10 @@ export const saveListeningCheckpoint = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => listeningCheckpointInputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const admin = await adminClient();
-    const { data: lessons } = await admin.from("lessons").select("summary, transcript");
-    const corpus = (lessons ?? [])
-      .map((lesson) => `${lesson.summary} ${lesson.transcript}`)
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .toLowerCase();
-    const builtIn = new Set(
-      [...STATIC_LISTENING, ...allListeningSentences()].map(normalizeListening),
+    await validateListeningEvidence(
+      admin,
+      data.evidence.map((item) => item.expected),
     );
-    for (const item of data.evidence) {
-      const expected = normalizeListening(item.expected);
-      if (!builtIn.has(expected) && !corpus.includes(expected)) {
-        throw new Error("Listening evidence is not part of the course");
-      }
-    }
     const result = {
       round: data.round,
       sessionSentences: data.sessionSentences,
@@ -250,24 +264,11 @@ export const persistListeningLegacy = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => listeningLegacyInputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const admin = await adminClient();
-    const { data: lessons } = await admin.from("lessons").select("summary, transcript");
-    const corpus = (lessons ?? [])
-      .map((lesson) => `${lesson.summary} ${lesson.transcript}`)
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .toLowerCase();
-    // The level drills (listeningLevels) are course content too: before they
-    // were accepted here, finishing a session with them failed with "Listening
-    // evidence is not part of the course".
-    const builtIn = new Set(
-      [...STATIC_LISTENING, ...allListeningSentences()].map(normalizeListening),
+    // Built-in level drills are checked in memory; lesson transcripts are a fallback.
+    await validateListeningEvidence(
+      admin,
+      data.evidence.map((item) => item.expected),
     );
-    for (const item of data.evidence) {
-      const expected = normalizeListening(item.expected);
-      if (!builtIn.has(expected) && !corpus.includes(expected)) {
-        throw new Error("Listening evidence is not part of the course");
-      }
-    }
     const itemScores = data.evidence.map((item) =>
       Math.max(...item.transcripts.map((text) => listeningAnswerScore(item.expected, text))),
     );
