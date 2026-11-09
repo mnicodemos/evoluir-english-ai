@@ -98,32 +98,16 @@ export async function syncSubscription(
     canceled_at: secondsToIso(subscription.canceled_at),
   };
 
-  const { data: existing } = await supabaseAdmin
+  // Atomic write: Stripe may deliver checkout.session.completed and
+  // customer.subscription.created concurrently for the same subscription.
+  // The database unique constraint arbitrates the race without losing retries.
+  const { data: saved, error } = await supabaseAdmin
     .from("subscriptions")
+    .upsert(row, { onConflict: "provider,provider_subscription_id" })
     .select("id")
-    .eq("provider", PROVIDER)
-    .eq("provider_subscription_id", subscription.id)
-    .maybeSingle();
-
-  // A failed write throws, so the webhook answers 500 and Stripe sends the
-  // event again (audit, 2026-10-24: errors were ignored and the event was
-  // marked processed, leaving a paid student without access).
-  let subscriptionId = existing?.id ?? null;
-  if (subscriptionId) {
-    const { error } = await supabaseAdmin
-      .from("subscriptions")
-      .update(row)
-      .eq("id", subscriptionId);
-    if (error) throw new Error(`subscription update failed: ${error.message}`);
-  } else {
-    const { data: inserted, error } = await supabaseAdmin
-      .from("subscriptions")
-      .insert(row)
-      .select("id")
-      .single();
-    if (error) throw new Error(`subscription insert failed: ${error.message}`);
-    subscriptionId = inserted?.id ?? null;
-  }
+    .single();
+  if (error) throw new Error(`subscription upsert failed: ${error.message}`);
+  const subscriptionId = saved?.id ?? null;
 
   const grantsAccess = subscriptionGrantsAccess({ status, current_period_end: period.end });
   await reconcileEntitlements({
