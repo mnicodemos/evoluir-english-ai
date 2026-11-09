@@ -266,8 +266,10 @@ function SaveMarkedWords({
       const result = await save({ data: { words } });
       return { terms: words.map((item) => item.word), result };
     },
+    onMutate: () => setSaveSummary(null),
     onSuccess: ({ terms, result }) => {
-      const next = [...new Set([...saved, ...terms])];
+      const savedTerms = terms.filter((term) => !result.skippedWords.includes(term));
+      const next = [...new Set([...saved, ...savedTerms])];
       setSaveSummary(result);
       setSaved(next);
       try {
@@ -320,6 +322,15 @@ function SaveMarkedWords({
         )}
         <span>{t("Save to my Vocabulary")}</span> <span>({pending.length})</span>
       </Button>
+      {saveSummary ? (
+        <p className="w-full text-xs text-muted-foreground">
+          {saveSummary.added} {t("new words added")}
+          {" · "}{saveSummary.existing} {t("already in your Vocabulary")}
+          {saveSummary.skipped > 0 ? (
+            <>{" · "}{saveSummary.skipped} {t("could not be added")}</>
+          ) : null}
+        </p>
+      ) : null}
       {mutation.isError ? (
         <span className="text-xs text-destructive">
           {mutation.error instanceof Error && mutation.error.message === "no translation"
