@@ -82,10 +82,8 @@ export function useFocusCloudSync() {
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("pagehide", handleVisibilityChange);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("pagehide", handleVisibilityChange);
     };
   }, [userId]);
 
@@ -133,6 +131,21 @@ export function useFocusCloudSync() {
         // An active local session is kept; otherwise restore the cloud copy.
         if (remoteState && local.phase === "idle") {
           focusRestoreState(remoteState);
+        }
+
+        // A full navigation/reload starts in the visible state, so no
+        // visibilitychange event fires. Resume the session this browser paused.
+        const resumeKey = `evoluir-focus-auto-resume:${userId}`;
+        let shouldResume = false;
+        try {
+          shouldResume = window.localStorage.getItem(resumeKey) === "1";
+          if (shouldResume) window.localStorage.removeItem(resumeKey);
+        } catch {
+          // The cloud-restored timer remains paused if storage is unavailable.
+        }
+        const restored = getFocusSnapshot().state;
+        if (shouldResume && restored.phase !== "idle" && restored.endsAt === null) {
+          focusResume();
         }
       })
       .catch(() => {
