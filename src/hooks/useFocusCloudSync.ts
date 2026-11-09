@@ -170,7 +170,7 @@ export function useFocusCloudSync() {
             day: String(row.day),
             minutes: Number(row.minutes),
             partial: Boolean(row.partial),
-            startedAt: row.startedAt == null ? undefined : Number(row.startedAt),
+            ...(row.startedAt == null ? {} : { startedAt: Number(row.startedAt) }),
             endedAt: Number(row.endedAt),
             preset: row.preset as "short" | "classic" | "deep",
             taskId: (row.taskId as string | null) ?? null,
