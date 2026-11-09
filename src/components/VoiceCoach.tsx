@@ -35,6 +35,7 @@ import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
 import {
   clearSpeakingCheckpoint,
   getSpeakingCheckpoint,
+  getLastSpeakingReport,
   saveSpeakingCheckpoint,
 } from "@/lib/speakingSession.functions";
 import { useServerFn } from "@tanstack/react-start";
@@ -117,6 +118,7 @@ export function VoiceCoach({
   const sessionGeneration = useRef(0);
   const finishTalking = useServerFn(finishTalkingLegacy);
   const getCheckpoint = useServerFn(getSpeakingCheckpoint);
+  const getLastReport = useServerFn(getLastSpeakingReport);
   const saveCheckpoint = useServerFn(saveSpeakingCheckpoint);
   const clearCheckpoint = useServerFn(clearSpeakingCheckpoint);
   const mounted = useRef(true);
@@ -144,9 +146,10 @@ export function VoiceCoach({
       setCheckpointReady(true);
       return;
     }
-    void getCheckpoint()
-      .then((checkpoint) => {
+    void Promise.all([getCheckpoint(), getLastReport()])
+      .then(([checkpoint, lastReport]) => {
         if (cancelled) return;
+        if (lastReport) setReport(lastReport);
         if (checkpoint) {
           talkingOperationKey.current =
             checkpoint.operationKey as typeof talkingOperationKey.current;
@@ -165,7 +168,7 @@ export function VoiceCoach({
     return () => {
       cancelled = true;
     };
-  }, [presentation, lessonTopic, getCheckpoint]);
+  }, [presentation, lessonTopic, getCheckpoint, getLastReport]);
 
   useEffect(() => {
     if (!checkpointReady || presentation === "call" || !lessonTopic || scenario) return;
@@ -331,7 +334,6 @@ export function VoiceCoach({
     turnMarks.current = null;
     speechQueue.current = Promise.resolve();
     setMessages([]);
-    setReport(null);
     setFinishing(false);
     setVoiceState("idle");
   }
@@ -343,7 +345,6 @@ export function VoiceCoach({
     stopSpeaking();
     setRolePlay(play);
     setScenario(play.scenario);
-    setReport(null);
     setMessages([{ role: "assistant", content: play.opener }]);
     void playResponse(play.opener);
   }
@@ -357,7 +358,6 @@ export function VoiceCoach({
     stopSpeaking();
     setRolePlay(null);
     setScenario(selected.id);
-    setReport(null);
     setMessages([]);
     setVoiceState("thinking");
     const used = loadUsedOpeners();
