@@ -49,20 +49,14 @@ BEGIN
     RAISE EXCEPTION 'Invalid Focus timer state';
   END IF;
 
+  INSERT INTO public.focus_timer_state(user_id, state, revision, updated_at)
+  VALUES (p_user_id, '{}'::jsonb, 0, now())
+  ON CONFLICT (user_id) DO NOTHING;
+
   SELECT * INTO v_current
   FROM public.focus_timer_state
   WHERE user_id = p_user_id
   FOR UPDATE;
-
-  IF NOT FOUND THEN
-    IF p_expected_revision <> 0 THEN
-      RETURN jsonb_build_object('saved', false, 'revision', 0, 'state', '{}'::jsonb);
-    END IF;
-    INSERT INTO public.focus_timer_state(user_id, state, revision, updated_at)
-    VALUES (p_user_id, p_state, 1, now())
-    RETURNING * INTO v_current;
-    RETURN jsonb_build_object('saved', true, 'revision', v_current.revision, 'state', v_current.state);
-  END IF;
 
   IF v_current.revision <> p_expected_revision THEN
     RETURN jsonb_build_object('saved', false, 'revision', v_current.revision, 'state', v_current.state);
@@ -103,8 +97,9 @@ BEGIN
       (v_session->>'day')::date,
       (v_session->>'minutes')::integer,
       COALESCE((v_session->>'partial')::boolean, false),
-      NULLIF(v_session->>'startedAt', '')::timestamptz,
-      (v_session->>'endedAt')::timestamptz,
+      CASE WHEN v_session->>'startedAt' IS NULL THEN NULL
+           ELSE to_timestamp((v_session->>'startedAt')::double precision / 1000) END,
+      to_timestamp((v_session->>'endedAt')::double precision / 1000),
       v_session->>'preset',
       NULLIF(v_session->>'taskId', '')::uuid,
       NULLIF(v_session->>'activity', '')
