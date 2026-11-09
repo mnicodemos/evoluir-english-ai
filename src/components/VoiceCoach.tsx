@@ -148,7 +148,8 @@ export function VoiceCoach({
       .then((checkpoint) => {
         if (cancelled) return;
         if (checkpoint) {
-          talkingOperationKey.current = checkpoint.operationKey as typeof talkingOperationKey.current;
+          talkingOperationKey.current =
+            checkpoint.operationKey as typeof talkingOperationKey.current;
           setScenario(checkpoint.scenario);
           setMessages(checkpoint.messages);
           setVoiceState("idle");
