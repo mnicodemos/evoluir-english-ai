@@ -2808,6 +2808,15 @@ export type Database = {
         }
         Returns: Json
       }
+      load_premium_video_social_counts: {
+        Args: { p_video_ids: string[]; p_user_id: string }
+        Returns: {
+          video_id: string
+          likes: number
+          liked: boolean
+          comments: number
+        }[]
+      }
       weekly_league: {
         Args: never
         Returns: {
