@@ -52,12 +52,7 @@ export const loadVideoSocial = createServerFn({ method: "POST" })
       }
       return { ready: false, counts };
     }
-    for (const row of (rows ?? []) as {
-      video_id: string;
-      likes: number;
-      liked: boolean;
-      comments: number;
-    }[]) {
+    for (const row of rows ?? []) {
       if (!counts[row.video_id]) continue;
       counts[row.video_id] = {
         likes: Number(row.likes),
