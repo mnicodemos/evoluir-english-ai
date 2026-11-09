@@ -59,6 +59,16 @@ export const listeningLegacyInputSchema = z
   })
   .strict();
 
+export const listeningCheckpointInputSchema = z
+  .object({
+    operationKey, trackId: z.enum(["everyday", "professional", "travel"]),
+    round: z.number().int().min(0).max(100000), minutes,
+    sessionSentences: z.array(z.string().trim().min(1).max(300)).length(9),
+    currentIndex: z.number().int().min(0).max(8),
+    scores: z.array(z.number().int().min(0).max(100).nullable()).length(9),
+    transcripts: z.array(z.array(z.string().trim().max(1000)).max(3)).length(9),
+    evidence: z.array(z.object({ expected: z.string().trim().min(1).max(300), transcripts: z.array(z.string().trim().max(1000)).min(1).max(3) }).strict()).min(1).max(3),
+  }).strict();
 export const pronunciationLegacyInputSchema = z
   .object({
     operationKey,
