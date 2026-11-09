@@ -126,6 +126,7 @@ export function reviewOutline(plan: CurriculumLesson): string {
 export function reviewPodcastMessages(plan: CurriculumLesson) {
   const level = plan.level.toLowerCase();
   const style = LEVEL_STYLE[level] ?? LEVEL_STYLE["b1"]!;
+  const length = podcastLength(level);
   return [
     {
       role: "system" as const,
@@ -142,7 +143,7 @@ export function reviewPodcastMessages(plan: CurriculumLesson) {
         "5) a quick challenge: EVO asks the listener a question, says 'Pause and answer out loud', then gives a model answer; " +
         "6) a short goodbye that invites the listener to the lesson's quiz. " +
         "Only review what the outline covers: no new grammar. Alternate the speakers naturally, EVO speaks first. " +
-        `Write 30 to 36 lines and at least 500 spoken English words in total. Aim for 15-17 spoken words per line and verify the total reaches 500 before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
+        `Write ${length.lines} lines and at least ${length.words} spoken English words in total. Aim for 13-17 spoken words per line and verify the total reaches ${length.words} before returning JSON; keep sentences simple and level-appropriate. Each line must be at most 60 words and ${PODCAST_LINE_MAX} characters, plain spoken English with no stage directions, emojis or markdown. ` +
         "For every line add 'pt', a natural Brazilian Portuguese translation. " +
         'Reply with JSON only: {"title": "...", "lines": [{"speaker": "evo" | "leo", "text": "...", "pt": "..."}]}',
     },
