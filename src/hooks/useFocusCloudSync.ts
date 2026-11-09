@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { addFocusLog, useFocusLog } from "@/hooks/useFocusLog";
+import { addFocusLog, clearFocusLog, useFocusLog } from "@/hooks/useFocusLog";
 import { useProfile } from "@/hooks/useProfile";
 import { loadFocusCloudSnapshot, saveFocusCloudSnapshot } from "@/lib/focusTimer.functions";
-import { focusRestoreState, type FocusState } from "@/lib/focusTimer";
+import { FOCUS_IDLE, focusRestoreState, type FocusState } from "@/lib/focusTimer";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
 import type { FocusActivity } from "@/lib/life";
 
@@ -20,6 +20,7 @@ export function useFocusCloudSync() {
   const readyForWrites = useRef(false);
   const loadingUser = useRef<string | null>(null);
   const latestState = useRef<FocusState>(state);
+  const [syncEpoch, setSyncEpoch] = useState(0);
 
   latestState.current = state;
 
@@ -27,6 +28,16 @@ export function useFocusCloudSync() {
     if (!userId || loadingUser.current === userId) return;
     loadingUser.current = userId;
     readyForWrites.current = false;
+    try {
+      const owner = window.localStorage.getItem("evoluir-focus-owner");
+      if (owner && owner !== userId) {
+        focusRestoreState(FOCUS_IDLE);
+        clearFocusLog();
+      }
+      window.localStorage.setItem("evoluir-focus-owner", userId);
+    } catch {
+      // Cloud sync still works if local storage is unavailable.
+    }
     void loadFocusCloudSnapshot()
       .then((remote) => {
         revision.current = remote.revision;
@@ -59,6 +70,7 @@ export function useFocusCloudSync() {
       })
       .finally(() => {
         readyForWrites.current = true;
+        setSyncEpoch((value) => value + 1);
       });
   }, [userId]);
 
@@ -107,5 +119,5 @@ export function useFocusCloudSync() {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [userId, state, sessions]);
+  }, [userId, state, sessions, syncEpoch]);
 }
