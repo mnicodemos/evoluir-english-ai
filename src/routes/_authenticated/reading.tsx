@@ -221,6 +221,7 @@ function SaveMarkedWords({
   const save = useServerFn(saveReadingWords);
   const key = `${markedKey(reading)}:saved`;
   const [saved, setSaved] = useState<string[]>([]);
+  const [saveSummary, setSaveSummary] = useState<{ added: number; existing: number; skipped: number } | null>(null);
   useEffect(() => {
     try {
       const parsed: unknown = JSON.parse(window.localStorage.getItem(key) ?? "[]");
@@ -262,11 +263,12 @@ function SaveMarkedWords({
       );
       const words = items.filter((item): item is NonNullable<typeof item> => item !== null);
       if (!words.length) throw new Error("no translation");
-      await save({ data: { words } });
-      return words.map((item) => item.word);
+      const result = await save({ data: { words } });
+      return { terms: words.map((item) => item.word), result };
     },
-    onSuccess: (terms) => {
+    onSuccess: ({ terms, result }) => {
       const next = [...new Set([...saved, ...terms])];
+      setSaveSummary(result);
       setSaved(next);
       try {
         window.localStorage.setItem(key, JSON.stringify(next));
@@ -284,7 +286,17 @@ function SaveMarkedWords({
     return saved.length ? (
       <p className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-brand-green">
         <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" />
-        <span>{t("Saved to your Vocabulary reviews.")}</span>
+        {saveSummary ? (
+          <span>
+            {saveSummary.added} {t("new words added")}
+            {" · "}{saveSummary.existing} {t("already in your Vocabulary")}
+            {saveSummary.skipped > 0 ? (
+              <>{" · "}{saveSummary.skipped} {t("could not be added")}</>
+            ) : null}
+          </span>
+        ) : (
+          <span>{t("Saved to your Vocabulary reviews.")}</span>
+        )}
         <Link to="/vocabulary" className="font-semibold underline-offset-2 hover:underline">
           {t("Open Vocabulary")}
         </Link>
