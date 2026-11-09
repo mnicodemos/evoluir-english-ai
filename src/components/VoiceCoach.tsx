@@ -334,7 +334,6 @@ export function VoiceCoach({
     turnMarks.current = null;
     speechQueue.current = Promise.resolve();
     setMessages([]);
-    setReport(null);
     setFinishing(false);
     setVoiceState("idle");
   }
@@ -346,7 +345,6 @@ export function VoiceCoach({
     stopSpeaking();
     setRolePlay(play);
     setScenario(play.scenario);
-    setReport(null);
     setMessages([{ role: "assistant", content: play.opener }]);
     void playResponse(play.opener);
   }
@@ -360,7 +358,6 @@ export function VoiceCoach({
     stopSpeaking();
     setRolePlay(null);
     setScenario(selected.id);
-    setReport(null);
     setMessages([]);
     setVoiceState("thinking");
     const used = loadUsedOpeners();
