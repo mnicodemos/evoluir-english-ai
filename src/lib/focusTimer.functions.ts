@@ -67,7 +67,7 @@ export const loadFocusCloudSnapshot = createServerFn({ method: "GET" })
         day: row["day"],
         minutes: row["minutes"],
         partial: row["partial"],
-        startedAt: row["started_at"] ? new Date(String(row.started_at)).getTime() : null,
+        startedAt: row["started_at"] ? new Date(String(row["started_at"])).getTime() : null,
         endedAt: new Date(String(row["ended_at"])).getTime(),
         preset: row["preset"],
         taskId: row["task_id"],
