@@ -125,8 +125,6 @@ export function useFocusCloudSync() {
       window.clearTimeout(timer);
     };
   }, [userId, state, sessions, syncEpoch]);
-}
-
 
   // Keep an already-open second device in step without requiring a reload.
   // Never replace local changes that have not yet been accepted by the cloud.
@@ -173,3 +171,4 @@ export function useFocusCloudSync() {
       document.removeEventListener("visibilitychange", refresh);
     };
   }, [userId, syncEpoch]);
+}
