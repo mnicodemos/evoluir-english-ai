@@ -234,11 +234,11 @@ function EnglishAdventuresPage() {
   // A2 without a story opens the first saved A2 adventure, never a disconnected fallback.
   if (key === "a2") return <A2SurpriseDelivery />;
   if (key === "a1") {
-    return welcomeCheckpoint.ready && welcomeCheckpoint.completed ? (
-      <A1NeighbourhoodMystery />
-    ) : (
-      <A1WelcomeMixUp />
-    );
+    // Do not briefly render A1.1 while the cloud checkpoint is loading.
+    // Once A1.1 is complete, resume directly at A1.2, including its saved
+    // completion screen when the student has already finished both adventures.
+    if (!welcomeCheckpoint.ready) return null;
+    return welcomeCheckpoint.completed ? <A1NeighbourhoodMystery /> : <A1WelcomeMixUp />;
   }
 
   const scene = adventure.scenes[sceneIndex] ?? adventure.scenes[0];
