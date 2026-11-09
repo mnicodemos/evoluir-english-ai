@@ -22,8 +22,8 @@ export const BLACK_FRIDAY = {
   discountMonths: 3,
   monthlyTrialDays: 15,
   /**
-   * The offer is live from 03/11; no warm-up phase.
-   * The exclusive end is midnight at the start of 21/11.
+   * The offer is live from 03/11; there is no separate warm-up phase.
+   * The exclusive end is midnight at the start of 01/12 (after 30/11).
    */
   warmupStartsAt: "2026-11-03T03:00:00Z",
   warmupEndsAt: "2026-11-03T03:00:00Z",
@@ -53,7 +53,7 @@ function saoPauloDay(time: number): string {
 /** The first and last days of the offer, in São Paulo. */
 export const BLACK_FRIDAY_FIRST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.startsAt));
 export const BLACK_FRIDAY_LAST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.endsAt) - 1);
-/** The first day of the warm-up, in São Paulo (03/11). */
+/** Legacy warm-up boundary; equal to campaign start because warm-up is disabled. */
 export const BLACK_FRIDAY_WARMUP_FIRST_DAY = saoPauloDay(Date.parse(BLACK_FRIDAY.warmupStartsAt));
 
 /** A São Paulo day as DD/MM. */
@@ -62,7 +62,7 @@ export function dayMonth(day: string): string {
 }
 
 /**
- * Where the campaign stands: live (03/11-30/11), or nothing.
+ * Where the campaign stands: live (03/11-30/11), or nothing. Warm-up is disabled.
  */
 export function blackFridayPhase(now: Date = new Date()): "warmup" | "live" | null {
   const time = now.getTime();
