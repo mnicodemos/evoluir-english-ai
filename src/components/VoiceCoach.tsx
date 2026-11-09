@@ -382,9 +382,12 @@ export function VoiceCoach({
     turnMarks.current = marks;
     try {
       const audio = await stopVoiceRecording();
-      if (mounted.current) setVoiceState("transcribing");
+      // A new session may have started while the recorder was stopping.
+      // Never let an old recording change the state of the new session.
+      if (!mounted.current || generation !== sessionGeneration.current) return;
+      setVoiceState("transcribing");
       const text = await transcribeAudio(audio);
-      if (generation !== sessionGeneration.current) return;
+      if (!mounted.current || generation !== sessionGeneration.current) return;
       marks.transcribedAt = performance.now();
       const next: ChatMessage[] = [...messages, { role: "user", content: text }];
       setMessages(next);
@@ -440,7 +443,8 @@ export function VoiceCoach({
       await speechQueue.current;
       if (mounted.current) setVoiceState("idle");
     } catch (error) {
-      if (!mounted.current) return;
+      // Ignore failures from an obsolete session; its replacement owns the UI.
+      if (!mounted.current || generation !== sessionGeneration.current) return;
       setVoiceState("idle");
       // Drop the empty placeholder left by a reply that never arrived.
       setMessages((current) =>
@@ -452,7 +456,8 @@ export function VoiceCoach({
         error instanceof Error ? error.message : "AI Speaking could not hear or answer you.",
       );
     } finally {
-      answering.current = false;
+      // An older request must not unlock the answering guard of a newer turn.
+      if (generation === sessionGeneration.current) answering.current = false;
     }
   }
 
