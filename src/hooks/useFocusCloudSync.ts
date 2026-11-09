@@ -162,8 +162,11 @@ export function useFocusCloudSync() {
         }
         if (localIsClean && remote.state) {
           revision.current = remote.revision;
-          lastSyncedState.current = focusStateSignature(remote.state as FocusState);
-          focusRestoreState(remote.state as FocusState);
+          const remoteSignature = focusStateSignature(remote.state as FocusState);
+          if (remoteSignature !== focusStateSignature(latestState.current)) {
+            focusRestoreState(remote.state as FocusState);
+          }
+          lastSyncedState.current = remoteSignature;
         }
       } catch {
         // A temporary connection failure must not interrupt the local timer.
