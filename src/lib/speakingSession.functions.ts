@@ -7,16 +7,20 @@ async function adminClient() {
   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
 }
 
-const messageSchema = z.object({
-  role: z.enum(["user", "assistant"]),
-  content: z.string().trim().min(1).max(8000),
-}).strict();
+const messageSchema = z
+  .object({
+    role: z.enum(["user", "assistant"]),
+    content: z.string().trim().min(1).max(8000),
+  })
+  .strict();
 
-const saveSchema = z.object({
-  operationKey: z.string().uuid(),
-  scenario: z.enum(["everyday", "professional", "travel"]),
-  messages: z.array(messageSchema).min(1).max(60),
-}).strict();
+const saveSchema = z
+  .object({
+    operationKey: z.string().uuid(),
+    scenario: z.enum(["everyday", "professional", "travel"]),
+    messages: z.array(messageSchema).min(1).max(60),
+  })
+  .strict();
 
 /** Restore the student's most recent unfinished AI Speaking conversation. */
 export const getSpeakingCheckpoint = createServerFn({ method: "GET" })
@@ -35,9 +39,15 @@ export const getSpeakingCheckpoint = createServerFn({ method: "GET" })
     if (!data) return null;
     const messages = z.array(messageSchema).safeParse(data.messages);
     if (!messages.success || messages.data.length === 0) return null;
-    const scenario = z.enum(["everyday", "professional", "travel"]).safeParse(data.scenario);
+    const scenario = z
+      .enum(["everyday", "professional", "travel"])
+      .safeParse(data.scenario);
     if (!scenario.success) return null;
-    return { operationKey: data.id, scenario: scenario.data, messages: messages.data };
+    return {
+      operationKey: data.id,
+      scenario: scenario.data,
+      messages: messages.data,
+    };
   });
 
 /** Persist the full conversation after each completed turn, not only at finish. */
@@ -65,14 +75,17 @@ export const saveSpeakingCheckpoint = createServerFn({ method: "POST" })
       .eq("user_id", context.userId)
       .eq("topic", "ai-speaking:active")
       .neq("id", data.operationKey);
-    if (cleanupError) throw new Error("Older AI Speaking checkpoint could not be cleaned up");
+    if (cleanupError)
+      throw new Error("Older AI Speaking checkpoint could not be cleaned up");
     return { saved: true };
   });
 
 /** Remove only the resumable checkpoint after the report has been saved. */
 export const clearSpeakingCheckpoint = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ operationKey: z.string().uuid() }).strict().parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ operationKey: z.string().uuid() }).strict().parse(input),
+  )
   .handler(async ({ data, context }) => {
     const admin = await adminClient();
     const { error } = await admin
@@ -81,6 +94,7 @@ export const clearSpeakingCheckpoint = createServerFn({ method: "POST" })
       .eq("id", data.operationKey)
       .eq("user_id", context.userId)
       .eq("topic", "ai-speaking:active");
-    if (error) throw new Error("Completed AI Speaking checkpoint could not be cleared");
+    if (error)
+      throw new Error("Completed AI Speaking checkpoint could not be cleared");
     return { cleared: true };
   });
