@@ -164,7 +164,7 @@ export function VoiceCoach({
     return () => {
       cancelled = true;
     };
-  }, [presentation, lessonTopic]);
+  }, [presentation, lessonTopic, getCheckpoint]);
 
   useEffect(() => {
     if (!checkpointReady || presentation === "call" || !lessonTopic || scenario) return;
@@ -174,7 +174,7 @@ export function VoiceCoach({
     setScenario("everyday");
     setMessages([{ role: "assistant", content: opener }]);
     void playResponse(opener);
-  }, [lessonTopic, presentation, scenario]);
+  }, [lessonTopic, presentation, scenario, checkpointReady]);
 
   // The AI always opens the conversation and chooses the subject itself.
   const started = useRef(false);
