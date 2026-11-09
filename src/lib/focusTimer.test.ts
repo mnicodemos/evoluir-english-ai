@@ -47,7 +47,6 @@ describe("focus timer store", () => {
     expect(getFocusSnapshot().state.blocks).toBe(1);
   });
 
-
   it("restores a cloud timer without changing the device-local widget", () => {
     openFocusWidget();
     focusRestoreState({
