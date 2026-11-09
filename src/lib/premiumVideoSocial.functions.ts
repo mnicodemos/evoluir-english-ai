@@ -41,13 +41,10 @@ export const loadVideoSocial = createServerFn({ method: "POST" })
     if (data.videoIds.length === 0) return { ready: true, counts };
     const tables = await socialTables();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin.rpc(
-      "load_premium_video_social_counts",
-      {
-        p_video_ids: data.videoIds,
-        p_user_id: context.userId,
-      },
-    );
+    const { data: rows, error } = await supabaseAdmin.rpc("load_premium_video_social_counts", {
+      p_video_ids: data.videoIds,
+      p_user_id: context.userId,
+    });
     if (error) {
       const missing = missingSocialTables(error);
       if (!missing) {
