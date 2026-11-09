@@ -59,7 +59,7 @@ export const saveFocusCloudSnapshot = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({
     state: focusStateSchema,
     expectedRevision: z.number().int().min(0),
-    sessions: z.array(focusLogSchema).max(100).default([]),
+    sessions: z.array(focusLogSchema).max(500).default([]),
   }).strict().parse(input))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
