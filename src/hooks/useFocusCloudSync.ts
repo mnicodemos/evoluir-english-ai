@@ -20,6 +20,7 @@ export function useFocusCloudSync() {
   const readyForWrites = useRef(false);
   const loadingUser = useRef<string | null>(null);
   const latestState = useRef<FocusState>(state);
+  const lastSyncedState = useRef<string | null>(null);
   const [syncEpoch, setSyncEpoch] = useState(0);
 
   latestState.current = state;
@@ -41,6 +42,7 @@ export function useFocusCloudSync() {
     void loadFocusCloudSnapshot()
       .then((remote) => {
         revision.current = remote.revision;
+        lastSyncedState.current = remote.state ? JSON.stringify(remote.state) : null;
         for (const row of remote.sessions) {
           addFocusLog({
             key: String(row.key),
@@ -107,7 +109,10 @@ export function useFocusCloudSync() {
             data: { state: payload, sessions: logPayload, expectedRevision: revision.current },
           });
           revision.current = result.revision;
-          if (result.saved) break;
+          if (result.saved) {
+            lastSyncedState.current = JSON.stringify(payload);
+            break;
+          }
           // A second device wrote first: retry against its new revision, with
           // this device's most recent user action, rather than losing it.
         }
@@ -121,3 +126,50 @@ export function useFocusCloudSync() {
     };
   }, [userId, state, sessions, syncEpoch]);
 }
+
+
+  // Keep an already-open second device in step without requiring a reload.
+  // Never replace local changes that have not yet been accepted by the cloud.
+  useEffect(() => {
+    if (!userId || !readyForWrites.current) return;
+    let active = true;
+    const refresh = async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const remote = await loadFocusCloudSnapshot();
+        if (!active || remote.revision <= revision.current) return;
+        const localIsClean =
+          lastSyncedState.current === null ||
+          JSON.stringify(latestState.current) === lastSyncedState.current;
+        for (const row of remote.sessions) {
+          addFocusLog({
+            key: String(row.key),
+            day: String(row.day),
+            minutes: Number(row.minutes),
+            partial: Boolean(row.partial),
+            startedAt: row.startedAt == null ? undefined : Number(row.startedAt),
+            endedAt: Number(row.endedAt),
+            preset: row.preset as "short" | "classic" | "deep",
+            taskId: (row.taskId as string | null) ?? null,
+            activity: (row.activity as FocusActivity | null) ?? null,
+          });
+        }
+        if (localIsClean && remote.state) {
+          revision.current = remote.revision;
+          lastSyncedState.current = JSON.stringify(remote.state);
+          focusRestoreState(remote.state as FocusState);
+        }
+      } catch {
+        // A temporary connection failure must not interrupt the local timer.
+      }
+    };
+    const interval = window.setInterval(() => void refresh(), 5000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [userId, syncEpoch]);
