@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { FocusState } from "@/lib/focusTimer";
 
 const focusStateSchema = z
   .object({
@@ -62,15 +63,15 @@ export const loadFocusCloudSnapshot = createServerFn({ method: "GET" })
       state: stateRead.data?.state ?? null,
       revision: Number(stateRead.data?.revision ?? 0),
       sessions: (logsRead.data ?? []).map((row: Record<string, unknown>) => ({
-        key: row.session_key,
-        day: row.day,
-        minutes: row.minutes,
-        partial: row.partial,
-        startedAt: row.started_at ? new Date(String(row.started_at)).getTime() : null,
-        endedAt: new Date(String(row.ended_at)).getTime(),
-        preset: row.preset,
-        taskId: row.task_id,
-        activity: row.activity,
+        key: row["session_key"],
+        day: row["day"],
+        minutes: row["minutes"],
+        partial: row["partial"],
+        startedAt: row["started_at"] ? new Date(String(row.started_at)).getTime() : null,
+        endedAt: new Date(String(row["ended_at"])).getTime(),
+        preset: row["preset"],
+        taskId: row["task_id"],
+        activity: row["activity"],
       })),
     };
   });
@@ -108,6 +109,6 @@ export const saveFocusCloudSnapshot = createServerFn({ method: "POST" })
     return stateWrite.data as {
       saved: boolean;
       revision: number;
-      state: Record<string, unknown>;
+      state: FocusState;
     };
   });
