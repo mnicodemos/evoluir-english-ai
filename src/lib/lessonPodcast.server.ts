@@ -20,7 +20,9 @@ async function readSharedPodcast(key: string, promptHash: string, level: string)
       .eq("curriculum_key", key)
       .eq("prompt_hash", promptHash)
       .maybeSingle();
-    const parsed = podcastSchemaForLevel(level).safeParse((data as { content?: unknown } | null)?.content);
+    const parsed = podcastSchemaForLevel(level).safeParse(
+      (data as { content?: unknown } | null)?.content,
+    );
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
