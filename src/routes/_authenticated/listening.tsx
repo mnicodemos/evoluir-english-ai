@@ -260,7 +260,8 @@ function ListeningPage() {
         : [];
     });
     const savedIndex = checkpoint.currentIndex;
-    const atPartEnd = (savedIndex + 1) % SENTENCES_PER_PART === 0 || savedIndex === SENTENCES_PER_SESSION - 1;
+    const atPartEnd =
+      (savedIndex + 1) % SENTENCES_PER_PART === 0 || savedIndex === SENTENCES_PER_SESSION - 1;
 
     operationKey.current = activeCheckpoint.operation_key;
     restoringCheckpoint.current = true;
@@ -659,8 +660,9 @@ function ListeningPage() {
           descriptionClassName="max-w-3xl"
           description={
             <>
-              Listen to the sentence and repeat it out loud. One session has 9 sentences. Each completed sentence is saved,
-              and the activity is consolidated every 3, so you can stop and come back later.
+              Listen to the sentence and repeat it out loud. One session has 9 sentences. Each
+              completed sentence is saved, and the activity is consolidated every 3, so you can stop
+              and come back later.
             </>
           }
         />
