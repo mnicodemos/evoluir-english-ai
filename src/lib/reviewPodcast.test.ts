@@ -73,7 +73,6 @@ describe("lesson audio dialogue", () => {
     expect(podcastLength("A2")).toEqual({ lines: "16 to 22", words: 250 });
   });
 
-
   it("uses CEFR-specific minimums for beginner and intermediate podcasts", () => {
     expect(podcastMinimumWords("A1")).toBe(180);
     expect(podcastMinimumWords("A2")).toBe(180);
