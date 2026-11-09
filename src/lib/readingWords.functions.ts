@@ -111,5 +111,5 @@ export const saveReadingWords = createServerFn({ method: "POST" })
       { onConflict: "user_id,word_id", ignoreDuplicates: true },
     );
     if (error) throw new Error("Could not save these words");
-    return { added, existing, skipped };
+    return { added, existing, skipped, skippedWords };
   });
