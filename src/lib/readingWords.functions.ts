@@ -60,6 +60,7 @@ export const saveReadingWords = createServerFn({ method: "POST" })
     const existing = ids.size;
     let added = 0;
     let skipped = 0;
+    const skippedWords: string[] = [];
 
     const today = studyToday();
     for (const [key, item] of byKey) {
@@ -91,9 +92,10 @@ export const saveReadingWords = createServerFn({ method: "POST" })
         // A legacy/global uniqueness conflict is not counted as a new or
         // already-owned word: it was not added to this student's vocabulary.
         skipped += 1;
+        skippedWords.push(item.word);
       }
     }
-    if (!ids.size) return { added, existing, skipped };
+    if (!ids.size) return { added, existing, skipped, skippedWords };
 
     // Reviews are written only by the server (migration 0061). Words already
     // under review keep their step.
