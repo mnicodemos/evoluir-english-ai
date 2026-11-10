@@ -32,7 +32,7 @@ async function fetchDailyUsdQuote(): Promise<DailyUsdQuote> {
     "',dataFinalCotacao='" +
     formatBcbDate(today) +
     "')?" +
-    params;
+    params.toString().replace(/\+/g, "%20");
   const response = await fetch(url);
   if (!response.ok) throw new Error("PTAX unavailable");
   const payload = (await response.json()) as {
@@ -188,7 +188,9 @@ export function AdminAiCostByActivity() {
                   ? "PTAX " +
                     quote.data.rate.toFixed(4) +
                     " · " +
-                    new Date(quote.data.date).toLocaleDateString(pt ? "pt-BR" : "en-US")
+                    new Date(quote.data.date.replace(" ", "T")).toLocaleDateString(
+                      pt ? "pt-BR" : "en-US",
+                    )
                   : pt
                     ? "Cotação PTAX indisponível"
                     : "PTAX rate unavailable"}
