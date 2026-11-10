@@ -627,6 +627,35 @@ export type Database = {
         }
         Relationships: []
       }
+      english_adventure_xp_awards: {
+        Row: {
+          awarded_at: string
+          level: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          awarded_at?: string
+          level: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          awarded_at?: string
+          level?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "english_adventure_xp_awards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       entitlements: {
         Row: {
           created_at: string
@@ -739,6 +768,85 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      focus_session_logs: {
+        Row: {
+          activity: string | null
+          created_at: string
+          day: string
+          ended_at: string
+          minutes: number
+          partial: boolean
+          preset: string
+          session_key: string
+          started_at: string | null
+          task_id: string | null
+          user_id: string
+        }
+        Insert: {
+          activity?: string | null
+          created_at?: string
+          day: string
+          ended_at: string
+          minutes: number
+          partial?: boolean
+          preset: string
+          session_key: string
+          started_at?: string | null
+          task_id?: string | null
+          user_id: string
+        }
+        Update: {
+          activity?: string | null
+          created_at?: string
+          day?: string
+          ended_at?: string
+          minutes?: number
+          partial?: boolean
+          preset?: string
+          session_key?: string
+          started_at?: string | null
+          task_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "focus_session_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      focus_timer_state: {
+        Row: {
+          revision: number
+          state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          revision?: number
+          state?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          revision?: number
+          state?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "focus_timer_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1226,6 +1334,44 @@ export type Database = {
             columns: ["goal_id"]
             isOneToOne: false
             referencedRelation: "plus_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listening_sentence_checkpoints: {
+        Row: {
+          duration_minutes: number
+          operation_key: string
+          result: Json
+          round: number
+          track_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          duration_minutes?: number
+          operation_key: string
+          result: Json
+          round: number
+          track_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          duration_minutes?: number
+          operation_key?: string
+          result?: Json
+          round?: number
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listening_sentence_checkpoints_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2680,6 +2826,10 @@ export type Database = {
       }
     }
     Functions: {
+      award_english_adventure_completion_xp: {
+        Args: { p_level: string; p_user_id: string }
+        Returns: boolean
+      }
       bump_landing_stat: { Args: { p_event: string }; Returns: undefined }
       cefr_rank: { Args: { p_level: string }; Returns: number }
       claim_pedagogical_retries: {
@@ -2693,7 +2843,12 @@ export type Database = {
           source_type: string
         }[]
       }
+      clear_listening_checkpoint: {
+        Args: { p_operation_key: string; p_user_id: string }
+        Returns: boolean
+      }
       credit_study_day: { Args: { p_user_id: string }; Returns: undefined }
+      get_listening_checkpoint: { Args: { p_user_id: string }; Returns: Json }
       has_active_entitlement: {
         Args: { _feature: string; _user_id: string }
         Returns: boolean
@@ -2708,6 +2863,15 @@ export type Database = {
       league_week_xp: {
         Args: { p_user_id: string; p_week_start: string }
         Returns: number
+      }
+      load_premium_video_social_counts: {
+        Args: { p_user_id: string; p_video_ids: string[] }
+        Returns: {
+          comments: number
+          liked: boolean
+          likes: number
+          video_id: string
+        }[]
       }
       persist_authoritative_legacy_activity: {
         Args: {
@@ -2808,14 +2972,24 @@ export type Database = {
         }
         Returns: Json
       }
-      load_premium_video_social_counts: {
-        Args: { p_video_ids: string[]; p_user_id: string }
-        Returns: {
-          video_id: string
-          likes: number
-          liked: boolean
-          comments: number
-        }[]
+      save_focus_session_logs: {
+        Args: { p_sessions: Json; p_user_id: string }
+        Returns: number
+      }
+      save_focus_timer_state: {
+        Args: { p_expected_revision: number; p_state: Json; p_user_id: string }
+        Returns: Json
+      }
+      save_listening_checkpoint: {
+        Args: {
+          p_duration_minutes: number
+          p_operation_key: string
+          p_result: Json
+          p_round: number
+          p_track_id: string
+          p_user_id: string
+        }
+        Returns: Json
       }
       weekly_league: {
         Args: never
