@@ -132,7 +132,7 @@ export function AdminLevelIntroVideos() {
                     ) : (
                       <Save className="size-4" />
                     )}
-                    Salvar
+                    {pt ? "Salvar" : "Save"}
                   </Button>
                   {saved ? (
                     <Button
