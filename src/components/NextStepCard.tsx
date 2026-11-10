@@ -32,6 +32,7 @@ import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useMistakesDue } from "@/hooks/useMistakesDue";
 import { useNextStep } from "@/hooks/useNextStep";
 import { useProfile } from "@/hooks/useProfile";
+import { profileIsPremium } from "@/lib/billing/subscriptionView";
 import { useTodayActivities } from "@/components/DailyGoalCard";
 import {
   dailyChallengeGoal,
@@ -67,6 +68,7 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { readStorage, writeStorage } from "@/lib/safeStorage";
 import { studyToday } from "@/lib/today";
+import { isExtraVideoDay } from "@/lib/extraVideoQuickWin";
 import { wordReviewTarget } from "@/lib/wordReview";
 import { weekXpRising } from "@/lib/weekXp";
 import { DoneSeal } from "@/components/DoneSeal";
@@ -162,6 +164,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // Key the cache by the current CEFR level: when the level changes, the
   // previous level's insight (confidence, reasons) is never reused.
   const { data: profile } = useProfile();
+  const videoQuickWinDay = !!profile && profileIsPremium(profile) && isExtraVideoDay(studyToday());
   const { data: homeImages } = useHomeImages();
   const desktopImage = homeImages?.desktop;
   const league = useWeeklyLeagueStanding(profile);
@@ -207,7 +210,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     wordsDueReady &&
     cardsFetched &&
     mistakesFetched;
-  const firstPillReady = pillWaitOver || firstPillFresh;
+  const firstPillReady = videoQuickWinDay ? firstPillFresh : pillWaitOver || firstPillFresh;
   // Owner report, 2026-10-31 (still slow after the split): each pill shows at
   // once what it showed last time on this device (the first pill only from
   // today), then follows the fresh data quietly; a pill seen for the first
@@ -662,7 +665,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         }
       : null;
   freshFirstPill.current = currentFirstPill;
-  const shownFirstPill = firstPillReady ? currentFirstPill : cachedFirstPill;
+  const shownFirstPill = firstPillReady
+    ? currentFirstPill
+    : videoQuickWinDay
+      ? null
+      : cachedFirstPill;
   const renderMobilePill = (pill: MobilePill) => {
     const content = (
       <span className="flex min-w-0 items-center gap-1.5 font-medium leading-none">
