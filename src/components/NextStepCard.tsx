@@ -691,15 +691,15 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         ...(quickWin!.activity.params ? { params: quickWin!.activity.params } : {}),
         label: t("Quick Win"),
       }
-    : mobileReviewButton && mobileReview
-      ? {
-          kind: "review",
-          to: mobileReview.to,
-          ...(mobileReview.params ? { params: mobileReview.params } : {}),
-          label: mobileReview.label,
-        }
-      : quickWinDoneRow
-        ? { kind: "done", to: "/learning/videos", label: t("Quick Win completed") }
+    : quickWinDoneRow
+      ? { kind: "done", to: "/learning/videos", label: t("Quick Win completed") }
+      : mobileReviewButton && mobileReview
+        ? {
+            kind: "review",
+            to: mobileReview.to,
+            ...(mobileReview.params ? { params: mobileReview.params } : {}),
+            label: mobileReview.label,
+          }
         : null;
   freshFirstPill.current = currentFirstPill;
   const shownFirstPill = firstPillReady

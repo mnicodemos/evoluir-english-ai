@@ -134,6 +134,13 @@ function ExtraVideosPage() {
             queryKey: ["next-step"],
             refetchType: "all",
           });
+          // The view just earned 5 league XP: the league cell, the phone pill
+          // and the league page read it fresh instead of a 5-minute-old cache.
+          await Promise.all(
+            [["weekly-league"], ["week-xp-history"], ["weekly-league-history"]].map((key) =>
+              queryClient.invalidateQueries({ queryKey: key, refetchType: "all" }),
+            ),
+          );
         }
         return result.recorded;
       } catch {
@@ -318,6 +325,14 @@ function ExtraVideosPage() {
                         referrerPolicy="strict-origin-when-cross-origin"
                         allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                         allowFullScreen
+                        onLoad={(event) => {
+                          // Also subscribe once the iframe loads, in case its
+                          // "ready" message arrived before our listener ran.
+                          event.currentTarget.contentWindow?.postMessage(
+                            JSON.stringify({ method: "addEventListener", value: "ended" }),
+                            "https://player.vimeo.com",
+                          );
+                        }}
                       />
                     ) : premium && embed ? (
                       <button
