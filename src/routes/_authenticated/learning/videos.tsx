@@ -100,24 +100,27 @@ function ExtraVideosPage() {
   const queryClient = useQueryClient();
   const sendView = useServerFn(recordVideoView);
   const recordView = useCallback(
-    (id: string) => {
-      void sendView({ data: { videoId: id } })
-        .then((result) => {
-          if (result.recorded)
-            void queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
-        })
-        .catch(() => undefined);
+    async (id: string) => {
+      try {
+        const result = await sendView({ data: { videoId: id } });
+        if (result.recorded) {
+          void queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
+        }
+        return result.recorded;
+      } catch {
+        return false;
+      }
     },
     [profile?.id, queryClient, sendView],
   );
   const completeWatch = useCallback(
-    (id: string) => {
-      recordView(id);
-      if (!profile?.id) return;
+    async (id: string) => {
+      const recorded = await recordView(id);
+      if (!recorded || !profile?.id) return;
       try {
         window.localStorage.setItem(extraVideoWatchedKey(profile.id, studyToday()), "1");
       } catch {
-        /* the server's record still closes the Quick Win */
+        /* the server's record still closes the Quick Win on other devices */
       }
     },
     [profile?.id, recordView],
