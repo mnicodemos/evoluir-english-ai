@@ -368,20 +368,18 @@ function WeeklyXpBreakdown() {
 
   return (
     <>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="size-8 shrink-0 rounded-full"
-        aria-label={t("View this week's XP details")}
-        title={t("View this week's XP details")}
-        onClick={() => setOpen(true)}
-      >
-        <Search className="size-4" />
-      </Button>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <span className="sr-only">{t("This week's XP history")}</span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8 shrink-0 rounded-full"
+            aria-label={t("View this week's XP details")}
+            title={t("View this week's XP details")}
+          >
+            <Search className="size-4" />
+          </Button>
         </PopoverTrigger>
         <PopoverContent align="end" sideOffset={8} className={cn("max-h-[80dvh] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:p-5", graphitePanelClass)}>
           <p className="font-display text-base font-semibold">{t("This week's XP history")}</p>
