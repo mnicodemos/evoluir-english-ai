@@ -2051,22 +2051,20 @@ export const getAiCostByActivity = createServerFn({ method: "GET" })
     for (const row of (rows ?? []) as unknown as BenchmarkUsageRow[]) {
       groups.set(row.operation, [...(groups.get(row.operation) ?? []), row]);
     }
-    const activities = [...groups.entries()].map(([operation, activityRows]) => {
-      const costs = activityRows
-        .map(rowCost)
-        .filter((value): value is number => value !== null);
-      const costUsd = costs.reduce((sum, value) => sum + value, 0);
-      return {
-        operation,
-        label: OPERATION_FACTS[operation]?.label ?? operation,
-        calls: activityRows.length,
-        measuredCalls: costs.length,
-        costUsd: costs.length ? costUsd : null,
-        averageCostUsd: costs.length ? costUsd / costs.length : null,
-      };
-    }).sort(
-      (a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1),
-    );
+    const activities = [...groups.entries()]
+      .map(([operation, activityRows]) => {
+        const costs = activityRows.map(rowCost).filter((value): value is number => value !== null);
+        const costUsd = costs.reduce((sum, value) => sum + value, 0);
+        return {
+          operation,
+          label: OPERATION_FACTS[operation]?.label ?? operation,
+          calls: activityRows.length,
+          measuredCalls: costs.length,
+          costUsd: costs.length ? costUsd : null,
+          averageCostUsd: costs.length ? costUsd / costs.length : null,
+        };
+      })
+      .sort((a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1));
     const totalUsd = activities.reduce((sum, row) => sum + (row.costUsd ?? 0), 0);
     const measuredCalls = activities.reduce((sum, row) => sum + row.measuredCalls, 0);
     return {
@@ -2077,10 +2075,7 @@ export const getAiCostByActivity = createServerFn({ method: "GET" })
       totalUsd: measuredCalls ? totalUsd : null,
       activities: activities.map((row) => ({
         ...row,
-        sharePercent:
-          totalUsd > 0 && row.costUsd !== null
-            ? (row.costUsd / totalUsd) * 100
-            : null,
+        sharePercent: totalUsd > 0 && row.costUsd !== null ? (row.costUsd / totalUsd) * 100 : null,
       })),
     };
   });
