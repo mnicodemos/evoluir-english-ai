@@ -63,7 +63,7 @@ export function AdminVideoComments() {
             {pt ? "Comentários dos vídeos extras" : "Extra video comments"}
             {reported ? (
               <span className="ml-2 rounded-full bg-destructive/15 px-2 py-0.5 text-xs text-destructive">
-                {reported} denunciado{reported === 1 ? "" : "s"}
+                {pt ? `${reported} denunciado${reported === 1 ? "" : "s"}` : `${reported} reported`}
               </span>
             ) : null}
           </h2>
@@ -105,7 +105,7 @@ export function AdminVideoComments() {
                   ) : null}
                   {hiddenByReports(comment.reports) ? (
                     <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-destructive/15 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
-                      <EyeOff className="size-3" /> Oculto
+                      <EyeOff className="size-3" /> {pt ? "Oculto" : "Hidden"}
                     </span>
                   ) : null}
                 </span>
