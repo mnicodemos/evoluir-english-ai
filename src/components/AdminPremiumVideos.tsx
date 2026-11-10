@@ -199,7 +199,7 @@ export function AdminPremiumVideos() {\n  const { lang } = useUiLang();\n  const
               ) : (
                 <Save className="size-4" />
               )}
-              Salvar
+              {isPt ? "Salvar" : "Save"}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
@@ -316,7 +316,7 @@ export function AdminPremiumVideos() {\n  const { lang } = useUiLang();\n  const
                             className="h-9"
                             onClick={() => setEditing(null)}
                           >
-                            Cancelar
+                            {isPt ? "Cancelar" : "Cancel"}
                           </Button>
                         </span>
                         {editing.kind === "short" ? (
@@ -375,7 +375,7 @@ export function AdminPremiumVideos() {\n  const { lang } = useUiLang();\n  const
                         onClick={() => notifyMutation.mutate(video.id)}
                       >
                         <Bell className="size-4" />
-                        Notificar
+                        {isPt ? "Notificar" : "Notify"}
                       </Button>
                     ) : null}
                     <Button
@@ -576,7 +576,7 @@ Caption text"}
               disabled={save.isPending || values[language].trim().length < 20}
               onClick={() => save.mutate({ language, content: values[language] })}
             >
-              Salvar legenda
+              {isPt ? "Salvar legenda" : "Save captions"}
             </Button>
             {rows.some((row) => row.language === language) ? (
               <Button
@@ -585,7 +585,7 @@ Caption text"}
                 disabled={remove.isPending}
                 onClick={() => remove.mutate(language)}
               >
-                Remover
+                {isPt ? "Remover" : "Remove"}
               </Button>
             ) : null}
           </div>
