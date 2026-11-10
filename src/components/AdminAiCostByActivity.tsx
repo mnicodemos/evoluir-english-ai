@@ -191,9 +191,7 @@ export function AdminAiCostByActivity() {
                     </td>
                     <td className="py-2 pr-3 text-right tabular-nums">
                       {brl(
-                        row.costUsd !== null && quote.data
-                          ? row.costUsd * quote.data.rate
-                          : null,
+                        row.costUsd !== null && quote.data ? row.costUsd * quote.data.rate : null,
                       )}
                     </td>
                     <td className="py-2 pr-3 text-right tabular-nums">
