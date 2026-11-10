@@ -29,7 +29,9 @@ type IntroLevel = (typeof INTRO_LEVELS)[number]["value"];
  * (owner request, 2026-10-31), shown as "Comece aqui" on top of the learning
  * path and of /business. Vimeo links only, like the Summary videos.
  */
-export function AdminLevelIntroVideos() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
+export function AdminLevelIntroVideos() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const queryClient = useQueryClient();
   const fetchVideos = useServerFn(getLevelIntroVideos);
   const save = useServerFn(saveLevelIntroVideo);
