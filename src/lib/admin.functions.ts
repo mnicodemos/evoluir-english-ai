@@ -2029,3 +2029,49 @@ export const getLessonVideoCaptionAdmin = createServerFn({ method: "GET" })
       languages: (rows ?? []).map((row) => row.language),
     };
   });
+
+/** Admin-only cost breakdown by the operation recorded on each AI usage event. */
+export const getAiCostByActivity = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ days: z.number().int().min(1).max(90) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - data.days * 86_400_000).toISOString();
+    const { data: rows, error } = await supabaseAdmin
+      .from("ai_usage_events")
+      .select("operation, model, input_tokens, output_tokens, estimated_cost")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(10000);
+    if (error) throw error;
+    const groups = new Map<string, BenchmarkUsageRow[]>();
+    for (const row of (rows ?? []) as unknown as BenchmarkUsageRow[]) {
+      groups.set(row.operation, [...(groups.get(row.operation) ?? []), row]);
+    }
+    const activities = [...groups.entries()].map(([operation, activityRows]) => {
+      const costs = activityRows.map(rowCost).filter((value): value is number => value !== null);
+      const costUsd = costs.reduce((sum, value) => sum + value, 0);
+      return {
+        operation,
+        label: OPERATION_FACTS[operation]?.label ?? operation,
+        calls: activityRows.length,
+        measuredCalls: costs.length,
+        costUsd: costs.length ? costUsd : null,
+        averageCostUsd: costs.length ? costUsd / costs.length : null,
+      };
+    }).sort((a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1));
+    const totalUsd = activities.reduce((sum, row) => sum + (row.costUsd ?? 0), 0);
+    const measuredCalls = activities.reduce((sum, row) => sum + row.measuredCalls, 0);
+    return {
+      days: data.days,
+      calls: (rows ?? []).length,
+      measuredCalls,
+      truncated: (rows ?? []).length >= 10000,
+      totalUsd: measuredCalls ? totalUsd : null,
+      activities: activities.map((row) => ({
+        ...row,
+        sharePercent: totalUsd > 0 && row.costUsd !== null ? (row.costUsd / totalUsd) * 100 : null,
+      })),
+    };
+  });
