@@ -62,15 +62,22 @@ export function AdminFinancialProjection() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved) as Partial<Inputs> & { lovable?: number; aiSubscriptions?: number };
+        const parsed = JSON.parse(saved) as Partial<Inputs> & {
+          lovable?: number;
+          aiSubscriptions?: number;
+        };
         const rate = Number(parsed.usdBrl) > 0 ? Number(parsed.usdBrl) : DEFAULTS.usdBrl;
         setValues({
           ...DEFAULTS,
           ...parsed,
-          lovableUsd: parsed.lovableUsd ?? (parsed.lovable !== undefined ? parsed.lovable / rate : DEFAULTS.lovableUsd),
+          lovableUsd:
+            parsed.lovableUsd ??
+            (parsed.lovable !== undefined ? parsed.lovable / rate : DEFAULTS.lovableUsd),
           aiSubscriptionsUsd:
             parsed.aiSubscriptionsUsd ??
-            (parsed.aiSubscriptions !== undefined ? parsed.aiSubscriptions / rate : DEFAULTS.aiSubscriptionsUsd),
+            (parsed.aiSubscriptions !== undefined
+              ? parsed.aiSubscriptions / rate
+              : DEFAULTS.aiSubscriptionsUsd),
         });
       }
     } catch {
@@ -227,11 +234,13 @@ export function AdminFinancialProjection() {
       </div>
 
       <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
-        Cotação centralizada: US$ 1 = {money(values.usdBrl)}. Todos os custos em USD usam essa
-        mesma taxa. Lovable: US$ {values.lovableUsd.toFixed(2)} ({money(values.lovableUsd * values.usdBrl)}/mês);
-        IAs Pro: US$ {values.aiSubscriptionsUsd.toFixed(2)} ({money(values.aiSubscriptionsUsd * values.usdBrl)}/mês).
-        Atualize a cotação e os valores originais conforme suas faturas; a taxa é uma premissa editável,
-        não uma cotação automática em tempo real.
+        Cotação centralizada: US$ 1 = {money(values.usdBrl)}. Todos os custos em USD usam essa mesma
+        taxa. Lovable: US$ {values.lovableUsd.toFixed(2)} (
+        {money(values.lovableUsd * values.usdBrl)}/mês); IAs Pro: US 
+        {values.aiSubscriptionsUsd.toFixed(2)} (
+        {money(values.aiSubscriptionsUsd * values.usdBrl)}/mês). Atualize a cotação e os valores
+        originais conforme suas faturas; a taxa é uma premissa editável, não uma cotação automática
+        em tempo real.
       </div>
 
       <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
