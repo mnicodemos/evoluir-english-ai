@@ -32,6 +32,7 @@ const baseUiPt: Record<string, string> = {
   "Extra learning videos": "Vídeos extras de aprendizagem",
   "View this week's XP details": "Ver extrato de XP desta semana",
   "This week's XP history": "Extrato de XP desta semana",
+  "Your credited XP this week, by activity.": "Seu XP creditado nesta semana, por atividade.",
   "Total this week": "Total da semana",
   "Could not load XP history. Please try again.":
     "Não foi possível carregar o extrato de XP. Tente novamente.",

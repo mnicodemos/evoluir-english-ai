@@ -10,7 +10,6 @@ import { AppShell } from "@/components/AppShell";
 import { ProofOfProgressMission } from "@/components/league/ProofOfProgressMission";
 import { useWeeklyLeagueStanding, weekXpLine } from "@/components/WeeklyLeagueSummary";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useHomeImages } from "@/hooks/useHomeImages";
 import { useProfile } from "@/hooks/useProfile";
@@ -19,6 +18,7 @@ import { findLevel, leagueLevelOf } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
+import { graphitePanelClass } from "@/lib/surfaces";
 import { rankingOpen, weekXpRising, type WeekXpSummary } from "@/lib/weekXp";
 
 export const Route = createFileRoute("/_authenticated/league")({
@@ -337,13 +337,14 @@ type WeeklyXpLedgerRow = {
 function WeeklyXpBreakdown() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const { data: profile } = useProfile();
   const [open, setOpen] = useState(false);
   const {
     data = [],
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["week-xp-breakdown"],
+    queryKey: ["week-xp-breakdown", profile?.id],
     enabled: open,
     staleTime: 30 * 1000,
     queryFn: async () => {
@@ -366,22 +367,31 @@ function WeeklyXpBreakdown() {
 
   return (
     <>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="size-8 shrink-0 rounded-full"
-        aria-label={t("View this week's XP details")}
-        title={t("View this week's XP details")}
-        onClick={() => setOpen(true)}
-      >
-        <Search className="size-4" />
-      </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[80vh] max-w-lg overflow-hidden border-white/10 bg-[#101820] text-foreground">
-          <DialogHeader>
-            <DialogTitle>{t("This week's XP history")}</DialogTitle>
-          </DialogHeader>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8 shrink-0 rounded-full"
+            aria-label={t("View this week's XP details")}
+            title={t("View this week's XP details")}
+          >
+            <Search className="size-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          align="end"
+          sideOffset={8}
+          className={cn(
+            "max-h-[80dvh] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:p-5",
+            graphitePanelClass,
+          )}
+        >
+          <p className="font-display text-base font-semibold">{t("This week's XP history")}</p>
+          <p className="mb-3 mt-1 text-xs text-muted-foreground">
+            {t("Your credited XP this week, by activity.")}
+          </p>
           <div className="flex items-center justify-between rounded-lg border border-brand-green/30 bg-brand-green/5 px-3 py-2">
             <span className="text-sm text-muted-foreground">{t("Total this week")}</span>
             <span className="font-display text-lg font-bold tabular-nums">{total} XP</span>
@@ -420,8 +430,8 @@ function WeeklyXpBreakdown() {
               ))
             )}
           </div>
-        </DialogContent>
-      </Dialog>
+        </PopoverContent>
+      </Popover>
     </>
   );
 }

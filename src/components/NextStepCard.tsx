@@ -189,15 +189,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // popping in seconds later; they leave only once that activity is known done.
   const actionAvailable = (to: string, indicators: typeof activityIndicators) =>
     !indicators.ready || dashboardActionAvailable(to, indicators);
-  const {
-    data,
-    isLoading,
-    isError,
-    isFetching,
-    isPlaceholderData,
-    videoStatusKnown,
-    refetch,
-  } = useNextStep();
+  const { data, isLoading, isError, isFetching, isPlaceholderData, videoStatusKnown, refetch } =
+    useNextStep();
   const videoQuickWinStatusReady = !videoQuickWinDay || videoStatusKnown;
 
   // Phones' pill row (user report, 2026-10-25: a pill showed, then another
@@ -671,13 +664,13 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         label: t("Quick Win"),
       }
     : mobileReviewButton && mobileReview
-        ? {
-            kind: "review",
-            to: mobileReview.to,
-            ...(mobileReview.params ? { params: mobileReview.params } : {}),
-            label: mobileReview.label,
-          }
-        : null;
+      ? {
+          kind: "review",
+          to: mobileReview.to,
+          ...(mobileReview.params ? { params: mobileReview.params } : {}),
+          label: mobileReview.label,
+        }
+      : null;
   freshFirstPill.current = currentFirstPill;
   const shownFirstPill = firstPillReady
     ? currentFirstPill
