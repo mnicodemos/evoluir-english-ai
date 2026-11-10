@@ -57,14 +57,21 @@ export function AdminAiCostByActivity() {
   const { lang } = useUiLang();
   const pt = lang === "pt";
   const [days, setDays] = useState(30);
-  const load = useServerFn(getAiCostByActivity);\n  const loadStudents = useServerFn(getAiCostByStudent);
+  const load = useServerFn(getAiCostByActivity);
+  const loadStudents = useServerFn(getAiCostByStudent);
   const query = useQuery({
     queryKey: ["admin-ai-cost-by-activity", days],
     queryFn: () => load({ data: { days } }),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
-  const studentQuery = useQuery({\n    queryKey: ["admin-ai-cost-by-student", days],\n    queryFn: () => loadStudents({ data: { days } }),\n    retry: false,\n    staleTime: 5 * 60 * 1000,\n  });\n  const quote = useQuery({
+  const studentQuery = useQuery({
+    queryKey: ["admin-ai-cost-by-student", days],
+    queryFn: () => loadStudents({ data: { days } }),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const quote = useQuery({
     queryKey: ["admin-ai-cost-activity-ptax"],
     queryFn: fetchDailyUsdQuote,
     retry: 1,
