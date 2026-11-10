@@ -270,8 +270,9 @@ export function AdminFinancialProjection() {
                 : "Informe a quantidade de alunos pagantes ou Free para calcular o custo completo por aluno."}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Dentro desse total, IA variável estimada por aluno: {money(aiPerStudent)}. O valor completo
-              também rateia Lovable, IAs Pro, domínio, marketing, outros custos e Stripe dos pagantes.
+              Dentro desse total, IA variável estimada por aluno: {money(aiPerStudent)}. O valor
+              completo também rateia Lovable, IAs Pro, domínio, marketing, outros custos e Stripe
+              dos pagantes.
             </p>
           </div>
 
@@ -321,11 +322,11 @@ export function AdminFinancialProjection() {
           </div>
 
           <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
-            Tarifa inicial configurada para simulação: 3,99% + R$ 0,39 por cobrança. Confirme no Dashboard/contrato
-            da sua conta Stripe se a tarifa efetiva é essa. A estimativa de IA de US$ 2,14 por aluno/mês
-            é uma premissa baseada no cenário informado, não um custo médio validado por aluno. IAs Pro
-            é mantido separado do consumo variável de tokens para evitar dupla contagem; ajuste se houver
-            sobreposição.
+            Tarifa inicial configurada para simulação: 3,99% + R$ 0,39 por cobrança. Confirme no
+            Dashboard/contrato da sua conta Stripe se a tarifa efetiva é essa. A estimativa de IA de
+            US$ 2,14 por aluno/mês é uma premissa baseada no cenário informado, não um custo médio
+            validado por aluno. IAs Pro é mantido separado do consumo variável de tokens para evitar
+            dupla contagem; ajuste se houver sobreposição.
           </div>
 
           <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
@@ -386,10 +387,10 @@ export function AdminFinancialProjection() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            Premissas salvas neste navegador. O custo variável de IA considera todos os alunos ativos,
-            incluindo Free, usando a mesma estimativa por aluno; ajuste essa premissa quando houver medição
-            separada por plano. Não inclui impostos, reembolsos, chargebacks ou tarifas adicionais não
-            informadas.
+            Premissas salvas neste navegador. O custo variável de IA considera todos os alunos
+            ativos, incluindo Free, usando a mesma estimativa por aluno; ajuste essa premissa quando
+            houver medição separada por plano. Não inclui impostos, reembolsos, chargebacks ou
+            tarifas adicionais não informadas.
           </p>
         </>
       )}
