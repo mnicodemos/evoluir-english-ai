@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
-import { useUiLang } from "@/lib/uiLang";\nimport { getSpeakingWait } from "@/lib/admin.functions";
+import { useUiLang } from "@/lib/uiLang";
+import { getSpeakingWait } from "@/lib/admin.functions";
 import type { StageSummary } from "@/lib/speakingTiming";
 
 function seconds(ms: number | null) {
@@ -12,7 +13,9 @@ function seconds(ms: number | null) {
  * Admin: the silence a student hears after answering in AI Speaking, per
  * stage, measured in the browser. The first sound is what the student feels.
  */
-export function AdminSpeakingWait() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
+export function AdminSpeakingWait() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const load = useServerFn(getSpeakingWait);
   const query = useQuery({ queryKey: ["admin", "speaking-wait"], queryFn: () => load() });
   if (query.isPending || query.isError) return null;
