@@ -221,8 +221,8 @@ export function AdminFinancialProjection() {
 
       <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
         Tarifa inicial configurada para simulação: 3,99% + R$ 0,39 por cobrança. Confirme no
-        Dashboard/contrato da sua conta Stripe se a tarifa efetiva é essa. A estimativa de IA de US$ 2,14
-        por aluno/mês é uma premissa baseada no cenário informado, não um custo médio validado
+        Dashboard/contrato da sua conta Stripe se a tarifa efetiva é essa. A estimativa de IA de US$
+        2,14 por aluno/mês é uma premissa baseada no cenário informado, não um custo médio validado
         por aluno. IAs Pro é mantido separado do consumo variável de tokens para evitar dupla
         contagem; ajuste se houver sobreposição.
       </div>
