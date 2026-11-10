@@ -70,7 +70,9 @@ async function fetchDailyUsdQuote(): Promise<DailyUsdQuote> {
     `CotacaoDolarPeriodo(dataInicial='${formatBcbDate(start)}',dataFinalCotacao='${formatBcbDate(today)}')?${params}`;
   const response = await fetch(url);
   if (!response.ok) throw new Error("Não foi possível consultar a cotação do Banco Central.");
-  const payload = (await response.json()) as { value?: { cotacaoVenda?: number; dataHoraCotacao?: string }[] };
+  const payload = (await response.json()) as {
+    value?: { cotacaoVenda?: number; dataHoraCotacao?: string }[];
+  };
   const latest = payload.value?.[0];
   if (!latest || !Number.isFinite(Number(latest.cotacaoVenda))) {
     throw new Error("O Banco Central ainda não disponibilizou uma cotação recente.");
@@ -108,7 +110,8 @@ export function AdminFinancialProjection() {
           ...DEFAULTS,
           ...parsed,
           lovableUsd: parsed.lovableUsd ?? parsed.lovable ?? DEFAULTS.lovableUsd,
-          aiSubscriptionsUsd: parsed.aiSubscriptionsUsd ?? parsed.aiSubscriptions ?? DEFAULTS.aiSubscriptionsUsd,
+          aiSubscriptionsUsd:
+            parsed.aiSubscriptionsUsd ?? parsed.aiSubscriptions ?? DEFAULTS.aiSubscriptionsUsd,
         });
       }
     } catch {
