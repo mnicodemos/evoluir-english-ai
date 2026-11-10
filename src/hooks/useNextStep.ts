@@ -62,7 +62,10 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
       // A loading/error state must never be interpreted as "completed".
       // Once available, the persisted server record is the sole source of truth.
       const serverStatusKnown =
-        videosFetched &&\n        !videosError &&\n        videos?.watchedToday !== null &&\n        videos?.watchedToday !== undefined;
+        videosFetched &&
+        !videosError &&
+        videos?.watchedToday !== null &&
+        videos?.watchedToday !== undefined;
       return withExtraVideoQuickWin<NextStepData>(step, {
         day: today,
         premium,
