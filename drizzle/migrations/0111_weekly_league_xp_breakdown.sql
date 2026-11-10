@@ -13,7 +13,7 @@ AS $$
            date_trunc('week', now() AT TIME ZONE 'America/Sao_Paulo')::date AS week_start
   ),
   bounds AS (
-    SELECT user_id,
+    SELECT user_id, week_start,
            (week_start::timestamp AT TIME ZONE 'America/Sao_Paulo') AS from_ts,
            ((week_start + 7)::timestamp AT TIME ZONE 'America/Sao_Paulo') AS to_ts
     FROM caller
@@ -75,8 +75,8 @@ AS $$
            30
     FROM bounds b
     CROSS JOIN LATERAL generate_series(
-      b.from_ts,
-      b.to_ts - interval '1 day',
+      b.week_start::timestamp,
+      (b.week_start + 6)::timestamp,
       interval '1 day'
     ) AS daily(day)
     WHERE
