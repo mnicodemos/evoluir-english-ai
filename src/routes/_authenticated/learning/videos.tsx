@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Check, Clapperboard, Crown, Layers, Lock, PlayCircle, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/PageHeader";
@@ -15,12 +15,12 @@ import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { findLevel, isReviewLevel, LEVELS } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl, vimeoTextTrackUrl } from "@/lib/lessonVideoDisplay";
-import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { recordVideoView } from "@/lib/premiumVideoSocial.functions";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { studyToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
+import { isVimeoEndedMessage } from "@/lib/vimeoPlayerEvents";
 
 /** The learning path's level chip (src/routes/_authenticated/learning/index.tsx). */
 const LEVEL_CHIP =
@@ -90,33 +90,55 @@ function ExtraVideosPage() {
   );
   const level = picked ?? (profile ? studentLevel : (levels[0] ?? null));
   const [playing, setPlaying] = useState<string | null>(null);
+  const playerRef = useRef<HTMLIFrameElement>(null);
   const pickLevel = (value: string) => {
     setPicked(value);
     setPlaying(null);
   };
-  // Playing a video closes today's "Watch an extra video" Quick Win: on this
-  // device at once, and on the server (migration 0104) for every device and the
-  // Admin's numbers. A failed record never stops the video.
+  // The Quick Win is completed only by Vimeo's actual "ended" event.
+  // Loading the page, mounting the iframe, or pressing Play is not completion.
   const queryClient = useQueryClient();
   const sendView = useServerFn(recordVideoView);
-  const recordView = (id: string) => {
-    void sendView({ data: { videoId: id } })
-      .then((result) => {
-        if (result.recorded)
-          void queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
-      })
-      .catch(() => undefined);
-  };
-  const watch = (id: string) => {
-    setPlaying(id);
-    recordView(id);
-    if (!profile?.id) return;
-    try {
-      window.localStorage.setItem(extraVideoWatchedKey(profile.id, studyToday()), "1");
-    } catch {
-      /* the server's record still closes the Quick Win */
-    }
-  };
+  const recordView = useCallback(
+    (id: string) => {
+      void sendView({ data: { videoId: id } })
+        .then((result) => {
+          if (result.recorded)
+            void queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
+        })
+        .catch(() => undefined);
+    },
+    [profile?.id, queryClient, sendView],
+  );
+  const completeWatch = useCallback(
+    (id: string) => {
+      recordView(id);
+      if (!profile?.id) return;
+      try {
+        window.localStorage.setItem(extraVideoWatchedKey(profile.id, studyToday()), "1");
+      } catch {
+        /* the server's record still closes the Quick Win */
+      }
+    },
+    [profile?.id, recordView],
+  );
+
+  useEffect(() => {
+    if (!playing) return;
+    const onMessage = (event: MessageEvent) => {
+      if (
+        event.origin !== "https://player.vimeo.com" ||
+        event.source !== playerRef.current?.contentWindow ||
+        !isVimeoEndedMessage(event.data)
+      ) {
+        return;
+      }
+      completeWatch(playing);
+      setPlaying(null);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [playing, completeWatch]);
 
   const levelVideos = useMemo(
     () => videos.filter((video) => video.level === level),
@@ -219,26 +241,45 @@ function ExtraVideosPage() {
             {levelVideos.map((video) => {
               const embed = video.url ? vimeoEmbedUrl(video.url) : null;
               const open = playing === video.id && embed;
+              const basePlayerUrl = embed
+                ? ["a1", "a2"].includes(video.level.toLowerCase())
+                  ? vimeoTextTrackUrl(embed, "pt")
+                  : cleanVimeoPlayerUrl(embed)
+                : null;
+              const playerUrl = basePlayerUrl ? new URL(basePlayerUrl) : null;
+              playerUrl?.searchParams.set("api", "1");
+              playerUrl?.searchParams.set("player_id", video.id);
               return (
                 <li key={video.id} className="card-soft overflow-hidden">
                   <div className="relative aspect-video w-full overflow-hidden bg-black">
-                    {premium && embed ? (
+                    {premium && embed && open && playerUrl ? (
                       <iframe
+                        ref={playerRef}
                         className="absolute inset-0 size-full"
-                        src={
-                          ["a1", "a2"].includes(video.level.toLowerCase())
-                            ? vimeoTextTrackUrl(embed, "pt")
-                            : cleanVimeoPlayerUrl(embed)
-                        }
+                        src={playerUrl.toString()}
                         title={video.title}
                         loading="lazy"
                         referrerPolicy="strict-origin-when-cross-origin"
                         allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                         allowFullScreen
-                        onLoad={() => {
-                          if (!playing) watch(video.id);
+                        onLoad={(event) => {
+                          event.currentTarget.contentWindow?.postMessage(
+                            JSON.stringify({ method: "addEventListener", value: "ended" }),
+                            "https://player.vimeo.com",
+                          );
                         }}
                       />
+                    ) : premium && embed ? (
+                      <button
+                        type="button"
+                        className="absolute inset-0 grid place-items-center bg-black text-white transition hover:bg-black/80"
+                        onClick={() => setPlaying(video.id)}
+                        aria-label={`Play ${video.title}`}
+                      >
+                        <span className="grid size-14 place-items-center rounded-full border border-white/20 bg-white/10">
+                          <PlayCircle className="size-8" />
+                        </span>
+                      </button>
                     ) : (
                       <div className="absolute inset-0 grid place-items-center bg-black">
                         <span className="grid size-14 place-items-center rounded-full border border-white/15 bg-white/10 text-white">
