@@ -16,6 +16,7 @@ import { AdminMistakeReview } from "@/components/AdminMistakeReview";
 import { AdminRetention } from "@/components/AdminRetention";
 import { AdminSpeakingWait } from "@/components/AdminSpeakingWait";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
+import { AdminFinancialProjection } from "@/components/AdminFinancialProjection";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
 import { AdminLevelIntroVideos } from "@/components/AdminLevelIntroVideos";
@@ -219,6 +220,7 @@ function AdminPage() {
                 tabs={[
                   { value: "usage", label: t("AI Usage") },
                   { value: "cost", label: t("Cost & Performance") },
+                  { value: "financial", label: t("Financeiro e Projeções") },
                 ]}
               >
                 <TabsContent value="usage">
@@ -227,6 +229,9 @@ function AdminPage() {
                 <TabsContent value="cost">
                   <AdminSpeakingWait />
                   <AdminCostPerformance />
+                </TabsContent>
+                <TabsContent value="financial">
+                  <AdminFinancialProjection />
                 </TabsContent>
               </FolderTabs>
             </TabsContent>
