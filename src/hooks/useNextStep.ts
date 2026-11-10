@@ -44,7 +44,12 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   const premium = !!profile && profileIsPremium(profile);
   const videoDay = premium && isExtraVideoDay(today);
   const fetchVideos = useServerFn(loadPremiumVideos);
-  const { data: videos, isFetched: videosFetched, isFetching: videosFetching, isError: videosError } = useQuery({
+  const {
+    data: videos,
+    isFetched: videosFetched,
+    isFetching: videosFetching,
+    isError: videosError,
+  } = useQuery({
     queryKey: ["premium-videos", profile?.id],
     enabled: !!profile?.id && videoDay,
     staleTime: 0,
@@ -81,7 +86,17 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
         watchedToday: watchedToday || !!videos?.watchedToday,
       });
     },
-    [today, premium, videoDay, videosFetched, videosFetching, videosError, videos?.watchedToday, levelHasVideos, watchedToday],
+    [
+      today,
+      premium,
+      videoDay,
+      videosFetched,
+      videosFetching,
+      videosError,
+      videos?.watchedToday,
+      levelHasVideos,
+      watchedToday,
+    ],
   );
 
   return useQuery({
