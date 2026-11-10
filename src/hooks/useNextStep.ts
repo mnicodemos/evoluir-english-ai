@@ -44,10 +44,16 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   const premium = !!profile && profileIsPremium(profile);
   const videoDay = premium && isExtraVideoDay(today);
   const fetchVideos = useServerFn(loadPremiumVideos);
-  const { data: videos, isFetched: videosFetched } = useQuery({
+  const {
+    data: videos,
+    isFetched: videosFetched,
+    isFetching: videosFetching,
+    isError: videosError,
+  } = useQuery({
     queryKey: ["premium-videos", profile?.id],
     enabled: !!profile?.id && videoDay,
-    staleTime: 10 * 60 * 1000,
+    staleTime: 0,
+    refetchOnMount: "always",
     queryFn: () => fetchVideos(),
   });
   const studentLevel = findLevel(profile?.level).value;
@@ -66,7 +72,12 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
       // On the designated video day, never flash the cached pronunciation
       // Quick Win while the video list is still loading. Show the correct
       // video action only after availability has been confirmed.
-      if (videoDay && !videosFetched) return { ...step, quickWin: null };
+      if (
+        videoDay &&
+        (!videosFetched || videosFetching || videosError || videos?.watchedToday === null)
+      ) {
+        return { ...step, quickWin: null };
+      }
       return withExtraVideoQuickWin<NextStepData>(step, {
         day: today,
         premium,
@@ -75,7 +86,17 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
         watchedToday: watchedToday || !!videos?.watchedToday,
       });
     },
-    [today, premium, videoDay, videosFetched, levelHasVideos, watchedToday, videos?.watchedToday],
+    [
+      today,
+      premium,
+      videoDay,
+      videosFetched,
+      videosFetching,
+      videosError,
+      videos?.watchedToday,
+      levelHasVideos,
+      watchedToday,
+    ],
   );
 
   return useQuery({

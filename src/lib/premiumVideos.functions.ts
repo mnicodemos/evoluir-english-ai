@@ -18,7 +18,7 @@ export const loadPremiumVideos = createServerFn({ method: "GET" })
       selectPremiumVideos(),
       hasPremium(context.userId),
     ]);
-    if (error) return { missingMigration: true, premium, watchedToday: false, videos: [] };
+    if (error) return { missingMigration: true, premium, watchedToday: null, videos: [] };
     return {
       missingMigration: false,
       premium,
@@ -28,7 +28,7 @@ export const loadPremiumVideos = createServerFn({ method: "GET" })
   });
 
 /** Whether the student played an extra video today (migration 0104; false before it). */
-async function watchedVideoToday(userId: string): Promise<boolean> {
+async function watchedVideoToday(userId: string): Promise<boolean | null> {
   const { socialTables } = await import("@/lib/premiumVideoSocial.server");
   const { studyToday } = await import("@/lib/today");
   const { data, error } = await (
@@ -39,7 +39,13 @@ async function watchedVideoToday(userId: string): Promise<boolean> {
     .eq("user_id", userId)
     .eq("day", studyToday())
     .limit(1);
-  return !error && (data?.length ?? 0) > 0;
+  if (error) {
+    console.error(
+      `Premium video completion status could not be read: ${error.code ?? ""} ${error.message}`,
+    );
+    return null;
+  }
+  return (data?.length ?? 0) > 0;
 }
 
 /** Premium-only WebVTT track for the active Short. */
