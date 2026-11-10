@@ -189,7 +189,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // popping in seconds later; they leave only once that activity is known done.
   const actionAvailable = (to: string, indicators: typeof activityIndicators) =>
     !indicators.ready || dashboardActionAvailable(to, indicators);
-  const { data, isLoading, isError, isFetching, isPlaceholderData, refetch } = useNextStep();
+  const {
+    data,
+    isLoading,
+    isError,
+    isFetching,
+    isPlaceholderData,
+    videoStatusKnown,
+    refetch,
+  } = useNextStep();
+  const videoQuickWinStatusReady = !videoQuickWinDay || videoStatusKnown;
 
   // Phones' pill row (user report, 2026-10-25: a pill showed, then another
   // replaced it; owner report, 2026-10-31: the whole row took seconds to
@@ -209,8 +218,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     todayFetched &&
     wordsDueReady &&
     cardsFetched &&
-    mistakesFetched;
-  const firstPillReady = videoQuickWinDay ? firstPillFresh : pillWaitOver || firstPillFresh;
+    mistakesFetched &&
+    videoQuickWinStatusReady;
+  const firstPillReady = videoQuickWinDay
+    ? firstPillFresh
+    : pillWaitOver || firstPillFresh;
   // Owner report, 2026-10-31 (still slow after the split): each pill shows at
   // once what it showed last time on this device (the first pill only from
   // today), then follows the fresh data quietly; a pill seen for the first
@@ -356,7 +368,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // Keep the challenge detail concise: the skill plus its daily progress
   // is enough context and fits on one complete line in the card.
   const questDetail = questSkillLabel;
-  const quickWin = data.quickWin;
+  const quickWin = videoQuickWinStatusReady ? data.quickWin : null;
   const mainAvailable = actionAvailable(data.activity.to, activityIndicators);
   const quickWinAvailable = quickWin
     ? actionAvailable(quickWin.activity.to, activityIndicators) &&
@@ -946,6 +958,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     )}
                   </div>
                 </>
+              ) : !videoQuickWinStatusReady ? (
+                <div
+                  className="mt-2 flex min-h-[7.5rem] flex-col justify-center gap-2 rounded-lg border border-dashed border-border px-3 xl:flex-1"
+                  aria-label={t("Loading extra practice")}
+                  aria-busy="true"
+                >
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-4/5" />
+                </div>
               ) : (
                 <div className="mt-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border px-3 text-center xl:flex-1">
                   <DoneSeal />
