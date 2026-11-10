@@ -2657,6 +2657,7 @@ const baseUiPt: Record<string, string> = {
   Unlike: "Descurtir",
   Comments: "Comentários",
   "Loading...": "Carregando...",
+  "Loading extra practice": "Carregando prática extra",
   "Delete comment": "Excluir comentário",
   "Delete this comment?": "Excluir este comentário?",
   "Report comment": "Denunciar comentário",
