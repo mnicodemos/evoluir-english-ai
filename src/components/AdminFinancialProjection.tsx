@@ -66,7 +66,7 @@ function formatBcbDate(date: Date) {
 
 function isUsableQuote(quote: DailyUsdQuote, now: Date) {
   const rate = Number(quote.rate);
-  const quoteTime = Date.parse(quote.date);
+  const quoteTime = Date.parse(quote.date.replace(" ", "T"));
   const age = now.getTime() - quoteTime;
   const maxAge = MAX_QUOTE_AGE_DAYS * 24 * 60 * 60 * 1000;
 
@@ -94,7 +94,7 @@ async function fetchDailyUsdQuote(pt: boolean): Promise<DailyUsdQuote> {
   });
   const url =
     "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
-    `CotacaoMoedaPeriodoFechamento(codigoMoeda=@codigoMoeda,dataInicialCotacao=@dataInicialCotacao,dataFinalCotacao=@dataFinalCotacao)?${params.toString()}`;
+    `CotacaoMoedaPeriodoFechamento(codigoMoeda=@codigoMoeda,dataInicialCotacao=@dataInicialCotacao,dataFinalCotacao=@dataFinalCotacao)?${params.toString().replace(/\+/g, "%20")}`;
 
   try {
     const response = await fetch(url, { headers: { Accept: "application/json" } });
