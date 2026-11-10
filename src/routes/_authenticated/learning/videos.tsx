@@ -153,7 +153,7 @@ function ExtraVideosPage() {
       // Vimeo's API only accepts addEventListener after its ready handshake.
       // Registering on iframe load can race the Player API initialization.
       if (isVimeoReadyMessage(event.data)) {
-        event.source?.postMessage(
+        playerRef.current?.contentWindow?.postMessage(
           JSON.stringify({ method: "addEventListener", value: "ended" }),
           "https://player.vimeo.com",
         );
@@ -293,6 +293,7 @@ function ExtraVideosPage() {
                   <div className="relative aspect-video w-full overflow-hidden bg-black">
                     {premium && embed && open && playerUrl ? (
                       <iframe
+                        id={video.id}
                         ref={playerRef}
                         className="absolute inset-0 size-full"
                         src={playerUrl.toString()}
