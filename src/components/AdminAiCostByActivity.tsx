@@ -64,7 +64,7 @@ export function AdminAiCostByActivity() {
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
-  const studentQuery = useQuery({\n    queryKey: ["admin-ai-cost-by-student", days],\n    queryFn: () => loadStudents({ data: { days } }),\n    retry: false,\n    staleTime: 5 *  60 * 1000,\n  });\n  const quote = useQuery({
+  const studentQuery = useQuery({\n    queryKey: ["admin-ai-cost-by-student", days],\n    queryFn: () => loadStudents({ data: { days } }),\n    retry: false,\n    staleTime: 5 * 60 * 1000,\n  });\n  const quote = useQuery({
     queryKey: ["admin-ai-cost-activity-ptax"],
     queryFn: fetchDailyUsdQuote,
     retry: 1,
