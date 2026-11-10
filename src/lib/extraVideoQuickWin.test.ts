@@ -33,8 +33,6 @@ describe("extra video Quick Win", () => {
     );
     expect(withExtraVideoQuickWin(step, { day, ...on, watchedToday: true }).quickWin).toBeNull();
     const otherDay = ["2026-11-01", "2026-11-02", "2026-11-03"].find((d) => !isExtraVideoDay(d))!;
-    expect(withExtraVideoQuickWin(step, { day: otherDay, ...on }).quickWin).toBe(
-      step.quickWin,
-    );
+    expect(withExtraVideoQuickWin(step, { day: otherDay, ...on }).quickWin).toBe(step.quickWin);
   });
 });
