@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Trash2, Wallet } from "lucide-react";
 import { useState } from "react";
+import { useUiLang } from "@/lib/uiLang";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -12,17 +13,20 @@ import { cn } from "@/lib/utils";
 const usd = (value: number) =>
   value.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 
-function day(iso: string) {
-  return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+function day(iso: string, locale: string) {
+  return new Date(iso).toLocaleDateString(locale, { timeZone: "America/Sao_Paulo" });
 }
 
 /**
  * Admin "Saldo da API" (user request). Google gives no balance for the Gemini
  * key, so the owner records each top-up and the balance is the top-ups minus
  * the cost measured on every call since the first one (owner only; Admin text
- * is Portuguese, outside the interface language rule).
+ * follows the selected interface language).
  */
 export function AdminCreditBalance() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
+  const locale = pt ? "pt-BR" : "en-US";
   const load = useServerFn(getAiCredit);
   const add = useServerFn(addAiCreditTopup);
   const remove = useServerFn(deleteAiCreditTopup);
@@ -48,19 +52,21 @@ export function AdminCreditBalance() {
       setNote("");
       void refresh();
     },
-    onError: () => toast.error("Não foi possível salvar a recarga."),
+    onError: () =>
+      toast.error(pt ? "Não foi possível salvar a recarga." : "Could not save the top-up."),
   });
   const drop = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
     onSuccess: () => void refresh(),
-    onError: () => toast.error("Não foi possível remover a recarga."),
+    onError: () =>
+      toast.error(pt ? "Não foi possível remover a recarga." : "Could not remove the top-up."),
   });
 
   if (query.isPending) return null;
   if (query.isError) {
     return (
       <p className="mt-3 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        Não foi possível carregar o saldo da API.
+        {pt ? "Não foi possível carregar o saldo da API." : "Could not load the API balance."}
       </p>
     );
   }
@@ -68,8 +74,9 @@ export function AdminCreditBalance() {
   if (!data.ready) {
     return (
       <p className="mt-3 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        Saldo da API: aplique a migração 0067_ai_credit_topups pelo chat do Lovable para registrar
-        as recargas.
+        {pt
+          ? "Saldo da API: aplique a migração 0067_ai_credit_topups pelo chat do Lovable para registrar as recargas."
+          : "API balance: apply migration 0067_ai_credit_topups through Lovable chat to track top-ups."}
       </p>
     );
   }
@@ -77,7 +84,7 @@ export function AdminCreditBalance() {
 
   return (
     <section
-      aria-label="Saldo da API"
+      aria-label={pt ? "Saldo da API" : "API balance"}
       className={cn(
         "mt-3 rounded-xl border p-3 sm:p-4",
         data.low ? "border-warning/40 bg-warning/10" : "border-border bg-card",
@@ -86,7 +93,7 @@ export function AdminCreditBalance() {
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
         <h2 className="flex items-center gap-2 text-sm font-semibold">
           <Wallet className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
-          Saldo da API (Gemini, estimado)
+          {pt ? "Saldo da API (Gemini, estimado)" : "API balance (estimated Gemini balance)"}
         </h2>
         {data.topups.length ? (
           <p className="text-sm">
@@ -94,25 +101,30 @@ export function AdminCreditBalance() {
               {usd(data.remainingUsd)}
             </span>{" "}
             <span className="text-muted-foreground">
-              de {usd(data.loadedUsd)} · gasto {usd(data.spentUsd)} em {data.measuredCalls} chamadas
-              desde {data.since ? day(data.since) : "—"}
+              {pt
+                ? `de ${usd(data.loadedUsd)} · gasto ${usd(data.spentUsd)} em ${data.measuredCalls} chamadas desde ${data.since ? day(data.since, locale) : "—"}`
+                : `of ${usd(data.loadedUsd)} · spent ${usd(data.spentUsd)} across ${data.measuredCalls} calls since ${data.since ? day(data.since, locale) : "—"}`}
             </span>
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Registre a recarga feita no Google para acompanhar o saldo.
+            {pt
+              ? "Registre a recarga feita no Google para acompanhar o saldo."
+              : "Record your Google top-up to track the balance."}
           </p>
         )}
       </div>
       {data.low && (
         <p className="mt-1 text-xs font-medium text-warning">
-          Menos de 20% do crédito restante: considere uma nova recarga.
+          {pt
+            ? "Menos de 20% do crédito restante: considere uma nova recarga."
+            : "Less than 20% of credit remains: consider adding funds."}
         </p>
       )}
       <p className="mt-1 text-[11px] text-muted-foreground">
-        O Google não informa o saldo por API: o valor é o total recarregado menos o custo medido de
-        cada chamada (o mesmo de Custo & Desempenho). Confira no faturamento do Google de vez em
-        quando.
+        {pt
+          ? "O Google não informa o saldo por API: o valor é o total recarregado menos o custo medido de cada chamada (o mesmo de Custo & Desempenho). Confira no faturamento do Google de vez em quando."
+          : "Google does not expose the balance through its API. This estimate subtracts measured call costs from recorded top-ups (the same costs shown in Cost & Performance). Check Google billing periodically."}
       </p>
 
       <form
@@ -123,7 +135,7 @@ export function AdminCreditBalance() {
         }}
       >
         <label className="grid gap-1 text-xs">
-          Valor (US$)
+          {pt ? "Valor (US$)" : "Amount (USD)"}
           <Input
             inputMode="decimal"
             value={amount}
@@ -133,7 +145,7 @@ export function AdminCreditBalance() {
           />
         </label>
         <label className="grid gap-1 text-xs">
-          Data
+          {pt ? "Data" : "Date"}
           <Input
             type="date"
             value={date}
@@ -142,17 +154,17 @@ export function AdminCreditBalance() {
           />
         </label>
         <label className="grid min-w-40 flex-1 gap-1 text-xs">
-          Observação
+          {pt ? "Observação" : "Note"}
           <Input
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Recarga no Google AI Studio"
+            placeholder={pt ? "Recarga no Google AI Studio" : "Google AI Studio top-up"}
             maxLength={200}
             className="h-9"
           />
         </label>
         <Button type="submit" size="sm" disabled={!(amountValue > 0) || save.isPending}>
-          Registrar recarga
+          {pt ? "Registrar recarga" : "Record top-up"}
         </Button>
       </form>
 
@@ -160,7 +172,7 @@ export function AdminCreditBalance() {
         <ul className="mt-3 grid gap-1 text-xs">
           {data.topups.map((topup) => (
             <li key={topup.id} className="flex items-center gap-2">
-              <span className="w-20 text-muted-foreground">{day(topup.added_at)}</span>
+              <span className="w-20 text-muted-foreground">{day(topup.added_at, locale)}</span>
               <span className="w-20 font-semibold">{usd(topup.amount_usd)}</span>
               <span className="min-w-0 flex-1 truncate text-muted-foreground">
                 {topup.note ?? ""}
@@ -169,7 +181,7 @@ export function AdminCreditBalance() {
                 type="button"
                 onClick={() => drop.mutate(topup.id)}
                 className="rounded p-1 text-muted-foreground hover:text-destructive"
-                aria-label="Remover recarga"
+                aria-label={pt ? "Remover recarga" : "Remove top-up"}
               >
                 <Trash2 className="size-3.5" aria-hidden="true" />
               </button>

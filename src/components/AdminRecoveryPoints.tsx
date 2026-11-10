@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createRecoveryPoint, listRecoveryPoints } from "@/lib/admin.functions";
+import { useUiLang } from "@/lib/uiLang";
 
 type RecoveryPoint = {
   id: string;
@@ -21,6 +22,8 @@ type RecoveryPoint = {
 };
 
 export function AdminRecoveryPoints() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const queryClient = useQueryClient();
   const list = useServerFn(listRecoveryPoints);
   const create = useServerFn(createRecoveryPoint);
@@ -64,8 +67,9 @@ export function AdminRecoveryPoints() {
           Recovery points
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Registro dos checkpoints de código do GitHub para localizar uma versão estável e orientar
-          uma recuperação. Este registro não cria backup do banco de dados nem executa restaurações.
+          {pt
+            ? "Registro dos checkpoints de código do GitHub para localizar uma versão estável e orientar uma recuperação. Este registro não cria backup do banco de dados nem executa restaurações."
+            : "A record of GitHub code checkpoints to identify a stable version and guide recovery. This record does not back up the database or perform restorations."}
         </p>
       </div>
 
@@ -77,7 +81,7 @@ export function AdminRecoveryPoints() {
         }}
       >
         <label className="grid gap-1 text-sm sm:col-span-2">
-          Título
+          {pt ? "Título" : "Title"}
           <Input
             value={title}
             onChange={(event) => setTitle(event.target.value)}
@@ -86,7 +90,7 @@ export function AdminRecoveryPoints() {
           />
         </label>
         <label className="grid gap-1 text-sm sm:col-span-2">
-          Descrição / observações
+          {pt ? "Descrição / observações" : "Description / notes"}
           <Textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
@@ -133,21 +137,25 @@ export function AdminRecoveryPoints() {
             ) : (
               <Plus className="mr-2 size-4" />
             )}
-            Registrar ponto de recuperação
+            {pt ? "Registrar ponto de recuperação" : "Save recovery point"}
           </Button>
         </div>
         {save.isError && <p className="text-sm text-red-400 sm:col-span-2">{save.error.message}</p>}
         {save.isSuccess && (
-          <p className="text-sm text-emerald-400 sm:col-span-2">Ponto de recuperação registrado.</p>
+          <p className="text-sm text-emerald-400 sm:col-span-2">
+            {pt ? "Ponto de recuperação registrado." : "Recovery point saved."}
+          </p>
         )}
       </form>
 
       <div className="grid gap-2">
-        <h4 className="text-sm font-semibold">Histórico de pontos de recuperação</h4>
+        <h4 className="text-sm font-semibold">
+          {pt ? "Histórico de pontos de recuperação" : "Recovery point history"}
+        </h4>
         {points.isPending ? (
           <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
-            Carregando...
+            {pt ? "Carregando..." : "Loading..."}
           </div>
         ) : points.isError ? (
           <p className="text-sm text-red-400">{points.error.message}</p>
@@ -160,7 +168,7 @@ export function AdminRecoveryPoints() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <strong>{point.title}</strong>
                 <span className="text-xs text-muted-foreground">
-                  {new Date(point.createdAt).toLocaleString("pt-BR")}
+                  {new Date(point.createdAt).toLocaleString(pt ? "pt-BR" : "en-US")}
                 </span>
               </div>
               {point.description && <p className="text-muted-foreground">{point.description}</p>}
@@ -173,7 +181,9 @@ export function AdminRecoveryPoints() {
             </article>
           ))
         ) : (
-          <p className="text-sm text-muted-foreground">Nenhum ponto de recuperação registrado.</p>
+          <p className="text-sm text-muted-foreground">
+            {pt ? "Nenhum ponto de recuperação registrado." : "No recovery points have been saved."}
+          </p>
         )}
       </div>
     </section>

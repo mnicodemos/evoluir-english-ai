@@ -4,6 +4,7 @@ import { Check, EyeOff, Flag, Loader2, MessageCircle, Trash2 } from "lucide-reac
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { useUiLang } from "@/lib/uiLang";
 import {
   deleteVideoCommentAdmin,
   getVideoCommentsAdmin,
@@ -16,6 +17,8 @@ import { HIDE_AFTER_REPORTS, hiddenByReports } from "@/lib/premiumVideoSocial";
  * reported ones first, so the owner removes what does not belong.
  */
 export function AdminVideoComments() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const queryClient = useQueryClient();
   const fetchComments = useServerFn(getVideoCommentsAdmin);
   const remove = useServerFn(deleteVideoCommentAdmin);
@@ -33,7 +36,13 @@ export function AdminVideoComments() {
       await queryClient.invalidateQueries({ queryKey: ["video-social"] });
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : "Não foi possível remover."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : pt
+            ? "Não foi possível remover."
+            : "Could not remove.",
+      ),
   });
   const keepMutation = useMutation({
     mutationFn: (id: string) => keep({ data: { id } }),
@@ -41,10 +50,20 @@ export function AdminVideoComments() {
       await queryClient.invalidateQueries({ queryKey: ["admin-video-comments"] });
       await queryClient.invalidateQueries({ queryKey: ["video-comments"] });
       await queryClient.invalidateQueries({ queryKey: ["video-social"] });
-      toast.success("Comentário mantido: as denúncias foram limpas.");
+      toast.success(
+        pt
+          ? "Comentário mantido: as denúncias foram limpas."
+          : "Comment kept; reports have been cleared.",
+      );
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : "Não foi possível manter."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : pt
+            ? "Não foi possível manter."
+            : "Could not keep the comment.",
+      ),
   });
   const comments = query.data?.comments ?? [];
   const reported = comments.filter((comment) => comment.reports > 0).length;
@@ -57,35 +76,60 @@ export function AdminVideoComments() {
         </span>
         <div>
           <h2 className="font-display text-base font-semibold">
-            Comentários dos vídeos extras
+            {pt ? "Comentários dos vídeos extras" : "Extra video comments"}
             {reported ? (
               <span className="ml-2 rounded-full bg-destructive/15 px-2 py-0.5 text-xs text-destructive">
-                {reported} denunciado{reported === 1 ? "" : "s"}
+                {pt ? `${reported} denunciado${reported === 1 ? "" : "s"}` : `${reported} reported`}
               </span>
             ) : null}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Os comentários aparecem na hora para os alunos Premium. Na primeira denúncia você recebe
-            um push; com {HIDE_AFTER_REPORTS} denúncias o comentário fica oculto até você decidir:
-            "Manter" limpa as denúncias e o devolve, a lixeira remove. Os alunos só veem o primeiro
-            nome e a inicial, e links ou contatos são bloqueados.
+            {pt ? (
+              <>
+                Os comentários aparecem na hora para os alunos Premium. Na primeira denúncia você
+                recebe um push; com {HIDE_AFTER_REPORTS} denúncias o comentário fica oculto até você
+                decidir: "Manter" limpa as denúncias e o devolve, a lixeira remove. Os alunos só
+                veem o primeiro nome e a inicial, e links ou contatos são bloqueados.
+              </>
+            ) : (
+              <>
+                Comments appear immediately for Premium students. You receive a push notification
+                after the first report; after {HIDE_AFTER_REPORTS} reports, the comment is hidden
+                until you decide: "Keep" clears the reports and restores it; the trash button
+                deletes it. Students see only the first name and last initial, and links or contact
+                details are blocked.
+              </>
+            )}
           </p>
         </div>
       </div>
 
       {query.isPending ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Carregando…
+          <Loader2 className="size-4 animate-spin" /> {pt ? "Carregando…" : "Loading…"}
         </p>
       ) : query.isError ? (
-        <p className="text-sm text-destructive">Não foi possível carregar os comentários.</p>
+        <p className="text-sm text-destructive">
+          {pt ? "Não foi possível carregar os comentários." : "Could not load comments."}
+        </p>
       ) : query.data?.missingMigration ? (
         <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-          Aplique a migração <code>0103_premium_video_social.sql</code> pelo chat do Lovable para
-          ativar curtidas e comentários.
+          {pt ? (
+            <>
+              Aplique a migração <code>0103_premium_video_social.sql</code> pelo chat do Lovable
+              para ativar curtidas e comentários.
+            </>
+          ) : (
+            <>
+              Apply migration <code>0103_premium_video_social.sql</code> through Lovable chat to
+              enable likes and comments.
+            </>
+          )}
         </p>
       ) : comments.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nenhum comentário ainda.</p>
+        <p className="text-sm text-muted-foreground">
+          {pt ? "Nenhum comentário ainda." : "No comments yet."}
+        </p>
       ) : (
         <ul className="max-h-[28rem] space-y-1.5 overflow-y-auto">
           {comments.map((comment) => (
@@ -98,7 +142,8 @@ export function AdminVideoComments() {
               <span className="min-w-0">
                 <span className="block text-xs text-muted-foreground">
                   <span className="font-semibold text-foreground">{comment.author}</span> ·{" "}
-                  {new Date(comment.createdAt).toLocaleString("pt-BR")} · {comment.video}
+                  {new Date(comment.createdAt).toLocaleString(pt ? "pt-BR" : "en-US")} ·{" "}
+                  {comment.video}
                   {comment.reports ? (
                     <span className="ml-2 inline-flex items-center gap-1 text-destructive">
                       <Flag className="size-3" /> {comment.reports}
@@ -106,7 +151,7 @@ export function AdminVideoComments() {
                   ) : null}
                   {hiddenByReports(comment.reports) ? (
                     <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-destructive/15 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
-                      <EyeOff className="size-3" /> Oculto
+                      <EyeOff className="size-3" /> {pt ? "Oculto" : "Hidden"}
                     </span>
                   ) : null}
                 </span>
@@ -121,7 +166,7 @@ export function AdminVideoComments() {
                     disabled={keepMutation.isPending}
                     onClick={() => keepMutation.mutate(comment.id)}
                   >
-                    <Check className="size-4" /> Manter
+                    <Check className="size-4" /> {pt ? "Manter" : "Keep"}
                   </Button>
                 ) : null}
                 <Button
@@ -129,9 +174,9 @@ export function AdminVideoComments() {
                   variant="ghost"
                   className="h-8 text-destructive hover:text-destructive"
                   disabled={deleteMutation.isPending}
-                  aria-label="Remover comentário"
+                  aria-label={pt ? "Remover comentário" : "Delete comment"}
                   onClick={() => {
-                    if (window.confirm("Remover este comentário?"))
+                    if (window.confirm(pt ? "Remover este comentário?" : "Delete this comment?"))
                       deleteMutation.mutate(comment.id);
                   }}
                 >
