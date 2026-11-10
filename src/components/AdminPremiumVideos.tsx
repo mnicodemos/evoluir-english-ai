@@ -28,7 +28,9 @@ const LEVELS = PREMIUM_VIDEO_LEVELS;
  * level, each with its title, listed for Premium students on /learning/videos.
  * Free students see the list with locks.
  */
-export function AdminPremiumVideos() {\n  const { lang } = useUiLang();\n  const isPt = lang === "pt";
+export function AdminPremiumVideos() {
+  const { lang } = useUiLang();
+  const isPt = lang === "pt";
   const queryClient = useQueryClient();
   const fetchVideos = useServerFn(getPremiumVideosAdmin);
   const save = useServerFn(savePremiumVideo);
