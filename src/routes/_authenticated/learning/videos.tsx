@@ -20,7 +20,7 @@ import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { studyToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
-import { isVimeoEndedMessage } from "@/lib/vimeoPlayerEvents";
+import { isVimeoEndedMessage, isVimeoReadyMessage } from "@/lib/vimeoPlayerEvents";
 
 /** The learning path's level chip (src/routes/_authenticated/learning/index.tsx). */
 const LEVEL_CHIP =
@@ -90,10 +90,16 @@ function ExtraVideosPage() {
   );
   const level = picked ?? (profile ? studentLevel : (levels[0] ?? null));
   const [playing, setPlaying] = useState<string | null>(null);
+  const [completionPending, setCompletionPending] = useState(false);
+  const [completionError, setCompletionError] = useState(false);
+  const completionInFlight = useRef(false);
   const playerRef = useRef<HTMLIFrameElement>(null);
   const pickLevel = (value: string) => {
     setPicked(value);
     setPlaying(null);
+    setCompletionError(false);
+    setCompletionPending(false);
+    completionInFlight.current = false;
   };
   // The Quick Win is completed only by Vimeo's actual "ended" event.
   // Loading the page, mounting the iframe, or pressing Play is not completion.
@@ -104,7 +110,14 @@ function ExtraVideosPage() {
       try {
         const result = await sendView({ data: { videoId: id } });
         if (result.recorded) {
-          void queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
+          // Update the shared query immediately so the Dashboard's Quick Win
+          // re-evaluates in this tab; then reconcile with the server.
+          queryClient.setQueryData(
+            ["premium-videos", profile?.id],
+            (current: Awaited<ReturnType<typeof fetchVideos>> | undefined) =>
+              current ? { ...current, watchedToday: true } : current,
+          );
+          await queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
         }
         return result.recorded;
       } catch {
@@ -116,32 +129,55 @@ function ExtraVideosPage() {
   const completeWatch = useCallback(
     async (id: string) => {
       const recorded = await recordView(id);
-      if (!recorded || !profile?.id) return;
+      if (!recorded || !profile?.id) return false;
       try {
         window.localStorage.setItem(extraVideoWatchedKey(profile.id, studyToday()), "1");
       } catch {
-        /* the server's record still closes the Quick Win on other devices */
+        /* The server record remains authoritative across devices. */
       }
+      return true;
     },
     [profile?.id, recordView],
   );
 
   useEffect(() => {
     if (!playing) return;
-    const onMessage = (event: MessageEvent) => {
+    const onMessage = async (event: MessageEvent) => {
       if (
         event.origin !== "https://player.vimeo.com" ||
-        event.source !== playerRef.current?.contentWindow ||
-        !isVimeoEndedMessage(event.data)
+        event.source !== playerRef.current?.contentWindow
       ) {
         return;
       }
-      completeWatch(playing);
-      setPlaying(null);
+
+      // Vimeo's API only accepts addEventListener after its ready handshake.
+      // Registering on iframe load can race the Player API initialization.
+      if (isVimeoReadyMessage(event.data)) {
+        event.source?.postMessage(
+          JSON.stringify({ method: "addEventListener", value: "ended" }),
+          "https://player.vimeo.com",
+        );
+        return;
+      }
+
+      if (!isVimeoEndedMessage(event.data) || completionInFlight.current) return;
+      completionInFlight.current = true;
+      setCompletionPending(true);
+      setCompletionError(false);
+      const recorded = await completeWatch(playing);
+      setCompletionPending(false);
+      completionInFlight.current = false;
+      if (recorded) {
+        setPlaying(null);
+      } else {
+        // Keep the finished player mounted and let the student retry the
+        // server confirmation; never silently leave the Quick Win pending.
+        setCompletionError(true);
+      }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [playing, completeWatch]);
+  }, [playing, completeWatch, queryClient]);
 
   const levelVideos = useMemo(
     () => videos.filter((video) => video.level === level),
@@ -265,12 +301,6 @@ function ExtraVideosPage() {
                         referrerPolicy="strict-origin-when-cross-origin"
                         allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                         allowFullScreen
-                        onLoad={(event) => {
-                          event.currentTarget.contentWindow?.postMessage(
-                            JSON.stringify({ method: "addEventListener", value: "ended" }),
-                            "https://player.vimeo.com",
-                          );
-                        }}
                       />
                     ) : premium && embed ? (
                       <button
@@ -301,15 +331,37 @@ function ExtraVideosPage() {
                       </span>
                     </span>
                     {open ? (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="shrink-0"
-                        aria-label="Close video"
-                        onClick={() => setPlaying(null)}
-                      >
-                        <X className="size-4" />
-                      </Button>
+                      <div className="flex shrink-0 items-center gap-2">
+                        {completionPending ? (
+                          <span className="text-xs text-muted-foreground">Saving completion…</span>
+                        ) : null}
+                        {completionError ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setCompletionError(false);
+                              setCompletionPending(true);
+                              void completeWatch(video.id).then((recorded) => {
+                                setCompletionPending(false);
+                                if (recorded) setPlaying(null);
+                                else setCompletionError(true);
+                              });
+                            }}
+                          >
+                            Retry completion
+                          </Button>
+                        ) : null}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="shrink-0"
+                          aria-label="Close video"
+                          onClick={() => setPlaying(null)}
+                        >
+                          <X className="size-4" />
+                        </Button>
+                      </div>
                     ) : null}
                   </div>
                 </li>
