@@ -53,10 +53,9 @@ type DailyUsdQuote = { rate: number; date: string; cached?: boolean };
 type BcbQuoteRecord = {
   cotacaoVenda?: number;
   dataHoraCotacao?: string;
-  tipoBoletim?: string;
 };
 
-const QUOTE_STORAGE_KEY = "evoluir-admin-financial-usd-brl-ptax-v2";
+const QUOTE_STORAGE_KEY = "evoluir-admin-financial-usd-brl-ptax-v3";
 const MAX_QUOTE_AGE_DAYS = 10;
 
 function formatBcbDate(date: Date) {
@@ -85,34 +84,37 @@ async function fetchDailyUsdQuote(pt: boolean): Promise<DailyUsdQuote> {
   const start = new Date(today);
   start.setDate(start.getDate() - 30);
   const params = new URLSearchParams({
-    "@dataInicial": `'${formatBcbDate(start)}'`,
+    "@codigoMoeda": "'USD'",
+    "@dataInicialCotacao": `'${formatBcbDate(start)}'`,
     "@dataFinalCotacao": `'${formatBcbDate(today)}'`,
     $top: "100",
     $orderby: "dataHoraCotacao desc",
     $format: "json",
-    $select: "cotacaoVenda,dataHoraCotacao,tipoBoletim",
+    $select: "cotacaoVenda,dataHoraCotacao",
   });
   const url =
     "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
-    `CotacaoDolarPeriodo(dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)?${params.toString()}`;
+    `CotacaoMoedaPeriodoFechamento(codigoMoeda=@codigoMoeda,dataInicialCotacao=@dataInicialCotacao,dataFinalCotacao=@dataFinalCotacao)?${params.toString()}`;
 
   try {
     const response = await fetch(url, { headers: { Accept: "application/json" } });
-    if (!response.ok)
+    if (!response.ok) {
       throw new Error(
         pt
-          ? "Não foi possível consultar a cotação do Banco Central."
-          : "Could not retrieve the Central Bank exchange rate.",
+          ? "Não foi possível consultar a PTAX de fechamento do Banco Central."
+          : "Could not retrieve the Central Bank PTAX closing rate.",
       );
+    }
+
     const payload = (await response.json()) as { value?: BcbQuoteRecord[] };
-    const closingQuotes = (payload.value ?? []).filter(
-      (item) => item.tipoBoletim?.trim().toLocaleLowerCase("pt-BR") === "fechamento",
-    );
-    const latest = closingQuotes[0];
+    const latest = (payload.value ?? [])
+      .filter((item) => Number.isFinite(Number(item.cotacaoVenda)) && Number(item.cotacaoVenda) > 0)
+      .sort((a, b) => Date.parse(b.dataHoraCotacao ?? "") - Date.parse(a.dataHoraCotacao ?? ""))[0];
     const quote: DailyUsdQuote = {
       rate: Number(latest?.cotacaoVenda),
       date: latest?.dataHoraCotacao ?? "",
     };
+
     if (!isUsableQuote(quote, today)) {
       throw new Error(
         pt
@@ -120,6 +122,7 @@ async function fetchDailyUsdQuote(pt: boolean): Promise<DailyUsdQuote> {
           : "The Central Bank did not return a valid and recent PTAX closing quote.",
       );
     }
+
     localStorage.setItem(QUOTE_STORAGE_KEY, JSON.stringify(quote));
     return quote;
   } catch (error) {
