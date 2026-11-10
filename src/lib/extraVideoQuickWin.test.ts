@@ -25,10 +25,10 @@ describe("extra video Quick Win", () => {
   it("replaces the Quick Win only for Premium, with videos, not watched today", () => {
     const day = ["2026-11-01", "2026-11-02", "2026-11-03"].find(isExtraVideoDay)!;
     expect(withExtraVideoQuickWin(step, { day, ...on }).quickWin).toBe(EXTRA_VIDEO_QUICK_WIN);
-    expect(withExtraVideoQuickWin(step, { day, ...on, premium: false }).quickWin).toBeNull();
-    expect(withExtraVideoQuickWin(step, { day, ...on, levelHasVideos: false }).quickWin).toBeNull();
+    expect(withExtraVideoQuickWin(step, { day, ...on, premium: false }).quickWin).toBe(step.quickWin);
+    expect(withExtraVideoQuickWin(step, { day, ...on, levelHasVideos: false }).quickWin).toBe(step.quickWin);
     expect(withExtraVideoQuickWin(step, { day, ...on, watchedToday: true }).quickWin).toBeNull();
     const otherDay = ["2026-11-01", "2026-11-02", "2026-11-03"].find((d) => !isExtraVideoDay(d))!;
-    expect(withExtraVideoQuickWin(step, { day: otherDay, ...on }).quickWin).toBeNull();
+    expect(withExtraVideoQuickWin(step, { day: otherDay, ...on }).quickWin).toBe(step.quickWin);
   });
 });
