@@ -477,7 +477,7 @@ export function AdminAiCostByActivity() {
                 )}
               </>
             )}
-          </div>>
+          </div>
         </>
       )}
     </section>
