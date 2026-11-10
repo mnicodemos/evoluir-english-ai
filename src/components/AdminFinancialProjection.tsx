@@ -27,7 +27,6 @@ const DEFAULTS: Inputs = {
 };
 const STORAGE_KEY = "evoluir-admin-financial-projection-v1";
 const money = (value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
-const safeNumber = (value: number) => Number.isFinite(value) ? Math.max(0, value) : 0;
 
 export function AdminFinancialProjection() {
   const [values, setValues] = useState<Inputs>(DEFAULTS);
