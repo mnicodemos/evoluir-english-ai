@@ -159,7 +159,9 @@ function FeatureUsagePanel({ pt }: { pt: boolean }) {
  * Admin "Retention" tab: how many students come back the next day and the
  * following weeks after signing up, overall and per signup week.
  */
-export function AdminRetention() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
+export function AdminRetention() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const { lang } = useUiLang();
   const pt = lang === "pt";
   const load = useServerFn(getRetention);
