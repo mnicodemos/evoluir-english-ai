@@ -336,25 +336,15 @@ export function AdminAiCostByActivity() {
                     const rows = studentQuery.data.students.filter(
                       (student) => student.plan === plan,
                     );
-                    const measured = rows.filter(
-                      (student) => student.costUsd !== null,
-                    );
-                    const cost = measured.reduce(
-                      (sum, student) => sum + (student.costUsd ?? 0),
-                      0,
-                    );
+                    const measured = rows.filter((student) => student.costUsd !== null);
+                    const cost = measured.reduce((sum, student) => sum + (student.costUsd ?? 0), 0);
                     return (
-                      <div
-                        key={plan}
-                        className="rounded-md border border-border bg-muted/30 p-3"
-                      >
+                      <div key={plan} className="rounded-md border border-border bg-muted/30 p-3">
                         <p className="text-xs text-muted-foreground">
                           {plan === "free" ? "Free" : "Premium"} ·{" "}
                           {pt ? "alunos com uso" : "students with usage"}
                         </p>
-                        <p className="mt-1 text-xl font-semibold tabular-nums">
-                          {rows.length}
-                        </p>
+                        <p className="mt-1 text-xl font-semibold tabular-nums">{rows.length}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {pt ? "Custo medido" : "Measured cost"}:{" "}
                           {usd(measured.length ? cost : null, pt ? "pt-BR" : "en-US")}
@@ -384,42 +374,25 @@ export function AdminAiCostByActivity() {
                       <tr className="border-b border-border text-xs font-semibold uppercase text-muted-foreground">
                         <th className="py-2 pr-3">{pt ? "Aluno" : "Student"}</th>
                         <th className="py-2 pr-3">{pt ? "Plano" : "Plan"}</th>
-                        <th className="py-2 pr-3 text-right">
-                          {pt ? "Chamadas" : "Calls"}
-                        </th>
-                        <th className="py-2 pr-3 text-right">
-                          {pt ? "Cobertura" : "Coverage"}
-                        </th>
-                        <th className="py-2 pr-3 text-right">
-                          {pt ? "Custo USD" : "USD cost"}
-                        </th>
-                        <th className="py-2 pr-3 text-right">
-                          {pt ? "Custo BRL" : "BRL cost"}
-                        </th>
-                        <th className="py-2 text-right">
-                          {pt ? "Média/chamada" : "Average/call"}
-                        </th>
+                        <th className="py-2 pr-3 text-right">{pt ? "Chamadas" : "Calls"}</th>
+                        <th className="py-2 pr-3 text-right">{pt ? "Cobertura" : "Coverage"}</th>
+                        <th className="py-2 pr-3 text-right">{pt ? "Custo USD" : "USD cost"}</th>
+                        <th className="py-2 pr-3 text-right">{pt ? "Custo BRL" : "BRL cost"}</th>
+                        <th className="py-2 text-right">{pt ? "Média/chamada" : "Average/call"}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {studentQuery.data.students.map((student) => (
-                        <tr
-                          key={student.userId}
-                          className="border-b border-border/60 align-top"
-                        >
+                        <tr key={student.userId} className="border-b border-border/60 align-top">
                           <td className="py-2 pr-3">
                             <div className="font-medium">{student.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {student.email}
-                            </div>
+                            <div className="text-xs text-muted-foreground">{student.email}</div>
                             <div className="mt-1 text-[11px] text-muted-foreground">
                               {student.operations
                                 .map((op) =>
                                   op.costUsd === null
                                     ? op.label + ": N/D"
-                                    : op.label +
-                                      ": " +
-                                      usd(op.costUsd, pt ? "pt-BR" : "en-US"),
+                                    : op.label + ": " + usd(op.costUsd, pt ? "pt-BR" : "en-US"),
                                 )
                                 .join(" · ")}
                             </div>
@@ -427,9 +400,7 @@ export function AdminAiCostByActivity() {
                           <td className="py-2 pr-3">
                             {student.plan === "premium" ? "Premium" : "Free"}
                           </td>
-                          <td className="py-2 pr-3 text-right tabular-nums">
-                            {student.calls}
-                          </td>
+                          <td className="py-2 pr-3 text-right tabular-nums">{student.calls}</td>
                           <td className="py-2 pr-3 text-right tabular-nums">
                             {student.measuredCalls}/{student.calls}
                           </td>
@@ -450,10 +421,7 @@ export function AdminAiCostByActivity() {
                       ))}
                       {studentQuery.data.students.length === 0 && (
                         <tr>
-                          <td
-                            colSpan={7}
-                            className="py-6 text-center text-muted-foreground"
-                          >
+                          <td colSpan={7} className="py-6 text-center text-muted-foreground">
                             {pt
                               ? "Nenhuma chamada de IA no período."
                               : "No AI calls in this period."}
