@@ -25,7 +25,6 @@ import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
 import { studyToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
-import { isVimeoEndedMessage, isVimeoReadyMessage } from "@/lib/vimeoPlayerEvents";
 
 /** The learning path's level chip (src/routes/_authenticated/learning/index.tsx). */
 const LEVEL_CHIP =
@@ -170,44 +169,45 @@ function ExtraVideosPage() {
     [profile?.id, recordView],
   );
 
+  // The official Vimeo Player API handles the handshake (the raw postMessage
+  // subscription could miss "ready" and never hear "ended"; owner report,
+  // 2026-11-10). Completion = "ended", or the last 3% reached (some players
+  // stop just short of the end without firing it).
   useEffect(() => {
-    if (!playing) return;
-    const onMessage = async (event: MessageEvent) => {
-      if (
-        event.origin !== "https://player.vimeo.com" ||
-        event.source !== playerRef.current?.contentWindow
-      ) {
-        return;
-      }
-
-      // Vimeo's API only accepts addEventListener after its ready handshake.
-      // Registering on iframe load can race the Player API initialization.
-      if (isVimeoReadyMessage(event.data)) {
-        playerRef.current?.contentWindow?.postMessage(
-          JSON.stringify({ method: "addEventListener", value: "ended" }),
-          "https://player.vimeo.com",
-        );
-        return;
-      }
-
-      if (!isVimeoEndedMessage(event.data) || completionInFlight.current) return;
+    if (!playing || loadedPlayer !== playing) return;
+    const iframe = playerRef.current;
+    if (!iframe) return;
+    let cancelled = false;
+    let player: { off: (e: string) => void; destroy?: () => Promise<void> } | null = null;
+    const finish = async () => {
+      if (cancelled || completionInFlight.current) return;
       completionInFlight.current = true;
       setCompletionPending(true);
       setCompletionError(false);
       const recorded = await completeWatch(playing);
       setCompletionPending(false);
-      completionInFlight.current = false;
       if (recorded) {
         setPlaying(null);
       } else {
-        // Keep the finished player mounted and let the student retry the
-        // server confirmation; never silently leave the Quick Win pending.
+        completionInFlight.current = false;
         setCompletionError(true);
       }
     };
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [playing, completeWatch, queryClient]);
+    void import("@vimeo/player").then(({ default: Player }) => {
+      if (cancelled) return;
+      const instance = new Player(iframe);
+      player = instance;
+      instance.on("ended", () => void finish());
+      instance.on("timeupdate", (data: { percent: number }) => {
+        if (data.percent >= 0.97) void finish();
+      });
+    });
+    return () => {
+      cancelled = true;
+      player?.off("ended");
+      player?.off("timeupdate");
+    };
+  }, [playing, loadedPlayer, completeWatch]);
 
   const levelVideos = useMemo(
     () => videos.filter((video) => video.level === level),
@@ -351,14 +351,8 @@ function ExtraVideosPage() {
                           referrerPolicy="strict-origin-when-cross-origin"
                           allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                           allowFullScreen
-                          onLoad={(event) => {
+                          onLoad={() => {
                             setLoadedPlayer(video.id);
-                            // Also subscribe once the iframe loads, in case its
-                            // "ready" message arrived before our listener ran.
-                            event.currentTarget.contentWindow?.postMessage(
-                              JSON.stringify({ method: "addEventListener", value: "ended" }),
-                              "https://player.vimeo.com",
-                            );
                           }}
                         />
                       </>
