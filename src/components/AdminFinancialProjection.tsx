@@ -19,8 +19,8 @@ type Inputs = {
   stripeFixed: number;
   usdBrl: number;
   aiUsdPerStudent: number;
-  lovable: number;
-  aiSubscriptions: number;
+  lovableUsd: number;
+  aiSubscriptionsUsd: number;
   domainAnnual: number;
   marketing: number;
   otherCosts: number;
@@ -36,8 +36,8 @@ const DEFAULTS: Inputs = {
   stripeFixed: 0.39,
   usdBrl: 5.3,
   aiUsdPerStudent: 2.14,
-  lovable: 100,
-  aiSubscriptions: 200,
+  lovableUsd: 18.87,
+  aiSubscriptionsUsd: 37.74,
   domainAnnual: 30,
   marketing: 500,
   otherCosts: 0,
@@ -62,8 +62,23 @@ export function AdminFinancialProjection() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved) as Partial<Inputs>;
-        setValues({ ...DEFAULTS, ...parsed });
+        const parsed = JSON.parse(saved) as Partial<Inputs> & {
+          lovable?: number;
+          aiSubscriptions?: number;
+        };
+        const rate = Number(parsed.usdBrl) > 0 ? Number(parsed.usdBrl) : DEFAULTS.usdBrl;
+        setValues({
+          ...DEFAULTS,
+          ...parsed,
+          lovableUsd:
+            parsed.lovableUsd ??
+            (parsed.lovable !== undefined ? parsed.lovable / rate : DEFAULTS.lovableUsd),
+          aiSubscriptionsUsd:
+            parsed.aiSubscriptionsUsd ??
+            (parsed.aiSubscriptions !== undefined
+              ? parsed.aiSubscriptions / rate
+              : DEFAULTS.aiSubscriptionsUsd),
+        });
       }
     } catch {
       /* Keep defaults if local storage is unavailable or invalid. */
@@ -90,8 +105,7 @@ export function AdminFinancialProjection() {
   };
 
   const fixedCosts =
-    values.lovable +
-    values.aiSubscriptions +
+    (values.lovableUsd + values.aiSubscriptionsUsd) * values.usdBrl +
     values.domainAnnual / 12 +
     values.marketing +
     values.otherCosts;
@@ -152,8 +166,8 @@ export function AdminFinancialProjection() {
       prefix: "US$",
       step: "0.01",
     },
-    { key: "lovable", label: "Lovable / mês", prefix: "R$", step: "0.01" },
-    { key: "aiSubscriptions", label: "Assinaturas IAs Pro / mês", prefix: "R$", step: "0.01" },
+    { key: "lovableUsd", label: "Lovable / mês", prefix: "US$", step: "0.01" },
+    { key: "aiSubscriptionsUsd", label: "Assinaturas IAs Pro / mês", prefix: "US$", step: "0.01" },
     { key: "domainAnnual", label: "Domínio / ano", prefix: "R$", step: "0.01" },
     { key: "marketing", label: "Marketing / mês", prefix: "R$", step: "0.01" },
     { key: "otherCosts", label: "Outros custos / mês", prefix: "R$", step: "0.01" },
@@ -217,6 +231,22 @@ export function AdminFinancialProjection() {
             </div>
           </label>
         ))}
+      </div>
+
+      <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
+        {[
+          "Cotação centralizada: US$ 1 =",
+          money(values.usdBrl),
+          ". Todos os custos em USD usam essa mesma taxa. Lovable: US$",
+          values.lovableUsd.toFixed(2),
+          "(",
+          money(values.lovableUsd * values.usdBrl),
+          "/mês); IAs Pro: US$",
+          values.aiSubscriptionsUsd.toFixed(2),
+          "(",
+          money(values.aiSubscriptionsUsd * values.usdBrl),
+          "/mês). Atualize a cotação e os valores originais conforme suas faturas; a taxa é uma premissa editável, não uma cotação automática em tempo real.",
+        ].join(" ")}
       </div>
 
       <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
