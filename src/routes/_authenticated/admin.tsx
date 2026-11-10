@@ -125,15 +125,15 @@ function AdminPage() {
           {/* Folders by type of control (owner request, 2026-10-29), each with
               its own tabs; the alerts above stay visible in every folder. */}
           <Tabs value={folder} onValueChange={chooseFolder} className="mt-4 min-w-0">
-            <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-6">
+            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-6">
               {ADMIN_FOLDERS.map((item) => (
                 <TabsTrigger
                   key={item.value}
                   value={item.value}
-                  className="min-w-0 gap-1.5 px-2 py-2 text-xs sm:text-sm"
+                  className="flex min-h-10 min-w-0 items-center justify-center gap-1.5 whitespace-normal px-2 py-2 text-center text-[11px] leading-tight sm:text-sm"
                 >
                   <item.icon className="size-4 shrink-0" aria-hidden="true" />
-                  <span className="truncate">{t(item.label)}</span>
+                  <span className="min-w-0 break-words">{t(item.label)}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -354,15 +354,12 @@ function FolderTabs({
   return (
     <Tabs defaultValue={tabs[0]!.value} className="min-w-0">
       {tabs.length > 1 ? (
-        <TabsList
-          className="grid h-auto w-full gap-1 sm:w-auto sm:inline-grid"
-          style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
-        >
+        <TabsList className="flex h-auto w-full flex-wrap gap-1 sm:w-auto">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="min-w-0 truncate px-3 py-1.5 text-xs sm:text-sm"
+              className="min-h-9 min-w-0 flex-[1_1_calc(50%-0.25rem)] whitespace-normal break-words px-2 py-1.5 text-center text-[11px] leading-tight sm:flex-none sm:px-3 sm:text-sm"
             >
               {tab.label}
             </TabsTrigger>

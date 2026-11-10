@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   CartesianGrid,
   Legend,
@@ -17,7 +18,6 @@ type Inputs = {
   annualPrice: number;
   stripePercent: number;
   stripeFixed: number;
-  usdBrl: number;
   aiUsdPerStudent: number;
   lovableUsd: number;
   aiSubscriptionsUsd: number;
@@ -34,7 +34,6 @@ const DEFAULTS: Inputs = {
   annualPrice: 799.9,
   stripePercent: 3.99,
   stripeFixed: 0.39,
-  usdBrl: 5.3,
   aiUsdPerStudent: 2.14,
   lovableUsd: 18.87,
   aiSubscriptionsUsd: 37.74,
@@ -48,6 +47,39 @@ const DEFAULTS: Inputs = {
 
 const STORAGE_KEY = "evoluir-admin-financial-projection-v1";
 
+type DailyUsdQuote = { rate: number; date: string };
+
+function formatBcbDate(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}-${day}-${date.getFullYear()}`;
+}
+
+async function fetchDailyUsdQuote(): Promise<DailyUsdQuote> {
+  const today = new Date();
+  const start = new Date(today);
+  start.setDate(start.getDate() - 7);
+  const params = new URLSearchParams({
+    $top: "1",
+    $orderby: "dataHoraCotacao desc",
+    $format: "json",
+    $select: "cotacaoVenda,dataHoraCotacao",
+  });
+  const url =
+    "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
+    `CotacaoDolarPeriodo(dataInicial='${formatBcbDate(start)}',dataFinalCotacao='${formatBcbDate(today)}')?${params}`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Não foi possível consultar a cotação do Banco Central.");
+  const payload = (await response.json()) as {
+    value?: { cotacaoVenda?: number; dataHoraCotacao?: string }[];
+  };
+  const latest = payload.value?.[0];
+  if (!latest || !Number.isFinite(Number(latest.cotacaoVenda))) {
+    throw new Error("O Banco Central ainda não disponibilizou uma cotação recente.");
+  }
+  return { rate: Number(latest.cotacaoVenda), date: latest.dataHoraCotacao ?? "" };
+}
+
 const money = (value: number) =>
   new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -57,6 +89,14 @@ const money = (value: number) =>
 export function AdminFinancialProjection() {
   const [values, setValues] = useState<Inputs>(DEFAULTS);
   const [loaded, setLoaded] = useState(false);
+  const exchangeRateQuery = useQuery({
+    queryKey: ["admin-financial-usd-brl-ptax"],
+    queryFn: fetchDailyUsdQuote,
+    staleTime: 6 * 60 * 60 * 1000,
+    refetchInterval: 24 * 60 * 60 * 1000,
+    retry: 2,
+  });
+  const usdBrl = exchangeRateQuery.data?.rate ?? 0;
 
   useEffect(() => {
     try {
@@ -66,18 +106,12 @@ export function AdminFinancialProjection() {
           lovable?: number;
           aiSubscriptions?: number;
         };
-        const rate = Number(parsed.usdBrl) > 0 ? Number(parsed.usdBrl) : DEFAULTS.usdBrl;
         setValues({
           ...DEFAULTS,
           ...parsed,
-          lovableUsd:
-            parsed.lovableUsd ??
-            (parsed.lovable !== undefined ? parsed.lovable / rate : DEFAULTS.lovableUsd),
+          lovableUsd: parsed.lovableUsd ?? parsed.lovable ?? DEFAULTS.lovableUsd,
           aiSubscriptionsUsd:
-            parsed.aiSubscriptionsUsd ??
-            (parsed.aiSubscriptions !== undefined
-              ? parsed.aiSubscriptions / rate
-              : DEFAULTS.aiSubscriptionsUsd),
+            parsed.aiSubscriptionsUsd ?? parsed.aiSubscriptions ?? DEFAULTS.aiSubscriptionsUsd,
         });
       }
     } catch {
@@ -105,7 +139,7 @@ export function AdminFinancialProjection() {
   };
 
   const fixedCosts =
-    (values.lovableUsd + values.aiSubscriptionsUsd) * values.usdBrl +
+    (values.lovableUsd + values.aiSubscriptionsUsd) * usdBrl +
     values.domainAnnual / 12 +
     values.marketing +
     values.otherCosts;
@@ -113,7 +147,7 @@ export function AdminFinancialProjection() {
   const annualStripe = (values.annualPrice * values.stripePercent) / 100 + values.stripeFixed;
   const monthlyNet = values.monthlyPrice - monthlyStripe;
   const annualNetMonthly = (values.annualPrice - annualStripe) / 12;
-  const aiPerStudent = values.aiUsdPerStudent * values.usdBrl;
+  const aiPerStudent = values.aiUsdPerStudent * usdBrl;
   const paidStudents = values.monthlySubscribers + values.annualSubscribers;
   const activeStudents = paidStudents + values.freeStudents;
   const revenue =
@@ -159,7 +193,6 @@ export function AdminFinancialProjection() {
       prefix: "R$",
       step: "0.01",
     },
-    { key: "usdBrl", label: "Câmbio USD/BRL", prefix: "R$", step: "0.01" },
     {
       key: "aiUsdPerStudent",
       label: "IA variável por aluno/mês (USD)",
@@ -212,6 +245,28 @@ export function AdminFinancialProjection() {
         </p>
       </div>
 
+      <div className="rounded-md border border-border bg-muted/20 p-3 text-sm">
+        <p className="font-semibold">Cotação automática do dólar (PTAX/BCB)</p>
+        {exchangeRateQuery.isPending ? (
+          <p className="mt-1 text-muted-foreground">Consultando a cotação mais recente...</p>
+        ) : exchangeRateQuery.isError ? (
+          <p className="mt-1 text-destructive">
+            Não foi possível atualizar a cotação. Recarregue o painel para tentar novamente.
+          </p>
+        ) : (
+          <p className="mt-1 text-muted-foreground">
+            US$ 1 = {money(usdBrl)}
+            {" · "}
+            Cotação de venda em{" "}
+            {new Date(exchangeRateQuery.data.date).toLocaleString("pt-BR", {
+              dateStyle: "short",
+              timeStyle: "short",
+              timeZone: "America/Sao_Paulo",
+            })}
+          </p>
+        )}
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {fields.map((field) => (
           <label key={field.key} className="text-xs text-muted-foreground">
@@ -231,22 +286,6 @@ export function AdminFinancialProjection() {
             </div>
           </label>
         ))}
-      </div>
-
-      <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
-        {[
-          "Cotação centralizada: US$ 1 =",
-          money(values.usdBrl),
-          ". Todos os custos em USD usam essa mesma taxa. Lovable: US$",
-          values.lovableUsd.toFixed(2),
-          "(",
-          money(values.lovableUsd * values.usdBrl),
-          "/mês); IAs Pro: US$",
-          values.aiSubscriptionsUsd.toFixed(2),
-          "(",
-          money(values.aiSubscriptionsUsd * values.usdBrl),
-          "/mês). Atualize a cotação e os valores originais conforme suas faturas; a taxa é uma premissa editável, não uma cotação automática em tempo real.",
-        ].join(" ")}
       </div>
 
       <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
