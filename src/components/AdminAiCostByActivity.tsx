@@ -181,7 +181,9 @@ export function AdminAiCostByActivity() {
                   ? "PTAX " +
                     quote.data.rate.toFixed(4) +
                     " · " +
-                    new Date(quote.data.date.replace(" ", "T")).toLocaleDateString(pt ? "pt-BR" : "en-US")
+                    new Date(quote.data.date.replace(" ", "T")).toLocaleDateString(
+                      pt ? "pt-BR" : "en-US",
+                    )
                   : pt
                     ? "Cotação PTAX indisponível"
                     : "PTAX rate unavailable"}
