@@ -27,8 +27,12 @@ async function fetchDailyUsdQuote(): Promise<DailyUsdQuote> {
   });
   const url =
     "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
-    "CotacaoDolarPeriodo(dataInicial='" + formatBcbDate(start) +
-    "',dataFinalCotacao='" + formatBcbDate(today) + "')?" + params;
+    "CotacaoDolarPeriodo(dataInicial='" +
+    formatBcbDate(start) +
+    "',dataFinalCotacao='" +
+    formatBcbDate(today) +
+    "')?" +
+    params;
   const response = await fetch(url);
   if (!response.ok) throw new Error("PTAX unavailable");
   const payload = (await response.json()) as {
@@ -73,7 +77,9 @@ export function AdminAiCostByActivity() {
     <section className="pt-3">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="font-semibold">{pt ? "Custo de IA por atividade" : "AI cost by activity"}</h3>
+          <h3 className="font-semibold">
+            {pt ? "Custo de IA por atividade" : "AI cost by activity"}
+          </h3>
           <p className="text-xs text-muted-foreground">
             {pt
               ? "Custos calculados por chamada registrada, sem rateio entre atividades."
@@ -109,30 +115,49 @@ export function AdminAiCostByActivity() {
         </div>
       ) : query.isError ? (
         <p className="py-8 text-sm text-muted-foreground">
-          {pt ? "Não foi possível carregar os custos por atividade." : "Could not load activity costs."}
+          {pt
+            ? "Não foi possível carregar os custos por atividade."
+            : "Could not load activity costs."}
         </p>
       ) : (
         <>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-md border border-border bg-muted/30 p-3">
-              <p className="text-xs text-muted-foreground">{pt ? "Custo total (USD)" : "Total cost (USD)"}</p>
-              <p className="mt-1 text-xl font-semibold tabular-nums">{usd(totalUsd, pt ? "pt-BR" : "en-US")}</p>
-            </div>
-            <div className="rounded-md border border-border bg-muted/30 p-3">
-              <p className="text-xs text-muted-foreground">{pt ? "Custo convertido (BRL)" : "Converted cost (BRL)"}</p>
-              <p className="mt-1 text-xl font-semibold tabular-nums">{brl(totalBrl)}</p>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                {quote.data
-                  ? "PTAX " + quote.data.rate.toFixed(4) + " · " + new Date(quote.data.date).toLocaleDateString(pt ? "pt-BR" : "en-US")
-                  : pt ? "Cotação PTAX indisponível" : "PTAX rate unavailable"}
+              <p className="text-xs text-muted-foreground">
+                {pt ? "Custo total (USD)" : "Total cost (USD)"}
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums">
+                {usd(totalUsd, pt ? "pt-BR" : "en-US")}
               </p>
             </div>
             <div className="rounded-md border border-border bg-muted/30 p-3">
-              <p className="text-xs text-muted-foreground">{pt ? "Chamadas registradas" : "Recorded calls"}</p>
-              <p className="mt-1 text-xl font-semibold tabular-nums">{query.data.calls.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">
+                {pt ? "Custo convertido (BRL)" : "Converted cost (BRL)"}
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums">{brl(totalBrl)}</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {quote.data
+                  ? "PTAX " +
+                    quote.data.rate.toFixed(4) +
+                    " · " +
+                    new Date(quote.data.date).toLocaleDateString(pt ? "pt-BR" : "en-US")
+                  : pt
+                    ? "Cotação PTAX indisponível"
+                    : "PTAX rate unavailable"}
+              </p>
             </div>
             <div className="rounded-md border border-border bg-muted/30 p-3">
-              <p className="text-xs text-muted-foreground">{pt ? "Chamadas com custo medido" : "Calls with measured cost"}</p>
+              <p className="text-xs text-muted-foreground">
+                {pt ? "Chamadas registradas" : "Recorded calls"}
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums">
+                {query.data.calls.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground">
+                {pt ? "Chamadas com custo medido" : "Calls with measured cost"}
+              </p>
               <p className="mt-1 text-xl font-semibold tabular-nums">
                 {query.data.measuredCalls.toLocaleString()} / {query.data.calls.toLocaleString()}
               </p>
@@ -161,9 +186,15 @@ export function AdminAiCostByActivity() {
                         {row.measuredCalls}/{row.calls} {pt ? "medidas" : "measured"}
                       </span>
                     </td>
-                    <td className="py-2 pr-3 text-right tabular-nums">{usd(row.costUsd, pt ? "pt-BR" : "en-US")}</td>
                     <td className="py-2 pr-3 text-right tabular-nums">
-                      {brl(row.costUsd !== null && quote.data ? row.costUsd * quote.data.rate : null)}
+                      {usd(row.costUsd, pt ? "pt-BR" : "en-US")}
+                    </td>
+                    <td className="py-2 pr-3 text-right tabular-nums">
+                      {brl(
+                        row.costUsd !== null && quote.data
+                          ? row.costUsd * quote.data.rate
+                          : null,
+                      )}
                     </td>
                     <td className="py-2 pr-3 text-right tabular-nums">
                       {usd(row.averageCostUsd, pt ? "pt-BR" : "en-US")}
@@ -190,7 +221,9 @@ export function AdminAiCostByActivity() {
           </p>
           {query.data.truncated && (
             <p className="mt-1 text-xs text-muted-foreground">
-              {pt ? "Amostra limitada às 10.000 chamadas mais recentes." : "Sample limited to the 10,000 most recent calls."}
+              {pt
+                ? "Amostra limitada às 10.000 chamadas mais recentes."
+                : "Sample limited to the 10,000 most recent calls."}
             </p>
           )}
         </>
