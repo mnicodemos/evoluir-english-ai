@@ -46,9 +46,13 @@ export function AdminCostPerformance() {
     <section className="pt-2">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="font-semibold">{pt ? "Custo &amp; desempenho" : "Cost &amp; performance"}</h3>
+          <h3 className="font-semibold">
+            {pt ? "Custo &amp; desempenho" : "Cost &amp; performance"}
+          </h3>
           <p className="text-xs text-muted-foreground">
-            {pt ? "Referência técnica e econômica · somente leitura" : "Technical and cost benchmark · read only"}
+            {pt
+              ? "Referência técnica e econômica · somente leitura"
+              : "Technical and cost benchmark · read only"}
           </p>
         </div>
         <div className="flex items-center gap-1">
@@ -116,7 +120,9 @@ export function AdminCostPerformance() {
         </div>
       ) : query.isError ? (
         <p className="py-8 text-sm text-muted-foreground">
-          {pt ? "Não foi possível carregar os dados de referência agora." : "Could not load benchmark data right now."}
+          {pt
+            ? "Não foi possível carregar os dados de referência agora."
+            : "Could not load benchmark data right now."}
         </p>
       ) : (
         <>
