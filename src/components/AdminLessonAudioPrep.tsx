@@ -50,7 +50,11 @@ export function AdminLessonAudioPrep() {
     } catch (error) {
       setLog((current) => [
         ...current,
-        error instanceof Error ? error.message : pt ? "Não foi possível preparar agora." : "Could not prepare the audio right now.",
+        error instanceof Error
+          ? error.message
+          : pt
+            ? "Não foi possível preparar agora."
+            : "Could not prepare the audio right now.",
       ]);
     } finally {
       setRunning(false);
@@ -68,7 +72,9 @@ export function AdminLessonAudioPrep() {
           <AudioLines className="size-5" aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-display text-base font-semibold">{pt ? "Áudios das lições" : "Lesson audio"}</h2>
+          <h2 className="font-display text-base font-semibold">
+            {pt ? "Áudios das lições" : "Lesson audio"}
+          </h2>
           <p className="text-sm text-muted-foreground">
             {pt
               ? "Prepare antecipadamente os diálogos da EVO com o Leo para as lições deste nível, evitando que os alunos esperem pela IA ao abrir uma lição. O roteiro é compartilhado com todos; a voz é gerada linha a linha na primeira reprodução e armazenada para uso posterior. Custo aproximado: US$ 0,01 por roteiro, uma única vez. Review I, Review II e o teste de revisão não têm áudio."
@@ -101,13 +107,23 @@ export function AdminLessonAudioPrep() {
           onClick={() => void run()}
         >
           {running ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
-          {running ? (pt ? "Preparando…" : "Preparing…") : pt ? "Preparar áudios do nível" : "Prepare level audio"}
+          {running
+            ? pt
+              ? "Preparando…"
+              : "Preparing…"
+            : pt
+              ? "Preparar áudios do nível"
+              : "Prepare level audio"}
         </Button>
         <span className="text-sm text-muted-foreground tabular-nums">
           {status.isPending
-            ? pt ? "Verificando…" : "Checking…"
+            ? pt
+              ? "Verificando…"
+              : "Checking…"
             : status.isError
-              ? pt ? "Não foi possível verificar." : "Could not check status."
+              ? pt
+                ? "Não foi possível verificar."
+                : "Could not check status."
               : data
                 ? `${data.ready}/${data.total} prontos${done ? " ✓" : ""}`
                 : null}
@@ -116,7 +132,9 @@ export function AdminLessonAudioPrep() {
 
       {data && !running && data.missing.length > 0 ? (
         <details className="text-xs text-muted-foreground">
-          <summary className="cursor-pointer">{pt ? "Faltam" : "Missing"} {data.missing.length}</summary>
+          <summary className="cursor-pointer">
+            {pt ? "Faltam" : "Missing"} {data.missing.length}
+          </summary>
           <ul className="mt-1 space-y-0.5">
             {data.missing.map((item) => (
               <li key={item}>{item}</li>
