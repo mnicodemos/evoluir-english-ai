@@ -14,7 +14,12 @@ import { useProfile } from "@/hooks/useProfile";
 import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { findLevel, isReviewLevel, LEVELS } from "@/lib/level";
-import { cleanVimeoPlayerUrl, vimeoEmbedUrl, vimeoTextTrackUrl } from "@/lib/lessonVideoDisplay";
+import {
+  cleanVimeoPlayerUrl,
+  vimeoEmbedUrl,
+  vimeoTextTrackUrl,
+  vimeoThumbnailUrl,
+} from "@/lib/lessonVideoDisplay";
 import { recordVideoView } from "@/lib/premiumVideoSocial.functions";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
@@ -90,6 +95,7 @@ function ExtraVideosPage() {
   );
   const level = picked ?? (profile ? studentLevel : (levels[0] ?? null));
   const [playing, setPlaying] = useState<string | null>(null);
+  const [loadedPlayer, setLoadedPlayer] = useState<string | null>(null);
   const [completionPending, setCompletionPending] = useState(false);
   const [completionError, setCompletionError] = useState(false);
   const completionInFlight = useRef(false);
@@ -97,6 +103,7 @@ function ExtraVideosPage() {
   const pickLevel = (value: string) => {
     setPicked(value);
     setPlaying(null);
+    setLoadedPlayer(null);
     setCompletionError(false);
     setCompletionPending(false);
     completionInFlight.current = false;
@@ -296,6 +303,7 @@ function ExtraVideosPage() {
             {levelVideos.map((video) => {
               const embed = video.url ? vimeoEmbedUrl(video.url) : null;
               const open = playing === video.id && embed;
+              const poster = vimeoThumbnailUrl(video.url);
               const basePlayerUrl = embed
                 ? ["a1", "a2"].includes(video.level.toLowerCase())
                   ? vimeoTextTrackUrl(embed, "pt")
@@ -308,25 +316,59 @@ function ExtraVideosPage() {
                 <li key={video.id} className="card-soft overflow-hidden">
                   <div className="relative aspect-video w-full overflow-hidden bg-black">
                     {premium && embed && open && playerUrl ? (
-                      <iframe
-                        id={video.id}
-                        ref={playerRef}
-                        className="absolute inset-0 size-full"
-                        src={playerUrl.toString()}
-                        title={video.title}
-                        loading="lazy"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-                        allowFullScreen
-                      />
+                      <>
+                        {poster ? (
+                          <img
+                            src={poster}
+                            alt=""
+                            aria-hidden="true"
+                            className={cn(
+                              "absolute inset-0 size-full object-cover transition-opacity",
+                              loadedPlayer === video.id ? "opacity-0" : "opacity-100",
+                            )}
+                            onError={(event) => {
+                              event.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : null}
+                        <iframe
+                          id={video.id}
+                          ref={playerRef}
+                          className={cn(
+                            "absolute inset-0 size-full transition-opacity",
+                            loadedPlayer === video.id ? "opacity-100" : "opacity-0",
+                          )}
+                          src={playerUrl.toString()}
+                          title={video.title}
+                          loading="lazy"
+                          onLoad={() => setLoadedPlayer(video.id)}
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                          allowFullScreen
+                        />
+                      </>
                     ) : premium && embed ? (
                       <button
                         type="button"
                         className="absolute inset-0 grid place-items-center bg-black text-white transition hover:bg-black/80"
-                        onClick={() => setPlaying(video.id)}
+                        onClick={() => {
+                          setLoadedPlayer(null);
+                          setPlaying(video.id);
+                        }}
                         aria-label={`Play ${video.title}`}
                       >
-                        <span className="grid size-14 place-items-center rounded-full border border-white/20 bg-white/10">
+                        {poster ? (
+                          <img
+                            src={poster}
+                            alt=""
+                            aria-hidden="true"
+                            className="absolute inset-0 size-full object-cover"
+                            onError={(event) => {
+                              event.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : null}
+                        <span className="relative z-10 grid size-14 place-items-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur-sm">
                           <PlayCircle className="size-8" />
                         </span>
                       </button>
