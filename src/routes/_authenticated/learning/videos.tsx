@@ -110,22 +110,30 @@ function ExtraVideosPage() {
       try {
         const result = await sendView({ data: { videoId: id } });
         if (result.recorded) {
-          // Reconcile with the server first. Setting the confirmed completion
-          // before invalidation lets a stale/refetch response overwrite it and
-          // makes the Dashboard Quick Win flip back to pending after load.
-          await queryClient.invalidateQueries({
-            queryKey: ["premium-videos", profile?.id],
-            refetchType: "active",
-          });
-          const latest = queryClient.getQueryData<
-            Awaited<ReturnType<typeof fetchVideos>> | undefined
-          >(["premium-videos", profile?.id]);
+          const queryKey = ["premium-videos", profile?.id] as const;
+          const latest =
+            queryClient.getQueryData<Awaited<ReturnType<typeof fetchVideos>>>(queryKey) ??
+            query.data;
+          // recordVideoView has confirmed the persisted write. Publish that
+          // confirmed status immediately so the Dashboard selector can update
+          // without waiting for another network round trip.
           if (latest) {
-            queryClient.setQueryData(["premium-videos", profile?.id], {
+            queryClient.setQueryData(queryKey, {
               ...latest,
               watchedToday: true,
             });
           }
+          // Mark the video list stale without allowing a concurrent refetch to
+          // overwrite the confirmed completion with an older response. The
+          // next visit will still fetch the server's persisted truth.
+          await queryClient.invalidateQueries({
+            queryKey,
+            refetchType: "none",
+          });
+          await queryClient.invalidateQueries({
+            queryKey: ["next-step"],
+            refetchType: "active",
+          });
         }
         return result.recorded;
       } catch {

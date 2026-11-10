@@ -53,29 +53,28 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   });
   const studentLevel = findLevel(profile?.level).value;
   const levelHasVideos = !!videos?.videos.some((video) => video.level === studentLevel);
+  const videoStatusKnown =
+    !videoDay ||
+    (videosFetched &&
+      !videosError &&
+      videos?.watchedToday !== null &&
+      videos?.watchedToday !== undefined);
   const select = useCallback(
     (step: NextStepData): NextStepData => {
-      // Keep a stable video Quick Win while the server status is unknown.
-      // A loading/error state must never be interpreted as "completed".
-      // Once available, the persisted server record is the sole source of truth.
-      const serverStatusKnown =
-        videosFetched &&
-        !videosError &&
-        videos?.watchedToday !== null &&
-        videos?.watchedToday !== undefined;
+      // Never interpret a loading/error state as completion. The card receives
+      // videoStatusKnown separately and keeps its Quick Win area in a loading
+      // state until the persisted server status is available.
       return withExtraVideoQuickWin<NextStepData>(step, {
         day: today,
         premium,
-        // Until availability is confirmed, avoid exposing the underlying EVO
-        // Quick Win or showing a false "nothing pending" state.
-        levelHasVideos: serverStatusKnown ? levelHasVideos : true,
-        watchedToday: serverStatusKnown && videos?.watchedToday === true,
+        levelHasVideos: videoStatusKnown ? levelHasVideos : true,
+        watchedToday: videoStatusKnown && videos?.watchedToday === true,
       });
     },
-    [today, premium, videosFetched, videosError, videos?.watchedToday, levelHasVideos],
+    [today, premium, videoStatusKnown, videos?.watchedToday, levelHasVideos],
   );
 
-  return useQuery({
+  const nextStepQuery = useQuery({
     select,
     queryKey: ["next-step", profile?.level ?? null],
     queryFn: async () => {
@@ -93,4 +92,5 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
     placeholderData: () => stored,
     ...(options.enabled === undefined ? {} : { enabled: options.enabled }),
   });
+  return { ...nextStepQuery, videoStatusKnown };
 }
