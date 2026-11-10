@@ -60,10 +60,10 @@ async function fetchDailyUsdQuote(): Promise<DailyUsdQuote> {
   const start = new Date(today);
   start.setDate(start.getDate() - 7);
   const params = new URLSearchParams({
-    "$top": "1",
-    "$orderby": "dataHoraCotacao desc",
-    "$format": "json",
-    "$select": "cotacaoVenda,dataHoraCotacao",
+    $top: "1",
+    $orderby: "dataHoraCotacao desc",
+    $format: "json",
+    $select: "cotacaoVenda,dataHoraCotacao",
   });
   const url =
     "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
@@ -250,10 +250,18 @@ export function AdminFinancialProjection() {
         {exchangeRateQuery.isPending ? (
           <p className="mt-1 text-muted-foreground">Consultando a cotação mais recente...</p>
         ) : exchangeRateQuery.isError ? (
-          <p className="mt-1 text-destructive">Não foi possível atualizar a cotação. Recarregue o painel para tentar novamente.</p>
+          <p className="mt-1 text-destructive">
+            Não foi possível atualizar a cotação. Recarregue o painel para tentar novamente.
+          </p>
         ) : (
           <p className="mt-1 text-muted-foreground">
-            US$ 1 = {money(usdBrl)} · Cotação de venda em {new Date(exchangeRateQuery.data.date).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" })}
+            US$ 1 = {money(usdBrl)}{" · "}
+            Cotação de venda em{" "}
+            {new Date(exchangeRateQuery.data.date).toLocaleString("pt-BR", {
+              dateStyle: "short",
+              timeStyle: "short",
+              timeZone: "America/Sao_Paulo",
+            })}
           </p>
         )}
       </div>
