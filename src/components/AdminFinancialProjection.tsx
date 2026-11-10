@@ -50,7 +50,14 @@ const STORAGE_KEY = "evoluir-admin-financial-projection-v1";
 
 type DailyUsdQuote = { rate: number; date: string; cached?: boolean };
 
-const QUOTE_STORAGE_KEY = "evoluir-admin-financial-usd-brl-ptax-v1";
+type BcbQuoteRecord = {
+  cotacaoVenda?: number;
+  dataHoraCotacao?: string;
+  tipoBoletim?: string;
+};
+
+const QUOTE_STORAGE_KEY = "evoluir-admin-financial-usd-brl-ptax-v2";
+const MAX_QUOTE_AGE_DAYS = 10;
 
 function formatBcbDate(date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -58,17 +65,32 @@ function formatBcbDate(date: Date) {
   return `${month}-${day}-${date.getFullYear()}`;
 }
 
+function isUsableQuote(quote: DailyUsdQuote, now: Date) {
+  const rate = Number(quote.rate);
+  const quoteTime = Date.parse(quote.date);
+  const age = now.getTime() - quoteTime;
+  const maxAge = MAX_QUOTE_AGE_DAYS * 24 * 60 * 60 * 1000;
+
+  return (
+    Number.isFinite(rate) &&
+    rate > 0 &&
+    Number.isFinite(quoteTime) &&
+    age >= -24 * 60 * 60 * 1000 &&
+    age <= maxAge
+  );
+}
+
 async function fetchDailyUsdQuote(pt: boolean): Promise<DailyUsdQuote> {
   const today = new Date();
   const start = new Date(today);
-  start.setDate(start.getDate() - 7);
+  start.setDate(start.getDate() - 30);
   const params = new URLSearchParams({
     "@dataInicial": `'${formatBcbDate(start)}'`,
     "@dataFinalCotacao": `'${formatBcbDate(today)}'`,
-    $top: "1",
+    $top: "100",
     $orderby: "dataHoraCotacao desc",
     $format: "json",
-    $select: "cotacaoVenda,dataHoraCotacao",
+    $select: "cotacaoVenda,dataHoraCotacao,tipoBoletim",
   });
   const url =
     "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
@@ -82,19 +104,22 @@ async function fetchDailyUsdQuote(pt: boolean): Promise<DailyUsdQuote> {
           ? "Não foi possível consultar a cotação do Banco Central."
           : "Could not retrieve the Central Bank exchange rate.",
       );
-    const payload = (await response.json()) as {
-      value?: { cotacaoVenda?: number; dataHoraCotacao?: string }[];
+    const payload = (await response.json()) as { value?: BcbQuoteRecord[] };
+    const closingQuotes = (payload.value ?? []).filter(
+      (item) => item.tipoBoletim?.trim().toLocaleLowerCase("pt-BR") === "fechamento",
+    );
+    const latest = closingQuotes[0];
+    const quote: DailyUsdQuote = {
+      rate: Number(latest?.cotacaoVenda),
+      date: latest?.dataHoraCotacao ?? "",
     };
-    const latest = payload.value?.[0];
-    const rate = Number(latest?.cotacaoVenda);
-    if (!latest || !Number.isFinite(rate) || rate <= 0 || !latest.dataHoraCotacao) {
+    if (!isUsableQuote(quote, today)) {
       throw new Error(
         pt
-          ? "O Banco Central ainda não disponibilizou uma cotação recente."
-          : "The Central Bank has not published a recent exchange rate yet.",
+          ? "O Banco Central não retornou uma PTAX de fechamento válida e recente."
+          : "The Central Bank did not return a valid and recent PTAX closing quote.",
       );
     }
-    const quote = { rate, date: latest.dataHoraCotacao };
     localStorage.setItem(QUOTE_STORAGE_KEY, JSON.stringify(quote));
     return quote;
   } catch (error) {
@@ -102,9 +127,7 @@ async function fetchDailyUsdQuote(pt: boolean): Promise<DailyUsdQuote> {
       const saved = localStorage.getItem(QUOTE_STORAGE_KEY);
       if (saved) {
         const quote = JSON.parse(saved) as DailyUsdQuote;
-        if (Number.isFinite(quote.rate) && quote.rate > 0 && quote.date) {
-          return { ...quote, cached: true };
-        }
+        if (isUsableQuote(quote, today)) return { ...quote, cached: true };
       }
     } catch {
       /* Ignore an unavailable or invalid cached quote. */
@@ -125,7 +148,7 @@ export function AdminFinancialProjection() {
   const [values, setValues] = useState<Inputs>(DEFAULTS);
   const [loaded, setLoaded] = useState(false);
   const exchangeRateQuery = useQuery({
-    queryKey: ["admin-financial-usd-brl-ptax"],
+    queryKey: ["admin-financial-usd-brl-ptax-closing"],
     queryFn: () => fetchDailyUsdQuote(pt),
     staleTime: 6 * 60 * 60 * 1000,
     refetchInterval: 24 * 60 * 60 * 1000,
