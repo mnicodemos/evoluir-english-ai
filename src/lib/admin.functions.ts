@@ -2199,9 +2199,7 @@ export const getAiCostByStudent = createServerFn({ method: "GET" })
       students,
       calls: (events ?? []).length,
       measuredCalls,
-      totalUsd: measuredCalls
-        ? students.reduce((sum, row) => sum + (row.costUsd ?? 0), 0)
-        : null,
+      totalUsd: measuredCalls ? students.reduce((sum, row) => sum + (row.costUsd ?? 0), 0) : null,
       truncated: (events ?? []).length >= 10000,
     };
   });
