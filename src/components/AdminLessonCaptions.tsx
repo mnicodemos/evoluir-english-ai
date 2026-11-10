@@ -4,6 +4,7 @@ import { FileText, Loader2, Trash2, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useUiLang } from "@/lib/uiLang";
 import {
   deleteLessonVideoCaption,
   getLessonVideoCaptionAdmin,
@@ -16,7 +17,7 @@ type Level = (typeof LEVELS)[number];
 type Language = "en" | "pt";
 type CaptionFile = { name: string; content: string };
 
-export function AdminLessonCaptions() {
+export function AdminLessonCaptions() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
   const [level, setLevel] = useState<Level>("a1");
   const [lessonKey, setLessonKey] = useState("");
   const [files, setFiles] = useState<Partial<Record<Language, CaptionFile>>>({});
@@ -78,16 +79,16 @@ export function AdminLessonCaptions() {
     setNotice("");
     if (!file) return;
     if (!file.name.toLowerCase().endsWith(".vtt") && file.type !== "text/vtt") {
-      setNotice("Selecione um arquivo .vtt.");
+      setNotice(pt ? "Selecione um arquivo .vtt." : "Select a .vtt file.");
       return;
     }
     if (file.size > 500_000) {
-      setNotice("O arquivo deve ter no máximo 500 KB.");
+      setNotice(pt ? "O arquivo deve ter no máximo 500 KB." : "The file must be no larger than 500 KB.");
       return;
     }
     const content = await file.text();
     if (!content.startsWith("WEBVTT")) {
-      setNotice("O arquivo selecionado não é um WebVTT válido.");
+      setNotice(pt ? "O arquivo selecionado não é um WebVTT válido." : "The selected file is not valid WebVTT.");
       return;
     }
     setFiles((current) => ({ ...current, [language]: { name: file.name, content } }));
@@ -103,10 +104,9 @@ export function AdminLessonCaptions() {
           <FileText className="size-5" aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-display text-base font-semibold">Legendas personalizadas (A1–B1)</h2>
+          <h2 className="font-display text-base font-semibold">{pt ? "Legendas personalizadas (A1–B1)" : "Custom captions (A1–B1)"}</h2>
           <p className="text-sm text-muted-foreground">
-            Envie faixas WebVTT em inglês e português por aula. O aluno verá as legendas dentro do
-            player, com tamanho inicial de 75% e controles próprios, sem depender do CC do Vimeo.
+            {pt ? "Envie faixas WebVTT em inglês e português por aula. O aluno verá as legendas dentro do player, com tamanho inicial de 75% e controles próprios, sem depender do CC do Vimeo." : "Upload English and Portuguese WebVTT tracks for each lesson. Students will see captions inside the player, initially sized at 75%, with their own controls and without relying on Vimeo CC."}
           </p>
         </div>
       </div>
@@ -153,14 +153,13 @@ export function AdminLessonCaptions() {
 
       {lessonsQuery.isPending || statusQuery.isPending ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Carregando aulas e legendas…
+          <Loader2 className="size-4 animate-spin" /> {pt ? "Carregando aulas e legendas…" : "Loading lessons and captions…"}
         </p>
       ) : lessonsQuery.isError ? (
-        <p className="text-sm text-destructive">Não foi possível carregar as aulas deste nível.</p>
+        <p className="text-sm text-destructive">{pt ? "Não foi possível carregar as aulas deste nível." : "Could not load lessons for this level."}</p>
       ) : statusQuery.data?.missingMigration ? (
         <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-          Aplique a migração <code>20261107170000_lesson_video_captions.sql</code> para habilitar o
-          envio das legendas.
+          {pt ? <>Aplique a migração <code>20261107170000_lesson_video_captions.sql</code> para habilitar o envio das legendas.</> : <>Apply migration <code>20261107170000_lesson_video_captions.sql</code> to enable caption uploads.</>}
         </p>
       ) : selectedKey ? (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -179,11 +178,11 @@ export function AdminLessonCaptions() {
                       exists ? "text-xs text-brand-green" : "text-xs text-muted-foreground"
                     }
                   >
-                    {exists ? "Publicado" : "Sem legenda"}
+                    {exists ? pt ? "Publicado" : "Published" : pt ? "Sem legenda" : "No captions"}
                   </span>
                 </div>
                 <label className="block text-xs text-muted-foreground">
-                  Arquivo WebVTT (.vtt)
+                  {pt ? "Arquivo WebVTT (.vtt)" : "WebVTT file (.vtt)"}
                   <input
                     className="mt-1 block w-full text-xs file:mr-2 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-2"
                     type="file"
@@ -193,7 +192,7 @@ export function AdminLessonCaptions() {
                 </label>
                 {draft ? (
                   <p className="truncate text-xs text-muted-foreground">
-                    {draft.name} · pronto para enviar
+                    {draft.name} · {pt ? "pronto para enviar" : "ready to upload"}
                   </p>
                 ) : null}
                 <div className="flex flex-wrap gap-2">
@@ -218,13 +217,13 @@ export function AdminLessonCaptions() {
                       disabled={busy}
                       onClick={() => {
                         if (
-                          window.confirm(`Remover a legenda ${language.toUpperCase()} desta aula?`)
+                          window.confirm(`${pt ? "Remover a legenda" : "Remove the"} ${language.toUpperCase()} ${pt ? "desta aula?" : "captions for this lesson?"}`)
                         ) {
                           deleteMutation.mutate(language);
                         }
                       }}
                     >
-                      <Trash2 className="mr-1 size-4" /> Remover
+                      <Trash2 className="mr-1 size-4" /> {pt ? "Remover" : "Remove"}
                     </Button>
                   ) : null}
                 </div>
@@ -233,11 +232,10 @@ export function AdminLessonCaptions() {
           })}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">Nenhuma aula cadastrada para este nível.</p>
+        <p className="text-sm text-muted-foreground">{pt ? "Nenhuma aula cadastrada para este nível." : "No lessons are configured for this level."}</p>
       )}
       <p className="text-xs text-muted-foreground">
-        Formato WebVTT · até 500 KB por idioma e aula. A legenda pode ser substituída a qualquer
-        momento.
+        {pt ? "Formato WebVTT · até 500 KB por idioma e aula. A legenda pode ser substituída a qualquer momento." : "WebVTT format · up to 500 KB per language and lesson. Captions can be replaced at any time."}
       </p>
       {notice ? (
         <p role="status" className="text-sm text-muted-foreground">
