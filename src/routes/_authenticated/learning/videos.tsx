@@ -15,7 +15,6 @@ import { useUiLang } from "@/lib/uiLang";
 import { uiPt } from "@/lib/uiDictionary";
 import { findLevel, isReviewLevel, LEVELS } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl, vimeoTextTrackUrl } from "@/lib/lessonVideoDisplay";
-import { reelEmbedUrl, type PremiumVideo } from "@/lib/premiumVideos";
 import { recordVideoView } from "@/lib/premiumVideoSocial.functions";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
 import { extraVideoWatchedKey } from "@/lib/extraVideoQuickWin";
