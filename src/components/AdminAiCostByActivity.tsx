@@ -72,6 +72,47 @@ export function AdminAiCostByActivity() {
   });
   const totalUsd = query.data?.totalUsd ?? null;
   const totalBrl = totalUsd !== null && quote.data ? totalUsd * quote.data.rate : null;
+  const summaryGroups = (() => {
+    const groups = new Map<string, number>();
+    const categoryByOperation: Record<string, string> = {
+      lesson_generation: "lessons",
+      teacher: "teacher",
+      talking: "speaking",
+      writing_correction: "writing",
+      vocabulary_generation: "vocabulary",
+      quiz_generation: "quizzes",
+      dictionary: "dictionary",
+      transcription: "audio",
+      tts: "audio",
+      chat: "chat",
+    };
+    for (const activity of query.data?.activities ?? []) {
+      const category = categoryByOperation[activity.operation] ?? "other";
+      if (activity.costUsd !== null) {
+        groups.set(category, (groups.get(category) ?? 0) + activity.costUsd);
+      }
+    }
+    const labels: Record<string, { pt: string; en: string }> = {
+      lessons: { pt: "Lessons", en: "Lessons" },
+      teacher: { pt: "AI Teacher", en: "AI Teacher" },
+      speaking: { pt: "Speaking", en: "Speaking" },
+      writing: { pt: "Writing / Correction", en: "Writing / Correction" },
+      vocabulary: { pt: "Vocabulary", en: "Vocabulary" },
+      quizzes: { pt: "Quizzes", en: "Quizzes" },
+      dictionary: { pt: "Dictionary", en: "Dictionary" },
+      audio: { pt: "Audio / Transcription", en: "Audio / Transcription" },
+      chat: { pt: "Chat", en: "Chat" },
+      other: { pt: "Outras atividades", en: "Other activities" },
+    };
+    return [...groups.entries()]
+      .map(([key, costUsd]) => ({
+        key,
+        label: labels[key]?.[pt ? "pt" : "en"] ?? key,
+        costUsd,
+        share: totalUsd && totalUsd > 0 ? (costUsd / totalUsd) * 100 : 0,
+      }))
+      .sort((a, b) => b.costUsd - a.costUsd);
+  })();
 
   return (
     <section className="pt-3">
@@ -161,6 +202,40 @@ export function AdminAiCostByActivity() {
               <p className="mt-1 text-xl font-semibold tabular-nums">
                 {query.data.measuredCalls.toLocaleString()} / {query.data.calls.toLocaleString()}
               </p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-md border border-border p-3">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <h4 className="text-sm font-semibold">
+                {pt ? "Onde o custo foi gasto" : "Where the cost went"}
+              </h4>
+              <span className="text-xs text-muted-foreground">
+                {pt ? "Participação no total" : "Share of total"}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {summaryGroups.map((group) => (
+                <div key={group.key}>
+                  <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                    <span className="font-medium">{group.label}</span>
+                    <span className="shrink-0 text-right tabular-nums text-muted-foreground">
+                      {group.share.toFixed(1)}% · {usd(group.costUsd, pt ? "pt-BR" : "en-US")}
+                    </span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: group.share + "%" }}
+                    />
+                  </div>
+                </div>
+              ))}
+              {summaryGroups.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {pt ? "Sem custos medidos para resumir." : "No measured costs to summarize."}
+                </p>
+              )}
             </div>
           </div>
 
