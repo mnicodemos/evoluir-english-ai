@@ -567,10 +567,7 @@ function ShortCaptionEditor({ videoId, field, isPt }: { videoId: string; field: 
             className={field + " h-36 w-full min-w-0 py-2 font-mono text-xs"}
             value={values[language]}
             onChange={(event) => setters[language](event.target.value)}
-            placeholder={"WEBVTT
-
-00:00:01.000 --> 00:00:03.000
-Caption text"}
+            placeholder={"WEBVTT\n\n00:00:01.000 --> 00:00:03.000\nCaption text"}
           />
           <div className="flex gap-2">
             <Button
