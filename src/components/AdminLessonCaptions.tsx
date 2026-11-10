@@ -115,7 +115,7 @@ export function AdminLessonCaptions() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="text-sm font-medium">
-          Nível
+          {pt ? "Nível" : "Level"}
           <select
             className={field}
             value={level}
@@ -210,7 +210,7 @@ export function AdminLessonCaptions() {
                     ) : (
                       <Upload className="mr-1 size-4" />
                     )}
-                    Enviar legenda
+                    {pt ? "Enviar legenda" : "Upload captions"}
                   </Button>
                   {exists ? (
                     <Button
