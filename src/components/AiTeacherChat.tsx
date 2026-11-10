@@ -362,7 +362,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
                   </span>
                 ) : (
                   <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                    <EvoAvatar decorative className="size-7 ring-1 sm:size-8" />
+                    <EvoAvatar decorative className="size-7 sm:size-8" />
                     {t("AI Teacher")}
                   </span>
                 )}
@@ -400,7 +400,7 @@ export function AiTeacherChat({ lessonId }: { lessonId?: string }) {
 
             {turn.isPending && (
               <div aria-live="polite" className="flex items-center gap-2 text-sm">
-                <EvoAvatar decorative className="size-7 ring-1 sm:size-8" />
+                <EvoAvatar decorative className="size-7 sm:size-8" />
                 <Shimmer>{t("Teacher is thinking...")}</Shimmer>
               </div>
             )}
