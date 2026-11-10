@@ -178,7 +178,7 @@ function ExtraVideosPage() {
     const iframe = playerRef.current;
     if (!iframe) return;
     let cancelled = false;
-    let player: { off: (e: string) => void; destroy?: () => Promise<void> } | null = null;
+    let player: import("@vimeo/player").default | null = null;
     const finish = async () => {
       if (cancelled || completionInFlight.current) return;
       completionInFlight.current = true;
