@@ -40,7 +40,9 @@ async function watchedVideoToday(userId: string): Promise<boolean | null> {
     .eq("day", studyToday())
     .limit(1);
   if (error) {
-    console.error(`Premium video completion status could not be read: ${error.code ?? ""} ${error.message}`);
+    console.error(
+      `Premium video completion status could not be read: ${error.code ?? ""} ${error.message}`,
+    );
     return null;
   }
   return (data?.length ?? 0) > 0;
