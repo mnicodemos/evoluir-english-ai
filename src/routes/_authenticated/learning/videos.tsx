@@ -110,15 +110,22 @@ function ExtraVideosPage() {
       try {
         const result = await sendView({ data: { videoId: id } });
         if (result.recorded) {
-          // Update the shared query immediately so the Dashboard's Quick Win
-          // re-evaluates in this tab; then reconcile with the server.
-          if (query.data) {
+          // Reconcile with the server first. Setting the confirmed completion
+          // before invalidation lets a stale/refetch response overwrite it and
+          // makes the Dashboard Quick Win flip back to pending after load.
+          await queryClient.invalidateQueries({
+            queryKey: ["premium-videos", profile?.id],
+            refetchType: "active",
+          });
+          const latest = queryClient.getQueryData<
+            Awaited<ReturnType<typeof fetchVideos>> | undefined
+          >(["premium-videos", profile?.id]);
+          if (latest) {
             queryClient.setQueryData(["premium-videos", profile?.id], {
-              ...query.data,
+              ...latest,
               watchedToday: true,
             });
           }
-          await queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
         }
         return result.recorded;
       } catch {
