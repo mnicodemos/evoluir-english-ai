@@ -659,29 +659,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     </Button>
   );
 
-  // Today's extra video is confirmed by the server: the Quick Win stays in its
-  // row as completed (with the 5 XP it earned) instead of disappearing.
-  const quickWinDoneRow =
-    !quickWinButton && extraVideoDone ? (
-      <div
-        className="flex min-h-12 items-center gap-2.5 !border-brand-green/40 !bg-brand-green/[0.06] px-2 py-1.5 text-sidebar-foreground"
-        role="status"
-      >
-        <DoneSeal size="sm" />
-        <span className="flex min-w-0 flex-1 flex-col items-start gap-1.5 text-left">
-          <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none sm:text-[13px]">
-            {quickWinIcon} {t("Quick Win completed")}
-            <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-400">
-              {practiceXpLabel("/learning/videos")}
-            </span>
-          </span>
-          <span className="w-full min-w-0 truncate text-[10px] leading-tight text-sidebar-foreground/70">
-            {t("Extra video watched")}
-          </span>
-        </span>
-      </div>
-    ) : null;
-  const quickWinSlot = quickWinButton ?? quickWinDoneRow;
+  // Today's extra video confirmed by the server (owner decision, 2026-11-10):
+  // the Quick Win simply leaves, and its row reads "Nothing else pending right now."
+  const quickWinSlot = quickWinButton;
 
   // The first phone pill as plain data, so it can be kept on the device.
   const currentFirstPill: MobilePill | null = quickWinButton
@@ -691,9 +671,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         ...(quickWin!.activity.params ? { params: quickWin!.activity.params } : {}),
         label: t("Quick Win"),
       }
-    : quickWinDoneRow
-      ? { kind: "done", to: "/learning/videos", label: t("Quick Win completed") }
-      : mobileReviewButton && mobileReview
+    : mobileReviewButton && mobileReview
         ? {
             kind: "review",
             to: mobileReview.to,
