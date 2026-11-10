@@ -47,7 +47,9 @@ const DEFAULTS: Inputs = {
 
 const STORAGE_KEY = "evoluir-admin-financial-projection-v1";
 
-type DailyUsdQuote = { rate: number; date: string };
+type DailyUsdQuote = { rate: number; date: string; cached?: boolean };
+
+const QUOTE_STORAGE_KEY = "evoluir-admin-financial-usd-brl-ptax-v1";
 
 function formatBcbDate(date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -60,6 +62,8 @@ async function fetchDailyUsdQuote(): Promise<DailyUsdQuote> {
   const start = new Date(today);
   start.setDate(start.getDate() - 7);
   const params = new URLSearchParams({
+    "@dataInicial": `'${formatBcbDate(start)}'`,
+    "@dataFinalCotacao": `'${formatBcbDate(today)}'`,
     $top: "1",
     $orderby: "dataHoraCotacao desc",
     $format: "json",
@@ -67,17 +71,36 @@ async function fetchDailyUsdQuote(): Promise<DailyUsdQuote> {
   });
   const url =
     "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
-    `CotacaoDolarPeriodo(dataInicial='${formatBcbDate(start)}',dataFinalCotacao='${formatBcbDate(today)}')?${params}`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error("Não foi possível consultar a cotação do Banco Central.");
-  const payload = (await response.json()) as {
-    value?: { cotacaoVenda?: number; dataHoraCotacao?: string }[];
-  };
-  const latest = payload.value?.[0];
-  if (!latest || !Number.isFinite(Number(latest.cotacaoVenda))) {
-    throw new Error("O Banco Central ainda não disponibilizou uma cotação recente.");
+    `CotacaoDolarPeriodo(dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)?${params.toString()}`;
+
+  try {
+    const response = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error("Não foi possível consultar a cotação do Banco Central.");
+    const payload = (await response.json()) as {
+      value?: { cotacaoVenda?: number; dataHoraCotacao?: string }[];
+    };
+    const latest = payload.value?.[0];
+    const rate = Number(latest?.cotacaoVenda);
+    if (!latest || !Number.isFinite(rate) || rate <= 0 || !latest.dataHoraCotacao) {
+      throw new Error("O Banco Central ainda não disponibilizou uma cotação recente.");
+    }
+    const quote = { rate, date: latest.dataHoraCotacao };
+    localStorage.setItem(QUOTE_STORAGE_KEY, JSON.stringify(quote));
+    return quote;
+  } catch (error) {
+    try {
+      const saved = localStorage.getItem(QUOTE_STORAGE_KEY);
+      if (saved) {
+        const quote = JSON.parse(saved) as DailyUsdQuote;
+        if (Number.isFinite(quote.rate) && quote.rate > 0 && quote.date) {
+          return { ...quote, cached: true };
+        }
+      }
+    } catch {
+      /* Ignore an unavailable or invalid cached quote. */
+    }
+    throw error;
   }
-  return { rate: Number(latest.cotacaoVenda), date: latest.dataHoraCotacao ?? "" };
 }
 
 const money = (value: number) =>
@@ -97,6 +120,7 @@ export function AdminFinancialProjection() {
     retry: 2,
   });
   const usdBrl = exchangeRateQuery.data?.rate ?? 0;
+  const hasExchangeRate = Number.isFinite(usdBrl) && usdBrl > 0;
 
   useEffect(() => {
     try {
@@ -223,6 +247,12 @@ export function AdminFinancialProjection() {
         </Button>
       </div>
 
+      {!hasExchangeRate ? (
+        <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
+          A projeção financeira está temporariamente indisponível porque ainda não há uma cotação USD/BRL válida. Os custos em dólar não serão tratados como zero.
+        </div>
+      ) : (
+      <>
       <div className="rounded-xl border-2 border-primary bg-primary/5 p-4 sm:p-5">
         <p className="text-sm font-semibold text-muted-foreground">
           CUSTO TOTAL DE 1 ALUNO POR MÊS
@@ -263,6 +293,7 @@ export function AdminFinancialProjection() {
               timeStyle: "short",
               timeZone: "America/Sao_Paulo",
             })}
+            {exchangeRateQuery.data.cached && " · usando última cotação salva (atualização indisponível)"}
           </p>
         )}
       </div>
@@ -359,6 +390,8 @@ export function AdminFinancialProjection() {
         medição separada por plano. Não inclui impostos, reembolsos, chargebacks ou tarifas
         adicionais não informadas.
       </p>
+      </>
+      )}
     </section>
   );
 }
