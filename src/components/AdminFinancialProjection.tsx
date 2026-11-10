@@ -109,10 +109,7 @@ async function fetchDailyUsdQuote(pt: boolean): Promise<DailyUsdQuote> {
     const payload = (await response.json()) as { value?: BcbQuoteRecord[] };
     const latest = (payload.value ?? [])
       .filter((item) => Number.isFinite(Number(item.cotacaoVenda)) && Number(item.cotacaoVenda) > 0)
-      .sort(
-        (a, b) =>
-          Date.parse(b.dataHoraCotacao ?? "") - Date.parse(a.dataHoraCotacao ?? ""),
-      )[0];
+      .sort((a, b) => Date.parse(b.dataHoraCotacao ?? "") - Date.parse(a.dataHoraCotacao ?? ""))[0];
     const quote: DailyUsdQuote = {
       rate: Number(latest?.cotacaoVenda),
       date: latest?.dataHoraCotacao ?? "",
