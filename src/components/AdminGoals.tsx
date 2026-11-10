@@ -38,17 +38,23 @@ export function AdminGoals() {
       <p className="text-sm font-semibold">{pt ? "Metas dos alunos" : "Student goals"}</p>
       <p className="text-xs text-muted-foreground">
         {report.activeGoals} metas ativas de {report.students}{" "}
-        {pt ? (report.students === 1 ? "aluno" : "alunos") + " · passos dos últimos 30 dias" : (report.students === 1 ? "student" : "students") + " · steps in the last 30 days"}
+        {pt
+          ? (report.students === 1 ? "aluno" : "alunos") + " · passos dos últimos 30 dias"
+          : (report.students === 1 ? "student" : "students") + " · steps in the last 30 days"}
       </p>
 
       {report.activeGoals === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">
-          {pt ? "Nenhum aluno criou metas ainda. Os números aparecem aqui assim que as primeiras metas forem criadas." : "No students have created goals yet. Results will appear here when the first goals are created."}
+          {pt
+            ? "Nenhum aluno criou metas ainda. Os números aparecem aqui assim que as primeiras metas forem criadas."
+            : "No students have created goals yet. Results will appear here when the first goals are created."}
         </p>
       ) : (
         <div className="mt-3 grid gap-4 lg:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold uppercase text-muted-foreground">{pt ? "Por área" : "By area"}</p>
+            <p className="text-xs font-semibold uppercase text-muted-foreground">
+              {pt ? "Por área" : "By area"}
+            </p>
             <ul className="mt-2 space-y-2">
               {report.byArea.map((row) => (
                 <li key={row.area} className="text-sm">
@@ -66,8 +72,12 @@ export function AdminGoals() {
                   </div>
                   <p className="mt-0.5 text-[11px] text-muted-foreground">
                     {row.donePercent === null
-                      ? pt ? "Sem passos no período" : "No steps during this period"
-                      : pt ? `Passos concluídos: ${row.donePercent}% (${row.stepsDone} de ${row.stepsGiven})` : `Steps completed: ${row.donePercent}% (${row.stepsDone} of ${row.stepsGiven})`}
+                      ? pt
+                        ? "Sem passos no período"
+                        : "No steps during this period"
+                      : pt
+                        ? `Passos concluídos: ${row.donePercent}% (${row.stepsDone} de ${row.stepsGiven})`
+                        : `Steps completed: ${row.donePercent}% (${row.stepsDone} of ${row.stepsGiven})`}
                   </p>
                 </li>
               ))}
