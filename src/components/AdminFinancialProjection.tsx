@@ -255,7 +255,8 @@ export function AdminFinancialProjection() {
           </p>
         ) : (
           <p className="mt-1 text-muted-foreground">
-            US$ 1 = {money(usdBrl)}{" · "}
+            US$ 1 = {money(usdBrl)}
+            {" · "}
             Cotação de venda em{" "}
             {new Date(exchangeRateQuery.data.date).toLocaleString("pt-BR", {
               dateStyle: "short",
