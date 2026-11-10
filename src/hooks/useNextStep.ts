@@ -75,7 +75,6 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
     [
       today,
       premium,
-      videoDay,
       videosFetched,
       videosError,
       videos?.watchedToday,
