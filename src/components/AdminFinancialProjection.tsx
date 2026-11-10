@@ -95,10 +95,8 @@ export function AdminFinancialProjection() {
     values.domainAnnual / 12 +
     values.marketing +
     values.otherCosts;
-  const monthlyStripe =
-    (values.monthlyPrice * values.stripePercent) / 100 + values.stripeFixed;
-  const annualStripe =
-    (values.annualPrice * values.stripePercent) / 100 + values.stripeFixed;
+  const monthlyStripe = (values.monthlyPrice * values.stripePercent) / 100 + values.stripeFixed;
+  const annualStripe = (values.annualPrice * values.stripePercent) / 100 + values.stripeFixed;
   const monthlyNet = values.monthlyPrice - monthlyStripe;
   const annualNetMonthly = (values.annualPrice - annualStripe) / 12;
   const aiPerStudent = values.aiUsdPerStudent * values.usdBrl;
@@ -108,8 +106,7 @@ export function AdminFinancialProjection() {
     values.monthlySubscribers * values.monthlyPrice +
     (values.annualSubscribers * values.annualPrice) / 12;
   const stripeCost =
-    values.monthlySubscribers * monthlyStripe +
-    (values.annualSubscribers * annualStripe) / 12;
+    values.monthlySubscribers * monthlyStripe + (values.annualSubscribers * annualStripe) / 12;
   const variableAi = activeStudents * aiPerStudent;
   const totalCosts = fixedCosts + stripeCost + variableAi;
   const result = revenue - totalCosts;
@@ -224,10 +221,10 @@ export function AdminFinancialProjection() {
 
       <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
         Tarifa inicial configurada para simulação: 3,99% + R$ 0,39 por cobrança. Confirme no
-        Dashboard/contrato da sua conta Stripe se a tarifa efetiva é essa. A estimativa de IA de
-        US$ 2,14 por aluno/mês é uma premissa baseada no cenário informado, não um custo médio
-        validado por aluno. IAs Pro é mantido separado do consumo variável de tokens para evitar
-        dupla contagem; ajuste se houver sobreposição.
+        Dashboard/contrato da sua conta Stripe se a tarifa efetiva é essa. A estimativa de IA de US$ 2,14
+        por aluno/mês é uma premissa baseada no cenário informado, não um custo médio validado
+        por aluno. IAs Pro é mantido separado do consumo variável de tokens para evitar dupla
+        contagem; ajuste se houver sobreposição.
       </div>
 
       <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
