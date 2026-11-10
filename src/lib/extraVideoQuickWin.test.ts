@@ -6,7 +6,7 @@ import {
   withExtraVideoQuickWin,
 } from "./extraVideoQuickWin";
 
-const step = { quickWin: null, other: 1 };
+const step = { quickWin: { cta: "Say 5 words out loud" } as never, other: 1 };
 const on = { premium: true, levelHasVideos: true, watchedToday: false };
 
 describe("extra video Quick Win", () => {
