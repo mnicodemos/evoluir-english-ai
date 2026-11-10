@@ -3,12 +3,13 @@ import { useServerFn } from "@tanstack/react-start";
 
 import { getGoalsReport } from "@/lib/admin.functions";
 import type { PlusArea } from "@/lib/plus";
+import { useUiLang } from "@/lib/uiLang";
 
 const AREA_LABEL: Record<PlusArea, string> = {
-  english: "Inglês",
-  money: "Dinheiro",
-  health: "Saúde",
-  other: "Outra",
+  english: "English",
+  money: "Money",
+  health: "Health",
+  other: "Other",
 };
 
 /**
@@ -16,13 +17,15 @@ const AREA_LABEL: Record<PlusArea, string> = {
  * they actually created (not from a survey), and which areas they keep up.
  */
 export function AdminGoals() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const load = useServerFn(getGoalsReport);
   const query = useQuery({ queryKey: ["admin", "goals"], queryFn: () => load() });
   if (query.isPending) return null;
   if (query.isError) {
     return (
       <p className="mt-4 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        Não foi possível carregar as metas dos alunos.
+        {pt ? "Não foi possível carregar as metas dos alunos." : "Could not load student goals."}
       </p>
     );
   }
@@ -30,23 +33,28 @@ export function AdminGoals() {
   return (
     <section
       className="mt-4 rounded-xl border border-border p-3 sm:p-4"
-      aria-label="Metas dos alunos"
+      aria-label={pt ? "Metas dos alunos" : "Student goals"}
     >
-      <p className="text-sm font-semibold">Metas dos alunos</p>
+      <p className="text-sm font-semibold">{pt ? "Metas dos alunos" : "Student goals"}</p>
       <p className="text-xs text-muted-foreground">
         {report.activeGoals} metas ativas de {report.students}{" "}
-        {report.students === 1 ? "aluno" : "alunos"} · passos dos últimos 30 dias
+        {pt
+          ? (report.students === 1 ? "aluno" : "alunos") + " · passos dos últimos 30 dias"
+          : (report.students === 1 ? "student" : "students") + " · steps in the last 30 days"}
       </p>
 
       {report.activeGoals === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">
-          Nenhum aluno criou metas ainda. Os números aparecem aqui assim que as primeiras metas
-          forem criadas.
+          {pt
+            ? "Nenhum aluno criou metas ainda. Os números aparecem aqui assim que as primeiras metas forem criadas."
+            : "No students have created goals yet. Results will appear here when the first goals are created."}
         </p>
       ) : (
         <div className="mt-3 grid gap-4 lg:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold uppercase text-muted-foreground">Por área</p>
+            <p className="text-xs font-semibold uppercase text-muted-foreground">
+              {pt ? "Por área" : "By area"}
+            </p>
             <ul className="mt-2 space-y-2">
               {report.byArea.map((row) => (
                 <li key={row.area} className="text-sm">
@@ -64,8 +72,12 @@ export function AdminGoals() {
                   </div>
                   <p className="mt-0.5 text-[11px] text-muted-foreground">
                     {row.donePercent === null
-                      ? "Sem passos no período"
-                      : `Passos concluídos: ${row.donePercent}% (${row.stepsDone} de ${row.stepsGiven})`}
+                      ? pt
+                        ? "Sem passos no período"
+                        : "No steps during this period"
+                      : pt
+                        ? `Passos concluídos: ${row.donePercent}% (${row.stepsDone} de ${row.stepsGiven})`
+                        : `Steps completed: ${row.donePercent}% (${row.stepsDone} of ${row.stepsGiven})`}
                   </p>
                 </li>
               ))}

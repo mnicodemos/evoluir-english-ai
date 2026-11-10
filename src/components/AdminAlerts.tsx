@@ -4,11 +4,12 @@ import { CircleAlert, CircleCheck, TriangleAlert } from "lucide-react";
 
 import { getOpsAlerts } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
+import { useUiLang } from "@/lib/uiLang";
 
 const KIND_LABEL: Record<string, string> = {
-  word: "Palavra do dia",
-  reminder: "Lembrete",
-  weekly: "Relatório semanal",
+  word: "Daily word",
+  reminder: "Reminder",
+  weekly: "Weekly report",
 };
 
 function when(iso: string) {
@@ -27,13 +28,15 @@ function when(iso: string) {
  * something needs attention.
  */
 export function AdminAlerts() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const load = useServerFn(getOpsAlerts);
   const query = useQuery({ queryKey: ["admin", "ops-alerts"], queryFn: () => load() });
   if (query.isPending) return null;
   if (query.isError) {
     return (
       <p className="mt-3 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        Não foi possível carregar os alertas.
+        {pt ? "Não foi possível carregar os alertas." : "Could not load alerts."}
       </p>
     );
   }
@@ -43,7 +46,7 @@ export function AdminAlerts() {
 
   return (
     <section
-      aria-label="Alertas"
+      aria-label={pt ? "Alertas" : "Alerts"}
       className={cn(
         "mt-3 rounded-xl border p-3 sm:p-4",
         errors
@@ -56,7 +59,9 @@ export function AdminAlerts() {
       {alerts.length === 0 ? (
         <p className="flex items-center gap-2 text-sm font-medium">
           <CircleCheck className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
-          Tudo funcionando: pushes e IA sem falhas nas últimas 24 h.
+          {pt
+            ? "Tudo funcionando: notificações push e IA sem falhas nas últimas 24 h."
+            : "All systems operational: no push notification or AI failures in the last 24 hours."}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -82,9 +87,12 @@ export function AdminAlerts() {
       )}
       {lastRun && (
         <p className="mt-2 text-xs text-muted-foreground">
-          Último push: {KIND_LABEL[lastRun.kind] ?? lastRun.kind} em {when(lastRun.created_at)} ·{" "}
-          {lastRun.sent} de {lastRun.devices} aparelho(s)
-          {lastRun.removed ? ` · ${lastRun.removed} token(s) vencido(s) removido(s)` : ""}
+          {pt ? "Última notificação:" : "Last notification:"}{" "}
+          {KIND_LABEL[lastRun.kind] ?? lastRun.kind} {pt ? "em" : "at"} {when(lastRun.created_at)} ·{" "}
+          {lastRun.sent} {pt ? "de" : "of"} {lastRun.devices} {pt ? "dispositivo(s)" : "device(s)"}
+          {lastRun.removed
+            ? ` · ${lastRun.removed} ${pt ? "token(s) expirado(s) removido(s)" : "expired token(s) removed"}`
+            : ""}
         </p>
       )}
     </section>

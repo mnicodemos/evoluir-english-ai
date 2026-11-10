@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { getAiCostPerformance } from "@/lib/admin.functions";
+import { useUiLang } from "@/lib/uiLang";
 
 const ND = "N/D";
 const fmtN = (value: number | null) => (value === null ? ND : value.toLocaleString());
@@ -16,6 +17,8 @@ const fmtCost = (value: number | null) =>
     : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 
 export function AdminCostPerformance() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const [days, setDays] = useState(7);
   const [operation, setOperation] = useState("all");
   const [providerModel, setProviderModel] = useState("all");
@@ -45,9 +48,13 @@ export function AdminCostPerformance() {
     <section className="pt-2">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="font-semibold">Custo &amp; Performance</h3>
+          <h3 className="font-semibold">
+            {pt ? "Custo &amp; desempenho" : "Cost &amp; performance"}
+          </h3>
           <p className="text-xs text-muted-foreground">
-            Benchmark técnico e econômico somente leitura
+            {pt
+              ? "Referência técnica e econômica · somente leitura"
+              : "Technical and cost benchmark · read only"}
           </p>
         </div>
         <div className="flex items-center gap-1">
@@ -64,7 +71,7 @@ export function AdminCostPerformance() {
           <Button
             size="icon"
             variant="ghost"
-            aria-label="Atualizar benchmark"
+            aria-label={pt ? "Atualizar referência" : "Refresh benchmark"}
             onClick={() => void query.refetch()}
             disabled={query.isFetching}
           >
@@ -75,13 +82,13 @@ export function AdminCostPerformance() {
 
       <div className="mb-4 grid gap-2 sm:grid-cols-2">
         <label className="text-xs text-muted-foreground">
-          Operação
+          {pt ? "Operação" : "Operation"}
           <select
             className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
             value={operation}
             onChange={(event) => setOperation(event.target.value)}
           >
-            <option value="all">Todas</option>
+            <option value="all">{pt ? "Todas" : "All"}</option>
             {operationOptions.map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
@@ -90,13 +97,13 @@ export function AdminCostPerformance() {
           </select>
         </label>
         <label className="text-xs text-muted-foreground">
-          Provider / modelo
+          {pt ? "Provedor / modelo" : "Provider / model"}
           <select
             className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
             value={providerModel}
             onChange={(event) => setProviderModel(event.target.value)}
           >
-            <option value="all">Todos</option>
+            <option value="all">{pt ? "Todos" : "All"}</option>
             {providerModelOptions.map((value) => {
               const [provider, model] = value.split("\u0000");
               return (
@@ -111,34 +118,36 @@ export function AdminCostPerformance() {
 
       {query.isPending ? (
         <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Carregando
+          <Loader2 className="size-4 animate-spin" /> {pt ? "Carregando" : "Loading"}
         </div>
       ) : query.isError ? (
         <p className="py-8 text-sm text-muted-foreground">
-          Não foi possível carregar o benchmark agora.
+          {pt
+            ? "Não foi possível carregar os dados de referência agora."
+            : "Could not load benchmark data right now."}
         </p>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-8">
             {[
-              ["Chamadas analisadas", query.data.calls.toLocaleString()],
-              ["Operações", query.data.operations.toLocaleString()],
-              ["Créditos Lovable", ND],
+              [pt ? "Chamadas analisadas" : "Calls analyzed", query.data.calls.toLocaleString()],
+              [pt ? "Operações" : "Operations", query.data.operations.toLocaleString()],
+              [pt ? "Créditos Lovable" : "Lovable credits", ND],
               [
-                "Custo Google",
+                pt ? "Custo Google" : "Google cost",
                 query.data.estimatedCost === null
                   ? ND
                   : `${fmtCost(query.data.estimatedCost)} · ${query.data.costCoverage}/${query.data.calls}`,
               ],
-              ["Latência média", fmtMs(query.data.avgMs)],
-              ["Taxa de erro", fmtPct(query.data.errorRate)],
+              [pt ? "Latência média" : "Average latency", fmtMs(query.data.avgMs)],
+              [pt ? "Taxa de erro" : "Error rate", fmtPct(query.data.errorRate)],
               [
                 "Cache HIT (cumulativo)",
                 query.data.cacheHitsOutsideTable > 0
                   ? `${query.data.cacheHits.toLocaleString()} · ${query.data.cacheHitsOutsideTable} fora da tabela`
                   : query.data.cacheHits.toLocaleString(),
               ],
-              ["Economia do cache", ND],
+              [pt ? "Economia do cache" : "Cache savings", ND],
             ].map(([label, value]) => (
               <div key={label} className="rounded-md border border-border bg-muted/30 p-3">
                 <p className="text-xs text-muted-foreground">{label}</p>
@@ -165,15 +174,9 @@ export function AdminCostPerformance() {
           </div>
 
           <p className="mt-3 text-xs text-muted-foreground">
-            Observado: chamadas, tokens, duração, erros e HITs cumulativos do cache. Calculado:
-            totais, médias, mediana e p95 com pelo menos 10 durações. Estimado: custo calculado
-            agora a partir dos tokens e da tabela de preços oficial (inclui chamadas antigas); "n/m"
-            mostra quantas chamadas têm custo medido, e as projeções usam a média dessas. Taxa de
-            erro: só falhas reais; bloqueios por limite (o app espera e tenta de novo) e
-            cancelamentos ficam à parte. First chunk: tempo até a primeira palavra (AI Speaking,
-            linha "reply") ou primeiro som (TTS), após a migração 0045. N/D: first token, streaming,
-            retries, fallback, créditos e economia do cache. O provider da Transcription histórica
-            não é atribuível porque o registro guardou o modelo de fallback.
+            {pt
+              ? 'Observado: chamadas, tokens, duração, erros e HITs cumulativos do cache. Calculado: totais, médias, mediana e p95 com pelo menos 10 durações. Estimado: custo calculado a partir dos tokens e da tabela oficial de preços (inclui chamadas antigas); "n/m" indica quantas chamadas têm custo medido, e as projeções usam a média dessas. Taxa de erro considera apenas falhas reais; bloqueios por limite e cancelamentos são contabilizados separadamente. First chunk: tempo até a primeira palavra (AI Speaking, linha "reply") ou primeiro som (TTS), após a migração 0045. N/D: first token, streaming, retries, fallback, créditos e economia do cache. O provedor da transcrição histórica não pode ser identificado porque o registro guardou o modelo de fallback.'
+              : 'Observed: calls, tokens, duration, errors and cumulative cache HITs. Calculated: totals, averages, median and p95 with at least 10 durations. Estimated: cost calculated from tokens and the official price table (including older calls); "n/m" indicates calls with measured cost, and projections use their average. Error rate includes real failures only; limit blocks and cancellations are counted separately. First chunk: time to the first word (AI Speaking, "reply" row) or first sound (TTS), after migration 0045. N/A: first token, streaming, retries, fallback, credits and cache savings. The provider for historical transcription cannot be identified because the record stored the fallback model.'}
           </p>
           {query.data.truncated && (
             <p className="mt-1 text-xs text-muted-foreground">

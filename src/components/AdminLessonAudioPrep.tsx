@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { getLevelPodcastStatus, prepareLevelPodcasts } from "@/lib/admin.functions";
+import { useUiLang } from "@/lib/uiLang";
 
 const LEVELS = ["a1", "a2", "b1", "b2", "c1", "c2"] as const;
 type Level = (typeof LEVELS)[number];
@@ -16,6 +17,8 @@ type Level = (typeof LEVELS)[number];
  * the shared copy students get, and its voice is cached line by line as it plays.
  */
 export function AdminLessonAudioPrep() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const queryClient = useQueryClient();
   const loadStatus = useServerFn(getLevelPodcastStatus);
   const prepare = useServerFn(prepareLevelPodcasts);
@@ -47,7 +50,11 @@ export function AdminLessonAudioPrep() {
     } catch (error) {
       setLog((current) => [
         ...current,
-        error instanceof Error ? error.message : "Não foi possível preparar agora.",
+        error instanceof Error
+          ? error.message
+          : pt
+            ? "Não foi possível preparar agora."
+            : "Could not prepare the audio right now.",
       ]);
     } finally {
       setRunning(false);
@@ -65,20 +72,20 @@ export function AdminLessonAudioPrep() {
           <AudioLines className="size-5" aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-display text-base font-semibold">Áudios das lições</h2>
+          <h2 className="font-display text-base font-semibold">
+            {pt ? "Áudios das lições" : "Lesson audio"}
+          </h2>
           <p className="text-sm text-muted-foreground">
-            Escreve antes o diálogo da EVO com o Leo das lições do nível, para nenhum aluno esperar
-            a IA ao abrir a lição. O roteiro preparado é o mesmo que os alunos recebem; a voz é
-            gerada linha a linha na primeira vez que alguém ouve e fica guardada para todos. Custa
-            cerca de US$ 0,01 por roteiro, uma vez só. Review I, Review II e o teste de revisão não
-            têm áudio.
+            {pt
+              ? "Prepare antecipadamente os diálogos da EVO com o Leo para as lições deste nível, evitando que os alunos esperem pela IA ao abrir uma lição. O roteiro é compartilhado com todos; a voz é gerada linha a linha na primeira reprodução e armazenada para uso posterior. Custo aproximado: US$ 0,01 por roteiro, uma única vez. Review I, Review II e o teste de revisão não têm áudio."
+              : "Pre-generate EVO and Leo dialogues for this level so students do not wait for AI when opening a lesson. The prepared script is shared with all students; voice is generated line by line on first playback and cached for everyone. Approximate cost: US$0.01 per script, one time. Review I, Review II and the review test do not have audio."}
           </p>
         </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
         <select
-          aria-label="Nível"
+          aria-label={pt ? "Nível" : "Level"}
           className="h-9 rounded-md border border-border bg-background px-3 text-sm"
           value={level}
           disabled={running}
@@ -100,13 +107,23 @@ export function AdminLessonAudioPrep() {
           onClick={() => void run()}
         >
           {running ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
-          {running ? "Preparando…" : "Preparar áudios do nível"}
+          {running
+            ? pt
+              ? "Preparando…"
+              : "Preparing…"
+            : pt
+              ? "Preparar áudios do nível"
+              : "Prepare level audio"}
         </Button>
         <span className="text-sm text-muted-foreground tabular-nums">
           {status.isPending
-            ? "Verificando…"
+            ? pt
+              ? "Verificando…"
+              : "Checking…"
             : status.isError
-              ? "Não foi possível verificar."
+              ? pt
+                ? "Não foi possível verificar."
+                : "Could not check status."
               : data
                 ? `${data.ready}/${data.total} prontos${done ? " ✓" : ""}`
                 : null}
@@ -115,7 +132,9 @@ export function AdminLessonAudioPrep() {
 
       {data && !running && data.missing.length > 0 ? (
         <details className="text-xs text-muted-foreground">
-          <summary className="cursor-pointer">Faltam {data.missing.length}</summary>
+          <summary className="cursor-pointer">
+            {pt ? "Faltam" : "Missing"} {data.missing.length}
+          </summary>
           <ul className="mt-1 space-y-0.5">
             {data.missing.map((item) => (
               <li key={item}>{item}</li>
