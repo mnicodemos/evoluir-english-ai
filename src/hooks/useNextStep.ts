@@ -4,10 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useProfile } from "@/hooks/useProfile";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
-import {
-  isExtraVideoDay,
-  withExtraVideoQuickWin,
-} from "@/lib/extraVideoQuickWin";
+import { isExtraVideoDay, withExtraVideoQuickWin } from "@/lib/extraVideoQuickWin";
 import { findLevel } from "@/lib/level";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
@@ -75,14 +72,7 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
         watchedToday: serverStatusKnown && videos?.watchedToday === true,
       });
     },
-    [
-      today,
-      premium,
-      videosFetched,
-      videosError,
-      videos?.watchedToday,
-      levelHasVideos,
-    ],
+    [today, premium, videosFetched, videosError, videos?.watchedToday, levelHasVideos],
   );
 
   return useQuery({
