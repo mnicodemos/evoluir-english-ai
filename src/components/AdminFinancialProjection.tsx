@@ -238,9 +238,9 @@ export function AdminFinancialProjection() {
         taxa. Lovable: US$ {values.lovableUsd.toFixed(2)} (
         {money(values.lovableUsd * values.usdBrl)}/mês); IAs Pro: US$
         {values.aiSubscriptionsUsd.toFixed(2)} (
-        {money(values.aiSubscriptionsUsd * values.usdBrl)}
-        /mês). Atualize a cotação e os valores originais conforme suas faturas; a taxa é uma
-        premissa editável, não uma cotação automática em tempo real.
+        {money(values.aiSubscriptionsUsd * values.usdBrl)}/mês). Atualize a cotação e os valores
+        originais conforme suas faturas; a taxa é uma premissa editável, não uma cotação automática
+        em tempo real.
       </div>
 
       <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
