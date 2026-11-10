@@ -22,8 +22,7 @@ export function AdminSpeakingWait() {
   if (query.data === null) {
     return (
       <p className="mt-4 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        Espera no AI Speaking: aplique a migração 0050_speaking_turn_timings pelo chat do Lovable
-        para começar a medir.
+        {pt ? "Espera no AI Speaking: aplique a migração 0050_speaking_turn_timings pelo chat do Lovable para começar a medir." : "AI Speaking wait time: apply migration 0050_speaking_turn_timings through Lovable chat to start measuring."}
       </p>
     );
   }
