@@ -112,7 +112,7 @@ export function practiceXpLabel(destination: string): string | null {
     path === "/reading"
   )
     return "+20 XP";
-  if (path === "/mistakes") return "+5 XP";
+  if (path === "/mistakes" || path === "/learning/videos") return "+5 XP";
   if (path === "/vocabulary") return "+2 XP";
   return null;
 }
