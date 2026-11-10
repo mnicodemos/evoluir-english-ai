@@ -38,7 +38,7 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   }, [storeKey]);
   // "Watch an extra video" in the Quick Win's rotation (owner request,
   // 2026-10-31): on its days, for Premium students whose level has videos and
-  // who have not played one today on this device (extraVideoQuickWin.ts).
+  // whose regular-video completion is confirmed by the server (extraVideoQuickWin.ts).
   const today = studyToday();
   const premium = !!profile && profileIsPremium(profile);
   const videoDay = premium && isExtraVideoDay(today);
@@ -46,7 +46,6 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   const {
     data: videos,
     isFetched: videosFetched,
-    isFetching: videosFetching,
     isError: videosError,
   } = useQuery({
     queryKey: ["premium-videos", profile?.id],
@@ -63,7 +62,7 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
       // A loading/error state must never be interpreted as "completed".
       // Once available, the persisted server record is the sole source of truth.
       const serverStatusKnown =
-        videosFetched && !videosError && videos?.watchedToday !== null && videos?.watchedToday !== undefined;
+        videosFetched &&\n        !videosError &&\n        videos?.watchedToday !== null &&\n        videos?.watchedToday !== undefined;
       return withExtraVideoQuickWin<NextStepData>(step, {
         day: today,
         premium,
