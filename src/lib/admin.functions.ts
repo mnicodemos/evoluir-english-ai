@@ -2080,7 +2080,6 @@ export const getAiCostByActivity = createServerFn({ method: "GET" })
     };
   });
 
-
 /** Admin-only AI cost per student, using the existing usage events and plan authority. */
 export const getAiCostByStudent = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -2099,14 +2098,30 @@ export const getAiCostByStudent = createServerFn({ method: "GET" })
 
     const userIds = [...new Set((events ?? []).map((row) => row.user_id))];
     if (!userIds.length) {
-      return { days: data.days, students: [], totalUsd: null, calls: 0, measuredCalls: 0, truncated: false };
+      return {
+        days: data.days,
+        students: [],
+        totalUsd: null,
+        calls: 0,
+        measuredCalls: 0,
+        truncated: false,
+      };
     }
 
-    const [{ data: profiles, error: profilesError }, { data: entitlements, error: entitlementsError }] =
-      await Promise.all([
-        supabaseAdmin.from("profiles").select("id, name, email, plan, plan_expires_at").in("id", userIds),
-        supabaseAdmin.from("entitlements").select("user_id, expires_at, revoked_at").in("user_id", userIds).eq("plan", "premium"),
-      ]);
+    const [
+      { data: profiles, error: profilesError },
+      { data: entitlements, error: entitlementsError },
+    ] = await Promise.all([
+      supabaseAdmin
+        .from("profiles")
+        .select("id, name, email, plan, plan_expires_at")
+        .in("id", userIds),
+      supabaseAdmin
+        .from("entitlements")
+        .select("user_id, expires_at, revoked_at")
+        .in("user_id", userIds)
+        .eq("plan", "premium"),
+    ]);
     if (profilesError) throw profilesError;
     if (entitlementsError) throw entitlementsError;
 
@@ -2123,7 +2138,15 @@ export const getAiCostByStudent = createServerFn({ method: "GET" })
     }
 
     const profileById = new Map((profiles ?? []).map((row) => [row.id, row]));
-    const groups = new Map<string, { calls: number; measuredCalls: number; costUsd: number; operations: Map<string, { calls: number; measuredCalls: number; costUsd: number }> }>();
+    const groups = new Map<
+      string,
+      {
+        calls: number;
+        measuredCalls: number;
+        costUsd: number;
+        operations: Map<string, { calls: number; measuredCalls: number; costUsd: number }>;
+      }
+    >();
     for (const event of events ?? []) {
       let group = groups.get(event.user_id);
       if (!group) {
@@ -2146,25 +2169,29 @@ export const getAiCostByStudent = createServerFn({ method: "GET" })
       }
     }
 
-    const students = [...groups.entries()].map(([userId, group]) => {
-      const profile = profileById.get(userId);
-      return {
-        userId,
-        name: profile?.name || "—",
-        email: profile?.email || "—",
-        plan: premiumIds.has(userId) ? "premium" as const : "free" as const,
-        calls: group.calls,
-        measuredCalls: group.measuredCalls,
-        costUsd: group.measuredCalls ? group.costUsd : null,
-        averageCostUsd: group.measuredCalls ? group.costUsd / group.measuredCalls : null,
-        operations: [...group.operations.entries()].map(([operation, values]) => ({
-          operation,
-          label: OPERATION_FACTS[operation]?.label ?? operation,
-          ...values,
-          costUsd: values.measuredCalls ? values.costUsd : null,
-        })).sort((a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1)),
-      };
-    }).sort((a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1));
+    const students = [...groups.entries()]
+      .map(([userId, group]) => {
+        const profile = profileById.get(userId);
+        return {
+          userId,
+          name: profile?.name || "—",
+          email: profile?.email || "—",
+          plan: premiumIds.has(userId) ? ("premium" as const) : ("free" as const),
+          calls: group.calls,
+          measuredCalls: group.measuredCalls,
+          costUsd: group.measuredCalls ? group.costUsd : null,
+          averageCostUsd: group.measuredCalls ? group.costUsd / group.measuredCalls : null,
+          operations: [...group.operations.entries()]
+            .map(([operation, values]) => ({
+              operation,
+              label: OPERATION_FACTS[operation]?.label ?? operation,
+              ...values,
+              costUsd: values.measuredCalls ? values.costUsd : null,
+            }))
+            .sort((a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1)),
+        };
+      })
+      .sort((a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1));
 
     const measuredCalls = students.reduce((sum, row) => sum + row.measuredCalls, 0);
     return {
@@ -2172,7 +2199,9 @@ export const getAiCostByStudent = createServerFn({ method: "GET" })
       students,
       calls: (events ?? []).length,
       measuredCalls,
-      totalUsd: measuredCalls ? students.reduce((sum, row) => sum + (row.costUsd ?? 0), 0) : null,
+      totalUsd: measuredCalls
+        ? students.reduce((sum, row) => sum + (row.costUsd ?? 0), 0)
+        : null,
       truncated: (events ?? []).length >= 10000,
     };
   });
