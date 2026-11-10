@@ -246,9 +246,7 @@ function ExtraVideosPage() {
                   ? vimeoTextTrackUrl(embed, "pt")
                   : cleanVimeoPlayerUrl(embed)
                 : null;
-              const playerUrl = basePlayerUrl
-                ? new URL(basePlayerUrl)
-                : null;
+              const playerUrl = basePlayerUrl ? new URL(basePlayerUrl) : null;
               playerUrl?.searchParams.set("api", "1");
               playerUrl?.searchParams.set("player_id", video.id);
               return (
