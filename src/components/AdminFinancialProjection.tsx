@@ -58,11 +58,13 @@ export function AdminFinancialProjection() {
   const annualNetMonthly = (values.annualPrice - annualStripe) / 12;
   const aiPerStudent = values.aiUsdPerStudent * values.usdBrl;
   const paidStudents = values.monthlySubscribers + values.annualSubscribers;
+  const activeStudents = paidStudents + values.freeStudents;
   const revenue = values.monthlySubscribers * values.monthlyPrice + values.annualSubscribers * values.annualPrice / 12;
   const stripeCost = values.monthlySubscribers * monthlyStripe + values.annualSubscribers * annualStripe / 12;
-  const variableAi = paidStudents * aiPerStudent;
+  const variableAi = activeStudents * aiPerStudent;
   const totalCosts = fixedCosts + stripeCost + variableAi;
   const result = revenue - totalCosts;
+  const totalCostPerStudent = activeStudents > 0 ? totalCosts / activeStudents : 0;
   const projections = useMemo(() => Array.from({ length: 12 }, (_, index) => {
     const month = index + 1;
     const factor = month;
@@ -98,6 +100,20 @@ export function AdminFinancialProjection() {
         <Button size="sm" variant="outline" onClick={() => setValues(DEFAULTS)}>Restaurar premissas</Button>
       </div>
 
+      <div className="rounded-xl border-2 border-primary bg-primary/5 p-4 sm:p-5">
+        <p className="text-sm font-semibold text-muted-foreground">CUSTO TOTAL DE 1 ALUNO POR MÊS</p>
+        <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <p className="text-3xl font-bold tabular-nums text-primary">{money(totalCostPerStudent)}</p>
+          <span className="text-xs text-muted-foreground">por aluno ativo / mês</span>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {activeStudents > 0
+            ? `Cálculo: ${money(totalCosts)} em custos mensais estimados ÷ ${activeStudents} alunos ativos (${paidStudents} pagantes + ${values.freeStudents} Free).`
+            : "Informe a quantidade de alunos pagantes ou Free para calcular o custo completo por aluno."}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">Dentro desse total, IA variável estimada por aluno: {money(aiPerStudent)}. O valor completo também rateia Lovable, IAs Pro, domínio, marketing, outros custos e Stripe dos pagantes.</p>
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {fields.map((field) => (
           <label key={field.key} className="text-xs text-muted-foreground">
@@ -128,7 +144,7 @@ export function AdminFinancialProjection() {
           ["Despesas totais estimadas", money(totalCosts)],
           ["Resultado operacional estimado", money(result)],
           ["Custos fixos", money(fixedCosts)],
-          ["IA variável", money(variableAi)],
+          ["IA variável (todos os alunos)", money(variableAi)],
           ["Líquido por plano mensal", money(monthlyNet)],
           ["Líquido anual / mês equivalente", money(annualNetMonthly)],
         ].map(([label, value]) => (
