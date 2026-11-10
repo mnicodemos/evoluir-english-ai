@@ -44,7 +44,7 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   const premium = !!profile && profileIsPremium(profile);
   const videoDay = premium && isExtraVideoDay(today);
   const fetchVideos = useServerFn(loadPremiumVideos);
-  const { data: videos } = useQuery({
+  const { data: videos, isFetched: videosFetched } = useQuery({
     queryKey: ["premium-videos", profile?.id],
     enabled: !!profile?.id && videoDay,
     staleTime: 10 * 60 * 1000,
@@ -62,15 +62,20 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
     }
   }, [profile?.id, today]);
   const select = useCallback(
-    (step: NextStepData): NextStepData =>
-      withExtraVideoQuickWin<NextStepData>(step, {
+    (step: NextStepData): NextStepData => {
+      // On the designated video day, never flash the cached pronunciation
+      // Quick Win while the video list is still loading. Show the correct
+      // video action only after availability has been confirmed.
+      if (videoDay && !videosFetched) return { ...step, quickWin: null };
+      return withExtraVideoQuickWin<NextStepData>(step, {
         day: today,
         premium,
         levelHasVideos,
-        // This device's mark, or a play recorded on the server from any device.
+        // This device's mark, or a completed view recorded on the server.
         watchedToday: watchedToday || !!videos?.watchedToday,
-      }),
-    [today, premium, levelHasVideos, watchedToday, videos?.watchedToday],
+      });
+    },
+    [today, premium, videoDay, videosFetched, levelHasVideos, watchedToday, videos?.watchedToday],
   );
 
   return useQuery({
