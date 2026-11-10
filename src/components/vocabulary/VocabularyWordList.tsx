@@ -93,7 +93,7 @@ export function WordCard({
     >
       <div className="flex flex-wrap items-start justify-between gap-2.5">
         <div className="min-w-0 flex-1 break-words" translate="no">
-          <h3 className="text-[1.05rem] font-semibold tracking-tight transition-colors group-hover:text-primary">
+          <h3 className="max-w-full whitespace-nowrap text-[clamp(0.78rem,4.8vw,1.05rem)] font-semibold leading-tight tracking-tight transition-colors group-hover:text-primary">
             {w.word}
           </h3>
           {!hidden && <p className="text-sm text-muted-foreground">{w.translation}</p>}
