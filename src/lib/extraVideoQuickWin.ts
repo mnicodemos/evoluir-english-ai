@@ -5,8 +5,8 @@ import { studyDayNumber } from "@/lib/pedagogy/conversationChallenge";
  * "Watch an extra video" joins the Quick Win's rotation (owner request,
  * 2026-10-31): on one study day in three the Quick Win invites a Premium
  * student to one of their level's extra videos (/learning/videos) instead of
- * the skill's five-minute practice, as long as the level has a video and none
- * was played on this device today. Free students, levels without videos and
+ * the skill's five-minute practice, as long as the level has a video and no regular video
+ * has been completed today. Free students, levels without videos and
  * the other days keep EVO's Quick Win. Pure, so the rotation is tested.
  */
 export const EXTRA_VIDEO_QUICK_WIN: NextStepQuickWin = {
@@ -30,12 +30,13 @@ export function withExtraVideoQuickWin<T extends { quickWin?: NextStepQuickWin |
   step: T,
   context: { day: string; premium: boolean; levelHasVideos: boolean; watchedToday: boolean },
 ): T {
-  if (!context.premium || !context.levelHasVideos || context.watchedToday) return step;
+  if (!context.premium || !context.levelHasVideos) return step;
   if (!isExtraVideoDay(context.day)) return step;
+  if (context.watchedToday) return { ...step, quickWin: null };
   return { ...step, quickWin: EXTRA_VIDEO_QUICK_WIN };
 }
 
-/** The device remembers a video played today, which closes the Quick Win. */
+/** Legacy key retained for cleanup of previously stored device markers. */
 export function extraVideoWatchedKey(userId: string, day: string): string {
   return `evoluir-extra-video-watched:${userId}:${day}`;
 }

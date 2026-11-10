@@ -45,7 +45,7 @@ export async function socialTables() {
     likes: () => from<LikeRow>("premium_video_likes"),
     comments: () => from<CommentRow>("premium_video_comments"),
     reports: () => from<ReportRow>("premium_video_comment_reports"),
-    videos: () => from<{ id: string }>("premium_level_videos"),
+    videos: () => from<{ id: string; kind: string | null }>("premium_level_videos"),
     views: () =>
       from<{ video_id: string; user_id: string; day: string; created_at: string }>(
         "premium_video_views",

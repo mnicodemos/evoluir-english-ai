@@ -4,11 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useProfile } from "@/hooks/useProfile";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
-import {
-  extraVideoWatchedKey,
-  isExtraVideoDay,
-  withExtraVideoQuickWin,
-} from "@/lib/extraVideoQuickWin";
+import { isExtraVideoDay, withExtraVideoQuickWin } from "@/lib/extraVideoQuickWin";
 import { findLevel } from "@/lib/level";
 import { loadNextStep } from "@/lib/pedagogy/nextStep.functions";
 import { loadPremiumVideos } from "@/lib/premiumVideos.functions";
@@ -39,7 +35,7 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   }, [storeKey]);
   // "Watch an extra video" in the Quick Win's rotation (owner request,
   // 2026-10-31): on its days, for Premium students whose level has videos and
-  // who have not played one today on this device (extraVideoQuickWin.ts).
+  // whose regular-video completion is confirmed by the server (extraVideoQuickWin.ts).
   const today = studyToday();
   const premium = !!profile && profileIsPremium(profile);
   const videoDay = premium && isExtraVideoDay(today);
@@ -47,7 +43,6 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   const {
     data: videos,
     isFetched: videosFetched,
-    isFetching: videosFetching,
     isError: videosError,
   } = useQuery({
     queryKey: ["premium-videos", profile?.id],
@@ -58,45 +53,26 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
   });
   const studentLevel = findLevel(profile?.level).value;
   const levelHasVideos = !!videos?.videos.some((video) => video.level === studentLevel);
-  const [watchedToday, setWatchedToday] = useState(false);
-  useEffect(() => {
-    if (!profile?.id) return;
-    try {
-      setWatchedToday(!!window.localStorage.getItem(extraVideoWatchedKey(profile.id, today)));
-    } catch {
-      setWatchedToday(false);
-    }
-  }, [profile?.id, today]);
   const select = useCallback(
     (step: NextStepData): NextStepData => {
-      // On the designated video day, never flash the cached pronunciation
-      // Quick Win while the video list is still loading. Show the correct
-      // video action only after availability has been confirmed.
-      if (
-        videoDay &&
-        (!videosFetched || videosFetching || videosError || videos?.watchedToday === null)
-      ) {
-        return { ...step, quickWin: null };
-      }
+      // Keep a stable video Quick Win while the server status is unknown.
+      // A loading/error state must never be interpreted as "completed".
+      // Once available, the persisted server record is the sole source of truth.
+      const serverStatusKnown =
+        videosFetched &&
+        !videosError &&
+        videos?.watchedToday !== null &&
+        videos?.watchedToday !== undefined;
       return withExtraVideoQuickWin<NextStepData>(step, {
         day: today,
         premium,
-        levelHasVideos,
-        // This device's mark, or a completed view recorded on the server.
-        watchedToday: watchedToday || !!videos?.watchedToday,
+        // Until availability is confirmed, avoid exposing the underlying EVO
+        // Quick Win or showing a false "nothing pending" state.
+        levelHasVideos: serverStatusKnown ? levelHasVideos : true,
+        watchedToday: serverStatusKnown && videos?.watchedToday === true,
       });
     },
-    [
-      today,
-      premium,
-      videoDay,
-      videosFetched,
-      videosFetching,
-      videosError,
-      videos?.watchedToday,
-      levelHasVideos,
-      watchedToday,
-    ],
+    [today, premium, videosFetched, videosError, videos?.watchedToday, levelHasVideos],
   );
 
   return useQuery({

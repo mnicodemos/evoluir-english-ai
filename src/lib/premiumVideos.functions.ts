@@ -31,21 +31,35 @@ export const loadPremiumVideos = createServerFn({ method: "GET" })
 async function watchedVideoToday(userId: string): Promise<boolean | null> {
   const { socialTables } = await import("@/lib/premiumVideoSocial.server");
   const { studyToday } = await import("@/lib/today");
-  const { data, error } = await (
-    await socialTables()
-  )
+  const tables = await socialTables();
+  const { data: views, error } = await tables
     .views()
     .select("video_id")
     .eq("user_id", userId)
     .eq("day", studyToday())
-    .limit(1);
+    .limit(2000);
   if (error) {
     console.error(
       `Premium video completion status could not be read: ${error.code ?? ""} ${error.message}`,
     );
     return null;
   }
-  return (data?.length ?? 0) > 0;
+  const videoIds = [...new Set((views ?? []).map((view) => view.video_id))];
+  if (videoIds.length === 0) return false;
+
+  // Views are also recorded for Shorts. Only regular videos satisfy
+  // the "Watch an extra video" Quick Win.
+  const { data: regularVideos, error: videoError } = await tables
+    .videos()
+    .select("id, kind")
+    .in("id", videoIds);
+  if (videoError) {
+    console.error(
+      `Premium video kind could not be read: ${videoError.code ?? ""} ${videoError.message}`,
+    );
+    return null;
+  }
+  return (regularVideos ?? []).some((video) => video.kind === "video");
 }
 
 /** Premium-only WebVTT track for the active Short. */
