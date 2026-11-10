@@ -4,7 +4,7 @@ import { Loader2, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { getAiCostByActivity } from "@/lib/admin.functions";
+import { getAiCostByActivity, getAiCostByStudent } from "@/lib/admin.functions";
 import { useUiLang } from "@/lib/uiLang";
 
 type DailyUsdQuote = { rate: number; date: string };
@@ -57,14 +57,14 @@ export function AdminAiCostByActivity() {
   const { lang } = useUiLang();
   const pt = lang === "pt";
   const [days, setDays] = useState(30);
-  const load = useServerFn(getAiCostByActivity);
+  const load = useServerFn(getAiCostByActivity);\n  const loadStudents = useServerFn(getAiCostByStudent);
   const query = useQuery({
     queryKey: ["admin-ai-cost-by-activity", days],
     queryFn: () => load({ data: { days } }),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
-  const quote = useQuery({
+  const studentQuery = useQuery({\n    queryKey: ["admin-ai-cost-by-student", days],\n    queryFn: () => loadStudents({ data: { days } }),\n    retry: false,\n    staleTime: 5 *  60 * 1000,\n  });\n  const quote = useQuery({
     queryKey: ["admin-ai-cost-activity-ptax"],
     queryFn: fetchDailyUsdQuote,
     retry: 1,
@@ -299,6 +299,110 @@ export function AdminAiCostByActivity() {
                 : "Sample limited to the 10,000 most recent calls."}
             </p>
           )}
+
+          <div className="mt-6 border-t border-border pt-4">
+            <div className="mb-3">
+              <h3 className="font-semibold">{pt ? "Custo de IA por aluno" : "AI cost per student"}</h3>
+              <p className="text-xs text-muted-foreground">
+                {pt
+                  ? "Custo direto estimado pelas chamadas atribuídas a cada aluno. Não inclui rateio operacional nem representa uma fatura."
+                  : "Estimated direct cost from calls attributed to each student. Excludes operational allocation and is not an invoice."}
+              </p>
+            </div>
+            {studentQuery.isPending ? (
+              <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" /> {pt ? "Carregando alunos..." : "Loading students..."}
+              </div>
+            ) : studentQuery.isError ? (
+              <p className="py-4 text-sm text-muted-foreground">
+                {pt ? "Não foi possível carregar o custo por aluno." : "Could not load per-student costs."}
+              </p>
+            ) : (
+              <>
+                <div className="mb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {(["free", "premium"] as const).map((plan) => {
+                    const rows = studentQuery.data.students.filter((student) => student.plan === plan);
+                    const measured = rows.filter((student) => student.costUsd !== null);
+                    const cost = measured.reduce((sum, student) => sum + (student.costUsd ?? 0), 0);
+                    return (
+                      <div key={plan} className="rounded-md border border-border bg-muted/30 p-3">
+                        <p className="text-xs text-muted-foreground">
+                          {plan === "free" ? "Free" : "Premium"} · {pt ? "alunos com uso" : "students with usage"}
+                        </p>
+                        <p className="mt-1 text-xl font-semibold tabular-nums">{rows.length}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {pt ? "Custo medido" : "Measured cost"}: {usd(measured.length ? cost : null, pt ? "pt-BR" : "en-US")}
+                          {quote.data && measured.length > 0 ? " · " + brl(cost * quote.data.rate) : ""}
+                        </p>
+                      </div>
+                    );
+                  })}
+                  <div className="rounded-md border border-border bg-muted/30 p-3">
+                    <p className="text-xs text-muted-foreground">{pt ? "Custo direto total" : "Total direct cost"}</p>
+                    <p className="mt-1 text-xl font-semibold tabular-nums">
+                      {usd(studentQuery.data.totalUsd, pt ? "pt-BR" : "en-US")}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {studentQuery.data.measuredCalls}/{studentQuery.data.calls} {pt ? "chamadas com custo" : "calls with cost"}
+                    </p>
+                  </div>
+                </div>
+                <div className="max-h-[55vh] overflow-auto">
+                  <table className="w-full min-w-[760px] text-left text-sm">
+                    <thead className="sticky top-0 bg-background">
+                      <tr className="border-b border-border text-xs font-semibold uppercase text-muted-foreground">
+                        <th className="py-2 pr-3">{pt ? "Aluno" : "Student"}</th>
+                        <th className="py-2 pr-3">{pt ? "Plano" : "Plan"}</th>
+                        <th className="py-2 pr-3 text-right">{pt ? "Chamadas" : "Calls"}</th>
+                        <th className="py-2 pr-3 text-right">{pt ? "Cobertura" : "Coverage"}</th>
+                        <th className="py-2 pr-3 text-right">{pt ? "Custo USD" : "USD cost"}</th>
+                        <th className="py-2 pr-3 text-right">{pt ? "Custo BRL" : "BRL cost"}</th>
+                        <th className="py-2 text-right">{pt ? "Média/chamada" : "Average/call"}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {studentQuery.data.students.map((student) => (
+                        <tr key={student.userId} className="border-b border-border/60 align-top">
+                          <td className="py-2 pr-3">
+                            <div className="font-medium">{student.name}</div>
+                            <div className="text-xs text-muted-foreground">{student.email}</div>
+                            <div className="mt-1 text-[11px] text-muted-foreground">
+                              {student.operations.map((op) =>
+                                op.costUsd === null ? op.label + ": N/D" : op.label + ": " + usd(op.costUsd, pt ? "pt-BR" : "en-US")
+                              ).join(" · ")}
+                            </div>
+                          </td>
+                          <td className="py-2 pr-3">{student.plan === "premium" ? "Premium" : "Free"}</td>
+                          <td className="py-2 pr-3 text-right tabular-nums">{student.calls}</td>
+                          <td className="py-2 pr-3 text-right tabular-nums">{student.measuredCalls}/{student.calls}</td>
+                          <td className="py-2 pr-3 text-right tabular-nums">{usd(student.costUsd, pt ? "pt-BR" : "en-US")}</td>
+                          <td className="py-2 pr-3 text-right tabular-nums">
+                            {brl(student.costUsd !== null && quote.data ? student.costUsd * quote.data.rate : null)}
+                          </td>
+                          <td className="py-2 text-right tabular-nums">{usd(student.averageCostUsd, pt ? "pt-BR" : "en-US")}</td>
+                        </tr>
+                      ))}
+                      {studentQuery.data.students.length === 0 && (
+                        <tr><td colSpan={7} className="py-6 text-center text-muted-foreground">
+                          {pt ? "Nenhuma chamada de IA no período." : "No AI calls in this period."}
+                        </td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {pt
+                    ? "A média considera apenas chamadas com custo calculável. N/D indica que o registro não possui tokens/preço suficientes. O plano reflete a situação atual do aluno, não necessariamente a situação na data de cada chamada."
+                    : "Averages include only calls with a calculable cost. N/A means the record lacks sufficient token/pricing data. Plan reflects the student's current status, not necessarily their status when each call occurred."}
+                </p>
+                {studentQuery.data.truncated && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {pt ? "Amostra limitada às 10.000 chamadas mais recentes." : "Sample limited to the 10,000 most recent calls."}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
         </>
       )}
     </section>

@@ -2079,3 +2079,100 @@ export const getAiCostByActivity = createServerFn({ method: "GET" })
       })),
     };
   });
+
+
+/** Admin-only AI cost per student, using the existing usage events and plan authority. */
+export const getAiCostByStudent = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ days: z.number().int().min(1).max(90) }).parse(data))
+  .handler(async ({ context, data }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - data.days * 86_400_000).toISOString();
+    const { data: events, error } = await supabaseAdmin
+      .from("ai_usage_events")
+      .select("user_id, operation, model, input_tokens, output_tokens, estimated_cost")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(10000);
+    if (error) throw error;
+
+    const userIds = [...new Set((events ?? []).map((row) => row.user_id))];
+    if (!userIds.length) {
+      return { days: data.days, students: [], totalUsd: null, calls: 0, measuredCalls: 0, truncated: false };
+    }
+
+    const [{ data: profiles, error: profilesError }, { data: entitlements, error: entitlementsError }] =
+      await Promise.all([
+        supabaseAdmin.from("profiles").select("id, name, email, plan, plan_expires_at").in("id", userIds),
+        supabaseAdmin.from("entitlements").select("user_id, expires_at, revoked_at").in("user_id", userIds).eq("plan", "premium"),
+      ]);
+    if (profilesError) throw profilesError;
+    if (entitlementsError) throw entitlementsError;
+
+    const now = new Date();
+    const premiumIds = new Set<string>();
+    for (const row of entitlements ?? []) {
+      if (row.revoked_at || (row.expires_at && new Date(row.expires_at) <= now)) continue;
+      premiumIds.add(row.user_id);
+    }
+    for (const row of profiles ?? []) {
+      if (row.plan === "premium" && (!row.plan_expires_at || new Date(row.plan_expires_at) > now)) {
+        premiumIds.add(row.id);
+      }
+    }
+
+    const profileById = new Map((profiles ?? []).map((row) => [row.id, row]));
+    const groups = new Map<string, { calls: number; measuredCalls: number; costUsd: number; operations: Map<string, { calls: number; measuredCalls: number; costUsd: number }> }>();
+    for (const event of events ?? []) {
+      let group = groups.get(event.user_id);
+      if (!group) {
+        group = { calls: 0, measuredCalls: 0, costUsd: 0, operations: new Map() };
+        groups.set(event.user_id, group);
+      }
+      group.calls++;
+      const cost = rowCost(event as unknown as BenchmarkUsageRow);
+      let operation = group.operations.get(event.operation);
+      if (!operation) {
+        operation = { calls: 0, measuredCalls: 0, costUsd: 0 };
+        group.operations.set(event.operation, operation);
+      }
+      operation.calls++;
+      if (cost !== null) {
+        group.measuredCalls++;
+        group.costUsd += cost;
+        operation.measuredCalls++;
+        operation.costUsd += cost;
+      }
+    }
+
+    const students = [...groups.entries()].map(([userId, group]) => {
+      const profile = profileById.get(userId);
+      return {
+        userId,
+        name: profile?.name || "—",
+        email: profile?.email || "—",
+        plan: premiumIds.has(userId) ? "premium" as const : "free" as const,
+        calls: group.calls,
+        measuredCalls: group.measuredCalls,
+        costUsd: group.measuredCalls ? group.costUsd : null,
+        averageCostUsd: group.measuredCalls ? group.costUsd / group.measuredCalls : null,
+        operations: [...group.operations.entries()].map(([operation, values]) => ({
+          operation,
+          label: OPERATION_FACTS[operation]?.label ?? operation,
+          ...values,
+          costUsd: values.measuredCalls ? values.costUsd : null,
+        })).sort((a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1)),
+      };
+    }).sort((a, b) => (b.costUsd ?? -1) - (a.costUsd ?? -1));
+
+    const measuredCalls = students.reduce((sum, row) => sum + row.measuredCalls, 0);
+    return {
+      days: data.days,
+      students,
+      calls: (events ?? []).length,
+      measuredCalls,
+      totalUsd: measuredCalls ? students.reduce((sum, row) => sum + (row.costUsd ?? 0), 0) : null,
+      truncated: (events ?? []).length >= 10000,
+    };
+  });
