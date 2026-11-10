@@ -189,15 +189,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // popping in seconds later; they leave only once that activity is known done.
   const actionAvailable = (to: string, indicators: typeof activityIndicators) =>
     !indicators.ready || dashboardActionAvailable(to, indicators);
-  const {
-    data,
-    isLoading,
-    isError,
-    isFetching,
-    isPlaceholderData,
-    videoStatusKnown,
-    refetch,
-  } = useNextStep();
+  const { data, isLoading, isError, isFetching, isPlaceholderData, videoStatusKnown, refetch } =
+    useNextStep();
   const videoQuickWinStatusReady = !videoQuickWinDay || videoStatusKnown;
 
   // Phones' pill row (user report, 2026-10-25: a pill showed, then another
@@ -220,9 +213,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     cardsFetched &&
     mistakesFetched &&
     videoQuickWinStatusReady;
-  const firstPillReady = videoQuickWinDay
-    ? firstPillFresh
-    : pillWaitOver || firstPillFresh;
+  const firstPillReady = videoQuickWinDay ? firstPillFresh : pillWaitOver || firstPillFresh;
   // Owner report, 2026-10-31 (still slow after the split): each pill shows at
   // once what it showed last time on this device (the first pill only from
   // today), then follows the fresh data quietly; a pill seen for the first
