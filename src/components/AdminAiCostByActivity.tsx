@@ -1,0 +1,231 @@
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Loader2, RefreshCw } from "lucide-react";
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { getAiCostByActivity } from "@/lib/admin.functions";
+import { useUiLang } from "@/lib/uiLang";
+
+type DailyUsdQuote = { rate: number; date: string };
+
+function formatBcbDate(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return month + "-" + day + "-" + date.getFullYear();
+}
+
+async function fetchDailyUsdQuote(): Promise<DailyUsdQuote> {
+  const today = new Date();
+  const start = new Date(today);
+  start.setDate(start.getDate() - 7);
+  const params = new URLSearchParams({
+    $top: "1",
+    $orderby: "dataHoraCotacao desc",
+    $format: "json",
+    $select: "cotacaoVenda,dataHoraCotacao",
+  });
+  const url =
+    "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
+    "CotacaoDolarPeriodo(dataInicial='" +
+    formatBcbDate(start) +
+    "',dataFinalCotacao='" +
+    formatBcbDate(today) +
+    "')?" +
+    params;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("PTAX unavailable");
+  const payload = (await response.json()) as {
+    value?: { cotacaoVenda?: number; dataHoraCotacao?: string }[];
+  };
+  const latest = payload.value?.[0];
+  const rate = Number(latest?.cotacaoVenda);
+  if (!latest || !Number.isFinite(rate) || rate <= 0) throw new Error("PTAX unavailable");
+  return { rate, date: latest.dataHoraCotacao ?? "" };
+}
+
+const usd = (value: number | null, locale: string) =>
+  value === null
+    ? "N/D"
+    : new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(value);
+const brl = (value: number | null) =>
+  value === null
+    ? "N/D"
+    : new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+
+export function AdminAiCostByActivity() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
+  const [days, setDays] = useState(30);
+  const load = useServerFn(getAiCostByActivity);
+  const query = useQuery({
+    queryKey: ["admin-ai-cost-by-activity", days],
+    queryFn: () => load({ data: { days } }),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const quote = useQuery({
+    queryKey: ["admin-ai-cost-activity-ptax"],
+    queryFn: fetchDailyUsdQuote,
+    retry: 1,
+    staleTime: 6 * 60 * 60 * 1000,
+  });
+  const totalUsd = query.data?.totalUsd ?? null;
+  const totalBrl = totalUsd !== null && quote.data ? totalUsd * quote.data.rate : null;
+
+  return (
+    <section className="pt-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="font-semibold">
+            {pt ? "Custo de IA por atividade" : "AI cost by activity"}
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            {pt
+              ? "Custos calculados por chamada registrada, sem rateio entre atividades."
+              : "Costs calculated from recorded calls, with no allocation across activities."}
+          </p>
+        </div>
+        <div className="flex items-center gap-1">
+          {[1, 7, 30, 90].map((value) => (
+            <Button
+              key={value}
+              size="sm"
+              variant={days === value ? "default" : "ghost"}
+              onClick={() => setDays(value)}
+            >
+              {value}d
+            </Button>
+          ))}
+          <Button
+            size="icon"
+            variant="ghost"
+            aria-label={pt ? "Atualizar" : "Refresh"}
+            onClick={() => void query.refetch()}
+            disabled={query.isFetching}
+          >
+            <RefreshCw className={"size-4 " + (query.isFetching ? "animate-spin" : "")} />
+          </Button>
+        </div>
+      </div>
+
+      {query.isPending ? (
+        <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" /> {pt ? "Carregando..." : "Loading..."}
+        </div>
+      ) : query.isError ? (
+        <p className="py-8 text-sm text-muted-foreground">
+          {pt
+            ? "Não foi possível carregar os custos por atividade."
+            : "Could not load activity costs."}
+        </p>
+      ) : (
+        <>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground">
+                {pt ? "Custo total (USD)" : "Total cost (USD)"}
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums">
+                {usd(totalUsd, pt ? "pt-BR" : "en-US")}
+              </p>
+            </div>
+            <div className="rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground">
+                {pt ? "Custo convertido (BRL)" : "Converted cost (BRL)"}
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums">{brl(totalBrl)}</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {quote.data
+                  ? "PTAX " +
+                    quote.data.rate.toFixed(4) +
+                    " · " +
+                    new Date(quote.data.date).toLocaleDateString(pt ? "pt-BR" : "en-US")
+                  : pt
+                    ? "Cotação PTAX indisponível"
+                    : "PTAX rate unavailable"}
+              </p>
+            </div>
+            <div className="rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground">
+                {pt ? "Chamadas registradas" : "Recorded calls"}
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums">
+                {query.data.calls.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground">
+                {pt ? "Chamadas com custo medido" : "Calls with measured cost"}
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums">
+                {query.data.measuredCalls.toLocaleString()} / {query.data.calls.toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[680px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-border text-xs font-semibold uppercase text-muted-foreground">
+                  <th className="py-2 pr-3">{pt ? "Atividade" : "Activity"}</th>
+                  <th className="py-2 pr-3 text-right">{pt ? "Chamadas" : "Calls"}</th>
+                  <th className="py-2 pr-3 text-right">{pt ? "Custo USD" : "USD cost"}</th>
+                  <th className="py-2 pr-3 text-right">{pt ? "Custo BRL" : "BRL cost"}</th>
+                  <th className="py-2 pr-3 text-right">{pt ? "Média/chamada" : "Average/call"}</th>
+                  <th className="py-2 text-right">{pt ? "% do total" : "% of total"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {query.data.activities.map((row) => (
+                  <tr key={row.operation} className="border-b border-border/60">
+                    <td className="py-2 pr-3 font-medium">{row.label}</td>
+                    <td className="py-2 pr-3 text-right tabular-nums">
+                      {row.calls.toLocaleString()}
+                      <span className="block text-[11px] text-muted-foreground">
+                        {row.measuredCalls}/{row.calls} {pt ? "medidas" : "measured"}
+                      </span>
+                    </td>
+                    <td className="py-2 pr-3 text-right tabular-nums">
+                      {usd(row.costUsd, pt ? "pt-BR" : "en-US")}
+                    </td>
+                    <td className="py-2 pr-3 text-right tabular-nums">
+                      {brl(
+                        row.costUsd !== null && quote.data ? row.costUsd * quote.data.rate : null,
+                      )}
+                    </td>
+                    <td className="py-2 pr-3 text-right tabular-nums">
+                      {usd(row.averageCostUsd, pt ? "pt-BR" : "en-US")}
+                    </td>
+                    <td className="py-2 text-right tabular-nums">
+                      {row.sharePercent === null ? "N/D" : row.sharePercent.toFixed(1) + "%"}
+                    </td>
+                  </tr>
+                ))}
+                {query.data.activities.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-6 text-center text-muted-foreground">
+                      {pt ? "Sem chamadas no período." : "No calls in this period."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            {pt
+              ? "O custo USD é recalculado pelos tokens e pela tabela de preços vigente, usando o custo salvo apenas quando não há preço disponível para o modelo. O BRL é uma conversão informativa pela cotação de venda PTAX mais recente; não representa o valor efetivamente debitado. Chamadas sem tokens/preço ficam fora da soma e são mostradas na cobertura."
+              : "USD cost is recalculated from tokens and the current price table, using the stored estimate only when no model price is available. BRL is an informational conversion using the latest PTAX selling rate; it is not the amount actually charged. Calls without tokens/pricing are excluded from the sum and shown in coverage."}
+          </p>
+          {query.data.truncated && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {pt
+                ? "Amostra limitada às 10.000 chamadas mais recentes."
+                : "Sample limited to the 10,000 most recent calls."}
+            </p>
+          )}
+        </>
+      )}
+    </section>
+  );
+}

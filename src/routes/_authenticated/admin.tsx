@@ -16,6 +16,7 @@ import { AdminMistakeReview } from "@/components/AdminMistakeReview";
 import { AdminRetention } from "@/components/AdminRetention";
 import { AdminSpeakingWait } from "@/components/AdminSpeakingWait";
 import { AdminCostPerformance } from "@/components/AdminCostPerformance";
+import { AdminAiCostByActivity } from "@/components/AdminAiCostByActivity";
 import { AdminFinancialProjection } from "@/components/AdminFinancialProjection";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
@@ -229,6 +230,9 @@ function AdminPage() {
                 <TabsContent value="cost">
                   <AdminSpeakingWait />
                   <AdminCostPerformance />
+                </TabsContent>
+                <TabsContent value="activity-cost">
+                  <AdminAiCostByActivity />
                 </TabsContent>
                 <TabsContent value="financial">
                   <AdminFinancialProjection />
