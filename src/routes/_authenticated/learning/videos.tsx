@@ -112,11 +112,12 @@ function ExtraVideosPage() {
         if (result.recorded) {
           // Update the shared query immediately so the Dashboard's Quick Win
           // re-evaluates in this tab; then reconcile with the server.
-          queryClient.setQueryData(
-            ["premium-videos", profile?.id],
-            (current: Awaited<ReturnType<typeof fetchVideos>> | undefined) =>
-              current ? { ...current, watchedToday: true } : current,
-          );
+          if (query.data) {
+            queryClient.setQueryData(["premium-videos", profile?.id], {
+              ...query.data,
+              watchedToday: true,
+            });
+          }
           await queryClient.invalidateQueries({ queryKey: ["premium-videos", profile?.id] });
         }
         return result.recorded;
@@ -124,7 +125,7 @@ function ExtraVideosPage() {
         return false;
       }
     },
-    [profile?.id, queryClient, sendView],
+    [profile?.id, query.data, queryClient, sendView],
   );
   const completeWatch = useCallback(
     async (id: string) => {
