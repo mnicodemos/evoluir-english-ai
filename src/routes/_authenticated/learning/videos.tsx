@@ -132,7 +132,7 @@ function ExtraVideosPage() {
           });
           await queryClient.invalidateQueries({
             queryKey: ["next-step"],
-            refetchType: "active",
+            refetchType: "all",
           });
         }
         return result.recorded;

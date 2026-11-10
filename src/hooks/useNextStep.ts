@@ -52,9 +52,9 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
     queryFn: () => fetchVideos(),
   });
   const studentLevel = findLevel(profile?.level).value;
-  const levelHasVideos = !!videos?.videos.some((video) => video.level === studentLevel);
+  const levelHasVideos = !!videos?.videos.some((video) => video.level === studentLevel && video.kind !== "short");
   const videoStatusKnown =
-    !videoDay ||
+    (!!profile && !videoDay) ||
     (videosFetched &&
       !videosError &&
       videos?.watchedToday !== null &&
