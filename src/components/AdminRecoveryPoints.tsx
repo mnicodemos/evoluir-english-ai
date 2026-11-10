@@ -79,7 +79,7 @@ export function AdminRecoveryPoints() {
         }}
       >
         <label className="grid gap-1 text-sm sm:col-span-2">
-          Título
+          {pt ? "Título" : "Title"}
           <Input
             value={title}
             onChange={(event) => setTitle(event.target.value)}
@@ -88,7 +88,7 @@ export function AdminRecoveryPoints() {
           />
         </label>
         <label className="grid gap-1 text-sm sm:col-span-2">
-          Descrição / observações
+          {pt ? "Descrição / observações" : "Description / notes"}
           <Textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
