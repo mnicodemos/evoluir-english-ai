@@ -16,7 +16,9 @@ import { HIDE_AFTER_REPORTS, hiddenByReports } from "@/lib/premiumVideoSocial";
  * Admin → Conteúdo: comments on the Premium extra videos (migration 0103),
  * reported ones first, so the owner removes what does not belong.
  */
-export function AdminVideoComments() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
+export function AdminVideoComments() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const queryClient = useQueryClient();
   const fetchComments = useServerFn(getVideoCommentsAdmin);
   const remove = useServerFn(deleteVideoCommentAdmin);
