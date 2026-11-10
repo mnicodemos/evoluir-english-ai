@@ -37,7 +37,7 @@ async function watchedVideoToday(userId: string): Promise<boolean | null> {
     .select("video_id")
     .eq("user_id", userId)
     .eq("day", studyToday())
-    .limit(200);
+    .limit(2000);
   if (error) {
     console.error(
       `Premium video completion status could not be read: ${error.code ?? ""} ${error.message}`,
