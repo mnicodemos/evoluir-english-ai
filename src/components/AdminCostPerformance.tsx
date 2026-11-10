@@ -17,6 +17,8 @@ const fmtCost = (value: number | null) =>
     : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 
 export function AdminCostPerformance() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const [days, setDays] = useState(7);
   const [operation, setOperation] = useState("all");
   const [providerModel, setProviderModel] = useState("all");
