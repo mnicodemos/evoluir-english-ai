@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { useUiLang } from "@/lib/uiLang";
 import {
   deleteLevelIntroVideo,
   getLevelIntroVideos,
@@ -28,7 +29,7 @@ type IntroLevel = (typeof INTRO_LEVELS)[number]["value"];
  * (owner request, 2026-10-31), shown as "Comece aqui" on top of the learning
  * path and of /business. Vimeo links only, like the Summary videos.
  */
-export function AdminLevelIntroVideos() {
+export function AdminLevelIntroVideos() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
   const queryClient = useQueryClient();
   const fetchVideos = useServerFn(getLevelIntroVideos);
   const save = useServerFn(saveLevelIntroVideo);
@@ -52,10 +53,10 @@ export function AdminLevelIntroVideos() {
     mutationFn: (input: { level: IntroLevel; url: string }) => save({ data: input }),
     onSuccess: async () => {
       await refresh();
-      toast.success("Vídeo de apresentação salvo.");
+      toast.success(pt ? "Vídeo de apresentação salvo." : "Intro video saved.");
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : "Não foi possível salvar."),
+      toast.error(error instanceof Error ? error.message : pt ? "Não foi possível salvar." : "Could not save."),
   });
   const deleteMutation = useMutation({
     mutationFn: (level: IntroLevel) => remove({ data: { level } }),
@@ -64,7 +65,7 @@ export function AdminLevelIntroVideos() {
       await refresh();
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : "Não foi possível remover."),
+      toast.error(error instanceof Error ? error.message : pt ? "Não foi possível remover." : "Could not remove."),
   });
 
   return (
@@ -74,23 +75,19 @@ export function AdminLevelIntroVideos() {
           <PlayCircle className="size-5" aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-display text-base font-semibold">Apresentação dos níveis</h2>
+          <h2 className="font-display text-base font-semibold">{pt ? "Apresentação dos níveis" : "Level introduction videos"}</h2>
           <p className="text-sm text-muted-foreground">
-            Um vídeo do Vimeo por nível e um para o Business English. Aparece como "Comece aqui" no
-            topo da trilha do nível (e da página do Business) até o aluno marcar "Já assisti";
-            depois fica numa linha que reabre o vídeo. É opcional: não conta no checklist, no dia de
-            estudo nem no Teste Final.
+            {pt ? 'Um vídeo do Vimeo por nível e um para o Business English. Aparece como "Comece aqui" no topo da trilha do nível (e da página do Business) até o aluno marcar "Já assisti"; depois fica numa linha que reabre o vídeo. É opcional: não conta no checklist, no dia de estudo nem no Teste Final.' : 'One Vimeo video per level, plus one for Business English. It appears at the top of the level path (and Business page) until the student marks it as watched; afterwards, it remains available in a row that reopens the video. Optional: it does not count toward the checklist, study day, or Final Test.'}
           </p>
         </div>
       </div>
       {query.isPending ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Carregando…
+          <Loader2 className="size-4 animate-spin" /> {pt ? "Carregando…" : "Loading…"}
         </p>
       ) : query.data?.missingMigration ? (
         <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-          Aplique a migração <code>0097_level_intro_videos.sql</code> pelo chat do Lovable para
-          cadastrar os vídeos.
+          {pt ? <>Aplique a migração <code>0097_level_intro_videos.sql</code> pelo chat do Lovable para cadastrar os vídeos.</> : <>Apply migration <code>0097_level_intro_videos.sql</code> through Lovable chat to add the videos.</>}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -108,7 +105,7 @@ export function AdminLevelIntroVideos() {
                 <span className="text-sm font-semibold">
                   {item.label}
                   {saved ? (
-                    <span className="ml-2 text-[11px] font-medium text-brand-green">● no ar</span>
+                    <span className="ml-2 text-[11px] font-medium text-brand-green">{pt ? "● no ar" : "● live"}</span>
                   ) : null}
                 </span>
                 <input
@@ -118,7 +115,7 @@ export function AdminLevelIntroVideos() {
                     setDrafts((current) => ({ ...current, [item.value]: event.target.value }))
                   }
                   placeholder="https://vimeo.com/123456789"
-                  aria-label={`Link do Vimeo: ${item.label}`}
+                  aria-label={`${pt ? "Link do Vimeo" : "Vimeo link"}: ${item.label}`}
                   className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
                 />
                 <span className="flex gap-1.5">
@@ -141,9 +138,9 @@ export function AdminLevelIntroVideos() {
                       variant="ghost"
                       className="h-9 text-destructive hover:text-destructive"
                       disabled={busy}
-                      aria-label={`Remover vídeo: ${item.label}`}
+                      aria-label={`${pt ? "Remover vídeo" : "Remove video"}: ${item.label}`}
                       onClick={() => {
-                        if (window.confirm(`Remover o vídeo de apresentação de ${item.label}?`))
+                        if (window.confirm(`${pt ? "Remover o vídeo de apresentação de" : "Remove the intro video for"} ${item.label}?`))
                           deleteMutation.mutate(item.value);
                       }}
                     >
