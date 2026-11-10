@@ -220,7 +220,7 @@ function AdminPage() {
                 tabs={[
                   { value: "usage", label: t("AI Usage") },
                   { value: "cost", label: t("Cost & Performance") },
-                  { value: "financial", label: t("Financeiro e Projeções") },
+                  { value: "financial", label: t("Financial projections") },
                 ]}
               >
                 <TabsContent value="usage">
