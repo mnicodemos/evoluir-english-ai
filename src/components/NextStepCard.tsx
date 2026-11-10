@@ -672,7 +672,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
           <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none sm:text-[13px]">
             {quickWinIcon} {t("Quick Win completed")}
             <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-400">
-              +5 XP
+              {practiceXpLabel("/learning/videos")}
             </span>
           </span>
           <span className="w-full min-w-0 truncate text-[10px] leading-tight text-sidebar-foreground/70">
