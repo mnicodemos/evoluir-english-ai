@@ -21,7 +21,9 @@ type RecoveryPoint = {
   createdAt: string;
 };
 
-export function AdminRecoveryPoints() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
+export function AdminRecoveryPoints() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const queryClient = useQueryClient();
   const list = useServerFn(listRecoveryPoints);
   const create = useServerFn(createRecoveryPoint);
