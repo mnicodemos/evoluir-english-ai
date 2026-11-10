@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
-import { useUiLang } from "@/lib/uiLang";\nimport { getMistakeReviewReport } from "@/lib/admin.functions";
+import { useUiLang } from "@/lib/uiLang";
+import { getMistakeReviewReport } from "@/lib/admin.functions";
 
 const SOURCE_LABEL = {
   teacher: "AI Teacher",
@@ -14,7 +15,9 @@ const SOURCE_LABEL = {
  * Writing, how many were reviewed and how many the students got right at
  * the last review.
  */
-export function AdminMistakeReview() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
+export function AdminMistakeReview() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const load = useServerFn(getMistakeReviewReport);
   const query = useQuery({ queryKey: ["admin", "mistake-review"], queryFn: () => load() });
   if (query.isPending) return null;
