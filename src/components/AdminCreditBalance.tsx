@@ -52,12 +52,14 @@ export function AdminCreditBalance() {
       setNote("");
       void refresh();
     },
-    onError: () => toast.error(pt ? "Não foi possível salvar a recarga." : "Could not save the top-up."),
+    onError: () =>
+      toast.error(pt ? "Não foi possível salvar a recarga." : "Could not save the top-up."),
   });
   const drop = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
     onSuccess: () => void refresh(),
-    onError: () => toast.error(pt ? "Não foi possível remover a recarga." : "Could not remove the top-up."),
+    onError: () =>
+      toast.error(pt ? "Não foi possível remover a recarga." : "Could not remove the top-up."),
   });
 
   if (query.isPending) return null;
@@ -72,7 +74,9 @@ export function AdminCreditBalance() {
   if (!data.ready) {
     return (
       <p className="mt-3 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        {pt ? "Saldo da API: aplique a migração 0067_ai_credit_topups pelo chat do Lovable para registrar as recargas." : "API balance: apply migration 0067_ai_credit_topups through Lovable chat to track top-ups."}
+        {pt
+          ? "Saldo da API: aplique a migração 0067_ai_credit_topups pelo chat do Lovable para registrar as recargas."
+          : "API balance: apply migration 0067_ai_credit_topups through Lovable chat to track top-ups."}
       </p>
     );
   }
@@ -97,22 +101,30 @@ export function AdminCreditBalance() {
               {usd(data.remainingUsd)}
             </span>{" "}
             <span className="text-muted-foreground">
-              {pt ? `de ${usd(data.loadedUsd)} · gasto ${usd(data.spentUsd)} em ${data.measuredCalls} chamadas desde ${data.since ? day(data.since, locale) : "—"}` : `of ${usd(data.loadedUsd)} · spent ${usd(data.spentUsd)} across ${data.measuredCalls} calls since ${data.since ? day(data.since, locale) : "—"}`}
+              {pt
+                ? `de ${usd(data.loadedUsd)} · gasto ${usd(data.spentUsd)} em ${data.measuredCalls} chamadas desde ${data.since ? day(data.since, locale) : "—"}`
+                : `of ${usd(data.loadedUsd)} · spent ${usd(data.spentUsd)} across ${data.measuredCalls} calls since ${data.since ? day(data.since, locale) : "—"}`}
             </span>
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">
-            {pt ? "Registre a recarga feita no Google para acompanhar o saldo." : "Record your Google top-up to track the balance."}
+            {pt
+              ? "Registre a recarga feita no Google para acompanhar o saldo."
+              : "Record your Google top-up to track the balance."}
           </p>
         )}
       </div>
       {data.low && (
         <p className="mt-1 text-xs font-medium text-warning">
-          {pt ? "Menos de 20% do crédito restante: considere uma nova recarga." : "Less than 20% of credit remains: consider adding funds."}
+          {pt
+            ? "Menos de 20% do crédito restante: considere uma nova recarga."
+            : "Less than 20% of credit remains: consider adding funds."}
         </p>
       )}
       <p className="mt-1 text-[11px] text-muted-foreground">
-        {pt ? "O Google não informa o saldo por API: o valor é o total recarregado menos o custo medido de cada chamada (o mesmo de Custo & Desempenho). Confira no faturamento do Google de vez em quando." : "Google does not expose the balance through its API. This estimate subtracts measured call costs from recorded top-ups (the same costs shown in Cost & Performance). Check Google billing periodically."}
+        {pt
+          ? "O Google não informa o saldo por API: o valor é o total recarregado menos o custo medido de cada chamada (o mesmo de Custo & Desempenho). Confira no faturamento do Google de vez em quando."
+          : "Google does not expose the balance through its API. This estimate subtracts measured call costs from recorded top-ups (the same costs shown in Cost & Performance). Check Google billing periodically."}
       </p>
 
       <form

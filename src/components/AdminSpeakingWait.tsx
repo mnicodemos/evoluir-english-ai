@@ -22,13 +22,19 @@ export function AdminSpeakingWait() {
   if (query.data === null) {
     return (
       <p className="mt-4 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        {pt ? "Espera no AI Speaking: aplique a migração 0050_speaking_turn_timings pelo chat do Lovable para começar a medir." : "AI Speaking wait time: apply migration 0050_speaking_turn_timings through Lovable chat to start measuring."}
+        {pt
+          ? "Espera no AI Speaking: aplique a migração 0050_speaking_turn_timings pelo chat do Lovable para começar a medir."
+          : "AI Speaking wait time: apply migration 0050_speaking_turn_timings through Lovable chat to start measuring."}
       </p>
     );
   }
   const summary = query.data;
   const stages: Array<{ label: string; stage: StageSummary; main?: boolean }> = [
-    { label: pt ? "Primeira palavra da EVO (som)" : "EVO first spoken word", stage: summary.firstAudio, main: true },
+    {
+      label: pt ? "Primeira palavra da EVO (som)" : "EVO first spoken word",
+      stage: summary.firstAudio,
+      main: true,
+    },
     { label: pt ? "Primeiro texto da resposta" : "First response text", stage: summary.firstText },
     { label: pt ? "Transcrição da fala" : "Speech transcription", stage: summary.transcribed },
   ];
@@ -37,9 +43,13 @@ export function AdminSpeakingWait() {
       className="mt-4 rounded-xl border border-border p-3 sm:p-4"
       aria-label={pt ? "Espera no AI Speaking" : "AI Speaking wait time"}
     >
-      <p className="text-sm font-semibold">{pt ? "Espera no AI Speaking (7 dias)" : "AI Speaking wait time (7 days)"}</p>
+      <p className="text-sm font-semibold">
+        {pt ? "Espera no AI Speaking (7 dias)" : "AI Speaking wait time (7 days)"}
+      </p>
       <p className="text-xs text-muted-foreground">
-        {pt ? `Do momento em que o aluno para de falar · ${summary.answers} respostas medidas` : `From when the student stops speaking · ${summary.answers} measured responses`}
+        {pt
+          ? `Do momento em que o aluno para de falar · ${summary.answers} respostas medidas`
+          : `From when the student stops speaking · ${summary.answers} measured responses`}
       </p>
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
         {stages.map(({ label, stage, main }) => (
@@ -50,7 +60,9 @@ export function AdminSpeakingWait() {
             <p className="text-xs text-muted-foreground">{label}</p>
             <p className="mt-1 font-display text-2xl font-bold">{seconds(stage.medianMs)}</p>
             <p className="text-[11px] text-muted-foreground">
-              {pt ? `mediana · 10% mais lentos: ${seconds(stage.p90Ms)}` : `median · slowest 10%: ${seconds(stage.p90Ms)}`}
+              {pt
+                ? `mediana · 10% mais lentos: ${seconds(stage.p90Ms)}`
+                : `median · slowest 10%: ${seconds(stage.p90Ms)}`}
             </p>
           </div>
         ))}

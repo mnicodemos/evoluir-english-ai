@@ -76,14 +76,23 @@ async function fetchDailyUsdQuote(pt: boolean): Promise<DailyUsdQuote> {
 
   try {
     const response = await fetch(url, { headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(pt ? "Não foi possível consultar a cotação do Banco Central." : "Could not retrieve the Central Bank exchange rate.");
+    if (!response.ok)
+      throw new Error(
+        pt
+          ? "Não foi possível consultar a cotação do Banco Central."
+          : "Could not retrieve the Central Bank exchange rate.",
+      );
     const payload = (await response.json()) as {
       value?: { cotacaoVenda?: number; dataHoraCotacao?: string }[];
     };
     const latest = payload.value?.[0];
     const rate = Number(latest?.cotacaoVenda);
     if (!latest || !Number.isFinite(rate) || rate <= 0 || !latest.dataHoraCotacao) {
-      throw new Error(pt ? "O Banco Central ainda não disponibilizou uma cotação recente." : "The Central Bank has not published a recent exchange rate yet.");
+      throw new Error(
+        pt
+          ? "O Banco Central ainda não disponibilizou uma cotação recente."
+          : "The Central Bank has not published a recent exchange rate yet.",
+      );
     }
     const quote = { rate, date: latest.dataHoraCotacao };
     localStorage.setItem(QUOTE_STORAGE_KEY, JSON.stringify(quote));
@@ -211,8 +220,18 @@ export function AdminFinancialProjection() {
     suffix?: string;
     step?: string;
   }[] = [
-    { key: "monthlyPrice", label: pt ? "Preço plano mensal" : "Monthly plan price", prefix: "R$", step: "0.01" },
-    { key: "annualPrice", label: pt ? "Preço plano anual" : "Annual plan price", prefix: "R$", step: "0.01" },
+    {
+      key: "monthlyPrice",
+      label: pt ? "Preço plano mensal" : "Monthly plan price",
+      prefix: "R$",
+      step: "0.01",
+    },
+    {
+      key: "annualPrice",
+      label: pt ? "Preço plano anual" : "Annual plan price",
+      prefix: "R$",
+      step: "0.01",
+    },
     { key: "stripePercent", label: "Stripe — percentage", suffix: "%", step: "0.01" },
     {
       key: "stripeFixed",
@@ -227,7 +246,12 @@ export function AdminFinancialProjection() {
       step: "0.01",
     },
     { key: "lovableUsd", label: "Lovable / month", prefix: "US$", step: "0.01" },
-    { key: "aiSubscriptionsUsd", label: "Pro AI subscriptions / month", prefix: "US$", step: "0.01" },
+    {
+      key: "aiSubscriptionsUsd",
+      label: "Pro AI subscriptions / month",
+      prefix: "US$",
+      step: "0.01",
+    },
     { key: "domainAnnual", label: "Domain / year", prefix: "R$", step: "0.01" },
     { key: "marketing", label: "Marketing / month", prefix: "R$", step: "0.01" },
     { key: "otherCosts", label: "Other costs / month", prefix: "R$", step: "0.01" },
@@ -240,9 +264,13 @@ export function AdminFinancialProjection() {
     <section className="mt-4 border-t border-border pt-4 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="font-semibold">{pt ? "Financeiro e Projeções" : "Financial projections"}</h3>
+          <h3 className="font-semibold">
+            {pt ? "Financeiro e Projeções" : "Financial projections"}
+          </h3>
           <p className="text-xs text-muted-foreground">
-            {pt ? "Simulador editável. Alterações recalculam os indicadores e gráficos automaticamente." : "Editable simulator. Changes automatically recalculate metrics and charts."}
+            {pt
+              ? "Simulador editável. Alterações recalculam os indicadores e gráficos automaticamente."
+              : "Editable simulator. Changes automatically recalculate metrics and charts."}
           </p>
         </div>
         <Button size="sm" variant="outline" onClick={() => setValues(DEFAULTS)}>
@@ -252,7 +280,9 @@ export function AdminFinancialProjection() {
 
       {!hasExchangeRate ? (
         <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
-          {pt ? "A projeção financeira está temporariamente indisponível porque ainda não há uma cotação USD/BRL válida. Os custos em dólar não serão tratados como zero." : "Financial projections are temporarily unavailable because there is no valid USD/BRL exchange rate. USD costs will not be treated as zero."}
+          {pt
+            ? "A projeção financeira está temporariamente indisponível porque ainda não há uma cotação USD/BRL válida. Os custos em dólar não serão tratados como zero."
+            : "Financial projections are temporarily unavailable because there is no valid USD/BRL exchange rate. USD costs will not be treated as zero."}
         </div>
       ) : (
         <>
@@ -264,25 +294,43 @@ export function AdminFinancialProjection() {
               <p className="text-3xl font-bold tabular-nums text-primary">
                 {money(totalCostPerStudent)}
               </p>
-              <span className="text-xs text-muted-foreground">{pt ? "por aluno ativo / mês" : "per active student / month"}</span>
+              <span className="text-xs text-muted-foreground">
+                {pt ? "por aluno ativo / mês" : "per active student / month"}
+              </span>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
               {activeStudents > 0
-                ? pt ? `Cálculo: ${money(totalCosts)} em custos mensais estimados ÷ ${activeStudents} alunos ativos (${paidStudents} pagantes + ${values.freeStudents} Free).` : `Calculation: ${money(totalCosts, "en-US")} in estimated monthly costs ÷ ${activeStudents} active students (${paidStudents} paid + ${values.freeStudents} Free).`
-                : pt ? "Informe a quantidade de alunos pagantes ou Free para calcular o custo completo por aluno." : "Enter the number of paid or Free students to calculate the full cost per student."}
+                ? pt
+                  ? `Cálculo: ${money(totalCosts)} em custos mensais estimados ÷ ${activeStudents} alunos ativos (${paidStudents} pagantes + ${values.freeStudents} Free).`
+                  : `Calculation: ${money(totalCosts, "en-US")} in estimated monthly costs ÷ ${activeStudents} active students (${paidStudents} paid + ${values.freeStudents} Free).`
+                : pt
+                  ? "Informe a quantidade de alunos pagantes ou Free para calcular o custo completo por aluno."
+                  : "Enter the number of paid or Free students to calculate the full cost per student."}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {pt ? `Dentro desse total, IA variável estimada por aluno: ${money(aiPerStudent)}. O valor completo também rateia Lovable, IAs Pro, domínio, marketing, outros custos e Stripe dos pagantes.` : `This total includes an estimated variable AI cost of ${money(aiPerStudent)} per student. It also allocates Lovable, Pro AI subscriptions, domain, marketing, other costs, and Stripe fees for paid students.`}
+              {pt
+                ? `Dentro desse total, IA variável estimada por aluno: ${money(aiPerStudent)}. O valor completo também rateia Lovable, IAs Pro, domínio, marketing, outros custos e Stripe dos pagantes.`
+                : `This total includes an estimated variable AI cost of ${money(aiPerStudent)} per student. It also allocates Lovable, Pro AI subscriptions, domain, marketing, other costs, and Stripe fees for paid students.`}
             </p>
           </div>
 
           <div className="rounded-md border border-border bg-muted/20 p-3 text-sm">
-            <p className="font-semibold">{pt ? "Cotação automática do dólar (PTAX/BCB)" : "Automatic USD exchange rate (PTAX/BCB)"}</p>
+            <p className="font-semibold">
+              {pt
+                ? "Cotação automática do dólar (PTAX/BCB)"
+                : "Automatic USD exchange rate (PTAX/BCB)"}
+            </p>
             {exchangeRateQuery.isPending ? (
-              <p className="mt-1 text-muted-foreground">{pt ? "Consultando a cotação mais recente..." : "Checking the latest exchange rate..."}</p>
+              <p className="mt-1 text-muted-foreground">
+                {pt
+                  ? "Consultando a cotação mais recente..."
+                  : "Checking the latest exchange rate..."}
+              </p>
             ) : exchangeRateQuery.isError ? (
               <p className="mt-1 text-destructive">
-                {pt ? "Não foi possível atualizar a cotação. Recarregue o painel para tentar novamente." : "Could not update the exchange rate. Reload the panel to try again."}
+                {pt
+                  ? "Não foi possível atualizar a cotação. Recarregue o painel para tentar novamente."
+                  : "Could not update the exchange rate. Reload the panel to try again."}
               </p>
             ) : (
               <p className="mt-1 text-muted-foreground">
@@ -295,7 +343,9 @@ export function AdminFinancialProjection() {
                   timeZone: "America/Sao_Paulo",
                 })}
                 {exchangeRateQuery.data.cached &&
-                  (pt ? " · usando última cotação salva (atualização indisponível)" : " · using the last saved rate (update unavailable)")}
+                  (pt
+                    ? " · usando última cotação salva (atualização indisponível)"
+                    : " · using the last saved rate (update unavailable)")}
               </p>
             )}
           </div>
@@ -322,19 +372,30 @@ export function AdminFinancialProjection() {
           </div>
 
           <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
-            {pt ? "Tarifa inicial configurada para simulação: 3,99% + R$ 0,39 por cobrança. Confirme no Dashboard/contrato da sua conta Stripe se a tarifa efetiva é essa. A estimativa de IA de US$ 2,14 por aluno/mês é uma premissa baseada no cenário informado, não um custo médio validado por aluno. IAs Pro é mantido separado do consumo variável de tokens para evitar dupla contagem; ajuste se houver sobreposição." : "Initial simulation fee: 3.99% + R$0.39 per charge. Confirm the actual fee in your Stripe Dashboard/agreement. The US$2.14 per-student/month AI estimate is an assumption based on the stated scenario, not a validated average cost per student. Pro AI subscriptions are kept separate from variable token usage to avoid double counting; adjust if they overlap."}
+            {pt
+              ? "Tarifa inicial configurada para simulação: 3,99% + R$ 0,39 por cobrança. Confirme no Dashboard/contrato da sua conta Stripe se a tarifa efetiva é essa. A estimativa de IA de US$ 2,14 por aluno/mês é uma premissa baseada no cenário informado, não um custo médio validado por aluno. IAs Pro é mantido separado do consumo variável de tokens para evitar dupla contagem; ajuste se houver sobreposição."
+              : "Initial simulation fee: 3.99% + R$0.39 per charge. Confirm the actual fee in your Stripe Dashboard/agreement. The US$2.14 per-student/month AI estimate is an assumption based on the stated scenario, not a validated average cost per student. Pro AI subscriptions are kept separate from variable token usage to avoid double counting; adjust if they overlap."}
           </div>
 
           <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
             {[
-              [pt ? "Receita bruta mensal equivalente" : "Equivalent monthly gross revenue", money(revenue)],
+              [
+                pt ? "Receita bruta mensal equivalente" : "Equivalent monthly gross revenue",
+                money(revenue),
+              ],
               [pt ? "Stripe estimada" : "Estimated Stripe fees", money(stripeCost)],
               [pt ? "Despesas totais estimadas" : "Estimated total expenses", money(totalCosts)],
               [pt ? "Resultado operacional estimado" : "Estimated operating result", money(result)],
               [pt ? "Custos fixos" : "Fixed costs", money(fixedCosts)],
-              [pt ? "IA variável (todos os alunos)" : "Variable AI (all students)", money(variableAi)],
+              [
+                pt ? "IA variável (todos os alunos)" : "Variable AI (all students)",
+                money(variableAi),
+              ],
               [pt ? "Líquido por plano mensal" : "Net per monthly plan", money(monthlyNet)],
-              [pt ? "Líquido anual / mês equivalente" : "Annual net / monthly equivalent", money(annualNetMonthly)],
+              [
+                pt ? "Líquido anual / mês equivalente" : "Annual net / monthly equivalent",
+                money(annualNetMonthly),
+              ],
             ].map(([label, value]) => (
               <div key={label} className="rounded-md border border-border bg-muted/20 p-3">
                 <p className="text-xs text-muted-foreground">{label}</p>
@@ -344,9 +405,13 @@ export function AdminFinancialProjection() {
           </div>
 
           <div>
-            <h4 className="mb-1 text-sm font-semibold">{pt ? "Projeção de 12 meses" : "12-month projection"}</h4>
+            <h4 className="mb-1 text-sm font-semibold">
+              {pt ? "Projeção de 12 meses" : "12-month projection"}
+            </h4>
             <p className="mb-3 text-xs text-muted-foreground">
-              {pt ? "Cenário constante: mesma quantidade de assinantes e custos por mês. Valores acumulados, sem crescimento presumido." : "Constant scenario: same number of subscribers and monthly costs. Cumulative values, with no assumed growth."}
+              {pt
+                ? "Cenário constante: mesma quantidade de assinantes e custos por mês. Valores acumulados, sem crescimento presumido."
+                : "Constant scenario: same number of subscribers and monthly costs. Cumulative values, with no assumed growth."}
             </p>
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -382,7 +447,9 @@ export function AdminFinancialProjection() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            {pt ? "Premissas salvas neste navegador. O custo variável de IA considera todos os alunos ativos, incluindo Free, usando a mesma estimativa por aluno; ajuste essa premissa quando houver medição separada por plano. Não inclui impostos, reembolsos, chargebacks ou tarifas adicionais não informadas." : "Assumptions are saved in this browser. Variable AI cost includes all active students, including Free users, using the same per-student estimate; adjust this assumption when plan-level measurements are available. Taxes, refunds, chargebacks, and unspecified additional fees are not included."}
+            {pt
+              ? "Premissas salvas neste navegador. O custo variável de IA considera todos os alunos ativos, incluindo Free, usando a mesma estimativa por aluno; ajuste essa premissa quando houver medição separada por plano. Não inclui impostos, reembolsos, chargebacks ou tarifas adicionais não informadas."
+              : "Assumptions are saved in this browser. Variable AI cost includes all active students, including Free users, using the same per-student estimate; adjust this assumption when plan-level measurements are available. Taxes, refunds, chargebacks, and unspecified additional fees are not included."}
           </p>
         </>
       )}

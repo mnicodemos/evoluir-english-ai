@@ -75,7 +75,13 @@ export function AdminPremiumVideos() {
       else showPushResult(result.push, isPt ? "Short salvo." : "Short saved.", isPt);
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : isPt ? "Não foi possível salvar." : "Could not save."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : isPt
+            ? "Não foi possível salvar."
+            : "Could not save.",
+      ),
   });
   const updateMutation = useMutation({
     mutationFn: () => {
@@ -88,31 +94,57 @@ export function AdminPremiumVideos() {
       toast.success(isPt ? "Vídeo atualizado e ordem salva." : "Video updated and order saved.");
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : isPt ? "Não foi possível atualizar." : "Could not update."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : isPt
+            ? "Não foi possível atualizar."
+            : "Could not update.",
+      ),
   });
   const notify = useServerFn(notifyPremiumShort);
   const notifyMutation = useMutation({
     mutationFn: (id: string) => notify({ data: { id } }),
-    onSuccess: (push) => showPushResult(push, isPt ? "Aviso do Short." : "Short notification.", isPt),
+    onSuccess: (push) =>
+      showPushResult(push, isPt ? "Aviso do Short." : "Short notification.", isPt),
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : isPt ? "Não foi possível notificar." : "Could not send notification."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : isPt
+            ? "Não foi possível notificar."
+            : "Could not send notification.",
+      ),
   });
   const changeKind = useServerFn(setPremiumVideoKind);
   const kindMutation = useMutation({
     mutationFn: (input: { id: string; kind: "video" | "short" }) => changeKind({ data: input }),
     onSuccess: async (result) => {
       await refresh();
-      if (result.push) showPushResult(result.push, isPt ? "Agora é Short." : "Changed to Short.", isPt);
+      if (result.push)
+        showPushResult(result.push, isPt ? "Agora é Short." : "Changed to Short.", isPt);
       else toast.success(isPt ? "Agora é vídeo." : "Changed to video.");
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : isPt ? "Não foi possível mudar o tipo." : "Could not change the type."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : isPt
+            ? "Não foi possível mudar o tipo."
+            : "Could not change the type.",
+      ),
   });
   const deleteMutation = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
     onSuccess: refresh,
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : isPt ? "Não foi possível remover." : "Could not delete."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : isPt
+            ? "Não foi possível remover."
+            : "Could not delete.",
+      ),
   });
 
   const field = "h-9 w-full rounded-md border border-border bg-background px-3 text-sm";
@@ -124,9 +156,13 @@ export function AdminPremiumVideos() {
           <Crown className="size-5" aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-display text-base font-semibold">{isPt ? "Vídeos extras (Premium)" : "Extra videos (Premium)"}</h2>
+          <h2 className="font-display text-base font-semibold">
+            {isPt ? "Vídeos extras (Premium)" : "Extra videos (Premium)"}
+          </h2>
           <p className="text-sm text-muted-foreground">
-            {isPt ? 'Vídeos do Vimeo por nível, quantos quiser, cada um com o seu título (sem ligação com unidade ou lição). Aparecem na página "Vídeos extras" (Aprendizado); só alunos Premium assistem, os gratuitos veem a lista com cadeado e o convite para o Premium. Não contam no checklist, no dia de estudo nem no Teste Final.' : 'Add any number of Vimeo videos per level, each with its own title (not linked to a unit or lesson). They appear on the "Extra videos" page under Learning. Only Premium students can watch; Free students see the locked list and the Premium invitation. These videos do not count toward the checklist, study day, or Final Test.'}
+            {isPt
+              ? 'Vídeos do Vimeo por nível, quantos quiser, cada um com o seu título (sem ligação com unidade ou lição). Aparecem na página "Vídeos extras" (Aprendizado); só alunos Premium assistem, os gratuitos veem a lista com cadeado e o convite para o Premium. Não contam no checklist, no dia de estudo nem no Teste Final.'
+              : 'Add any number of Vimeo videos per level, each with its own title (not linked to a unit or lesson). They appear on the "Extra videos" page under Learning. Only Premium students can watch; Free students see the locked list and the Premium invitation. These videos do not count toward the checklist, study day, or Final Test.'}
           </p>
         </div>
       </div>
@@ -144,7 +180,17 @@ export function AdminPremiumVideos() {
         <>
           {query.data && !query.data.kindReady ? (
             <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-              {isPt ? <>Para cadastrar Shorts, aplique a migração <code>0102_premium_video_kind.sql</code> pelo chat do Lovable. Os vídeos normais funcionam sem ela.</> : <>To add Shorts, apply migration <code>0102_premium_video_kind.sql</code> through Lovable chat. Regular videos work without it.</>}
+              {isPt ? (
+                <>
+                  Para cadastrar Shorts, aplique a migração <code>0102_premium_video_kind.sql</code>{" "}
+                  pelo chat do Lovable. Os vídeos normais funcionam sem ela.
+                </>
+              ) : (
+                <>
+                  To add Shorts, apply migration <code>0102_premium_video_kind.sql</code> through
+                  Lovable chat. Regular videos work without it.
+                </>
+              )}
             </p>
           ) : null}
           <div className="grid gap-2 sm:grid-cols-[6rem_7rem_minmax(0,1.2fr)_minmax(0,1fr)_auto]">
@@ -178,7 +224,15 @@ export function AdminPremiumVideos() {
                   ? "Vimeo ou https://www.instagram.com/reel/…"
                   : "https://vimeo.com/123456789"
               }
-              aria-label={kind === "short" ? (isPt ? "Link do Vimeo ou do Reel" : "Vimeo or Reel URL") : (isPt ? "Link do Vimeo" : "Vimeo URL")}
+              aria-label={
+                kind === "short"
+                  ? isPt
+                    ? "Link do Vimeo ou do Reel"
+                    : "Vimeo or Reel URL"
+                  : isPt
+                    ? "Link do Vimeo"
+                    : "Vimeo URL"
+              }
               className={field}
             />
             <input
@@ -205,11 +259,17 @@ export function AdminPremiumVideos() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            {isPt ? 'Defina a posição de cada item ao editar. A ordem é independente para Shorts e Vídeos extras. Shorts são vídeos verticais (9:16): um vídeo do Vimeo ou um Reel público do Instagram, e ficam na aba "Shorts" da página. Você pode editar título, link, nível, tipo e posição sem excluir o cadastro.' : 'Set each item’s position when editing. Shorts and extra videos have independent ordering. Shorts are vertical (9:16) videos: either a Vimeo video or a public Instagram Reel, displayed in the page’s "Shorts" tab. You can edit the title, URL, level, type, and position without deleting the entry.'}
+            {isPt
+              ? 'Defina a posição de cada item ao editar. A ordem é independente para Shorts e Vídeos extras. Shorts são vídeos verticais (9:16): um vídeo do Vimeo ou um Reel público do Instagram, e ficam na aba "Shorts" da página. Você pode editar título, link, nível, tipo e posição sem excluir o cadastro.'
+              : 'Set each item’s position when editing. Shorts and extra videos have independent ordering. Shorts are vertical (9:16) videos: either a Vimeo video or a public Instagram Reel, displayed in the page’s "Shorts" tab. You can edit the title, URL, level, type, and position without deleting the entry.'}
           </p>
 
           {saved.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{isPt ? "Nenhum vídeo extra cadastrado ainda." : "No extra videos have been added yet."}</p>
+            <p className="text-sm text-muted-foreground">
+              {isPt
+                ? "Nenhum vídeo extra cadastrado ainda."
+                : "No extra videos have been added yet."}
+            </p>
           ) : (
             <ul className="space-y-1.5">
               {saved.map((video) => (
@@ -353,8 +413,12 @@ export function AdminPremiumVideos() {
                         disabled={kindMutation.isPending}
                         title={
                           video.kind === "short"
-                            ? isPt ? "Mudar para vídeo comum (aba Vídeos)" : "Change to regular video (Videos tab)"
-                            : isPt ? "Mudar para Short (aba Shorts) e notificar os alunos do nível" : "Change to Short (Shorts tab) and notify students at this level"
+                            ? isPt
+                              ? "Mudar para vídeo comum (aba Vídeos)"
+                              : "Change to regular video (Videos tab)"
+                            : isPt
+                              ? "Mudar para Short (aba Shorts) e notificar os alunos do nível"
+                              : "Change to Short (Shorts tab) and notify students at this level"
                         }
                         onClick={() =>
                           kindMutation.mutate({
@@ -363,7 +427,13 @@ export function AdminPremiumVideos() {
                           })
                         }
                       >
-                        {video.kind === "short" ? (isPt ? "Virar vídeo" : "Make video") : (isPt ? "Virar Short" : "Make Short")}
+                        {video.kind === "short"
+                          ? isPt
+                            ? "Virar vídeo"
+                            : "Make video"
+                          : isPt
+                            ? "Virar Short"
+                            : "Make Short"}
                       </Button>
                     ) : null}
                     {video.kind === "short" ? (
@@ -373,7 +443,11 @@ export function AdminPremiumVideos() {
                         className="h-8 gap-1.5"
                         disabled={notifyMutation.isPending}
                         aria-label={`${isPt ? "Notificar os alunos do nível" : "Notify students at this level"}: ${video.title}`}
-                        title={isPt ? "Enviar a notificação deste Short aos alunos do nível" : "Send this Short notification to students at this level"}
+                        title={
+                          isPt
+                            ? "Enviar a notificação deste Short aos alunos do nível"
+                            : "Send this Short notification to students at this level"
+                        }
                         onClick={() => notifyMutation.mutate(video.id)}
                       >
                         <Bell className="size-4" />
@@ -387,7 +461,13 @@ export function AdminPremiumVideos() {
                       disabled={deleteMutation.isPending}
                       aria-label={`${isPt ? "Remover vídeo extra" : "Delete extra video"}: ${video.title}`}
                       onClick={() => {
-                        if (window.confirm(isPt ? `Remover o vídeo extra "${video.title}"?` : `Delete the extra video "${video.title}"?`))
+                        if (
+                          window.confirm(
+                            isPt
+                              ? `Remover o vídeo extra "${video.title}"?`
+                              : `Delete the extra video "${video.title}"?`,
+                          )
+                        )
                           deleteMutation.mutate(video.id);
                       }}
                     >
@@ -405,7 +485,15 @@ export function AdminPremiumVideos() {
 }
 
 /** What happened to a short's push, so the owner sees why nobody got it. */
-function ShortCaptionEditor({ videoId, field, isPt }: { videoId: string; field: string; isPt: boolean }) {
+function ShortCaptionEditor({
+  videoId,
+  field,
+  isPt,
+}: {
+  videoId: string;
+  field: string;
+  isPt: boolean;
+}) {
   const fetchCaptions = useServerFn(getPremiumShortCaptionsAdmin);
   const saveCaption = useServerFn(savePremiumShortCaption);
   const removeCaption = useServerFn(deletePremiumShortCaption);
@@ -449,7 +537,13 @@ function ShortCaptionEditor({ videoId, field, isPt }: { videoId: string; field: 
       toast.success(isPt ? "Legenda salva." : "Caption saved.");
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : isPt ? "Falha ao salvar legenda." : "Could not save caption."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : isPt
+            ? "Falha ao salvar legenda."
+            : "Could not save caption.",
+      ),
   });
   const remove = useMutation({
     mutationFn: (language: "en" | "pt") => removeCaption({ data: { videoId, language } }),
@@ -460,19 +554,32 @@ function ShortCaptionEditor({ videoId, field, isPt }: { videoId: string; field: 
       toast.success(isPt ? "Legenda removida." : "Caption removed.");
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : isPt ? "Falha ao remover legenda." : "Could not remove caption."),
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : isPt
+            ? "Falha ao remover legenda."
+            : "Could not remove caption.",
+      ),
   });
   return (
     <div className="mt-2 grid w-full min-w-0 gap-3 rounded-md border border-border/60 bg-background p-3 sm:col-span-full sm:grid-cols-2">
       <div className="sm:col-span-2">
-        <p className="text-sm font-semibold">{isPt ? "Legendas do Short (WebVTT)" : "Short captions (WebVTT)"}</p>
-        <p className="text-xs text-muted-foreground">
-          {isPt ? "Legendas vinculadas somente a este Short. Envie um arquivo .vtt ou edite o conteúdo abaixo." : "Captions linked only to this Short. Upload a .vtt file or edit the content below."}
+        <p className="text-sm font-semibold">
+          {isPt ? "Legendas do Short (WebVTT)" : "Short captions (WebVTT)"}
         </p>
-        {query.isPending ? <p className="text-xs text-muted-foreground">{isPt ? "Carregando…" : "Loading…"}</p> : null}
+        <p className="text-xs text-muted-foreground">
+          {isPt
+            ? "Legendas vinculadas somente a este Short. Envie um arquivo .vtt ou edite o conteúdo abaixo."
+            : "Captions linked only to this Short. Upload a .vtt file or edit the content below."}
+        </p>
+        {query.isPending ? (
+          <p className="text-xs text-muted-foreground">{isPt ? "Carregando…" : "Loading…"}</p>
+        ) : null}
         {query.data?.missingMigration ? (
           <p className="text-xs text-warning">
-            {isPt ? "Aplique a migração" : "Apply migration"} 20261107180000_premium_video_captions.sql.
+            {isPt ? "Aplique a migração" : "Apply migration"}{" "}
+            20261107180000_premium_video_captions.sql.
           </p>
         ) : null}
       </div>
@@ -525,7 +632,9 @@ function ShortCaptionEditor({ videoId, field, isPt }: { videoId: string; field: 
           <span className="w-10 text-right tabular-nums">{backgroundOpacity}%</span>
         </label>
         <span className="text-xs text-muted-foreground">
-          {isPt ? "Tamanho, cores e transparência são aplicados aos dois idiomas e salvos junto com cada legenda." : "Size, colors, and opacity apply to both languages and are saved with each caption."}
+          {isPt
+            ? "Tamanho, cores e transparência são aplicados aos dois idiomas e salvos junto com cada legenda."
+            : "Size, colors, and opacity apply to both languages and are saved with each caption."}
         </span>
       </div>
       {(["en", "pt"] as const).map((language) => (
@@ -543,7 +652,11 @@ function ShortCaptionEditor({ videoId, field, isPt }: { videoId: string; field: 
                 const file = event.target.files?.[0];
                 if (!file) return;
                 if (file.size > 500_000) {
-                  toast.error(isPt ? "O arquivo .vtt deve ter até 500 KB." : "The .vtt file must be 500 KB or smaller.");
+                  toast.error(
+                    isPt
+                      ? "O arquivo .vtt deve ter até 500 KB."
+                      : "The .vtt file must be 500 KB or smaller.",
+                  );
                   event.target.value = "";
                   return;
                 }
@@ -553,12 +666,20 @@ function ShortCaptionEditor({ videoId, field, isPt }: { videoId: string; field: 
                     content,
                   );
                 if (!content.startsWith("WEBVTT") || !hasTiming) {
-                  toast.error(isPt ? "Arquivo inválido: selecione um WebVTT com marcações de tempo." : "Invalid file: select a WebVTT file with timestamps.");
+                  toast.error(
+                    isPt
+                      ? "Arquivo inválido: selecione um WebVTT com marcações de tempo."
+                      : "Invalid file: select a WebVTT file with timestamps.",
+                  );
                   event.target.value = "";
                   return;
                 }
                 (language === "en" ? setEn : setPt)(content);
-                toast.success(isPt ? `Arquivo ${file.name} carregado para prévia.` : `File ${file.name} loaded for preview.`);
+                toast.success(
+                  isPt
+                    ? `Arquivo ${file.name} carregado para prévia.`
+                    : `File ${file.name} loaded for preview.`,
+                );
                 event.target.value = "";
               }}
             />
@@ -595,15 +716,28 @@ function ShortCaptionEditor({ videoId, field, isPt }: { videoId: string; field: 
 }
 
 function showPushResult(push: NewShortPushResult, prefix: string, isPt: boolean) {
-  if (push.problem) toast.error(isPt ? `${prefix} Notificação não enviada: ${push.problem}.` : `${prefix} Notification not sent: ${push.problem}.`);
+  if (push.problem)
+    toast.error(
+      isPt
+        ? `${prefix} Notificação não enviada: ${push.problem}.`
+        : `${prefix} Notification not sent: ${push.problem}.`,
+    );
   else if (push.students === 0)
-    toast.warning(isPt ? `${prefix} Nenhum aluno está neste nível, então ninguém foi notificado.` : `${prefix} There are no students at this level, so nobody was notified.`);
+    toast.warning(
+      isPt
+        ? `${prefix} Nenhum aluno está neste nível, então ninguém foi notificado.`
+        : `${prefix} There are no students at this level, so nobody was notified.`,
+    );
   else if (push.devices === 0)
     toast.warning(
-      isPt ? `${prefix} ${push.students} aluno(s) no nível, mas nenhum ativou as notificações no aparelho.` : `${prefix} ${push.students} student(s) at this level, but none enabled notifications on their device.`,
+      isPt
+        ? `${prefix} ${push.students} aluno(s) no nível, mas nenhum ativou as notificações no aparelho.`
+        : `${prefix} ${push.students} student(s) at this level, but none enabled notifications on their device.`,
     );
   else
     toast.success(
-      isPt ? `${prefix} Notificação enviada a ${push.sent} de ${push.devices} aparelho(s) (${push.students} aluno(s) do nível).` : `${prefix} Notification sent to ${push.sent} of ${push.devices} device(s) (${push.students} student(s) at this level).`,
+      isPt
+        ? `${prefix} Notificação enviada a ${push.sent} de ${push.devices} aparelho(s) (${push.students} aluno(s) do nível).`
+        : `${prefix} Notification sent to ${push.sent} of ${push.devices} device(s) (${push.students} student(s) at this level).`,
     );
 }

@@ -24,7 +24,9 @@ export function AdminMistakeReview() {
   if (query.isError) {
     return (
       <p className="mt-4 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        {pt ? "Não foi possível carregar a revisão dos erros." : "Could not load the mistake review."}
+        {pt
+          ? "Não foi possível carregar a revisão dos erros."
+          : "Could not load the mistake review."}
       </p>
     );
   }
@@ -33,9 +35,13 @@ export function AdminMistakeReview() {
       className="mt-4 rounded-xl border border-border p-3 sm:p-4"
       aria-label={pt ? "As correções ficam?" : "Do corrections stick?"}
     >
-      <p className="text-sm font-semibold">{pt ? "As correções ficam?" : "Do corrections stick?"}</p>
+      <p className="text-sm font-semibold">
+        {pt ? "As correções ficam?" : "Do corrections stick?"}
+      </p>
       <p className="text-xs text-muted-foreground">
-        {pt ? "Erros salvos em Meus erros, revisados e acertados na última revisão" : "Mistakes saved in My Mistakes, reviewed, and answered correctly in the latest review"}
+        {pt
+          ? "Erros salvos em Meus erros, revisados e acertados na última revisão"
+          : "Mistakes saved in My Mistakes, reviewed, and answered correctly in the latest review"}
       </p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {query.data.map((row) => (
@@ -45,7 +51,9 @@ export function AdminMistakeReview() {
               {row.percent === null ? "—" : `${row.percent}%`}
             </p>
             <p className="text-xs text-muted-foreground">
-              {pt ? `${row.retained} acertados de ${row.reviewed} revisados · ${row.saved} salvos` : `${row.retained} correct out of ${row.reviewed} reviewed · ${row.saved} saved`}
+              {pt
+                ? `${row.retained} acertados de ${row.reviewed} revisados · ${row.saved} salvos`
+                : `${row.retained} correct out of ${row.reviewed} reviewed · ${row.saved} saved`}
             </p>
           </div>
         ))}

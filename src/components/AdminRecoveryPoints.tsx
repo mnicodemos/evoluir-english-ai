@@ -67,7 +67,9 @@ export function AdminRecoveryPoints() {
           Recovery points
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          {pt ? "Registro dos checkpoints de código do GitHub para localizar uma versão estável e orientar uma recuperação. Este registro não cria backup do banco de dados nem executa restaurações." : "A record of GitHub code checkpoints to identify a stable version and guide recovery. This record does not back up the database or perform restorations."}
+          {pt
+            ? "Registro dos checkpoints de código do GitHub para localizar uma versão estável e orientar uma recuperação. Este registro não cria backup do banco de dados nem executa restaurações."
+            : "A record of GitHub code checkpoints to identify a stable version and guide recovery. This record does not back up the database or perform restorations."}
         </p>
       </div>
 
@@ -140,12 +142,16 @@ export function AdminRecoveryPoints() {
         </div>
         {save.isError && <p className="text-sm text-red-400 sm:col-span-2">{save.error.message}</p>}
         {save.isSuccess && (
-          <p className="text-sm text-emerald-400 sm:col-span-2">{pt ? "Ponto de recuperação registrado." : "Recovery point saved."}</p>
+          <p className="text-sm text-emerald-400 sm:col-span-2">
+            {pt ? "Ponto de recuperação registrado." : "Recovery point saved."}
+          </p>
         )}
       </form>
 
       <div className="grid gap-2">
-        <h4 className="text-sm font-semibold">{pt ? "Histórico de pontos de recuperação" : "Recovery point history"}</h4>
+        <h4 className="text-sm font-semibold">
+          {pt ? "Histórico de pontos de recuperação" : "Recovery point history"}
+        </h4>
         {points.isPending ? (
           <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
@@ -175,7 +181,9 @@ export function AdminRecoveryPoints() {
             </article>
           ))
         ) : (
-          <p className="text-sm text-muted-foreground">{pt ? "Nenhum ponto de recuperação registrado." : "No recovery points have been saved."}</p>
+          <p className="text-sm text-muted-foreground">
+            {pt ? "Nenhum ponto de recuperação registrado." : "No recovery points have been saved."}
+          </p>
         )}
       </div>
     </section>

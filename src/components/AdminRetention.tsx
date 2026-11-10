@@ -12,7 +12,13 @@ function percent(rate: Rate) {
 }
 
 function detail(rate: Rate, pt: boolean) {
-  return rate.eligible ? (pt ? `${rate.returned} de ${rate.eligible}` : `${rate.returned} of ${rate.eligible}`) : (pt ? "ainda sem alunos com idade" : "not enough student history yet");
+  return rate.eligible
+    ? pt
+      ? `${rate.returned} de ${rate.eligible}`
+      : `${rate.returned} of ${rate.eligible}`
+    : pt
+      ? "ainda sem alunos com idade"
+      : "not enough student history yet";
 }
 
 function shortDate(day: string) {
@@ -39,7 +45,9 @@ function LandingFunnelPanel({ pt }: { pt: boolean }) {
   if (query.isError) {
     return (
       <p className="rounded-xl border border-border p-3 text-xs text-muted-foreground">
-        {pt ? "Funil da página inicial indisponível agora" : "Homepage funnel is currently unavailable"}
+        {pt
+          ? "Funil da página inicial indisponível agora"
+          : "Homepage funnel is currently unavailable"}
         {query.error instanceof Error && query.error.message ? ` (${query.error.message})` : ""}.
       </p>
     );
@@ -47,7 +55,9 @@ function LandingFunnelPanel({ pt }: { pt: boolean }) {
   if (!query.data) {
     return (
       <p className="rounded-xl border border-border p-3 text-xs text-muted-foreground">
-        {pt ? "Funil da página inicial: aplique a migração 0054 para começar a contar." : "Homepage funnel: apply migration 0054 to start tracking."}
+        {pt
+          ? "Funil da página inicial: aplique a migração 0054 para começar a contar."
+          : "Homepage funnel: apply migration 0054 to start tracking."}
       </p>
     );
   }
@@ -59,7 +69,9 @@ function LandingFunnelPanel({ pt }: { pt: boolean }) {
     <section className="rounded-xl border border-border p-3">
       <h3 className="text-sm font-semibold">{pt ? "Página inicial" : "Homepage"}</h3>
       <p className="text-xs text-muted-foreground">
-        {pt ? 'Visitas e cliques em "Começar" contados sem cookies, ao lado dos cadastros.' : 'Visits and "Get started" clicks tracked without cookies, alongside sign-ups.'}
+        {pt
+          ? 'Visitas e cliques em "Começar" contados sem cookies, ao lado dos cadastros.'
+          : 'Visits and "Get started" clicks tracked without cookies, alongside sign-ups.'}
       </p>
       <table className="mt-2 w-full text-sm">
         <thead>
@@ -92,7 +104,9 @@ function LandingFunnelPanel({ pt }: { pt: boolean }) {
         </tbody>
       </table>
       <p className="mt-2 text-xs text-muted-foreground">
-        {pt ? "Entre parênteses: cliques por visita e cadastros por clique." : "In parentheses: clicks per visit and sign-ups per click."}
+        {pt
+          ? "Entre parênteses: cliques por visita e cadastros por clique."
+          : "In parentheses: clicks per visit and sign-ups per click."}
       </p>
     </section>
   );
@@ -107,9 +121,13 @@ function FeatureUsagePanel({ pt }: { pt: boolean }) {
   const query = useQuery({ queryKey: ["admin", "feature-usage"], queryFn: () => load() });
   return (
     <section className="rounded-xl border border-border p-3">
-      <h3 className="font-display text-sm font-semibold">{pt ? "Uso dos recursos" : "Feature usage"}</h3>
+      <h3 className="font-display text-sm font-semibold">
+        {pt ? "Uso dos recursos" : "Feature usage"}
+      </h3>
       <p className="text-xs text-muted-foreground">
-        {pt ? "Alunos que usaram cada recurso e quantas vezes, nos últimos 7 e 30 dias (admins fora)." : "Students who used each feature and how often in the last 7 and 30 days (admins excluded)."}
+        {pt
+          ? "Alunos que usaram cada recurso e quantas vezes, nos últimos 7 e 30 dias (admins fora)."
+          : "Students who used each feature and how often in the last 7 and 30 days (admins excluded)."}
       </p>
       {query.isPending ? (
         <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
@@ -117,7 +135,9 @@ function FeatureUsagePanel({ pt }: { pt: boolean }) {
         </p>
       ) : query.isError ? (
         <p className="mt-3 text-sm text-muted-foreground">
-          {pt ? "Não foi possível carregar o uso dos recursos agora." : "Could not load feature usage right now."}
+          {pt
+            ? "Não foi possível carregar o uso dos recursos agora."
+            : "Could not load feature usage right now."}
         </p>
       ) : (
         <div className="mt-2 overflow-x-auto">
@@ -137,7 +157,9 @@ function FeatureUsagePanel({ pt }: { pt: boolean }) {
                   <td className="py-2 pr-3">
                     {row.label}
                     {!row.available ? (
-                      <span className="ml-2 text-[11px] text-warning">{pt ? "migração pendente" : "migration pending"}</span>
+                      <span className="ml-2 text-[11px] text-warning">
+                        {pt ? "migração pendente" : "migration pending"}
+                      </span>
                     ) : null}
                   </td>
                   {[row.students7, row.uses7, row.students30, row.uses30].map((value, index) => (
@@ -176,16 +198,27 @@ export function AdminRetention() {
   if (query.isError) {
     return (
       <p className="py-6 text-sm text-muted-foreground">
-        {pt ? "Não foi possível calcular a retenção agora." : "Could not calculate retention right now."}
+        {pt
+          ? "Não foi possível calcular a retenção agora."
+          : "Could not calculate retention right now."}
       </p>
     );
   }
   const report = query.data;
   const cards = [
     { label: pt ? "Voltam no dia seguinte (D1)" : "Return the next day (D1)", rate: report.d1 },
-    { label: pt ? "Voltam na 1ª semana (dias 1–7)" : "Return in week 1 (days 1–7)", rate: report.week1 },
-    { label: pt ? "Seguem na semana seguinte (dias 8–14)" : "Return in week 2 (days 8–14)", rate: report.week2 },
-    { label: pt ? "Nunca voltaram depois do cadastro" : "Never returned after sign-up", rate: report.neverReturned },
+    {
+      label: pt ? "Voltam na 1ª semana (dias 1–7)" : "Return in week 1 (days 1–7)",
+      rate: report.week1,
+    },
+    {
+      label: pt ? "Seguem na semana seguinte (dias 8–14)" : "Return in week 2 (days 8–14)",
+      rate: report.week2,
+    },
+    {
+      label: pt ? "Nunca voltaram depois do cadastro" : "Never returned after sign-up",
+      rate: report.neverReturned,
+    },
   ];
 
   return (
@@ -220,7 +253,9 @@ export function AdminRetention() {
       {report.firstConversation && (
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded-xl border border-border p-3">
-            <p className="text-xs text-muted-foreground">{pt ? "Falaram com a EVO no 1º dia" : "Spoke with EVO on day 1"}</p>
+            <p className="text-xs text-muted-foreground">
+              {pt ? "Falaram com a EVO no 1º dia" : "Spoke with EVO on day 1"}
+            </p>
             <p className="mt-1 font-display text-2xl font-bold">
               {percent(report.firstConversation.firstDay)}
             </p>
@@ -229,13 +264,17 @@ export function AdminRetention() {
             </p>
           </div>
           <div className="rounded-xl border border-border p-3">
-            <p className="text-xs text-muted-foreground">{pt ? "Do cadastro à 1ª resposta falada" : "Sign-up to first spoken response"}</p>
+            <p className="text-xs text-muted-foreground">
+              {pt ? "Do cadastro à 1ª resposta falada" : "Sign-up to first spoken response"}
+            </p>
             <p className="mt-1 font-display text-2xl font-bold">
               {report.firstConversation.medianMinutes === null
                 ? "—"
                 : `${report.firstConversation.medianMinutes} min`}
             </p>
-            <p className="text-[11px] text-muted-foreground">{pt ? "mediana · meta: poucos minutos" : "median · target: a few minutes"}</p>
+            <p className="text-[11px] text-muted-foreground">
+              {pt ? "mediana · meta: poucos minutos" : "median · target: a few minutes"}
+            </p>
           </div>
         </div>
       )}
@@ -255,7 +294,9 @@ export function AdminRetention() {
             {report.cohorts.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-4 text-muted-foreground">
-                  {pt ? "Nenhum cadastro nas últimas 8 semanas." : "No sign-ups in the last 8 weeks."}
+                  {pt
+                    ? "Nenhum cadastro nas últimas 8 semanas."
+                    : "No sign-ups in the last 8 weeks."}
                 </td>
               </tr>
             ) : (
@@ -274,7 +315,9 @@ export function AdminRetention() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        {pt ? 'Conta como ativo quem fez algo no dia (atividade, lição concluída ou resposta da IA), no horário de São Paulo. Administradores ficam de fora. "—" significa que ninguém daquela semana tem idade suficiente para a medida.' : 'A student is considered active if they did something that day (activity, completed lesson, or AI response), using São Paulo time. Administrators are excluded. "—" means the cohort is not old enough for that measurement.'}
+        {pt
+          ? 'Conta como ativo quem fez algo no dia (atividade, lição concluída ou resposta da IA), no horário de São Paulo. Administradores ficam de fora. "—" significa que ninguém daquela semana tem idade suficiente para a medida.'
+          : 'A student is considered active if they did something that day (activity, completed lesson, or AI response), using São Paulo time. Administrators are excluded. "—" means the cohort is not old enough for that measurement.'}
       </p>
     </div>
   );

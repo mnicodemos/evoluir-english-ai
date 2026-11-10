@@ -85,12 +85,18 @@ export function AdminLessonCaptions() {
       return;
     }
     if (file.size > 500_000) {
-      setNotice(pt ? "O arquivo deve ter no máximo 500 KB." : "The file must be no larger than 500 KB.");
+      setNotice(
+        pt ? "O arquivo deve ter no máximo 500 KB." : "The file must be no larger than 500 KB.",
+      );
       return;
     }
     const content = await file.text();
     if (!content.startsWith("WEBVTT")) {
-      setNotice(pt ? "O arquivo selecionado não é um WebVTT válido." : "The selected file is not valid WebVTT.");
+      setNotice(
+        pt
+          ? "O arquivo selecionado não é um WebVTT válido."
+          : "The selected file is not valid WebVTT.",
+      );
       return;
     }
     setFiles((current) => ({ ...current, [language]: { name: file.name, content } }));
@@ -106,9 +112,13 @@ export function AdminLessonCaptions() {
           <FileText className="size-5" aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-display text-base font-semibold">{pt ? "Legendas personalizadas (A1–B1)" : "Custom captions (A1–B1)"}</h2>
+          <h2 className="font-display text-base font-semibold">
+            {pt ? "Legendas personalizadas (A1–B1)" : "Custom captions (A1–B1)"}
+          </h2>
           <p className="text-sm text-muted-foreground">
-            {pt ? "Envie faixas WebVTT em inglês e português por aula. O aluno verá as legendas dentro do player, com tamanho inicial de 75% e controles próprios, sem depender do CC do Vimeo." : "Upload English and Portuguese WebVTT tracks for each lesson. Students will see captions inside the player, initially sized at 75%, with their own controls and without relying on Vimeo CC."}
+            {pt
+              ? "Envie faixas WebVTT em inglês e português por aula. O aluno verá as legendas dentro do player, com tamanho inicial de 75% e controles próprios, sem depender do CC do Vimeo."
+              : "Upload English and Portuguese WebVTT tracks for each lesson. Students will see captions inside the player, initially sized at 75%, with their own controls and without relying on Vimeo CC."}
           </p>
         </div>
       </div>
@@ -155,13 +165,28 @@ export function AdminLessonCaptions() {
 
       {lessonsQuery.isPending || statusQuery.isPending ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> {pt ? "Carregando aulas e legendas…" : "Loading lessons and captions…"}
+          <Loader2 className="size-4 animate-spin" />{" "}
+          {pt ? "Carregando aulas e legendas…" : "Loading lessons and captions…"}
         </p>
       ) : lessonsQuery.isError ? (
-        <p className="text-sm text-destructive">{pt ? "Não foi possível carregar as aulas deste nível." : "Could not load lessons for this level."}</p>
+        <p className="text-sm text-destructive">
+          {pt
+            ? "Não foi possível carregar as aulas deste nível."
+            : "Could not load lessons for this level."}
+        </p>
       ) : statusQuery.data?.missingMigration ? (
         <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-          {pt ? <>Aplique a migração <code>20261107170000_lesson_video_captions.sql</code> para habilitar o envio das legendas.</> : <>Apply migration <code>20261107170000_lesson_video_captions.sql</code> to enable caption uploads.</>}
+          {pt ? (
+            <>
+              Aplique a migração <code>20261107170000_lesson_video_captions.sql</code> para
+              habilitar o envio das legendas.
+            </>
+          ) : (
+            <>
+              Apply migration <code>20261107170000_lesson_video_captions.sql</code> to enable
+              caption uploads.
+            </>
+          )}
         </p>
       ) : selectedKey ? (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -180,7 +205,7 @@ export function AdminLessonCaptions() {
                       exists ? "text-xs text-brand-green" : "text-xs text-muted-foreground"
                     }
                   >
-                    {exists ? pt ? "Publicado" : "Published" : pt ? "Sem legenda" : "No captions"}
+                    {exists ? (pt ? "Publicado" : "Published") : pt ? "Sem legenda" : "No captions"}
                   </span>
                 </div>
                 <label className="block text-xs text-muted-foreground">
@@ -219,7 +244,9 @@ export function AdminLessonCaptions() {
                       disabled={busy}
                       onClick={() => {
                         if (
-                          window.confirm(`${pt ? "Remover a legenda" : "Remove the"} ${language.toUpperCase()} ${pt ? "desta aula?" : "captions for this lesson?"}`)
+                          window.confirm(
+                            `${pt ? "Remover a legenda" : "Remove the"} ${language.toUpperCase()} ${pt ? "desta aula?" : "captions for this lesson?"}`,
+                          )
                         ) {
                           deleteMutation.mutate(language);
                         }
@@ -234,10 +261,16 @@ export function AdminLessonCaptions() {
           })}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">{pt ? "Nenhuma aula cadastrada para este nível." : "No lessons are configured for this level."}</p>
+        <p className="text-sm text-muted-foreground">
+          {pt
+            ? "Nenhuma aula cadastrada para este nível."
+            : "No lessons are configured for this level."}
+        </p>
       )}
       <p className="text-xs text-muted-foreground">
-        {pt ? "Formato WebVTT · até 500 KB por idioma e aula. A legenda pode ser substituída a qualquer momento." : "WebVTT format · up to 500 KB per language and lesson. Captions can be replaced at any time."}
+        {pt
+          ? "Formato WebVTT · até 500 KB por idioma e aula. A legenda pode ser substituída a qualquer momento."
+          : "WebVTT format · up to 500 KB per language and lesson. Captions can be replaced at any time."}
       </p>
       {notice ? (
         <p role="status" className="text-sm text-muted-foreground">
