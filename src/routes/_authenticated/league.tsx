@@ -381,9 +381,18 @@ function WeeklyXpBreakdown() {
             <Search className="size-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="end" sideOffset={8} className={cn("max-h-[80dvh] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:p-5", graphitePanelClass)}>
+        <PopoverContent
+          align="end"
+          sideOffset={8}
+          className={cn(
+            "max-h-[80dvh] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:p-5",
+            graphitePanelClass,
+          )}
+        >
           <p className="font-display text-base font-semibold">{t("This week's XP history")}</p>
-          <p className="mb-3 mt-1 text-xs text-muted-foreground">{t("Your credited XP this week, by activity.")}</p>
+          <p className="mb-3 mt-1 text-xs text-muted-foreground">
+            {t("Your credited XP this week, by activity.")}
+          </p>
           <div className="flex items-center justify-between rounded-lg border border-brand-green/30 bg-brand-green/5 px-3 py-2">
             <span className="text-sm text-muted-foreground">{t("Total this week")}</span>
             <span className="font-display text-lg font-bold tabular-nums">{total} XP</span>
