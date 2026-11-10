@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { History, Loader2, TrendingUp, Trophy, Users } from "lucide-react";
+import { History, Loader2, Search, TrendingUp, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +10,12 @@ import { AppShell } from "@/components/AppShell";
 import { ProofOfProgressMission } from "@/components/league/ProofOfProgressMission";
 import { useWeeklyLeagueStanding, weekXpLine } from "@/components/WeeklyLeagueSummary";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useHomeImages } from "@/hooks/useHomeImages";
 import { useProfile } from "@/hooks/useProfile";
@@ -286,12 +292,15 @@ function YourWeek({ week }: { week: WeekXpSummary }) {
   const rising = weekXpRising(week);
   return (
     <section className="card-soft space-y-3 p-4 sm:p-5">
-      <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
-        <TrendingUp
-          className={cn("size-4 sm:size-5", rising ? "text-brand-green" : "text-muted-foreground")}
-        />
-        {t("Weekly XP")}
-      </h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
+          <TrendingUp
+            className={cn("size-4 sm:size-5", rising ? "text-brand-green" : "text-muted-foreground")}
+          />
+          {t("Weekly XP")}
+        </h2>
+        <WeeklyXpBreakdown />
+      </div>
       <p className="flex items-baseline gap-1.5">
         <span className="font-display text-4xl font-bold tabular-nums">{week.thisWeek}</span>
         <span className="text-sm text-muted-foreground">{t("XP this week")}</span>
@@ -317,6 +326,102 @@ function YourWeek({ week }: { week: WeekXpSummary }) {
         {t("Beat your own last week: every lesson, text, conversation and review adds XP.")}
       </p>
     </section>
+  );
+}
+
+
+type WeeklyXpLedgerRow = {
+  occurred_at: string;
+  activity: string;
+  xp: number;
+};
+
+/** A detail view of the same current-week XP counted by league_week_xp. */
+function WeeklyXpBreakdown() {
+  const { lang } = useUiLang();
+  const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
+  const [open, setOpen] = useState(false);
+  const { data = [], isLoading, isError } = useQuery({
+    queryKey: ["week-xp-breakdown"],
+    enabled: open,
+    staleTime: 30 * 1000,
+    queryFn: async () => {
+      const rpc = supabase.rpc.bind(supabase) as unknown as (
+        name: string,
+      ) => Promise<{ data: WeeklyXpLedgerRow[] | null; error: { message: string } | null }>;
+      const { data: rows, error } = await rpc("weekly_league_xp_breakdown");
+      if (error) throw error;
+      return rows ?? [];
+    },
+  });
+  const total = data.reduce((sum, row) => sum + row.xp, 0);
+  const formatDate = (value: string) =>
+    new Date(value).toLocaleString(lang === "pt" ? "pt-BR" : "en-US", {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  return (
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="size-8 shrink-0 rounded-full"
+        aria-label={t("View this week's XP details")}
+        title={t("View this week's XP details")}
+        onClick={() => setOpen(true)}
+      >
+        <Search className="size-4" />
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-h-[80vh] max-w-lg overflow-hidden border-white/10 bg-[#101820] text-foreground">
+          <DialogHeader>
+            <DialogTitle>{t("This week's XP history")}</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-between rounded-lg border border-brand-green/30 bg-brand-green/5 px-3 py-2">
+            <span className="text-sm text-muted-foreground">{t("Total this week")}</span>
+            <span className="font-display text-lg font-bold tabular-nums">{total} XP</span>
+          </div>
+          <div className="max-h-[55vh] space-y-2 overflow-y-auto pr-1">
+            {isLoading ? (
+              <div className="space-y-2" aria-busy="true">
+                {[0, 1, 2, 3].map((item) => (
+                  <Skeleton key={item} className="h-14 w-full" />
+                ))}
+              </div>
+            ) : isError ? (
+              <p className="py-6 text-center text-sm text-destructive">
+                {t("Could not load XP history. Please try again.")}
+              </p>
+            ) : data.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                {t("No XP earned this week yet.")}
+              </p>
+            ) : (
+              data.map((row, index) => (
+                <div
+                  key={row.occurred_at + row.activity + index}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-white/10 px-3 py-2"
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium">{t(row.activity)}</span>
+                    <span className="block text-xs text-muted-foreground">
+                      {formatDate(row.occurred_at)}
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-semibold tabular-nums text-brand-green">
+                    +{row.xp} XP
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
