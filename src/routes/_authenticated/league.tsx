@@ -10,12 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { ProofOfProgressMission } from "@/components/league/ProofOfProgressMission";
 import { useWeeklyLeagueStanding, weekXpLine } from "@/components/WeeklyLeagueSummary";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useHomeImages } from "@/hooks/useHomeImages";
 import { useProfile } from "@/hooks/useProfile";
@@ -295,7 +290,10 @@ function YourWeek({ week }: { week: WeekXpSummary }) {
       <div className="flex items-center justify-between gap-2">
         <h2 className="font-display flex items-center gap-2 text-base font-semibold sm:text-lg">
           <TrendingUp
-            className={cn("size-4 sm:size-5", rising ? "text-brand-green" : "text-muted-foreground")}
+            className={cn(
+              "size-4 sm:size-5",
+              rising ? "text-brand-green" : "text-muted-foreground",
+            )}
           />
           {t("Weekly XP")}
         </h2>
@@ -329,7 +327,6 @@ function YourWeek({ week }: { week: WeekXpSummary }) {
   );
 }
 
-
 type WeeklyXpLedgerRow = {
   occurred_at: string;
   activity: string;
@@ -341,7 +338,11 @@ function WeeklyXpBreakdown() {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const [open, setOpen] = useState(false);
-  const { data = [], isLoading, isError } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["week-xp-breakdown"],
     enabled: open,
     staleTime: 30 * 1000,
