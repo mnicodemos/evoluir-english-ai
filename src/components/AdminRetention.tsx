@@ -162,8 +162,6 @@ function FeatureUsagePanel({ pt }: { pt: boolean }) {
 export function AdminRetention() {
   const { lang } = useUiLang();
   const pt = lang === "pt";
-  const { lang } = useUiLang();
-  const pt = lang === "pt";
   const load = useServerFn(getRetention);
   const query = useQuery({ queryKey: ["admin", "retention"], queryFn: () => load() });
 
