@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils";
 const usd = (value: number) =>
   value.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 
-function day(iso: string) {
-  return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+function day(iso: string, locale: string) {
+  return new Date(iso).toLocaleDateString(locale, { timeZone: "America/Sao_Paulo" });
 }
 
 /**
@@ -23,7 +23,10 @@ function day(iso: string) {
  * the cost measured on every call since the first one (owner only; Admin text
  * follows the selected interface language).
  */
-export function AdminCreditBalance() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";\n  const locale = pt ? "pt-BR" : "en-US";
+export function AdminCreditBalance() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
+  const locale = pt ? "pt-BR" : "en-US";
   const load = useServerFn(getAiCredit);
   const add = useServerFn(addAiCreditTopup);
   const remove = useServerFn(deleteAiCreditTopup);
