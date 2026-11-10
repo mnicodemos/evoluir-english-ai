@@ -59,7 +59,9 @@ export function AdminAlerts() {
       {alerts.length === 0 ? (
         <p className="flex items-center gap-2 text-sm font-medium">
           <CircleCheck className="size-4 shrink-0 text-brand-green" aria-hidden="true" />
-          {pt ? "Tudo funcionando: notificações push e IA sem falhas nas últimas 24 h." : "All systems operational: no push notification or AI failures in the last 24 hours."}
+          {pt
+            ? "Tudo funcionando: notificações push e IA sem falhas nas últimas 24 h."
+            : "All systems operational: no push notification or AI failures in the last 24 hours."}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -85,9 +87,12 @@ export function AdminAlerts() {
       )}
       {lastRun && (
         <p className="mt-2 text-xs text-muted-foreground">
-          {pt ? "Última notificação:" : "Last notification:"} {KIND_LABEL[lastRun.kind] ?? lastRun.kind} {pt ? "em" : "at"} {when(lastRun.created_at)} ·{" "}
+          {pt ? "Última notificação:" : "Last notification:"}{" "}
+          {KIND_LABEL[lastRun.kind] ?? lastRun.kind} {pt ? "em" : "at"} {when(lastRun.created_at)} ·{" "}
           {lastRun.sent} {pt ? "de" : "of"} {lastRun.devices} {pt ? "dispositivo(s)" : "device(s)"}
-          {lastRun.removed ? ` · ${lastRun.removed} ${pt ? "token(s) expirado(s) removido(s)" : "expired token(s) removed"}` : ""}
+          {lastRun.removed
+            ? ` · ${lastRun.removed} ${pt ? "token(s) expirado(s) removido(s)" : "expired token(s) removed"}`
+            : ""}
         </p>
       )}
     </section>
