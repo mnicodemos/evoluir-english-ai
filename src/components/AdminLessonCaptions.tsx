@@ -17,7 +17,9 @@ type Level = (typeof LEVELS)[number];
 type Language = "en" | "pt";
 type CaptionFile = { name: string; content: string };
 
-export function AdminLessonCaptions() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
+export function AdminLessonCaptions() {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const [level, setLevel] = useState<Level>("a1");
   const [lessonKey, setLessonKey] = useState("");
   const [files, setFiles] = useState<Partial<Record<Language, CaptionFile>>>({});
