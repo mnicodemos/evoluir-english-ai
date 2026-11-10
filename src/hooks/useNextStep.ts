@@ -92,5 +92,9 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
     placeholderData: () => stored,
     ...(options.enabled === undefined ? {} : { enabled: options.enabled }),
   });
-  return { ...nextStepQuery, videoStatusKnown };
+  // The extra-video Quick Win of today is confirmed done by the server: the card
+  // shows it as completed instead of letting it silently vanish.
+  const extraVideoDone =
+    videoDay && videoStatusKnown && levelHasVideos && videos?.watchedToday === true;
+  return { ...nextStepQuery, videoStatusKnown, extraVideoDone };
 }

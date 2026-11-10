@@ -80,7 +80,7 @@ import { DoneSeal } from "@/components/DoneSeal";
 
 /** The first phone pill, kept on the device to show at once next time. */
 type MobilePill = {
-  kind: "quick" | "review";
+  kind: "quick" | "review" | "done";
   to: string;
   params?: { lessonId: string };
   label: string;
@@ -189,8 +189,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // popping in seconds later; they leave only once that activity is known done.
   const actionAvailable = (to: string, indicators: typeof activityIndicators) =>
     !indicators.ready || dashboardActionAvailable(to, indicators);
-  const { data, isLoading, isError, isFetching, isPlaceholderData, videoStatusKnown, refetch } =
-    useNextStep();
+  const {
+    data,
+    isLoading,
+    isError,
+    isFetching,
+    isPlaceholderData,
+    videoStatusKnown,
+    extraVideoDone,
+    refetch,
+  } = useNextStep();
   const videoQuickWinStatusReady = !videoQuickWinDay || videoStatusKnown;
 
   // Phones' pill row (user report, 2026-10-25: a pill showed, then another
@@ -651,6 +659,30 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     </Button>
   );
 
+  // Today's extra video is confirmed by the server: the Quick Win stays in its
+  // row as completed (with the 5 XP it earned) instead of disappearing.
+  const quickWinDoneRow =
+    !quickWinButton && extraVideoDone ? (
+      <div
+        className="flex min-h-12 items-center gap-2.5 !border-brand-green/40 !bg-brand-green/[0.06] px-2 py-1.5 text-sidebar-foreground"
+        role="status"
+      >
+        <DoneSeal size="sm" />
+        <span className="flex min-w-0 flex-1 flex-col items-start gap-1.5 text-left">
+          <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none sm:text-[13px]">
+            {quickWinIcon} {t("Quick Win completed")}
+            <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-400">
+              {practiceXpLabel("/learning/videos")}
+            </span>
+          </span>
+          <span className="w-full min-w-0 truncate text-[10px] leading-tight text-sidebar-foreground/70">
+            {t("Extra video watched")}
+          </span>
+        </span>
+      </div>
+    ) : null;
+  const quickWinSlot = quickWinButton ?? quickWinDoneRow;
+
   // The first phone pill as plain data, so it can be kept on the device.
   const currentFirstPill: MobilePill | null = quickWinButton
     ? {
@@ -659,14 +691,16 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
         ...(quickWin!.activity.params ? { params: quickWin!.activity.params } : {}),
         label: t("Quick Win"),
       }
-    : mobileReviewButton && mobileReview
-      ? {
-          kind: "review",
-          to: mobileReview.to,
-          ...(mobileReview.params ? { params: mobileReview.params } : {}),
-          label: mobileReview.label,
-        }
-      : null;
+    : quickWinDoneRow
+      ? { kind: "done", to: "/learning/videos", label: t("Quick Win completed") }
+      : mobileReviewButton && mobileReview
+        ? {
+            kind: "review",
+            to: mobileReview.to,
+            ...(mobileReview.params ? { params: mobileReview.params } : {}),
+            label: mobileReview.label,
+          }
+        : null;
   freshFirstPill.current = currentFirstPill;
   const shownFirstPill = firstPillReady
     ? currentFirstPill
@@ -678,6 +712,8 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
       <span className="flex min-w-0 items-center gap-1.5 font-medium leading-none">
         {pill.kind === "quick" ? (
           quickWinIcon
+        ) : pill.kind === "done" ? (
+          <DoneSeal size="sm" />
         ) : (
           <RefreshCw className="size-4 shrink-0 text-sky-300" aria-hidden="true" />
         )}
@@ -928,7 +964,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   {t("Extra practice")}
                 </h3>
               </div>
-              {quickWinButton || challengeButton ? (
+              {quickWinSlot || challengeButton ? (
                 <>
                   <p
                     className="mt-0.5 hidden w-full min-w-0 truncate whitespace-nowrap text-xs text-sidebar-foreground/70 sm:block xl:hidden"
@@ -938,9 +974,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   </p>
                   {/* Stacked, one full-width option per row, each with its description. */}
                   <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5 xl:flex-1 xl:auto-rows-fr xl:[&>*]:items-center">
-                    {quickWinButton}
+                    {quickWinSlot}
                     {challengeButton}
-                    {!(quickWinButton && challengeButton) && (
+                    {!(quickWinSlot && challengeButton) && (
                       // One option left: the other row says it is done.
                       <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !bg-transparent text-xs text-muted-foreground">
                         <DoneSeal size="sm" />

@@ -2504,6 +2504,8 @@ const baseUiPt: Record<string, string> = {
   "Fix them now so they do not become habits.": "Corrija agora para não virarem hábito.",
   "Nothing else pending right now.": "Nada mais pendente agora.",
   "Extra practice done for today": "Prática extra concluída hoje",
+  "Quick Win completed": "Quick Win concluído",
+  "Extra video watched": "Vídeo extra assistido",
   "New options appear tomorrow.": "Novas opções aparecem amanhã.",
   "Nothing else to review right now.": "Nada mais para revisar agora.",
   "Business English": "Inglês para Negócios",
