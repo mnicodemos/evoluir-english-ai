@@ -160,6 +160,8 @@ function FeatureUsagePanel({ pt }: { pt: boolean }) {
  * following weeks after signing up, overall and per signup week.
  */
 export function AdminRetention() {\n  const { lang } = useUiLang();\n  const pt = lang === "pt";
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const load = useServerFn(getRetention);
   const query = useQuery({ queryKey: ["admin", "retention"], queryFn: () => load() });
 
@@ -167,7 +169,7 @@ export function AdminRetention() {\n  const { lang } = useUiLang();\n  const pt 
     return (
       <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
         <Loader2 className="size-4 animate-spin" />
-        Carregando
+        {pt ? "Carregando" : "Loading"}
       </div>
     );
   }
@@ -188,8 +190,8 @@ export function AdminRetention() {\n  const { lang } = useUiLang();\n  const pt 
 
   return (
     <div className="mt-4 space-y-4">
-      <LandingFunnelPanel />
-      <FeatureUsagePanel />
+      <LandingFunnelPanel pt={pt} />
+      <FeatureUsagePanel pt={pt} />
       <div className="grid grid-cols-3 gap-2 text-center">
         {[
           { label: pt ? "Ativos hoje" : "Active today", value: report.activeToday },
@@ -243,7 +245,7 @@ export function AdminRetention() {\n  const { lang } = useUiLang();\n  const pt 
           <thead>
             <tr className="border-b border-border text-xs font-semibold uppercase text-muted-foreground">
               <th className="py-2 pr-3">{pt ? "Cadastro na semana de" : "Sign-up week"}</th>
-              <th className="py-2 pr-3 text-right">Alunos</th>
+              <th className="py-2 pr-3 text-right">{pt ? "Alunos" : "Students"}</th>
               <th className="py-2 pr-3 text-right">D1</th>
               <th className="py-2 pr-3 text-right">{pt ? "1ª semana" : "Week 1"}</th>
               <th className="py-2 text-right">{pt ? "Semana seguinte" : "Following week"}</th>
