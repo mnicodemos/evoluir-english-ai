@@ -72,8 +72,7 @@ export function AdminCreditBalance() {
   if (!data.ready) {
     return (
       <p className="mt-3 rounded-xl border border-border p-3 text-sm text-muted-foreground">
-        Saldo da API: aplique a migração 0067_ai_credit_topups pelo chat do Lovable para registrar
-        as recargas.
+        {pt ? "Saldo da API: aplique a migração 0067_ai_credit_topups pelo chat do Lovable para registrar as recargas." : "API balance: apply migration 0067_ai_credit_topups through Lovable chat to track top-ups."}
       </p>
     );
   }
@@ -98,8 +97,7 @@ export function AdminCreditBalance() {
               {usd(data.remainingUsd)}
             </span>{" "}
             <span className="text-muted-foreground">
-              de {usd(data.loadedUsd)} · gasto {usd(data.spentUsd)} em {data.measuredCalls} chamadas
-              desde {data.since ? day(data.since, locale) : "—"}
+              {pt ? `de ${usd(data.loadedUsd)} · gasto ${usd(data.spentUsd)} em ${data.measuredCalls} chamadas desde ${data.since ? day(data.since, locale) : "—"}` : `of ${usd(data.loadedUsd)} · spent ${usd(data.spentUsd)} across ${data.measuredCalls} calls since ${data.since ? day(data.since, locale) : "—"}`}
             </span>
           </p>
         ) : (
@@ -114,9 +112,7 @@ export function AdminCreditBalance() {
         </p>
       )}
       <p className="mt-1 text-[11px] text-muted-foreground">
-        O Google não informa o saldo por API: o valor é o total recarregado menos o custo medido de
-        cada chamada (o mesmo de Custo & Desempenho). Confira no faturamento do Google de vez em
-        quando.
+        {pt ? "O Google não informa o saldo por API: o valor é o total recarregado menos o custo medido de cada chamada (o mesmo de Custo & Desempenho). Confira no faturamento do Google de vez em quando." : "Google does not expose the balance through its API. This estimate subtracts measured call costs from recorded top-ups (the same costs shown in Cost & Performance). Check Google billing periodically."}
       </p>
 
       <form
