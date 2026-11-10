@@ -196,7 +196,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     isFetching,
     isPlaceholderData,
     videoStatusKnown,
-    extraVideoDone,
     refetch,
   } = useNextStep();
   const videoQuickWinStatusReady = !videoQuickWinDay || videoStatusKnown;
