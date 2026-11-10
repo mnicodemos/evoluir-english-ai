@@ -11,7 +11,6 @@ import { ProofOfProgressMission } from "@/components/league/ProofOfProgressMissi
 import { useWeeklyLeagueStanding, weekXpLine } from "@/components/WeeklyLeagueSummary";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useHomeImages } from "@/hooks/useHomeImages";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
