@@ -2485,6 +2485,8 @@ const baseUiPt: Record<string, string> = {
   "Save and rebuild my week": "Salvar e refazer minha semana",
   "Days per week": "Dias por semana",
   "Study days": "Dias de estudo",
+  "Green days are completed study days. Outlined days are part of your weekly plan.":
+    "Os dias verdes representam dias de estudo concluídos. Os dias contornados fazem parte do seu plano semanal.",
   "per week.": "por semana.",
   "Choose from 1 to 7 days.": "Escolha de 1 a 7 dias.",
   "Your weekly plan sets your learning rhythm. Jewels need study days in a row (one missed day a week is protected), so study more days to climb them.":
