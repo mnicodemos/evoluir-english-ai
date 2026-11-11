@@ -389,12 +389,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const challengeProgress = challengeGoal
     ? ` · ${challengeGoal.done}/${challengeGoal.target} ${t(challengeGoal.unit)}`
     : "";
-  // AI Teacher time is a progress goal, not a Weekly League XP event.
-  // Explain this beside the goal so students do not expect XP for minutes alone.
-  const challengeRewardNote =
-    data.quest?.resource.to.split("?")[0] === "/teacher"
-      ? t("Minutes track progress; time alone earns no XP.")
-      : "";
   // Extra practice earns the weekly league's XP (user request): each option
   // shows what its activity is worth.
   const xpChip = (destination: string) => {
@@ -491,9 +485,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:font-normal">
                 {questDetail}
                 {challengeProgress}
-                {challengeRewardNote ? (
-                  <span className="block whitespace-normal">{challengeRewardNote}</span>
-                ) : null}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,
@@ -513,9 +504,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:font-normal">
                 {questDetail}
                 {challengeProgress}
-                {challengeRewardNote ? (
-                  <span className="block whitespace-normal">{challengeRewardNote}</span>
-                ) : null}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,

@@ -5,7 +5,8 @@
  * activities and leaves the Dashboard once the goal is reached. The XP shown
  * is what the weekly league already gives each activity (league_week_xp:
  * lesson 50, writing/listening/conversation/daily reading 20, reviewed word 2,
- * reviewed mistake 5, plus 30 per study day); the AI Teacher earns no league XP.
+ * reviewed mistake 5, plus 30 per study day). The AI Teacher challenge earns
+ * 5 XP once per local day when its accumulated practice reaches 10 minutes.
  */
 
 export type ChallengeActivityRow = {
@@ -103,6 +104,7 @@ export function pronunciationQuickWinDone(activities: ChallengeActivityRow[]): b
 /** League XP the destination's activity earns, as a short English label. */
 export function practiceXpLabel(destination: string): string | null {
   const path = destination.split("?")[0]!;
+  if (path === "/teacher") return "+5 XP";
   if (path === "/learning/$lessonId") return "+50 XP";
   if (
     path === "/writing" ||
