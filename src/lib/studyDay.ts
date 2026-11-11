@@ -33,6 +33,28 @@ export function qualifiesAsStudyDay(day: StudyDayEvidence): boolean {
 }
 
 /**
+ * Model A weekly-frequency credit. Every distinct qualified study date in the
+ * current week contributes, including dates outside the selected weekdays.
+ * Credit stops at the student's weekly target; extra qualified dates remain
+ * in the underlying study_days history and are never deleted or rewritten.
+ */
+export function weeklyFrequencyProgress(
+  qualifiedStudyDays: ReadonlySet<string>,
+  weeklyGoal: number,
+) {
+  const goal = Math.max(0, Math.floor(weeklyGoal));
+  const validStudyDays = qualifiedStudyDays.size;
+  const creditedStudyDays = Math.min(validStudyDays, goal);
+
+  return {
+    validStudyDays,
+    creditedStudyDays,
+    progressPercent: goal > 0 ? Math.round((creditedStudyDays / goal) * 100) : 0,
+    goalReached: goal > 0 && validStudyDays >= goal,
+  };
+}
+
+/**
  * Activity types whose minutes count toward the daily goal: finished activities,
  * plus the screens without a finish button and the lesson page itself. Other
  * "*_practice" rows (a session left open) are kept out.
