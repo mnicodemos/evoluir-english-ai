@@ -177,7 +177,7 @@ export function A1NeighbourhoodMystery() {
             <p className="text-base leading-relaxed sm:text-lg" translate="no" lang="en">{challenge.story}</p>
             <p className="text-sm font-semibold">{t("Choose your response")}</p>
             <div className="grid gap-2">
-              {getStableAdventureChoiceOrder("a1-neighbourhood-mystery", challengeIndex, challenge.choices.length).map((choiceIndex) => {
+              {getStableAdventureChoiceOrder("a1-neighbourhood-mystery", index, challenge.choices.length).map((choiceIndex) => {
                 const option = challenge.choices[choiceIndex];
                 return (
                   <button
