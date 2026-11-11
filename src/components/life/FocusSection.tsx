@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useFocusLog } from "@/hooks/useFocusLog";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { useLife } from "@/hooks/useLife";
+import { useProfile } from "@/hooks/useProfile";
 import {
   focusClearLastTask,
   focusPause,
@@ -41,6 +42,7 @@ import {
   focusSummary,
 } from "@/lib/life";
 import { setLifeTaskDone } from "@/lib/life.functions";
+import { normalizeStudyDays } from "@/lib/studyPlan";
 import { cn } from "@/lib/utils";
 
 /**
@@ -55,6 +57,7 @@ import { cn } from "@/lib/utils";
 export function FocusSection() {
   const { t, lang } = useLifeT();
   const { data, refresh } = useLife();
+  const { data: profile } = useProfile();
   const focusLog = useFocusLog();
   const markDone = useServerFn(setLifeTaskDone);
   const { state, view } = useFocusTimer();
@@ -62,7 +65,8 @@ export function FocusSection() {
 
   if (!data) return null;
 
-  const summary = focusSummary(focusLog, data.today);
+  const studyDays = normalizeStudyDays(profile?.study_days, profile?.study_days_per_week ?? 3);
+  const summary = focusSummary(focusLog, data.today, studyDays);
   const openTasks = data.premium
     ? data.tasks.filter((task) => task.day === data.today && !task.doneAt)
     : [];
@@ -297,7 +301,7 @@ export function FocusSection() {
         </div>
       ) : null}
 
-      {/* The last seven days, one bar per day, today on the right. */}
+      {/* Only the student's selected My Study Plan days, in Monday-first order. */}
       <div className="mt-3 border-t border-white/10 pt-2.5 xl:mt-2 xl:pt-2">
         <div className="flex items-end justify-between gap-3">
           <ol

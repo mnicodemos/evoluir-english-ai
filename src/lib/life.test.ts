@@ -157,7 +157,7 @@ describe("focus", () => {
     expect(focusBreakMinutes("short", 3)).toBe(3);
   });
 
-  it("sums today and the last seven days", () => {
+  it("shows the current week from Monday through Sunday and excludes the previous week", () => {
     const summary = focusSummary(
       [
         { day: "2026-10-17", minutes: 25 },
@@ -165,13 +165,33 @@ describe("focus", () => {
         { day: "2026-10-11", minutes: 50 },
         { day: "2026-10-10", minutes: 15 },
         { day: "2026-10-17", minutes: 12, partial: true },
+        { day: "2026-10-18", minutes: 20 },
       ],
       "2026-10-17",
     );
     expect(summary.todayCount).toBe(2);
     expect(summary.todayMinutes).toBe(62);
-    expect(summary.week[0]).toEqual({ day: "2026-10-11", count: 1, minutes: 50 });
-    expect(summary.weekMinutes).toBe(112);
+    expect(summary.week[0]).toEqual({ day: "2026-10-12", count: 0, minutes: 0 });
+    expect(summary.week[5]).toEqual({ day: "2026-10-17", count: 2, minutes: 62 });
+    expect(summary.week[6]).toEqual({ day: "2026-10-18", count: 1, minutes: 20 });
+    expect(summary.weekMinutes).toBe(82);
+  });
+
+  it("shows only the selected My Study Plan days in Monday-first order", () => {
+    const summary = focusSummary(
+      [
+        { day: "2026-10-12", minutes: 25 },
+        { day: "2026-10-13", minutes: 40 },
+        { day: "2026-10-14", minutes: 30 },
+        { day: "2026-10-16", minutes: 15 },
+      ],
+      "2026-10-17",
+      ["Monday", "Wednesday", "Friday"],
+    );
+    expect(summary.week.map((row) => row.day)).toEqual(["2026-10-12", "2026-10-14", "2026-10-16"]);
+    expect(summary.weekMinutes).toBe(70);
+    expect(summary.todayCount).toBe(0);
+    expect(summary.todayMinutes).toBe(0);
   });
 
   it("shows the countdown as mm:ss", () => {
