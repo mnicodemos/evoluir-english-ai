@@ -23,6 +23,8 @@ jobs:
   postgres-jewels-integration:
     name: Testes reais das migrations 0090 e 0099
     runs-on: ubuntu-latest
+    container:
+      image: postgres:16
     timeout-minutes: 10
     services:
       postgres:
@@ -31,15 +33,13 @@ jobs:
           POSTGRES_DB: jewels_test
           POSTGRES_USER: jewels_test
           POSTGRES_PASSWORD: ci_only_password
-        ports:
-          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U jewels_test -d jewels_test"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
     env:
-      PGHOST: 127.0.0.1
+      PGHOST: postgres
       PGPORT: 5432
       PGDATABASE: jewels_test
       PGUSER: jewels_test
@@ -48,16 +48,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Instalar cliente PostgreSQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes postgresql-client
-
       - name: Confirmar isolamento do banco descartável
         shell: bash
         run: |
           set -euo pipefail
-          test "$PGHOST" = "127.0.0.1"
+          test "$PGHOST" = "postgres"
           test "$PGDATABASE" = "jewels_test"
           test "$PGUSER" = "jewels_test"
           if [[ "${DATABASE_URL:-}" == *"lovable"* || "${DATABASE_URL:-}" == *"supabase"* ]]; then
