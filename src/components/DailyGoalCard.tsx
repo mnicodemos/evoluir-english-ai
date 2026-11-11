@@ -5,26 +5,28 @@ import { Check, CircleDotDashed, Hourglass } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { countsAsLearningMinutes, LEARNING_ACTIVITY_TYPES } from "@/lib/studyDay";
+import { studyDayStartIso } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 /** Today's counted activities (type and minutes); one query shared by the
  *  minutes ring and the Today's Progress lines. */
 function todayActivitiesQuery(userId?: string) {
   return {
-    queryKey: ["minutes-today", userId],
+    queryKey: ["minutes-today", userId, studyDayStartIso()],
     enabled: !!userId,
     // Keep the displayed total fresh even if Realtime delivery is temporarily unavailable.
     refetchInterval: 15_000,
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      const start = new Date();
-      start.setHours(0, 0, 0, 0);
+      const start = studyDayStartIso();
+      const end = new Date(new Date(start).getTime() + 86_400_000).toISOString();
       const { data, error } = await supabase
         .from("activities")
         .select("duration_minutes, activity_type, title")
         .eq("user_id", userId!)
         .in("activity_type", [...LEARNING_ACTIVITY_TYPES])
-        .gte("created_at", start.toISOString());
+        .gte("created_at", start)
+        .lt("created_at", end);
       if (error) throw error;
       return (data ?? []).filter((a) => countsAsLearningMinutes(a.activity_type));
     },
