@@ -10,10 +10,10 @@ Validar o comportamento real dos gatilhos PostgreSQL de concessão de joias e ci
 - [x] Inspecionados os testes unitários de `diamondCycles` e `streakFreeze`.
 - [x] Confirmado que o Vitest coleta testes TypeScript, mas não há configuração explícita de conexão PostgreSQL de teste no `vitest.config.ts`.
 - [x] Criada esta especificação em branch isolada.
-- [ ] Provisionar banco PostgreSQL descartável com versão compatível com o ambiente do projeto.
-- [ ] Aplicar migrations necessárias somente nesse banco descartável.
-- [ ] Implementar e executar os testes SQL de integração.
-- [ ] Anexar evidência dos resultados e do descarte do banco.
+- [x] Provisionar banco PostgreSQL descartável (PostgreSQL 16) no workflow de CI.
+- [x] Aplicar migrations reais 0038, 0042, 0090 e 0099 somente nesse banco descartável.
+- [x] Implementar assertions SQL para Freeze disponível/consumido, ausência de estudo artificial e rollback atômico.
+- [ ] Aguardar CI do PR e anexar evidência PASS do workflow e descarte automático do banco.
 
 ## Regras que os testes devem preservar
 
@@ -41,8 +41,9 @@ Validar o comportamento real dos gatilhos PostgreSQL de concessão de joias e ci
 | DIA-02 | Salto de ciclos | Atualizar 126 para 252 | Ciclos 3 e 4 concedidos, sem duplicar ciclo 2 |
 | DIA-03 | Idempotência dos ciclos | Repetir atualização no mesmo valor | Nenhum ciclo duplicado |
 | DIA-04 | Permanência dos ciclos | Reduzir/resetar streak após ciclos concedidos | Ciclos permanecem |
-| FRZ-01 | Freeze não é estudo | Exercitar o fluxo real de proteção de um dia perdido | Proteção da sequência sem nova linha artificial em `study_days` |
-| TX-01 | Atomicidade | Forçar falha dentro da mesma transação de teste após atualização | Atualização e concessões sofrem rollback juntas |
+| FRZ-01 | Freeze não é estudo | Executar `credit_study_day` com evidência válida e um dia perdido | Proteção da sequência sem nova linha artificial em `study_days` |
+| FRZ-02 | Limite semanal | Executar o fluxo com Freeze já usado na mesma semana | Sequência não é protegida uma segunda vez e a data anterior permanece |
+| TX-01 | Atomicidade | Forçar rollback após cruzar marco de joia | Streak e concessões sofrem rollback juntas |
 
 ## Pré-condições do ambiente
 
@@ -65,4 +66,4 @@ Para cada cenário, registrar:
 
 ## Fora do escopo
 
-Não alterar migrations existentes, regras de negócio, dados de alunos, histórico de joias, UI, XP, Weekly League ou sincronização entre dispositivos. Não executar backfill em produção. A implementação do harness e os testes executáveis serão feitos somente após identificar e validar o provisionamento do banco descartável.
+Não alterar migrations existentes, regras de negócio, dados de alunos, histórico de joias, UI, XP, Weekly League ou sincronização entre dispositivos. Não executar backfill em produção. O harness e os testes executáveis estão preparados na branch de validação; o encerramento desta fase depende de CI verde e revisão do diff.
