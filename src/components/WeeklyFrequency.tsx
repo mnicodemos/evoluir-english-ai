@@ -478,9 +478,7 @@ export function WeeklyFrequency({
                       aria-hidden="true"
                     />
                   )}
-                  <span
-                      className={cn("text-sm text-muted-foreground", !isPlanned && "opacity-35")}
-                  >
+                  <span className={cn("text-sm text-muted-foreground", !isPlanned && "opacity-35")}>
                     {labels[i]}
                   </span>
                 </div>
