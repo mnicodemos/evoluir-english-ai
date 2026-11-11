@@ -11,6 +11,7 @@ import { useAdventureActivityTimer } from "@/hooks/useEnglishAdventuresProgress"
 import { useEnglishAdventureCheckpoint } from "@/hooks/useEnglishAdventureCheckpoint";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { getStableAdventureChoiceOrder } from "@/lib/adventureChoiceOrder";
 
 type Challenge = {
   place: string;
@@ -176,27 +177,30 @@ export function A1NeighbourhoodMystery() {
             <p className="text-base leading-relaxed sm:text-lg" translate="no" lang="en">{challenge.story}</p>
             <p className="text-sm font-semibold">{t("Choose your response")}</p>
             <div className="grid gap-2">
-              {challenge.choices.map((option, optionIndex) => (
-                <button
-                  key={option.label}
-                  type="button"
-                  onClick={() => {
-                    const recoveredDelta =
-                      selected !== null && !challenge.choices[selected]?.correct && option.correct ? 1 : 0;
-                    progress.choose(optionIndex, recoveredDelta);
-                  }}
-                  aria-pressed={selected === optionIndex}
-                  className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${
-                    selected === optionIndex
-                      ? option.correct
-                        ? "border-brand-green bg-brand-green/10"
-                        : "border-warning bg-warning/10"
-                      : "border-border hover:border-brand-green/50 hover:bg-secondary/50"
-                  }`}
-                >
-                  <span className="font-medium" translate="no" lang="en">{option.label}</span>
-                </button>
-              ))}
+              {getStableAdventureChoiceOrder("a1-neighbourhood-mystery", challengeIndex, challenge.choices.length).map((choiceIndex) => {
+                const option = challenge.choices[choiceIndex];
+                return (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() => {
+                      const recoveredDelta =
+                        selected !== null && !challenge.choices[selected]?.correct && option.correct ? 1 : 0;
+                      progress.choose(choiceIndex, recoveredDelta);
+                    }}
+                    aria-pressed={selected === choiceIndex}
+                    className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${
+                      selected === choiceIndex
+                        ? option.correct
+                          ? "border-brand-green bg-brand-green/10"
+                          : "border-warning bg-warning/10"
+                        : "border-border hover:border-brand-green/50 hover:bg-secondary/50"
+                    }`}
+                  >
+                    <span className="font-medium" translate="no" lang="en">{option.label}</span>
+                  </button>
+                );
+              })}
             </div>
             {choice && (
               <div className="rounded-xl bg-brand-green/10 p-3">
