@@ -86,9 +86,7 @@ export function WeeklyFrequency({
   // Model A: every qualified study day in the week contributes to the
   // weekly target, regardless of its planned weekday. Credit is capped at the
   // target; the full day history remains in study_days and the calendar.
-  const weeklyProgress = studyDays
-    ? weeklyFrequencyProgress(studyDays, weeklyGoal)
-    : null;
+  const weeklyProgress = studyDays ? weeklyFrequencyProgress(studyDays, weeklyGoal) : null;
   const allStudied = weeklyProgress?.goalReached ?? false;
   // Only the desktop panel, the one on screen there, celebrates the week's plan
   // (user request), so the hidden phone strip never fires it a second time.
@@ -477,7 +475,11 @@ export function WeeklyFrequency({
                   ) : (
                     <span className="size-6 rounded-full bg-muted-foreground/10 opacity-35" aria-hidden="true" />
                   )}
-                  <span className={cn("text-sm text-muted-foreground", !isPlanned && "opacity-35")}>{labels[i]}</span>
+                  <span
+                    className={cn("text-sm text-muted-foreground", !isPlanned && "opacity-35")}
+                  >
+                    {labels[i]}
+                  </span>
                 </div>
               );
             })}
