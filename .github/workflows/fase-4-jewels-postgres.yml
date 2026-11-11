@@ -1,0 +1,85 @@
+name: Fase 4 - PostgreSQL isolado para joias
+
+on:
+  push:
+    branches:
+      - test/fase-4-permanent-jewels-integration
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/fase-4-jewels-postgres.yml"
+      - "docs/testing/fase-4-permanent-jewels-integration-plan.md"
+      - "drizzle/migrations/**"
+      - "tests/integration/jewels/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-jewels-integration:
+    name: Testes reais das migrations 0090 e 0099
+    runs-on: ubuntu-latest
+    container:
+      image: postgres:16
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: jewels_test
+          POSTGRES_USER: jewels_test
+          POSTGRES_PASSWORD: ci_only_password
+        options: >-
+          --health-cmd "pg_isready -U jewels_test -d jewels_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: jewels_test
+      PGUSER: jewels_test
+      PGPASSWORD: ci_only_password
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Confirmar isolamento do banco descartável
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$PGHOST" = "postgres"
+          test "$PGDATABASE" = "jewels_test"
+          test "$PGUSER" = "jewels_test"
+          if [[ "${DATABASE_URL:-}" == *"lovable"* || "${DATABASE_URL:-}" == *"supabase"* ]]; then
+            echo "Bloqueado: URL externa detectada no ambiente de teste."
+            exit 1
+          fi
+          for attempt in {1..30}; do
+            if pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE"; then
+              break
+            fi
+            sleep 2
+          done
+          test "$(psql -Atqc "SELECT current_database()")" = "jewels_test"
+          test "$(psql -Atqc "SELECT current_user")" = "jewels_test"
+
+      - name: Preparar schema mínimo isolado
+        run: psql -v ON_ERROR_STOP=1 -f tests/integration/jewels/bootstrap.sql
+
+      - name: Aplicar migration real 0090
+        run: psql -v ON_ERROR_STOP=1 -f drizzle/migrations/0090_permanent_jewel_awards.sql
+
+      - name: Aplicar migration real 0099
+        run: psql -v ON_ERROR_STOP=1 -f drizzle/migrations/0099_diamond_cycles.sql
+
+      - name: Executar assertions de integração
+        run: psql -v ON_ERROR_STOP=1 -f tests/integration/jewels/assertions.sql
+
+      - name: Descartar banco efêmero
+        if: always()
+        run: echo "O serviço PostgreSQL será descartado automaticamente ao final deste job."
