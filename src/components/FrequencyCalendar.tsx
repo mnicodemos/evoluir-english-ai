@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
+import { normalizeStudyDays } from "@/lib/studyPlan";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -29,11 +30,14 @@ export function FrequencyCalendar({ userId }: Props) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("study_days")
+        .select("study_days, study_days_per_week")
         .eq("id", userId)
         .maybeSingle();
       if (error) throw error;
-      return (data?.study_days as string[] | null) ?? ["Monday", "Wednesday", "Friday"];
+      return normalizeStudyDays(
+        data?.study_days as string[] | null,
+        data?.study_days_per_week ?? 3,
+      );
     },
   });
   const [monthOffset, setMonthOffset] = useState(0);

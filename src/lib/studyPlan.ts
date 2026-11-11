@@ -41,9 +41,12 @@ const WEEK_DAYS = STUDY_WEEKDAYS;
 
 /** Backward-compatible weekday defaults for students with an older saved plan. */
 export const DEFAULT_STUDY_DAYS: Record<number, readonly string[]> = {
+  1: ["Wednesday"],
   2: ["Tuesday", "Thursday"],
   3: ["Monday", "Wednesday", "Friday"],
+  4: ["Monday", "Tuesday", "Thursday", "Friday"],
   5: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+  6: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
   7: [...WEEK_DAYS],
 };
 
