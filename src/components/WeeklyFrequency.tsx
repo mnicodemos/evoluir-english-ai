@@ -167,28 +167,39 @@ export function WeeklyFrequency({
           )}
         </p>
         {weekKeys.map((key, i) => {
-          const studied =
-            selectedWeekdays.includes(
-              ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!,
-            ) &&
-            (studyDays?.has(key) ?? false);
+          const isPlanned = selectedWeekdays.includes(
+            ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!,
+          );
+          const studied = isPlanned && (studyDays?.has(key) ?? false);
           const isToday = key === todayKey;
           return (
             <div
               key={key}
               className={cn("grid justify-items-center gap-1", !weekReady && "invisible")}
+              aria-label={
+                isPlanned
+                  ? studied
+                    ? lang === "pt"
+                      ? "Dia planejado concluído"
+                      : "Planned day completed"
+                    : lang === "pt"
+                      ? "Dia previsto no plano"
+                      : "Planned study day"
+                  : lang === "pt"
+                    ? "Fora do plano de estudos"
+                    : "Not in study plan"
+              }
             >
               <span
                 className={cn(
                   "text-[9px] text-muted-foreground",
-                  isToday && "font-semibold text-brand-green",
+                  isToday && isPlanned && "font-semibold text-brand-green",
+                  !isPlanned && "opacity-35",
                 )}
               >
                 {labels[i]}
               </span>
               {studied ? (
-                // Past studied days are a soft tint; only today is solid, so the
-                // brand colour marks where the student is (user request, 2026-10-24).
                 <span
                   className={cn(
                     "grid size-5 place-items-center rounded-full",
@@ -199,12 +210,17 @@ export function WeeklyFrequency({
                 >
                   <Check className="size-3.5" strokeWidth={3} />
                 </span>
-              ) : (
+              ) : isPlanned ? (
                 <span
                   className={cn(
                     "size-5 rounded-full border border-dashed",
                     isToday ? "border-brand-green bg-brand-green/15" : "border-muted-foreground",
                   )}
+                />
+              ) : (
+                <span
+                  className="size-5 rounded-full bg-muted-foreground/10 opacity-35"
+                  aria-hidden="true"
                 />
               )}
             </div>
@@ -382,20 +398,23 @@ export function WeeklyFrequency({
         </div>
         <div className="mt-2 grid grid-cols-7 gap-1">
           {weekKeys.map((key, i) => {
-            const studied = studyDays?.has(key) ?? false;
+            const isPlanned = selectedWeekdays.includes(
+              ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!,
+            );
+            const studied = isPlanned && (studyDays?.has(key) ?? false);
             const isToday = key === todayKey;
             return (
               <div key={key} className="grid justify-items-center gap-1">
                 <span
                   className={cn(
                     "text-[9px] text-muted-foreground",
-                    isToday && "font-semibold text-brand-green",
+                    isToday && isPlanned && "font-semibold text-brand-green",
+                    !isPlanned && "opacity-35",
                   )}
                 >
                   {labels[i]}
                 </span>
                 {studied ? (
-                  // Like the phone strip: past studied days tinted, today solid.
                   <span
                     className={cn(
                       "grid size-5 place-items-center rounded-full",
@@ -403,17 +422,21 @@ export function WeeklyFrequency({
                         ? "bg-brand-green text-primary-foreground"
                         : "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35",
                     )}
-                    title={isToday ? (lang === "pt" ? "Hoje" : "Today") : undefined}
                   >
                     <Check className="size-3" strokeWidth={3} />
                   </span>
-                ) : isToday ? (
+                ) : isPlanned ? (
                   <span
-                    className="size-5 rounded-full border border-dashed border-brand-green bg-brand-green/15"
-                    title={lang === "pt" ? "Hoje" : "Today"}
+                    className={cn(
+                      "size-5 rounded-full border border-dashed",
+                      isToday ? "border-brand-green bg-brand-green/15" : "border-muted-foreground",
+                    )}
                   />
                 ) : (
-                  <span className="size-5 rounded-full border border-dashed border-muted-foreground" />
+                  <span
+                    className="size-5 rounded-full bg-muted-foreground/10 opacity-35"
+                    aria-hidden="true"
+                  />
                 )}
               </div>
             );

@@ -145,7 +145,7 @@ jobs:
         # Public, security and smoke specs block the build. The signed-in
         # specs run in the next step.
         run: |
-          bunx playwright install chromium --with-deps
+          bunx playwright install chromium
           bun run e2e --grep-invert "authenticated smoke"
         env:
           # Publishable backend values; CI relies on the tracked .env for now —
