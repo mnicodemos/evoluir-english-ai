@@ -200,7 +200,7 @@ export function A2CommunityFestival() {
             {showTranslation && <p className="rounded-lg bg-secondary/60 p-3 text-sm leading-relaxed text-muted-foreground" lang="pt">{translations[activity.story] ?? "A tradução deste trecho estará disponível em breve."}</p>}
             <p className="text-sm font-semibold">{t("What would you say?")}</p>
             <div className="grid gap-2">
-              {getStableAdventureChoiceOrder("a2-community-festival", activityIndex, activity.choices.length).map((choiceIndex) => {
+              {getStableAdventureChoiceOrder("a2-community-festival", index, activity.choices.length).map((choiceIndex) => {
                 const option = activity.choices[choiceIndex];
                 return (
                   <button key={option.label} type="button" onClick={() => progress.choose(choiceIndex)} aria-pressed={selected === choiceIndex} className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${selected === choiceIndex ? "border-brand-green bg-brand-green/10" : "border-border hover:border-brand-green/50 hover:bg-secondary/50"}`}>
