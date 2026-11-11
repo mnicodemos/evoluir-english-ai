@@ -23,8 +23,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { findLevel } from "@/lib/level";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
-import { normalizeStudyDays } from "@/lib/studyPlan";
 import {
+  normalizeStudyDays,
   planReasonText,
   STUDY_WEEKDAYS,
   STUDY_PLAN_FOCUS_AREAS,
