@@ -49,12 +49,12 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
     enabled: !!profile?.id,
     staleTime: 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { count, error } = await supabase
         .from("study_days")
-        .select("day")
+        .select("day", { count: "exact", head: true })
         .eq("user_id", profile!.id);
       if (error) throw error;
-      return data?.length ?? 0;
+      return count ?? 0;
     },
   });
   const earned = Array.isArray(earnedData) ? earnedData : [];
