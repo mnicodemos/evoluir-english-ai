@@ -88,7 +88,7 @@ WHERE id = '00000000-0000-0000-0000-000000000006';
 UPDATE public.profiles SET streak_days = 84
 WHERE id = '00000000-0000-0000-0000-000000000007';
 
-DO $
+DO $$
 DECLARE
   four_week_count integer;
   eight_week_count integer;
@@ -119,7 +119,7 @@ BEGIN
       )) THEN
     RAISE EXCEPTION 'F5-DIA: a Diamond repeat cycle was granted before day 126';
   END IF;
-END $;
+END $$;
 
 -- Replays and resets at the long-cycle checkpoints must preserve, not duplicate,
 -- the permanent awards already earned.
@@ -127,13 +127,13 @@ UPDATE public.profiles SET streak_days = 84
 WHERE id = '00000000-0000-0000-0000-000000000007';
 UPDATE public.profiles SET streak_days = 0
 WHERE id = '00000000-0000-0000-0000-000000000007';
-DO $
+DO $$
 BEGIN
   IF (SELECT count(*) FROM public.permanent_jewel_awards
       WHERE user_id = '00000000-0000-0000-0000-000000000007') <> 10 THEN
     RAISE EXCEPTION 'F5-PERM: 12-week jewels were removed or duplicated after reset';
   END IF;
-END $;
+END $$;
 
 -- A failed transaction must roll back both the streak update and trigger awards.
 BEGIN;
