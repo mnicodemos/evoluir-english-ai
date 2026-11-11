@@ -121,10 +121,12 @@ function StudyPlanPage() {
 
       // Publish the same normalized weekday value consumed by the calendar
       // and weekly rhythm before invalidating their server-backed queries.
-      queryClient.setQueryData(
-        ["study-weekdays", profile.id],
-        normalizeStudyDays(studyDays, daysPerWeek),
-      );
+      if (profile) {
+        queryClient.setQueryData(
+          ["study-weekdays", profile.id],
+          normalizeStudyDays(studyDays, daysPerWeek),
+        );
+      }
 
       // Refresh active page queries that derive their output from the study plan.
       await queryClient.invalidateQueries();
