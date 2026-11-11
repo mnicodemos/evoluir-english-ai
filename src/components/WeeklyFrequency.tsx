@@ -178,7 +178,7 @@ export function WeeklyFrequency({
           )}
         </p>
         {weekKeys.map((key, i) => {
-          const studied = studyDays?.has(key) ?? false;
+          const studied = selectedWeekdays.includes(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!) && (studyDays?.has(key) ?? false);
           const isToday = key === todayKey;
           return (
             <div
