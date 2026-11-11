@@ -10,6 +10,7 @@ import { useAdventureActivityTimer } from "@/hooks/useEnglishAdventuresProgress"
 import { useEnglishAdventureCheckpoint } from "@/hooks/useEnglishAdventureCheckpoint";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { getStableAdventureChoiceOrder } from "@/lib/adventureChoiceOrder";
 
 type Choice = {
   label: string;
@@ -368,31 +369,34 @@ export function A1WelcomeMixUp() {
             </p>
             <p className="text-sm font-semibold">{t("Choose your response")}</p>
             <div className="grid gap-2">
-              {scene.choices.map((option, index) => (
-                <button
-                  key={option.label}
-                  type="button"
-                  onClick={() => {
-                    const recoveredDelta =
-                      selected !== null && !scene.choices[selected]?.correct && option.correct
-                        ? 1
-                        : 0;
-                    progress.choose(index, recoveredDelta);
-                  }}
-                  aria-pressed={selected === index}
-                  className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${
-                    selected === index
-                      ? option.correct
-                        ? "border-brand-green bg-brand-green/10"
-                        : "border-warning bg-warning/10"
-                      : "border-border hover:border-brand-green/50 hover:bg-secondary/50"
-                  }`}
-                >
-                  <span className="font-medium" translate="no" lang="en">
-                    {option.label}
-                  </span>
-                </button>
-              ))}
+              {getStableAdventureChoiceOrder("a1-welcome-mix-up", sceneIndex, scene.choices.length).map((choiceIndex) => {
+                const option = scene.choices[choiceIndex];
+                return (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() => {
+                      const recoveredDelta =
+                        selected !== null && !scene.choices[selected]?.correct && option.correct
+                          ? 1
+                          : 0;
+                      progress.choose(choiceIndex, recoveredDelta);
+                    }}
+                    aria-pressed={selected === choiceIndex}
+                    className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${
+                      selected === choiceIndex
+                        ? option.correct
+                          ? "border-brand-green bg-brand-green/10"
+                          : "border-warning bg-warning/10"
+                        : "border-border hover:border-brand-green/50 hover:bg-secondary/50"
+                    }`}
+                  >
+                    <span className="font-medium" translate="no" lang="en">
+                      {option.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
             {choice && (
               <div className="rounded-xl bg-brand-green/10 p-3">
