@@ -1,0 +1,80 @@
+name: Fase 4 - PostgreSQL isolado para joias
+
+on:
+  push:
+    branches:
+      - test/fase-4-permanent-jewels-integration
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/fase-4-jewels-postgres.yml"
+      - "docs/testing/fase-4-permanent-jewels-integration-plan.md"
+      - "drizzle/migrations/**"
+      - "src/lib/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-test-environment:
+    name: Provisionar e validar PostgreSQL descartável
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: jewels_test
+          POSTGRES_USER: jewels_test
+          POSTGRES_PASSWORD: ci_only_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jewels_test -d jewels_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGDATABASE: jewels_test
+      PGUSER: jewels_test
+      PGPASSWORD: ci_only_password
+    steps:
+      - name: Confirmar que o alvo é o PostgreSQL efêmero do job
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$PGHOST" = "127.0.0.1"
+          test "$PGDATABASE" = "jewels_test"
+          test "$PGUSER" = "jewels_test"
+          if [[ "${DATABASE_URL:-}" == *"lovable"* || "${DATABASE_URL:-}" == *"supabase"* ]]; then
+            echo "Bloqueado: URL externa detectada no ambiente de teste."
+            exit 1
+          fi
+
+      - name: Aguardar PostgreSQL saudável
+        run: |
+          for attempt in {1..30}; do
+            if pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE"; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "PostgreSQL não ficou saudável dentro do prazo."
+          exit 1
+
+      - name: Validar conexão, versão e isolamento
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -c "SELECT current_database() AS database, current_user AS role, version() AS postgres_version;"
+          test "$(psql -Atqc "SELECT current_database()")" = "jewels_test"
+          test "$(psql -Atqc "SELECT current_user")" = "jewels_test"
+
+      - name: Encerrar ambiente descartável
+        if: always()
+        run: echo "O serviço PostgreSQL será descartado automaticamente ao final deste job."
