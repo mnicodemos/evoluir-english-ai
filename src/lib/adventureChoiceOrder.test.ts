@@ -11,11 +11,16 @@ describe("getStableAdventureChoiceOrder", () => {
   });
 
   it("changes the first position across consecutive activities", () => {
-    const firstPositions = Array.from({ length: 10 }, (_, step) =>
-      getStableAdventureChoiceOrder("a1-welcome-mix-up", step, 3)[0],
+    const firstPositions = Array.from(
+      { length: 10 },
+      (_, step) => getStableAdventureChoiceOrder("a1-welcome-mix-up", step, 3)[0],
     );
     expect(new Set(firstPositions)).toEqual(new Set([0, 1, 2]));
-    expect(firstPositions.slice(0, 3)).toEqual([firstPositions[0], firstPositions[1], firstPositions[2]]);
+    expect(firstPositions.slice(0, 3)).toEqual([
+      firstPositions[0],
+      firstPositions[1],
+      firstPositions[2],
+    ]);
   });
 
   it("is stable for the same adventure and step", () => {
