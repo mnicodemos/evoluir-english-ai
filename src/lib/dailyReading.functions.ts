@@ -133,8 +133,18 @@ export const getLevelIntroVideo = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
     z.object({ level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2", "business"]) }).strict().parse(input),
   )
-  .handler(async ({ data }): Promise<string | null> => {
+  .handler(async ({ data, context }): Promise<string | null> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Students can retrieve only their own CEFR level. Business English is a
+    // shared public learning path, so its single intro video is also available.
+    if (data.level !== "business") {
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .select("level")
+        .eq("id", context.userId)
+        .maybeSingle();
+      if (profileError || readingLevel(profile?.level) !== data.level) return null;
+    }
     const { data: row, error } = await supabaseAdmin
       .from("level_intro_videos")
       .select("video_url")
