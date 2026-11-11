@@ -202,6 +202,7 @@ export function A2CommunityFestival() {
             <div className="grid gap-2">
               {getStableAdventureChoiceOrder("a2-community-festival", index, activity.choices.length).map((choiceIndex) => {
                 const option = activity.choices[choiceIndex];
+                if (!option) return null;
                 return (
                   <button key={option.label} type="button" onClick={() => progress.choose(choiceIndex)} aria-pressed={selected === choiceIndex} className={`rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60 ${selected === choiceIndex ? "border-brand-green bg-brand-green/10" : "border-border hover:border-brand-green/50 hover:bg-secondary/50"}`}>
                     <span className="block font-medium" translate="no" lang="en">{option.label}</span>
