@@ -384,7 +384,7 @@ function WeeklyXpBreakdown() {
           align="end"
           sideOffset={8}
           className={cn(
-            "max-h-[80dvh] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:p-5",
+            "max-h-[40dvh] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:p-5",
             graphitePanelClass,
           )}
         >
@@ -396,7 +396,7 @@ function WeeklyXpBreakdown() {
             <span className="text-sm text-muted-foreground">{t("Total this week")}</span>
             <span className="font-display text-lg font-bold tabular-nums">{total} XP</span>
           </div>
-          <div className="max-h-[55vh] space-y-2 overflow-y-auto pr-1">
+          <div className="max-h-[27.5vh] space-y-2 overflow-y-auto pr-1">
             {isLoading ? (
               <div className="space-y-2" aria-busy="true">
                 {[0, 1, 2, 3].map((item) => (
