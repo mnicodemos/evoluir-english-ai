@@ -36,7 +36,7 @@ export const STUDY_WEEKDAYS = [
   "Friday",
   "Saturday",
   "Sunday",
- ] as const;
+] as const;
 const WEEK_DAYS = STUDY_WEEKDAYS;
 
 /** Backward-compatible weekday defaults for students with an older saved plan. */
@@ -260,7 +260,10 @@ export function mondayOf(date: string): string {
 }
 
 /** Normalize the saved weekday selection, with legacy frequency fallback. */
-export function normalizeStudyDays(studyDays: readonly string[] | null | undefined, daysPerWeek = 3): string[] {
+export function normalizeStudyDays(
+  studyDays: readonly string[] | null | undefined,
+  daysPerWeek = 3,
+): string[] {
   const selected = Array.isArray(studyDays)
     ? WEEK_DAYS.filter((day) => studyDays.includes(day))
     : [...(DEFAULT_STUDY_DAYS[daysPerWeek] ?? DEFAULT_STUDY_DAYS[3]!)];
