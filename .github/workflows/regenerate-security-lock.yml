@@ -1,0 +1,32 @@
+name: Regenerate security lockfile
+
+on:
+  push:
+    branches:
+      - fix/security-transitive-zod-seroval
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/security-transitive-zod-seroval
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: oven-sh/setup-bun@v2
+      - name: Regenerate lockfile
+        run: bun install
+      - name: Commit lockfile if changed
+        run: |
+          if git diff --quiet -- bun.lock; then
+            echo "bun.lock is already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bun.lock
+          git commit -m "chore(deps): regenerate Bun lockfile"
+          git push origin HEAD:fix/security-transitive-zod-seroval
