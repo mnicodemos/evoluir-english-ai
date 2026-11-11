@@ -185,11 +185,51 @@ function RootComponent() {
 
   useEffect(() => {
     initSentry();
+
+    // Keep one app-wide listener for profile changes. Study-plan preferences are
+    // consumed by several routes; updating only the profile cache in the editor
+    // does not notify other tabs/devices or refresh their derived queries.
+    let profileChannel: ReturnType<typeof supabase.channel> | null = null;
+    let subscribedUserId: string | null = null;
+    const syncProfileSubscription = (userId: string | null) => {
+      if (subscribedUserId === userId) return;
+      if (profileChannel) {
+        void supabase.removeChannel(profileChannel);
+        profileChannel = null;
+      }
+      subscribedUserId = userId;
+      if (!userId) return;
+
+      profileChannel = supabase
+        .channel(`profile-sync-${userId}`)
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
+          ({ new: updatedProfile }) => {
+            queryClient.setQueryData(["profile"], (current: unknown) =>
+              current && typeof current === "object"
+                ? { ...current, ...updatedProfile }
+                : updatedProfile,
+            );
+            // Refresh active route data derived from profile preferences. The
+            // profile itself is updated from the realtime payload above.
+            void queryClient.invalidateQueries({
+              predicate: (query) => query.queryKey[0] !== "profile",
+            });
+          },
+        )
+        .subscribe();
+    };
+
     supabase.auth.getSession().then(({ data }) => {
-      setSentryUser(data.session?.user.id ?? null);
+      const userId = data.session?.user.id ?? null;
+      setSentryUser(userId);
+      syncProfileSubscription(userId);
     });
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      setSentryUser(session?.user.id ?? null);
+      const userId = session?.user.id ?? null;
+      setSentryUser(userId);
+      syncProfileSubscription(userId);
       // A reset link may land on any page (e.g. the Site URL when /reset-password
       // is not an allowed redirect): always finish on the new-password screen.
       if (event === "PASSWORD_RECOVERY" && window.location.pathname !== "/reset-password") {
@@ -200,7 +240,10 @@ function RootComponent() {
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
-    return () => data.subscription.unsubscribe();
+    return () => {
+      data.subscription.unsubscribe();
+      if (profileChannel) void supabase.removeChannel(profileChannel);
+    };
   }, [router, queryClient]);
 
   // No pinch zoom (user request, 2026-10-23: students enlarged the screen by
