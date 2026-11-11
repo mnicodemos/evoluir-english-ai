@@ -479,7 +479,7 @@ export function WeeklyFrequency({
                     />
                   )}
                   <span
-                    className={cn("text-sm text-muted-foreground", !isPlanned && "opacity-35")}
+                      className={cn("text-sm text-muted-foreground", !isPlanned && "opacity-35")}
                   >
                     {labels[i]}
                   </span>
