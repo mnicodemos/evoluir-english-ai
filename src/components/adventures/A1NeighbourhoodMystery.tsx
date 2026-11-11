@@ -179,6 +179,7 @@ export function A1NeighbourhoodMystery() {
             <div className="grid gap-2">
               {getStableAdventureChoiceOrder("a1-neighbourhood-mystery", index, challenge.choices.length).map((choiceIndex) => {
                 const option = challenge.choices[choiceIndex];
+                if (!option) return null;
                 return (
                   <button
                     key={option.label}
