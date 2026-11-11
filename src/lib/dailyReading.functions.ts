@@ -131,7 +131,10 @@ async function readStored(day: string, level: ReadingLevel, choice: ReadingChoic
 export const getLevelIntroVideo = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2", "business"]) }).strict().parse(input),
+    z
+      .object({ level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2", "business"]) })
+      .strict()
+      .parse(input),
   )
   .handler(async ({ data, context }): Promise<string | null> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
