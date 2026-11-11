@@ -331,6 +331,11 @@ export function FocusSection() {
             {t("in 7 days")}
           </p>
         </div>
+        {summary.extraWeekMinutes > 0 ? (
+          <p className="mt-1 text-right text-[11px] text-muted-foreground">
+            {summary.extraWeekMinutes} min {t("studied outside planned days")}
+          </p>
+        ) : null}
         <div className="mt-2 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
           <div className="rounded-lg bg-secondary/50 p-2">
             <span className="block text-muted-foreground">{t("Completed sessions")}</span>

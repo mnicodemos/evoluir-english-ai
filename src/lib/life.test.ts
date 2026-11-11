@@ -189,9 +189,28 @@ describe("focus", () => {
       ["Monday", "Wednesday", "Friday"],
     );
     expect(summary.week.map((row) => row.day)).toEqual(["2026-10-12", "2026-10-14", "2026-10-16"]);
-    expect(summary.weekMinutes).toBe(70);
+    expect(summary.weekMinutes).toBe(110);
+    expect(summary.extraWeekMinutes).toBe(40);
     expect(summary.todayCount).toBe(0);
     expect(summary.todayMinutes).toBe(0);
+  });
+
+  it("counts real study on unplanned days without marking those days as planned", () => {
+    const summary = focusSummary(
+      [
+        { day: "2026-10-12", minutes: 25 },
+        { day: "2026-10-13", minutes: 40 },
+        { day: "2026-10-14", minutes: 30 },
+        { day: "2026-10-14", minutes: 10, partial: true },
+      ],
+      "2026-10-14",
+      ["Monday", "Tuesday"],
+    );
+    expect(summary.week.map((row) => row.day)).toEqual(["2026-10-12", "2026-10-13"]);
+    expect(summary.todayCount).toBe(1);
+    expect(summary.todayMinutes).toBe(40);
+    expect(summary.weekMinutes).toBe(105);
+    expect(summary.extraWeekMinutes).toBe(40);
   });
 
   it("shows the countdown as mm:ss", () => {
