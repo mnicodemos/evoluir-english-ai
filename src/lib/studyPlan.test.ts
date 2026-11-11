@@ -37,6 +37,26 @@ describe("custom study weekdays", () => {
     ]);
   });
 
+  it("restores all seven weekdays when the legacy frequency says seven but the saved list is stale", () => {
+    expect(normalizeStudyDays(["Monday", "Wednesday", "Friday"], 7)).toEqual([
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ]);
+  });
+
+  it("preserves a matching custom weekday selection", () => {
+    expect(normalizeStudyDays(["Saturday", "Monday", "Thursday"], 3)).toEqual([
+      "Monday",
+      "Thursday",
+      "Saturday",
+    ]);
+  });
+
   it("preserves legacy frequency defaults when no weekday list exists", () => {
     expect(normalizeStudyDays(null, 2)).toEqual(["Tuesday", "Thursday"]);
   });
