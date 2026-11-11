@@ -37,13 +37,17 @@ export function useTodayStudyMetrics(userId?: string) {
     refetchInterval: 60_000,
     queryFn: async () => {
       if (!userId) throw new Error("A signed-in student is required");
+      // Recompute on every poll so the query crosses São Paulo midnight even
+      // when the component stays mounted and the device timezone differs.
+      const currentStart = studyDayStartIso();
+      const currentEnd = new Date(new Date(currentStart).getTime() + 86_400_000).toISOString();
       const [lessons, cards, words, quizzes] = await Promise.all([
         supabase
           .from("user_lessons")
           .select("completed_at, video_completed_at")
           .eq("user_id", userId)
           .or(
-            `and(completed_at.gte.${start},completed_at.lt.${end}),and(video_completed_at.gte.${start},video_completed_at.lt.${end})`,
+            `and(completed_at.gte.${currentStart},completed_at.lt.${currentEnd}),and(video_completed_at.gte.${currentStart},video_completed_at.lt.${currentEnd})`,
           ),
         supabase
           .from("user_flashcards")
