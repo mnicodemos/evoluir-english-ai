@@ -117,7 +117,9 @@ function StudyPlanPage() {
       const message =
         error instanceof Error
           ? error.message
-          : error && typeof error === "object" && "message" in error &&
+          : error &&
+              typeof error === "object" &&
+              "message" in error &&
               typeof error.message === "string"
             ? error.message
             : "Could not save your plan";
