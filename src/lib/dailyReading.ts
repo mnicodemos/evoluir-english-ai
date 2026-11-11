@@ -385,6 +385,20 @@ export function readingWeekDays(today: string): string[] {
   );
 }
 
+/** The current Monday–Sunday reading strip, restricted to the learner's plan days. */
+export function readingPlanDays(today: string, studyDays?: readonly string[] | null): string[] {
+  const base = Date.parse(`${today}T12:00:00Z`);
+  const weekday = new Date(base).getUTCDay();
+  const monday = new Date(base - ((weekday + 6) % 7) * 86_400_000);
+  const names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const selected = studyDays?.length ? studyDays : ["Monday", "Wednesday", "Friday"];
+  return names.flatMap((name, index) =>
+    selected.includes(name)
+      ? [new Date(monday.getTime() + index * 86_400_000).toISOString().slice(0, 10)]
+      : [],
+  );
+}
+
 /** Words a learner reads per minute, by level (slower than a native reader). */
 const READING_WORDS_PER_MINUTE: Record<ReadingLevel, number> = {
   a1: 70,

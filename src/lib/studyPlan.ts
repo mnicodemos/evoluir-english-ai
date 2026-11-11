@@ -15,7 +15,7 @@ export const STUDY_PLAN_GOALS = [
 
 export const STUDY_PLAN_MINUTES = [15, 30, 45, 60] as const;
 
-export const STUDY_PLAN_DAYS_PER_WEEK = [2, 3, 5, 7] as const;
+export const STUDY_PLAN_DAYS_PER_WEEK = [1, 2, 3, 4, 5, 6, 7] as const;
 
 export const STUDY_PLAN_FOCUS_AREAS = [
   { value: "grammar", label: "Grammar" },
@@ -28,7 +28,7 @@ export const STUDY_PLAN_FOCUS_AREAS = [
 
 export type StudyFocus = (typeof STUDY_PLAN_FOCUS_AREAS)[number]["value"];
 
-const WEEK_DAYS = [
+export const STUDY_WEEKDAYS = [
   "Monday",
   "Tuesday",
   "Wednesday",
@@ -37,9 +37,10 @@ const WEEK_DAYS = [
   "Saturday",
   "Sunday",
 ] as const;
+const WEEK_DAYS = STUDY_WEEKDAYS;
 
-/** Which week days each frequency uses. Fixed, so the plan never shuffles. */
-const DAYS_BY_FREQUENCY: Record<number, readonly string[]> = {
+/** Backward-compatible weekday defaults for students with an older saved plan. */
+export const DEFAULT_STUDY_DAYS: Record<number, readonly string[]> = {
   2: ["Tuesday", "Thursday"],
   3: ["Monday", "Wednesday", "Friday"],
   5: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -115,6 +116,8 @@ export type StudyPlanInput = {
   goal: string;
   dailyMinutes: number;
   daysPerWeek: number;
+  /** Explicit Monday-first weekday selection. Optional only for legacy callers. */
+  studyDays?: string[];
   focus: StudyFocus;
   level: string | null;
   /** Lessons of the level; `completed` = ever completed, so they are not planned again. */
@@ -256,8 +259,19 @@ export function mondayOf(date: string): string {
   return addDays(date, -weekday);
 }
 
+/** Normalize the saved weekday selection, with legacy frequency fallback. */
+export function normalizeStudyDays(
+  studyDays: readonly string[] | null | undefined,
+  daysPerWeek = 3,
+): string[] {
+  const selected = Array.isArray(studyDays)
+    ? WEEK_DAYS.filter((day) => studyDays.includes(day))
+    : [...(DEFAULT_STUDY_DAYS[daysPerWeek] ?? DEFAULT_STUDY_DAYS[3]!)];
+  return selected.length ? selected : [...DEFAULT_STUDY_DAYS[3]!];
+}
+
 export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
-  const days = DAYS_BY_FREQUENCY[input.daysPerWeek] ?? DAYS_BY_FREQUENCY[3]!;
+  const days = normalizeStudyDays(input.studyDays, input.daysPerWeek);
   const needs = input.needs ?? [];
   const skills = skillSequence(input.goal, input.focus, days.length, needs);
   const today = input.today ?? new Date().toISOString().slice(0, 10);

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildStudyPlan,
   planReasonText,
+  normalizeStudyDays,
   skillSequence,
   type PlanLesson,
   type StudyPlanInput,
@@ -27,8 +28,26 @@ function input(overrides: Partial<StudyPlanInput> = {}): StudyPlanInput {
   };
 }
 
+describe("custom study weekdays", () => {
+  it("uses any explicitly selected weekdays in Monday-first order", () => {
+    expect(normalizeStudyDays(["Saturday", "Monday", "Thursday"], 3)).toEqual([
+      "Monday",
+      "Thursday",
+      "Saturday",
+    ]);
+  });
+
+  it("preserves legacy frequency defaults when no weekday list exists", () => {
+    expect(normalizeStudyDays(null, 2)).toEqual(["Tuesday", "Thursday"]);
+  });
+
+  it("falls back safely when the stored selection is empty", () => {
+    expect(normalizeStudyDays([], 4)).toEqual(["Monday", "Wednesday", "Friday"]);
+  });
+});
+
 describe("studyPlan", () => {
-  it("uses the fixed week days for each frequency", () => {
+  it("uses the fixed week days for legacy frequency inputs", () => {
     expect(buildStudyPlan(input({ daysPerWeek: 2 })).days.map((d) => d.day)).toEqual([
       "Tuesday",
       "Thursday",

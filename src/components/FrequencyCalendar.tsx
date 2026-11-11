@@ -1,5 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
@@ -20,6 +22,20 @@ const WEEKDAYS_PT = ["S", "T", "Q", "Q", "S", "S", "D"];
 export function FrequencyCalendar({ userId }: Props) {
   const { lang } = useUiLang();
   const todayKey = dayFmt.format(new Date());
+  const { data: plannedDays } = useQuery({
+    queryKey: ["study-weekdays", userId],
+    enabled: !!userId,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("study_days")
+        .eq("id", userId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.study_days as string[] | null) ?? ["Monday", "Wednesday", "Friday"];
+    },
+  });
   const [monthOffset, setMonthOffset] = useState(0);
 
   const baseYear = Number(todayKey.slice(0, 4));
@@ -94,6 +110,17 @@ export function FrequencyCalendar({ userId }: Props) {
           const key = `${monthKey}-${String(day).padStart(2, "0")}`;
           const studied = studyDays?.has(key);
           const isToday = key === todayKey;
+          const weekday = new Date(`${key}T12:00:00Z`).getUTCDay();
+          const weekdayName = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ][weekday]!;
+          const isPlanned = plannedDays?.includes(weekdayName) ?? false;
           return (
             <span
               key={key}
@@ -101,7 +128,9 @@ export function FrequencyCalendar({ userId }: Props) {
                 "mx-auto flex size-6 items-center justify-center rounded-full text-[11px] sm:size-7 sm:text-xs " +
                 (studied
                   ? "bg-brand-green font-semibold text-primary-foreground"
-                  : "text-muted-foreground") +
+                  : isPlanned
+                    ? "border border-primary/60 font-medium text-foreground"
+                    : "text-muted-foreground") +
                 (isToday ? " ring-1 ring-foreground/50" : "")
               }
             >
@@ -111,7 +140,7 @@ export function FrequencyCalendar({ userId }: Props) {
         })}
       </div>
       <p className="mt-2 hidden text-xs text-muted-foreground sm:mt-3 sm:block">
-        Green days are the days you practiced. Keep the streak going!
+        Green days are completed study days. Outlined days are part of your weekly plan.
       </p>
     </div>
   );

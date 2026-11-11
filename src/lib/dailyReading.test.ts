@@ -15,6 +15,7 @@ import {
   readingSpeechChunks,
   readingSpeechParts,
   readingWeekDays,
+  readingPlanDays,
   readingThemeForDay,
   readingKindLabel,
   readingEstimate,
@@ -203,6 +204,20 @@ describe("daily reading rules", () => {
     expect(lookupTerm("Maria’s")).toBe("maria");
     expect(lookupTerm("Habits")).toBe("habits");
     expect(lookupTerm("don't")).toBe("don't");
+  });
+});
+
+describe("readingPlanDays", () => {
+  it("uses the selected weekdays in the current Monday-to-Sunday week", () => {
+    expect(readingPlanDays("2026-11-11", ["Monday", "Thursday", "Saturday"])).toEqual([
+      "2026-11-09",
+      "2026-11-12",
+      "2026-11-14",
+    ]);
+  });
+
+  it("keeps the legacy three-day rhythm when no selection exists", () => {
+    expect(readingPlanDays("2026-11-11", null)).toEqual(["2026-11-09", "2026-11-11", "2026-11-13"]);
   });
 });
 
