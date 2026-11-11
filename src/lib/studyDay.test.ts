@@ -200,13 +200,9 @@ describe("qualifiesAsStudyDay (mirror of credit_study_day)", () => {
   });
 });
 
-
 describe("Model A weekly frequency credit", () => {
   it("counts every qualified study date, including dates outside the selected plan days", () => {
-    const result = weeklyFrequencyProgress(
-      new Set(["2026-11-09", "2026-11-10", "2026-11-12"]),
-      4,
-    );
+    const result = weeklyFrequencyProgress(new Set(["2026-11-09", "2026-11-10", "2026-11-12"]), 4);
     expect(result).toEqual({
       validStudyDays: 3,
       creditedStudyDays: 3,
