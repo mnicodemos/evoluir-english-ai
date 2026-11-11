@@ -35,7 +35,30 @@ export function WeeklyFrequency({
   compact = false,
   presentation = "default",
 }: Props) {
-  const weeklyGoal = daysPerWeek ?? 7;
+  const { data: savedWeekdays } = useQuery({
+    queryKey: ["study-weekdays", userId],
+    enabled: !!userId,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("study_days")
+        .eq("id", userId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.study_days as string[] | null) ?? null;
+    },
+  });
+  const selectedWeekdays = savedWeekdays?.length
+    ? savedWeekdays
+    : daysPerWeek === 2
+      ? ["Tuesday", "Thursday"]
+      : daysPerWeek === 5
+        ? ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+        : daysPerWeek === 7
+          ? ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+          : ["Monday", "Wednesday", "Friday"];
+  const weeklyGoal = selectedWeekdays.length;
   const { lang } = useUiLang();
   const labels = lang === "pt" ? LABELS_PT : LABELS_EN;
 
@@ -76,7 +99,8 @@ export function WeeklyFrequency({
     queryKey: `week:${weekKeys[0]}`,
   });
 
-  const allStudied = (studyDays?.size ?? 0) >= weeklyGoal;
+  const plannedWeekKeys = new Set(weekKeys.filter((_, index) => selectedWeekdays.includes(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][index]!)));
+  const allStudied = [...plannedWeekKeys].every((key) => studyDays?.has(key));
   // Only the desktop panel, the one on screen there, celebrates the week's plan
   // (user request), so the hidden phone strip never fires it a second time.
   const celebrateWeek = useCelebrate(
@@ -87,7 +111,7 @@ export function WeeklyFrequency({
       typeof window !== "undefined" &&
       window.matchMedia("(min-width: 1024px)").matches,
   );
-  const studiedCount = studyDays?.size ?? 0;
+  const studiedCount = [...plannedWeekKeys].filter((key) => studyDays?.has(key)).length;
   const weekReady = studyDays !== undefined && totalStudyDays !== undefined;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
