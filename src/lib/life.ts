@@ -417,7 +417,10 @@ export function focusBreakMinutes(preset: FocusPresetId, blocksInRun: number): n
   return blocksInRun > 0 && blocksInRun % FOCUS_LONG_BREAK_EVERY === 0 ? longBreak : shortBreak;
 }
 
-/** Today's blocks and minutes, and the current Monday-to-Sunday week for the week strip. */
+/** Today's actual focus and the current Monday-to-Sunday week.
+ * The strip contains planned weekdays only; totals include every real session,
+ * including study done on an unplanned day.
+ */
 export function focusSummary(
   sessions: FocusSessionLog[],
   today: string,
@@ -432,29 +435,34 @@ export function focusSummary(
   ],
 ) {
   const monday = weekStart(today);
+  const sunday = addDays(monday, 6);
   const selected = new Set(studyDays);
+  const weekSessions = sessions.filter((session) => session.day >= monday && session.day <= sunday);
   const week = Array.from({ length: 7 }, (_, index) => {
     const day = addDays(monday, index);
     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][
       weekdayOf(day)
     ]!;
     if (!selected.has(weekday)) return null;
-    const ofDay = sessions.filter((session) => session.day === day);
+    const ofDay = weekSessions.filter((session) => session.day === day);
     return {
       day,
       count: ofDay.filter((session) => !session.partial).length,
       minutes: ofDay.reduce((sum, session) => sum + session.minutes, 0),
     };
   }).filter((row): row is { day: string; count: number; minutes: number } => row !== null);
-  const todayRow = week.find((row) => row.day === today) ?? { day: today, count: 0, minutes: 0 };
+  const todaySessions = sessions.filter((session) => session.day === today);
+  const plannedWeekMinutes = week.reduce((sum, row) => sum + row.minutes, 0);
+  const weekMinutes = weekSessions.reduce((sum, session) => sum + session.minutes, 0);
   const completedCount = sessions.filter((session) => !session.partial).length;
   const partialCount = sessions.filter((session) => session.partial).length;
   const totalCount = completedCount + partialCount;
   return {
-    todayCount: todayRow.count,
-    todayMinutes: todayRow.minutes,
+    todayCount: todaySessions.filter((session) => !session.partial).length,
+    todayMinutes: todaySessions.reduce((sum, session) => sum + session.minutes, 0),
     week,
-    weekMinutes: week.reduce((sum, row) => sum + row.minutes, 0),
+    weekMinutes,
+    extraWeekMinutes: Math.max(0, weekMinutes - plannedWeekMinutes),
     completedCount,
     partialCount,
     completionRate: totalCount ? Math.round((completedCount / totalCount) * 100) : 0,
