@@ -53,14 +53,14 @@ export function useTodayStudyMetrics(userId?: string) {
           .from("user_flashcards")
           .select("mastery_level, times_reviewed, last_reviewed_at")
           .eq("user_id", userId)
-          .gte("last_reviewed_at", start)
-          .lt("last_reviewed_at", end),
+          .gte("last_reviewed_at", currentStart)
+          .lt("last_reviewed_at", currentEnd),
         supabase
           .from("user_vocabulary")
           .select("mastery_level, last_reviewed_at")
           .eq("user_id", userId)
-          .gte("last_reviewed_at", start)
-          .lt("last_reviewed_at", end),
+          .gte("last_reviewed_at", currentStart)
+          .lt("last_reviewed_at", currentEnd),
         // Keep the existing latest-30 quiz window before the daily aggregation.
         supabase
           .from("quiz_results")
@@ -77,7 +77,7 @@ export function useTodayStudyMetrics(userId?: string) {
           words: words.data ?? [],
           quizzes: quizzes.data ?? [],
         },
-        new Date(start),
+        new Date(currentStart),
       );
     },
   });
