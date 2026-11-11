@@ -13,6 +13,7 @@ import { useUiLang } from "@/lib/uiLang";
 import { useStudyWeekdays } from "@/hooks/useStudyWeekdays";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { weeklyFrequencyProgress } from "@/lib/studyDay";
 
 type Props = {
   userId: string;
@@ -82,14 +83,13 @@ export function WeeklyFrequency({
     queryKey: `week:${weekKeys[0]}`,
   });
 
-  const plannedWeekKeys = new Set(
-    weekKeys.filter((_, index) =>
-      selectedWeekdays.includes(
-        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][index]!,
-      ),
-    ),
-  );
-  const allStudied = [...plannedWeekKeys].every((key) => studyDays?.has(key));
+  // Model A: every qualified study day in the week contributes to the
+  // weekly target, regardless of its planned weekday. Credit is capped at the
+  // target; the full day history remains in study_days and the calendar.
+  const weeklyProgress = studyDays
+    ? weeklyFrequencyProgress(studyDays, weeklyGoal)
+    : null;
+  const allStudied = weeklyProgress?.goalReached ?? false;
   // Only the desktop panel, the one on screen there, celebrates the week's plan
   // (user request), so the hidden phone strip never fires it a second time.
   const celebrateWeek = useCelebrate(
@@ -100,7 +100,7 @@ export function WeeklyFrequency({
       typeof window !== "undefined" &&
       window.matchMedia("(min-width: 1024px)").matches,
   );
-  const studiedCount = [...plannedWeekKeys].filter((key) => studyDays?.has(key)).length;
+  const studiedCount = weeklyProgress?.creditedStudyDays ?? 0;
   const weekReady = studyDays !== undefined && totalStudyDays !== undefined;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
@@ -141,7 +141,7 @@ export function WeeklyFrequency({
             <>
               <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-semibold text-brand-green">
                 <Check className="size-3" strokeWidth={3} aria-hidden="true" />
-                {lang === "pt" ? `Plano de ${weeklyGoal} batido` : `Plan of ${weeklyGoal} reached`}
+                {lang === "pt" ? "Meta semanal atingida" : "Weekly goal reached"}
               </span>
             </>
           ) : (
@@ -462,17 +462,22 @@ export function WeeklyFrequency({
         <div className="flex w-full flex-col gap-2">
           <div className="grid grid-cols-7 place-items-center gap-1">
             {weekKeys.map((key, i) => {
-              const studied = studyDays?.has(key) ?? false;
+              const isPlanned = selectedWeekdays.includes(
+                ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!,
+              );
+              const studied = isPlanned && (studyDays?.has(key) ?? false);
               return (
                 <div key={key} className="flex flex-col items-center gap-1">
                   {studied ? (
                     <span className="grid size-6 place-items-center rounded-full bg-brand-green text-primary-foreground">
                       <Check className="size-3.5" strokeWidth={3} />
                     </span>
-                  ) : (
+                  ) : isPlanned ? (
                     <span className="size-6 rounded-full border-2 border-border" />
+                  ) : (
+                    <span className="size-6 rounded-full bg-muted-foreground/10 opacity-35" aria-hidden="true" />
                   )}
-                  <span className="text-sm text-muted-foreground">{labels[i]}</span>
+                  <span className={cn("text-sm text-muted-foreground", !isPlanned && "opacity-35")}>{labels[i]}</span>
                 </div>
               );
             })}
