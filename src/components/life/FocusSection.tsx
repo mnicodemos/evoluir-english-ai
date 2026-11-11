@@ -21,6 +21,7 @@ import { LifeSectionTitle, useLifeT } from "@/components/life/LifeNav";
 import { Button } from "@/components/ui/button";
 import { useFocusLog } from "@/hooks/useFocusLog";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
+import { useStudyWeekdays } from "@/hooks/useStudyWeekdays";
 import { useLife } from "@/hooks/useLife";
 import { useProfile } from "@/hooks/useProfile";
 import {
@@ -58,6 +59,10 @@ export function FocusSection() {
   const { t, lang } = useLifeT();
   const { data, refresh } = useLife();
   const { data: profile } = useProfile();
+  const { data: sharedStudyDays } = useStudyWeekdays(
+    profile?.id ?? "",
+    profile?.study_days_per_week ?? 3,
+  );
   const focusLog = useFocusLog();
   const markDone = useServerFn(setLifeTaskDone);
   const { state, view } = useFocusTimer();
@@ -65,7 +70,8 @@ export function FocusSection() {
 
   if (!data) return null;
 
-  const studyDays = normalizeStudyDays(profile?.study_days, profile?.study_days_per_week ?? 3);
+  const studyDays =
+    sharedStudyDays ?? normalizeStudyDays(profile?.study_days, profile?.study_days_per_week ?? 3);
   const summary = focusSummary(focusLog, data.today, studyDays);
   const openTasks = data.premium
     ? data.tasks.filter((task) => task.day === data.today && !task.doneAt)
