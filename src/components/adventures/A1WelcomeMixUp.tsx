@@ -375,6 +375,7 @@ export function A1WelcomeMixUp() {
                 scene.choices.length,
               ).map((choiceIndex) => {
                 const option = scene.choices[choiceIndex];
+                if (!option) return null;
                 return (
                   <button
                     key={option.label}
