@@ -44,6 +44,19 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
       return (data ?? []).map((row) => row.jewel_index);
     },
   });
+  const { data: totalStudyDays = 0 } = useQuery({
+    queryKey: ["jewel-study-days-total", profile?.id],
+    enabled: !!profile?.id,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("study_days")
+        .select("day")
+        .eq("user_id", profile!.id);
+      if (error) throw error;
+      return data?.length ?? 0;
+    },
+  });
   const earned = Array.isArray(earnedData) ? earnedData : [];
   const streak = profile ? effectiveStreak(profile) : 0;
   // Reaching a jewel means passing every one before it, and older accounts
@@ -141,6 +154,10 @@ export function JewelsCard({ translate }: { translate: (label: string) => string
           );
         })}
       </ol>
+      <p className="mt-2 text-center text-[11px] text-muted-foreground">
+        {pt ? "Dias válidos de estudo acumulados:" : "Total valid study days:"}{" "}
+        <span className="font-semibold tabular-nums text-foreground">{totalStudyDays}</span>
+      </p>
       {diamondLvl >= 1 ? (
         <p className="mt-3 text-center text-xs text-muted-foreground">
           <span>{translate("Every 63 more days in a row adds another Diamond cycle.")}</span>{" "}
