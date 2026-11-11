@@ -66,4 +66,4 @@ Para cada cenário, registrar:
 
 ## Fora do escopo
 
-Não alterar migrations existentes, regras de negócio, dados de alunos, histórico de joias, UI, XP, Weekly League ou sincronização entre dispositivos. Não executar backfill em produção. A implementação do harness e os testes executáveis serão feitos somente após identificar e validar o provisionamento do banco descartável.
+Não alterar migrations existentes, regras de negócio, dados de alunos, histórico de joias, UI, XP, Weekly League ou sincronização entre dispositivos. Não executar backfill em produção. O harness e os testes executáveis estão preparados na branch de validação; o encerramento desta fase depende de CI verde e revisão do diff.
