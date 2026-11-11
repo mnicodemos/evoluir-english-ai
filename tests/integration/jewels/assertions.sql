@@ -5,7 +5,10 @@ INSERT INTO public.profiles (id, streak_days) VALUES
   ('00000000-0000-0000-0000-000000000001', 0),
   ('00000000-0000-0000-0000-000000000002', 62),
   ('00000000-0000-0000-0000-000000000003', 125),
-  ('00000000-0000-0000-0000-000000000004', 125);
+  ('00000000-0000-0000-0000-000000000004', 125),
+  ('00000000-0000-0000-0000-000000000005', 0),
+  ('00000000-0000-0000-0000-000000000006', 0),
+  ('00000000-0000-0000-0000-000000000007', 0);
 
 -- Cross several thresholds in one trusted upward update.
 UPDATE public.profiles SET streak_days = 21
@@ -73,6 +76,64 @@ BEGIN
     RAISE EXCEPTION 'DIA-02 expected cycles 2,3,4, got %', cycles;
   END IF;
 END $$;
+
+
+-- Fase 5: sustained 4-, 8-, and 12-week streak checkpoints.
+-- These checkpoints exercise the existing 7-day jewel ladder without
+-- changing weekly-frequency credit or inventing study_days rows.
+UPDATE public.profiles SET streak_days = 28
+WHERE id = '00000000-0000-0000-0000-000000000005';
+UPDATE public.profiles SET streak_days = 56
+WHERE id = '00000000-0000-0000-0000-000000000006';
+UPDATE public.profiles SET streak_days = 84
+WHERE id = '00000000-0000-0000-0000-000000000007';
+
+DO $
+DECLARE
+  four_week_count integer;
+  eight_week_count integer;
+  twelve_week_count integer;
+BEGIN
+  SELECT count(*) INTO four_week_count FROM public.permanent_jewel_awards
+  WHERE user_id = '00000000-0000-0000-0000-000000000005';
+  SELECT count(*) INTO eight_week_count FROM public.permanent_jewel_awards
+  WHERE user_id = '00000000-0000-0000-0000-000000000006';
+  SELECT count(*) INTO twelve_week_count FROM public.permanent_jewel_awards
+  WHERE user_id = '00000000-0000-0000-0000-000000000007';
+
+  IF four_week_count <> 5 THEN
+    RAISE EXCEPTION 'F5-04 expected 5 jewels at 4 weeks (28 days), got %', four_week_count;
+  END IF;
+  IF eight_week_count <> 9 THEN
+    RAISE EXCEPTION 'F5-08 expected 9 jewels at 8 weeks (56 days), got %', eight_week_count;
+  END IF;
+  IF twelve_week_count <> 10 THEN
+    RAISE EXCEPTION 'F5-12 expected all 10 jewels at 12 weeks (84 days), got %', twelve_week_count;
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM public.diamond_cycles
+      WHERE user_id IN (
+        '00000000-0000-0000-0000-000000000005',
+        '00000000-0000-0000-0000-000000000006',
+        '00000000-0000-0000-0000-000000000007'
+      )) THEN
+    RAISE EXCEPTION 'F5-DIA: a Diamond repeat cycle was granted before day 126';
+  END IF;
+END $;
+
+-- Replays and resets at the long-cycle checkpoints must preserve, not duplicate,
+-- the permanent awards already earned.
+UPDATE public.profiles SET streak_days = 84
+WHERE id = '00000000-0000-0000-0000-000000000007';
+UPDATE public.profiles SET streak_days = 0
+WHERE id = '00000000-0000-0000-0000-000000000007';
+DO $
+BEGIN
+  IF (SELECT count(*) FROM public.permanent_jewel_awards
+      WHERE user_id = '00000000-0000-0000-0000-000000000007') <> 10 THEN
+    RAISE EXCEPTION 'F5-PERM: 12-week jewels were removed or duplicated after reset';
+  END IF;
+END $;
 
 -- A failed transaction must roll back both the streak update and trigger awards.
 BEGIN;
