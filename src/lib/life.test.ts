@@ -188,11 +188,7 @@ describe("focus", () => {
       "2026-10-17",
       ["Monday", "Wednesday", "Friday"],
     );
-    expect(summary.week.map((row) => row.day)).toEqual([
-      "2026-10-12",
-      "2026-10-14",
-      "2026-10-16",
-    ]);
+    expect(summary.week.map((row) => row.day)).toEqual(["2026-10-12", "2026-10-14", "2026-10-16"]);
     expect(summary.weekMinutes).toBe(70);
     expect(summary.todayCount).toBe(0);
     expect(summary.todayMinutes).toBe(0);
