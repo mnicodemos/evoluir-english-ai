@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { findLevel } from "@/lib/level";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import {
+  normalizeStudyDays,
   planReasonText,
   STUDY_WEEKDAYS,
   STUDY_PLAN_FOCUS_AREAS,
@@ -116,6 +117,15 @@ function StudyPlanPage() {
           study_days: studyDays,
           study_focus: focus,
         });
+      }
+
+      // Publish the same normalized weekday value consumed by the calendar
+      // and weekly rhythm before invalidating their server-backed queries.
+      if (profile) {
+        queryClient.setQueryData(
+          ["study-weekdays", profile.id],
+          normalizeStudyDays(studyDays, daysPerWeek),
+        );
       }
 
       // Refresh active page queries that derive their output from the study plan.
