@@ -2757,6 +2757,7 @@ const baseUiPt: Record<string, string> = {
   Beat: "Supere",
   "Remember, check and say your words: ten new ones with every new lesson.":
     "Lembre, confira e fale suas palavras: dez novas a cada nova lição.",
+  "studied outside planned days": "estudados fora dos dias planejados",
   "Completed sessions": "Sessões concluídas",
   "Completion rate": "Taxa de conclusão",
   "Partial sessions": "Sessões parciais",
