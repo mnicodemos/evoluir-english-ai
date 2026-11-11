@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   BookOpenCheck,
   CheckCircle2,
@@ -11,11 +12,11 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { usePersistentState } from "@/hooks/usePersistentState";
-import { supabase } from "@/integrations/supabase/client";
 import { findLevel } from "@/lib/level";
 import { cleanVimeoPlayerUrl, vimeoEmbedUrl } from "@/lib/lessonVideoDisplay";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { getLevelIntroVideo } from "@/lib/dailyReading.functions";
 
 /** What the level holds, beside the video (the same facts as the path and the guide). */
 const LEVEL_FACTS = [
@@ -54,19 +55,13 @@ export function LevelIntroVideo({
   started?: boolean;
 }) {
   const { lang } = useUiLang();
+  const fetchIntroVideo = useServerFn(getLevelIntroVideo);
   const t = (text: string) => (lang === "pt" ? (uiPt[text] ?? text) : text);
   const { data: url } = useQuery({
     queryKey: ["level-intro-video", level],
     staleTime: 10 * 60 * 1000,
     retry: false,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("level_intro_videos")
-        .select("video_url")
-        .eq("level", level)
-        .maybeSingle();
-      return error ? null : (data?.video_url ?? null);
-    },
+    queryFn: () => fetchIntroVideo({ data: { level: level as "a1" | "a2" | "b1" | "b2" | "c1" | "c2" | "business" } }),
   });
   const [seen, setSeen] = usePersistentState<boolean>(
     `evoluir-level-intro-seen:${userId ?? "guest"}:${level}`,

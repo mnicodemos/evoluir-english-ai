@@ -125,6 +125,36 @@ async function readStored(day: string, level: ReadingLevel, choice: ReadingChoic
 }
 
 /**
+ * Public-facing level intro video lookup. Reads only the authenticated student's
+ * requested level; the underlying table is intentionally inaccessible to clients.
+ */
+export const getLevelIntroVideo = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ level: z.enum(["a1", "a2", "b1", "b2", "c1", "c2", "business"]) }).strict().parse(input),
+  )
+  .handler(async ({ data, context }): Promise<string | null> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Students can retrieve only their own CEFR level. Business English is a
+    // shared public learning path, so its single intro video is also available.
+    if (data.level !== "business") {
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .select("level")
+        .eq("id", context.userId)
+        .maybeSingle();
+      if (profileError || readingLevel(profile?.level) !== data.level) return null;
+    }
+    const { data: row, error } = await supabaseAdmin
+      .from("level_intro_videos")
+      .select("video_url")
+      .eq("level", data.level)
+      .maybeSingle();
+    if (error) return null;
+    return row?.video_url ?? null;
+  });
+
+/**
  * Today's reading for the student's level. The first student of a level on a
  * given day has it written by the AI and stored for everyone of that level;
  * the others read the stored copy with no AI call. When the AI fails, a fixed
