@@ -11,6 +11,7 @@ import { STUDY_TIME_ZONE } from "@/lib/today";
 import { normalizeStudyDays } from "@/lib/studyPlan";
 import { useUiLang } from "@/lib/uiLang";
 import { useStudyWeekdays } from "@/hooks/useStudyWeekdays";
+import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
