@@ -61,7 +61,12 @@ export function LevelIntroVideo({
     queryKey: ["level-intro-video", level],
     staleTime: 10 * 60 * 1000,
     retry: false,
-    queryFn: () => fetchIntroVideo({ data: { level: level as "a1" | "a2" | "b1" | "b2" | "c1" | "c2" | "business" } }),
+    queryFn: () =>
+      fetchIntroVideo({
+        data: {
+          level: level as "a1" | "a2" | "b1" | "b2" | "c1" | "c2" | "business",
+        },
+      }),
   });
   const [seen, setSeen] = usePersistentState<boolean>(
     `evoluir-level-intro-seen:${userId ?? "guest"}:${level}`,

@@ -224,7 +224,6 @@ describe("Model A weekly frequency credit", () => {
     });
   });
 
-
   it.each([
     [1, 0, 0, false],
     [1, 1, 100, true],
@@ -239,8 +238,9 @@ describe("Model A weekly frequency credit", () => {
   ])(
     "applies the Model A cap for a weekly target of %i days with %i qualified dates",
     (goal, count, percent, reached) => {
-      const dates = Array.from({ length: count }, (_, index) =>
-        `2026-11-${String(index + 1).padStart(2, "0")}`,
+      const dates = Array.from(
+        { length: count },
+        (_, index) => `2026-11-${String(index + 1).padStart(2, "0")}`,
       );
       const result = weeklyFrequencyProgress(new Set(dates), goal);
       expect(result.validStudyDays).toBe(count);

@@ -62,7 +62,6 @@ import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import { useHomeImages } from "@/hooks/useHomeImages";
 
 import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
-
 import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
@@ -390,6 +389,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   const challengeProgress = challengeGoal
     ? ` · ${challengeGoal.done}/${challengeGoal.target} ${t(challengeGoal.unit)}`
     : "";
+  // AI Teacher time is a progress goal, not a Weekly League XP event.
+  // Explain this beside the goal so students do not expect XP for minutes alone.
+  const challengeRewardNote =
+    data.quest?.resource.to.split("?")[0] === "/teacher"
+      ? t("Minutes track progress; time alone earns no XP.")
+      : "";
   // Extra practice earns the weekly league's XP (user request): each option
   // shows what its activity is worth.
   const xpChip = (destination: string) => {
@@ -483,9 +488,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
-              <span className="hidden w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:block sm:font-normal">
+              <span className="w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:font-normal">
                 {questDetail}
                 {challengeProgress}
+                {challengeRewardNote ? (
+                  <span className="block whitespace-normal">{challengeRewardNote}</span>
+                ) : null}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,
@@ -502,9 +510,12 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="flex items-center gap-1.5 text-[11.5px] font-bold leading-none max-sm:text-[11px] min-[380px]:max-sm:text-xs max-sm:font-medium sm:text-[13px]">
                 {challengeIcon} {t("Take the challenge")} {xpChip(data.quest.resource.to)}
               </span>
-              <span className="hidden w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:block sm:font-normal">
+              <span className="w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:font-normal">
                 {questDetail}
                 {challengeProgress}
+                {challengeRewardNote ? (
+                  <span className="block whitespace-normal">{challengeRewardNote}</span>
+                ) : null}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,
