@@ -107,18 +107,16 @@ function StudyPlanPage() {
       // Publish the saved preferences immediately to every useProfile() consumer.
       // Invalidating only ["profile"] leaves derived, page-specific queries stale
       // until the student navigates away or reloads the page.
-      queryClient.setQueryData(["profile"], (current: typeof profile) =>
-        current
-          ? {
-              ...current,
-              goal,
-              daily_minutes: minutes,
-              study_days_per_week: daysPerWeek,
-              study_days: studyDays,
-              study_focus: focus,
-            }
-          : current,
-      );
+      if (profile) {
+        queryClient.setQueryData(["profile"], {
+          ...profile,
+          goal,
+          daily_minutes: minutes,
+          study_days_per_week: daysPerWeek,
+          study_days: studyDays,
+          study_focus: focus,
+        });
+      }
 
       // Refresh active page queries that derive their output from the study plan.
       await queryClient.invalidateQueries();
