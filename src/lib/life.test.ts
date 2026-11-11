@@ -177,6 +177,27 @@ describe("focus", () => {
     expect(summary.weekMinutes).toBe(82);
   });
 
+  it("shows only the selected My Study Plan days in Monday-first order", () => {
+    const summary = focusSummary(
+      [
+        { day: "2026-10-12", minutes: 25 },
+        { day: "2026-10-13", minutes: 40 },
+        { day: "2026-10-14", minutes: 30 },
+        { day: "2026-10-16", minutes: 15 },
+      ],
+      "2026-10-17",
+      ["Monday", "Wednesday", "Friday"],
+    );
+    expect(summary.week.map((row) => row.day)).toEqual([
+      "2026-10-12",
+      "2026-10-14",
+      "2026-10-16",
+    ]);
+    expect(summary.weekMinutes).toBe(70);
+    expect(summary.todayCount).toBe(0);
+    expect(summary.todayMinutes).toBe(0);
+  });
+
   it("shows the countdown as mm:ss", () => {
     expect(focusClock(25 * 60_000)).toBe("25:00");
     expect(focusClock(61_001)).toBe("01:02");
