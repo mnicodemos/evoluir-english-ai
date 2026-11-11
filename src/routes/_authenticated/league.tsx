@@ -384,7 +384,7 @@ function WeeklyXpBreakdown() {
           align="end"
           sideOffset={8}
           className={cn(
-            "max-h-[calc(40dvh-24px)] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:p-5",
+            "max-h-[calc(38.8dvh-24px)] w-[min(36rem,calc(100vw-1.5rem))] overflow-y-auto p-4 sm:max-h-[calc(40dvh-24px)] sm:p-5",
             graphitePanelClass,
           )}
         >
