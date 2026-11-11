@@ -38,5 +38,4 @@ ALTER TABLE public.profiles
   CHECK (
     cardinality(study_days) BETWEEN 1 AND 7
     AND study_days <@ ARRAY['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']::text[]
-    AND cardinality(study_days) = cardinality(ARRAY(SELECT DISTINCT unnest(study_days)))
   );
