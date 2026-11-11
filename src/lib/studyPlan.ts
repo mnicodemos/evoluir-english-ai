@@ -28,7 +28,7 @@ export const STUDY_PLAN_FOCUS_AREAS = [
 
 export type StudyFocus = (typeof STUDY_PLAN_FOCUS_AREAS)[number]["value"];
 
-const WEEK_DAYS = [
+export const STUDY_WEEKDAYS = [
   "Monday",
   "Tuesday",
   "Wednesday",
@@ -36,7 +36,8 @@ const WEEK_DAYS = [
   "Friday",
   "Saturday",
   "Sunday",
-] as const;
+ ] as const;
+const WEEK_DAYS = STUDY_WEEKDAYS;
 
 /** Backward-compatible weekday defaults for students with an older saved plan. */
 export const DEFAULT_STUDY_DAYS: Record<number, readonly string[]> = {
