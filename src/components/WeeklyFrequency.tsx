@@ -344,11 +344,11 @@ export function WeeklyFrequency({
               {studiedCount}{" "}
               {lang === "pt"
                 ? studiedCount === 1
-                  ? "dia ativo esta semana"
-                  : "dias ativos esta semana"
+                  ? "dia esta semana"
+                  : "dias esta semana"
                 : studiedCount === 1
-                  ? "day active this week"
-                  : "days active this week"}
+                  ? "day this week"
+                  : "days this week"}
             </p>
             {totalStudyDays != null && (
               <p className="mt-0.5 flex items-start gap-1 text-[11px] leading-tight text-muted-foreground">
