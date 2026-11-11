@@ -266,8 +266,15 @@ export function normalizeStudyDays(
 ): string[] {
   const selected = Array.isArray(studyDays)
     ? WEEK_DAYS.filter((day) => studyDays.includes(day))
-    : [...(DEFAULT_STUDY_DAYS[daysPerWeek] ?? DEFAULT_STUDY_DAYS[3]!)];
-  return selected.length ? selected : [...DEFAULT_STUDY_DAYS[3]!];
+    : [];
+
+  // The legacy frequency is still stored for compatibility. If it says seven
+  // days while the weekday array contains an older default (for example Mon/Wed/Fri),
+  // the explicit 7-day frequency must win instead of silently hiding four days.
+  if (daysPerWeek === 7 && selected.length !== 7) return [...WEEK_DAYS];
+
+  if (selected.length) return selected;
+  return [...(DEFAULT_STUDY_DAYS[daysPerWeek] ?? DEFAULT_STUDY_DAYS[3]!)];
 }
 
 export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
