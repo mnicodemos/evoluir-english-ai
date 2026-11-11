@@ -206,16 +206,35 @@ function RootComponent() {
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
           ({ new: updatedProfile }) => {
+            const previous = queryClient.getQueryData<Record<string, unknown>>(["profile"]);
+            const preferenceFields = [
+              "goal",
+              "daily_minutes",
+              "study_days_per_week",
+              "study_days",
+              "study_focus",
+              "level",
+            ] as const;
+            const preferencesChanged =
+              !previous ||
+              preferenceFields.some(
+                (field) =>
+                  JSON.stringify(previous[field]) !== JSON.stringify(updatedProfile[field]),
+              );
+
             queryClient.setQueryData(["profile"], (current: unknown) =>
               current && typeof current === "object"
                 ? { ...current, ...updatedProfile }
                 : updatedProfile,
             );
-            // Refresh active route data derived from profile preferences. The
-            // profile itself is updated from the realtime payload above.
-            void queryClient.invalidateQueries({
-              predicate: (query) => query.queryKey[0] !== "profile",
-            });
+
+            // Only preference changes affect the study-plan consumers. Avoid
+            // refetching unrelated route data for routine profile updates.
+            if (preferencesChanged) {
+              void queryClient.invalidateQueries({
+                predicate: (query) => query.queryKey[0] !== "profile",
+              });
+            }
           },
         )
         .subscribe();
