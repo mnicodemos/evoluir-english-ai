@@ -103,6 +103,7 @@ export function pronunciationQuickWinDone(activities: ChallengeActivityRow[]): b
 /** League XP the destination's activity earns, as a short English label. */
 export function practiceXpLabel(destination: string): string | null {
   const path = destination.split("?")[0]!;
+  if (path === "/teacher") return "0 XP";
   if (path === "/learning/$lessonId") return "+50 XP";
   if (
     path === "/writing" ||
