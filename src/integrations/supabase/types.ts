@@ -1938,6 +1938,7 @@ export type Database = {
           plan_started_at?: string | null
           streak_days?: number
           streak_freeze_used_on?: string | null
+          study_days?: string[]
           study_days_per_week?: number | null
           study_focus?: string | null
           updated_at?: string
