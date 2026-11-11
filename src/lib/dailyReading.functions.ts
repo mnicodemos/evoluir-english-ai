@@ -20,6 +20,7 @@ import {
   readingLevel,
   readingThemeForDay,
   readingWeekDays,
+  readingPlanDays,
   todaysPickForDay,
   type DailyReadingContent,
   type ReadingChoice,
@@ -205,20 +206,20 @@ export const loadReadingWeek = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ReadingWeekDay[]> => {
     const today = studyToday();
-    const days = readingWeekDays(today);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: profile }, { data: rows }] = await Promise.all([
-      supabaseAdmin.from("profiles").select("level").eq("id", context.userId).maybeSingle(),
+      supabaseAdmin.from("profiles").select("level, study_days").eq("id", context.userId).maybeSingle(),
       supabaseAdmin
         .from("activities")
         .select("score, result, created_at")
         .eq("user_id", context.userId)
         .eq("activity_type", "daily_reading")
-        .gte("created_at", dayStartIso(days[0]!))
+        .gte("created_at", dayStartIso(readingWeekDays(today)[0]!))
         .order("created_at", { ascending: true })
         .limit(20),
     ]);
     const level = readingLevel(profile?.level);
+    const days = readingPlanDays(today, profile?.study_days as string[] | null);
     const byDay = new Map<string, { score: number | null; choice: ReadingChoice | null }>();
     for (const row of rows ?? []) {
       const result = (row.result ?? {}) as { day?: unknown; choice?: unknown };
