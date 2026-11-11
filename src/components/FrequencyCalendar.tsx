@@ -4,7 +4,6 @@ import { useStudyWeekdays } from "@/hooks/useStudyWeekdays";
 
 import { Button } from "@/components/ui/button";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
-import { normalizeStudyDays } from "@/lib/studyPlan";
 import { STUDY_TIME_ZONE } from "@/lib/today";
 import { useUiLang } from "@/lib/uiLang";
 
