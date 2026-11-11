@@ -320,4 +320,27 @@ export const appGuidePt: Record<string, string> = {
     "Ouça cada palavra e toque no microfone para falá-la em voz alta.",
   "Ten reviewed words complete a study day; your lesson cards due show right under them, and the translator sits at the top.":
     "Dez palavras revisadas completam um dia de estudo; os cartões das lições a revisar aparecem logo abaixo, e o tradutor fica no topo.",
+
+  "Your weekly frequency is the number of distinct valid study days divided by your weekly target, capped at 100%. Extra study days remain in your history but do not increase the percentage.":
+    "Sua frequência semanal é o número de dias de estudo válidos e distintos dividido pela meta semanal, limitada a 100%. Dias extras continuam no histórico, mas não aumentam o percentual.",
+  "The frequency week runs from Monday to Sunday, in Brasília time. Your streak is a separate measure: it counts consecutive credited study days.":
+    "A semana da frequência vai de segunda a domingo, no horário de Brasília. Sua sequência (streak) é uma medida separada: conta os dias de estudo válidos consecutivos.",
+  "The app credits a study day only once per calendar day, using America/Sao_Paulo time. More activities on the same day do not create extra study days.":
+    "O app contabiliza no máximo um dia de estudo por data, usando o fuso America/Sao_Paulo. Fazer mais atividades no mesmo dia não cria dias de estudo adicionais.",
+  "A study day is based on a completed qualifying activity, not on minutes alone. Minutes can still contribute to the daily time goal.":
+    "O dia de estudo depende da conclusão de uma atividade válida, não apenas dos minutos. Os minutos ainda podem contribuir para a meta diária de tempo.",
+  "Jewels mark streak milestones. Once earned, they remain yours permanently, even if your streak later resets.":
+    "As joias marcam etapas da sequência de estudos. Depois de conquistadas, continuam sendo suas permanentemente, mesmo que sua sequência seja reiniciada.",
+  "The milestones are 1, 7, 14, 21, 28, 35, 42, 49, 56 and 63 credited study days: Bronze first, then the next jewel at each milestone, up to Diamond.":
+    "As etapas são 1, 7, 14, 21, 28, 35, 42, 49, 56 e 63 dias de estudo contabilizados: primeiro Bronze e depois uma nova joia em cada etapa, até o Diamante.",
+  "After Diamond, each additional 63-day cycle grants another Diamond at 126, 189, 252 days and so on.":
+    "Depois do Diamante, cada novo ciclo de 63 dias concede outro Diamante aos 126, 189, 252 dias e assim por diante.",
+  "Freeze can protect at most one missed day in each Monday–Sunday week (Brasília time). It protects your streak but does not create a study-day record.":
+    "O Freeze pode proteger no máximo um dia perdido em cada semana, de segunda a domingo (horário de Brasília). Ele protege sua sequência, mas não cria um registro de dia de estudo.",
+  "A jewel you earn is permanent; resetting or rebuilding a streak never removes or duplicates an award.":
+    "A joia conquistada é permanente; reiniciar ou reconstruir uma sequência nunca remove nem duplica uma conquista.",
+  "Earn XP through eligible learning activities; minutes alone and a study day do not grant an XP bonus.":
+    "Ganhe XP por meio de atividades de aprendizagem elegíveis; apenas os minutos e o dia de estudo não concedem bônus de XP.",
+  "Weekly League XP, study frequency, streaks, Freeze and permanent jewels are separate systems. XP does not grant jewels, and jewels do not multiply XP.":
+    "O XP da Liga Semanal, a frequência de estudo, as sequências, o Freeze e as joias permanentes são sistemas separados. XP não concede joias, e joias não multiplicam o XP.",
 };
