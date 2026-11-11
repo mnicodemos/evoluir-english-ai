@@ -56,7 +56,10 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
   const level = profile?.level ?? null;
   const goal = profile?.goal ?? "conversation";
   const dailyMinutes = profile?.daily_minutes ?? 30;
-  const studyDays = normalizeStudyDays(profile?.study_days as string[] | null, profile?.study_days_per_week ?? 3);
+  const studyDays = normalizeStudyDays(
+    profile?.study_days as string[] | null,
+    profile?.study_days_per_week ?? 3,
+  );
   const daysPerWeek = studyDays.length;
   const focus = (profile?.study_focus ?? "balanced") as StudyFocus;
 
