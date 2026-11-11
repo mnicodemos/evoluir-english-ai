@@ -417,10 +417,11 @@ export function focusBreakMinutes(preset: FocusPresetId, blocksInRun: number): n
   return blocksInRun > 0 && blocksInRun % FOCUS_LONG_BREAK_EVERY === 0 ? longBreak : shortBreak;
 }
 
-/** Today's blocks and minutes, and the last seven days (oldest first) for the week strip. */
+/** Today's blocks and minutes, and the current Monday-to-Sunday week for the week strip. */
 export function focusSummary(sessions: FocusSessionLog[], today: string) {
+  const monday = weekStart(today);
   const week = Array.from({ length: 7 }, (_, index) => {
-    const day = addDays(today, index - 6);
+    const day = addDays(monday, index);
     const ofDay = sessions.filter((session) => session.day === day);
     return {
       day,
@@ -428,7 +429,7 @@ export function focusSummary(sessions: FocusSessionLog[], today: string) {
       minutes: ofDay.reduce((sum, session) => sum + session.minutes, 0),
     };
   });
-  const todayRow = week[6]!;
+  const todayRow = week.find((row) => row.day === today)!;
   const completedCount = sessions.filter((session) => !session.partial).length;
   const partialCount = sessions.filter((session) => session.partial).length;
   const totalCount = completedCount + partialCount;
