@@ -111,7 +111,15 @@ export function FrequencyCalendar({ userId }: Props) {
           const studied = studyDays?.has(key);
           const isToday = key === todayKey;
           const weekday = new Date(`${key}T12:00:00Z`).getUTCDay();
-          const weekdayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][weekday]!;
+          const weekdayName = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ][weekday]!;
           const isPlanned = plannedDays?.includes(weekdayName) ?? false;
           return (
             <span
