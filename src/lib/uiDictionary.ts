@@ -847,8 +847,6 @@ const baseUiPt: Record<string, string> = {
   "Practice this step in English": "Praticar este passo em inglês",
   "Quick practice": "Prática rápida",
   "Take the challenge": "Aceitar o desafio",
-  "Minutes track progress; time alone earns no XP.":
-    "Os minutos contam para o progresso; o tempo, por si só, não gera XP.",
   "Your trail": "Sua trilha",
   "Do a first activity so we can measure this skill":
     "Faça uma primeira atividade para medirmos esta habilidade",
