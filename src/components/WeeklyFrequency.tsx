@@ -473,7 +473,10 @@ export function WeeklyFrequency({
                   ) : isPlanned ? (
                     <span className="size-6 rounded-full border-2 border-border" />
                   ) : (
-                    <span className="size-6 rounded-full bg-muted-foreground/10 opacity-35" aria-hidden="true" />
+                    <span
+                    className="size-6 rounded-full bg-muted-foreground/10 opacity-35"
+                    aria-hidden="true"
+                  />
                   )}
                   <span
                     className={cn("text-sm text-muted-foreground", !isPlanned && "opacity-35")}
