@@ -1,7 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useStudyWeekdays } from "@/hooks/useStudyWeekdays";
 
 import { Button } from "@/components/ui/button";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
@@ -23,23 +22,7 @@ const WEEKDAYS_PT = ["S", "T", "Q", "Q", "S", "S", "D"];
 export function FrequencyCalendar({ userId }: Props) {
   const { lang } = useUiLang();
   const todayKey = dayFmt.format(new Date());
-  const { data: plannedDays } = useQuery({
-    queryKey: ["study-weekdays", userId],
-    enabled: !!userId,
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("study_days, study_days_per_week")
-        .eq("id", userId)
-        .maybeSingle();
-      if (error) throw error;
-      return normalizeStudyDays(
-        data?.study_days as string[] | null,
-        data?.study_days_per_week ?? 3,
-      );
-    },
-  });
+  const { data: plannedDays = [] } = useStudyWeekdays(userId);
   const [monthOffset, setMonthOffset] = useState(0);
 
   const baseYear = Number(todayKey.slice(0, 4));
