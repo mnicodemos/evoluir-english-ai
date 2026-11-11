@@ -99,7 +99,13 @@ export function WeeklyFrequency({
     queryKey: `week:${weekKeys[0]}`,
   });
 
-  const plannedWeekKeys = new Set(weekKeys.filter((_, index) => selectedWeekdays.includes(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][index]!)));
+  const plannedWeekKeys = new Set(
+    weekKeys.filter((_, index) =>
+      selectedWeekdays.includes(
+        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][index]!,
+      ),
+    ),
+  );
   const allStudied = [...plannedWeekKeys].every((key) => studyDays?.has(key));
   // Only the desktop panel, the one on screen there, celebrates the week's plan
   // (user request), so the hidden phone strip never fires it a second time.
@@ -178,7 +184,11 @@ export function WeeklyFrequency({
           )}
         </p>
         {weekKeys.map((key, i) => {
-          const studied = selectedWeekdays.includes(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!) && (studyDays?.has(key) ?? false);
+          const studied =
+            selectedWeekdays.includes(
+              ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!,
+            ) &&
+            (studyDays?.has(key) ?? false);
           const isToday = key === todayKey;
           return (
             <div
