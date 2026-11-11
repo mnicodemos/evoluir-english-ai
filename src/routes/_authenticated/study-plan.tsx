@@ -25,7 +25,7 @@ import { findLevel } from "@/lib/level";
 import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import {
   planReasonText,
-  STUDY_PLAN_DAYS_PER_WEEK,
+  STUDY_WEEKDAYS,
   STUDY_PLAN_FOCUS_AREAS,
   STUDY_PLAN_GOALS,
   STUDY_PLAN_MINUTES,
@@ -76,14 +76,15 @@ function StudyPlanPage() {
 
   const [goal, setGoal] = useState("conversation");
   const [minutes, setMinutes] = useState(30);
-  const [daysPerWeek, setDaysPerWeek] = useState(3);
+  const [studyDays, setStudyDays] = useState<string[]>(["Monday", "Wednesday", "Friday"]);
+  const daysPerWeek = studyDays.length;
   const [focus, setFocus] = useState<StudyFocus>("balanced");
 
   useEffect(() => {
     if (!data) return;
     setGoal(data.preferences.goal);
     setMinutes(data.preferences.dailyMinutes);
-    setDaysPerWeek(data.preferences.daysPerWeek);
+    setStudyDays(data.preferences.studyDays);
     setFocus(data.preferences.focus);
   }, [data]);
 
@@ -96,6 +97,7 @@ function StudyPlanPage() {
           goal,
           daily_minutes: minutes,
           study_days_per_week: daysPerWeek,
+          study_days: studyDays,
           study_focus: focus,
         })
         .eq("id", profile.id);
@@ -242,15 +244,35 @@ function StudyPlanPage() {
                       value={String(minutes)}
                       onChange={(v) => setMinutes(Number(v))}
                     />
-                    <Choice
-                      label="Days per week"
-                      options={STUDY_PLAN_DAYS_PER_WEEK.map((d) => ({
-                        value: String(d),
-                        label: `${d} days`,
-                      }))}
-                      value={String(daysPerWeek)}
-                      onChange={(v) => setDaysPerWeek(Number(v))}
-                    />
+                    <div className="grid gap-1 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:items-start sm:gap-2">
+                      <p className="pt-1 text-[11px] font-medium sm:text-sm">Study days</p>
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-4 gap-1 sm:grid-cols-7 sm:gap-2">
+                          {STUDY_WEEKDAYS.map((day, index) => {
+                            const selected = studyDays.includes(day);
+                            const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+                            return (
+                              <button
+                                key={day}
+                                type="button"
+                                aria-pressed={selected}
+                                onClick={() =>
+                                  setStudyDays((current) =>
+                                    selected ? current.filter((item) => item !== day) : [...current, day],
+                                  )
+                                }
+                                className={`h-8 rounded-lg border px-2 text-xs font-medium transition-colors sm:h-9 ${selected ? "border-transparent bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+                              >
+                                {labels[index]}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          {daysPerWeek} {daysPerWeek === 1 ? "day selected" : "days selected"} per week. Choose from 1 to 7 days.
+                        </p>
+                      </div>
+                    </div>
                     {/* The rule is told where the plan is chosen (user request): the plan
                         sets the weekly rhythm, jewels need more days in a row. */}
                     <p className="text-[11px] leading-snug text-muted-foreground sm:pl-[8rem] sm:text-xs">
@@ -268,7 +290,7 @@ function StudyPlanPage() {
                     />
                     <Button
                       className="h-9 w-full sm:w-auto"
-                      disabled={save.isPending || isFetching}
+                      disabled={save.isPending || isFetching || studyDays.length === 0}
                       onClick={() => save.mutate()}
                     >
                       {save.isPending && <Loader2 className="size-4 animate-spin" />}
