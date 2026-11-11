@@ -279,6 +279,7 @@ export function A2SurpriseDelivery() {
             <div className="grid gap-2">
               {getStableAdventureChoiceOrder("a2-surprise-delivery", index, scene.choices.length).map((choiceIndex) => {
                 const option = scene.choices[choiceIndex];
+                if (!option) return null;
                 return (
                   <button
                     key={option.label}
