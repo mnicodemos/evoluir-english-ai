@@ -42,6 +42,7 @@ export type Profile = {
   plan_started_at: string | null;
   plan_expires_at: string | null;
   study_days_per_week: number | null;
+  study_days?: string[];
   study_focus: string | null;
 };
 
