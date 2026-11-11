@@ -2,14 +2,13 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { todayStudyMetrics } from "@/lib/studyDay";
+import { studyDayStartIso } from "@/lib/today";
 
 /** Daily evidence only; the AI's cumulative study snapshot remains independent. */
 export function useTodayStudyMetrics(userId?: string) {
   const queryClient = useQueryClient();
-  const dayStart = new Date();
-  dayStart.setHours(0, 0, 0, 0);
-  const start = dayStart.toISOString();
-  const end = new Date(dayStart.getTime() + 86_400_000).toISOString();
+  const start = studyDayStartIso();
+  const end = new Date(new Date(start).getTime() + 86_400_000).toISOString();
 
   useEffect(() => {
     if (!userId) return;
