@@ -15,6 +15,7 @@ import {
   readingSpeechChunks,
   readingSpeechParts,
   readingWeekDays,
+  readingPlanDays,
   readingThemeForDay,
   readingKindLabel,
   readingEstimate,
