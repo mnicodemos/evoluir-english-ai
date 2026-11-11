@@ -166,7 +166,7 @@
     {
       "idx": 23,
       "version": "7",
-      "when": 1789761052960,
+      "when": 1789761052963,
       "tag": "0023_phase11_content_enrichment",
       "breakpoints": true
     },
@@ -313,7 +313,7 @@
     {
       "idx": 44,
       "version": "7",
-      "when": 1791309064735,
+      "when": 1791222601327,
       "tag": "0044_league_by_max_level",
       "breakpoints": true
     },
@@ -362,7 +362,7 @@
     {
       "idx": 51,
       "version": "7",
-      "when": 1791457424074,
+      "when": 1791457424077,
       "tag": "0051_0051_plus_goals",
       "breakpoints": true
     },
@@ -616,6 +616,20 @@
       "version": "7",
       "when": 1794402397507,
       "tag": "0116_repair_bronze_jewel_awards",
+      "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1794430000000,
+      "tag": "0117_restrict_shared_content_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1794431000000,
+      "tag": "0118_restrict_profile_streak_trigger_execute",
       "breakpoints": true
     }
   ]
