@@ -36,8 +36,10 @@ export function WeeklyFrequency({
   compact = false,
   presentation = "default",
 }: Props) {
-  const { data: selectedWeekdays = normalizeStudyDays(null, daysPerWeek) } =
-    useStudyWeekdays(userId, daysPerWeek);
+  const { data: selectedWeekdays = normalizeStudyDays(null, daysPerWeek) } = useStudyWeekdays(
+    userId,
+    daysPerWeek,
+  );
   const weeklyGoal = selectedWeekdays.length;
   const { lang } = useUiLang();
   const labels = lang === "pt" ? LABELS_PT : LABELS_EN;
