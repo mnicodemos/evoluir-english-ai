@@ -1,6 +1,6 @@
 # Weekly Frequency — Model A
 
-Status: implementation candidate on a feature branch; no production data or schema changes.
+Status: Model A implementation merged; this document records the approved rule and validation contract. No production data or schema changes are part of the test-only follow-up.
 
 ## Approved product rule
 
@@ -27,4 +27,4 @@ No changes to streak calculation, weekly freeze, permanent jewel awards, Diamond
 
 ## Validation
 
-Pure-function tests cover partial progress, off-plan qualified dates, target cap with retained excess count, and zero/negative targets. Repository CI must pass before merge.
+Pure-function tests cover weekly targets of 1, 2, 3, 5 and 7 days; partial progress; off-plan qualified dates; excess dates capped without losing the full valid-day count; deduplication by calendar date; and zero/negative targets. The component derives week boundaries and labels using the America/Sao_Paulo study time zone and a Monday–Sunday week. Repository CI must pass before merge.
