@@ -66,8 +66,21 @@ describe("custom study weekdays", () => {
     expect(normalizeStudyDays(null, 2)).toEqual(["Tuesday", "Thursday"]);
     expect(normalizeStudyDays(null, 3)).toEqual(["Monday", "Wednesday", "Friday"]);
     expect(normalizeStudyDays(null, 4)).toEqual(["Monday", "Tuesday", "Thursday", "Friday"]);
-    expect(normalizeStudyDays(null, 5)).toEqual(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]);
-    expect(normalizeStudyDays(null, 6)).toEqual(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]);
+    expect(normalizeStudyDays(null, 5)).toEqual([
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+    ]);
+    expect(normalizeStudyDays(null, 6)).toEqual([
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ]);
     expect(normalizeStudyDays(null, 7)).toHaveLength(7);
     expect(normalizeStudyDays([], 4)).toEqual(["Monday", "Tuesday", "Thursday", "Friday"]);
   });
