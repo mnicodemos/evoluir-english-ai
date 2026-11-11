@@ -11,9 +11,10 @@ export function getStableAdventureChoiceOrder(
     return Array.from({ length: Math.max(0, choiceCount) }, (_, index) => index);
   }
 
-  const adventureOffset =
-    Array.from(adventureId).reduce((total, character) => total + character.charCodeAt(0), 0) %
-    choiceCount;
+  const adventureOffset = Array.from(adventureId).reduce(
+    (total, character) => total + character.charCodeAt(0),
+    0,
+  ) % choiceCount;
   const rotation =
     (((stepIndex + adventureOffset) % choiceCount) + choiceCount) % choiceCount;
 
