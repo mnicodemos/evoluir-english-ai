@@ -82,8 +82,8 @@ export type PlanLesson = {
 };
 
 /**
- * Existing skill evidence, read as-is from the current skill profile. Nothing
- * is recomputed here: no CEFR change, no new score, no new evidence.
+ * Existing skill evidence, read as-is from the current skill profile. Nothing is
+ * recomputed here: no CEFR change, no new score, no new evidence.
  */
 export type PlanSkillNeed = {
   skill: string;
@@ -168,7 +168,6 @@ export type StudyPlan = {
   reasons: PlanReason[];
 };
 
-/** Skill mapping from study plan to the existing lesson taxonomy. */
 export function lessonSkillOf(planSkill: string) {
   return planSkill === "speaking" ? "talking" : planSkill;
 }
@@ -206,7 +205,7 @@ function orderByNeed(goalSkills: readonly string[], needs: PlanSkillNeed[]): str
     .map((entry) => entry.skill);
 }
 
-/** Need weight per skill, mirroring the wording already used by the app. */
+/** Skill sequence: the focus area every other day, goal skills in between. */
 export function skillSequence(
   goal: string,
   focus: StudyFocus,
@@ -281,7 +280,6 @@ export function normalizeStudyDays(
   return [...(DEFAULT_STUDY_DAYS[daysPerWeek] ?? DEFAULT_STUDY_DAYS[3]!)];
 }
 
-/** Builds a deterministic study plan from existing profile and activity data. */
 export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
   const days = normalizeStudyDays(input.studyDays, input.daysPerWeek);
   const needs = input.needs ?? [];
@@ -314,9 +312,9 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
     const date = addDays(weekStart, WEEK_DAYS.indexOf(day as (typeof WEEK_DAYS)[number]));
     const fallback = FALLBACK_BY_SKILL[skill] ?? FALLBACK_BY_SKILL["reading"]!;
 
-    // One distinct practice event can complete one slot only, and only on or
-    // after its scheduled date. Later practice may catch up missed slots, but
-    // practice before a future slot must not complete it.
+    // One distinct practice event can complete one slot only, and only on
+    // or after that slot's scheduled date. Later practice may catch up missed
+    // slots, but practice before a future slot must not complete it.
     const matchedPractice = availablePractice.find(
       (event) => event.skill === skill && event.date >= date && !usedPractice.has(event),
     );
@@ -338,7 +336,8 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
 
     // Not done yet: a lesson never completed, else the practice area. A lesson
     // the student already finished is never planned again.
-    // A Reading day opens the daily reading, never a reading lesson.
+    // A Reading day opens the daily reading, never a reading lesson: lessons
+    // count for Grammar and Vocabulary only (user decision, 2026-10-17).
     const dbSkill = lessonSkillOf(skill);
     const lesson =
       skill === "reading"
@@ -364,6 +363,8 @@ export function buildStudyPlan(input: StudyPlanInput): StudyPlan {
   const todayIndex = items.findIndex((item) => item.status === "today");
   const nextUpcoming = items.findIndex((item) => item.status === "upcoming");
   const nextMissed = items.findIndex((item) => item.status === "missed");
+  // Today's day first; on a day off, catch up the earliest missed day; else the
+  // next planned day.
   const nextIndex =
     todayIndex >= 0
       ? todayIndex
