@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   countsAsLearningMinutes,
   qualifiesAsStudyDay,
+  weeklyFrequencyProgress,
   isTimestampToday,
   todayStudyMetrics,
   type StudyDayRows,
@@ -196,5 +197,45 @@ describe("qualifiesAsStudyDay (mirror of credit_study_day)", () => {
     expect(qualifiesAsStudyDay({ ...empty, conversation: true })).toBe(true);
     expect(qualifiesAsStudyDay({ ...empty, readingDone: true })).toBe(true);
     expect(qualifiesAsStudyDay({ ...empty, goalsDone: true })).toBe(true);
+  });
+});
+
+describe("Model A weekly frequency credit", () => {
+  it("counts every qualified study date, including dates outside the selected plan days", () => {
+    const result = weeklyFrequencyProgress(new Set(["2026-11-09", "2026-11-10", "2026-11-12"]), 4);
+    expect(result).toEqual({
+      validStudyDays: 3,
+      creditedStudyDays: 3,
+      progressPercent: 75,
+      goalReached: false,
+    });
+  });
+
+  it("caps weekly credit at the goal while preserving the full valid-day count", () => {
+    const result = weeklyFrequencyProgress(
+      new Set(["2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13"]),
+      3,
+    );
+    expect(result).toEqual({
+      validStudyDays: 5,
+      creditedStudyDays: 3,
+      progressPercent: 100,
+      goalReached: true,
+    });
+  });
+
+  it("does not award progress for a zero or negative target", () => {
+    expect(weeklyFrequencyProgress(new Set(["2026-11-09"]), 0)).toEqual({
+      validStudyDays: 1,
+      creditedStudyDays: 0,
+      progressPercent: 0,
+      goalReached: false,
+    });
+    expect(weeklyFrequencyProgress(new Set(["2026-11-09"]), -2)).toEqual({
+      validStudyDays: 1,
+      creditedStudyDays: 0,
+      progressPercent: 0,
+      goalReached: false,
+    });
   });
 });
