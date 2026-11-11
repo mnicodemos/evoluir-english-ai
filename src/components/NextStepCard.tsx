@@ -492,7 +492,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:font-normal">
                 {questDetail}
                 {challengeProgress}
-                {challengeRewardNote ? <span className="block whitespace-normal">{challengeRewardNote}</span> : null}
+                {challengeRewardNote ? (
+                  <span className="block whitespace-normal">{challengeRewardNote}</span>
+                ) : null}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,
@@ -512,7 +514,9 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
               <span className="w-full min-w-0 whitespace-nowrap text-left text-[9px] leading-tight text-sidebar-foreground/70 sm:font-normal">
                 {questDetail}
                 {challengeProgress}
-                {challengeRewardNote ? <span className="block whitespace-normal">{challengeRewardNote}</span> : null}
+                {challengeRewardNote ? (
+                  <span className="block whitespace-normal">{challengeRewardNote}</span>
+                ) : null}
               </span>
             </span>
             {/* The row is the button: an arrow on the right lights up on hover,
