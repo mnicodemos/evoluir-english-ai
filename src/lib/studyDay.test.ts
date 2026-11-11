@@ -224,6 +224,42 @@ describe("Model A weekly frequency credit", () => {
     });
   });
 
+
+  it.each([
+    [1, 0, 0, false],
+    [1, 1, 100, true],
+    [2, 1, 50, false],
+    [2, 3, 100, true],
+    [3, 2, 67, false],
+    [3, 5, 100, true],
+    [5, 3, 60, false],
+    [5, 7, 100, true],
+    [7, 4, 57, false],
+    [7, 7, 100, true],
+  ])(
+    "applies the Model A cap for a weekly target of %i days with %i qualified dates",
+    (goal, count, percent, reached) => {
+      const dates = Array.from({ length: count }, (_, index) =>
+        `2026-11-${String(index + 1).padStart(2, "0")}`,
+      );
+      const result = weeklyFrequencyProgress(new Set(dates), goal);
+      expect(result.validStudyDays).toBe(count);
+      expect(result.creditedStudyDays).toBe(Math.min(count, goal));
+      expect(result.progressPercent).toBe(percent);
+      expect(result.goalReached).toBe(reached);
+    },
+  );
+
+  it("deduplicates repeated qualified dates because input is a set of calendar days", () => {
+    const dates = new Set(["2026-11-09", "2026-11-09", "2026-11-10"]);
+    expect(weeklyFrequencyProgress(dates, 3)).toEqual({
+      validStudyDays: 2,
+      creditedStudyDays: 2,
+      progressPercent: 67,
+      goalReached: false,
+    });
+  });
+
   it("does not award progress for a zero or negative target", () => {
     expect(weeklyFrequencyProgress(new Set(["2026-11-09"]), 0)).toEqual({
       validStudyDays: 1,
