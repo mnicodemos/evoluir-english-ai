@@ -432,7 +432,9 @@ function ReadingWeek({
   t: (label: string) => string;
 }) {
   const doneCount = week.filter((entry) => entry.done).length;
-  const today = week[week.length - 1]?.day;
+  // The final item is not necessarily today: the week can include upcoming
+  // scheduled study days. Highlight only the actual São Paulo study date.
+  const today = studyToday();
   return (
     <section className="card-soft p-3 sm:p-4" aria-labelledby="reading-week-title">
       <h2 id="reading-week-title" className="text-xs font-semibold text-muted-foreground">
