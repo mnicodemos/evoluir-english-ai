@@ -369,7 +369,11 @@ export function A1WelcomeMixUp() {
             </p>
             <p className="text-sm font-semibold">{t("Choose your response")}</p>
             <div className="grid gap-2">
-              {getStableAdventureChoiceOrder("a1-welcome-mix-up", sceneIndex, scene.choices.length).map((choiceIndex) => {
+              {getStableAdventureChoiceOrder(
+                "a1-welcome-mix-up",
+                sceneIndex,
+                scene.choices.length,
+              ).map((choiceIndex) => {
                 const option = scene.choices[choiceIndex];
                 return (
                   <button
