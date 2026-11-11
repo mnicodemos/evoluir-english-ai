@@ -5,7 +5,7 @@ INSERT INTO public.profiles (id, streak_days) VALUES
   ('00000000-0000-0000-0000-000000000001', 0),
   ('00000000-0000-0000-0000-000000000002', 62),
   ('00000000-0000-0000-0000-000000000003', 125),
-  ('00000000-0000-0000-0000-000000000004', 126);
+  ('00000000-0000-0000-0000-000000000004', 125);
 
 -- Cross several thresholds in one trusted upward update.
 UPDATE public.profiles SET streak_days = 21
