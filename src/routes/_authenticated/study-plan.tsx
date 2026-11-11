@@ -275,8 +275,10 @@ function StudyPlanPage() {
                           })}
                         </div>
                         <p className="text-[11px] text-muted-foreground">
-                          {daysPerWeek} {daysPerWeek === 1 ? "day selected" : "days selected"} per week.
-                          Choose from 1 to 7 days.
+                          <span>
+                            {daysPerWeek} {daysPerWeek === 1 ? "day selected" : "days selected"} per week.
+                          </span>{" "}
+                          <span>Choose from 1 to 7 days.</span>
                         </p>
                       </div>
                     </div>
