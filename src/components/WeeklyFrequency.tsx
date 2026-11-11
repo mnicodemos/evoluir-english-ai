@@ -1,5 +1,4 @@
 import { Activity, CalendarDays, Check, Trophy } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
@@ -8,8 +7,9 @@ import { GaugeRing } from "@/components/GaugeRing";
 import { useCelebrate } from "@/hooks/useCelebrate";
 import { useQualifiedStudyDays } from "@/hooks/useQualifiedStudyDays";
 import { STUDY_TIME_ZONE } from "@/lib/today";
+import { normalizeStudyDays } from "@/lib/studyPlan";
 import { useUiLang } from "@/lib/uiLang";
-import { supabase } from "@/integrations/supabase/client";
+import { useStudyWeekdays } from "@/hooks/useStudyWeekdays";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
@@ -35,29 +35,7 @@ export function WeeklyFrequency({
   compact = false,
   presentation = "default",
 }: Props) {
-  const { data: savedWeekdays } = useQuery({
-    queryKey: ["study-weekdays", userId],
-    enabled: !!userId,
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("study_days")
-        .eq("id", userId)
-        .maybeSingle();
-      if (error) throw error;
-      return (data?.study_days as string[] | null) ?? null;
-    },
-  });
-  const selectedWeekdays = savedWeekdays?.length
-    ? savedWeekdays
-    : daysPerWeek === 2
-      ? ["Tuesday", "Thursday"]
-      : daysPerWeek === 5
-        ? ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-        : daysPerWeek === 7
-          ? ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-          : ["Monday", "Wednesday", "Friday"];
+  const { data: selectedWeekdays = normalizeStudyDays(null, daysPerWeek) } = useStudyWeekdays(userId, daysPerWeek);
   const weeklyGoal = selectedWeekdays.length;
   const { lang } = useUiLang();
   const labels = lang === "pt" ? LABELS_PT : LABELS_EN;
