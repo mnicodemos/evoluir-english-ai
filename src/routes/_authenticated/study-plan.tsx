@@ -110,8 +110,21 @@ function StudyPlanPage() {
       ]);
       toast.success("Study plan updated");
     },
-    onError: (error: unknown) =>
-      toast.error(error instanceof Error ? error.message : "Could not save your plan"),
+    onError: (error: unknown) => {
+      // Supabase/PostgREST errors are plain objects, not necessarily Error
+      // instances. Preserve the database message so schema/RLS failures are
+      // diagnosable instead of collapsing every failure into a generic toast.
+      const message =
+        error instanceof Error
+          ? error.message
+          : error &&
+              typeof error === "object" &&
+              "message" in error &&
+              typeof error.message === "string"
+            ? error.message
+            : "Could not save your plan";
+      toast.error(message);
+    },
   });
 
   const plan = data?.plan;
