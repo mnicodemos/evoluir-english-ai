@@ -37,7 +37,7 @@ describe("daily challenge goal", () => {
     expect(practiceXpLabel("/reading")).toBe("+20 XP");
     expect(practiceXpLabel("/learning/$lessonId")).toBe("+50 XP");
     expect(practiceXpLabel("/learning/videos")).toBe("+5 XP");
-    expect(practiceXpLabel("/teacher")).toBeNull();
+    expect(practiceXpLabel("/teacher")).toBe("+5 XP");
   });
 });
 
