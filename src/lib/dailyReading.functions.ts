@@ -208,7 +208,11 @@ export const loadReadingWeek = createServerFn({ method: "GET" })
     const today = studyToday();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: profile }, { data: rows }] = await Promise.all([
-      supabaseAdmin.from("profiles").select("level, study_days").eq("id", context.userId).maybeSingle(),
+      supabaseAdmin
+        .from("profiles")
+        .select("level, study_days")
+        .eq("id", context.userId)
+        .maybeSingle(),
       supabaseAdmin
         .from("activities")
         .select("score, result, created_at")
