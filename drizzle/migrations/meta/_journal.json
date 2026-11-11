@@ -610,6 +610,13 @@
       "when": 1794350691190,
       "tag": "0086_reassert_extra_video_quick_win_xp",
       "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1794402397507,
+      "tag": "0116_repair_bronze_jewel_awards",
+      "breakpoints": true
     }
   ]
 }
