@@ -62,7 +62,6 @@ import { loadStudyPlan } from "@/lib/studyPlan.functions";
 import { useHomeImages } from "@/hooks/useHomeImages";
 
 import { SKILL_QUEST_ACTION_TEXT } from "@/lib/pedagogy/skillQuest";
-
 import { findLevel } from "@/lib/level";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
