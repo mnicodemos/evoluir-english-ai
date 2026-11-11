@@ -179,9 +179,15 @@ export function WeeklyFrequency({
               aria-label={
                 isPlanned
                   ? studied
-                    ? lang === "pt" ? "Dia planejado concluído" : "Planned day completed"
-                    : lang === "pt" ? "Dia previsto no plano" : "Planned study day"
-                  : lang === "pt" ? "Fora do plano de estudos" : "Not in study plan"
+                    ? lang === "pt"
+                      ? "Dia planejado concluído"
+                      : "Planned day completed"
+                    : lang === "pt"
+                      ? "Dia previsto no plano"
+                      : "Planned study day"
+                  : lang === "pt"
+                    ? "Fora do plano de estudos"
+                    : "Not in study plan"
               }
             >
               <span
@@ -212,7 +218,10 @@ export function WeeklyFrequency({
                   )}
                 />
               ) : (
-                <span className="size-5 rounded-full bg-muted-foreground/10 opacity-35" aria-hidden="true" />
+                <span
+                  className="size-5 rounded-full bg-muted-foreground/10 opacity-35"
+                  aria-hidden="true"
+                />
               )}
             </div>
           );
@@ -420,9 +429,7 @@ export function WeeklyFrequency({
                   <span
                     className={cn(
                       "size-5 rounded-full border border-dashed",
-                      isToday
-                        ? "border-brand-green bg-brand-green/15"
-                        : "border-muted-foreground",
+                      isToday ? "border-brand-green bg-brand-green/15" : "border-muted-foreground",
                     )}
                   />
                 ) : (
