@@ -217,11 +217,7 @@ describe("readingPlanDays", () => {
   });
 
   it("keeps the legacy three-day rhythm when no selection exists", () => {
-    expect(readingPlanDays("2026-11-11", null)).toEqual([
-      "2026-11-09",
-      "2026-11-11",
-      "2026-11-13",
-    ]);
+    expect(readingPlanDays("2026-11-11", null)).toEqual(["2026-11-09", "2026-11-11", "2026-11-13"]);
   });
 });
 
