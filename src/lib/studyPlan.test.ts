@@ -31,7 +31,9 @@ function input(overrides: Partial<StudyPlanInput> = {}): StudyPlanInput {
 describe("custom study weekdays", () => {
   it("uses any explicitly selected weekdays in Monday-first order", () => {
     expect(normalizeStudyDays(["Saturday", "Monday", "Thursday"], 3)).toEqual([
-      "Monday", "Thursday", "Saturday",
+      "Monday",
+      "Thursday",
+      "Saturday",
     ]);
   });
 
