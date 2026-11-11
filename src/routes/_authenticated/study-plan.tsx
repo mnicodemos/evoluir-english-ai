@@ -258,10 +258,16 @@ function StudyPlanPage() {
                                 aria-pressed={selected}
                                 onClick={() =>
                                   setStudyDays((current) =>
-                                    selected ? current.filter((item) => item !== day) : [...current, day],
+                                    selected
+                                      ? current.filter((item) => item !== day)
+                                      : [...current, day],
                                   )
                                 }
-                                className={`h-8 rounded-lg border px-2 text-xs font-medium transition-colors sm:h-9 ${selected ? "border-transparent bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+                                className={`h-8 rounded-lg border px-2 text-xs font-medium transition-colors sm:h-9 ${
+                                  selected
+                                    ? "border-transparent bg-primary text-primary-foreground"
+                                    : "border-border hover:bg-secondary"
+                                }`}
                               >
                                 {labels[index]}
                               </button>
