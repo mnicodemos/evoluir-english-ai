@@ -9,6 +9,7 @@ import { STUDY_TIME_ZONE, studyToday } from "@/lib/today";
 import { weekStartNeeds } from "./studyPlanNeeds";
 import {
   buildStudyPlan,
+  normalizeStudyDays,
   type PlanLesson,
   type PlanPractice,
   type PlanSkillNeed,
@@ -31,6 +32,7 @@ export type StudyPlanResult = {
     goal: string;
     dailyMinutes: number;
     daysPerWeek: number;
+    studyDays: string[];
     focus: StudyFocus;
     level: string | null;
   };
@@ -47,14 +49,15 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
 
   const { data: profile } = await supabaseAdmin
     .from("profiles")
-    .select("level, goal, daily_minutes, study_focus, study_days_per_week")
+    .select("level, goal, daily_minutes, study_focus, study_days_per_week, study_days")
     .eq("id", userId)
     .maybeSingle();
 
   const level = profile?.level ?? null;
   const goal = profile?.goal ?? "conversation";
   const dailyMinutes = profile?.daily_minutes ?? 30;
-  const daysPerWeek = profile?.study_days_per_week ?? 3;
+  const studyDays = normalizeStudyDays(profile?.study_days as string[] | null, profile?.study_days_per_week ?? 3);
+  const daysPerWeek = studyDays.length;
   const focus = (profile?.study_focus ?? "balanced") as StudyFocus;
 
   // Shared lessons and the student's own path lessons only (never another
@@ -186,11 +189,12 @@ export async function loadStudyPlanFor(userId: string): Promise<StudyPlanResult>
 
   return {
     configured: profile?.study_focus != null && profile?.study_days_per_week != null,
-    preferences: { goal, dailyMinutes, daysPerWeek, focus, level },
+    preferences: { goal, dailyMinutes, daysPerWeek, studyDays, focus, level },
     plan: buildStudyPlan({
       goal,
       dailyMinutes,
       daysPerWeek,
+      studyDays,
       focus,
       level,
       lessons,
