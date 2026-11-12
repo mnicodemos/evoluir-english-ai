@@ -247,10 +247,8 @@ describe("quick win", () => {
       skill: "grammar",
       activity: { to: "/mistakes" },
     });
-    // When the quick practice would land on the main screen, the smart review steps in.
-    expect(buildNextStep({ ...base, skills: [skill("listening", 30)] }).quickWin).toMatchObject({
-      activity: { to: "/learning/review" },
-    });
+    // Listening recommendations belong in Keep Improving, not the Quick Win slot.
+    expect(buildNextStep({ ...base, skills: [skill("listening", 30)] }).quickWin).toBeNull();
   });
 
   it("keeps a selected grammar lesson for Practice now; Reading always opens the daily reading", () => {

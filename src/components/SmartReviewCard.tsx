@@ -277,20 +277,20 @@ export function SmartReviewCard({
             >
               <img src={reviewWords} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
-                <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
+                <RowTag kind="review" label={t("To review")} detail={t("Flashcards")} />
                 <p className="truncate text-sm font-semibold">
                   {wordReview.total === 1
-                    ? t("Review 1 word")
-                    : t("Review {n} words").replace("{n}", String(wordReview.total))}
+                    ? t("Review 1 flashcard")
+                    : t("Review {n} flashcards").replace("{n}", String(wordReview.total))}
                 </p>
                 <p
                   className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
                 >
-                  {t("Their review date has arrived: a quick review keeps them in memory.")}
+                  {t("Revisit your lesson cards to strengthen what you have learned.")}
                 </p>
               </div>
               <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
-                <Link to={wordReview.to} aria-label={`${t("Review now")}: ${t("Vocabulary")}`}>
+                <Link to={wordReview.to} aria-label={`${t("Review now")}: ${t("Flashcards")}`}>
                   <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
               </Button>
