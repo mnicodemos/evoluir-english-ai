@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
-import { isFlashcardDue, lessonStarted } from "@/lib/flashcards";
+import { isFlashcardDue, isFlashcardReviewed, lessonStarted } from "@/lib/flashcards";
 import { studyToday } from "@/lib/today";
 
 /**
@@ -22,7 +22,7 @@ export function useFlashcardsDue(userId?: string, options: { reviewedOnly?: bool
         supabase.from("flashcards").select("id, lesson_id"),
         supabase
           .from("user_flashcards")
-          .select("flashcard_id, next_review_date")
+          .select("flashcard_id, next_review_date, times_reviewed")
           .eq("user_id", userId!),
         supabase
           .from("user_lessons")
@@ -41,7 +41,7 @@ export function useFlashcardsDue(userId?: string, options: { reviewedOnly?: bool
       const today = studyToday();
       return (cards.data ?? []).filter((card) => {
         const state = byCard.get(card.id);
-        if (options.reviewedOnly && !state) return false;
+        if (options.reviewedOnly && !isFlashcardReviewed(state)) return false;
         return isFlashcardDue(card, state, started, today);
       }).length;
     },

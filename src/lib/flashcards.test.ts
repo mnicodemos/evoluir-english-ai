@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { isFlashcardDue, lessonStarted, reversedCard, sessionCardState } from "./flashcards";
+import {
+  isFlashcardDue,
+  isFlashcardReviewed,
+  lessonStarted,
+  reversedCard,
+  sessionCardState,
+} from "./flashcards";
 
 const card = { card_type: "word", translation: "casa" };
 
@@ -90,5 +96,17 @@ describe("sessionCardState (session ends at 10/10, the Again queue keeps showing
     const state = sessionCardState(cards, { index: 0, done: false }, []);
     expect(state.card?.id).toBe("c1");
     expect(state.inMainDeck).toBe(true);
+  });
+});
+
+describe("isFlashcardReviewed (new cards are not due reviews)", () => {
+  it("excludes missing and zero-review states", () => {
+    expect(isFlashcardReviewed(undefined)).toBe(false);
+    expect(isFlashcardReviewed({ times_reviewed: 0 })).toBe(false);
+    expect(isFlashcardReviewed({ times_reviewed: null })).toBe(false);
+  });
+  it("includes only cards the student has actually rated", () => {
+    expect(isFlashcardReviewed({ times_reviewed: 1 })).toBe(true);
+    expect(isFlashcardReviewed({ times_reviewed: 3 })).toBe(true);
   });
 });
