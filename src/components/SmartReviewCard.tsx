@@ -32,7 +32,6 @@ import { useActivityIndicators } from "@/hooks/useActivityIndicators";
 import { useDailyReadingDone } from "@/hooks/useDailyReadingDone";
 import { useDueReviewState } from "@/hooks/useDueReviewCount";
 import { useFlashcardsDue } from "@/hooks/useFlashcardsDue";
-import { wordReviewTarget } from "@/lib/wordReview";
 import { ACTIVITY_CHART_COLORS } from "@/lib/activityChartColors";
 import { useProfile } from "@/hooks/useProfile";
 import { dashboardActionAvailable } from "@/lib/activityIndicators";
