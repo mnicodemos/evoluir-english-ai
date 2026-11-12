@@ -19,7 +19,7 @@ import {
   Volume2,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/PageHeader";
@@ -37,6 +37,7 @@ import {
   READING_STYLE_LABELS,
   READING_STYLES,
   readingChoiceKey,
+  readingOptionOrders,
   readingEstimate,
   readingKindLabel,
   readingLevel,
@@ -664,6 +665,7 @@ function ReadingPage() {
       .getElementById(`reading-paragraph-${paragraph}`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
+  const optionOrders = useMemo(() => reading ? readingOptionOrders(reading.questions) : [], [reading]);
   const [chosen, setChosen] = useState<(number | null)[]>([]);
   const [checked, setChecked] = useState(false);
   // The question on screen: the five questions sit behind numbered tabs.
@@ -1119,19 +1121,20 @@ function ReadingPage() {
                         {qIndex + 1}. {question.question}
                       </p>
                       <div className="mt-2 grid gap-1.5">
-                        {question.options.map((option, oIndex) => {
-                          const picked = chosen[qIndex] === oIndex;
-                          const right = checked && oIndex === question.answer;
-                          const wrong = checked && picked && oIndex !== question.answer;
+                        {(optionOrders[qIndex] ?? question.options.map((_, index) => index)).map((originalIndex) => {
+                          const option = question.options[originalIndex]!;
+                          const picked = chosen[qIndex] === originalIndex;
+                          const right = checked && originalIndex === question.answer;
+                          const wrong = checked && picked && originalIndex !== question.answer;
                           return (
                             <button
-                              key={oIndex}
+                              key={originalIndex}
                               type="button"
                               disabled={checked}
                               aria-pressed={picked}
                               onClick={() => {
                                 const next = chosen.map((value, index) =>
-                                  index === qIndex ? oIndex : value,
+                                  index === qIndex ? originalIndex : value,
                                 );
                                 setChosen(next);
                                 // On to the next open question, so answering flows.
